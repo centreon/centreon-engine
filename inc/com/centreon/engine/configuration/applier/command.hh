@@ -39,10 +39,7 @@ namespace             configuration {
                       ~command() throw ();
       command&        operator=(command const& right);
       void            add_object(configuration::command const& obj);
-      void            expand_object(
-                        std::set<configuration::command>& expanded,
-                        configuration::command const& obj,
-                        configuration::state& s);
+      void            expand_objects(configuration::state& s);
       void            modify_object(
                         configuration::command const& obj);
       void            remove_object(

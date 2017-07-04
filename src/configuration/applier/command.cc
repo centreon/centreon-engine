@@ -97,18 +97,12 @@ void applier::command::add_object(configuration::command const& obj) {
  *  @brief Expand command.
  *
  *  Command configuration objects do not need expansion. Therefore this
- *  method only insert obj in expanded.
+ *  method does nothing.
  *
- *  @param[out] expanded  Output set.
- *  @param[in]  obj       Base object.
- *  @param[in]  s         Unused.
+ *  @param[in] s  Unused.
  */
-void applier::command::expand_object(
-                         std::set<configuration::command>& expanded,
-                         configuration::command const& obj,
-                         configuration::state& s) {
+void applier::command::expand_objects(configuration::state& s) {
   (void)s;
-  expanded.insert(obj);
   return ;
 }
 
