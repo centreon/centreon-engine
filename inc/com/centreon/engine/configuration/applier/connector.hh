@@ -39,10 +39,7 @@ namespace               configuration {
       connector&        operator=(connector const& right);
       void              add_object(
                           configuration::connector const& obj);
-      void              expand_object(
-                          std::set<configuration::connector>& expanded,
-                          configuration::connector const& obj,
-                          configuration::state& s);
+      void              expand_objects(configuration::state& s);
       void              modify_object(
                           configuration::connector const& obj);
       void              remove_object(

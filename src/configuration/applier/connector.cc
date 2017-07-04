@@ -103,16 +103,10 @@ void applier::connector::add_object(
  *  Connector configuration objects do not need expansion. Therefore
  *  this method only copy obj to expanded.
  *
- *  @param[out] expanded  Output set.
- *  @param[in]  obj       Base object.
- *  @param[in]  s         Unused.
+ *  @param[in] s  Unused.
  */
-void applier::connector::expand_object(
-                           std::set<configuration::connector>& expanded,
-                           configuration::connector const& obj,
-                           configuration::state& s) {
+void applier::connector::expand_objects(configuration::state& s) {
   (void)s;
-  expanded.insert(obj);
   return ;
 }
 
