@@ -1421,9 +1421,9 @@ void applier::state::_processing(
   _expand<configuration::contactgroup, applier::contactgroup>(
     new_cfg);
 
-  // // Expand hosts.
-  // _expand<configuration::host, applier::host>(
-  //   new_cfg);
+  // Expand hosts.
+  _expand<configuration::host, applier::host>(
+    new_cfg);
 
   // // Expand hostgroups.
   // _expand<configuration::hostgroup, applier::hostgroup>(
@@ -1489,9 +1489,9 @@ void applier::state::_processing(
 
   // Build difference for hosts.
   difference<set_host> diff_hosts;
-  // diff_hosts.parse(
-  //   config->hosts(),
-  //   new_cfg.hosts());
+  diff_hosts.parse(
+    config->hosts(),
+    new_cfg.hosts());
 
   // Build difference for hostgroups.
   difference<set_hostgroup> diff_hostgroups;
@@ -1607,9 +1607,9 @@ void applier::state::_processing(
     _resolve<configuration::contact, applier::contact>(
       config->contacts());
 
-    // // Apply hosts and hostgroups.
-    // _apply<configuration::host, applier::host>(
-    //   diff_hosts);
+    // Apply hosts and hostgroups.
+    _apply<configuration::host, applier::host>(
+      diff_hosts);
     // _apply<configuration::hostgroup, applier::hostgroup>(
     //   diff_hostgroups);
 
@@ -1619,9 +1619,9 @@ void applier::state::_processing(
     // _apply<configuration::servicegroup, applier::servicegroup>(
     //   diff_servicegroups);
 
-    // // Resolve hosts, services, host groups and service groups.
-    // _resolve<configuration::host, applier::host>(
-    //   config->hosts());
+    // Resolve hosts, services, host groups and service groups.
+    _resolve<configuration::host, applier::host>(
+      config->hosts());
     // _resolve<configuration::hostgroup, applier::hostgroup>(
     //   config->hostgroups());
     // _resolve<configuration::service, applier::service>(

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -37,7 +37,7 @@ namespace                  configuration {
   class                    hostextinfo;
 
   class                    host : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       up = (1 << 0),
@@ -115,7 +115,7 @@ namespace                  configuration {
     int                    get_acknowledgement_timeout() const throw ();
     bool                   set_acknowledgement_timeout(int value);
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(host&, char const*);
@@ -221,9 +221,9 @@ namespace                  configuration {
     std::string            _vrml_image;
   };
 
-  typedef shared_ptr<host>    host_ptr;
-  typedef std::list<host_ptr> list_host;
-  typedef std::set<host_ptr>  set_host;
+  typedef shared_ptr<host>  host_ptr;
+  typedef std::list<host>   list_host;
+  typedef std::set<host>    set_host;
 }
 
 CCE_END()
