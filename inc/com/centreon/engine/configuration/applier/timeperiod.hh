@@ -46,10 +46,7 @@ namespace         configuration {
                   ~timeperiod() throw ();
       timeperiod& operator=(timeperiod const& right);
       void        add_object(configuration::timeperiod const& obj);
-      void        expand_object(
-                    std::set<configuration::timeperiod>& expanded,
-                    configuration::timeperiod const& obj,
-                    configuration::state& s);
+      void        expand_objects(configuration::state& s);
       void        modify_object(configuration::timeperiod const& obj);
       void        remove_object(configuration::timeperiod const& obj);
       void        resolve_object(configuration::timeperiod const& obj);

@@ -95,18 +95,12 @@ void applier::timeperiod::add_object(
  *  @brief Expand time period.
  *
  *  Time period objects do not need expansion. Therefore this method
- *  only store obj in expanded.
+ *  does nothing.
  *
- *  @param[out] expanded  Output configuration set.
- *  @param[in]  obj       Base object.
- *  @param[in]  s         Unused.
+ *  @param[in] s  Unused.
  */
-void applier::timeperiod::expand_object(
-                            std::set<configuration::timeperiod>& expanded,
-                            configuration::timeperiod const& obj,
-                            configuration::state& s) {
+void applier::timeperiod::expand_objects(configuration::state& s) {
   (void)s;
-  expanded.insert(obj);
   return ;
 }
 
