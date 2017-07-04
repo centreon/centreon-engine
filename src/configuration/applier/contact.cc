@@ -202,44 +202,40 @@ void applier::contact::add_object(configuration::contact const& obj) {
  *  During expansion, the contact will be added to its contact groups.
  *  These will be modified in the state.
  *
- *  @param[out]     expanded  Expanded objects.
- *  @param[in]      obj       Contact to expand.
- *  @param[in,out]  s         Configuration state.
+ *  @param[in,out] s  Configuration state.
  */
-void applier::contact::expand_object(
-                         std::set<configuration::contact>& expanded,
-                         configuration::contact const& obj,
-                         configuration::state& s) {
-  // Expanded object.
-  expanded.insert(obj);
+void applier::contact::expand_objects(configuration::state& s) {
+  // Browse all contacts.
+  for (configuration::set_contact::iterator
+         it_contact(s.contacts().begin()),
+         end_contact(s.contacts().end());
+       it_contact != end_contact;
+       ++it_contact)
+    // Browse current contact's groups.
+    for (list_string::const_iterator
+           it_group(it_contact->contactgroups().begin()),
+           end_group(it_contact->contactgroups().end());
+         it_group != end_group;
+         ++it_group) {
+      // Find contact group.
+      configuration::set_contactgroup::iterator
+        group(s.contactgroups_find(*it_group));
+      if (group == s.contactgroups().end())
+        throw (engine_error() << "Could not add contact '"
+               << it_contact->contact_name()
+               << "' to non-existing contact group '" << *it_group
+               << "'");
 
-  // Browse contact groups.
-  for (list_string::const_iterator
-         it(obj.contactgroups().begin()),
-         end(obj.contactgroups().end());
-       it != end;
-       ++it) {
-    // Find contact group.
-    std::set<shared_ptr<configuration::contactgroup> >::iterator
-      it_group(std::find_if(
-                      s.contactgroups().begin(),
-                      s.contactgroups().end(),
-                      contactgroup_name_comparator(*it)));
-    if (it_group == s.contactgroups().end())
-      throw (engine_error() << "Could not add contact '"
-             << obj.contact_name()
-             << "' to non-existing contact group '" << *it << "'");
+      // Remove contact group from state.
+      configuration::contactgroup backup(*group);
+      s.contactgroups().erase(group);
 
-    // Remove contact group from state.
-    shared_ptr<configuration::contactgroup> backup(*it_group);
-    s.contactgroups().erase(it_group);
+      // Add contact to group members.
+      backup.members().push_back(it_contact->contact_name());
 
-    // Add contact to group members.
-    backup->members().push_back(obj.contact_name());
-
-    // Reinsert contact group.
-    s.contactgroups().insert(backup);
-  }
+      // Reinsert contact group.
+      s.contactgroups().insert(backup);
+    }
 
   return ;
 }

@@ -38,10 +38,7 @@ namespace             configuration {
                       ~contact() throw ();
       contact&        operator=(contact const& right);
       void            add_object(configuration::contact const& obj);
-      void            expand_object(
-                        std::set<configuration::contact>& expanded,
-                        configuration::contact const& obj,
-                        configuration::state& s);
+      void            expand_objects(configuration::state& s);
       void            modify_object(configuration::contact const& obj);
       void            remove_object(configuration::contact const& obj);
       void            resolve_object(configuration::contact const& obj);
