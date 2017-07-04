@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -40,8 +40,7 @@ contactgroup::setters const contactgroup::_setters[] = {
  */
 contactgroup::contactgroup(key_type const& key)
   : object(object::contactgroup),
-    _contactgroup_name(key),
-    _resolved(false) {}
+    _contactgroup_name(key) {}
 
 /**
  *  Copy constructor.
@@ -72,8 +71,6 @@ contactgroup& contactgroup::operator=(contactgroup const& right) {
     _contactgroup_members = right._contactgroup_members;
     _contactgroup_name = right._contactgroup_name;
     _members = right._members;
-    _resolved = right._resolved;
-    _resolved_members = right._resolved_members;
   }
   return (*this);
 }
@@ -90,9 +87,7 @@ bool contactgroup::operator==(contactgroup const& right) const throw () {
           && _alias == right._alias
           && _contactgroup_members == right._contactgroup_members
           && _contactgroup_name == right._contactgroup_name
-          && _members == right._members
-          && _resolved == right._resolved
-          && _resolved_members == right._resolved_members);
+          && _members == right._members);
 }
 
 /**
@@ -120,11 +115,7 @@ bool contactgroup::operator<(contactgroup const& right) const throw () {
     return (_alias < right._alias);
   else if (_contactgroup_members != right._contactgroup_members)
     return (_contactgroup_members < right._contactgroup_members);
-  else if (_members != right._members)
-    return (_members < right._members);
-  else if (_resolved != right._resolved)
-    return (_resolved < right._resolved);
-  return (_resolved_members < right._resolved_members);
+  return (_members < right._members);
 }
 
 /**
@@ -196,6 +187,15 @@ std::string const& contactgroup::alias() const throw () {
  *
  *  @return The contactgroup_members.
  */
+list_string& contactgroup::contactgroup_members() throw () {
+  return (*_contactgroup_members);
+}
+
+/**
+ *  Get contactgroup_members.
+ *
+ *  @return The contactgroup_members.
+ */
 list_string const& contactgroup::contactgroup_members() const throw () {
   return (*_contactgroup_members);
 }
@@ -225,35 +225,6 @@ list_string& contactgroup::members() throw () {
  */
 list_string const& contactgroup::members() const throw () {
   return (*_members);
-}
-
-/**
- *  Check if contactgroup was resolved.
- *
- *  @return True if contactgroup was resolved, false otherwise.
- */
-bool contactgroup::is_resolved() const throw () {
-  return (_resolved);
-}
-
-/**
- *  Get resolved members.
- *
- *  @return Modified list of members.
- */
-set_string& contactgroup::resolved_members() const throw () {
-  return (_resolved_members);
-}
-
-/**
- *  Set whether or not contactgroup has been resolved.
- *
- *  @param[in] resolved True if contactgroup has been resolved, false
- *                      otherwise.
- */
-void contactgroup::set_resolved(bool resolved) const throw () {
-  _resolved = resolved;
-  return ;
 }
 
 /**

@@ -615,7 +615,7 @@ bool state::operator==(state const& right) const throw () {
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
           && _connectors == right._connectors
-          && cmp_set_ptr(_contactgroups, right._contactgroups)
+          && _contactgroups == right._contactgroups
           && _contacts == right._contacts
           && _date_format == right._date_format
           && _debug_file == right._debug_file
@@ -1400,14 +1400,13 @@ set_contact::iterator state::contacts_find(
  */
 set_contactgroup::const_iterator state::contactgroups_find(
                                 contactgroup::key_type const& k) const {
-  shared_ptr<configuration::contactgroup>
-    below_searched(new configuration::contactgroup(k));
+  configuration::contactgroup below_searched(k);
   set_contactgroup::const_iterator
     it(_contactgroups.upper_bound(below_searched));
-  if ((it != _contactgroups.end()) && ((*it)->contactgroup_name() == k))
+  if ((it != _contactgroups.end()) && (it->contactgroup_name() == k))
     return (it);
   else if ((it != _contactgroups.begin())
-           && ((*--it)->contactgroup_name() == k))
+           && ((--it)->contactgroup_name() == k))
     return (it);
   return (_contactgroups.end());
 }
@@ -1422,13 +1421,13 @@ set_contactgroup::const_iterator state::contactgroups_find(
  */
 set_contactgroup::iterator state::contactgroups_find(
                                  contactgroup::key_type const& k) {
-  shared_ptr<configuration::contactgroup>
-    below_searched(new configuration::contactgroup(k));
-  set_contactgroup::iterator it(_contactgroups.upper_bound(below_searched));
-  if ((it != _contactgroups.end()) && ((*it)->contactgroup_name() == k))
+  configuration::contactgroup below_searched(k);
+  set_contactgroup::iterator
+    it(_contactgroups.upper_bound(below_searched));
+  if ((it != _contactgroups.end()) && (it->contactgroup_name() == k))
     return (it);
   else if ((it != _contactgroups.begin())
-           && ((*--it)->contactgroup_name() == k))
+           && ((--it)->contactgroup_name() == k))
     return (it);
   return (_contactgroups.end());
 }
@@ -1438,7 +1437,7 @@ set_contactgroup::iterator state::contactgroups_find(
  *
  *  @return All engine contactgroups.
  */
-set_contactgroup const& state::contactgroups() const throw () {
+set_contactgroup& state::contactgroups() throw () {
   return (_contactgroups);
 }
 
@@ -1447,7 +1446,7 @@ set_contactgroup const& state::contactgroups() const throw () {
  *
  *  @return All engine contactgroups.
  */
-set_contactgroup& state::contactgroups() throw () {
+set_contactgroup const& state::contactgroups() const throw () {
   return (_contactgroups);
 }
 

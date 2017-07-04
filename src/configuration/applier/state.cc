@@ -1417,9 +1417,9 @@ void applier::state::_processing(
   _expand<configuration::contact, applier::contact>(
     new_cfg);
 
-  // // Expand contactgroups.
-  // _expand<configuration::contactgroup, applier::contactgroup>(
-  //   new_cfg);
+  // Expand contactgroups.
+  _expand<configuration::contactgroup, applier::contactgroup>(
+    new_cfg);
 
   // // Expand hosts.
   // _expand<configuration::host, applier::host>(
@@ -1483,9 +1483,9 @@ void applier::state::_processing(
 
   // Build difference for contactgroups.
   difference<set_contactgroup> diff_contactgroups;
-  // diff_contactgroups.parse(
-  //   config->contactgroups(),
-  //   new_cfg.contactgroups());
+  diff_contactgroups.parse(
+    config->contactgroups(),
+    new_cfg.contactgroups());
 
   // Build difference for hosts.
   difference<set_host> diff_hosts;
@@ -1600,10 +1600,10 @@ void applier::state::_processing(
     // Apply contacts and contactgroups.
     _apply<configuration::contact, applier::contact>(
       diff_contacts);
-    // _apply<configuration::contactgroup, applier::contactgroup>(
-    //   diff_contactgroups);
-    // _resolve<configuration::contactgroup, applier::contactgroup>(
-    //   config->contactgroups());
+    _apply<configuration::contactgroup, applier::contactgroup>(
+      diff_contactgroups);
+    _resolve<configuration::contactgroup, applier::contactgroup>(
+      config->contactgroups());
     _resolve<configuration::contact, applier::contact>(
       config->contacts());
 

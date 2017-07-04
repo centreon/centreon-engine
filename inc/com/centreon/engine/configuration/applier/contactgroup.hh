@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,39 +20,41 @@
 #ifndef CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
 
+#  include <map>
+#  include "com/centreon/engine/configuration/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
 namespace           configuration {
   // Forward declarations.
-  class             contactgroup;
   class             state;
 
   namespace         applier {
     class           contactgroup {
-    public:
+     public:
                     contactgroup();
                     contactgroup(contactgroup const& right);
                     ~contactgroup() throw ();
       contactgroup& operator=(contactgroup const& right);
       void          add_object(
-                      shared_ptr<configuration::contactgroup> obj);
-      void          expand_object(
-                      shared_ptr<configuration::contactgroup> obj,
-                      configuration::state& s);
+                      configuration::contactgroup const& obj);
+      void          expand_objects(configuration::state& s);
       void          modify_object(
-                      shared_ptr<configuration::contactgroup> obj);
+                      configuration::contactgroup const& obj);
       void          remove_object(
-                      shared_ptr<configuration::contactgroup> obj);
+                      configuration::contactgroup const& obj);
       void          resolve_object(
-                      shared_ptr<configuration::contactgroup> obj);
+                      configuration::contactgroup const& obj);
 
-    private:
+     private:
+      typedef std::map<configuration::contactgroup::key_type, configuration::contactgroup> resolved_set;
+
       void          _resolve_members(
-                       shared_ptr<configuration::contactgroup> obj,
-                       configuration::state& s);
+                      configuration::state& s,
+                      configuration::contactgroup const& obj);
+
+      resolved_set  _resolved;
     };
   }
 }

@@ -86,10 +86,10 @@ void parser::parse(std::string const& path, state& config) {
   _apply_serviceextinfo();
 
   // Fill state.
-  // _insert(_map_objects[object::command], config.commands());
+  _insert(_map_objects[object::command], config.commands());
   _insert(_map_objects[object::connector], config.connectors());
-  // _insert(_map_objects[object::contact], config.contacts());
-  // _insert(_map_objects[object::contactgroup], config.contactgroups());
+  _insert(_map_objects[object::contact], config.contacts());
+  _insert(_map_objects[object::contactgroup], config.contactgroups());
   // _insert(_lst_objects[object::hostdependency], config.hostdependencies());
   // _insert(_lst_objects[object::hostescalation], config.hostescalations());
   // _insert(_map_objects[object::hostgroup], config.hostgroups());
