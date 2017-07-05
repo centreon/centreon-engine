@@ -435,13 +435,12 @@ void applier::servicedependency::_expand_services(
              << *it << "'");
 
     // Add service group members.
-    // XXX
-    // for (std::set<std::pair<std::string, std::string> >::const_iterator
-    //        it_member(it_group->members().begin()),
-    //        end_member(it_group->members().end());
-    //      it_member != end_member;
-    //      ++it_member)
-    //   expanded.insert(*it_member);
+    for (set_pair_string::const_iterator
+           it_member(it_group->members().begin()),
+           end_member(it_group->members().end());
+         it_member != end_member;
+         ++it_member)
+      expanded.insert(*it_member);
   }
 
   return ;
