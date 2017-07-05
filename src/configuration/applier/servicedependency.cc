@@ -179,83 +179,93 @@ void applier::servicedependency::add_object(
  *  @param[in,out] s  Configuration being applied.
  */
 void applier::servicedependency::expand_objects(configuration::state& s) {
-  // Check service dependency.
-  if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
-      || (obj->service_description().size() != 1)
-      || !obj->servicegroups().empty()
-      || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty()
-      || (obj->dependent_service_description().size() != 1)
-      || !obj->dependent_servicegroups().empty()
-      || (obj->dependency_type()
-          == configuration::servicedependency::unknown_type)) {
-    // Expand depended services.
-    std::set<std::pair<std::string, std::string> >
-      depended_services;
-    _expand_services(
-      obj->hosts(),
-      obj->hostgroups(),
-      obj->service_description(),
-      obj->servicegroups(),
-      s,
-      depended_services);
+  // Browse all dependencies.
+  configuration::set_servicedependency expanded;
+  for (configuration::set_servicedependency::const_iterator
+         it_dep(s.servicedependencies().begin()),
+         end_dep(s.servicedependencies().end());
+       it_dep != end_dep;
+       ++it_dep) {
+    // Expand service dependency instances.
+    if ((it_dep->hosts().size() != 1)
+        || !it_dep->hostgroups().empty()
+        || (it_dep->service_description().size() != 1)
+        || !it_dep->servicegroups().empty()
+        || (it_dep->dependent_hosts().size() != 1)
+        || !it_dep->dependent_hostgroups().empty()
+        || (it_dep->dependent_service_description().size() != 1)
+        || !it_dep->dependent_servicegroups().empty()
+        || (it_dep->dependency_type()
+            == configuration::servicedependency::unknown_type)) {
+      // Expand depended services.
+      std::set<std::pair<std::string, std::string> >
+        depended_services;
+      _expand_services(
+        it_dep->hosts(),
+        it_dep->hostgroups(),
+        it_dep->service_description(),
+        it_dep->servicegroups(),
+        s,
+        depended_services);
 
-    // Expand dependent services.
-    std::set<std::pair<std::string, std::string> >
-      dependent_services;
-    _expand_services(
-      obj->dependent_hosts(),
-      obj->dependent_hostgroups(),
-      obj->dependent_service_description(),
-      obj->dependent_servicegroups(),
-      s,
-      dependent_services);
+      // Expand dependent services.
+      std::set<std::pair<std::string, std::string> >
+        dependent_services;
+      _expand_services(
+        it_dep->dependent_hosts(),
+        it_dep->dependent_hostgroups(),
+        it_dep->dependent_service_description(),
+        it_dep->dependent_servicegroups(),
+        s,
+        dependent_services);
 
-    // Remove current service dependency.
-    s.servicedependencies().erase(obj);
-
-    // Browse all depended and dependent services.
-    for (std::set<std::pair<std::string, std::string> >::const_iterator
-           it1(depended_services.begin()),
-           end1(depended_services.end());
-         it1 != end1;
-         ++it1)
+      // Browse all depended and dependent services.
       for (std::set<std::pair<std::string, std::string> >::const_iterator
-             it2(dependent_services.begin()),
-             end2(dependent_services.end());
-           it2 != end2;
-           ++it2)
-        for (unsigned int i(0); i < 2; ++i) {
-          // Create service dependency instance.
-          shared_ptr<configuration::servicedependency>
-            sdep(new configuration::servicedependency(*obj));
-          sdep->hostgroups().clear();
-          sdep->hosts().clear();
-          sdep->hosts().push_back(it1->first);
-          sdep->servicegroups().clear();
-          sdep->service_description().clear();
-          sdep->service_description().push_back(it1->second);
-          sdep->dependent_hostgroups().clear();
-          sdep->dependent_hosts().clear();
-          sdep->dependent_hosts().push_back(it2->first);
-          sdep->dependent_servicegroups().clear();
-          sdep->dependent_service_description().clear();
-          sdep->dependent_service_description().push_back(it2->second);
-          sdep->dependency_type(
-            !i
-            ? configuration::servicedependency::execution_dependency
-            : configuration::servicedependency::notification_dependency);
-          if (i)
-            sdep->execution_failure_options(0);
-          else
-            sdep->notification_failure_options(0);
+             it1(depended_services.begin()),
+             end1(depended_services.end());
+           it1 != end1;
+           ++it1)
+        for (std::set<std::pair<std::string, std::string> >::const_iterator
+               it2(dependent_services.begin()),
+               end2(dependent_services.end());
+             it2 != end2;
+             ++it2)
+          for (unsigned int i(0); i < 2; ++i) {
+            // Create service dependency instance.
+            configuration::servicedependency sdep(*it_dep);
+            sdep.hostgroups().clear();
+            sdep.hosts().clear();
+            sdep.hosts().push_back(it1->first);
+            sdep.servicegroups().clear();
+            sdep.service_description().clear();
+            sdep.service_description().push_back(it1->second);
+            sdep.dependent_hostgroups().clear();
+            sdep.dependent_hosts().clear();
+            sdep.dependent_hosts().push_back(it2->first);
+            sdep.dependent_servicegroups().clear();
+            sdep.dependent_service_description().clear();
+            sdep.dependent_service_description().push_back(it2->second);
+            sdep.dependency_type(
+              !i
+              ? configuration::servicedependency::execution_dependency
+              : configuration::servicedependency::notification_dependency);
+            if (i)
+              sdep.execution_failure_options(0);
+            else
+              sdep.notification_failure_options(0);
 
-          // Insert new service dependency. We do not need to expand it
-          // because no expansion is made on 1->1 dependency.
-          s.servicedependencies().insert(sdep);
-        }
+            // Insert new service dependency. We do not need to expand it
+            // because no expansion is made on 1->1 dependency.
+            expanded.insert(sdep);
+          }
+    }
+    // Insert dependency if already good to go.
+    else
+      expanded.insert(*it_dep);
   }
+
+  // Set expanded service dependencies in configuration state.
+  s.servicedependencies().swap(expanded);
 
   return ;
 }
