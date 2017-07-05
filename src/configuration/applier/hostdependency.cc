@@ -220,6 +220,9 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
       expanded.insert(*it_dep);
   }
 
+  // Set expanded host dependencies in configuration state.
+  s.hostdependencies().swap(expanded);
+
   return ;
 }
 
