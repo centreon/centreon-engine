@@ -293,30 +293,6 @@ static std::string const               default_use_timezone("");
 static bool const                      default_use_true_regexp_matching(false);
 
 /**
- *  Compare sets with the pointer content.
- *
- *  @param[in] s1 The first set.
- *  @param[in] s2 The second set.
- *
- *  @return True on success, otherwise false.
- */
-template <typename T>
-static bool cmp_set_ptr(
-              std::set<shared_ptr<T> > const& s1,
-              std::set<shared_ptr<T> > const& s2) {
-  if (s1.size() != s2.size())
-    return (false);
-  typename std::set<shared_ptr<T> >::const_iterator
-    it1(s1.begin()),
-    end1(s1.end()),
-    it2(s2.begin());
-  while (it1 != end1)
-    if (**it1++ != **it2++)
-      return (false);
-  return (true);
-}
-
-/**
  *  Default constructor.
  */
 state::state()
@@ -636,10 +612,10 @@ bool state::operator==(state const& right) const throw () {
           && _global_service_event_handler == right._global_service_event_handler
           && _high_host_flap_threshold == right._high_host_flap_threshold
           && _high_service_flap_threshold == right._high_service_flap_threshold
-          && cmp_set_ptr(_hostdependencies, right._hostdependencies)
-          && cmp_set_ptr(_hostescalations, right._hostescalations)
-          && cmp_set_ptr(_hostgroups, right._hostgroups)
-          && cmp_set_ptr(_hosts, right._hosts)
+          && _hostdependencies == right._hostdependencies
+          && _hostescalations == right._hostescalations
+          && _hostgroups == right._hostgroups
+          && _hosts == right._hosts
           && _host_check_timeout == right._host_check_timeout
           && _host_freshness_check_interval == right._host_freshness_check_interval
           && _host_inter_check_delay_method == right._host_inter_check_delay_method
@@ -686,10 +662,10 @@ bool state::operator==(state const& right) const throw () {
           && _retain_state_information == right._retain_state_information
           && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
-          && cmp_set_ptr(_servicedependencies, right._servicedependencies)
-          && cmp_set_ptr(_serviceescalations, right._serviceescalations)
-          && cmp_set_ptr(_servicegroups, right._servicegroups)
-          && cmp_set_ptr(_services, right._services)
+          && _servicedependencies == right._servicedependencies
+          && _serviceescalations == right._serviceescalations
+          && _servicegroups == right._servicegroups
+          && _services == right._services
           && _service_check_timeout == right._service_check_timeout
           && _service_freshness_check_interval == right._service_freshness_check_interval
           && _service_inter_check_delay_method == right._service_inter_check_delay_method
@@ -1874,14 +1850,13 @@ set_hostgroup& state::hostgroups() throw () {
  */
 set_hostgroup::const_iterator state::hostgroups_find(
                                 hostgroup::key_type const& k) const {
-  shared_ptr<configuration::hostgroup>
-    below_searched(new configuration::hostgroup(k));
+  configuration::hostgroup below_searched(k);
   set_hostgroup::const_iterator
     it(_hostgroups.upper_bound(below_searched));
-  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
+  if ((it != _hostgroups.end()) && (it->hostgroup_name() == k))
     return (it);
   else if ((it != _hostgroups.begin())
-           && ((*--it)->hostgroup_name() == k))
+           && ((--it)->hostgroup_name() == k))
     return (it);
   return (_hostgroups.end());
 }
@@ -1896,13 +1871,12 @@ set_hostgroup::const_iterator state::hostgroups_find(
  */
 set_hostgroup::iterator state::hostgroups_find(
                                  hostgroup::key_type const& k) {
-  shared_ptr<configuration::hostgroup>
-    below_searched(new configuration::hostgroup(k));
+  configuration::hostgroup below_searched(k);
   set_hostgroup::iterator it(_hostgroups.upper_bound(below_searched));
-  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
+  if ((it != _hostgroups.end()) && (it->hostgroup_name() == k))
     return (it);
   else if ((it != _hostgroups.begin())
-           && ((*--it)->hostgroup_name() == k))
+           && ((--it)->hostgroup_name() == k))
     return (it);
   return (_hostgroups.end());
 }
@@ -1934,12 +1908,11 @@ set_host& state::hosts() throw () {
  */
 set_host::const_iterator state::hosts_find(
                                   host::key_type const& k) const {
-  shared_ptr<configuration::host>
-    below_searched(new configuration::host(k));
+  configuration::host below_searched(k);
   set_host::const_iterator it(_hosts.upper_bound(below_searched));
-  if ((it != _hosts.end()) && ((*it)->host_name() == k))
+  if ((it != _hosts.end()) && (it->host_name() == k))
     return (it);
-  else if ((it != _hosts.begin()) && ((*--it)->host_name() == k))
+  else if ((it != _hosts.begin()) && ((--it)->host_name() == k))
     return (it);
   return (_hosts.end());
 }
@@ -1953,12 +1926,11 @@ set_host::const_iterator state::hosts_find(
  */
 set_host::iterator state::hosts_find(
                             host::key_type const& k) {
-  shared_ptr<configuration::host>
-    below_searched(new configuration::host(k));
+  configuration::host below_searched(k);
   set_host::iterator it(_hosts.upper_bound(below_searched));
-  if ((it != _hosts.end()) && ((*it)->host_name() == k))
+  if ((it != _hosts.end()) && (it->host_name() == k))
     return (it);
-  else if ((it != _hosts.begin()) && ((*--it)->host_name() == k))
+  else if ((it != _hosts.begin()) && ((--it)->host_name() == k))
     return (it);
   return (_hosts.end());
 }
@@ -2913,14 +2885,13 @@ set_servicegroup& state::servicegroups() throw () {
  */
 set_servicegroup::const_iterator state::servicegroups_find(
                                    servicegroup::key_type const& k) const {
-  shared_ptr<configuration::servicegroup>
-    below_searched(new configuration::servicegroup(k));
+  configuration::servicegroup below_searched(k);
   set_servicegroup::const_iterator
     it(_servicegroups.upper_bound(below_searched));
-  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
+  if ((it != _servicegroups.end()) && (it->servicegroup_name() == k))
     return (it);
   else if ((it != _servicegroups.begin())
-           && ((*--it)->servicegroup_name() == k))
+           && ((--it)->servicegroup_name() == k))
     return (it);
   return (_servicegroups.end());
 }
@@ -2935,14 +2906,13 @@ set_servicegroup::const_iterator state::servicegroups_find(
  */
 set_servicegroup::iterator state::servicegroups_find(
                              servicegroup::key_type const& k) {
-  shared_ptr<configuration::servicegroup>
-    below_searched(new configuration::servicegroup(k));
+  configuration::servicegroup below_searched(k);
   set_servicegroup::iterator
     it(_servicegroups.upper_bound(below_searched));
-  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
+  if ((it != _servicegroups.end()) && (it->servicegroup_name() == k))
     return (it);
   else if ((it != _servicegroups.begin())
-           && ((*--it)->servicegroup_name() == k))
+           && ((--it)->servicegroup_name() == k))
     return (it);
   return (_servicegroups.end());
 }
@@ -2975,19 +2945,18 @@ set_service& state::services() throw () {
  */
 set_service::const_iterator state::services_find(
                                    service::key_type const& k) const {
-  shared_ptr<configuration::service>
-    below_searched(new configuration::service);
-  below_searched->hosts().push_back(k.first);
-  below_searched->service_description() = k.second;
+  configuration::service below_searched;
+  below_searched.hosts().insert(k.first);
+  below_searched.service_description() = k.second;
   set_service::const_iterator
     it(_services.upper_bound(below_searched));
   if ((it != _services.end())
-      && ((*it)->hosts().front() == k.first)
-      && ((*it)->service_description() == k.second))
+      && (*it->hosts().begin() == k.first)
+      && (it->service_description() == k.second))
     return (it);
   else if ((it != _services.begin())
-           && ((*--it)->hosts().front() == k.first)
-           && ((*it)->service_description() == k.second))
+           && (*(--it)->hosts().begin() == k.first)
+           && (it->service_description() == k.second))
     return (it);
   return (_services.end());
 }
@@ -3002,19 +2971,18 @@ set_service::const_iterator state::services_find(
  */
 set_service::iterator state::services_find(
                              service::key_type const& k) {
-  shared_ptr<configuration::service>
-    below_searched(new configuration::service);
-  below_searched->hosts().push_back(k.first);
-  below_searched->service_description() = k.second;
+  configuration::service below_searched;
+  below_searched.hosts().insert(k.first);
+  below_searched.service_description() = k.second;
   set_service::iterator
     it(_services.upper_bound(below_searched));
   if ((it != _services.end())
-      && ((*it)->hosts().front() == k.first)
-      && ((*it)->service_description() == k.second))
+      && (*it->hosts().begin() == k.first)
+      && (it->service_description() == k.second))
     return (it);
   else if ((it != _services.begin())
-           && ((*--it)->hosts().front() == k.first)
-           && ((*it)->service_description() == k.second))
+           && (*(--it)->hosts().begin() == k.first)
+           && (it->service_description() == k.second))
     return (it);
   return (_services.end());
 }

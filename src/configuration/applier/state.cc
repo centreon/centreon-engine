@@ -442,13 +442,13 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::const_iterator appli
 umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
   typedef umultimap<std::string, shared_ptr<hostdependency_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
-  p = _hostdependencies.equal_range(k.dependent_hosts().front());
+  p = _hostdependencies.equal_range(*k.dependent_hosts().begin());
   while (p.first != p.second) {
     configuration::hostdependency current;
     current.configuration::object::operator=(k);
-    current.dependent_hosts().push_back(
+    current.dependent_hosts().insert(
                                 p.first->second->dependent_host_name);
-    current.hosts().push_back(p.first->second->host_name);
+    current.hosts().insert(p.first->second->host_name);
     current.dependency_period(p.first->second->dependency_period
                               ? p.first->second->dependency_period
                               : "");
@@ -525,18 +525,16 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
   // Copy host escalation configuration to sort some
   // members (used for comparison below).
   configuration::hostescalation hesc(k);
-  hesc.contacts().sort();
-  hesc.contactgroups().sort();
 
   // Browse escalations matching target host.
   typedef umultimap<std::string, shared_ptr<hostescalation_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
-  p = _hostescalations.equal_range(k.hosts().front());
+  p = _hostescalations.equal_range(*k.hosts().begin());
   while (p.first != p.second) {
     // Create host escalation configuration from object.
     configuration::hostescalation current;
     current.configuration::object::operator=(k);
-    current.hosts().push_back(p.first->second->host_name);
+    current.hosts().insert(p.first->second->host_name);
     current.first_notification(p.first->second->first_notification);
     current.last_notification(p.first->second->last_notification);
     current.notification_interval(
@@ -558,13 +556,11 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_name);
-    current.contacts().sort();
+      current.contacts().insert(m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_name);
-    current.contactgroups().sort();
+      current.contactgroups().insert(m->group_name);
 
     // Found !
     if (current == hesc)
@@ -791,8 +787,6 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
   // Copy service escalation configuration to sort some
   // members (used for comparison below).
   configuration::serviceescalation sesc(k);
-  sesc.contacts().sort();
-  sesc.contactgroups().sort();
 
   // Browse escalations matching target service.
   typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > collection;
@@ -828,13 +822,11 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_name);
-    current.contacts().sort();
+      current.contacts().insert(m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_name);
-    current.contactgroups().sort();
+      current.contactgroups().insert(m->group_name);
 
     // Found !
     if (current == sesc)
@@ -1716,7 +1708,7 @@ void applier::state::_processing(
            ++it) {
         umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
           svc(services().find(std::make_pair(
-                                     it->hosts().front(),
+                                     *it->hosts().begin(),
                                      it->service_description())));
         if (svc != services().end())
           log_service_state(INITIAL_STATES, svc->second.get());
