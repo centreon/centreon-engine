@@ -1425,9 +1425,9 @@ void applier::state::_processing(
   _expand<configuration::host, applier::host>(
     new_cfg);
 
-  // // Expand hostgroups.
-  // _expand<configuration::hostgroup, applier::hostgroup>(
-  //   new_cfg);
+  // Expand hostgroups.
+  _expand<configuration::hostgroup, applier::hostgroup>(
+    new_cfg);
 
   // // Expand services.
   // _expand<configuration::service, applier::service>(
@@ -1495,9 +1495,9 @@ void applier::state::_processing(
 
   // Build difference for hostgroups.
   difference<set_hostgroup> diff_hostgroups;
-  // diff_hostgroups.parse(
-  //   config->hostgroups(),
-  //   new_cfg.hostgroups());
+  diff_hostgroups.parse(
+    config->hostgroups(),
+    new_cfg.hostgroups());
 
   // Build difference for services.
   difference<set_service> diff_services;
@@ -1610,8 +1610,8 @@ void applier::state::_processing(
     // Apply hosts and hostgroups.
     _apply<configuration::host, applier::host>(
       diff_hosts);
-    // _apply<configuration::hostgroup, applier::hostgroup>(
-    //   diff_hostgroups);
+    _apply<configuration::hostgroup, applier::hostgroup>(
+      diff_hostgroups);
 
     // // Apply services and servicegroups.
     // _apply<configuration::service, applier::service>(
@@ -1622,8 +1622,8 @@ void applier::state::_processing(
     // Resolve hosts, services, host groups and service groups.
     _resolve<configuration::host, applier::host>(
       config->hosts());
-    // _resolve<configuration::hostgroup, applier::hostgroup>(
-    //   config->hostgroups());
+    _resolve<configuration::hostgroup, applier::hostgroup>(
+      config->hostgroups());
     // _resolve<configuration::service, applier::service>(
     //   config->services());
     // _resolve<configuration::servicegroup, applier::servicegroup>(
@@ -1705,7 +1705,7 @@ void applier::state::_processing(
            it != end;
            ++it) {
         umap<std::string, shared_ptr<host_struct> >::const_iterator
-          hst(hosts().find((*it)->host_name()));
+          hst(hosts().find(it->host_name()));
         if (hst != hosts().end())
           log_host_state(INITIAL_STATES, hst->second.get());
       }

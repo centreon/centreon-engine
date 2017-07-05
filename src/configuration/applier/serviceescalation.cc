@@ -332,16 +332,16 @@ void applier::serviceescalation::_expand_services(
        it != end;
        ++it) {
     // Find host group.
-    std::set<shared_ptr<configuration::hostgroup> >::iterator
+    configuration::set_hostgroup::iterator
       it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
       throw (engine_error() << "Could not resolve host group '"
              << *it << "'");
 
     // Add host group members.
-    for (std::set<std::string>::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
+    for (list_string::const_iterator
+           it_member(it_group->members().begin()),
+           end_member(it_group->members().end());
          it_member != end_member;
          ++it_member)
       all_hosts.insert(*it_member);

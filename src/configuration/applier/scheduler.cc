@@ -79,14 +79,14 @@ void applier::scheduler::apply(
     umap<std::string, shared_ptr<host_struct> > const&
       hosts(applier::state::instance().hosts());
     umap<std::string, shared_ptr<host_struct> >::const_iterator
-      hst(hosts.find((*it)->host_name()));
+      hst(hosts.find(it->host_name()));
     if (hst != hosts.end()) {
       bool has_event(quick_timed_event.find(
                                          events::hash_timed_event::low,
                                          events::hash_timed_event::host_check,
                                          hst->second.get()));
-      bool should_schedule((*it)->checks_active()
-                           && ((*it)->check_interval() > 0));
+      bool should_schedule(it->checks_active()
+                           && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         hst_to_unschedule.insert(*it);
         hst_to_schedule.insert(*it);
@@ -813,10 +813,11 @@ void applier::scheduler::_get_hosts(
   umap<std::string, shared_ptr<host_struct> > const&
     hosts(applier::state::instance().hosts());
   for (set_host::const_reverse_iterator
-         it(hst_cfg.rbegin()), end(hst_cfg.rend());
+         it(hst_cfg.rbegin()),
+         end(hst_cfg.rend());
        it != end;
        ++it) {
-    std::string const& host_name((*it)->host_name());
+    std::string const& host_name(it->host_name());
     umap<std::string, shared_ptr<host_struct> >::const_iterator
       hst(hosts.find(host_name));
     if (hst == hosts.end()) {

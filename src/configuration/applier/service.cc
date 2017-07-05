@@ -302,16 +302,16 @@ void applier::service::expand_object(
                << obj->service_description() << "'");
 
       // Check host group and user configuration.
-      if ((*it2)->resolved_members().empty()
+      if (it2->members().empty()
           && !s.allow_empty_hostgroup_assignment())
         throw (engine_error() << "Could not expand host group '"
                << *it << "' specified in service '"
                << obj->service_description() << "'");
 
       // Add host group members.
-      for (set_string::const_iterator
-             it3((*it2)->resolved_members().begin()),
-             end3((*it2)->resolved_members().end());
+      for (list_string::const_iterator
+             it3(it2->members().begin()),
+             end3(it2->members().end());
            it3 != end3;
            ++it3)
         target_hosts.insert(*it3);
@@ -791,7 +791,7 @@ void applier::service::_inherits_special_vars(
     s.services().erase(obj);
 
     // Find host.
-    std::set<shared_ptr<configuration::host> >::const_iterator
+    configuration::set_host::const_iterator
       it(s.hosts_find(obj->hosts().front()));
     if (it == s.hosts().end())
       throw (engine_error()
@@ -801,17 +801,17 @@ void applier::service::_inherits_special_vars(
 
     // Inherits variables.
     if (!obj->host_id())
-      obj->host_id((*it)->host_id());
+      obj->host_id(it->host_id());
     if (!obj->contacts_defined() && !obj->contactgroups_defined()) {
-      obj->contacts() = (*it)->contacts();
-      obj->contactgroups() = (*it)->contactgroups();
+      obj->contacts() = it->contacts();
+      obj->contactgroups() = it->contactgroups();
     }
     if (!obj->notification_interval_defined())
-      obj->notification_interval((*it)->notification_interval());
+      obj->notification_interval(it->notification_interval());
     if (!obj->notification_period_defined())
-      obj->notification_period((*it)->notification_period());
+      obj->notification_period(it->notification_period());
     if (!obj->timezone_defined())
-      obj->timezone((*it)->timezone());
+      obj->timezone(it->timezone());
 
     // Reinsert service.
     s.services().insert(obj);
