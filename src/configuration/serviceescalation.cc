@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2015 Merethis
+** Copyright 2011-2015,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -242,7 +242,7 @@ bool serviceescalation::parse(char const* key, char const* value) {
  *
  *  @return The contact groups.
  */
-list_string& serviceescalation::contactgroups() throw () {
+set_string& serviceescalation::contactgroups() throw () {
   return (*_contactgroups);
 }
 
@@ -251,7 +251,7 @@ list_string& serviceescalation::contactgroups() throw () {
  *
  *  @return The contactgroups.
  */
-list_string const& serviceescalation::contactgroups() const throw () {
+set_string const& serviceescalation::contactgroups() const throw () {
   return (*_contactgroups);
 }
 
@@ -269,7 +269,7 @@ bool serviceescalation::contactgroups_defined() const throw () {
  *
  *  @return The contacts;
  */
-list_string& serviceescalation::contacts() throw () {
+set_string& serviceescalation::contacts() throw () {
   return (*_contacts);
 }
 
@@ -278,7 +278,7 @@ list_string& serviceescalation::contacts() throw () {
  *
  *  @return The contacts.
  */
-list_string const& serviceescalation::contacts() const throw () {
+set_string const& serviceescalation::contacts() const throw () {
   return (*_contacts);
 }
 

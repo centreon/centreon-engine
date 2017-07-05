@@ -230,7 +230,7 @@ unsigned int hostgroup::hostgroup_id() const throw() {
  *
  *  @return The hostgroup_members.
  */
-list_string& hostgroup::hostgroup_members() throw () {
+set_string& hostgroup::hostgroup_members() throw () {
   return (*_hostgroup_members);
 }
 
@@ -239,7 +239,7 @@ list_string& hostgroup::hostgroup_members() throw () {
  *
  *  @return The hostgroup_members.
  */
-list_string const& hostgroup::hostgroup_members() const throw () {
+set_string const& hostgroup::hostgroup_members() const throw () {
   return (*_hostgroup_members);
 }
 
@@ -257,7 +257,7 @@ std::string const& hostgroup::hostgroup_name() const throw () {
  *
  *  @return The members.
  */
-list_string& hostgroup::members() throw () {
+set_string& hostgroup::members() throw () {
   return (*_members);
 }
 
@@ -266,7 +266,7 @@ list_string& hostgroup::members() throw () {
  *
  *  @return The members.
  */
-list_string const& hostgroup::members() const throw () {
+set_string const& hostgroup::members() const throw () {
   return (*_members);
 }
 

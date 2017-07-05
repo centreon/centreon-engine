@@ -221,7 +221,7 @@ std::string const& servicegroup::alias() const throw () {
  *
  *  @return The members.
  */
-list_string& servicegroup::members() throw () {
+set_pair_string& servicegroup::members() throw () {
   return (*_members);
 }
 
@@ -230,7 +230,7 @@ list_string& servicegroup::members() throw () {
  *
  *  @return The members.
  */
-list_string const& servicegroup::members() const throw () {
+set_pair_string const& servicegroup::members() const throw () {
   return (*_members);
 }
 
@@ -266,7 +266,7 @@ unsigned int servicegroup::servicegroup_id() const throw() {
  *
  *  @return The servicegroup_members.
  */
-list_string& servicegroup::servicegroup_members() throw () {
+set_string& servicegroup::servicegroup_members() throw () {
   return (*_servicegroup_members);
 }
 
@@ -275,7 +275,7 @@ list_string& servicegroup::servicegroup_members() throw () {
  *
  *  @return The servicegroup_members.
  */
-list_string const& servicegroup::servicegroup_members() const throw () {
+set_string const& servicegroup::servicegroup_members() const throw () {
   return (*_servicegroup_members);
 }
 

@@ -56,7 +56,7 @@ namespace                  configuration {
     std::string const&     alias() const throw ();
     std::vector<std::list<daterange> > const&
                            exceptions() const throw ();
-    list_string const&     exclude() const throw ();
+    set_string const&      exclude() const throw ();
     std::string const&     timeperiod_name() const throw ();
     std::vector<std::list<timerange> > const&
                            timeranges() const throw ();
@@ -95,7 +95,7 @@ namespace                  configuration {
     static setters const   _setters[];
     std::vector<std::list<daterange> >
                            _exceptions;
-    group                  _exclude;
+    group<set_string>      _exclude;
     std::string            _timeperiod_name;
     std::vector<std::list<timerange> >
                            _timeranges;

@@ -58,11 +58,11 @@ namespace                  configuration {
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 
-    list_string&           contactgroups() throw ();
-    list_string const&     contactgroups() const throw ();
+    set_string&            contactgroups() throw ();
+    set_string const&      contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
-    list_string&           contacts() throw ();
-    list_string const&     contacts() const throw ();
+    set_string&            contacts() throw ();
+    set_string const&      contacts() const throw ();
     bool                   contacts_defined() const throw ();
     void                   escalation_options(
                              unsigned int options) throw ();
@@ -106,17 +106,17 @@ namespace                  configuration {
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
 
-    group                  _contactgroups;
-    group                  _contacts;
+    group<set_string>      _contactgroups;
+    group<set_string>      _contacts;
     opt<unsigned short>    _escalation_options;
     opt<std::string>       _escalation_period;
     opt<unsigned int>      _first_notification;
-    group                  _hostgroups;
-    group                  _hosts;
+    group<list_string>     _hostgroups;
+    group<list_string>     _hosts;
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
-    group                  _servicegroups;
-    group                  _service_description;
+    group<list_string>     _servicegroups;
+    group<list_string>     _service_description;
     static setters const   _setters[];
   };
 

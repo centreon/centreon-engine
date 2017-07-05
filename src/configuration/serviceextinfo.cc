@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -198,7 +198,7 @@ std::string const& serviceextinfo::icon_image_alt() const throw () {
  *
  *  @return The hostgroups.
  */
-list_string const& serviceextinfo::hostgroups() const throw () {
+set_string const& serviceextinfo::hostgroups() const throw () {
   return (*_hostgroups);
 }
 
@@ -207,7 +207,7 @@ list_string const& serviceextinfo::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-list_string const& serviceextinfo::hosts() const throw () {
+set_string const& serviceextinfo::hosts() const throw () {
   return (*_hosts);
 }
 

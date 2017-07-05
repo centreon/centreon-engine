@@ -51,11 +51,11 @@ namespace                  configuration {
     std::string const&     action_url() const throw ();
     std::string const&     alias() const throw ();
     unsigned int           hostgroup_id() const throw();
-    list_string&           hostgroup_members() throw ();
-    list_string const&     hostgroup_members() const throw ();
+    set_string&            hostgroup_members() throw ();
+    set_string const&      hostgroup_members() const throw ();
     std::string const&     hostgroup_name() const throw ();
-    list_string&           members() throw ();
-    list_string const&     members() const throw ();
+    set_string&            members() throw ();
+    set_string const&      members() const throw ();
     std::string const&     notes() const throw ();
     std::string const&     notes_url() const throw ();
 
@@ -77,9 +77,9 @@ namespace                  configuration {
     std::string            _action_url;
     std::string            _alias;
     unsigned int           _hostgroup_id;
-    group                  _hostgroup_members;
+    group<set_string>      _hostgroup_members;
     std::string            _hostgroup_name;
-    group                  _members;
+    group<set_string>      _members;
     std::string            _notes;
     std::string            _notes_url;
     static setters const   _setters[];

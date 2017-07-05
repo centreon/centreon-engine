@@ -49,11 +49,11 @@ namespace                  configuration {
     bool                   parse(char const* key, char const* value);
 
     std::string const&     alias() const throw ();
-    list_string&           contactgroup_members() throw ();
-    list_string const&     contactgroup_members() const throw ();
+    set_string&            contactgroup_members() throw ();
+    set_string const&      contactgroup_members() const throw ();
     std::string const&     contactgroup_name() const throw ();
-    list_string&           members() throw ();
-    list_string const&     members() const throw ();
+    set_string&            members() throw ();
+    set_string const&      members() const throw ();
 
    private:
     struct                 setters {
@@ -67,9 +67,9 @@ namespace                  configuration {
     bool                   _set_members(std::string const& value);
 
     std::string            _alias;
-    group                  _contactgroup_members;
+    group<set_string>      _contactgroup_members;
     std::string            _contactgroup_name;
-    group                  _members;
+    group<set_string>      _members;
     static setters const   _setters[];
   };
 

@@ -344,7 +344,7 @@ bool contact::can_submit_commands() const throw () {
  *
  *  @return The contact groups.
  */
-list_string& contact::contactgroups() throw () {
+set_string& contact::contactgroups() throw () {
   return (*_contactgroups);
 }
 
@@ -353,7 +353,7 @@ list_string& contact::contactgroups() throw () {
  *
  *  @return The contactgroups.
  */
-list_string const& contact::contactgroups() const throw () {
+set_string const& contact::contactgroups() const throw () {
   return (*_contactgroups);
 }
 

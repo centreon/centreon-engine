@@ -185,10 +185,12 @@ void hostdependency::check_validity() const {
 
   if (!_execution_failure_options && !_notification_failure_options) {
     ++config_warnings;
-    std::string host_name = !_hosts->empty() ?
-                              _hosts->front() : _hostgroups->front();
-    std::string dependend_host_name = !_dependent_hosts->empty() ?
-                  _dependent_hosts->front() : _dependent_hostgroups->front();
+    std::string host_name(!_hosts->empty()
+                          ? *_hosts->begin()
+                          : *_hostgroups->begin());
+    std::string dependend_host_name(!_dependent_hosts->empty()
+                                    ? *_dependent_hosts->begin()
+                                    : *_dependent_hostgroups->begin());
     logger(log_config_warning, basic)
       << "Warning: Ignoring lame host dependency of '"
       << dependend_host_name << "' on host/hostgroups '"
@@ -289,7 +291,7 @@ hostdependency::dependency_kind hostdependency::dependency_type() const throw ()
  *
  *  @return Dependent host groups.
  */
-list_string& hostdependency::dependent_hostgroups() throw () {
+set_string& hostdependency::dependent_hostgroups() throw () {
   return (*_dependent_hostgroups);
 }
 
@@ -298,7 +300,7 @@ list_string& hostdependency::dependent_hostgroups() throw () {
  *
  *  @return The dependent_hostgroups.
  */
-list_string const& hostdependency::dependent_hostgroups() const throw () {
+set_string const& hostdependency::dependent_hostgroups() const throw () {
   return (*_dependent_hostgroups);
 }
 
@@ -307,7 +309,7 @@ list_string const& hostdependency::dependent_hostgroups() const throw () {
  *
  *  @return The dependent hosts.
  */
-list_string& hostdependency::dependent_hosts() throw () {
+set_string& hostdependency::dependent_hosts() throw () {
   return (*_dependent_hosts);
 }
 
@@ -316,7 +318,7 @@ list_string& hostdependency::dependent_hosts() throw () {
  *
  *  @return The dependent_hosts.
  */
-list_string const& hostdependency::dependent_hosts() const throw () {
+set_string const& hostdependency::dependent_hosts() const throw () {
   return (*_dependent_hosts);
 }
 
@@ -345,7 +347,7 @@ unsigned int hostdependency::execution_failure_options() const throw () {
  *
  *  @return The host groups.
  */
-list_string& hostdependency::hostgroups() throw () {
+set_string& hostdependency::hostgroups() throw () {
   return (*_hostgroups);
 }
 
@@ -354,7 +356,7 @@ list_string& hostdependency::hostgroups() throw () {
  *
  *  @return The hostgroups.
  */
-list_string const& hostdependency::hostgroups() const throw () {
+set_string const& hostdependency::hostgroups() const throw () {
   return (*_hostgroups);
 }
 
@@ -363,7 +365,7 @@ list_string const& hostdependency::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-list_string& hostdependency::hosts() throw () {
+set_string& hostdependency::hosts() throw () {
   return (*_hosts);
 }
 
@@ -372,7 +374,7 @@ list_string& hostdependency::hosts() throw () {
  *
  *  @return The hosts.
  */
-list_string const& hostdependency::hosts() const throw () {
+set_string const& hostdependency::hosts() const throw () {
   return (*_hosts);
 }
 

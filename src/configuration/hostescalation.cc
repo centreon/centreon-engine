@@ -222,7 +222,7 @@ bool hostescalation::parse(char const* key, char const* value) {
  *
  *  @return The contact groups.
  */
-list_string& hostescalation::contactgroups() throw () {
+set_string& hostescalation::contactgroups() throw () {
   return (*_contactgroups);
 }
 
@@ -231,7 +231,7 @@ list_string& hostescalation::contactgroups() throw () {
  *
  *  @return The contactgroups.
  */
-list_string const& hostescalation::contactgroups() const throw () {
+set_string const& hostescalation::contactgroups() const throw () {
   return (*_contactgroups);
 }
 
@@ -249,7 +249,7 @@ bool hostescalation::contactgroups_defined() const throw () {
  *
  *  @return The contacts.
  */
-list_string& hostescalation::contacts() throw () {
+set_string& hostescalation::contacts() throw () {
   return (*_contacts);
 }
 
@@ -258,7 +258,7 @@ list_string& hostescalation::contacts() throw () {
  *
  *  @return The contacts.
  */
-list_string const& hostescalation::contacts() const throw () {
+set_string const& hostescalation::contacts() const throw () {
   return (*_contacts);
 }
 
@@ -343,7 +343,7 @@ unsigned int hostescalation::first_notification() const throw () {
  *
  *  @return The host groups.
  */
-list_string& hostescalation::hostgroups() throw () {
+set_string& hostescalation::hostgroups() throw () {
   return (*_hostgroups);
 }
 
@@ -352,7 +352,7 @@ list_string& hostescalation::hostgroups() throw () {
  *
  *  @return The hostgroups.
  */
-list_string const& hostescalation::hostgroups() const throw () {
+set_string const& hostescalation::hostgroups() const throw () {
   return (*_hostgroups);
 }
 
@@ -361,7 +361,7 @@ list_string const& hostescalation::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-list_string& hostescalation::hosts() throw () {
+set_string& hostescalation::hosts() throw () {
   return (*_hosts);
 }
 
@@ -370,7 +370,7 @@ list_string& hostescalation::hosts() throw () {
  *
  *  @return The hosts.
  */
-list_string const& hostescalation::hosts() const throw () {
+set_string const& hostescalation::hosts() const throw () {
   return (*_hosts);
 }
 
