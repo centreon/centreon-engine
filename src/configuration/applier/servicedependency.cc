@@ -66,122 +66,119 @@ applier::servicedependency& applier::servicedependency::operator=(
 /**
  *  Add new service dependency.
  *
- *  @param[in] obj The new servicedependency to add into the monitoring
- *                 engine.
+ *  @param[in] obj  The new servicedependency to add into the monitoring
+ *                  engine.
  */
 void applier::servicedependency::add_object(
-                                   shared_ptr<configuration::servicedependency> obj) {
+                                   configuration::servicedependency const& obj) {
   // Check service dependency.
-  if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
-      || (obj->service_description().size() != 1)
-      || !obj->servicegroups().empty()
-      || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty()
-      || (obj->dependent_service_description().size() != 1)
-      || !obj->dependent_servicegroups().empty())
+  if ((obj.hosts().size() != 1)
+      || !obj.hostgroups().empty()
+      || (obj.service_description().size() != 1)
+      || !obj.servicegroups().empty()
+      || (obj.dependent_hosts().size() != 1)
+      || !obj.dependent_hostgroups().empty()
+      || (obj.dependent_service_description().size() != 1)
+      || !obj.dependent_servicegroups().empty())
     throw (engine_error() << "Could not create service "
            << "dependency with multiple (dependent) hosts / host groups "
            << "/ services / service groups");
-  if ((obj->dependency_type()
+  if ((obj.dependency_type()
        != configuration::servicedependency::execution_dependency)
-      && (obj->dependency_type()
+      && (obj.dependency_type()
           != configuration::servicedependency::notification_dependency))
     throw (engine_error() << "Could not create unexpanded "
            << "dependency of service '"
-           << obj->dependent_service_description().front()
-           << "' of host '" << obj->dependent_hosts().front()
-           << "' on service '" << obj->service_description().front()
-           << "' of host '" << obj->hosts().front() << "'");
+           << obj.dependent_service_description().front()
+           << "' of host '" << obj.dependent_hosts().front()
+           << "' on service '" << obj.service_description().front()
+           << "' of host '" << obj.hosts().front() << "'");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new service dependency of service '"
-    << obj->dependent_service_description().front() << "' of host '"
-    << obj->dependent_hosts().front() << "' on service '"
-    << obj->service_description().front() << "' of host '"
-    << obj->hosts().front() << "'.";
+    << obj.dependent_service_description().front() << "' of host '"
+    << obj.dependent_hosts().front() << "' on service '"
+    << obj.service_description().front() << "' of host '"
+    << obj.hosts().front() << "'.";
 
   // Add dependency to the global configuration set.
   config->servicedependencies().insert(obj);
 
   // Create execution dependency.
-  if (obj->dependency_type()
+  if (obj.dependency_type()
       == configuration::servicedependency::execution_dependency) {
     if (!add_service_dependency(
-           obj->dependent_hosts().front().c_str(),
-           obj->dependent_service_description().front().c_str(),
-           obj->hosts().front().c_str(),
-           obj->service_description().front().c_str(),
+           obj.dependent_hosts().front().c_str(),
+           obj.dependent_service_description().front().c_str(),
+           obj.hosts().front().c_str(),
+           obj.service_description().front().c_str(),
            EXECUTION_DEPENDENCY,
-           obj->inherits_parent(),
+           obj.inherits_parent(),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::servicedependency::ok),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::servicedependency::warning),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::servicedependency::unknown),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::servicedependency::critical),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::servicedependency::pending),
-           NULL_IF_EMPTY(obj->dependency_period())))
+           NULL_IF_EMPTY(obj.dependency_period())))
       throw (engine_error() << "Could not create service "
              << "execution dependency of service '"
-             << obj->dependent_service_description().front()
-             << "' of host '" << obj->dependent_hosts().front()
-             << "' on service '" << obj->service_description().front()
-             << "' of host '" << obj->hosts().front() << "'");
+             << obj.dependent_service_description().front()
+             << "' of host '" << obj.dependent_hosts().front()
+             << "' on service '" << obj.service_description().front()
+             << "' of host '" << obj.hosts().front() << "'");
   }
   // Create notification dependency.
   else
     if (!add_service_dependency(
-           obj->dependent_hosts().front().c_str(),
-           obj->dependent_service_description().front().c_str(),
-           obj->hosts().front().c_str(),
-           obj->service_description().front().c_str(),
+           obj.dependent_hosts().front().c_str(),
+           obj.dependent_service_description().front().c_str(),
+           obj.hosts().front().c_str(),
+           obj.service_description().front().c_str(),
            NOTIFICATION_DEPENDENCY,
-           obj->inherits_parent(),
+           obj.inherits_parent(),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::servicedependency::ok),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::servicedependency::warning),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::servicedependency::unknown),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::servicedependency::critical),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::servicedependency::pending),
-           NULL_IF_EMPTY(obj->dependency_period())))
+           NULL_IF_EMPTY(obj.dependency_period())))
       throw (engine_error() << "Could not create service "
              << "notification dependency of service '"
-             << obj->dependent_service_description().front()
-             << "' of host '" << obj->dependent_hosts().front()
-             << "' on service '" << obj->service_description().front()
-             << "' of host '" << obj->hosts().front() << "'");
+             << obj.dependent_service_description().front()
+             << "' of host '" << obj.dependent_hosts().front()
+             << "' on service '" << obj.service_description().front()
+             << "' of host '" << obj.hosts().front() << "'");
 
   return ;
 }
 
 /**
- *  Expand service dependency.
+ *  Expand service dependencies.
  *
- *  @param[in,out] obj Service dependency object to expand.
- *  @param[in,out] s   Configuration being applied.
+ *  @param[in,out] s  Configuration being applied.
  */
-void applier::servicedependency::expand_object(
-                                   shared_ptr<configuration::servicedependency> obj,
-                                   configuration::state& s) {
+void applier::servicedependency::expand_objects(configuration::state& s) {
   // Check service dependency.
   if ((obj->hosts().size() != 1)
       || !obj->hostgroups().empty()
@@ -269,10 +266,10 @@ void applier::servicedependency::expand_object(
  *  Service dependencies cannot be defined with anything else than their
  *  full content. Therefore no modification can occur.
  *
- *  @param[in] obj Unused.
+ *  @param[in] obj  Unused.
  */
 void applier::servicedependency::modify_object(
-                                   shared_ptr<configuration::servicedependency> obj) {
+       configuration::servicedependency const& obj) {
   (void)obj;
   throw (engine_error() << "Could not modify a service "
          << "dependency: service dependency objects can only be added "
@@ -284,18 +281,18 @@ void applier::servicedependency::modify_object(
 /**
  *  Remove old service dependency.
  *
- *  @param[in] obj The service dependency to remove from the monitoring
- *                 engine.
+ *  @param[in] obj  The service dependency to remove from the monitoring
+ *                  engine.
  */
 void applier::servicedependency::remove_object(
-                                   shared_ptr<configuration::servicedependency> obj) {
+       configuration::servicedependency const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing a service dependency.";
 
   // Find service dependency.
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
-    it(applier::state::instance().servicedependencies_find(obj->key()));
+    it(applier::state::instance().servicedependencies_find(obj.key()));
   if (it != applier::state::instance().servicedependencies().end()) {
     servicedependency_struct* dependency(it->second.get());
 
@@ -326,17 +323,17 @@ void applier::servicedependency::remove_object(
 /**
  *  Resolve a servicedependency.
  *
- *  @param[in] obj Servicedependency object.
+ *  @param[in] obj  Servicedependency object.
  */
 void applier::servicedependency::resolve_object(
-                shared_ptr<configuration::servicedependency> obj) {
+       configuration::servicedependency const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Resolving a service dependency.";
 
   // Find service dependency.
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
-    it(applier::state::instance().servicedependencies_find(obj->key()));
+    it(applier::state::instance().servicedependencies_find(obj.key()));
   if (applier::state::instance().servicedependencies().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "
            << "service dependency");

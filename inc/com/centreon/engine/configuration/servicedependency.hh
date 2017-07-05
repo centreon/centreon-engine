@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    servicedependency : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       ok = (1 << 0),
@@ -93,7 +93,7 @@ namespace                  configuration {
     list_string&           service_description() throw ();
     list_string const&     service_description() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(servicedependency&, char const*);
@@ -128,8 +128,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<servicedependency>    servicedependency_ptr;
-  typedef std::set<servicedependency_ptr>  set_servicedependency;
+  typedef shared_ptr<servicedependency>  servicedependency_ptr;
+  typedef std::set<servicedependency>    set_servicedependency;
 }
 
 CCE_END()

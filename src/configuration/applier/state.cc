@@ -1441,9 +1441,9 @@ void applier::state::_processing(
   _expand<configuration::hostdependency, applier::hostdependency>(
     new_cfg);
 
-  // // Expand servicedependencies.
-  // _expand<configuration::servicedependency, applier::servicedependency>(
-  //   new_cfg);
+  // Expand servicedependencies.
+  _expand<configuration::servicedependency, applier::servicedependency>(
+    new_cfg);
 
   // Expand hostescalations.
   _expand<configuration::hostescalation, applier::hostescalation>(
@@ -1519,9 +1519,9 @@ void applier::state::_processing(
 
   // Build difference for servicedependencies.
   difference<set_servicedependency> diff_servicedependencies;
-  // diff_servicedependencies.parse(
-  //   config->servicedependencies(),
-  //   new_cfg.servicedependencies());
+  diff_servicedependencies.parse(
+    config->servicedependencies(),
+    new_cfg.servicedependencies());
 
   // Build difference for hostescalations.
   difference<set_hostescalation> diff_hostescalations;
@@ -1635,11 +1635,11 @@ void applier::state::_processing(
     _resolve<configuration::hostdependency, applier::hostdependency>(
       config->hostdependencies());
 
-    // // Apply service dependencies.
-    // _apply<configuration::servicedependency, applier::servicedependency>(
-    //   diff_servicedependencies);
-    // _resolve<configuration::servicedependency, applier::servicedependency>(
-    //   config->servicedependencies());
+    // Apply service dependencies.
+    _apply<configuration::servicedependency, applier::servicedependency>(
+      diff_servicedependencies);
+    _resolve<configuration::servicedependency, applier::servicedependency>(
+      config->servicedependencies());
 
     // Apply host escalations.
     _apply<configuration::hostescalation, applier::hostescalation>(

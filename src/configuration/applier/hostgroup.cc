@@ -343,8 +343,8 @@ void applier::hostgroup::_resolve_members(
       // Add hostgroup member members to members.
       configuration::hostgroup& resolved_group(_resolved[*it]);
       for (list_string::const_iterator
-             it3(it2->members().begin()),
-             end3(it2->members().end());
+             it3(resolved_group.members().begin()),
+             end3(resolved_group.members().end());
            it3 != end3;
            ++it3)
         resolved_obj.members().push_back(*it3);
