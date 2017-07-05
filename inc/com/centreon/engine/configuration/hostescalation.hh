@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    hostescalation : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       down = (1 << 0),
@@ -78,7 +78,7 @@ namespace                  configuration {
     unsigned int           notification_interval() const throw ();
     bool                   notification_interval_defined() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(hostescalation&, char const*);
@@ -106,8 +106,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<hostescalation>   hostescalation_ptr;
-  typedef std::set<hostescalation_ptr> set_hostescalation;
+  typedef shared_ptr<hostescalation> hostescalation_ptr;
+  typedef std::set<hostescalation>   set_hostescalation;
 }
 
 CCE_END()
