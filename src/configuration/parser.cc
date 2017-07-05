@@ -96,8 +96,8 @@ void parser::parse(std::string const& path, state& config) {
   _insert(_map_objects[object::host], config.hosts());
   _insert(_lst_objects[object::servicedependency], config.servicedependencies());
   _insert(_lst_objects[object::serviceescalation], config.serviceescalations());
-  // _insert(_map_objects[object::servicegroup], config.servicegroups());
-  // _insert(_lst_objects[object::service], config.services());
+  _insert(_map_objects[object::servicegroup], config.servicegroups());
+  _insert(_lst_objects[object::service], config.services());
   _insert(_map_objects[object::timeperiod], config.timeperiods());
 
   // cleanup.

@@ -1429,13 +1429,13 @@ void applier::state::_processing(
   _expand<configuration::hostgroup, applier::hostgroup>(
     new_cfg);
 
-  // // Expand services.
-  // _expand<configuration::service, applier::service>(
-  //   new_cfg);
+  // Expand services.
+  _expand<configuration::service, applier::service>(
+    new_cfg);
 
-  // // Expand servicegroups.
-  // _expand<configuration::servicegroup, applier::servicegroup>(
-  //   new_cfg);
+  // Expand servicegroups.
+  _expand<configuration::servicegroup, applier::servicegroup>(
+    new_cfg);
 
   // Expand hostdependencies.
   _expand<configuration::hostdependency, applier::hostdependency>(
@@ -1501,15 +1501,15 @@ void applier::state::_processing(
 
   // Build difference for services.
   difference<set_service> diff_services;
-  // diff_services.parse(
-  //   config->services(),
-  //   new_cfg.services());
+  diff_services.parse(
+    config->services(),
+    new_cfg.services());
 
   // Build difference for servicegroups.
   difference<set_servicegroup> diff_servicegroups;
-  // diff_servicegroups.parse(
-  //   config->servicegroups(),
-  //   new_cfg.servicegroups());
+  diff_servicegroups.parse(
+    config->servicegroups(),
+    new_cfg.servicegroups());
 
   // Build difference for hostdependencies.
   difference<set_hostdependency> diff_hostdependencies;
@@ -1613,21 +1613,21 @@ void applier::state::_processing(
     _apply<configuration::hostgroup, applier::hostgroup>(
       diff_hostgroups);
 
-    // // Apply services and servicegroups.
-    // _apply<configuration::service, applier::service>(
-    //   diff_services);
-    // _apply<configuration::servicegroup, applier::servicegroup>(
-    //   diff_servicegroups);
+    // Apply services and servicegroups.
+    _apply<configuration::service, applier::service>(
+      diff_services);
+    _apply<configuration::servicegroup, applier::servicegroup>(
+      diff_servicegroups);
 
     // Resolve hosts, services, host groups and service groups.
     _resolve<configuration::host, applier::host>(
       config->hosts());
     _resolve<configuration::hostgroup, applier::hostgroup>(
       config->hostgroups());
-    // _resolve<configuration::service, applier::service>(
-    //   config->services());
-    // _resolve<configuration::servicegroup, applier::servicegroup>(
-    //   config->servicegroups());
+    _resolve<configuration::service, applier::service>(
+      config->services());
+    _resolve<configuration::servicegroup, applier::servicegroup>(
+      config->servicegroups());
 
     // Apply host dependencies.
     _apply<configuration::hostdependency, applier::hostdependency>(
@@ -1716,8 +1716,8 @@ void applier::state::_processing(
            ++it) {
         umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
           svc(services().find(std::make_pair(
-                                     (*it)->hosts().front(),
-                                     (*it)->service_description())));
+                                     it->hosts().front(),
+                                     it->service_description())));
         if (svc != services().end())
           log_service_state(INITIAL_STATES, svc->second.get());
       }

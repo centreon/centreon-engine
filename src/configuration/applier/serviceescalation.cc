@@ -362,16 +362,16 @@ void applier::serviceescalation::_expand_services(
        it != end;
        ++it) {
     // Find service group.
-    std::set<shared_ptr<configuration::servicegroup> >::iterator
+    configuration::set_servicegroup::iterator
       it_group(s.servicegroups_find(*it));
     if (it_group == s.servicegroups().end())
       throw (engine_error() << "Could not resolve service group '"
              << *it << "'");
 
     // Add service group members.
-    for (std::set<std::pair<std::string, std::string> >::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
+    for (set_pair_string::const_iterator
+           it_member(it_group->members().begin()),
+           end_member(it_group->members().end());
          it_member != end_member;
          ++it_member)
       expanded.insert(*it_member);
