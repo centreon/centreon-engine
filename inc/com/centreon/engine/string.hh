@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -26,6 +26,7 @@
 #  include <fstream>
 #  include <list>
 #  include <limits>
+#  include <set>
 #  include <sstream>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
@@ -103,6 +104,14 @@ namespace                 string {
   void                    split(
                             std::string const& data,
                             std::list<std::string>& out,
+                            char delim);
+  void                    split(
+                            std::string const& data,
+                            std::set<std::string>& out,
+                            char delim);
+  void                    split(
+                            std::string const& data,
+                            std::set<std::pair<std::string, std::string> >& out,
                             char delim);
 
   template<typename T>

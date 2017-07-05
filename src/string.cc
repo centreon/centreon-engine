@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2014,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
@@ -152,6 +153,50 @@ void string::split(
   }
   std::string tmp(last ? data.substr(last) : data);
   out.push_back(trim(tmp));
+  return ;
+}
+
+/**
+ *  Split data into sorted elements.
+ *
+ *  @param[in]  data   The data to split.
+ *  @param[out] out    The set to fill.
+ *  @param[in]  delim  The delimiter.
+ */
+void string::split(
+               std::string const& data,
+               std::set<std::string>& out,
+               char delim) {
+  std::list<std::string> elements;
+  split(data, elements, delim);
+  out.insert(elements.begin(), elements.end());
+  return ;
+}
+
+/**
+ *  Split data into pair of sorted elements.
+ *
+ *  @param[in]  data   The data to split.
+ *  @param[out] out    The set to fill.
+ *  @param[in]  delim  The delimiter.
+ */
+void string::split(
+               std::string const& data,
+               std::set<std::pair<std::string, std::string> >& out,
+               char delim) {
+  std::list<std::string> elements;
+  split(data, elements, delim);
+  for (std::list<std::string>::const_iterator
+         it(elements.begin()),
+         end(elements.end());
+       it != end;
+       ++it) {
+    std::list<std::string>::const_iterator first(it++);
+    if (it == end)
+      throw (engine_error()
+             << "Not enough elements in the line to make pairs");
+    out.insert(std::make_pair(*first, *it));
+  }
   return ;
 }
 
