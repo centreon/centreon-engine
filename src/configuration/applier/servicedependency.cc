@@ -379,12 +379,7 @@ void applier::servicedependency::_expand_services(
   std::set<std::string> all_hosts;
 
   // Base hosts.
-  for (std::list<std::string>::const_iterator
-         it(hst.begin()),
-         end(hst.end());
-       it != end;
-       ++it)
-    all_hosts.insert(*it);
+  all_hosts.insert(hst.begin(), hst.end());
 
   // Host groups.
   for (std::list<std::string>::const_iterator
@@ -400,12 +395,9 @@ void applier::servicedependency::_expand_services(
              << *it << "'");
 
     // Add host group members.
-    for (list_string::const_iterator
-           it_member(it_group->members().begin()),
-           end_member(it_group->members().end());
-         it_member != end_member;
-         ++it_member)
-      all_hosts.insert(*it_member);
+    all_hosts.insert(
+                it_group->members().begin(),
+                it_group->members().end());
   }
 
   // Hosts * services.

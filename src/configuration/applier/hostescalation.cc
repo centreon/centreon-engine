@@ -76,7 +76,7 @@ void applier::hostescalation::add_object(
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new escalation for host '"
-    << obj.hosts().front() << "'.";
+    << *obj.hosts().begin() << "'.";
 
   // Add escalation to the global configuration set.
   config->hostescalations().insert(obj);
@@ -84,7 +84,7 @@ void applier::hostescalation::add_object(
   // Create host escalation.
   hostescalation_struct*
     he(add_host_escalation(
-         obj.hosts().front().c_str(),
+         obj.hosts().begin()->c_str(),
          obj.first_notification(),
          obj.last_notification(),
          obj.notification_interval(),
@@ -100,47 +100,29 @@ void applier::hostescalation::add_object(
            & configuration::hostescalation::recovery)));
   if (!he)
     throw (engine_error() << "Could not create escalation "
-           << "on host '" << obj.hosts().front() << "'");
-
-  // Unique contacts.
-  std::set<std::string> contacts;
-  for (std::list<std::string>::const_iterator
-         it(obj.contacts().begin()),
-         end(obj.contacts().end());
-       it != end;
-       ++it)
-    contacts.insert(*it);
+           << "on host '" << *obj.hosts().begin() << "'");
 
   // Add contacts to host escalation.
-  for (std::set<std::string>::const_iterator
-         it(contacts.begin()),
-         end(contacts.end());
+  for (set_string::const_iterator
+         it(obj.contacts().begin()),
+         end(obj.contacts().end());
        it != end;
        ++it)
     if (!add_contact_to_host_escalation(he, it->c_str()))
       throw (engine_error() << "Could not add contact '" << *it
              << "' on escalation of host '"
-             << obj.hosts().front() << "'");
-
-  // Unique contact groups.
-  std::set<std::string> contact_groups;
-  for (std::list<std::string>::const_iterator
-         it(obj.contactgroups().begin()),
-         end(obj.contactgroups().end());
-       it != end;
-       ++it)
-    contact_groups.insert(*it);
+             << *obj.hosts().begin() << "'");
 
   // Add contact groups to host escalation.
-  for (std::set<std::string>::const_iterator
-         it(contact_groups.begin()),
-         end(contact_groups.end());
+  for (set_string::const_iterator
+         it(obj.contactgroups().begin()),
+         end(obj.contactgroups().end());
        it != end;
        ++it)
     if (!add_contactgroup_to_host_escalation(he, it->c_str()))
       throw (engine_error() << "Could not add contact group '"
              << *it << "' on escalation of host '"
-             << obj.hosts().front() << "'");
+             << *obj.hosts().begin() << "'");
 
   return ;
 }
@@ -175,7 +157,7 @@ void applier::hostescalation::expand_objects(configuration::state& s) {
       configuration::hostescalation hesc(*it_esc);
       hesc.hostgroups().clear();
       hesc.hosts().clear();
-      hesc.hosts().push_back(*it);
+      hesc.hosts().insert(*it);
 
       // Insert new host escalation and expand it.
       _inherits_special_vars(hesc, s);
@@ -287,39 +269,30 @@ void applier::hostescalation::resolve_object(
  *  @param[out]    expanded   Expanded hosts.
  */
 void applier::hostescalation::_expand_hosts(
-                                std::list<std::string> const& hosts,
-                                std::list<std::string> const& hostgroups,
+                                std::set<std::string> const& hosts,
+                                std::set<std::string> const& hostgroups,
                                 configuration::state const& s,
                                 std::set<std::string>& expanded) {
   // Copy hosts.
-  for (std::list<std::string>::const_iterator
-         it(hosts.begin()),
-         end(hosts.end());
-       it != end;
-       ++it)
-    expanded.insert(*it);
+  expanded = hosts;
 
   // Browse host groups.
-  for (std::list<std::string>::const_iterator
+  for (set_string::const_iterator
          it(hostgroups.begin()),
          end(hostgroups.end());
        it != end;
        ++it) {
     // Find host group.
-    set_hostgroup::const_iterator
-      it_group(s.hostgroups_find(*it));
+    set_hostgroup::const_iterator it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
       throw (engine_error()
              << "Could not expand non-existing host group '"
              << *it << "'");
 
     // Add host group members.
-    for (std::list<std::string>::const_iterator
-           it_member(it_group->members().begin()),
-           end_member(it_group->members().end());
-         it_member != end_member;
-         ++it_member)
-      expanded.insert(*it_member);
+    expanded.insert(
+               it_group->members().begin(),
+               it_group->members().end());
   }
 
   return ;
@@ -341,11 +314,11 @@ void applier::hostescalation::_inherits_special_vars(
       || !obj.escalation_period_defined()) {
     // Find host.
     configuration::set_host::const_iterator
-      it(s.hosts_find(obj.hosts().front()));
+      it(s.hosts_find(*obj.hosts().begin()));
     if (it == s.hosts().end())
       throw (engine_error()
              << "Could not inherit special variables from host '"
-             << obj.hosts().front() << "': host does not exist");
+             << *obj.hosts().begin() << "': host does not exist");
 
     // Inherits variables.
     if (!obj.contacts_defined())

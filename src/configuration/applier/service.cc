@@ -105,14 +105,14 @@ void applier::service::add_object(
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new service '" << obj.service_description()
-    << "' of host '" << obj.hosts().front() << "'.";
+    << "' of host '" << *obj.hosts().begin() << "'.";
 
   // Add service to the global configuration set.
   config->services().insert(obj);
 
   // Create service.
   service_struct* svc(add_service(
-    obj.hosts().front().c_str(),
+    obj.hosts().begin()->c_str(),
     obj.service_description().c_str(),
     NULL_IF_EMPTY(obj.display_name()),
     NULL_IF_EMPTY(obj.check_period()),
@@ -178,35 +178,35 @@ void applier::service::add_object(
   if (!svc)
       throw (engine_error() << "Could not register service '"
              << obj.service_description()
-             << "' of host '" << obj.hosts().front() << "'");
+             << "' of host '" << *obj.hosts().begin() << "'");
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].initial_notif_time = 0;
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].timezone = obj.timezone();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].host_id = obj.host_id();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].service_id = obj.service_id();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].acknowledgement_timeout
     = obj.get_acknowledgement_timeout() * config->interval_length();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].last_acknowledgement = 0;
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].recovery_notification_delay = obj.recovery_notification_delay();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].recovery_been_sent = true;
 
   // Add contacts.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.contacts().begin()),
          end(obj.contacts().end());
        it != end;
@@ -214,10 +214,10 @@ void applier::service::add_object(
     if (!add_contact_to_service(svc, it->c_str()))
       throw (engine_error() << "Could not add contact '"
              << *it << "' to service '" << obj.service_description()
-             << "' of host '" << obj.hosts().front() << "'");
+             << "' of host '" << *obj.hosts().begin() << "'");
 
   // Add contactgroups.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.contactgroups().begin()),
          end(obj.contactgroups().end());
        it != end;
@@ -225,7 +225,7 @@ void applier::service::add_object(
     if (!add_contactgroup_to_service(svc, it->c_str()))
       throw (engine_error() << "Could not add contact group '"
              << *it << "' to service '" << obj.service_description()
-             << "' of host '" << obj.hosts().front() << "'");
+             << "' of host '" << *obj.hosts().begin() << "'");
 
   // Add custom variables.
   for (map_customvar::const_iterator
@@ -240,7 +240,7 @@ void applier::service::add_object(
       throw (engine_error() << "Could not add custom variable '"
              << it->first << "' to service '"
              << obj.service_description() << "' of host '"
-             << obj.hosts().front() << "'");
+             << *obj.hosts().begin() << "'");
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -274,15 +274,10 @@ void applier::service::expand_objects(configuration::state& s) {
     std::set<std::string> target_hosts;
 
     // Hosts members.
-    for (list_string::const_iterator
-           it(it_svc->hosts().begin()),
-           end(it_svc->hosts().end());
-         it != end;
-         ++it)
-      target_hosts.insert(*it);
+    target_hosts = it_svc->hosts();
 
     // Host group members.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(it_svc->hostgroups().begin()),
            end(it_svc->hostgroups().end());
          it != end;
@@ -302,12 +297,9 @@ void applier::service::expand_objects(configuration::state& s) {
                << it_svc->service_description() << "'");
 
       // Add host group members.
-      for (list_string::const_iterator
-             it3(it2->members().begin()),
-             end3(it2->members().end());
-           it3 != end3;
-           ++it3)
-        target_hosts.insert(*it3);
+      target_hosts.insert(
+                     it2->members().begin(),
+                     it2->members().end());
     }
 
     // Browse all target hosts.
@@ -320,7 +312,7 @@ void applier::service::expand_objects(configuration::state& s) {
       configuration::service svc(*it_svc);
       svc.hostgroups().clear();
       svc.hosts().clear();
-      svc.hosts().push_back(*it);
+      svc.hosts().insert(*it);
 
       // Expand memberships.
       _expand_service_memberships(svc, s);
@@ -347,7 +339,7 @@ void applier::service::expand_objects(configuration::state& s) {
  */
 void applier::service::modify_object(
                          configuration::service const& obj) {
-  std::string const& host_name(obj.hosts().front());
+  std::string const& host_name(*obj.hosts().begin());
   std::string const& service_description(obj.service_description());
 
   // Logging.
@@ -519,20 +511,20 @@ void applier::service::modify_object(
     s->is_volatile,
     static_cast<int>(obj.is_volatile()));
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].timezone = obj.timezone();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].host_id = obj.host_id();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].service_id = obj.service_id();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].acknowledgement_timeout
     = obj.get_acknowledgement_timeout() * config->interval_length();
   service_other_props[std::make_pair(
-                             obj.hosts().front(),
+                             *obj.hosts().begin(),
                              obj.service_description())].recovery_notification_delay
     = obj.recovery_notification_delay();
 
@@ -542,7 +534,7 @@ void applier::service::modify_object(
     deleter::listmember(s->contacts, &deleter::contactsmember);
 
     // Add contacts to host.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.contacts().begin()),
            end(obj.contacts().end());
          it != end;
@@ -561,7 +553,7 @@ void applier::service::modify_object(
       &deleter::contactgroupsmember);
 
     // Add contact groups to host.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.contactgroups().begin()),
            end(obj.contactgroups().end());
          it != end;
@@ -614,7 +606,7 @@ void applier::service::modify_object(
  */
 void applier::service::remove_object(
                          configuration::service const& obj) {
-  std::string const& host_name(obj.hosts().front());
+  std::string const& host_name(*obj.hosts().begin());
   std::string const& service_description(obj.service_description());
 
   // Logging.
@@ -669,7 +661,7 @@ void applier::service::remove_object(
 
     // Remove service object (will effectively delete the object).
     service_other_props.erase(std::make_pair(
-                                     obj.hosts().front(),
+                                     *obj.hosts().begin(),
                                      obj.service_description()));
     applier::state::instance().services().erase(it);
   }
@@ -690,7 +682,7 @@ void applier::service::resolve_object(
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Resolving service '" << obj.service_description()
-    << "' of host '" << obj.hosts().front() << "'.";
+    << "' of host '" << *obj.hosts().begin() << "'.";
 
   // Find service.
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
@@ -698,7 +690,7 @@ void applier::service::resolve_object(
   if (applier::state::instance().services().end() == it)
     throw (engine_error() << "Cannot resolve non-existing service '"
            << obj.service_description() << "' of host '"
-           << obj.hosts().front() << "'");
+           << *obj.hosts().begin() << "'");
 
   // Remove service group links.
   deleter::listmember(
@@ -718,7 +710,7 @@ void applier::service::resolve_object(
   if (!check_service(it->second.get(), &config_warnings, &config_errors))
       throw (engine_error() << "Cannot resolve service '"
              << obj.service_description() << "' of host '"
-             << obj.hosts().front() << "'");
+             << *obj.hosts().begin() << "'");
 
   return ;
 }
@@ -733,7 +725,7 @@ void applier::service::_expand_service_memberships(
                          configuration::service& obj,
                          configuration::state& s) {
   // Browse service groups.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.servicegroups().begin()),
          end(obj.servicegroups().end());
        it != end;
@@ -744,7 +736,7 @@ void applier::service::_expand_service_memberships(
     if (it_group == s.servicegroups().end())
       throw (engine_error() << "Could not add service '"
              << obj.service_description() << "' of host '"
-             << obj.hosts().front()
+             << *obj.hosts().begin()
              << "' to non-existing service group '" << *it << "'");
 
     // Remove service group from state.
@@ -752,8 +744,9 @@ void applier::service::_expand_service_memberships(
     s.servicegroups().erase(it_group);
 
     // Add service to service members.
-    backup.members().push_back(obj.hosts().front());
-    backup.members().push_back(obj.service_description());
+    backup.members().insert(std::make_pair(
+                                   *obj.hosts().begin(),
+                                   obj.service_description()));
 
     // Reinsert service group.
     s.servicegroups().insert(backup);
@@ -784,12 +777,12 @@ void applier::service::_inherits_special_vars(
       || !obj.timezone_defined()) {
     // Find host.
     configuration::set_host::const_iterator
-      it(s.hosts_find(obj.hosts().front()));
+      it(s.hosts_find(*obj.hosts().begin()));
     if (it == s.hosts().end())
       throw (engine_error()
              << "Could not inherit special variables for service '"
              << obj.service_description() << "': host '"
-             << obj.hosts().front() << "' does not exist");
+             << *obj.hosts().begin() << "' does not exist");
 
     // Inherits variables.
     if (!obj.host_id())

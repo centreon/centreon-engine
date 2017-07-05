@@ -53,7 +53,7 @@ namespace         configuration {
 
      private:
       void        _add_exclusions(
-                    std::list<std::string> const& exclusions,
+                    std::set<std::string> const& exclusions,
                     timeperiod_struct* tp);
       void        _add_exceptions(
                     std::vector<std::list<daterange> > const& exceptions,

@@ -88,7 +88,7 @@ void applier::contactgroup::add_object(
            << obj.contactgroup_name() << "'");
 
   // Apply resolved contacts on contactgroup.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.members().begin()),
          end(obj.members().end());
        it != end;
@@ -173,7 +173,7 @@ void applier::contactgroup::modify_object(
       &deleter::contactsmember);
 
     // Create new contact group members.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.members().begin()),
            end(obj.members().end());
          it != end;
@@ -286,7 +286,7 @@ void applier::contactgroup::_resolve_members(
     resolved_obj.contactgroup_members().clear();
 
     // Add contactgroup members.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.contactgroup_members().begin()),
            end(obj.contactgroup_members().end());
          it != end;
@@ -304,12 +304,9 @@ void applier::contactgroup::_resolve_members(
 
       // Add contactgroup member members to members.
       configuration::contactgroup& resolved_group(_resolved[*it]);
-      for (list_string::const_iterator
-             it3(resolved_group.members().begin()),
-             end3(resolved_group.members().end());
-           it3 != end3;
-           ++it3)
-        resolved_obj.members().push_back(*it3);
+      resolved_obj.members().insert(
+                               resolved_group.members().begin(),
+                               resolved_group.members().end());
     }
   }
 

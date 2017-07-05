@@ -20,11 +20,9 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 
-#  include <list>
 #  include <set>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -52,8 +50,8 @@ namespace             configuration {
 
      private:
       void            _expand_hosts(
-                        std::list<std::string> const& hosts,
-                        std::list<std::string> const& hostgroups,
+                        std::set<std::string> const& hosts,
+                        std::set<std::string> const& hostgroups,
                         configuration::state& s,
                         std::set<std::string>& expanded);
     };

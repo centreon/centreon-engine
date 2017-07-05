@@ -212,7 +212,7 @@ void applier::contact::expand_objects(configuration::state& s) {
        it_contact != end_contact;
        ++it_contact)
     // Browse current contact's groups.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it_group(it_contact->contactgroups().begin()),
            end_group(it_contact->contactgroups().end());
          it_group != end_group;
@@ -231,7 +231,7 @@ void applier::contact::expand_objects(configuration::state& s) {
       s.contactgroups().erase(group);
 
       // Add contact to group members.
-      backup.members().push_back(it_contact->contact_name());
+      backup.members().insert(it_contact->contact_name());
 
       // Reinsert contact group.
       s.contactgroups().insert(backup);

@@ -112,19 +112,10 @@ void applier::serviceescalation::add_object(
            << "service '" << obj.service_description().front()
            << "' of host '" << obj.hosts().front() << "'");
 
-  // Unique contacts.
-  std::set<std::string> contacts;
-  for (std::list<std::string>::const_iterator
+  // Add contacts to host escalation.
+  for (set_string::const_iterator
          it(obj.contacts().begin()),
          end(obj.contacts().end());
-       it != end;
-       ++it)
-    contacts.insert(*it);
-
-  // Add contacts to host escalation.
-  for (std::set<std::string>::const_iterator
-         it(contacts.begin()),
-         end(contacts.end());
        it != end;
        ++it)
     if (!add_contact_to_serviceescalation(se, it->c_str()))
@@ -133,19 +124,10 @@ void applier::serviceescalation::add_object(
              << obj.service_description().front() << "' of host '"
              << obj.hosts().front() << "'");
 
-  // Unique contact groups.
-  std::set<std::string> contact_groups;
-  for (std::list<std::string>::const_iterator
+  // Add contact groups to service escalation.
+  for (set_string::const_iterator
          it(obj.contactgroups().begin()),
          end(obj.contactgroups().end());
-       it != end;
-       ++it)
-    contact_groups.insert(*it);
-
-  // Add contact groups to service escalation.
-  for (std::set<std::string>::const_iterator
-         it(contact_groups.begin()),
-         end(contact_groups.end());
        it != end;
        ++it)
     if (!add_contactgroup_to_serviceescalation(se, it->c_str()))
@@ -313,12 +295,7 @@ void applier::serviceescalation::_expand_services(
   std::set<std::string> all_hosts;
 
   // Base hosts.
-  for (std::list<std::string>::const_iterator
-         it(hst.begin()),
-         end(hst.end());
-       it != end;
-       ++it)
-    all_hosts.insert(*it);
+  all_hosts.insert(hst.begin(), hst.end());
 
   // Host groups.
   for (std::list<std::string>::const_iterator
@@ -334,12 +311,9 @@ void applier::serviceescalation::_expand_services(
              << *it << "'");
 
     // Add host group members.
-    for (list_string::const_iterator
-           it_member(it_group->members().begin()),
-           end_member(it_group->members().end());
-         it_member != end_member;
-         ++it_member)
-      all_hosts.insert(*it_member);
+    all_hosts.insert(
+                it_group->members().begin(),
+                it_group->members().end());
   }
 
   // Hosts * services.

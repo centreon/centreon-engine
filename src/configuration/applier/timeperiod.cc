@@ -259,9 +259,9 @@ void applier::timeperiod::resolve_object(
  *  @param[out] tp         Time period object.
  */
 void applier::timeperiod::_add_exclusions(
-                            std::list<std::string> const& exclusions,
+                            std::set<std::string> const& exclusions,
                             timeperiod_struct* tp) {
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(exclusions.begin()),
          end(exclusions.end());
        it != end;

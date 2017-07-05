@@ -107,7 +107,7 @@ void applier::scheduler::apply(
       services(applier::state::instance().services());
     umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(
-                               it->hosts().front(),
+                               *it->hosts().begin(),
                                it->service_description())));
     if (svc != services.end()) {
       bool has_event(quick_timed_event.find(
@@ -229,7 +229,7 @@ void applier::scheduler::remove_service(
     services(applier::state::instance().services());
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
     svc(services.find(std::make_pair(
-                             s.hosts().front(),
+                             *s.hosts().begin(),
                              s.service_description())));
   if (svc != services.end()) {
     std::vector<service_struct*> svec;
@@ -849,7 +849,7 @@ void applier::scheduler::_get_services(
          it(svc_cfg.rbegin()), end(svc_cfg.rend());
        it != end;
        ++it) {
-    std::string const& host_name(it->hosts().front());
+    std::string const& host_name(*it->hosts().begin());
     std::string const& service_description(it->service_description());
     umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(host_name, service_description)));

@@ -101,7 +101,7 @@ void applier::hostgroup::add_object(
     &tv);
 
   // Apply resolved hosts on hostgroup.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.members().begin()),
          end(obj.members().end());
        it != end;
@@ -208,7 +208,7 @@ void applier::hostgroup::modify_object(
       &deleter::hostsmember);
 
     // Create new host group members.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.members().begin()),
            end(obj.members().end());
          it != end;
@@ -324,7 +324,7 @@ void applier::hostgroup::_resolve_members(
     resolved_obj.hostgroup_members().clear();
 
     // Add hostgroup members.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.hostgroup_members().begin()),
            end(obj.hostgroup_members().end());
          it != end;
@@ -342,12 +342,9 @@ void applier::hostgroup::_resolve_members(
 
       // Add hostgroup member members to members.
       configuration::hostgroup& resolved_group(_resolved[*it]);
-      for (list_string::const_iterator
-             it3(resolved_group.members().begin()),
-             end3(resolved_group.members().end());
-           it3 != end3;
-           ++it3)
-        resolved_obj.members().push_back(*it3);
+      resolved_obj.members().insert(
+                               resolved_group.members().begin(),
+                               resolved_group.members().end());
     }
   }
 

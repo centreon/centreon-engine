@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
 
-#  include <list>
 #  include <set>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
@@ -52,8 +51,8 @@ namespace             configuration {
 
      private:
       void            _expand_hosts(
-                        std::list<std::string> const& h,
-                        std::list<std::string> const& hg,
+                        std::set<std::string> const& h,
+                        std::set<std::string> const& hg,
                         configuration::state const& s,
                         std::set<std::string>& expanded);
       void            _inherits_special_vars(

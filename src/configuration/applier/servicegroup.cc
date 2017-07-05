@@ -333,7 +333,7 @@ void applier::servicegroup::_resolve_members(
     resolved_obj.servicegroup_members().clear();
 
     // Add servicegroup members.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.servicegroup_members().begin()),
            end(obj.servicegroup_members().end());
          it != end;
@@ -355,7 +355,7 @@ void applier::servicegroup::_resolve_members(
              end3(it2->members().end());
            it3 != end3;
            ++it3)
-        obj.members().insert(*it3);
+        resolved_obj.members().insert(*it3);
     }
   }
 

@@ -80,14 +80,14 @@ void applier::hostdependency::add_object(
       && (obj.dependency_type()
           != configuration::hostdependency::notification_dependency))
     throw (engine_error() << "Could not create unexpanded "
-           << "host dependency of '" << obj.dependent_hosts().front()
-           << "' on '" << obj.hosts().front() << "'");
+           << "host dependency of '" << *obj.dependent_hosts().begin()
+           << "' on '" << *obj.hosts().begin() << "'");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new host dependency of host '"
-    << obj.dependent_hosts().front() << "' on host '"
-    << obj.hosts().front() << "'.";
+    << *obj.dependent_hosts().begin() << "' on host '"
+    << *obj.hosts().begin() << "'.";
 
   // Add dependency to the global configuration set.
   config->hostdependencies().insert(obj);
@@ -96,8 +96,8 @@ void applier::hostdependency::add_object(
   if (obj.dependency_type()
       == configuration::hostdependency::execution_dependency) {
     if (!add_host_dependency(
-           obj.dependent_hosts().front().c_str(),
-           obj.hosts().front().c_str(),
+           obj.dependent_hosts().begin()->c_str(),
+           obj.hosts().begin()->c_str(),
            EXECUTION_DEPENDENCY,
            obj.inherits_parent(),
            static_cast<bool>(
@@ -114,14 +114,14 @@ void applier::hostdependency::add_object(
              & configuration::hostdependency::pending),
            NULL_IF_EMPTY(obj.dependency_period())))
       throw (engine_error() << "Could not create host execution "
-             << "dependency of '" << obj.dependent_hosts().front()
-             << "' on '" << obj.hosts().front() << "'");
+             << "dependency of '" << *obj.dependent_hosts().begin()
+             << "' on '" << *obj.hosts().begin() << "'");
   }
   // Create notification dependency.
   else
     if (!add_host_dependency(
-           obj.dependent_hosts().front().c_str(),
-           obj.hosts().front().c_str(),
+           obj.dependent_hosts().begin()->c_str(),
+           obj.hosts().begin()->c_str(),
            NOTIFICATION_DEPENDENCY,
            obj.inherits_parent(),
            static_cast<bool>(
@@ -139,8 +139,8 @@ void applier::hostdependency::add_object(
            NULL_IF_EMPTY(obj.dependency_period())))
       throw (engine_error() << "Could not create host "
              << "notification dependency of '"
-             << obj.dependent_hosts().front() << "' on '"
-             << obj.hosts().front() << "'");
+             << *obj.dependent_hosts().begin() << "' on '"
+             << *obj.hosts().begin() << "'");
 
   return ;
 }
@@ -166,7 +166,7 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
         || (it_dep->dependency_type()
             == configuration::hostdependency::unknown)) {
       // Expanded depended hosts.
-      std::set<std::string> depended_hosts;
+      set_string depended_hosts;
       _expand_hosts(
         it_dep->hosts(),
         it_dep->hostgroups(),
@@ -197,10 +197,10 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
             configuration::hostdependency hdep(*it_dep);
             hdep.hostgroups().clear();
             hdep.hosts().clear();
-            hdep.hosts().push_back(*it1);
+            hdep.hosts().insert(*it1);
             hdep.dependent_hostgroups().clear();
             hdep.dependent_hosts().clear();
-            hdep.dependent_hosts().push_back(*it2);
+            hdep.dependent_hosts().insert(*it2);
             hdep.dependency_type(
               !i
               ? configuration::hostdependency::execution_dependency
@@ -323,20 +323,15 @@ void applier::hostdependency::resolve_object(
  *  @param[out]    expanded   Expanded hosts.
  */
 void applier::hostdependency::_expand_hosts(
-                                std::list<std::string> const& hosts,
-                                std::list<std::string> const& hostgroups,
+                                std::set<std::string> const& hosts,
+                                std::set<std::string> const& hostgroups,
                                 configuration::state& s,
                                 std::set<std::string>& expanded) {
   // Copy hosts.
-  for (std::list<std::string>::const_iterator
-         it(hosts.begin()),
-         end(hosts.end());
-       it != end;
-       ++it)
-    expanded.insert(*it);
+  expanded = hosts;
 
   // Browse host groups.
-  for (std::list<std::string>::const_iterator
+  for (set_string::const_iterator
          it(hostgroups.begin()),
          end(hostgroups.end());
        it != end;
@@ -349,12 +344,9 @@ void applier::hostdependency::_expand_hosts(
              << *it << "'");
 
     // Add host group members.
-    for (list_string::const_iterator
-           it_member(it_group->members().begin()),
-           end_member(it_group->members().end());
-         it_member != end_member;
-         ++it_member)
-      expanded.insert(*it_member);
+    expanded.insert(
+               it_group->members().begin(),
+               it_group->members().end());
   }
 
   return ;

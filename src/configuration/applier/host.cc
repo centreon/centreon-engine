@@ -169,7 +169,7 @@ void applier::host::add_object(
     = true;
 
   // Contacts.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.contacts().begin()),
          end(obj.contacts().end());
        it != end;
@@ -179,7 +179,7 @@ void applier::host::add_object(
              << *it << "' to host '" << obj.host_name() << "'");
 
   // Contact groups.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.contactgroups().begin()),
          end(obj.contactgroups().end());
        it != end;
@@ -202,7 +202,7 @@ void applier::host::add_object(
              << it->first << "' to host '" << obj.host_name() << "'");
 
   // Parents.
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(obj.parents().begin()),
          end(obj.parents().end());
        it != end;
@@ -242,7 +242,7 @@ void applier::host::expand_objects(configuration::state& s) {
        it_host != end_host;
        ++it_host)
     // Browse current host's groups.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it_group(it_host->hostgroups().begin()),
            end_group(it_host->hostgroups().end());
          it_group != end_group;
@@ -260,7 +260,7 @@ void applier::host::expand_objects(configuration::state& s) {
       s.hostgroups().erase(group);
 
       // Add host to group members.
-      backup.members().push_back(it_host->host_name());
+      backup.members().insert(it_host->host_name());
 
       // Reinsert host group.
       s.hostgroups().insert(backup);
@@ -455,7 +455,7 @@ void applier::host::modify_object(
     deleter::listmember(h->contacts, &deleter::contactsmember);
 
     // Add contacts to host.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.contacts().begin()),
            end(obj.contacts().end());
          it != end;
@@ -473,7 +473,7 @@ void applier::host::modify_object(
       &deleter::contactgroupsmember);
 
     // Add contact groups to host.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.contactgroups().begin()),
            end(obj.contactgroups().end());
          it != end;
@@ -524,7 +524,7 @@ void applier::host::modify_object(
     deleter::listmember(h->parent_hosts, &deleter::hostsmember);
 
     // Create parents.
-    for (list_string::const_iterator
+    for (set_string::const_iterator
            it(obj.parents().begin()),
            end(obj.parents().end());
          it != end;
