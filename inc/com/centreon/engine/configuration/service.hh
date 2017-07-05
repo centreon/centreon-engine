@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -36,7 +36,7 @@ namespace                  configuration {
   class                    serviceextinfo;
 
   class                    service : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       ok = (1 << 0),
@@ -130,7 +130,7 @@ namespace                  configuration {
     int                    get_acknowledgement_timeout() const throw ();
     bool                   set_acknowledgement_timeout(int value);
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(service&, char const*);
@@ -233,7 +233,7 @@ namespace                  configuration {
 
   typedef shared_ptr<service>    service_ptr;
   typedef std::list<service_ptr> list_service;
-  typedef std::set<service_ptr>  set_service;
+  typedef std::set<service>      set_service;
   typedef umap<std::pair<std::string, std::string>, service_ptr> map_service;
 }
 
