@@ -1449,9 +1449,9 @@ void applier::state::_processing(
   _expand<configuration::hostescalation, applier::hostescalation>(
     new_cfg);
 
-  // // Expand serviceescalations.
-  // _expand<configuration::serviceescalation, applier::serviceescalation>(
-  //   new_cfg);
+  // Expand serviceescalations.
+  _expand<configuration::serviceescalation, applier::serviceescalation>(
+    new_cfg);
 
   //
   //  Build difference for all objects.
@@ -1531,9 +1531,9 @@ void applier::state::_processing(
 
   // Build difference for serviceescalations.
   difference<set_serviceescalation> diff_serviceescalations;
-  // diff_serviceescalations.parse(
-  //   config->serviceescalations(),
-  //   new_cfg.serviceescalations());
+  diff_serviceescalations.parse(
+    config->serviceescalations(),
+    new_cfg.serviceescalations());
 
   // Timing.
   gettimeofday(tv + 1, NULL);
@@ -1647,11 +1647,11 @@ void applier::state::_processing(
     _resolve<configuration::hostescalation, applier::hostescalation>(
       config->hostescalations());
 
-    // // Apply service escalations.
-    // _apply<configuration::serviceescalation, applier::serviceescalation>(
-    //   diff_serviceescalations);
-    // _resolve<configuration::serviceescalation, applier::serviceescalation>(
-    //   config->serviceescalations());
+    // Apply service escalations.
+    _apply<configuration::serviceescalation, applier::serviceescalation>(
+      diff_serviceescalations);
+    _resolve<configuration::serviceescalation, applier::serviceescalation>(
+      config->serviceescalations());
 
     // Load retention.
     if (state)

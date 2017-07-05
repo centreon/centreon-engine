@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    serviceescalation : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       unknown = (1 << 1),
@@ -88,7 +88,7 @@ namespace                  configuration {
     list_string&           service_description() throw ();
     list_string const&     service_description() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(serviceescalation&, char const*);
@@ -120,8 +120,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<serviceescalation>   serviceescalation_ptr;
-  typedef std::set<serviceescalation_ptr> set_serviceescalation;
+  typedef shared_ptr<serviceescalation>  serviceescalation_ptr;
+  typedef std::set<serviceescalation>    set_serviceescalation;
 }
 
 CCE_END()
