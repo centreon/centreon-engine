@@ -63,16 +63,16 @@ applier::serviceescalation& applier::serviceescalation::operator=(
 /**
  *  Add new service escalation.
  *
- *  @param[in] obj The new service escalation to add into the monitoring
- *                 engine.
+ *  @param[in] obj  The new service escalation to add into the
+ *                  monitoring engine.
  */
 void applier::serviceescalation::add_object(
-                                   shared_ptr<configuration::serviceescalation> obj) {
+       configuration::serviceescalation const& obj) {
   // Check service escalation.
-  if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
-      || (obj->service_description().size() != 1)
-      || !obj->servicegroups().empty())
+  if ((obj.hosts().size() != 1)
+      || !obj.hostgroups().empty()
+      || (obj.service_description().size() != 1)
+      || !obj.servicegroups().empty())
     throw (engine_error() << "Could not create service "
            << "escalation with multiple hosts / host groups / services "
            << "/ service groups");
@@ -80,8 +80,8 @@ void applier::serviceescalation::add_object(
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new escalation for service '"
-    << obj->service_description().front() << "' of host '"
-    << obj->hosts().front() << "'";
+    << obj.service_description().front() << "' of host '"
+    << obj.hosts().front() << "'";
 
   // Add escalation to the global configuration set.
   config->serviceescalations().insert(obj);
@@ -89,103 +89,78 @@ void applier::serviceescalation::add_object(
   // Create service escalation.
   serviceescalation_struct*
     se(add_service_escalation(
-         obj->hosts().front().c_str(),
-         obj->service_description().front().c_str(),
-         obj->first_notification(),
-         obj->last_notification(),
-         obj->notification_interval(),
-         NULL_IF_EMPTY(obj->escalation_period()),
+         obj.hosts().front().c_str(),
+         obj.service_description().front().c_str(),
+         obj.first_notification(),
+         obj.last_notification(),
+         obj.notification_interval(),
+         NULL_IF_EMPTY(obj.escalation_period()),
          static_cast<bool>(
-           obj->escalation_options()
+           obj.escalation_options()
            & configuration::serviceescalation::warning),
          static_cast<bool>(
-           obj->escalation_options()
+           obj.escalation_options()
            & configuration::serviceescalation::unknown),
          static_cast<bool>(
-           obj->escalation_options()
+           obj.escalation_options()
            & configuration::serviceescalation::critical),
          static_cast<bool>(
-           obj->escalation_options()
+           obj.escalation_options()
            & configuration::serviceescalation::recovery)));
   if (!se)
     throw (engine_error() << "Could not create escalation on "
-           << "service '" << obj->service_description().front()
-           << "' of host '" << obj->hosts().front() << "'");
-
-  // Unique contacts.
-  std::set<std::string> contacts;
-  for (std::list<std::string>::const_iterator
-         it(obj->contacts().begin()),
-         end(obj->contacts().end());
-       it != end;
-       ++it)
-    contacts.insert(*it);
+           << "service '" << obj.service_description().front()
+           << "' of host '" << obj.hosts().front() << "'");
 
   // Add contacts to host escalation.
-  for (std::set<std::string>::const_iterator
-         it(contacts.begin()),
-         end(contacts.end());
+  for (set_string::const_iterator
+         it(obj.contacts().begin()),
+         end(obj.contacts().end());
        it != end;
        ++it)
     if (!add_contact_to_serviceescalation(se, it->c_str()))
       throw (engine_error() << "Could not add contact '" << *it
              << "' to escalation of service '"
-             << obj->service_description().front() << "' of host '"
-             << obj->hosts().front() << "'");
-
-  // Unique contact groups.
-  std::set<std::string> contact_groups;
-  for (std::list<std::string>::const_iterator
-         it(obj->contactgroups().begin()),
-         end(obj->contactgroups().end());
-       it != end;
-       ++it)
-    contact_groups.insert(*it);
+             << obj.service_description().front() << "' of host '"
+             << obj.hosts().front() << "'");
 
   // Add contact groups to service escalation.
-  for (std::set<std::string>::const_iterator
-         it(contact_groups.begin()),
-         end(contact_groups.end());
+  for (set_string::const_iterator
+         it(obj.contactgroups().begin()),
+         end(obj.contactgroups().end());
        it != end;
        ++it)
     if (!add_contactgroup_to_serviceescalation(se, it->c_str()))
       throw (engine_error() << "Could not add contact group '"
              << *it << "' to escalation of service '"
-             << obj->service_description().front() << "' of host '"
-             << obj->hosts().front() << "'");
+             << obj.service_description().front() << "' of host '"
+             << obj.hosts().front() << "'");
 
   return ;
 }
 
 /**
- *  Expand a service escalation.
+ *  Expand all service escalations.
  *
- *  @param[in]     obj Service escalation object.
- *  @param[in,out] s   Configuration being applied.
+ *  @param[in,out] s  Configuration being applied.
  */
-void applier::serviceescalation::expand_object(
-                                   shared_ptr<configuration::serviceescalation> obj,
-                                   configuration::state& s) {
-  // Inherits special vars.
-  if ((obj->hosts().size() == 1)
-      && obj->hostgroups().empty()
-      && (obj->service_description().size() == 1)
-      && obj->servicegroups().empty())
-    _inherits_special_vars(obj, s);
-  // Expand service escalation.
-  else {
+void applier::serviceescalation::expand_objects(configuration::state& s) {
+  // Browse all escalations.
+  configuration::set_serviceescalation expanded;
+  for (configuration::set_serviceescalation::const_iterator
+         it_esc(s.serviceescalations().begin()),
+         end_esc(s.serviceescalations().end());
+       it_esc != end_esc;
+       ++it_esc) {
     // Expanded services.
     std::set<std::pair<std::string, std::string> > expanded_services;
     _expand_services(
-      obj->hosts(),
-      obj->hostgroups(),
-      obj->service_description(),
-      obj->servicegroups(),
+      it_esc->hosts(),
+      it_esc->hostgroups(),
+      it_esc->service_description(),
+      it_esc->servicegroups(),
       s,
       expanded_services);
-
-    // Remove current service escalation.
-    s.serviceescalations().erase(obj);
 
     // Browse all services.
     for (std::set<std::pair<std::string, std::string> >::const_iterator
@@ -193,20 +168,22 @@ void applier::serviceescalation::expand_object(
            end(expanded_services.end());
          it != end;
          ++it) {
-      shared_ptr<configuration::serviceescalation>
-        sesc(new configuration::serviceescalation(*obj));
-      sesc->hostgroups().clear();
-      sesc->hosts().clear();
-      sesc->hosts().push_back(it->first);
-      sesc->servicegroups().clear();
-      sesc->service_description().clear();
-      sesc->service_description().push_back(it->second);
+      configuration::serviceescalation sesc(*it_esc);
+      sesc.hostgroups().clear();
+      sesc.hosts().clear();
+      sesc.hosts().push_back(it->first);
+      sesc.servicegroups().clear();
+      sesc.service_description().clear();
+      sesc.service_description().push_back(it->second);
 
       // Insert new service escalation and expand it.
-      s.serviceescalations().insert(sesc);
-      expand_object(sesc, s);
+      _inherits_special_vars(sesc, s);
+      expanded.insert(sesc);
     }
   }
+
+  // Set expanded service escalations in configuration state.
+  s.serviceescalations().swap(expanded);
 
   return ;
 }
@@ -217,10 +194,10 @@ void applier::serviceescalation::expand_object(
  *  Service escalations cannot be defined with anything else than their
  *  full content. Therefore no modification can occur.
  *
- *  @param[in] obj Unused.
+ *  @param[in] obj  Unused.
  */
 void applier::serviceescalation::modify_object(
-                                   shared_ptr<configuration::serviceescalation> obj) {
+       configuration::serviceescalation const& obj) {
   (void)obj;
   throw (engine_error() << "Could not modify a service "
          << "escalation: service escalation objects can only be added "
@@ -232,18 +209,18 @@ void applier::serviceescalation::modify_object(
 /**
  *  Remove old service escalation.
  *
- *  @param[in] obj The service escalation to remove from the monitoring
- *                 engine.
+ *  @param[in] obj  The service escalation to remove from the monitoring
+ *                  engine.
  */
 void applier::serviceescalation::remove_object(
-                                   shared_ptr<configuration::serviceescalation> obj) {
+       configuration::serviceescalation const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing a service escalation.";
 
   // Find service escalation.
   umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
-    it(applier::state::instance().serviceescalations_find(obj->key()));
+    it(applier::state::instance().serviceescalations_find(obj.key()));
   if (it != applier::state::instance().serviceescalations().end()) {
     serviceescalation_struct* escalation(it->second.get());
     // Remove service escalation from its list.
@@ -273,17 +250,17 @@ void applier::serviceescalation::remove_object(
 /**
  *  Resolve a serviceescalation.
  *
- *  @param[in] obj Serviceescalation object.
+ *  @param[in] obj  Serviceescalation object.
  */
 void applier::serviceescalation::resolve_object(
-                shared_ptr<configuration::serviceescalation> obj) {
+       configuration::serviceescalation const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Resolving a service escalation.";
 
   // Find service escalation.
   umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
-    it(applier::state::instance().serviceescalations_find(obj->key()));
+    it(applier::state::instance().serviceescalations_find(obj.key()));
   if (applier::state::instance().serviceescalations().end() == it)
     throw (engine_error() << "Cannot resolve service escalation");
 
@@ -318,12 +295,7 @@ void applier::serviceescalation::_expand_services(
   std::set<std::string> all_hosts;
 
   // Base hosts.
-  for (std::list<std::string>::const_iterator
-         it(hst.begin()),
-         end(hst.end());
-       it != end;
-       ++it)
-    all_hosts.insert(*it);
+  all_hosts.insert(hst.begin(), hst.end());
 
   // Host groups.
   for (std::list<std::string>::const_iterator
@@ -332,19 +304,16 @@ void applier::serviceescalation::_expand_services(
        it != end;
        ++it) {
     // Find host group.
-    std::set<shared_ptr<configuration::hostgroup> >::iterator
+    configuration::set_hostgroup::iterator
       it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
       throw (engine_error() << "Could not resolve host group '"
              << *it << "'");
 
     // Add host group members.
-    for (std::set<std::string>::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
-         it_member != end_member;
-         ++it_member)
-      all_hosts.insert(*it_member);
+    all_hosts.insert(
+                it_group->members().begin(),
+                it_group->members().end());
   }
 
   // Hosts * services.
@@ -367,16 +336,16 @@ void applier::serviceescalation::_expand_services(
        it != end;
        ++it) {
     // Find service group.
-    std::set<shared_ptr<configuration::servicegroup> >::iterator
+    configuration::set_servicegroup::iterator
       it_group(s.servicegroups_find(*it));
     if (it_group == s.servicegroups().end())
       throw (engine_error() << "Could not resolve service group '"
              << *it << "'");
 
     // Add service group members.
-    for (std::set<std::pair<std::string, std::string> >::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
+    for (set_pair_string::const_iterator
+           it_member(it_group->members().begin()),
+           end_member(it_group->members().end());
          it_member != end_member;
          ++it_member)
       expanded.insert(*it_member);
@@ -389,43 +358,36 @@ void applier::serviceescalation::_expand_services(
  *  Inherits special variables from the service.
  *
  *  @param[in,out] obj Service escalation object.
- *  @param[in,out] s   Configuration state.
+ *  @param[in]     s   Configuration state.
  */
 void applier::serviceescalation::_inherits_special_vars(
-                                   shared_ptr<configuration::serviceescalation> obj,
-                                   configuration::state& s) {
+       configuration::serviceescalation& obj,
+       configuration::state const& s) {
   // Detect if any special variables has not been defined.
-  if (!obj->contacts_defined()
-      || !obj->contactgroups_defined()
-      || !obj->notification_interval_defined()
-      || !obj->escalation_period_defined()) {
-    // Remove service escalation from state. It will be modified and
-    // reinserted at the end of the method.
-    s.serviceescalations().erase(obj);
-
+  if (!obj.contacts_defined()
+      || !obj.contactgroups_defined()
+      || !obj.notification_interval_defined()
+      || !obj.escalation_period_defined()) {
     // Find service.
-    std::set<shared_ptr<configuration::service> >::const_iterator
+    configuration::set_service::const_iterator
       it(s.services_find(std::make_pair(
-                                obj->hosts().front(),
-                                obj->service_description().front())));
+                                obj.hosts().front(),
+                                obj.service_description().front())));
     if (it == s.services().end())
       throw (engine_error() << "Could not inherit special "
              << "variables from service '"
-             << obj->service_description().front() << "' of host '"
-             << obj->hosts().front() << "': service does not exist");
+             << obj.service_description().front() << "' of host '"
+             << obj.hosts().front() << "': service does not exist");
 
     // Inherits variables.
-    if (!obj->contacts_defined())
-      obj->contacts() = (*it)->contacts();
-    if (!obj->contactgroups_defined())
-      obj->contactgroups() = (*it)->contactgroups();
-    if (!obj->notification_interval_defined())
-      obj->notification_interval((*it)->notification_interval());
-    if (!obj->escalation_period_defined())
-      obj->escalation_period((*it)->notification_period());
-
-    // Reinsert service escalation.
-    s.serviceescalations().insert(obj);
+    if (!obj.contacts_defined())
+      obj.contacts() = it->contacts();
+    if (!obj.contactgroups_defined())
+      obj.contactgroups() = it->contactgroups();
+    if (!obj.notification_interval_defined())
+      obj.notification_interval(it->notification_interval());
+    if (!obj.escalation_period_defined())
+      obj.escalation_period(it->notification_period());
   }
 
   return ;

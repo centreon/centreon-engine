@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -69,24 +69,23 @@ applier::command& applier::command::operator=(
 /**
  *  Add new command.
  *
- *  @param[in] obj The new command to add into the monitoring engine.
+ *  @param[in] obj  The new command to add into the monitoring engine.
  */
-void applier::command::add_object(
-                         shared_ptr<configuration::command> obj) {
+void applier::command::add_object(configuration::command const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new command '" << obj->command_name() << "'.";
+    << "Creating new command '" << obj.command_name() << "'.";
 
   // Add command to the global configuration set.
   config->commands().insert(obj);
 
   // Create compatibility command.
   command_struct* c(add_command(
-                      obj->command_name().c_str(),
-                      obj->command_line().c_str()));
+                      obj.command_name().c_str(),
+                      obj.command_line().c_str()));
   if (!c)
     throw (engine_error() << "Could not register command '"
-           << obj->command_name() << "'");
+           << obj.command_name() << "'");
 
   // Create real command object.
   _create_command(obj);
@@ -100,13 +99,9 @@ void applier::command::add_object(
  *  Command configuration objects do not need expansion. Therefore this
  *  method does nothing.
  *
- *  @param[in] obj Unused.
- *  @param[in] s   Unused.
+ *  @param[in] s  Unused.
  */
-void applier::command::expand_object(
-                         shared_ptr<configuration::command> obj,
-                         configuration::state& s) {
-  (void)obj;
+void applier::command::expand_objects(configuration::state& s) {
   (void)s;
   return ;
 }
@@ -117,38 +112,37 @@ void applier::command::expand_object(
  *  @param[in] obj The new command to modify into the monitoring engine.
  */
 void applier::command::modify_object(
-                         shared_ptr<configuration::command> obj) {
+                         configuration::command const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying command '" << obj->command_name() << "'.";
+    << "Modifying command '" << obj.command_name() << "'.";
 
   // Find old configuration.
-  set_command::iterator it_cfg(config->commands_find(obj->key()));
+  set_command::iterator it_cfg(config->commands_find(obj.key()));
   if (it_cfg == config->commands().end())
     throw (engine_error() << "Cannot modify non-existing "
-           << "command '" << obj->command_name() << "'");
+           << "command '" << obj.command_name() << "'");
 
   // Find command object.
   umap<std::string, shared_ptr<command_struct> >::iterator
-    it_obj(applier::state::instance().commands_find(obj->key()));
+    it_obj(applier::state::instance().commands_find(obj.key()));
   if (it_obj == applier::state::instance().commands().end())
     throw (engine_error() << "Could not modify non-existing "
-           << "command object '" << obj->command_name() << "'");
+           << "command object '" << obj.command_name() << "'");
   command_struct* c(it_obj->second.get());
 
   // Update the global configuration set.
-  shared_ptr<configuration::command> old_cfg(*it_cfg);
   config->commands().erase(it_cfg);
   config->commands().insert(obj);
 
   // Modify command.
-  modify_if_different(c->command_line, obj->command_line().c_str());
+  modify_if_different(c->command_line, obj.command_line().c_str());
 
   // Command will be temporarily removed from the command set but
   // will be added back right after with _create_command. This does
   // not create dangling pointers since commands::command object are
   // not referenced anywhere, only ::command objects are.
-  commands::set::instance().remove_command(obj->command_name());
+  commands::set::instance().remove_command(obj.command_name());
   _create_command(obj);
 
   // Notify event broker.
@@ -169,14 +163,14 @@ void applier::command::modify_object(
  *  @param[in] obj The new command to remove from the monitoring engine.
  */
 void applier::command::remove_object(
-                         shared_ptr<configuration::command> obj) {
+                         configuration::command const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing command '" << obj->command_name() << "'.";
+    << "Removing command '" << obj.command_name() << "'.";
 
   // Find command.
   umap<std::string, shared_ptr<command_struct> >::iterator
-    it(applier::state::instance().commands_find(obj->key()));
+    it(applier::state::instance().commands_find(obj.key()));
   if (it != applier::state::instance().commands().end()) {
     command_struct* cmd(it->second.get());
 
@@ -197,7 +191,7 @@ void applier::command::remove_object(
   }
 
   // Remove command objects.
-  commands::set::instance().remove_command(obj->command_name());
+  commands::set::instance().remove_command(obj.command_name());
 
   // Remove command from the global configuration set.
   config->commands().erase(obj);
@@ -206,14 +200,17 @@ void applier::command::remove_object(
 }
 
 /**
- *  Resolve command.
+ *  @brief Resolve command.
  *
- *  @param[in] obj Unused.
+ *  This method will check for its connector's existence, if command is
+ *  configured to use one.
+ *
+ *  @param[in] obj  Command object.
  */
 void applier::command::resolve_object(
-                         shared_ptr<configuration::command> obj) {
-  if (!obj->connector().empty())
-    commands::set::instance().get_command(obj->connector());
+                         configuration::command const& obj) {
+  if (!obj.connector().empty())
+    commands::set::instance().get_command(obj.connector());
   return ;
 }
 
@@ -223,19 +220,19 @@ void applier::command::resolve_object(
  *  Create the commands::command object. This can be either a
  *  commands::raw object or a commands::forward object.
  *
- *  @param[in] obj Command configuration object.
+ *  @param[in] obj  Command configuration object.
  */
 void applier::command::_create_command(
-                         shared_ptr<configuration::command> obj) {
+                         configuration::command const& obj) {
   // Command set.
   commands::set& cmd_set(commands::set::instance());
 
   // Raw command.
-  if (obj->connector().empty()) {
+  if (obj.connector().empty()) {
     shared_ptr<commands::command>
       cmd(new commands::raw(
-                          obj->command_name(),
-                          obj->command_line(),
+                          obj.command_name(),
+                          obj.command_line(),
                           &checks::checker::instance()));
     cmd_set.add_command(cmd);
   }
@@ -243,9 +240,9 @@ void applier::command::_create_command(
   else {
     shared_ptr<commands::command>
       cmd(new commands::forward(
-                          obj->command_name(),
-                          obj->command_line(),
-                          *cmd_set.get_command(obj->connector())));
+                          obj.command_name(),
+                          obj.command_line(),
+                          *cmd_set.get_command(obj.connector())));
     cmd_set.add_command(cmd);
   }
 

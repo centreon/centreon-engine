@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    hostdependency : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       up = (1 << 0),
@@ -64,24 +64,24 @@ namespace                  configuration {
     void                   dependency_type(
                              dependency_kind type) throw ();
     dependency_kind        dependency_type() const throw ();
-    list_string&           dependent_hostgroups() throw ();
-    list_string const&     dependent_hostgroups() const throw ();
-    list_string&           dependent_hosts() throw ();
-    list_string const&     dependent_hosts() const throw ();
+    set_string&            dependent_hostgroups() throw ();
+    set_string const&      dependent_hostgroups() const throw ();
+    set_string&            dependent_hosts() throw ();
+    set_string const&      dependent_hosts() const throw ();
     void                   execution_failure_options(
                              unsigned int options) throw ();
     unsigned int           execution_failure_options() const throw ();
-    list_string&           hostgroups() throw ();
-    list_string const&     hostgroups() const throw ();
-    list_string&           hosts() throw ();
-    list_string const&     hosts() const throw ();
+    set_string&            hostgroups() throw ();
+    set_string const&      hostgroups() const throw ();
+    set_string&            hosts() throw ();
+    set_string const&      hosts() const throw ();
     void                   inherits_parent(bool inherit) throw ();
     bool                   inherits_parent() const throw ();
     void                   notification_failure_options(
                              unsigned int options) throw ();
     unsigned int           notification_failure_options() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(hostdependency&, char const*);
@@ -98,18 +98,18 @@ namespace                  configuration {
 
     std::string            _dependency_period;
     dependency_kind        _dependency_type;
-    group                  _dependent_hostgroups;
-    group                  _dependent_hosts;
+    group<set_string>      _dependent_hostgroups;
+    group<set_string>      _dependent_hosts;
     opt<unsigned int>      _execution_failure_options;
-    group                  _hostgroups;
-    group                  _hosts;
+    group<set_string>      _hostgroups;
+    group<set_string>      _hosts;
     opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<hostdependency>    hostdependency_ptr;
-  typedef std::set<hostdependency_ptr>  set_hostdependency;
+  typedef shared_ptr<hostdependency>  hostdependency_ptr;
+  typedef std::set<hostdependency>    set_hostdependency;
 }
 
 CCE_END()

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,11 +20,9 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 
-#  include <list>
 #  include <set>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -35,27 +33,25 @@ namespace             configuration {
 
   namespace           applier {
     class             hostdependency {
-    public:
+     public:
                       hostdependency();
                       hostdependency(hostdependency const& right);
                       ~hostdependency() throw ();
       hostdependency& operator=(hostdependency const& right);
       void            add_object(
-                        shared_ptr<configuration::hostdependency> obj);
-      void            expand_object(
-                        shared_ptr<configuration::hostdependency> obj,
-                        configuration::state& s);
+                        configuration::hostdependency const& obj);
+      void            expand_objects(configuration::state& s);
       void            modify_object(
-                        shared_ptr<configuration::hostdependency> obj);
+                        configuration::hostdependency const& obj);
       void            remove_object(
-                        shared_ptr<configuration::hostdependency> obj);
+                        configuration::hostdependency const& obj);
       void            resolve_object(
-                        shared_ptr<configuration::hostdependency> obj);
+                        configuration::hostdependency const& obj);
 
-    private:
+     private:
       void            _expand_hosts(
-                        std::list<std::string> const& hosts,
-                        std::list<std::string> const& hostgroups,
+                        std::set<std::string> const& hosts,
+                        std::set<std::string> const& hostgroups,
                         configuration::state& s,
                         std::set<std::string>& expanded);
     };

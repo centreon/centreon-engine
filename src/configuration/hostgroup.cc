@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,8 +45,7 @@ hostgroup::setters const hostgroup::_setters[] = {
 hostgroup::hostgroup(key_type const& key)
   : object(object::hostgroup),
     _hostgroup_id(0),
-    _hostgroup_name(key),
-    _resolved(false) {}
+    _hostgroup_name(key) {}
 
 /**
  *  Copy constructor.
@@ -81,8 +80,6 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
     _members = right._members;
     _notes = right._notes;
     _notes_url = right._notes_url;
-    _resolved = right._resolved;
-    _resolved_members = right._resolved_members;
   }
   return (*this);
 }
@@ -103,9 +100,7 @@ bool hostgroup::operator==(hostgroup const& right) const throw () {
           && _hostgroup_name == right._hostgroup_name
           && _members == right._members
           && _notes == right._notes
-          && _notes_url == right._notes_url
-          && _resolved == right._resolved
-          && _resolved_members == right._resolved_members);
+          && _notes_url == right._notes_url);
 }
 
 /**
@@ -143,11 +138,7 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
     return (_notes_url < right._notes_url);
   else if (_hostgroup_members != right._hostgroup_members)
     return (_hostgroup_members < right._hostgroup_members);
-  else if (_members != right._members)
-    return (_members < right._members);
-  else if (_resolved != right._resolved)
-    return (_resolved < right._resolved);
-  return (_resolved_members < right._resolved_members);
+  return (_members < right._members);
 }
 
 /**
@@ -239,7 +230,16 @@ unsigned int hostgroup::hostgroup_id() const throw() {
  *
  *  @return The hostgroup_members.
  */
-list_string const& hostgroup::hostgroup_members() const throw () {
+set_string& hostgroup::hostgroup_members() throw () {
+  return (*_hostgroup_members);
+}
+
+/**
+ *  Get hostgroup_members.
+ *
+ *  @return The hostgroup_members.
+ */
+set_string const& hostgroup::hostgroup_members() const throw () {
   return (*_hostgroup_members);
 }
 
@@ -257,7 +257,7 @@ std::string const& hostgroup::hostgroup_name() const throw () {
  *
  *  @return The members.
  */
-list_string& hostgroup::members() throw () {
+set_string& hostgroup::members() throw () {
   return (*_members);
 }
 
@@ -266,7 +266,7 @@ list_string& hostgroup::members() throw () {
  *
  *  @return The members.
  */
-list_string const& hostgroup::members() const throw () {
+set_string const& hostgroup::members() const throw () {
   return (*_members);
 }
 
@@ -286,35 +286,6 @@ std::string const& hostgroup::notes() const throw () {
  */
 std::string const& hostgroup::notes_url() const throw () {
   return (_notes_url);
-}
-
-/**
- *  Check if hostgroup was resolved.
- *
- *  @return True if hostgroup was resolved, false otherwise.
- */
-bool hostgroup::is_resolved() const throw () {
-  return (_resolved);
-}
-
-/**
- *  Get resolved members.
- *
- *  @return Modifiable list of members.
- */
-set_string& hostgroup::resolved_members() const throw () {
-  return (_resolved_members);
-}
-
-/**
- *  Set whether or not hostgroup has been resolved.
- *
- *  @param[in] resolved True if hostgroup has been resolved, false
- *                      otherwise.
- */
-void hostgroup::set_resolved(bool resolved) const throw () {
-  _resolved = resolved;
-  return ;
 }
 
 /**

@@ -215,7 +215,7 @@ point_3d const& hostextinfo::coords_3d() const throw () {
  *
  *  @return The hostgroups.
  */
-list_string const& hostextinfo::hostgroups() const throw () {
+set_string const& hostextinfo::hostgroups() const throw () {
   return (*_hostgroups);
 }
 
@@ -224,7 +224,7 @@ list_string const& hostextinfo::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-list_string const& hostextinfo::hosts() const throw () {
+set_string const& hostextinfo::hosts() const throw () {
   return (*_hosts);
 }
 

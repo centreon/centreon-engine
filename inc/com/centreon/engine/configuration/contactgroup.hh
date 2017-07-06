@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    contactgroup : public object {
-  public:
+   public:
     typedef std::string    key_type;
 
                            contactgroup(key_type const& key = "");
@@ -49,16 +49,13 @@ namespace                  configuration {
     bool                   parse(char const* key, char const* value);
 
     std::string const&     alias() const throw ();
-    list_string const&     contactgroup_members() const throw ();
+    set_string&            contactgroup_members() throw ();
+    set_string const&      contactgroup_members() const throw ();
     std::string const&     contactgroup_name() const throw ();
-    list_string&           members() throw ();
-    list_string const&     members() const throw ();
+    set_string&            members() throw ();
+    set_string const&      members() const throw ();
 
-    bool                   is_resolved() const throw ();
-    set_string&            resolved_members() const throw ();
-    void                   set_resolved(bool resolved) const throw ();
-
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(contactgroup&, char const*);
@@ -70,16 +67,14 @@ namespace                  configuration {
     bool                   _set_members(std::string const& value);
 
     std::string            _alias;
-    group                  _contactgroup_members;
+    group<set_string>      _contactgroup_members;
     std::string            _contactgroup_name;
-    group                  _members;
-    mutable bool           _resolved;
-    mutable set_string     _resolved_members;
+    group<set_string>      _members;
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<contactgroup>   contactgroup_ptr;
-  typedef std::set<contactgroup_ptr> set_contactgroup;
+  typedef shared_ptr<contactgroup> contactgroup_ptr;
+  typedef std::set<contactgroup>   set_contactgroup;
 }
 
 CCE_END()

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    connector : public object {
-  public:
+   public:
     typedef std::string    key_type;
 
                            connector(key_type const& key = "");
@@ -51,7 +51,7 @@ namespace                  configuration {
     std::string const&     connector_line() const throw ();
     std::string const&     connector_name() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(connector&, char const*);
@@ -65,11 +65,10 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<connector>   connector_ptr;
-  typedef std::set<connector_ptr> set_connector;
+  typedef shared_ptr<connector> connector_ptr;
+  typedef std::set<connector>   set_connector;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_CONNECTOR_HH
-

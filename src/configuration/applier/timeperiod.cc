@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -64,29 +64,29 @@ applier::timeperiod& applier::timeperiod::operator=(
 /**
  *  Add new time period.
  *
- *  @param[in] obj The new time period to add in the monitoring engine.
+ *  @param[in] obj  The new time period to add in the monitoring engine.
  */
 void applier::timeperiod::add_object(
-                            shared_ptr<configuration::timeperiod> obj) {
+                            configuration::timeperiod const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new time period '" << obj->timeperiod_name() << "'.";
+    << "Creating new time period '" << obj.timeperiod_name() << "'.";
 
   // Add time period to the global configuration set.
   config->timeperiods().insert(obj);
 
   // Create time period.
   timeperiod_struct* tp(add_timeperiod(
-                          obj->timeperiod_name().c_str(),
-                          NULL_IF_EMPTY(obj->alias())));
+                          obj.timeperiod_name().c_str(),
+                          NULL_IF_EMPTY(obj.alias())));
   if (!tp)
     throw (engine_error() << "Could not register time period '"
-           << obj->timeperiod_name() << "'");
+           << obj.timeperiod_name() << "'");
 
   // Fill time period structure.
-  _add_time_ranges(obj->timeranges(), tp);
-  _add_exceptions(obj->exceptions(), tp);
-  _add_exclusions(obj->exclude(), tp);
+  _add_time_ranges(obj.timeranges(), tp);
+  _add_exceptions(obj.exceptions(), tp);
+  _add_exclusions(obj.exclude(), tp);
 
   return ;
 }
@@ -97,13 +97,9 @@ void applier::timeperiod::add_object(
  *  Time period objects do not need expansion. Therefore this method
  *  does nothing.
  *
- *  @param[in] obj Unused.
- *  @param[in] s   Unused.
+ *  @param[in] s  Unused.
  */
-void applier::timeperiod::expand_object(
-                            shared_ptr<configuration::timeperiod> obj,
-                            configuration::state& s) {
-  (void)obj;
+void applier::timeperiod::expand_objects(configuration::state& s) {
   (void)s;
   return ;
 }
@@ -111,67 +107,67 @@ void applier::timeperiod::expand_object(
 /**
  *  Modify time period.
  *
- *  @param[in] obj The time period to modify in the monitoring engine.
+ *  @param[in] obj  The time period to modify in the monitoring engine.
  */
 void applier::timeperiod::modify_object(
-                            shared_ptr<configuration::timeperiod> obj) {
+                            configuration::timeperiod const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying time period '" << obj->timeperiod_name() << "'.";
+    << "Modifying time period '" << obj.timeperiod_name() << "'.";
 
   // Find old configuration.
   set_timeperiod::iterator
-    it_cfg(config->timeperiods_find(obj->key()));
+    it_cfg(config->timeperiods_find(obj.key()));
   if (it_cfg == config->timeperiods().end())
     throw (engine_error() << "Could not modify non-existing "
-           << "time period '" << obj->timeperiod_name() << "'");
+           << "time period '" << obj.timeperiod_name() << "'");
 
   // Find time period object.
   umap<std::string, shared_ptr<timeperiod_struct> >::iterator
-    it_obj(applier::state::instance().timeperiods_find(obj->key()));
+    it_obj(applier::state::instance().timeperiods_find(obj.key()));
   if (it_obj == applier::state::instance().timeperiods().end())
     throw (engine_error() << "Could not modify non-existing "
-           << "time period object '" << obj->timeperiod_name() << "'");
+           << "time period object '" << obj.timeperiod_name() << "'");
   timeperiod_struct* tp(it_obj->second.get());
 
   // Update the global configuration set.
-  shared_ptr<configuration::timeperiod> old_cfg(*it_cfg);
+  configuration::timeperiod old_cfg(*it_cfg);
   config->timeperiods().erase(it_cfg);
   config->timeperiods().insert(obj);
 
   // Modify properties.
   modify_if_different(
     tp->alias,
-    (obj->alias().empty() ? obj->timeperiod_name() : obj->alias()).c_str());
+    (obj.alias().empty() ? obj.timeperiod_name() : obj.alias()).c_str());
 
   // Time ranges modified ?
-  if (obj->timeranges() != old_cfg->timeranges()) {
+  if (obj.timeranges() != old_cfg.timeranges()) {
     // Delete old time ranges.
     for (unsigned int i(0);
          i < sizeof(tp->days) / sizeof(*tp->days);
          ++i)
       deleter::listmember(tp->days[i], &deleter::timerange);
     // Create new time ranges.
-    _add_time_ranges(obj->timeranges(), tp);
+    _add_time_ranges(obj.timeranges(), tp);
   }
 
   // Exceptions modified ?
-  if (obj->exceptions() != old_cfg->exceptions()) {
+  if (obj.exceptions() != old_cfg.exceptions()) {
     // Delete old exceptions.
     for (unsigned int i(0);
          i < sizeof(tp->exceptions) / sizeof(*tp->exceptions);
          ++i)
       deleter::listmember(tp->exceptions[i], &deleter::daterange);
     // Create new exceptions.
-    _add_exceptions(obj->exceptions(), tp);
+    _add_exceptions(obj.exceptions(), tp);
   }
 
   // Exclusions modified ?
-  if (obj->exclude() != old_cfg->exclude()) {
+  if (obj.exclude() != old_cfg.exclude()) {
     // Delete old exclusions.
     deleter::listmember(tp->exclusions, &deleter::timeperiodexclusion);
     // Create new exclusions.
-    _add_exclusions(obj->exclude(), tp);
+    _add_exclusions(obj.exclude(), tp);
   }
 
   // Notify event broker.
@@ -190,17 +186,17 @@ void applier::timeperiod::modify_object(
 /**
  *  Remove old time period.
  *
- *  @param[in] obj The time period to remove from the monitoring engine.
+ *  @param[in] obj  The time period to remove from the monitoring engine.
  */
 void applier::timeperiod::remove_object(
-                            shared_ptr<configuration::timeperiod> obj) {
+                            configuration::timeperiod const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing time period '" << obj->timeperiod_name() << "'.";
+    << "Removing time period '" << obj.timeperiod_name() << "'.";
 
   // Find time period.
   umap<std::string, shared_ptr<timeperiod_struct> >::iterator
-    it(applier::state::instance().timeperiods_find(obj->key()));
+    it(applier::state::instance().timeperiods_find(obj.key()));
   if (it != applier::state::instance().timeperiods().end()) {
     timeperiod_struct* tp(it->second.get());
 
@@ -236,22 +232,22 @@ void applier::timeperiod::remove_object(
  *  @param[in] obj Unused.
  */
 void applier::timeperiod::resolve_object(
-                            shared_ptr<configuration::timeperiod> obj) {
+                            configuration::timeperiod const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving time period '" << obj->timeperiod_name() << "'.";
+    << "Resolving time period '" << obj.timeperiod_name() << "'.";
 
   // Find time period.
   umap<std::string, shared_ptr<timeperiod_struct> >::iterator
-    it(applier::state::instance().timeperiods_find(obj->key()));
+    it(applier::state::instance().timeperiods_find(obj.key()));
   if (applier::state::instance().timeperiods().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "
-           << "time period '" << obj->timeperiod_name() << "'");
+           << "time period '" << obj.timeperiod_name() << "'");
 
   // Resolve time period.
   if (!check_timeperiod(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve time period '"
-           << obj->timeperiod_name() << "'");
+           << obj.timeperiod_name() << "'");
 
   return ;
 }
@@ -263,9 +259,9 @@ void applier::timeperiod::resolve_object(
  *  @param[out] tp         Time period object.
  */
 void applier::timeperiod::_add_exclusions(
-                            std::list<std::string> const& exclusions,
+                            std::set<std::string> const& exclusions,
                             timeperiod_struct* tp) {
-  for (list_string::const_iterator
+  for (set_string::const_iterator
          it(exclusions.begin()),
          end(exclusions.end());
        it != end;

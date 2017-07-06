@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
 
-#  include <list>
 #  include <set>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
@@ -35,31 +34,29 @@ namespace             configuration {
 
   namespace           applier {
     class             hostescalation {
-    public:
+     public:
                       hostescalation();
                       hostescalation(hostescalation const& right);
                       ~hostescalation() throw ();
       hostescalation& operator=(hostescalation const& right);
       void            add_object(
-                        shared_ptr<configuration::hostescalation> obj);
-      void            expand_object(
-                        shared_ptr<configuration::hostescalation> obj,
-                        configuration::state& s);
+                        configuration::hostescalation const& obj);
+      void            expand_objects(configuration::state& s);
       void            modify_object(
-                        shared_ptr<configuration::hostescalation> obj);
+                        configuration::hostescalation const& obj);
       void            remove_object(
-                        shared_ptr<configuration::hostescalation> obj);
+                        configuration::hostescalation const& obj);
       void            resolve_object(
-                        shared_ptr<configuration::hostescalation> obj);
+                        configuration::hostescalation const& obj);
 
-    private:
+     private:
       void            _expand_hosts(
-                        std::list<std::string> const& h,
-                        std::list<std::string> const& hg,
+                        std::set<std::string> const& h,
+                        std::set<std::string> const& hg,
                         configuration::state const& s,
                         std::set<std::string>& expanded);
       void            _inherits_special_vars(
-                        shared_ptr<configuration::hostescalation> obj,
+                        configuration::hostescalation& obj,
                         configuration::state& s);
     };
   }

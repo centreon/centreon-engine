@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    servicedependency : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       ok = (1 << 0),
@@ -93,7 +93,7 @@ namespace                  configuration {
     list_string&           service_description() throw ();
     list_string const&     service_description() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(servicedependency&, char const*);
@@ -114,22 +114,22 @@ namespace                  configuration {
 
     std::string            _dependency_period;
     dependency_kind        _dependency_type;
-    group                  _dependent_hostgroups;
-    group                  _dependent_hosts;
-    group                  _dependent_servicegroups;
-    group                  _dependent_service_description;
+    group<list_string>     _dependent_hostgroups;
+    group<list_string>     _dependent_hosts;
+    group<list_string>     _dependent_servicegroups;
+    group<list_string>     _dependent_service_description;
     opt<unsigned int>      _execution_failure_options;
-    group                  _hostgroups;
-    group                  _hosts;
+    group<list_string>     _hostgroups;
+    group<list_string>     _hosts;
     opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
-    group                  _servicegroups;
-    group                  _service_description;
+    group<list_string>     _servicegroups;
+    group<list_string>     _service_description;
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<servicedependency>    servicedependency_ptr;
-  typedef std::set<servicedependency_ptr>  set_servicedependency;
+  typedef shared_ptr<servicedependency>  servicedependency_ptr;
+  typedef std::set<servicedependency>    set_servicedependency;
 }
 
 CCE_END()

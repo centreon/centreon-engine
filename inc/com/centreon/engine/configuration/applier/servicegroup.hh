@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,38 +20,41 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
 
+#  include <map>
+#  include "com/centreon/engine/configuration/servicegroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace                  configuration {
   // Forward declarations.
-  class                    servicegroup;
   class                    state;
 
   namespace                applier {
     class                  servicegroup {
-    public:
+     public:
                            servicegroup();
                            servicegroup(servicegroup const& right);
                            ~servicegroup() throw ();
       servicegroup&        operator=(servicegroup const& right);
       void                 add_object(
-                             shared_ptr<configuration::servicegroup> obj);
-      void                 expand_object(
-                             shared_ptr<configuration::servicegroup> obj,
-                             configuration::state& s);
+                             configuration::servicegroup const& obj);
+      void                 expand_objects(configuration::state& s);
       void                 modify_object(
-                             shared_ptr<configuration::servicegroup> obj);
+                             configuration::servicegroup const& obj);
       void                 remove_object(
-                             shared_ptr<configuration::servicegroup> obj);
+                             configuration::servicegroup const& obj);
       void                 resolve_object(
-                             shared_ptr<configuration::servicegroup> obj);
+                             configuration::servicegroup const& obj);
 
-    private:
+     private:
+      typedef std::map<configuration::servicegroup::key_type, configuration::servicegroup> resolved_set;
+
       void                 _resolve_members(
-                             shared_ptr<configuration::servicegroup> obj,
-                             configuration::state& s);
+                             configuration::servicegroup const& obj,
+                             configuration::state const& s);
+
+      resolved_set         _resolved;
     };
   }
 }

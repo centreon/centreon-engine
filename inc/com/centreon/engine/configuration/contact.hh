@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -35,7 +35,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    contact : public object {
-  public:
+   public:
     typedef std::string    key_type;
 
                            contact(key_type const& key = "");
@@ -56,8 +56,8 @@ namespace                  configuration {
     tab_string const&      address() const throw ();
     std::string const&     alias() const throw ();
     bool                   can_submit_commands() const throw ();
-    list_string&           contactgroups() throw ();
-    list_string const&     contactgroups() const throw ();
+    set_string&            contactgroups() throw ();
+    set_string const&      contactgroups() const throw ();
     std::string const&     contact_name() const throw ();
     map_customvar const&   customvariables() const throw ();
     std::string const&     email() const throw ();
@@ -74,7 +74,7 @@ namespace                  configuration {
     bool                   service_notifications_enabled() const throw ();
     std::string const&     timezone() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(contact&, char const*);
@@ -104,18 +104,18 @@ namespace                  configuration {
     tab_string             _address;
     std::string            _alias;
     opt<bool>              _can_submit_commands;
-    group                  _contactgroups;
+    group<set_string>      _contactgroups;
     std::string            _contact_name;
     map_customvar          _customvariables;
     std::string            _email;
     opt<bool>              _host_notifications_enabled;
-    group                  _host_notification_commands;
+    group<list_string>     _host_notification_commands;
     opt<unsigned int>      _host_notification_options;
     std::string            _host_notification_period;
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     std::string            _pager;
-    group                  _service_notification_commands;
+    group<list_string>     _service_notification_commands;
     opt<unsigned int>      _service_notification_options;
     std::string            _service_notification_period;
     opt<bool>              _service_notifications_enabled;
@@ -123,8 +123,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<contact>   contact_ptr;
-  typedef std::set<contact_ptr> set_contact;
+  typedef shared_ptr<contact> contact_ptr;
+  typedef std::set<contact>   set_contact;
 }
 
 CCE_END()

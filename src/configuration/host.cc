@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -620,7 +620,7 @@ std::string const& host::check_period() const throw () {
  *
  *  @return The contactgroups.
  */
-list_string const& host::contactgroups() const throw () {
+set_string const& host::contactgroups() const throw () {
   return (*_contactgroups);
 }
 
@@ -629,7 +629,7 @@ list_string const& host::contactgroups() const throw () {
  *
  *  @return The contacts.
  */
-list_string const& host::contacts() const throw () {
+set_string const& host::contacts() const throw () {
   return (*_contacts);
 }
 
@@ -755,7 +755,7 @@ unsigned int host::high_flap_threshold() const throw () {
  *
  *  @return The host groups.
  */
-list_string& host::hostgroups() throw () {
+set_string& host::hostgroups() throw () {
   return (*_hostgroups);
 }
 
@@ -764,7 +764,7 @@ list_string& host::hostgroups() throw () {
  *
  *  @return The hostgroups.
  */
-list_string const& host::hostgroups() const throw () {
+set_string const& host::hostgroups() const throw () {
   return (*_hostgroups);
 }
 
@@ -899,7 +899,7 @@ bool host::obsess_over_host() const throw () {
  *
  *  @return The parents.
  */
-list_string& host::parents() throw () {
+set_string& host::parents() throw () {
   return (*_parents);
 }
 
@@ -908,7 +908,7 @@ list_string& host::parents() throw () {
  *
  *  @return The parents.
  */
-list_string const& host::parents() const throw () {
+set_string const& host::parents() const throw () {
   return (*_parents);
 }
 

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    hostescalation : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       down = (1 << 0),
@@ -54,11 +54,11 @@ namespace                  configuration {
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 
-    list_string&           contactgroups() throw ();
-    list_string const&     contactgroups() const throw ();
+    set_string&            contactgroups() throw ();
+    set_string const&      contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
-    list_string&           contacts() throw ();
-    list_string const&     contacts() const throw ();
+    set_string&            contacts() throw ();
+    set_string const&      contacts() const throw ();
     bool                   contacts_defined() const throw ();
     void                   escalation_options(
                              unsigned short options) throw ();
@@ -68,17 +68,17 @@ namespace                  configuration {
     bool                   escalation_period_defined() const throw ();
     void                   first_notification(unsigned int n) throw ();
     unsigned int           first_notification() const throw ();
-    list_string&           hostgroups() throw ();
-    list_string const&     hostgroups() const throw ();
-    list_string&           hosts() throw ();
-    list_string const&     hosts() const throw ();
+    set_string&            hostgroups() throw ();
+    set_string const&      hostgroups() const throw ();
+    set_string&            hosts() throw ();
+    set_string const&      hosts() const throw ();
     void                   last_notification(unsigned int n) throw ();
     unsigned int           last_notification() const throw ();
     void                   notification_interval(unsigned int interval);
     unsigned int           notification_interval() const throw ();
     bool                   notification_interval_defined() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(hostescalation&, char const*);
@@ -94,20 +94,20 @@ namespace                  configuration {
     bool                   _set_last_notification(unsigned int value);
     bool                   _set_notification_interval(unsigned int value);
 
-    group                  _contactgroups;
-    group                  _contacts;
+    group<set_string>      _contactgroups;
+    group<set_string>      _contacts;
     opt<unsigned short>    _escalation_options;
     opt<std::string>       _escalation_period;
     opt<unsigned int>      _first_notification;
-    group                  _hostgroups;
-    group                  _hosts;
+    group<set_string>      _hostgroups;
+    group<set_string>      _hosts;
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<hostescalation>   hostescalation_ptr;
-  typedef std::set<hostescalation_ptr> set_hostescalation;
+  typedef shared_ptr<hostescalation> hostescalation_ptr;
+  typedef std::set<hostescalation>   set_hostescalation;
 }
 
 CCE_END()

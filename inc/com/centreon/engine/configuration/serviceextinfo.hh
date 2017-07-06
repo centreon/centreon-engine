@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -50,8 +50,8 @@ namespace                  configuration {
     std::string const&     action_url() const throw ();
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();
-    list_string const&     hostgroups() const throw ();
-    list_string const&     hosts() const throw ();
+    set_string const&      hostgroups() const throw ();
+    set_string const&      hosts() const throw ();
     std::string const&     notes() const throw ();
     std::string const&     notes_url() const throw ();
     std::string const&     service_description() const throw ();
@@ -74,8 +74,8 @@ namespace                  configuration {
     std::string            _action_url;
     std::string            _icon_image;
     std::string            _icon_image_alt;
-    group                  _hostgroups;
-    group                  _hosts;
+    group<set_string>      _hostgroups;
+    group<set_string>      _hosts;
     std::string            _notes;
     std::string            _notes_url;
     std::string            _service_description;
@@ -89,4 +89,3 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICEEXTINFO_HH
-

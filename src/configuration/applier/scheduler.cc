@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2016 Centreon
+** Copyright 2011-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -79,14 +79,14 @@ void applier::scheduler::apply(
     umap<std::string, shared_ptr<host_struct> > const&
       hosts(applier::state::instance().hosts());
     umap<std::string, shared_ptr<host_struct> >::const_iterator
-      hst(hosts.find((*it)->host_name()));
+      hst(hosts.find(it->host_name()));
     if (hst != hosts.end()) {
       bool has_event(quick_timed_event.find(
                                          events::hash_timed_event::low,
                                          events::hash_timed_event::host_check,
                                          hst->second.get()));
-      bool should_schedule((*it)->checks_active()
-                           && ((*it)->check_interval() > 0));
+      bool should_schedule(it->checks_active()
+                           && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         hst_to_unschedule.insert(*it);
         hst_to_schedule.insert(*it);
@@ -107,15 +107,15 @@ void applier::scheduler::apply(
       services(applier::state::instance().services());
     umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(
-                               (*it)->hosts().front(),
-                               (*it)->service_description())));
+                               *it->hosts().begin(),
+                               it->service_description())));
     if (svc != services.end()) {
       bool has_event(quick_timed_event.find(
                                          events::hash_timed_event::low,
                                          events::hash_timed_event::service_check,
                                          svc->second.get()));
-      bool should_schedule((*it)->checks_active()
-                           && ((*it)->check_interval() > 0));
+      bool should_schedule(it->checks_active()
+                           && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         svc_to_unschedule.insert(*it);
         svc_to_schedule.insert(*it);
@@ -229,7 +229,7 @@ void applier::scheduler::remove_service(
     services(applier::state::instance().services());
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
     svc(services.find(std::make_pair(
-                             s.hosts().front(),
+                             *s.hosts().begin(),
                              s.service_description())));
   if (svc != services.end()) {
     std::vector<service_struct*> svec;
@@ -813,10 +813,11 @@ void applier::scheduler::_get_hosts(
   umap<std::string, shared_ptr<host_struct> > const&
     hosts(applier::state::instance().hosts());
   for (set_host::const_reverse_iterator
-         it(hst_cfg.rbegin()), end(hst_cfg.rend());
+         it(hst_cfg.rbegin()),
+         end(hst_cfg.rend());
        it != end;
        ++it) {
-    std::string const& host_name((*it)->host_name());
+    std::string const& host_name(it->host_name());
     umap<std::string, shared_ptr<host_struct> >::const_iterator
       hst(hosts.find(host_name));
     if (hst == hosts.end()) {
@@ -848,8 +849,8 @@ void applier::scheduler::_get_services(
          it(svc_cfg.rbegin()), end(svc_cfg.rend());
        it != end;
        ++it) {
-    std::string const& host_name((*it)->hosts().front());
-    std::string const& service_description((*it)->service_description());
+    std::string const& host_name(*it->hosts().begin());
+    std::string const& service_description(it->service_description());
     umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(host_name, service_description)));
     if (svc == services.end()) {

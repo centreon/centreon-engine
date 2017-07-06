@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,30 +32,28 @@ namespace             configuration {
 
   namespace           applier {
     class             service {
-    public:
+     public:
                       service();
                       service(service const& right);
                       ~service() throw ();
       service&        operator=(service const& right);
       void            add_object(
-                        shared_ptr<configuration::service> obj);
-      void            expand_object(
-                        shared_ptr<configuration::service> obj,
-                        configuration::state& s);
+                        configuration::service const& obj);
+      void            expand_objects(configuration::state& s);
       void            modify_object(
-                        shared_ptr<configuration::service> obj);
+                        configuration::service const& obj);
       void            remove_object(
-                        shared_ptr<configuration::service> obj);
+                        configuration::service const& obj);
       void            resolve_object(
-                        shared_ptr<configuration::service> obj);
+                        configuration::service const& obj);
 
-    private:
+     private:
       void            _expand_service_memberships(
-                        shared_ptr<configuration::service> obj,
+                        configuration::service& obj,
                         configuration::state& s);
       void            _inherits_special_vars(
-                        shared_ptr<configuration::service> obj,
-                        configuration::state& s);
+                        configuration::service& obj,
+                        configuration::state const& s);
     };
   }
 }

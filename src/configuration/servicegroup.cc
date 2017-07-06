@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,7 +45,6 @@ servicegroup::setters const servicegroup::_setters[] = {
  */
 servicegroup::servicegroup(key_type const& key)
   : object(object::servicegroup),
-    _resolved(false),
     _servicegroup_id(0),
     _servicegroup_name(key) {}
 
@@ -79,8 +78,6 @@ servicegroup& servicegroup::operator=(servicegroup const& right) {
     _members = right._members;
     _notes = right._notes;
     _notes_url = right._notes_url;
-    _resolved = right._resolved;
-    _resolved_members = right._resolved_members;
     _servicegroup_id = right._servicegroup_id;
     _servicegroup_members = right._servicegroup_members;
     _servicegroup_name = right._servicegroup_name;
@@ -102,8 +99,6 @@ bool servicegroup::operator==(servicegroup const& right) const throw () {
           && _members == right._members
           && _notes == right._notes
           && _notes_url == right._notes_url
-          && _resolved == right._resolved
-          && _resolved_members == right._resolved_members
           && _servicegroup_id == right._servicegroup_id
           && _servicegroup_members == right._servicegroup_members
           && _servicegroup_name == right._servicegroup_name);
@@ -142,11 +137,7 @@ bool servicegroup::operator<(servicegroup const& right) const throw () {
     return (_notes_url < right._notes_url);
   else if (_servicegroup_members != right._servicegroup_members)
     return (_servicegroup_members < right._servicegroup_members);
-  else if (_members != right._members)
-    return (_members < right._members);
-  else if (_resolved != right._resolved)
-    return (_resolved < right._resolved);
-  return (_resolved_members < right._resolved_members);
+  return (_members < right._members);
 }
 
 /**
@@ -230,7 +221,7 @@ std::string const& servicegroup::alias() const throw () {
  *
  *  @return The members.
  */
-list_string& servicegroup::members() throw () {
+set_pair_string& servicegroup::members() throw () {
   return (*_members);
 }
 
@@ -239,7 +230,7 @@ list_string& servicegroup::members() throw () {
  *
  *  @return The members.
  */
-list_string const& servicegroup::members() const throw () {
+set_pair_string const& servicegroup::members() const throw () {
   return (*_members);
 }
 
@@ -275,7 +266,16 @@ unsigned int servicegroup::servicegroup_id() const throw() {
  *
  *  @return The servicegroup_members.
  */
-list_string const& servicegroup::servicegroup_members() const throw () {
+set_string& servicegroup::servicegroup_members() throw () {
+  return (*_servicegroup_members);
+}
+
+/**
+ *  Get servicegroup_members.
+ *
+ *  @return The servicegroup_members.
+ */
+set_string const& servicegroup::servicegroup_members() const throw () {
   return (*_servicegroup_members);
 }
 
@@ -286,35 +286,6 @@ list_string const& servicegroup::servicegroup_members() const throw () {
  */
 std::string const& servicegroup::servicegroup_name() const throw () {
   return (_servicegroup_name);
-}
-
-/**
- *  Check if servicegroup was resolved.
- *
- *  @return True if servicegroup was resolved, false otherwise.
- */
-bool servicegroup::is_resolved() const throw () {
-  return (_resolved);
-}
-
-/**
- *  Get resolved members.
- *
- *  @return Modifiable list of members.
- */
-set_pair_string& servicegroup::resolved_members() const throw () {
-  return (_resolved_members);
-}
-
-/**
- *  Set whether or not servicegroup has been resolved.
- *
- *  @param[in] resolved True if servicegroup has been resolved, false
- *                      otherwise.
- */
-void servicegroup::set_resolved(bool resolved) const throw () {
-  _resolved = resolved;
-  return ;
 }
 
 /**

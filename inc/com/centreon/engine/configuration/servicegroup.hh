@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -33,7 +33,7 @@ CCE_BEGIN()
 
 namespace                   configuration {
   class                     servicegroup : public object {
-  public:
+   public:
     typedef std::string     key_type;
 
                             servicegroup(key_type const& key = "");
@@ -53,19 +53,16 @@ namespace                   configuration {
 
     std::string const&      action_url() const throw ();
     std::string const&      alias() const throw ();
-    list_string&            members() throw ();
-    list_string const&      members() const throw ();
+    set_pair_string&        members() throw ();
+    set_pair_string const&  members() const throw ();
     std::string const&      notes() const throw ();
     std::string const&      notes_url() const throw ();
     unsigned int            servicegroup_id() const throw();
-    list_string const&      servicegroup_members() const throw ();
+    set_string&             servicegroup_members() throw ();
+    set_string const&       servicegroup_members() const throw ();
     std::string const&      servicegroup_name() const throw ();
 
-    bool                    is_resolved() const throw ();
-    set_pair_string&        resolved_members() const throw ();
-    void                    set_resolved(bool resolved) const throw ();
-
-  private:
+   private:
     struct                  setters {
       char const*           name;
       bool                  (*func)(servicegroup&, char const*);
@@ -82,19 +79,17 @@ namespace                   configuration {
 
     std::string             _action_url;
     std::string             _alias;
-    group                   _members;
+    group<set_pair_string>  _members;
     std::string             _notes;
     std::string             _notes_url;
-    mutable bool            _resolved;
-    mutable set_pair_string _resolved_members;
     unsigned int            _servicegroup_id;
-    group                   _servicegroup_members;
+    group<set_string>       _servicegroup_members;
     std::string             _servicegroup_name;
     static setters const    _setters[];
   };
 
-  typedef shared_ptr<servicegroup>   servicegroup_ptr;
-  typedef std::set<servicegroup_ptr> set_servicegroup;
+  typedef shared_ptr<servicegroup>  servicegroup_ptr;
+  typedef std::set<servicegroup>    set_servicegroup;
 }
 
 CCE_END()

@@ -65,31 +65,31 @@ applier::hostgroup& applier::hostgroup::operator=(
 /**
  *  Add new hostgroup.
  *
- *  @param[in] obj The new hostgroup to add into the monitoring engine.
+ *  @param[in] obj  The new hostgroup to add into the monitoring engine.
  */
 void applier::hostgroup::add_object(
-                           shared_ptr<configuration::hostgroup> obj) {
+                           configuration::hostgroup const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new hostgroup '" << obj->hostgroup_name() << "'.";
+    << "Creating new hostgroup '" << obj.hostgroup_name() << "'.";
 
   // Add host group to the global configuration state.
   config->hostgroups().insert(obj);
 
   // Add hostgroup id to the other props.
-  hostgroup_other_props[obj->hostgroup_name()].hostgroup_id
-    = obj->hostgroup_id();
+  hostgroup_other_props[obj.hostgroup_name()].hostgroup_id
+    = obj.hostgroup_id();
 
   // Create host group.
   hostgroup_struct* hg(add_hostgroup(
-                         obj->hostgroup_name().c_str(),
-                         NULL_IF_EMPTY(obj->alias()),
-                         NULL_IF_EMPTY(obj->notes()),
-                         NULL_IF_EMPTY(obj->notes_url()),
-                         NULL_IF_EMPTY(obj->action_url())));
+                         obj.hostgroup_name().c_str(),
+                         NULL_IF_EMPTY(obj.alias()),
+                         NULL_IF_EMPTY(obj.notes()),
+                         NULL_IF_EMPTY(obj.notes_url()),
+                         NULL_IF_EMPTY(obj.action_url())));
   if (!hg)
     throw (engine_error() << "Could not register host group '"
-           << obj->hostgroup_name() << "'");
+           << obj.hostgroup_name() << "'");
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -102,34 +102,41 @@ void applier::hostgroup::add_object(
 
   // Apply resolved hosts on hostgroup.
   for (set_string::const_iterator
-         it(obj->resolved_members().begin()),
-         end(obj->resolved_members().end());
+         it(obj.members().begin()),
+         end(obj.members().end());
        it != end;
        ++it)
     if (!add_host_to_hostgroup(hg, it->c_str()))
       throw (engine_error() << "Could not add host member '"
-             << *it << "' to host group '" << obj->hostgroup_name()
+             << *it << "' to host group '" << obj.hostgroup_name()
              << "'");
 
   return ;
 }
 
 /**
- *  Expand a hostgroup.
+ *  Expand all host groups.
  *
- *  @param[in]     obj      Object to expand.
- *  @param[in,out] s        State being applied.
+ *  @param[in,out] s  State being applied.
  */
-void applier::hostgroup::expand_object(
-                           shared_ptr<configuration::hostgroup> obj,
-                           configuration::state& s) {
-  // Resolve group.
-  _resolve_members(obj, s);
+void applier::hostgroup::expand_objects(configuration::state& s) {
+  // Resolve groups.
+  _resolved.clear();
+  for (configuration::set_hostgroup::const_iterator
+         it(s.hostgroups().begin()),
+         end(s.hostgroups().end());
+       it != end;
+       ++it)
+    _resolve_members(s, *it);
 
-  // We do not need to reinsert the object in the set, as
-  // _resolve_members() only affects hostgroup::resolved_members()
-  // and hostgroup::is_resolved() that are not used for the set
-  // ordering.
+  // Save resolved groups in the configuration set.
+  s.hostgroups().clear();
+  for (resolved_set::const_iterator
+         it(_resolved.begin()),
+         end(_resolved.end());
+       it != end;
+       ++it)
+    s.hostgroups().insert(it->second);
 
   return ;
 }
@@ -137,54 +144,54 @@ void applier::hostgroup::expand_object(
 /**
  *  Modified hostgroup.
  *
- *  @param[in] obj The new hostgroup to modify into the monitoring
- *                 engine.
+ *  @param[in] obj  The new hostgroup to modify into the monitoring
+ *                  engine.
  */
 void applier::hostgroup::modify_object(
-                           shared_ptr<configuration::hostgroup> obj) {
+                           configuration::hostgroup const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying hostgroup '" << obj->hostgroup_name() << "'";
+    << "Modifying hostgroup '" << obj.hostgroup_name() << "'";
 
   // Find old configuration.
   set_hostgroup::iterator
-    it_cfg(config->hostgroups_find(obj->key()));
+    it_cfg(config->hostgroups_find(obj.key()));
   if (it_cfg == config->hostgroups().end())
     throw (engine_error() << "Could not modify non-existing "
-           << "host group '" << obj->hostgroup_name() << "'");
+           << "host group '" << obj.hostgroup_name() << "'");
 
   // Find host group object.
   umap<std::string, shared_ptr<hostgroup_struct> >::iterator
-    it_obj(applier::state::instance().hostgroups_find(obj->key()));
+    it_obj(applier::state::instance().hostgroups_find(obj.key()));
   if (it_obj == applier::state::instance().hostgroups().end())
     throw (engine_error() << "Could not modify non-existing "
-           << "host group object '" << obj->hostgroup_name() << "'");
+           << "host group object '" << obj.hostgroup_name() << "'");
   hostgroup_struct* hg(it_obj->second.get());
 
   // Update the global configuration set.
-  shared_ptr<configuration::hostgroup> old_cfg(*it_cfg);
+  configuration::hostgroup old_cfg(*it_cfg);
   config->hostgroups().erase(it_cfg);
   config->hostgroups().insert(obj);
 
   // Modify properties.
   modify_if_different(
     hg->action_url,
-    NULL_IF_EMPTY(obj->action_url()));
+    NULL_IF_EMPTY(obj.action_url()));
   modify_if_different(
     hg->alias,
-    (obj->alias().empty() ? obj->hostgroup_name() : obj->alias()).c_str());
+    (obj.alias().empty() ? obj.hostgroup_name() : obj.alias()).c_str());
   modify_if_different(
     hg->notes,
-    NULL_IF_EMPTY(obj->notes()));
+    NULL_IF_EMPTY(obj.notes()));
   modify_if_different(
     hg->notes_url,
-    NULL_IF_EMPTY(obj->notes_url()));
-  hostgroup_other_props[obj->hostgroup_name()].hostgroup_id = obj->hostgroup_id();
+    NULL_IF_EMPTY(obj.notes_url()));
+  hostgroup_other_props[obj.hostgroup_name()].hostgroup_id = obj.hostgroup_id();
 
   // Were members modified ?
-  if (obj->resolved_members() != old_cfg->resolved_members()) {
+  if (obj.members() != old_cfg.members()) {
     // Delete all old host group members.
-    for (hostsmember* m((*it_obj).second->members);
+    for (hostsmember* m(it_obj->second->members);
          m;
          m = m->next) {
       timeval tv(get_broker_timestamp(NULL));
@@ -202,15 +209,15 @@ void applier::hostgroup::modify_object(
 
     // Create new host group members.
     for (set_string::const_iterator
-           it(obj->resolved_members().begin()),
-           end(obj->resolved_members().end());
+           it(obj.members().begin()),
+           end(obj.members().end());
          it != end;
          ++it)
       if (!add_host_to_hostgroup(
              hg,
              it->c_str()))
         throw (engine_error() << "Could not add host member '"
-               << *it << "' to host group '" << obj->hostgroup_name()
+               << *it << "' to host group '" << obj.hostgroup_name()
                << "'");
   }
 
@@ -229,17 +236,18 @@ void applier::hostgroup::modify_object(
 /**
  *  Remove old hostgroup.
  *
- *  @param[in] obj The new hostgroup to remove from the monitoring engine.
+ *  @param[in] obj  The new hostgroup to remove from the monitoring
+ *                  engine.
  */
 void applier::hostgroup::remove_object(
-                           shared_ptr<configuration::hostgroup> obj) {
+                           configuration::hostgroup const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing host group '" << obj->hostgroup_name() << "'";
+    << "Removing host group '" << obj.hostgroup_name() << "'";
 
   // Find host group.
   umap<std::string, shared_ptr<hostgroup_struct> >::iterator
-    it(applier::state::instance().hostgroups_find(obj->key()));
+    it(applier::state::instance().hostgroups_find(obj.key()));
   if (it != applier::state::instance().hostgroups().end()) {
     hostgroup_struct* grp(it->second.get());
 
@@ -256,7 +264,7 @@ void applier::hostgroup::remove_object(
       &tv);
 
     // Erase host group object (will effectively delete the object).
-    hostgroup_other_props.erase(obj->hostgroup_name());
+    hostgroup_other_props.erase(obj.hostgroup_name());
     applier::state::instance().hostgroups().erase(it);
   }
 
@@ -269,26 +277,25 @@ void applier::hostgroup::remove_object(
 /**
  *  Resolve a host group.
  *
- *  @param[in] obj
- *  @param[in] s
+ *  @param[in] obj  Object to resolved.
  */
 void applier::hostgroup::resolve_object(
-                           shared_ptr<configuration::hostgroup> obj) {
+                           configuration::hostgroup const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving host group '" << obj->hostgroup_name() << "'";
+    << "Resolving host group '" << obj.hostgroup_name() << "'";
 
   // Find host group.
   umap<std::string, shared_ptr<hostgroup_struct> >::iterator
-    it(applier::state::instance().hostgroups_find(obj->key()));
+    it(applier::state::instance().hostgroups_find(obj.key()));
   if (applier::state::instance().hostgroups().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "
-           << "host group '" << obj->hostgroup_name() << "'");
+           << "host group '" << obj.hostgroup_name() << "'");
 
   // Resolve host group.
   if (!check_hostgroup(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve host group '"
-           << obj->hostgroup_name() << "'");
+           << obj.hostgroup_name() << "'");
 
   return ;
 }
@@ -296,34 +303,30 @@ void applier::hostgroup::resolve_object(
 /**
  *  Resolve members of a host group.
  *
- *  @param[in,out] obj Hostgroup object.
- *  @param[in]     s   Configuration being applied.
+ *  @param[in]     s    Configuration being applied.
+ *  @param[in,out] obj  Hostgroup object.
  */
 void applier::hostgroup::_resolve_members(
-                           shared_ptr<configuration::hostgroup> obj,
-                           configuration::state& s) {
+                           configuration::state& s,
+                           configuration::hostgroup const& obj) {
   // Only process if hostgroup has not been resolved already.
-  if (!obj->is_resolved()) {
+  if (_resolved.find(obj.key()) == _resolved.end()) {
     // Logging.
     logger(logging::dbg_config, logging::more)
       << "Resolving members of host group '"
-      << obj->hostgroup_name() << "'";
+      << obj.hostgroup_name() << "'";
 
     // Mark object as resolved.
-    obj->set_resolved(true);
+    configuration::hostgroup& resolved_obj(_resolved[obj.key()]);
 
-    // Add base members.
-    for (list_string::const_iterator
-           it(obj->members().begin()),
-           end(obj->members().end());
-         it != end;
-         ++it)
-      obj->resolved_members().insert(*it);
+    // Insert base members.
+    resolved_obj = obj;
+    resolved_obj.hostgroup_members().clear();
 
     // Add hostgroup members.
-    for (list_string::const_iterator
-           it(obj->hostgroup_members().begin()),
-           end(obj->hostgroup_members().end());
+    for (set_string::const_iterator
+           it(obj.hostgroup_members().begin()),
+           end(obj.hostgroup_members().end());
          it != end;
          ++it) {
       // Find hostgroup entry.
@@ -332,18 +335,16 @@ void applier::hostgroup::_resolve_members(
         throw (engine_error()
                << "Could not add non-existing host group member '"
                << *it << "' to host group '"
-               << obj->hostgroup_name() << "'");
+               << obj.hostgroup_name() << "'");
 
       // Resolve hostgroup member.
-      _resolve_members(*it2, s);
+      _resolve_members(s, *it2);
 
       // Add hostgroup member members to members.
-      for (set_string::const_iterator
-             it3((*it2)->resolved_members().begin()),
-             end3((*it2)->resolved_members().end());
-           it3 != end3;
-           ++it3)
-        obj->resolved_members().insert(*it3);
+      configuration::hostgroup& resolved_group(_resolved[*it]);
+      resolved_obj.members().insert(
+                               resolved_group.members().begin(),
+                               resolved_group.members().end());
     }
   }
 

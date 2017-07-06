@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    serviceescalation : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       unknown = (1 << 1),
@@ -58,11 +58,11 @@ namespace                  configuration {
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 
-    list_string&           contactgroups() throw ();
-    list_string const&     contactgroups() const throw ();
+    set_string&            contactgroups() throw ();
+    set_string const&      contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
-    list_string&           contacts() throw ();
-    list_string const&     contacts() const throw ();
+    set_string&            contacts() throw ();
+    set_string const&      contacts() const throw ();
     bool                   contacts_defined() const throw ();
     void                   escalation_options(
                              unsigned int options) throw ();
@@ -88,7 +88,7 @@ namespace                  configuration {
     list_string&           service_description() throw ();
     list_string const&     service_description() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(serviceescalation&, char const*);
@@ -106,22 +106,22 @@ namespace                  configuration {
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
 
-    group                  _contactgroups;
-    group                  _contacts;
+    group<set_string>      _contactgroups;
+    group<set_string>      _contacts;
     opt<unsigned short>    _escalation_options;
     opt<std::string>       _escalation_period;
     opt<unsigned int>      _first_notification;
-    group                  _hostgroups;
-    group                  _hosts;
+    group<list_string>     _hostgroups;
+    group<list_string>     _hosts;
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
-    group                  _servicegroups;
-    group                  _service_description;
+    group<list_string>     _servicegroups;
+    group<list_string>     _service_description;
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<serviceescalation>   serviceescalation_ptr;
-  typedef std::set<serviceescalation_ptr> set_serviceescalation;
+  typedef shared_ptr<serviceescalation>  serviceescalation_ptr;
+  typedef std::set<serviceescalation>    set_serviceescalation;
 }
 
 CCE_END()

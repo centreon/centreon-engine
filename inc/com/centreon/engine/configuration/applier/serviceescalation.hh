@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -35,25 +35,23 @@ namespace                configuration {
 
   namespace              applier {
     class                serviceescalation {
-    public:
+     public:
                          serviceescalation();
                          serviceescalation(
                            serviceescalation const& right);
                          ~serviceescalation() throw ();
       serviceescalation& operator=(serviceescalation const& right);
       void               add_object(
-                           shared_ptr<configuration::serviceescalation> obj);
-      void               expand_object(
-                           shared_ptr<configuration::serviceescalation> obj,
-                           configuration::state& s);
+                           configuration::serviceescalation const& obj);
+      void               expand_objects(configuration::state& s);
       void               modify_object(
-                           shared_ptr<configuration::serviceescalation> obj);
+                           configuration::serviceescalation const& obj);
       void               remove_object(
-                           shared_ptr<configuration::serviceescalation> obj);
+                           configuration::serviceescalation const& obj);
       void               resolve_object(
-                           shared_ptr<configuration::serviceescalation> obj);
+                           configuration::serviceescalation const& obj);
 
-    private:
+     private:
       void               _expand_services(
                            std::list<std::string> const& hst,
                            std::list<std::string> const& hg,
@@ -62,8 +60,8 @@ namespace                configuration {
                            configuration::state& s,
                            std::set<std::pair<std::string, std::string> >& expanded);
       void               _inherits_special_vars(
-                           shared_ptr<configuration::serviceescalation> obj,
-                           configuration::state& s);
+                           configuration::serviceescalation& obj,
+                           configuration::state const& s);
     };
   }
 }

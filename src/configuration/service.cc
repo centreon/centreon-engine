@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -445,7 +445,7 @@ void service::check_validity() const {
 service::key_type service::key() const {
   key_type k;
   if (!_hosts->empty())
-    k.first = _hosts->front();
+    k.first = *_hosts->begin();
   k.second = _service_description;
   return (k);
 }
@@ -616,7 +616,7 @@ std::string const& service::check_period() const throw () {
  *
  *  @return The contactgroups.
  */
-list_string& service::contactgroups() throw () {
+set_string& service::contactgroups() throw () {
   return (*_contactgroups);
 }
 
@@ -625,7 +625,7 @@ list_string& service::contactgroups() throw () {
  *
  *  @return The contactgroups.
  */
-list_string const& service::contactgroups() const throw () {
+set_string const& service::contactgroups() const throw () {
   return (*_contactgroups);
 }
 
@@ -643,7 +643,7 @@ bool service::contactgroups_defined() const throw () {
  *
  *  @return The contacts.
  */
-list_string& service::contacts() throw () {
+set_string& service::contacts() throw () {
   return (*_contacts);
 }
 
@@ -652,7 +652,7 @@ list_string& service::contacts() throw () {
  *
  *  @return The contacts.
  */
-list_string const& service::contacts() const throw () {
+set_string const& service::contacts() const throw () {
   return (*_contacts);
 }
 
@@ -751,7 +751,7 @@ unsigned int service::high_flap_threshold() const throw () {
  *
  *  @return The hostgroups.
  */
-list_string& service::hostgroups() throw () {
+set_string& service::hostgroups() throw () {
   return (*_hostgroups);
 }
 
@@ -760,7 +760,7 @@ list_string& service::hostgroups() throw () {
  *
  *  @return The hostgroups.
  */
-list_string const& service::hostgroups() const throw () {
+set_string const& service::hostgroups() const throw () {
   return (*_hostgroups);
 }
 
@@ -769,7 +769,7 @@ list_string const& service::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-list_string& service::hosts() throw () {
+set_string& service::hosts() throw () {
   return (*_hosts);
 }
 
@@ -778,7 +778,7 @@ list_string& service::hosts() throw () {
  *
  *  @return The hosts.
  */
-list_string const& service::hosts() const throw () {
+set_string const& service::hosts() const throw () {
   return (*_hosts);
 }
 
@@ -1006,7 +1006,7 @@ unsigned int service::recovery_notification_delay() const throw() {
  *
  *  @return The service groups.
  */
-list_string& service::servicegroups() throw () {
+set_string& service::servicegroups() throw () {
   return (*_servicegroups);
 }
 
@@ -1015,7 +1015,7 @@ list_string& service::servicegroups() throw () {
  *
  *  @return The servicegroups.
  */
-list_string const& service::servicegroups() const throw () {
+set_string const& service::servicegroups() const throw () {
   return (*_servicegroups);
 }
 

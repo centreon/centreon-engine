@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,10 +20,9 @@
 #ifndef CCE_CONFIGURATION_APPLIER_COMMAND_HH
 #  define CCE_CONFIGURATION_APPLIER_COMMAND_HH
 
-#  include <list>
+#  include <set>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -34,26 +33,23 @@ namespace             configuration {
 
   namespace           applier {
     class             command {
-    public:
+     public:
                       command();
                       command(command const& right);
                       ~command() throw ();
       command&        operator=(command const& right);
-      void            add_object(
-                        shared_ptr<configuration::command> obj);
-      void            expand_object(
-                        shared_ptr<configuration::command> obj,
-                        configuration::state& s);
+      void            add_object(configuration::command const& obj);
+      void            expand_objects(configuration::state& s);
       void            modify_object(
-                        shared_ptr<configuration::command> obj);
+                        configuration::command const& obj);
       void            remove_object(
-                        shared_ptr<configuration::command> obj);
+                        configuration::command const& obj);
       void            resolve_object(
-                        shared_ptr<configuration::command> obj);
+                        configuration::command const& obj);
 
-    private:
+     private:
       void            _create_command(
-                        shared_ptr<configuration::command> obj);
+                        configuration::command const& obj);
     };
   }
 }

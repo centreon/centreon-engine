@@ -442,13 +442,13 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::const_iterator appli
 umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
   typedef umultimap<std::string, shared_ptr<hostdependency_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
-  p = _hostdependencies.equal_range(k.dependent_hosts().front());
+  p = _hostdependencies.equal_range(*k.dependent_hosts().begin());
   while (p.first != p.second) {
     configuration::hostdependency current;
     current.configuration::object::operator=(k);
-    current.dependent_hosts().push_back(
+    current.dependent_hosts().insert(
                                 p.first->second->dependent_host_name);
-    current.hosts().push_back(p.first->second->host_name);
+    current.hosts().insert(p.first->second->host_name);
     current.dependency_period(p.first->second->dependency_period
                               ? p.first->second->dependency_period
                               : "");
@@ -525,18 +525,16 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
   // Copy host escalation configuration to sort some
   // members (used for comparison below).
   configuration::hostescalation hesc(k);
-  hesc.contacts().sort();
-  hesc.contactgroups().sort();
 
   // Browse escalations matching target host.
   typedef umultimap<std::string, shared_ptr<hostescalation_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
-  p = _hostescalations.equal_range(k.hosts().front());
+  p = _hostescalations.equal_range(*k.hosts().begin());
   while (p.first != p.second) {
     // Create host escalation configuration from object.
     configuration::hostescalation current;
     current.configuration::object::operator=(k);
-    current.hosts().push_back(p.first->second->host_name);
+    current.hosts().insert(p.first->second->host_name);
     current.first_notification(p.first->second->first_notification);
     current.last_notification(p.first->second->last_notification);
     current.notification_interval(
@@ -558,13 +556,11 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_name);
-    current.contacts().sort();
+      current.contacts().insert(m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_name);
-    current.contactgroups().sort();
+      current.contactgroups().insert(m->group_name);
 
     // Found !
     if (current == hesc)
@@ -791,8 +787,6 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
   // Copy service escalation configuration to sort some
   // members (used for comparison below).
   configuration::serviceescalation sesc(k);
-  sesc.contacts().sort();
-  sesc.contactgroups().sort();
 
   // Browse escalations matching target service.
   typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > collection;
@@ -828,13 +822,11 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_name);
-    current.contacts().sort();
+      current.contacts().insert(m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_name);
-    current.contactgroups().sort();
+      current.contactgroups().insert(m->group_name);
 
     // Found !
     if (current == sesc)
@@ -1253,9 +1245,9 @@ void applier::state::_apply(configuration::state const& new_cfg) {
  */
 template <typename ConfigurationType, typename ApplierType>
 void applier::state::_apply(
-       difference<std::set<shared_ptr<ConfigurationType> > > const& diff) {
+       difference<std::set<ConfigurationType> > const& diff) {
   // Type alias.
-  typedef std::set<shared_ptr<ConfigurationType> > cfg_set;
+  typedef std::set<ConfigurationType> cfg_set;
 
   /*
   ** Configuration application.
@@ -1358,28 +1350,18 @@ void applier::state::_apply(
  *  @param[in,out] cfg       Configuration objects.
  */
 template <typename ConfigurationType, typename ApplierType>
-void applier::state::_expand(
-                       configuration::state& new_state,
-                       std::set<shared_ptr<ConfigurationType> >& cfg) {
+void applier::state::_expand(configuration::state& new_state) {
   ApplierType aplyr;
-  for (typename std::set<shared_ptr<ConfigurationType> >::iterator
-         it(cfg.begin()),
-         end(cfg.end());
-       it != end;) {
-    typename std::set<shared_ptr<ConfigurationType> >::iterator
-      to_expand(it++);
-    if (!verify_config)
-      aplyr.expand_object(*to_expand, new_state);
-    else {
-      try {
-        aplyr.expand_object(*to_expand, new_state);
-      }
-      catch (std::exception const& e) {
-        ++config_errors;
-        logger(log_info_message, basic)
-          << e.what();
-      }
+  try {
+    aplyr.expand_objects(new_state);
+  }
+  catch (std::exception const& e) {
+    if (verify_config) {
+      ++config_errors;
+      logger(log_info_message, basic) << e.what();
     }
+    else
+      throw ;
   }
   return ;
 }
@@ -1413,68 +1395,55 @@ void applier::state::_processing(
 
   // Expand timeperiods.
   _expand<configuration::timeperiod, applier::timeperiod>(
-    new_cfg,
-    new_cfg.timeperiods());
+    new_cfg);
 
   // Expand connectors.
   _expand<configuration::connector, applier::connector>(
-    new_cfg,
-    new_cfg.connectors());
+    new_cfg);
 
   // Expand commands.
   _expand<configuration::command, applier::command>(
-    new_cfg,
-    new_cfg.commands());
+    new_cfg);
 
   // Expand contacts.
   _expand<configuration::contact, applier::contact>(
-    new_cfg,
-    new_cfg.contacts());
+    new_cfg);
 
   // Expand contactgroups.
   _expand<configuration::contactgroup, applier::contactgroup>(
-    new_cfg,
-    new_cfg.contactgroups());
+    new_cfg);
 
   // Expand hosts.
   _expand<configuration::host, applier::host>(
-    new_cfg,
-    new_cfg.hosts());
+    new_cfg);
 
   // Expand hostgroups.
   _expand<configuration::hostgroup, applier::hostgroup>(
-    new_cfg,
-    new_cfg.hostgroups());
+    new_cfg);
 
   // Expand services.
   _expand<configuration::service, applier::service>(
-    new_cfg,
-    new_cfg.services());
+    new_cfg);
 
   // Expand servicegroups.
   _expand<configuration::servicegroup, applier::servicegroup>(
-    new_cfg,
-    new_cfg.servicegroups());
+    new_cfg);
 
   // Expand hostdependencies.
   _expand<configuration::hostdependency, applier::hostdependency>(
-    new_cfg,
-    new_cfg.hostdependencies());
+    new_cfg);
 
   // Expand servicedependencies.
   _expand<configuration::servicedependency, applier::servicedependency>(
-    new_cfg,
-    new_cfg.servicedependencies());
+    new_cfg);
 
   // Expand hostescalations.
   _expand<configuration::hostescalation, applier::hostescalation>(
-    new_cfg,
-    new_cfg.hostescalations());
+    new_cfg);
 
   // Expand serviceescalations.
   _expand<configuration::serviceescalation, applier::serviceescalation>(
-    new_cfg,
-    new_cfg.serviceescalations());
+    new_cfg);
 
   //
   //  Build difference for all objects.
@@ -1728,7 +1697,7 @@ void applier::state::_processing(
            it != end;
            ++it) {
         umap<std::string, shared_ptr<host_struct> >::const_iterator
-          hst(hosts().find((*it)->host_name()));
+          hst(hosts().find(it->host_name()));
         if (hst != hosts().end())
           log_host_state(INITIAL_STATES, hst->second.get());
       }
@@ -1739,8 +1708,8 @@ void applier::state::_processing(
            ++it) {
         umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
           svc(services().find(std::make_pair(
-                                     (*it)->hosts().front(),
-                                     (*it)->service_description())));
+                                     *it->hosts().begin(),
+                                     it->service_description())));
         if (svc != services().end())
           log_service_state(INITIAL_STATES, svc->second.get());
       }
@@ -1788,24 +1757,23 @@ void applier::state::_processing(
  */
 template <typename ConfigurationType, typename ApplierType>
 void applier::state::_resolve(
-       std::set<shared_ptr<ConfigurationType> >& cfg) {
+       std::set<ConfigurationType>& cfg) {
   ApplierType aplyr;
-  for (typename std::set<shared_ptr<ConfigurationType> >::const_iterator
+  for (typename std::set<ConfigurationType>::const_iterator
          it(cfg.begin()),
          end(cfg.end());
        it != end;
        ++it) {
-    if (!verify_config)
+    try {
       aplyr.resolve_object(*it);
-    else {
-      try {
-        aplyr.resolve_object(*it);
-      }
-      catch (std::exception const& e) {
+    }
+    catch (std::exception const& e) {
+      if (verify_config) {
         ++config_errors;
-        logger(log_info_message, basic)
-          << e.what();
+        logger(log_info_message, basic) << e.what();
       }
+      else
+        throw ;
     }
   }
   return ;

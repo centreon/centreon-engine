@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,10 +21,10 @@
 #  define CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
 
 #  include <list>
+#  include <set>
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 // Forward declaration.
 struct            timeperiod_struct;
@@ -40,26 +40,20 @@ namespace         configuration {
 
   namespace       applier {
     class         timeperiod {
-    public:
+     public:
                   timeperiod();
                   timeperiod(timeperiod const& right);
                   ~timeperiod() throw ();
       timeperiod& operator=(timeperiod const& right);
-      void        add_object(
-                    shared_ptr<configuration::timeperiod> obj);
-      void        expand_object(
-                    shared_ptr<configuration::timeperiod> obj,
-                    configuration::state& s);
-      void        modify_object(
-                    shared_ptr<configuration::timeperiod> obj);
-      void        remove_object(
-                    shared_ptr<configuration::timeperiod> obj);
-      void        resolve_object(
-                    shared_ptr<configuration::timeperiod> obj);
+      void        add_object(configuration::timeperiod const& obj);
+      void        expand_objects(configuration::state& s);
+      void        modify_object(configuration::timeperiod const& obj);
+      void        remove_object(configuration::timeperiod const& obj);
+      void        resolve_object(configuration::timeperiod const& obj);
 
-    private:
+     private:
       void        _add_exclusions(
-                    std::list<std::string> const& exclusions,
+                    std::set<std::string> const& exclusions,
                     timeperiod_struct* tp);
       void        _add_exceptions(
                     std::vector<std::list<daterange> > const& exceptions,

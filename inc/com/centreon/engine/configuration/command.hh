@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,7 +29,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    command : public object {
-  public:
+   public:
     typedef std::string    key_type;
 
                            command(key_type const& key = "");
@@ -51,7 +51,7 @@ namespace                  configuration {
     std::string const&     command_name() const throw ();
     std::string const&     connector() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(command&, char const*);
@@ -66,12 +66,10 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<command>   command_ptr;
-  typedef std::set<command_ptr> set_command;
+  typedef shared_ptr<command> command_ptr;
+  typedef std::set<command>   set_command;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_COMMAND_HH
-
-

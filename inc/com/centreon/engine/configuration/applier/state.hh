@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -202,16 +202,12 @@ namespace           configuration {
       void          _apply(configuration::state const& new_cfg);
       template      <typename ConfigurationType, typename ApplierType>
       void          _apply(
-                      difference<std::set<shared_ptr<ConfigurationType> > > const& diff);
+                      difference<std::set<ConfigurationType> > const& diff);
       void          _apply(
                       configuration::state& new_cfg,
                       retention::state& state);
+      template      <typename ConfigurationType, typename ApplierType>
       void          _expand(configuration::state& new_state);
-      template      <typename ConfigurationType,
-                     typename ApplierType>
-      void          _expand(
-                      configuration::state& new_state,
-                      std::set<shared_ptr<ConfigurationType> >& cfg);
       void          _processing(
                       configuration::state& new_cfg,
                       bool waiting_thread,
@@ -219,7 +215,7 @@ namespace           configuration {
       template      <typename ConfigurationType,
                      typename ApplierType>
       void          _resolve(
-                      std::set<shared_ptr<ConfigurationType> >& cfg);
+                      std::set<ConfigurationType>& cfg);
 
       state*        _config;
 
@@ -264,4 +260,3 @@ namespace           configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_APPLIER_STATE_HH
-

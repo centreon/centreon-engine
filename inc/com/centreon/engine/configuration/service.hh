@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -36,7 +36,7 @@ namespace                  configuration {
   class                    serviceextinfo;
 
   class                    service : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       ok = (1 << 0),
@@ -73,11 +73,11 @@ namespace                  configuration {
     bool                   check_freshness() const throw ();
     unsigned int           check_interval() const throw ();
     std::string const&     check_period() const throw ();
-    list_string&           contactgroups() throw ();
-    list_string const&     contactgroups() const throw ();
+    set_string&            contactgroups() throw ();
+    set_string const&      contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
-    list_string&           contacts() throw ();
-    list_string const&     contacts() const throw ();
+    set_string&            contacts() throw ();
+    set_string const&      contacts() const throw ();
     bool                   contacts_defined() const throw ();
     map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
@@ -88,10 +88,10 @@ namespace                  configuration {
     unsigned short         flap_detection_options() const throw ();
     unsigned int           freshness_threshold() const throw ();
     unsigned int           high_flap_threshold() const throw ();
-    list_string&           hostgroups() throw ();
-    list_string const&     hostgroups() const throw ();
-    list_string&           hosts() throw ();
-    list_string const&     hosts() const throw ();
+    set_string&            hostgroups() throw ();
+    set_string const&      hostgroups() const throw ();
+    set_string&            hosts() throw ();
+    set_string const&      hosts() const throw ();
     unsigned int           host_id() const throw ();
     void                   host_id(unsigned int id);
     std::string const&     icon_image() const throw ();
@@ -118,8 +118,8 @@ namespace                  configuration {
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
     unsigned int           recovery_notification_delay() const throw();
-    list_string&           servicegroups() throw ();
-    list_string const&     servicegroups() const throw ();
+    set_string&            servicegroups() throw ();
+    set_string const&      servicegroups() const throw ();
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
     unsigned int           service_id() const throw();
@@ -130,7 +130,7 @@ namespace                  configuration {
     int                    get_acknowledgement_timeout() const throw ();
     bool                   set_acknowledgement_timeout(int value);
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(service&, char const*);
@@ -191,8 +191,8 @@ namespace                  configuration {
     opt<bool>              _check_freshness;
     opt<unsigned int>      _check_interval;
     std::string            _check_period;
-    group                  _contactgroups;
-    group                  _contacts;
+    group<set_string>      _contactgroups;
+    group<set_string>      _contacts;
     map_customvar          _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
@@ -202,8 +202,8 @@ namespace                  configuration {
     opt<unsigned short>    _flap_detection_options;
     opt<unsigned int>      _freshness_threshold;
     opt<unsigned int>      _high_flap_threshold;
-    group                  _hostgroups;
-    group                  _hosts;
+    group<set_string>      _hostgroups;
+    group<set_string>      _hosts;
     unsigned int           _host_id;
     std::string            _icon_image;
     std::string            _icon_image_alt;
@@ -223,7 +223,7 @@ namespace                  configuration {
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
     opt<unsigned int>      _recovery_notification_delay;
-    group                  _servicegroups;
+    group<set_string>      _servicegroups;
     std::string            _service_description;
     unsigned int           _service_id;
     static setters const   _setters[];
@@ -233,7 +233,7 @@ namespace                  configuration {
 
   typedef shared_ptr<service>    service_ptr;
   typedef std::list<service_ptr> list_service;
-  typedef std::set<service_ptr>  set_service;
+  typedef std::set<service>      set_service;
   typedef umap<std::pair<std::string, std::string>, service_ptr> map_service;
 }
 

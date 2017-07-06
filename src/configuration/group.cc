@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/configuration/group.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -25,67 +26,68 @@ using namespace  com::centreon::engine::configuration;
 /**
  *  Constructor.
  *
- *  @param[in] is_add_inherit True if add on merge list.
+ *  @param[in] is_inherit  True if add on merge list.
  */
-group::group(bool is_inherit)
+template <typename T>
+group<T>::group(bool is_inherit)
   : _is_inherit(is_inherit),
     _is_null(false),
-    _is_set(false) {
-
-}
+    _is_set(false) {}
 
 /**
  *  Copy constructor.
  *
- *  @param[in] right The object to copy.
+ *  @param[in] other  The object to copy.
  */
-group::group(group const& right) {
-  operator=(right);
+template <typename T>
+group<T>::group(group const& other) {
+  operator=(other);
 }
 
 /**
  *  Destructor.
  */
-group::~group() throw () {
-
-}
+template <typename T>
+group<T>::~group() throw () {}
 
 /**
  *  Copy constructor.
  *
- *  @param[in] right The object to copy.
+ *  @param[in] other  The object to copy.
  *
  *  @return This object.
  */
-group& group::operator=(group const& right) {
-  if (this != &right) {
-    _data = right._data;
-    _is_inherit = right._is_inherit;
-    _is_null = right._is_null;
-    _is_set = right._is_set;
+template <typename T>
+group<T>& group<T>::operator=(group const& other) {
+  if (this != &other) {
+    _data = other._data;
+    _is_inherit = other._is_inherit;
+    _is_null = other._is_null;
+    _is_set = other._is_set;
   }
   return (*this);
 }
 
 /**
- *  Copy constructor.
+ *  Assignment operator.
  *
- *  @param[in] right The object to copy.
+ *  @param[in] other  The object to copy.
  *
  *  @return This object.
  */
-group& group::operator=(std::string const& right) {
+template <typename T>
+group<T>& group<T>::operator=(std::string const& other) {
   _data.clear();
-  if (!right.empty()) {
-    if (right[0] == '+') {
+  if (!other.empty()) {
+    if (other[0] == '+') {
       _is_inherit = true;
-      string::split(right.substr(1), _data, ',');
+      string::split(other.substr(1), _data, ',');
     }
-    else if (right == "null")
+    else if (other == "null")
       _is_null = true;
     else {
       _is_inherit = false;
-      string::split(right, _data, ',');
+      string::split(other, _data, ',');
     }
   }
   _is_set = true;
@@ -95,13 +97,17 @@ group& group::operator=(std::string const& right) {
 /**
  *  Add data.
  *
- *  @param[in] right The object to add.
+ *  @param[in] other  The object to add.
  *
  *  @return This object.
  */
-group& group::operator+=(group const& right) {
-  if (this != &right) {
-    _data.insert(_data.end(), right._data.begin(), right._data.end());
+template <typename T>
+group<T>& group<T>::operator+=(group<T> const& other) {
+  if (this != &other) {
+    std::copy(
+           other._data.begin(),
+           other._data.end(),
+           std::inserter(_data, _data.end()));
     _is_set = true;
   }
   return (*this);
@@ -110,42 +116,51 @@ group& group::operator+=(group const& right) {
 /**
  *  Equal operator.
  *
- *  @param[in] right The object to compare.
+ *  @param[in] other  The object to compare.
  *
  *  @return True if is the same object, otherwise false.
  */
-bool group::operator==(group const& right) const throw () {
-  return (_data == right._data);
+template <typename T>
+bool group<T>::operator==(group const& other) const throw () {
+  return (_data == other._data);
 }
 
 /**
  *  Not equal operator.
  *
- *  @param[in] right The object to compare.
+ *  @param[in] other  The object to compare.
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool group::operator!=(group const& right) const throw () {
-  return (!operator==(right));
+template <typename T>
+bool group<T>::operator!=(group const& other) const throw () {
+  return (!operator==(other));
 }
 
 /**
  *  Less-than operator.
  *
- *  @param[in] right Object to compare to.
+ *  @param[in] other  Object to compare to.
  *
- *  @return True if this object is less than right.
+ *  @return True if this object is less than other.
  */
-bool group::operator<(group const& right) const throw () {
-  return (_data < right._data);
+template <typename T>
+bool group<T>::operator<(group const& other) const throw () {
+  return (_data < other._data);
 }
 
 /**
  *  Clear group.
  */
-void group::reset() {
+template <typename T>
+void group<T>::reset() {
   _data.clear();
   _is_inherit = false;
   _is_null = false;
   _is_set = false;
 }
+
+// Explicit instantiations.
+template class group<list_string>;
+template class group<set_string>;
+template class group<set_pair_string>;
