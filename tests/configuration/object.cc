@@ -39,8 +39,8 @@ TEST(ConfigurationObjectResolveTemplateTest, NoInheritanceOverride) {
   umap<std::string, shared_ptr<configuration::object> > templates;
   templates["parent"] = new configuration::service(parent);
   obj.resolve_template(templates);
-  list_string result;
-  result.push_back("contact1");
+  set_string result;
+  result.insert("contact1");
   ASSERT_EQ(obj.contacts(), result);
 }
 
@@ -57,8 +57,8 @@ TEST(ConfigurationObjectResolveTemplateTest, BasicInheritance) {
   umap<std::string, shared_ptr<configuration::object> > templates;
   templates["parent"] = new configuration::service(parent);
   obj.resolve_template(templates);
-  list_string result;
-  result.push_back("contact1");
+  set_string result;
+  result.insert("contact1");
   ASSERT_EQ(obj.contacts(), result);
 }
 
@@ -77,9 +77,9 @@ TEST(ConfigurationObjectResolveTemplateTest, BasicAdditiveInheritance) {
   umap<std::string, shared_ptr<configuration::object> > templates;
   templates["parent"] = new configuration::service(parent);
   obj.resolve_template(templates);
-  list_string result;
-  result.push_back("contact1");
-  result.push_back("contact2");
+  set_string result;
+  result.insert("contact1");
+  result.insert("contact2");
   ASSERT_EQ(obj.contacts(), result);
 }
 
@@ -102,9 +102,9 @@ TEST(ConfigurationObjectResolveTemplateTest, InheritanceFromFirstTemplateOnly) {
   templates["parent1"] = new configuration::service(parent1);
   templates["parent2"] = new configuration::service(parent2);
   obj.resolve_template(templates);
-  list_string result;
-  result.push_back("contact1");
-  result.push_back("contact2");
+  set_string result;
+  result.insert("contact1");
+  result.insert("contact2");
   ASSERT_EQ(obj.contacts(), result);
 }
 
@@ -126,8 +126,8 @@ TEST(ConfigurationObjectResolveTemplateTest, AdditiveInheritanceFromFirstTemplat
   templates["parent1"] = new configuration::service(parent1);
   templates["parent2"] = new configuration::service(parent2);
   obj.resolve_template(templates);
-  list_string result;
-  result.push_back("contact1");
+  set_string result;
+  result.insert("contact1");
   ASSERT_EQ(obj.contacts(), result);
 }
 
@@ -150,9 +150,9 @@ TEST(ConfigurationObjectResolveTemplateTest, AdditiveInheritanceFromFirstTemplat
   templates["parent1"] = new configuration::service(parent1);
   templates["parent2"] = new configuration::service(parent2);
   obj.resolve_template(templates);
-  list_string result;
-  result.push_back("contact1");
-  result.push_back("contact2");
+  set_string result;
+  result.insert("contact1");
+  result.insert("contact2");
   ASSERT_EQ(obj.contacts(), result);
 }
 
@@ -195,9 +195,9 @@ TEST(ConfigurationObjectResolveTemplateTest, RecursiveAdditiveInheritance) {
     templates[oss.str()] = new configuration::service(parents[i]);
   }
   obj.resolve_template(templates);
-  list_string result;
-  result.push_back("contact1");
-  result.push_back("contact2");
-  result.push_back("contact5");
+  set_string result;
+  result.insert("contact1");
+  result.insert("contact2");
+  result.insert("contact5");
   ASSERT_EQ(obj.contacts(), result);
 }

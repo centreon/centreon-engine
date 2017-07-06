@@ -83,16 +83,16 @@ namespace              configuration {
     void               _apply_serviceextinfo();
     file_info const&   _get_file_info(object* obj) const;
     void               _get_hosts_by_hostgroups(
-                         hostgroup_ptr const& hostgroups,
+                         hostgroup const& hostgroups,
                          list_host& hosts);
     void               _get_hosts_by_hostgroups_name(
-                         list_string const& lst_group,
+                         set_string const& lst_group,
                          list_host& hosts);
     template<typename T>
     void               _get_objects_by_list_name(
-                         list_string const& lst,
+                         set_string const& lst,
                          map_object& objects,
-                         std::list<shared_ptr<T> >& out);
+                         std::list<T>& out);
 
 
     template<typename T>

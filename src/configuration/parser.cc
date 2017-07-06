@@ -180,10 +180,10 @@ void parser::_apply_hostextinfo() {
     _get_objects_by_list_name(obj->hosts(), gl_hosts, hosts);
     _get_hosts_by_hostgroups_name(obj->hostgroups(), hosts);
 
-    for (list_host::const_iterator it(hosts.begin()), end(hosts.end());
+    for (list_host::iterator it(hosts.begin()), end(hosts.end());
          it != end;
          ++it)
-      (*it)->merge(*obj);
+      it->merge(*obj);
   }
 }
 
@@ -223,14 +223,16 @@ void parser::_apply_serviceextinfo() {
 
       bool found(false);
       for (list_host::const_iterator
-             it_host(hosts.begin()), end(hosts.end());
-           !found && it_host != end;
+             it_host(hosts.begin()),
+             end_host(hosts.end());
+           !found && it_host != end_host;
            ++it_host) {
         for (list_host::const_iterator
-               it_svc_host(svc_hosts.begin()), end(svc_hosts.end());
-             it_svc_host != end;
+               it_svc_host(svc_hosts.begin()),
+               end_svc_host(svc_hosts.end());
+             it_svc_host != end_svc_host;
              ++it_svc_host) {
-          if ((*it_host)->host_name() == (*it_svc_host)->host_name()) {
+          if (it_host->host_name() == it_svc_host->host_name()) {
             svc->merge(*obj);
             found = true;
           }
@@ -264,10 +266,13 @@ file_info const& parser::_get_file_info(object* obj) const {
  *  @param[in,out] hosts      The host list to fill.
  */
 void parser::_get_hosts_by_hostgroups(
-       hostgroup_ptr const& hostgroups,
+       hostgroup const& hostgroups,
        list_host& hosts) {
-  _get_objects_by_list_name(hostgroups->members(), _map_objects[object::host], hosts);
-  _get_hosts_by_hostgroups_name(hostgroups->hostgroup_members(), hosts);
+  _get_objects_by_list_name(
+    hostgroups.members(),
+    _map_objects[object::host],
+    hosts);
+  _get_hosts_by_hostgroups_name(hostgroups.hostgroup_members(), hosts);
 }
 
 /**
@@ -277,18 +282,20 @@ void parser::_get_hosts_by_hostgroups(
  *  @param[in,out] hosts      The host list to fill.
  */
 void parser::_get_hosts_by_hostgroups_name(
-       list_string const& lst_group,
+       set_string const& lst_group,
        list_host& hosts) {
   map_object& gl_hostgroups(_map_objects[object::hostgroup]);
-  for (list_string::const_iterator
-         it(lst_group.begin()), end(lst_group.end());
+  for (set_string::const_iterator
+         it(lst_group.begin()),
+         end(lst_group.end());
        it != end;
        ++it) {
     map_object::iterator it_hostgroups(gl_hostgroups.find(*it));
-    if (it_hostgroups != gl_hostgroups.end()) {
-      hostgroup_ptr obj(it_hostgroups->second);
-      _get_hosts_by_hostgroups(obj, hosts);
-    }
+    if (it_hostgroups != gl_hostgroups.end())
+      _get_hosts_by_hostgroups(
+        *static_cast<configuration::hostgroup*>(
+           it_hostgroups->second.get()),
+        hosts);
   }
 }
 
@@ -301,17 +308,15 @@ void parser::_get_hosts_by_hostgroups_name(
  */
 template<typename T>
 void parser::_get_objects_by_list_name(
-       list_string const& lst,
+       set_string const& lst,
        map_object& objects,
-       std::list<shared_ptr<T> >& out) {
-  for (list_string::const_iterator it(lst.begin()), end(lst.end());
+       std::list<T>& out) {
+  for (set_string::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
     map_object::iterator it_obj(objects.find(*it));
-    if (it_obj != objects.end()) {
-      shared_ptr<T> obj(it_obj->second);
-      out.push_back(obj);
-    }
+    if (it_obj != objects.end())
+      out.push_back(*static_cast<T*>(it_obj->second.get()));
   }
 }
 
@@ -328,7 +333,7 @@ void parser::_insert(
   for (list_object::const_iterator it(from.begin()), end(from.end());
        it != end;
        ++it)
-    to.insert(*it);
+    to.insert(*static_cast<T const*>(it->get()));
   return ;
 }
 
