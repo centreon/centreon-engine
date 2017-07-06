@@ -64,14 +64,14 @@ try {
     }
   }
 
-  if (env.BRANCH_NAME == '1.7') {
+  if (env.BRANCH_NAME == 'master') {
     build job: 'centreon-web/master', wait: false
     build job: 'centreon-web/2.8.x', wait: false
   }
 }
 finally {
   buildStatus = currentBuild.result ?: 'SUCCESS';
-  if ((buildStatus != 'SUCCESS') && (env.BRANCH_NAME == '1.7')) {
+  if ((buildStatus != 'SUCCESS') && (env.BRANCH_NAME == 'master')) {
     slackSend channel: '#monitoring-metrology', message: "@channel Centreon Engine build ${env.BUILD_NUMBER} of branch ${env.BRANCH_NAME} was broken by ${source.COMMITTER}. Please fix it ASAP."
   }
 }
