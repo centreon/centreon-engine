@@ -40,9 +40,6 @@ try {
           tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
         ])
       }
-    }
-    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-      error('Unit tests stage failure.');
     },
     'debian9': {
       node {
