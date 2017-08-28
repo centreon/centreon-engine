@@ -2847,13 +2847,6 @@ int process_host_check_result_3x(
       /* set the current state */
       hst->current_state = HOST_UP;
 
-      /* When the host goes back to the HOST_UP state, we must reinitialize the
-       * current_notification_number so that the first notification delay will
-       * be waited before sending next notification when the host will fall
-       * down.
-       */ 
-      hst->current_notification_number = 0;
-
       /* set the state type */
       /* set state type to HARD for passive checks and active checks that were previously in a HARD STATE */
       if (hst->state_type == HARD_STATE
