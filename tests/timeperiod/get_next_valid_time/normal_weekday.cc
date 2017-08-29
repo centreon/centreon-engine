@@ -84,6 +84,32 @@ TEST_F(GetNextValidTimeNormalWeekdayTest, WithinWeekday) {
 }
 
 // Given a timeperiod configured with normal weekdays
+// And we are just before the end of a weekday
+// When get_next_valid_time() is called
+// Then the next valid time is now
+TEST_F(GetNextValidTimeNormalWeekdayTest, JustBeforeEndWeekday) {
+  default_data_set();
+  time_t now(strtotimet("2016-10-27 12:59:59"));
+  set_time(now);
+  time_t computed((time_t)-1);
+  get_next_valid_time(now, &computed, _creator.get_timeperiods());
+  ASSERT_EQ(computed, now);
+}
+
+// Given a timeperiod configured with normal weekdays
+// And we are just before the end of the weekdays
+// When get_next_valid_time() is called
+// Then the next valid time is now
+TEST_F(GetNextValidTimeNormalWeekdayTest, JustBeforeEndWeekdays) {
+  default_data_set();
+  time_t now(strtotimet("2016-10-28 19:44:59"));
+  set_time(now);
+  time_t computed((time_t)-1);
+  get_next_valid_time(now, &computed, _creator.get_timeperiods());
+  ASSERT_EQ(computed, now);
+}
+
+// Given a timeperiod configured with normal weekdays
 // And we are after the weekdays but in the same week
 // When get_next_valid_time() is called
 // Then the next valid time is the next week's first week day
