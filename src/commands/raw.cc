@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -553,9 +553,9 @@ void raw::_build_macrosx_environment(
     // Need to grab macros?
     if (!macros.x[i]) {
       // Skip summary macro in lage instalation tweaks.
-      if ((i < MACRO_TOTALHOSTSUP
-           || i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
-          && !config->use_large_installation_tweaks()) {
+      if ((i < MACRO_TOTALHOSTSUP)
+          || (i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
+          || !config->use_large_installation_tweaks()) {
         grab_macrox_value_r(
           &macros,
           i,
