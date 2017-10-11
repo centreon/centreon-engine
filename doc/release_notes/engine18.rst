@@ -6,6 +6,13 @@ Centreon Engine 1.8.1
 Bug fixes
 *********
 
+Generate environment macros when using large installation tweaks
+================================================================
+
+Environment macros were not generated when using large installation
+tweaks, in contradiction with the documentation. Only summary macros
+are not generated now.
+
 =====================
 Centreon Engine 1.8.0
 =====================
