@@ -20,7 +20,7 @@
 #ifndef CCE_HOST_HH
 #  define CCE_HOST_HH
 
-#  include "com/centreon/engine/checks/checkable.hh"
+#  include "com/centreon/engine/notifications/notifier.hh"
 
 CCE_BEGIN()
 
@@ -30,8 +30,12 @@ CCE_BEGIN()
  *
  *  A host is checkable and also a notifier.
  */
-class               host : public checkable {
-
+class               host : public notifier {
+ public:
+                    host();
+                    host(host const& other);
+                    ~host();
+  host&             operator=(host const& other);
 };
 
 CCE_END()

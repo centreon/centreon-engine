@@ -29,8 +29,12 @@ namespace           checks {
    *  @brief Object executing checks.
    *
    */
-  class             checkable : public notifier {
+  class             checkable {
    public:
+                    checkable();
+                    checkable(checkable const& other);
+                    ~checkable();
+    checkable&      operator=(checkable const& other);
     bool            is_flapping();
     int             get_state();
     int             get_last_state();
@@ -42,4 +46,3 @@ namespace           checks {
 CCE_END()
 
 #endif // !CCE_CHECKS_CHECKABLE_HH
-

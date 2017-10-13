@@ -20,6 +20,8 @@
 #ifndef CCE_NOTIFICATIONS_NOTIFIER_HH
 #  define CCE_NOTIFICATIONS_NOTIFIER_HH
 
+#  include "com/centreon/engine/checks/checkable"
+
 CCE_BEGIN()
 
 namespace           notifications {
@@ -29,7 +31,7 @@ namespace           notifications {
    *  @brief Object validating notifications and sending them if needed.
    *
    */
-  class             notifier {
+  class             notifier : public checkable {
    public:
     enum            notification_type {
                     PROBLEM,
@@ -42,12 +44,14 @@ namespace           notifications {
                     DOWNTIMESTOP,
                     DOWNTIMECANCELLED
     }
-
+                    notifier();
+                    notifier(notifier const& other);
+                    ~notifier();
+    notifier&       operator=(notifier const& other);
     bool            in_downtime();
     bool            notifications_enabled();
     void            notify(notification_type type);
   };
-
 }
 
 CCE_END()
