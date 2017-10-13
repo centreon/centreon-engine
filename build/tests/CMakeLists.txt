@@ -53,4 +53,15 @@ if (WITH_TESTING)
     "${TESTS_DIR}/timeperiod/utils.hh"
   )
   target_link_libraries("ut" "gtest" "cce_core")
+
+  add_test(NAME tests COMMAND ut)
+
+  if (WITH_COVERAGE)
+    set(COVERAGE_EXCLUDES '${PROJECT_BINARY_DIR}/tests/*' '*/tests/*' '/usr/include/c++/*')
+    SETUP_TARGET_FOR_COVERAGE(
+        NAME test-coverage
+        EXECUTABLE ut
+        DEPENDENCIES ut
+    )
+  endif ()
 endif ()

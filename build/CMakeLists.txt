@@ -629,6 +629,14 @@ else ()
   set(LIBRARY_TYPE STATIC)
 endif ()
 
+# Code coverage on unit tests
+option(WITH_COVERAGE "Add code coverage on unit tests." OFF)
+if (WITH_TESTING AND WITH_COVERAGE)
+  set(CMAKE_BUILD_TYPE "Debug")
+  include("CodeCoverage.cmake")
+  APPEND_COVERAGE_COMPILER_FLAGS()
+endif()
+
 # Configure files.
 configure_file("${INC_DIR}/compatibility/common.h.in"
   "${INC_DIR}/compatibility/common.h")
@@ -866,6 +874,11 @@ endif ()
 message(STATUS "    - External commands module    enabled")
 if (WITH_TESTING)
   message(STATUS "    - Unit tests                  enabled")
+  if (WITH_COVERAGE)
+    message(STATUS "    - Code coverage               enabled")
+  else ()
+    message(STATUS "    - Code coverage               disabled")
+  endif ()
 else ()
   message(STATUS "    - Unit tests                  disabled")
 endif ()
