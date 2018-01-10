@@ -78,6 +78,12 @@ try {
         sh 'cd /opt/centreon-build && git pull && cd -'
         sh '/opt/centreon-build/jobs/engine/3.4/mon-engine-package.sh debian9'
       }
+    },
+    'debian9-armhf': {
+      node {
+        sh 'cd /opt/centreon-build && git pull && cd -'
+        sh '/opt/centreon-build/jobs/engine/3.4/mon-engine-package.sh debian9-armhf'
+      }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Package stage failure.');
