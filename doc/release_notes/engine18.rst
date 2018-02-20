@@ -1,4 +1,19 @@
 =====================
+Centreon Engine 1.8.2
+=====================
+
+*********
+Bug fixes
+*********
+
+Use debug level as configured in Centreon Web
+=============================================
+
+Centreon Engine used a different bitmask than Centreon Web to configure
+the debug level. As a consequence, only the "All" option worked as
+expected.
+
+=====================
 Centreon Engine 1.8.1
 =====================
 

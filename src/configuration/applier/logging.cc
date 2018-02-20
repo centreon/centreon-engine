@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2014,2018 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -231,7 +231,7 @@ void applier::logging::_add_log_file(state const& config) {
  */
 void applier::logging::_add_debug(state const& config) {
   _del_debug();
-  _debug_level = config.debug_level();
+  _debug_level = (config.debug_level() << 32) | engine::logging::log_all;
   _debug_verbosity = config.debug_verbosity();
   _debug_max_size = config.max_debug_file_size();
   _debug = new com::centreon::engine::logging::debug_file(
