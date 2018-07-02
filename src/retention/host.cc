@@ -37,6 +37,8 @@ host::setters const host::_setters[] = {
   { "check_options",                        SETTER(int, _set_check_options) },
   { "check_period",                         SETTER(std::string const&, _set_check_period) },
   { "check_type",                           SETTER(int, _set_check_type) },
+  { "criticality_name",                     SETTER(std::string const&, _set_criticality_name) },
+  { "criticality_level",                    SETTER(int, _set_criticality_level) },
   { "current_attempt",                      SETTER(int, _set_current_attempt) },
   { "current_event_id",                     SETTER(unsigned long, _set_current_event_id) },
   { "current_notification_id",              SETTER(unsigned long, _set_current_notification_id) },
@@ -842,6 +844,26 @@ bool host::_set_check_period(std::string const& value) {
  */
 bool host::_set_check_type(int value) {
   _check_type = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_level.
+ *
+ *  @param[in] value The new criticality_level.
+ */
+bool host::_set_criticality_level(int value) {
+  _criticality_level = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_name.
+ *
+ *  @param[in] value The new criticality_name.
+ */
+bool host::_set_criticality_name(std::string const& value) {
+  _criticality_name = value;
   return (true);
 }
 

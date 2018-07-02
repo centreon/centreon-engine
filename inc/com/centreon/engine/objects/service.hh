@@ -42,6 +42,8 @@ typedef struct                  service_struct {
   int                           initial_state;
   double                        check_interval;
   double                        retry_interval;
+  char*                         criticality_name;
+  int                           criticality_level;
   int                           max_attempts;
   int                           parallelize;
   contactgroupsmember_struct*   contact_groups;
@@ -212,7 +214,9 @@ service* add_service(
            char const* icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_service);
+           int obsess_over_service,
+           char const* criticality_name,
+           int criticality_level);
 int      get_service_count();
 int      is_contact_for_service(
            service_struct* svc,

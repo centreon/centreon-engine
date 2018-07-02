@@ -174,7 +174,9 @@ void applier::service::add_object(
     NULL_IF_EMPTY(obj.icon_image_alt()),
     obj.retain_status_information(),
     obj.retain_nonstatus_information(),
-    obj.obsess_over_service()));
+    obj.obsess_over_service(),
+    obj.criticality_name().c_str(),
+    obj.criticality_level()));
   if (!svc)
       throw (engine_error() << "Could not register service '"
              << obj.service_description()

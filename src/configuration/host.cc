@@ -89,7 +89,9 @@ host::setters const host::_setters[] = {
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
-  { "timezone",                     SETTER(std::string const&, _set_timezone) }
+  { "timezone",                     SETTER(std::string const&, _set_timezone) },
+  { "criticality_name",             SETTER(std::string const&, _set_criticality_name) },
+  { "criticality_level",            SETTER(unsigned int, _set_criticality_level) }
 };
 
 // Default values.
@@ -100,6 +102,7 @@ static bool const           default_check_freshness(false);
 static unsigned int const   default_check_interval(5);
 static point_2d const       default_coords_2d;
 static point_3d const       default_coords_3d;
+static unsigned int const   default_criticality_level(0);
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
@@ -131,6 +134,7 @@ host::host(key_type const& key)
     _checks_passive(default_checks_passive),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
+    _criticality_level(default_criticality_level),
     _event_handler_enabled(default_event_handler_enabled),
     _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),
@@ -191,6 +195,8 @@ host& host::operator=(host const& other) {
     _contacts = other._contacts;
     _coords_2d = other._coords_2d;
     _coords_3d = other._coords_3d;
+    _criticality_name = other._criticality_name;
+    _criticality_level = other._criticality_level;
     _customvariables = other._customvariables;
     _display_name = other._display_name;
     _event_handler = other._event_handler;
@@ -649,6 +655,24 @@ point_2d const& host::coords_2d() const throw () {
  */
 point_3d const& host::coords_3d() const throw () {
   return (_coords_3d.get());
+}
+
+/**
+ *  Get criticality_name.
+ *
+ *  @return The criticality_name.
+ */
+std::string const& host::criticality_name() const throw () {
+  return (_criticality_name);
+}
+
+/**
+ *  Get criticality_level.
+ *
+ *  @return The criticality_level.
+ */
+unsigned int host::criticality_level() const throw () {
+  return (_criticality_level);
 }
 
 /**
@@ -1202,6 +1226,30 @@ bool host::_set_coords_3d(std::string const& value) {
     return (false);
 
   _coords_3d = point_3d(x, y, z);
+  return (true);
+}
+
+/**
+ *  Set criticality_name value.
+ *
+ *  @param[in] value The new criticality name.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool host::_set_criticality_name(std::string const& value) {
+  _criticality_name = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_level value.
+ *
+ *  @param[in] value The new criticality value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool host::_set_criticality_level(unsigned int value) {
+  _criticality_level = value;
   return (true);
 }
 

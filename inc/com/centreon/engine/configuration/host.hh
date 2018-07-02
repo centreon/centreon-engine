@@ -74,6 +74,8 @@ namespace                  configuration {
     set_string const&      contacts() const throw ();
     point_2d const&        coords_2d() const throw ();
     point_3d const&        coords_3d() const throw ();
+    std::string const&     criticality_name() const throw ();
+    unsigned int           criticality_level() const throw ();
     map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
@@ -134,6 +136,8 @@ namespace                  configuration {
     bool                   _set_contacts(std::string const& value);
     bool                   _set_coords_2d(std::string const& value);
     bool                   _set_coords_3d(std::string const& value);
+    bool                   _set_criticality_name(std::string const& value);
+    bool                   _set_criticality_level(unsigned int value);
     bool                   _set_display_name(std::string const& value);
     bool                   _set_event_handler(std::string const& value);
     bool                   _set_event_handler_enabled(bool value);
@@ -184,6 +188,8 @@ namespace                  configuration {
     group<set_string>      _contacts;
     opt<point_2d>          _coords_2d;
     opt<point_3d>          _coords_3d;
+    opt<std::string>       _criticality_name;
+    opt<unsigned int>      _criticality_level;
     map_customvar          _customvariables;
     std::string            _display_name;
     std::string            _event_handler;

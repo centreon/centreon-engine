@@ -47,6 +47,8 @@ typedef struct                  host_struct {
   int                           initial_state;
   double                        check_interval;
   double                        retry_interval;
+  char*                         criticality_name;
+  int                           criticality_level;
   int                           max_attempts;
   char*                         event_handler;
   contactgroupsmember_struct*   contact_groups;
@@ -234,7 +236,9 @@ host* add_host(
         int should_be_drawn,
         int retain_status_information,
         int retain_nonstatus_information,
-        int obsess_over_host);
+        int obsess_over_host,
+        char const* criticality_name,
+        int criticality_level);
 int   get_host_count();
 int   is_contact_for_host(host* hst, contact_struct* cntct);
 int   is_escalated_contact_for_host(host* hst, contact_struct* cntct);

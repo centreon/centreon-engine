@@ -152,7 +152,9 @@ void applier::host::add_object(
         true, // should_be_drawn, enabled by Nagios
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
-        obj.obsess_over_host()));
+        obj.obsess_over_host(),
+        obj.criticality_name().c_str(),
+        obj.criticality_level()));
   if (!h)
     throw (engine_error() << "Could not register host '"
            << obj.host_name() << "'");

@@ -287,7 +287,9 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  is_executing:                         " << obj.is_executing << "\n"
     "  check_options:                        " << obj.check_options << "\n"
     "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n";
+    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
+    "  criticality_name:                     " << obj.criticality_name << "\n"
+    "  criticality_level:                    " << obj.criticality_level << "\n";
 
   os << "  state_history:                        ";
   for (unsigned int i(0), end(sizeof(obj.state_history) / sizeof(obj.state_history[0]));
@@ -388,6 +390,8 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *                                          non-status information ?
  *  @param[in] obsess_over_service          Should we obsess over
  *                                          service ?
+ *  @param[in] criticality_name             Criticality name.
+ *  @param[in] criticality_level            Criticality level.
  *
  *  @return New service.
  */
@@ -440,7 +444,9 @@ service* add_service(
            char const* icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_service) {
+           int obsess_over_service,
+           char const* criticality_name,
+           int criticality_level) {
   (void)failure_prediction_enabled;
   (void)failure_prediction_options;
 
@@ -481,6 +487,13 @@ service* add_service(
     return (NULL);
   }
 
+  if (criticality_level < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid criticality_level value for service '"
+      << description << "' on host '" << host_name << "'";
+    return (NULL);
+  }
+
   // Check if the service is already exist.
   std::pair<std::string, std::string>
     id(std::make_pair(host_name, description));
@@ -517,6 +530,8 @@ service* add_service(
       obj->icon_image = string::dup(icon_image);
     if (icon_image_alt)
       obj->icon_image_alt = string::dup(icon_image_alt);
+    if (criticality_name)
+      obj->criticality_name = string::dup(criticality_name);
 
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
@@ -525,6 +540,7 @@ service* add_service(
     obj->check_options = CHECK_OPTION_NONE;
     obj->check_type = SERVICE_CHECK_ACTIVE;
     obj->checks_enabled = (checks_enabled > 0);
+    obj->criticality_level = criticality_level;
     obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);

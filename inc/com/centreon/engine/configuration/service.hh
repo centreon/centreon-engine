@@ -79,6 +79,8 @@ namespace                  configuration {
     set_string&            contacts() throw ();
     set_string const&      contacts() const throw ();
     bool                   contacts_defined() const throw ();
+    std::string const&     criticality_name() const throw ();
+    unsigned int           criticality_level() const throw ();
     map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
@@ -145,6 +147,8 @@ namespace                  configuration {
     bool                   _set_check_period(std::string const& value);
     bool                   _set_contactgroups(std::string const& value);
     bool                   _set_contacts(std::string const& value);
+    bool                   _set_criticality_name(std::string const& value);
+    bool                   _set_criticality_level(unsigned int value);
     bool                   _set_display_name(std::string const& value);
     bool                   _set_event_handler(std::string const& value);
     bool                   _set_event_handler_enabled(bool value);
@@ -193,6 +197,8 @@ namespace                  configuration {
     std::string            _check_period;
     group<set_string>      _contactgroups;
     group<set_string>      _contacts;
+    opt<std::string>       _criticality_name;
+    opt<unsigned int>      _criticality_level;
     map_customvar          _customvariables;
     std::string            _display_name;
     std::string            _event_handler;

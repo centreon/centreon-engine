@@ -60,6 +60,7 @@ namespace                         retention {
     map_customvar const&          customvariables() const throw ();
     opt<std::string> const&       event_handler() const throw ();
     opt<bool> const&              event_handler_enabled() const throw ();
+    opt<bool> const&              failure_prediction_enabled() const throw ();
     opt<bool> const&              flap_detection_enabled() const throw ();
     opt<bool> const&              has_been_checked() const throw ();
     std::string const&            host_name() const throw ();
@@ -112,6 +113,8 @@ namespace                         retention {
     bool                          _set_check_options(int value);
     bool                          _set_check_period(std::string const& value);
     bool                          _set_check_type(int value);
+    bool                          _set_criticality_level(int value);
+    bool                          _set_criticality_name(std::string const& value);
     bool                          _set_current_attempt(int value);
     bool                          _set_current_event_id(unsigned long value);
     bool                          _set_current_notification_id(unsigned long value);
@@ -167,6 +170,8 @@ namespace                         retention {
     opt<int>                      _check_options;
     opt<std::string>              _check_period;
     opt<int>                      _check_type;
+    opt<int>                      _criticality_level;
+    opt<std::string>              _criticality_name;
     opt<int>                      _current_attempt;
     opt<unsigned long>            _current_event_id;
     opt<unsigned long>            _current_notification_id;
@@ -176,6 +181,7 @@ namespace                         retention {
     map_customvar                 _customvariables;
     opt<std::string>              _event_handler;
     opt<bool>                     _event_handler_enabled;
+    opt<bool>                     _failure_prediction_enabled;
     opt<bool>                     _flap_detection_enabled;
     opt<bool>                     _has_been_checked;
     std::string                   _host_name;

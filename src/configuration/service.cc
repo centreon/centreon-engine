@@ -89,7 +89,9 @@ service::setters const service::_setters[] = {
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
-  { "timezone",                     SETTER(std::string const&, _set_timezone) }
+  { "timezone",                     SETTER(std::string const&, _set_timezone) },
+  { "criticality_name",             SETTER(std::string const&, _set_criticality_name) },
+  { "criticality_level",            SETTER(unsigned int, _set_criticality_level) }
 };
 
 // Default values.
@@ -98,6 +100,7 @@ static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(0);
 static unsigned int const   default_check_interval(5);
+static unsigned int const   default_criticality_level(0);
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
@@ -140,6 +143,7 @@ service::service()
     _check_command_is_important(false),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
+    _criticality_level(default_criticality_level),
     _event_handler_enabled(default_event_handler_enabled),
     _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),
@@ -198,6 +202,8 @@ service& service::operator=(service const& other) {
     _check_period = other._check_period;
     _contactgroups = other._contactgroups;
     _contacts = other._contacts;
+    _criticality_name = other._criticality_name;
+    _criticality_level = other._criticality_level;
     _customvariables = other._customvariables;
     _display_name = other._display_name;
     _event_handler = other._event_handler;
@@ -663,6 +669,24 @@ set_string const& service::contacts() const throw () {
  */
 bool service::contacts_defined() const throw () {
   return (_contacts.is_set());
+}
+
+/**
+ *  Get criticality_name.
+ *
+ *  @return The criticality_name.
+ */
+std::string const& service::criticality_name() const throw () {
+  return (_criticality_name);
+}
+
+/**
+ *  Get criticality_level.
+ *
+ *  @return The criticality_level.
+ */
+unsigned int service::criticality_level() const throw () {
+  return (_criticality_level);
 }
 
 /**
@@ -1218,6 +1242,30 @@ bool service::_set_contactgroups(std::string const& value) {
  */
 bool service::_set_contacts(std::string const& value) {
   _contacts = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_name value.
+ *
+ *  @param[in] value The new criticality name.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_criticality_name(std::string const& value) {
+  _criticality_name = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_level value.
+ *
+ *  @param[in] value The new criticality value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_criticality_level(unsigned int value) {
+  _criticality_level = value;
   return (true);
 }
 
