@@ -153,6 +153,7 @@ void applier::host::add_object(
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
         obj.obsess_over_host(),
+        obj.criticality_id(),
         obj.criticality_name().c_str(),
         obj.criticality_level()));
   if (!h)

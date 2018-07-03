@@ -47,6 +47,7 @@ typedef struct                  host_struct {
   int                           initial_state;
   double                        check_interval;
   double                        retry_interval;
+  int                           criticality_id;
   char*                         criticality_name;
   int                           criticality_level;
   int                           max_attempts;
@@ -237,6 +238,7 @@ host* add_host(
         int retain_status_information,
         int retain_nonstatus_information,
         int obsess_over_host,
+        int criticality_id,
         char const* criticality_name,
         int criticality_level);
 int   get_host_count();

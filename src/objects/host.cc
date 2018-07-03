@@ -304,6 +304,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  check_flapping_recovery_notification: " << obj.check_flapping_recovery_notification << "\n"
     "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
     "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
+    "  criticality_id:                       " << obj.criticality_id << "\n"
     "  criticality_name:                     " << obj.criticality_name << "\n"
     "  criticality_level:                    " << obj.criticality_level << "\n";
   os << "  state_history:                        ";
@@ -410,6 +411,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *                                           this host ?
  *  @param[in] obsess_over_host              Should we obsess over this
  *                                           host ?
+ *  @param[in] criticality_id                Criticality id.
  *  @param[in] criticality_name              Criticality name.
  *  @param[in] criticality_level             Criticality level.
  *
@@ -471,6 +473,7 @@ host* add_host(
         int retain_status_information,
         int retain_nonstatus_information,
         int obsess_over_host,
+        int criticality_id,
         char const* criticality_name,
         int criticality_level) {
   (void)failure_prediction_enabled;
@@ -512,9 +515,14 @@ host* add_host(
       << name << "'";
     return (NULL);
   }
-  if (criticality_level < 0) {
+  if (criticality_id < 0) {
     logger(log_config_error, basic)
-      << "ERROR: FIXME DBR: criticality_level = " << criticality_level;
+      << "Error: Invalid criticality_id value for host '"
+      << name << "'";
+    return (NULL);
+  }
+
+  if (criticality_level < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid criticality_level value for host '"
       << name << "'";
@@ -572,6 +580,7 @@ host* add_host(
     obj->check_options = CHECK_OPTION_NONE;
     obj->check_type = HOST_CHECK_ACTIVE;
     obj->checks_enabled = (checks_enabled > 0);
+    obj->criticality_id = criticality_id;
     obj->criticality_level = criticality_level;
     obj->current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
     obj->current_state = initial_state;

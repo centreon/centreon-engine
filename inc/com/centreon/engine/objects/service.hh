@@ -42,6 +42,7 @@ typedef struct                  service_struct {
   int                           initial_state;
   double                        check_interval;
   double                        retry_interval;
+  int                           criticality_id;
   char*                         criticality_name;
   int                           criticality_level;
   int                           max_attempts;
@@ -215,6 +216,7 @@ service* add_service(
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_service,
+           int criticality_id,
            char const* criticality_name,
            int criticality_level);
 int      get_service_count();

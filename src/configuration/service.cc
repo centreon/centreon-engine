@@ -90,6 +90,7 @@ service::setters const service::_setters[] = {
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
   { "timezone",                     SETTER(std::string const&, _set_timezone) },
+  { "criticality_id",               SETTER(unsigned int, _set_criticality_id) },
   { "criticality_name",             SETTER(std::string const&, _set_criticality_name) },
   { "criticality_level",            SETTER(unsigned int, _set_criticality_level) }
 };
@@ -100,7 +101,6 @@ static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(0);
 static unsigned int const   default_check_interval(5);
-static unsigned int const   default_criticality_level(0);
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
@@ -143,7 +143,8 @@ service::service()
     _check_command_is_important(false),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
-    _criticality_level(default_criticality_level),
+    _criticality_id(0),
+    _criticality_level(0),
     _event_handler_enabled(default_event_handler_enabled),
     _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),
@@ -202,6 +203,7 @@ service& service::operator=(service const& other) {
     _check_period = other._check_period;
     _contactgroups = other._contactgroups;
     _contacts = other._contacts;
+    _criticality_id = other._criticality_id;
     _criticality_name = other._criticality_name;
     _criticality_level = other._criticality_level;
     _customvariables = other._customvariables;
@@ -669,6 +671,15 @@ set_string const& service::contacts() const throw () {
  */
 bool service::contacts_defined() const throw () {
   return (_contacts.is_set());
+}
+
+/**
+ *  Get criticality_id.
+ *
+ *  @return The criticality_id.
+ */
+unsigned int service::criticality_id() const throw () {
+  return (_criticality_id);
 }
 
 /**
@@ -1242,6 +1253,18 @@ bool service::_set_contactgroups(std::string const& value) {
  */
 bool service::_set_contacts(std::string const& value) {
   _contacts = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_id value.
+ *
+ *  @param[in] value The new criticality id.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_criticality_id(unsigned int value) {
+  _criticality_id = value;
   return (true);
 }
 

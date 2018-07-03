@@ -175,6 +175,7 @@ void applier::service::add_object(
     obj.retain_status_information(),
     obj.retain_nonstatus_information(),
     obj.obsess_over_service(),
+    obj.criticality_id(),
     obj.criticality_name().c_str(),
     obj.criticality_level()));
   if (!svc)

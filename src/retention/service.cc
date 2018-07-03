@@ -37,6 +37,7 @@ service::setters const service::_setters[] = {
   { "check_options",                        SETTER(int, _set_check_options) },
   { "check_period",                         SETTER(std::string const&, _set_check_period) },
   { "check_type",                           SETTER(int, _set_check_type) },
+  { "criticality_id",                       SETTER(int, _set_criticality_id) },
   { "criticality_level",                    SETTER(int, _set_criticality_level) },
   { "criticality_name",                     SETTER(std::string const&, _set_criticality_name) },
   { "current_attempt",                      SETTER(int, _set_current_attempt) },
@@ -902,6 +903,16 @@ bool service::_set_check_period(std::string const& value) {
  */
 bool service::_set_check_type(int value) {
   _check_type = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_id.
+ *
+ *  @param[in] value The new criticality_id.
+ */
+bool service::_set_criticality_id(int value) {
+  _criticality_id = value;
   return (true);
 }
 

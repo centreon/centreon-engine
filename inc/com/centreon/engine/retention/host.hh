@@ -113,6 +113,7 @@ namespace                         retention {
     bool                          _set_check_options(int value);
     bool                          _set_check_period(std::string const& value);
     bool                          _set_check_type(int value);
+    bool                          _set_criticality_id(int value);
     bool                          _set_criticality_level(int value);
     bool                          _set_criticality_name(std::string const& value);
     bool                          _set_current_attempt(int value);
@@ -170,6 +171,7 @@ namespace                         retention {
     opt<int>                      _check_options;
     opt<std::string>              _check_period;
     opt<int>                      _check_type;
+    opt<int>                      _criticality_id;
     opt<int>                      _criticality_level;
     opt<std::string>              _criticality_name;
     opt<int>                      _current_attempt;
