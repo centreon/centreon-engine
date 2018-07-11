@@ -87,6 +87,12 @@ void applier::service::_update(
       obj.latency = *state.check_latency();
     if (state.check_type().is_set())
       obj.check_type = *state.check_type();
+    if (state.criticality_id().is_set())
+      obj.criticality_id = *state.criticality_id();
+    if (state.criticality_name().is_set())
+      string::setstr(obj.criticality_name, *state.criticality_name());
+    if (state.criticality_level().is_set())
+      obj.criticality_level = *state.criticality_level();
     if (state.current_state().is_set())
       obj.current_state = *state.current_state();
     if (state.last_state().is_set())

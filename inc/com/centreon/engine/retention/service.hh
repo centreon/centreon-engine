@@ -51,6 +51,9 @@ namespace                         retention {
     opt<int> const&               check_options() const throw ();
     opt<std::string> const&       check_period() const throw ();
     opt<int> const&               check_type() const throw ();
+    opt<int> const&               criticality_id() const throw ();
+    opt<std::string> const&       criticality_name() const throw ();
+    opt<int> const&               criticality_level() const throw ();
     opt<int> const&               current_attempt() const throw ();
     opt<unsigned long> const&     current_event_id() const throw ();
     opt<unsigned long> const&     current_notification_id() const throw ();
@@ -178,8 +181,8 @@ namespace                         retention {
     opt<std::string>              _check_period;
     opt<int>                      _check_type;
     opt<int>                      _criticality_id;
-    opt<int>                      _criticality_level;
     opt<std::string>              _criticality_name;
+    opt<int>                      _criticality_level;
     opt<int>                      _current_attempt;
     opt<unsigned long>            _current_event_id;
     opt<unsigned long>            _current_notification_id;

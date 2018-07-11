@@ -354,6 +354,33 @@ opt<int> const& host::check_type() const throw () {
 }
 
 /**
+ *  Get criticality_id.
+ *
+ *  @return The criticality_id.
+ */
+opt<int> const& host::criticality_id() const throw () {
+  return (_criticality_id);
+}
+
+/**
+ *  Get criticality_name.
+ *
+ *  @return The criticality_name.
+ */
+opt<std::string> const& host::criticality_name() const throw () {
+  return (_criticality_name);
+}
+
+/**
+ *  Get criticality_level.
+ *
+ *  @return The criticality_level.
+ */
+opt<int> const& host::criticality_level() const throw () {
+  return (_criticality_level);
+}
+
+/**
  *  Get current_attempt.
  *
  *  @return The current_attempt.

@@ -385,6 +385,33 @@ opt<int> const& service::check_type() const throw () {
 }
 
 /**
+ *  Get criticality_id.
+ *
+ *  @return The criticality_id.
+ */
+opt<int> const& service::criticality_id() const throw () {
+  return (_criticality_id);
+}
+
+/**
+ *  Get criticality_name.
+ *
+ *  @return The criticality_name.
+ */
+opt<std::string> const& service::criticality_name() const throw () {
+  return (_criticality_name);
+}
+
+/**
+ *  Get criticality_level.
+ *
+ *  @return The criticality_level.
+ */
+opt<int> const& service::criticality_level() const throw () {
+  return (_criticality_level);
+}
+
+/**
  *  Get current_attempt.
  *
  *  @return The current_attempt.
@@ -917,22 +944,22 @@ bool service::_set_criticality_id(int value) {
 }
 
 /**
- *  Set criticality_level.
- *
- *  @param[in] value The new criticality_level.
- */
-bool service::_set_criticality_level(int value) {
-  _criticality_level = value;
-  return (true);
-}
-
-/**
  *  Set criticality_name.
  *
  *  @param[in] value The new criticality_name.
  */
 bool service::_set_criticality_name(std::string const& value) {
   _criticality_name = value;
+  return (true);
+}
+
+/**
+ *  Set criticality_level.
+ *
+ *  @param[in] value The new criticality_level.
+ */
+bool service::_set_criticality_level(int value) {
+  _criticality_level = value;
   return (true);
 }
 

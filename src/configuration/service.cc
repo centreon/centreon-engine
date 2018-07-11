@@ -351,6 +351,12 @@ bool service::operator<(service const& other) const throw () {
     return (_contactgroups < other._contactgroups);
   else if (_contacts != other._contacts)
     return (_contacts < other._contacts);
+  else if (_criticality_id != other._criticality_id)
+    return (_criticality_id < other._criticality_id);
+  else if (_criticality_name != other._criticality_name)
+    return (_criticality_name < other._criticality_name);
+  else if (_criticality_level != other._criticality_level)
+    return (_criticality_level < other._criticality_level);
   else if (_customvariables != other._customvariables)
     return (_customvariables < other._customvariables);
   else if (_display_name != other._display_name)

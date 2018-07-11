@@ -347,6 +347,12 @@ bool host::operator<(host const& other) const throw () {
     return (_coords_2d < other._coords_2d);
   else if (_coords_3d != other._coords_3d)
     return (_coords_3d < other._coords_3d);
+  else if (_criticality_id != other._criticality_id)
+    return (_criticality_id < other._criticality_id);
+  else if (_criticality_name != other._criticality_name)
+    return (_criticality_name < other._criticality_name);
+  else if (_criticality_level != other._criticality_level)
+    return (_criticality_level < other._criticality_level);
   else if (_customvariables != other._customvariables)
     return (_customvariables < other._customvariables);
   else if (_display_name != other._display_name)

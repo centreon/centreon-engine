@@ -107,6 +107,12 @@ void applier::host::_update(
         && config.use_retained_scheduling_info()
         && scheduling_info_is_ok)
       obj.check_options = *state.check_options();
+    if (state.criticality_id().is_set())
+      obj.criticality_id = *state.criticality_id();
+    if (state.criticality_name().is_set())
+      string::setstr(obj.criticality_name, *state.criticality_name());
+    if (state.criticality_level().is_set())
+      obj.criticality_level = *state.criticality_level();
     if (state.current_attempt().is_set())
       obj.current_attempt = *state.current_attempt();
     if (state.current_event_id().is_set())
