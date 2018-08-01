@@ -96,10 +96,8 @@ further steps too.
 CentOS
 ------
 
-In CentOS you need to add manually cmake. After that you can
-install binary packages. Either use the Package Manager or the
-yum tool to install them. You should check packages version when
-necessary.
+Either use the Package Manager or the yum tool to install them.
+You should check packages version when necessary.
 
 Package required to build:
 
