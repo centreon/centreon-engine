@@ -65,6 +65,7 @@ since 1999.  If I missed your name, let me know.
 * Eric Coquard
 * Charlie Cook
 * Garry Cook
+* Luiz Gustavo S. Costa
 * Jeff Cours
 * Michelle Craft
 * Matthias Cramer
