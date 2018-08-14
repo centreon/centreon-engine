@@ -18,7 +18,7 @@ Using packages
 Centreon provides RPM for its products through Centreon Open Sources (COS) version
 available free of charge on our repository.
 Open source products are freely available from our repository.
-These packages are available for CentOS 6 or 7 architeture x86_64, which is
+These packages are available for CentOS 6 or 7 architecture x86_64, which is
 the sole platform officially supported by Centreon
 
 .. _user_installation_packages_prerequisites:
