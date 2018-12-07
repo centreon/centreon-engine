@@ -39,6 +39,11 @@ try {
           ],
           tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
         ])
+        if (env.BRANCH_NAME == 'master') {
+          withSonarQubeEnv('SonarQube') {
+            sh './centreon-build/jobs/engine/3.4/mon-engine-analysis.sh'
+          }
+        }
       }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
