@@ -39,7 +39,7 @@ try {
           ],
           tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
         ])
-        if (env.BRANCH_NAME == 'master') {
+        if (env.BRANCH_NAME == '1.8.x') {
           withSonarQubeEnv('SonarQube') {
             sh './centreon-build/jobs/engine/3.4/mon-engine-analysis.sh'
           }
