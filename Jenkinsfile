@@ -25,6 +25,11 @@ try {
           ],
           tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
         ])
+        if (env.BRANCH_NAME == 'master') {
+          withSonarQubeEnv('SonarQube') {
+            sh './centreon-build/jobs/engine/18.10/mon-engine-analysis.sh'
+          }
+        }
       }
     },
     'debian9': {
