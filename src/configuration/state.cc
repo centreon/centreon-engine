@@ -1918,11 +1918,22 @@ set_host::const_iterator state::hosts_find(
                                   host::key_type const& k) const {
   configuration::host below_searched(k);
   set_host::const_iterator it(_hosts.upper_bound(below_searched));
-  if ((it != _hosts.end()) && (it->host_name() == k))
+  if ((it != _hosts.end()) && (it->host_id() == k))
     return (it);
-  else if ((it != _hosts.begin()) && ((--it)->host_name() == k))
+  else if ((it != _hosts.begin()) && ((--it)->host_id() == k))
     return (it);
   return (_hosts.end());
+}
+
+set_host::const_iterator state::hosts_find(std::string const& name) const {
+  configuration::host below_searched(0);
+  below_searched.parse("host_name", name.c_str());
+  set_host::const_iterator it(_hosts.upper_bound(below_searched));
+  if ((it != _hosts.end()) && (it->host_name() == name))
+    return it;
+  else if (it != _hosts.begin() && (--it)->host_name() == name)
+    return it;
+  return _hosts.end();
 }
 
 /**
@@ -1936,11 +1947,11 @@ set_host::iterator state::hosts_find(
                             host::key_type const& k) {
   configuration::host below_searched(k);
   set_host::iterator it(_hosts.upper_bound(below_searched));
-  if ((it != _hosts.end()) && (it->host_name() == k))
+  if (it != _hosts.end() && it->host_id() == k)
     return (it);
-  else if ((it != _hosts.begin()) && ((--it)->host_name() == k))
-    return (it);
-  return (_hosts.end());
+  else if (it != _hosts.begin() && (--it)->host_id() == k)
+    return it;
+  return _hosts.end();
 }
 
 /**
@@ -2954,19 +2965,21 @@ set_service& state::services() throw () {
 set_service::const_iterator state::services_find(
                                    service::key_type const& k) const {
   configuration::service below_searched;
-  below_searched.hosts().insert(k.first);
-  below_searched.service_description() = k.second;
+  std::string host_name(find_host(k.first).name);
+  std::string service_description(find_service(k.first, k.second).description);
+  below_searched.hosts().insert(host_name);
+  below_searched.service_description() = service_description;
   set_service::const_iterator
     it(_services.upper_bound(below_searched));
-  if ((it != _services.end())
-      && (*it->hosts().begin() == k.first)
-      && (it->service_description() == k.second))
-    return (it);
+  if (it != _services.end()
+      && *it->hosts().begin() == host_name
+      && it->service_description() == service_description)
+    return it;
   else if ((it != _services.begin())
-           && (*(--it)->hosts().begin() == k.first)
-           && (it->service_description() == k.second))
-    return (it);
-  return (_services.end());
+           && *(--it)->hosts().begin() == host_name
+           && it->service_description() == service_description)
+    return it;
+  return _services.end();
 }
 
 /**
@@ -2980,19 +2993,21 @@ set_service::const_iterator state::services_find(
 set_service::iterator state::services_find(
                              service::key_type const& k) {
   configuration::service below_searched;
-  below_searched.hosts().insert(k.first);
-  below_searched.service_description() = k.second;
+  std::string host_name(find_host(k.first).name);
+  std::string service_description(find_service(k.first, k.second).description);
+  below_searched.hosts().insert(host_name);
+  below_searched.service_description() = service_description;
   set_service::iterator
     it(_services.upper_bound(below_searched));
-  if ((it != _services.end())
-      && (*it->hosts().begin() == k.first)
-      && (it->service_description() == k.second))
-    return (it);
-  else if ((it != _services.begin())
-           && (*(--it)->hosts().begin() == k.first)
-           && (it->service_description() == k.second))
-    return (it);
-  return (_services.end());
+  if (it != _services.end()
+      && *it->hosts().begin() == host_name
+      && it->service_description() == service_description)
+    return it;
+  else if (it != _services.begin()
+           && *(--it)->hosts().begin() == host_name
+           && it->service_description() == service_description)
+    return it;
+  return _services.end();
 }
 
 /**

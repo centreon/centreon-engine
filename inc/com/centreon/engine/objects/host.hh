@@ -180,6 +180,7 @@ extern "C" {
 #  endif /* C++ */
 
 host* add_host(
+        unsigned int host_id,
         char const* name,
         char const* display_name,
         char const* alias,
@@ -263,9 +264,9 @@ std::ostream& operator<<(std::ostream& os, host const& obj);
 CCE_BEGIN()
 
 void          check_for_expired_acknowledgement(host* h);
-host&         find_host(std::string const& name);
+host&         find_host(unsigned int host_id);
 char const*   get_host_timezone(char const* name);
-bool          is_host_exist(std::string const& name) throw ();
+bool          is_host_exist(unsigned int host_id) throw ();
 unsigned int  get_host_id(char const* name);
 void          schedule_acknowledgement_expiration(host* h);
 

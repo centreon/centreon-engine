@@ -163,9 +163,11 @@ void checker::reap() {
       if (SERVICE_CHECK == result.object_check_type) {
         try {
           // Check if the service exists.
-          service& svc(find_service(
-                         result.host_name,
-                         result.service_description));
+          unsigned int host_id(get_host_id(result.host_name));
+          unsigned int service_id(get_service_id(
+                                    result.host_name,
+                                    result.service_description));
+          service& svc(find_service(host_id, service_id));
           // Process the check result.
           logger(dbg_checks, more)
             << "Handling check result for service '"
@@ -185,7 +187,7 @@ void checker::reap() {
       // Host check result.
       else {
         try {
-          host& hst(find_host(result.host_name));
+          host& hst(find_host(get_host_id(result.host_name)));
           // Process the check result.
           logger(dbg_checks, more)
             << "Handling check result for host '"

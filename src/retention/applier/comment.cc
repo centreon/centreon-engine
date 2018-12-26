@@ -54,8 +54,8 @@ void applier::comment::apply(list_comment const& lst) {
  */
 void applier::comment::_add_host_comment(
        retention::comment const& obj) throw () {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it(configuration::applier::state::instance().hosts().find(obj.host_name()));
+  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+    it(configuration::applier::state::instance().hosts().find(get_host_id(obj.host_name().c_str())));
   if (it == configuration::applier::state::instance().hosts().end())
     return;
   host_struct* hst(it->second.get());
@@ -94,12 +94,12 @@ void applier::comment::_add_host_comment(
  */
 void applier::comment::_add_service_comment(
        retention::comment const& obj) throw () {
-  if (!is_host_exist(obj.host_name()))
+  if (!is_host_exist(get_host_id(obj.host_name().c_str())))
     return;
 
-  std::pair<std::string, std::string>
-    id(std::make_pair(obj.host_name(), obj.service_description()));
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+  std::pair<unsigned int, unsigned int>
+    id(get_host_and_service_id(obj.host_name().c_str(), obj.service_description().c_str()));
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
     it_svc(configuration::applier::state::instance().services().find(id));
   if (it_svc == configuration::applier::state::instance().services().end())
     return;

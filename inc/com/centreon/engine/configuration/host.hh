@@ -46,9 +46,9 @@ namespace                  configuration {
       flapping = (1 << 3),
       downtime = (1 << 4)
     };
-    typedef std::string    key_type;
+    typedef unsigned int   key_type;
 
-                           host(key_type const& key = "");
+                           host(key_type const& key = 0);
                            host(host const& other);
                            ~host() throw ();
     host&                  operator=(host const& other);

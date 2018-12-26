@@ -46,7 +46,7 @@ namespace                  configuration {
       flapping = (1 << 4),
       downtime = (1 << 5)
     };
-    typedef                std::pair<std::string, std::string>
+    typedef                std::pair<unsigned int, unsigned int>
                            key_type;
 
                            service();

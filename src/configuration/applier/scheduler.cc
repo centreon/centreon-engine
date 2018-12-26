@@ -76,10 +76,10 @@ void applier::scheduler::apply(
          end(diff_hosts.modified().end());
        it != end;
        ++it) {
-    umap<std::string, shared_ptr<host_struct> > const&
+    umap<unsigned int, shared_ptr<host_struct> > const&
       hosts(applier::state::instance().hosts());
-    umap<std::string, shared_ptr<host_struct> >::const_iterator
-      hst(hosts.find(it->host_name()));
+    umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+      hst(hosts.find(get_host_id(it->host_name().c_str())));
     if (hst != hosts.end()) {
       bool has_event(quick_timed_event.find(
                                          events::hash_timed_event::low,
@@ -103,12 +103,12 @@ void applier::scheduler::apply(
          end(diff_services.modified().end());
        it != end;
        ++it) {
-    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
+    umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
       services(applier::state::instance().services());
-    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+    umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(
-                               *it->hosts().begin(),
-                               it->service_description())));
+                               it->host_id(),   //*it->hosts().begin(),
+                               it->service_id())));
     if (svc != services.end()) {
       bool has_event(quick_timed_event.find(
                                          events::hash_timed_event::low,
@@ -206,10 +206,10 @@ void applier::scheduler::load() {
  *  @param[in] h  Host configuration.
  */
 void applier::scheduler::remove_host(configuration::host const& h) {
-  umap<std::string, shared_ptr<host_struct> > const&
+  umap<unsigned int, shared_ptr<host_struct> > const&
     hosts(applier::state::instance().hosts());
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    hst(hosts.find(h.host_name()));
+  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+    hst(hosts.find(get_host_id(h.host_name().c_str())));
   if (hst != hosts.end()) {
     std::vector<host_struct*> hvec;
     hvec.push_back(hst->second.get());
@@ -225,12 +225,12 @@ void applier::scheduler::remove_host(configuration::host const& h) {
  */
 void applier::scheduler::remove_service(
                            configuration::service const& s) {
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
     services(applier::state::instance().services());
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
     svc(services.find(std::make_pair(
-                             *s.hosts().begin(),
-                             s.service_description())));
+                             s.host_id(),
+                             s.service_id())));
   if (svc != services.end()) {
     std::vector<service_struct*> svec;
     svec.push_back(svc->second.get());
@@ -542,7 +542,7 @@ void applier::scheduler::_calculate_host_scheduling_params() {
   time_t const now(time(NULL));
 
   // get total hosts and total scheduled hosts.
-  for (umap<std::string, shared_ptr<host_struct> >::const_iterator
+  for (umap<unsigned int, shared_ptr<host_struct> >::const_iterator
          it(applier::state::instance().hosts().begin()),
          end(applier::state::instance().hosts().end());
          it != end;
@@ -698,7 +698,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
   time_t const now(time(NULL));
 
   // get total services and total scheduled services.
-  for (umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+  for (umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
          it(applier::state::instance().services().begin()),
          end(applier::state::instance().services().end());
        it != end;
@@ -810,16 +810,17 @@ void applier::scheduler::_get_hosts(
        set_host const& hst_cfg,
        std::vector<host_struct*>& hst_obj,
        bool throw_if_not_found) {
-  umap<std::string, shared_ptr<host_struct> > const&
+  umap<unsigned int, shared_ptr<host_struct> > const&
     hosts(applier::state::instance().hosts());
   for (set_host::const_reverse_iterator
          it(hst_cfg.rbegin()),
          end(hst_cfg.rend());
        it != end;
        ++it) {
+    unsigned int host_id(it->host_id());
     std::string const& host_name(it->host_name());
-    umap<std::string, shared_ptr<host_struct> >::const_iterator
-      hst(hosts.find(host_name));
+    umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+      hst(hosts.find(host_id));
     if (hst == hosts.end()) {
       if (throw_if_not_found)
         throw (engine_error() << "Could not schedule non-existing host '"
@@ -843,16 +844,18 @@ void applier::scheduler::_get_services(
        set_service const& svc_cfg,
        std::vector<service_struct*>& svc_obj,
        bool throw_if_not_found) {
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
     services(applier::state::instance().services());
   for (set_service::const_reverse_iterator
          it(svc_cfg.rbegin()), end(svc_cfg.rend());
        it != end;
        ++it) {
+    unsigned int host_id(it->host_id());
+    unsigned int service_id(it->service_id());
     std::string const& host_name(*it->hosts().begin());
     std::string const& service_description(it->service_description());
-    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
-      svc(services.find(std::make_pair(host_name, service_description)));
+    umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
+      svc(services.find(std::make_pair(host_id, service_id)));
     if (svc == services.end()) {
       if (throw_if_not_found)
         throw (engine_error() << "Cannot schedule non-existing service '"
