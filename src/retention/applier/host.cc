@@ -45,7 +45,7 @@ void applier::host::apply(
        it != end;
        ++it) {
     try {
-      host_struct& hst(find_host((*it)->host_name()));
+      host_struct& hst(find_host(get_host_id((*it)->host_name().c_str())));
       _update(config, **it, hst, scheduling_info_is_ok);
     }
     catch (...) {

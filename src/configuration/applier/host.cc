@@ -87,6 +87,7 @@ void applier::host::add_object(
   // Create host.
   host_struct*
     h(add_host(
+        obj.host_id(),
         obj.host_name().c_str(),
         NULL_IF_EMPTY(obj.display_name()),
         NULL_IF_EMPTY(obj.alias()),
@@ -302,7 +303,7 @@ void applier::host::modify_object(
            << obj.host_name() << "'");
 
   // Find host object.
-  umap<std::string, shared_ptr<host_struct> >::iterator
+  umap<unsigned int, shared_ptr<host_struct> >::iterator
     it_obj(applier::state::instance().hosts_find(obj.key()));
   if (it_obj == applier::state::instance().hosts().end())
     throw (engine_error() << "Could not modify non-existing "
@@ -576,7 +577,7 @@ void applier::host::remove_object(
     << "Removing host '" << obj.host_name() << "'.";
 
   // Find host.
-  umap<std::string, shared_ptr<host_struct> >::iterator
+  umap<unsigned int, shared_ptr<host_struct> >::iterator
     it(applier::state::instance().hosts_find(obj.key()));
   if (it != applier::state::instance().hosts().end()) {
     host_struct* hst(it->second.get());
@@ -636,14 +637,14 @@ void applier::host::resolve_object(
   // It is necessary to do it only once to prevent the removal
   // of valid child backlinks.
   if (obj == *config->hosts().begin()) {
-    for (umap<std::string, shared_ptr<host_struct> >::iterator
+    for (umap<unsigned int, shared_ptr<host_struct> >::iterator
          it(applier::state::instance().hosts().begin()),
          end(applier::state::instance().hosts().end()); it != end; ++it)
       deleter::listmember(it->second->child_hosts, &deleter::hostsmember);
   }
 
   // Find host.
-  umap<std::string, shared_ptr<host_struct> >::iterator
+  umap<unsigned int, shared_ptr<host_struct> >::iterator
     it(applier::state::instance().hosts_find(obj.key()));
   if (applier::state::instance().hosts().end() == it)
     throw (engine_error() << "Cannot resolve non-existing host '"

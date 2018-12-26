@@ -47,9 +47,10 @@ void applier::service::apply(
        it != end;
        ++it) {
     try {
-      service_struct& svc(find_service(
-                            (*it)->host_name(),
-                            (*it)->service_description()));
+      std::pair<unsigned int, unsigned int> id(get_host_and_service_id(
+            (*it)->host_name().c_str(),
+            (*it)->service_description().c_str()));
+      service_struct& svc(find_service(id.first, id.second));
       _update(config, **it, svc, scheduling_info_is_ok);
     }
     catch (...) {

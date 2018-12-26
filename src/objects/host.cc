@@ -413,6 +413,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @return New host.
  */
 host* add_host(
+        unsigned int host_id,
         char const* name,
         char const* display_name,
         char const* alias,
@@ -508,8 +509,8 @@ host* add_host(
     return (NULL);
   }
 
-  // Check if the host is already exist.
-  std::string id(name);
+  // Check if the host already exists.
+  unsigned int id(host_id);
   if (is_host_exist(id)) {
     logger(log_config_error, basic)
       << "Error: Host '" << name << "' has already been defined";
@@ -846,12 +847,12 @@ void engine::check_for_expired_acknowledgement(host* h) {
  *  @return The struct host or throw exception if the
  *          host is not found.
  */
-host& engine::find_host(std::string const& name) {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it(state::instance().hosts().find(name));
+host& engine::find_host(unsigned int host_id) {
+  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+    it(state::instance().hosts().find(host_id));
   if (it == state::instance().hosts().end())
-    throw (engine_error() << "Host '" << name << "' was not found");
-  return (*it->second);
+    throw (engine_error() << "Host '" << host_id << "' was not found");
+  return *it->second;
 }
 
 /**
@@ -873,9 +874,9 @@ char const* engine::get_host_timezone(char const* name) {
  *
  *  @return True if the host is found, otherwise false.
  */
-bool engine::is_host_exist(std::string const& name) throw () {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it(state::instance().hosts().find(name));
+bool engine::is_host_exist(unsigned int host_id) throw () {
+  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+    it(state::instance().hosts().find(host_id));
   return (it != state::instance().hosts().end());
 }
 

@@ -445,9 +445,9 @@ void service::check_validity() const {
 service::key_type service::key() const {
   key_type k;
   if (!_hosts->empty())
-    k.first = *_hosts->begin();
-  k.second = _service_description;
-  return (k);
+    k.first = _host_id;
+  k.second = _service_id;
+  return k;
 }
 
 /**

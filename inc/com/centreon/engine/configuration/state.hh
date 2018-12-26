@@ -238,6 +238,8 @@ namespace               configuration {
     set_host::const_iterator
                         hosts_find(host::key_type const& k) const;
     set_host::iterator  hosts_find(host::key_type const& k);
+    set_host::const_iterator
+                        hosts_find(std::string const& name) const;
     unsigned int        host_check_timeout() const throw ();
     void                host_check_timeout(unsigned int value);
     unsigned int        host_freshness_check_interval() const throw ();
