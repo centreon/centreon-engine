@@ -317,6 +317,9 @@ void applier::host::modify_object(
 
   // Modify properties.
   modify_if_different(
+    h->name,
+    NULL_IF_EMPTY(obj.host_name()));
+  modify_if_different(
     h->display_name,
     NULL_IF_EMPTY(obj.display_name()));
   modify_if_different(
