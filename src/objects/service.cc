@@ -447,7 +447,13 @@ service* add_service(
   (void)failure_prediction_options;
 
   // Make sure we have everything we need.
-  if (!description || !description[0]) {
+  if (!service_id) {
+    logger(log_config_error, basic)
+      << "Error: Service comes from a database, therefore its service id "
+      << "must not be null";
+    return NULL;
+  }
+  else if (!description || !description[0]) {
     logger(log_config_error, basic)
       << "Error: Service description is not set";
     return (NULL);
@@ -463,6 +469,14 @@ service* add_service(
       << "Error: Check command of service '" << description
       << "' on host '" << host_name << "' is not set";
     return (NULL);
+  }
+
+  host_id = get_host_id(host_name);
+  if (!host_id) {
+    logger(log_config_error, basic)
+      << "Error: The service '" << description << "' cannot be created because"
+      << " host '" << host_name << "' does not exist (host_id is null)";
+    return NULL;
   }
 
   // Check values.

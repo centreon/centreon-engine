@@ -478,6 +478,11 @@ host* add_host(
       << "Error: Host name or address is NULL";
     return (NULL);
   }
+  if (host_id == 0) {
+    logger(log_config_error, basic)
+      << "Error: Host must contain a host id because it comes from a database";
+    return NULL;
+  }
   if (max_attempts <= 0) {
     logger(log_config_error, basic)
       << "Error: Invalid max_check_attempts value for host '"
