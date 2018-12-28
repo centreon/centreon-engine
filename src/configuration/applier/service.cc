@@ -384,6 +384,9 @@ void applier::service::modify_object(
 
   // Modify properties.
   modify_if_different(
+    s->description,
+    NULL_IF_EMPTY(obj.service_description()));
+  modify_if_different(
     s->display_name,
     NULL_IF_EMPTY(obj.display_name()));
   modify_if_different(
@@ -800,8 +803,6 @@ void applier::service::_inherits_special_vars(
              << *obj.hosts().begin() << "' does not exist");
 
     // Inherits variables.
-    if (!obj.host_id())
-      obj.host_id(it->host_id());
     if (!obj.contacts_defined() && !obj.contactgroups_defined()) {
       obj.contacts() = it->contacts();
       obj.contactgroups() = it->contactgroups();
