@@ -1926,13 +1926,13 @@ set_host::const_iterator state::hosts_find(
 }
 
 set_host::const_iterator state::hosts_find(std::string const& name) const {
-  configuration::host below_searched(0);
-  below_searched.parse("host_name", name.c_str());
-  set_host::const_iterator it(_hosts.upper_bound(below_searched));
-  if ((it != _hosts.end()) && (it->host_name() == name))
-    return it;
-  else if (it != _hosts.begin() && (--it)->host_name() == name)
-    return it;
+  for (set_host::const_iterator
+         it(_hosts.begin()), end(_hosts.end());
+       it != end;
+       ++it) {
+    if (it->host_name() == name)
+      return it;
+  }
   return _hosts.end();
 }
 
