@@ -37,6 +37,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/configuration/service.cc"
     "${TESTS_DIR}/configuration/applier/applier-host.cc"
     "${TESTS_DIR}/configuration/applier/applier-service.cc"
+    "${TESTS_DIR}/configuration/applier/applier-servicegroup.cc"
     "${TESTS_DIR}/downtime_finder.cc"
     "${TESTS_DIR}/main.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/between_two_years.cc"
