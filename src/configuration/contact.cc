@@ -306,7 +306,7 @@ bool contact::parse(char const* key, char const* value) {
   if (!strncmp(key, ADDRESS_PROPERTY, sizeof(ADDRESS_PROPERTY) - 1))
     return (_set_address(key + sizeof(ADDRESS_PROPERTY) - 1, value));
   else if (key[0] == '_') {
-    _customvariables[key + 1] = value;
+    _customvariables.insert(std::make_pair(key + 1, customvariable(key + 1, value)));
     return (true);
   }
   return (false);

@@ -76,6 +76,7 @@ state::setters const state::_setters[] = {
   { "enable_event_handlers",                       SETTER(bool, enable_event_handlers) },
   { "enable_failure_prediction",                   SETTER(std::string const&, _set_enable_failure_prediction) },
   { "enable_flap_detection",                       SETTER(bool, enable_flap_detection) },
+  { "enable_macros_filter",                        SETTER(bool, enable_macros_filter) },
   { "enable_notifications",                        SETTER(bool, enable_notifications) },
   { "enable_predictive_host_dependency_checks",    SETTER(bool, enable_predictive_host_dependency_checks) },
   { "enable_predictive_service_dependency_checks", SETTER(bool, enable_predictive_service_dependency_checks) },
@@ -115,6 +116,7 @@ state::setters const state::_setters[] = {
   { "log_service_retries",                         SETTER(bool, log_service_retries) },
   { "low_host_flap_threshold",                     SETTER(float, low_host_flap_threshold) },
   { "low_service_flap_threshold",                  SETTER(float, low_service_flap_threshold) },
+  { "macros_filter",                               SETTER(std::string const&, macros_filter) },
   { "max_check_result_file_age",                   SETTER(unsigned long, max_check_result_file_age) },
   { "max_check_result_reaper_time",                SETTER(unsigned int, max_check_reaper_time) },
   { "max_concurrent_checks",                       SETTER(unsigned int, max_parallel_service_checks) },
@@ -212,6 +214,7 @@ static unsigned int const              default_debug_verbosity(1);
 static bool const                      default_enable_environment_macros(false);
 static bool const                      default_enable_event_handlers(true);
 static bool const                      default_enable_flap_detection(false);
+static bool const                      default_enable_macros_filter(false);
 static bool const                      default_enable_notifications(true);
 static bool const                      default_enable_predictive_host_dependency_checks(true);
 static bool const                      default_enable_predictive_service_dependency_checks(true);
@@ -324,6 +327,7 @@ state::state()
     _enable_environment_macros(default_enable_environment_macros),
     _enable_event_handlers(default_enable_event_handlers),
     _enable_flap_detection(default_enable_flap_detection),
+    _enable_macros_filter(default_enable_macros_filter),
     _enable_notifications(default_enable_notifications),
     _enable_predictive_host_dependency_checks(default_enable_predictive_host_dependency_checks),
     _enable_predictive_service_dependency_checks(default_enable_predictive_service_dependency_checks),
@@ -460,6 +464,7 @@ state& state::operator=(state const& right) {
     _enable_environment_macros = right._enable_environment_macros;
     _enable_event_handlers = right._enable_event_handlers;
     _enable_flap_detection = right._enable_flap_detection;
+    _enable_macros_filter = right._enable_macros_filter;
     _enable_notifications = right._enable_notifications;
     _enable_predictive_host_dependency_checks = right._enable_predictive_host_dependency_checks;
     _enable_predictive_service_dependency_checks = right._enable_predictive_service_dependency_checks;
@@ -498,6 +503,7 @@ state& state::operator=(state const& right) {
     _log_service_retries = right._log_service_retries;
     _low_host_flap_threshold = right._low_host_flap_threshold;
     _low_service_flap_threshold = right._low_service_flap_threshold;
+    _macros_filter = right._macros_filter;
     _max_check_reaper_time = right._max_check_reaper_time;
     _max_check_result_file_age = right._max_check_result_file_age;
     _max_debug_file_size = right._max_debug_file_size;
@@ -600,6 +606,7 @@ bool state::operator==(state const& right) const throw () {
           && _enable_environment_macros == right._enable_environment_macros
           && _enable_event_handlers == right._enable_event_handlers
           && _enable_flap_detection == right._enable_flap_detection
+          && _enable_macros_filter == right._enable_macros_filter
           && _enable_notifications == right._enable_notifications
           && _enable_predictive_host_dependency_checks == right._enable_predictive_host_dependency_checks
           && _enable_predictive_service_dependency_checks == right._enable_predictive_service_dependency_checks
@@ -638,6 +645,7 @@ bool state::operator==(state const& right) const throw () {
           && _log_service_retries == right._log_service_retries
           && _low_host_flap_threshold == right._low_host_flap_threshold
           && _low_service_flap_threshold == right._low_service_flap_threshold
+          && _macros_filter == right._macros_filter
           && _max_check_reaper_time == right._max_check_reaper_time
           && _max_check_result_file_age == right._max_check_result_file_age
           && _max_debug_file_size == right._max_debug_file_size
@@ -4120,4 +4128,43 @@ void state::_set_use_embedded_perl_implicitly(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: use_embedded_perl_implicitly variable ignored";
   ++config_warnings;
+}
+
+void state::macros_filter(std::string const& value) {
+  size_t previous(0), first, last;
+  size_t current(value.find(','));
+  while (current != std::string::npos) {
+    std::string item(value.substr(previous, current - previous));
+    first = item.find_first_not_of(' ');
+    last = item.find_last_not_of(' ');
+    _macros_filter.insert(item.substr(first, last - first + 1));
+    previous = current + 1;
+    current = value.find(',', previous);
+  }
+  std::string item(value.substr(previous, current - previous));
+  first = item.find_first_not_of(' ');
+  last = item.find_last_not_of(' ');
+  _macros_filter.insert(item.substr(first, last - first + 1));
+}
+
+std::set<std::string> const& state::macros_filter() const {
+  return _macros_filter;
+}
+
+/**
+ *  Get enable_macros_filter value.
+ *
+ *  @return The enable_macros_filter value.
+ */
+bool state::enable_macros_filter() const throw () {
+  return _enable_macros_filter;
+}
+
+/**
+ *  Set enable_macros_filter value.
+ *
+ *  @param[in] value The new enable_macros_filter value.
+ */
+void state::enable_macros_filter(bool value) {
+  _enable_macros_filter = value;
 }

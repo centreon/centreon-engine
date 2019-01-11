@@ -188,7 +188,7 @@ void applier::contact::add_object(configuration::contact const& obj) {
     if (!add_custom_variable_to_contact(
            c,
 	   it->first.c_str(),
-	   it->second.c_str()))
+	   it->second))
       throw (engine_error()
 	     << "Could not add custom variable '" << it->first
 	     << "' to contact '" << obj.contact_name() << "'");
@@ -401,7 +401,7 @@ void applier::contact::modify_object(
       if (!add_custom_variable_to_contact(
              c,
              it->first.c_str(),
-             it->second.c_str()))
+             it->second))
         throw (engine_error()
                << "Could not add custom variable '" << it->first
                << "' to contact '" << obj.contact_name() << "'");

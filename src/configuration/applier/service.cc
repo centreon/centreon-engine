@@ -20,9 +20,9 @@
 #include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
+#include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
@@ -236,7 +236,7 @@ void applier::service::add_object(
     if (!add_custom_variable_to_service(
            svc,
            it->first.c_str(),
-           it->second.c_str()))
+           it->second))
       throw (engine_error() << "Could not add custom variable '"
              << it->first << "' to service '"
              << obj.service_description() << "' of host '"
@@ -270,6 +270,19 @@ void applier::service::expand_objects(configuration::state& s) {
          end_svc(s.services().end());
        it_svc != end_svc;
        ++it_svc) {
+    // Should custom variables be sent to broker ?
+    for (map_customvar::const_iterator
+           it(it_svc->customvariables().begin()),
+           end(it_svc->customvariables().end());
+         it != end;
+         ++it) {
+      if (!s.enable_macros_filter()
+          || s.macros_filter().find(it->first) != s.macros_filter().end()) {
+        customvariable& cv(const_cast<customvariable&>(it->second));
+        cv.set_sent(true);
+      }
+    }
+
     // Expand service to instances.
     std::set<std::string> target_hosts;
 
@@ -578,7 +591,7 @@ void applier::service::modify_object(
       if (!add_custom_variable_to_service(
              s,
              it->first.c_str(),
-             it->second.c_str()))
+             it->second))
         throw (engine_error() << "Could not add custom variable '"
                << it->first << "' to service '" << service_description
                << "' on host '" << host_name << "'");

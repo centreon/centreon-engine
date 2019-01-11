@@ -17,8 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <set>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
@@ -43,7 +45,8 @@ bool operator==(
        customvariablesmember const& obj2) throw () {
   if (is_equal(obj1.variable_name, obj2.variable_name)
       && is_equal(obj1.variable_value, obj2.variable_value)
-      && obj1.has_been_modified == obj2.has_been_modified) {
+      && obj1.has_been_modified == obj2.has_been_modified
+      && obj1.is_sent == obj2.is_sent) {
     if (!obj1.next || !obj2.next)
       return (!obj1.next && !obj2.next);
     return (*obj1.next == *obj2.next);
@@ -112,25 +115,27 @@ std::ostream& operator<<(std::ostream& os, customvariablesmember const& obj) {
 customvariablesmember* add_custom_variable_to_contact(
                          contact* cntct,
                          char const* varname,
-                         char const* varvalue) {
+                         customvariable const& cv) {
   // Add custom variable to contact.
   customvariablesmember* retval(add_custom_variable_to_object(
                                   &cntct->custom_variables,
                                   varname,
-                                  varvalue));
+                                  cv.get_value().c_str(),
+                                  cv.is_sent()));
 
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
-  broker_custom_variable(
-    NEBTYPE_CONTACTCUSTOMVARIABLE_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    cntct,
-    varname,
-    varvalue,
-    &tv);
-
-  return (retval);
+  if (cv.is_sent()) {
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_custom_variable(
+      NEBTYPE_CONTACTCUSTOMVARIABLE_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      cntct,
+      varname,
+      cv.get_value().c_str(),
+      &tv);
+  }
+  return retval;
 }
 
 /**
@@ -145,25 +150,27 @@ customvariablesmember* add_custom_variable_to_contact(
 customvariablesmember* add_custom_variable_to_host(
                          host* hst,
                          char const* varname,
-                         char const* varvalue) {
+                         customvariable const& cv) {
   // Add custom variable to host.
   customvariablesmember* retval(add_custom_variable_to_object(
                                   &hst->custom_variables,
                                   varname,
-                                  varvalue));
+                                  cv.get_value().c_str(),
+                                  cv.is_sent()));
 
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
-  broker_custom_variable(
-    NEBTYPE_HOSTCUSTOMVARIABLE_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    hst,
-    varname,
-    varvalue,
-    &tv);
-
-  return (retval);
+  if (cv.is_sent()) {
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_custom_variable(
+      NEBTYPE_HOSTCUSTOMVARIABLE_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      hst,
+      varname,
+      cv.get_value().c_str(),
+      &tv);
+  }
+  return retval;
 }
 
 /**
@@ -178,7 +185,8 @@ customvariablesmember* add_custom_variable_to_host(
 customvariablesmember* add_custom_variable_to_object(
                          customvariablesmember** object_ptr,
                          char const* varname,
-                         char const* varvalue) {
+                         char const* varvalue,
+                         bool is_sent) {
   // Make sure we have the data we need.
   if (!object_ptr) {
     logger(log_config_error, basic)
@@ -200,6 +208,7 @@ customvariablesmember* add_custom_variable_to_object(
     if (varvalue)
       obj->variable_value = string::dup(varvalue);
 
+    obj->is_sent = is_sent;
     // Add the new member to the head of the member list.
     obj->next = *object_ptr;
     *object_ptr = obj;
@@ -224,25 +233,27 @@ customvariablesmember* add_custom_variable_to_object(
 customvariablesmember* add_custom_variable_to_service(
                          service* svc,
                          char const* varname,
-                         char const* varvalue) {
+                         customvariable const& cv) {
   // Add custom variable to service.
   customvariablesmember* retval(add_custom_variable_to_object(
                                   &svc->custom_variables,
                                   varname,
-                                  varvalue));
+                                  cv.get_value().c_str(),
+                                  cv.is_sent()));
 
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
-  broker_custom_variable(
-    NEBTYPE_SERVICECUSTOMVARIABLE_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    svc,
-    varname,
-    varvalue,
-    &tv);
-
-  return (retval);
+  if (cv.is_sent()) {
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_custom_variable(
+      NEBTYPE_SERVICECUSTOMVARIABLE_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      svc,
+      varname,
+      cv.get_value().c_str(),
+      &tv);
+  }
+  return retval;
 }
 
 /**

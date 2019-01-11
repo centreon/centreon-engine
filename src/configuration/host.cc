@@ -528,7 +528,7 @@ bool host::parse(char const* key, char const* value) {
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   if (key[0] == '_') {
-    _customvariables[key + 1] = value;
+    _customvariables.insert(std::make_pair(key + 1, customvariable(key + 1, value)));
     return (true);
   }
   return (false);

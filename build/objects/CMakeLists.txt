@@ -34,6 +34,7 @@ set(
   "${SRC_DIR}/contactgroup.cc"
   "${SRC_DIR}/contactgroupsmember.cc"
   "${SRC_DIR}/contactsmember.cc"
+  "${SRC_DIR}/customvariable.cc"
   "${SRC_DIR}/customvariablesmember.cc"
   "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/downtime.cc"
