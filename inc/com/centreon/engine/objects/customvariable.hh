@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,11 +21,42 @@
 #  define CCE_OBJECTS_CUSTOMVARIABLE_HH
 
 #  include <map>
+#  include <string>
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-typedef std::map<std::string, std::string> map_customvar;
+/**
+ * @class customvariable customvariable.hh "com/centreon/engine/objects/customvariable.hh"
+ * @brief This class represent a customvariable
+ *
+ * This class represents a customvariable, it contains its name, its value and
+ * others properties that can be useful.
+ */
+class                customvariable {
+ public:
+                     customvariable(
+                       std::string const& key,
+                       std::string const& value);
+                     customvariable(customvariable const& other);
+                     ~customvariable();
+  customvariable&    operator=(customvariable const& other);
+  bool               operator<(customvariable const& other) const;
+  bool               operator==(customvariable const& other) const;
+  bool               operator==(customvariable const& other);
+  bool               operator!=(customvariable const& other);
+  void               set_sent(bool sent);
+  bool               is_sent() const;
+  void               set_value(std::string const& value);
+  std::string const& get_value() const;
+
+ private:
+  std::string        _key;
+  std::string        _value;
+  bool               _is_sent;
+};
+
+typedef std::map<std::string, customvariable> map_customvar;
 
 CCE_END()
 

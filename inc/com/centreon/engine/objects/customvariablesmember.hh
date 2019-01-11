@@ -19,6 +19,7 @@
 
 #ifndef CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 #  define CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
+#  include "com/centreon/engine/objects/customvariable.hh"
 
 /* Forward declarations. */
 struct contact_struct;
@@ -29,6 +30,7 @@ typedef struct                         customvariablesmember_struct {
   char*                                variable_name;
   char*                                variable_value;
   int                                  has_been_modified;
+  bool                                 is_sent;
   struct customvariablesmember_struct* next;
 }                                      customvariablesmember;
 
@@ -39,19 +41,20 @@ extern "C" {
 customvariablesmember* add_custom_variable_to_contact(
                          contact_struct* cntct,
                          char const* varname,
-                         char const* varvalue);
+                         com::centreon::engine::customvariable const& cv);
 customvariablesmember* add_custom_variable_to_host(
                          host_struct* hst,
                          char const* varname,
-                         char const* varvalue);
+                         com::centreon::engine::customvariable const& cv);
 customvariablesmember* add_custom_variable_to_object(
                          customvariablesmember** object_ptr,
                          char const* varname,
-                         char const* varvalue);
+                         char const* varvalue,
+                         bool is_sent);
 customvariablesmember* add_custom_variable_to_service(
                          service_struct* svc,
                          char const* varname,
-                         char const* varvalue);
+                         com::centreon::engine::customvariable const& cv);
 void                   remove_all_custom_variables_from_contact(
                          contact_struct* cntct);
 void                   remove_all_custom_variables_from_host(

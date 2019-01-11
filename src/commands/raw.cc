@@ -401,7 +401,8 @@ void raw::_build_custom_contact_macro_environment(
         add_custom_variable_to_object(
           &macros.custom_contact_vars,
           name.c_str(),
-          value);
+          value,
+          customvar->is_sent);
       }
   }
   // Set custom contact variable into the environement
@@ -448,7 +449,8 @@ void raw::_build_custom_host_macro_environment(
         add_custom_variable_to_object(
           &macros.custom_host_vars,
           name.c_str(),
-          value);
+          value,
+          customvar->is_sent);
       }
   }
   // Set custom host variable into the environement
@@ -495,7 +497,8 @@ void raw::_build_custom_service_macro_environment(
         add_custom_variable_to_object(
           &macros.custom_service_vars,
           name.c_str(),
-          value);
+          value,
+          customvar->is_sent);
       }
   }
   // Set custom service variable into the environement

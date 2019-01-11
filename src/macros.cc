@@ -1511,7 +1511,8 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
       add_custom_variable_to_object(
         &mac->custom_host_vars,
         var.c_str(),
-        temp_customvariablesmember->variable_value);
+        temp_customvariablesmember->variable_value,
+        temp_customvariablesmember->is_sent);
     }
   }
   /* set variables */
@@ -1537,7 +1538,8 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
       add_custom_variable_to_object(
         &mac->custom_service_vars,
         var.c_str(),
-        temp_customvariablesmember->variable_value);
+        temp_customvariablesmember->variable_value,
+        temp_customvariablesmember->is_sent);
     }
   }
   /* set variables */
@@ -1562,7 +1564,8 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
       add_custom_variable_to_object(
         &mac->custom_contact_vars,
         var.c_str(),
-        temp_customvariablesmember->variable_value);
+        temp_customvariablesmember->variable_value,
+        temp_customvariablesmember->is_sent);
     }
   }
   /* set variables */

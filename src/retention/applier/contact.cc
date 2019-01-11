@@ -124,7 +124,7 @@ void applier::contact::_update(
         update_customvariable(
           obj.custom_variables,
           it->first,
-          it->second);
+          it->second.get_value());
       }
     }
   }

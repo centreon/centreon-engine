@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_COMMAND_HH
 #  define CCE_CONFIGURATION_APPLIER_COMMAND_HH
 
-#  include <set>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 

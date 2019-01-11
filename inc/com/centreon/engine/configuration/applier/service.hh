@@ -21,7 +21,6 @@
 #  define CCE_CONFIGURATION_APPLIER_SERVICE_HH
 
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
