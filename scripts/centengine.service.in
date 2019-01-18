@@ -18,6 +18,9 @@
 
 [Unit]
 Description=Centreon Engine
+PartOf=centreon.service
+After=centreon.service
+ReloadPropagatedFrom=centreon.service
 
 [Service]
 ExecStart=@PREFIX_BIN@/centengine @PREFIX_CONF@/centengine.cfg
@@ -26,4 +29,5 @@ Type=simple
 User=@USER@
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=centreon.service
+
