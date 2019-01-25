@@ -102,3 +102,33 @@ Custom Variables And Inheritance
 Custom object variables are :ref:`inherited <object_inheritance>`
 just like standard host, service, or contact variables.
 
+Custom Variables and Centreon Broker
+====================================
+
+The configuration we talk about here is for advanced configurations. It
+can lead to malfunctions.
+
+We know sending all custom variables to Centreon Broker can be long
+during a poller restart. Therefore, it is possible to filter them.
+This feature must be used by advanced users because
+it can break Centreon functionalities.
+
+To acquieve this, there is two configuration variables that are:
+
+* enable_macros_filter: Its values are 1 or 0 to enable or disable the filter.
+  By default its value is 0, all the values are sent.
+* macros_filter: This variable is a string. It is taken in account only when
+  `enable_macros_filter` is enabled. Its value is custom variables to send to
+  broker separated by commas.
+
+Examples
+========
+
+Here's an example of those two configurations variables::
+
+  enable_macros_filter=1
+  macros_filter=my_customvariable,service1_severity
+
+Here, when the poller is restarted, only `my_customvariable` and
+`service1_severity` will be sent to Centreon Broker to store them in the
+Centreon storage database.
