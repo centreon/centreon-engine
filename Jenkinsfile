@@ -4,7 +4,7 @@ stage('Source') {
     dir('centreon-engine') {
       checkout scm
     }
-    sh './centreon-build/jobs/engine/18.10/mon-engine-source.sh'
+    sh './centreon-build/jobs/engine/19.04/mon-engine-source.sh'
     source = readProperties file: 'source.properties'
     env.VERSION = "${source.VERSION}"
     env.RELEASE = "${source.RELEASE}"
@@ -16,7 +16,7 @@ try {
     parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/18.10/mon-engine-unittest.sh centos7'
+        sh './centreon-build/jobs/engine/19.04/mon-engine-unittest.sh centos7'
         step([
           $class: 'XUnitBuilder',
           thresholds: [
@@ -27,7 +27,7 @@ try {
         ])
         if (env.BRANCH_NAME == 'master') {
           withSonarQubeEnv('SonarQube') {
-            sh './centreon-build/jobs/engine/18.10/mon-engine-analysis.sh'
+            sh './centreon-build/jobs/engine/19.04/mon-engine-analysis.sh'
           }
         }
       }
@@ -35,7 +35,7 @@ try {
     'debian9': {
       node {
         sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/18.10/mon-engine-unittest.sh debian9'
+        sh './centreon-build/jobs/engine/19.04/mon-engine-unittest.sh debian9'
         step([
           $class: 'XUnitBuilder',
           thresholds: [
@@ -49,7 +49,7 @@ try {
     'debian10': {
       node {
         sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/18.10/mon-engine-unittest.sh debian10'
+        sh './centreon-build/jobs/engine/19.04/mon-engine-unittest.sh debian10'
         step([
           $class: 'XUnitBuilder',
           thresholds: [
@@ -69,25 +69,25 @@ try {
     parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/18.10/mon-engine-package.sh centos7'
+        sh './centreon-build/jobs/engine/19.04/mon-engine-package.sh centos7'
       }
     },
     'debian9': {
       node {
         sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/18.10/mon-engine-package.sh debian9'
+        sh './centreon-build/jobs/engine/19.04/mon-engine-package.sh debian9'
       }
     },
     'debian9-armhf': {
       node {
         sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/18.10/mon-engine-package.sh debian9-armhf'
+        sh './centreon-build/jobs/engine/19.04/mon-engine-package.sh debian9-armhf'
       }
     },
     'debian10': {
       node {
         sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/18.10/mon-engine-package.sh debian10'
+        sh './centreon-build/jobs/engine/19.04/mon-engine-package.sh debian10'
       }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {

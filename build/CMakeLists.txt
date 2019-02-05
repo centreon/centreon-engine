@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2018 Centreon
+## Copyright 2011-2019 Centreon
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -32,8 +32,8 @@ include_directories("${INC_DIR}")
 include_directories("${INC_DIR}/compatibility")
 
 # Version.
-set(CENTREON_ENGINE_MAJOR 18)
-set(CENTREON_ENGINE_MINOR 10)
+set(CENTREON_ENGINE_MAJOR 19)
+set(CENTREON_ENGINE_MINOR 04)
 set(CENTREON_ENGINE_PATCH 0)
 set(CENTREON_ENGINE_VERSION "${CENTREON_ENGINE_MAJOR}.${CENTREON_ENGINE_MINOR}.${CENTREON_ENGINE_PATCH}")
 message(STATUS "Generating version header (${CENTREON_ENGINE_VERSION}).")
