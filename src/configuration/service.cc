@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2017 Centreon
+** Copyright 2011-2013,2015-2017,2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -509,6 +509,7 @@ void service::merge(object const& obj) {
   MRG_OPTION(_notification_period);
   MRG_OPTION(_obsess_over_service);
   MRG_OPTION(_process_perf_data);
+  MRG_OPTION(_recovery_notification_delay);
   MRG_OPTION(_retain_nonstatus_information);
   MRG_OPTION(_retain_status_information);
   MRG_OPTION(_retry_interval);
