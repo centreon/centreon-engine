@@ -30,6 +30,8 @@ if (WITH_TESTING)
   # Unit test executable.
   add_executable("ut"
     # Sources.
+    "${TESTS_DIR}/commands/simple-command.cc"
+    "${TESTS_DIR}/configuration/applier/applier-service.cc"
     "${TESTS_DIR}/configuration/host.cc"
     "${TESTS_DIR}/configuration/object.cc"
     "${TESTS_DIR}/configuration/service.cc"

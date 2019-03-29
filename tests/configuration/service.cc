@@ -62,3 +62,8 @@ TEST(ConfigurationServiceAcknowledgementTimeoutTest, SetToNegativeValue) {
   ASSERT_FALSE(s.set_acknowledgement_timeout(-36));
   ASSERT_EQ(42, s.get_acknowledgement_timeout());
 }
+
+TEST(ConfigurationServiceParseProperties, SetCustomVariable) {
+  configuration::service s;
+  ASSERT_TRUE(s.parse("_VARNAME", "TEST1"));
+}
