@@ -79,18 +79,8 @@ void applier::command::add_object(configuration::command const& obj) {
   // Add command to the global configuration set.
   config->commands().insert(obj);
 
-  // Create compatibility command.
-  command_struct* c(add_command(
-                      obj.command_name().c_str(),
-                      obj.command_line().c_str()));
-  if (!c)
-    throw (engine_error() << "Could not register command '"
-           << obj.command_name() << "'");
-
-  // Create real command object.
+  // Create and register command object.
   _create_command(obj);
-
-  return ;
 }
 
 /**
@@ -103,7 +93,6 @@ void applier::command::add_object(configuration::command const& obj) {
  */
 void applier::command::expand_objects(configuration::state& s) {
   (void)s;
-  return ;
 }
 
 /**
@@ -124,19 +113,20 @@ void applier::command::modify_object(
            << "command '" << obj.command_name() << "'");
 
   // Find command object.
-  umap<std::string, std::shared_ptr<command_struct> >::iterator
-    it_obj(applier::state::instance().commands_find(obj.key()));
+  std::unordered_map<std::string, std::shared_ptr<commands::command>>::iterator
+    it_obj(applier::state::instance().commands().find(obj.key()));
   if (it_obj == applier::state::instance().commands().end())
     throw (engine_error() << "Could not modify non-existing "
            << "command object '" << obj.command_name() << "'");
-  command_struct* c(it_obj->second.get());
+  commands::command* c(it_obj->second.get());
 
   // Update the global configuration set.
   config->commands().erase(it_cfg);
   config->commands().insert(obj);
 
   // Modify command.
-  modify_if_different(c->command_line, obj.command_line().c_str());
+  if (c->get_command_line() != obj.command_line())
+    c->set_command_line(obj.command_line());
 
   // Command will be temporarily removed from the command set but
   // will be added back right after with _create_command. This does
@@ -153,8 +143,6 @@ void applier::command::modify_object(
     NEBATTR_NONE,
     c,
     &tv);
-
-  return ;
 }
 
 /**
@@ -169,13 +157,10 @@ void applier::command::remove_object(
     << "Removing command '" << obj.command_name() << "'.";
 
   // Find command.
-  umap<std::string, std::shared_ptr<command_struct> >::iterator
-    it(applier::state::instance().commands_find(obj.key()));
+  std::unordered_map<std::string, std::shared_ptr<commands::command> >::iterator
+    it(applier::state::instance().commands().find(obj.key()));
   if (it != applier::state::instance().commands().end()) {
-    command_struct* cmd(it->second.get());
-
-    // Remove command from its list.
-    unregister_object<command_struct>(&command_list, cmd);
+    commands::command* cmd(it->second.get());
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -189,14 +174,15 @@ void applier::command::remove_object(
     // Erase command (will effectively delete the object).
     applier::state::instance().commands().erase(it);
   }
+  else
+    throw engine_error() << "Could not remove command '"
+        << obj.key() << "': it does not exist";
 
   // Remove command objects.
   commands::set::instance().remove_command(obj.command_name());
 
   // Remove command from the global configuration set.
   config->commands().erase(obj);
-
-  return ;
 }
 
 /**
@@ -211,7 +197,6 @@ void applier::command::resolve_object(
                          configuration::command const& obj) {
   if (!obj.connector().empty())
     commands::set::instance().get_command(obj.connector());
-  return ;
 }
 
 /**
@@ -222,29 +207,25 @@ void applier::command::resolve_object(
  *
  *  @param[in] obj  Command configuration object.
  */
-void applier::command::_create_command(
-                         configuration::command const& obj) {
-  // Command set.
-  commands::set& cmd_set(commands::set::instance());
-
+commands::command const* applier::command::_create_command(
+                           configuration::command const& obj) {
   // Raw command.
-  if (obj.connector().empty()) {
-    std::shared_ptr<commands::command>
-      cmd(new commands::raw(
-                          obj.command_name(),
-                          obj.command_line(),
-                          &checks::checker::instance()));
-    cmd_set.add_command(cmd);
-  }
+  if (obj.connector().empty())
+    return commands::command::add_command(new commands::raw(
+                                obj.command_name(),
+                                obj.command_line(),
+                                &checks::checker::instance()));
   // Connector command.
   else {
-    std::shared_ptr<commands::command>
-      cmd(new commands::forward(
-                          obj.command_name(),
-                          obj.command_line(),
-                          *cmd_set.get_command(obj.connector())));
-    cmd_set.add_command(cmd);
+    commands::connector* conn(applier::state::instance().find_connector(obj.connector()));
+    if (conn)
+      return commands::command::add_command(new commands::forward(
+                                  obj.command_name(),
+                                  obj.command_line(),
+                                  *conn));
+    else
+      throw engine_error() << "Could not register command '"
+        << obj.command_name() << "': unable to find '"
+        << obj.connector() << "'";
   }
-
-  return ;
 }

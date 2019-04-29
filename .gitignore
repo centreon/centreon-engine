@@ -13,8 +13,11 @@ build/test-coverage/*
 conf/centengine.cfg
 conf/objects/*.cfg
 conf/resource.cfg
+doc/_build
 inc/com/centreon/engine/version.hh
 inc/compatibility/common.h
 inc/compatibility/locations.h
 scripts/centengine.pc
 scripts/centengine.sh
+tags
+*.swp

@@ -26,6 +26,7 @@
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/configuration/applier/difference.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/shared.hh"
 

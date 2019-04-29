@@ -261,7 +261,7 @@ customvariablesmember* add_custom_variable_to_service(
  *
  *  @param[in,out] cntct  Target contact.
  */
-void remove_all_custom_variables_from_contact(contact_struct* cntct) {
+void remove_all_custom_variables_from_contact(com::centreon::engine::contact* cntct) {
   // Browse all custom vars.
   customvariablesmember* m(cntct->custom_variables);
   cntct->custom_variables = NULL;

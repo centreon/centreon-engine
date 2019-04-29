@@ -366,15 +366,12 @@ void raw::_build_contact_address_environment(
             environment& env) {
   if (!macros.contact_ptr)
     return;
-  for (unsigned int i(0); i < MAX_CONTACT_ADDRESSES; ++i) {
-    char const* value(macros.contact_ptr->address[i]);
-    if (!value)
-      value = "";
+  std::vector<std::string> const& address(macros.contact_ptr->get_addresses());
+  for (unsigned int i(0); i < address.size(); ++i) {
     std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS" << i << "=" << value;
+    oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS" << i << "=" << address[i];
     env.add(oss.str());
   }
-  return;
 }
 
 /**

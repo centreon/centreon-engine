@@ -418,7 +418,7 @@ void broker_command_data(
        int type,
        int flags,
        int attr,
-       command* cmd,
+       commands::command* cmd,
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_COMMAND_DATA))
@@ -434,7 +434,6 @@ void broker_command_data(
 
   // Make callback.
   neb_make_callbacks(NEBCALLBACK_COMMAND_DATA, &ds);
-  return;
 }
 
 /**
@@ -549,7 +548,7 @@ int broker_contact_notification_data(
   ds.start_time = start_time;
   ds.end_time = end_time;
   ds.reason_type = reason_type;
-  ds.contact_name = cntct->name;
+  ds.contact_name = const_cast<char*>(cntct->get_name().c_str());
   if (notification_type == SERVICE_NOTIFICATION) {
     temp_service = (service*)data;
     ds.host_name = temp_service->host_name;
@@ -637,7 +636,7 @@ int broker_contact_notification_method_data(
   ds.start_time = start_time;
   ds.end_time = end_time;
   ds.reason_type = reason_type;
-  ds.contact_name = cntct->name;
+  ds.contact_name = const_cast<char*>(cntct->get_name().c_str());
   ds.command_name = command_name;
   ds.command_args = command_args;
   if (notification_type == SERVICE_NOTIFICATION) {

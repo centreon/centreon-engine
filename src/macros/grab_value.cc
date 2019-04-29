@@ -355,7 +355,7 @@ static int handle_contact_macro(
   if (arg2 == NULL) {
     // Find the contact for on-demand macros
     // or use saved contact pointer.
-    contact* cntct(arg1 ? find_contact(arg1) : mac->contact_ptr);
+    contact* cntct(arg1 ? configuration::applier::state::instance().find_contact(arg1) : mac->contact_ptr);
     if (!cntct)
       retval = ERROR;
     else {
@@ -1155,7 +1155,7 @@ int grab_macro_value_r(
 
           if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
             continue;
-          if ((temp_contact = find_contact(temp_contactsmember->contact_name)) == NULL)
+          if ((temp_contact = configuration::applier::state::instance().find_contact(temp_contactsmember->contact_name)) == NULL)
             continue;
 
           /* get the macro value for this contact */
@@ -1184,7 +1184,7 @@ int grab_macro_value_r(
       /* else on-demand contact macro */
       else {
         /* find the contact */
-        if ((temp_contact = find_contact(arg[0])) == NULL) {
+        if ((temp_contact = configuration::applier::state::instance().find_contact(arg[0])) == NULL) {
           delete[] buf;
           return (ERROR);
         }

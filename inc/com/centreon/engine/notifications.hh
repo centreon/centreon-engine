@@ -24,7 +24,7 @@
 
 #  include <sys/time.h>
 #  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/hostescalation.hh"
 #  include "com/centreon/engine/objects/service.hh"
@@ -47,7 +47,7 @@
 
 // NOTIFY_LIST structure
 typedef struct               notify_list_struct {
-  contact*                   cntct;
+  com::centreon::engine::contact*                   cntct;
   struct notify_list_struct* next;
 }                            notification;
 
@@ -71,14 +71,14 @@ int check_service_notification_viability(
       int options);
 // checks viability of notifying a contact about a service
 int check_contact_service_notification_viability(
-      contact* cntct,
+      com::centreon::engine::contact* cntct,
       service* svc,
       unsigned int type,
       int options);
 // notify a single contact about a service
 int notify_contact_of_service(
       nagios_macros* mac,
-      contact* cntct,
+      com::centreon::engine::contact* cntct,
       service* svc,
       int type,
       char* not_author,
@@ -112,14 +112,14 @@ int check_host_notification_viability(
       int options);
 // checks viability of notifying a contact about a host
 int check_contact_host_notification_viability(
-      contact* cntct,
+      com::centreon::engine::contact* cntct,
       host* hst,
       unsigned int type,
       int options);
 // notify a single contact about a host
 int notify_contact_of_host(
       nagios_macros* mac,
-      contact* cntct,
+      com::centreon::engine::contact* cntct,
       host* hst,
       int type,
       char* not_author,
@@ -144,9 +144,9 @@ time_t get_next_service_notification_time(service* svc, time_t offset);
 // calculates nex acceptable re-notification time for a host
 time_t get_next_host_notification_time(host* hst, time_t offset);
 // finds a notification object
-notification* find_notification(contact* cntct);
+notification* find_notification(com::centreon::engine::contact* cntct);
 // adds a notification instance
-int add_notification(nagios_macros* mac, contact* cntct);
+int add_notification(nagios_macros* mac, com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
 }

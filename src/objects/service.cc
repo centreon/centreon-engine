@@ -24,7 +24,6 @@
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/commandsmember.hh"
 #include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
@@ -181,10 +180,10 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     hst_str = chkstr(obj.host_ptr->name);
   char const* evt_str(NULL);
   if (obj.event_handler_ptr)
-    evt_str = chkstr(obj.event_handler_ptr->name);
+    evt_str = obj.event_handler_ptr->get_name().c_str();
   char const* cmd_str(NULL);
   if (obj.check_command_ptr)
-    cmd_str = chkstr(obj.check_command_ptr->name);
+    cmd_str = obj.check_command_ptr->get_name().c_str();
   char const* chk_period_str(NULL);
   if (obj.check_period_ptr)
     chk_period_str = chkstr(obj.check_period_ptr->name);

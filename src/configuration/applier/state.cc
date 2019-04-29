@@ -17,6 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
+#include <unordered_map>
 #include <unistd.h>
 #include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
@@ -146,7 +148,7 @@ void applier::state::apply(
  *  @return Singleton instance.
  */
 applier::state& applier::state::instance() {
-  return (*_instance);
+  return *_instance;
 }
 
 /**
@@ -184,6 +186,7 @@ applier::state::state()
  *  Destructor.
  */
 applier::state::~state() throw() {
+  std::cout << "CONFIGURATION/APPLIER/STATE DESTRUCTOR...\n";
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();
@@ -196,8 +199,8 @@ applier::state::~state() throw() {
  *
  *  @return The current commands.
  */
-umap<std::string, std::shared_ptr<command_struct> > const& applier::state::commands() const throw () {
-  return (_commands);
+std::unordered_map<std::string, std::shared_ptr<commands::command>> const& applier::state::commands() const throw () {
+  return _commands;
 }
 
 /**
@@ -205,56 +208,84 @@ umap<std::string, std::shared_ptr<command_struct> > const& applier::state::comma
  *
  *  @return The current commands.
  */
-umap<std::string, std::shared_ptr<command_struct> >& applier::state::commands() throw () {
-  return (_commands);
+std::unordered_map<std::string, std::shared_ptr<commands::command>>& applier::state::commands() throw () {
+  return _commands;
 }
 
 /**
- *  Find a command from its key.
+ *  Given a command name, find a command from the list in memory.
  *
- *  @param[in] k Command name.
+ *  @param[in] name Command name.
  *
- *  @return Iterator to the element if found, commands().end()
- *          otherwise.
+ *  @return Command object if found, NULL otherwise.
  */
-umap<std::string, std::shared_ptr<command_struct> >::const_iterator applier::state::commands_find(configuration::command::key_type const& k) const {
-  return (_commands.find(k));
+commands::command const* applier::state::find_command(configuration::command::key_type const& k) const {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
+    it(_commands.find(k));
+
+  if (it != _commands.end())
+    return it->second.get();
+  return NULL;
 }
 
 /**
- *  Find a command from its key.
+ *  Given a command name, find a command from the list in memory.
  *
- *  @param[in] k Command name.
+ *  @param[in] name Command name.
  *
- *  @return Iterator to the element if found, commands().end()
- *          otherwise.
+ *  @return Command object if found, NULL otherwise.
  */
-umap<std::string, std::shared_ptr<command_struct> >::iterator applier::state::commands_find(configuration::command::key_type const& k) {
-  return (_commands.find(k));
+commands::command* applier::state::find_command(configuration::command::key_type const& k) {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
+    it(_commands.find(k));
+
+  if (it != _commands.end())
+    return it->second.get();
+  return NULL;
 }
 
 /**
- *  Find a connector from its key.
+ *  Given a contact name, find a contact from the list in memory.
  *
- *  @param[in] k Connector name.
+ *  @param[in] name Contact name.
  *
- *  @return Iterator to the element if found, connectors().end()
- *          otherwise.
+ *  @return Contact object if found, NULL otherwise.
  */
-umap<std::string, std::shared_ptr<commands::connector> >::const_iterator applier::state::connectors_find(configuration::connector::key_type const& k) const {
-  return (_connectors.find(k));
+engine::contact const* applier::state::find_contact(configuration::contact::key_type const& k) const {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<engine::contact>>::const_iterator
+    it(_contacts.find(k));
+
+  if (it != _contacts.end())
+    return it->second.get();
+  return NULL;
 }
 
 /**
- *  Find a connector from its key.
+ *  Given a contact name, find a contact from the list in memory.
  *
- *  @param[in] k Connector name.
+ *  @param[in] name Contact name.
  *
- *  @return Iterator to the element if found, connectors().end()
- *          otherwise.
+ *  @return Contact object if found, NULL otherwise.
  */
-umap<std::string, std::shared_ptr<commands::connector> >::iterator applier::state::connectors_find(configuration::connector::key_type const& k) {
-  return (_connectors.find(k));
+engine::contact* applier::state::find_contact(configuration::contact::key_type const& k) {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<engine::contact>>::const_iterator
+    it(_contacts.find(k));
+
+  if (it != _contacts.end())
+    return it->second.get();
+  return NULL;
 }
 
 /**
@@ -262,8 +293,8 @@ umap<std::string, std::shared_ptr<commands::connector> >::iterator applier::stat
  *
  *  @return The current connectors.
  */
-umap<std::string, std::shared_ptr<commands::connector> > const& applier::state::connectors() const throw () {
-  return (_connectors);
+std::unordered_map<std::string, std::shared_ptr<commands::connector> > const& applier::state::connectors() const throw () {
+  return _connectors;
 }
 
 /**
@@ -271,8 +302,46 @@ umap<std::string, std::shared_ptr<commands::connector> > const& applier::state::
  *
  *  @return The current connectors.
  */
-umap<std::string, std::shared_ptr<commands::connector> >& applier::state::connectors() throw () {
-  return (_connectors);
+std::unordered_map<std::string, std::shared_ptr<commands::connector> >& applier::state::connectors() throw () {
+  return _connectors;
+}
+
+/**
+ *  Given a connector name, find a connector from the list in memory.
+ *
+ *  @param[in] name Command name.
+ *
+ *  @return Command object if found, NULL otherwise.
+ */
+commands::connector const* applier::state::find_connector(configuration::connector::key_type const& k) const {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<commands::connector>>::const_iterator
+    it(_connectors.find(k));
+
+  if (it != _connectors.end())
+    return it->second.get();
+  return NULL;
+}
+
+/**
+ *  Given a connector name, find a connector from the list in memory.
+ *
+ *  @param[in] name Command name.
+ *
+ *  @return Command object if found, NULL otherwise.
+ */
+commands::connector* applier::state::find_connector(configuration::connector::key_type const& k) {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<commands::connector>>::const_iterator
+    it(_connectors.find(k));
+
+  if (it != _connectors.end())
+    return it->second.get();
+  return NULL;
 }
 
 /**
@@ -280,8 +349,8 @@ umap<std::string, std::shared_ptr<commands::connector> >& applier::state::connec
  *
  *  @return The current contacts.
  */
-umap<std::string, std::shared_ptr<contact_struct> > const& applier::state::contacts() const throw () {
-  return (_contacts);
+std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact> > const& applier::state::contacts() const throw () {
+  return _contacts;
 }
 
 /**
@@ -289,32 +358,8 @@ umap<std::string, std::shared_ptr<contact_struct> > const& applier::state::conta
  *
  *  @return The current contacts.
  */
-umap<std::string, std::shared_ptr<contact_struct> >& applier::state::contacts() throw () {
-  return (_contacts);
-}
-
-/**
- *  Find a contact from its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-umap<std::string, std::shared_ptr<contact_struct> >::const_iterator applier::state::contacts_find(configuration::contact::key_type const& k) const {
-  return (_contacts.find(k));
-}
-
-/**
- *  Find a contact from its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-umap<std::string, std::shared_ptr<contact_struct> >::iterator applier::state::contacts_find(configuration::contact::key_type const& k) {
-  return (_contacts.find(k));
+std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact> >& applier::state::contacts() throw () {
+  return _contacts;
 }
 
 /**
@@ -322,8 +367,8 @@ umap<std::string, std::shared_ptr<contact_struct> >::iterator applier::state::co
  *
  *  @return The current contactgroups.
  */
-umap<std::string, std::shared_ptr<contactgroup_struct> > const& applier::state::contactgroups() const throw () {
-  return (_contactgroups);
+std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> > const& applier::state::contactgroups() const throw () {
+  return _contactgroups;
 }
 
 /**
@@ -331,8 +376,8 @@ umap<std::string, std::shared_ptr<contactgroup_struct> > const& applier::state::
  *
  *  @return The current contactgroups.
  */
-umap<std::string, std::shared_ptr<contactgroup_struct> >& applier::state::contactgroups() throw () {
-  return (_contactgroups);
+std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >& applier::state::contactgroups() throw () {
+  return _contactgroups;
 }
 
 /**
@@ -343,8 +388,8 @@ umap<std::string, std::shared_ptr<contactgroup_struct> >& applier::state::contac
  *  @return Iterator to the element if found, contactgroups().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
-  return (_contactgroups.find(k));
+std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
+  return _contactgroups.find(k);
 }
 
 /**
@@ -355,8 +400,8 @@ umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator applier
  *  @return Iterator to the element if found, contactgroups().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<contactgroup_struct> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
-  return (_contactgroups.find(k));
+std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
+  return _contactgroups.find(k);
 }
 
 /**
@@ -364,7 +409,7 @@ umap<std::string, std::shared_ptr<contactgroup_struct> >::iterator applier::stat
  *
  *  @return The current hosts.
  */
-umap<unsigned int, std::shared_ptr<host_struct> > const& applier::state::hosts() const throw () {
+std::unordered_map<unsigned int, std::shared_ptr<host_struct> > const& applier::state::hosts() const throw () {
   return _hosts;
 }
 
@@ -373,7 +418,7 @@ umap<unsigned int, std::shared_ptr<host_struct> > const& applier::state::hosts()
  *
  *  @return The current hosts.
  */
-umap<unsigned int, std::shared_ptr<host_struct> >& applier::state::hosts() throw () {
+std::unordered_map<unsigned int, std::shared_ptr<host_struct> >& applier::state::hosts() throw () {
   return _hosts;
 }
 
@@ -385,7 +430,7 @@ umap<unsigned int, std::shared_ptr<host_struct> >& applier::state::hosts() throw
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
+std::unordered_map<unsigned int, std::shared_ptr<host_struct> >::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
   return _hosts.find(k);
 }
 
@@ -397,7 +442,7 @@ umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator applier::state
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-umap<unsigned int, std::shared_ptr<host_struct> >::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
+std::unordered_map<unsigned int, std::shared_ptr<host_struct> >::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
   return _hosts.find(k);
 }
 
@@ -407,7 +452,7 @@ umap<unsigned int, std::shared_ptr<host_struct> >::iterator applier::state::host
  *  @return The current hostdependencies.
  */
 umultimap<std::string, std::shared_ptr<hostdependency_struct> > const& applier::state::hostdependencies() const throw () {
-  return (_hostdependencies);
+  return _hostdependencies;
 }
 
 /**
@@ -416,7 +461,7 @@ umultimap<std::string, std::shared_ptr<hostdependency_struct> > const& applier::
  *  @return The current hostdependencies.
  */
 umultimap<std::string, std::shared_ptr<hostdependency_struct> >& applier::state::hostdependencies() throw () {
-  return (_hostdependencies);
+  return _hostdependencies;
 }
 
 /**
@@ -428,7 +473,7 @@ umultimap<std::string, std::shared_ptr<hostdependency_struct> >& applier::state:
  *          otherwise.
  */
 umultimap<std::string, std::shared_ptr<hostdependency_struct> >::const_iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) const {
-  return (const_cast<state*>(this)->hostdependencies_find(k));
+  return const_cast<state*>(this)->hostdependencies_find(k);
 }
 
 /**
@@ -480,7 +525,7 @@ umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator applie
       break ;
     ++p.first;
   }
-  return ((p.first == p.second) ? _hostdependencies.end() : p.first);
+  return (p.first == p.second) ? _hostdependencies.end() : p.first;
 }
 
 /**
@@ -489,7 +534,7 @@ umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator applie
  *  @return The current hostescalations.
  */
 umultimap<std::string, std::shared_ptr<hostescalation_struct> > const& applier::state::hostescalations() const throw () {
-  return (_hostescalations);
+  return _hostescalations;
 }
 
 /**
@@ -498,7 +543,7 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> > const& applier::
  *  @return The current hostescalations.
  */
 umultimap<std::string, std::shared_ptr<hostescalation_struct> >& applier::state::hostescalations() throw () {
-  return (_hostescalations);
+  return _hostescalations;
 }
 
 /**
@@ -510,7 +555,7 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >& applier::state:
  *          otherwise.
  */
 umultimap<std::string, std::shared_ptr<hostescalation_struct> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
-  return (const_cast<state*>(this)->hostescalations_find(k));
+  return const_cast<state*>(this)->hostescalations_find(k);
 }
 
 /**
@@ -569,7 +614,7 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator applie
     // Keep going.
     ++p.first;
   }
-  return ((p.first == p.second) ? _hostescalations.end() : p.first);
+  return (p.first == p.second) ? _hostescalations.end() : p.first;
 }
 
 /**
@@ -577,8 +622,8 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator applie
  *
  *  @return The current hostgroups.
  */
-umap<std::string, std::shared_ptr<hostgroup_struct> > const& applier::state::hostgroups() const throw () {
-  return (_hostgroups);
+std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> > const& applier::state::hostgroups() const throw () {
+  return _hostgroups;
 }
 
 /**
@@ -586,8 +631,8 @@ umap<std::string, std::shared_ptr<hostgroup_struct> > const& applier::state::hos
  *
  *  @return The current hostgroups.
  */
-umap<std::string, std::shared_ptr<hostgroup_struct> >& applier::state::hostgroups() throw () {
-  return (_hostgroups);
+std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >& applier::state::hostgroups() throw () {
+  return _hostgroups;
 }
 
 /**
@@ -598,8 +643,8 @@ umap<std::string, std::shared_ptr<hostgroup_struct> >& applier::state::hostgroup
  *  @return Iterator to the element if found, hostgroups().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) const {
-  return (_hostgroups.find(k));
+std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) const {
+  return _hostgroups.find(k);
 }
 
 /**
@@ -610,8 +655,8 @@ umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator applier::s
  *  @return Iterator to the element if found, hostgroups().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) {
-  return (_hostgroups.find(k));
+std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >::iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) {
+  return _hostgroups.find(k);
 }
 
 /**
@@ -619,7 +664,7 @@ umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator applier::state::
  *
  *  @return The current services.
  */
-umap<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned int, unsigned int>,
      std::shared_ptr<service_struct> > const& applier::state::services() const throw () {
   return _services;
 }
@@ -629,9 +674,9 @@ umap<std::pair<unsigned int, unsigned int>,
  *
  *  @return The current services.
  */
-umap<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned int, unsigned int>,
      std::shared_ptr<service_struct> >& applier::state::services() throw () {
-  return (_services);
+  return _services;
 }
 
 /**
@@ -642,9 +687,9 @@ umap<std::pair<unsigned int, unsigned int>,
  *  @return Iterator to the element if found, services().end()
  *          otherwise.
  */
-umap<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned int, unsigned int>,
      std::shared_ptr<service_struct> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
-  return (_services.find(k));
+  return _services.find(k);
 }
 
 /**
@@ -655,9 +700,9 @@ umap<std::pair<unsigned int, unsigned int>,
  *  @return Iterator to the element if found, services().end()
  *          otherwise.
  */
-umap<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned int, unsigned int>,
      std::shared_ptr<service_struct> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
-  return (_services.find(k));
+  return _services.find(k);
 }
 
 /**
@@ -666,7 +711,7 @@ umap<std::pair<unsigned int, unsigned int>,
  *  @return The current servicedependencies.
  */
 umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> > const& applier::state::servicedependencies() const throw () {
-  return (_servicedependencies);
+  return _servicedependencies;
 }
 
 /**
@@ -675,7 +720,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
  *  @return The current servicedependencies.
  */
 umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >& applier::state::servicedependencies() throw () {
-  return (_servicedependencies);
+  return _servicedependencies;
 }
 
 /**
@@ -687,7 +732,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
  *          servicedependencies().end() otherwise.
  */
 umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >::const_iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) const {
-  return (const_cast<state*>(this)->servicedependencies_find(k));
+  return const_cast<state*>(this)->servicedependencies_find(k);
 }
 
 /**
@@ -746,7 +791,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
       break ;
     ++p.first;
   }
-  return ((p.first == p.second) ? _servicedependencies.end() : p.first);
+  return (p.first == p.second) ? _servicedependencies.end() : p.first;
 }
 
 /**
@@ -755,7 +800,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
  *  @return The current serviceescalations.
  */
 umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> > const& applier::state::serviceescalations() const throw () {
-  return (_serviceescalations);
+  return _serviceescalations;
 }
 
 /**
@@ -764,7 +809,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
  *  @return The current serviceescalations.
  */
 umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >& applier::state::serviceescalations() throw () {
-  return (_serviceescalations);
+  return _serviceescalations;
 }
 
 /**
@@ -776,7 +821,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
  *          otherwise.
  */
 umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
-  return (const_cast<state*>(this)->serviceescalations_find(k));
+  return const_cast<state*>(this)->serviceescalations_find(k);
 }
 
 /**
@@ -839,7 +884,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
     // Keep going.
     ++p.first;
   }
-  return ((p.first == p.second) ? _serviceescalations.end() : p.first);
+  return (p.first == p.second) ? _serviceescalations.end() : p.first;
 }
 
 /**
@@ -847,8 +892,8 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
  *
  *  @return The current servicegroups.
  */
-umap<std::string, std::shared_ptr<servicegroup_struct> > const& applier::state::servicegroups() const throw () {
-  return (_servicegroups);
+std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> > const& applier::state::servicegroups() const throw () {
+  return _servicegroups;
 }
 
 /**
@@ -856,8 +901,8 @@ umap<std::string, std::shared_ptr<servicegroup_struct> > const& applier::state::
  *
  *  @return The current servicegroups.
  */
-umap<std::string, std::shared_ptr<servicegroup_struct> >& applier::state::servicegroups() throw () {
-  return (_servicegroups);
+std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >& applier::state::servicegroups() throw () {
+  return _servicegroups;
 }
 
 /**
@@ -868,8 +913,8 @@ umap<std::string, std::shared_ptr<servicegroup_struct> >& applier::state::servic
  *  @return Iterator to the element if found, servicegroups().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
-  return (_servicegroups.find(k));
+std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
+  return _servicegroups.find(k);
 }
 
 /**
@@ -880,8 +925,8 @@ umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator applier
  *  @return Iterator to the element if found, servicegroups().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<servicegroup_struct> >::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
-  return (_servicegroups.find(k));
+std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
+  return _servicegroups.find(k);
 }
 
 /**
@@ -889,8 +934,8 @@ umap<std::string, std::shared_ptr<servicegroup_struct> >::iterator applier::stat
  *
  *  @return The current timeperiods.
  */
-umap<std::string, std::shared_ptr<timeperiod_struct> > const& applier::state::timeperiods() const throw () {
-  return (_timeperiods);
+std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> > const& applier::state::timeperiods() const throw () {
+  return _timeperiods;
 }
 
 /**
@@ -898,8 +943,8 @@ umap<std::string, std::shared_ptr<timeperiod_struct> > const& applier::state::ti
  *
  *  @return The current timeperiods.
  */
-umap<std::string, std::shared_ptr<timeperiod_struct> >& applier::state::timeperiods() throw () {
-  return (_timeperiods);
+std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >& applier::state::timeperiods() throw () {
+  return _timeperiods;
 }
 
 /**
@@ -910,8 +955,8 @@ umap<std::string, std::shared_ptr<timeperiod_struct> >& applier::state::timeperi
  *  @return Iterator to the element if found, timeperiods().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) const {
-  return (_timeperiods.find(k));
+std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) const {
+  return _timeperiods.find(k);
 }
 
 /**
@@ -922,8 +967,8 @@ umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator applier::
  *  @return Iterator to the element if found, timeperiods().end()
  *          otherwise.
  */
-umap<std::string, std::shared_ptr<timeperiod_struct> >::iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) {
-  return (_timeperiods.find(k));
+std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >::iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) {
+  return _timeperiods.find(k);
 }
 
 /**
@@ -931,8 +976,8 @@ umap<std::string, std::shared_ptr<timeperiod_struct> >::iterator applier::state:
  *
  *  @return  The user macros.
  */
-umap<std::string, std::string>& applier::state::user_macros() {
-  return (_user_macros);
+std::unordered_map<std::string, std::string>& applier::state::user_macros() {
+  return _user_macros;
 }
 
 /**
@@ -940,8 +985,8 @@ umap<std::string, std::string>& applier::state::user_macros() {
  *
  *  @return  The user macros, immutable.
  */
-umap<std::string, std::string> const& applier::state::user_macros() const {
-  return (_user_macros);
+std::unordered_map<std::string, std::string> const& applier::state::user_macros() const {
+  return _user_macros;
 }
 
 /**
@@ -951,8 +996,8 @@ umap<std::string, std::string> const& applier::state::user_macros() const {
  *
  *  @return  Iterator to user macros.
  */
-umap<std::string, std::string>::const_iterator applier::state::user_macros_find(std::string const& key) const {
-  return (_user_macros.find(key));
+std::unordered_map<std::string, std::string>::const_iterator applier::state::user_macros_find(std::string const& key) const {
+  return _user_macros.find(key);
 }
 
 /**
@@ -1172,7 +1217,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     std::string temp_command_name(config->global_host_event_handler().substr(
                                     0,
                                     config->global_host_event_handler().find_first_of('!')));
-    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    commands::command* temp_command(instance().find_command(temp_command_name));
     if (!temp_command) {
       logger(log_verification_error, basic)
         << "Error: Global host event handler command '"
@@ -1188,7 +1233,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     std::string temp_command_name(config->global_service_event_handler().substr(
                                     0,
                                     config->global_service_event_handler().find_first_of('!')));
-    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    commands::command* temp_command(instance().find_command(temp_command_name));
     if (!temp_command) {
       logger(log_verification_error, basic)
         << "Error: Global service event handler command '"
@@ -1208,7 +1253,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     std::string temp_command_name(config->ocsp_command().substr(
                                     0,
                                     config->ocsp_command().find_first_of('!')));
-    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    commands::command* temp_command(instance().find_command(temp_command_name));
     if (!temp_command) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive service processor command '"
@@ -1223,7 +1268,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     std::string temp_command_name(config->ochp_command().substr(
                                     0,
                                     config->ochp_command().find_first_of('!')));
-    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    commands::command* temp_command(instance().find_command(temp_command_name));
     if (!temp_command) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive host processor command '"
@@ -1700,7 +1745,7 @@ void applier::state::_processing(
              end(diff_hosts.added().end());
            it != end;
            ++it) {
-        umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+        std::unordered_map<unsigned int, std::shared_ptr<host_struct> >::const_iterator
           hst(hosts().find(it->host_id()));
         if (hst != hosts().end())
           log_host_state(INITIAL_STATES, hst->second.get());
@@ -1710,7 +1755,7 @@ void applier::state::_processing(
              end(diff_services.added().end());
            it != end;
            ++it) {
-        umap<std::pair<unsigned int, unsigned int>,
+        std::unordered_map<std::pair<unsigned int, unsigned int>,
              std::shared_ptr<service_struct> >::const_iterator
           svc(services().find(std::make_pair(
                                      it->host_id(),

@@ -21,7 +21,7 @@
 #ifndef CCE_STATUSDATA_HH
 #  define CCE_STATUSDATA_HH
 
-#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -41,8 +41,6 @@ int update_program_status(int aggregated_dump);
 int update_host_status(host* hst,int aggregated_dump);
 // updates service status data
 int update_service_status(service* svc,int aggregated_dump);
-// updates contact status data
-int update_contact_status(contact* cntct,int aggregated_dump);
 
 #  ifdef __cplusplus
 }

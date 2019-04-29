@@ -25,6 +25,7 @@
 #include <sys/time.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtime_finder.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
@@ -55,7 +56,7 @@ int check_for_external_commands() {
 
   /* bail out if we shouldn't be checking for external commands */
   if (!config->check_external_commands())
-    return (ERROR);
+    return ERROR;
 
   /* update last command check time */
   last_command_check = time(NULL);
@@ -98,7 +99,7 @@ int check_for_external_commands() {
     delete[] buffer;
   }
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -117,7 +118,7 @@ int process_external_commands_from_file(
     << "process_external_commands_from_file()";
 
   if (!file)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_external_command, more)
     << "Processing commands from file '" << file
@@ -130,7 +131,7 @@ int process_external_commands_from_file(
     logger(log_info_message, basic)
       << "Error: Cannot open file '" << file
       << "' to process external commands!";
-    return (ERROR);
+    return ERROR;
   }
 
   /* process all commands in the file */
@@ -155,13 +156,13 @@ int process_external_commands_from_file(
   if (delete_file)
     ::remove(file);
 
-  return (OK);
+  return OK;
 }
 
 /* external command processor */
 int process_external_command(char const* cmd) {
   modules::external_commands::gl_processor.execute(cmd);
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -182,27 +183,27 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* if we're adding a service comment...  */
   if (cmd == CMD_ADD_SVC_COMMENT) {
 
     /* get the service description */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   /* else verify that the host is valid */
   if ((temp_host = find_host(host_name)) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* get the persistent flag */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   persistent = atoi(temp_ptr);
   if (persistent > 1)
     persistent = 1;
@@ -211,11 +212,11 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
 
   /* get the name of the user who entered the comment */
   if ((user = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* get the comment */
   if ((comment_data = my_strtok(NULL, "\n")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* add the comment */
   result = add_new_comment(
@@ -232,8 +233,8 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
              (time_t)0,
              NULL);
   if (result < 0)
-    return (ERROR);
-  return (OK);
+    return ERROR;
+  return OK;
 }
 
 /* removes a host or service comment from the status log */
@@ -242,7 +243,7 @@ int cmd_delete_comment(int cmd, char* args) {
 
   /* get the comment id we should delete */
   if ((comment_id = strtoul(args, NULL, 10)) == 0)
-    return (ERROR);
+    return ERROR;
 
   /* delete the specified comment */
   if (cmd == CMD_DEL_HOST_COMMENT)
@@ -250,7 +251,7 @@ int cmd_delete_comment(int cmd, char* args) {
   else
     delete_service_comment(comment_id);
 
-  return (OK);
+  return OK;
 }
 
 /* removes all comments associated with a host or service from the status log */
@@ -262,30 +263,30 @@ int cmd_delete_all_comments(int cmd, char* args) {
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* if we're deleting service comments...  */
   if (cmd == CMD_DEL_ALL_SVC_COMMENTS) {
 
     /* get the service description */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   /* else verify that the host is valid */
   if ((temp_host = find_host(host_name)) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* delete comments */
   delete_all_comments(
     (cmd == CMD_DEL_ALL_HOST_COMMENTS) ? HOST_COMMENT : SERVICE_COMMENT,
     host_name,
     svc_description);
-  return (OK);
+  return OK;
 }
 
 /* delays a host or service notification for given number of minutes */
@@ -299,29 +300,29 @@ int cmd_delay_notification(int cmd, char* args) {
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* if this is a service notification delay...  */
   if (cmd == CMD_DELAY_SVC_NOTIFICATION) {
 
     /* get the service description */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   /* else verify that the host is valid */
   else {
     if ((temp_host = find_host(host_name)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   /* get the time that we should delay until... */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
-    return (ERROR);
+    return ERROR;
   delay_time = strtoul(temp_ptr, NULL, 10);
 
   /* delay the next notification... */
@@ -330,7 +331,7 @@ int cmd_delay_notification(int cmd, char* args) {
   else
     temp_service->next_notification = delay_time;
 
-  return (OK);
+  return OK;
 }
 
 /* schedules a host check at a particular time */
@@ -345,7 +346,7 @@ int cmd_schedule_check(int cmd, char* args) {
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   if (cmd == CMD_SCHEDULE_HOST_CHECK
       || cmd == CMD_SCHEDULE_FORCED_HOST_CHECK
@@ -354,23 +355,23 @@ int cmd_schedule_check(int cmd, char* args) {
 
     /* verify that the host is valid */
     if ((temp_host = find_host(host_name)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   else {
 
     /* get the service description */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   /* get the next check time */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
-    return (ERROR);
+    return ERROR;
   delay_time = strtoul(temp_ptr, NULL, 10);
 
   /* schedule the host check */
@@ -402,7 +403,7 @@ int cmd_schedule_check(int cmd, char* args) {
       (cmd == CMD_SCHEDULE_FORCED_SVC_CHECK)
       ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
 
-  return (OK);
+  return OK;
 }
 
 /* schedules all service checks on a host for a particular time */
@@ -418,15 +419,15 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* verify that the host is valid */
   if ((temp_host = find_host(host_name)) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* get the next check time */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
-    return (ERROR);
+    return ERROR;
   delay_time = strtoul(temp_ptr, NULL, 10);
 
   /* reschedule all services on the specified host */
@@ -441,7 +442,7 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
       (force) ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
   }
 
-  return (OK);
+  return OK;
 }
 
 /* schedules a program shutdown or restart */
@@ -485,7 +486,7 @@ int cmd_process_service_check_result(
   (void)cmd;
 
   if (!args)
-    return (ERROR);
+    return ERROR;
   char* delimiter;
 
   // Get the host name.
@@ -494,7 +495,7 @@ int cmd_process_service_check_result(
   // Get the service description.
   delimiter = strchr(host_name, ';');
   if (!delimiter)
-    return (ERROR);
+    return ERROR;
   *delimiter = '\0';
   ++delimiter;
   char* svc_description(delimiter);
@@ -502,7 +503,7 @@ int cmd_process_service_check_result(
   // Get the service check return code and output.
   delimiter = strchr(svc_description, ';');
   if (!delimiter)
-    return (ERROR);
+    return ERROR;
   *delimiter = '\0';
   ++delimiter;
   char const* output(strchr(delimiter, ';'));
@@ -536,11 +537,11 @@ int process_passive_service_check(
 
   /* skip this service check result if we aren't accepting passive service checks */
   if (config->accept_passive_service_checks() == false)
-    return (ERROR);
+    return ERROR;
 
   /* make sure we have all required data */
   if (host_name == NULL || svc_description == NULL || output == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* find the host by its name or address */
   if (find_host(host_name) != NULL)
@@ -560,7 +561,7 @@ int process_passive_service_check(
       << "Warning:  Passive check result was received for service '"
       << svc_description << "' on host '" << host_name
       << "', but the host could not be found!";
-    return (ERROR);
+    return ERROR;
   }
 
   /* make sure the service exists */
@@ -569,12 +570,12 @@ int process_passive_service_check(
       << "Warning:  Passive check result was received for service '"
       << svc_description << "' on host '" << host_name
       << "', but the service could not be found!";
-    return (ERROR);
+    return ERROR;
   }
 
   /* skip this is we aren't accepting passive checks for this service */
   if (temp_service->accept_passive_service_checks == false)
-    return (ERROR);
+    return ERROR;
 
   timeval tv;
   gettimeofday(&tv, NULL);
@@ -614,7 +615,7 @@ int process_passive_service_check(
 
   checks::checker::instance().push_check_result(result);
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -633,7 +634,7 @@ int cmd_process_host_check_result(
   (void)cmd;
 
   if (!args)
-    return (ERROR);
+    return ERROR;
 
   // Get the host name.
   char* host_name(args);
@@ -641,7 +642,7 @@ int cmd_process_host_check_result(
   // Get the host check return code and output.
   char* delimiter(strchr(host_name, ';'));
   if (!delimiter)
-    return (ERROR);
+    return ERROR;
   *delimiter = '\0';
   ++delimiter;
   char const* output(strchr(delimiter, ';'));
@@ -672,15 +673,15 @@ int process_passive_host_check(
 
   /* skip this host check result if we aren't accepting passive host checks */
   if (config->accept_passive_service_checks() == false)
-    return (ERROR);
+    return ERROR;
 
   /* make sure we have all required data */
   if (host_name == NULL || output == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* make sure we have a reasonable return code */
   if (return_code < 0 || return_code > 2)
-    return (ERROR);
+    return ERROR;
 
   /* find the host by its name or address */
   if ((temp_host = find_host(host_name)) != NULL)
@@ -699,12 +700,12 @@ int process_passive_host_check(
     logger(log_runtime_warning, basic)
       << "Warning:  Passive check result was received for host '"
       << host_name << "', but the host could not be found!";
-    return (ERROR);
+    return ERROR;
   }
 
   /* skip this is we aren't accepting passive checks for this host */
   if (temp_host->accept_passive_host_checks == false)
-    return (ERROR);
+    return ERROR;
 
   timeval tv;
   gettimeofday(&tv, NULL);
@@ -744,7 +745,7 @@ int process_passive_host_check(
 
   checks::checker::instance().push_check_result(result);
 
-  return (OK);
+  return OK;
 }
 
 /* acknowledges a host or service problem */
@@ -762,48 +763,48 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* verify that the host is valid */
   if ((temp_host = find_host(host_name)) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* this is a service acknowledgement */
   if (cmd == CMD_ACKNOWLEDGE_SVC_PROBLEM) {
 
     /* get the service name */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if ((temp_service = find_service(temp_host->name, svc_description)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   /* get the type */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   type = atoi(temp_ptr);
 
   /* get the notification option */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   notify = (atoi(temp_ptr) > 0) ? true : false;
 
   /* get the persistent option */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   persistent = (atoi(temp_ptr) > 0) ? true : false;
 
   /* get the acknowledgement author */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   ack_author = string::dup(temp_ptr);
 
   /* get the acknowledgement data */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
     delete[] ack_author;
-    return (ERROR);
+    return ERROR;
   }
   ack_data = string::dup(temp_ptr);
 
@@ -830,7 +831,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   delete[] ack_author;
   delete[] ack_data;
 
-  return (OK);
+  return OK;
 }
 
 /* removes a host or service acknowledgement */
@@ -842,22 +843,22 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* verify that the host is valid */
   if ((temp_host = find_host(host_name)) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* we are removing a service acknowledgement */
   if (cmd == CMD_REMOVE_SVC_ACKNOWLEDGEMENT) {
 
     /* get the service name */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if (!(temp_service = find_service(temp_host->name, svc_description)))
-      return (ERROR);
+      return ERROR;
   }
 
   /* acknowledge the host problem */
@@ -868,7 +869,7 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
   else
     remove_service_acknowledgement(temp_service);
 
-  return (OK);
+  return OK;
 }
 
 /* schedules downtime for a specific host or service */
@@ -900,11 +901,11 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
     /* get the hostgroup name */
     if ((hostgroup_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the hostgroup is valid */
     if ((temp_hostgroup = find_hostgroup(hostgroup_name)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   else if (cmd == CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME
@@ -912,68 +913,68 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
     /* get the servicegroup name */
     if ((servicegroup_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the servicegroup is valid */
     if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == NULL)
-      return (ERROR);
+      return ERROR;
   }
 
   else {
 
     /* get the host name */
     if ((host_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the host is valid */
     if ((temp_host = find_host(host_name)) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* this is a service downtime */
     if (cmd == CMD_SCHEDULE_SVC_DOWNTIME) {
 
       /* get the service name */
       if ((svc_description = my_strtok(NULL, ";")) == NULL)
-        return (ERROR);
+        return ERROR;
 
       /* verify that the service is valid */
       if ((temp_service = find_service(temp_host->name, svc_description)) == NULL)
-        return (ERROR);
+        return ERROR;
     }
   }
 
   /* get the start time */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   start_time = (time_t)strtoul(temp_ptr, NULL, 10);
 
   /* get the end time */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   end_time = (time_t)strtoul(temp_ptr, NULL, 10);
 
   /* get the fixed flag */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   fixed = atoi(temp_ptr);
 
   /* get the trigger id */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   triggered_by = strtoul(temp_ptr, NULL, 10);
 
   /* get the duration */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   duration = strtoul(temp_ptr, NULL, 10);
 
   /* get the author */
   if ((author = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* get the comment */
   if ((comment_data = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* check if flexible downtime demanded and duration set to non-zero.
   ** according to the documentation, a flexible downtime is started
@@ -982,7 +983,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   ** duration>0 is needed.
   */
   if ((0 == fixed) && (0 == duration))
-    return (ERROR);
+    return ERROR;
 
   /* duration should be auto-calculated, not user-specified */
   if (fixed > 0)
@@ -1197,7 +1198,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   default:
     break;
   }
-  return (OK);
+  return OK;
 }
 
 /* deletes scheduled host or service downtime */
@@ -1207,7 +1208,7 @@ int cmd_delete_downtime(int cmd, char* args) {
 
   /* Get the id of the downtime to delete. */
   if (NULL == (temp_ptr = my_strtok(args,"\n")))
-    return (ERROR);
+    return ERROR;
 
   downtime_id = strtoul(temp_ptr, NULL, 10);
 
@@ -1216,7 +1217,7 @@ int cmd_delete_downtime(int cmd, char* args) {
   else
     unschedule_downtime(SERVICE_DOWNTIME, downtime_id);
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -1231,7 +1232,7 @@ int cmd_delete_downtime_full(int cmd, char* args) {
 
   // Host name.
   if (!(temp_ptr = my_strtok(args, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("host", temp_ptr));
   // Service description and downtime type.
@@ -1239,7 +1240,7 @@ int cmd_delete_downtime_full(int cmd, char* args) {
   if (cmd == CMD_DEL_SVC_DOWNTIME_FULL) {
     downtime_type = SERVICE_DOWNTIME;
     if (!(temp_ptr = my_strtok(NULL, ";")))
-      return (ERROR);
+      return ERROR;
     if (*temp_ptr)
       criterias.push_back(downtime_finder::criteria("service", temp_ptr));
   }
@@ -1249,37 +1250,37 @@ int cmd_delete_downtime_full(int cmd, char* args) {
   }
   // Start time.
   if (!(temp_ptr = my_strtok(NULL, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("start", temp_ptr));
   // End time.
   if (!(temp_ptr = my_strtok(NULL, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("end", temp_ptr));
   // Fixed.
   if (!(temp_ptr = my_strtok(NULL, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("fixed", temp_ptr));
   // Trigger ID.
   if (!(temp_ptr = my_strtok(NULL, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("triggered_by", temp_ptr));
   // Duration.
   if (!(temp_ptr = my_strtok(NULL, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("duration", temp_ptr));
   // Author.
   if (!(temp_ptr = my_strtok(NULL, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("author", temp_ptr));
   // Comment.
   if (!(temp_ptr = my_strtok(NULL, ";")))
-    return (ERROR);
+    return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("comment", temp_ptr));
 
@@ -1293,7 +1294,7 @@ int cmd_delete_downtime_full(int cmd, char* args) {
     unschedule_downtime(downtime_type, *it);
   }
 
-  return (OK);
+  return OK;
 }
 
 /*
@@ -1315,7 +1316,7 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
   /* Get the host name of the downtime to delete. */
   temp_ptr = my_strtok(args, ";");
   if (NULL == temp_ptr)
-    return (ERROR);
+    return ERROR;
   hostname = temp_ptr;
 
   /* Get the optional service name. */
@@ -1344,8 +1345,8 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
               downtime_start_time,
               downtime_comment);
   if (0 == deleted)
-    return (ERROR);
-  return (OK);
+    return ERROR;
+  return OK;
 }
 
 /* Deletes scheduled host and service downtime based on hostgroup and optionally other filter arguments. */
@@ -1366,11 +1367,11 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
   /* Get the host group name of the downtime to delete. */
   temp_ptr = my_strtok(args, ";");
   if (NULL == temp_ptr)
-    return (ERROR);
+    return ERROR;
 
   temp_hostgroup = find_hostgroup(temp_ptr);
   if (NULL == temp_hostgroup)
-    return (ERROR);
+    return ERROR;
 
   /* Get the optional host name. */
   temp_ptr = my_strtok(NULL, ";");
@@ -1434,9 +1435,9 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
   }
 
   if (0 == deleted)
-    return (ERROR);
+    return ERROR;
 
-  return (OK);
+  return OK;
 }
 
 /* Delete downtimes based on start time and/or comment. */
@@ -1462,7 +1463,7 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 
   /* No args should give an error. */
   if ((0 == downtime_start_time) && (NULL == downtime_comment))
-    return (ERROR);
+    return ERROR;
 
   deleted = delete_downtime_by_hostname_service_description_start_time_comment(
               NULL,
@@ -1471,9 +1472,9 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
               downtime_comment);
 
   if (0 == deleted)
-    return (ERROR);
+    return ERROR;
 
-  return (OK);
+  return OK;
 }
 
 /* changes a host or service (integer) variable */
@@ -1503,15 +1504,15 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
     /* get the host name */
     if ((host_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* get the service name */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
+      return ERROR;
     break;
 
   case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
@@ -1520,11 +1521,11 @@ int cmd_change_object_int_var(int cmd, char* args) {
   case CMD_CHANGE_HOST_MODATTR:
     /* get the host name */
     if ((host_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the host is valid */
     if ((temp_host = find_host(host_name)) == NULL)
-      return (ERROR);
+      return ERROR;
     break;
 
   case CMD_CHANGE_CONTACT_MODATTR:
@@ -1532,25 +1533,25 @@ int cmd_change_object_int_var(int cmd, char* args) {
   case CMD_CHANGE_CONTACT_MODSATTR:
     /* get the contact name */
     if ((contact_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the contact is valid */
-    if ((temp_contact = find_contact(contact_name)) == NULL)
-      return (ERROR);
+    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == NULL)
+      return ERROR;
     break;
 
   default:
     /* unknown command */
-    return (ERROR);
+    return ERROR;
     break;
   }
 
   /* get the value */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   intval = (int)strtol(temp_ptr, NULL, 0);
   if (intval < 0 || (intval == 0 && errno == EINVAL))
-    return (ERROR);
+    return ERROR;
   dval = (int)strtod(temp_ptr, NULL);
 
   switch (cmd) {
@@ -1733,15 +1734,15 @@ int cmd_change_object_int_var(int cmd, char* args) {
     /* set the modified attribute */
     switch (cmd) {
     case CMD_CHANGE_CONTACT_MODATTR:
-      temp_contact->modified_attributes = attr;
+      temp_contact->set_modified_attributes(attr);
       break;
 
     case CMD_CHANGE_CONTACT_MODHATTR:
-      temp_contact->modified_host_attributes = hattr;
+      temp_contact->set_modified_host_attributes(hattr);
       break;
 
     case CMD_CHANGE_CONTACT_MODSATTR:
-      temp_contact->modified_service_attributes = sattr;
+      temp_contact->set_modified_service_attributes(sattr);
       break;
 
     default:
@@ -1755,22 +1756,22 @@ int cmd_change_object_int_var(int cmd, char* args) {
       NEBATTR_NONE,
       temp_contact,
       cmd, attr,
-      temp_contact->modified_attributes,
+      temp_contact->get_modified_attributes(),
       hattr,
-      temp_contact->modified_host_attributes,
+      temp_contact->get_modified_host_attributes(),
       sattr,
-      temp_contact->modified_service_attributes,
+      temp_contact->get_modified_service_attributes(),
       NULL);
 
     /* update the status log with the contact info */
-    update_contact_status(temp_contact, false);
+    temp_contact->update_status_info(false);
     break;
 
   default:
     break;
   }
 
-  return (OK);
+  return OK;
 }
 
 /* changes a host or service (char) variable */
@@ -1779,7 +1780,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   host* temp_host(NULL);
   contact* temp_contact(NULL);
   timeperiod* temp_timeperiod(NULL);
-  command* temp_command(NULL);
+  commands::command* temp_command(NULL);
   char* host_name(NULL);
   char* svc_description(NULL);
   char* contact_name(NULL);
@@ -1798,7 +1799,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_EVENT_HANDLER:
   case CMD_CHANGE_HOST_CHECK_COMMAND:
   case CMD_CHANGE_SVC_CHECK_COMMAND:
-    return (ERROR);
+    return ERROR;
   }
 
   /* get the command arguments */
@@ -1807,7 +1808,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER:
   case CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER:
     if ((charval = my_strtok(args, "\n")) == NULL)
-      return (ERROR);
+      return ERROR;
     break;
 
   case CMD_CHANGE_HOST_EVENT_HANDLER:
@@ -1816,14 +1817,14 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
     /* get the host name */
     if ((host_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the host is valid */
     if ((temp_host = find_host(host_name)) == NULL)
-      return (ERROR);
+      return ERROR;
 
     if ((charval = my_strtok(NULL, "\n")) == NULL)
-      return (ERROR);
+      return ERROR;
     break;
 
   case CMD_CHANGE_SVC_EVENT_HANDLER:
@@ -1832,37 +1833,37 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
     /* get the host name */
     if ((host_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* get the service name */
     if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the service is valid */
     if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
+      return ERROR;
 
     if ((charval = my_strtok(NULL, "\n")) == NULL)
-      return (ERROR);
+      return ERROR;
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     /* get the contact name */
     if ((contact_name = my_strtok(args, ";")) == NULL)
-      return (ERROR);
+      return ERROR;
 
     /* verify that the contact is valid */
-    if ((temp_contact = find_contact(contact_name)) == NULL)
-      return (ERROR);
+    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == NULL)
+      return ERROR;
 
     if ((charval = my_strtok(NULL, "\n")) == NULL)
-      return (ERROR);
+      return ERROR;
     break;
 
   default:
     /* invalid command */
-    return (ERROR);
+    return ERROR;
     break;
   }
 
@@ -1880,7 +1881,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     /* make sure the timeperiod is valid */
     if ((temp_timeperiod = find_timeperiod(temp_ptr)) == NULL) {
       delete[] temp_ptr;
-      return (ERROR);
+      return ERROR;
     }
     break;
 
@@ -1892,9 +1893,9 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_CHECK_COMMAND:
     /* make sure the command exists */
     temp_ptr2 = my_strtok(temp_ptr, "!");
-    if ((temp_command = find_command(temp_ptr2)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_ptr2)) == NULL) {
       delete[] temp_ptr;
-      return (ERROR);
+      return ERROR;
     }
 
     delete[] temp_ptr;
@@ -1977,15 +1978,13 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
-    delete[] temp_contact->host_notification_period;
-    temp_contact->host_notification_period = temp_ptr;
+    temp_contact->set_host_notification_period(temp_ptr);
     temp_contact->host_notification_period_ptr = temp_timeperiod;
     hattr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
-    delete[] temp_contact->service_notification_period;
-    temp_contact->service_notification_period = temp_ptr;
+    temp_contact->set_service_notification_period(temp_ptr);
     temp_contact->service_notification_period_ptr = temp_timeperiod;
     sattr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
@@ -2084,8 +2083,12 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     /* set the modified attributes */
-    temp_contact->modified_host_attributes |= hattr;
-    temp_contact->modified_service_attributes |= sattr;
+    temp_contact->set_modified_host_attributes(
+                    temp_contact->get_modified_host_attributes()
+                    | hattr);
+    temp_contact->set_modified_service_attributes(
+                    temp_contact->get_modified_service_attributes()
+                    | sattr);
 
     /* send data to event broker */
     broker_adaptive_contact_data(
@@ -2095,22 +2098,22 @@ int cmd_change_object_char_var(int cmd, char* args) {
       temp_contact,
       cmd,
       attr,
-      temp_contact->modified_attributes,
+      temp_contact->get_modified_attributes(),
       hattr,
-      temp_contact->modified_host_attributes,
+      temp_contact->get_modified_host_attributes(),
       sattr,
-      temp_contact->modified_service_attributes,
+      temp_contact->get_modified_service_attributes(),
       NULL);
 
     /* update the status log with the contact info */
-    update_contact_status(temp_contact, false);
+    temp_contact->update_status_info(false);
     break;
 
   default:
     break;
   }
 
-  return (OK);
+  return OK;
 }
 
 /* changes a custom host or service variable */
@@ -2128,14 +2131,14 @@ int cmd_change_object_custom_var(int cmd, char* args) {
 
   /* get the host or contact name */
   if ((temp_ptr = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   name1 = string::dup(temp_ptr);
 
   /* get the service description if necessary */
   if (cmd == CMD_CHANGE_CUSTOM_SVC_VAR) {
     if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
       delete[] name1;
-      return (ERROR);
+      return ERROR;
     }
     name2 = string::dup(temp_ptr);
   }
@@ -2144,7 +2147,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
     delete[] name1;
     delete[] name2;
-    return (ERROR);
+    return ERROR;
   }
   varname = string::dup(temp_ptr);
 
@@ -2159,19 +2162,19 @@ int cmd_change_object_custom_var(int cmd, char* args) {
 
   case CMD_CHANGE_CUSTOM_HOST_VAR:
     if ((temp_host = find_host(name1)) == NULL)
-      return (ERROR);
+      return ERROR;
     temp_customvariablesmember = temp_host->custom_variables;
     break;
 
   case CMD_CHANGE_CUSTOM_SVC_VAR:
     if ((temp_service = find_service(name1, name2)) == NULL)
-      return (ERROR);
+      return ERROR;
     temp_customvariablesmember = temp_service->custom_variables;
     break;
 
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
-    if ((temp_contact = find_contact(name1)) == NULL)
-      return (ERROR);
+    if ((temp_contact = configuration::applier::state::instance().find_contact(name1)) == NULL)
+      return ERROR;
     temp_customvariablesmember = temp_contact->custom_variables;
     break;
 
@@ -2221,15 +2224,17 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
-    temp_contact->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-    update_contact_status(temp_contact, false);
+    temp_contact->set_modified_attributes(
+        temp_contact->get_modified_attributes()
+        | MODATTR_CUSTOM_VARIABLE);
+    temp_contact->update_status_info(false);
     break;
 
   default:
     break;
   }
 
-  return (OK);
+  return OK;
 }
 
 /* processes an external host command */
@@ -2242,13 +2247,13 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
 
   /* get the file name */
   if ((temp_ptr = my_strtok(args, ";")) == NULL)
-    return (ERROR);
+    return ERROR;
   fname = string::dup(temp_ptr);
 
   /* find the deletion option */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
     delete[] fname;
-    return (ERROR);
+    return ERROR;
   }
   if (atoi(temp_ptr) == 0)
     delete_file = false;
@@ -2261,7 +2266,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
   /* free memory */
   delete[] fname;
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -2636,14 +2641,15 @@ void enable_contact_host_notifications(contact* cntct) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
-  if (cntct->host_notifications_enabled)
+  if (cntct->get_host_notifications_enabled())
     return;
 
   /* set the attribute modified flag */
-  cntct->modified_host_attributes |= attr;
+  cntct->set_modified_host_attributes(
+           cntct->get_modified_host_attributes() | attr);
 
   /* enable the host notifications... */
-  cntct->host_notifications_enabled = true;
+  cntct->set_host_notifications_enabled(true);
 
   /* send data to event broker */
   broker_adaptive_contact_data(
@@ -2653,15 +2659,15 @@ void enable_contact_host_notifications(contact* cntct) {
     cntct,
     CMD_NONE,
     MODATTR_NONE,
-    cntct->modified_attributes,
+    cntct->get_modified_attributes(),
     attr,
-    cntct->modified_host_attributes,
+    cntct->get_modified_host_attributes(),
     MODATTR_NONE,
-    cntct->modified_service_attributes,
+    cntct->get_modified_service_attributes(),
     NULL);
 
   /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  cntct->update_status_info(false);
 }
 
 /* disables host notifications for a contact */
@@ -2669,14 +2675,16 @@ void disable_contact_host_notifications(contact* cntct) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
-  if (cntct->host_notifications_enabled == false)
+  if (!cntct->get_host_notifications_enabled())
     return;
 
   /* set the attribute modified flag */
-  cntct->modified_host_attributes |= attr;
+  cntct->set_modified_host_attributes(
+      cntct->get_modified_host_attributes()
+      | attr);
 
   /* enable the host notifications... */
-  cntct->host_notifications_enabled = false;
+  cntct->set_host_notifications_enabled(false);
 
   /* send data to event broker */
   broker_adaptive_contact_data(
@@ -2686,15 +2694,15 @@ void disable_contact_host_notifications(contact* cntct) {
     cntct,
     CMD_NONE,
     MODATTR_NONE,
-    cntct->modified_attributes,
+    cntct->get_modified_attributes(),
     attr,
-    cntct->modified_host_attributes,
+    cntct->get_modified_host_attributes(),
     MODATTR_NONE,
-    cntct->modified_service_attributes,
+    cntct->get_modified_service_attributes(),
     NULL);
 
   /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  cntct->update_status_info(false);
 }
 
 /* enables service notifications for a contact */
@@ -2702,14 +2710,16 @@ void enable_contact_service_notifications(contact* cntct) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
-  if (cntct->service_notifications_enabled)
+  if (cntct->get_service_notifications_enabled())
     return;
 
   /* set the attribute modified flag */
-  cntct->modified_service_attributes |= attr;
+  cntct->set_modified_service_attributes(
+      cntct->get_modified_service_attributes()
+      | attr);
 
   /* enable the host notifications... */
-  cntct->service_notifications_enabled = true;
+  cntct->set_service_notifications_enabled(true);
 
   /* send data to event broker */
   broker_adaptive_contact_data(
@@ -2719,15 +2729,15 @@ void enable_contact_service_notifications(contact* cntct) {
     cntct,
     CMD_NONE,
     MODATTR_NONE,
-    cntct->modified_attributes,
+    cntct->get_modified_attributes(),
     MODATTR_NONE,
-    cntct->modified_host_attributes,
+    cntct->get_modified_host_attributes(),
     attr,
-    cntct->modified_service_attributes,
+    cntct->get_modified_service_attributes(),
     NULL);
 
   /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  cntct->update_status_info(false);
 }
 
 /* disables service notifications for a contact */
@@ -2735,14 +2745,16 @@ void disable_contact_service_notifications(contact* cntct) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
-  if (cntct->service_notifications_enabled == false)
+  if (!cntct->get_service_notifications_enabled())
     return;
 
   /* set the attribute modified flag */
-  cntct->modified_service_attributes |= attr;
+  cntct->set_modified_service_attributes(
+      cntct->get_modified_service_attributes()
+      | attr);
 
   /* enable the host notifications... */
-  cntct->service_notifications_enabled = false;
+  cntct->set_service_notifications_enabled(false);
 
   /* send data to event broker */
   broker_adaptive_contact_data(
@@ -2752,15 +2764,15 @@ void disable_contact_service_notifications(contact* cntct) {
     cntct,
     CMD_NONE,
     MODATTR_NONE,
-    cntct->modified_attributes,
+    cntct->get_modified_attributes(),
     MODATTR_NONE,
-    cntct->modified_host_attributes,
+    cntct->get_modified_host_attributes(),
     attr,
-    cntct->modified_service_attributes,
+    cntct->get_modified_service_attributes(),
     NULL);
 
   /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  cntct->update_status_info(false);
 }
 
 /* schedules downtime for all hosts "beyond" a given host */

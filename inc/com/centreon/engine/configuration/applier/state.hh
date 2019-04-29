@@ -29,9 +29,11 @@
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 
+CCE_BEGIN()
+  class contact;
+CCE_END()
+
 // Forward declaration.
-struct command_struct;
-struct contact_struct;
 struct contactgroup_struct;
 struct host_struct;
 struct hostdependency_struct;
@@ -47,6 +49,7 @@ CCE_BEGIN()
 
 // Forward declaration.
 namespace commands {
+  class   command;
   class   connector;
 }
 
@@ -75,115 +78,119 @@ namespace           configuration {
       static void   load();
       static void   unload();
 
-      umap<std::string, std::shared_ptr<command_struct> > const&
+      std::unordered_map<std::string, std::shared_ptr<commands::command>> const&
                     commands() const throw ();
-      umap<std::string, std::shared_ptr<command_struct> >&
+      std::unordered_map<std::string, std::shared_ptr<commands::command>>&
                     commands() throw ();
-      umap<std::string, std::shared_ptr<command_struct> >::const_iterator
-                    commands_find(configuration::command::key_type const& k) const;
-      umap<std::string, std::shared_ptr<command_struct> >::iterator
-                    commands_find(configuration::command::key_type const& k);
-      umap<std::string, std::shared_ptr<commands::connector> > const&
+      commands::command const*
+                    find_command(configuration::command::key_type const& k) const;
+      commands::command*
+                    find_command(configuration::command::key_type const& k);
+      engine::contact const*
+                    find_contact(configuration::contact::key_type const& k) const;
+      engine::contact*
+                    find_contact(configuration::contact::key_type const& k);
+      std::unordered_map<std::string, std::shared_ptr<commands::connector>> const&
                     connectors() const throw ();
-      umap<std::string, std::shared_ptr<commands::connector> >&
+      std::unordered_map<std::string, std::shared_ptr<commands::connector>>&
                     connectors() throw ();
-      umap<std::string, std::shared_ptr<commands::connector> >::const_iterator
-                    connectors_find(configuration::connector::key_type const& k) const;
-      umap<std::string, std::shared_ptr<commands::connector> >::iterator
-                    connectors_find(configuration::connector::key_type const& k);
-      umap<std::string, std::shared_ptr<contact_struct> > const&
+      commands::connector const*
+                    find_connector(configuration::connector::key_type const& k) const;
+      commands::connector*
+                    find_connector(configuration::connector::key_type const& k);
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>> const&
                     contacts() const throw ();
-      umap<std::string, std::shared_ptr<contact_struct> >&
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>&
                     contacts() throw ();
-      umap<std::string, std::shared_ptr<contact_struct> >::const_iterator
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>::const_iterator
                     contacts_find(configuration::contact::key_type const& k) const;
-      umap<std::string, std::shared_ptr<contact_struct> >::iterator
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>::iterator
                     contacts_find(configuration::contact::key_type const& k);
-      umap<std::string, std::shared_ptr<contactgroup_struct> > const&
+      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>> const&
                     contactgroups() const throw ();
-      umap<std::string, std::shared_ptr<contactgroup_struct> >&
+      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>&
                     contactgroups() throw ();
-      umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator
+      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>::const_iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k) const;
-      umap<std::string, std::shared_ptr<contactgroup_struct> >::iterator
+      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
-      umap<unsigned int, std::shared_ptr<host_struct> > const&
+      std::unordered_map<unsigned int, std::shared_ptr<host_struct>> const&
                     hosts() const throw ();
-      umap<unsigned int, std::shared_ptr<host_struct> >&
+      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>&
                     hosts() throw ();
-      umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>::const_iterator
                     hosts_find(configuration::host::key_type const& k) const;
-      umap<unsigned int, std::shared_ptr<host_struct> >::iterator
+      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>::iterator
                     hosts_find(configuration::host::key_type const& k);
-      umultimap<std::string, std::shared_ptr<hostdependency_struct> > const&
+      umultimap<std::string, std::shared_ptr<hostdependency_struct>> const&
                     hostdependencies() const throw ();
-      umultimap<std::string, std::shared_ptr<hostdependency_struct> >&
+      umultimap<std::string, std::shared_ptr<hostdependency_struct>>&
                     hostdependencies() throw ();
-      umultimap<std::string, std::shared_ptr<hostdependency_struct> >::const_iterator
+      umultimap<std::string, std::shared_ptr<hostdependency_struct>>::const_iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
-      umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator
+      umultimap<std::string, std::shared_ptr<hostdependency_struct>>::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      umultimap<std::string, std::shared_ptr<hostescalation_struct> > const&
+      umultimap<std::string, std::shared_ptr<hostescalation_struct>> const&
                     hostescalations() const throw ();
-      umultimap<std::string, std::shared_ptr<hostescalation_struct> >&
+      umultimap<std::string, std::shared_ptr<hostescalation_struct>>&
                     hostescalations() throw ();
-      umultimap<std::string, std::shared_ptr<hostescalation_struct> >::const_iterator
+      umultimap<std::string, std::shared_ptr<hostescalation_struct>>::const_iterator
                     hostescalations_find(configuration::hostescalation::key_type const& k) const;
-      umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator
+      umultimap<std::string, std::shared_ptr<hostescalation_struct>>::iterator
                     hostescalations_find(configuration::hostescalation::key_type const& k);
-      umap<std::string, std::shared_ptr<hostgroup_struct> > const&
+      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>> const&
                     hostgroups() const throw ();
-      umap<std::string, std::shared_ptr<hostgroup_struct> >&
+      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>&
                     hostgroups() throw ();
-      umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator
+      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>::const_iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k) const;
-      umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator
+      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>::iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k);
-      umap<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct> > const&
+      std::unordered_map<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct>> const&
                     services() const throw ();
-      umap<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct> >&
+      std::unordered_map<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct>>&
                     services() throw ();
-      umap<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct> >::const_iterator
+      std::unordered_map<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct>>::const_iterator
                     services_find(configuration::service::key_type const& k) const;
-      umap<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct> >::iterator
+      std::unordered_map<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct>>::iterator
                     services_find(configuration::service::key_type const& k);
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> > const&
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>> const&
                     servicedependencies() const throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >&
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>>&
                     servicedependencies() throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >::const_iterator
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>>::const_iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k) const;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >::iterator
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>>::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> > const&
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>> const&
                     serviceescalations() const throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >&
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>&
                     serviceescalations() throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >::const_iterator
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>::const_iterator
                     serviceescalations_find(configuration::serviceescalation::key_type const& k) const;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >::iterator
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>::iterator
                     serviceescalations_find(configuration::serviceescalation::key_type const& k);
-      umap<std::string, std::shared_ptr<servicegroup_struct> > const&
+      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>> const&
                     servicegroups() const throw ();
-      umap<std::string, std::shared_ptr<servicegroup_struct> >&
+      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>&
                     servicegroups() throw ();
-      umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
+      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>::const_iterator
                     servicegroups_find(configuration::servicegroup::key_type const& k) const;
-      umap<std::string, std::shared_ptr<servicegroup_struct> >::iterator
+      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>::iterator
                     servicegroups_find(configuration::servicegroup::key_type const& k);
-      umap<std::string, std::shared_ptr<timeperiod_struct> > const&
+      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>> const&
                     timeperiods() const throw ();
-      umap<std::string, std::shared_ptr<timeperiod_struct> >&
+      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>&
                     timeperiods() throw ();
-      umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator
+      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>::const_iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k) const;
-      umap<std::string, std::shared_ptr<timeperiod_struct> >::iterator
+      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>::iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k);
-      umap<std::string, std::string>&
+      std::unordered_map<std::string, std::string>&
                     user_macros();
-      umap<std::string, std::string> const&
+      std::unordered_map<std::string, std::string> const&
                     user_macros() const;
-      umap<std::string, std::string>::const_iterator
+      std::unordered_map<std::string, std::string>::const_iterator
                     user_macros_find(std::string const& key) const;
       void          try_lock();
 
@@ -202,7 +209,7 @@ namespace           configuration {
       void          _apply(configuration::state const& new_cfg);
       template      <typename ConfigurationType, typename ApplierType>
       void          _apply(
-                      difference<std::set<ConfigurationType> > const& diff);
+                      difference<std::set<ConfigurationType>> const& diff);
       void          _apply(
                       configuration::state& new_cfg,
                       retention::state& state);
@@ -219,40 +226,40 @@ namespace           configuration {
 
       state*        _config;
 
-      umap<std::string, std::shared_ptr<command_struct> >
+      std::unordered_map<std::string, std::shared_ptr<commands::command>>
                     _commands;
-      umap<std::string, std::shared_ptr<commands::connector> >
+      std::unordered_map<std::string, std::shared_ptr<commands::connector>>
                     _connectors;
-      umap<std::string, std::shared_ptr<contact_struct> >
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>
                     _contacts;
-      umap<std::string, std::shared_ptr<contactgroup_struct> >
+      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>
                     _contactgroups;
       concurrency::condvar
                     _cv_lock;
-      umap<unsigned int, std::shared_ptr<host_struct> >
+      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>
                     _hosts;
-      umultimap<std::string, std::shared_ptr<hostdependency_struct> >
+      umultimap<std::string, std::shared_ptr<hostdependency_struct>>
                     _hostdependencies;
-      umultimap<std::string, std::shared_ptr<hostescalation_struct> >
+      umultimap<std::string, std::shared_ptr<hostescalation_struct>>
                     _hostescalations;
-      umap<std::string, std::shared_ptr<hostgroup_struct> >
+      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>
                     _hostgroups;
       concurrency::mutex
                     _lock;
       processing_state
                     _processing_state;
-      umap<std::pair<unsigned int, unsigned int>,
-           std::shared_ptr<service_struct> >
+      std::unordered_map<std::pair<unsigned int, unsigned int>,
+                         std::shared_ptr<service_struct>>
                     _services;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>>
                     _servicedependencies;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>
                     _serviceescalations;
-      umap<std::string, std::shared_ptr<servicegroup_struct> >
+      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>
                     _servicegroups;
-      umap<std::string, std::shared_ptr<timeperiod_struct> >
+      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>
                     _timeperiods;
-      umap<std::string, std::string>
+      std::unordered_map<std::string, std::string>
                     _user_macros;
     };
   }
