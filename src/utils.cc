@@ -82,7 +82,7 @@ int my_system_r(
 
   // if no command was passed, return with no error.
   if (cmd == NULL) {
-    return (STATE_OK);
+    return STATE_OK;
   }
 
   logger(dbg_commands, more)
@@ -148,7 +148,7 @@ int my_system_r(
     (output == NULL ? NULL : *output),
     NULL);
 
-  return (result);
+  return result;
 }
 
 /*
@@ -178,13 +178,13 @@ char const* my_ctime(time_t const* t) {
   char* buf(ctime(t));
   if (buf != NULL)
     buf[strlen(buf) - 1] = 0;
-  return (buf);
+  return buf;
 }
 
 /* given a "raw" command, return the "expanded" or "whole" command line */
 int get_raw_command_line_r(
       nagios_macros* mac,
-      command* cmd_ptr,
+      commands::command* cmd_ptr,
       char const* cmd,
       char** full_command,
       int macro_options) {
@@ -203,16 +203,16 @@ int get_raw_command_line_r(
 
   /* make sure we've got all the requirements */
   if (cmd_ptr == NULL) {
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_commands | dbg_checks | dbg_macros, most)
-    << "Raw Command Input: " << cmd_ptr->command_line;
+    << "Raw Command Input: " << cmd_ptr->get_command_line();
 
   /* get the full command line */
   if (full_command != NULL) {
     *full_command
-      = string::dup(cmd_ptr->command_line ? cmd_ptr->command_line : "");
+      = string::dup(cmd_ptr->get_command_line());
   }
 
   /* get the command arguments */
@@ -267,7 +267,7 @@ int get_raw_command_line_r(
       << "Expanded Command Output: " << *full_command;
   }
 
-  return (OK);
+  return OK;
 }
 
 /*
@@ -275,7 +275,7 @@ int get_raw_command_line_r(
  * threadsafe
  */
 int get_raw_command_line(
-      command* cmd_ptr,
+      commands::command* cmd_ptr,
       char* cmd,
       char** full_command,
       int macro_options) {
@@ -296,7 +296,7 @@ int get_raw_command_line(
 int set_environment_var(char const* name, char const* value, int set) {
   /* we won't mess with null variable names */
   if (name == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* set the environment variable */
   if (set) {
@@ -314,7 +314,7 @@ int set_environment_var(char const* name, char const* value, int set) {
     unsetenv(name);
   }
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -370,14 +370,14 @@ void sighandler(int sig) {
 /* frees memory associated with a host/service check result */
 int free_check_result(check_result* info) {
   if (info == NULL)
-    return (OK);
+    return OK;
 
   delete[] info->host_name;
   delete[] info->service_description;
   delete[] info->output_file;
   delete[] info->output;
 
-  return (OK);
+  return OK;
 }
 
 /* parse raw plugin output and return: short and long output, perf data */
@@ -411,7 +411,7 @@ int parse_check_output(
 
   /* nothing to do */
   if (buf == NULL || *buf == 0)
-    return (OK);
+    return OK;
 
   used_buf = strlen(buf) + 1;
 
@@ -576,7 +576,7 @@ int parse_check_output(
   dbuf_free(&db1);
   dbuf_free(&db2);
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -593,24 +593,24 @@ char* get_next_string_from_buf(
   int x;
 
   if (buf == NULL || start_index == NULL)
-    return (NULL);
+    return NULL;
   if (bufsize < 0)
-    return (NULL);
+    return NULL;
   if (*start_index >= (bufsize - 1))
-    return (NULL);
+    return NULL;
 
   sptr = buf + *start_index;
 
   /* end of buffer */
   if (sptr[0] == '\x0')
-    return (NULL);
+    return NULL;
 
   x = strcspn(sptr, nl);
   sptr[x] = '\x0';
 
   *start_index += x + 1;
 
-  return (sptr);
+  return sptr;
 }
 
 /**
@@ -628,10 +628,10 @@ char* get_next_string_from_buf(
  *  @return True if the object name contains an illegal character, false
  *          otherwise.
  */
-int contains_illegal_object_chars(char* name) {
+bool contains_illegal_object_chars(char const* name) {
   if (!name || !illegal_object_chars)
-    return (false);
-  return (strpbrk(name, illegal_object_chars) ? TRUE : FALSE);
+    return false;
+  return strpbrk(name, illegal_object_chars) ? true : false;
 }
 
 /* escapes newlines in a string */
@@ -640,7 +640,7 @@ char* escape_newlines(char* rawbuf) {
   int x, y;
 
   if (rawbuf == NULL)
-    return (NULL);
+    return NULL;
 
   /* allocate enough memory to escape all chars if necessary */
   newbuf = new char[strlen(rawbuf) * 2 + 1];
@@ -664,13 +664,13 @@ char* escape_newlines(char* rawbuf) {
   }
   newbuf[y] = '\x0';
 
-  return (newbuf);
+  return newbuf;
 }
 
 /* compares strings */
 int compare_strings(char* val1a, char* val2a) {
   /* use the compare_hashdata() function */
-  return (compare_hashdata(val1a, NULL, val2a, NULL));
+  return compare_hashdata(val1a, NULL, val2a, NULL);
 }
 
 /******************************************************************/
@@ -683,7 +683,7 @@ int my_rename(char const* source, char const* dest) {
 
   /* make sure we have something */
   if (source == NULL || dest == NULL)
-    return (-1);
+    return -1;
 
   /* first see if we can rename file with standard function */
   rename_result = rename(source, dest);
@@ -699,7 +699,7 @@ int my_rename(char const* source, char const* dest) {
         logger(log_runtime_error, basic)
           << "Error: Unable to rename file '" << source
           << "' to '" << dest << "': " << strerror(errno);
-        return (-1);
+        return -1;
       }
 
       /* delete the original file */
@@ -713,11 +713,11 @@ int my_rename(char const* source, char const* dest) {
       logger(log_runtime_error, basic)
         << "Error: Unable to rename file '" << source
         << "' to '" << dest << "': " << strerror(errno);
-      return (rename_result);
+      return rename_result;
     }
   }
 
-  return (rename_result);
+  return rename_result;
 }
 
 /*
@@ -736,7 +736,7 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
     logger(log_runtime_error, basic)
       << "Error: Unable to open file '" << source
       << "' for reading: " << strerror(errno);
-    return (ERROR);
+    return ERROR;
   }
 
   /*
@@ -748,7 +748,7 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
       << "Error: Unable to stat source file '" << source
       << "' for my_fcopy(): " << strerror(errno);
     close(source_fd);
-    return (ERROR);
+    return ERROR;
   }
 
   /*
@@ -810,10 +810,10 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
   if (rd_result < 0 || wr_result < 0) {
     /* don't leave half-written files around */
     unlink(dest);
-    return (ERROR);
+    return ERROR;
   }
 
-  return (OK);
+  return OK;
 }
 
 /* copies a file */
@@ -822,7 +822,7 @@ int my_fcopy(char const* source, char const* dest) {
 
   /* make sure we have something */
   if (source == NULL || dest == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* unlink destination file first (not doing so can cause problems on network file systems like CIFS) */
   unlink(dest);
@@ -835,12 +835,12 @@ int my_fcopy(char const* source, char const* dest) {
     logger(log_runtime_error, basic)
       << "Error: Unable to open file '" << dest
       << "' for writing: " << strerror(errno);
-    return (ERROR);
+    return ERROR;
   }
 
   result = my_fdcopy(source, dest, dest_fd);
   close(dest_fd);
-  return (result);
+  return result;
 }
 
 /******************************************************************/
@@ -850,20 +850,20 @@ int my_fcopy(char const* source, char const* dest) {
 /* initializes a dynamic buffer */
 int dbuf_init(dbuf* db, int chunk_size) {
   if (db == NULL)
-    return (ERROR);
+    return ERROR;
 
   db->buf = NULL;
   db->used_size = 0L;
   db->allocated_size = 0L;
   db->chunk_size = chunk_size;
 
-  return (OK);
+  return OK;
 }
 
 /* frees a dynamic buffer */
 int dbuf_free(dbuf* db) {
   if (db == NULL)
-    return (ERROR);
+    return ERROR;
 
   if (db->buf != NULL)
     delete[] db->buf;
@@ -871,13 +871,13 @@ int dbuf_free(dbuf* db) {
   db->used_size = 0L;
   db->allocated_size = 0L;
 
-  return (OK);
+  return OK;
 }
 
 /* dynamically expands a string */
 int dbuf_strcat(dbuf* db, char const* buf) {
   if (db == NULL || buf == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* how much memory should we allocate (if any)? */
   unsigned long buflen(strlen(buf));
@@ -906,7 +906,7 @@ int dbuf_strcat(dbuf* db, char const* buf) {
   /* update size allocated */
   db->used_size += buflen;
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -921,14 +921,14 @@ bool set_cloexec(int fd) {
   while ((flags = fcntl(fd, F_GETFD)) < 0) {
     if (errno == EINTR)
       continue;
-    return (false);
+    return false;
   }
   while (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) < 0) {
     if (errno == EINTR)
       continue;
-    return (false);
+    return false;
   }
-  return (true);
+  return true;
 }
 
 /******************************************************************/

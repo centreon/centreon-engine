@@ -60,7 +60,7 @@ bool operator==(
 bool operator!=(
        command const& obj1,
        command const& obj2) throw () {
-  return (!operator==(obj1, obj2));
+  return !operator==(obj1, obj2);
 }
 
 /**
@@ -76,7 +76,7 @@ std::ostream& operator<<(std::ostream& os, command const& obj) {
     "  name:         " << chkstr(obj.name) << "\n"
     "  command_line: " << chkstr(obj.command_line) << "\n"
     "}\n";
-  return (os);
+  return os;
 }
 
 /**
@@ -87,53 +87,52 @@ std::ostream& operator<<(std::ostream& os, command const& obj) {
  *
  *  @return New command object.
  */
-command* add_command(char const* name, char const* value) {
-  // Make sure we have the data we need.
-  if (!name || !name[0] || !value || !value[0]) {
-    logger(log_config_error, basic)
-      << "Error: Command name or command line is NULL";
-    return (NULL);
-  }
-
-  // Check if the command already exist.
-  std::string id(name);
-  if (is_command_exist(id)) {
-    logger(log_config_error, basic)
-      << "Error: Command '" << name << "' has already been defined";
-    return (NULL);
-  }
-
-  // Allocate memory for the new command.
-  std::shared_ptr<command> obj(new command, deleter::command);
-  memset(obj.get(), 0, sizeof(*obj));
-
-  try {
-    // Duplicate vars.
-    obj->name = string::dup(name);
-    obj->command_line = string::dup(value);
-
-    // Add new items to the configuration state.
-    state::instance().commands()[id] = obj;
-
-    // Add new items to the list.
-    obj->next = command_list;
-    command_list = obj.get();
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_command_data(
-      NEBTYPE_COMMAND_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      obj.get(),
-      &tv);
-  }
-  catch (...) {
-    obj.reset();
-  }
-
-  return (obj.get());
-}
+//command* add_command(char const* name, char const* value) {
+//  // Make sure we have the data we need.
+//  if (!name || !name[0] || !value || !value[0]) {
+//    logger(log_config_error, basic)
+//      << "Error: Command name or command line is NULL";
+//    return NULL;
+//  }
+//
+//  // Check if the command already exist.
+//  std::string id(name);
+//  if (is_command_exist(id)) {
+//    logger(log_config_error, basic)
+//      << "Error: Command '" << name << "' has already been defined";
+//    return NULL;
+//  }
+//
+//  // Allocate memory for the new command.
+//  std::shared_ptr<commands::command> obj(new commands::command);
+//
+//  try {
+//    // Duplicate vars.
+//    obj->set_name(name);
+//    obj->set_command_line(value);
+//
+//    // Add new items to the configuration state.
+//    state::instance().commands()[id] = obj;
+//
+//    // Add new items to the list.
+//    obj->next = command_list;
+//    command_list = obj.get();
+//
+//    // Notify event broker.
+//    timeval tv(get_broker_timestamp(NULL));
+//    broker_command_data(
+//      NEBTYPE_COMMAND_ADD,
+//      NEBFLAG_NONE,
+//      NEBATTR_NONE,
+//      obj.get(),
+//      &tv);
+//  }
+//  catch (...) {
+//    obj.reset();
+//  }
+//
+//  return obj.get();
+//}
 
 /**
  *  Get command by name.
@@ -143,13 +142,13 @@ command* add_command(char const* name, char const* value) {
  *  @return The struct command or throw exception if the
  *          command is not found.
  */
-command& engine::find_command(std::string const& name) {
-  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
-    it(state::instance().commands().find(name));
-  if (it == state::instance().commands().end())
-    throw (engine_error() << "Command '" << name << "' was not found");
-  return (*it->second);
-}
+//command& engine::find_command(std::string const& name) {
+//  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
+//    it(state::instance().commands().find(name));
+//  if (it == state::instance().commands().end())
+//    throw (engine_error() << "Command '" << name << "' was not found");
+//  return *it->second;
+//}
 
 /**
  *  Get if command exist.
@@ -159,7 +158,7 @@ command& engine::find_command(std::string const& name) {
  *  @return True if the command is found, otherwise false.
  */
 bool engine::is_command_exist(std::string const& name) throw () {
-  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<commands::command>>::const_iterator
     it(state::instance().commands().find(name));
-  return (it != state::instance().commands().end());
+  return it != state::instance().commands().end();
 }

@@ -54,7 +54,7 @@ class SimpleCommand : public ::testing::Test {
 class my_listener : public commands::command_listener {
  public:
   result const& get_result() const {
-    return (_res);
+    return _res;
   }
 
   void finished(result const& res) throw () {
@@ -69,22 +69,26 @@ class my_listener : public commands::command_listener {
 // When the add_command method is called with it as argument,
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, NewCommandWithNoName) {
-  ASSERT_TRUE(add_command("", "bar") == NULL);
+  ASSERT_THROW(commands::command::add_command(
+        new commands::raw("", "bar")), std::exception);
 }
 
 // Given a command to store,
 // When the add_command method is called with an empty value,
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, NewCommandWithNoValue) {
-  ASSERT_TRUE(add_command("foo", "") == NULL);
+  ASSERT_THROW(commands::command::add_command(
+        new commands::raw("foo", "")), std::exception);
 }
 
 // Given an already existing command
 // When the add_command method is called with the same name
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, CommandAlreadyExisting) {
-  add_command("toto", "/bin/ls");
-  ASSERT_TRUE(add_command("toto", "/bin/ls") == NULL);
+  commands::command::add_command(
+        new commands::raw("toto", "/bin/ls"));
+  ASSERT_NO_THROW(commands::command::add_command(
+        new commands::raw("toto", "/bin/ls")));
 }
 
 // Given a name and a command line
@@ -93,9 +97,8 @@ TEST_F(SimpleCommand, CommandAlreadyExisting) {
 // When sync executed
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandSync) {
-  std::shared_ptr<commands::raw> cmd(new raw("test", "/bin/echo bonjour"));
-  set::instance().add_command(cmd);
-
+  commands::command* cmd(commands::command::add_command(
+        new commands::raw("test", "/bin/echo bonjour")));
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
   commands::result res;
@@ -112,22 +115,19 @@ TEST_F(SimpleCommand, NewCommandSync) {
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandAsync) {
   std::unique_ptr<my_listener> lstnr(new my_listener);
-  std::shared_ptr<commands::raw> cmd(new raw("test", "/bin/echo bonjour"));
+  commands::command* cmd(commands::command::add_command(
+    new commands::raw("test", "/bin/echo bonjour")));
   cmd->set_listener(lstnr.get());
-  set::instance().add_command(cmd);
-
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  commands::result res;
   std::string cc(cmd->process_cmd(&mac));
   ASSERT_EQ(cc, "/bin/echo bonjour");
-
   unsigned long id(cmd->run(cc, mac, 2));
   int timeout(0);
-  while (timeout < 10 && lstnr->get_result().output == "") {
+  while (timeout < 20 && lstnr->get_result().output == "") {
     usleep(100000);
     ++timeout;
   }
-  ASSERT_TRUE(timeout < 10);
+  ASSERT_TRUE(timeout < 20);
   ASSERT_EQ(lstnr->get_result().output, "bonjour\n");
 }

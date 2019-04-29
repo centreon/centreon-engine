@@ -50,7 +50,6 @@ std::ostream& operator<<(std::ostream& os, command const& obj);
 
 CCE_BEGIN()
 
-command&      find_command(std::string const& name);
 bool          is_command_exist(std::string const& name) throw ();
 
 CCE_END()

@@ -17,8 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <memory>
 #include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/command.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/grab.hh"
 
 using namespace com::centreon;
@@ -26,6 +30,32 @@ using namespace com::centreon::engine;
 
 static concurrency::mutex _lock_id;
 static unsigned long      _id = 0;
+
+/**
+ *  Add (or replace) a new command.
+ *
+ *  @param[in] obj        A raw or forward command pointer.
+ *
+ *  @return               A pointer to the command.
+ */
+commands::command* commands::command::add_command(
+                     commands::command* obj) {
+  std::shared_ptr<commands::command> cmd(obj);
+
+  if (cmd->get_name().empty())
+    throw (engine_error()
+           << "Could not create a command with an empty name");
+  if (cmd->get_command_line().empty())
+    throw (engine_error()
+           << "Could not create '"
+           << cmd->get_name() << "' command: command line is empty");
+  // Add new items to the configuration state.
+  configuration::applier::state::instance().commands()[cmd->get_name()] = cmd;
+  logger(logging::dbg_commands, logging::basic)
+    << "added command " << cmd->get_name();
+  return cmd.get();
+}
+
 
 /**
  *  Default constructor
@@ -40,16 +70,12 @@ commands::command::command(
                      command_listener* listener)
   : _command_line(command_line),
     _listener(listener),
-    _name(name) {
-
-}
+    _name(name) {}
 
 /**
  *  Destructor.
  */
-commands::command::~command() throw () {
-
-}
+commands::command::~command() throw () {}
 
 /**
  *  Compare two result.

@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -39,14 +40,14 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
-static command*        xpddefault_host_perfdata_command_ptr(NULL);
-static command*        xpddefault_service_perfdata_command_ptr(NULL);
+static commands::command*        xpddefault_host_perfdata_command_ptr(NULL);
+static commands::command*        xpddefault_service_perfdata_command_ptr(NULL);
 
 static char*           xpddefault_host_perfdata_file_template(NULL);
 static char*           xpddefault_service_perfdata_file_template(NULL);
 
-static command*        xpddefault_host_perfdata_file_processing_command_ptr(NULL);
-static command*        xpddefault_service_perfdata_file_processing_command_ptr(NULL);
+static commands::command*        xpddefault_host_perfdata_file_processing_command_ptr(NULL);
+static commands::command*        xpddefault_service_perfdata_file_processing_command_ptr(NULL);
 
 static FILE*           xpddefault_host_perfdata_fp(NULL);
 static FILE*           xpddefault_service_perfdata_fp(NULL);
@@ -63,7 +64,7 @@ static pthread_mutex_t xpddefault_service_perfdata_fp_lock;
 // initializes performance data.
 int xpddefault_initialize_performance_data() {
   char* temp_command_name(NULL);
-  command* temp_command(NULL);
+  commands::command* temp_command(NULL);
 
   // reset vars.
   xpddefault_host_perfdata_command_ptr = NULL;
@@ -90,7 +91,7 @@ int xpddefault_initialize_performance_data() {
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
 
-    if ((temp_command = find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
       logger(log_runtime_warning, basic)
         << "Warning: Host performance command '" << temp_command_name
         << "' was not found - host performance data will not "
@@ -108,7 +109,7 @@ int xpddefault_initialize_performance_data() {
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
 
-    if ((temp_command = find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
       logger(log_runtime_warning, basic)
         << "Warning: Service performance command '" << temp_command_name
         << "' was not found - service performance data will not "
@@ -128,7 +129,7 @@ int xpddefault_initialize_performance_data() {
 
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
-    if ((temp_command = find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
       logger(log_runtime_warning, basic)
         << "Warning: Host performance file processing command '"
         << temp_command_name << "' was not found - host performance "
@@ -148,7 +149,7 @@ int xpddefault_initialize_performance_data() {
 
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
-    if ((temp_command = find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
       logger(log_runtime_warning, basic)
         << "Warning: Service performance file processing command '"
         << temp_command_name << "' was not found - service performance "

@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/objects/command.hh"
-#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/objects/contactgroup.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostgroup.hh"
@@ -38,41 +38,23 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 
-/**
- *  Given a command name, find a command from the list in memory.
- *
- *  @param[in] name Command name.
- *
- *  @return Command object if found, NULL otherwise.
- */
-command* find_command(char const* name) {
-  if (!name)
-    return (NULL);
-
-  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
-    it(state::instance().commands().find(name));
-  if (it != state::instance().commands().end())
-    return (it->second.get());
-  return (NULL);
-}
-
-/**
- *  Find a contact from the list in memory.
- *
- *  @param[in] name Contact name.
- *
- *  @return Contact object if found, NULL otherwise.
- */
-contact* find_contact(char const* name) {
-  if (!name)
-    return (NULL);
-
-  umap<std::string, std::shared_ptr<contact_struct> >::const_iterator
-    it(state::instance().contacts().find(name));
-  if (it != state::instance().contacts().end())
-    return (it->second.get());
-  return (NULL);
-}
+///**
+// *  Given a command name, find a command from the list in memory.
+// *
+// *  @param[in] name Command name.
+// *
+// *  @return Command object if found, NULL otherwise.
+// */
+//commands::command* find_command(char const* name) {
+//  if (!name)
+//    return NULL;
+//
+//  std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
+//    it(state::instance().commands().find(name));
+//  if (it != state::instance().commands().end())
+//    return it->second.get();
+//  return NULL;
+//}
 
 /**
  *  Find a contact group from the list in memory.
@@ -83,13 +65,13 @@ contact* find_contact(char const* name) {
  */
 contactgroup* find_contactgroup(char const* name) {
   if (!name)
-    return (NULL);
+    return NULL;
 
   umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator
     it(state::instance().contactgroups().find(name));
   if (it != state::instance().contactgroups().end())
-    return (it->second.get());
-  return (NULL);
+    return it->second.get();
+  return NULL;
 }
 
 /**
@@ -101,13 +83,13 @@ contactgroup* find_contactgroup(char const* name) {
  */
 host* find_host(char const* name) {
   if (!name)
-    return (NULL);
+    return NULL;
 
   umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(get_host_id(name)));
   if (it != state::instance().hosts().end())
-    return (it->second.get());
-  return (NULL);
+    return it->second.get();
+  return NULL;
 }
 
 /**
@@ -119,13 +101,13 @@ host* find_host(char const* name) {
  */
 hostgroup* find_hostgroup(char const* name) {
   if (!name)
-    return (NULL);
+    return NULL;
 
   umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator
     it(state::instance().hostgroups().find(name));
   if (it != state::instance().hostgroups().end())
-    return (it->second.get());
-  return (NULL);
+    return it->second.get();
+  return NULL;
 }
 
 /**
@@ -157,13 +139,13 @@ service* find_service(char const* host_name, char const* svc_desc) {
  */
 servicegroup* find_servicegroup(char const* name) {
   if (!name)
-    return (NULL);
+    return NULL;
 
   umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())
-    return (it->second.get());
-  return (NULL);
+    return it->second.get();
+  return NULL;
 }
 
 /**
@@ -175,13 +157,13 @@ servicegroup* find_servicegroup(char const* name) {
  */
 timeperiod* find_timeperiod(char const* name) {
   if (!name)
-    return (NULL);
+    return NULL;
 
   umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator
     it(state::instance().timeperiods().find(name));
   if (it != state::instance().timeperiods().end())
-    return (it->second.get());
-  return (NULL);
+    return it->second.get();
+  return NULL;
 }
 
 /**
@@ -197,7 +179,7 @@ hostdependency_struct* get_first_host_dependency_by_dependent_host(
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }
 
 /**
@@ -213,7 +195,7 @@ hostescalation_struct* get_first_host_escalation_by_host(
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }
 
 /**
@@ -232,7 +214,7 @@ servicedependency_struct* get_first_service_dependency_by_dependent_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }
 
 /**
@@ -251,7 +233,7 @@ serviceescalation_struct* get_first_service_escalation_by_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }
 
 /**
@@ -267,7 +249,7 @@ hostdependency_struct* get_next_host_dependency_by_dependent_host(
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }
 
 /**
@@ -283,7 +265,7 @@ hostescalation_struct* get_next_host_escalation_by_host(
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }
 
 /**
@@ -302,7 +284,7 @@ servicedependency_struct* get_next_service_dependency_by_dependent_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }
 
 /**
@@ -321,5 +303,5 @@ serviceescalation_struct* get_next_service_escalation_by_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return (NULL);
+  return NULL;
 }

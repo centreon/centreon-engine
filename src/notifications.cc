@@ -102,7 +102,7 @@ int service_notification(
     logger(dbg_notifications, basic)
       << "Couldn't find the host associated with this service, so we "
       "won't send a notification!";
-    return (ERROR);
+    return ERROR;
   }
 
   /* check the viability of sending out a service notification */
@@ -113,7 +113,7 @@ int service_notification(
     logger(dbg_notifications, basic)
       << "Notification viability test failed.  No notification will "
       "be sent out.";
-    return (OK);
+    return OK;
   }
 
   logger(dbg_notifications, basic)
@@ -161,11 +161,11 @@ int service_notification(
     NULL);
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
     free_notification_list();
-    return (ERROR);
+    return ERROR;
   }
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result) {
     free_notification_list();
-    return (OK);
+    return OK;
   }
 
   /* we have contacts to notify... */
@@ -179,12 +179,17 @@ int service_notification(
     if (not_author != NULL) {
 
       /* see if we can find the contact - first by name, then by alias */
-      if ((temp_contact = find_contact(not_author)) == NULL) {
-        for (temp_contact = contact_list;
-	     temp_contact != NULL;
-             temp_contact = temp_contact->next) {
-          if (!strcmp(temp_contact->alias, not_author))
+
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == NULL) {
+        for (umap<std::string, std::shared_ptr<contact> >::const_iterator
+               it(state::instance().contacts().begin()),
+               end(state::instance().contacts().end());
+             it != end;
+             ++it) {
+          if (!strcmp(it->second->get_alias().c_str(), not_author)) {
+            temp_contact = it->second.get();
             break;
+          }
         }
       }
     }
@@ -193,8 +198,8 @@ int service_notification(
     string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
     string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
     if (temp_contact) {
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->name);
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->alias);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->get_name());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->get_alias());
     }
     else {
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
@@ -207,8 +212,8 @@ int service_notification(
       string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
       string::setstr(mac.x[MACRO_SERVICEACKCOMMENT], not_data);
       if (temp_contact) {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->get_name());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->get_alias());
       }
       else {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
@@ -366,7 +371,7 @@ int service_notification(
                         svc->host_ptr->name,
                         svc->description)].recovery_been_sent = true;
 
-  return (OK);
+  return OK;
 }
 
 /* checks the viability of sending out a service alert (top level filters) */
@@ -386,7 +391,7 @@ int check_service_notification_viability(
   if (options & NOTIFICATION_OPTION_FORCED) {
     logger(dbg_notifications, more)
       << "This is a forced service notification, so we'll send it out.";
-    return (OK);
+    return OK;
   }
 
   /* get current time */
@@ -397,7 +402,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "Notifications are disabled, so service notifications will "
       "not be sent out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* find the host this service is associated with */
@@ -405,7 +410,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "Couldn't find the host associated with this service, "
       "so we won't send a notification.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* if the service has no notification period, inherit one from the host */
@@ -444,7 +449,7 @@ int check_service_notification_viability(
           << my_ctime(&svc->next_notification);
       }
 
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -453,7 +458,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "Notifications are temporarily disabled for "
       "this service, so we won't send one out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /*********************************************/
@@ -467,9 +472,9 @@ int check_service_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't send custom notification during "
         "scheduled downtime.";
-      return (ERROR);
+      return ERROR;
     }
-    return (OK);
+    return OK;
   }
 
   /****************************************/
@@ -484,11 +489,11 @@ int check_service_notification_viability(
       logger(dbg_notifications, more)
         << "The service is currently OK, so we won't send an "
         "acknowledgement.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* acknowledgement viability test passed, so the notification can be sent out */
-    return (OK);
+    return OK;
   }
 
 
@@ -506,7 +511,7 @@ int check_service_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events for this "
         "service.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* don't send notifications during scheduled downtime */
@@ -515,11 +520,11 @@ int check_service_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events during "
         "scheduled downtime.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* flapping viability test passed, so the notification can be sent out */
-    return (OK);
+    return OK;
   }
 
   /****************************************/
@@ -536,7 +541,7 @@ int check_service_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events for "
         "this service.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* don't send notifications during scheduled downtime (for service only, not host) */
@@ -544,11 +549,11 @@ int check_service_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events during "
         "scheduled downtime.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* downtime viability test passed, so the notification can be sent out */
-    return (OK);
+    return OK;
   }
 
   /****************************************/
@@ -560,7 +565,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "This service is in a soft state, so we won't send a "
       "notification out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* has this problem already been acknowledged? */
@@ -568,7 +573,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "This service problem has already been acknowledged, "
       "so we won't send a notification out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* check service notification dependencies */
@@ -578,7 +583,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "Service notification dependencies for this service "
       "have failed, so we won't sent a notification out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* check host notification dependencies */
@@ -588,7 +593,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "Host notification dependencies for this service have failed, "
       "so we won't sent a notification out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* see if we should notify about problems with this service */
@@ -596,32 +601,32 @@ int check_service_notification_viability(
       && svc->notify_on_unknown == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about UNKNOWN states for this service.";
-    return (ERROR);
+    return ERROR;
   }
   if (svc->current_state == STATE_WARNING
       && svc->notify_on_warning == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about WARNING states for this service.";
-    return (ERROR);
+    return ERROR;
   }
   if (svc->current_state == STATE_CRITICAL
       && svc->notify_on_critical == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about CRITICAL states for this service.";
-    return (ERROR);
+    return ERROR;
   }
   if (svc->current_state == STATE_OK) {
     if (svc->notify_on_recovery == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about RECOVERY states for this service.";
-      return (ERROR);
+      return ERROR;
     }
     if (!(svc->notified_on_unknown == true
           || svc->notified_on_warning == true
           || svc->notified_on_critical == true)) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about this recovery.";
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -661,7 +666,7 @@ int check_service_notification_viability(
         logger(dbg_notifications, more)
           << "Not enough time has elapsed since the service changed to a "
           "non-OK state, so we should not notify about this problem yet";
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -670,7 +675,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "This service is currently flapping, so we won't send "
       "notifications.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* if this service is currently in a scheduled downtime period, don't send the notification */
@@ -678,7 +683,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "This service is currently in a scheduled downtime, so "
       "we won't send notifications.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* if this host is currently in a scheduled downtime period, don't send the notification */
@@ -686,7 +691,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "The host this service is associated with is currently in "
       "a scheduled downtime, so we won't send notifications.";
-    return (ERROR);
+    return ERROR;
   }
 
   /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT IF ANY OTHER NOTIFICATION WAS SENT *****/
@@ -699,7 +704,7 @@ int check_service_notification_viability(
   if (svc->no_more_notifications == true) {
     logger(dbg_notifications, more)
       << "We shouldn't re-notify contacts about this service problem.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* if the host is down or unreachable, don't notify contacts about service failures */
@@ -707,7 +712,7 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "The host is either down or unreachable, so we won't "
       "notify contacts about this service.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* don't notify if we haven't waited long enough since the last time (and the service is not marked as being volatile) */
@@ -719,10 +724,10 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "Next valid notification time: "
       << my_ctime(&svc->next_notification);
-    return (ERROR);
+    return ERROR;
   }
 
-  return (OK);
+  return OK;
 }
 
 /* check viability of sending out a service notification to a specific contact (contact-specific filters) */
@@ -737,32 +742,32 @@ int check_contact_service_notification_viability(
 
   logger(dbg_notifications, most)
     << "** Checking service notification viability "
-    "for contact '" << cntct->name << "'...";
+    "for contact '" << cntct->get_name() << "'...";
 
   /* forced notifications bust through everything */
   if (options & NOTIFICATION_OPTION_FORCED) {
     logger(dbg_notifications, more)
       << "This is a forced service notification, so we'll "
       "send it out to this contact.";
-    return (OK);
+    return OK;
   }
 
   /* are notifications enabled? */
-  if (cntct->service_notifications_enabled == false) {
+  if (!cntct->get_service_notifications_enabled()) {
     logger(dbg_notifications, most)
       << "Service notifications are disabled for this contact.";
-    return (ERROR);
+    return ERROR;
   }
 
   // See if the contact can be notified at this time.
   {
-    timezone_locker lock(get_contact_timezone(cntct->name));
+    timezone_locker lock(cntct->get_timezone().c_str());
     if (check_time_against_period(
           time(NULL),
           cntct->service_notification_period_ptr) == ERROR) {
       logger(dbg_notifications, most)
         << "This contact shouldn't be notified at this time.";
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -772,7 +777,7 @@ int check_contact_service_notification_viability(
 
   /* custom notifications are good to go at this point... */
   if (type == NOTIFICATION_CUSTOM)
-    return (OK);
+    return OK;
 
   /****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
@@ -782,14 +787,14 @@ int check_contact_service_notification_viability(
       || type == NOTIFICATION_FLAPPINGSTOP
       || type == NOTIFICATION_FLAPPINGDISABLED) {
 
-    if (cntct->notify_on_service_flapping == false) {
+    if (!cntct->notify_on_service_flapping()) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
         "service events.";
-      return (ERROR);
+      return ERROR;
     }
 
-    return (OK);
+    return OK;
   }
 
   /****************************************/
@@ -800,14 +805,14 @@ int check_contact_service_notification_viability(
       || type == NOTIFICATION_DOWNTIMEEND
       || type == NOTIFICATION_DOWNTIMECANCELLED) {
 
-    if (cntct->notify_on_service_downtime == false) {
+    if (!cntct->notify_on_service_downtime()) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about DOWNTIME "
         "service events.";
-      return (ERROR);
+      return ERROR;
     }
 
-    return (OK);
+    return OK;
   }
 
   /*************************************/
@@ -816,55 +821,55 @@ int check_contact_service_notification_viability(
 
   /* see if we should notify about problems with this service */
   if (svc->current_state == STATE_UNKNOWN
-      && cntct->notify_on_service_unknown == false) {
+      && !cntct->notify_on_service_unknown()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNKNOWN "
       "service states.";
-    return (ERROR);
+    return ERROR;
   }
 
   if (svc->current_state == STATE_WARNING
-      && cntct->notify_on_service_warning == false) {
+      && !cntct->notify_on_service_warning()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about WARNING "
       "service states.";
-    return (ERROR);
+    return ERROR;
   }
 
   if (svc->current_state == STATE_CRITICAL
-      && cntct->notify_on_service_critical == false) {
+      && !cntct->notify_on_service_critical()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about CRITICAL "
       "service states.";
-    return (ERROR);
+    return ERROR;
   }
 
   if (svc->current_state == STATE_OK) {
 
-    if (cntct->notify_on_service_recovery == false) {
+    if (!cntct->notify_on_service_recovery()) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about RECOVERY "
         "service states.";
-      return (ERROR);
+      return ERROR;
     }
 
     if (!((svc->notified_on_unknown == true
-           && cntct->notify_on_service_unknown == true)
+           && cntct->notify_on_service_unknown())
           || (svc->notified_on_warning == true
-              && cntct->notify_on_service_warning == true)
+              && cntct->notify_on_service_warning())
           || (svc->notified_on_critical == true
-              && cntct->notify_on_service_critical == true))) {
+              && cntct->notify_on_service_critical()))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
-      return (ERROR);
+      return ERROR;
     }
   }
 
   logger(dbg_notifications, most)
     << "** Service notification viability for contact '"
-    << cntct->name <<"' PASSED.";
+    << cntct->get_name() <<"' PASSED.";
 
-  return (OK);
+  return OK;
 }
 
 /* notify a specific contact about a service problem or recovery */
@@ -877,9 +882,7 @@ int notify_contact_of_service(
       char* not_data,
       int options,
       int escalated) {
-  commandsmember* temp_commandsmember = NULL;
-  char* command_name = NULL;
-  char* command_name_ptr = NULL;
+  char* command_name_ptr(NULL);
   char* raw_command = NULL;
   char* processed_command = NULL;
   int early_timeout = false;
@@ -892,7 +895,7 @@ int notify_contact_of_service(
   logger(dbg_functions, basic)
     << "notify_contact_of_service()";
   logger(dbg_notifications, most)
-    << "** Attempting to notifying contact '" << cntct->name << "'...";
+    << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
 
   /* check viability of notifying this user */
   /* acknowledgements are no longer excluded from this test - added 8/19/02 Tom Bertelson */
@@ -901,10 +904,10 @@ int notify_contact_of_service(
         svc,
         type,
         options) == ERROR)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_notifications, most)
-    << "** Notifying contact '" << cntct->name << "'";
+    << "** Notifying contact '" << cntct->get_name() << "'";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -927,15 +930,12 @@ int notify_contact_of_service(
                  escalated,
                  NULL);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
-    return (ERROR);
+    return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
-    return (OK);
+    return OK;
 
   /* process all the notification commands this user has */
-  for (temp_commandsmember = cntct->service_notification_commands;
-       temp_commandsmember != NULL;
-       temp_commandsmember = temp_commandsmember->next) {
-
+  for (std::shared_ptr<commands::command> const& cmd : cntct->get_service_notification_commands()) {
     /* get start time */
     gettimeofday(&method_start_time, NULL);
 
@@ -952,7 +952,7 @@ int notify_contact_of_service(
                    method_end_time,
                    (void*)svc,
                    cntct,
-                   temp_commandsmember->cmd,
+                   cmd->get_command_line().c_str(),
                    not_author,
                    not_data,
                    escalated,
@@ -965,8 +965,8 @@ int notify_contact_of_service(
     /* get the raw command line */
     get_raw_command_line_r(
       mac,
-      temp_commandsmember->command_ptr,
-      temp_commandsmember->cmd,
+      cmd.get(),
+      cmd->get_command_line().c_str(),
       &raw_command,
       macro_options);
     if (raw_command == NULL)
@@ -983,10 +983,6 @@ int notify_contact_of_service(
       macro_options);
     if (processed_command == NULL)
       continue;
-
-    /* get the command name */
-    command_name = string::dup(temp_commandsmember->cmd);
-    command_name_ptr = strtok(command_name, "!");
 
     /* run the notification command... */
 
@@ -1026,10 +1022,10 @@ int notify_contact_of_service(
           .append(")");
 
       logger(log_service_notification, basic)
-        << "SERVICE NOTIFICATION: " << cntct->name << ';'
+        << "SERVICE NOTIFICATION: " << cntct->get_name() << ';'
         << svc->host_name << ';' << svc->description << ';'
         << service_notification_state << ";"
-        << command_name_ptr << ';'
+        << cmd->get_name() << ';'
         << (svc->plugin_output ? svc->plugin_output : "")
         << info;
     }
@@ -1047,20 +1043,19 @@ int notify_contact_of_service(
     } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
         << "Error: can't execute service notification '"
-        << cntct->name << "' : " << e.what();
+        << cntct->get_name() << "' : " << e.what();
     }
 
     /* check to see if the notification command timed out */
     if (early_timeout == true) {
       logger(log_service_notification | log_runtime_warning, basic)
-        << "Warning: Contact '" << cntct->name
+        << "Warning: Contact '" << cntct->get_name()
         << "' service notification command '" << processed_command
         << "' timed out after " << config->notification_timeout()
         << " seconds";
     }
 
     /* free memory */
-    delete[] command_name;
     delete[] raw_command;
     delete[] processed_command;
 
@@ -1078,7 +1073,7 @@ int notify_contact_of_service(
       method_end_time,
       (void*)svc,
       cntct,
-      temp_commandsmember->cmd,
+      cmd->get_command_line().c_str(),
       not_author,
       not_data,
       escalated,
@@ -1089,7 +1084,7 @@ int notify_contact_of_service(
   gettimeofday(&end_time, NULL);
 
   /* update the contact's last service notification time */
-  cntct->last_service_notification = start_time.tv_sec;
+  cntct->set_last_service_notification(start_time.tv_sec);
 
   /* send data to event broker */
   broker_contact_notification_data(
@@ -1106,7 +1101,7 @@ int notify_contact_of_service(
     not_data,
     escalated,
     NULL);
-  return (OK);
+  return OK;
 }
 
 /* checks to see if a service escalation entry is a match for the current service notification */
@@ -1346,7 +1341,7 @@ int create_notification_list_from_service(
     }
   }
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -1388,7 +1383,7 @@ int host_notification(
     logger(dbg_notifications, basic)
       << "Notification viability test failed.  No notification will "
       "be sent out.";
-    return (OK);
+    return OK;
   }
 
   /* allocate memory for local macro */
@@ -1438,11 +1433,11 @@ int host_notification(
     NULL);
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
     free_notification_list();
-    return (ERROR);
+    return ERROR;
   }
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result) {
     free_notification_list();
-    return (OK);
+    return OK;
   }
 
   /* there are contacts to be notified... */
@@ -1455,23 +1450,26 @@ int host_notification(
     if (not_author != NULL) {
 
       /* see if we can find the contact - first by name, then by alias */
-      if ((temp_contact = find_contact(not_author)) == NULL) {
-        for (temp_contact = contact_list;
-             temp_contact != NULL;
-             temp_contact = temp_contact->next) {
-          if (!strcmp(temp_contact->alias, not_author))
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == NULL) {
+        for (umap<std::string, std::shared_ptr<contact> >::const_iterator
+               it(state::instance().contacts().begin()),
+               end(state::instance().contacts().end());
+             it != end;
+             ++it) {
+          if (!strcmp(it->second->get_alias().c_str(), not_author)) {
+            temp_contact = it->second.get();
             break;
+          }
         }
       }
-
     }
 
     /* get author and comment macros */
     string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
     string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
     if (temp_contact) {
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->name);
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->alias);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->get_name());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->get_alias());
     }
     else {
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
@@ -1484,8 +1482,8 @@ int host_notification(
       string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
       string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
       if (temp_contact) {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->get_name());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->get_alias());
       }
       else {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
@@ -1641,7 +1639,7 @@ int host_notification(
   if (hst->current_state == HOST_UP)
     host_other_props[hst->name].recovery_been_sent = true;
 
-  return (OK);
+  return OK;
 }
 
 /* checks viability of sending a host notification */
@@ -1659,7 +1657,7 @@ int check_host_notification_viability(
   if (options & NOTIFICATION_OPTION_FORCED) {
     logger(dbg_notifications, more)
       << "This is a forced host notification, so we'll send it out.";
-    return (OK);
+    return OK;
   }
 
   /* get current time */
@@ -1670,7 +1668,7 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "Notifications are disabled, so host notifications will not "
       "be sent out.";
-    return (ERROR);
+    return ERROR;
   }
 
   // See if the host can have notifications sent out at this time.
@@ -1703,7 +1701,7 @@ int check_host_notification_viability(
           << "Next possible notification time: "
           << my_ctime(&hst->next_host_notification);
       }
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -1712,7 +1710,7 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "Notifications are temporarily disabled for this host, "
       "so we won't send one out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /*********************************************/
@@ -1725,9 +1723,9 @@ int check_host_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't send custom notification during "
         "scheduled downtime.";
-      return (ERROR);
+      return ERROR;
     }
-    return (OK);
+    return OK;
   }
 
   /****************************************/
@@ -1742,11 +1740,11 @@ int check_host_notification_viability(
       logger(dbg_notifications, more)
         << "The host is currently UP, so we won't send "
         "an acknowledgement.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* acknowledgement viability test passed, so the notification can be sent out */
-    return (OK);
+    return OK;
   }
 
   /*****************************************/
@@ -1762,7 +1760,7 @@ int check_host_notification_viability(
     if (hst->notify_on_flapping == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events for this host.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* don't send notifications during scheduled downtime */
@@ -1770,11 +1768,11 @@ int check_host_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events during "
         "scheduled downtime.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* flapping viability test passed, so the notification can be sent out */
-    return (OK);
+    return OK;
   }
 
   /*****************************************/
@@ -1790,7 +1788,7 @@ int check_host_notification_viability(
     if (hst->notify_on_downtime == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events for this host.";
-      return (ERROR);
+      return ERROR;
     }
 
     /* don't send notifications during scheduled downtime */
@@ -1798,11 +1796,11 @@ int check_host_notification_viability(
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events during "
         "scheduled downtime!";
-      return (ERROR);
+      return ERROR;
     }
 
     /* downtime viability test passed, so the notification can be sent out */
-    return (OK);
+    return OK;
   }
 
   /****************************************/
@@ -1814,7 +1812,7 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "This host is in a soft state, so we won't send "
       "a notification out.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* has this problem already been acknowledged? */
@@ -1822,7 +1820,7 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "This host problem has already been acknowledged, "
       "so we won't send a notification out!";
-    return (ERROR);
+    return ERROR;
   }
 
   /* check notification dependencies */
@@ -1832,7 +1830,7 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "Notification dependencies for this host have failed, "
       "so we won't sent a notification out!";
-    return (ERROR);
+    return ERROR;
   }
 
   /* see if we should notify about problems with this host */
@@ -1840,26 +1838,26 @@ int check_host_notification_viability(
       && hst->notify_on_unreachable == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about UNREACHABLE status for this host.";
-    return (ERROR);
+    return ERROR;
   }
   if (hst->current_state == HOST_DOWN
       && hst->notify_on_down == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about DOWN states for this host.";
-    return (ERROR);
+    return ERROR;
   }
   if (hst->current_state == HOST_UP) {
 
     if (hst->notify_on_recovery == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about RECOVERY states for this host.";
-      return (ERROR);
+      return ERROR;
     }
     if (!(hst->notified_on_down == true
           || hst->notified_on_unreachable == true)) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about this recovery.";
-      return (ERROR);
+      return ERROR;
     }
 
   }
@@ -1895,7 +1893,7 @@ int check_host_notification_viability(
           << "Not enough time has elapsed since the host changed to a "
           "non-UP state (or since program start), so we shouldn't notify "
           "about this problem yet.";
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -1904,7 +1902,7 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "This host is currently flapping, so we won't "
       "send notifications.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* if this host is currently in a scheduled downtime period, don't send the notification */
@@ -1912,18 +1910,18 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "This host is currently in a scheduled downtime, "
       "so we won't send notifications.";
-    return (ERROR);
+    return ERROR;
   }
 
   /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
   if (hst->current_state == HOST_UP)
-    return (OK);
+    return OK;
 
   /* check if we shouldn't renotify contacts about the host problem */
   if (hst->no_more_notifications == true) {
     logger(dbg_notifications, more)
       << "We shouldn't re-notify contacts about this host problem.";
-    return (ERROR);
+    return ERROR;
   }
 
   /* check if its time to re-notify the contacts about the host... */
@@ -1934,10 +1932,10 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "Next acceptable notification time: "
       << my_ctime(&hst->next_host_notification);
-    return (ERROR);
+    return ERROR;
   }
 
-  return (OK);
+  return OK;
 }
 
 /* checks the viability of notifying a specific contact about a host */
@@ -1950,32 +1948,32 @@ int check_contact_host_notification_viability(
     << "check_contact_host_notification_viability()";
   logger(dbg_notifications, most)
     << "** Checking host notification viability for contact '"
-    << cntct->name << "'...";
+    << cntct->get_name() << "'...";
 
   /* forced notifications bust through everything */
   if (options & NOTIFICATION_OPTION_FORCED) {
     logger(dbg_notifications, most)
       << "This is a forced host notification, so we'll "
       "send it out for this contact.";
-    return (OK);
+    return OK;
   }
 
   /* are notifications enabled? */
-  if (cntct->host_notifications_enabled == false) {
+  if (!cntct->get_host_notifications_enabled()) {
     logger(dbg_notifications, most)
       << "Host notifications are disabled for this contact.";
-    return (ERROR);
+    return ERROR;
   }
 
   // See if the contact can be notified at this time.
   {
-    timezone_locker lock(get_contact_timezone(cntct->name));
+    timezone_locker lock(cntct->get_timezone().c_str());
     if (check_time_against_period(
           time(NULL),
           cntct->host_notification_period_ptr) == ERROR) {
       logger(dbg_notifications, most)
         << "This contact shouldn't be notified at this time.";
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -1985,7 +1983,7 @@ int check_contact_host_notification_viability(
 
   /* custom notifications are good to go at this point... */
   if (type == NOTIFICATION_CUSTOM)
-    return (OK);
+    return OK;
 
   /****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
@@ -1995,14 +1993,14 @@ int check_contact_host_notification_viability(
       || type == NOTIFICATION_FLAPPINGSTOP
       || type == NOTIFICATION_FLAPPINGDISABLED) {
 
-    if (cntct->notify_on_host_flapping == false) {
+    if (!cntct->notify_on_host_flapping()) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
         "host events.";
-      return (ERROR);
+      return ERROR;
     }
 
-    return (OK);
+    return OK;
   }
 
   /****************************************/
@@ -2013,14 +2011,14 @@ int check_contact_host_notification_viability(
       || type == NOTIFICATION_DOWNTIMEEND
       || type == NOTIFICATION_DOWNTIMECANCELLED) {
 
-    if (cntct->notify_on_host_downtime == false) {
+    if (!cntct->notify_on_host_downtime()) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about DOWNTIME "
         "host events.";
-      return (ERROR);
+      return ERROR;
     }
 
-    return (OK);
+    return OK;
   }
 
   /*************************************/
@@ -2029,43 +2027,43 @@ int check_contact_host_notification_viability(
 
   /* see if we should notify about problems with this host */
   if (hst->current_state == HOST_DOWN
-      && cntct->notify_on_host_down == false) {
+      && !cntct->notify_on_host_down()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about DOWN states.";
-    return (ERROR);
+    return ERROR;
   }
 
   if (hst->current_state == HOST_UNREACHABLE
-      && cntct->notify_on_host_unreachable == false) {
+      && !cntct->notify_on_host_unreachable()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNREACHABLE states,";
-    return (ERROR);
+    return ERROR;
   }
 
   if (hst->current_state == HOST_UP) {
 
-    if (cntct->notify_on_host_recovery == false) {
+    if (!cntct->notify_on_host_recovery()) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about RECOVERY states.";
-      return (ERROR);
+      return ERROR;
     }
 
     if (!((hst->notified_on_down == true
-           && cntct->notify_on_host_down == true)
+           && cntct->notify_on_host_down())
           || (hst->notified_on_unreachable == true
-              && cntct->notify_on_host_unreachable == true))) {
+              && cntct->notify_on_host_unreachable()))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
-      return (ERROR);
+      return ERROR;
     }
 
   }
 
   logger(dbg_notifications, most)
     << "** Host notification viability for contact '"
-    << cntct->name << "' PASSED.";
+    << cntct->get_name() << "' PASSED.";
 
-  return (OK);
+  return OK;
 }
 
 /* notify a specific contact that an entire host is down or up */
@@ -2078,9 +2076,7 @@ int notify_contact_of_host(
       char* not_data,
       int options,
       int escalated) {
-  commandsmember* temp_commandsmember = NULL;
   char* command_name = NULL;
-  char* command_name_ptr = NULL;
   char* raw_command = NULL;
   char* processed_command = NULL;
   int early_timeout = false;
@@ -2095,7 +2091,7 @@ int notify_contact_of_host(
   logger(dbg_functions, basic)
     << "notify_contact_of_host()";
   logger(dbg_notifications, most)
-    << "** Attempting to notifying contact '" << cntct->name << "'...";
+    << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
 
   /* check viability of notifying this user about the host */
   /* acknowledgements are no longer excluded from this test - added 8/19/02 Tom Bertelson */
@@ -2104,10 +2100,10 @@ int notify_contact_of_host(
         hst,
         type,
         options) == ERROR)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_notifications, most)
-    << "** Notifying contact '" << cntct->name << "'";
+    << "** Notifying contact '" << cntct->get_name() << "'";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -2130,14 +2126,12 @@ int notify_contact_of_host(
                  escalated,
                  NULL);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
-    return (ERROR);
+    return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
-    return (OK);
+    return OK;
 
   /* process all the notification commands this user has */
-  for (temp_commandsmember = cntct->host_notification_commands;
-       temp_commandsmember != NULL;
-       temp_commandsmember = temp_commandsmember->next) {
+  for (std::shared_ptr<commands::command> const& cmd : cntct->get_host_notification_commands()) {
 
     /* get start time */
     gettimeofday(&method_start_time, NULL);
@@ -2155,7 +2149,7 @@ int notify_contact_of_host(
                    method_end_time,
                    (void*)hst,
                    cntct,
-                   temp_commandsmember->cmd,
+                   cmd->get_command_line().c_str(),
                    not_author,
                    not_data,
                    escalated,
@@ -2168,8 +2162,8 @@ int notify_contact_of_host(
     /* get the raw command line */
     get_raw_command_line_r(
       mac,
-      temp_commandsmember->command_ptr,
-      temp_commandsmember->cmd,
+      cmd.get(),
+      cmd->get_command_line().c_str(),
       &raw_command,
       macro_options);
     if (raw_command == NULL)
@@ -2188,8 +2182,7 @@ int notify_contact_of_host(
       continue;
 
     /* get the command name */
-    command_name = string::dup(temp_commandsmember->cmd);
-    command_name_ptr = strtok(command_name, "!");
+    command_name = string::dup(cmd->get_command_line());
 
     /* run the notification command... */
 
@@ -2229,9 +2222,9 @@ int notify_contact_of_host(
           .append(")");
 
       logger(log_host_notification, basic)
-        << "HOST NOTIFICATION: " << cntct->name
+        << "HOST NOTIFICATION: " << cntct->get_name()
         << ';' << hst->name << ';' << host_notification_state
-        << ";" << command_name_ptr
+        << ";" << cmd->get_name()
         << ';' << (hst->plugin_output ? hst->plugin_output : "")
         << info;
     }
@@ -2249,20 +2242,19 @@ int notify_contact_of_host(
     } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
         << "Error: can't execute host notification '"
-        << cntct->name << "' : " << e.what();
+        << cntct->get_name() << "' : " << e.what();
     }
 
     /* check to see if the notification timed out */
     if (early_timeout == true) {
       logger(log_host_notification | log_runtime_warning, basic)
-        << "Warning: Contact '" << cntct->name
+        << "Warning: Contact '" << cntct->get_name()
         << "' host notification command '" << processed_command
         << "' timed out after " << config->notification_timeout()
         << " seconds";
     }
 
     /* free memory */
-    delete[] command_name;
     delete[] raw_command;
     delete[] processed_command;
 
@@ -2280,7 +2272,7 @@ int notify_contact_of_host(
       method_end_time,
       (void*)hst,
       cntct,
-      temp_commandsmember->cmd,
+      cmd->get_command_line().c_str(),
       not_author,
       not_data,
       escalated,
@@ -2291,7 +2283,7 @@ int notify_contact_of_host(
   gettimeofday(&end_time, NULL);
 
   /* update the contact's last host notification time */
-  cntct->last_host_notification = start_time.tv_sec;
+  cntct->set_last_host_notification(start_time.tv_sec);
 
   /* send data to event broker */
   broker_contact_notification_data(
@@ -2309,7 +2301,7 @@ int notify_contact_of_host(
     escalated,
     NULL);
 
-  return (OK);
+  return OK;
 }
 
 /* checks to see if a host escalation entry is a match for the current host notification */
@@ -2544,7 +2536,7 @@ int create_notification_list_from_host(
     }
   }
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -2716,14 +2708,14 @@ int add_notification(nagios_macros* mac, contact* cntct) {
     << "add_notification()";
 
   if (cntct == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_notifications, most)
-    << "Adding contact '" << cntct->name << "' to notification list.";
+    << "Adding contact '" << cntct->get_name() << "' to notification list.";
 
   /* don't add anything if this contact is already on the notification list */
   if (find_notification(cntct))
-    return (OK);
+    return OK;
 
   /* allocate memory for a new contact in the notification list */
   notification* new_notification(new notification);
@@ -2737,13 +2729,13 @@ int add_notification(nagios_macros* mac, contact* cntct) {
 
   /* add contact to notification recipients macro */
   if (!mac->x[MACRO_NOTIFICATIONRECIPIENTS])
-    string::setstr(mac->x[MACRO_NOTIFICATIONRECIPIENTS], cntct->name);
+    string::setstr(mac->x[MACRO_NOTIFICATIONRECIPIENTS], cntct->get_name());
   else {
     std::string buffer(mac->x[MACRO_NOTIFICATIONRECIPIENTS]);
     buffer += ",";
-    buffer += cntct->name;
+    buffer += cntct->get_name();
     string::setstr(mac->x[MACRO_NOTIFICATIONRECIPIENTS], buffer);
   }
 
-  return (OK);
+  return OK;
 }

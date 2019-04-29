@@ -67,7 +67,7 @@ char const* my_ctime(time_t const* t);
 // thread-safe version of get_raw_command_line_r()
 int get_raw_command_line_r(
       nagios_macros* mac,
-      command* cmd_ptr,
+      com::centreon::engine::commands::command* cmd_ptr,
       char const* cmd,
       char** full_command,
       int macro_options);
@@ -97,7 +97,7 @@ char* get_next_string_from_buf(
         int* start_index,
         int bufsize);
 // tests whether or not an object name (host, service, etc.) contains illegal characters
-int contains_illegal_object_chars(char* name);
+bool contains_illegal_object_chars(char const* name);
 char* escape_newlines(char* rawbuf);
 // compares two strings for equality
 int compare_strings(char* val1a, char* val2a);

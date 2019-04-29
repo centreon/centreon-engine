@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
@@ -32,6 +33,8 @@
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
+
+#  define NULL_IF_EMPTY(str) ((str).empty() ? NULL : (str).c_str())
 
 /******************************************************************/
 /********************** MACRO GRAB FUNCTIONS **********************/
@@ -262,7 +265,7 @@ int grab_custom_macro_value_r(
     if (arg2 == NULL) {
       /* find the contact for on-demand macros */
       if (arg1) {
-        if ((temp_contact = find_contact(arg1)) == NULL)
+        if ((temp_contact = configuration::applier::state::instance().find_contact(arg1)) == NULL)
           return (ERROR);
       }
       /* else use saved contact pointer */
@@ -295,7 +298,7 @@ int grab_custom_macro_value_r(
         grab_custom_macro_value_r(
           mac,
           macro_name,
-          temp_contact->name,
+          temp_contact->get_name().c_str(),
           NULL,
           &temp_buffer);
 
@@ -722,21 +725,21 @@ int grab_standard_contact_macro_r(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_CONTACTNAME:
-    *output = string::dup(temp_contact->name);
+    *output = string::dup(temp_contact->get_name());
     break;
 
   case MACRO_CONTACTALIAS:
-    *output = string::dup(temp_contact->alias);
+    *output = string::dup(temp_contact->get_alias());
     break;
 
   case MACRO_CONTACTEMAIL:
-    if (temp_contact->email)
-      *output = string::dup(temp_contact->email);
+    if (!temp_contact->get_email().empty())
+      *output = string::dup(temp_contact->get_email());
     break;
 
   case MACRO_CONTACTPAGER:
-    if (temp_contact->pager)
-      *output = string::dup(temp_contact->pager);
+    if (!temp_contact->get_pager().empty())
+      *output = string::dup(temp_contact->get_pager());
     break;
 
   case MACRO_CONTACTGROUPNAMES: {
@@ -759,7 +762,7 @@ int grab_standard_contact_macro_r(
     break;
 
   case MACRO_CONTACTTIMEZONE: {
-    *output = string::dup(get_contact_timezone(temp_contact->name));
+    *output = string::dup(temp_contact->get_timezone());
   }
     break ;
 
@@ -795,8 +798,8 @@ int grab_contact_address_macro(
     return (ERROR);
 
   /* get the macro */
-  if (temp_contact->address[macro_num])
-    *output = string::dup(temp_contact->address[macro_num]);
+  if (!temp_contact->get_address(macro_num).empty())
+    *output = string::dup(temp_contact->get_address(macro_num));
   return (OK);
 }
 
@@ -1601,7 +1604,7 @@ int set_contact_address_environment_vars_r(
     oss << "CONTACTADDRESS" << x;
     set_macro_environment_var(
       oss.str().c_str(),
-      mac->contact_ptr->address[x],
+      NULL_IF_EMPTY(mac->contact_ptr->get_address(x)),
       set);
   }
 

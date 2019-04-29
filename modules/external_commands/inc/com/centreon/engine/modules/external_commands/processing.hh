@@ -24,16 +24,17 @@
 #  include <map>
 #  include <string>
 #  include "com/centreon/concurrency/mutex.hh"
+#  include "com/centreon/engine/configuration/applier/state.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects/contact.hh"
-#  include "com/centreon/engine/objects/contactsmember.hh"
 #  include "com/centreon/engine/objects/contactgroup.hh"
+#  include "com/centreon/engine/objects/contactsmember.hh"
 #  include "com/centreon/engine/objects/host.hh"
-#  include "com/centreon/engine/objects/hostsmember.hh"
 #  include "com/centreon/engine/objects/hostgroup.hh"
+#  include "com/centreon/engine/objects/hostsmember.hh"
 #  include "com/centreon/engine/objects/service.hh"
-#  include "com/centreon/engine/objects/servicesmember.hh"
 #  include "com/centreon/engine/objects/servicegroup.hh"
+#  include "com/centreon/engine/objects/servicesmember.hh"
 #  include "com/centreon/unordered_hash.hh"
 #  include "find.hh"
 
@@ -276,7 +277,7 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        contact* cntc(::find_contact(name));
+        contact* cntc(configuration::applier::state::instance().find_contact(name));
         if (!cntc)
           return ;
         (*fptr)(cntc);

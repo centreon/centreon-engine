@@ -29,7 +29,6 @@ configuration::state* config(NULL);
 events::hash_timed_event quick_timed_event;
 std::map<std::string, host_other_properties> host_other_props;
 std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-std::map<std::string, contact_other_properties> contact_other_props;
 std::map<std::string, hostgroup_other_properties> hostgroup_other_props;
 std::map<std::string, servicegroup_other_properties> servicegroup_other_props;
 
@@ -61,15 +60,15 @@ char*               use_timezone(NULL);
 char**              macro_x(NULL);
 check_stats         check_statistics[MAX_CHECK_STATS_TYPES];
 circular_buffer     external_command_buffer;
-command*            command_list(NULL);
-command*            command_list_tail(NULL);
-command*            global_host_event_handler_ptr(NULL);
-command*            global_service_event_handler_ptr(NULL);
-command*            ochp_command_ptr(NULL);
-command*            ocsp_command_ptr(NULL);
+com::centreon::engine::commands::command*
+                    global_host_event_handler_ptr(NULL);
+com::centreon::engine::commands::command*
+                    global_service_event_handler_ptr(NULL);
+com::centreon::engine::commands::command*
+                    ochp_command_ptr(NULL);
+com::centreon::engine::commands::command*
+                    ocsp_command_ptr(NULL);
 comment*            comment_list(NULL);
-contact*            contact_list(NULL);
-contact*            contact_list_tail(NULL);
 contactgroup*       contactgroup_list(NULL);
 contactgroup*       contactgroup_list_tail(NULL);
 dbuf                check_result_dbuf;
@@ -119,7 +118,6 @@ serviceescalation*  serviceescalation_list(NULL);
 serviceescalation*  serviceescalation_list_tail(NULL);
 servicegroup*       servicegroup_list(NULL);
 servicegroup*       servicegroup_list_tail(NULL);
-skiplist*           object_skiplists[NUM_OBJECT_SKIPLISTS];
 time_t              event_start((time_t)-1);
 time_t              last_command_check((time_t)-1);
 time_t              last_command_status_update((time_t)-1);

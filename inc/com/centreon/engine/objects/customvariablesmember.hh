@@ -22,7 +22,10 @@
 #  include "com/centreon/engine/objects/customvariable.hh"
 
 /* Forward declarations. */
-struct contact_struct;
+CCE_BEGIN()
+  class contact;
+CCE_END()
+
 struct host_struct;
 struct service_struct;
 
@@ -39,7 +42,7 @@ extern "C" {
 #  endif /* C++ */
 
 customvariablesmember* add_custom_variable_to_contact(
-                         contact_struct* cntct,
+                         com::centreon::engine::contact* cntct,
                          char const* varname,
                          com::centreon::engine::customvariable const& cv);
 customvariablesmember* add_custom_variable_to_host(
@@ -56,7 +59,7 @@ customvariablesmember* add_custom_variable_to_service(
                          char const* varname,
                          com::centreon::engine::customvariable const& cv);
 void                   remove_all_custom_variables_from_contact(
-                         contact_struct* cntct);
+                         com::centreon::engine::contact* cntct);
 void                   remove_all_custom_variables_from_host(
                          host_struct* hst);
 void                   remove_all_custom_variables_from_service(

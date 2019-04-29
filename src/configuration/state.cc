@@ -562,7 +562,7 @@ state& state::operator=(state const& right) {
     _use_timezone = right._use_timezone;
     _use_true_regexp_matching = right._use_true_regexp_matching;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -713,7 +713,7 @@ bool state::operator==(state const& right) const throw () {
  *  @return True if object is not the same object, otherwise false.
  */
 bool state::operator!=(state const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -722,7 +722,7 @@ bool state::operator!=(state const& right) const throw () {
  *  @return The accept_passive_host_checks value.
  */
 bool state::accept_passive_host_checks() const throw () {
-  return (_accept_passive_host_checks);
+  return _accept_passive_host_checks;
 }
 
 /**
@@ -740,7 +740,7 @@ void state::accept_passive_host_checks(bool value) {
  *  @return The accept_passive_service_checks value.
  */
 bool state::accept_passive_service_checks() const throw () {
-  return (_accept_passive_service_checks);
+  return _accept_passive_service_checks;
 }
 
 /**
@@ -758,7 +758,7 @@ void state::accept_passive_service_checks(bool value) {
  *  @return The additional_freshness_latency value.
  */
 int state::additional_freshness_latency() const throw () {
-  return (_additional_freshness_latency);
+  return _additional_freshness_latency;
 }
 
 /**
@@ -776,7 +776,7 @@ void state::additional_freshness_latency(int value) {
  *  @return The admin_email value.
  */
 std::string const& state::admin_email() const throw () {
-  return (_admin_email);
+  return _admin_email;
 }
 
 /**
@@ -794,7 +794,7 @@ void state::admin_email(std::string const& value) {
  *  @return The admin_pager value.
  */
 std::string const& state::admin_pager() const throw () {
-  return (_admin_pager);
+  return _admin_pager;
 }
 
 /**
@@ -812,7 +812,7 @@ void state::admin_pager(std::string const& value) {
  *  @return The allow_empty_hostgroup_assignment value.
  */
 bool state::allow_empty_hostgroup_assignment() const throw () {
-  return (_allow_empty_hostgroup_assignment);
+  return _allow_empty_hostgroup_assignment;
 }
 
 /**
@@ -830,7 +830,7 @@ void state::allow_empty_hostgroup_assignment(bool value) {
  *  @return The auto_reschedule_checks value.
  */
 bool state::auto_reschedule_checks() const throw () {
-  return (_auto_reschedule_checks);
+  return _auto_reschedule_checks;
 }
 
 /**
@@ -848,7 +848,7 @@ void state::auto_reschedule_checks(bool value) {
  *  @return The auto_rescheduling_interval value.
  */
 unsigned int state::auto_rescheduling_interval() const throw () {
-  return (_auto_rescheduling_interval);
+  return _auto_rescheduling_interval;
 }
 
 /**
@@ -868,7 +868,7 @@ void state::auto_rescheduling_interval(unsigned int value) {
  *  @return The auto_rescheduling_window value.
  */
 unsigned int state::auto_rescheduling_window() const throw () {
-  return (_auto_rescheduling_window);
+  return _auto_rescheduling_window;
 }
 
 /**
@@ -888,7 +888,7 @@ void state::auto_rescheduling_window(unsigned int value) {
  *  @return The auto_rescheduling_window value.
  */
 std::list<std::string> const& state::broker_module() const throw () {
-  return (_broker_module);
+  return _broker_module;
 }
 
 /**
@@ -906,7 +906,7 @@ void state::broker_module(std::list<std::string> const& value) {
  *  @return The broker_module_directory value.
  */
 std::string const& state::broker_module_directory() const throw () {
-  return (_broker_module_directory);
+  return _broker_module_directory;
 }
 
 /**
@@ -930,7 +930,7 @@ void state::broker_module_directory(std::string const& value) {
  *  @return The cached_host_check_horizon value.
  */
 unsigned long state::cached_host_check_horizon() const throw () {
-  return (_cached_host_check_horizon);
+  return _cached_host_check_horizon;
 }
 
 /**
@@ -948,7 +948,7 @@ void state::cached_host_check_horizon(unsigned long value) {
  *  @return The cached_service_check_horizon value.
  */
 unsigned long state::cached_service_check_horizon() const throw () {
-  return (_cached_service_check_horizon);
+  return _cached_service_check_horizon;
 }
 
 /**
@@ -966,7 +966,7 @@ void state::cached_service_check_horizon(unsigned long value) {
  *  @return The cfg_dir value.
  */
 std::list<std::string> const& state::cfg_dir() const throw () {
-  return (_cfg_dir);
+  return _cfg_dir;
 }
 
 /**
@@ -976,7 +976,7 @@ std::list<std::string> const& state::cfg_dir() const throw () {
  */
 std::list<std::string> const& state::cfg_file() const throw () {
 
-  return (_cfg_file);
+  return _cfg_file;
 }
 
 /**
@@ -985,7 +985,7 @@ std::list<std::string> const& state::cfg_file() const throw () {
  *  @return The check_external_commands value.
  */
 bool state::check_external_commands() const throw () {
-  return (_check_external_commands);
+  return _check_external_commands;
 }
 
 /**
@@ -1003,7 +1003,7 @@ void state::cfg_main(std::string const& value) {
  *  @return The cfg_main value.
  */
 std::string const& state::cfg_main() const throw () {
-  return (_cfg_main);
+  return _cfg_main;
 }
 
 /**
@@ -1021,7 +1021,7 @@ void state::check_external_commands(bool value) {
  *  @return The check_host_freshness value.
  */
 bool state::check_host_freshness() const throw () {
-  return (_check_host_freshness);
+  return _check_host_freshness;
 }
 
 /**
@@ -1039,7 +1039,7 @@ void state::check_host_freshness(bool value) {
  *  @return The check_orphaned_hosts value.
  */
 bool state::check_orphaned_hosts() const throw () {
-  return (_check_orphaned_hosts);
+  return _check_orphaned_hosts;
 }
 
 /**
@@ -1066,7 +1066,7 @@ void state::check_orphaned_services(bool value) {
  *  @return The check_orphaned_services value.
  */
 bool state::check_orphaned_services() const throw () {
-  return (_check_orphaned_services);
+  return _check_orphaned_services;
 }
 
 /**
@@ -1075,7 +1075,7 @@ bool state::check_orphaned_services() const throw () {
  *  @return The check_reaper_interval value.
  */
 unsigned int state::check_reaper_interval() const throw () {
-  return (_check_reaper_interval);
+  return _check_reaper_interval;
 }
 
 /**
@@ -1095,7 +1095,7 @@ void state::check_reaper_interval(unsigned int value) {
  *  @return The check_result_path value.
  */
 std::string const& state::check_result_path() const throw () {
-  return (_check_result_path);
+  return _check_result_path;
 }
 
 /**
@@ -1116,7 +1116,7 @@ void state::check_result_path(std::string const& value) {
  *  @return The check_service_freshness value.
  */
 bool state::check_service_freshness() const throw () {
-  return (_check_service_freshness);
+  return _check_service_freshness;
 }
 
 /**
@@ -1134,7 +1134,7 @@ void state::check_service_freshness(bool value) {
  *  @return All engine commands.
  */
 set_command const& state::commands() const throw () {
-  return (_commands);
+  return _commands;
 }
 
 /**
@@ -1143,7 +1143,7 @@ set_command const& state::commands() const throw () {
  *  @return All engine commands.
  */
 set_command& state::commands() throw () {
-  return (_commands);
+  return _commands;
 }
 
 /**
@@ -1160,11 +1160,11 @@ set_command::const_iterator state::commands_find(
   set_command::const_iterator
     it(_commands.upper_bound(below_searched));
   if ((it != _commands.end()) && (it->command_name() == k))
-    return (it);
+    return it;
   else if ((it != _commands.begin())
            && ((--it)->command_name() == k))
-    return (it);
-  return (_commands.end());
+    return it;
+  return _commands.end();
 }
 
 /**
@@ -1181,11 +1181,11 @@ set_command::iterator state::commands_find(
   set_command::iterator
     it(_commands.upper_bound(below_searched));
   if ((it != _commands.end()) && (it->command_name() == k))
-    return (it);
+    return it;
   else if ((it != _commands.begin())
            && ((--it)->command_name() == k))
-    return (it);
-  return (_commands.end());
+    return it;
+  return _commands.end();
 }
 
 /**
@@ -1194,7 +1194,7 @@ set_command::iterator state::commands_find(
  *  @return The command_check_interval value.
  */
 int state::command_check_interval() const throw () {
-  return (_command_check_interval);
+  return _command_check_interval;
 }
 
 /**
@@ -1233,7 +1233,7 @@ void state::command_check_interval(int value, bool is_second) {
  *  @return true if the check interval is in seconds.
  */
 bool state::command_check_interval_is_seconds() const throw() {
-  return (_command_check_interval_is_seconds);
+  return _command_check_interval_is_seconds;
 }
 
 /**
@@ -1242,7 +1242,7 @@ bool state::command_check_interval_is_seconds() const throw() {
  *  @return The command_file value.
  */
 std::string const& state::command_file() const throw () {
-  return (_command_file);
+  return _command_file;
 }
 
 /**
@@ -1260,7 +1260,7 @@ void state::command_file(std::string const& value) {
  *  @return All engine connectors.
  */
 set_connector const& state::connectors() const throw () {
-  return (_connectors);
+  return _connectors;
 }
 
 /**
@@ -1269,7 +1269,7 @@ set_connector const& state::connectors() const throw () {
  *  @return All engine connectors.
  */
 set_connector& state::connectors() throw () {
-  return (_connectors);
+  return _connectors;
 }
 
 /**
@@ -1286,11 +1286,11 @@ set_connector::const_iterator state::connectors_find(
   set_connector::const_iterator
     it(_connectors.upper_bound(below_searched));
   if ((it != _connectors.end()) && (it->connector_name() == k))
-    return (it);
+    return it;
   else if ((it != _connectors.begin())
            && ((--it)->connector_name() == k))
-    return (it);
-  return (_connectors.end());
+    return it;
+  return _connectors.end();
 }
 
 /**
@@ -1307,11 +1307,11 @@ set_connector::iterator state::connectors_find(
   set_connector::iterator
     it(_connectors.upper_bound(below_searched));
   if ((it != _connectors.end()) && (it->connector_name() == k))
-    return (it);
+    return it;
   else if ((it != _connectors.begin())
            && ((--it)->connector_name() == k))
-    return (it);
-  return (_connectors.end());
+    return it;
+  return _connectors.end();
 }
 
 /**
@@ -1320,7 +1320,7 @@ set_connector::iterator state::connectors_find(
  *  @return All engine contacts.
  */
 set_contact const& state::contacts() const throw () {
-  return (_contacts);
+  return _contacts;
 }
 
 /**
@@ -1329,7 +1329,7 @@ set_contact const& state::contacts() const throw () {
  *  @return All engine contacts.
  */
 set_contact& state::contacts() throw () {
-  return (_contacts);
+  return _contacts;
 }
 
 /**
@@ -1346,11 +1346,11 @@ set_contact::const_iterator state::contacts_find(
   set_contact::const_iterator
     it(_contacts.upper_bound(below_searched));
   if ((it != _contacts.end()) && (it->contact_name() == k))
-    return (it);
+    return it;
   else if ((it != _contacts.begin())
            && ((--it)->contact_name() == k))
-    return (it);
-  return (_contacts.end());
+    return it;
+  return _contacts.end();
 }
 
 /**
@@ -1367,11 +1367,11 @@ set_contact::iterator state::contacts_find(
   set_contact::iterator
     it(_contacts.upper_bound(below_searched));
   if ((it != _contacts.end()) && (it->contact_name() == k))
-    return (it);
+    return it;
   else if ((it != _contacts.begin())
            && ((--it)->contact_name() == k))
-    return (it);
-  return (_contacts.end());
+    return it;
+  return _contacts.end();
 }
 
 /**
@@ -1388,11 +1388,11 @@ set_contactgroup::const_iterator state::contactgroups_find(
   set_contactgroup::const_iterator
     it(_contactgroups.upper_bound(below_searched));
   if ((it != _contactgroups.end()) && (it->contactgroup_name() == k))
-    return (it);
+    return it;
   else if ((it != _contactgroups.begin())
            && ((--it)->contactgroup_name() == k))
-    return (it);
-  return (_contactgroups.end());
+    return it;
+  return _contactgroups.end();
 }
 
 /**
@@ -1409,11 +1409,11 @@ set_contactgroup::iterator state::contactgroups_find(
   set_contactgroup::iterator
     it(_contactgroups.upper_bound(below_searched));
   if ((it != _contactgroups.end()) && (it->contactgroup_name() == k))
-    return (it);
+    return it;
   else if ((it != _contactgroups.begin())
            && ((--it)->contactgroup_name() == k))
-    return (it);
-  return (_contactgroups.end());
+    return it;
+  return _contactgroups.end();
 }
 
 /**
@@ -1422,7 +1422,7 @@ set_contactgroup::iterator state::contactgroups_find(
  *  @return All engine contactgroups.
  */
 set_contactgroup& state::contactgroups() throw () {
-  return (_contactgroups);
+  return _contactgroups;
 }
 
 /**
@@ -1431,7 +1431,7 @@ set_contactgroup& state::contactgroups() throw () {
  *  @return All engine contactgroups.
  */
 set_contactgroup const& state::contactgroups() const throw () {
-  return (_contactgroups);
+  return _contactgroups;
 }
 
 /**
@@ -1440,7 +1440,7 @@ set_contactgroup const& state::contactgroups() const throw () {
  *  @return The date_format value.
  */
 state::date_type state::date_format() const throw () {
-  return (_date_format);
+  return _date_format;
 }
 
 /**
@@ -1458,7 +1458,7 @@ void state::date_format(date_type value) {
  *  @return The debug_file value.
  */
 std::string const& state::debug_file() const throw () {
-  return (_debug_file);
+  return _debug_file;
 }
 
 /**
@@ -1477,7 +1477,7 @@ void state::debug_file(std::string const& value) {
  *  @return The debug_level value.
  */
 unsigned long long state::debug_level() const throw () {
-  return (_debug_level);
+  return _debug_level;
 }
 
 /**
@@ -1498,7 +1498,7 @@ void state::debug_level(unsigned long long value) {
  *  @return The debug_verbosity value.
  */
 unsigned int state::debug_verbosity() const throw () {
-  return (_debug_verbosity);
+  return _debug_verbosity;
 }
 
 /**
@@ -1519,7 +1519,7 @@ void state::debug_verbosity(unsigned int value) {
  *  @return The enable_environment_macros value.
  */
 bool state::enable_environment_macros() const throw () {
-  return (_enable_environment_macros);
+  return _enable_environment_macros;
 }
 
 /**
@@ -1537,7 +1537,7 @@ void state::enable_environment_macros(bool value) {
  *  @return The enable_event_handlers value.
  */
 bool state::enable_event_handlers() const throw () {
-  return (_enable_event_handlers);
+  return _enable_event_handlers;
 }
 
 /**
@@ -1555,7 +1555,7 @@ void state::enable_event_handlers(bool value) {
  *  @return The enable_flap_detection value.
  */
 bool state::enable_flap_detection() const throw () {
-  return (_enable_flap_detection);
+  return _enable_flap_detection;
 }
 
 /**
@@ -1573,7 +1573,7 @@ void state::enable_flap_detection(bool value) {
  *  @return The enable_notifications value.
  */
 bool state::enable_notifications() const throw () {
-  return (_enable_notifications);
+  return _enable_notifications;
 }
 
 /**
@@ -1591,7 +1591,7 @@ void state::enable_notifications(bool value) {
  *  @return The enable_predictive_host_dependency_checks value.
  */
 bool state::enable_predictive_host_dependency_checks() const throw () {
-  return (_enable_predictive_host_dependency_checks);
+  return _enable_predictive_host_dependency_checks;
 }
 
 /**
@@ -1609,7 +1609,7 @@ void state::enable_predictive_host_dependency_checks(bool value) {
  *  @return The enable_predictive_service_dependency_checks value.
  */
 bool state::enable_predictive_service_dependency_checks() const throw () {
-  return (_enable_predictive_service_dependency_checks);
+  return _enable_predictive_service_dependency_checks;
 }
 
 /**
@@ -1627,7 +1627,7 @@ void state::enable_predictive_service_dependency_checks(bool value) {
  *  @return The event_broker_options value.
  */
 unsigned long state::event_broker_options() const throw () {
-  return (_event_broker_options);
+  return _event_broker_options;
 }
 
 /**
@@ -1645,7 +1645,7 @@ void state::event_broker_options(unsigned long value) {
  *  @return The event_handler_timeout value.
  */
 unsigned int state::event_handler_timeout() const throw () {
-  return (_event_handler_timeout);
+  return _event_handler_timeout;
 }
 
 /**
@@ -1666,7 +1666,7 @@ void state::event_handler_timeout(unsigned int value) {
  *  @return The execute_host_checks value.
  */
 bool state::execute_host_checks() const throw () {
-  return (_execute_host_checks);
+  return _execute_host_checks;
 }
 
 /**
@@ -1684,7 +1684,7 @@ void state::execute_host_checks(bool value) {
  *  @return The execute_service_checks value.
  */
 bool state::execute_service_checks() const throw () {
-  return (_execute_service_checks);
+  return _execute_service_checks;
 }
 
 /**
@@ -1702,7 +1702,7 @@ void state::execute_service_checks(bool value) {
  *  @return The external_command_buffer_slots value.
  */
 int state::external_command_buffer_slots() const throw () {
-  return (_external_command_buffer_slots);
+  return _external_command_buffer_slots;
 }
 
 /**
@@ -1720,7 +1720,7 @@ void state::external_command_buffer_slots(int value) {
  *  @return The global_host_event_handler value.
  */
 std::string const& state::global_host_event_handler() const throw () {
-  return (_global_host_event_handler);
+  return _global_host_event_handler;
 }
 
 /**
@@ -1739,7 +1739,7 @@ void state::global_host_event_handler(std::string const& value) {
  *  @return The global_service_event_handler value.
  */
 std::string const& state::global_service_event_handler() const throw () {
-  return (_global_service_event_handler);
+  return _global_service_event_handler;
 }
 
 /**
@@ -1758,7 +1758,7 @@ void state::global_service_event_handler(std::string const& value) {
  *  @return The high_host_flap_threshold value.
  */
 float state::high_host_flap_threshold() const throw () {
-  return (_high_host_flap_threshold);
+  return _high_host_flap_threshold;
 }
 
 /**
@@ -1779,7 +1779,7 @@ void state::high_host_flap_threshold(float value) {
  *  @return The high_service_flap_threshold value.
  */
 float state::high_service_flap_threshold() const throw () {
-  return (_high_service_flap_threshold);
+  return _high_service_flap_threshold;
 }
 
 /**
@@ -1800,7 +1800,7 @@ void state::high_service_flap_threshold(float value) {
  *  @return All engine hostdependencies.
  */
 set_hostdependency const& state::hostdependencies() const throw () {
-  return (_hostdependencies);
+  return _hostdependencies;
 }
 
 /**
@@ -1809,7 +1809,7 @@ set_hostdependency const& state::hostdependencies() const throw () {
  *  @return All engine hostdependencies.
  */
 set_hostdependency& state::hostdependencies() throw () {
-  return (_hostdependencies);
+  return _hostdependencies;
 }
 
 /**
@@ -1818,7 +1818,7 @@ set_hostdependency& state::hostdependencies() throw () {
  *  @return All engine hostescalations.
  */
 set_hostescalation const& state::hostescalations() const throw () {
-  return (_hostescalations);
+  return _hostescalations;
 }
 
 /**
@@ -1827,7 +1827,7 @@ set_hostescalation const& state::hostescalations() const throw () {
  *  @return All engine hostescalations.
  */
 set_hostescalation& state::hostescalations() throw () {
-  return (_hostescalations);
+  return _hostescalations;
 }
 
 /**
@@ -1836,7 +1836,7 @@ set_hostescalation& state::hostescalations() throw () {
  *  @return All engine hostgroups.
  */
 set_hostgroup const& state::hostgroups() const throw () {
-  return (_hostgroups);
+  return _hostgroups;
 }
 
 /**
@@ -1845,7 +1845,7 @@ set_hostgroup const& state::hostgroups() const throw () {
  *  @return All engine hostgroups.
  */
 set_hostgroup& state::hostgroups() throw () {
-  return (_hostgroups);
+  return _hostgroups;
 }
 
 /**
@@ -1862,11 +1862,11 @@ set_hostgroup::const_iterator state::hostgroups_find(
   set_hostgroup::const_iterator
     it(_hostgroups.upper_bound(below_searched));
   if ((it != _hostgroups.end()) && (it->hostgroup_name() == k))
-    return (it);
+    return it;
   else if ((it != _hostgroups.begin())
            && ((--it)->hostgroup_name() == k))
-    return (it);
-  return (_hostgroups.end());
+    return it;
+  return _hostgroups.end();
 }
 
 /**
@@ -1882,11 +1882,11 @@ set_hostgroup::iterator state::hostgroups_find(
   configuration::hostgroup below_searched(k);
   set_hostgroup::iterator it(_hostgroups.upper_bound(below_searched));
   if ((it != _hostgroups.end()) && (it->hostgroup_name() == k))
-    return (it);
+    return it;
   else if ((it != _hostgroups.begin())
            && ((--it)->hostgroup_name() == k))
-    return (it);
-  return (_hostgroups.end());
+    return it;
+  return _hostgroups.end();
 }
 
 /**
@@ -1895,7 +1895,7 @@ set_hostgroup::iterator state::hostgroups_find(
  *  @return All engine hosts.
  */
 set_host const& state::hosts() const throw () {
-  return (_hosts);
+  return _hosts;
 }
 
 /**
@@ -1904,7 +1904,7 @@ set_host const& state::hosts() const throw () {
  *  @return All engine hosts.
  */
 set_host& state::hosts() throw () {
-  return (_hosts);
+  return _hosts;
 }
 
 /**
@@ -1919,10 +1919,10 @@ set_host::const_iterator state::hosts_find(
   configuration::host below_searched(k);
   set_host::const_iterator it(_hosts.upper_bound(below_searched));
   if ((it != _hosts.end()) && (it->host_id() == k))
-    return (it);
+    return it;
   else if ((it != _hosts.begin()) && ((--it)->host_id() == k))
-    return (it);
-  return (_hosts.end());
+    return it;
+  return _hosts.end();
 }
 
 set_host::const_iterator state::hosts_find(std::string const& name) const {
@@ -1948,7 +1948,7 @@ set_host::iterator state::hosts_find(
   configuration::host below_searched(k);
   set_host::iterator it(_hosts.upper_bound(below_searched));
   if (it != _hosts.end() && it->host_id() == k)
-    return (it);
+    return it;
   else if (it != _hosts.begin() && (--it)->host_id() == k)
     return it;
   return _hosts.end();
@@ -1960,7 +1960,7 @@ set_host::iterator state::hosts_find(
  *  @return The host_check_timeout value.
  */
 unsigned int state::host_check_timeout() const throw () {
-  return (_host_check_timeout);
+  return _host_check_timeout;
 }
 
 /**
@@ -1980,7 +1980,7 @@ void state::host_check_timeout(unsigned int value) {
  *  @return The host_freshness_check_interval value.
  */
 unsigned int state::host_freshness_check_interval() const throw () {
-  return (_host_freshness_check_interval);
+  return _host_freshness_check_interval;
 }
 
 /**
@@ -1998,7 +1998,7 @@ void state::host_freshness_check_interval(unsigned int value) {
  *  @return The host_inter_check_delay_method value.
  */
 state::inter_check_delay state::host_inter_check_delay_method() const throw () {
-  return (_host_inter_check_delay_method);
+  return _host_inter_check_delay_method;
 }
 
 /**
@@ -2016,7 +2016,7 @@ void state::host_inter_check_delay_method(inter_check_delay value) {
  *  @return The host_perfdata_command value.
  */
 std::string const& state::host_perfdata_command() const throw () {
-  return (_host_perfdata_command);
+  return _host_perfdata_command;
 }
 
 /**
@@ -2034,7 +2034,7 @@ void state::host_perfdata_command(std::string const& value) {
  *  @return The host_perfdata_file value.
  */
 std::string const& state::host_perfdata_file() const throw () {
-  return (_host_perfdata_file);
+  return _host_perfdata_file;
 }
 
 /**
@@ -2052,7 +2052,7 @@ void state::host_perfdata_file(std::string const& value) {
  *  @return The host_perfdata_file_mode value.
  */
 state::perfdata_file_mode state::host_perfdata_file_mode() const throw () {
-  return (_host_perfdata_file_mode);
+  return _host_perfdata_file_mode;
 }
 
 /**
@@ -2070,7 +2070,7 @@ void state::host_perfdata_file_mode(perfdata_file_mode value) {
  *  @return The host_perfdata_file_processing_command value.
  */
 std::string const& state::host_perfdata_file_processing_command() const throw () {
-  return (_host_perfdata_file_processing_command);
+  return _host_perfdata_file_processing_command;
 }
 
 /**
@@ -2088,7 +2088,7 @@ void state::host_perfdata_file_processing_command(std::string const& value) {
  *  @return The host_perfdata_file_processing_interval value.
  */
 unsigned int state::host_perfdata_file_processing_interval() const throw () {
-  return (_host_perfdata_file_processing_interval);
+  return _host_perfdata_file_processing_interval;
 }
 
 /**
@@ -2106,7 +2106,7 @@ void state::host_perfdata_file_processing_interval(unsigned int value) {
  *  @return The host_perfdata_file_template value.
  */
 std::string const& state::host_perfdata_file_template() const throw () {
-  return (_host_perfdata_file_template);
+  return _host_perfdata_file_template;
 }
 
 /**
@@ -2124,7 +2124,7 @@ void state::host_perfdata_file_template(std::string const& value) {
  *  @return The illegal_object_chars value.
  */
 std::string const& state::illegal_object_chars() const throw () {
-  return (_illegal_object_chars);
+  return _illegal_object_chars;
 }
 
 /**
@@ -2142,7 +2142,7 @@ void state::illegal_object_chars(std::string const& value) {
  *  @return The illegal_output_chars value.
  */
 std::string const& state::illegal_output_chars() const throw () {
-  return (_illegal_output_chars);
+  return _illegal_output_chars;
 }
 
 /**
@@ -2161,7 +2161,7 @@ void state::illegal_output_chars(std::string const& value) {
  *  @return The interval_length value.
  */
 unsigned int state::interval_length() const throw () {
-  return (_interval_length);
+  return _interval_length;
 }
 
 /**
@@ -2189,7 +2189,7 @@ void state::interval_length(unsigned int value) {
  *  @return The log_event_handlers value.
  */
 bool state::log_event_handlers() const throw () {
-  return (_log_event_handlers);
+  return _log_event_handlers;
 }
 
 /**
@@ -2207,7 +2207,7 @@ void state::log_event_handlers(bool value) {
  *  @return The log_external_commands value.
  */
 bool state::log_external_commands() const throw () {
-  return (_log_external_commands);
+  return _log_external_commands;
 }
 
 /**
@@ -2225,7 +2225,7 @@ void state::log_external_commands(bool value) {
  *  @return The log_file value.
  */
 std::string const& state::log_file() const throw () {
-  return (_log_file);
+  return _log_file;
 }
 
 /**
@@ -2243,7 +2243,7 @@ void state::log_file(std::string const& value) {
  *  @return The log_host_retries value.
  */
 bool state::log_host_retries() const throw () {
-  return (_log_host_retries);
+  return _log_host_retries;
 }
 
 /**
@@ -2261,7 +2261,7 @@ void state::log_host_retries(bool value) {
  *  @return The log_notifications value.
  */
 bool state::log_notifications() const throw () {
-  return (_log_notifications);
+  return _log_notifications;
 }
 
 /**
@@ -2279,7 +2279,7 @@ void state::log_notifications(bool value) {
  *  @return The log_passive_checks value.
  */
 bool state::log_passive_checks() const throw () {
-  return (_log_passive_checks);
+  return _log_passive_checks;
 }
 
 /**
@@ -2297,7 +2297,7 @@ void state::log_passive_checks(bool value) {
  *  @return  Log pid value.
  */
 bool state::log_pid() const throw() {
-  return (_log_pid);
+  return _log_pid;
 }
 
 /**
@@ -2315,7 +2315,7 @@ void state::log_pid(bool value) {
  *  @return The log_service_retries value.
  */
 bool state::log_service_retries() const throw () {
-  return (_log_service_retries);
+  return _log_service_retries;
 }
 
 /**
@@ -2333,7 +2333,7 @@ void state::log_service_retries(bool value) {
  *  @return The low_host_flap_threshold value.
  */
 float state::low_host_flap_threshold() const throw () {
-  return (_low_host_flap_threshold);
+  return _low_host_flap_threshold;
 }
 
 /**
@@ -2354,7 +2354,7 @@ void state::low_host_flap_threshold(float value) {
  *  @return The low_service_flap_threshold value.
  */
 float state::low_service_flap_threshold() const throw () {
-  return (_low_service_flap_threshold);
+  return _low_service_flap_threshold;
 }
 
 /**
@@ -2375,7 +2375,7 @@ void state::low_service_flap_threshold(float value) {
  *  @return The max_check_reaper_time value.
  */
 unsigned int state::max_check_reaper_time() const throw () {
-  return (_max_check_reaper_time);
+  return _max_check_reaper_time;
 }
 
 /**
@@ -2395,7 +2395,7 @@ void state::max_check_reaper_time(unsigned int value) {
  *  @return The max_check_result_file_age value.
  */
 unsigned long state::max_check_result_file_age() const throw () {
-  return (_max_check_result_file_age);
+  return _max_check_result_file_age;
 }
 
 /**
@@ -2416,7 +2416,7 @@ void state::max_check_result_file_age(unsigned long value) {
  *  @return The max_debug_file_size value.
  */
 unsigned long state::max_debug_file_size() const throw () {
-  return (_max_debug_file_size);
+  return _max_debug_file_size;
 }
 
 /**
@@ -2434,7 +2434,7 @@ void state::max_debug_file_size(unsigned long value) {
  *  @return The max_host_check_spread value.
  */
 unsigned int state::max_host_check_spread() const throw () {
-  return (_max_host_check_spread);
+  return _max_host_check_spread;
 }
 
 /**
@@ -2454,7 +2454,7 @@ void state::max_host_check_spread(unsigned int value) {
  *  @return The max_log_file_size value.
  */
 unsigned long state::max_log_file_size() const throw () {
-  return (_max_log_file_size);
+  return _max_log_file_size;
 }
 
 /**
@@ -2472,7 +2472,7 @@ void state::max_log_file_size(unsigned long value) {
  *  @return The max_parallel_service_checks value.
  */
 unsigned int state::max_parallel_service_checks() const throw () {
-  return (_max_parallel_service_checks);
+  return _max_parallel_service_checks;
 }
 
 /**
@@ -2490,7 +2490,7 @@ void state::max_parallel_service_checks(unsigned int value) {
  *  @return The max_service_check_spread value.
  */
 unsigned int state::max_service_check_spread() const throw () {
-  return (_max_service_check_spread);
+  return _max_service_check_spread;
 }
 
 /**
@@ -2510,7 +2510,7 @@ void state::max_service_check_spread(unsigned int value) {
  *  @return The notification_timeout value.
  */
 unsigned int state::notification_timeout() const throw () {
-  return (_notification_timeout);
+  return _notification_timeout;
 }
 
 /**
@@ -2530,7 +2530,7 @@ void state::notification_timeout(unsigned int value) {
  *  @return The obsess_over_hosts value.
  */
 bool state::obsess_over_hosts() const throw () {
-  return (_obsess_over_hosts);
+  return _obsess_over_hosts;
 }
 
 /**
@@ -2548,7 +2548,7 @@ void state::obsess_over_hosts(bool value) {
  *  @return The obsess_over_services value.
  */
 bool state::obsess_over_services() const throw () {
-  return (_obsess_over_services);
+  return _obsess_over_services;
 }
 
 /**
@@ -2566,7 +2566,7 @@ void state::obsess_over_services(bool value) {
  *  @return The ochp_command value.
  */
 std::string const& state::ochp_command() const throw () {
-  return (_ochp_command);
+  return _ochp_command;
 }
 
 /**
@@ -2585,7 +2585,7 @@ void state::ochp_command(std::string const& value) {
  *  @return The ochp_timeout value.
  */
 unsigned int state::ochp_timeout() const throw () {
-  return (_ochp_timeout);
+  return _ochp_timeout;
 }
 
 /**
@@ -2605,7 +2605,7 @@ void state::ochp_timeout(unsigned int value) {
  *  @return The ocsp_command value.
  */
 std::string const& state::ocsp_command() const throw () {
-  return (_ocsp_command);
+  return _ocsp_command;
 }
 
 /**
@@ -2623,7 +2623,7 @@ void state::ocsp_command(std::string const& value) {
  *  @return The ocsp_timeout value.
  */
 unsigned int state::ocsp_timeout() const throw () {
-  return (_ocsp_timeout);
+  return _ocsp_timeout;
 }
 
 /**
@@ -2643,7 +2643,7 @@ void state::ocsp_timeout(unsigned int value) {
  *  @return The passive_host_checks_are_soft value.
  */
 bool state::passive_host_checks_are_soft() const throw () {
-  return (_passive_host_checks_are_soft);
+  return _passive_host_checks_are_soft;
 }
 
 /**
@@ -2661,7 +2661,7 @@ void state::passive_host_checks_are_soft(bool value) {
  *  @return The perfdata_timeout value.
  */
 int state::perfdata_timeout() const throw () {
-  return (_perfdata_timeout);
+  return _perfdata_timeout;
 }
 
 /**
@@ -2679,7 +2679,7 @@ void state::perfdata_timeout(int value) {
  *  @return The process_performance_data value.
  */
 bool state::process_performance_data() const throw () {
-  return (_process_performance_data);
+  return _process_performance_data;
 }
 
 /**
@@ -2697,7 +2697,7 @@ void state::process_performance_data(bool value) {
  *  @return The resource_file value.
  */
 std::list<std::string> const& state::resource_file() const throw () {
-  return (_resource_file);
+  return _resource_file;
 }
 
 /**
@@ -2715,7 +2715,7 @@ void state::resource_file(std::list<std::string> const& value) {
  *  @return The retained_contact_host_attribute_mask value.
  */
 unsigned long state::retained_contact_host_attribute_mask() const throw () {
-  return (_retained_contact_host_attribute_mask);
+  return _retained_contact_host_attribute_mask;
 }
 
 /**
@@ -2733,7 +2733,7 @@ void state::retained_contact_host_attribute_mask(unsigned long value) {
  *  @return The retained_contact_service_attribute_mask value.
  */
 unsigned long state::retained_contact_service_attribute_mask() const throw () {
-  return (_retained_contact_service_attribute_mask);
+  return _retained_contact_service_attribute_mask;
 }
 
 /**
@@ -2751,7 +2751,7 @@ void state::retained_contact_service_attribute_mask(unsigned long value) {
  *  @return The retained_host_attribute_mask value.
  */
 unsigned long state::retained_host_attribute_mask() const throw () {
-  return (_retained_host_attribute_mask);
+  return _retained_host_attribute_mask;
 }
 
 /**
@@ -2769,7 +2769,7 @@ void state::retained_host_attribute_mask(unsigned long value) {
  *  @return The retained_process_host_attribute_mask value.
  */
 unsigned long state::retained_process_host_attribute_mask() const throw () {
-  return (_retained_process_host_attribute_mask);
+  return _retained_process_host_attribute_mask;
 }
 
 /**
@@ -2787,7 +2787,7 @@ void state::retained_process_host_attribute_mask(unsigned long value) {
  *  @return The retain_state_information value.
  */
 bool state::retain_state_information() const throw () {
-  return (_retain_state_information);
+  return _retain_state_information;
 }
 
 /**
@@ -2805,7 +2805,7 @@ void state::retain_state_information(bool value) {
  *  @return The retention_scheduling_horizon value.
  */
 unsigned int state::retention_scheduling_horizon() const throw () {
-  return (_retention_scheduling_horizon);
+  return _retention_scheduling_horizon;
 }
 
 /**
@@ -2826,7 +2826,7 @@ void state::retention_scheduling_horizon(unsigned int value) {
  *  @return The retention_update_interval value.
  */
 unsigned int state::retention_update_interval() const throw () {
-  return (_retention_update_interval);
+  return _retention_update_interval;
 }
 
 /**
@@ -2846,7 +2846,7 @@ void state::retention_update_interval(unsigned int value) {
  *  @return All engine servicedependencies.
  */
 set_servicedependency const& state::servicedependencies() const throw () {
-  return (_servicedependencies);
+  return _servicedependencies;
 }
 
 /**
@@ -2855,7 +2855,7 @@ set_servicedependency const& state::servicedependencies() const throw () {
  *  @return All engine servicedependencies.
  */
 set_servicedependency& state::servicedependencies() throw () {
-  return (_servicedependencies);
+  return _servicedependencies;
 }
 
 /**
@@ -2864,7 +2864,7 @@ set_servicedependency& state::servicedependencies() throw () {
  *  @return All engine serviceescalations.
  */
 set_serviceescalation const& state::serviceescalations() const throw () {
-  return (_serviceescalations);
+  return _serviceescalations;
 }
 
 /**
@@ -2873,7 +2873,7 @@ set_serviceescalation const& state::serviceescalations() const throw () {
  *  @return All engine serviceescalations.
  */
 set_serviceescalation& state::serviceescalations() throw () {
-  return (_serviceescalations);
+  return _serviceescalations;
 }
 
 /**
@@ -2882,7 +2882,7 @@ set_serviceescalation& state::serviceescalations() throw () {
  *  @return All engine servicegroups.
  */
 set_servicegroup const& state::servicegroups() const throw () {
-  return (_servicegroups);
+  return _servicegroups;
 }
 
 /**
@@ -2891,7 +2891,7 @@ set_servicegroup const& state::servicegroups() const throw () {
  *  @return All engine servicegroups.
  */
 set_servicegroup& state::servicegroups() throw () {
-  return (_servicegroups);
+  return _servicegroups;
 }
 
 /**
@@ -2908,11 +2908,11 @@ set_servicegroup::const_iterator state::servicegroups_find(
   set_servicegroup::const_iterator
     it(_servicegroups.upper_bound(below_searched));
   if ((it != _servicegroups.end()) && (it->servicegroup_name() == k))
-    return (it);
+    return it;
   else if ((it != _servicegroups.begin())
            && ((--it)->servicegroup_name() == k))
-    return (it);
-  return (_servicegroups.end());
+    return it;
+  return _servicegroups.end();
 }
 
 /**
@@ -2929,11 +2929,11 @@ set_servicegroup::iterator state::servicegroups_find(
   set_servicegroup::iterator
     it(_servicegroups.upper_bound(below_searched));
   if ((it != _servicegroups.end()) && (it->servicegroup_name() == k))
-    return (it);
+    return it;
   else if ((it != _servicegroups.begin())
            && ((--it)->servicegroup_name() == k))
-    return (it);
-  return (_servicegroups.end());
+    return it;
+  return _servicegroups.end();
 }
 
 /**
@@ -2942,7 +2942,7 @@ set_servicegroup::iterator state::servicegroups_find(
  *  @return All engine services.
  */
 set_service const& state::services() const throw () {
-  return (_services);
+  return _services;
 }
 
 /**
@@ -2951,7 +2951,7 @@ set_service const& state::services() const throw () {
  *  @return All engine services.
  */
 set_service& state::services() throw () {
-  return (_services);
+  return _services;
 }
 
 /**
@@ -3016,7 +3016,7 @@ set_service::iterator state::services_find(
  *  @return The service_check_timeout value.
  */
 unsigned int state::service_check_timeout() const throw () {
-  return (_service_check_timeout);
+  return _service_check_timeout;
 }
 
 /**
@@ -3036,7 +3036,7 @@ void state::service_check_timeout(unsigned int value) {
  *  @return The service_freshness_check_interval value.
  */
 unsigned int state::service_freshness_check_interval() const throw () {
-  return (_service_freshness_check_interval);
+  return _service_freshness_check_interval;
 }
 
 /**
@@ -3057,7 +3057,7 @@ void state::service_freshness_check_interval(unsigned int value) {
  *  @return The service_inter_check_delay_method value.
  */
 state::inter_check_delay state::service_inter_check_delay_method() const throw () {
-  return (_service_inter_check_delay_method);
+  return _service_inter_check_delay_method;
 }
 
 /**
@@ -3075,7 +3075,7 @@ void state::service_inter_check_delay_method(inter_check_delay value) {
  *  @return The service_interleave_factor_method value.
  */
 state::interleave_factor state::service_interleave_factor_method() const throw () {
-  return (_service_interleave_factor_method);
+  return _service_interleave_factor_method;
 }
 
 /**
@@ -3093,7 +3093,7 @@ void state::service_interleave_factor_method(interleave_factor value) {
  *  @return The service_perfdata_command value.
  */
 std::string const& state::service_perfdata_command() const throw () {
-  return (_service_perfdata_command);
+  return _service_perfdata_command;
 }
 
 /**
@@ -3111,7 +3111,7 @@ void state::service_perfdata_command(std::string const& value) {
  *  @return The service_perfdata_file value.
  */
 std::string const& state::service_perfdata_file() const throw () {
-  return (_service_perfdata_file);
+  return _service_perfdata_file;
 }
 
 /**
@@ -3129,7 +3129,7 @@ void state::service_perfdata_file(std::string const& value) {
  *  @return The service_perfdata_file_mode value.
  */
 state::perfdata_file_mode state::service_perfdata_file_mode() const throw () {
-  return (_service_perfdata_file_mode);
+  return _service_perfdata_file_mode;
 }
 
 /**
@@ -3147,7 +3147,7 @@ void state::service_perfdata_file_mode(perfdata_file_mode value) {
  *  @return The service_perfdata_file_processing_command value.
  */
 std::string const& state::service_perfdata_file_processing_command() const throw () {
-  return (_service_perfdata_file_processing_command);
+  return _service_perfdata_file_processing_command;
 }
 
 /**
@@ -3165,7 +3165,7 @@ void state::service_perfdata_file_processing_command(std::string const& value) {
  *  @return The service_perfdata_file_processing_interval value.
  */
 unsigned int state::service_perfdata_file_processing_interval() const throw () {
-  return (_service_perfdata_file_processing_interval);
+  return _service_perfdata_file_processing_interval;
 }
 
 /**
@@ -3183,7 +3183,7 @@ void state::service_perfdata_file_processing_interval(unsigned int value) {
  *  @return The service_perfdata_file_template value.
  */
 std::string const& state::service_perfdata_file_template() const throw () {
-  return (_service_perfdata_file_template);
+  return _service_perfdata_file_template;
 }
 
 /**
@@ -3201,7 +3201,7 @@ void state::service_perfdata_file_template(std::string const& value) {
  *  @return The sleep_time value.
  */
 float state::sleep_time() const throw () {
-  return (_sleep_time);
+  return _sleep_time;
 }
 
 /**
@@ -3222,7 +3222,7 @@ void state::sleep_time(float value) {
  *  @return The soft_state_dependencies value.
  */
 bool state::soft_state_dependencies() const throw () {
-  return (_soft_state_dependencies);
+  return _soft_state_dependencies;
 }
 
 /**
@@ -3240,7 +3240,7 @@ void state::soft_state_dependencies(bool value) {
  *  @return The state_retention_file value.
  */
 std::string const& state::state_retention_file() const throw () {
-  return (_state_retention_file);
+  return _state_retention_file;
 }
 
 /**
@@ -3264,7 +3264,7 @@ void state::state_retention_file(std::string const& value) {
  *  @return The status_file value.
  */
 std::string const& state::status_file() const throw () {
-  return (_status_file);
+  return _status_file;
 }
 
 /**
@@ -3282,7 +3282,7 @@ void state::status_file(std::string const& value) {
  *  @return The status_update_interval value.
  */
 unsigned int state::status_update_interval() const throw () {
-  return (_status_update_interval);
+  return _status_update_interval;
 }
 
 /**
@@ -3312,14 +3312,14 @@ bool state::set(char const* key, char const* value) {
          i < sizeof(_setters) / sizeof(_setters[0]);
          ++i)
       if (!strcmp(_setters[i].name, key))
-        return ((_setters[i].func)(*this, value));
+        return (_setters[i].func)(*this, value);
   }
   catch (std::exception const& e) {
     logger(log_config_error, basic)
       << e.what();
-    return (false);
+    return false;
   }
-  return (true);
+  return true;
 }
 
 /**
@@ -3328,7 +3328,7 @@ bool state::set(char const* key, char const* value) {
  *  @return All engine timeperiods.
  */
 set_timeperiod const& state::timeperiods() const throw () {
-  return (_timeperiods);
+  return _timeperiods;
 }
 
 /**
@@ -3337,7 +3337,7 @@ set_timeperiod const& state::timeperiods() const throw () {
  *  @return All engine timeperiods.
  */
 set_timeperiod& state::timeperiods() throw () {
-  return (_timeperiods);
+  return _timeperiods;
 }
 
 /**
@@ -3353,11 +3353,11 @@ set_timeperiod::const_iterator state::timeperiods_find(timeperiod::key_type cons
   set_timeperiod::const_iterator
     it(_timeperiods.upper_bound(below_searched));
   if ((it != _timeperiods.end()) && (it->timeperiod_name() == k))
-    return (it);
+    return it;
   else if ((it != _timeperiods.begin())
            && ((--it)->timeperiod_name() == k))
-    return (it);
-  return (_timeperiods.end());
+    return it;
+  return _timeperiods.end();
 }
 
 /**
@@ -3373,11 +3373,11 @@ set_timeperiod::iterator state::timeperiods_find(timeperiod::key_type const& k) 
   set_timeperiod::iterator
     it(_timeperiods.upper_bound(below_searched));
   if ((it != _timeperiods.end()) && (it->timeperiod_name() == k))
-    return (it);
+    return it;
   else if ((it != _timeperiods.begin())
            && ((--it)->timeperiod_name() == k))
-    return (it);
-  return (_timeperiods.end());
+    return it;
+  return _timeperiods.end();
 }
 
 /**
@@ -3386,7 +3386,7 @@ set_timeperiod::iterator state::timeperiods_find(timeperiod::key_type const& k) 
  *  @return The time_change_threshold value.
  */
 unsigned int state::time_change_threshold() const throw () {
-  return (_time_change_threshold);
+  return _time_change_threshold;
 }
 
 /**
@@ -3408,7 +3408,7 @@ void state::time_change_threshold(unsigned int value) {
  *  @return The translate_passive_host_checks value.
  */
 bool state::translate_passive_host_checks() const throw () {
-  return (_translate_passive_host_checks);
+  return _translate_passive_host_checks;
 }
 
 /**
@@ -3426,7 +3426,7 @@ void state::translate_passive_host_checks(bool value) {
  *  @return The users resources list.
  */
 umap<std::string, std::string> const& state::user() const throw () {
-  return (_users);
+  return _users;
 }
 
 /**
@@ -3469,7 +3469,7 @@ void state::user(unsigned int key, std::string const& value) {
  *  @return The use_aggressive_host_checking value.
  */
 bool state::use_aggressive_host_checking() const throw () {
-  return (_use_aggressive_host_checking);
+  return _use_aggressive_host_checking;
 }
 
 /**
@@ -3487,7 +3487,7 @@ void state::use_aggressive_host_checking(bool value) {
  *  @return The use_check_result_path value.
  */
 bool state::use_check_result_path() const throw () {
-  return (_use_check_result_path);
+  return _use_check_result_path;
 }
 
 /**
@@ -3505,7 +3505,7 @@ void state::use_check_result_path(bool value) {
  *  @return The use_large_installation_tweaks value.
  */
 bool state::use_large_installation_tweaks() const throw () {
-  return (_use_large_installation_tweaks);
+  return _use_large_installation_tweaks;
 }
 
 /**
@@ -3523,7 +3523,7 @@ void state::use_large_installation_tweaks(bool value) {
  *  @return The use_regexp_matches value.
  */
 bool state::use_regexp_matches() const throw () {
-  return (_use_regexp_matches);
+  return _use_regexp_matches;
 }
 
 /**
@@ -3541,7 +3541,7 @@ void state::use_regexp_matches(bool value) {
  *  @return The use_retained_program_state value.
  */
 bool state::use_retained_program_state() const throw () {
-  return (_use_retained_program_state);
+  return _use_retained_program_state;
 }
 
 /**
@@ -3559,7 +3559,7 @@ void state::use_retained_program_state(bool value) {
  *  @return The use_retained_scheduling_info value.
  */
 bool state::use_retained_scheduling_info() const throw () {
-  return (_use_retained_scheduling_info);
+  return _use_retained_scheduling_info;
 }
 
 /**
@@ -3577,7 +3577,7 @@ void state::use_retained_scheduling_info(bool value) {
  *  @return The use_setpgid value.
  */
 bool state::use_setpgid() const throw () {
-  return (_use_setpgid);
+  return _use_setpgid;
 }
 
 /**
@@ -3595,7 +3595,7 @@ void state::use_setpgid(bool value) {
  *  @return The use_syslog value.
  */
 bool state::use_syslog() const throw () {
-  return (_use_syslog);
+  return _use_syslog;
 }
 
 /**
@@ -3613,7 +3613,7 @@ void state::use_syslog(bool value) {
  *  @return The use_timezone value.
  */
 std::string const& state::use_timezone() const throw () {
-  return (_use_timezone);
+  return _use_timezone;
 }
 
 /**
@@ -3632,7 +3632,7 @@ void state::use_timezone(std::string const& value) {
  *  @return The use_true_regexp_matching value.
  */
 bool state::use_true_regexp_matching() const throw () {
-  return (_use_true_regexp_matching);
+  return _use_true_regexp_matching;
 }
 
 /**
