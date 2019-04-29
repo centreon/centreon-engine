@@ -153,7 +153,8 @@ typedef struct   nebstruct_command_struct {
   int            attr;
   struct timeval timestamp;
 
-  command*       cmd;
+  com::centreon::engine::commands::command*
+                 cmd;
 }                nebstruct_command_data;
 
 /* Comment data structure. */

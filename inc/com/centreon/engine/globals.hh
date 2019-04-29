@@ -35,7 +35,6 @@
 #  include "com/centreon/engine/notifications.hh"
 #  include "com/centreon/engine/objects.hh"
 #  include "com/centreon/engine/utils.hh"
-#  include "skiplist.h"
 
 #  ifdef __cplusplus
 extern "C" {
@@ -51,11 +50,15 @@ extern char*                     check_result_path;
 extern com::centreon::engine::configuration::state* config;
 extern char*                     config_file;
 
-extern command*                  global_host_event_handler_ptr;
-extern command*                  global_service_event_handler_ptr;
+extern com::centreon::engine::commands::command*
+                                 global_host_event_handler_ptr;
+extern com::centreon::engine::commands::command*
+                                 global_service_event_handler_ptr;
 
-extern command*                  ocsp_command_ptr;
-extern command*                  ochp_command_ptr;
+extern com::centreon::engine::commands::command*
+                                 ocsp_command_ptr;
+extern com::centreon::engine::commands::command*
+                                 ochp_command_ptr;
 
 extern unsigned long             logging_options;
 extern unsigned long             syslog_options;
@@ -104,9 +107,8 @@ extern std::map<std::string, host_other_properties> host_other_props;
 extern service*                  service_list;
 extern service*                  service_list_tail;
 extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-extern contact*                  contact_list;
-extern contact*                  contact_list_tail;
-extern std::map<std::string, contact_other_properties> contact_other_props;
+//extern com::centreon::engine::contact*                  contact_list;
+//extern com::centreon::engine::contact*                  contact_list_tail;
 extern contactgroup*             contactgroup_list;
 extern contactgroup*             contactgroup_list_tail;
 extern hostgroup*                hostgroup_list;
@@ -127,8 +129,6 @@ extern hostdependency*           hostdependency_list;
 extern hostdependency*           hostdependency_list_tail;
 extern hostescalation*           hostescalation_list;
 extern hostescalation*           hostescalation_list_tail;
-
-extern skiplist*                 object_skiplists[];
 
 extern int                       __nagios_object_structure_version;
 

@@ -25,6 +25,11 @@
 
 CCE_BEGIN()
 
+// Forward declarations.
+namespace commands {
+  class command;
+}
+
 namespace             configuration {
   // Forward declarations.
   class               command;
@@ -47,8 +52,8 @@ namespace             configuration {
                         configuration::command const& obj);
 
      private:
-      void            _create_command(
-                        configuration::command const& obj);
+      commands::command const*
+                      _create_command(configuration::command const& obj);
     };
   }
 }

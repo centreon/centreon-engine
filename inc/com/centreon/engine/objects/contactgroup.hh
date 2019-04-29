@@ -21,8 +21,11 @@
 #  define CCE_OBJECTS_CONTACTGROUP_HH
 
 /* Forward declaration. */
-struct contact_struct;
 struct contactsmember_struct;
+
+CCE_BEGIN()
+class contact;
+CCE_END()
 
 typedef struct                contactgroup_struct {
   char*                       group_name;
@@ -39,7 +42,7 @@ extern "C" {
 contactgroup* add_contactgroup(char const* name, char const* alias);
 int           is_contact_member_of_contactgroup(
                 contactgroup_struct* group,
-                contact_struct* cntct);
+                com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
 }

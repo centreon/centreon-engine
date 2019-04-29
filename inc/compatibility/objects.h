@@ -23,8 +23,7 @@
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/objects/command.hh"
-#  include "com/centreon/engine/objects/commandsmember.hh"
-#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/objects/contactgroup.hh"
 #  include "com/centreon/engine/objects/contactgroupsmember.hh"
 #  include "com/centreon/engine/objects/contactsmember.hh"

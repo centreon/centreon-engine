@@ -412,7 +412,7 @@ void checker::run(
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
   std::shared_ptr<commands::command>
-    cmd(cmd_set.get_command(hst->check_command_ptr->name));
+    cmd(cmd_set.get_command(hst->check_command_ptr->get_name()));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
 
@@ -647,7 +647,7 @@ void checker::run(
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
   std::shared_ptr<commands::command>
-    cmd(cmd_set.get_command(svc->check_command_ptr->name));
+    cmd(cmd_set.get_command(svc->check_command_ptr->get_name()));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
 
@@ -1055,7 +1055,7 @@ int checker::_execute_sync(host* hst) {
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
   std::shared_ptr<commands::command>
-    cmd(cmd_set.get_command(hst->check_command_ptr->name));
+    cmd(cmd_set.get_command(hst->check_command_ptr->get_name()));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* tmp_processed_cmd(string::dup(processed_cmd));
 
@@ -1084,7 +1084,7 @@ int checker::_execute_sync(host* hst) {
 
   // Debug messages.
   logger(dbg_commands, more)
-    << "Raw host check command: " << hst->check_command_ptr->command_line;
+    << "Raw host check command: " << hst->check_command_ptr->get_command_line();
   logger(dbg_commands, more)
     << "Processed host check ommand: " << processed_cmd;
 
