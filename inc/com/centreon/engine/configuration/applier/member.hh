@@ -26,23 +26,22 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/unordered_hash.hh"
 
-struct command_struct;
 struct commandsmember_struct;
-struct contact_struct;
 struct contactsmember_struct;
 
 CCE_BEGIN()
+// Forward declaration
+class  contact;
+namespace commands {
+  class command;
+}
 
 namespace             configuration {
   namespace           applier {
     void    add_member(
-              umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
+              umap<std::string, std::shared_ptr<contact> > const& contacts,
               std::string const& name,
               contactsmember_struct*& members);
-    void    add_member(
-              umap<std::string, std::shared_ptr<command_struct> > const& commands,
-              std::string const& name,
-              commandsmember_struct*& members);
 
     template<typename T, typename U>
     void    add_members(
@@ -69,7 +68,7 @@ namespace             configuration {
       return (false);
     }
     void    update_members(
-              umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
+              umap<std::string, std::shared_ptr<contact> > const& contacts,
               std::list<std::string> const& lst,
               contactsmember_struct*& members);
   }

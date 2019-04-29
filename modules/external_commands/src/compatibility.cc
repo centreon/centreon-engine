@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -1476,7 +1477,7 @@ int process_contact_command(int cmd,
     return (ERROR);
 
   /* find the contact */
-  if ((temp_contact = find_contact(contact_name)) == NULL)
+  if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == NULL)
     return (ERROR);
 
   switch (cmd) {

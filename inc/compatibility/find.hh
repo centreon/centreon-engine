@@ -20,12 +20,15 @@
 #ifndef CCE_COMPATIBILITY_FIND_H
 #  define CCE_COMPATIBILITY_FIND_H
 
+CCE_BEGIN()
+class contact;
+CCE_END()
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif // C++
 
 struct command_struct;
-struct contact_struct;
 struct contactgroup_struct;
 struct host_struct;
 struct hostdependency_struct;
@@ -41,8 +44,6 @@ struct serviceescalation_struct;
 struct servicegroup_struct;
 struct timeperiod_struct;
 
-command_struct*           find_command(char const* name);
-contact_struct*           find_contact(char const* name);
 contactgroup_struct*      find_contactgroup(char const* name);
 host_struct*              find_host(char const* name);
 hostgroup_struct*         find_hostgroup(char const* name);

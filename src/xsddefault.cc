@@ -29,16 +29,19 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/comment.hh"
+#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
-#include "skiplist.h"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 
 static int xsddefault_status_log_fd(-1);
 
@@ -59,7 +62,7 @@ int xsddefault_initialize_status_data() {
                                       config->status_file().c_str(),
                                       O_WRONLY | O_CREAT,
                                       S_IRUSR | S_IWUSR | S_IRGRP)) == -1) {
-      logger(logging::log_runtime_error, logging::basic)
+      logger(engine::logging::log_runtime_error, engine::logging::basic)
         << "Error: Unable to open status data file '"
         << config->status_file() << "': " << strerror(errno);
       return (ERROR);
@@ -99,7 +102,7 @@ int xsddefault_save_status_data() {
   int used_external_command_buffer_slots(0);
   int high_external_command_buffer_slots(0);
 
-  logger(logging::dbg_functions, logging::basic)
+  logger(engine::logging::dbg_functions, engine::logging::basic)
     << "save_status_data()";
 
   // get number of items in the command buffer
@@ -341,19 +344,24 @@ int xsddefault_save_status_data() {
   }
 
   // save contact status data
-  for (contact* cntct = contact_list; cntct; cntct = cntct->next) {
+  for (umap<std::string, std::shared_ptr<contact> >::const_iterator
+         it(state::instance().contacts().begin()),
+         end(state::instance().contacts().end());
+       it != end;
+       ++it) {
+    contact *cntct(it->second.get());
     stream
       << "contactstatus {\n"
-         "\tcontact_name=" << cntct->name << "\n"
-         "\tmodified_attributes=" << cntct->modified_attributes << "\n"
-         "\tmodified_host_attributes=" << cntct->modified_host_attributes << "\n"
-         "\tmodified_service_attributes=" << cntct->modified_service_attributes << "\n"
-         "\thost_notification_period=" << (cntct->host_notification_period ? cntct->host_notification_period : "") << "\n"
-         "\tservice_notification_period=" << (cntct->service_notification_period ? cntct->service_notification_period : "") << "\n"
-         "\tlast_host_notification=" << static_cast<unsigned long>(cntct->last_host_notification) << "\n"
-         "\tlast_service_notification=" << static_cast<unsigned long>(cntct->last_service_notification) << "\n"
-         "\thost_notifications_enabled=" << cntct->host_notifications_enabled << "\n"
-         "\tservice_notifications_enabled=" << cntct->service_notifications_enabled << "\n";
+         "\tcontact_name=" << cntct->get_name() << "\n"
+         "\tmodified_attributes=" << cntct->get_modified_attributes() << "\n"
+         "\tmodified_host_attributes=" << cntct->get_modified_host_attributes() << "\n"
+         "\tmodified_service_attributes=" << cntct->get_modified_service_attributes() << "\n"
+         "\thost_notification_period=" << cntct->get_host_notification_period() << "\n"
+         "\tservice_notification_period=" << cntct->get_service_notification_period() << "\n"
+         "\tlast_host_notification=" << static_cast<unsigned long>(cntct->get_last_host_notification()) << "\n"
+         "\tlast_service_notification=" << static_cast<unsigned long>(cntct->get_last_service_notification()) << "\n"
+         "\thost_notifications_enabled=" << cntct->get_host_notifications_enabled() << "\n"
+         "\tservice_notifications_enabled=" << cntct->get_service_notifications_enabled() << "\n";
     // custom variables
     for (customvariablesmember* cvarm = cntct->custom_variables; cvarm; cvarm = cvarm->next) {
       if (cvarm->variable_name)
@@ -415,7 +423,7 @@ int xsddefault_save_status_data() {
       || (fsync(xsddefault_status_log_fd) == -1)
       || (lseek(xsddefault_status_log_fd, 0, SEEK_SET) == (off_t)-1)) {
     char const* msg(strerror(errno));
-    logger(logging::log_runtime_error, logging::basic)
+    logger(engine::logging::log_runtime_error, engine::logging::basic)
       << "Error: Unable to update status data file '"
       << config->status_file() << "': " << msg;
     return (ERROR);
@@ -429,7 +437,7 @@ int xsddefault_save_status_data() {
     ssize_t wb(write(xsddefault_status_log_fd, data_ptr, size));
     if (wb <= 0) {
       char const* msg(strerror(errno));
-      logger(logging::log_runtime_error, logging::basic)
+      logger(engine::logging::log_runtime_error, engine::logging::basic)
         << "Error: Unable to update status data file '"
         << config->status_file() << "': " << msg;
       return (ERROR);

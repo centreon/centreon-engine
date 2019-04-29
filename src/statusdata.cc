@@ -30,7 +30,7 @@
 
 /* initializes status data at program start */
 int initialize_status_data() {
-  return (xsddefault_initialize_status_data());
+  return xsddefault_initialize_status_data();
 }
 
 /* update all status data (aggregated dump) */
@@ -54,13 +54,13 @@ int update_all_status_data() {
     NULL);
 
   if (result != OK)
-    return (ERROR);
-  return (OK);
+    return ERROR;
+  return OK;
 }
 
 /* cleans up status data before program termination */
 int cleanup_status_data(int delete_status_data) {
-  return (xsddefault_cleanup_status_data(delete_status_data));
+  return xsddefault_cleanup_status_data(delete_status_data);
 }
 
 /* updates program status info */
@@ -72,7 +72,7 @@ int update_program_status(int aggregated_dump) {
       NEBFLAG_NONE,
       NEBATTR_NONE,
       NULL);
-  return (OK);
+  return OK;
 }
 
 /* updates host status info */
@@ -85,7 +85,7 @@ int update_host_status(host* hst, int aggregated_dump) {
       NEBATTR_NONE,
       hst,
       NULL);
-  return (OK);
+  return OK;
 }
 
 /* updates service status info */
@@ -98,18 +98,5 @@ int update_service_status(service* svc, int aggregated_dump) {
       NEBATTR_NONE,
       svc,
       NULL);
-  return (OK);
-}
-
-/* updates contact status info */
-int update_contact_status(contact* cntct, int aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == false)
-    broker_contact_status(
-      NEBTYPE_CONTACTSTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      cntct,
-      NULL);
-  return (OK);
+  return OK;
 }

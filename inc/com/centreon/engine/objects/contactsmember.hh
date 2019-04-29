@@ -20,8 +20,11 @@
 #ifndef CCE_OBJECTS_CONTACTSMEMBER_HH
 #  define CCE_OBJECTS_CONTACTSMEMBER_HH
 
+CCE_BEGIN()
+  class contact;
+CCE_END()
+
 /* Forward declaration. */
-struct contact_struct;
 struct contactgroup_struct;
 struct host_struct;
 struct hostescalation_struct;
@@ -30,7 +33,8 @@ struct serviceescalation_struct;
 
 typedef struct                  contactsmember_struct {
   char*                         contact_name;
-  contact_struct*               contact_ptr;
+  com::centreon::engine::contact*
+                                contact_ptr;
   struct contactsmember_struct* next;
 }                               contactsmember;
 

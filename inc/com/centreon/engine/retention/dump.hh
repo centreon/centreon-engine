@@ -25,19 +25,19 @@
 
 // Forward declaration.
 struct comment_struct;
-struct contact_struct;
 struct customvariablesmember_struct;
 struct host_struct;
 struct scheduled_downtime_struct;
 struct service_struct;
 
 CCE_BEGIN()
+class contact;
 
 namespace         retention {
   namespace       dump {
     std::ostream& comment(std::ostream& os, comment_struct const& obj);
     std::ostream& comments(std::ostream& os);
-    std::ostream& contact(std::ostream& os, contact_struct const& obj);
+    std::ostream& contact(std::ostream& os, contact const& obj);
     std::ostream& contacts(std::ostream& os);
     std::ostream& customvariables(std::ostream& os, customvariablesmember_struct const& obj);
     std::ostream& downtime(std::ostream& os, scheduled_downtime_struct const& obj);

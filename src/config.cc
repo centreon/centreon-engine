@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <sstream>
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -41,7 +42,7 @@ int pre_flight_check() {
   host* temp_host(NULL);
   char* buf(NULL);
   service* temp_service(NULL);
-  command* temp_command(NULL);
+  commands::command* temp_command(NULL);
   char* temp_command_name(NULL);
   int warnings(0);
   int errors(0);
@@ -79,7 +80,7 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Global host event handler command '"
@@ -101,7 +102,7 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Global service event handler command '"
@@ -128,7 +129,7 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive service processor command '"
@@ -149,7 +150,7 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive host processor command '"
@@ -283,10 +284,14 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking contacts...";
   total_objects = 0;
-  for (contact* temp_contact(contact_list);
-       temp_contact;
-       temp_contact = temp_contact->next, ++total_objects)
-    check_contact(temp_contact, &warnings, &errors);
+  for (umap<std::string,
+            std::shared_ptr<com::centreon::engine::contact> >::iterator
+         it(configuration::applier::state::instance().contacts().begin()),
+         end(configuration::applier::state::instance().contacts().end());
+       it != end;
+       ++it) {
+    check_contact(it->second.get(), &warnings, &errors);
+  }
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " contacts.";
@@ -357,13 +362,17 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking commands...";
   total_objects = 0;
-  for (command* temp_command(command_list);
-       temp_command;
-       temp_command = temp_command->next, ++total_objects) {
+  for (std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
+         it(configuration::applier::state::instance().commands().begin()),
+         end(configuration::applier::state::instance().commands().end());
+       it != end;
+       ++it, ++total_objects) {
+    std::shared_ptr<commands::command> const& temp_command(it->second);
+
     // Check for illegal characters in command name.
-    if (contains_illegal_object_chars(temp_command->name)) {
+    if (contains_illegal_object_chars(temp_command->get_name().c_str())) {
       logger(log_verification_error, basic)
-        << "Error: The name of command '" << temp_command->name
+        << "Error: The name of command '" << temp_command->get_name()
         << "' contains one or more illegal characters.";
       errors++;
     }
@@ -656,7 +665,8 @@ int check_service(service* svc, int* w, int* e) {
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
 
-    command* temp_command = find_command(temp_command_name);
+    commands::command* temp_command(
+      configuration::applier::state::instance().find_command(temp_command_name));
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
@@ -677,7 +687,7 @@ int check_service(service* svc, int* w, int* e) {
   /* get the command name, leave any arguments behind */
   char* temp_command_name = my_strtok(buf, "!");
 
-  command* temp_command = find_command(temp_command_name);
+  commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
   if (temp_command == NULL) {
     logger(log_verification_error, basic)
       << "Error: Service check command '" << temp_command_name
@@ -709,7 +719,9 @@ int check_service(service* svc, int* w, int* e) {
        temp_contactsmember != NULL;
        temp_contactsmember = temp_contactsmember->next) {
 
-    contact* temp_contact = find_contact(temp_contactsmember->contact_name);
+    com::centreon::engine::contact* temp_contact
+      = configuration::applier::state::instance().find_contact(
+        temp_contactsmember->contact_name);
 
     if (temp_contact == NULL) {
       logger(log_verification_error, basic)
@@ -856,7 +868,7 @@ int check_host(host* hst, int* w, int* e) {
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
 
-    command* temp_command = find_command(temp_command_name);
+    commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
@@ -880,7 +892,7 @@ int check_host(host* hst, int* w, int* e) {
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
 
-    command* temp_command = find_command(temp_command_name);
+    commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Host check command '" << temp_command_name
@@ -915,8 +927,9 @@ int check_host(host* hst, int* w, int* e) {
        temp_contactsmember != NULL;
        temp_contactsmember = temp_contactsmember->next) {
 
-    contact* temp_contact
-      = find_contact(temp_contactsmember->contact_name);
+    com::centreon::engine::contact* temp_contact
+      = configuration::applier::state::instance().find_contact(
+        temp_contactsmember->contact_name);
 
     if (temp_contact == NULL) {
       logger(log_verification_error, basic)
@@ -1014,92 +1027,42 @@ int check_host(host* hst, int* w, int* e) {
   return (errors == 0);
 }
 
-int check_contact(contact* cntct, int* w, int* e) {
+int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
   int warnings(0);
   int errors(0);
 
   /* check service notification commands */
-  if (cntct->service_notification_commands == NULL) {
+  if (cntct->get_service_notification_commands().empty()) {
     logger(log_verification_error, basic)
-      << "Error: Contact '" << cntct->name << "' has no service "
+      << "Error: Contact '" << cntct->get_name() << "' has no service "
       "notification commands defined!";
     errors++;
   }
-  else
-    for (commandsmember* temp_commandsmember = cntct->service_notification_commands;
-	 temp_commandsmember != NULL;
-	 temp_commandsmember = temp_commandsmember->next) {
-
-      /* check the host notification command */
-      char* buf = string::dup(temp_commandsmember->cmd);
-
-      /* get the command name, leave any arguments behind */
-      char* temp_command_name = my_strtok(buf, "!");
-
-      command* temp_command = find_command(temp_command_name);
-      if (temp_command == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Service notification command '"
-          << temp_command_name << "' specified for contact '"
-          << cntct->name << "' is not defined anywhere!";
-	errors++;
-      }
-
-      /* save pointer to the command for later */
-      temp_commandsmember->command_ptr = temp_command;
-
-      delete[] buf;
-    }
 
   /* check host notification commands */
-  if (cntct->host_notification_commands == NULL) {
+  if (cntct->get_host_notification_commands().empty()) {
     logger(log_verification_error, basic)
-      << "Error: Contact '" << cntct->name << "' has no host "
+      << "Error: Contact '" << cntct->get_name() << "' has no host "
       "notification commands defined!";
     errors++;
   }
-  else
-    for (commandsmember* temp_commandsmember = cntct->host_notification_commands;
-	 temp_commandsmember != NULL;
-	 temp_commandsmember = temp_commandsmember->next) {
-
-      /* check the host notification command */
-      char* buf = string::dup(temp_commandsmember->cmd);
-
-      /* get the command name, leave any arguments behind */
-      char* temp_command_name = my_strtok(buf, "!");
-
-      command* temp_command = find_command(temp_command_name);
-      if (temp_command == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Host notification command '" << temp_command_name
-          << "' specified for contact '" << cntct->name
-          << "' is not defined anywhere!";
-	errors++;
-      }
-
-      /* save pointer to the command for later */
-      temp_commandsmember->command_ptr = temp_command;
-
-      delete[] buf;
-    }
 
   /* check service notification timeperiod */
-  if (cntct->service_notification_period == NULL) {
+  if (cntct->get_service_notification_period().empty()) {
     logger(log_verification_error, basic)
-      << "Warning: Contact '" << cntct->name << "' has no service "
+      << "Warning: Contact '" << cntct->get_name() << "' has no service "
       "notification time period defined!";
     warnings++;
   }
 
   else {
     timeperiod* temp_timeperiod
-      = find_timeperiod(cntct->service_notification_period);
+      = find_timeperiod(cntct->get_service_notification_period().c_str());
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
         << "Error: Service notification period '"
-        << cntct->service_notification_period
-        << "' specified for contact '" << cntct->name
+        << cntct->get_service_notification_period()
+        << "' specified for contact '" << cntct->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1109,21 +1072,21 @@ int check_contact(contact* cntct, int* w, int* e) {
   }
 
   /* check host notification timeperiod */
-  if (cntct->host_notification_period == NULL) {
+  if (cntct->get_host_notification_period().empty()) {
     logger(log_verification_error, basic)
-      << "Warning: Contact '" << cntct->name << "' has no host "
+      << "Warning: Contact '" << cntct->get_name() << "' has no host "
       "notification time period defined!";
     warnings++;
   }
 
   else {
     timeperiod* temp_timeperiod
-      = find_timeperiod(cntct->host_notification_period);
+      = find_timeperiod(cntct->get_host_notification_period().c_str());
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
         << "Error: Host notification period '"
-        << cntct->host_notification_period
-        << "' specified for contact '" << cntct->name
+        << cntct->get_host_notification_period()
+        << "' specified for contact '" << cntct->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1133,31 +1096,31 @@ int check_contact(contact* cntct, int* w, int* e) {
   }
 
   /* check for sane host recovery options */
-  if (cntct->notify_on_host_recovery
-      && cntct->notify_on_host_down == false
-      && cntct->notify_on_host_unreachable == false) {
+  if (cntct->notify_on_host_recovery()
+      && !cntct->notify_on_host_down()
+      && !cntct->notify_on_host_unreachable()) {
     logger(log_verification_error, basic)
       << "Warning: Host recovery notification option for contact '"
-      << cntct->name << "' doesn't make any sense - specify down "
+      << cntct->get_name() << "' doesn't make any sense - specify down "
       "and/or unreachable options as well";
     warnings++;
   }
 
   /* check for sane service recovery options */
-  if (cntct->notify_on_service_recovery
-      && cntct->notify_on_service_critical == false
-      && cntct->notify_on_service_warning == false) {
+  if (cntct->notify_on_service_recovery()
+      && !cntct->notify_on_service_critical()
+      && !cntct->notify_on_service_warning()) {
     logger(log_verification_error, basic)
       << "Warning: Service recovery notification option for contact '"
-      << cntct->name << "' doesn't make any sense - specify critical "
+      << cntct->get_name() << "' doesn't make any sense - specify critical "
       "and/or warning options as well";
     warnings++;
   }
 
   /* check for illegal characters in contact name */
-  if (contains_illegal_object_chars(cntct->name)) {
+  if (contains_illegal_object_chars(const_cast<char*>(cntct->get_name().c_str()))) {
     logger(log_verification_error, basic)
-      << "Error: The name of contact '" << cntct->name
+      << "Error: The name of contact '" << cntct->get_name()
       << "' contains one or more illegal characters.";
     errors++;
   }
@@ -1291,7 +1254,8 @@ int check_contactgroup(contactgroup* cg, int* w, int* e) {
        temp_contactsmember;
        temp_contactsmember = temp_contactsmember->next) {
     contact* temp_contact(
-               find_contact(temp_contactsmember->contact_name));
+      configuration::applier::state::instance().find_contact(
+        temp_contactsmember->contact_name));
     if (!temp_contact) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << temp_contactsmember->contact_name
@@ -1521,7 +1485,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
        temp_contactsmember;
        temp_contactsmember = temp_contactsmember->next) {
     // Find the contact.
-    contact* temp_contact(find_contact(
+    contact* temp_contact(configuration::applier::state::instance().find_contact(
                             temp_contactsmember->contact_name));
     if (!temp_contact) {
       logger(log_verification_error, basic)
@@ -1543,8 +1507,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
        temp_contactgroupsmember = temp_contactgroupsmember->next) {
     // Find the contact group.
     contactgroup* temp_contactgroup(
-                    find_contactgroup(
-                      temp_contactgroupsmember->group_name));
+      find_contactgroup(temp_contactgroupsmember->group_name));
     if (!temp_contactgroup) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
@@ -1611,7 +1574,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
        temp_contactsmember;
        temp_contactsmember = temp_contactsmember->next) {
     // Find the contact.
-    contact* temp_contact(find_contact(
+    contact* temp_contact(configuration::applier::state::instance().find_contact(
                             temp_contactsmember->contact_name));
     if (!temp_contact) {
       logger(log_verification_error, basic)
@@ -1632,8 +1595,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
        temp_contactgroupsmember = temp_contactgroupsmember->next) {
     // Find the contact group.
     contactgroup* temp_contactgroup(
-                    find_contactgroup(
-                      temp_contactgroupsmember->group_name));
+      find_contactgroup(temp_contactgroupsmember->group_name));
     if (!temp_contactgroup) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"

@@ -21,8 +21,7 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/objects/command.hh"
-#include "com/centreon/engine/objects/commandsmember.hh"
-#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
@@ -39,11 +38,13 @@ using namespace com::centreon::engine::configuration;
  *  @param[in] members  The contact members to fill.
  */
 void applier::add_member(
-       umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
+       umap<std::string,
+           std::shared_ptr<com::centreon::engine::contact> > const& contacts,
        std::string const& name,
        contactsmember_struct*& members) {
   // Find contact to add.
-  umap<std::string, std::shared_ptr<contact_struct> >::const_iterator
+  umap<std::string,
+       std::shared_ptr<com::centreon::engine::contact> >::const_iterator
     it(contacts.find(name));
   if (it == contacts.end()) {
     logger(log_config_error, basic)
@@ -68,31 +69,10 @@ void applier::add_member(
  *  @param[in] name     The commands name to add.
  *  @param[in] members  The command members to fill.
  */
-void applier::add_member(
-       umap<std::string, std::shared_ptr<command_struct> > const& commands,
-       std::string const& name,
-       commandsmember_struct*& members) {
-  // Find command to add.
-  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
-    it(commands.find(name));
-  if (it == commands.end()) {
-    logger(log_config_error, basic)
-      << "Error: Cannot add command member: command '"
-      << name << "' not found";
-    return ;
-  }
-
-  // Create and fill the new member.
-  std::unique_ptr<commandsmember_struct> obj(new commandsmember_struct);
-  memset(obj.get(), 0, sizeof(*obj));
-  obj->cmd = string::dup(name);
-  obj->command_ptr = &(*it->second);
-  obj->next = members;
-  members = obj.release();
-}
 
 void applier::update_members(
-       umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
+       umap<std::string,
+            std::shared_ptr<com::centreon::engine::contact> > const& contacts,
        std::list<std::string> const& lst,
        contactsmember_struct*& members) {
   deleter::contactsmember(members);

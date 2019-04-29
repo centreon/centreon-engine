@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostescalation.hh"

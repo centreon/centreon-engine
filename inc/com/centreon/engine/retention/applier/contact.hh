@@ -23,10 +23,10 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/contact.hh"
 
-// Forward declaration.
-struct contact_struct;
-
 CCE_BEGIN()
+// Forward declaration.
+class contact;
+
 
 // Forward declaration.
 namespace configuration {
@@ -45,7 +45,7 @@ namespace   retention {
       void  _update(
               configuration::state const& config,
               retention::contact const& state,
-              contact_struct& obj);
+              com::centreon::engine::contact* obj);
 
     };
   }

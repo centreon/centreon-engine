@@ -39,6 +39,7 @@ namespace                      commands {
    */
   class                        command {
   public:
+    static command*            add_command(commands::command* obj);
                                command(
                                  std::string const& name,
                                  std::string const& command_line,
