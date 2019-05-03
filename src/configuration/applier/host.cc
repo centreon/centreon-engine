@@ -240,7 +240,21 @@ void applier::host::expand_objects(configuration::state& s) {
          it_host(s.hosts().begin()),
          end_host(s.hosts().end());
        it_host != end_host;
-       ++it_host)
+       ++it_host) {
+
+    // Should custom variables be sent to broker ?
+    for (map_customvar::const_iterator
+           it(it_host->customvariables().begin()),
+           end(it_host->customvariables().end());
+         it != end;
+         ++it) {
+      if (!s.enable_macros_filter()
+          || s.macros_filter().find(it->first) != s.macros_filter().end()) {
+        customvariable& cv(const_cast<customvariable&>(it->second));
+        cv.set_sent(true);
+      }
+    }
+
     // Browse current host's groups.
     for (set_string::const_iterator
            it_group(it_host->hostgroups().begin()),
@@ -265,6 +279,7 @@ void applier::host::expand_objects(configuration::state& s) {
       // Reinsert host group.
       s.hostgroups().insert(backup);
     }
+  }
 
   return ;
 }

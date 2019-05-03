@@ -210,7 +210,20 @@ void applier::contact::expand_objects(configuration::state& s) {
          it_contact(s.contacts().begin()),
          end_contact(s.contacts().end());
        it_contact != end_contact;
-       ++it_contact)
+       ++it_contact) {
+    // Should custom variables be sent to broker ?
+    for (map_customvar::const_iterator
+           it(it_contact->customvariables().begin()),
+           end(it_contact->customvariables().end());
+         it != end;
+         ++it) {
+      if (!s.enable_macros_filter()
+          || s.macros_filter().find(it->first) != s.macros_filter().end()) {
+        customvariable& cv(const_cast<customvariable&>(it->second));
+        cv.set_sent(true);
+      }
+    }
+
     // Browse current contact's groups.
     for (set_string::const_iterator
            it_group(it_contact->contactgroups().begin()),
@@ -236,7 +249,7 @@ void applier::contact::expand_objects(configuration::state& s) {
       // Reinsert contact group.
       s.contactgroups().insert(backup);
     }
-
+  }
   return ;
 }
 
