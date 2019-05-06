@@ -85,8 +85,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<hostgroup> hostgroup_ptr;
-  typedef std::set<hostgroup>   set_hostgroup;
+  typedef std::shared_ptr<hostgroup> hostgroup_ptr;
+  typedef std::set<hostgroup>        set_hostgroup;
 }
 
 CCE_END()

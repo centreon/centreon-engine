@@ -28,7 +28,6 @@
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/utils.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -106,9 +105,9 @@ int neb_load_all_modules() {
     if (!mod_dir.empty())
       loader.load_directory(mod_dir);
 
-    std::list<shared_ptr<broker::handle> >
+    std::list<std::shared_ptr<broker::handle> >
       modules(loader.get_modules());
-    for (std::list<shared_ptr<broker::handle> >::const_iterator
+    for (std::list<std::shared_ptr<broker::handle> >::const_iterator
            it(modules.begin()), end(modules.end());
          it != end;
          ++it)
@@ -163,9 +162,9 @@ int neb_reload_all_modules() {
   try {
     broker::loader* loader(&broker::loader::instance());
     if (loader) {
-      std::list<shared_ptr<broker::handle> >
+      std::list<std::shared_ptr<broker::handle> >
         modules(loader->get_modules());
-      for (std::list<shared_ptr<broker::handle> >::const_iterator
+      for (std::list<std::shared_ptr<broker::handle> >::const_iterator
              it(modules.begin()), end(modules.end());
            it != end;
            ++it) {
@@ -220,9 +219,9 @@ int neb_unload_all_modules(int flags, int reason) {
   try {
     broker::loader* loader(&broker::loader::instance());
     if (loader) {
-      std::list<shared_ptr<broker::handle> >
+      std::list<std::shared_ptr<broker::handle> >
         modules(loader->get_modules());
-      for (std::list<shared_ptr<broker::handle> >::const_iterator
+      for (std::list<std::shared_ptr<broker::handle> >::const_iterator
              it(modules.begin()), end(modules.end());
            it != end;
            ++it)

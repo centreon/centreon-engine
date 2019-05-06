@@ -40,7 +40,6 @@
 #  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/string.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 

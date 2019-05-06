@@ -26,7 +26,6 @@
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/logging/engine.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon;
@@ -61,7 +60,7 @@ int main_test(int argc, char** argv) {
   engine::broker::loader& loader(engine::broker::loader::instance());
 
   // Load dummy module.
-  shared_ptr<engine::broker::handle> mod(loader.add_module("./dummymod.so"));
+  std::shared_ptr<engine::broker::handle> mod(loader.add_module("./dummymod.so"));
   mod->open();
 
   // Get instance of logging engine.

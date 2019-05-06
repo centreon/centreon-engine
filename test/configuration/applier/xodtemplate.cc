@@ -42,7 +42,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "nagios.h"
 #include "skiplist.h"
 #include "xodtemplate.hh"
@@ -10278,7 +10277,7 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
     using namespace com::centreon::engine;
     commands::set& cmd_set(commands::set::instance());
     if (this_command->connector_name == NULL) {
-      com::centreon::shared_ptr<commands::command>
+      std::shared_ptr<commands::command>
         cmd(new commands::raw(
                             this_command->command_name,
                             this_command->command_line,
@@ -10286,10 +10285,10 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
       cmd_set.add_command(cmd);
     }
     else {
-      com::centreon::shared_ptr<commands::command>
+      std::shared_ptr<commands::command>
         cmd_forward(cmd_set.get_command(this_command->connector_name));
 
-      com::centreon::shared_ptr<commands::command>
+      std::shared_ptr<commands::command>
         cmd(new commands::forward(
                             this_command->command_name,
                             this_command->command_line,
@@ -10343,7 +10342,7 @@ int xodtemplate_register_connector(xodtemplate_connector* this_connector) {
     std::string processed_cmd(command_line);
     delete[] command_line;
 
-    com::centreon::shared_ptr<commands::command>
+    std::shared_ptr<commands::command>
       cmd(new commands::connector(
                           this_connector->connector_name,
                           processed_cmd,

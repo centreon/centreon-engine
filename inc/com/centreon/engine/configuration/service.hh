@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_SERVICE_HH
 
 #  include <list>
+#  include <memory>
 #  include <set>
 #  include <utility>
 #  include "com/centreon/engine/common.hh"
@@ -230,9 +231,9 @@ namespace                  configuration {
     opt<std::string>       _timezone;
  };
 
-  typedef shared_ptr<service>    service_ptr;
-  typedef std::list<service_ptr> list_service;
-  typedef std::set<service>      set_service;
+  typedef std::shared_ptr<service> service_ptr;
+  typedef std::list<service_ptr>   list_service;
+  typedef std::set<service>        set_service;
   typedef umap<std::pair<std::string, std::string>, service_ptr> map_service;
 }
 

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <memory>
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
@@ -174,7 +175,7 @@ void parser::_apply_hostextinfo() {
        it != end;
        ++it) {
     // Get the current hostextinfo to check.
-    hostextinfo_ptr obj(*it);
+    hostextinfo_ptr obj(std::static_pointer_cast<hostextinfo>(*it));
 
     list_host hosts;
     _get_objects_by_list_name(obj->hosts(), gl_hosts, hosts);
@@ -203,7 +204,7 @@ void parser::_apply_serviceextinfo() {
        it != end;
        ++it) {
     // Get the current serviceextinfo to check.
-    serviceextinfo_ptr obj(*it);
+    serviceextinfo_ptr obj(std::static_pointer_cast<serviceextinfo>(*it));
 
     list_host hosts;
     _get_objects_by_list_name(obj->hosts(), gl_hosts, hosts);
@@ -213,7 +214,7 @@ void parser::_apply_serviceextinfo() {
            it(gl_services.begin()), end(gl_services.end());
          it != end;
          ++it) {
-      service_ptr svc(*it);
+      service_ptr svc(std::static_pointer_cast<service>(*it));
       if (svc->service_description() != obj->service_description())
         continue;
 
@@ -447,7 +448,7 @@ void parser::_parse_object_definitions(std::string const& path) {
     }
 
     // Check if is a valid object.
-    if (obj.is_null()) {
+    if (obj == nullptr) {
       if (input.find("define") || !std::isspace(input[6]))
         throw (engine_error() << "Parsing of object definition failed "
                << "in file '" << _current_path << "' on line "
@@ -460,7 +461,7 @@ void parser::_parse_object_definitions(std::string const& path) {
                << _current_line << ": Unexpected start definition");
       std::string const& type(string::trim_right(input.erase(last)));
       obj = object::create(type);
-      if (obj.is_null())
+      if (obj == nullptr)
         throw (engine_error() << "Parsing of object definition failed "
                << "in file '" << _current_path << "' on line "
                << _current_line << ": Unknown object type name '"
@@ -486,7 +487,7 @@ void parser::_parse_object_definitions(std::string const& path) {
         if (obj->should_register())
           _add_object(obj);
       }
-      obj.clear();
+      obj.reset();
     }
   }
 }
@@ -598,12 +599,12 @@ void parser::_store_into_list(object_ptr obj) {
  */
 template<typename T, std::string const& (T::*ptr)() const throw ()>
 void parser::_store_into_map(object_ptr obj) {
-  shared_ptr<T> real(obj);
+  std::shared_ptr<T> real(std::static_pointer_cast<T>(obj));
   map_object::iterator
     it(_map_objects[obj->type()].find((real.get()->*ptr)()));
   if (it != _map_objects[obj->type()].end())
     throw (engine_error() << "Parsing of " << obj->type_name()
            << " failed " << _get_file_info(obj.get()) << ": "
-           << obj->name() << " already exists");
+           << obj->name() << " alrealdy exists");
   _map_objects[obj->type()][(real.get()->*ptr)()] = real;
 }

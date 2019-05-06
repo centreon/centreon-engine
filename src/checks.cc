@@ -1008,9 +1008,11 @@ int handle_async_service_check_result(
         /* we do this because we might be sending out a notification soon and we want the dependency logic to be accurate */
         std::pair<std::string, std::string>
           id(std::make_pair(temp_service->host_name, temp_service->description));
-        umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> > const&
+        umultimap<std::pair<std::string, std::string>,
+                  std::shared_ptr<servicedependency> > const&
           dependencies(state::instance().servicedependencies());
-        for (umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >::const_iterator
+        for (umultimap<std::pair<std::string, std::string>,
+                       std::shared_ptr<servicedependency> >::const_iterator
                it(dependencies.find(id)), end(dependencies.end());
              it != end && it->first == id;
              ++it) {
@@ -1476,9 +1478,11 @@ unsigned int check_service_dependencies(
 
   std::pair<std::string, std::string>
     id(svc->host_name, svc->description);
-  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> > const&
+  umultimap<std::pair<std::string, std::string>,
+            std::shared_ptr<servicedependency> > const&
     dependencies(state::instance().servicedependencies());
-  for (umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >::const_iterator
+  for (umultimap<std::pair<std::string, std::string>,
+                 std::shared_ptr<servicedependency> >::const_iterator
          it(dependencies.find(id)), end(dependencies.end());
        it != end && it->first == id;
        ++it) {
@@ -1965,11 +1969,11 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
     << "check_host_dependencies()";
 
   std::string id(hst->name);
-  umultimap<std::string, shared_ptr<hostdependency> > const&
+  umultimap<std::string, std::shared_ptr<hostdependency> > const&
     dependencies(state::instance().hostdependencies());
 
   /* check all dependencies... */
-  for (umultimap<std::string, shared_ptr<hostdependency> >::const_iterator
+  for (umultimap<std::string, std::shared_ptr<hostdependency> >::const_iterator
          it(dependencies.find(id)), end(dependencies.end());
        it != end && it->first == id;
        ++it) {
@@ -3198,9 +3202,10 @@ int process_host_check_result_3x(
             "one depends on...";
 
           std::string id(hst->name);
-          umultimap<std::string, shared_ptr<hostdependency> > const&
+          umultimap<std::string, std::shared_ptr<hostdependency> > const&
             dependencies(state::instance().hostdependencies());
-          for (umultimap<std::string, shared_ptr<hostdependency> >::const_iterator
+          for (umultimap<std::string,
+                         std::shared_ptr<hostdependency> >::const_iterator
                  it(dependencies.find(id)), end(dependencies.end());
                  it != end && it->first == id;
                  ++it) {

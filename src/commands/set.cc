@@ -21,7 +21,6 @@
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -43,7 +42,7 @@ static set* _instance = NULL;
  *  @param[in] cmd The new command.
  */
 void set::add_command(command const& cmd) {
-  add_command(shared_ptr<command>(cmd.clone()));
+  add_command(std::shared_ptr<command>(cmd.clone()));
   return;
 }
 
@@ -52,7 +51,7 @@ void set::add_command(command const& cmd) {
  *
  *  @param[in] cmd The new command.
  */
-void set::add_command(shared_ptr<command> cmd) {
+void set::add_command(std::shared_ptr<command> cmd) {
   _list[cmd->get_name()] = cmd;
   logger(dbg_commands, basic)
     << "added command " << cmd->get_name();
@@ -64,11 +63,11 @@ void set::add_command(shared_ptr<command> cmd) {
  *
  *  @param[in] cmd_name The command name.
  *
- *  @return The shared pointer on a command object.
+ *  @return The std::shared pointer on a command object.
  */
-shared_ptr<commands::command> set::get_command(
+std::shared_ptr<commands::command> set::get_command(
                                      std::string const& cmd_name) {
-  umap<std::string, shared_ptr<command> >::iterator
+  umap<std::string, std::shared_ptr<command> >::iterator
     it(_list.find(cmd_name));
   if (it == _list.end())
     throw (engine_error()

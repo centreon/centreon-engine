@@ -30,7 +30,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -131,7 +130,7 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
 
 
   // Allocate memory for the new timeperiod.
-  shared_ptr<timeperiod> obj(new timeperiod, deleter::timeperiod);
+  std::shared_ptr<timeperiod> obj(new timeperiod, deleter::timeperiod);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -157,7 +156,7 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -172,7 +171,7 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
  *          timeperiod is not found.
  */
 timeperiod& engine::find_timperiod(std::string const& name) {
-  umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator
     it(state::instance().timeperiods().find(name));
   if (it == state::instance().timeperiods().end())
     throw (engine_error() << "Time period '"
@@ -188,7 +187,7 @@ timeperiod& engine::find_timperiod(std::string const& name) {
  *  @return True if the timeperiod is found, otherwise false.
  */
 bool engine::is_timeperiod_exist(std::string const& name) throw () {
-  umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator
     it(state::instance().timeperiods().find(name));
   return (it != state::instance().timeperiods().end());
 }

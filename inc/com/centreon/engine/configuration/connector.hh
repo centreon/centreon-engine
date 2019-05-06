@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_CONNECTOR_HH
 #  define CCE_CONFIGURATION_CONNECTOR_HH
 
+#  include <memory>
 #  include <set>
 #  include <string>
 #  include "com/centreon/engine/commands/connector.hh"
@@ -65,8 +66,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<connector> connector_ptr;
-  typedef std::set<connector>   set_connector;
+  typedef std::shared_ptr<connector> connector_ptr;
+  typedef std::set<connector>        set_connector;
 }
 
 CCE_END()

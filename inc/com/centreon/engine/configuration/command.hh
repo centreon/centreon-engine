@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_COMMAND_HH
 #  define CCE_CONFIGURATION_COMMAND_HH
 
+#  include <memory>
 #  include <set>
 #  include <string>
 #  include "com/centreon/engine/configuration/object.hh"
@@ -66,8 +67,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<command> command_ptr;
-  typedef std::set<command>   set_command;
+  typedef std::shared_ptr<command> command_ptr;
+  typedef std::set<command>        set_command;
 }
 
 CCE_END()

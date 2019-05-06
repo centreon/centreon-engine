@@ -21,7 +21,6 @@
 #include <time.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "test/logging/test.hh"
 #include "test/unittest.hh"
 
@@ -64,7 +63,7 @@ int main_test(int argc, char** argv) {
       if (i == 8)
         continue;
       unsigned long long type(1ull << i);
-      com::centreon::shared_ptr<object>
+      std::shared_ptr<object>
         obj(new test(LOG_MESSAGE, type, j, j + 1));
       engine::obj_info info(obj, type, j);
       id[i + j * NB_LOG_TYPE] = engine.add_object(info);
@@ -75,7 +74,7 @@ int main_test(int argc, char** argv) {
   // One object by debug logging type.
   for (unsigned int i(0); i < NB_DBG_TYPE; ++i) {
     unsigned long long type(1ull << (i + 32));
-    com::centreon::shared_ptr<object>
+    std::shared_ptr<object>
       obj(new test(LOG_MESSAGE, type, 0, 1));
     engine::obj_info info(obj, type, 0);
     id[NB_LOG_TYPE * NB_LOG_LEVEL + i] = engine.add_object(info);

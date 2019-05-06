@@ -28,7 +28,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/shared.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -148,7 +147,7 @@ void applier::contactgroup::modify_object(
            << "contact group '" << obj.contactgroup_name() << "'");
 
   // Find contact group object.
-  umap<std::string, shared_ptr<contactgroup_struct> >::iterator
+  umap<std::string, std::shared_ptr<contactgroup_struct> >::iterator
     it_obj(applier::state::instance().contactgroups_find(obj.key()));
   if (it_obj == applier::state::instance().contactgroups().end())
     throw (engine_error() << "Error: Could not modify non-existing "
@@ -209,7 +208,7 @@ void applier::contactgroup::remove_object(
     << "Removing contactgroup '" << obj.contactgroup_name() << "'";
 
   // Find contact group.
-  umultimap<std::string, shared_ptr<contactgroup_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<contactgroup_struct> >::iterator
     it(applier::state::instance().contactgroups_find(obj.key()));
   if (it != applier::state::instance().contactgroups().end()) {
     contactgroup_struct* grp(it->second.get());
@@ -248,7 +247,7 @@ void applier::contactgroup::resolve_object(
     << "Resolving contact group '" << obj.contactgroup_name() << "'";
 
   // Find contact group.
-  umap<std::string, shared_ptr<contactgroup_struct> >::iterator
+  umap<std::string, std::shared_ptr<contactgroup_struct> >::iterator
     it(applier::state::instance().contactgroups_find(obj.key()));
   if (applier::state::instance().contactgroups().end() == it)
     throw (engine_error() << "Error: Cannot resolve non-existing "
