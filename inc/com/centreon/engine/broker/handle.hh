@@ -20,10 +20,10 @@
 #ifndef CCE_BROKER_HANDLE_HH
 # define CCE_BROKER_HANDLE_HH
 
+#  include <memory>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/library.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -83,7 +83,7 @@ namespace                    broker {
     std::string              _copyright;
     std::string              _description;
     std::string              _filename;
-    shared_ptr<library>      _handle;
+    std::shared_ptr<library> _handle;
     std::string              _license;
     std::string              _name;
     std::string              _version;

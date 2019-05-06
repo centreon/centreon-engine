@@ -24,7 +24,6 @@
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/object.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -90,8 +89,8 @@ namespace                retention {
     unsigned long        _triggered_by;
   };
 
-  typedef shared_ptr<downtime> downtime_ptr;
-  typedef std::list<downtime_ptr> list_downtime;
+  typedef std::shared_ptr<downtime> downtime_ptr;
+  typedef std::list<downtime_ptr>   list_downtime;
 }
 
 CCE_END()

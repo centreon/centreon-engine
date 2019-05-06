@@ -26,7 +26,6 @@
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/logging/engine.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon;

@@ -33,7 +33,6 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -508,7 +507,7 @@ service* add_service(
   }
 
   // Allocate memory.
-  shared_ptr<service> obj(new service, deleter::service);
+  std::shared_ptr<service> obj(new service, deleter::service);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -593,7 +592,7 @@ service* add_service(
     service_list = obj.get();
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -652,10 +651,12 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
 
   std::pair<std::string, std::string>
     id(std::make_pair(svc->host_name, svc->description));
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
+  umultimap<std::pair<std::string, std::string>,
+            std::shared_ptr<serviceescalation> > const&
     escalations(state::instance().serviceescalations());
 
-  for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
+  for (umultimap<std::pair<std::string, std::string>,
+                 std::shared_ptr<serviceescalation> >::const_iterator
          it(escalations.find(id)), end(escalations.end());
        it != end && it->first == id;
        ++it) {
@@ -722,7 +723,8 @@ service& engine::find_service(
            unsigned int service_id) {
   std::pair<unsigned int, unsigned int>
     id(std::make_pair(host_id, service_id));
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<unsigned int, unsigned int>,
+       std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   if (it == state::instance().services().end())
     throw (engine_error() << "Service '" << service_id
@@ -757,7 +759,8 @@ char const* engine::get_service_timezone(
  */
 bool engine::is_service_exist(
        std::pair<unsigned int, unsigned int> const& id) {
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<unsigned int, unsigned int>,
+       std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   return (it != state::instance().services().end());
 }

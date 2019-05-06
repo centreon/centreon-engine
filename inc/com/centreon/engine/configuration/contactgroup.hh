@@ -73,8 +73,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<contactgroup> contactgroup_ptr;
-  typedef std::set<contactgroup>   set_contactgroup;
+  typedef std::shared_ptr<contactgroup> contactgroup_ptr;
+  typedef std::set<contactgroup>        set_contactgroup;
 }
 
 CCE_END()

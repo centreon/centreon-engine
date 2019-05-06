@@ -24,7 +24,6 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -114,7 +113,7 @@ namespace                     retention {
     static setters const      _setters[];
   };
 
-  typedef shared_ptr<program> program_ptr;
+  typedef std::shared_ptr<program> program_ptr;
 }
 
 CCE_END()

@@ -28,7 +28,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -122,7 +121,7 @@ servicegroup* add_servicegroup(
   }
 
   // Allocate memory.
-  shared_ptr<servicegroup> obj(new servicegroup, deleter::servicegroup);
+  std::shared_ptr<servicegroup> obj(new servicegroup, deleter::servicegroup);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -144,7 +143,7 @@ servicegroup* add_servicegroup(
     servicegroup_list = obj.get();
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -206,7 +205,7 @@ int is_service_member_of_servicegroup(
  *          servicegroup is not found.
  */
 servicegroup& engine::find_servicegroup(std::string const& name) {
-  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it == state::instance().servicegroups().end())
     throw (engine_error() << "Service group "
@@ -222,7 +221,7 @@ servicegroup& engine::find_servicegroup(std::string const& name) {
  *  @return True if the servicegroup is found, otherwise false.
  */
 bool engine::is_servicegroup_exist(std::string const& name) throw () {
-  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   return (it != state::instance().servicegroups().end());
 }

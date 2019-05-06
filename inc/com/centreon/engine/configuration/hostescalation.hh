@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTESCALATION_HH
 #  define CCE_CONFIGURATION_HOSTESCALATION_HH
 
+#  include <memory>
 #  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -106,8 +107,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<hostescalation> hostescalation_ptr;
-  typedef std::set<hostescalation>   set_hostescalation;
+  typedef std::shared_ptr<hostescalation> hostescalation_ptr;
+  typedef std::set<hostescalation>        set_hostescalation;
 }
 
 CCE_END()

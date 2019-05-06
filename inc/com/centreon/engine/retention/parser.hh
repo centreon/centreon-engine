@@ -38,7 +38,7 @@ namespace        retention {
   private:
     typedef void (parser::*store)(state&, object_ptr obj);
 
-    template<typename T, T& (state::*ptr)() throw ()>
+    template<typename T, typename T2, T& (state::*ptr)() throw ()>
     void         _store_into_list(state& retention, object_ptr obj);
     template<typename T, T& (state::*ptr)() throw ()>
     void         _store_object(state& retention, object_ptr obj);

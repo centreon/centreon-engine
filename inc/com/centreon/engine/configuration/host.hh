@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOST_HH
 #  define CCE_CONFIGURATION_HOST_HH
 
+#  include <memory>
 #  include <list>
 #  include <set>
 #  include "com/centreon/engine/common.hh"
@@ -221,9 +222,9 @@ namespace                  configuration {
     std::string            _vrml_image;
   };
 
-  typedef shared_ptr<host>  host_ptr;
-  typedef std::list<host>   list_host;
-  typedef std::set<host>    set_host;
+  typedef std::shared_ptr<host> host_ptr;
+  typedef std::list<host>       list_host;
+  typedef std::set<host>        set_host;
 }
 
 CCE_END()
