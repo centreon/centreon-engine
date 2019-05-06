@@ -88,8 +88,8 @@ namespace                   configuration {
     static setters const    _setters[];
   };
 
-  typedef shared_ptr<servicegroup>  servicegroup_ptr;
-  typedef std::set<servicegroup>    set_servicegroup;
+  typedef std::shared_ptr<servicegroup> servicegroup_ptr;
+  typedef std::set<servicegroup>        set_servicegroup;
 }
 
 CCE_END()

@@ -301,7 +301,8 @@ void applier::servicedependency::remove_object(
     << "Removing a service dependency.";
 
   // Find service dependency.
-  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
+  umultimap<std::pair<std::string, std::string>,
+            std::shared_ptr<servicedependency_struct> >::iterator
     it(applier::state::instance().servicedependencies_find(obj.key()));
   if (it != applier::state::instance().servicedependencies().end()) {
     servicedependency_struct* dependency(it->second.get());
@@ -342,7 +343,8 @@ void applier::servicedependency::resolve_object(
     << "Resolving a service dependency.";
 
   // Find service dependency.
-  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
+  umultimap<std::pair<std::string, std::string>,
+            std::shared_ptr<servicedependency_struct> >::iterator
     it(applier::state::instance().servicedependencies_find(obj.key()));
   if (applier::state::instance().servicedependencies().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

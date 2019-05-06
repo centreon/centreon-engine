@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTDEPENDENCY_HH
 #  define CCE_CONFIGURATION_HOSTDEPENDENCY_HH
 
+#  include <memory>
 #  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -108,8 +109,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<hostdependency>  hostdependency_ptr;
-  typedef std::set<hostdependency>    set_hostdependency;
+  typedef std::shared_ptr<hostdependency>  hostdependency_ptr;
+  typedef std::set<hostdependency>         set_hostdependency;
 }
 
 CCE_END()

@@ -35,7 +35,6 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -523,7 +522,7 @@ host* add_host(
   }
 
   // Allocate memory for a new host.
-  shared_ptr<host> obj(new host, deleter::host);
+  std::shared_ptr<host> obj(new host, deleter::host);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -618,7 +617,7 @@ host* add_host(
     host_list = obj.get();
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -676,10 +675,10 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
     return (false);
 
   std::string id(hst->name);
-  umultimap<std::string, shared_ptr<hostescalation> > const&
+  umultimap<std::string, std::shared_ptr<hostescalation> > const&
     escalations(state::instance().hostescalations());
 
-  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+  for (umultimap<std::string, std::shared_ptr<hostescalation> >::const_iterator
          it(escalations.find(id)), end(escalations.end());
          it != end && it->first == id;
        ++it) {
@@ -853,7 +852,7 @@ void engine::check_for_expired_acknowledgement(host* h) {
  *          host is not found.
  */
 host& engine::find_host(unsigned int host_id) {
-  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+  umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(host_id));
   if (it == state::instance().hosts().end())
     throw (engine_error() << "Host '" << host_id << "' was not found");
@@ -880,7 +879,7 @@ char const* engine::get_host_timezone(char const* name) {
  *  @return True if the host is found, otherwise false.
  */
 bool engine::is_host_exist(unsigned int host_id) throw () {
-  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+  umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(host_id));
   return (it != state::instance().hosts().end());
 }

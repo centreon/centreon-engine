@@ -124,7 +124,7 @@ void applier::command::modify_object(
            << "command '" << obj.command_name() << "'");
 
   // Find command object.
-  umap<std::string, shared_ptr<command_struct> >::iterator
+  umap<std::string, std::shared_ptr<command_struct> >::iterator
     it_obj(applier::state::instance().commands_find(obj.key()));
   if (it_obj == applier::state::instance().commands().end())
     throw (engine_error() << "Could not modify non-existing "
@@ -169,7 +169,7 @@ void applier::command::remove_object(
     << "Removing command '" << obj.command_name() << "'.";
 
   // Find command.
-  umap<std::string, shared_ptr<command_struct> >::iterator
+  umap<std::string, std::shared_ptr<command_struct> >::iterator
     it(applier::state::instance().commands_find(obj.key()));
   if (it != applier::state::instance().commands().end()) {
     command_struct* cmd(it->second.get());
@@ -229,7 +229,7 @@ void applier::command::_create_command(
 
   // Raw command.
   if (obj.connector().empty()) {
-    shared_ptr<commands::command>
+    std::shared_ptr<commands::command>
       cmd(new commands::raw(
                           obj.command_name(),
                           obj.command_line(),
@@ -238,7 +238,7 @@ void applier::command::_create_command(
   }
   // Connector command.
   else {
-    shared_ptr<commands::command>
+    std::shared_ptr<commands::command>
       cmd(new commands::forward(
                           obj.command_name(),
                           obj.command_line(),

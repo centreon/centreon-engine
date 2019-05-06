@@ -33,7 +33,6 @@
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "compatibility/locations.h"
 #include "chkdiff.hh"
 #include "test/unittest.hh"
@@ -59,31 +58,33 @@ struct                global {
   servicegroup*       servicegroups;
   timeperiod*         timeperiods;
 
-  umap<std::string, shared_ptr<command> >
+  umap<std::string, std::shared_ptr<command> >
                       save_commands;
-  umap<std::string, shared_ptr<commands::connector> >
+  umap<std::string, std::shared_ptr<commands::connector> >
                       save_connectors;
-  umap<std::string, shared_ptr<contact> >
+  umap<std::string, std::shared_ptr<contact> >
                       save_contacts;
-  umap<std::string, shared_ptr<contactgroup> >
+  umap<std::string, std::shared_ptr<contactgroup> >
                       save_contactgroups;
-  umap<std::string, shared_ptr<host> >
+  umap<std::string, std::shared_ptr<host> >
                       save_hosts;
-  umultimap<std::string, shared_ptr<hostdependency> >
+  umultimap<std::string, std::shared_ptr<hostdependency> >
                       save_hostdependencies;
-  umultimap<std::string, shared_ptr<hostescalation> >
+  umultimap<std::string, std::shared_ptr<hostescalation> >
                       save_hostescalations;
-  umap<std::string, shared_ptr<hostgroup> >
+  umap<std::string, std::shared_ptr<hostgroup> >
                       save_hostgroups;
-  umap<std::pair<std::string, std::string>, shared_ptr<service> >
+  umap<std::pair<std::string, std::string>, std::shared_ptr<service> >
                       save_services;
-  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
+  umultimap<std::pair<std::string, std::string>,
+    std::shared_ptr<servicedependency> >
                       save_servicedependencies;
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >
+  umultimap<std::pair<std::string, std::string>,
+    std::shared_ptr<serviceescalation> >
                       save_serviceescalations;
-  umap<std::string, shared_ptr<servicegroup> >
+  umap<std::string, std::shared_ptr<servicegroup> >
                       save_servicegroups;
-  umap<std::string, shared_ptr<timeperiod> >
+  umap<std::string, std::shared_ptr<timeperiod> >
                       save_timeperiods;
 
   bool                accept_passive_host_checks;

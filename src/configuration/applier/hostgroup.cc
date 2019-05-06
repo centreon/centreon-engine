@@ -161,7 +161,7 @@ void applier::hostgroup::modify_object(
            << "host group '" << obj.hostgroup_name() << "'");
 
   // Find host group object.
-  umap<std::string, shared_ptr<hostgroup_struct> >::iterator
+  umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator
     it_obj(applier::state::instance().hostgroups_find(obj.key()));
   if (it_obj == applier::state::instance().hostgroups().end())
     throw (engine_error() << "Could not modify non-existing "
@@ -246,7 +246,7 @@ void applier::hostgroup::remove_object(
     << "Removing host group '" << obj.hostgroup_name() << "'";
 
   // Find host group.
-  umap<std::string, shared_ptr<hostgroup_struct> >::iterator
+  umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator
     it(applier::state::instance().hostgroups_find(obj.key()));
   if (it != applier::state::instance().hostgroups().end()) {
     hostgroup_struct* grp(it->second.get());
@@ -286,7 +286,7 @@ void applier::hostgroup::resolve_object(
     << "Resolving host group '" << obj.hostgroup_name() << "'";
 
   // Find host group.
-  umap<std::string, shared_ptr<hostgroup_struct> >::iterator
+  umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator
     it(applier::state::instance().hostgroups_find(obj.key()));
   if (applier::state::instance().hostgroups().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

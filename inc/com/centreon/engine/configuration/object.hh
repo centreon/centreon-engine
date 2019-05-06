@@ -23,11 +23,11 @@
 #  include <algorithm>
 #  include <list>
 #  include <map>
+#  include <memory>
 #  include <set>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/string.hh"
-#  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
 typedef std::list<std::string>             list_string;
@@ -65,14 +65,15 @@ namespace                  configuration {
     bool                   operator!=(
                              object const& right) const throw ();
     virtual void           check_validity() const = 0;
-    static shared_ptr<object>
+    static std::shared_ptr<object>
                            create(std::string const& type_name);
     virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
     virtual bool           parse(char const* key, char const* value);
     virtual bool           parse(std::string const& line);
     void                   resolve_template(
-                             umap<std::string, shared_ptr<object> >& templates);
+                             umap<std::string,
+                               std::shared_ptr<object> >& templates);
     bool                   should_register() const throw ();
     object_type            type() const throw ();
     std::string const&     type_name() const throw ();
@@ -112,38 +113,12 @@ namespace                  configuration {
     object_type            _type;
   };
 
-  typedef shared_ptr<object>            object_ptr;
+  typedef std::shared_ptr<object>       object_ptr;
   typedef std::list<object_ptr>         list_object;
   typedef umap<std::string, object_ptr> map_object;
 }
 
 CCE_END()
-
-namespace std {
-  template <typename T>
-  struct  less<com::centreon::shared_ptr<T> >
-            : std::binary_function<
-                     com::centreon::shared_ptr<T>,
-                     com::centreon::shared_ptr<T>,
-                     bool> {
-    bool  operator()(
-            com::centreon::shared_ptr<T> const& left,
-            com::centreon::shared_ptr<T> const& right) const {
-      bool retval;
-      if (left.get()) {
-        if (right.get())
-          retval = *left < *right;
-        else
-          retval = false;
-      }
-      else if (right.get())
-        retval = true;
-      else
-        retval = false;
-      return (retval);
-    }
-  };
-}
 
 #  define MRG_TAB(prop) \
   do { \

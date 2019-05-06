@@ -24,7 +24,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/io/file_stream.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -48,10 +47,10 @@ static loader* _instance = NULL;
  *
  *  @return The new object module.
  */
-shared_ptr<broker::handle> loader::add_module(
+std::shared_ptr<broker::handle> loader::add_module(
                                      std::string const& filename,
                                      std::string const& args) {
-  shared_ptr<handle> module(new handle(filename, args));
+  std::shared_ptr<handle> module(new handle(filename, args));
   _modules.push_back(module);
   return (module);
 }
@@ -61,8 +60,8 @@ shared_ptr<broker::handle> loader::add_module(
  *
  *  @param[in] mod Module to remove.
  */
-void loader::del_module(shared_ptr<handle> const& module) {
-  for (std::list<shared_ptr<handle> >::iterator
+void loader::del_module(std::shared_ptr<handle> const& module) {
+  for (std::list<std::shared_ptr<handle> >::iterator
          it(_modules.begin()), end(_modules.end());
        it != end;
        ++it)
@@ -78,7 +77,7 @@ void loader::del_module(shared_ptr<handle> const& module) {
  *
  *  @return All modules in a list.
  */
-std::list<shared_ptr<broker::handle> > const& loader::get_modules() const {
+std::list<std::shared_ptr<broker::handle> > const& loader::get_modules() const {
   return (_modules);
 }
 
@@ -131,7 +130,7 @@ unsigned int loader::load_directory(std::string const& dir) {
     std::string config_file(dir + "/" + f.base_name() + ".cfg");
     if (io::file_stream::exists(config_file.c_str()) == false)
       config_file = "";
-    shared_ptr<handle> module;
+    std::shared_ptr<handle> module;
     try {
       module = add_module(dir + "/" + f.file_name(), config_file);
       module->open();
@@ -163,7 +162,7 @@ void loader::unload() {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (std::list<shared_ptr<handle> >::iterator
+  for (std::list<std::shared_ptr<handle> >::iterator
          it(_modules.begin()), end(_modules.end());
        it != end;
        ++it) {

@@ -23,7 +23,6 @@
 #include "com/centreon/engine/logging/debug_file.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/logging/engine.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;

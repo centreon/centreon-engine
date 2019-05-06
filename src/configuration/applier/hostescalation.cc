@@ -202,7 +202,7 @@ void applier::hostescalation::remove_object(
     << "Removing a host escalation.";
 
   // Find host escalation.
-  umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator
     it(applier::state::instance().hostescalations_find(obj.key()));
   if (it != applier::state::instance().hostescalations().end()) {
     hostescalation_struct* escalation(it->second.get());
@@ -244,7 +244,7 @@ void applier::hostescalation::resolve_object(
     << "Resolving a host escalation.";
 
   // Find host escalation.
-  umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator
     it(applier::state::instance().hostescalations_find(obj.key()));
   if (applier::state::instance().hostescalations().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

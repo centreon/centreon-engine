@@ -26,7 +26,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -184,7 +183,8 @@ hostdependency* add_host_dependency(
   }
 
   // Allocate memory for a new host dependency entry.
-  shared_ptr<hostdependency> obj(new hostdependency, deleter::hostdependency);
+  std::shared_ptr<hostdependency> obj(new hostdependency,
+    deleter::hostdependency);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -218,7 +218,7 @@ hostdependency* add_host_dependency(
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());

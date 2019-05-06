@@ -45,7 +45,7 @@ public:
     _contactgroup_name = contactgroup_name;
   }
 
-  bool        operator()(shared_ptr<configuration::contactgroup> cg) {
+  bool        operator()(std::shared_ptr<configuration::contactgroup> cg) {
     return (_contactgroup_name == cg->contactgroup_name());
  }
 
@@ -271,7 +271,7 @@ void applier::contact::modify_object(
            << obj.contact_name() << "'");
 
   // Find contact object.
-  umap<std::string, shared_ptr<contact_struct> >::iterator
+  umap<std::string, std::shared_ptr<contact_struct> >::iterator
     it_obj(applier::state::instance().contacts_find(obj.key()));
   if (it_obj == applier::state::instance().contacts().end())
     throw (engine_error() << "Could not modify non-existing "
@@ -451,7 +451,7 @@ void applier::contact::remove_object(
     << "Removing contact '" << obj.contact_name() << "'.";
 
   // Find contact.
-  umap<std::string, shared_ptr<contact_struct> >::iterator
+  umap<std::string, std::shared_ptr<contact_struct> >::iterator
     it(applier::state::instance().contacts_find(obj.key()));
   if (it != applier::state::instance().contacts().end()) {
     contact_struct* cntct(it->second.get());
@@ -498,7 +498,7 @@ void applier::contact::resolve_object(
     << "Resolving contact '" << obj.contact_name() << "'.";
 
   // Find contact.
-  umap<std::string, shared_ptr<contact_struct> >::iterator
+  umap<std::string, std::shared_ptr<contact_struct> >::iterator
     it(applier::state::instance().contacts().find(obj.contact_name()));
   if (applier::state::instance().contacts().end() == it)
     throw (engine_error()

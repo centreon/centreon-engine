@@ -35,7 +35,6 @@
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/io/file_entry.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon;
