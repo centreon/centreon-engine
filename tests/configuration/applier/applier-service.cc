@@ -29,7 +29,6 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -103,7 +102,8 @@ TEST_F(ApplierService, NewServiceFromConfig) {
 
   svc_aply.add_object(svc);
   svc_aply.expand_objects(*config);
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
+  umap<std::pair<unsigned int, unsigned int>,
+       std::shared_ptr<service_struct> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 1);
   ASSERT_EQ(sm.begin()->first.first, 1);
@@ -145,14 +145,16 @@ TEST_F(ApplierService, ServicesEquality) {
   ASSERT_THROW(svc_aply.add_object(csvc), std::exception);
   ASSERT_TRUE(csvc.parse("service_id", "12346"));
   ASSERT_NO_THROW(svc_aply.add_object(csvc));
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
+  umap<std::pair<unsigned int, unsigned int>,
+       std::shared_ptr<service_struct> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 2);
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::
+  umap<std::pair<unsigned int, unsigned int>,
+       std::shared_ptr<service_struct> >::
     const_iterator it(sm.begin());
-  shared_ptr<service_struct> svc1(it->second);
+  std::shared_ptr<service_struct> svc1(it->second);
   ++it;
-  shared_ptr<service_struct> svc2(it->second);
+  std::shared_ptr<service_struct> svc2(it->second);
   configuration::service csvc1(csvc);
   ASSERT_EQ(csvc, csvc1);
   ASSERT_TRUE(csvc1.parse("recovery_notification_delay", "120"));
@@ -207,11 +209,12 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   ASSERT_NO_THROW(csvc.check_validity());
   svc_aply.resolve_object(csvc);
 
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
+  umap<std::pair<unsigned int, unsigned int>,
+       std::shared_ptr<service_struct> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 1);
 
-  umap<unsigned int, shared_ptr<host_struct> > const& hm(
+  umap<unsigned int, std::shared_ptr<host_struct> > const& hm(
     configuration::applier::state::instance().hosts());
   ASSERT_EQ(sm.begin()->second->host_ptr, hm.begin()->second.get());
 }

@@ -28,7 +28,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -122,7 +121,7 @@ hostgroup* add_hostgroup(
   }
 
   // Allocate memory.
-  shared_ptr<hostgroup> obj(new hostgroup, deleter::hostgroup);
+  std::shared_ptr<hostgroup> obj(new hostgroup, deleter::hostgroup);
   memset(obj.get(), 0, sizeof(hostgroup));
 
   try {
@@ -144,7 +143,7 @@ hostgroup* add_hostgroup(
     hostgroup_list = obj.get();
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -181,7 +180,7 @@ int is_host_member_of_hostgroup(hostgroup* group, host* hst) {
  *          hostgroup is not found.
  */
 hostgroup& engine::find_hostgroup(std::string const& name) {
-  umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator
     it(state::instance().hostgroups().find(name));
   if (it == state::instance().hostgroups().end())
     throw (engine_error() << "Host group '"
@@ -197,7 +196,7 @@ hostgroup& engine::find_hostgroup(std::string const& name) {
  *  @return True if the hostgroup is found, otherwise false.
  */
 bool engine::is_hostgroup_exist(std::string const& name) throw () {
-  umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator
     it(state::instance().hostgroups().find(name));
   return (it != state::instance().hostgroups().end());
 }

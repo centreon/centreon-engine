@@ -29,7 +29,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -92,7 +91,7 @@ TEST_F(ApplierServicegroup, ModifyServicegroupFromConfig) {
   configuration::servicegroup sg("test");
   ASSERT_TRUE(sg.parse("members", "host1,service1"));
   aply.add_object(sg);
-  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(configuration::applier::state::instance().servicegroups_find("test"));
   ASSERT_TRUE(strcmp(it->second->alias, "test") == 0);
 

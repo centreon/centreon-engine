@@ -27,7 +27,6 @@
 #  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -85,8 +84,8 @@ namespace                     retention {
     static setters const      _setters[];
   };
 
-  typedef shared_ptr<contact>    contact_ptr;
-  typedef std::list<contact_ptr> list_contact;
+  typedef std::shared_ptr<contact> contact_ptr;
+  typedef std::list<contact_ptr>   list_contact;
 }
 
 CCE_END()

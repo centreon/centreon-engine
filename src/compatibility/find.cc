@@ -26,7 +26,6 @@
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "find.hh"
 
 // forward declaration.
@@ -50,7 +49,7 @@ command* find_command(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<command_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
     it(state::instance().commands().find(name));
   if (it != state::instance().commands().end())
     return (it->second.get());
@@ -68,7 +67,7 @@ contact* find_contact(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<contact_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contact_struct> >::const_iterator
     it(state::instance().contacts().find(name));
   if (it != state::instance().contacts().end())
     return (it->second.get());
@@ -86,7 +85,7 @@ contactgroup* find_contactgroup(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator
     it(state::instance().contactgroups().find(name));
   if (it != state::instance().contactgroups().end())
     return (it->second.get());
@@ -104,7 +103,7 @@ host* find_host(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+  umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(get_host_id(name)));
   if (it != state::instance().hosts().end())
     return (it->second.get());
@@ -122,7 +121,7 @@ hostgroup* find_hostgroup(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator
     it(state::instance().hostgroups().find(name));
   if (it != state::instance().hostgroups().end())
     return (it->second.get());
@@ -142,7 +141,7 @@ service* find_service(char const* host_name, char const* svc_desc) {
     return NULL;
 
   std::pair<unsigned int, unsigned int> id(get_host_and_service_id(host_name, svc_desc));
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   if (it != state::instance().services().end())
     return &(*it->second);
@@ -160,7 +159,7 @@ servicegroup* find_servicegroup(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())
     return (it->second.get());
@@ -178,7 +177,7 @@ timeperiod* find_timeperiod(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator
     it(state::instance().timeperiods().find(name));
   if (it != state::instance().timeperiods().end())
     return (it->second.get());

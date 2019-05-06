@@ -39,11 +39,11 @@ using namespace com::centreon::engine::configuration;
  *  @param[in] members  The contact members to fill.
  */
 void applier::add_member(
-       umap<std::string, shared_ptr<contact_struct> > const& contacts,
+       umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
        std::string const& name,
        contactsmember_struct*& members) {
   // Find contact to add.
-  umap<std::string, shared_ptr<contact_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contact_struct> >::const_iterator
     it(contacts.find(name));
   if (it == contacts.end()) {
     logger(log_config_error, basic)
@@ -53,7 +53,7 @@ void applier::add_member(
   }
 
   // Create and fill the new member.
-  std::auto_ptr<contactsmember_struct> obj(new contactsmember_struct);
+  std::unique_ptr<contactsmember_struct> obj(new contactsmember_struct);
   memset(obj.get(), 0, sizeof(*obj));
   obj->contact_name = string::dup(name);
   obj->contact_ptr = &(*it->second);
@@ -69,11 +69,11 @@ void applier::add_member(
  *  @param[in] members  The command members to fill.
  */
 void applier::add_member(
-       umap<std::string, shared_ptr<command_struct> > const& commands,
+       umap<std::string, std::shared_ptr<command_struct> > const& commands,
        std::string const& name,
        commandsmember_struct*& members) {
   // Find command to add.
-  umap<std::string, shared_ptr<command_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
     it(commands.find(name));
   if (it == commands.end()) {
     logger(log_config_error, basic)
@@ -83,7 +83,7 @@ void applier::add_member(
   }
 
   // Create and fill the new member.
-  std::auto_ptr<commandsmember_struct> obj(new commandsmember_struct);
+  std::unique_ptr<commandsmember_struct> obj(new commandsmember_struct);
   memset(obj.get(), 0, sizeof(*obj));
   obj->cmd = string::dup(name);
   obj->command_ptr = &(*it->second);
@@ -92,7 +92,7 @@ void applier::add_member(
 }
 
 void applier::update_members(
-       umap<std::string, shared_ptr<contact_struct> > const& contacts,
+       umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
        std::list<std::string> const& lst,
        contactsmember_struct*& members) {
   deleter::contactsmember(members);

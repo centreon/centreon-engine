@@ -219,7 +219,8 @@ void applier::serviceescalation::remove_object(
     << "Removing a service escalation.";
 
   // Find service escalation.
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
+  umultimap<std::pair<std::string, std::string>,
+            std::shared_ptr<serviceescalation_struct> >::iterator
     it(applier::state::instance().serviceescalations_find(obj.key()));
   if (it != applier::state::instance().serviceescalations().end()) {
     serviceescalation_struct* escalation(it->second.get());
@@ -259,7 +260,8 @@ void applier::serviceescalation::resolve_object(
     << "Resolving a service escalation.";
 
   // Find service escalation.
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
+  umultimap<std::pair<std::string, std::string>,
+            std::shared_ptr<serviceescalation_struct> >::iterator
     it(applier::state::instance().serviceescalations_find(obj.key()));
   if (applier::state::instance().serviceescalations().end() == it)
     throw (engine_error() << "Cannot resolve service escalation");

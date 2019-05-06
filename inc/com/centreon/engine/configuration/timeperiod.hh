@@ -101,8 +101,8 @@ namespace                  configuration {
                            _timeranges;
   };
 
-  typedef shared_ptr<timeperiod> timeperiod_ptr;
-  typedef std::set<timeperiod>   set_timeperiod;
+  typedef std::shared_ptr<timeperiod> timeperiod_ptr;
+  typedef std::set<timeperiod>        set_timeperiod;
 }
 
 CCE_END()

@@ -167,7 +167,7 @@ void applier::servicegroup::modify_object(
            << "service group '" << obj.servicegroup_name() << "'");
 
   // Find service group object.
-  umap<std::string, shared_ptr<servicegroup_struct> >::iterator
+  umap<std::string, std::shared_ptr<servicegroup_struct> >::iterator
     it_obj(applier::state::instance().servicegroups_find(obj.key()));
   if (it_obj == applier::state::instance().servicegroups().end())
     throw (engine_error() << "Could not modify non-existing "
@@ -255,7 +255,7 @@ void applier::servicegroup::remove_object(
     << "Removing servicegroup '" << obj.servicegroup_name() << "'";
 
   // Find service group.
-  umap<std::string, shared_ptr<servicegroup_struct> >::iterator
+  umap<std::string, std::shared_ptr<servicegroup_struct> >::iterator
     it(applier::state::instance().servicegroups_find(obj.key()));
   if (it != applier::state::instance().servicegroups().end()) {
     servicegroup_struct* grp(it->second.get());
@@ -295,7 +295,7 @@ void applier::servicegroup::resolve_object(
     << "Removing service group '" << obj.servicegroup_name() << "'";
 
   // Find service group.
-  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(applier::state::instance().servicegroups_find(obj.key()));
   if (applier::state::instance().servicegroups().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

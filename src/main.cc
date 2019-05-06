@@ -67,7 +67,6 @@
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/logging/engine.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine;
 

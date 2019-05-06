@@ -31,7 +31,6 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -82,10 +81,10 @@ TEST_F(ApplierHost, HostRenamed) {
   ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
   ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
   hst_aply.add_object(hst);
-  umap<unsigned int, com::centreon::shared_ptr<host_struct> > const&
+  umap<unsigned int, std::shared_ptr<host_struct> > const&
     hm(configuration::applier::state::instance().hosts());
   ASSERT_EQ(hm.size(), 1);
-  com::centreon::shared_ptr<host_struct> h1(hm.begin()->second);
+  std::shared_ptr<host_struct> h1(hm.begin()->second);
   ASSERT_TRUE(strcmp(h1->name, "test_host") == 0);
 
   ASSERT_TRUE(hst.parse("host_name", "test_host1"));

@@ -20,6 +20,7 @@
 #ifndef CCE_COMMANDS_CONNECTOR_HH
 #  define CCE_COMMANDS_CONNECTOR_HH
 
+#  include <memory>
 #  include <string>
 #  include "com/centreon/concurrency/condvar.hh"
 #  include "com/centreon/concurrency/mutex.hh"
@@ -28,7 +29,6 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/process.hh"
 #  include "com/centreon/process_listener.hh"
-#  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
@@ -108,7 +108,7 @@ namespace                commands {
     concurrency::condvar _cv_query;
     std::string          _data_available;
     bool                 _is_running;
-    umap<unsigned long, shared_ptr<query_info> >
+    umap<unsigned long, std::shared_ptr<query_info> >
                          _queries;
     bool                 _query_quit_ok;
     bool                 _query_version_ok;

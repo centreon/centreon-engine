@@ -22,7 +22,6 @@
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/nebmods.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "test/broker/mod_load.hh"
 #include "test/unittest.hh"
 
@@ -56,13 +55,13 @@ int main_test(int argc, char** argv) {
   if (neb_load_all_modules() != 0)
     throw (engine_error() << "neb_load_all_modules failed.");
 
-  std::list<com::centreon::shared_ptr<handle> >
+  std::list<std::shared_ptr<handle> >
     modules(loader.get_modules());
 
   if (modules.size() != 2)
     throw (engine_error() << "invalid modules size.");
 
-  for (std::list<com::centreon::shared_ptr<handle> >::const_iterator
+  for (std::list<std::shared_ptr<handle> >::const_iterator
          it(modules.begin()),
          end(modules.end());
        it != end;

@@ -92,8 +92,8 @@ namespace                  configuration {
     std::string            _vrml_image;
   };
 
-  typedef shared_ptr<hostextinfo>    hostextinfo_ptr;
-  typedef std::list<hostextinfo_ptr> list_hostextinfo;
+  typedef std::shared_ptr<hostextinfo> hostextinfo_ptr;
+  typedef std::list<hostextinfo_ptr>   list_hostextinfo;
 }
 
 CCE_END()

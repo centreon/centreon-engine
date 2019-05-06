@@ -20,7 +20,6 @@
 #include <exception>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -49,7 +48,7 @@ int main_test(int argc, char** argv) {
   if (cmd3 != cmd2)
     throw (engine_error() << "error: assignment operator failed");
 
-  com::centreon::shared_ptr<commands::command> cmd4(cmd3.clone());
+  std::shared_ptr<commands::command> cmd4(cmd3.clone());
   if (!cmd4.get())
     throw (engine_error() << "error: clone failed");
 

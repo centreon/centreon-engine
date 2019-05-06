@@ -28,7 +28,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -191,7 +190,8 @@ hostescalation* add_host_escalation(
   }
 
   // Allocate memory for a new host escalation entry.
-  shared_ptr<hostescalation> obj(new hostescalation, deleter::hostescalation);
+  std::shared_ptr<hostescalation> obj(new hostescalation,
+    deleter::hostescalation);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -224,7 +224,7 @@ hostescalation* add_host_escalation(
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());

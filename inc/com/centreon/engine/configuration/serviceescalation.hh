@@ -120,8 +120,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<serviceescalation>  serviceescalation_ptr;
-  typedef std::set<serviceescalation>    set_serviceescalation;
+  typedef std::shared_ptr<serviceescalation> serviceescalation_ptr;
+  typedef std::set<serviceescalation>        set_serviceescalation;
 }
 
 CCE_END()

@@ -257,7 +257,7 @@ void applier::hostdependency::remove_object(
     << "Removing a host dependency.";
 
   // Find host dependency.
-  umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator
     it(applier::state::instance().hostdependencies_find(obj.key()));
   if (it != applier::state::instance().hostdependencies().end()) {
     hostdependency_struct* dependency(it->second.get());
@@ -298,7 +298,7 @@ void applier::hostdependency::resolve_object(
     << "Resolving a host dependency.";
 
   // Find host dependency.
-  umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator
     it(applier::state::instance().hostdependencies_find(obj.key()));
   if (applier::state::instance().hostdependencies().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

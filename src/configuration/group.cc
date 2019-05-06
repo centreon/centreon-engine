@@ -161,6 +161,6 @@ void group<T>::reset() {
 }
 
 // Explicit instantiations.
-template class group<list_string>;
-template class group<set_string>;
-template class group<set_pair_string>;
+template class com::centreon::engine::configuration::group<list_string>;
+template class com::centreon::engine::configuration::group<set_string>;
+template class com::centreon::engine::configuration::group<set_pair_string>;

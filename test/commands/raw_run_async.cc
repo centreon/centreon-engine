@@ -39,7 +39,7 @@ using namespace com::centreon::engine::commands;
  */
 static bool run_without_timeout() {
   // Raw command object and its waiter.
-  shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --timeout=off"));
+  std::shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --timeout=off"));
   wait_process wait_proc(cmd.get());
   set::instance().add_command(cmd);
 
@@ -64,7 +64,7 @@ static bool run_without_timeout() {
  */
 static bool run_with_timeout() {
   // Raw command object and its waiter.
-  shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --timeout=on"));
+  std::shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --timeout=on"));
   wait_process wait_proc(cmd.get());
   set::instance().add_command(cmd);
 
@@ -99,7 +99,7 @@ static bool run_with_environment_macros() {
   strcpy(mac.argv[0], argv);
 
   // Raw command object and its waiter.
-  shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --check_macros"));
+  std::shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --check_macros"));
   wait_process wait_proc(cmd.get());
   set::instance().add_command(cmd);
 
@@ -123,7 +123,7 @@ static bool run_with_environment_macros() {
  */
 static bool run_with_single_quotes() {
   // Raw command object and its waiter.
-  shared_ptr<raw> cmd(new raw(__func__, "'./bin_test_run' '--timeout'='off'"));
+  std::shared_ptr<raw> cmd(new raw(__func__, "'./bin_test_run' '--timeout'='off'"));
   wait_process wait_proc(cmd.get());
   set::instance().add_command(cmd);
 
@@ -148,7 +148,7 @@ static bool run_with_single_quotes() {
  */
 static bool run_with_double_quotes() {
   // Raw command object and its waiter.
-  shared_ptr<raw> cmd(new raw(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\""));
+  std::shared_ptr<raw> cmd(new raw(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\""));
   wait_process wait_proc(cmd.get());
   set::instance().add_command(cmd);
 

@@ -21,9 +21,9 @@
 #  define CCE_CONFIGURATION_APPLIER_MEMBER_HH
 
 #  include <list>
+#  include <memory>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
 struct command_struct;
@@ -36,17 +36,17 @@ CCE_BEGIN()
 namespace             configuration {
   namespace           applier {
     void    add_member(
-              umap<std::string, shared_ptr<contact_struct> > const& contacts,
+              umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
               std::string const& name,
               contactsmember_struct*& members);
     void    add_member(
-              umap<std::string, shared_ptr<command_struct> > const& commands,
+              umap<std::string, std::shared_ptr<command_struct> > const& commands,
               std::string const& name,
               commandsmember_struct*& members);
 
     template<typename T, typename U>
     void    add_members(
-              umap<std::string, shared_ptr<T> > const& objects,
+              umap<std::string, std::shared_ptr<T> > const& objects,
               std::list<std::string> const& lst,
               U*& members) {
       for (std::list<std::string>::const_iterator
@@ -69,7 +69,7 @@ namespace             configuration {
       return (false);
     }
     void    update_members(
-              umap<std::string, shared_ptr<contact_struct> > const& contacts,
+              umap<std::string, std::shared_ptr<contact_struct> > const& contacts,
               std::list<std::string> const& lst,
               contactsmember_struct*& members);
   }

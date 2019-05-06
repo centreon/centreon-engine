@@ -123,7 +123,7 @@ void applier::timeperiod::modify_object(
            << "time period '" << obj.timeperiod_name() << "'");
 
   // Find time period object.
-  umap<std::string, shared_ptr<timeperiod_struct> >::iterator
+  umap<std::string, std::shared_ptr<timeperiod_struct> >::iterator
     it_obj(applier::state::instance().timeperiods_find(obj.key()));
   if (it_obj == applier::state::instance().timeperiods().end())
     throw (engine_error() << "Could not modify non-existing "
@@ -195,7 +195,7 @@ void applier::timeperiod::remove_object(
     << "Removing time period '" << obj.timeperiod_name() << "'.";
 
   // Find time period.
-  umap<std::string, shared_ptr<timeperiod_struct> >::iterator
+  umap<std::string, std::shared_ptr<timeperiod_struct> >::iterator
     it(applier::state::instance().timeperiods_find(obj.key()));
   if (it != applier::state::instance().timeperiods().end()) {
     timeperiod_struct* tp(it->second.get());
@@ -238,7 +238,7 @@ void applier::timeperiod::resolve_object(
     << "Resolving time period '" << obj.timeperiod_name() << "'.";
 
   // Find time period.
-  umap<std::string, shared_ptr<timeperiod_struct> >::iterator
+  umap<std::string, std::shared_ptr<timeperiod_struct> >::iterator
     it(applier::state::instance().timeperiods_find(obj.key()));
   if (applier::state::instance().timeperiods().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

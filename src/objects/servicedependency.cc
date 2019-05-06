@@ -26,7 +26,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -227,7 +226,8 @@ servicedependency* add_service_dependency(
   }
 
   // Allocate memory for a new service dependency entry.
-  shared_ptr<servicedependency> obj(new servicedependency, deleter::servicedependency);
+  std::shared_ptr<servicedependency> obj(new servicedependency,
+      deleter::servicedependency);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -267,7 +267,7 @@ servicedependency* add_service_dependency(
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
