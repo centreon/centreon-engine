@@ -34,6 +34,7 @@ define host{
   host_name  winserver          ; The name we\'re giving to this host.
   alias      My Windows Server  ; A longer name associated with the host.
   address    192.168.1.2        ; IP address of the host.
+  _HOST_ID   5
 }
 
 
@@ -57,6 +58,7 @@ define service{
   host_name            winserver
   service_description  NSClient++ Version
   check_command        check_nt!CLIENTVERSION
+  _SERVICE_ID          17
 }
 
 # Create a service for monitoring the uptime of the server
@@ -67,6 +69,7 @@ define service{
   host_name            winserver
   service_description  Uptime
   check_command        check_nt!UPTIME
+  _SERVICE_ID          18
 }
 
 # Create a service for monitoring CPU load
@@ -77,6 +80,7 @@ define service{
   host_name            winserver
   service_description  CPU Load
   check_command        check_nt!CPULOAD!-l 5,80,90
+  _SERVICE_ID          19
 }
 
 # Create a service for monitoring memory usage
@@ -87,6 +91,7 @@ define service{
   host_name            winserver
   service_description  Memory Usage
   check_command        check_nt!MEMUSE!-w 80 -c 90
+  _SERVICE_ID          20
 }
 
 # Create a service for monitoring C:\ disk usage
@@ -97,6 +102,7 @@ define service{
   host_name            winserver
   service_description  C:\ Drive Space
   check_command        check_nt!USEDDISKSPACE!-l c -w 80 -c 90
+  _SERVICE_ID          21
 }
 
 # Create a service for monitoring the W3SVC service
@@ -107,6 +113,7 @@ define service{
   host_name            winserver
   service_description  W3SVC
   check_command        check_nt!SERVICESTATE!-d SHOWALL -l W3SVC
+  _SERVICE_ID          22
 }
 
 # Create a service for monitoring the Explorer.exe process
@@ -117,4 +124,5 @@ define service{
   host_name            winserver
   service_description  Explorer
   check_command        check_nt!PROCSTATE!-d SHOWALL -l Explorer.exe
+  _SERVICE_ID          23
 }
