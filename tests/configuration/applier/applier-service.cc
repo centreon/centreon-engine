@@ -17,10 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
-#include <iostream>
-#include <memory>
 #include <gtest/gtest.h>
+#include <memory>
 #include "../../timeperiod/utils.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
@@ -46,6 +44,7 @@ class ApplierService : public ::testing::Test {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load(); // Needed to create a contact
+    commands::set::load();
   }
 
   void TearDown() {
@@ -149,8 +148,8 @@ TEST_F(ApplierService, ServicesEquality) {
   umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 2);
-  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
-    it(sm.begin());
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::
+    const_iterator it(sm.begin());
   shared_ptr<service_struct> svc1(it->second);
   ++it;
   shared_ptr<service_struct> svc2(it->second);
@@ -165,154 +164,109 @@ TEST_F(ApplierService, ServicesEquality) {
   ASSERT_TRUE(svc1 != svc2);
 }
 
-//// Given a service configuration applied to a service,
-//// When the check_validity() method is executed on the configuration,
-//// Then it throws an exception because:
-////  1. it does not provide a service description
-////  2. it is not attached to a host
-////  3. the service does not contain any check command.
-//TEST_F(ApplierService, ServicesCheckValidity) {
-//  configuration::applier::host hst_aply;
-//  configuration::applier::service svc_aply;
-//  configuration::service csvc;
-//
-//  // No service description
-//  ASSERT_THROW(csvc.check_validity(), engine::error);
-//
-//  ASSERT_TRUE(csvc.parse("service_description", "check description"));
-//  ASSERT_TRUE(csvc.parse("host_name", "test_host"));
-//  // No host attached to
-//  ASSERT_THROW(csvc.check_validity(), engine::error);
-//
-//  configuration::host hst;
-//  ASSERT_TRUE(hst.parse("host_name", "test_host"));
-//  hst_aply.add_object(hst);
-//  svc_aply.add_object(csvc);
-//  ASSERT_TRUE(csvc.parse("hosts", "test_host"));
-//
-//  // No check command
-//  ASSERT_THROW(csvc.check_validity(), engine::error);
-//
-//  configuration::applier::command cmd_aply;
-//  configuration::command cmd("cmd");
-//  cmd.parse("command_line", "echo 1");
-//  csvc.parse("check_command", "cmd");
-//  cmd_aply.add_object(cmd);
-//
-//  // Check validity OK
-//  ASSERT_NO_THROW(csvc.check_validity());
-//  svc_aply.resolve_object(csvc);
-//
-//  umap<std::pair<std::string, std::string>, com::centreon::shared_ptr<engine::service> > const&
-//    sm(configuration::applier::state::instance().services());
-//  ASSERT_EQ(sm.size(), 1);
-//
-//  umap<std::string, com::centreon::shared_ptr<engine::host> > const&
-//    hm(configuration::applier::state::instance().hosts());
-//  ASSERT_EQ(sm.begin()->second->get_host(), hm.begin()->second.get());
-//}
-//
-//// Given a service configuration,
-//// When the flap_detection_options is set to none,
-//// Then it is well recorded with only none.
-//TEST_F(ApplierService, ServicesFlapOptionsNone) {
-//  configuration::applier::host hst_aply;
-//  configuration::applier::service svc_aply;
-//  configuration::service csvc;
-//  ASSERT_TRUE(csvc.parse("service_description", "test description"));
-//  configuration::host hst;
-//  ASSERT_TRUE(hst.parse("host_name", "test_host"));
-//  hst_aply.add_object(hst);
-//  ASSERT_TRUE(csvc.parse("hosts", "test_host"));
-//  configuration::applier::command cmd_aply;
-//  configuration::command cmd("cmd");
-//  cmd.parse("command_line", "echo 1");
-//  csvc.parse("check_command", "cmd");
-//
-//  csvc.parse("flap_detection_options", "n");
-//  ASSERT_EQ(csvc.flap_detection_options(), configuration::service::none);
-//}
-//
-//// Given a service configuration,
-//// When the flap_detection_options is set to all,
-//// Then it is well recorded with all.
-//TEST_F(ApplierService, ServicesFlapOptionsAll) {
-//  configuration::applier::host hst_aply;
-//  configuration::applier::service svc_aply;
-//  configuration::service csvc;
-//  ASSERT_TRUE(csvc.parse("service_description", "test description"));
-//  configuration::host hst;
-//  ASSERT_TRUE(hst.parse("host_name", "test_host"));
-//  hst_aply.add_object(hst);
-//  ASSERT_TRUE(csvc.parse("hosts", "test_host"));
-//  configuration::applier::command cmd_aply;
-//  configuration::command cmd("cmd");
-//  cmd.parse("command_line", "echo 1");
-//  csvc.parse("check_command", "cmd");
-//
-//  csvc.parse("flap_detection_options", "a");
-//  ASSERT_EQ(
-//    csvc.flap_detection_options(),
-//      configuration::service::ok
-//    | configuration::service::warning
-//    | configuration::service::critical
-//    | configuration::service::unknown);
-//}
-//
-//// Given a service configuration,
-//// When the initial_state value is set to unknown,
-//// Then it is well recorded with unknown.
-//// When the initial_state value is set to whatever
-//// Then the parse method returns false.
-//TEST_F(ApplierService, ServicesInitialState) {
-//  configuration::applier::host hst_aply;
-//  configuration::applier::service svc_aply;
-//  configuration::service csvc;
-//  ASSERT_TRUE(csvc.parse("service_description", "test description"));
-//  configuration::host hst;
-//  ASSERT_TRUE(hst.parse("host_name", "test_host"));
-//  hst_aply.add_object(hst);
-//  ASSERT_TRUE(csvc.parse("hosts", "test_host"));
-//  configuration::applier::command cmd_aply;
-//  configuration::command cmd("cmd");
-//  cmd.parse("command_line", "echo 1");
-//  csvc.parse("check_command", "cmd");
-//
-//  ASSERT_TRUE(csvc.parse("initial_state", "u"));
-//  ASSERT_EQ(csvc.initial_state(), STATE_UNKNOWN);
-//
-//  ASSERT_FALSE(csvc.parse("initial_state", "g"));
-//}
-//
-//// Given a service configuration,
-//// When the stalking options are set to "c,w",
-//// Then they are well recorded with "critical | warning"
-//// When the initial_state value is set to "a"
-//// Then they are well recorded with "ok | warning | unknown | critical"
-//TEST_F(ApplierService, ServicesStalkingOptions) {
-//  configuration::applier::host hst_aply;
-//  configuration::applier::service svc_aply;
-//  configuration::service csvc;
-//  ASSERT_TRUE(csvc.parse("service_description", "test description"));
-//  configuration::host hst;
-//  ASSERT_TRUE(hst.parse("host_name", "test_host"));
-//  hst_aply.add_object(hst);
-//  ASSERT_TRUE(csvc.parse("hosts", "test_host"));
-//  configuration::applier::command cmd_aply;
-//  configuration::command cmd("cmd");
-//  cmd.parse("command_line", "echo 1");
-//  csvc.parse("check_command", "cmd");
-//
-//  ASSERT_TRUE(csvc.parse("stalking_options", "c,w"));
-//  ASSERT_EQ(
-//    csvc.stalking_options(),
-//    configuration::service::critical | configuration::service::warning);
-//
-//  ASSERT_TRUE(csvc.parse("stalking_options", "a"));
-//  ASSERT_EQ(
-//    csvc.stalking_options(),
-//      configuration::service::ok
-//    | configuration::service::warning
-//    | configuration::service::unknown
-//    | configuration::service::critical);
-//}
+// Given a service configuration applied to a service,
+// When the check_validity() method is executed on the configuration,
+// Then it throws an exception because:
+//  1. it does not provide a service description
+//  2. it is not attached to a host
+//  3. the service does not contain any check command.
+TEST_F(ApplierService, ServicesCheckValidity) {
+  configuration::applier::host hst_aply;
+  configuration::applier::service svc_aply;
+  configuration::service csvc;
+
+  // No service description
+  ASSERT_THROW(csvc.check_validity(), engine::error);
+
+  ASSERT_TRUE(csvc.parse("service_description", "check description"));
+  ASSERT_TRUE(csvc.parse("service_id", "53"));
+
+  // No host attached to
+  ASSERT_THROW(csvc.check_validity(), engine::error);
+
+  ASSERT_TRUE(csvc.parse("hosts", "test_host"));
+
+  // No check command attached to
+  ASSERT_THROW(csvc.check_validity(), engine::error);
+
+  configuration::applier::command cmd_aply;
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  csvc.parse("check_command", "cmd");
+  cmd_aply.add_object(cmd);
+
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "10.11.12.13"));
+  ASSERT_TRUE(hst.parse("host_id", "124"));
+  hst_aply.add_object(hst);
+  svc_aply.add_object(csvc);
+  ASSERT_TRUE(csvc.parse("service_description", "foo"));
+
+  // No check command
+  ASSERT_NO_THROW(csvc.check_validity());
+  svc_aply.resolve_object(csvc);
+
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
+    sm(configuration::applier::state::instance().services());
+  ASSERT_EQ(sm.size(), 1);
+
+  umap<unsigned int, shared_ptr<host_struct> > const& hm(
+    configuration::applier::state::instance().hosts());
+  ASSERT_EQ(sm.begin()->second->host_ptr, hm.begin()->second.get());
+}
+
+// Given a service configuration,
+// When the flap_detection_options is set to none,
+// Then it is well recorded with only none.
+TEST_F(ApplierService, ServicesFlapOptionsNone) {
+  configuration::service csvc;
+  ASSERT_TRUE(csvc.parse("service_description", "test description"));
+  ASSERT_TRUE(csvc.parse("hosts", "test_host"));
+
+  csvc.parse("flap_detection_options", "n");
+  ASSERT_EQ(csvc.flap_detection_options(), configuration::service::none);
+}
+
+// Given a service configuration,
+// When the flap_detection_options is set to all,
+// Then it is well recorded with all.
+TEST_F(ApplierService, ServicesFlapOptionsAll) {
+  configuration::service csvc;
+  csvc.parse("flap_detection_options", "a");
+  ASSERT_EQ(
+    csvc.flap_detection_options(),
+    configuration::service::ok | configuration::service::warning
+      | configuration::service::critical | configuration::service::unknown);
+}
+
+// Given a service configuration,
+// When the initial_state value is set to unknown,
+// Then it is well recorded with unknown.
+// When the initial_state value is set to whatever
+// Then the parse method returns false.
+TEST_F(ApplierService, ServicesInitialState) {
+  configuration::service csvc;
+  ASSERT_TRUE(csvc.parse("initial_state", "u"));
+  ASSERT_EQ(csvc.initial_state(), STATE_UNKNOWN);
+  ASSERT_FALSE(csvc.parse("initial_state", "g"));
+}
+
+// Given a service configuration,
+// When the stalking options are set to "c,w",
+// Then they are well recorded with "critical | warning"
+// When the initial_state value is set to "a"
+// Then they are well recorded with "ok | warning | unknown | critical"
+TEST_F(ApplierService, ServicesStalkingOptions) {
+  configuration::service csvc;
+  ASSERT_TRUE(csvc.parse("stalking_options", "c,w"));
+  ASSERT_EQ(
+    csvc.stalking_options(),
+    configuration::service::critical | configuration::service::warning);
+
+  ASSERT_TRUE(csvc.parse("stalking_options", "a"));
+  ASSERT_EQ(
+    csvc.stalking_options(),
+    configuration::service::ok | configuration::service::warning
+      | configuration::service::unknown | configuration::service::critical);
+}

@@ -93,14 +93,18 @@ applier::service& applier::service::operator=(
 void applier::service::add_object(
                          configuration::service const& obj) {
   // Check service.
-  if (obj.hosts().size() != 1)
-    throw (engine_error() << "Could not create service '"
+  if (obj.hosts().size() < 1)
+    throw engine_error() << "Could not create service '"
            << obj.service_description()
-           << "' with multiple hosts defined");
+           << "' with no host defined";
+  else if (obj.hosts().size() > 1)
+    throw engine_error() << "Could not create service '"
+           << obj.service_description()
+           << "' with multiple hosts defined";
   else if (!obj.hostgroups().empty())
-    throw (engine_error() << "Could not create service '"
+    throw engine_error() << "Could not create service '"
            << obj.service_description()
-           << "' with multiple host groups defined");
+           << "' with multiple host groups defined";
 
   // Logging.
   logger(logging::dbg_config, logging::more)
