@@ -59,6 +59,7 @@ define host{
   retain_nonstatus_information  1             ; Retain non-status information across program restarts.
   notification_period           24x7          ; Send host notifications at any time.
   register                      0             ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL HOST, JUST A TEMPLATE!
+  _HOST_ID                      4
 }
 
 # Linux host definition template - This is NOT a real host, just a template!
@@ -162,6 +163,7 @@ define service{
   notification_interval         60               ; Re-notify about service problems every hour.
   notification_period           24x7             ; Notifications can be sent out at any time.
   register                      0                ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL SERVICE, JUST A TEMPLATE!
+  _SERVICE_ID                   15
 }
 
 # Local service definition template - This is NOT a real service, just a
@@ -174,4 +176,5 @@ define service{
   normal_check_interval  5                ; Check the service every 5 minutes under normal conditions.
   retry_check_interval   1                ; Re-check the service every minute until a hard state can be determined.
   register               0                ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL SERVICE, JUST A TEMPLATE!
+  _SERVICE_ID            16
 }
