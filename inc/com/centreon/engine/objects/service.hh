@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,9 +20,11 @@
 #ifndef CCE_OBJECTS_SERVICE_HH
 #  define CCE_OBJECTS_SERVICE_HH
 
+#  include <list>
 #  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/contactgroup.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
@@ -50,7 +52,7 @@ typedef struct                  service_struct {
   double                        retry_interval;
   int                           max_attempts;
   int                           parallelize;
-  contactgroupsmember_struct*   contact_groups;
+  contactgroup_map              contact_groups;
   contactsmember_struct*        contacts;
   double                        notification_interval;
   double                        first_notification_delay;

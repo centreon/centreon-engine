@@ -1,5 +1,5 @@
 /*
-** Copyright 2017-2018 Centreon
+** Copyright 2017-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -28,7 +28,7 @@
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/contact.hh"
-#include "com/centreon/engine/objects/contactgroup.hh"
+#include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/shared_ptr.hh"
 

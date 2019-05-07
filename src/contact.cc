@@ -301,9 +301,8 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, contact const& obj) {
-  char const* cntctgrp_str(NULL);
-  if (obj.contactgroups_ptr)
-    cntctgrp_str = chkstr(static_cast<contactgroup const*>(obj.contactgroups_ptr->object_ptr)->group_name);
+  std::string cg_name(static_cast<contactgroup const*>(
+      obj.contactgroups_ptr->object_ptr)->get_name());
   char const* hst_notif_str(NULL);
   if (obj.host_notification_period_ptr)
     hst_notif_str = chkstr(obj.host_notification_period_ptr->name);
@@ -354,7 +353,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  modified_service_attributes:     " << obj.get_modified_service_attributes() << "\n"
     "  host_notification_period_ptr:    " << chkstr(hst_notif_str) << "\n"
     "  service_notification_period_ptr: " << chkstr(svc_notif_str) << "\n"
-    "  contactgroups_ptr:               " << chkstr(cntctgrp_str) << "\n"
+    "  contactgroups_ptr:               " << cg_name << "\n"
      << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
      << "}\n";
   return os;

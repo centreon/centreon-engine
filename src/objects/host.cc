@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,7 +24,6 @@
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/host.hh"
@@ -67,7 +66,11 @@ bool operator==(
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
           && is_equal(obj1.event_handler, obj2.event_handler)
-          && is_equal(obj1.contact_groups, obj2.contact_groups)
+          && ((obj1.contact_groups.size() == obj2.contact_groups.size()) &&
+               std::equal(obj1.contact_groups.begin(),
+                          obj1.contact_groups.end(),
+                          obj2.contact_groups.begin()))
+          && is_equal(obj1.contacts, obj2.contacts)
           && is_equal(obj1.contacts, obj2.contacts)
           && obj1.notification_interval == obj2.notification_interval
           && obj1.first_notification_delay == obj2.first_notification_delay
@@ -204,6 +207,16 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   if (obj.hostgroups_ptr)
     hstgrp_str = chkstr(static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr)->group_name);
 
+  std::string cg_oss;
+
+  if (obj.contact_groups.empty())
+    cg_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.contact_groups;
+    cg_oss = oss.str();
+  }
+
   os << "host {\n"
     "  name:                                 " << chkstr(obj.name) << "\n"
     "  display_name:                         " << chkstr(obj.display_name) << "\n"
@@ -218,7 +231,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
-    "  contact_groups:                       " << chkobj(obj.contact_groups) << "\n"
+    "  contact_groups:                       " << cg_oss << "\n"
     "  contacts:                             " << chkobj(obj.contacts) << "\n"
     "  notification_interval:                " << obj.notification_interval << "\n"
     "  first_notification_delay:             " << obj.first_notification_delay << "\n"
@@ -650,11 +663,13 @@ int is_contact_for_host(host* hst, contact* cntct) {
     if (member->contact_ptr == cntct)
       return (true);
 
-  // Search all contactgroups of this host.
-  for (contactgroupsmember* member(hst->contact_groups);
-       member;
-       member = member->next)
-    if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
+  for (contactgroup_map::iterator
+         it(hst->contact_groups.begin()),
+         end(hst->contact_groups.end());
+       it != end;
+       ++it)
+    if (it->second->get_members().find(cntct->get_name()) ==
+        it->second->get_members().end())
       return (true);
 
   return (false);
@@ -683,18 +698,21 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
        ++it) {
     hostescalation* hstescalation(&*it->second);
     // Search all contacts of this host escalation.
-    for (contactsmember* member(hstescalation->contacts);
-         member;
-         member = member->next)
-      if (member->contact_ptr == cntct)
-        return (true);
+  for (contactsmember* member(hstescalation->contacts);
+       member;
+       member = member->next)
+    if (member->contact_ptr == cntct)
+      return (true);
 
-    // Search all contactgroups of this host escalation.
-    for (contactgroupsmember* member(hstescalation->contact_groups);
-         member;
-         member = member->next)
-      if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
-        return (true);
+  // Search all contactgroups of this host escalation.
+  for (contactgroup_map::iterator
+         it(hstescalation->contact_groups.begin()),
+         end(hstescalation->contact_groups.begin());
+       it != end;
+       ++it) 
+    if (it->second->get_members().find(cntct->get_name()) ==
+      it->second->get_members().end())
+      return (true);
   }
 
   return (false);

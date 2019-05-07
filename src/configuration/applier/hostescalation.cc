@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2017 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -119,10 +119,7 @@ void applier::hostescalation::add_object(
          end(obj.contactgroups().end());
        it != end;
        ++it)
-    if (!add_contactgroup_to_host_escalation(he, it->c_str()))
-      throw (engine_error() << "Could not add contact group '"
-             << *it << "' on escalation of host '"
-             << *obj.hosts().begin() << "'");
+    he->contact_groups.insert({*it, nullptr});
 
   return ;
 }

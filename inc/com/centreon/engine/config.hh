@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -39,7 +39,8 @@ int check_host(host* hst, int* w, int* e);
 int check_contact(com::centreon::engine::contact* cntct, int* w, int* e);
 int check_servicegroup(servicegroup* sg, int* w, int* e);
 int check_hostgroup(hostgroup* hg, int* w, int* e);
-int check_contactgroup(contactgroup* cg, int* w, int* e);
+int check_contactgroup(com::centreon::engine::contactgroup* cg, int* w,
+  int* e);
 int check_servicedependency(servicedependency* sd, int* w, int* e);
 int check_hostdependency(hostdependency* hd, int* w, int* e);
 int check_serviceescalation(serviceescalation* se, int* w, int* e);

@@ -1,7 +1,7 @@
 /*
-** Copyright 1999-2009      Ethan Galstad
-** Copyright 2009-2010      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013,2017 Centreon
+** Copyright 1999-2009 Ethan Galstad
+** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -107,10 +107,6 @@ extern std::map<std::string, host_other_properties> host_other_props;
 extern service*                  service_list;
 extern service*                  service_list_tail;
 extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-//extern com::centreon::engine::contact*                  contact_list;
-//extern com::centreon::engine::contact*                  contact_list_tail;
-extern contactgroup*             contactgroup_list;
-extern contactgroup*             contactgroup_list_tail;
 extern hostgroup*                hostgroup_list;
 extern hostgroup*                hostgroup_list_tail;
 extern std::map<std::string, hostgroup_other_properties> hostgroup_other_props;

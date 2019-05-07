@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010      Ethan Galstad
-** Copyright 2011-2013,2016 Centreon
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -281,24 +281,26 @@ int grab_custom_macro_value_r(
     }
     /* a contact macro with a contactgroup name and delimiter */
     else {
-      if ((temp_contactgroup = find_contactgroup(arg1)) == NULL)
+      if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(arg1)) == NULL)
         return (ERROR);
 
       delimiter_len = strlen(arg2);
 
       /* concatenate macro values for all contactgroup members */
-      for (temp_contactsmember = temp_contactgroup->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
+      for (std::unordered_map<std::string, contact *>::const_iterator
+             it(temp_contactgroup->get_members().begin()),
+             end(temp_contactgroup->get_members().end());
+           it != end;
+           ++it) {
 
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
+        if (it->second == nullptr)
           continue;
 
         /* get the macro value for this contact */
         grab_custom_macro_value_r(
           mac,
           macro_name,
-          temp_contact->get_name().c_str(),
+          it->second->get_name().c_str(),
           NULL,
           &temp_buffer);
 
@@ -754,7 +756,7 @@ int grab_standard_contact_macro_r(
 
       if (!buf.empty())
         buf.append(",");
-      buf.append(temp_contactgroup->group_name);
+      buf.append(temp_contactgroup->get_name());
     }
     if (!buf.empty())
       *output = string::dup(buf);
@@ -816,23 +818,23 @@ int grab_standard_contactgroup_macro(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_CONTACTGROUPNAME:
-    *output = string::dup(temp_contactgroup->group_name);
+    *output = string::dup(temp_contactgroup->get_name());
     break;
 
   case MACRO_CONTACTGROUPALIAS:
-    if (temp_contactgroup->alias)
-      *output = string::dup(temp_contactgroup->alias);
+    if (!temp_contactgroup->get_alias().empty())
+      *output = string::dup(temp_contactgroup->get_alias());
     break;
 
   case MACRO_CONTACTGROUPMEMBERS:
     /* get the member list */
-    for (temp_contactsmember = temp_contactgroup->members;
-         temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-      if (temp_contactsmember->contact_name == NULL)
-        continue;
+    for (std::unordered_map<std::string, contact *>::const_iterator
+           it(temp_contactgroup->get_members().begin()),
+           end(temp_contactgroup->get_members().end());
+         it != end;
+         ++it) {
       if (*output == NULL)
-        *output = string::dup(temp_contactsmember->contact_name);
+        *output = string::dup(it->second->get_name());
       else {
         *output = resize_string(
                     *output,

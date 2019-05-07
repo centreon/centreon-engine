@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,10 +22,9 @@
 
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
-#  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/objects/contactgroup.hh"
-#  include "com/centreon/engine/objects/contactgroupsmember.hh"
+#  include "com/centreon/engine/contactgroup.hh"
+#  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/objects/contactsmember.hh"
 #  include "com/centreon/engine/objects/customvariablesmember.hh"
 #  include "com/centreon/engine/objects/daterange.hh"

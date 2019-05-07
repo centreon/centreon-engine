@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2017 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -289,6 +289,43 @@ engine::contact* applier::state::find_contact(configuration::contact::key_type c
 }
 
 /**
+ *  Given a contact name, find a contact from the list in memory.
+ *
+ *  @param[in] name Contact name.
+ *
+ *  @return Contact object if found, NULL otherwise.
+ */
+engine::contactgroup const* applier::state::find_contactgroup(configuration::contact::key_type const& k) const {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<engine::contactgroup>>::const_iterator
+    it(_contactgroups.find(k));
+
+  if (it != _contactgroups.end())
+    return it->second.get();
+  return NULL;
+}
+
+/**
+ *  Given a contact name, find a contact from the list in memory.
+ *
+ *  @param[in] name Contact name.
+ *
+ *  @return Contact object if found, NULL otherwise.
+ */
+engine::contactgroup* applier::state::find_contactgroup(configuration::contact::key_type const& k) {
+  if (k.empty())
+    return NULL;
+
+  std::unordered_map<std::string, std::shared_ptr<engine::contactgroup>>::const_iterator
+    it(_contactgroups.find(k));
+
+  if (it != _contactgroups.end())
+    return it->second.get();
+  return NULL;
+}
+/**
  *  Get the current connectors.
  *
  *  @return The current connectors.
@@ -367,7 +404,7 @@ std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact> 
  *
  *  @return The current contactgroups.
  */
-std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> > const& applier::state::contactgroups() const throw () {
+std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> > const& applier::state::contactgroups() const throw () {
   return _contactgroups;
 }
 
@@ -376,7 +413,7 @@ std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> > const& ap
  *
  *  @return The current contactgroups.
  */
-std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >& applier::state::contactgroups() throw () {
+std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> >& applier::state::contactgroups() throw () {
   return _contactgroups;
 }
 
@@ -388,7 +425,7 @@ std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >& applier:
  *  @return Iterator to the element if found, contactgroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
+std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
   return _contactgroups.find(k);
 }
 
@@ -400,7 +437,7 @@ std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >::const_it
  *  @return Iterator to the element if found, contactgroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<contactgroup_struct> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
+std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
   return _contactgroups.find(k);
 }
 
@@ -602,10 +639,12 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator applie
          m;
          m = m->next)
       current.contacts().insert(m->contact_name);
-    for (contactgroupsmember_struct* m(p.first->second->contact_groups);
-         m;
-         m = m->next)
-      current.contactgroups().insert(m->group_name);
+    for (contactgroup_map::iterator
+           it(p.first->second->contact_groups.begin()),
+           end(p.first->second->contact_groups.begin());
+         it != end;
+         ++it)
+      current.contactgroups().insert(it->second->get_name());
 
     // Found !
     if (current == hesc)
@@ -872,10 +911,12 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
          m;
          m = m->next)
       current.contacts().insert(m->contact_name);
-    for (contactgroupsmember_struct* m(p.first->second->contact_groups);
-         m;
-         m = m->next)
-      current.contactgroups().insert(m->group_name);
+    for (contactgroup_map::iterator 
+           it(p.first->second->contact_groups.begin()),
+           end(p.first->second->contact_groups.end());
+         it != end;
+         ++it)
+      current.contactgroups().insert(it->second->get_name());
 
     // Found !
     if (current == sesc)

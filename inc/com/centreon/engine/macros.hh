@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -73,7 +73,7 @@ int grab_contact_address_macro(
       char** output);
 int grab_standard_contactgroup_macro(
       int macro_type,
-      contactgroup* temp_contactgroup,
+      com::centreon::engine::contactgroup* temp_contactgroup,
       char** output);
 int grab_custom_object_macro(
       char* macro_name,

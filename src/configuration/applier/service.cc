@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2017 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,7 +24,6 @@
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
@@ -227,10 +226,7 @@ void applier::service::add_object(
          end(obj.contactgroups().end());
        it != end;
        ++it)
-    if (!add_contactgroup_to_service(svc, it->c_str()))
-      throw (engine_error() << "Could not add contact group '"
-             << *it << "' to service '" << obj.service_description()
-             << "' of host '" << *obj.hosts().begin() << "'");
+    svc->contact_groups.insert({*it, nullptr});
 
   // Add custom variables.
   for (map_customvar::const_iterator
@@ -570,9 +566,7 @@ void applier::service::modify_object(
   // Contact groups.
   if (obj.contactgroups() != obj_old.contactgroups()) {
     // Delete old contact groups.
-    deleter::listmember(
-      s->contact_groups,
-      &deleter::contactgroupsmember);
+    s->contact_groups.clear();
 
     // Add contact groups to host.
     for (set_string::const_iterator
@@ -580,10 +574,7 @@ void applier::service::modify_object(
            end(obj.contactgroups().end());
          it != end;
          ++it)
-      if (!add_contactgroup_to_service(s, it->c_str()))
-        throw (engine_error() << "Could not add contact group '"
-               << *it << "' to service '" << service_description
-               << "' on host '" << host_name << "'");
+      s->contact_groups.insert({*it, nullptr});
   }
 
   // Custom variables.
