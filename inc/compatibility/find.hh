@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -44,7 +44,6 @@ struct serviceescalation_struct;
 struct servicegroup_struct;
 struct timeperiod_struct;
 
-contactgroup_struct*      find_contactgroup(char const* name);
 host_struct*              find_host(char const* name);
 hostgroup_struct*         find_hostgroup(char const* name);
 service_struct*           find_service(

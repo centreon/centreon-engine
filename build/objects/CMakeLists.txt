@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2019 Centreon
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -29,8 +29,6 @@ set(
   # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/comment.cc"
-  "${SRC_DIR}/contactgroup.cc"
-  "${SRC_DIR}/contactgroupsmember.cc"
   "${SRC_DIR}/contactsmember.cc"
   "${SRC_DIR}/customvariable.cc"
   "${SRC_DIR}/customvariablesmember.cc"
@@ -54,8 +52,6 @@ set(
   # Headers.
   "${INC_DIR}/command.hh"
   "${INC_DIR}/comment.hh"
-  "${INC_DIR}/contactgroup.hh"
-  "${INC_DIR}/contactgroupsmember.hh"
   "${INC_DIR}/contactsmember.hh"
   "${INC_DIR}/customvariable.hh"
   "${INC_DIR}/customvariablesmember.hh"

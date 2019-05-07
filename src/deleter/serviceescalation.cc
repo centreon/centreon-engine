@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,11 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/deleter/contactgroupsmember.hh"
+#include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/serviceescalation.hh"
-#include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
 
@@ -38,7 +37,7 @@ void deleter::serviceescalation(void* ptr) throw () {
 
   serviceescalation_struct* obj(static_cast<serviceescalation_struct*>(ptr));
 
-  listmember(obj->contact_groups, &contactgroupsmember);
+  obj->contact_groups.clear();
   listmember(obj->contacts, &contactsmember);
 
   // service_ptr not free.

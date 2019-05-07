@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,6 @@
 #include "com/centreon/engine/deleter/serviceescalation.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
 #include "com/centreon/engine/objects/tool.hh"
@@ -61,7 +60,10 @@ bool operator==(
           && obj1.escalate_on_warning == obj2.escalate_on_warning
           && obj1.escalate_on_unknown == obj2.escalate_on_unknown
           && obj1.escalate_on_critical == obj2.escalate_on_critical
-          && is_equal(obj1.contact_groups, obj2.contact_groups)
+          && ((obj1.contact_groups.size() == obj2.contact_groups.size()) &&
+               std::equal(obj1.contact_groups.begin(),
+                          obj1.contact_groups.end(),
+                          obj2.contact_groups.begin()))
           && is_equal(obj1.contacts, obj2.contacts));
 }
 
@@ -109,23 +111,17 @@ bool operator<(
     return (obj1.escalate_on_critical < obj2.escalate_on_critical);
   else if (obj1.escalate_on_unknown != obj2.escalate_on_unknown)
     return (obj1.escalate_on_unknown < obj2.escalate_on_unknown);
-  for (contactgroupsmember
-         * m1(obj1.contact_groups),
-         * m2(obj2.contact_groups);
-       m1 || m2;
-       m1 = m1->next, m2 = m2->next) {
-    if (!m1 || !m2)
-      return (!!m1 < !!m2);
-    else if (*m1 != *m2)
-      return (*m1 < *m2);
-  }
-  for (contactsmember* m1(obj1.contacts), * m2(obj2.contacts);
-       m1 || m2;
-       m1 = m1->next, m2 = m2->next) {
-    if (!m1 || !m2)
-      return (!!m1 < !!m2);
-    else if (*m1 != *m2)
-      return (*m1 < *m2);
+  for (contactgroup_map::const_iterator
+         it1(obj1.contact_groups.begin()),
+         it2(obj2.contact_groups.begin()),
+         end1(obj1.contact_groups.end()),
+         end2(obj2.contact_groups.end());
+       (it1 != end1) || (it2 != end2);
+       ++it1, ++it2) {
+    if (it1->second == nullptr || it2->second == nullptr)
+      return (!!it1->second < !!it2->second);
+    else if (it1->second != it2->second)
+      return (it1->second < it2->second);
   }
   return (false);
 }
@@ -149,6 +145,16 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
     svc_str += chkstr(obj.service_ptr->description);
   }
 
+  std::string cg_oss;
+
+  if (obj.contact_groups.empty())
+    cg_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.contact_groups;
+    cg_oss = oss.str();
+  }
+
   os << "serviceescalation {\n"
     "  host_name:             " << chkstr(obj.host_name) << "\n"
     "  description:           " << chkstr(obj.description) << "\n"
@@ -160,7 +166,7 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
     "  escalate_on_warning:   " << obj.escalate_on_warning << "\n"
     "  escalate_on_unknown:   " << obj.escalate_on_unknown << "\n"
     "  escalate_on_critical:  " << obj.escalate_on_critical << "\n"
-    "  contact_groups:        " << chkobj(obj.contact_groups) << "\n"
+    "  contact_groups:        " << cg_oss << "\n"
     "  contacts:              " << chkobj(obj.contacts) << "\n"
     "  service_ptr:           " << svc_str << "\n"
     "  escalation_period_ptr: " << chkstr(escalation_period_str) << "\n"

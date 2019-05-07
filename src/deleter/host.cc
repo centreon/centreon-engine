@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/host.hh"
@@ -25,7 +24,6 @@
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
-#include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/host.hh"
@@ -46,10 +44,11 @@ void deleter::host(void* ptr) throw () {
 
   host_struct* obj(static_cast<host_struct*>(ptr));
 
+    // Add contact groups to host.
+  obj->contact_groups.clear();
   listmember(obj->parent_hosts, &hostsmember);
   listmember(obj->child_hosts, &hostsmember);
   listmember(obj->services, &servicesmember);
-  listmember(obj->contact_groups, &contactgroupsmember);
   listmember(obj->contacts, &contactsmember);
   listmember(obj->custom_variables, &customvariablesmember);
   listmember(obj->hostgroups_ptr, &objectlist);

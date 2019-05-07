@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2008           Ethan Galstad
-** Copyright 2011-2013,2015-2017 Centreon
+** Copyright 1999-2008 Ethan Galstad
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -80,7 +80,8 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(
+      temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Global host event handler command '"
@@ -102,7 +103,8 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(
+      temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Global service event handler command '"
@@ -129,7 +131,8 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(
+      temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive service processor command '"
@@ -150,7 +153,8 @@ int pre_flight_check() {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
 
-    temp_command = configuration::applier::state::instance().find_command(temp_command_name);
+    temp_command = configuration::applier::state::instance().find_command(
+      temp_command_name);
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive host processor command '"
@@ -284,7 +288,7 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking contacts...";
   total_objects = 0;
-  for (umap<std::string,
+  for (std::unordered_map<std::string,
             std::shared_ptr<com::centreon::engine::contact> >::iterator
          it(configuration::applier::state::instance().contacts().begin()),
          end(configuration::applier::state::instance().contacts().end());
@@ -300,10 +304,13 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking contact groups...";
   total_objects = 0;
-  for (contactgroup* temp_contactgroup(contactgroup_list);
-       temp_contactgroup;
-       temp_contactgroup = temp_contactgroup->next, ++total_objects)
-    check_contactgroup(temp_contactgroup, &warnings, &errors);
+  for (std::unordered_map<std::string,
+            std::shared_ptr<com::centreon::engine::contactgroup> >::iterator
+         it(configuration::applier::state::instance().contactgroups().begin()),
+         end(configuration::applier::state::instance().contactgroups().end());
+       it != end;
+       ++it)
+    check_contactgroup(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " contact groups.";
@@ -736,23 +743,24 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check all contact groupss */
-  for (contactgroupsmember* temp_contactgroupsmember = svc->contact_groups;
-       temp_contactgroupsmember != NULL;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+  for (contactgroup_map::iterator
+         it(svc->contact_groups.begin()),
+         end(svc->contact_groups.end());
+       it != end;
+       ++it) {
 
-    contactgroup* temp_contactgroup
-      = find_contactgroup(temp_contactgroupsmember->group_name);
+    // Find the contact group.
+    com::centreon::engine::contactgroup* temp_contactgroup(
+      configuration::applier::state::instance().find_contactgroup(
+        it->first));
 
     if (temp_contactgroup == NULL) {
       logger(log_verification_error, basic)
-        << "Error: Contact group '" << temp_contactgroupsmember->group_name
+        << "Error: Contact group '" << it->first
         << "' specified in service '" << svc->description << "' for "
         "host '" << svc->host_name << "' is not defined anywhere!";
       errors++;
     }
-
-    /* save the contact group pointer for later */
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
   }
 
   /* verify service check timeperiod */
@@ -944,24 +952,24 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* check all contact groups */
-  for (contactgroupsmember* temp_contactgroupsmember = hst->contact_groups;
-       temp_contactgroupsmember != NULL;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
-
-    contactgroup* temp_contactgroup
-      = find_contactgroup(temp_contactgroupsmember->group_name);
+  for (contactgroup_map::iterator
+         it(hst->contact_groups.begin()),
+         end(hst->contact_groups.end());
+       it != end;
+       ++it) {
+    // Find the contact group.
+    com::centreon::engine::contactgroup* temp_contactgroup(
+      configuration::applier::state::instance().find_contactgroup(
+        it->first));
 
     if (temp_contactgroup == NULL) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
-        << temp_contactgroupsmember->group_name
+        << it->first
         << "' specified in host '" << hst->name
         << "' is not defined anywhere!";
       errors++;
     }
-
-    /* save the contact group pointer for later */
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
   }
 
   // Check notification timeperiod.
@@ -1249,17 +1257,18 @@ int check_contactgroup(contactgroup* cg, int* w, int* e) {
   (void)w;
   int errors(0);
 
-  // Check all the group members.
-  for (contactsmember* temp_contactsmember(cg->members);
-       temp_contactsmember;
-       temp_contactsmember = temp_contactsmember->next) {
-    contact* temp_contact(
+  for (std::unordered_map<std::string, contact *>::const_iterator
+         it(cg->get_members().begin()),
+         end(cg->get_members().end());
+       it != end;
+       ++it) {
+    contact *temp_contact(
       configuration::applier::state::instance().find_contact(
-        temp_contactsmember->contact_name));
-    if (!temp_contact) {
+        it->first));
+    if (temp_contact == nullptr) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
-        << "' specified in contact group '" << cg->group_name
+        << "Error: Contact '" << it->first
+        << "' specified in contact group '" << cg->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1270,13 +1279,12 @@ int check_contactgroup(contactgroup* cg, int* w, int* e) {
       add_object_to_objectlist(&temp_contact->contactgroups_ptr, cg);
 
     // Save the contact pointer for later.
-    temp_contactsmember->contact_ptr = temp_contact;
   }
 
   // Check for illegal characters in contact group name.
-  if (contains_illegal_object_chars(cg->group_name)) {
+  if (contains_illegal_object_chars(const_cast<char *>(cg->get_name().c_str()))) {
     logger(log_verification_error, basic)
-      << "Error: The name of contact group '" << cg->group_name
+      << "Error: The name of contact group '" << cg->get_name()
       << "' contains one or more illegal characters.";
     errors++;
   }
@@ -1501,25 +1509,25 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   }
 
   // Check all contact groups.
-  for (contactgroupsmember*
-         temp_contactgroupsmember(se->contact_groups);
-       temp_contactgroupsmember;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+  for (contactgroup_map::iterator
+         it(se->contact_groups.begin()),
+         end(se->contact_groups.end());
+       it != end;
+       ++it) {
     // Find the contact group.
-    contactgroup* temp_contactgroup(
-      find_contactgroup(temp_contactgroupsmember->group_name));
+    com::centreon::engine::contactgroup* temp_contactgroup(
+      configuration::applier::state::instance().find_contactgroup(
+        it->first));
+
     if (!temp_contactgroup) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
-        << temp_contactgroupsmember->group_name
+        << it->first
         << "' specified in service escalation for service '"
         << se->description << "' on host '" << se->host_name
         << "' is not defined anywhere!";
       errors++;
     }
-
-    // Save the contact group pointer for later.
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
   }
 
   // Add errors.
@@ -1589,24 +1597,24 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   }
 
   // Check all contact groups.
-  for (contactgroupsmember*
-         temp_contactgroupsmember(he->contact_groups);
-       temp_contactgroupsmember;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+  for (contactgroup_map::iterator
+         it(he->contact_groups.begin()),
+         end(he->contact_groups.end());
+       it != end;
+       ++it) {
     // Find the contact group.
-    contactgroup* temp_contactgroup(
-      find_contactgroup(temp_contactgroupsmember->group_name));
+    com::centreon::engine::contactgroup* temp_contactgroup(
+      configuration::applier::state::instance().find_contactgroup(
+        it->first));
+
     if (!temp_contactgroup) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
-        << temp_contactgroupsmember->group_name
+        << it->first
         << "' specified in host escalation for host '"
         << he->host_name << "' is not defined anywhere!";
       errors++;
     }
-
-    // Save the contact group pointer for later.
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
   }
 
   // Add errors.

@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2016 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -181,7 +181,8 @@ int service_notification(
       /* see if we can find the contact - first by name, then by alias */
 
       if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == NULL) {
-        for (umap<std::string, std::shared_ptr<contact> >::const_iterator
+        for (std::unordered_map<std::string,
+                                std::shared_ptr<contact> >::const_iterator
                it(state::instance().contacts().begin()),
                end(state::instance().contacts().end());
              it != end;
@@ -1214,7 +1215,6 @@ int create_notification_list_from_service(
       int* escalated) {
   contactsmember* temp_contactsmember = NULL;
   contact* temp_contact = NULL;
-  contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
   int escalate_notification = false;
 
@@ -1283,22 +1283,26 @@ int create_notification_list_from_service(
         "to notification list.";
 
       /* add all contacts that belong to contactgroups for this escalation */
-      for (temp_contactgroupsmember = temp_se->contact_groups;
-           temp_contactgroupsmember != NULL;
-           temp_contactgroupsmember = temp_contactgroupsmember->next) {
+      for (contactgroup_map::iterator
+             it(temp_se->contact_groups.begin()),
+             end(temp_se->contact_groups.end());
+           it != end;
+           ++it) {
         logger(dbg_notifications, most)
           << "Adding members of contact group '"
-          << temp_contactgroupsmember->group_name
+          << it->first
           << "' for service escalation to notification list.";
 
-        if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
+        if (it->second == nullptr)
           continue;
-        for (temp_contactsmember = temp_contactgroup->members;
-             temp_contactsmember != NULL;
-             temp_contactsmember = temp_contactsmember->next) {
-          if (!(temp_contact = temp_contactsmember->contact_ptr))
+        for (std::unordered_map<std::string, contact *>::const_iterator
+               itm(it->second->get_members().begin()),
+               mend(it->second->get_members().end());
+              itm != mend;
+              ++itm) {
+          if (itm->second == nullptr)
             continue;
-          add_notification(mac, temp_contact);
+          add_notification(mac, itm->second);
         }
       }
     }
@@ -1321,22 +1325,26 @@ int create_notification_list_from_service(
     }
 
     /* add all contacts that belong to contactgroups for this service */
-    for (temp_contactgroupsmember = svc->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
+    for (contactgroup_map::iterator
+           it(svc->contact_groups.begin()),
+           end(svc->contact_groups.end());
+         it != end;
+         ++it) {
       logger(dbg_notifications, most)
         << "Adding members of contact group '"
-        << temp_contactgroupsmember->group_name
+        << it->first
         << "' for service to notification list.";
 
-      if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
+      if (it->second == nullptr)
         continue;
-      for (temp_contactsmember = temp_contactgroup->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if (!(temp_contact = temp_contactsmember->contact_ptr))
+      for (std::unordered_map<std::string, contact *>::const_iterator
+             itm(it->second->get_members().begin()),
+             mend(it->second->get_members().end());
+            itm != mend;
+            ++itm) {
+        if (itm->second == nullptr)
           continue;
-        add_notification(mac, temp_contact);
+        add_notification(mac, itm->second);
       }
     }
   }
@@ -1451,7 +1459,7 @@ int host_notification(
 
       /* see if we can find the contact - first by name, then by alias */
       if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == NULL) {
-        for (umap<std::string, std::shared_ptr<contact> >::const_iterator
+        for (std::unordered_map<std::string, std::shared_ptr<contact> >::const_iterator
                it(state::instance().contacts().begin()),
                end(state::instance().contacts().end());
              it != end;
@@ -2404,7 +2412,6 @@ int create_notification_list_from_host(
       int* escalated) {
   contactsmember* temp_contactsmember = NULL;
   contact* temp_contact = NULL;
-  contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
   int escalate_notification = false;
 
@@ -2471,22 +2478,26 @@ int create_notification_list_from_host(
         "escalation(s) to notification list.";
 
       /* add all contacts that belong to contactgroups for this escalation */
-      for (temp_contactgroupsmember = temp_he->contact_groups;
-           temp_contactgroupsmember != NULL;
-           temp_contactgroupsmember = temp_contactgroupsmember->next) {
+      for (contactgroup_map::iterator
+             it(temp_he->contact_groups.begin()),
+             end(temp_he->contact_groups.end());
+           it != end;
+           ++it) {
         logger(dbg_notifications, most)
           << "Adding members of contact group '"
-          << temp_contactgroupsmember->group_name
+          << it->first
           << "' for host escalation to notification list.";
 
-        if ((temp_contactgroup = temp_contactgroupsmember->group_ptr) == NULL)
+        if (it->second == nullptr)
           continue;
-        for (temp_contactsmember = temp_contactgroup->members;
-             temp_contactsmember != NULL;
-             temp_contactsmember = temp_contactsmember->next) {
-          if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
+        for (std::unordered_map<std::string, contact *>::const_iterator
+               itm(it->second->get_members().begin()),
+               endm(it->second->get_members().end());
+              itm != endm;
+              ++itm) {
+          if (itm->second == nullptr)
             continue;
-          add_notification(mac, temp_contact);
+          add_notification(mac, itm->second);
         }
       }
     }
@@ -2516,22 +2527,26 @@ int create_notification_list_from_host(
       "notification list.";
 
     /* add all contacts that belong to contactgroups for this host */
-    for (temp_contactgroupsmember = hst->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
+    for (contactgroup_map::iterator
+           it(hst->contact_groups.begin()),
+           end(hst->contact_groups.end());
+         it != end;
+         ++it) {
       logger(dbg_notifications, most)
         << "Adding members of contact group '"
-        << temp_contactgroupsmember->group_name
+        << it->first
         << "' for host to notification list.";
 
-      if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
+      if (it->second == nullptr)
         continue;
-      for (temp_contactsmember = temp_contactgroup->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
+      for (std::unordered_map<std::string, contact *>::const_iterator
+             itm(it->second->get_members().begin()),
+             endm(it->second->get_members().end());
+            itm != endm;
+            ++itm) {
+        if (itm->second == nullptr)
           continue;
-        add_notification(mac, temp_contact);
+        add_notification(mac, itm->second);
       }
     }
   }

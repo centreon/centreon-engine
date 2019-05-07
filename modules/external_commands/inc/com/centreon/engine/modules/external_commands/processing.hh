@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,11 +23,12 @@
 #  include <cstring>
 #  include <map>
 #  include <string>
+#  include <unordered_map>
 #  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/configuration/applier/state.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects/contactgroup.hh"
+#  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/objects/contactsmember.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/hostgroup.hh"
@@ -35,7 +36,6 @@
 #  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/objects/servicegroup.hh"
 #  include "com/centreon/engine/objects/servicesmember.hh"
-#  include "com/centreon/unordered_hash.hh"
 #  include "find.hh"
 
 CCE_BEGIN()
@@ -292,18 +292,20 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        contactgroup* group(::find_contactgroup(group_name));
+        contactgroup* group(configuration::applier::state::instance().find_contactgroup(group_name));
         if (!group)
           return ;
 
-        for (contactsmember* member(group->members);
-             member;
-             member = member->next)
-          if (member->contact_ptr)
-            (*fptr)(member->contact_ptr);
+        for (std::unordered_map<std::string, contact *>::const_iterator
+               it(group->get_members().begin()),
+               end(group->get_members().end());
+             it != end;
+             ++it)
+          if (it->second)
+            (*fptr)(it->second);
       }
 
-      umap<std::string, command_info> _lst_command;
+      std::unordered_map<std::string, command_info> _lst_command;
       mutable concurrency::mutex      _mutex;
     };
   }
