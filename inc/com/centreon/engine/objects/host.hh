@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2016 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,6 +23,7 @@
 #  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 /* Forward declaration. */
@@ -55,7 +56,7 @@ typedef struct                  host_struct {
   double                        retry_interval;
   int                           max_attempts;
   char*                         event_handler;
-  contactgroupsmember_struct*   contact_groups;
+  contactgroup_map              contact_groups;
   contactsmember_struct*        contacts;
   double                        notification_interval;
   double                        first_notification_delay;

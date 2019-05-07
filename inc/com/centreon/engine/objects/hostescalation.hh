@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -35,7 +35,7 @@ typedef struct                   hostescalation_struct {
   int                            escalate_on_recovery;
   int                            escalate_on_down;
   int                            escalate_on_unreachable;
-  contactgroupsmember_struct*    contact_groups;
+  contactgroup_map               contact_groups;
   contactsmember_struct*         contacts;
   host_struct*                   host_ptr;
   timeperiod_struct*             escalation_period_ptr;

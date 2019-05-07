@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010      Ethan Galstad
-** Copyright 2011-2013,2016 Centreon
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,7 +24,6 @@
 #include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/unordered_hash.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 
 using namespace com::centreon::engine;
@@ -371,17 +370,19 @@ static int handle_contact_macro(
   }
   // A contact macro with a contactgroup name and delimiter.
   else if (arg1 && arg2) {
-    contactgroup* cg(find_contactgroup(arg1));
+    contactgroup* cg(configuration::applier::state::instance().find_contactgroup(arg1));
     if (!cg)
       retval = ERROR;
     else {
       size_t delimiter_len(strlen(arg2));
 
       // Concatenate macro values for all contactgroup members.
-      for (contactsmember* temp_contactsmember = cg->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        contact* cntct(temp_contactsmember->contact_ptr);
+      for(std::unordered_map<std::string, contact *>::const_iterator
+            it(cg->get_members().begin()),
+            end(cg->get_members().end());
+            it != end;
+            ++it) {
+        contact* cntct(it->second);
         if (cntct) {
           // Get the macro value for this contact.
           char* buffer(NULL);
@@ -445,7 +446,7 @@ static int handle_contactgroup_macro(
 
   // Use the saved contactgroup pointer.
   // or find the contactgroup for on-demand macros.
-  contactgroup* cg(arg1 ? find_contactgroup(arg1) : mac->contactgroup_ptr);
+  contactgroup* cg(arg1 ? configuration::applier::state::instance().find_contactgroup(arg1) : mac->contactgroup_ptr);
   if (!cg)
     retval = ERROR;
   else {
@@ -741,7 +742,7 @@ static int handle_summary_macro(
 
 // Redirection object.
 struct grab_value_redirection {
-  typedef umap<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, char**, int*)> entry;
+  typedef std::unordered_map<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, char**, int*)> entry;
   entry routines;
   grab_value_redirection() {
     // Host macros.
@@ -1143,17 +1144,18 @@ int grab_macro_value_r(
     else {
       /* on-demand contact macro with a contactgroup and a delimiter */
       if (arg[1] != NULL) {
-        if ((temp_contactgroup = find_contactgroup(arg[0])) == NULL)
+        if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(arg[0])) == NULL)
           return (ERROR);
 
         delimiter_len = strlen(arg[1]);
 
         /* concatenate macro values for all contactgroup members */
-        for (temp_contactsmember = temp_contactgroup->members;
-             temp_contactsmember != NULL;
-             temp_contactsmember = temp_contactsmember->next) {
-
-          if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
+      for(std::unordered_map<std::string, contact *>::const_iterator
+            it(temp_contactgroup->get_members().begin()),
+            end(temp_contactgroup->get_members().end());
+            it != end;
+            ++it) {
+          if ((temp_contact = it->second) == NULL)
             continue;
           if ((temp_contact = configuration::applier::state::instance().find_contact(temp_contactsmember->contact_name)) == NULL)
             continue;

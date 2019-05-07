@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2017 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -90,6 +90,10 @@ namespace           configuration {
                     find_contact(configuration::contact::key_type const& k) const;
       engine::contact*
                     find_contact(configuration::contact::key_type const& k);
+      engine::contactgroup const*
+                    find_contactgroup(configuration::contactgroup::key_type const& k) const;
+      engine::contactgroup*
+                    find_contactgroup(configuration::contactgroup::key_type const& k);
       std::unordered_map<std::string, std::shared_ptr<commands::connector>> const&
                     connectors() const throw ();
       std::unordered_map<std::string, std::shared_ptr<commands::connector>>&
@@ -106,13 +110,13 @@ namespace           configuration {
                     contacts_find(configuration::contact::key_type const& k) const;
       std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>::iterator
                     contacts_find(configuration::contact::key_type const& k);
-      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>> const&
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>> const&
                     contactgroups() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>&
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>&
                     contactgroups() throw ();
-      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>::const_iterator
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>::const_iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k) const;
-      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>::iterator
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
       std::unordered_map<unsigned int, std::shared_ptr<host_struct>> const&
                     hosts() const throw ();
@@ -232,7 +236,7 @@ namespace           configuration {
                     _connectors;
       std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>
                     _contacts;
-      std::unordered_map<std::string, std::shared_ptr<contactgroup_struct>>
+      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>
                     _contactgroups;
       concurrency::condvar
                     _cv_lock;

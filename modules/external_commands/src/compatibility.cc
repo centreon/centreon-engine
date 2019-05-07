@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006           Ethan Galstad
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2002-2006 Ethan Galstad
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -1519,7 +1519,7 @@ int process_contactgroup_command(int cmd,
     return (ERROR);
 
   /* find the contactgroup */
-  if ((temp_contactgroup = find_contactgroup(contactgroup_name)) == NULL)
+  if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(contactgroup_name)) == NULL)
     return (ERROR);
 
   switch (cmd) {
@@ -1530,29 +1530,31 @@ int process_contactgroup_command(int cmd,
   case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
 
     /* loop through all contactgroup members */
-    for (temp_member = temp_contactgroup->members;
-         temp_member != NULL;
-         temp_member = temp_member->next) {
+    for (std::unordered_map<std::string, contact *>::const_iterator
+           it(temp_contactgroup->get_members().begin()),
+           end(temp_contactgroup->get_members().end());
+         it != end;
+         ++it) {
 
-      if ((temp_contact = temp_member->contact_ptr) == NULL)
+      if (it->second == nullptr)
         continue;
 
       switch (cmd) {
 
       case CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        enable_contact_host_notifications(temp_contact);
+        enable_contact_host_notifications(it->second);
         break;
 
       case CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        disable_contact_host_notifications(temp_contact);
+        disable_contact_host_notifications(it->second);
         break;
 
       case CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        enable_contact_service_notifications(temp_contact);
+        enable_contact_service_notifications(it->second);
         break;
 
       case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        disable_contact_service_notifications(temp_contact);
+        disable_contact_service_notifications(it->second);
         break;
 
       default:

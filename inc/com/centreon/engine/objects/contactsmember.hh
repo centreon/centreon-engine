@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -42,9 +42,6 @@ typedef struct                  contactsmember_struct {
 extern "C" {
 #  endif /* C++ */
 
-contactsmember* add_contact_to_contactgroup(
-                  contactgroup_struct* grp,
-                  char const* contact_name);
 contactsmember* add_contact_to_host(
                   host_struct* hst,
                   char const* contact_name);

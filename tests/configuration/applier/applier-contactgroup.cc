@@ -1,5 +1,5 @@
 /*
-** Copyright 2018 Centreon
+** Copyright 2018-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -26,7 +26,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/objects/contactgroup.hh"
+#include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
@@ -104,8 +104,12 @@ TEST_F(ApplierContactgroup, ModifyUnexistingContactgroupFromConfig) {
 // When we change remove the configuration
 // Then it is really removed
 TEST_F(ApplierContactgroup, RemoveContactgroupFromConfig) {
+  configuration::applier::contact caply;
   configuration::applier::contactgroup aply;
   configuration::contactgroup cg("test");
+  configuration::contact ct("contact");
+
+  caply.add_object(ct);
   ASSERT_TRUE(cg.parse("members", "contact"));
   aply.add_object(cg);
   ASSERT_FALSE(
@@ -147,11 +151,7 @@ TEST_F(ApplierContactgroup, ResolveInexistentContact) {
   configuration::applier::contactgroup aplyr;
   configuration::contactgroup grp("test");
   grp.parse("members", "non_existing_contact");
-  aplyr.add_object(grp);
-  aplyr.expand_objects(*config);
-  ASSERT_THROW(aplyr.resolve_object(grp), std::exception);
-  ASSERT_EQ(config_warnings, 0);
-  ASSERT_EQ(config_errors, 1);
+  ASSERT_THROW(aplyr.add_object(grp), std::exception);
 }
 
 // Given a contactgroup with a contact

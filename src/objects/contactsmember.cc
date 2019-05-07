@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,9 +18,9 @@
 */
 
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contactgroup.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostescalation.hh"
@@ -99,54 +99,6 @@ std::ostream& operator<<(std::ostream& os, contactsmember const& obj) {
   for (contactsmember const* m(&obj); m; m = m->next)
     os << chkstr(m->contact_name) << (m->next ? ", " : "");
   return (os);
-}
-
-/**
- *  Add a new member to a contact group.
- *
- *  @param[in] grp          Contact group.
- *  @param[in] contact_name Contact name.
- *
- *  @return Contact group membership object.
- */
-contactsmember* add_contact_to_contactgroup(
-                  contactgroup* grp,
-                  char const* contact_name) {
-  // Make sure we have the data we need.
-  if (!grp || !contact_name || !contact_name[0]) {
-    logger(log_config_error, basic)
-      << "Error: Contactgroup or contact name is NULL";
-    return (NULL);
-  }
-
-  // Allocate memory for a new member.
-  contactsmember* obj(new contactsmember);
-  memset(obj, 0, sizeof(*obj));
-
-  try {
-    // Duplicate vars.
-    obj->contact_name = string::dup(contact_name);
-
-    // Add the new member to the head of the member list.
-    obj->next = grp->members;
-    grp->members = obj;
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_group_member(
-      NEBTYPE_CONTACTGROUPMEMBER_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      obj,
-      grp,
-      &tv);
-  }
-  catch (...) {
-    deleter::contactsmember(obj);
-    obj = NULL;
-  }
-
-  return (obj);
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015,2017 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,6 +30,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 /**
  *  Default constructor.
@@ -65,37 +66,47 @@ applier::contactgroup& applier::contactgroup::operator=(
 }
 
 /**
- *  Add new contactgroup.
+ *  Add new contactgroup
  *
  *  @param[in] obj  The new contactgroup to add into the monitoring engine.
  */
 void applier::contactgroup::add_object(
                               configuration::contactgroup const& obj) {
+  std::string const& name(obj.contactgroup_name());
+
   // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Creating new contactgroup '" << obj.contactgroup_name() << "'.";
+  logger(logging::dbg_config, logging::more) << "Creating new contactgroup '" 
+    << name << "'.";
+
+  if(applier::state::instance().find_contactgroup(name) != NULL)
+    throw (engine_error() << "Contactgroup '" << name << 
+        "' has already been defined");
 
   // Add contact group to the global configuration set.
   config->contactgroups().insert(obj);
 
   // Create contact group.
-  contactgroup_struct* cg(add_contactgroup(
-                            obj.contactgroup_name().c_str(),
-                            NULL_IF_EMPTY(obj.alias())));
-  if (!cg)
-    throw (engine_error() << "Error: Could not register contact group '"
-           << obj.contactgroup_name() << "'");
+  std::shared_ptr<engine::contactgroup> cg(new engine::contactgroup(obj));
 
-  // Apply resolved contacts on contactgroup.
   for (set_string::const_iterator
          it(obj.members().begin()),
          end(obj.members().end());
        it != end;
-       ++it)
-    if (!add_contact_to_contactgroup(cg, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact '" << *it
-             << "' to contact group '" << obj.contactgroup_name()
-             << "'");
+       ++it) {
+    engine::contact* cntct(
+      configuration::applier::state::instance().find_contact(*it));
+    if (cntct == nullptr) {
+     logger(log_verification_error, basic)
+        << "Error: Contact '" << *it
+        << "' specified in contact group '" << cg->get_name()
+        << "' is not defined anywhere!";
+      throw (engine_error() << "Error: Cannot resolve contact group "
+         << obj.contactgroup_name() << "'");
+    } else
+      cg->add_member(cntct);
+  }
+
+  applier::state::instance().contactgroups().insert({name, cg});
 
   return ;
 }
@@ -147,12 +158,13 @@ void applier::contactgroup::modify_object(
            << "contact group '" << obj.contactgroup_name() << "'");
 
   // Find contact group object.
-  umap<std::string, std::shared_ptr<contactgroup_struct> >::iterator
-    it_obj(applier::state::instance().contactgroups_find(obj.key()));
+  std::unordered_map<std::string,
+                     std::shared_ptr<engine::contactgroup> >::iterator
+    it_obj(applier::state::instance().contactgroups().find(obj.key()));
   if (it_obj == applier::state::instance().contactgroups().end())
     throw (engine_error() << "Error: Could not modify non-existing "
            << "contact group object '" << obj.contactgroup_name() << "'");
-  contactgroup_struct* cg(it_obj->second.get());
+  engine::contactgroup* cg(it_obj->second.get());
 
   // Update the global configuration set.
   configuration::contactgroup old_cfg(*it_cfg);
@@ -160,29 +172,30 @@ void applier::contactgroup::modify_object(
   config->contactgroups().insert(obj);
 
   // Modify properties.
-  modify_if_different(
-    cg->alias,
-    (obj.alias().empty() ? obj.contactgroup_name() : obj.alias()).c_str());
+  if (cg->get_alias() != obj.alias())
+    cg->set_alias(obj.alias());
 
-  // Were members modified ?
   if (obj.members() != old_cfg.members()) {
-    // Delete all old contact group members.
-    deleter::listmember(
-      (*it_obj).second->members,
-      &deleter::contactsmember);
+    //delete all old contact group members
+    (*it_obj).second->clear_members();
 
-    // Create new contact group members.
     for (set_string::const_iterator
-           it(obj.members().begin()),
-           end(obj.members().end());
-         it != end;
-         ++it)
-      if (!add_contact_to_contactgroup(
-             cg,
-             it->c_str()))
-        throw (engine_error() << "Error: Could not add contact member '"
-               << *it << "' to contact group '" << obj.contactgroup_name()
-               << "'");
+         it(obj.members().begin()),
+         end(obj.members().end());
+       it != end;
+       ++it) {
+      engine::contact *cntct(
+        configuration::applier::state::instance().find_contact(*it));
+      if (cntct == nullptr) {
+       logger(log_verification_error, basic)
+          << "Error: Contact '" << *it
+          << "' specified in contact group '" << cg->get_name()
+          << "' is not defined anywhere!";
+        throw (engine_error() << "Error: Cannot resolve contact group "
+           << obj.contactgroup_name() << "'");
+      } else
+        cg->add_member(cntct);
+    }
   }
 
   // Notify event broker.
@@ -208,13 +221,13 @@ void applier::contactgroup::remove_object(
     << "Removing contactgroup '" << obj.contactgroup_name() << "'";
 
   // Find contact group.
-  umultimap<std::string, std::shared_ptr<contactgroup_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<engine::contactgroup> >::iterator
     it(applier::state::instance().contactgroups_find(obj.key()));
   if (it != applier::state::instance().contactgroups().end()) {
-    contactgroup_struct* grp(it->second.get());
+    engine::contactgroup* grp(it->second.get());
 
     // Remove contact group from its list.
-    unregister_object<contactgroup_struct>(&contactgroup_list, grp);
+    //unregister_object<contactgroup>(&contactgroup_list, grp);
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -247,7 +260,8 @@ void applier::contactgroup::resolve_object(
     << "Resolving contact group '" << obj.contactgroup_name() << "'";
 
   // Find contact group.
-  umap<std::string, std::shared_ptr<contactgroup_struct> >::iterator
+  std::unordered_map<std::string,
+                     std::shared_ptr<engine::contactgroup> >::iterator
     it(applier::state::instance().contactgroups_find(obj.key()));
   if (applier::state::instance().contactgroups().end() == it)
     throw (engine_error() << "Error: Cannot resolve non-existing "
