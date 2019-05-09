@@ -38,19 +38,19 @@ namespace                      logging {
   public:
                                broker();
                                broker(broker const& right);
-                               ~broker() throw ();
+                               ~broker() throw () override;
     broker&                    operator=(broker const& right);
-    void                       close() throw ();
+    void                       close() throw () override;
     void                       log(
                                  unsigned long long types,
                                  unsigned int verbose,
                                  char const* msg,
-                                 unsigned int size) throw ();
-    void                        open();
-    void                        reopen();
-    void                        show_pid(bool enable);
-    void                        show_timestamp(com::centreon::logging::time_precision val);
-    void                        show_thread_id(bool enable);
+                                 unsigned int size) throw () override;
+    void                        open() override;
+    void                        reopen() override;
+    void                        show_pid(bool enable) override;
+    void                        show_timestamp(com::centreon::logging::time_precision val) override;
+    void                        show_thread_id(bool enable) override;
 
   private:
     bool                       _enable;

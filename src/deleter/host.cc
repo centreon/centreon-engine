@@ -18,14 +18,12 @@
 */
 
 #include "com/centreon/engine/deleter/contactsmember.hh"
-#include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/host.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
-#include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
@@ -50,7 +48,6 @@ void deleter::host(void* ptr) throw () {
   listmember(obj->child_hosts, &hostsmember);
   listmember(obj->services, &servicesmember);
   listmember(obj->contacts, &contactsmember);
-  listmember(obj->custom_variables, &customvariablesmember);
   listmember(obj->hostgroups_ptr, &objectlist);
 
   delete[] obj->name;

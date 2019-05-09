@@ -234,14 +234,7 @@ void applier::service::add_object(
          end(obj.customvariables().end());
        it != end;
        ++it)
-    if (!add_custom_variable_to_service(
-           svc,
-           it->first.c_str(),
-           it->second))
-      throw (engine_error() << "Could not add custom variable '"
-             << it->first << "' to service '"
-             << obj.service_description() << "' of host '"
-             << *obj.hosts().begin() << "'");
+    svc->custom_variables.insert({it->first, it->second});
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -578,24 +571,8 @@ void applier::service::modify_object(
   }
 
   // Custom variables.
-  if (obj.customvariables() != obj_old.customvariables()) {
-    // Delete old custom variables.
-    remove_all_custom_variables_from_service(s);
-
-    // Add custom variables.
-    for (map_customvar::const_iterator
-           it(obj.customvariables().begin()),
-           end(obj.customvariables().end());
-         it != end;
-         ++it)
-      if (!add_custom_variable_to_service(
-             s,
-             it->first.c_str(),
-             it->second))
-        throw (engine_error() << "Could not add custom variable '"
-               << it->first << "' to service '" << service_description
-               << "' on host '" << host_name << "'");
-  }
+  if (obj.customvariables() != obj_old.customvariables())
+    s->custom_variables = obj.customvariables();
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));

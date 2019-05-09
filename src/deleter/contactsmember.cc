@@ -17,26 +17,24 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/deleter/customvariablesmember.hh"
-#include "com/centreon/engine/objects/customvariablesmember.hh"
+#include "com/centreon/engine/deleter/contactsmember.hh"
+#include "com/centreon/engine/objects/contactsmember.hh"
 
 using namespace com::centreon::engine;
 
 /**
- *  Delete customvariablesmember.
+ *  Delete contactsmember.
  *
- *  @param[in] ptr The customvariablesmember to delete.
+ *  @param[in] ptr The contactsmember to delete.
  */
-void deleter::customvariablesmember(void* ptr) throw () {
+void deleter::contactsmember(void* ptr) throw () {
   if (!ptr)
     return;
 
-  customvariablesmember_struct* obj(static_cast<customvariablesmember_struct*>(ptr));
+  contactsmember_struct* obj(static_cast<contactsmember_struct*>(ptr));
 
-  delete[] obj->variable_name;
-  obj->variable_name = NULL;
-  delete[] obj->variable_value;
-  obj->variable_value = NULL;
+  delete[] obj->contact_name;
+  obj->contact_name = NULL;
 
   delete obj;
 }

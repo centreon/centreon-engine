@@ -41,7 +41,7 @@ extern int config_warnings;
 
 class ApplierServicegroup : public ::testing::Test {
  public:
-  void SetUp() {
+  void SetUp() override {
     config_errors = 0;
     config_warnings = 0;
     if (config == NULL)
@@ -50,7 +50,7 @@ class ApplierServicegroup : public ::testing::Test {
     commands::set::load();
   }
 
-  void TearDown() {
+  void TearDown() override {
     configuration::applier::state::unload();
     delete config;
     config = NULL;

@@ -26,7 +26,7 @@ using namespace com::centreon::engine;
 
 class    GetNextValidTimeSkipIntervalTest : public ::testing::Test {
  public:
-  void   SetUp() {
+  void   SetUp() override {
     _computed = (time_t)-1;
     _creator.new_timeperiod();
     _now = strtotimet("2016-11-24 6:00:00");

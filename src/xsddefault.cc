@@ -268,10 +268,10 @@ int xsddefault_save_status_data() {
          "\tscheduled_downtime_depth=" << hst->scheduled_downtime_depth << "\n";
 
     // custom variables
-    for (customvariablesmember* cvarm = hst->custom_variables; cvarm; cvarm = cvarm->next) {
-      if (cvarm->variable_name)
-        stream << "\t_" << cvarm->variable_name << "=" << cvarm->has_been_modified << ";"
-               << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
+    for (std::pair<std::string, customvariable> const& cv : hst->custom_variables) {
+      if (!cv.first.empty())
+        stream << "\t_" << cv.first << "=" << cv.second.has_been_modified() << ";"
+               << cv.second.get_value() << "\n";
     }
     stream << "\t}\n\n";
   }
@@ -335,10 +335,10 @@ int xsddefault_save_status_data() {
          "\tscheduled_downtime_depth=" << svc->scheduled_downtime_depth << "\n";
 
     // custom variables
-    for (customvariablesmember* cvarm = svc->custom_variables; cvarm; cvarm = cvarm->next) {
-      if (cvarm->variable_name)
-        stream << "\t_" << cvarm->variable_name << "=" << cvarm->has_been_modified << ";"
-               << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
+    for (std::pair<std::string, customvariable> const& cv : svc->custom_variables) {
+      if (!cv.first.empty())
+        stream << "\t_" << cv.first << "=" << cv.second.has_been_modified() << ";"
+               << cv.second.get_value() << "\n";
     }
     stream << "\t}\n\n";
   }
@@ -363,10 +363,10 @@ int xsddefault_save_status_data() {
          "\thost_notifications_enabled=" << cntct->get_host_notifications_enabled() << "\n"
          "\tservice_notifications_enabled=" << cntct->get_service_notifications_enabled() << "\n";
     // custom variables
-    for (customvariablesmember* cvarm = cntct->custom_variables; cvarm; cvarm = cvarm->next) {
-      if (cvarm->variable_name)
-        stream << "\t_" << cvarm->variable_name << "=" << cvarm->has_been_modified << ";"
-               << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
+    for (std::pair<std::string, customvariable> const& cv : cntct->custom_variables) {
+      if (!cv.first.empty())
+        stream << "\t_" << cv.first << "=" << cv.second.has_been_modified() << ";"
+               << cv.second.get_value() << "\n";
     }
     stream << "\t}\n\n";
   }

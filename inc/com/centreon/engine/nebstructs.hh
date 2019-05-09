@@ -21,8 +21,6 @@
 #ifndef CCE_NEBSTRUCTS_HH
 #  define CCE_NEBSTRUCTS_HH
 
-#  include "com/centreon/engine/objects/command.hh"
-#  include "com/centreon/engine/objects/customvariablesmember.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 

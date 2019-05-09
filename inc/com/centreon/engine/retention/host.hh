@@ -21,10 +21,12 @@
 #  define CCE_RETENTION_HOST_HH
 
 #  include <list>
+#  include <map>
 #  include <string>
+#  include <unordered_map>
 #  include <vector>
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
 
@@ -35,11 +37,11 @@ namespace                         retention {
   public:
                                   host();
                                   host(host const& right);
-                                  ~host() throw ();
+                                  ~host() throw () override;
     host&                         operator=(host const& right);
     bool                          operator==(host const& right) const throw ();
     bool                          operator!=(host const& right) const throw ();
-    bool                          set(char const* key, char const* value);
+    bool                          set(char const* key, char const* value) override;
 
     opt<int> const&               acknowledgement_type() const throw ();
     opt<bool> const&              active_checks_enabled() const throw ();
@@ -56,7 +58,8 @@ namespace                         retention {
     opt<int> const&               current_notification_number() const throw ();
     opt<unsigned long> const&     current_problem_id() const throw ();
     opt<int> const&               current_state() const throw ();
-    map_customvar const&          customvariables() const throw ();
+    std::unordered_map<std::string, engine::customvariable> const&
+                                  customvariables() const throw ();
     opt<std::string> const&       event_handler() const throw ();
     opt<bool> const&              event_handler_enabled() const throw ();
     opt<bool> const&              flap_detection_enabled() const throw ();

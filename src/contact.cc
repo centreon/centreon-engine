@@ -19,13 +19,11 @@
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
@@ -270,7 +268,7 @@ bool operator==(
          && obj1.get_can_submit_commands() == obj2.get_can_submit_commands()
          && obj1.get_retain_status_information() == obj2.get_retain_status_information()
          && obj1.get_retain_nonstatus_information() == obj2.get_retain_nonstatus_information()
-          && is_equal(obj1.custom_variables, obj2.custom_variables)
+         && obj1.custom_variables == obj2.custom_variables
          && obj1.get_last_host_notification() == obj2.get_last_host_notification()
          && obj1.get_last_service_notification() == obj2.get_last_service_notification()
          && obj1.get_modified_attributes() == obj2.get_modified_attributes()
@@ -354,8 +352,10 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  host_notification_period_ptr:    " << chkstr(hst_notif_str) << "\n"
     "  service_notification_period_ptr: " << chkstr(svc_notif_str) << "\n"
     "  contactgroups_ptr:               " << cg_name << "\n"
-     << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
-     << "}\n";
+    "  customvariables:                 ";
+  for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
+    os << cv.first << " ; ";
+  os << "}\n";
   return os;
 }
 
@@ -518,7 +518,6 @@ contact::contact()
  : _addresses(MAX_CONTACT_ADDRESSES) {}
 
 contact::~contact() {
-  deleter::listmember(this->custom_variables, &deleter::customvariablesmember);
   deleter::listmember(this->contactgroups_ptr, &deleter::objectlist);
 
   // host_notification_period_ptr not free.

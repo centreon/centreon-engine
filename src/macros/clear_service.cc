@@ -80,21 +80,12 @@ int clear_service_macros_r(nagios_macros* mac) {
   }
 
   // Clear custom service variables.
-  customvariablesmember* next(NULL);
-  for (customvariablesmember* it = mac->custom_service_vars;
-       it != NULL;
-       it = next) {
-    next = it->next;
-    delete[] it->variable_name;
-    delete[] it->variable_value;
-    delete it;
-  }
+  mac->custom_service_vars.clear();
 
   // Clear pointers.
-  mac->custom_service_vars = NULL;
   mac->service_ptr = NULL;
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -105,7 +96,7 @@ int clear_service_macros_r(nagios_macros* mac) {
  *  @see clear_service_macros_r
  */
 int clear_service_macros() {
-  return (clear_service_macros_r(get_global_macros()));
+  return clear_service_macros_r(get_global_macros());
 }
 
 }

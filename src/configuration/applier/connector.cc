@@ -35,31 +35,9 @@ using namespace com::centreon::engine::configuration;
 applier::connector::connector() {}
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-applier::connector::connector(applier::connector const& right) {
-  (void)right;
-}
-
-/**
  *  Destructor.
  */
 applier::connector::~connector() throw () {}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-applier::connector& applier::connector::operator=(
-                      applier::connector const& right) {
-  (void)right;
-  return (*this);
-}
 
 /**
  *  Add new connector.
@@ -94,7 +72,6 @@ void applier::connector::add_object(
                         &checks::checker::instance()));
   state::instance().connectors()[obj.connector_name()] = cmd;
   commands::set::instance().add_command(cmd);
-  return ;
 }
 
 /**
@@ -107,7 +84,6 @@ void applier::connector::add_object(
  */
 void applier::connector::expand_objects(configuration::state& s) {
   (void)s;
-  return ;
 }
 
 /**
@@ -152,7 +128,6 @@ void applier::connector::modify_object(
 
   // Set the new command line.
   c->set_command_line(processed_cmd);
-  return ;
 }
 
 /**
@@ -178,8 +153,6 @@ void applier::connector::remove_object(
 
   // Remove connector from the global configuration set.
   config->connectors().erase(obj);
-
-  return ;
 }
 
 /**
@@ -193,5 +166,4 @@ void applier::connector::remove_object(
 void applier::connector::resolve_object(
                            configuration::connector const& obj) {
   (void)obj;
-  return ;
 }

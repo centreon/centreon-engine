@@ -42,18 +42,18 @@ namespace              commands {
                          std::string const& command_line,
                          command& cmd);
                        forward(forward const& right);
-                       ~forward() throw();
+                       ~forward() throw() override;
     forward&           operator=(forward const& right);
-    commands::command* clone() const;
+    commands::command* clone() const override;
     unsigned long      run(
                          std::string const& processed_cmd,
                          nagios_macros& macros,
-                         unsigned int timeout);
+                         unsigned int timeout) override;
     void               run(
                          std::string const& processed_cmd,
                          nagios_macros& macros,
                          unsigned int timeout,
-                         result& res);
+                         result& res) override;
 
   private:
     void               _internal_copy(forward const& right);

@@ -26,7 +26,7 @@ using namespace com::centreon::engine;
 
 class     GetNextValidTimeEarliestDaterangeFirstTest : public testing::Test {
  public:
-  void    SetUp() {
+  void    SetUp() override {
     // All dateranges are based on the same day : 2016-11-07.
     _creator.new_timeperiod();
     _now = strtotimet("2016-11-07 00:00:00");

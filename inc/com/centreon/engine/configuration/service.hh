@@ -27,7 +27,7 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/objects/customvariable.hh"
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -52,7 +52,7 @@ namespace                  configuration {
 
                            service();
                            service(service const& other);
-                           ~service() throw ();
+                           ~service() throw () override;
     service&               operator=(service const& other);
     bool                   operator==(
                              service const& other) const throw ();
@@ -60,11 +60,11 @@ namespace                  configuration {
                              service const& other) const throw ();
     bool                   operator<(
                              service const& other) const throw ();
-    void                   check_validity() const;
+    void                   check_validity() const override;
     key_type               key() const;
     void                   merge(configuration::serviceextinfo const& obj);
-    void                   merge(object const& obj);
-    bool                   parse(char const* key, char const* value);
+    void                   merge(object const& obj) override;
+    bool                   parse(char const* key, char const* value) override;
 
     std::string const&     action_url() const throw ();
     bool                   checks_active() const throw ();

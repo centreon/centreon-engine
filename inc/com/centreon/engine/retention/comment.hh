@@ -37,11 +37,11 @@ namespace                retention {
 
                          comment(type_id type);
                          comment(comment const& right);
-                         ~comment() throw ();
+                         ~comment() throw () override;
     comment&             operator=(comment const& right);
     bool                 operator==(comment const& right) const throw ();
     bool                 operator!=(comment const& right) const throw ();
-    bool                 set(char const* key, char const* value);
+    bool                 set(char const* key, char const* value) override;
 
     std::string const&   author() const throw ();
     std::string const&   comment_data() const throw ();

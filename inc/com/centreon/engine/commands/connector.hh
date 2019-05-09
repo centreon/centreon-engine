@@ -50,31 +50,31 @@ namespace                commands {
                            std::string const& connector_line,
                            command_listener* listener = NULL);
                          connector(connector const& right);
-                         ~connector() throw();
+                         ~connector() throw() override;
     connector&           operator=(connector const& right);
-    commands::command*   clone() const;
+    commands::command*   clone() const override;
     unsigned long        run(
                            std::string const& processed_cmd,
                            nagios_macros& macros,
-                           unsigned int timeout);
+                           unsigned int timeout) override;
     void                 run(
                            std::string const& processed_cmd,
                            nagios_macros& macros,
                            unsigned int timeout,
-                           result& res);
+                           result& res) override;
     void                 set_command_line(
-                           std::string const& command_line);
+                           std::string const& command_line) override;
 
   private:
     class                restart : public concurrency::thread {
     public:
                          restart(connector* c);
-                         ~restart() throw ();
+                         ~restart() throw () override;
 
     private:
                          restart(restart const& right);
       restart&           operator=(restart const& right);
-      void               _run();
+      void               _run() override;
 
       connector*         _c;
     };
@@ -86,9 +86,9 @@ namespace                commands {
       bool               waiting_result;
     };
 
-    void                 data_is_available(process& p) throw ();
-    void                 data_is_available_err(process& p) throw ();
-    void                 finished(process& p) throw ();
+    void                 data_is_available(process& p) throw () override;
+    void                 data_is_available_err(process& p) throw () override;
+    void                 finished(process& p) throw () override;
     void                 _connector_close();
     void                 _connector_start();
     void                 _internal_copy(connector const& right);

@@ -42,7 +42,7 @@ public:
                  char const* function,
                  int line) throw ();
                error(error const& e) throw ();
-               ~error() throw ();
+               ~error() throw () override;
   error&       operator=(error const& e) throw ();
   error&       operator<<(char c) throw ();
   error&       operator<<(char const* str) throw ();
@@ -53,7 +53,7 @@ public:
   error&       operator<<(unsigned long long ull) throw ();
   error&       operator<<(double d) throw ();
   error&       operator<<(std::string const& str) throw ();
-  char const*  what() const throw ();
+  char const*  what() const throw () override;
 
 private:
   template     <typename T>
