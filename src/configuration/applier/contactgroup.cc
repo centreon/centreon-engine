@@ -184,7 +184,7 @@ void applier::contactgroup::modify_object(
          end(obj.members().end());
        it != end;
        ++it) {
-      engine::contact *cntct(
+      engine::contact* cntct(
         configuration::applier::state::instance().find_contact(*it));
       if (cntct == nullptr) {
        logger(log_verification_error, basic)

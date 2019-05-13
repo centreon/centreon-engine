@@ -20,16 +20,19 @@
 #ifndef CCE_OBJECTS_HOST_HH
 #  define CCE_OBJECTS_HOST_HH
 
+#  include <list>
+#  include <unordered_map>
+#  include <memory>
 #  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 /* Forward declaration. */
 struct contactgroupsmember_struct;
 struct contactsmember_struct;
-struct customvariablesmember_struct;
 struct hostsmember_struct;
 struct objectlist_struct;
 struct servicesmember_struct;
@@ -102,7 +105,8 @@ typedef struct                  host_struct {
   double                        y_3d;
   double                        z_3d;
   int                           should_be_drawn;
-  customvariablesmember_struct* custom_variables;
+  std::unordered_map<std::string, com::centreon::engine::customvariable>
+                                custom_variables;
   int                           problem_has_been_acknowledged;
   int                           acknowledgement_type;
   int                           check_type;

@@ -33,9 +33,7 @@ namespace               configuration {
     class               connector {
      public:
                         connector();
-                        connector(connector const& right);
                         ~connector() throw ();
-      connector&        operator=(connector const& right);
       void              add_object(
                           configuration::connector const& obj);
       void              expand_objects(configuration::state& s);
@@ -45,6 +43,9 @@ namespace               configuration {
                           configuration::connector const& obj);
       void              resolve_object(
                           configuration::connector const& obj);
+     private:
+                        connector(connector const& right);
+      connector&        operator=(connector const& right);
     };
   }
 }

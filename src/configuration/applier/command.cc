@@ -40,31 +40,9 @@ using namespace com::centreon::engine::configuration;
 applier::command::command() {}
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-applier::command::command(applier::command const& right) {
-  (void)right;
-}
-
-/**
  *  Destructor.
  */
 applier::command::~command() throw () {}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-applier::command& applier::command::operator=(
-                                      applier::command const& right) {
-  (void)right;
-  return (*this);
-}
 
 /**
  *  Add new command.

@@ -24,7 +24,6 @@
 #  include <sys/time.h>
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/objects/daterange.hh"
 #  include "com/centreon/engine/objects/timeperiod.hh"
 
@@ -73,7 +72,7 @@ int get_raw_command_line_r(
       int macro_options);
 // given a raw command line, determine the actual command to run Manipulates global_macros.argv and is thus not threadsafe
 int get_raw_command_line(
-      command* cmd_ptr,
+      com::centreon::engine::commands::command* cmd_ptr,
       char* cmd,
       char** full_command,
       int macro_options);

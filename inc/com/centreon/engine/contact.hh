@@ -21,17 +21,18 @@
 #  define CCE_CONTACT_HH
 
 #include <list>
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include <time.h>
 #include <vector>
+#include "com/centreon/engine/customvariable.hh"
 #include "com/centreon/engine/namespace.hh"
 
 /* Max number of custom addresses a contact can have. */
 #  define MAX_CONTACT_ADDRESSES 6
 
 /* Forward declaration. */
-struct customvariablesmember_struct;
 struct timeperiod_struct;
 struct objectlist_struct;
 
@@ -168,7 +169,8 @@ class                           contact {
                                 _service_notification_commands;
 
  public:
-  customvariablesmember_struct* custom_variables;
+  std::unordered_map<std::string, customvariable>
+                                custom_variables;
 
   timeperiod_struct*            host_notification_period_ptr;
   timeperiod_struct*            service_notification_period_ptr;

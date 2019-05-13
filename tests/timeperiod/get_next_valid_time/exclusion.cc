@@ -26,7 +26,7 @@ using namespace com::centreon::engine;
 
 class      GetNextValidTimeExclusionTest : public ::testing::Test {
  public:
-  void     SetUp() {
+  void     SetUp() override {
     _computed = (time_t)-1;
     _tp = _creator.new_timeperiod();
     for (int i(0); i < 7; ++i)

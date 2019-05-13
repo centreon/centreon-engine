@@ -42,7 +42,7 @@ int process_macros_r(
   int in_macro = false;
   char* selected_macro = NULL;
   char* original_macro = NULL;
-  char const* cleaned_macro = NULL;
+  std::string cleaned_macro;
   int clean_macro = false;
   int result = OK;
   int clean_options = 0;
@@ -53,12 +53,12 @@ int process_macros_r(
     << "process_macros_r()";
 
   if (output_buffer == NULL)
-    return (ERROR);
+    return ERROR;
 
   *output_buffer = string::dup("");
 
   if (input_buffer == NULL)
-    return (ERROR);
+    return ERROR;
 
   in_macro = false;
 
@@ -89,7 +89,7 @@ int process_macros_r(
     clean_macro = false;
 
     /* we're in plain text... */
-    if (in_macro == false) {
+    if (!in_macro) {
 
       /* add the plain text to the end of the already processed buffer */
       *output_buffer = resize_string(
@@ -127,7 +127,7 @@ int process_macros_r(
         logger(dbg_macros, basic)
           << " WARNING: An error occurred processing macro '"
           << temp_buffer << "'!";
-        if (free_macro == true) {
+        if (free_macro) {
           delete[] selected_macro;
           selected_macro = NULL;
         }
@@ -180,7 +180,7 @@ int process_macros_r(
         if (macro_options & URL_ENCODE_MACRO_CHARS) {
           original_macro = selected_macro;
           selected_macro = get_url_encoded_string(selected_macro);
-          if (free_macro == true) {
+          if (free_macro) {
             delete[] original_macro;
             original_macro = NULL;
           }
@@ -188,26 +188,24 @@ int process_macros_r(
         }
 
         /* some macros are cleaned... */
-        if (clean_macro == true
-            || ((macro_options & STRIP_ILLEGAL_MACRO_CHARS)
-                || (macro_options & ESCAPE_MACRO_CHARS))) {
+        if (clean_macro
+            || (macro_options & STRIP_ILLEGAL_MACRO_CHARS)
+            || (macro_options & ESCAPE_MACRO_CHARS)) {
 
-          /* add the (cleaned) processed macro to the end of the already processed buffer */
-          if (selected_macro != NULL
-              && (cleaned_macro = clean_macro_chars(
-                                    selected_macro,
-                                    macro_options)) != NULL) {
-            *output_buffer = resize_string(
-                               *output_buffer,
-                               strlen(*output_buffer)
-                               + strlen(cleaned_macro)
-                               + 1);
-            strcat(*output_buffer, cleaned_macro);
+          /* add the (cleaned) processed macro to the end of the already
+           * processed buffer */
+          if (selected_macro != NULL) {
+            cleaned_macro = clean_macro_chars(selected_macro, macro_options);
+            if (!cleaned_macro.empty()) {
+              *output_buffer = resize_string(
+                *output_buffer,
+                strlen(*output_buffer) + cleaned_macro.size() + 1);
+              strcat(*output_buffer, cleaned_macro.c_str());
 
-            logger(dbg_macros, basic)
-              << "  Cleaned macro.  Running output ("
-              << strlen(*output_buffer) << "): '"
-              << *output_buffer << "'";
+              logger(dbg_macros, basic)
+                << "  Cleaned macro.  Running output ("
+                << strlen(*output_buffer) << "): '" << *output_buffer << "'";
+            }
           }
         }
         /* others are not cleaned */
@@ -229,7 +227,7 @@ int process_macros_r(
         }
 
         /* free memory if necessary (if we URL encoded the macro or we were told to do so by grab_macro_value()) */
-        if (free_macro == true) {
+        if (free_macro) {
           delete[] selected_macro;
           selected_macro = NULL;
         }
@@ -249,7 +247,7 @@ int process_macros_r(
   logger(dbg_macros, more)
     << "  Done.  Final output: '" << *output_buffer << "'\n"
     "**** END MACRO PROCESSING *************";
-  return (OK);
+  return OK;
 }
 
 int process_macros(

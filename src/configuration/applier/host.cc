@@ -192,12 +192,7 @@ void applier::host::add_object(
          end(obj.customvariables().end());
        it != end;
        ++it)
-    if (!add_custom_variable_to_host(
-           h,
-           it->first.c_str(),
-           it->second))
-      throw (engine_error() << "Could not add custom variable '"
-             << it->first << "' to host '" << obj.host_name() << "'");
+    h->custom_variables.insert({it->first, it->second});
 
   // Parents.
   for (set_string::const_iterator
@@ -496,24 +491,8 @@ void applier::host::modify_object(
   }
 
   // Custom variables.
-  if (obj.customvariables() != obj_old.customvariables()) {
-    // Delete old custom variables.
-    remove_all_custom_variables_from_host(h);
-
-    // Add custom variables.
-    for (map_customvar::const_iterator
-           it(obj.customvariables().begin()),
-           end(obj.customvariables().end());
-         it != end;
-         ++it)
-      if (!add_custom_variable_to_host(
-             h,
-             it->first.c_str(),
-             it->second))
-        throw (engine_error()
-               << "Could not add custom variable '" << it->first
-               << "' to host '" << obj.host_name() << "'");
-  }
+  if (obj.customvariables() != obj_old.customvariables())
+    h->custom_variables = obj.customvariables();
 
   // Parents.
   if (obj.parents() != obj_old.parents()) {

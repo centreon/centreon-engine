@@ -29,7 +29,7 @@
 #  include "com/centreon/engine/configuration/point_2d.hh"
 #  include "com/centreon/engine/configuration/point_3d.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects/customvariable.hh"
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 
 CCE_BEGIN()
@@ -51,16 +51,16 @@ namespace                  configuration {
 
                            host(key_type const& key = 0);
                            host(host const& other);
-                           ~host() throw ();
+                           ~host() throw () override;
     host&                  operator=(host const& other);
     bool                   operator==(host const& other) const throw ();
     bool                   operator!=(host const& other) const throw ();
     bool                   operator<(host const& other) const throw ();
-    void                   check_validity() const;
+    void                   check_validity() const override;
     key_type const&        key() const throw ();
     void                   merge(configuration::hostextinfo const& obj);
-    void                   merge(object const& obj);
-    bool                   parse(char const* key, char const* value);
+    void                   merge(object const& obj) override;
+    bool                   parse(char const* key, char const* value) override;
 
     std::string const&     action_url() const throw ();
     std::string const&     address() const throw ();

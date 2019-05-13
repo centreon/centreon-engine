@@ -45,7 +45,7 @@ namespace                  configuration {
                            serviceescalation();
                            serviceescalation(
                              serviceescalation const& right);
-                           ~serviceescalation() throw ();
+                           ~serviceescalation() throw () override;
     serviceescalation&     operator=(serviceescalation const& right);
     bool                   operator==(
                              serviceescalation const& right) const throw ();
@@ -53,10 +53,10 @@ namespace                  configuration {
                              serviceescalation const& right) const throw ();
     bool                   operator<(
                              serviceescalation const& right) const;
-    void                   check_validity() const;
+    void                   check_validity() const override;
     key_type const&        key() const throw ();
-    void                   merge(object const& obj);
-    bool                   parse(char const* key, char const* value);
+    void                   merge(object const& obj) override;
+    bool                   parse(char const* key, char const* value) override;
 
     set_string&            contactgroups() throw ();
     set_string const&      contactgroups() const throw ();

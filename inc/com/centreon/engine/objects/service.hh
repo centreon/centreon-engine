@@ -20,9 +20,11 @@
 #ifndef CCE_OBJECTS_SERVICE_HH
 #  define CCE_OBJECTS_SERVICE_HH
 
-#  include <list>
+#  include <unordered_map>
+#  include <memory>
 #  include <string>
 #  include <time.h>
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/contactgroup.hh"
 
@@ -36,7 +38,6 @@ CCE_END()
 
 struct contactgroupsmember_struct;
 struct contactsmember_struct;
-struct customvariablesmember_struct;
 struct host_struct;
 struct objectlist_struct;
 struct timeperiod_struct;
@@ -93,7 +94,8 @@ typedef struct                  service_struct {
   char*                         action_url;
   char*                         icon_image;
   char*                         icon_image_alt;
-  customvariablesmember_struct* custom_variables;
+  std::unordered_map<std::string, com::centreon::engine::customvariable>
+                                custom_variables;
   int                           problem_has_been_acknowledged;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;

@@ -40,14 +40,14 @@ extern configuration::state* config;
 
 class ApplierCommand : public ::testing::Test {
  public:
-  void SetUp() {
+  void SetUp() override {
     if (config == nullptr)
       config = new configuration::state;
     applier::state::load();  // Needed to create a contact
     commands::set::load();
   }
 
-  void TearDown() {
+  void TearDown() override {
     configuration::applier::state::unload();
     delete config;
     config = nullptr;

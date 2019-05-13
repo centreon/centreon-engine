@@ -77,9 +77,9 @@ namespace                checks {
   private:
                          checker();
                          checker(checker const& right);
-                         ~checker() throw ();
+                         ~checker() throw () override;
     checker&             operator=(checker const& right);
-    void                 finished(commands::result const& res) throw ();
+    void                 finished(commands::result const& res) throw () override;
     int                  _execute_sync(host* hst);
 
     umap<unsigned long, check_result>

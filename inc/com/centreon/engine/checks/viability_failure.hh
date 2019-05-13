@@ -42,7 +42,7 @@ namespace              checks {
                          int line);
                        viability_failure(
                          viability_failure const& other);
-                       ~viability_failure() throw ();
+                       ~viability_failure() throw () override;
     viability_failure& operator=(viability_failure const& other);
     template <typename T>
     viability_failure& operator<<(T const& t) {

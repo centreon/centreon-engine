@@ -38,7 +38,7 @@ namespace   configuration {
   class     reload : private concurrency::thread {
   public:
             reload();
-            ~reload() throw ();
+            ~reload() throw () override;
     bool    is_finished() const;
     void    start();
     void    try_lock();
@@ -47,7 +47,7 @@ namespace   configuration {
   private:
             reload(reload const&);
     reload& operator=(reload const&);
-    void    _run();
+    void    _run() override;
     void    _set_is_finished(bool value);
 
     bool    _is_finished;

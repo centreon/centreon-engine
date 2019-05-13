@@ -30,7 +30,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/string.hh"

@@ -32,6 +32,9 @@
 #  include "com/centreon/engine/macros/misc.hh"
 #  include "com/centreon/engine/macros/process.hh"
 
+// cleans macros characters before insertion into output string
+std::string clean_macro_chars(std::string const& macro, int options);
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif // C++
@@ -77,7 +80,7 @@ int grab_standard_contactgroup_macro(
       char** output);
 int grab_custom_object_macro(
       char* macro_name,
-      customvariablesmember* vars,
+      std::list<com::centreon::engine::customvariable> const& vars,
       char** output);
 
 // Thread-safe version of the above.
@@ -121,11 +124,8 @@ int grab_standard_contact_macro_r(
 int grab_custom_object_macro_r(
       nagios_macros* mac,
       char* macro_name,
-      customvariablesmember* vars,
+      std::unordered_map<std::string, com::centreon::engine::customvariable> const& vars,
       char** output);
-
-// cleans macros characters before insertion into output string
-char const* clean_macro_chars(char* macro,int options);
 
 // URL encode a string
 char* get_url_encoded_string(char* input);
@@ -150,22 +150,22 @@ int clear_contact_macros_r(nagios_macros* mac);
 int clear_contactgroup_macros_r(nagios_macros* mac);
 int clear_summary_macros_r(nagios_macros* mac);
 
-int set_all_macro_environment_vars(int set);
-int set_macrox_environment_vars(int set);
-int set_argv_macro_environment_vars(int set);
-int set_custom_macro_environment_vars(int set);
-int set_contact_address_environment_vars(int set);
+int set_all_macro_environment_vars(bool set);
+int set_macrox_environment_vars(bool set);
+int set_argv_macro_environment_vars(bool set);
+int set_custom_macro_environment_vars(bool set);
+int set_contact_address_environment_vars(bool set);
 int set_macro_environment_var(
-      char const* name,
-      char const* value,
-      int set);
+      std::string const& name,
+      std::string const& value,
+      bool set);
 
 /* thread-safe version of the above */
-int set_all_macro_environment_vars_r(nagios_macros* mac, int set);
-int set_macrox_environment_vars_r(nagios_macros* mac, int set);
-int set_argv_macro_environment_vars_r(nagios_macros* mac, int set);
-int set_custom_macro_environment_vars_r(nagios_macros* mac, int set);
-int set_contact_address_environment_vars_r(nagios_macros* mac, int set);
+int set_all_macro_environment_vars_r(nagios_macros* mac, bool set);
+int set_macrox_environment_vars_r(nagios_macros* mac, bool set);
+int set_argv_macro_environment_vars_r(nagios_macros* mac, bool set);
+int set_custom_macro_environment_vars_r(nagios_macros* mac, bool set);
+int set_contact_address_environment_vars_r(nagios_macros* mac, bool set);
 
 #  ifdef __cplusplus
 }

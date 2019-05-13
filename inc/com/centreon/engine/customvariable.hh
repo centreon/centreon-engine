@@ -20,7 +20,7 @@
 #ifndef CCE_OBJECTS_CUSTOMVARIABLE_HH
 #  define CCE_OBJECTS_CUSTOMVARIABLE_HH
 
-#  include <map>
+#  include <unordered_map>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 
@@ -36,7 +36,12 @@ CCE_BEGIN()
 class                customvariable {
  public:
                      customvariable(
-                       std::string const& key,
+                       std::string const& value = "",
+                       bool is_sent = true);
+                     customvariable(
+                       std::string&& value,
+                       bool is_sent = true);
+                     customvariable(
                        std::string const& value);
                      customvariable(customvariable const& other);
                      ~customvariable();
@@ -49,14 +54,16 @@ class                customvariable {
   bool               is_sent() const;
   void               set_value(std::string const& value);
   std::string const& get_value() const;
+  bool               has_been_modified() const;
+  void               update(std::string const& value);
 
  private:
-  std::string        _key;
   std::string        _value;
   bool               _is_sent;
+  bool               _modified;
 };
 
-typedef std::map<std::string, customvariable> map_customvar;
+typedef std::unordered_map<std::string, customvariable> map_customvar;
 
 CCE_END()
 

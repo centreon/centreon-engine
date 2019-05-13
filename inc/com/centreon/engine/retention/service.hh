@@ -24,7 +24,7 @@
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects/customvariable.hh"
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
 
@@ -35,11 +35,11 @@ namespace                         retention {
   public:
                                   service();
                                   service(service const& right);
-                                  ~service() throw ();
+                                  ~service() throw () override;
     service&                      operator=(service const& right);
     bool                          operator==(service const& right) const throw ();
     bool                          operator!=(service const& right) const throw ();
-    bool                          set(char const* key, char const* value);
+    bool                          set(char const* key, char const* value) override;
 
     opt<int> const&               acknowledgement_type() const throw ();
     opt<bool> const&              active_checks_enabled() const throw ();
