@@ -22,7 +22,6 @@
 #include "com/centreon/engine/deleter/hostescalation.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/hostescalation.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
@@ -62,7 +61,10 @@ bool operator==(
                std::equal(obj1.contact_groups.begin(),
                           obj1.contact_groups.end(),
                           obj2.contact_groups.begin()))
-          && is_equal(obj1.contacts, obj2.contacts));
+          && ((obj1.contacts.size() == obj2.contacts.size()) &&
+               std::equal(obj1.contacts.begin(),
+                          obj1.contacts.end(),
+                          obj2.contacts.begin())));
 }
 
 /**
@@ -119,13 +121,17 @@ bool operator<(
     else if (it1->second != it2->second)
       return (it1->second < it2->second);
   }
-  for (contactsmember* m1(obj1.contacts), * m2(obj2.contacts);
-       m1 || m2;
-       m1 = m1->next, m2 = m2->next) {
-    if (!m1 || !m2)
-      return (!!m1 < !!m2);
-    else if (*m1 != *m2)
-      return (*m1 < *m2);
+  for (contact_map::const_iterator
+         it1(obj1.contacts.begin()),
+         it2(obj2.contacts.begin()),
+         end1(obj1.contacts.end()),
+         end2(obj2.contacts.end());
+       (it1 != end1) || (it2 != end2);
+       ++it1, ++it2) {
+    if (it1->second == nullptr || it2->second == nullptr)
+      return (!!it1->second < !!it2->second);
+    else if (it1->second != it2->second)
+      return (it1->second < it2->second);
   }
   return (false);
 }
@@ -147,6 +153,7 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     escalation_period_str = chkstr(obj.escalation_period_ptr->name);
 
   std::string cg_oss;
+  std::string c_oss;
 
   if (obj.contact_groups.empty())
     cg_oss = "\"NULL\"";
@@ -154,6 +161,13 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     std::ostringstream oss;
     oss << obj.contact_groups;
     cg_oss = oss.str();
+  }
+  if (obj.contacts.empty())
+    c_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.contacts;
+    c_oss = oss.str();
   }
 
   os << "hostescalation {\n"
@@ -166,7 +180,7 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     "  escalate_on_down:        " << obj.escalate_on_down << "\n"
     "  escalate_on_unreachable: " << obj.escalate_on_unreachable << "\n"
     "  contact_groups:          " << cg_oss << "\n"
-    "  contacts:                " << chkobj(obj.contacts) << "\n"
+    "  contacts:                " << c_oss << "\n"
     "  host_ptr:                " << chkstr(hst_str) << "\n"
     "  escalation_period_ptr:   " << chkstr(escalation_period_str) << "\n"
     "}\n";

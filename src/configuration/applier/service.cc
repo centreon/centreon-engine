@@ -24,7 +24,6 @@
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/error.hh"
@@ -215,10 +214,7 @@ void applier::service::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    if (!add_contact_to_service(svc, it->c_str()))
-      throw (engine_error() << "Could not add contact '"
-             << *it << "' to service '" << obj.service_description()
-             << "' of host '" << *obj.hosts().begin() << "'");
+    svc->contacts.insert({*it, nullptr});
 
   // Add contactgroups.
   for (set_string::const_iterator
@@ -542,7 +538,7 @@ void applier::service::modify_object(
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
     // Delete old contacts.
-    deleter::listmember(s->contacts, &deleter::contactsmember);
+    s->contacts.clear();
 
     // Add contacts to host.
     for (set_string::const_iterator
@@ -550,10 +546,7 @@ void applier::service::modify_object(
            end(obj.contacts().end());
          it != end;
          ++it)
-      if (!add_contact_to_service(s, it->c_str()))
-        throw (engine_error() << "Could not add contact '"
-               << *it << "' to service '" << service_description
-               << "' on host '" << host_name << "'");
+      s->contacts.insert({*it, nullptr});
   }
 
   // Contact groups.

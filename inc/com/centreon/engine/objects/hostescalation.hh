@@ -21,8 +21,6 @@
 #  define CCE_OBJECTS_HOSTESCALATION_HH
 
 /* Forward declaration. */
-struct contactgroupsmember_struct;
-struct contactsmember_struct;
 struct host_struct;
 struct timeperiod_struct;
 
@@ -36,7 +34,7 @@ typedef struct                   hostescalation_struct {
   int                            escalate_on_down;
   int                            escalate_on_unreachable;
   contactgroup_map               contact_groups;
-  contactsmember_struct*         contacts;
+  contact_map                    contacts;
   host_struct*                   host_ptr;
   timeperiod_struct*             escalation_period_ptr;
   struct hostescalation_struct*  next;

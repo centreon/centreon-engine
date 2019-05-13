@@ -1008,7 +1008,6 @@ int grab_macro_value_r(
   char* arg[2] = { NULL, NULL };
   contact* temp_contact = NULL;
   contactgroup* temp_contactgroup = NULL;
-  contactsmember* temp_contactsmember = NULL;
   char* temp_buffer = NULL;
   int delimiter_len = 0;
   unsigned int x;
@@ -1155,9 +1154,9 @@ int grab_macro_value_r(
             end(temp_contactgroup->get_members().end());
             it != end;
             ++it) {
-          if ((temp_contact = it->second) == NULL)
+          if (it->second == NULL)
             continue;
-          if ((temp_contact = configuration::applier::state::instance().find_contact(temp_contactsmember->contact_name)) == NULL)
+          if ((temp_contact = configuration::applier::state::instance().find_contact(it->second->get_name())) == NULL)
             continue;
 
           /* get the macro value for this contact */

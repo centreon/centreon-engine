@@ -24,7 +24,6 @@
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
@@ -69,8 +68,10 @@ bool operator==(
                std::equal(obj1.contact_groups.begin(),
                           obj1.contact_groups.end(),
                           obj2.contact_groups.begin()))
-          && is_equal(obj1.contacts, obj2.contacts)
-          && is_equal(obj1.contacts, obj2.contacts)
+          && ((obj1.contacts.size() == obj2.contacts.size()) &&
+               std::equal(obj1.contacts.begin(),
+                          obj1.contacts.end(),
+                          obj2.contacts.begin()))
           && obj1.notification_interval == obj2.notification_interval
           && obj1.first_notification_delay == obj2.first_notification_delay
           && obj1.notify_on_down == obj2.notify_on_down
@@ -207,6 +208,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     hstgrp_str = chkstr(static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr)->group_name);
 
   std::string cg_oss;
+  std::string c_oss;
 
   if (obj.contact_groups.empty())
     cg_oss = "\"NULL\"";
@@ -215,6 +217,14 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     oss << obj.contact_groups;
     cg_oss = oss.str();
   }
+  if (obj.contacts.empty())
+    c_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.contacts;
+    c_oss = oss.str();
+  }
+
 
   os << "host {\n"
     "  name:                                 " << chkstr(obj.name) << "\n"
@@ -231,7 +241,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
     "  contact_groups:                       " << cg_oss << "\n"
-    "  contacts:                             " << chkobj(obj.contacts) << "\n"
+    "  contacts:                             " << c_oss << "\n"
     "  notification_interval:                " << obj.notification_interval << "\n"
     "  first_notification_delay:             " << obj.first_notification_delay << "\n"
     "  notify_on_down:                       " << obj.notify_on_down << "\n"
@@ -659,11 +669,13 @@ int is_contact_for_host(host* hst, contact* cntct) {
     return false;
 
   // Search all individual contacts of this host.
-  for (contactsmember* member(hst->contacts);
-       member;
-       member = member->next)
-    if (member->contact_ptr == cntct)
-      return true;
+  for (contact_map::iterator
+         it(hst->contacts.begin()),
+         end(hst->contacts.end());
+       it != end;
+       ++it)
+    if (it->second.get() == cntct)
+      return (true);
 
   for (contactgroup_map::iterator
          it(hst->contact_groups.begin()),
@@ -700,11 +712,13 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
        ++it) {
     hostescalation* hstescalation(&*it->second);
     // Search all contacts of this host escalation.
-  for (contactsmember* member(hstescalation->contacts);
-       member;
-       member = member->next)
-    if (member->contact_ptr == cntct)
-      return true;
+  for (contact_map::iterator
+         it(hstescalation->contacts.begin()),
+         end(hstescalation->contacts.end());
+       it != end;
+       ++it)
+    if (it->second.get() == cntct)
+      return (true);
 
   // Search all contactgroups of this host escalation.
   for (contactgroup_map::iterator

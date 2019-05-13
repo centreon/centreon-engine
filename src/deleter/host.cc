@@ -17,13 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/host.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
@@ -44,10 +42,10 @@ void deleter::host(void* ptr) throw () {
 
     // Add contact groups to host.
   obj->contact_groups.clear();
+  obj->contacts.clear();
   listmember(obj->parent_hosts, &hostsmember);
   listmember(obj->child_hosts, &hostsmember);
   listmember(obj->services, &servicesmember);
-  listmember(obj->contacts, &contactsmember);
   listmember(obj->hostgroups_ptr, &objectlist);
 
   delete[] obj->name;

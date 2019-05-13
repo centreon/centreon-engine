@@ -633,10 +633,12 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator applie
                       ? configuration::hostescalation::unreachable
                       : 0));
     current.escalation_options(options);
-    for (contactsmember_struct* m(p.first->second->contacts);
-         m;
-         m = m->next)
-      current.contacts().insert(m->contact_name);
+    for (contact_map::iterator
+           it(p.first->second->contacts.begin()),
+           end(p.first->second->contacts.end());
+         it != end;
+         ++it)
+      current.contacts().insert(it->first);
     for (contactgroup_map::iterator
            it(p.first->second->contact_groups.begin()),
            end(p.first->second->contact_groups.begin());
@@ -905,16 +907,18 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
                             ? configuration::serviceescalation::critical
                             : 0));
     current.escalation_options(options);
-    for (contactsmember_struct* m(p.first->second->contacts);
-         m;
-         m = m->next)
-      current.contacts().insert(m->contact_name);
+    for (contact_map::iterator
+           it(p.first->second->contacts.begin()),
+           end(p.first->second->contacts.end());
+         it != end;
+         ++it)
+      current.contacts().insert(it->first);
     for (contactgroup_map::iterator 
            it(p.first->second->contact_groups.begin()),
            end(p.first->second->contact_groups.end());
          it != end;
          ++it)
-      current.contactgroups().insert(it->second->get_name());
+      current.contactgroups().insert(it->first);
 
     // Found !
     if (current == sesc)

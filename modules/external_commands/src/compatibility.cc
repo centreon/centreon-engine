@@ -1509,7 +1509,6 @@ int process_contactgroup_command(int cmd,
                                  char* args) {
   char* contactgroup_name = NULL;
   contactgroup* temp_contactgroup = NULL;
-  contactsmember* temp_member = NULL;
   contact* temp_contact = NULL;
 
   (void)entry_time;

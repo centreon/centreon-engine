@@ -17,12 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
-#include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/service.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/objects/service.hh"
 
@@ -40,7 +39,6 @@ void deleter::service(void* ptr) throw () {
   service_struct* obj(static_cast<service_struct*>(ptr));
 
   obj->contact_groups.clear();
-  listmember(obj->contacts, &contactsmember);
   listmember(obj->servicegroups_ptr, &objectlist);
 
   delete[] obj->host_name;
