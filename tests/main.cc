@@ -22,13 +22,13 @@
 
 class  CentreonEngineEnvironment : public testing::Environment {
 public:
-  void SetUp() {
+  void SetUp() override {
     setenv("TZ", ":Europe/Paris", 1);
     com::centreon::clib::load(com::centreon::clib::with_logging_engine);
     return ;
   }
 
-  void TearDown() {
+  void TearDown() override {
     com::centreon::clib::unload();
     return ;
   }

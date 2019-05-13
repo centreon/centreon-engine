@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008           Ethan Galstad
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -2121,115 +2121,97 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   host* temp_host(NULL);
   service* temp_service(NULL);
   contact* temp_contact(NULL);
-  customvariablesmember* temp_customvariablesmember(NULL);
-  char* temp_ptr(NULL);
-  char* name1(NULL);
-  char* name2(NULL);
-  char* varname(NULL);
-  char* varvalue(NULL);
-  int x(0);
 
   /* get the host or contact name */
-  if ((temp_ptr = my_strtok(args, ";")) == NULL)
+  char* temp_ptr(index(args, ';'));
+  if (!temp_ptr)
     return ERROR;
-  name1 = string::dup(temp_ptr);
+  int pos(temp_ptr - args);
+  std::string name1(args, pos);
+  args += pos + 1;
 
-  /* get the service description if necessary */
+  /* get the service name */
+  std::string name2;
   if (cmd == CMD_CHANGE_CUSTOM_SVC_VAR) {
-    if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
-      delete[] name1;
+    temp_ptr = index(args, ';');
+    if (!temp_ptr)
       return ERROR;
-    }
-    name2 = string::dup(temp_ptr);
+    pos = temp_ptr - args;
+    name2 = std::string(args, pos);
+    args += pos + 1;
   }
 
   /* get the custom variable name */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
-    delete[] name1;
-    delete[] name2;
+  temp_ptr = index(args, ';');
+  if (!temp_ptr)
     return ERROR;
-  }
-  varname = string::dup(temp_ptr);
+  pos = temp_ptr - args;
+  std::string varname(args, pos);
+  args += pos + 1;
 
   /* get the custom variable value */
-  if ((temp_ptr = my_strtok(NULL, ";")) != NULL)
-    varvalue = string::dup(temp_ptr);
-  else
-    varvalue = string::dup("");
+  temp_ptr = index(args, ';');
+  std::string varvalue;
+  if (temp_ptr) {
+    pos = temp_ptr - args;
+    varvalue = std::string(args, pos);
+  }
+
+  std::transform(varname.begin(), varname.end(), varname.begin(), ::toupper);
 
   /* find the object */
   switch (cmd) {
-
   case CMD_CHANGE_CUSTOM_HOST_VAR:
-    if ((temp_host = find_host(name1)) == NULL)
-      return ERROR;
-    temp_customvariablesmember = temp_host->custom_variables;
-    break;
+    {
+      if ((temp_host = find_host(name1.c_str())) == NULL)
+        return ERROR;
+      std::unordered_map<std::string, customvariable>::iterator it(temp_host->custom_variables.find(varname));
+      if (it == temp_host->custom_variables.end())
+        temp_host->custom_variables.insert({std::move(varname), customvariable(std::move(varvalue))});
+      else
+        it->second.update(std::move(varvalue));
 
-  case CMD_CHANGE_CUSTOM_SVC_VAR:
-    if ((temp_service = find_service(name1, name2)) == NULL)
-      return ERROR;
-    temp_customvariablesmember = temp_service->custom_variables;
-    break;
-
-  case CMD_CHANGE_CUSTOM_CONTACT_VAR:
-    if ((temp_contact = configuration::applier::state::instance().find_contact(name1)) == NULL)
-      return ERROR;
-    temp_customvariablesmember = temp_contact->custom_variables;
-    break;
-
-  default:
-    break;
-  }
-
-  /* capitalize the custom variable name */
-  for (x = 0; varname[x] != '\x0'; x++)
-    varname[x] = toupper(varname[x]);
-
-  /* find the proper variable */
-  for (; temp_customvariablesmember != NULL;
-       temp_customvariablesmember = temp_customvariablesmember->next) {
-
-    /* we found the variable, so update the value */
-    if (!strcmp(varname, temp_customvariablesmember->variable_name)) {
-
-      /* update the value */
-      delete[] temp_customvariablesmember->variable_value;
-      temp_customvariablesmember->variable_value = string::dup(varvalue);
-
-      /* mark the variable value as having been changed */
-      temp_customvariablesmember->has_been_modified = true;
-
-      break;
+      /* set the modified attributes and update the status of the object */
+      temp_host->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
+      update_host_status(temp_host, false);
     }
-  }
-
-  /* free memory */
-  delete[] name1;
-  delete[] name2;
-  delete[] varname;
-  delete[] varvalue;
-
-  /* set the modified attributes and update the status of the object */
-  switch (cmd) {
-
-  case CMD_CHANGE_CUSTOM_HOST_VAR:
-    temp_host->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-    update_host_status(temp_host, false);
     break;
-
   case CMD_CHANGE_CUSTOM_SVC_VAR:
-    temp_service->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-    update_service_status(temp_service, false);
-    break;
+    {
+      if ((temp_service = find_service(name1.c_str(), name2.c_str())) == NULL)
+        return ERROR;
+      std::unordered_map<std::string, customvariable>::iterator it(temp_service->custom_variables.find(varname));
+      if (it == temp_service->custom_variables.end())
+        temp_service->custom_variables.insert({std::move(varname), customvariable(std::move(varvalue))});
+      else
+        it->second.update(std::move(varvalue));
 
+      /* set the modified attributes and update the status of the object */
+      temp_service->custom_variables.insert(
+          {std::move(varname), customvariable(std::move(varvalue))});
+      temp_service->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
+      update_service_status(temp_service, false);
+    }
+    break;
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
-    temp_contact->set_modified_attributes(
-        temp_contact->get_modified_attributes()
-        | MODATTR_CUSTOM_VARIABLE);
-    temp_contact->update_status_info(false);
-    break;
+    {
+      if ((temp_contact = configuration::applier::state::instance().find_contact(name1)) == NULL)
+        return ERROR;
+      std::unordered_map<std::string, customvariable>::iterator it(temp_contact->custom_variables.find(varname));
+      if (it == temp_contact->custom_variables.end())
+        temp_contact->custom_variables.insert({std::move(varname), customvariable(std::move(varvalue))});
+      else
+        it->second.update(std::move(varvalue));
 
+      /* set the modified attributes and update the status of the object */
+      temp_contact->custom_variables.insert(
+          {std::move(varname), customvariable(std::move(varvalue))});
+      temp_contact->set_modified_attributes(
+          temp_contact->get_modified_attributes()
+          | MODATTR_CUSTOM_VARIABLE);
+      temp_contact->update_status_info(false);
+    }
+    break;
   default:
     break;
   }

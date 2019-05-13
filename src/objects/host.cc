@@ -25,7 +25,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
-#include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
@@ -114,7 +113,7 @@ bool operator==(
           && obj1.y_3d == obj2.y_3d
           && obj1.z_3d == obj2.z_3d
           && obj1.should_be_drawn == obj2.should_be_drawn
-          && is_equal(obj1.custom_variables, obj2.custom_variables)
+          && obj1.custom_variables == obj2.custom_variables
           && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
           && obj1.acknowledgement_type == obj2.acknowledgement_type
           && obj1.check_type == obj2.check_type
@@ -179,7 +178,7 @@ bool operator==(
 bool operator!=(
        host const& obj1,
        host const& obj2) throw () {
-  return (!operator==(obj1, obj2));
+  return !operator==(obj1, obj2);
 }
 
 /**
@@ -337,10 +336,13 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
     "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
-    "  hostgroups_ptr:                       " << chkstr(hstgrp_str) << "\n"
-    << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
-    << "}\n";
-  return (os);
+    "  hostgroups_ptr:                       " << chkstr(hstgrp_str) << "\n";
+
+  for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
+    os << cv.first << " ; ";
+
+  os << "\n}\n";
+  return os;
 }
 
 /**
@@ -487,7 +489,7 @@ host* add_host(
   if (!name || !name[0] || !address || !address[0]) {
     logger(log_config_error, basic)
       << "Error: Host name or address is NULL";
-    return (NULL);
+    return NULL;
   }
   if (host_id == 0) {
     logger(log_config_error, basic)
@@ -498,31 +500,31 @@ host* add_host(
     logger(log_config_error, basic)
       << "Error: Invalid max_check_attempts value for host '"
       << name << "'";
-    return (NULL);
+    return NULL;
   }
   if (check_interval < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid check_interval value for host '"
       << name << "'";
-    return (NULL);
+    return NULL;
   }
   if (notification_interval < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid notification_interval value for host '"
       << name << "'";
-    return (NULL);
+    return NULL;
   }
   if (first_notification_delay < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid first_notification_delay value for host '"
       << name << "'";
-    return (NULL);
+    return NULL;
   }
   if (freshness_threshold < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid freshness_threshold value for host '"
       << name << "'";
-    return (NULL);
+    return NULL;
   }
 
   // Check if the host already exists.
@@ -530,7 +532,7 @@ host* add_host(
   if (is_host_exist(id)) {
     logger(log_config_error, basic)
       << "Error: Host '" << name << "' has already been defined";
-    return (NULL);
+    return NULL;
   }
 
   // Allocate memory for a new host.
@@ -632,7 +634,7 @@ host* add_host(
     obj.reset();
   }
 
-  return (obj.get());
+  return obj.get();
 }
 
 /**
@@ -641,7 +643,7 @@ host* add_host(
  *  @return Number of registered hosts.
  */
 int get_host_count() {
-  return (state::instance().hosts().size());
+  return state::instance().hosts().size();
 }
 
 /**
@@ -654,14 +656,14 @@ int get_host_count() {
  */
 int is_contact_for_host(host* hst, contact* cntct) {
   if (!hst || !cntct)
-    return (false);
+    return false;
 
   // Search all individual contacts of this host.
   for (contactsmember* member(hst->contacts);
        member;
        member = member->next)
     if (member->contact_ptr == cntct)
-      return (true);
+      return true;
 
   for (contactgroup_map::iterator
          it(hst->contact_groups.begin()),
@@ -670,9 +672,9 @@ int is_contact_for_host(host* hst, contact* cntct) {
        ++it)
     if (it->second->get_members().find(cntct->get_name()) ==
         it->second->get_members().end())
-      return (true);
+      return true;
 
-  return (false);
+  return false;
 }
 
 /**
@@ -686,7 +688,7 @@ int is_contact_for_host(host* hst, contact* cntct) {
  */
 int is_escalated_contact_for_host(host* hst, contact* cntct) {
   if (!hst || !cntct)
-    return (false);
+    return false;
 
   std::string id(hst->name);
   umultimap<std::string, std::shared_ptr<hostescalation> > const&
@@ -702,7 +704,7 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
        member;
        member = member->next)
     if (member->contact_ptr == cntct)
-      return (true);
+      return true;
 
   // Search all contactgroups of this host escalation.
   for (contactgroup_map::iterator
@@ -712,10 +714,10 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
        ++it) 
     if (it->second->get_members().find(cntct->get_name()) ==
       it->second->get_members().end())
-      return (true);
+      return true;
   }
 
-  return (false);
+  return false;
 }
 
 /**
@@ -732,12 +734,12 @@ int is_host_immediate_child_of_host(
       host* child_host) {
   // Not enough data.
   if (!child_host)
-    return (false);
+    return false;
 
   // Root/top-level hosts.
   if (!parent_host) {
     if (!child_host->parent_hosts)
-      return (true);
+      return true;
   }
   // Mid-level/bottom hosts.
   else {
@@ -745,10 +747,10 @@ int is_host_immediate_child_of_host(
          member;
          member = member->next)
       if (member->host_ptr == parent_host)
-        return (true);
+        return true;
   }
 
-  return (false);
+  return false;
 }
 
 /**
@@ -764,8 +766,8 @@ int is_host_immediate_parent_of_host(
       host* child_host,
       host* parent_host) {
   if (is_host_immediate_child_of_host(parent_host, child_host) == true)
-    return (true);
-  return (false);
+    return true;
+  return false;
 }
 
 /**
@@ -782,7 +784,7 @@ int number_of_immediate_child_hosts(host* hst) {
   for (host* tmp(host_list); tmp; tmp = tmp->next)
     if (is_host_immediate_child_of_host(hst, tmp))
       ++children;
-  return (children);
+  return children;
 }
 
 /**
@@ -799,7 +801,7 @@ int number_of_immediate_parent_hosts(host* hst) {
   for (host* tmp(host_list); tmp; tmp = tmp->next)
     if (is_host_immediate_parent_of_host(hst, tmp))
       ++parents;
-  return (parents);
+  return parents;
 }
 
 /**
@@ -816,7 +818,7 @@ int number_of_total_child_hosts(host* hst) {
   for (host* tmp(host_list); tmp; tmp = tmp->next)
     if (is_host_immediate_child_of_host(hst, tmp))
       children += number_of_total_child_hosts(tmp) + 1;
-  return (children);
+  return children;
 }
 
 /**
@@ -833,7 +835,7 @@ int number_of_total_parent_hosts(host* hst) {
   for (host* tmp(host_list); tmp; tmp = tmp->next)
     if (is_host_immediate_parent_of_host(hst, tmp))
       parents += number_of_total_parent_hosts(tmp) + 1;
-  return (parents);
+  return parents;
 }
 
 /**
@@ -885,7 +887,7 @@ host& engine::find_host(unsigned int host_id) {
  */
 char const* engine::get_host_timezone(char const* name) {
   std::string const& timezone(host_other_props[name].timezone);
-  return (timezone.empty() ? NULL : timezone.c_str());
+  return timezone.empty() ? NULL : timezone.c_str();
 }
 
 /**
@@ -898,7 +900,7 @@ char const* engine::get_host_timezone(char const* name) {
 bool engine::is_host_exist(unsigned int host_id) throw () {
   umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(host_id));
-  return (it != state::instance().hosts().end());
+  return it != state::instance().hosts().end();
 }
 
 /**
@@ -911,7 +913,7 @@ bool engine::is_host_exist(unsigned int host_id) throw () {
 unsigned int engine::get_host_id(char const* name) {
   std::map<std::string, host_other_properties>::const_iterator
     found = host_other_props.find(name);
-  return (found != host_other_props.end() ? found->second.host_id : 0);
+  return found != host_other_props.end() ? found->second.host_id : 0;
 }
 
 /**

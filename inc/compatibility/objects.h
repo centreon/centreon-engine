@@ -21,12 +21,11 @@
 #  define CCE_COMPATIBILITY_OBJECTS_H
 
 #  include <time.h>
+#  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
-#  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/objects/contactsmember.hh"
-#  include "com/centreon/engine/objects/customvariablesmember.hh"
 #  include "com/centreon/engine/objects/daterange.hh"
 #  include "com/centreon/engine/objects/defines.hh"
 #  include "com/centreon/engine/objects/host.hh"

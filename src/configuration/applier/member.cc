@@ -20,7 +20,6 @@
 #include <memory>
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
-#include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"

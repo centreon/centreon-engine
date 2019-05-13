@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/retention/applier/utils.hh"
-#include "com/centreon/engine/objects/command.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::retention::applier;

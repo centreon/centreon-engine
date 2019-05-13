@@ -113,8 +113,6 @@ extern std::map<std::string, hostgroup_other_properties> hostgroup_other_props;
 extern servicegroup*             servicegroup_list;
 extern servicegroup*             servicegroup_list_tail;
 extern std::map<std::string, servicegroup_other_properties> servicegroup_other_props;
-extern command*                  command_list;
-extern command*                  command_list_tail;
 extern timeperiod*               timeperiod_list;
 extern timeperiod*               timeperiod_list_tail;
 extern serviceescalation*        serviceescalation_list;

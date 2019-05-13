@@ -23,7 +23,6 @@
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/process_manager.hh"
 
 using namespace com::centreon;
@@ -34,7 +33,7 @@ extern configuration::state* config;
 
 class SimpleCommand : public ::testing::Test {
  public:
-  void SetUp() {
+  void SetUp() override {
 //    set_time(20);
     if (config == NULL)
       config = new configuration::state;
@@ -43,7 +42,7 @@ class SimpleCommand : public ::testing::Test {
     set::load();
   }
 
-  void TearDown() {
+  void TearDown() override {
     configuration::applier::state::unload();  // Needed to store commands
     process_manager::unload();
     delete config;
@@ -57,7 +56,7 @@ class my_listener : public commands::command_listener {
     return _res;
   }
 
-  void finished(result const& res) throw () {
+  void finished(result const& res) throw () override {
     _res = res;
   }
 

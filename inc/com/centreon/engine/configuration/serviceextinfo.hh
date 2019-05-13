@@ -37,15 +37,15 @@ namespace                  configuration {
   public:
                            serviceextinfo();
                            serviceextinfo(serviceextinfo const& right);
-                           ~serviceextinfo() throw ();
+                           ~serviceextinfo() throw () override;
     serviceextinfo&        operator=(serviceextinfo const& right);
     bool                   operator==(
                              serviceextinfo const& right) const throw ();
     bool                   operator!=(
                              serviceextinfo const& right) const throw ();
-    void                   check_validity() const;
-    void                   merge(object const& obj);
-    bool                   parse(char const* key, char const* value);
+    void                   check_validity() const override;
+    void                   merge(object const& obj) override;
+    bool                   parse(char const* key, char const* value) override;
 
     std::string const&     action_url() const throw ();
     std::string const&     icon_image() const throw ();

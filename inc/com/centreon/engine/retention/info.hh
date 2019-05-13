@@ -32,11 +32,11 @@ namespace                retention {
   public:
                          info();
                          info(info const& right);
-                         ~info() throw ();
+                         ~info() throw () override;
     info&                operator=(info const& right);
     bool                 operator==(info const& right) const throw ();
     bool                 operator!=(info const& right) const throw ();
-    bool                 set(char const* key, char const* value);
+    bool                 set(char const* key, char const* value) override;
 
     time_t               created() const throw ();
 

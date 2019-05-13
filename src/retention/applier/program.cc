@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/retention/applier/program.hh"
 #include "com/centreon/engine/retention/applier/utils.hh"
 #include "com/centreon/engine/string.hh"
