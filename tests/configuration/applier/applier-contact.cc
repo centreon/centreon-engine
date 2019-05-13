@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
+#include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -43,7 +44,7 @@ extern int config_warnings;
 
 class ApplierContact : public ::testing::Test {
  public:
-  void SetUp() {
+  void SetUp() override {
     config_errors = 0;
     config_warnings = 0;
     if (config == NULL)
@@ -52,7 +53,7 @@ class ApplierContact : public ::testing::Test {
     com::centreon::engine::commands::set::load();
   }
 
-  void TearDown() {
+  void TearDown() override {
     configuration::applier::state::unload();
     com::centreon::engine::commands::set::unload();
     delete config;
@@ -85,7 +86,7 @@ class ApplierContact : public ::testing::Test {
     ctct.parse("service_notification_period", "24x7");
     ctct.parse("host_notification_commands", "cmd");
     ctct.parse("service_notification_commands", "cmd");
-    return (ctct);
+    return ctct;
   }
 };
 
@@ -118,8 +119,8 @@ TEST_F(ApplierContact, ModifyUnexistingContactFromConfig) {
 // Given contactgroup / contact appliers
 // And a configuration contactgroup and a configuration contact
 // that are already in configuration
-// When we change the contact configuration
-// Then the appliers modify_object updates the contact.
+// When we remove the contact configuration applier
+// Then it is really removed from the configuration applier.
 TEST_F(ApplierContact, RemoveContactFromConfig) {
   configuration::applier::contact aply;
   configuration::applier::contactgroup aply_grp;
@@ -134,6 +135,59 @@ TEST_F(ApplierContact, RemoveContactFromConfig) {
   aply.expand_objects(*config);
   aply.remove_object(ctct);
   ASSERT_TRUE(configuration::applier::state::instance().contacts().empty());
+}
+
+TEST_F(ApplierContact, ModifyContactFromConfig) {
+  configuration::applier::contact aply;
+  configuration::applier::contactgroup aply_grp;
+  configuration::contactgroup grp("test_group");
+  configuration::contact ctct("test");
+  ASSERT_TRUE(ctct.parse("contactgroups", "test_group"));
+  ASSERT_TRUE(ctct.parse("host_notification_commands", "cmd1,cmd2"));
+  ASSERT_TRUE(ctct.parse("service_notification_commands", "svc1,svc2"));
+  ASSERT_TRUE(ctct.parse("_superVar", "superValue"));
+  ASSERT_TRUE(ctct.customvariables().size() == 1);
+  ASSERT_TRUE(ctct.customvariables().at("superVar").get_value() == "superValue");
+
+  configuration::applier::command cmd_aply;
+  configuration::applier::connector cnn_aply;
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  cmd.parse("connector", "perl");
+  configuration::connector cnn("perl");
+  cnn_aply.add_object(cnn);
+  cmd_aply.add_object(cmd);
+
+  aply_grp.add_object(grp);
+  aply.add_object(ctct);
+  aply.expand_objects(*config);
+  ASSERT_TRUE(ctct.parse("host_notification_commands", "cmd"));
+  ASSERT_TRUE(ctct.parse("service_notification_commands", "svc1,svc2"));
+  ASSERT_TRUE(ctct.parse("_superVar", "Super"));
+  ASSERT_TRUE(ctct.parse("_superVar1", "Super1"));
+  ASSERT_TRUE(ctct.parse("alias", "newAlias"));
+  ASSERT_TRUE(ctct.customvariables().size() == 2);
+  ASSERT_TRUE(ctct.parse("service_notification_options", "n"));
+  aply.modify_object(ctct);
+  engine::contact* c(configuration::applier::state::instance().find_contact("test"));
+  ASSERT_TRUE(c->custom_variables.size() == 2);
+  ASSERT_TRUE(c->custom_variables["superVar"].get_value() == "Super");
+  ASSERT_TRUE(c->custom_variables["superVar1"].get_value() == "Super1");
+  ASSERT_TRUE(c->get_alias() == "newAlias");
+  ASSERT_FALSE(c->notify_on_service_unknown());
+
+  std::set<configuration::command>::iterator it{config->commands_find("cmd")};
+  ASSERT_TRUE(it != config->commands().end());
+  config->commands().erase(it);
+
+  cmd.parse("command_name", "cmd");
+  cmd.parse("command_line", "bar");
+  configuration::applier::command aplyr;
+  aplyr.add_object(cmd);
+  ASSERT_TRUE(ctct.parse("host_notification_commands", "cmd"));
+  aply.modify_object(ctct);
+  engine::commands::command* cc{configuration::applier::state::instance().find_command("cmd")};
+  ASSERT_TRUE(cc->get_command_line() == "bar");
 }
 
 // Given contactgroup / contact appliers

@@ -37,14 +37,14 @@ extern configuration::state* config;
 
 class ApplierConnector : public ::testing::Test {
  public:
-  void SetUp() {
+  void SetUp() override {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
     commands::set::load();
   }
 
-  void TearDown() {
+  void TearDown() override {
     configuration::applier::state::unload();
     delete config;
     config = NULL;

@@ -51,7 +51,7 @@ namespace                  configuration {
                            servicedependency();
                            servicedependency(
                              servicedependency const& right);
-                           ~servicedependency() throw ();
+                           ~servicedependency() throw () override;
     servicedependency&     operator=(servicedependency const& right);
     bool                   operator==(
                              servicedependency const& right) const throw ();
@@ -59,10 +59,10 @@ namespace                  configuration {
                              servicedependency const& right) const throw ();
     bool                   operator<(
                              servicedependency const& right) const;
-    void                   check_validity() const;
+    void                   check_validity() const override;
     key_type const&        key() const throw ();
-    void                   merge(object const& obj);
-    bool                   parse(char const* key, char const* value);
+    void                   merge(object const& obj) override;
+    bool                   parse(char const* key, char const* value) override;
 
     void                   dependency_period(std::string const& period);
     std::string const&     dependency_period() const throw ();

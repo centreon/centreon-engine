@@ -25,7 +25,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
-#include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
@@ -101,7 +100,7 @@ bool operator==(
           && is_equal(obj1.action_url, obj2.action_url)
           && is_equal(obj1.icon_image, obj2.icon_image)
           && is_equal(obj1.icon_image_alt, obj2.icon_image_alt)
-          && is_equal(obj1.custom_variables, obj2.custom_variables)
+          && obj1.custom_variables == obj2.custom_variables
           && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
           && obj1.acknowledgement_type == obj2.acknowledgement_type
           && obj1.host_problem_at_last_check == obj2.host_problem_at_last_check
@@ -165,7 +164,7 @@ bool operator==(
 bool operator!=(
        service const& obj1,
        service const& obj2) throw () {
-  return (!operator==(obj1, obj2));
+  return !operator==(obj1, obj2);
 }
 
 /**
@@ -318,10 +317,13 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  check_command_args:                   " << chkstr(obj.check_command_args) << "\n"
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
     "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
-    "  servicegroups_ptr:                    " << chkstr(svcgrp_str) << "\n"
-    << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
-    << "}\n";
-  return (os);
+    "  servicegroups_ptr:                    " << chkstr(svcgrp_str) << "\n";
+
+  for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
+    os << cv.first << " ; ";
+
+  os << "\n}\n";
+  return os;
 }
 
 /**
@@ -466,19 +468,19 @@ service* add_service(
   else if (!description || !description[0]) {
     logger(log_config_error, basic)
       << "Error: Service description is not set";
-    return (NULL);
+    return NULL;
   }
   else if (!host_name || !host_name[0]) {
     logger(log_config_error, basic)
       << "Error: Host name of service '"
       << description << "' is not set";
-    return (NULL);
+    return NULL;
   }
   else if (!check_command || !check_command[0]) {
     logger(log_config_error, basic)
       << "Error: Check command of service '" << description
       << "' on host '" << host_name << "' is not set";
-    return (NULL);
+    return NULL;
   }
 
   host_id = get_host_id(host_name);
@@ -498,13 +500,13 @@ service* add_service(
       << "Error: Invalid max_attempts, check_interval, retry_interval"
          ", or notification_interval value for service '"
       << description << "' on host '" << host_name << "'";
-    return (NULL);
+    return NULL;
   }
   if (first_notification_delay < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid first_notification_delay value for service '"
       << description << "' on host '" << host_name << "'";
-    return (NULL);
+    return NULL;
   }
 
   // Check if the service is already exist.
@@ -514,7 +516,7 @@ service* add_service(
     logger(log_config_error, basic)
       << "Error: Service '" << description << "' on host '"
       << host_name << "' has already been defined";
-    return (NULL);
+    return NULL;
   }
 
   // Allocate memory.
@@ -606,7 +608,7 @@ service* add_service(
     obj.reset();
   }
 
-  return (obj.get());
+  return obj.get();
 }
 
 /**
@@ -615,7 +617,7 @@ service* add_service(
  *  @return Number of registered services.
  */
 int get_service_count() {
-  return (state::instance().services().size());
+  return state::instance().services().size();
 }
 
 /**
@@ -628,14 +630,14 @@ int get_service_count() {
  */
 int is_contact_for_service(service* svc, contact* cntct) {
   if (!svc || !cntct)
-    return (false);
+    return false;
 
   // Search all individual contacts of this service.
   for (contactsmember* member(svc->contacts);
        member;
        member = member->next)
     if (member->contact_ptr == cntct)
-      return (true);
+      return true;
 
   // Search all contactgroups of this service.
   for (contactgroup_map::iterator
@@ -645,9 +647,9 @@ int is_contact_for_service(service* svc, contact* cntct) {
        ++it)
     if (it->second->get_members().find(cntct->get_name()) ==
         it->second->get_members().end())
-      return (true);
+      return true;
 
-  return (false);
+  return false;
 }
 
 /**
@@ -661,7 +663,7 @@ int is_contact_for_service(service* svc, contact* cntct) {
  */
 int is_escalated_contact_for_service(service* svc, contact* cntct) {
   if (!svc || !cntct)
-    return (false);
+    return false;
 
   std::pair<std::string, std::string>
     id(std::make_pair(svc->host_name, svc->description));
@@ -680,7 +682,7 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
          member;
          member = member->next)
       if (member->contact_ptr == cntct)
-        return (true);
+        return true;
 
     // Search all contactgroups of this service escalation.
     for (contactgroup_map::iterator
@@ -690,10 +692,10 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
          ++it)
       if (it->second->get_members().find(cntct->get_name()) ==
           it->second->get_members().end())
-        return (true);
+        return true;
   }
 
-  return (false);
+  return false;
 }
 
 /**
@@ -746,7 +748,7 @@ service& engine::find_service(
   if (it == state::instance().services().end())
     throw (engine_error() << "Service '" << service_id
            << "' on host '" << host_id << "' was not found");
-  return (*it->second);
+  return *it->second;
 }
 
 /**
@@ -764,7 +766,7 @@ char const* engine::get_service_timezone(
                                 std::make_pair<std::string, std::string>(
                                   hst,
                                   svc)].timezone);
-  return (timezone.empty() ? NULL : timezone.c_str());
+  return timezone.empty() ? NULL : timezone.c_str();
 }
 
 /**
@@ -779,7 +781,7 @@ bool engine::is_service_exist(
   umap<std::pair<unsigned int, unsigned int>,
        std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
-  return (it != state::instance().services().end());
+  return it != state::instance().services().end();
 }
 
 /**
@@ -809,7 +811,7 @@ std::pair<unsigned int, unsigned int> engine::get_host_and_service_id(
  *  @return The service ID if found, 0 otherwise.
  */
 unsigned int engine::get_service_id(char const* host, char const* svc) {
-  return (get_host_and_service_id(host, svc).second);
+  return get_host_and_service_id(host, svc).second;
 }
 
 /**

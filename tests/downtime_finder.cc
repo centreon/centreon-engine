@@ -26,7 +26,7 @@ using namespace com::centreon::engine;
 
 class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
 public:
-  void SetUp() {
+  void SetUp() override {
     scheduled_downtime** dtp(&dtl);
     *dtp = new_scheduled_downtime(
              1,
@@ -91,7 +91,7 @@ public:
     dtf = new downtime_finder(dtl);
   }
 
-  void TearDown() {
+  void TearDown() override {
     delete dtf;
     for (scheduled_downtime* dt(dtl); dt;) {
       scheduled_downtime* to_delete(dt);

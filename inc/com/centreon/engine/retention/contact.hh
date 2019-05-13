@@ -24,7 +24,7 @@
 #  include <list>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects/customvariable.hh"
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
 
@@ -35,11 +35,11 @@ namespace                     retention {
   public:
                               contact();
                               contact(contact const& right);
-                              ~contact() throw ();
+                              ~contact() throw () override;
     contact&                  operator=(contact const& right);
     bool                      operator==(contact const& right) const throw ();
     bool                      operator!=(contact const& right) const throw ();
-    bool                      set(char const* key, char const* value);
+    bool                      set(char const* key, char const* value) override;
 
     std::string const&        contact_name() const throw ();
     map_customvar const&      customvariables() const throw ();

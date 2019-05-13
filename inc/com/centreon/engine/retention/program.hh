@@ -32,11 +32,11 @@ namespace                     retention {
   public:
                               program();
                               program(program const& right);
-                              ~program() throw ();
+                              ~program() throw () override;
     program&                  operator=(program const& right);
     bool                      operator==(program const& right) const throw ();
     bool                      operator!=(program const& right) const throw ();
-    bool                      set(char const* key, char const* value);
+    bool                      set(char const* key, char const* value) override;
 
     opt<bool> const&          active_host_checks_enabled() const throw ();
     opt<bool> const&          active_service_checks_enabled() const throw ();

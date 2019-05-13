@@ -49,23 +49,23 @@ namespace               commands {
                           std::string const& command_line,
                           command_listener* listener = NULL);
                         raw(raw const& right);
-                        ~raw() throw ();
+                        ~raw() throw () override;
     raw&                operator=(raw const& right);
-    command*            clone() const;
+    command*            clone() const override;
     unsigned long       run(
                           std::string const& process_cmd,
                           nagios_macros& macros,
-                          unsigned int timeout);
+                          unsigned int timeout) override;
     void                run(
                           std::string const& process_cmd,
                           nagios_macros& macros,
                           unsigned int timeout,
-                          result& res);
+                          result& res) override;
 
   private:
-    void                data_is_available(process& p) throw ();
-    void                data_is_available_err(process& p) throw ();
-    void                finished(process& p) throw ();
+    void                data_is_available(process& p) throw () override;
+    void                data_is_available_err(process& p) throw () override;
+    void                finished(process& p) throw () override;
     static void         _build_argv_macro_environment(
                           nagios_macros const& macros,
                           environment& env);

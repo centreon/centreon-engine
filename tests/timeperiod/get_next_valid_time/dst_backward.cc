@@ -26,7 +26,7 @@ using namespace com::centreon::engine;
 
 class        GetNextValidTimeBackwardDST : public ::testing::Test {
  public:
-  void       SetUp() {
+  void       SetUp() override {
     _creator.new_timeperiod();
     _computed = (time_t)-1;
   }

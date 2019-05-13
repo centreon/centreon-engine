@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <unordered_map>
 #include <unistd.h>
 #include "com/centreon/concurrency/locker.hh"
@@ -186,7 +185,6 @@ applier::state::state()
  *  Destructor.
  */
 applier::state::~state() throw() {
-  std::cout << "CONFIGURATION/APPLIER/STATE DESTRUCTOR...\n";
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();
@@ -215,7 +213,7 @@ std::unordered_map<std::string, std::shared_ptr<commands::command>>& applier::st
 /**
  *  Given a command name, find a command from the list in memory.
  *
- *  @param[in] name Command name.
+ *  @param[in] k Command name.
  *
  *  @return Command object if found, NULL otherwise.
  */
@@ -234,7 +232,7 @@ commands::command const* applier::state::find_command(configuration::command::ke
 /**
  *  Given a command name, find a command from the list in memory.
  *
- *  @param[in] name Command name.
+ *  @param[in] k Command name.
  *
  *  @return Command object if found, NULL otherwise.
  */
@@ -253,7 +251,7 @@ commands::command* applier::state::find_command(configuration::command::key_type
 /**
  *  Given a contact name, find a contact from the list in memory.
  *
- *  @param[in] name Contact name.
+ *  @param[in] k Contact name.
  *
  *  @return Contact object if found, NULL otherwise.
  */
@@ -272,7 +270,7 @@ engine::contact const* applier::state::find_contact(configuration::contact::key_
 /**
  *  Given a contact name, find a contact from the list in memory.
  *
- *  @param[in] name Contact name.
+ *  @param[in] k Contact name.
  *
  *  @return Contact object if found, NULL otherwise.
  */
@@ -346,7 +344,7 @@ std::unordered_map<std::string, std::shared_ptr<commands::connector> >& applier:
 /**
  *  Given a connector name, find a connector from the list in memory.
  *
- *  @param[in] name Command name.
+ *  @param[in] k Command name.
  *
  *  @return Command object if found, NULL otherwise.
  */
@@ -365,7 +363,7 @@ commands::connector const* applier::state::find_connector(configuration::connect
 /**
  *  Given a connector name, find a connector from the list in memory.
  *
- *  @param[in] name Command name.
+ *  @param[in] k Command name.
  *
  *  @return Command object if found, NULL otherwise.
  */

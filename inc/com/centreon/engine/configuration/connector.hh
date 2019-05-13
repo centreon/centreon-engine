@@ -36,7 +36,7 @@ namespace                  configuration {
 
                            connector(key_type const& key = "");
                            connector(connector const& right);
-                           ~connector() throw ();
+                           ~connector() throw () override;
     connector&             operator=(connector const& right);
     bool                   operator==(
                              connector const& right) const throw ();
@@ -44,10 +44,10 @@ namespace                  configuration {
                              connector const& right) const throw ();
     bool                   operator<(
                              connector const& right) const throw ();
-    void                   check_validity() const;
+    void                   check_validity() const override;
     key_type const&        key() const throw ();
-    void                   merge(object const& obj);
-    bool                   parse(char const* key, char const* value);
+    void                   merge(object const& obj) override;
+    bool                   parse(char const* key, char const* value) override;
 
     std::string const&     connector_line() const throw ();
     std::string const&     connector_name() const throw ();

@@ -35,7 +35,7 @@ namespace                  configuration {
 
                            hostgroup(key_type const& key = "");
                            hostgroup(hostgroup const& right);
-                           ~hostgroup() throw ();
+                           ~hostgroup() throw () override;
     hostgroup&             operator=(hostgroup const& right);
     bool                   operator==(
                              hostgroup const& right) const throw ();
@@ -43,10 +43,10 @@ namespace                  configuration {
                              hostgroup const& right) const throw ();
     bool                   operator<(
                              hostgroup const& right) const throw ();
-    void                   check_validity() const;
+    void                   check_validity() const override;
     key_type const&        key() const throw ();
-    void                   merge(object const& obj);
-    bool                   parse(char const* key, char const* value);
+    void                   merge(object const& obj) override;
+    bool                   parse(char const* key, char const* value) override;
 
     std::string const&     action_url() const throw ();
     std::string const&     alias() const throw ();

@@ -58,15 +58,6 @@ private:
 applier::contact::contact() {}
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-applier::contact::contact(applier::contact const& right) {
-  (void)right;
-}
-
-/**
  *  Destructor.
  */
 applier::contact::~contact() throw () {}
@@ -78,11 +69,11 @@ applier::contact::~contact() throw () {}
  *
  *  @return This object.
  */
-applier::contact& applier::contact::operator=(
-                                      applier::contact const& right) {
-  (void)right;
-  return *this;
-}
+//applier::contact& applier::contact::operator=(
+//                                      applier::contact const& right) {
+//  (void)right;
+//  return *this;
+//}
 
 /**
  *  Add new contact.
@@ -158,13 +149,7 @@ void applier::contact::add_object(configuration::contact const& obj) {
            end(obj.customvariables().end());
        it != end;
        ++it)
-    if (!add_custom_variable_to_contact(
-           c,
-	   it->first.c_str(),
-	   it->second))
-      throw (engine_error()
-	     << "Could not add custom variable '" << it->first
-	     << "' to contact '" << obj.contact_name() << "'");
+    c->custom_variables.insert({it->first, it->second});
 }
 
 /**
@@ -377,22 +362,8 @@ void applier::contact::modify_object(
   }
 
   // Custom variables.
-  if (std::operator!=(obj.customvariables(), old_cfg.customvariables())) {
-    remove_all_custom_variables_from_contact(c);
-
-    for (map_customvar::const_iterator
-           it(obj.customvariables().begin()),
-           end(obj.customvariables().end());
-         it != end;
-         ++it)
-      if (!add_custom_variable_to_contact(
-             c,
-             it->first.c_str(),
-             it->second))
-        throw (engine_error()
-               << "Could not add custom variable '" << it->first
-               << "' to contact '" << obj.contact_name() << "'");
-  }
+  if (std::operator!=(obj.customvariables(), old_cfg.customvariables()))
+    c->custom_variables = obj.customvariables();
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
