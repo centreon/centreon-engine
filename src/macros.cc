@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2019 Centreon
+** Copyright 2011-201016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -114,7 +114,6 @@ int grab_custom_macro_value_r(
   servicegroup* temp_servicegroup = NULL;
   servicesmember* temp_servicesmember = NULL;
   contactgroup* temp_contactgroup = NULL;
-  contactsmember* temp_contactsmember = NULL;
   int delimiter_len = 0;
   char* temp_buffer = NULL;
   int result = OK;
@@ -810,7 +809,6 @@ int grab_standard_contactgroup_macro(
       int macro_type,
       contactgroup* temp_contactgroup,
       char** output) {
-  contactsmember* temp_contactsmember = NULL;
 
   if (temp_contactgroup == NULL || output == NULL)
     return ERROR;
@@ -833,14 +831,16 @@ int grab_standard_contactgroup_macro(
            end(temp_contactgroup->get_members().end());
          it != end;
          ++it) {
+      if (it->second->get_name().empty())
+        continue;
       if (*output == NULL)
-        *output = string::dup(it->second->get_name());
+        *output = string::dup(it->first);
       else {
         *output = resize_string(
                     *output,
-                    strlen(*output) + strlen(temp_contactsmember->contact_name) + 2);
+                    strlen(*output) + strlen(it->first.c_str()) + 2);
         strcat(*output, ",");
-        strcat(*output, temp_contactsmember->contact_name);
+        strcat(*output, it->first.c_str());
       }
     }
     break;

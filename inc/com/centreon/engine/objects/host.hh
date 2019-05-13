@@ -26,13 +26,11 @@
 #  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
-#  include "com/centreon/engine/customvariable.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 /* Forward declaration. */
-struct contactgroupsmember_struct;
-struct contactsmember_struct;
 struct hostsmember_struct;
 struct objectlist_struct;
 struct servicesmember_struct;
@@ -42,7 +40,6 @@ CCE_BEGIN()
   namespace commands {
     class command;
   }
-  class contact;
 CCE_END()
 
 typedef struct                  host_struct {
@@ -60,7 +57,7 @@ typedef struct                  host_struct {
   int                           max_attempts;
   char*                         event_handler;
   contactgroup_map              contact_groups;
-  contactsmember_struct*        contacts;
+  contact_map                   contacts;
   double                        notification_interval;
   double                        first_notification_delay;
   int                           notify_on_down;

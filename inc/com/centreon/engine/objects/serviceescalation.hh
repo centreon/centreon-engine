@@ -21,8 +21,6 @@
 #  define CCE_OBJECTS_SERVICEESCALATION_HH
 
 /* Forward declaration. */
-struct contactgroupsmember_struct;
-struct contactsmember_struct;
 struct service_struct;
 struct timeperiod_struct;
 
@@ -38,7 +36,7 @@ typedef struct                     serviceescalation_struct {
   int                              escalate_on_unknown;
   int                              escalate_on_critical;
   contactgroup_map                 contact_groups;
-  contactsmember_struct*           contacts;
+  contact_map                      contacts;
   service_struct*                  service_ptr;
   timeperiod_struct*               escalation_period_ptr;
   struct serviceescalation_struct* next;

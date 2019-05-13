@@ -774,3 +774,19 @@ contact::get_service_notification_commands() {
   return _service_notification_commands;
 }
 
+std::ostream& operator<<(
+                std::ostream& os,
+                contact_map const& obj)
+{
+  for (contact_map::const_iterator
+         it(obj.begin()), end(obj.end());
+       it != end;
+       ++it) {
+    os << it->first;
+    if (next(it) != end)
+      os << ", ";
+    else
+      os << "";
+  }
+  return (os);
+}

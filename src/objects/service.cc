@@ -24,7 +24,6 @@
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
@@ -62,7 +61,10 @@ bool operator==(
                std::equal(obj1.contact_groups.begin(),
                           obj1.contact_groups.end(),
                           obj2.contact_groups.begin()))
-          && is_equal(obj1.contacts, obj2.contacts)
+          && ((obj1.contacts.size() == obj2.contacts.size()) &&
+               std::equal(obj1.contacts.begin(),
+                          obj1.contacts.end(),
+                          obj2.contacts.begin()))
           && obj1.notification_interval == obj2.notification_interval
           && obj1.first_notification_delay == obj2.first_notification_delay
           && obj1.notify_on_unknown == obj2.notify_on_unknown
@@ -196,6 +198,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     svcgrp_str = chkstr(static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)->group_name);
 
   std::string cg_oss;
+  std::string c_oss;
 
   if (obj.contact_groups.empty())
     cg_oss = "\"NULL\"";
@@ -203,6 +206,13 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     std::ostringstream oss;
     oss << obj.contact_groups;
     cg_oss = oss.str();
+  }
+  if (obj.contacts.empty())
+    c_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.contacts;
+    c_oss = oss.str();
   }
 
   os << "service {\n"
@@ -217,7 +227,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  parallelize:                          " << obj.parallelize << "\n"
     "  contact_groups:                       " << cg_oss << "\n"
-    "  contacts:                             " << chkobj(obj.contacts) << "\n"
+    "  contacts:                             " << c_oss << "\n"
     "  notification_interval:                " << obj.notification_interval << "\n"
     "  first_notification_delay:             " << obj.first_notification_delay << "\n"
     "  notify_on_unknown:                    " << obj.notify_on_unknown << "\n"
@@ -633,11 +643,13 @@ int is_contact_for_service(service* svc, contact* cntct) {
     return false;
 
   // Search all individual contacts of this service.
-  for (contactsmember* member(svc->contacts);
-       member;
-       member = member->next)
-    if (member->contact_ptr == cntct)
-      return true;
+  for (contact_map::iterator
+         it(svc->contacts.begin()),
+         end(svc->contacts.end());
+       it != end;
+       ++it)
+    if (it->second.get() == cntct)
+      return (true);
 
   // Search all contactgroups of this service.
   for (contactgroup_map::iterator
@@ -678,11 +690,13 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
        ++it) {
     serviceescalation* svcescalation(&*it->second);
     // Search all contacts of this service escalation.
-    for (contactsmember* member(svcescalation->contacts);
-         member;
-         member = member->next)
-      if (member->contact_ptr == cntct)
-        return true;
+    for (contact_map::iterator
+           it(svcescalation->contacts.begin()),
+           end(svcescalation->contacts.end());
+         it != end;
+         ++it)
+      if (it->second.get() == cntct)
+        return (true);
 
     // Search all contactgroups of this service escalation.
     for (contactgroup_map::iterator

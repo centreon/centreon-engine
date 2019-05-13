@@ -28,7 +28,6 @@ set(
 
   # Sources.
   "${SRC_DIR}/comment.cc"
-  "${SRC_DIR}/contactsmember.cc"
   "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/downtime.cc"
   "${SRC_DIR}/host.cc"
@@ -49,7 +48,6 @@ set(
 
   # Headers.
   "${INC_DIR}/comment.hh"
-  "${INC_DIR}/contactsmember.hh"
   "${INC_DIR}/daterange.hh"
   "${INC_DIR}/downtime.hh"
   "${INC_DIR}/host.hh"

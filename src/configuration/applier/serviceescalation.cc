@@ -118,11 +118,7 @@ void applier::serviceescalation::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    if (!add_contact_to_serviceescalation(se, it->c_str()))
-      throw (engine_error() << "Could not add contact '" << *it
-             << "' to escalation of service '"
-             << obj.service_description().front() << "' of host '"
-             << obj.hosts().front() << "'");
+    se->contacts.insert({*it, nullptr});
 
   // Add contact groups to service escalation.
   for (set_string::const_iterator
