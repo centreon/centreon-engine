@@ -22,7 +22,6 @@
 #include "com/centreon/engine/deleter/serviceescalation.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
@@ -64,7 +63,10 @@ bool operator==(
                std::equal(obj1.contact_groups.begin(),
                           obj1.contact_groups.end(),
                           obj2.contact_groups.begin()))
-          && is_equal(obj1.contacts, obj2.contacts));
+          && ((obj1.contacts.size() == obj2.contacts.size()) &&
+               std::equal(obj1.contacts.begin(),
+                          obj1.contacts.end(),
+                          obj2.contacts.begin())));
 }
 
 /**
@@ -146,6 +148,7 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
   }
 
   std::string cg_oss;
+  std::string c_oss;
 
   if (obj.contact_groups.empty())
     cg_oss = "\"NULL\"";
@@ -153,6 +156,14 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
     std::ostringstream oss;
     oss << obj.contact_groups;
     cg_oss = oss.str();
+  }
+
+  if (obj.contacts.empty())
+    c_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.contacts;
+    c_oss = oss.str();
   }
 
   os << "serviceescalation {\n"
@@ -167,7 +178,7 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
     "  escalate_on_unknown:   " << obj.escalate_on_unknown << "\n"
     "  escalate_on_critical:  " << obj.escalate_on_critical << "\n"
     "  contact_groups:        " << cg_oss << "\n"
-    "  contacts:              " << chkobj(obj.contacts) << "\n"
+    "  contacts:              " << c_oss << "\n"
     "  service_ptr:           " << svc_str << "\n"
     "  escalation_period_ptr: " << chkstr(escalation_period_str) << "\n"
     "}\n";

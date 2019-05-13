@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <time.h>
+#include <unordered_map>
 #include <vector>
 #include "com/centreon/engine/customvariable.hh"
 #include "com/centreon/engine/namespace.hh"
@@ -179,6 +180,10 @@ class                           contact {
 
 CCE_END()
 
+typedef std::unordered_map<std::string,
+                           std::shared_ptr<com::centreon::engine::contact>>
+                      contact_map;
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* C++ */
@@ -222,6 +227,9 @@ bool          operator!=(
                 com::centreon::engine::contact const& obj1,
                 com::centreon::engine::contact const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::contact const& obj);
+std::ostream& operator<<(
+                std::ostream& os,
+                contact_map const& obj);
 
 #  endif /* C++ */
 

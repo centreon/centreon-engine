@@ -108,10 +108,7 @@ void applier::hostescalation::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    if (!add_contact_to_host_escalation(he, it->c_str()))
-      throw (engine_error() << "Could not add contact '" << *it
-             << "' on escalation of host '"
-             << *obj.hosts().begin() << "'");
+    he->contacts.insert({*it, nullptr});
 
   // Add contact groups to host escalation.
   for (set_string::const_iterator

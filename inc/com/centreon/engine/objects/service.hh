@@ -1,4 +1,6 @@
 /*
+struct contactgroupsmember_struct;
+struct contactgroupsmember_struct;
 ** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
@@ -36,8 +38,6 @@ CCE_BEGIN()
   class contact;
 CCE_END()
 
-struct contactgroupsmember_struct;
-struct contactsmember_struct;
 struct host_struct;
 struct objectlist_struct;
 struct timeperiod_struct;
@@ -54,7 +54,7 @@ typedef struct                  service_struct {
   int                           max_attempts;
   int                           parallelize;
   contactgroup_map              contact_groups;
-  contactsmember_struct*        contacts;
+  contact_map                   contacts;
   double                        notification_interval;
   double                        first_notification_delay;
   int                           notify_on_unknown;

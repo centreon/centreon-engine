@@ -25,7 +25,6 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
-#  include "com/centreon/engine/objects/contactsmember.hh"
 #  include "com/centreon/engine/objects/daterange.hh"
 #  include "com/centreon/engine/objects/defines.hh"
 #  include "com/centreon/engine/objects/host.hh"

@@ -17,11 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
-#include "com/centreon/engine/deleter/contactsmember.hh"
-#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/serviceescalation.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
 
 using namespace com::centreon::engine;
@@ -38,7 +36,7 @@ void deleter::serviceescalation(void* ptr) throw () {
   serviceescalation_struct* obj(static_cast<serviceescalation_struct*>(ptr));
 
   obj->contact_groups.clear();
-  listmember(obj->contacts, &contactsmember);
+  obj->contacts.clear();
 
   // service_ptr not free.
   // escalation_period_ptr not free.

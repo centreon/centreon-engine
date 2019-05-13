@@ -22,11 +22,9 @@
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
-#include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
@@ -174,9 +172,7 @@ void applier::host::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    if (!add_contact_to_host(h, it->c_str()))
-      throw (engine_error() << "Could not add contact '"
-             << *it << "' to host '" << obj.host_name() << "'");
+    h->contacts.insert({*it, nullptr});
 
   // Contact groups.
   for (set_string::const_iterator
@@ -463,7 +459,7 @@ void applier::host::modify_object(
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
     // Delete old contacts.
-    deleter::listmember(h->contacts, &deleter::contactsmember);
+    h->contacts.clear();
 
     // Add contacts to host.
     for (set_string::const_iterator
@@ -471,9 +467,7 @@ void applier::host::modify_object(
            end(obj.contacts().end());
          it != end;
          ++it)
-      if (!add_contact_to_host(h, it->c_str()))
-        throw (engine_error() << "Could not add contact '"
-               << *it << "' to host '" << obj.host_name() << "'");
+      h->contacts.insert({*it, nullptr});
   }
 
   // Contact groups.

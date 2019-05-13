@@ -722,24 +722,21 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check for valid contacts */
-  for (contactsmember* temp_contactsmember = svc->contacts;
-       temp_contactsmember != NULL;
-       temp_contactsmember = temp_contactsmember->next) {
-
+  for (contact_map::iterator
+         it(svc->contacts.begin()),
+         end(svc->contacts.end());
+       it != end;
+       ++it) {
     com::centreon::engine::contact* temp_contact
-      = configuration::applier::state::instance().find_contact(
-        temp_contactsmember->contact_name);
+      = configuration::applier::state::instance().find_contact(it->first);
 
-    if (temp_contact == NULL) {
+    if (temp_contact == nullptr) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
+        << "Error: Contact '" << it->first
         << "' specified in service '" << svc->description << "' for "
         "host '" << svc->host_name << "' is not defined anywhere!";
       errors++;
     }
-
-    /* save the contact pointer for later */
-    temp_contactsmember->contact_ptr = temp_contact;
   }
 
   /* check all contact groupss */
@@ -931,24 +928,21 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* check all contacts */
-  for (contactsmember* temp_contactsmember = hst->contacts;
-       temp_contactsmember != NULL;
-       temp_contactsmember = temp_contactsmember->next) {
-
+  for (contact_map::iterator
+         it(hst->contacts.begin()),
+         end(hst->contacts.end());
+       it != end;
+       ++it) {
     com::centreon::engine::contact* temp_contact
-      = configuration::applier::state::instance().find_contact(
-        temp_contactsmember->contact_name);
+      = configuration::applier::state::instance().find_contact(it->first);
 
     if (temp_contact == NULL) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
+        << "Error: Contact '" << it->first
         << "' specified in host '" << hst->name
         << "' is not defined anywhere!";
       errors++;
     }
-
-    /* save the contact pointer for later */
-    temp_contactsmember->contact_ptr = temp_contact;
   }
 
   /* check all contact groups */
@@ -1489,23 +1483,22 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   }
 
   // Check all contacts.
-  for (contactsmember* temp_contactsmember(se->contacts);
-       temp_contactsmember;
-       temp_contactsmember = temp_contactsmember->next) {
+  for (contact_map::iterator
+         it(se->contacts.begin()),
+         end(se->contacts.end());
+       it != end;
+       ++it) {
     // Find the contact.
-    contact* temp_contact(configuration::applier::state::instance().find_contact(
-                            temp_contactsmember->contact_name));
-    if (!temp_contact) {
+    contact* cntct(configuration::applier::state::instance().find_contact(
+      it->first));
+    if (cntct == nullptr) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
+        << "Error: Contact '" << it->first
         << "' specified in service escalation for service '"
         << se->description << "' on host '"
         << se->host_name << "' is not defined anywhere!";
       errors++;
     }
-
-    // Save the contact pointer for later.
-    temp_contactsmember->contact_ptr = temp_contact;
   }
 
   // Check all contact groups.
@@ -1578,22 +1571,21 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   }
 
   // Check all contacts.
-  for (contactsmember* temp_contactsmember(he->contacts);
-       temp_contactsmember;
-       temp_contactsmember = temp_contactsmember->next) {
+  for (contact_map::iterator
+         it(he->contacts.begin()),
+         end(he->contacts.end());
+       it != end;
+       ++it) {
     // Find the contact.
-    contact* temp_contact(configuration::applier::state::instance().find_contact(
-                            temp_contactsmember->contact_name));
-    if (!temp_contact) {
+    contact* cntct(configuration::applier::state::instance().find_contact(
+                            it->first));
+    if (!cntct) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
+        << "Error: Contact '" << it->first
         << "' specified in host escalation for host '"
         << he->host_name << "' is not defined anywhere!";
       errors++;
     }
-
-    // Save the contact pointer for later.
-    temp_contactsmember->contact_ptr = temp_contact;
   }
 
   // Check all contact groups.

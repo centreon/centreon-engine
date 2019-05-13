@@ -1213,9 +1213,6 @@ int create_notification_list_from_service(
       nagios_macros* mac,
       service* svc, int options,
       int* escalated) {
-  contactsmember* temp_contactsmember = NULL;
-  contact* temp_contact = NULL;
-  contactgroup* temp_contactgroup = NULL;
   int escalate_notification = false;
 
   logger(dbg_functions, basic)
@@ -1270,13 +1267,12 @@ int create_notification_list_from_service(
         "to notification list.";
 
       /* add all individual contacts for this escalation entry */
-      for (temp_contactsmember = temp_se->contacts;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-          continue;
-        add_notification(mac, temp_contact);
-      }
+      for (contact_map::iterator
+             it(temp_se->contacts.begin()),
+             end(temp_se->contacts.end());
+           it != end;
+           ++it)
+        add_notification(mac, it->second.get());
 
       logger(dbg_notifications, most)
         << "Adding members of contact groups from service escalation(s) "
@@ -1316,12 +1312,12 @@ int create_notification_list_from_service(
       << "Adding normal contacts for service to notification list.";
 
     /* add all individual contacts for this service */
-    for (temp_contactsmember = svc->contacts;
-         temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-      if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-        continue;
-      add_notification(mac, temp_contact);
+    for (contact_map::iterator
+           it(svc->contacts.begin()),
+           end(svc->contacts.end());
+         it != end;
+         ++it) {
+      add_notification(mac, it->second.get());
     }
 
     /* add all contacts that belong to contactgroups for this service */
@@ -2410,9 +2406,6 @@ int create_notification_list_from_host(
       host* hst,
       int options,
       int* escalated) {
-  contactsmember* temp_contactsmember = NULL;
-  contact* temp_contact = NULL;
-  contactgroup* temp_contactgroup = NULL;
   int escalate_notification = false;
 
   logger(dbg_functions, basic)
@@ -2465,13 +2458,12 @@ int create_notification_list_from_host(
         "to notification list.";
 
       /* add all individual contacts for this escalation */
-      for (temp_contactsmember = temp_he->contacts;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-          continue;
-        add_notification(mac, temp_contact);
-      }
+      for(contact_map::iterator
+            it(temp_he->contacts.begin()),
+            end(temp_he->contacts.end());
+          it != end;
+          ++it)
+        add_notification(mac, it->second.get());
 
       logger(dbg_notifications, most)
         << "Adding members of contact groups from host "
@@ -2514,13 +2506,12 @@ int create_notification_list_from_host(
       << "Adding individual contacts for host to notification list.";
 
     /* add all individual contacts for this host */
-    for (temp_contactsmember = hst->contacts;
-         temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-      if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-        continue;
-      add_notification(mac, temp_contact);
-    }
+    for (contact_map::iterator
+           it(hst->contacts.begin()),
+           end(hst->contacts.end());
+         it != end;
+         ++it)
+      add_notification(mac, it->second.get());
 
     logger(dbg_notifications, most)
       << "Adding members of contact groups for host to "
