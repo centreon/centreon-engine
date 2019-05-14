@@ -2965,7 +2965,7 @@ set_service& state::services() throw () {
 set_service::const_iterator state::services_find(
                                    service::key_type const& k) const {
   configuration::service below_searched;
-  std::string host_name(find_host(k.first).name);
+  std::string host_name(find_host(k.first).get_name());
   std::string service_description(find_service(k.first, k.second).description);
   below_searched.hosts().insert(host_name);
   below_searched.service_description() = service_description;
@@ -2993,7 +2993,7 @@ set_service::const_iterator state::services_find(
 set_service::iterator state::services_find(
                              service::key_type const& k) {
   configuration::service below_searched;
-  std::string host_name(find_host(k.first).name);
+  std::string host_name(find_host(k.first).get_name());
   std::string service_description(find_service(k.first, k.second).description);
   below_searched.hosts().insert(host_name);
   below_searched.service_description() = service_description;

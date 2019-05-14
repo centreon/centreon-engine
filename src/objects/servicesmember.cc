@@ -21,7 +21,7 @@
 #include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/contact.hh"
-#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"

@@ -21,17 +21,18 @@
 #  define CCE_RETENTION_DUMP_HH
 
 #  include <ostream>
+#  include <unordered_map>
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
 struct comment_struct;
-struct host_struct;
 struct scheduled_downtime_struct;
 struct service_struct;
 
 CCE_BEGIN()
 class contact;
 class customvariable;
+class host;
 
 namespace         retention {
   namespace       dump {
@@ -43,7 +44,7 @@ namespace         retention {
     std::ostream& downtime(std::ostream& os, scheduled_downtime_struct const& obj);
     std::ostream& downtimes(std::ostream& os);
     std::ostream& header(std::ostream& os);
-    std::ostream& host(std::ostream& os, host_struct const& obj);
+    std::ostream& host(std::ostream& os, com::centreon::engine::host const& obj);
     std::ostream& hosts(std::ostream& os);
     std::ostream& info(std::ostream& os);
     std::ostream& program(std::ostream& os);

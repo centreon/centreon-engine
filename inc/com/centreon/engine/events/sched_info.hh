@@ -26,7 +26,6 @@
 #  include <time.h>
 
 // Forward declaration.
-struct host_struct;
 struct service_struct;
 struct timed_event_struct;
 

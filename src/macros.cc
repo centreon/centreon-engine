@@ -161,7 +161,7 @@ int grab_custom_macro_value_r(
         grab_custom_macro_value_r(
           mac,
           macro_name,
-          temp_host->name,
+          temp_host->get_name().c_str(),
           NULL,
           &temp_buffer);
 
@@ -205,7 +205,7 @@ int grab_custom_macro_value_r(
       if (mac->host_ptr == NULL)
         return ERROR;
       if ((temp_service = find_service(
-                            mac->host_ptr ? mac->host_ptr->name : NULL,
+                            mac->host_ptr ? mac->host_ptr->get_name().c_str() : NULL,
                             arg2))) {
         /* get the service macro value */
         result = grab_custom_object_macro_r(

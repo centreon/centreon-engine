@@ -125,8 +125,8 @@ void applier::service::_update(
     if (state.performance_data().is_set())
       string::setstr(obj.perf_data, *state.performance_data());
     if (state.last_acknowledgement().is_set())
-      service_other_props[std::make_pair(obj.host_ptr->name, obj.description)].last_acknowledgement
-        = *state.last_acknowledgement();
+      service_other_props[std::make_pair(obj.host_ptr->get_name(),
+        obj.description)].last_acknowledgement = *state.last_acknowledgement();
     if (state.last_check().is_set())
       obj.last_check = *state.last_check();
     if (state.next_check().is_set()
@@ -322,7 +322,7 @@ void applier::service::_update(
   // Handle recovery been sent
   if (state.recovery_been_sent().is_set())
     service_other_props[std::make_pair(obj.description,
-                                       obj.host_ptr->name)].recovery_been_sent
+                                       obj.host_ptr->get_name())].recovery_been_sent
       = *state.recovery_been_sent();
 
   // update service status.

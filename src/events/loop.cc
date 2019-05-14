@@ -346,7 +346,7 @@ void loop::_dispatching() {
         }
 
         // Forced checks override normal check logic.
-        if (temp_host->check_options & CHECK_OPTION_FORCE_EXECUTION)
+        if (temp_host->get_check_options() & CHECK_OPTION_FORCE_EXECUTION)
           run_event = true;
 
         // Reschedule the host check if we can't run it right now.
@@ -362,18 +362,18 @@ void loop::_dispatching() {
             &event_list_low_tail);
 
           // Reschedule.
-          if ((SOFT_STATE == temp_host->state_type)
-              && (temp_host->current_state != STATE_OK))
-            temp_host->next_check
-              = (time_t)(temp_host->next_check
-                         + (temp_host->retry_interval
-                            * config->interval_length()));
+          if ((SOFT_STATE == temp_host->get_state_type())
+              && (temp_host->get_current_state() != STATE_OK))
+            temp_host->set_next_check(
+              (time_t)(temp_host->get_next_check()
+                         + (temp_host->get_retry_interval()
+                            * config->interval_length())));
           else
-            temp_host->next_check
-              = (time_t)(temp_host->next_check
-                         + (temp_host->check_interval
-                            * config->interval_length()));
-          temp_event->run_time = temp_host->next_check;
+            temp_host->set_next_check(
+              (time_t)(temp_host->get_next_check()
+                         + (temp_host->get_check_interval()
+                            * config->interval_length())));
+          temp_event->run_time = temp_host->get_next_check();
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
           update_host_status(temp_host, false);
           run_event = false;

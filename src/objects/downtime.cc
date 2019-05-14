@@ -210,7 +210,7 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
   if (temp_downtime->fixed == false
       && temp_downtime->incremented_pending_downtime == true) {
     if (temp_downtime->type == HOST_DOWNTIME)
-      hst->pending_flex_downtime--;
+      hst->set_pending_flex_downtime(hst->get_pending_flex_downtime() - 1);
     else
       svc->pending_flex_downtime--;
   }
@@ -239,13 +239,14 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
       NULL);
 
     if (temp_downtime->type == HOST_DOWNTIME) {
-      hst->scheduled_downtime_depth--;
+      hst->set_scheduled_downtime_depth(
+        hst->get_scheduled_downtime_depth() -1);
       update_host_status(hst, false);
 
       /* log a notice - this is parsed by the history CGI */
-      if (hst->scheduled_downtime_depth == 0) {
+      if (hst->get_scheduled_downtime_depth() == 0) {
         logger(log_info_message, basic)
-          << "HOST DOWNTIME ALERT: " << hst->name
+          << "HOST DOWNTIME ALERT: " << hst->get_name()
           << ";CANCELLED; Scheduled downtime for host has been "
           "cancelled.";
 
@@ -382,7 +383,7 @@ int register_downtime(int type, unsigned long downtime_id) {
   if (temp_downtime->type == HOST_DOWNTIME) {
     logger(dbg_downtime, basic)
       << " Type:        Host Downtime\n"
-         " Host:        " << hst->name;
+         " Host:        " << hst->get_name();
   }
   else {
     logger(dbg_downtime, basic)
@@ -417,7 +418,7 @@ int register_downtime(int type, unsigned long downtime_id) {
     add_new_comment(
       HOST_COMMENT,
       DOWNTIME_COMMENT,
-      hst->name,
+      hst->get_name().c_str(),
       NULL,
       time(NULL),
       "(Centreon Engine Process)",
@@ -506,13 +507,13 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
       /* host is up or service is ok, so we don't really do anything right now */
       if ((temp_downtime->type == HOST_DOWNTIME
-           && hst->current_state == HOST_UP)
+           && hst->get_current_state() == HOST_UP)
           || (temp_downtime->type == SERVICE_DOWNTIME
               && svc->current_state == STATE_OK)) {
 
         /* increment pending flex downtime counter */
         if (temp_downtime->type == HOST_DOWNTIME)
-          hst->pending_flex_downtime++;
+          hst->set_pending_flex_downtime(hst->get_pending_flex_downtime() + 1);
         else
           svc->pending_flex_downtime++;
         temp_downtime->incremented_pending_downtime = true;
@@ -560,21 +561,22 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
     /* decrement the downtime depth variable */
     if (temp_downtime->type == HOST_DOWNTIME)
-      hst->scheduled_downtime_depth--;
+      hst->set_scheduled_downtime_depth(
+        hst->get_scheduled_downtime_depth() - 1);
     else
       svc->scheduled_downtime_depth--;
 
     if (temp_downtime->type == HOST_DOWNTIME
-        && hst->scheduled_downtime_depth == 0) {
+        && hst->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
-        << "Host '" << hst->name << "' has exited from a period "
+        << "Host '" << hst->get_name() << "' has exited from a period "
         "of scheduled downtime (id=" << temp_downtime->downtime_id
         << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "HOST DOWNTIME ALERT: " << hst->name
+        << "HOST DOWNTIME ALERT: " << hst->get_name()
         << ";STOPPED; Host has exited from a period of scheduled "
         "downtime";
 
@@ -620,8 +622,8 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
     if (temp_downtime->fixed == false
         && temp_downtime->incremented_pending_downtime == true) {
       if (temp_downtime->type == HOST_DOWNTIME) {
-        if (hst->pending_flex_downtime > 0)
-          hst->pending_flex_downtime--;
+        if (hst->get_pending_flex_downtime() > 0)
+          hst->set_pending_flex_downtime(hst->get_pending_flex_downtime() - 1);
       }
       else if (svc->pending_flex_downtime > 0)
         svc->pending_flex_downtime--;
@@ -672,15 +674,15 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
       temp_downtime->downtime_id, NULL);
 
     if (temp_downtime->type == HOST_DOWNTIME
-        && hst->scheduled_downtime_depth == 0) {
+        && hst->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
-        << "Host '" << hst->name << "' has entered a period of "
+        << "Host '" << hst->get_name() << "' has entered a period of "
         "scheduled downtime (id=" << temp_downtime->downtime_id << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "HOST DOWNTIME ALERT: " << hst->name
+        << "HOST DOWNTIME ALERT: " << hst->get_name()
         << ";STARTED; Host has entered a period of scheduled downtime";
 
       /* send a notification */
@@ -717,7 +719,8 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
     /* increment the downtime depth variable */
     if (temp_downtime->type == HOST_DOWNTIME)
-      hst->scheduled_downtime_depth++;
+      hst->set_scheduled_downtime_depth(
+        hst->get_scheduled_downtime_depth() + 1);
     else
       svc->scheduled_downtime_depth++;
 
@@ -775,7 +778,7 @@ int check_pending_flex_host_downtime(host* hst) {
   time(&current_time);
 
   /* if host is currently up, nothing to do */
-  if (hst->current_state == HOST_UP)
+  if (hst->get_current_state() == HOST_UP)
     return (OK);
 
   /* check all downtime entries */
@@ -796,7 +799,7 @@ int check_pending_flex_host_downtime(host* hst) {
 
         logger(dbg_downtime, basic)
           << "Flexible downtime (id=" << temp_downtime->downtime_id
-          << ") for host '" << hst->name << "' starting now...";
+          << ") for host '" << hst->get_name() << "' starting now...";
 
         temp_downtime->start_flex_downtime = true;
         handle_scheduled_downtime(temp_downtime);

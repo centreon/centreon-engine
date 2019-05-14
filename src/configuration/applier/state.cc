@@ -444,7 +444,7 @@ std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgr
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned int, std::shared_ptr<host_struct> > const& applier::state::hosts() const throw () {
+std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
   return _hosts;
 }
 
@@ -453,7 +453,7 @@ std::unordered_map<unsigned int, std::shared_ptr<host_struct> > const& applier::
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned int, std::shared_ptr<host_struct> >& applier::state::hosts() throw () {
+std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
   return _hosts;
 }
 
@@ -465,7 +465,7 @@ std::unordered_map<unsigned int, std::shared_ptr<host_struct> >& applier::state:
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-std::unordered_map<unsigned int, std::shared_ptr<host_struct> >::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
+std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
   return _hosts.find(k);
 }
 
@@ -477,7 +477,7 @@ std::unordered_map<unsigned int, std::shared_ptr<host_struct> >::const_iterator 
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-std::unordered_map<unsigned int, std::shared_ptr<host_struct> >::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
+std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
   return _hosts.find(k);
 }
 
@@ -1788,7 +1788,8 @@ void applier::state::_processing(
              end(diff_hosts.added().end());
            it != end;
            ++it) {
-        std::unordered_map<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+        std::unordered_map<unsigned int,
+                           std::shared_ptr<com::centreon::engine::host>>::const_iterator
           hst(hosts().find(it->host_id()));
         if (hst != hosts().end())
           log_host_state(INITIAL_STATES, hst->second.get());

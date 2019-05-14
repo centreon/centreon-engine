@@ -24,9 +24,9 @@
 #include <sys/time.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/file.hh"
@@ -222,24 +222,24 @@ int log_service_event(service const* svc) {
  *
  *  @return Return true on success.
  */
-int log_host_event(host const* hst) {
-  if (!hst || !hst->name)
+int log_host_event(com::centreon::engine::host const* hst) {
+  if (!hst)
     return (ERROR);
 
   unsigned long log_options(NSLOG_HOST_UP);
   char const* state("UP");
-  if (hst->current_state > 0
-      && (unsigned int)hst->current_state
+  if (hst->get_current_state() > 0
+      && (unsigned int)hst->get_current_state()
       < sizeof(tab_host_states) / sizeof(*tab_host_states)) {
-    log_options = tab_host_states[hst->current_state].id;
-    state = tab_host_states[hst->current_state].str;
+    log_options = tab_host_states[hst->get_current_state()].id;
+    state = tab_host_states[hst->get_current_state()].str;
   }
-  char const* state_type(tab_state_type[hst->state_type]);
-  char const* output(hst->plugin_output ? hst->plugin_output : "");
+  char const* state_type(tab_state_type[hst->get_state_type()]);
 
   logger(log_options, basic)
-    << "HOST ALERT: " << hst->name << ";" << state << ";"
-    << state_type << ";" << hst->current_attempt << ";" << output;
+    << "HOST ALERT: " << hst->get_name() << ";" << state << ";"
+    << state_type << ";" << hst->get_current_attempt() << ";"
+    << hst->get_plugin_output();
 
   return (OK);
 }
@@ -250,21 +250,18 @@ int log_host_event(host const* hst) {
  *  @param[in] type  State logging type.
  *  @param[in] hst   Host object.
  */
-void log_host_state(unsigned int type, host* hst) {
-  if (hst->name) {
-    char const* type_str(tab_initial_state[type]);
-    char const* state("UP");
-    if ((hst->current_state > 0)
-        && ((unsigned int)hst->current_state
-            < sizeof(tab_host_states) / sizeof(*tab_host_states)))
-      state = tab_host_states[hst->current_state].str;
-    char const* state_type(tab_state_type[hst->state_type]);
-    char const* output(hst->plugin_output ? hst->plugin_output : "");
-    logger(log_info_message, basic)
-      << type_str << " HOST STATE: " << hst->name << ";" << state
-      << ";" << state_type << ";" << hst->current_attempt << ";"
-      << output;
-  }
+void log_host_state(unsigned int type, com::centreon::engine::host* hst) {
+  char const* type_str(tab_initial_state[type]);
+  char const* state("UP");
+  if ((hst->get_current_state() > 0)
+      && ((unsigned int)hst->get_current_state()
+          < sizeof(tab_host_states) / sizeof(*tab_host_states)))
+    state = tab_host_states[hst->get_current_state()].str;
+  char const* state_type(tab_state_type[hst->get_state_type()]);
+  logger(log_info_message, basic)
+    << type_str << " HOST STATE: " << hst->get_name() << ";" << state
+    << ";" << state_type << ";" << hst->get_current_attempt() << ";"
+    << hst->get_plugin_output();
   return ;
 }
 
@@ -279,7 +276,7 @@ void log_host_state(unsigned int type, host* hst) {
  */
 int log_host_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-  for (host* hst(host_list); hst; hst = hst->next)
+  for (com::centreon::engine::host* hst(host_list); hst; hst = hst->next)
     log_host_state(type, hst);
   return (OK);
 }

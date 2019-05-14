@@ -202,7 +202,7 @@ static int handle_service_macro(
       if (!mac->host_ptr)
         retval = ERROR;
       else if (arg2) {
-        service* svc(find_service(mac->host_ptr->name, arg2));
+        service* svc(find_service(mac->host_ptr->get_name().c_str(), arg2));
         if (!svc)
           retval = ERROR;
         else
@@ -592,26 +592,26 @@ static int handle_summary_macro(
              : true);
       if (authorized) {
         bool problem(true);
-        if ((temp_host->current_state == HOST_UP)
-            && (temp_host->has_been_checked == true))
+        if ((temp_host->get_current_state() == HOST_UP)
+            && temp_host->get_has_been_checked())
           hosts_up++;
-        else if (temp_host->current_state == HOST_DOWN) {
-          if (temp_host->scheduled_downtime_depth > 0)
+        else if (temp_host->get_current_state() == HOST_DOWN) {
+          if (temp_host->get_scheduled_downtime_depth() > 0)
             problem = false;
-          if (temp_host->problem_has_been_acknowledged == true)
+          if (temp_host->get_problem_has_been_acknowledged())
             problem = false;
-          if (temp_host->checks_enabled == false)
+          if (!temp_host->get_checks_enabled())
             problem = false;
           if (problem)
             hosts_down_unhandled++;
           hosts_down++;
         }
-        else if (temp_host->current_state == HOST_UNREACHABLE) {
-          if (temp_host->scheduled_downtime_depth > 0)
+        else if (temp_host->get_current_state() == HOST_UNREACHABLE) {
+          if (temp_host->get_scheduled_downtime_depth() > 0)
             problem = false;
-          if (temp_host->problem_has_been_acknowledged == true)
+          if (temp_host->get_problem_has_been_acknowledged())
             problem = false;
-          if (temp_host->checks_enabled == false)
+          if (!temp_host->get_checks_enabled())
             problem = false;
           if (problem)
             hosts_down_unhandled++;
@@ -651,8 +651,8 @@ static int handle_summary_macro(
         else if (temp_service->current_state == STATE_WARNING) {
           host* temp_host(find_host(temp_service->host_name));
           if (temp_host != NULL
-              && (temp_host->current_state == HOST_DOWN
-                  || temp_host->current_state == HOST_UNREACHABLE))
+              && (temp_host->get_current_state() == HOST_DOWN
+                  || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
@@ -667,8 +667,8 @@ static int handle_summary_macro(
         else if (temp_service->current_state == STATE_UNKNOWN) {
           host* temp_host(find_host(temp_service->host_name));
           if (temp_host != NULL
-              && (temp_host->current_state == HOST_DOWN
-                  || temp_host->current_state == HOST_UNREACHABLE))
+              && (temp_host->get_current_state() == HOST_DOWN
+                  || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
@@ -683,8 +683,8 @@ static int handle_summary_macro(
         else if (temp_service->current_state == STATE_CRITICAL) {
           host* temp_host(find_host(temp_service->host_name));
           if (temp_host != NULL
-              && (temp_host->current_state == HOST_DOWN
-                  || temp_host->current_state == HOST_UNREACHABLE))
+              && (temp_host->get_current_state() == HOST_DOWN
+                  || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;

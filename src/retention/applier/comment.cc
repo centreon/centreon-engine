@@ -54,11 +54,12 @@ void applier::comment::apply(list_comment const& lst) {
  */
 void applier::comment::_add_host_comment(
        retention::comment const& obj) throw () {
-  umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+  umap<unsigned int,
+       std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(obj.host_name().c_str())));
   if (it == configuration::applier::state::instance().hosts().end())
     return;
-  host_struct* hst(it->second.get());
+  com::centreon::engine::host* hst(it->second.get());
 
   // add the comment.
   add_comment(
@@ -78,7 +79,7 @@ void applier::comment::_add_host_comment(
   // acknowledgement comments get deleted if they're not persistent
   // and the original problem is no longer acknowledged.
   if (obj.entry_type() == ACKNOWLEDGEMENT_COMMENT) {
-    if (!hst->problem_has_been_acknowledged && !obj.persistent())
+    if (!hst->get_problem_has_been_acknowledged() && !obj.persistent())
       delete_comment(HOST_COMMENT, obj.comment_id());
   }
   // non-persistent comments don't last past restarts UNLESS

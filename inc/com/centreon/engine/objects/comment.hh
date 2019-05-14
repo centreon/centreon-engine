@@ -23,7 +23,7 @@
 
 #  include <time.h>
 #  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
 // Comment sources.
@@ -148,7 +148,7 @@ int      delete_all_service_comments(
            char const* host_name,
            char const* svc_description);
 int      delete_comment(unsigned int type, unsigned long comment_id);
-int      delete_host_acknowledgement_comments(host* hst);
+int      delete_host_acknowledgement_comments(com::centreon::engine::host* hst);
 int      delete_host_comment(unsigned long comment_id);
 int      delete_service_acknowledgement_comments(service* svc);
 int      delete_service_comment(unsigned long comment_id);
