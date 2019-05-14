@@ -26,11 +26,13 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::configuration;
 
 /**
@@ -612,7 +614,7 @@ void applier::service::remove_object(
       service_description.c_str());
 
     // Remove service downtimes.
-    delete_downtime_by_hostname_service_description_start_time_comment(
+    downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
       host_name.c_str(),
       service_description.c_str(),
       (time_t)0,

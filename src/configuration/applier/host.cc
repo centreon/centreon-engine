@@ -29,6 +29,7 @@
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -478,7 +479,7 @@ void applier::host::remove_object(
     delete_all_host_comments(obj.host_name().c_str());
 
     // Remove host downtimes.
-    delete_downtime_by_hostname_service_description_start_time_comment(
+    downtimes::downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
       obj.host_name().c_str(),
       NULL,
       (time_t)0,

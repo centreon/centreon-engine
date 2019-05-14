@@ -22,7 +22,6 @@
 #  define CCE_CHECKS_HH
 
 #  include <sys/time.h>
-#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 

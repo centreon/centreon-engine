@@ -22,7 +22,6 @@ struct contactgroupsmember_struct;
 #ifndef CCE_OBJECTS_SERVICE_HH
 #  define CCE_OBJECTS_SERVICE_HH
 
-#  include <unordered_map>
 #  include <memory>
 #  include <string>
 #  include <time.h>
@@ -240,7 +239,6 @@ int      is_escalated_contact_for_service(
 
 #    include <ostream>
 #    include <string>
-#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 service const& obj1,

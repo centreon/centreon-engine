@@ -26,7 +26,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/downtime_finder.hh"
+#include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -37,13 +37,15 @@
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/objects/downtime.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
+#include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "mmap.h"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -993,7 +995,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   switch (cmd) {
 
   case CMD_SCHEDULE_HOST_DOWNTIME:
-    schedule_downtime(
+    downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
       NULL,
@@ -1009,7 +1011,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_SVC_DOWNTIME:
-    schedule_downtime(
+    downtime_manager::instance().schedule_downtime(
       SERVICE_DOWNTIME,
       host_name,
       svc_description,
@@ -1030,7 +1032,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
          temp_servicesmember = temp_servicesmember->next) {
       if ((temp_service = temp_servicesmember->service_ptr) == NULL)
         continue;
-      schedule_downtime(
+      downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
         host_name,
         temp_service->description,
@@ -1050,7 +1052,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     for (temp_hgmember = temp_hostgroup->members;
          temp_hgmember != NULL;
          temp_hgmember = temp_hgmember->next)
-      schedule_downtime(
+      downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
         temp_hgmember->host_name,
         NULL,
@@ -1076,7 +1078,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
            temp_servicesmember = temp_servicesmember->next) {
         if ((temp_service = temp_servicesmember->service_ptr) == NULL)
           continue;
-        schedule_downtime(
+        downtime_manager::instance().schedule_downtime(
           SERVICE_DOWNTIME,
           temp_service->host_name,
           temp_service->description,
@@ -1102,7 +1104,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         continue;
       if (last_host == temp_host)
         continue;
-      schedule_downtime(
+      downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
         temp_sgmember->host_name,
         NULL,
@@ -1123,7 +1125,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     for (temp_sgmember = temp_servicegroup->members;
          temp_sgmember != NULL;
          temp_sgmember = temp_sgmember->next)
-      schedule_downtime(
+      downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
         temp_sgmember->host_name,
         temp_sgmember->service_description,
@@ -1139,7 +1141,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME:
     /* schedule downtime for "parent" host */
-    schedule_downtime(
+    downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
       NULL,
@@ -1168,7 +1170,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME:
     /* schedule downtime for "parent" host */
-    schedule_downtime(
+    downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
       NULL,
@@ -1213,9 +1215,9 @@ int cmd_delete_downtime(int cmd, char* args) {
   downtime_id = strtoul(temp_ptr, NULL, 10);
 
   if (CMD_DEL_HOST_DOWNTIME == cmd)
-    unschedule_downtime(HOST_DOWNTIME, downtime_id);
+    downtime_manager::instance().unschedule_downtime(HOST_DOWNTIME, downtime_id);
   else
-    unschedule_downtime(SERVICE_DOWNTIME, downtime_id);
+    downtime_manager::instance().unschedule_downtime(SERVICE_DOWNTIME, downtime_id);
 
   return OK;
 }
@@ -1291,7 +1293,7 @@ int cmd_delete_downtime_full(int cmd, char* args) {
          it(result.begin()), end(result.end());
        it != end;
        ++it) {
-    unschedule_downtime(downtime_type, *it);
+    downtime_manager::instance().unschedule_downtime(downtime_type, *it);
   }
 
   return OK;
@@ -1339,7 +1341,7 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
     }
   }
 
-  deleted = delete_downtime_by_hostname_service_description_start_time_comment(
+  deleted = downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
               hostname,
               service_description,
               downtime_start_time,
@@ -1427,7 +1429,7 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
       continue ;
     if ((host_name != NULL) && (temp_host->get_name() != host_name))
       continue ;
-    deleted = delete_downtime_by_hostname_service_description_start_time_comment(
+    deleted = downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
                 temp_host->get_name().c_str(),
                 service_description,
                 downtime_start_time,
@@ -1465,7 +1467,7 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
   if ((0 == downtime_start_time) && (NULL == downtime_comment))
     return ERROR;
 
-  deleted = delete_downtime_by_hostname_service_description_start_time_comment(
+  deleted = downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
               NULL,
               NULL,
               downtime_start_time,
@@ -2793,7 +2795,7 @@ void schedule_and_propagate_downtime(
       duration);
 
     /* schedule downtime for this host */
-    schedule_downtime(
+    downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       child_host->get_name().c_str(),
       NULL,

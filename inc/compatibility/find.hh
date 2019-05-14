@@ -19,6 +19,7 @@
 
 #ifndef CCE_COMPATIBILITY_FIND_H
 #  define CCE_COMPATIBILITY_FIND_H
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 class contact;

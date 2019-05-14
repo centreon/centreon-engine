@@ -17,46 +17,55 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_DOWNTIME_FINDER_HH
-#  define CCE_DOWNTIME_FINDER_HH
+#ifndef CCE_DOWNTIMES_DOWNTIME_FINDER_HH
+#  define CCE_DOWNTIMES_DOWNTIME_FINDER_HH
 
+#  include <map>
+#  include <memory>
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/namespace.hh"
 
-struct scheduled_downtime_struct;
-
 CCE_BEGIN()
 
+namespace downtimes {
+class downtime;
+class host_downtime;
+class service_downtime;
+
 /**
- *  @class downtime_finder downtime_finder.hh "com/centreon/engine/downtime_finder.hh"
+ *  @class downtime_finder downtime_finder.hh
+ * "com/centreon/engine/downtime_finder.hh"
  *  @brier Find active downtimes.
  *
  *  This class can find active downtimes according to some criterias.
  */
-class                 downtime_finder {
-public:
+class downtime_finder {
+ public:
   typedef std::pair<std::string, std::string>  criteria;
   typedef std::vector<criteria>                criteria_set;
   typedef std::vector<unsigned long>           result_set;
 
                       downtime_finder(
-                        scheduled_downtime_struct const* list);
-                      downtime_finder(downtime_finder const& other);
-                      ~downtime_finder();
+                        std::multimap<time_t, std::shared_ptr<downtime>> const& map);
+                      downtime_finder(downtime_finder const& other) = default;
+                      downtime_finder(downtime_finder&& other) = default;
   downtime_finder&    operator=(downtime_finder const& other);
+                      ~downtime_finder();
   result_set          find_matching_all(criteria_set const& criterias);
-  // result_set          find_matching_any(criteria_set const& criterias);
 
-private:
+ private:
   bool                _match_criteria(
-                        scheduled_downtime_struct const* dt,
+                        host_downtime const& dt,
+                        criteria const& crit);
+  bool                _match_criteria(
+                        service_downtime const& dt,
                         criteria const& crit);
 
-  scheduled_downtime_struct const*
-                      _list;
+  std::multimap<time_t, std::shared_ptr<downtime>> const* _map;
 };
+} // namespace downtimes
 
 CCE_END()
 
-#endif // !CCE_DOWNTIME_FINDER_HH
+#endif // !CCE_DOWNTIMES_DOWNTIME_FINDER_HH

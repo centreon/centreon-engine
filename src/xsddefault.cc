@@ -30,17 +30,19 @@
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/contact.hh"
-#include "com/centreon/engine/objects/downtime.hh"
+#include "com/centreon/engine/downtimes/downtime.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::configuration::applier;
 
 static int xsddefault_status_log_fd(-1);
@@ -52,7 +54,7 @@ static int xsddefault_status_log_fd(-1);
 /* initialize status data */
 int xsddefault_initialize_status_data() {
   if (verify_config || config->status_file().empty())
-    return (OK);
+    return OK;
 
   if (xsddefault_status_log_fd == -1) {
     // delete the old status log (it might not exist).
@@ -65,29 +67,29 @@ int xsddefault_initialize_status_data() {
       logger(engine::logging::log_runtime_error, engine::logging::basic)
         << "Error: Unable to open status data file '"
         << config->status_file() << "': " << strerror(errno);
-      return (ERROR);
+      return ERROR;
     }
     set_cloexec(xsddefault_status_log_fd);
   }
-  return (OK);
+  return OK;
 }
 
 // cleanup status data before terminating.
 int xsddefault_cleanup_status_data(int delete_status_data) {
   if (verify_config)
-    return (OK);
+    return OK;
 
   // delete the status log.
   if (delete_status_data && !config->status_file().empty()) {
     if (unlink(config->status_file().c_str()))
-      return (ERROR);
+      return ERROR;
   }
 
   if (xsddefault_status_log_fd != -1) {
     close(xsddefault_status_log_fd);
     xsddefault_status_log_fd = -1;
   }
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -97,7 +99,7 @@ int xsddefault_cleanup_status_data(int delete_status_data) {
 /* write all status data to file */
 int xsddefault_save_status_data() {
   if (xsddefault_status_log_fd == -1)
-    return (OK);
+    return OK;
 
   int used_external_command_buffer_slots(0);
   int high_external_command_buffer_slots(0);
@@ -158,7 +160,6 @@ int xsddefault_save_status_data() {
        "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
        "\tnext_comment_id=" << next_comment_id << "\n"
-       "\tnext_downtime_id=" << next_downtime_id << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
        "\tnext_notification_id=" << next_notification_id << "\n"
@@ -394,26 +395,8 @@ int xsddefault_save_status_data() {
   }
 
   // save all downtime
-  for (scheduled_downtime* dt = scheduled_downtime_list; dt; dt = dt->next) {
-    if (dt->type == HOST_DOWNTIME)
-      stream << "hostdowntime {\n";
-    else
-      stream << "servicedowntime {\n";
-    stream << "\thost_name=" << dt->host_name << "\n";
-    if (dt->type == SERVICE_DOWNTIME)
-      stream << "\tservice_description=" << dt->service_description << "\n";
-    stream
-      << "\tdowntime_id=" << dt->downtime_id << "\n"
-         "\tentry_time=" << static_cast<unsigned long>(dt->entry_time) << "\n"
-         "\tstart_time=" << static_cast<unsigned long>(dt->start_time) << "\n"
-         "\tend_time=" << static_cast<unsigned long>(dt->end_time) << "\n"
-         "\ttriggered_by=" << dt->triggered_by << "\n"
-         "\tfixed=" << dt->fixed << "\n"
-         "\tduration=" << dt->duration << "\n"
-         "\tauthor=" << dt->author << "\n"
-         "\tcomment=" << dt->comment << "\n"
-         "\t}\n\n";
-  }
+  for (std::pair<time_t, std::shared_ptr<downtime>> const& dt : downtime_manager::instance().get_scheduled_downtimes())
+    stream << *dt.second;
 
   // Write data in buffer.
   stream.flush();
@@ -426,7 +409,7 @@ int xsddefault_save_status_data() {
     logger(engine::logging::log_runtime_error, engine::logging::basic)
       << "Error: Unable to update status data file '"
       << config->status_file() << "': " << msg;
-    return (ERROR);
+    return ERROR;
   }
 
   // Write status file.
@@ -440,11 +423,11 @@ int xsddefault_save_status_data() {
       logger(engine::logging::log_runtime_error, engine::logging::basic)
         << "Error: Unable to update status data file '"
         << config->status_file() << "': " << msg;
-      return (ERROR);
+      return ERROR;
     }
     data_ptr += wb;
     size -= wb;
   }
 
-  return (OK);
+  return OK;
 }

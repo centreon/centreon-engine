@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <map>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "nagios.h"
@@ -109,7 +110,6 @@ nebcallback*        neb_callback_list[NEBCALLBACK_NUMITEMS];
 notification*       notification_list(NULL);
 pthread_t           worker_threads[TOTAL_WORKER_THREADS];
 sched_info          scheduling_info;
-scheduled_downtime* scheduled_downtime_list(NULL);
 service*            service_list(NULL);
 service*            service_list_tail(NULL);
 servicedependency*  servicedependency_list(NULL);
@@ -222,7 +222,6 @@ unsigned long       max_debug_file_size(1000000);
 unsigned long       modified_host_process_attributes(MODATTR_NONE);
 unsigned long       modified_service_process_attributes(MODATTR_NONE);
 unsigned long       next_comment_id(0L);
-unsigned long       next_downtime_id(0L);
 unsigned long       next_event_id(1);
 unsigned long       next_notification_id(1);
 unsigned long       next_problem_id(0L);
