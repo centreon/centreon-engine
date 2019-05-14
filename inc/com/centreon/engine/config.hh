@@ -22,6 +22,8 @@
 #  define CCE_CONFIG_HH
 
 #  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/servicegroup.hh"
+#  include "com/centreon/engine/objects/timeperiod.hh"
 
 #  ifdef __cplusplus
 extern "C" {

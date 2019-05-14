@@ -41,7 +41,8 @@
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/objects/downtime.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
+#include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -54,6 +55,7 @@
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
@@ -1117,7 +1119,7 @@ int handle_async_service_check_result(
       /* we need to check for both, state_change (SOFT) and hard_state_change (HARD) values */
       if (((true == hard_state_change) || (true == state_change))
           && (temp_service->pending_flex_downtime > 0))
-        check_pending_flex_service_downtime(temp_service);
+        downtime_manager::instance().check_pending_flex_service_downtime(temp_service);
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */

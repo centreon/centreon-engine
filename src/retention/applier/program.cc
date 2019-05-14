@@ -111,9 +111,6 @@ void applier::program::apply(
     if (obj.next_comment_id().is_set())
       next_comment_id = *obj.next_comment_id();
 
-    if (obj.next_downtime_id().is_set())
-      next_downtime_id = *obj.next_downtime_id();
-
     if (obj.next_event_id().is_set())
       next_event_id = *obj.next_event_id();
 

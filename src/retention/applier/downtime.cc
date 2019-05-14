@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/objects/downtime.hh"
+#include "com/centreon/engine/downtimes/host_downtime.hh"
+#include "com/centreon/engine/downtimes/service_downtime.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/retention/applier/downtime.hh"
 
 using namespace com::centreon::engine;
@@ -31,7 +33,6 @@ using namespace com::centreon::engine::retention;
  */
 void applier::downtime::apply(list_downtime const& lst) {
   // Big speedup when reading retention.dat in bulk.
-  defer_downtime_sorting = 1;
 
   for (list_downtime::const_iterator it(lst.begin()), end(lst.end());
        it != end;
@@ -41,9 +42,6 @@ void applier::downtime::apply(list_downtime const& lst) {
     else
       _add_service_downtime(**it);
   }
-
-  // Sort all downtimes.
-  sort_downtime();
 }
 
 /**
@@ -53,7 +51,7 @@ void applier::downtime::apply(list_downtime const& lst) {
  */
 void applier::downtime::_add_host_downtime(
        retention::downtime const& obj) throw () {
-  add_host_downtime(
+  downtimes::downtime_manager::instance().add_host_downtime(
     obj.host_name().c_str(),
     obj.entry_time(),
     obj.author().c_str(),
@@ -74,7 +72,7 @@ void applier::downtime::_add_host_downtime(
  */
 void applier::downtime::_add_service_downtime(
        retention::downtime const& obj) throw () {
-  add_service_downtime(
+  downtimes::downtime_manager::instance().add_service_downtime(
     obj.host_name().c_str(),
     obj.service_description().c_str(),
     obj.entry_time(),
