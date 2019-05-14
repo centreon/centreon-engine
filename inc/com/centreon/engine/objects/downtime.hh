@@ -22,7 +22,7 @@
 #  define CCE_OBJECTS_DOWTIME_HH
 
 #  include <time.h>
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
 typedef struct                      scheduled_downtime_struct {
@@ -123,7 +123,7 @@ int                 add_service_downtime(
                       unsigned long downtime_id);
 int                 check_for_expired_downtime();
 int                 check_pending_flex_host_downtime(
-                      host_struct* hst);
+                      com::centreon::engine::host* hst);
 int                 check_pending_flex_service_downtime(
                       service_struct* svc);
 int                 delete_downtime(

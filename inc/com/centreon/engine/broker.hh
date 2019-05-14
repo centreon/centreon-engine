@@ -23,7 +23,7 @@
 
 #  include <sys/time.h>
 #  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/commands/command.hh"
 
@@ -348,7 +348,7 @@ void           broker_adaptive_host_data(
                  int type,
                  int flags,
                  int attr,
-                 host* hst,
+                 com::centreon::engine::host* hst,
                  int command_type,
                  unsigned long modattr,
                  unsigned long modattrs,
@@ -521,7 +521,7 @@ int            broker_host_check(
                  int type,
                  int flags,
                  int attr,
-                 host* hst,
+                 com::centreon::engine::host* hst,
                  int check_type,
                  int state,
                  int state_type,
@@ -542,7 +542,7 @@ void           broker_host_status(
                  int type,
                  int flags,
                  int attr,
-                 host* hst,
+                 com::centreon::engine::host* hst,
                  struct timeval const* timestamp);
 void           broker_log_data(
                  int type,
@@ -587,9 +587,9 @@ void           broker_relation_data(
                  int type,
                  int flags,
                  int attr,
-                 host* hst,
+                 com::centreon::engine::host* hst,
                  service* svc,
-                 host* dep_hst,
+                 com::centreon::engine::host* dep_hst,
                  service* dep_svc,
                  struct timeval const* timestamp);
 void           broker_retention_data(

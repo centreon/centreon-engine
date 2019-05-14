@@ -22,7 +22,7 @@
 #  define CCE_STATUSDATA_HH
 
 #  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
 #  ifdef __cplusplus
@@ -38,7 +38,7 @@ int cleanup_status_data(int delete_status_data);
 // updates program status data
 int update_program_status(int aggregated_dump);
 // updates host status data
-int update_host_status(host* hst,int aggregated_dump);
+int update_host_status(com::centreon::engine::host* hst,int aggregated_dump);
 // updates service status data
 int update_service_status(service* svc,int aggregated_dump);
 

@@ -39,6 +39,24 @@ namespace  macros {
    *
    *  @return Newly allocated string with value as a fixed point string.
    */
+  template <typename T, double (T::* member)() const, unsigned int precision>
+  char*    get_double(T& t, nagios_macros* mac) {
+    (void)mac;
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(precision)
+        << (t.*member)();
+    return (string::dup(oss.str()));
+  }
+
+  /**
+   *  Extract double.
+   *
+   *  @param[in] t   Host object.
+   *  @param[in] mac Unused.
+   *
+   *  @return Newly allocated string with value as a fixed point string.
+   */
+  //TODO SGA to remove after service rework
   template <typename T, double (T::* member), unsigned int precision>
   char*    get_double(T& t, nagios_macros* mac) {
     (void)mac;
@@ -58,6 +76,40 @@ namespace  macros {
    */
   template <typename T>
   char*    get_duration(T& t, nagios_macros* mac) {
+    (void)mac;
+
+    // Get duration.
+    time_t now(time(NULL));
+    unsigned long duration(now - t.get_last_state_change());
+
+    // Break down duration.
+    unsigned int days(duration / (24 * 60 * 60));
+    duration %= (24 * 60 * 60);
+    unsigned int hours(duration / (60 * 60));
+    duration %= (60 * 60);
+    unsigned int minutes(duration / 60);
+    duration %= 60;
+
+    // Stringify duration.
+    std::ostringstream oss;
+    oss << days << "d "
+        << hours << "h "
+        << minutes << "m "
+        << duration << "s";
+    return (string::dup(oss.str()));
+  }
+
+  /**
+   *  Extract duration.
+   *
+   *  @param[in] t   Base object.
+   *  @param[in] mac Unused.
+   *
+   *  @return Duration in a newly allocated string.
+   */
+  //TODO SGA to remove with service rework
+  template <typename T>
+  char*    get_duration_old(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get duration.
@@ -95,6 +147,25 @@ namespace  macros {
 
     // Get duration.
     time_t now(time(NULL));
+    unsigned long duration(now - t.get_last_state_change());
+    return (string::dup(duration));
+  }
+
+  /**
+   *  Extract duration in seconds.
+   *
+   *  @param[in] t   Base object.
+   *  @param[in] mac Unused.
+   *
+   *  @return Duration in second in a newly allocated string.
+   */
+  //TODO SGA to remove with service
+  template <typename T>
+  char*    get_duration_sec_old(T& t, nagios_macros* mac) {
+    (void)mac;
+
+    // Get duration.
+    time_t now(time(NULL));
     unsigned long duration(now - t.last_state_change);
     return (string::dup(duration));
   }
@@ -121,6 +192,22 @@ namespace  macros {
    *
    *  @return String copy of object member.
    */
+
+  template <typename T, typename U, U (T::* member)() const>
+  char*    get_member_as_string(T& t, nagios_macros* mac) {
+    (void)mac;
+    return (string::dup((t.*member)()));
+  }
+
+  /**
+   *  Get string copy of object member.
+   *
+   *  @param[in] t   Base object.
+   *  @param[in] mac Unused.
+   *
+   *  @return String copy of object member.
+   */
+//TODO SGA to remove after service
   template <typename T, typename U, U (T::* member)>
   char*    get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
@@ -135,6 +222,25 @@ namespace  macros {
    *
    *  @return Newly allocated string with macros processed.
    */
+  template <typename T, std::string const& (T::* member)() const, unsigned int options>
+  char* get_recursive(T& t, nagios_macros* mac) {
+    (void)mac;
+
+    // Get copy of string with macros processed.
+    char* buffer(NULL);
+    process_macros_r(mac, (t.*member)().c_str(), &buffer, options);
+    return (buffer);
+  }
+
+  /**
+   *  Recursively process macros.
+   *
+   *  @param[in] hst Host object.
+   *  @param[in] mac Unused.
+   *
+   *  @return Newly allocated string with macros processed.
+   */
+  //TODO SGA to remove after service rework
   template <typename T, char* (T::* member), unsigned int options>
   char* get_recursive(T& t, nagios_macros* mac) {
     (void)mac;
@@ -144,7 +250,6 @@ namespace  macros {
     process_macros_r(mac, t.*member, &buffer, options);
     return (buffer);
   }
-
   /**
    *  Extract state type.
    *
@@ -155,6 +260,22 @@ namespace  macros {
    */
   template <typename T>
   char* get_state_type(T& t, nagios_macros* mac) {
+    (void)mac;
+    return (string::dup((t.get_state_type() == HARD_STATE)
+                      ? "HARD"
+                      : "SOFT"));
+  }
+  /**
+   *  Extract state type.
+   *
+   *  @param[in] t   Base object.
+   *  @param[in] mac Unused.
+   *
+   *  @return Newly allocated state type as a string.
+   */
+  //TODO SGA to remove after service rework
+  template <typename T>
+  char* get_state_type_old(T& t, nagios_macros* mac) {
     (void)mac;
     return (string::dup((t.state_type == HARD_STATE)
                       ? "HARD"

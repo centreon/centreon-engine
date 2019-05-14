@@ -77,7 +77,7 @@ void adjust_check_scheduling() {
         continue;
 
       // ignore forced checks.
-      if (hst->check_options & CHECK_OPTION_FORCE_EXECUTION)
+      if (hst->get_check_options() & CHECK_OPTION_FORCE_EXECUTION)
         continue;
 
       // does the last check "bump" into this one?
@@ -152,11 +152,11 @@ void adjust_check_scheduling() {
         continue;
 
       // ignore forced checks.
-      if (hst->check_options & CHECK_OPTION_FORCE_EXECUTION)
+      if (hst->get_check_options() & CHECK_OPTION_FORCE_EXECUTION)
         continue;
 
       current_exec_time
-        = ((hst->execution_time
+        = ((hst->get_execution_time()
             + projected_host_check_overhead)
            * exec_time_factor);
     }
@@ -184,7 +184,7 @@ void adjust_check_scheduling() {
 
     if (tmp->event_type == EVENT_HOST_CHECK) {
       tmp->run_time = new_run_time;
-      hst->next_check = new_run_time;
+      hst->set_next_check(new_run_time);
       update_host_status(hst, false);
     }
     else {

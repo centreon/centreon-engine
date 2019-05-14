@@ -21,8 +21,8 @@
 #ifndef CCE_MACROS_GRAB_HOST_HH
 #  define CCE_MACROS_GRAB_HOST_HH
 
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/objects/host.hh"
 
 #  ifdef __cplusplus
 extern "C" {
@@ -31,16 +31,16 @@ extern "C" {
 int grab_standard_host_macro_r(
       nagios_macros* mac,
       int macro_type,
-      host* hst,
+      com::centreon::engine::host* hst,
       char** output,
       int* free_macro);
 int grab_standard_host_macro(
       int macro_type,
-      host* hst,
+      com::centreon::engine::host* hst,
       char** output,
       int* free_macro);
-int grab_host_macros_r(nagios_macros* mac, host* hst);
-int grab_host_macros(host* hst);
+int grab_host_macros_r(nagios_macros* mac, com::centreon::engine::host* hst);
+int grab_host_macros(com::centreon::engine::host* hst);
 
 #  ifdef __cplusplus
 }

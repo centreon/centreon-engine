@@ -81,9 +81,9 @@ void broker_acknowledgement_data(
   }
   else {
     temp_host = (host*)data;
-    ds.host_name = temp_host->name;
+    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
     ds.service_description = NULL;
-    ds.state = temp_host->current_state;
+    ds.state = temp_host->get_current_state();
   }
   ds.object_ptr = data;
   ds.author_name = ack_author;
@@ -558,10 +558,10 @@ int broker_contact_notification_data(
   }
   else {
     temp_host = (host*)data;
-    ds.host_name = temp_host->name;
+    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
     ds.service_description = NULL;
-    ds.state = temp_host->current_state;
-    ds.output = temp_host->plugin_output;
+    ds.state = temp_host->get_current_state();
+    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
@@ -648,10 +648,10 @@ int broker_contact_notification_method_data(
   }
   else {
     temp_host = (host*)data;
-    ds.host_name = temp_host->name;
+    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
     ds.service_description = NULL;
-    ds.state = temp_host->current_state;
-    ds.output = temp_host->plugin_output;
+    ds.state = temp_host->get_current_state();
+    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
@@ -882,7 +882,7 @@ int broker_event_handler(
   }
   else {
     temp_host = (host*)data;
-    ds.host_name = temp_host->name;
+    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
     ds.service_description = NULL;
   }
   ds.object_ptr = data;
@@ -996,9 +996,9 @@ void broker_flapping_data(
   }
   else {
     temp_host = (host*)data;
-    ds.host_name = temp_host->name;
+    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
     ds.service_description = NULL;
-    ds.comment_id = temp_host->flapping_comment_id;
+    ds.comment_id = temp_host->get_flapping_comment_id();
   }
   ds.object_ptr = data;
   ds.percent_change = percent_change;
@@ -1148,11 +1148,11 @@ int broker_host_check(
   ds.flags = flags;
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
-  ds.host_name = hst->name;
+  ds.host_name = const_cast<char *>(hst->get_name().c_str());
   ds.object_ptr = hst;
   ds.check_type = check_type;
-  ds.current_attempt = hst->current_attempt;
-  ds.max_attempts = hst->max_attempts;
+  ds.current_attempt = hst->get_current_attempt();
+  ds.max_attempts = hst->get_max_attempts();
   ds.state = state;
   ds.state_type = state_type;
   ds.timeout = timeout;
@@ -1345,10 +1345,10 @@ int broker_notification_data(
   }
   else {
     temp_host = (host*)data;
-    ds.host_name = temp_host->name;
+    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
     ds.service_description = NULL;
-    ds.state = temp_host->current_state;
-    ds.output = temp_host->plugin_output;
+    ds.state = temp_host->get_current_state();
+    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.ack_author = ack_author;
@@ -1689,9 +1689,9 @@ void broker_statechange_data(
   }
   else {
     temp_host = (host*)data;
-    ds.host_name = temp_host->name;
+    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
     ds.service_description = NULL;
-    ds.output = temp_host->plugin_output;
+    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.state = state;

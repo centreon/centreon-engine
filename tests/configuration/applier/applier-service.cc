@@ -214,7 +214,7 @@ TEST_F(ApplierService, ServicesCheckValidity) {
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 1);
 
-  umap<unsigned int, std::shared_ptr<host_struct> > const& hm(
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>> const& hm(
     configuration::applier::state::instance().hosts());
   ASSERT_EQ(sm.begin()->second->host_ptr, hm.begin()->second.get());
 }

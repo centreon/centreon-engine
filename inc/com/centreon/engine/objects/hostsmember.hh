@@ -21,27 +21,29 @@
 #  define CCE_OBJECTS_HOSTSMEMBER_HH
 
 /* Forward declaration. */
-struct host_struct;
+CCE_BEGIN()
+  class host;
+CCE_END()
 struct hostgroup_struct;
 
-typedef struct               hostsmember_struct {
-  char*                      host_name;
-  host_struct*               host_ptr;
-  struct hostsmember_struct* next;
-}                            hostsmember;
+typedef struct                 hostsmember_struct {
+  char*                        host_name;
+  com::centreon::engine::host* host_ptr;
+  struct hostsmember_struct*   next;
+}                              hostsmember;
 
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* C++ */
 
 hostsmember* add_child_link_to_host(
-               host_struct* hst,
-               host_struct* child_ptr);
+               com::centreon::engine::host* hst,
+               com::centreon::engine::host* child_ptr);
 hostsmember* add_host_to_hostgroup(
                hostgroup_struct* temp_hostgroup,
                char const* host_name);
 hostsmember* add_parent_host_to_host(
-               host_struct* hst,
+               com::centreon::engine::host* hst,
                char const* host_name);
 
 #  ifdef __cplusplus

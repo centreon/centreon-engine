@@ -178,9 +178,6 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, service const& obj) {
-  char const* hst_str(NULL);
-  if (obj.host_ptr)
-    hst_str = chkstr(obj.host_ptr->name);
   char const* evt_str(NULL);
   if (obj.event_handler_ptr)
     evt_str = obj.event_handler_ptr->get_name().c_str();
@@ -320,7 +317,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  flapping_comment_id:                  " << obj.flapping_comment_id << "\n"
     "  percent_state_change:                 " << obj.percent_state_change << "\n"
     "  modified_attributes:                  " << obj.modified_attributes << "\n"
-    "  host_ptr:                             " << chkstr(hst_str) << "\n"
+    "  host_ptr:                             " << (obj.host_ptr ? obj.host_ptr->get_name() : "\"NULL\"") << "\n"
     "  event_handler_ptr:                    " << chkstr(evt_str) << "\n"
     "  event_handler_args:                   " << chkstr(obj.event_handler_args) << "\n"
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
@@ -721,18 +718,18 @@ void engine::check_for_expired_acknowledgement(service* s) {
   if (s->problem_has_been_acknowledged) {
     int acknowledgement_timeout(
           service_other_props[std::make_pair(
-                                     s->host_ptr->name,
+                                     s->host_ptr->get_name().c_str(),
                                      s->description)].acknowledgement_timeout);
     if (acknowledgement_timeout > 0) {
       time_t last_ack(
                service_other_props[std::make_pair(
-                                          s->host_ptr->name,
+                                          s->host_ptr->get_name().c_str(),
                                           s->description)].last_acknowledgement);
       time_t now(time(NULL));
       if (last_ack + acknowledgement_timeout >= now) {
         logger(log_info_message, basic)
           << "Acknowledgement of service '" << s->description
-          << "' on host '" << s->host_ptr->name << "' just expired";
+          << "' on host '" << s->host_ptr->get_name() << "' just expired";
         s->problem_has_been_acknowledged = false;
         s->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
         update_service_status(s, false);
@@ -835,7 +832,7 @@ unsigned int engine::get_service_id(char const* host, char const* svc) {
  */
 void engine::schedule_acknowledgement_expiration(service* s) {
   std::pair<std::string, std::string>
-    hs(std::make_pair(s->host_ptr->name, s->description));
+    hs(std::make_pair(s->host_ptr->get_name(), s->description));
   int ack_timeout(service_other_props[hs].acknowledgement_timeout);
   time_t last_ack(service_other_props[hs].last_acknowledgement);
   if ((ack_timeout > 0) && (last_ack != (time_t)0)) {

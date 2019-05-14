@@ -108,9 +108,9 @@ int write_to_syslog(char const* buffer, unsigned long data_type);
 // logs a service event
 int log_service_event(service const* svc);
 // logs a host event
-int log_host_event(host const* hst);
+int log_host_event(com::centreon::engine::host const* hst);
 // logs initial/current host states
-void log_host_state(unsigned int type, host* hst);
+void log_host_state(unsigned int type, com::centreon::engine::host* hst);
 int log_host_states(unsigned int type, time_t* timestamp);
 // logs initial/current service states
 void log_service_state(unsigned int type, service* svc);

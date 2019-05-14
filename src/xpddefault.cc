@@ -28,9 +28,9 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/xpddefault.hh"
@@ -235,7 +235,7 @@ int xpddefault_update_host_performance_data(host* hst) {
    * bail early if we've got nothing to do so we don't spend a lot
    * of time calculating macros that never get used
    */
-  if (!hst || !hst->perf_data || !*hst->perf_data)
+  if (!hst || !hst->get_perf_data().empty())
     return (OK);
   if ((!xpddefault_host_perfdata_fp
        || !xpddefault_host_perfdata_file_template)
@@ -413,7 +413,7 @@ int xpddefault_run_host_performance_data_command(
   if (early_timeout == true)
     logger(log_runtime_warning, basic)
       << "Warning: Host performance data command '"
-      << processed_command_line << "' for host '" << hst->name
+      << processed_command_line << "' for host '" << hst->get_name()
       << "' timed out after " << config->perfdata_timeout()
       << " seconds";
 

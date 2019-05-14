@@ -21,7 +21,7 @@
 #ifndef CCE_PERFDATA_HH
 #  define CCE_PERFDATA_HH
 
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
 #  ifdef __cplusplus
@@ -35,7 +35,7 @@ int cleanup_performance_data();
 // updates service performance data
 int update_service_performance_data(service* svc);
 // updates host performance data
-int update_host_performance_data(host* hst);
+int update_host_performance_data(com::centreon::engine::host* hst);
 
 #  ifdef __cplusplus
 }

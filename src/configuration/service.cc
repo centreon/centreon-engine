@@ -20,8 +20,8 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/string.hh"
 
 extern int config_warnings;

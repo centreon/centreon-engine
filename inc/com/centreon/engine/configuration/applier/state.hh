@@ -31,11 +31,11 @@
 
 CCE_BEGIN()
   class contact;
+  class host;
 CCE_END()
 
 // Forward declaration.
 struct contactgroup_struct;
-struct host_struct;
 struct hostdependency_struct;
 struct hostescalation_struct;
 struct hostgroup_struct;
@@ -118,13 +118,13 @@ namespace           configuration {
                     contactgroups_find(configuration::contactgroup::key_type const& k) const;
       std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
-      std::unordered_map<unsigned int, std::shared_ptr<host_struct>> const&
+      std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>> const&
                     hosts() const throw ();
-      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>&
+      std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>&
                     hosts() throw ();
-      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>::const_iterator
+      std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
                     hosts_find(configuration::host::key_type const& k) const;
-      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>::iterator
+      std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::iterator
                     hosts_find(configuration::host::key_type const& k);
       umultimap<std::string, std::shared_ptr<hostdependency_struct>> const&
                     hostdependencies() const throw ();
@@ -240,7 +240,7 @@ namespace           configuration {
                     _contactgroups;
       concurrency::condvar
                     _cv_lock;
-      std::unordered_map<unsigned int, std::shared_ptr<host_struct>>
+      std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>
                     _hosts;
       umultimap<std::string, std::shared_ptr<hostdependency_struct>>
                     _hostdependencies;

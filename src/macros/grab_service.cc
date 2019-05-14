@@ -169,7 +169,7 @@ struct grab_service_redirection {
     routines[MACRO_SERVICECHECKTYPE].first = &get_service_check_type;
     routines[MACRO_SERVICECHECKTYPE].second = true;
     // State type.
-    routines[MACRO_SERVICESTATETYPE].first = &get_state_type<service>;
+    routines[MACRO_SERVICESTATETYPE].first = &get_state_type_old<service>;
     routines[MACRO_SERVICESTATETYPE].second = true;
     // State.
     routines[MACRO_SERVICESTATE].first = &get_service_state<&service::current_state>;
@@ -223,10 +223,10 @@ struct grab_service_redirection {
     routines[MACRO_SERVICEPERCENTCHANGE].first = &get_double<service, &service::percent_state_change, 2>;
     routines[MACRO_SERVICEPERCENTCHANGE].second = true;
     // Duration.
-    routines[MACRO_SERVICEDURATION].first = &get_duration<service>;
+    routines[MACRO_SERVICEDURATION].first = &get_duration_old<service>;
     routines[MACRO_SERVICEDURATION].second = true;
     // Duration in seconds.
-    routines[MACRO_SERVICEDURATIONSEC].first = &get_duration_sec<service>;
+    routines[MACRO_SERVICEDURATIONSEC].first = &get_duration_sec_old<service>;
     routines[MACRO_SERVICEDURATIONSEC].second = true;
     // Notification number.
     routines[MACRO_SERVICENOTIFICATIONNUMBER].first = &get_member_as_string<service, int, &service::current_notification_number>;

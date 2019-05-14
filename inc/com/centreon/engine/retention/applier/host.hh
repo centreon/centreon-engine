@@ -24,8 +24,6 @@
 #  include "com/centreon/engine/retention/host.hh"
 
 // Forward declaration.
-struct host_struct;
-
 CCE_BEGIN()
 
 // Forward declaration.
@@ -46,7 +44,7 @@ namespace   retention {
       void  _update(
               configuration::state const& config,
               retention::host const& state,
-              host_struct& obj,
+              engine::host& obj,
               bool scheduling_info_is_ok);
     };
   }

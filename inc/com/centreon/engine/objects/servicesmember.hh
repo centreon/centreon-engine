@@ -21,7 +21,9 @@
 #  define CCE_OBJECTS_SERVICESMEMBER_HH
 
 /* Forward declaration. */
-struct host_struct;
+CCE_BEGIN()
+  class host;
+CCE_END()
 struct service_struct;
 struct servicegroup_struct;
 
@@ -37,7 +39,7 @@ extern "C" {
 #  endif /* C++ */
 
 servicesmember* add_service_link_to_host(
-                  host_struct* hst,
+                  com::centreon::engine::host* hst,
                   service_struct* service_ptr);
 servicesmember* add_service_to_servicegroup(
                   servicegroup_struct* temp_servicegroup,

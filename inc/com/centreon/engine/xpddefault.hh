@@ -21,8 +21,8 @@
 #ifndef CCE_XPDDEFAULT_HH
 #  define CCE_XPDDEFAULT_HH
 
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
 #  ifdef __cplusplus
@@ -33,21 +33,21 @@ int xpddefault_initialize_performance_data();
 int xpddefault_cleanup_performance_data();
 
 int xpddefault_update_service_performance_data(service* svc);
-int xpddefault_update_host_performance_data(host* hst);
+int xpddefault_update_host_performance_data(com::centreon::engine::host* hst);
 
 int xpddefault_run_service_performance_data_command(
       nagios_macros* mac,
       service* svc);
 int xpddefault_run_host_performance_data_command(
       nagios_macros* mac,
-      host* hst);
+      com::centreon::engine::host* hst);
 
 int xpddefault_update_service_performance_data_file(
       nagios_macros* mac,
       service* svc);
 int xpddefault_update_host_performance_data_file(
       nagios_macros* mac,
-      host* hst);
+      com::centreon::engine::host* hst);
 
 void xpddefault_preprocess_file_templates(char* tmpl);
 

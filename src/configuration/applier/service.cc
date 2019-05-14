@@ -684,12 +684,13 @@ void applier::service::resolve_object(
 
   // Find host and adjust its counters.
   unsigned int host_id(it->first.first);
-  umap<unsigned int, std::shared_ptr<host_struct> >::iterator
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::iterator
     hst(applier::state::instance().hosts_find(it->first.first));
   if (hst != applier::state::instance().hosts().end()) {
-    ++hst->second->total_services;
-    hst->second->total_service_check_interval
-      += static_cast<unsigned long>(it->second->check_interval);
+    hst->second->set_total_services(hst->second->get_total_services() + 1);
+    hst->second->set_total_service_check_interval(
+      hst->second->get_total_service_check_interval() +
+      static_cast<unsigned long>(it->second->check_interval));
   }
 
   // Resolve service.
