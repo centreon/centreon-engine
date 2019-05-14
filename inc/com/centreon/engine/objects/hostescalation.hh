@@ -21,7 +21,9 @@
 #  define CCE_OBJECTS_HOSTESCALATION_HH
 
 /* Forward declaration. */
-struct host_struct;
+CCE_BEGIN()
+  class host;
+CCE_END()
 struct timeperiod_struct;
 
 typedef struct                   hostescalation_struct {
@@ -35,7 +37,7 @@ typedef struct                   hostescalation_struct {
   int                            escalate_on_unreachable;
   contactgroup_map               contact_groups;
   contact_map                    contacts;
-  host_struct*                   host_ptr;
+  com::centreon::engine::host*   host_ptr;
   timeperiod_struct*             escalation_period_ptr;
   struct hostescalation_struct*  next;
   struct hostescalation_struct*  nexthash;

@@ -146,8 +146,6 @@ bool operator<(
  */
 std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
   char const* hst_str(NULL);
-  if (obj.host_ptr)
-    hst_str = chkstr(obj.host_ptr->name);
   char const* escalation_period_str(NULL);
   if (obj.escalation_period_ptr)
     escalation_period_str = chkstr(obj.escalation_period_ptr->name);
@@ -181,7 +179,9 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     "  escalate_on_unreachable: " << obj.escalate_on_unreachable << "\n"
     "  contact_groups:          " << cg_oss << "\n"
     "  contacts:                " << c_oss << "\n"
-    "  host_ptr:                " << chkstr(hst_str) << "\n"
+    "  host_ptr:                " << (obj.host_ptr ?
+                                        obj.host_ptr->get_name() :
+                                        "\"NULL\"") << "\n"
     "  escalation_period_ptr:   " << chkstr(escalation_period_str) << "\n"
     "}\n";
   return (os);

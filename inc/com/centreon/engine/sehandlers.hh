@@ -21,8 +21,8 @@
 #ifndef CCE_SEHANDLERS_HH
 #  define CCE_SEHANDLERS_HH
 
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
 // Event Handler Types
@@ -40,7 +40,7 @@ extern "C" {
 // distributed monitoring craziness...
 int obsessive_compulsive_service_check_processor(service* svc);
 // distributed monitoring craziness...
-int obsessive_compulsive_host_check_processor(host* hst);
+int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst);
 // top level service event logic
 int handle_service_event(service* svc);
 // runs the global service event handler
@@ -48,13 +48,15 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc);
 // runs the event handler for a specific service
 int run_service_event_handler(nagios_macros* mac, service* svc);
 // top level host event logic
-int handle_host_event(host* hst);
+int handle_host_event(com::centreon::engine::host* hst);
 // runs the global host event handler
-int run_global_host_event_handler(nagios_macros* mac, host* hst);
+int run_global_host_event_handler(nagios_macros* mac,
+                                  com::centreon::engine::host* hst);
 // runs the event handler for a specific host
-int run_host_event_handler(nagios_macros* mac, host* hst);
+int run_host_event_handler(nagios_macros* mac,
+                           com::centreon::engine::host* hst);
 // top level host state handler
-int handle_host_state(host* hst);
+int handle_host_state(com::centreon::engine::host* hst);
 
 #  ifdef __cplusplus
 }

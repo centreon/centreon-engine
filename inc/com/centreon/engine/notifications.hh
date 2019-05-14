@@ -25,7 +25,7 @@
 #  include <sys/time.h>
 #  include "com/centreon/engine/macros/defines.hh"
 #  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/hostescalation.hh"
 #  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/objects/serviceescalation.hh"
@@ -100,27 +100,27 @@ int create_notification_list_from_service(
       int* escalated);
 // notify all contacts about a host (problem or recovery)
 int host_notification(
-      host* hst,
+      com::centreon::engine::host* hst,
       unsigned int type,
       char* not_author,
       char* not_data,
       int options);
 // checks viability of notifying all contacts about a host
 int check_host_notification_viability(
-      host* hst,
+      com::centreon::engine::host* hst,
       unsigned int type,
       int options);
 // checks viability of notifying a contact about a host
 int check_contact_host_notification_viability(
       com::centreon::engine::contact* cntct,
-      host* hst,
+      com::centreon::engine::host* hst,
       unsigned int type,
       int options);
 // notify a single contact about a host
 int notify_contact_of_host(
       nagios_macros* mac,
       com::centreon::engine::contact* cntct,
-      host* hst,
+      com::centreon::engine::host* hst,
       int type,
       char* not_author,
       char* not_data,
@@ -128,21 +128,21 @@ int notify_contact_of_host(
       int escalated);
 // checks if an escalation entry is valid for a particular host notification
 int is_valid_escalation_for_host_notification(
-      host* hst,
+      com::centreon::engine::host* hst,
       hostescalation* he,
       int options);
 // checks if a host notification should be escalated
-int should_host_notification_be_escalated(host* hst);
+int should_host_notification_be_escalated(com::centreon::engine::host* hst);
 // given a host, create list of contacts to be notified (remove duplicates)
 int create_notification_list_from_host(
       nagios_macros* mac,
-      host* hst,
+      com::centreon::engine::host* hst,
       int options,
       int* escalated);
 // calculates nex acceptable re-notification time for a service
 time_t get_next_service_notification_time(service* svc, time_t offset);
 // calculates nex acceptable re-notification time for a host
-time_t get_next_host_notification_time(host* hst, time_t offset);
+time_t get_next_host_notification_time(com::centreon::engine::host* hst, time_t offset);
 // finds a notification object
 notification* find_notification(com::centreon::engine::contact* cntct);
 // adds a notification instance

@@ -21,7 +21,9 @@
 #  define CCE_OBJECTS_HOSTGROUP_HH
 
 /* Forward declaration. */
-struct host_struct;
+CCE_BEGIN()
+  class host;
+CCE_END()
 struct hostsmember_struct;
 
 typedef struct             hostgroup_struct {
@@ -52,7 +54,7 @@ hostgroup* add_hostgroup(
              char const* action_url);
 int        is_host_member_of_hostgroup(
              hostgroup_struct* group,
-             host_struct* hst);
+             com::centreon::engine::host* hst);
 
 #  ifdef __cplusplus
 }

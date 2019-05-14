@@ -97,7 +97,7 @@ hostsmember* add_child_link_to_host(host* parent, host* child) {
   try {
     // Initialize values.
     obj->host_ptr = child;
-    obj->host_name = string::dup(child->name);
+    obj->host_name = string::dup(child->get_name().c_str());
 
     // Add the child entry to the host definition.
     obj->next = parent->child_hosts;
@@ -206,9 +206,9 @@ hostsmember* add_parent_host_to_host(
   }
 
   // A host cannot be a parent/child of itself.
-  if (!strcmp(host_name, hst->name)) {
+  if (hst->get_name() == host_name) {
     logger(log_config_error, basic)
-      << "Error: Host '" << hst->name
+      << "Error: Host '" << hst->get_name()
       << "' cannot be a child/parent of itself";
     return (NULL);
   }

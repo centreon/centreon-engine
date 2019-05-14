@@ -173,9 +173,10 @@ int pre_flight_check() {
        temp_service != NULL;
        temp_service = temp_service->next) {
     if ((temp_host = find_host(temp_service->host_name))) {
-      temp_host->total_services++;
-      temp_host->total_service_check_interval
-        += static_cast<unsigned long>(temp_service->check_interval);
+      temp_host->set_total_services(temp_host->get_total_services() + 1);
+      temp_host->set_total_service_check_interval(
+        temp_host->get_total_service_check_interval()
+        + static_cast<unsigned long>(temp_service->check_interval));
     }
   }
 
@@ -414,9 +415,9 @@ int pre_flight_object_check(int* w, int* e) {
 #define DFS_NEAR_LOOP                    3      /* has trouble sons */
 #define DFS_LOOPY                        4      /* is a part of a loop */
 
-#define dfs_get_status(h) h->circular_path_checked
-#define dfs_unset_status(h) h->circular_path_checked = 0
-#define dfs_set_status(h, flag) h->circular_path_checked = (flag)
+#define dfs_get_status(h) h->get_circular_path_checked()
+#define dfs_unset_status(h) h->set_circular_path_checked(0)
+#define dfs_set_status(h, flag) h->set_circular_path_checked(flag)
 #define dfs_host_status(h) (h ? dfs_get_status(h) : DFS_OK)
 
 /**
@@ -512,7 +513,7 @@ int pre_flight_circular_check(int* w, int* e) {
        temp_host = temp_host->next) {
     if (dfs_get_status(temp_host) == DFS_LOOPY)
       logger(log_verification_error, basic)
-        << "Error: The host '" << temp_host->name
+        << "Error: The host '" << temp_host->get_name()
         << "' is part of a circular parent/child chain!";
     /* clean DFS status */
     dfs_set_status(temp_host, DFS_UNCHECKED);
@@ -848,27 +849,27 @@ int check_host(host* hst, int* w, int* e) {
   if (!use_large_installation_tweaks) {
     bool found(false);
     for (service* temp_service(service_list);
-	 temp_service;
-	 temp_service = temp_service->next)
-      if (!strcmp(temp_service->host_name, hst->name)) {
-	found = true;
-	break ;
+	       temp_service;
+	       temp_service = temp_service->next)
+      if (hst->get_name() != temp_service->host_name) {
+        found = true;
+        break ;
       }
 
     // We couldn't find a service associated with this host!
     if (!found) {
       logger(log_verification_error, basic)
-        << "Warning: Host '" << hst->name
+        << "Warning: Host '" << hst->get_name()
         << "' has no services associated with it!";
       ++warnings;
     }
   }
 
   /* check the event handler command */
-  if (hst->event_handler != NULL) {
+  if (!hst->get_event_handler().empty()) {
 
     /* check the event handler command */
-    char* buf = string::dup(hst->event_handler);
+    char* buf = string::dup(hst->get_event_handler());
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -877,7 +878,7 @@ int check_host(host* hst, int* w, int* e) {
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
-        << "' specified for host '" << hst->name
+        << "' specified for host '" << hst->get_name()
         << "' not defined anywhere";
       errors++;
     }
@@ -889,10 +890,10 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* hosts that don't have check commands defined shouldn't ever be checked... */
-  if (hst->host_check_command != NULL) {
+  if (!hst->get_host_check_command().empty()) {
 
     /* check the host check_command */
-    char* buf = string::dup(hst->host_check_command);
+    char* buf = string::dup(hst->get_host_check_command());
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -901,7 +902,7 @@ int check_host(host* hst, int* w, int* e) {
     if (temp_command == NULL) {
       logger(log_verification_error, basic)
         << "Error: Host check command '" << temp_command_name
-        << "' specified for host '" << hst->name
+        << "' specified for host '" << hst->get_name()
         << "' is not defined anywhere!",
       errors++;
     }
@@ -912,13 +913,12 @@ int check_host(host* hst, int* w, int* e) {
     delete[] buf;
   }
 
-  /* check host check timeperiod */
-  if (hst->check_period != NULL) {
-    timeperiod* temp_timeperiod = find_timeperiod(hst->check_period);
+  if (!hst->get_check_period().empty()) {
+    timeperiod* temp_timeperiod = find_timeperiod(hst->get_check_period().c_str());
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
-        << "Error: Check period '" << hst->check_period
-        << "' specified for host '" << hst->name
+        << "Error: Check period '" << hst->get_check_period()
+        << "' specified for host '" << hst->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -939,7 +939,7 @@ int check_host(host* hst, int* w, int* e) {
     if (temp_contact == NULL) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
-        << "' specified in host '" << hst->name
+        << "' specified in host '" << hst->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -960,20 +960,20 @@ int check_host(host* hst, int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
         << it->first
-        << "' specified in host '" << hst->name
+        << "' specified in host '" << hst->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
   }
 
   // Check notification timeperiod.
-  if (hst->notification_period) {
+  if (hst->get_notification_period().empty()) {
     timeperiod* temp_timeperiod(
-                  find_timeperiod(hst->notification_period));
+                  find_timeperiod(hst->get_notification_period().c_str()));
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Notification period '" << hst->notification_period
-        << "' specified for host '" << hst->name
+        << "Error: Notification period '" << hst->get_notification_period()
+        << "' specified for host '" << hst->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -991,7 +991,7 @@ int check_host(host* hst, int* w, int* e) {
     if ((hst2 = find_host(temp_hostsmember->host_name)) == NULL) {
       logger(log_verification_error, basic)
         << "Error: '" << temp_hostsmember->host_name << "' is not a "
-        "valid parent for host '" << hst->name << "'!";
+        "valid parent for host '" << hst->get_name() << "'!";
       errors++;
     }
 
@@ -1003,21 +1003,21 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   // Check for sane recovery options.
-  if (hst->notifications_enabled
-      && hst->notify_on_recovery
-      && !hst->notify_on_down
-      && !hst->notify_on_unreachable) {
+  if (hst->get_notifications_enabled()
+      && hst->get_notify_on_recovery()
+      && !hst->get_notify_on_down()
+      && !hst->get_notify_on_unreachable()) {
     logger(log_verification_error, basic)
-      << "Warning: Recovery notification option in host '" << hst->name
+      << "Warning: Recovery notification option in host '" << hst->get_name()
       << "' definition doesn't make any sense - specify down and/or "
          "unreachable options as well";
     warnings++;
   }
 
   /* check for illegal characters in host name */
-  if (contains_illegal_object_chars(hst->name)) {
+  if (contains_illegal_object_chars(hst->get_name().c_str())) {
     logger(log_verification_error, basic)
-      << "Error: The name of host '" << hst->name
+      << "Error: The name of host '" << hst->get_name()
       << "' contains one or more illegal characters.";
     errors++;
   }

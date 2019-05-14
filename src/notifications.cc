@@ -129,7 +129,8 @@ int service_notification(
   logger(dbg_notifications, more)
     << "Current notification number: "
     << svc->current_notification_number
-    << " (" << (increment_notification_number == true ? "incremented)" : "unchanged)");
+    << " ("
+    << (increment_notification_number == true ? "incremented)" : "unchanged)");
 
   /* save and increase the current notification id */
   svc->current_notification_id = next_notification_id;
@@ -175,7 +176,10 @@ int service_notification(
     grab_host_macros_r(&mac, temp_host);
     grab_service_macros_r(&mac, svc);
 
-    /* if this notification has an author, attempt to lookup the associated contact */
+    /*
+     * if this notification has an author, attempt to lookup the
+     * associated contact
+     */
     if (not_author != NULL) {
 
       /* see if we can find the contact - first by name, then by alias */
@@ -199,22 +203,29 @@ int service_notification(
     string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
     string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
     if (temp_contact) {
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->get_name());
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->get_alias());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME],
+        temp_contact->get_name());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS],
+        temp_contact->get_alias());
     }
     else {
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
     }
 
-    /* NOTE: these macros are deprecated and will likely disappear in next major release */
-    /* if this is an acknowledgement, get author and comment macros */
+    /*
+     * NOTE: these macros are deprecated and will likely disappear in next
+     * major release, If this is an acknowledgement, get author and comment
+     * macros
+     */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
       string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
       string::setstr(mac.x[MACRO_SERVICEACKCOMMENT], not_data);
       if (temp_contact) {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->get_name());
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->get_alias());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME],
+          temp_contact->get_name());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS],
+          temp_contact->get_alias());
       }
       else {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
@@ -245,14 +256,19 @@ int service_notification(
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
 
     /* set the notification number macro */
-    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONNUMBER], svc->current_notification_number);
+    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONNUMBER],
+      svc->current_notification_number);
 
-    /* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
+    /*
+     * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability
+     */
     char const* notificationnumber(mac.x[MACRO_SERVICENOTIFICATIONNUMBER]);
-    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER], notificationnumber ? notificationnumber : "");
+    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER],
+      notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
-    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONID], svc->current_notification_id);
+    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONID],
+      svc->current_notification_id);
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
@@ -284,12 +300,18 @@ int service_notification(
     /* free memory allocated to the notification list */
     free_notification_list();
 
-    /* clear summary macros so they will be regenerated without contact filters when needed next */
+    /*
+     * clear summary macros so they will be regenerated without contact
+     * filters when needed next
+     */
     clear_summary_macros_r(&mac);
 
     if (type == NOTIFICATION_NORMAL) {
 
-      /* adjust last/next notification time and notification flags if we notified someone */
+      /*
+       * adjust last/next notification time and notification flags if we
+       * notified someone
+       */
       if (contacts_notified > 0) {
 
         /* calculate the next acceptable re-notification time */
@@ -302,7 +324,10 @@ int service_notification(
           "Next possible notification time: "
           << my_ctime(&svc->next_notification);
 
-        /* update the last notification time for this service (this is needed for rescheduling later notifications) */
+        /*
+         * update the last notification time for this service (this is needed
+         * for rescheduling later notifications)
+         * */
         svc->last_notification = current_time;
 
         /* update notifications flags */
@@ -369,7 +394,7 @@ int service_notification(
   /* Update recovery been sent parameter */
   if (svc->current_state == STATE_OK)
     service_other_props[std::make_pair(
-                        svc->host_ptr->name,
+                        svc->host_ptr->get_name(),
                         svc->description)].recovery_been_sent = true;
 
   return OK;
@@ -469,7 +494,7 @@ int check_service_notification_viability(
   /* custom notifications are good to go at this point... */
   if (type == NOTIFICATION_CUSTOM) {
     if (svc->scheduled_downtime_depth > 0
-        || temp_host->scheduled_downtime_depth > 0) {
+        || temp_host->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
         << "We shouldn't send custom notification during "
         "scheduled downtime.";
@@ -482,7 +507,10 @@ int check_service_notification_viability(
   /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
   /****************************************/
 
-  /* acknowledgements only have to pass three general filters, although they have another test of their own... */
+  /*
+   * acknowledgements only have to pass three general filters, although they
+   * have another test of their own...
+   */
   if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
 
     /* don't send an acknowledgement if there isn't a problem... */
@@ -493,7 +521,10 @@ int check_service_notification_viability(
       return ERROR;
     }
 
-    /* acknowledgement viability test passed, so the notification can be sent out */
+    /*
+     * acknowledgement viability test passed, so the notification can be sent
+     * out
+     */
     return OK;
   }
 
@@ -517,7 +548,7 @@ int check_service_notification_viability(
 
     /* don't send notifications during scheduled downtime */
     if (svc->scheduled_downtime_depth > 0
-        || temp_host->scheduled_downtime_depth > 0) {
+        || temp_host->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events during "
         "scheduled downtime.";
@@ -545,7 +576,10 @@ int check_service_notification_viability(
       return ERROR;
     }
 
-    /* don't send notifications during scheduled downtime (for service only, not host) */
+    /*
+     * don't send notifications during scheduled downtime (for service only,
+     * not host)
+     */
     if (svc->scheduled_downtime_depth > 0) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events during "
@@ -636,13 +670,13 @@ int check_service_notification_viability(
       && (svc->current_notification_number == 0
           || (svc->current_state == STATE_OK
                 && !service_other_props[std::make_pair(
-                    svc->host_ptr->name,
+                    svc->host_ptr->get_name(),
                     svc->description)].recovery_been_sent))) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(
               service_other_props[std::make_pair(
-                                         svc->host_ptr->name,
+                                         svc->host_ptr->get_name(),
                                          svc->description)].initial_notif_time);
 
     /* if not set, set it to now */
@@ -652,7 +686,7 @@ int check_service_notification_viability(
     double notification_delay = (svc->current_state != STATE_OK ?
              svc->first_notification_delay
              : service_other_props[std::make_pair(
-                 svc->host_ptr->name,
+                 svc->host_ptr->get_name(),
                  svc->description)].recovery_notification_delay)
         * config->interval_length();
 
@@ -679,7 +713,10 @@ int check_service_notification_viability(
     return ERROR;
   }
 
-  /* if this service is currently in a scheduled downtime period, don't send the notification */
+  /*
+   * if this service is currently in a scheduled downtime period, don't send
+   * the notification
+   */
   if (svc->scheduled_downtime_depth > 0) {
     logger(dbg_notifications, more)
       << "This service is currently in a scheduled downtime, so "
@@ -687,36 +724,51 @@ int check_service_notification_viability(
     return ERROR;
   }
 
-  /* if this host is currently in a scheduled downtime period, don't send the notification */
-  if (temp_host->scheduled_downtime_depth > 0) {
+  /*
+   * if this host is currently in a scheduled downtime period, don't send the
+   * notification
+   * */
+  if (temp_host->get_scheduled_downtime_depth() > 0) {
     logger(dbg_notifications, more)
       << "The host this service is associated with is currently in "
       "a scheduled downtime, so we won't send notifications.";
     return ERROR;
   }
 
-  /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT IF ANY OTHER NOTIFICATION WAS SENT *****/
+  /*
+   ***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT IF ANY OTHER *****
+   ***** NOTIFICATION WAS SENT                                            *****
+   */
   if (svc->current_state == STATE_OK)
     return ((svc->current_notification_number > 0)
             ? OK
             : ERROR);
 
-  /* don't notify contacts about this service problem again if the notification interval is set to 0 */
+  /*
+   * don't notify contacts about this service problem again if the notification
+   * interval is set to 0
+   */
   if (svc->no_more_notifications == true) {
     logger(dbg_notifications, more)
       << "We shouldn't re-notify contacts about this service problem.";
     return ERROR;
   }
 
-  /* if the host is down or unreachable, don't notify contacts about service failures */
-  if (temp_host->current_state != HOST_UP) {
+  /*
+   * if the host is down or unreachable, don't notify contacts about service
+   * failures
+   */
+  if (temp_host->get_current_state() != HOST_UP) {
     logger(dbg_notifications, more)
       << "The host is either down or unreachable, so we won't "
       "notify contacts about this service.";
     return ERROR;
   }
 
-  /* don't notify if we haven't waited long enough since the last time (and the service is not marked as being volatile) */
+  /*
+   * don't notify if we haven't waited long enough since the last time (and
+   * the service is not marked as being volatile)
+   */
   if ((current_time < svc->next_notification)
       && svc->is_volatile == false) {
     logger(dbg_notifications, more)
@@ -731,7 +783,10 @@ int check_service_notification_viability(
   return OK;
 }
 
-/* check viability of sending out a service notification to a specific contact (contact-specific filters) */
+/*
+ * check viability of sending out a service notification to a specific contact
+ * (contact-specific filters)
+ */
 int check_contact_service_notification_viability(
       contact* cntct,
       service* svc,
@@ -898,8 +953,11 @@ int notify_contact_of_service(
   logger(dbg_notifications, most)
     << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
 
-  /* check viability of notifying this user */
-  /* acknowledgements are no longer excluded from this test - added 8/19/02 Tom Bertelson */
+  /*
+   * check viability of notifying this user
+   * acknowledgements are no longer excluded from this test -
+   * added 8/19/02 Tom Bertelson
+   */
   if (check_contact_service_notification_viability(
         cntct,
         svc,
@@ -936,7 +994,8 @@ int notify_contact_of_service(
     return OK;
 
   /* process all the notification commands this user has */
-  for (std::shared_ptr<commands::command> const& cmd : cntct->get_service_notification_commands()) {
+  for (std::shared_ptr<commands::command> const& cmd :
+        cntct->get_service_notification_commands()) {
     /* get start time */
     gettimeofday(&method_start_time, NULL);
 
@@ -993,11 +1052,13 @@ int notify_contact_of_service(
     /* log the notification to program log file */
     if (config->log_notifications() == true) {
       char const* service_state_str("UNKNOWN");
-      if ((unsigned int)svc->current_state < sizeof(tab_service_state_str) / sizeof(*tab_service_state_str))
+      if ((unsigned int)svc->current_state <
+           sizeof(tab_service_state_str) / sizeof(*tab_service_state_str))
         service_state_str = tab_service_state_str[svc->current_state];
 
       char const* notification_str("");
-      if ((unsigned int)type < sizeof(tab_notification_str) / sizeof(*tab_notification_str))
+      if ((unsigned int)type <
+           sizeof(tab_notification_str) / sizeof(*tab_notification_str))
         notification_str = tab_notification_str[type];
 
       std::string info;
@@ -1105,7 +1166,10 @@ int notify_contact_of_service(
   return OK;
 }
 
-/* checks to see if a service escalation entry is a match for the current service notification */
+/*
+ * checks to see if a service escalation entry is a match for the current
+ * service notification
+ */
 int is_valid_escalation_for_service_notification(
       service* svc,
       serviceescalation* se,
@@ -1120,7 +1184,10 @@ int is_valid_escalation_for_service_notification(
   /* get the current time */
   time(&current_time);
 
-  /* if this is a recovery, really we check for who got notified about a previous problem */
+  /*
+   * if this is a recovery, really we check for who got notified about a
+   * previous problem
+   */
   if (svc->current_state == STATE_OK)
     notification_number = svc->current_notification_number - 1;
   else
@@ -1129,44 +1196,47 @@ int is_valid_escalation_for_service_notification(
   /* this entry if it is not for this service */
   temp_service = se->service_ptr;
   if (temp_service == NULL || temp_service != svc)
-    return (false);
+    return false;
 
   /*** EXCEPTION ***/
   /* broadcast options go to everyone, so this escalation is valid */
   if (options & NOTIFICATION_OPTION_BROADCAST)
-    return (true);
+    return true;
 
   /* skip this escalation if it happens later */
   if (se->first_notification > notification_number)
-    return (false);
+    return false;
 
   /* skip this escalation if it has already passed */
   if (se->last_notification != 0
       && se->last_notification < notification_number)
-    return (false);
+    return false;
 
-  /* skip this escalation if it has a timeperiod and the current time isn't valid */
+  /*
+   * skip this escalation if it has a timeperiod and the current time isn't
+   * valid
+   */
   if (se->escalation_period != NULL
       && check_time_against_period(
            current_time,
            se->escalation_period_ptr) == ERROR)
-    return (false);
+    return false;
 
   /* skip this escalation if the state options don't match */
   if (svc->current_state == STATE_OK
       && se->escalate_on_recovery == false)
-    return (false);
+    return false;
   else if (svc->current_state == STATE_WARNING
            && se->escalate_on_warning == false)
-    return (false);
+    return false;
   else if (svc->current_state == STATE_UNKNOWN
            && se->escalate_on_unknown == false)
-    return (false);
+    return false;
   else if (svc->current_state == STATE_CRITICAL
            && se->escalate_on_critical == false)
-    return (false);
+    return false;
 
-  return (true);
+  return true;
 }
 
 /**
@@ -1198,17 +1268,20 @@ int should_service_notification_be_escalated(service* svc) {
           NOTIFICATION_OPTION_NONE) == true) {
       logger(dbg_notifications, more)
         << "Service notification WILL be escalated.";
-      return (true);
+      return true;
     }
 
     ++p.first;
   }
   logger(dbg_notifications, more)
     << "Service notification will NOT be escalated.";
-  return (false);
+  return false;
 }
 
-/* given a service, create a list of contacts to be notified, removing duplicates */
+/*
+ * given a service, create a list of contacts to be notified, removing
+ * duplicates
+ */
 int create_notification_list_from_service(
       nagios_macros* mac,
       service* svc, int options,
@@ -1374,12 +1447,13 @@ int host_notification(
   time(&current_time);
   gettimeofday(&start_time, NULL);
 
+  time_t time = hst->get_last_host_notification();
   logger(dbg_notifications, basic)
-    << "** Host Notification Attempt ** Host: '" << hst->name
+    << "** Host Notification Attempt ** Host: '" << hst->get_name()
     << "', Type: " << type << ", Options: " << options
-    << ", Current State: " << hst->current_state
+    << ", Current State: " << hst->get_current_state()
     << ", Last Notification: "
-    << my_ctime(&hst->last_host_notification);
+    << my_ctime(&time);
 
 
   /* check viability of sending out a host notification */
@@ -1399,17 +1473,20 @@ int host_notification(
   /* should the notification number be increased? */
   if (type == NOTIFICATION_NORMAL
       || (options & NOTIFICATION_OPTION_INCREMENT)) {
-    hst->current_notification_number++;
+    hst->set_current_notification_number(hst->get_current_notification_number()
+                                         + 1);
     increment_notification_number = true;
   }
 
   logger(dbg_notifications, more)
     << "Current notification number: "
-    << hst->current_notification_number
-    << " (" << (increment_notification_number == true ? "incremented" : "unchanged") << ")";
+    << hst->get_current_notification_number()
+    << " ("
+    << (increment_notification_number == true ? "incremented" : "unchanged")
+    << ")";
 
   /* save and increase the current notification id */
-  hst->current_notification_id = next_notification_id;
+  hst->set_current_notification_id(next_notification_id);
   next_notification_id++;
 
   logger(dbg_notifications, most)
@@ -1450,7 +1527,10 @@ int host_notification(
     /* grab the macro variables */
     grab_host_macros_r(&mac, hst);
 
-    /* if this notification has an author, attempt to lookup the associated contact */
+    /*
+     * if this notification has an author, attempt to lookup the associated
+     * contact
+     */
     if (not_author != NULL) {
 
       /* see if we can find the contact - first by name, then by alias */
@@ -1472,22 +1552,29 @@ int host_notification(
     string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
     string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
     if (temp_contact) {
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->get_name());
-      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->get_alias());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME],
+        temp_contact->get_name());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS],
+        temp_contact->get_alias());
     }
     else {
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
     }
 
-    /* NOTE: these macros are deprecated and will likely disappear in next major release */
-    /* if this is an acknowledgement, get author and comment macros */
+    /*
+     * NOTE: these macros are deprecated and will likely disappear in next
+     * major release
+     * if this is an acknowledgement, get author and comment macros
+     */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
       string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
       string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
       if (temp_contact) {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->get_name());
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->get_alias());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME],
+          temp_contact->get_name());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS],
+          temp_contact->get_alias());
       }
       else {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
@@ -1512,20 +1599,25 @@ int host_notification(
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
-    else if (hst->current_state == HOST_UP)
+    else if (hst->get_current_state() == HOST_UP)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
 
     /* set the notification number macro */
-    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONNUMBER], hst->current_notification_number);
+    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONNUMBER],
+      hst->get_current_notification_number());
 
-    /* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
+    /*
+     * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability
+     */
     char const* notificationnumber(mac.x[MACRO_HOSTNOTIFICATIONNUMBER]);
-    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER], notificationnumber ? notificationnumber : "");
+    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER],
+      notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
-    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID], hst->current_notification_id);
+    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID],
+      hst->get_current_notification_id());
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
@@ -1557,44 +1649,56 @@ int host_notification(
     /* free memory allocated to the notification list */
     free_notification_list();
 
-    /* clear summary macros so they will be regenerated without contact filters when needednext */
+    /*
+     * clear summary macros so they will be regenerated without contact
+     * filters when needednext
+     */
     clear_summary_macros_r(&mac);
 
     if (type == NOTIFICATION_NORMAL) {
 
-      /* adjust last/next notification time and notification flags if we notified someone */
+      /*
+       * adjust last/next notification time and notification flags if we
+       * notified someone
+       */
       if (contacts_notified > 0) {
 
         /* calculate the next acceptable re-notification time */
-        hst->next_host_notification = get_next_host_notification_time(
+        hst->set_next_host_notification(get_next_host_notification_time(
                                         hst,
-                                        current_time);
+                                        current_time));
 
-        /* update the last notification time for this host (this is needed for scheduling the next problem notification) */
-        hst->last_host_notification = current_time;
+        /*
+         * update the last notification time for this host (this is needed for
+         * scheduling the next problem notification)
+         */
+        hst->set_last_host_notification(current_time);
 
         /* update notifications flags */
-        if (hst->current_state == HOST_DOWN)
-          hst->notified_on_down = true;
-        else if (hst->current_state == HOST_UNREACHABLE)
-          hst->notified_on_unreachable = true;
+        if (hst->get_current_state() == HOST_DOWN)
+          hst->set_notified_on_down(true);
+        else if (hst->get_current_state() == HOST_UNREACHABLE)
+          hst->set_notified_on_unreachable(true);
 
+        time_t time = hst->get_next_host_notification();
         logger(dbg_notifications, basic)
           << contacts_notified << " contacts were notified.  "
           "Next possible notification time: "
-          << my_ctime(&hst->next_host_notification);
+          << my_ctime(&time);
       }
 
       /* we didn't end up notifying anyone */
       else if (increment_notification_number == true) {
 
         /* adjust current notification number */
-        hst->current_notification_number--;
+        hst->set_current_notification_number(
+          hst->get_current_notification_number() - 1);
 
+        time_t time = hst->get_next_host_notification();
         logger(dbg_notifications, basic)
           << "No contacts were notified.  Next possible "
           "notification time: "
-          << my_ctime(&hst->next_host_notification);
+          << my_ctime(&time);
       }
     }
 
@@ -1607,7 +1711,8 @@ int host_notification(
 
     /* adjust notification number, since no notification actually went out */
     if (increment_notification_number == true)
-      hst->current_notification_number--;
+      hst->set_current_notification_number(
+        hst->get_current_notification_number() - 1);
 
     logger(dbg_notifications, basic)
       << "No contacts were found for notification purposes.  "
@@ -1640,8 +1745,8 @@ int host_notification(
   clear_volatile_macros_r(&mac);
 
   /* Update recovery been sent parameter */
-  if (hst->current_state == HOST_UP)
-    host_other_props[hst->name].recovery_been_sent = true;
+  if (hst->get_current_state() == HOST_UP)
+    host_other_props[hst->get_name()].recovery_been_sent = true;
 
   return OK;
 }
@@ -1677,7 +1782,7 @@ int check_host_notification_viability(
 
   // See if the host can have notifications sent out at this time.
   {
-    timezone_locker lock(get_host_timezone(hst->name));
+    timezone_locker lock(get_host_timezone(hst->get_name()));
     if (check_time_against_period(
           current_time,
           hst->notification_period_ptr) == ERROR) {
@@ -1696,21 +1801,23 @@ int check_host_notification_viability(
         // It looks like there is no notification time defined, so
         // schedule next one far into the future (one year)...
         if (timeperiod_start == (time_t)0)
-          hst->next_host_notification
-            = (time_t)(current_time + (60 * 60 * 24 * 365));
+          hst->set_next_host_notification(
+            (time_t)(current_time + (60 * 60 * 24 * 365)));
         // Else use the next valid notification time.
         else
-          hst->next_host_notification = timeperiod_start;
+          hst->set_next_host_notification(timeperiod_start);
+
+        time_t time = hst->get_next_host_notification();
         logger(dbg_notifications, more)
           << "Next possible notification time: "
-          << my_ctime(&hst->next_host_notification);
+          << my_ctime(&time);
       }
       return ERROR;
     }
   }
 
   /* are notifications temporarily disabled for this host? */
-  if (hst->notifications_enabled == false) {
+  if (!hst->get_notifications_enabled()) {
     logger(dbg_notifications, more)
       << "Notifications are temporarily disabled for this host, "
       "so we won't send one out.";
@@ -1723,7 +1830,7 @@ int check_host_notification_viability(
 
   /* custom notifications are good to go at this point... */
   if (type == NOTIFICATION_CUSTOM) {
-    if (hst->scheduled_downtime_depth > 0) {
+    if (hst->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
         << "We shouldn't send custom notification during "
         "scheduled downtime.";
@@ -1736,18 +1843,24 @@ int check_host_notification_viability(
   /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
   /****************************************/
 
-  /* acknowledgements only have to pass three general filters, although they have another test of their own... */
+  /*
+   * acknowledgements only have to pass three general filters, although they
+   * have another test of their own...
+   */
   if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
 
     /* don't send an acknowledgement if there isn't a problem... */
-    if (hst->current_state == HOST_UP) {
+    if (hst->get_current_state() == HOST_UP) {
       logger(dbg_notifications, more)
         << "The host is currently UP, so we won't send "
         "an acknowledgement.";
       return ERROR;
     }
 
-    /* acknowledgement viability test passed, so the notification can be sent out */
+    /*
+     * acknowledgement viability test passed, so the notification can be sent
+     * out
+     */
     return OK;
   }
 
@@ -1761,14 +1874,14 @@ int check_host_notification_viability(
       || type == NOTIFICATION_FLAPPINGDISABLED) {
 
     /* don't send a notification if we're not supposed to... */
-    if (hst->notify_on_flapping == false) {
+    if (!hst->get_notify_on_flapping()) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events for this host.";
       return ERROR;
     }
 
     /* don't send notifications during scheduled downtime */
-    if (hst->scheduled_downtime_depth > 0) {
+    if (hst->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events during "
         "scheduled downtime.";
@@ -1789,14 +1902,14 @@ int check_host_notification_viability(
       || type == NOTIFICATION_DOWNTIMECANCELLED) {
 
     /* don't send a notification if we're not supposed to... */
-    if (hst->notify_on_downtime == false) {
+    if (!hst->get_notify_on_downtime()) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events for this host.";
       return ERROR;
     }
 
     /* don't send notifications during scheduled downtime */
-    if (hst->scheduled_downtime_depth > 0) {
+    if (hst->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events during "
         "scheduled downtime!";
@@ -1812,7 +1925,7 @@ int check_host_notification_viability(
   /****************************************/
 
   /* is this a hard problem/recovery? */
-  if (hst->state_type == SOFT_STATE) {
+  if (hst->get_state_type() == SOFT_STATE) {
     logger(dbg_notifications, more)
       << "This host is in a soft state, so we won't send "
       "a notification out.";
@@ -1820,7 +1933,7 @@ int check_host_notification_viability(
   }
 
   /* has this problem already been acknowledged? */
-  if (hst->problem_has_been_acknowledged == true) {
+  if (hst->get_problem_has_been_acknowledged()) {
     logger(dbg_notifications, more)
       << "This host problem has already been acknowledged, "
       "so we won't send a notification out!";
@@ -1838,27 +1951,27 @@ int check_host_notification_viability(
   }
 
   /* see if we should notify about problems with this host */
-  if (hst->current_state == HOST_UNREACHABLE
-      && hst->notify_on_unreachable == false) {
+  if (hst->get_current_state() == HOST_UNREACHABLE
+      && !hst->get_notify_on_unreachable()) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about UNREACHABLE status for this host.";
     return ERROR;
   }
-  if (hst->current_state == HOST_DOWN
-      && hst->notify_on_down == false) {
+  if (hst->get_current_state() == HOST_DOWN
+      && !hst->get_notify_on_down()) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about DOWN states for this host.";
     return ERROR;
   }
-  if (hst->current_state == HOST_UP) {
+  if (hst->get_current_state() == HOST_UP) {
 
-    if (hst->notify_on_recovery == false) {
+    if (!hst->get_notify_on_recovery()) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about RECOVERY states for this host.";
       return ERROR;
     }
-    if (!(hst->notified_on_down == true
-          || hst->notified_on_unreachable == true)) {
+    if (!(hst->get_notified_on_down()
+          || hst->get_notified_on_unreachable())) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about this recovery.";
       return ERROR;
@@ -1868,26 +1981,28 @@ int check_host_notification_viability(
 
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL
-      && (hst->current_notification_number == 0
-         || (hst->current_state == HOST_UP &&
-             !host_other_props[std::string(hst->name)].recovery_been_sent))) {
+      && (hst->get_current_notification_number() == 0
+         || (hst->get_current_state() == HOST_UP &&
+             !host_other_props[
+               std::string(hst->get_name())].recovery_been_sent))) {
 
     /* get the time at which a notification should have been sent */
-    time_t& initial_notif_time(host_other_props[hst->name].initial_notif_time);
+    time_t& initial_notif_time(
+      host_other_props[hst->get_name()].initial_notif_time);
 
     /* if not set, set it to now */
     if (!initial_notif_time)
       initial_notif_time = time(NULL);
 
-    double notification_delay = (hst->current_state != HOST_UP ?
-             hst->first_notification_delay
-             : host_other_props[std::string(hst->name)].recovery_notification_delay)
+    double notification_delay = (hst->get_current_state() != HOST_UP ?
+             hst->get_first_notification_delay()
+             : host_other_props[hst->get_name()].recovery_notification_delay)
         * config->interval_length();
 
     if (current_time
         < (time_t)(initial_notif_time
                    + (time_t)(notification_delay))) {
-      if (hst->current_state == HOST_UP)
+      if (hst->get_current_state() == HOST_UP)
         logger(dbg_notifications, more)
           << "Not enough time has elapsed since the host changed to an "
           "UP state (or since program start), so we shouldn't notify "
@@ -1902,15 +2017,18 @@ int check_host_notification_viability(
   }
 
   /* if this host is currently flapping, don't send the notification */
-  if (hst->is_flapping == true) {
+  if (hst->get_is_flapping()) {
     logger(dbg_notifications, more)
       << "This host is currently flapping, so we won't "
       "send notifications.";
     return ERROR;
   }
 
-  /* if this host is currently in a scheduled downtime period, don't send the notification */
-  if (hst->scheduled_downtime_depth > 0) {
+  /*
+   * if this host is currently in a scheduled downtime period,
+   * don't send the notification
+   */
+  if (hst->get_scheduled_downtime_depth() > 0) {
     logger(dbg_notifications, more)
       << "This host is currently in a scheduled downtime, "
       "so we won't send notifications.";
@@ -1918,24 +2036,25 @@ int check_host_notification_viability(
   }
 
   /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
-  if (hst->current_state == HOST_UP)
+  if (hst->get_current_state() == HOST_UP)
     return OK;
 
   /* check if we shouldn't renotify contacts about the host problem */
-  if (hst->no_more_notifications == true) {
+  if (hst->get_no_more_notifications()) {
     logger(dbg_notifications, more)
       << "We shouldn't re-notify contacts about this host problem.";
     return ERROR;
   }
 
   /* check if its time to re-notify the contacts about the host... */
-  if (current_time < hst->next_host_notification) {
+  if (current_time < hst->get_next_host_notification()) {
     logger(dbg_notifications, more)
       << "Its not yet time to re-notify the contacts "
       "about this host problem...";
+    time_t time = hst->get_next_host_notification();
     logger(dbg_notifications, more)
       << "Next acceptable notification time: "
-      << my_ctime(&hst->next_host_notification);
+      << my_ctime(&time);
     return ERROR;
   }
 
@@ -2030,21 +2149,21 @@ int check_contact_host_notification_viability(
   /*************************************/
 
   /* see if we should notify about problems with this host */
-  if (hst->current_state == HOST_DOWN
+  if (hst->get_current_state() == HOST_DOWN
       && !cntct->notify_on_host_down()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about DOWN states.";
     return ERROR;
   }
 
-  if (hst->current_state == HOST_UNREACHABLE
+  if (hst->get_current_state() == HOST_UNREACHABLE
       && !cntct->notify_on_host_unreachable()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNREACHABLE states,";
     return ERROR;
   }
 
-  if (hst->current_state == HOST_UP) {
+  if (hst->get_current_state() == HOST_UP) {
 
     if (!cntct->notify_on_host_recovery()) {
       logger(dbg_notifications, most)
@@ -2052,9 +2171,9 @@ int check_contact_host_notification_viability(
       return ERROR;
     }
 
-    if (!((hst->notified_on_down == true
+    if (!((hst->get_notified_on_down()
            && cntct->notify_on_host_down())
-          || (hst->notified_on_unreachable == true
+          || (hst->get_notified_on_unreachable()
               && cntct->notify_on_host_unreachable()))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
@@ -2097,8 +2216,11 @@ int notify_contact_of_host(
   logger(dbg_notifications, most)
     << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
 
-  /* check viability of notifying this user about the host */
-  /* acknowledgements are no longer excluded from this test - added 8/19/02 Tom Bertelson */
+  /*
+   * check viability of notifying this user about the host
+   * acknowledgements are no longer excluded from this test -
+   * added 8/19/02 Tom Bertelson
+   */
   if (check_contact_host_notification_viability(
         cntct,
         hst,
@@ -2135,7 +2257,8 @@ int notify_contact_of_host(
     return OK;
 
   /* process all the notification commands this user has */
-  for (std::shared_ptr<commands::command> const& cmd : cntct->get_host_notification_commands()) {
+  for (std::shared_ptr<commands::command> const& cmd :
+        cntct->get_host_notification_commands()) {
 
     /* get start time */
     gettimeofday(&method_start_time, NULL);
@@ -2196,11 +2319,13 @@ int notify_contact_of_host(
     /* log the notification to program log file */
     if (config->log_notifications() == true) {
       char const* host_state_str("UP");
-      if ((unsigned int)hst->current_state < sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
-        host_state_str = tab_host_state_str[hst->current_state];
+      if ((unsigned int)hst->get_current_state() <
+           sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
+        host_state_str = tab_host_state_str[hst->get_current_state()];
 
       char const* notification_str("");
-      if ((unsigned int)type < sizeof(tab_notification_str) / sizeof(*tab_notification_str))
+      if ((unsigned int)type <
+           sizeof(tab_notification_str) / sizeof(*tab_notification_str))
         notification_str = tab_notification_str[type];
 
       std::string info;
@@ -2227,9 +2352,8 @@ int notify_contact_of_host(
 
       logger(log_host_notification, basic)
         << "HOST NOTIFICATION: " << cntct->get_name()
-        << ';' << hst->name << ';' << host_notification_state
-        << ";" << cmd->get_name()
-        << ';' << (hst->plugin_output ? hst->plugin_output : "")
+        << ';' << hst->get_name() << ';' << host_notification_state
+        << ";" << cmd->get_name() << ';' << hst->get_plugin_output()
         << info;
     }
 
@@ -2308,7 +2432,10 @@ int notify_contact_of_host(
   return OK;
 }
 
-/* checks to see if a host escalation entry is a match for the current host notification */
+/*
+ * checks to see if a host escalation entry is a match for the current host
+ * notification
+ */
 int is_valid_escalation_for_host_notification(
       host* hst,
       hostescalation* he,
@@ -2323,50 +2450,56 @@ int is_valid_escalation_for_host_notification(
   /* get the current time */
   time(&current_time);
 
-  /* if this is a recovery, really we check for who got notified about a previous problem */
-  if (hst->current_state == HOST_UP)
-    notification_number = hst->current_notification_number - 1;
+  /*
+   * if this is a recovery, really we check for who got notified about a
+   * previous problem
+   */
+  if (hst->get_current_state() == HOST_UP)
+    notification_number = hst->get_current_notification_number() - 1;
   else
-    notification_number = hst->current_notification_number;
+    notification_number = hst->get_current_notification_number();
 
   /* find the host this escalation entry is associated with */
   temp_host = he->host_ptr;
   if (temp_host == NULL || temp_host != hst)
-    return (false);
+    return false;
 
   /*** EXCEPTION ***/
   /* broadcast options go to everyone, so this escalation is valid */
   if (options & NOTIFICATION_OPTION_BROADCAST)
-    return (true);
+    return true;
 
   /* skip this escalation if it happens later */
   if (he->first_notification > notification_number)
-    return (false);
+    return false;
 
   /* skip this escalation if it has already passed */
   if (he->last_notification != 0
       && he->last_notification < notification_number)
-    return (false);
+    return false;
 
-  /* skip this escalation if it has a timeperiod and the current time isn't valid */
+  /*
+   * skip this escalation if it has a timeperiod and the current time
+   * isn't valid
+   */
   if (he->escalation_period != NULL
       && check_time_against_period(
            current_time,
            he->escalation_period_ptr) == ERROR)
-    return (false);
+    return false;
 
   /* skip this escalation if the state options don't match */
-  if (hst->current_state == HOST_UP
+  if (hst->get_current_state() == HOST_UP
       && he->escalate_on_recovery == false)
-    return (false);
-  else if (hst->current_state == HOST_DOWN
+    return false;
+  else if (hst->get_current_state() == HOST_DOWN
            && he->escalate_on_down == false)
-    return (false);
-  else if (hst->current_state == HOST_UNREACHABLE
+    return false;
+  else if (hst->get_current_state() == HOST_UNREACHABLE
            && he->escalate_on_unreachable == false)
-    return (false);
+    return false;
 
-  return (true);
+  return true;
 }
 
 /* checks to see whether a host notification should be escalation */
@@ -2375,9 +2508,9 @@ int should_host_notification_be_escalated(host* hst) {
     << "should_host_notification_be_escalated()";
 
   if (hst == NULL)
-    return (false);
+    return false;
 
-  std::string id(hst->name);
+  std::string id(hst->get_name());
   umultimap<std::string, std::shared_ptr<hostescalation> > const&
     escalations(state::instance().hostescalations());
   for (umultimap<std::string, std::shared_ptr<hostescalation> >::const_iterator
@@ -2391,16 +2524,19 @@ int should_host_notification_be_escalated(host* hst) {
           hst,
           temp_he,
           NOTIFICATION_OPTION_NONE) == true)
-      return (true);
+      return true;
   }
 
   logger(dbg_notifications, more)
     << "Host notification will NOT be escalated.";
 
-  return (false);
+  return false;
 }
 
-/* given a host, create a list of contacts to be notified, removing duplicates */
+/*
+ * given a host, create a list of contacts to be notified,
+ * removing duplicates
+ */
 int create_notification_list_from_host(
       nagios_macros* mac,
       host* hst,
@@ -2436,7 +2572,7 @@ int create_notification_list_from_host(
       << "Adding contacts from host escalation(s) to "
       "notification list.";
 
-    std::string id(hst->name);
+    std::string id(hst->get_name());
     umultimap<std::string, std::shared_ptr<hostescalation> > const&
       escalations(state::instance().hostescalations());
     for (umultimap<std::string,
@@ -2567,7 +2703,10 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
   logger(dbg_notifications, most)
     << "Default interval: " << interval_to_use;
 
-  /* search all the escalation entries for valid matches for this service (at its current notification number) */
+  /*
+   * search all the escalation entries for valid matches for this service (at
+   * its current notification number)
+   */
   for (temp_se = serviceescalation_list;
        temp_se != NULL;
        temp_se = temp_se->next) {
@@ -2587,7 +2726,10 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
       << "Found a valid escalation w/ interval of "
       << temp_se->notification_interval;
 
-    /* if we haven't used a notification interval from an escalation yet, use this one */
+    /*
+     * if we haven't used a notification interval from an escalation yet,
+     * use this one
+     */
     if (have_escalated_interval == false) {
       have_escalated_interval = true;
       interval_to_use = temp_se->notification_interval;
@@ -2601,7 +2743,10 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
       << "New interval: " << interval_to_use;
   }
 
-  /* if notification interval is 0, we shouldn't send any more problem notifications (unless service is volatile) */
+  /*
+   * if notification interval is 0, we shouldn't send any more problem
+   * notifications (unless service is volatile)
+   */
   if (interval_to_use == 0.0 && svc->is_volatile == false)
     svc->no_more_notifications = true;
   else
@@ -2612,8 +2757,9 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
     "notification time: " << interval_to_use;
 
   /* calculate next notification time */
-  next_notification = offset + static_cast<time_t>(interval_to_use * config->interval_length());
-  return (next_notification);
+  next_notification = offset + static_cast<time_t>(interval_to_use *
+    config->interval_length());
+  return next_notification;
 }
 
 /* calculates next acceptable re-notification time for a host */
@@ -2629,12 +2775,15 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
     << "Calculating next valid notification time...";
 
   /* default notification interval */
-  interval_to_use = hst->notification_interval;
+  interval_to_use = hst->get_notification_interval();
 
   logger(dbg_notifications, most)
     << "Default interval: " << interval_to_use;
 
-  /* check all the host escalation entries for valid matches for this host (at its current notification number) */
+  /*
+   * check all the host escalation entries for valid matches for this host
+   * (at its current notification number)
+   */
   for (temp_he = hostescalation_list;
        temp_he != NULL;
        temp_he = temp_he->next) {
@@ -2654,7 +2803,10 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
       << "Found a valid escalation w/ interval of "
       << temp_he->notification_interval;
 
-    /* if we haven't used a notification interval from an escalation yet, use this one */
+    /*
+     * if we haven't used a notification interval from an escalation yet,
+     * use this one
+     */
     if (have_escalated_interval == false) {
       have_escalated_interval = true;
       interval_to_use = temp_he->notification_interval;
@@ -2670,42 +2822,45 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
 
   /* if interval is 0, no more notifications should be sent */
   if (interval_to_use == 0.0)
-    hst->no_more_notifications = true;
+    hst->set_no_more_notifications(true);
   else
-    hst->no_more_notifications = false;
+    hst->set_no_more_notifications(false);
 
   logger(dbg_notifications, most)
     << "Interval used for calculating next valid notification time: "
     << interval_to_use;
 
   /* calculate next notification time */
-  next_notification = static_cast<time_t>(offset
-                                          + (interval_to_use * config->interval_length()));
+  next_notification = static_cast<time_t>(offset +
+    (interval_to_use * config->interval_length()));
 
-  return (next_notification);
+  return next_notification;
 }
 
 /******************************************************************/
 /***************** NOTIFICATION OBJECT FUNCTIONS ******************/
 /******************************************************************/
 
-/* given a contact name, find the notification entry for them for the list in memory */
+/*
+ * given a contact name, find the notification entry for them for the list in
+ * memory
+ */
 notification* find_notification(contact* cntct) {
   logger(dbg_functions, basic)
     << "find_notification()";
 
   if (cntct == NULL)
-    return (NULL);
+    return NULL;
 
   for (notification* temp_notification = notification_list;
        temp_notification != NULL;
        temp_notification = temp_notification->next) {
     if (temp_notification->cntct == cntct)
-      return (temp_notification);
+      return temp_notification;
   }
 
   /* we couldn't find the contact in the notification list */
-  return (NULL);
+  return NULL;
 }
 
 /* add a new notification to the list in memory */

@@ -35,7 +35,7 @@ int pre_flight_object_check(int* w, int* e);
 int pre_flight_circular_check(int* w, int* e);
 
 int check_service(service* svc, int* w, int* e);
-int check_host(host* hst, int* w, int* e);
+int check_host(com::centreon::engine::host* hst, int* w, int* e);
 int check_contact(com::centreon::engine::contact* cntct, int* w, int* e);
 int check_servicegroup(servicegroup* sg, int* w, int* e);
 int check_hostgroup(hostgroup* hg, int* w, int* e);

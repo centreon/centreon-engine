@@ -21,7 +21,9 @@
 #  define CCE_OBJECTS_SERVICEGROUP_HH
 
 /* Forward declaration. */
-struct host_struct;
+CCE_BEGIN()
+  class host;
+CCE_END()
 struct service_struct;
 struct servicesmember_struct;
 
@@ -53,7 +55,7 @@ servicegroup* add_servicegroup(
                 char const* action_url);
 int           is_host_member_of_servicegroup(
                 servicegroup_struct* group,
-                host_struct* hst);
+                com::centreon::engine::host* hst);
 int           is_service_member_of_servicegroup(
                 servicegroup_struct* group,
                 service_struct* svc);

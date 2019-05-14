@@ -76,9 +76,10 @@ void applier::scheduler::apply(
          end(diff_hosts.modified().end());
        it != end;
        ++it) {
-    umap<unsigned int, std::shared_ptr<host_struct> > const&
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>> const&
       hosts(applier::state::instance().hosts());
-    umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+    umap<unsigned int,
+         std::shared_ptr<com::centreon::engine::host>>::const_iterator
       hst(hosts.find(get_host_id(it->host_name().c_str())));
     if (hst != hosts.end()) {
       bool has_event(quick_timed_event.find(
@@ -130,7 +131,7 @@ void applier::scheduler::apply(
 
   // Remove deleted host check from the scheduler.
   {
-    std::vector<host_struct*> old_hosts;
+    std::vector<com::centreon::engine::host*> old_hosts;
     _get_hosts(hst_to_unschedule, old_hosts, false);
     _unschedule_host_events(old_hosts);
   }
@@ -169,7 +170,7 @@ void applier::scheduler::apply(
 
     // Get and schedule new hosts.
     {
-      std::vector<host_struct*> new_hosts;
+      std::vector<com::centreon::engine::host*> new_hosts;
       _get_hosts(hst_to_schedule, new_hosts, true);
       _schedule_host_events(new_hosts);
     }
@@ -206,12 +207,13 @@ void applier::scheduler::load() {
  *  @param[in] h  Host configuration.
  */
 void applier::scheduler::remove_host(configuration::host const& h) {
-  umap<unsigned int, std::shared_ptr<host_struct> > const&
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host> > const&
     hosts(applier::state::instance().hosts());
-  umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+  umap<unsigned int,
+       std::shared_ptr<com::centreon::engine::host>>::const_iterator
     hst(hosts.find(get_host_id(h.host_name().c_str())));
   if (hst != hosts.end()) {
-    std::vector<host_struct*> hvec;
+    std::vector<com::centreon::engine::host*> hvec;
     hvec.push_back(hst->second.get());
     _unschedule_host_events(hvec);
   }
@@ -542,18 +544,19 @@ void applier::scheduler::_calculate_host_scheduling_params() {
   time_t const now(time(NULL));
 
   // get total hosts and total scheduled hosts.
-  for (umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+  for (umap<unsigned int,
+            std::shared_ptr<com::centreon::engine::host>>::const_iterator
          it(applier::state::instance().hosts().begin()),
          end(applier::state::instance().hosts().end());
          it != end;
          ++it) {
-    host_struct& hst(*it->second);
+    com::centreon::engine::host& hst(*it->second);
 
     bool schedule_check(true);
-    if (!hst.check_interval || !hst.checks_enabled)
+    if (!hst.get_check_interval() || !hst.get_checks_enabled())
       schedule_check = false;
     else {
-      timezone_locker lock(get_host_timezone(hst.name));
+      timezone_locker lock(get_host_timezone(hst.get_name()));
       if (check_time_against_period(
             now,
             hst.check_period_ptr) == ERROR) {
@@ -568,15 +571,15 @@ void applier::scheduler::_calculate_host_scheduling_params() {
     }
 
     if (schedule_check) {
-      hst.should_be_scheduled = true;
+      hst.set_should_be_scheduled(true);
       ++scheduling_info.total_scheduled_hosts;
       scheduling_info.host_check_interval_total
-        += static_cast<unsigned long>(hst.check_interval);
+        += static_cast<unsigned long>(hst.get_check_interval());
     }
     else {
-      hst.should_be_scheduled = false;
+      hst.set_should_be_scheduled(false);
       logger(dbg_events, more)
-        << "Host " << hst.name << " should not be scheduled.";
+        << "Host " << hst.get_name() << " should not be scheduled.";
     }
 
     ++scheduling_info.total_hosts;
@@ -809,9 +812,9 @@ timed_event* applier::scheduler::_create_misc_event(
  */
 void applier::scheduler::_get_hosts(
        set_host const& hst_cfg,
-       std::vector<host_struct*>& hst_obj,
+       std::vector<com::centreon::engine::host*>& hst_obj,
        bool throw_if_not_found) {
-  umap<unsigned int, std::shared_ptr<host_struct> > const&
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host> > const&
     hosts(applier::state::instance().hosts());
   for (set_host::const_reverse_iterator
          it(hst_cfg.rbegin()),
@@ -820,7 +823,7 @@ void applier::scheduler::_get_hosts(
        ++it) {
     unsigned int host_id(it->host_id());
     std::string const& host_name(it->host_name());
-    umap<unsigned int, std::shared_ptr<host_struct> >::const_iterator
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host> >::const_iterator
       hst(hosts.find(host_id));
     if (hst == hosts.end()) {
       if (throw_if_not_found)
@@ -890,7 +893,7 @@ void applier::scheduler::_remove_misc_event(timed_event*& evt) {
  *  @param[in] hosts  The list of hosts to schedule.
  */
 void applier::scheduler::_schedule_host_events(
-       std::vector<host_struct*> const& hosts) {
+       std::vector<com::centreon::engine::host*> const& hosts) {
   logger(dbg_events, most)
     << "Scheduling host checks...";
 
@@ -902,103 +905,105 @@ void applier::scheduler::_schedule_host_events(
   // determine check times for host checks.
   int mult_factor(0);
   for (unsigned int i(0); i < end; ++i) {
-    host_struct& hst(*hosts[i]);
+    com::centreon::engine::host& hst(*hosts[i]);
 
     logger(dbg_events, most)
-      << "Host '" <<  hst.name << "'";
+      << "Host '" <<  hst.get_name() << "'";
 
     // skip hosts that shouldn't be scheduled.
-    if (!hst.should_be_scheduled) {
+    if (!hst.get_should_be_scheduled()) {
       logger(dbg_events, most)
         << "Host check should not be scheduled.";
       continue;
     }
 
     // calculate preferred host check time.
-    hst.next_check
-      = (time_t)(now
-           + (mult_factor * scheduling_info.host_inter_check_delay));
+    hst.set_next_check(
+      (time_t)(now
+           + (mult_factor * scheduling_info.host_inter_check_delay)));
 
+    time_t time = hst.get_next_check();
     logger(dbg_events, most)
-      << "Preferred Check Time: " << hst.next_check
-      << " --> " << my_ctime(&hst.next_check);
+      << "Preferred Check Time: " << hst.get_next_check()
+      << " --> " << my_ctime(&time);
 
     // Make sure the host can actually be scheduled at this time.
     {
-      timezone_locker lock(get_host_timezone(hst.name));
+      timezone_locker lock(get_host_timezone(hst.get_name()));
       if (check_time_against_period(
-            hst.next_check,
+            hst.get_next_check(),
             hst.check_period_ptr) == ERROR) {
         time_t next_valid_time(0);
         get_next_valid_time(
-          hst.next_check,
+          hst.get_next_check(),
           &next_valid_time,
           hst.check_period_ptr);
-        hst.next_check = next_valid_time;
+        hst.set_next_check(next_valid_time);
       }
     }
 
+    time = hst.get_next_check();
     logger(dbg_events, most)
-      << "Actual Check Time: " << hst.next_check
-      << " --> " << my_ctime(&hst.next_check);
+      << "Actual Check Time: " << hst.get_next_check()
+      << " --> " << my_ctime(&time);
 
     if (!scheduling_info.first_host_check
-        || (hst.next_check < scheduling_info.first_host_check))
-      scheduling_info.first_host_check = hst.next_check;
-    if (hst.next_check > scheduling_info.last_host_check)
-      scheduling_info.last_host_check = hst.next_check;
+        || (hst.get_next_check() < scheduling_info.first_host_check))
+      scheduling_info.first_host_check = hst.get_next_check();
+    if (hst.get_next_check() > scheduling_info.last_host_check)
+      scheduling_info.last_host_check = hst.get_next_check();
 
     ++mult_factor;
   }
 
   // Need to optimize add_event insert.
-  std::multimap<time_t, host_struct*> hosts_to_schedule;
+  std::multimap<time_t, com::centreon::engine::host*> hosts_to_schedule;
 
   // add scheduled host checks to event queue.
   for (unsigned int i(0); i < end; ++i) {
-    host_struct& hst(*hosts[i]);
+    com::centreon::engine::host& hst(*hosts[i]);
 
     // update status of all hosts (scheduled or not).
     update_host_status(&hst, false);
 
     // skip most hosts that shouldn't be scheduled.
-    if (!hst.should_be_scheduled) {
+    if (!hst.get_should_be_scheduled()) {
       // passive checks are an exception if a forced check was
       // scheduled before Centreon Engine was restarted.
-      if (!(hst.checks_enabled == false
-            && hst.next_check
-            && (hst.check_options & CHECK_OPTION_FORCE_EXECUTION)))
+      if (!(!hst.get_checks_enabled()
+            && hst.get_next_check()
+            && (hst.get_check_options() & CHECK_OPTION_FORCE_EXECUTION)))
         continue;
     }
-    hosts_to_schedule.insert(std::make_pair(hst.next_check, &hst));
+    hosts_to_schedule.insert(std::make_pair(hst.get_next_check(), &hst));
   }
 
   // Schedule events list.
-  for (std::multimap<time_t, host_struct*>::const_iterator
+  for (std::multimap<time_t, com::centreon::engine::host*>::const_iterator
          it(hosts_to_schedule.begin()), end(hosts_to_schedule.end());
        it != end;
        ++it) {
-    host_struct& hst(*it->second);
+    com::centreon::engine::host& hst(*it->second);
 
     // Schedule a new host check event.
     events::schedule(
               EVENT_HOST_CHECK,
               false,
-              hst.next_check,
+              hst.get_next_check(),
               false,
               0,
               NULL,
               true,
               (void*)&hst,
               NULL,
-              hst.check_options);
+              hst.get_check_options());
   }
 
   // Schedule acknowledgement expirations.
   logger(dbg_events, most)
     << "Scheduling host acknowledgement expirations...";
   for (int i(0), end(hosts.size()); i < end; ++i)
-    if (hosts[i]->problem_has_been_acknowledged)
+    if (hosts[i]->get_problem_has_been_acknowledged())
       schedule_acknowledgement_expiration(hosts[i]);
 
   return ;
@@ -1135,8 +1140,8 @@ void applier::scheduler::_schedule_service_events(
  *  @param[in] hosts  The list of hosts to unschedule.
  */
 void applier::scheduler::_unschedule_host_events(
-                           std::vector<host_struct*> const& hosts) {
-  for (std::vector<host_struct*>::const_iterator
+                           std::vector<com::centreon::engine::host*> const& hosts) {
+  for (std::vector<com::centreon::engine::host*>::const_iterator
          it(hosts.begin()),
          end(hosts.end());
        it != end;

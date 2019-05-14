@@ -36,9 +36,9 @@ CCE_BEGIN()
     class command;
   }
   class contact;
+  class host;
 CCE_END()
 
-struct host_struct;
 struct objectlist_struct;
 struct timeperiod_struct;
 
@@ -145,10 +145,12 @@ typedef struct                  service_struct {
   double                        percent_state_change;
   unsigned long                 modified_attributes;
 
-  host_struct*                  host_ptr;
-  com::centreon::engine::commands::command*               event_handler_ptr;
+  com::centreon::engine::host*  host_ptr;
+  com::centreon::engine::commands::command*
+                                event_handler_ptr;
   char*                         event_handler_args;
-  com::centreon::engine::commands::command*               check_command_ptr;
+  com::centreon::engine::commands::command*
+                                check_command_ptr;
   char*                         check_command_args;
   timeperiod_struct*            check_period_ptr;
   timeperiod_struct*            notification_period_ptr;

@@ -82,7 +82,7 @@ void applier::host::add_object(
   config->hosts().insert(obj);
 
   // Create host.
-  host_struct*
+  com::centreon::engine::host*
     h(add_host(
         obj.host_id(),
         obj.host_name().c_str(),
@@ -291,12 +291,13 @@ void applier::host::modify_object(
            << obj.host_name() << "'");
 
   // Find host object.
-  umap<unsigned int, std::shared_ptr<host_struct> >::iterator
+  umap<unsigned int,
+       std::shared_ptr<com::centreon::engine::host>>::iterator
     it_obj(applier::state::instance().hosts_find(obj.key()));
   if (it_obj == applier::state::instance().hosts().end())
     throw (engine_error() << "Could not modify non-existing "
            << "host object '" << obj.host_name() << "'");
-  host_struct* h(it_obj->second.get());
+  com::centreon::engine::host* h(it_obj->second.get());
 
   // Update the global configuration set.
   configuration::host obj_old(*it_cfg);
@@ -304,151 +305,73 @@ void applier::host::modify_object(
   config->hosts().insert(obj);
 
   // Modify properties.
-  modify_if_different(
-    h->name,
-    NULL_IF_EMPTY(obj.host_name()));
-  modify_if_different(
-    h->display_name,
-    NULL_IF_EMPTY(obj.display_name()));
-  modify_if_different(
-    h->alias,
-    (obj.alias().empty() ? obj.host_name() : obj. alias()).c_str());
-  modify_if_different(h->address, NULL_IF_EMPTY(obj.address()));
-  modify_if_different(
-    h->check_period,
-    NULL_IF_EMPTY(obj.check_period()));
-  modify_if_different(
-    h->initial_state,
-    static_cast<int>(obj.initial_state()));
-  modify_if_different(
-    h->check_interval,
-    static_cast<double>(obj.check_interval()));
-  modify_if_different(
-    h->retry_interval,
-    static_cast<double>(obj.retry_interval()));
-  modify_if_different(
-    h->max_attempts,
-    static_cast<int>(obj.max_check_attempts()));
-  modify_if_different(
-    h->notify_on_recovery,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::up)));
-  modify_if_different(
-    h->notify_on_down,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::down)));
-  modify_if_different(
-    h->notify_on_unreachable,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::unreachable)));
-  modify_if_different(
-    h->notify_on_flapping,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::flapping)));
-  modify_if_different(
-    h->notify_on_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::downtime)));
-  modify_if_different(
-    h->notification_interval,
-    static_cast<double>(obj.notification_interval()));
-  modify_if_different(
-    h->first_notification_delay,
-    static_cast<double>(obj.first_notification_delay()));
-  modify_if_different(
-    h->notification_period,
-    NULL_IF_EMPTY(obj.notification_period()));
-  modify_if_different(
-    h->notifications_enabled,
-    static_cast<int>(obj.notifications_enabled()));
-  modify_if_different(
-    h->host_check_command,
-    NULL_IF_EMPTY(obj.check_command()));
-  modify_if_different(
-    h->checks_enabled,
-    static_cast<int>(obj.checks_active()));
-  modify_if_different(
-    h->accept_passive_host_checks,
-    static_cast<int>(obj.checks_passive()));
-  modify_if_different(
-    h->event_handler,
-    NULL_IF_EMPTY(obj.event_handler()));
-  modify_if_different(
-    h->event_handler_enabled,
-    static_cast<int>(obj.event_handler_enabled()));
-  modify_if_different(
-    h->flap_detection_enabled,
-    static_cast<int>(obj.flap_detection_enabled()));
-  modify_if_different(
-    h->low_flap_threshold,
-    static_cast<double>(obj.low_flap_threshold()));
-  modify_if_different(
-    h->high_flap_threshold,
-    static_cast<double>(obj.high_flap_threshold()));
-  modify_if_different(
-    h->flap_detection_on_up,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::host::up)));
-  modify_if_different(
-    h->flap_detection_on_down,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::host::down)));
-  modify_if_different(
-    h->flap_detection_on_unreachable,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::host::unreachable)));
-  modify_if_different(
-    h->stalk_on_up,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::host::up)));
-  modify_if_different(
-    h->stalk_on_down,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::host::down)));
-  modify_if_different(
-    h->stalk_on_unreachable,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::host::unreachable)));
-  modify_if_different(
-    h->process_performance_data,
-    static_cast<int>(obj.process_perf_data()));
-  modify_if_different(
-    h->check_freshness,
-    static_cast<int>(obj.check_freshness()));
-  modify_if_different(
-    h->freshness_threshold,
-    static_cast<int>(obj.freshness_threshold()));
-  modify_if_different(h->notes, NULL_IF_EMPTY(obj.notes()));
-  modify_if_different(h->notes_url, NULL_IF_EMPTY(obj.notes_url()));
-  modify_if_different(h->action_url, NULL_IF_EMPTY(obj.action_url()));
-  modify_if_different(h->icon_image, NULL_IF_EMPTY(obj.icon_image()));
-  modify_if_different(
-    h->icon_image_alt,
-    NULL_IF_EMPTY(obj.icon_image_alt()));
-  modify_if_different(h->vrml_image, NULL_IF_EMPTY(obj.vrml_image()));
-  modify_if_different(
-    h->statusmap_image,
-    NULL_IF_EMPTY(obj.statusmap_image()));
-  modify_if_different(h->x_2d, obj.coords_2d().x());
-  modify_if_different(h->y_2d, obj.coords_2d().y());
-  modify_if_different(
-    h->have_2d_coords,
-    static_cast<int>(obj.have_coords_2d()));
-  modify_if_different(h->x_3d, obj.coords_3d().x());
-  modify_if_different(h->y_3d, obj.coords_3d().y());
-  modify_if_different(h->z_3d, obj.coords_3d().z());
-  modify_if_different(
-    h->have_3d_coords,
-    static_cast<int>(obj.have_coords_3d()));
-  modify_if_different(
-    h->retain_status_information,
-    static_cast<int>(obj.retain_status_information()));
-  modify_if_different(
-    h->retain_nonstatus_information,
-    static_cast<int>(obj.retain_nonstatus_information()));
-  modify_if_different(
-    h->obsess_over_host,
-    static_cast<int>(obj.obsess_over_host()));
+  h->set_name(obj.host_name());
+  h->set_display_name(obj.display_name());
+  if (!obj.alias().empty())
+    h->set_alias(obj.alias());
+  else
+    h->set_alias(obj.host_name());
+  h->set_address(obj.address());
+  if (obj.check_period().empty())
+  h->set_check_period(obj.check_period());
+  h->set_initial_state(static_cast<int>(obj.initial_state()));
+  h->set_check_interval(static_cast<double>(obj.check_interval()));
+  h->set_retry_interval(static_cast<double>(obj.retry_interval()));
+  h->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
+  h->set_notify_on_recovery(static_cast<int>(static_cast<bool>(
+    obj.notification_options() & configuration::host::up)));
+  h->set_notify_on_down(static_cast<int>(static_cast<bool>(
+    obj.notification_options() & configuration::host::down)));
+  h->set_notify_on_unreachable(static_cast<int>(static_cast<bool>(
+    obj.notification_options() & configuration::host::unreachable)));
+  h->set_notify_on_flapping(static_cast<int>(static_cast<bool>(
+    obj.notification_options() & configuration::host::flapping)));
+  h->set_notify_on_downtime(static_cast<int>(static_cast<bool>(
+    obj.notification_options() & configuration::host::downtime)));
+  h->set_notification_interval(static_cast<double>(obj.notification_interval()));
+  h->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
+  h->set_notification_period(obj.notification_period());
+  h->set_notifications_enabled(static_cast<int>(obj.notifications_enabled()));
+  h->set_host_check_command(obj.check_command());
+  h->set_checks_enabled(static_cast<int>(obj.checks_active()));
+  h->set_accept_passive_host_checks(static_cast<int>(obj.checks_passive()));
+  h->set_event_handler(obj.event_handler());
+  h->set_event_handler_enabled(static_cast<int>(obj.event_handler_enabled()));
+  h->set_flap_detection_enabled(static_cast<int>(obj.flap_detection_enabled()));
+  h->set_low_flap_threshold(static_cast<double>(obj.low_flap_threshold()));
+  h->set_high_flap_threshold(static_cast<double>(obj.high_flap_threshold()));
+  h->set_flap_detection_on_up(static_cast<int>(static_cast<bool>(
+    obj.flap_detection_options() & configuration::host::up)));
+  h->set_flap_detection_on_down(static_cast<int>(static_cast<bool>(
+    obj.flap_detection_options() & configuration::host::down)));
+  h->set_flap_detection_on_unreachable(static_cast<int>(static_cast<bool>(
+    obj.flap_detection_options() & configuration::host::unreachable)));
+  h->set_stalk_on_up(static_cast<int>(static_cast<bool>(
+    obj.stalking_options() & configuration::host::up)));
+  h->set_stalk_on_down(static_cast<int>(static_cast<bool>(
+    obj.stalking_options() & configuration::host::down)));
+  h->set_stalk_on_unreachable(static_cast<int>(static_cast<bool>(
+    obj.stalking_options() & configuration::host::unreachable)));
+  h->set_process_performance_data(static_cast<int>(obj.process_perf_data()));
+  h->set_check_freshness(static_cast<int>(obj.check_freshness()));
+  h->set_freshness_threshold(static_cast<int>(obj.freshness_threshold()));
+  h->set_notes(obj.notes());
+  h->set_notes_url(obj.notes_url());
+  h->set_action_url(obj.action_url());
+  h->set_icon_image(obj.icon_image());
+  h->set_icon_image_alt(obj.icon_image_alt());
+  h->set_vrml_image(obj.vrml_image());
+  h->set_statusmap_image(obj.statusmap_image());
+  h->set_x_2d(obj.coords_2d().x());
+  h->set_y_2d(obj.coords_2d().y());
+  h->set_have_2d_coords(static_cast<int>(obj.have_coords_2d()));
+  h->set_x_3d(obj.coords_3d().x());
+  h->set_y_3d(obj.coords_3d().y());
+  h->set_z_3d(obj.coords_3d().z());
+  h->set_have_3d_coords(static_cast<int>(obj.have_coords_3d()));
+  h->set_retain_status_information(static_cast<int>(obj.retain_status_information()));
+  h->set_retain_nonstatus_information(static_cast<int>(obj.retain_nonstatus_information()));
+  h->set_obsess_over_host(static_cast<int>(obj.obsess_over_host()));
   host_other_props[obj.host_name()].timezone = obj.timezone();
   host_other_props[obj.host_name()].host_id = obj.host_id();
   host_other_props[obj.host_name()].acknowledgement_timeout
@@ -546,10 +469,10 @@ void applier::host::remove_object(
     << "Removing host '" << obj.host_name() << "'.";
 
   // Find host.
-  umap<unsigned int, std::shared_ptr<host_struct> >::iterator
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host> >::iterator
     it(applier::state::instance().hosts_find(obj.key()));
   if (it != applier::state::instance().hosts().end()) {
-    host_struct* hst(it->second.get());
+    com::centreon::engine::host* hst(it->second.get());
 
     // Remove host comments.
     delete_all_host_comments(obj.host_name().c_str());
@@ -565,7 +488,7 @@ void applier::host::remove_object(
     applier::scheduler::instance().remove_host(obj);
 
     // Remove host from its list.
-    unregister_object<host_struct>(&host_list, hst);
+    unregister_object<com::centreon::engine::host>(&host_list, hst);
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -606,14 +529,15 @@ void applier::host::resolve_object(
   // It is necessary to do it only once to prevent the removal
   // of valid child backlinks.
   if (obj == *config->hosts().begin()) {
-    for (umap<unsigned int, std::shared_ptr<host_struct> >::iterator
+    for (umap<unsigned int,
+              std::shared_ptr<com::centreon::engine::host> >::iterator
          it(applier::state::instance().hosts().begin()),
          end(applier::state::instance().hosts().end()); it != end; ++it)
       deleter::listmember(it->second->child_hosts, &deleter::hostsmember);
   }
 
   // Find host.
-  umap<unsigned int, std::shared_ptr<host_struct> >::iterator
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host> >::iterator
     it(applier::state::instance().hosts_find(obj.key()));
   if (applier::state::instance().hosts().end() == it)
     throw (engine_error() << "Cannot resolve non-existing host '"
@@ -626,8 +550,8 @@ void applier::host::resolve_object(
   deleter::listmember(it->second->hostgroups_ptr, &deleter::objectlist);
 
   // Reset host counters.
-  it->second->total_services = 0;
-  it->second->total_service_check_interval = 0;
+  it->second->set_total_services(0);
+  it->second->set_total_service_check_interval(0);
 
   // Resolve host.
   if (!check_host(it->second.get(), &config_warnings, &config_errors))

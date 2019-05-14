@@ -29,7 +29,7 @@
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/contactgroup.hh"
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/hostgroup.hh"
 #  include "com/centreon/engine/objects/hostsmember.hh"
 #  include "com/centreon/engine/objects/service.hh"

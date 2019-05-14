@@ -255,7 +255,7 @@ static void _exec_event_host_check(timed_event* event) {
                             + (double)(tv.tv_usec / 1000) / 1000.0);
 
   logger(dbg_events, basic)
-    << "** Host Check Event ==> Host: '" << hst->name
+    << "** Host Check Event ==> Host: '" << hst->get_name()
     << "', Options: " << event->event_options
     << ", Latency: " << latency << " sec";
 
@@ -606,14 +606,14 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       &service_other_props[std::make_pair(
-                                  svc->host_ptr->name,
+                                  svc->host_ptr->get_name(),
                                   svc->description)].initial_notif_time);
     adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
       &service_other_props[std::make_pair(
-                                  svc->host_ptr->name,
+                                  svc->host_ptr->get_name(),
                                   svc->description)].last_acknowledgement);
 
     // recalculate next re-notification time.
@@ -628,52 +628,65 @@ void compensate_for_system_time_change(
 
   // adjust host timestamps.
   for (host* hst(host_list); hst; hst = hst->next) {
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->last_host_notification);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->last_check);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->next_check);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->last_state_change);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->last_hard_state_change);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->last_state_history_update);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &host_other_props[hst->name].initial_notif_time);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &host_other_props[hst->name].last_acknowledgement);
+    time_t last_host_notif(hst->get_last_host_notification());
+    time_t last_check(hst->get_last_check());
+    time_t next_check(hst->get_next_check());
+    time_t last_state_change(hst->get_last_state_change());
+    time_t last_hard_state_change(hst->get_last_hard_state_change());
+    time_t last_state_history_update(hst->get_last_state_history_update());
 
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &last_host_notif);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &last_check);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &next_check);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &last_state_change);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &last_hard_state_change);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &last_state_history_update);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &host_other_props[hst->get_name()].initial_notif_time);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &host_other_props[hst->get_name()].last_acknowledgement);
+
+    hst->set_last_host_notification(last_host_notif);
+    hst->set_last_check(last_check);
+    hst->set_next_check(next_check);
+    hst->set_last_state_change(last_state_change);
+    hst->set_last_hard_state_change(last_hard_state_change);
+    hst->set_last_state_history_update(last_state_history_update);
     // recalculate next re-notification time.
-    hst->next_host_notification
-      = get_next_host_notification_time(
-          hst,
-          hst->last_host_notification);
+    hst->set_next_host_notification(
+    get_next_host_notification_time(
+        hst,
+        hst->get_last_host_notification()));
 
     // update the status data.
     update_host_status(hst, false);
@@ -1036,7 +1049,7 @@ bool operator==(
           || (obj1.event_type == EVENT_EXPIRE_HOST_ACK))) {
     host& hst1(*(host*)obj1.event_data);
     host& hst2(*(host*)obj2.event_data);
-    if (strcmp(hst1.name, hst2.name))
+    if (hst1.get_name() != hst2.get_name())
       return (false);
   }
   else if (is_not_null
@@ -1105,7 +1118,7 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
            || obj.event_type == EVENT_EXPIRE_HOST_ACK) {
     host& hst(*(host*)obj.event_data);
     os << "  event_data:                 "
-       << hst.name << "\n";
+       << hst.get_name() << "\n";
   }
   else if (obj.event_type == EVENT_SERVICE_CHECK
            || obj.event_type == EVENT_EXPIRE_SERVICE_ACK) {

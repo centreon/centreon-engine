@@ -77,23 +77,23 @@ void check_for_service_flapping(
   update_history = update;
 
   /* should we update state history for this state? */
-  if (update_history == true) {
+  if (update_history) {
     if (svc->current_state == STATE_OK
-        && svc->flap_detection_on_ok == false)
+        && !svc->flap_detection_on_ok)
       update_history = false;
     if (svc->current_state == STATE_WARNING
-        && svc->flap_detection_on_warning == false)
+        && !svc->flap_detection_on_warning)
       update_history = false;
     if (svc->current_state == STATE_UNKNOWN
-        && svc->flap_detection_on_unknown == false)
+        && !svc->flap_detection_on_unknown)
       update_history = false;
     if (svc->current_state == STATE_CRITICAL
-        && svc->flap_detection_on_critical == false)
+        && !svc->flap_detection_on_critical)
       update_history = false;
   }
 
   /* record current service state */
-  if (update_history == true) {
+  if (update_history) {
     /* record the current state in the state history */
     svc->state_history[svc->state_history_index] = svc->current_state;
 
@@ -141,11 +141,11 @@ void check_for_service_flapping(
     << ", PSC=" << curved_percent_change << "%";
 
   /* don't do anything if we don't have flap detection enabled on a program-wide basis */
-  if (config->enable_flap_detection() == false)
+  if (!config->enable_flap_detection())
     return;
 
   /* don't do anything if we don't have flap detection enabled for this service */
-  if (svc->flap_detection_enabled == false)
+  if (!svc->flap_detection_enabled)
     return;
 
   /* are we flapping, undecided, or what?... */
@@ -163,11 +163,11 @@ void check_for_service_flapping(
 
   logger(dbg_flapping, more)
     << com::centreon::logging::setprecision(2)
-    << "Service " << (is_flapping == true ? "is" : "is not")
+    << "Service " << (is_flapping ? "is" : "is not")
     << " flapping (" << curved_percent_change << "% state change).";
 
   /* did the service just start flapping? */
-  if (is_flapping == true && svc->is_flapping == false)
+  if (is_flapping && !svc->is_flapping)
     set_service_flap(
       svc,
       curved_percent_change,
@@ -176,7 +176,7 @@ void check_for_service_flapping(
       allow_flapstart_notification);
 
   /* did the service just stop flapping? */
-  else if (is_flapping == false && svc->is_flapping == true)
+  else if (!is_flapping && svc->is_flapping)
     clear_service_flap(
       svc,
       curved_percent_change,
@@ -187,7 +187,7 @@ void check_for_service_flapping(
 
 /* detects host flapping */
 void check_for_host_flapping(
-       host* hst,
+       com::centreon::engine::host* hst,
        int update,
        int actual_check,
        int allow_flapstart_notification) {
@@ -212,64 +212,64 @@ void check_for_host_flapping(
     return;
 
   logger(dbg_flapping, more)
-    << "Checking host '" << hst->name << "' for flapping...";
+    << "Checking host '" << hst->get_name() << "' for flapping...";
 
   time(&current_time);
 
   /* period to wait for updating archived state info if we have no state change */
-  if (hst->total_services == 0)
+  if (hst->get_total_services() == 0)
     wait_threshold
-      = static_cast<unsigned long>(hst->notification_interval
+      = static_cast<unsigned long>(hst->get_notification_interval()
                                    * config->interval_length());
   else
     wait_threshold
-      = static_cast<unsigned long>((hst->total_service_check_interval
+      = static_cast<unsigned long>((hst->get_total_service_check_interval()
                                     * config->interval_length())
-                                   / hst->total_services);
+                                   / hst->get_total_services());
 
   update_history = update;
 
   /* should we update state history for this state? */
-  if (update_history == true) {
-    if (hst->current_state == HOST_UP
-        && hst->flap_detection_on_up == false)
+  if (update_history) {
+    if (hst->get_current_state() == HOST_UP
+        && !hst->get_flap_detection_on_up())
       update_history = false;
-    if (hst->current_state == HOST_DOWN
-        && hst->flap_detection_on_down == false)
+    if (hst->get_current_state() == HOST_DOWN
+        && !hst->get_flap_detection_on_down())
       update_history = false;
-    if (hst->current_state == HOST_UNREACHABLE
-        && hst->flap_detection_on_unreachable == false)
+    if (hst->get_current_state() == HOST_UNREACHABLE
+        && !hst->get_flap_detection_on_unreachable())
       update_history = false;
   }
 
   /* if we didn't have an actual check, only update if we've waited long enough */
-  if (update_history == true && actual_check == false
-      && static_cast<unsigned long>(current_time - hst->last_state_history_update) < wait_threshold) {
+  if (update_history && !actual_check
+      && static_cast<unsigned long>(current_time - hst->get_last_state_history_update()) < wait_threshold) {
     update_history = false;
   }
 
   /* what thresholds should we use (global or host-specific)? */
-  low_threshold = (hst->low_flap_threshold <= 0.0)
-    ? config->low_host_flap_threshold() : hst->low_flap_threshold;
-  high_threshold = (hst->high_flap_threshold <= 0.0)
-    ? config->high_host_flap_threshold() : hst->high_flap_threshold;
+  low_threshold = (hst->get_low_flap_threshold() <= 0.0)
+    ? config->low_host_flap_threshold() : hst->get_low_flap_threshold();
+  high_threshold = (hst->get_high_flap_threshold() <= 0.0)
+    ? config->high_host_flap_threshold() : hst->get_high_flap_threshold();
 
   /* record current host state */
-  if (update_history == true) {
+  if (update_history) {
     /* update the last record time */
-    hst->last_state_history_update = current_time;
+    hst->set_last_state_history_update(current_time);
 
     /* record the current state in the state history */
-    hst->state_history[hst->state_history_index] = hst->current_state;
+    hst->state_history[hst->get_state_history_index()] = hst->get_current_state();
 
     /* increment state history index to next available slot */
-    hst->state_history_index++;
-    if (hst->state_history_index >= MAX_STATE_HISTORY_ENTRIES)
-      hst->state_history_index = 0;
+    hst->set_state_history_index(hst->get_state_history_index() + 1);
+    if (hst->get_state_history_index() >= MAX_STATE_HISTORY_ENTRIES)
+      hst->set_state_history_index(0);
   }
 
   /* calculate overall changes in state */
-  for (x = 0, y = hst->state_history_index;
+  for (x = 0, y = hst->get_state_history_index();
        x < MAX_STATE_HISTORY_ENTRIES;
        x++) {
 
@@ -298,7 +298,7 @@ void check_for_host_flapping(
     = (double)(((double)curved_changes * 100.0)
                / (double)(MAX_STATE_HISTORY_ENTRIES - 1));
 
-  hst->percent_state_change = curved_percent_change;
+  hst->set_percent_state_change(curved_percent_change);
 
   logger(dbg_flapping, most)
     << com::centreon::logging::setprecision(2)
@@ -308,11 +308,11 @@ void check_for_host_flapping(
     << ", PSC=" << curved_percent_change << "%";
 
   /* don't do anything if we don't have flap detection enabled on a program-wide basis */
-  if (config->enable_flap_detection() == false)
+  if (!config->enable_flap_detection())
     return;
 
   /* don't do anything if we don't have flap detection enabled for this host */
-  if (hst->flap_detection_enabled == false)
+  if (!hst->get_flap_detection_enabled())
     return;
 
   /* are we flapping, undecided, or what?... */
@@ -331,11 +331,11 @@ void check_for_host_flapping(
     is_flapping = true;
 
   logger(dbg_flapping, more)
-    << "Host " << (is_flapping == true ? "is" : "is not")
+    << "Host " << (is_flapping ? "is" : "is not")
     << " flapping (" << curved_percent_change << "% state change).";
 
   /* did the host just start flapping? */
-  if (is_flapping == true && hst->is_flapping == false)
+  if (is_flapping && !hst->get_is_flapping())
     set_host_flap(
       hst,
       curved_percent_change,
@@ -344,7 +344,7 @@ void check_for_host_flapping(
       allow_flapstart_notification);
 
   /* did the host just stop flapping? */
-  else if (is_flapping == false && hst->is_flapping == true)
+  else if (!is_flapping && hst->get_is_flapping())
     clear_host_flap(
       hst,
       curved_percent_change,
@@ -428,7 +428,7 @@ void set_service_flap(
     svc->check_flapping_recovery_notification = false;
 
   /* send a notification */
-  if (allow_flapstart_notification == true)
+  if (allow_flapstart_notification)
     service_notification(
       svc,
       NOTIFICATION_FLAPPINGSTART,
@@ -493,7 +493,7 @@ void clear_service_flap(
     NOTIFICATION_OPTION_NONE);
 
   /* should we send a recovery notification? */
-  if (svc->check_flapping_recovery_notification == true
+  if (svc->check_flapping_recovery_notification
       && svc->current_state == STATE_OK)
     service_notification(
       svc,
@@ -509,7 +509,7 @@ void clear_service_flap(
 
 /* handles a host that is flapping */
 void set_host_flap(
-       host* hst,
+       com::centreon::engine::host* hst,
        double percent_change,
        double high_threshold,
        double low_threshold,
@@ -521,12 +521,12 @@ void set_host_flap(
     return;
 
   logger(dbg_flapping, more)
-    << "Host '" << hst->name << "' started flapping!";
+    << "Host '" << hst->get_name() << "' started flapping!";
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_runtime_warning, basic)
     << com::centreon::logging::setprecision(1)
-    << "HOST FLAPPING ALERT: " << hst->name
+    << "HOST FLAPPING ALERT: " << hst->get_name()
     << ";STARTED; Host appears to have started flapping ("
     << percent_change << "% change > "
     << high_threshold << "% threshold)";
@@ -540,9 +540,11 @@ void set_host_flap(
       << "% threshold).  When the host state stabilizes and the "
       << "flapping stops, notifications will be re-enabled.";
 
+  unsigned long comment_id;
+  comment_id = hst->get_flapping_comment_id();
   add_new_host_comment(
     FLAPPING_COMMENT,
-    hst->name,
+    hst->get_name().c_str(),
     time(NULL),
     "(Centreon Engine Process)",
     oss.str().c_str(),
@@ -550,10 +552,11 @@ void set_host_flap(
     COMMENTSOURCE_INTERNAL,
     false,
     (time_t)0,
-    &(hst->flapping_comment_id));
+    &comment_id);
+  hst->set_flapping_comment_id(comment_id);
 
   /* set the flapping indicator */
-  hst->is_flapping = true;
+  hst->set_is_flapping(true);
 
   /* send data to event broker */
   broker_flapping_data(
@@ -568,14 +571,14 @@ void set_host_flap(
     NULL);
 
   /* see if we should check to send a recovery notification out when flapping stops */
-  if (hst->current_state != HOST_UP
-      && hst->current_notification_number > 0)
-    hst->check_flapping_recovery_notification = true;
+  if (hst->get_current_state() != HOST_UP
+      && hst->get_current_notification_number() > 0)
+    hst->set_check_flapping_recovery_notification(true);
   else
-    hst->check_flapping_recovery_notification = false;
+    hst->set_check_flapping_recovery_notification(false);
 
   /* send a notification */
-  if (allow_flapstart_notification == true)
+  if (allow_flapstart_notification)
     host_notification(
       hst,
       NOTIFICATION_FLAPPINGSTART,
@@ -587,7 +590,7 @@ void set_host_flap(
 
 /* handles a host that has stopped flapping */
 void clear_host_flap(
-       host* hst,
+       com::centreon::engine::host* hst,
        double percent_change,
        double high_threshold,
        double low_threshold) {
@@ -599,23 +602,23 @@ void clear_host_flap(
     return;
 
   logger(dbg_flapping, basic)
-    << "Host '" << hst->name << "' stopped flapping.";
+    << "Host '" << hst->get_name() << "' stopped flapping.";
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_info_message, basic)
     << com::centreon::logging::setprecision(1)
-    << "HOST FLAPPING ALERT: " << hst->name
+    << "HOST FLAPPING ALERT: " << hst->get_name()
     << ";STOPPED; Host appears to have stopped flapping ("
     << percent_change << "% change < "
     << low_threshold << "% threshold)";
 
   /* delete the comment we added earlier */
-  if (hst->flapping_comment_id != 0)
-    delete_host_comment(hst->flapping_comment_id);
-  hst->flapping_comment_id = 0;
+  if (hst->get_flapping_comment_id() != 0)
+    delete_host_comment(hst->get_flapping_comment_id());
+  hst->set_flapping_comment_id(0);
 
   /* clear the flapping indicator */
-  hst->is_flapping = false;
+  hst->set_is_flapping(false);
 
   /* send data to event broker */
   broker_flapping_data(
@@ -638,8 +641,8 @@ void clear_host_flap(
     NOTIFICATION_OPTION_NONE);
 
   /* should we send a recovery notification? */
-  if (hst->check_flapping_recovery_notification == true
-      && hst->current_state == HOST_UP)
+  if (hst->get_check_flapping_recovery_notification()
+      && hst->get_current_state() == HOST_UP)
     host_notification(
       hst,
       NOTIFICATION_NORMAL,
@@ -648,7 +651,7 @@ void clear_host_flap(
       NOTIFICATION_OPTION_NONE);
 
   /* clear the recovery notification flag */
-  hst->check_flapping_recovery_notification = false;
+  hst->set_check_flapping_recovery_notification(false);
   return;
 }
 
@@ -658,7 +661,7 @@ void clear_host_flap(
 
 /* enables flap detection on a program wide basis */
 void enable_flap_detection_routines() {
-  host* temp_host = NULL;
+  com::centreon::engine::host* temp_host = NULL;
   service* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
@@ -666,7 +669,7 @@ void enable_flap_detection_routines() {
     << "enable_flap_detection_routines()";
 
   /* bail out if we're already set */
-  if (config->enable_flap_detection() == true)
+  if (config->enable_flap_detection())
     return;
 
   /* set the attribute modified flag */
@@ -704,7 +707,7 @@ void enable_flap_detection_routines() {
 
 /* disables flap detection on a program wide basis */
 void disable_flap_detection_routines() {
-  host* temp_host = NULL;
+  com::centreon::engine::host* temp_host = NULL;
   service* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
@@ -712,7 +715,7 @@ void disable_flap_detection_routines() {
     << "disable_flap_detection_routines()";
 
   /* bail out if we're already set */
-  if (config->enable_flap_detection() == false)
+  if (!config->enable_flap_detection())
     return;
 
   /* set the attribute modified flag */
@@ -749,7 +752,7 @@ void disable_flap_detection_routines() {
 }
 
 /* enables flap detection for a specific host */
-void enable_host_flap_detection(host* hst) {
+void enable_host_flap_detection(com::centreon::engine::host* hst) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)
@@ -759,17 +762,17 @@ void enable_host_flap_detection(host* hst) {
     return;
 
   logger(dbg_flapping, more)
-    << "Enabling flap detection for host '" << hst->name << "'.";
+    << "Enabling flap detection for host '" << hst->get_name() << "'.";
 
   /* nothing to do... */
-  if (hst->flap_detection_enabled == true)
+  if (hst->get_flap_detection_enabled())
     return;
 
   /* set the attribute modified flag */
-  hst->modified_attributes |= attr;
+  hst->set_modified_attributes(hst->get_modified_attributes() | attr);
 
   /* set the flap detection enabled flag */
-  hst->flap_detection_enabled = true;
+  hst->set_flap_detection_enabled(true);
 
   /* send data to event broker */
   broker_adaptive_host_data(
@@ -779,7 +782,7 @@ void enable_host_flap_detection(host* hst) {
     hst,
     CMD_NONE,
     attr,
-    hst->modified_attributes,
+    hst->get_modified_attributes(),
     NULL);
 
   /* check for flapping */
@@ -791,7 +794,7 @@ void enable_host_flap_detection(host* hst) {
 }
 
 /* disables flap detection for a specific host */
-void disable_host_flap_detection(host* hst) {
+void disable_host_flap_detection(com::centreon::engine::host* hst) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)
@@ -801,17 +804,17 @@ void disable_host_flap_detection(host* hst) {
     return;
 
   logger(dbg_functions, more)
-    << "Disabling flap detection for host '" << hst->name << "'.";
+    << "Disabling flap detection for host '" << hst->get_name() << "'.";
 
   /* nothing to do... */
-  if (hst->flap_detection_enabled == false)
+  if (!hst->get_flap_detection_enabled())
     return;
 
   /* set the attribute modified flag */
-  hst->modified_attributes |= attr;
+  hst->set_modified_attributes(hst->get_modified_attributes() | attr);
 
   /* set the flap detection enabled flag */
-  hst->flap_detection_enabled = false;
+  hst->set_flap_detection_enabled(false);
 
   /* send data to event broker */
   broker_adaptive_host_data(
@@ -821,7 +824,7 @@ void disable_host_flap_detection(host* hst) {
     hst,
     CMD_NONE,
     attr,
-    hst->modified_attributes,
+    hst->get_modified_attributes(),
     NULL);
 
   /* handle the details... */
@@ -830,7 +833,7 @@ void disable_host_flap_detection(host* hst) {
 }
 
 /* handles the details for a host when flap detection is disabled (globally or per-host) */
-void handle_host_flap_detection_disabled(host* hst) {
+void handle_host_flap_detection_disabled(com::centreon::engine::host* hst) {
   logger(dbg_functions, basic)
     << "handle_host_flap_detection_disabled()";
 
@@ -838,17 +841,17 @@ void handle_host_flap_detection_disabled(host* hst) {
     return;
 
   /* if the host was flapping, remove the flapping indicator */
-  if (hst->is_flapping == true) {
-    hst->is_flapping = false;
+  if (hst->get_is_flapping()) {
+    hst->set_is_flapping(false);
 
     /* delete the original comment we added earlier */
-    if (hst->flapping_comment_id != 0)
-      delete_host_comment(hst->flapping_comment_id);
-    hst->flapping_comment_id = 0;
+    if (hst->get_flapping_comment_id() != 0)
+      delete_host_comment(hst->get_flapping_comment_id());
+    hst->set_flapping_comment_id(0);
 
     /* log a notice - this one is parsed by the history CGI */
     logger(log_info_message, basic)
-      << "HOST FLAPPING ALERT: " << hst->name
+      << "HOST FLAPPING ALERT: " << hst->get_name()
       << ";DISABLED; Flap detection has been disabled";
 
     /* send data to event broker */
@@ -858,7 +861,7 @@ void handle_host_flap_detection_disabled(host* hst) {
       NEBATTR_FLAPPING_STOP_DISABLED,
       HOST_FLAPPING,
       hst,
-      hst->percent_state_change,
+      hst->get_percent_state_change(),
       0.0,
       0.0,
       NULL);
@@ -872,8 +875,8 @@ void handle_host_flap_detection_disabled(host* hst) {
       NOTIFICATION_OPTION_NONE);
 
     /* should we send a recovery notification? */
-    if (hst->check_flapping_recovery_notification == true
-        && hst->current_state == HOST_UP)
+    if (hst->get_check_flapping_recovery_notification()
+        && hst->get_current_state() == HOST_UP)
       host_notification(
         hst,
         NOTIFICATION_NORMAL,
@@ -882,7 +885,7 @@ void handle_host_flap_detection_disabled(host* hst) {
         NOTIFICATION_OPTION_NONE);
 
     /* clear the recovery notification flag */
-    hst->check_flapping_recovery_notification = false;
+    hst->set_check_flapping_recovery_notification(false);
   }
 
   /* update host status */
@@ -905,7 +908,7 @@ void enable_service_flap_detection(service* svc) {
     << "' on host '" << svc->host_name << "'.";
 
   /* nothing to do... */
-  if (svc->flap_detection_enabled == true)
+  if (svc->flap_detection_enabled)
     return;
 
   /* set the attribute modified flag */
@@ -948,7 +951,7 @@ void disable_service_flap_detection(service* svc) {
     << "' on host '" << svc->host_name << "'.";
 
   /* nothing to do... */
-  if (svc->flap_detection_enabled == false)
+  if (!svc->flap_detection_enabled)
     return;
 
   /* set the attribute modified flag */
@@ -982,7 +985,7 @@ void handle_service_flap_detection_disabled(service* svc) {
     return;
 
   /* if the service was flapping, remove the flapping indicator */
-  if (svc->is_flapping == true) {
+  if (svc->is_flapping) {
     svc->is_flapping = false;
 
     /* delete the original comment we added earlier */
@@ -1017,7 +1020,7 @@ void handle_service_flap_detection_disabled(service* svc) {
       NOTIFICATION_OPTION_NONE);
 
     /* should we send a recovery notification? */
-    if (svc->check_flapping_recovery_notification == true
+    if (svc->check_flapping_recovery_notification
         && svc->current_state == STATE_OK)
       service_notification(
         svc,

@@ -76,7 +76,8 @@ int update_program_status(int aggregated_dump) {
 }
 
 /* updates host status info */
-int update_host_status(host* hst, int aggregated_dump) {
+int update_host_status(com::centreon::engine::host* hst,
+                       int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
   if (aggregated_dump == false)
     broker_host_status(

@@ -21,7 +21,7 @@
 #ifndef CCE_FLAPPING_HH
 #  define CCE_FLAPPING_HH
 
-#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
 // Flapping Types
@@ -41,7 +41,7 @@ void check_for_service_flapping(
        int allow_flapstart_notification);
 // determines whether or not a host is "flapping" between states
 void check_for_host_flapping(
-       host* hst,
+       com::centreon::engine::host* hst,
        int update,
        int actual_check,
        int allow_flapstart_notification);
@@ -60,14 +60,14 @@ void clear_service_flap(
        double low_threshold);
 // handles a host that is flapping
 void set_host_flap(
-       host* hst,
+       com::centreon::engine::host* hst,
        double percent_change,
        double high_threshold,
        double low_threshold,
        int allow_flapstart_notification);
 // handles a host that has stopped flapping
 void clear_host_flap(
-       host* hst,
+       com::centreon::engine::host* hst,
        double percent_change,
        double high_threshold,
        double low_threshold);
@@ -76,11 +76,11 @@ void enable_flap_detection_routines();
 // disables flap detection on a program-wide basis
 void disable_flap_detection_routines();
 // enables flap detection for a particular host
-void enable_host_flap_detection(host* hst);
+void enable_host_flap_detection(com::centreon::engine::host* hst);
 // disables flap detection for a particular host
-void disable_host_flap_detection(host* hst);
+void disable_host_flap_detection(com::centreon::engine::host* hst);
 // handles the details when flap detection is disabled globally or on a per-host basis
-void handle_host_flap_detection_disabled(host* hst);
+void handle_host_flap_detection_disabled(com::centreon::engine::host* hst);
 // enables flap detection for a particular service
 void enable_service_flap_detection(service* svc);
 // disables flap detection for a particular service
