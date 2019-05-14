@@ -57,7 +57,7 @@ public:
 
 private:
   template     <typename T>
-  void         _insert_with_snprintf(T t, char const* format);
+  void         _insert_with_snprintf(T& t, char const* format);
 
   mutable char _buffer[4096];
   unsigned int _current;

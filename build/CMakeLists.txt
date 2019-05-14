@@ -671,7 +671,6 @@ set(
   "${SRC_DIR}/contactgroup.cc"
   "${SRC_DIR}/customvariable.cc"
   "${SRC_DIR}/diagnostic.cc"
-  "${SRC_DIR}/downtime_finder.cc"
   "${SRC_DIR}/error.cc"
   "${SRC_DIR}/flapping.cc"
   "${SRC_DIR}/globals.cc"
@@ -689,7 +688,6 @@ set(
   "${SRC_DIR}/timezone_manager.cc"
   "${SRC_DIR}/utils.cc"
   "${SRC_DIR}/xcddefault.cc"
-  "${SRC_DIR}/xdddefault.cc"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
 
@@ -703,7 +701,6 @@ set(
   "${INC_DIR}/com/centreon/engine/customvariable.hh"
   "${INC_DIR}/com/centreon/engine/contactgroup.hh"
   "${INC_DIR}/com/centreon/engine/diagnostic.hh"
-  "${INC_DIR}/com/centreon/engine/downtime_finder.hh"
   "${INC_DIR}/com/centreon/engine/error.hh"
   "${INC_DIR}/com/centreon/engine/flapping.hh"
   "${INC_DIR}/com/centreon/engine/globals.hh"
@@ -728,7 +725,6 @@ set(
   "${INC_DIR}/com/centreon/engine/utils.hh"
   "${INC_DIR}/com/centreon/engine/version.hh"
   "${INC_DIR}/com/centreon/engine/xcddefault.hh"
-  "${INC_DIR}/com/centreon/engine/xdddefault.hh"
   "${INC_DIR}/com/centreon/engine/xpddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )
@@ -741,6 +737,7 @@ add_subdirectory("configuration")
 add_subdirectory("commands")
 add_subdirectory("compatibility")
 add_subdirectory("deleter")
+add_subdirectory("downtimes")
 add_subdirectory("events")
 add_subdirectory("logging")
 add_subdirectory("macros")

@@ -25,12 +25,14 @@
 
 // Forward declaration.
 struct comment_struct;
-struct scheduled_downtime_struct;
 struct service_struct;
 
 CCE_BEGIN()
 class contact;
 class customvariable;
+namespace downtimes {
+  class downtime;
+}
 class host;
 
 namespace         retention {
@@ -40,7 +42,7 @@ namespace         retention {
     std::ostream& contact(std::ostream& os, contact const& obj);
     std::ostream& contacts(std::ostream& os);
     std::ostream& customvariables(std::ostream& os, std::unordered_map<std::string, customvariable> const& obj);
-    std::ostream& downtime(std::ostream& os, scheduled_downtime_struct const& obj);
+    std::ostream& scheduled_downtime(std::ostream& os, downtimes::downtime const& obj);
     std::ostream& downtimes(std::ostream& os);
     std::ostream& header(std::ostream& os);
     std::ostream& host(std::ostream& os, com::centreon::engine::host const& obj);

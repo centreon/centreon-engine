@@ -71,7 +71,6 @@ set(
   "${INC_DIR}/sretention.h"
   "${INC_DIR}/statusdata.h"
   "${INC_DIR}/xcddefault.h"
-  "${INC_DIR}/xdddefault.h"
   "${INC_DIR}/xodtemplate.h"
   "${INC_DIR}/xpddefault.h"
   "${INC_DIR}/xrddefault.h"

@@ -21,6 +21,7 @@
 */
 
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/timed_event.hh"
@@ -30,9 +31,10 @@
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine;
 
 /**
  *  Execute service check.
@@ -55,7 +57,6 @@ static void _exec_event_service_check(timed_event* event) {
 
   // run the service check.
   run_scheduled_service_check(svc, event->event_options, latency);
-  return;
 }
 
 /**
@@ -78,7 +79,6 @@ static void _exec_event_command_check(timed_event* event) {
     NULL,
     NULL,
     NULL);
-  return;
 }
 
 /**
@@ -88,7 +88,6 @@ static void _exec_event_command_check(timed_event* event) {
  */
 static void _exec_event_log_rotation(timed_event* event) {
   (void)event;
-  return;
 }
 
 /**
@@ -107,7 +106,6 @@ static void _exec_event_program_shutdown(timed_event* event) {
   // log the shutdown.
   logger(log_process_info, basic)
     << "PROGRAM_SHUTDOWN event encountered, shutting down...";
-  return;
 }
 
 /**
@@ -126,7 +124,6 @@ static void _exec_event_program_restart(timed_event* event) {
   // log the restart.
   logger(log_process_info, basic)
     << "PROGRAM_RESTART event encountered, restarting...";
-  return;
 }
 
 /**
@@ -141,7 +138,6 @@ static void _exec_event_check_reaper(timed_event* event) {
 
   // reap host and service check results.
   reap_check_results();
-  return;
 }
 
 /**
@@ -159,7 +155,6 @@ static void _exec_event_orphan_check(timed_event* event) {
     check_for_orphaned_hosts();
   if (config->check_orphaned_services())
     check_for_orphaned_services();
-  return;
 }
 
 /**
@@ -174,7 +169,6 @@ static void _exec_event_retention_save(timed_event* event) {
 
   // save state retention data.
   retention::dump::save(config->state_retention_file());
-  return;
 }
 
 /**
@@ -189,7 +183,6 @@ static void _exec_event_status_save(timed_event* event) {
 
   // save all status data (program, host, and service).
   update_all_status_data();
-  return;
 }
 
 /**
@@ -207,7 +200,6 @@ static void _exec_event_scheduled_downtime(timed_event* event) {
     delete static_cast<unsigned long*>(event->event_data);
     event->event_data = NULL;
   }
-  return;
 }
 
 /**
@@ -222,7 +214,6 @@ static void _exec_event_sfreshness_check(timed_event* event) {
 
   // check service result freshness.
   check_service_result_freshness();
-  return;
 }
 
 /**
@@ -236,8 +227,7 @@ static void _exec_event_expire_downtime(timed_event* event) {
     << "** Expire Downtime Event";
 
   // check for expired scheduled downtime entries.
-  check_for_expired_downtime();
-  return;
+  downtime_manager::instance().check_for_expired_downtime();
 }
 
 /**
@@ -261,7 +251,6 @@ static void _exec_event_host_check(timed_event* event) {
 
   // run the host check.
   perform_scheduled_host_check(hst, event->event_options, latency);
-  return;
 }
 
 /**
@@ -276,7 +265,6 @@ static void _exec_event_hfreshness_check(timed_event* event) {
 
   // check host result freshness.
   check_host_result_freshness();
-  return;
 }
 
 /**
@@ -291,7 +279,6 @@ static void _exec_event_reschedule_checks(timed_event* event) {
 
   // adjust scheduling of host and service checks.
   adjust_check_scheduling();
-  return;
 }
 
 /**
@@ -305,7 +292,6 @@ static void _exec_event_expire_comment(timed_event* event) {
 
   // check for expired comment.
   check_for_expired_comment((unsigned long)event->event_data);
-  return;
 }
 
 /**
@@ -352,7 +338,6 @@ static void _exec_event_user_function(timed_event* event) {
     user.data = event->event_data;
     (*user.func)(event->event_args);
   }
-  return;
 }
 
 /**
@@ -425,7 +410,6 @@ void add_event(
     NEBATTR_NONE,
     event,
     NULL);
-  return;
 }
 
 /**
@@ -461,7 +445,6 @@ void adjust_timestamp_for_time_change(
   // we moved into the future...
   else
     *ts = (time_t)(*ts + time_difference);
-  return;
 }
 
 /**
@@ -711,7 +694,6 @@ void compensate_for_system_time_change(
 
   // update the status data.
   update_program_status(false);
-  return;
 }
 
 /**
@@ -822,7 +804,6 @@ void remove_event(
       }
     }
   }
-  return;
 }
 
 /**
@@ -863,7 +844,6 @@ void reschedule_event(
 
   // add the event to the event list.
   add_event(event, event_list, event_list_tail);
-  return;
 }
 
 /**
@@ -898,7 +878,6 @@ void resort_event_list(
     tmp->prev = NULL;
     add_event(tmp, event_list, event_list_tail);
   }
-  return;
 }
 
 /**

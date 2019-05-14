@@ -21,25 +21,17 @@
 #ifndef CCE_OBJECTS_HH
 #  define CCE_OBJECTS_HH
 
-#  include <time.h>
-#  include "com/centreon/engine/common.hh"
-#  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/contactgroup.hh"
-#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/comment.hh"
 #  include "com/centreon/engine/objects/daterange.hh"
-#  include "com/centreon/engine/objects/downtime.hh"
+#  include "com/centreon/engine/downtimes/downtime.hh"
 #  include "com/centreon/engine/objects/hostdependency.hh"
 #  include "com/centreon/engine/objects/hostescalation.hh"
 #  include "com/centreon/engine/objects/hostgroup.hh"
 #  include "com/centreon/engine/objects/hostsmember.hh"
 #  include "com/centreon/engine/objects/objectlist.hh"
-#  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/objects/servicedependency.hh"
 #  include "com/centreon/engine/objects/serviceescalation.hh"
-#  include "com/centreon/engine/objects/servicegroup.hh"
 #  include "com/centreon/engine/objects/servicesmember.hh"
-#  include "com/centreon/engine/objects/timeperiod.hh"
 #  include "com/centreon/engine/objects/timeperiodexclusion.hh"
 #  include "com/centreon/engine/objects/timerange.hh"
 #  include "find.hh"

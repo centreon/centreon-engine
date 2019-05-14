@@ -258,9 +258,7 @@ static void check_event_sfreshness_check() {
 static void check_event_expire_downtime() {
   // create fake comment.
   unsigned long downtime_id(42);
-  if (add_downtime(HOST_DOWNTIME,
-                   const_cast<char*>("name"),
-                   NULL,
+  if (add_host_downtime("name",
                    0,
                    const_cast<char*>("author"),
                    const_cast<char*>("comment"),

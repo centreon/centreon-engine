@@ -20,6 +20,8 @@
 
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/downtimes/downtime.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -27,11 +29,11 @@
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -1094,8 +1096,8 @@ int handle_host_state(com::centreon::engine::host* hst) {
 
     /* check for start of flexible (non-fixed) scheduled downtime */
     /* CHANGED 08-05-2010 EG flex downtime can now start on soft states */
-    /*if(hst->get_state_type==HARD_STATE) */
-    check_pending_flex_host_downtime(hst);
+    /*if(hst->state_type==HARD_STATE) */
+    downtime_manager::instance().check_pending_flex_host_downtime(hst);
 
     if (hst->get_current_state() == HOST_UP) {
       host_other_props[hst->get_name()].recovery_been_sent = false;

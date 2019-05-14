@@ -39,6 +39,7 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
@@ -964,7 +965,7 @@ void free_memory(nagios_macros* mac) {
   free_comment_data();
 
   // Free memory allocated to downtimes.
-  free_downtime_data();
+  downtimes::downtime_manager::instance().clear_scheduled_downtimes();
 
   // Free memory for the high priority event list.
   for (timed_event* this_event(event_list_high); this_event;) {

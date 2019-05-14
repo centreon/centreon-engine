@@ -21,14 +21,10 @@
 #  define CCE_CONTACT_HH
 
 #include <list>
-#include <unordered_map>
 #include <memory>
-#include <string>
 #include <time.h>
-#include <unordered_map>
 #include <vector>
 #include "com/centreon/engine/customvariable.hh"
-#include "com/centreon/engine/namespace.hh"
 
 /* Max number of custom addresses a contact can have. */
 #  define MAX_CONTACT_ADDRESSES 6
@@ -217,8 +213,6 @@ com::centreon::engine::contact* add_contact(
 }
 
 #    include <ostream>
-#    include <string>
-#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 com::centreon::engine::contact const& obj1,

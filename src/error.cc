@@ -71,7 +71,7 @@ error& error::operator=(error const& e) throw () {
   std::exception::operator=(e);
   _current = e._current;
   memcpy(_buffer, e._buffer, _current * sizeof(*_buffer));
-  return (*this);
+  return *this;
 }
 
 /**
@@ -85,7 +85,7 @@ error& error::operator<<(char c) throw () {
   char buffer[2];
   buffer[0] = c;
   buffer[1] = '\0';
-  return (operator<<(buffer));
+  return operator<<(buffer);
 }
 
 /**
@@ -110,7 +110,7 @@ error& error::operator<<(char const* str) throw () {
   memcpy(_buffer + _current, str, to_copy * sizeof(*_buffer));
   _current += to_copy;
 
-  return (*this);
+  return *this;
 }
 
 /**
@@ -122,7 +122,7 @@ error& error::operator<<(char const* str) throw () {
  */
 error& error::operator<<(int i) throw () {
   _insert_with_snprintf(i, "%d%n");
-  return (*this);
+  return *this;
 }
 
 /**
@@ -134,7 +134,7 @@ error& error::operator<<(int i) throw () {
  */
 error& error::operator<<(unsigned int u) throw () {
   _insert_with_snprintf(u, "%u%n");
-  return (*this);
+  return *this;
 }
 
 /**
@@ -146,7 +146,7 @@ error& error::operator<<(unsigned int u) throw () {
  */
 error& error::operator<<(long l) throw () {
   _insert_with_snprintf(l, "%ld%n");
-  return (*this);
+  return *this;
 }
 
 /**
@@ -158,7 +158,7 @@ error& error::operator<<(long l) throw () {
  */
 error& error::operator<<(long long ll) throw () {
   _insert_with_snprintf(ll, "%lld%n");
-  return (*this);
+  return *this;
 }
 
 /**
@@ -170,7 +170,7 @@ error& error::operator<<(long long ll) throw () {
  */
 error& error::operator<<(unsigned long long ull) throw () {
   _insert_with_snprintf(ull, "%llu%n");
-  return (*this);
+  return *this;
 }
 
 /**
@@ -182,7 +182,7 @@ error& error::operator<<(unsigned long long ull) throw () {
  */
 error& error::operator<<(double d) throw () {
   _insert_with_snprintf(d, "%lf%n");
-  return (*this);
+  return *this;
 }
 
 /**
@@ -193,7 +193,7 @@ error& error::operator<<(double d) throw () {
  *  @return This object.
  */
 error& error::operator<<(std::string const& str) throw () {
-  return (operator<<(str.c_str()));
+  return operator<<(str.c_str());
 }
 
 /**
@@ -203,7 +203,7 @@ error& error::operator<<(std::string const& str) throw () {
  */
 char const* error::what() const throw () {
   _buffer[_current] = '\0';
-  return (_buffer);
+  return _buffer;
 }
 
 /**************************************
@@ -220,7 +220,7 @@ char const* error::what() const throw () {
  *                    This format must be terminated by a %n.
  */
 template <typename T>
-void error::_insert_with_snprintf(T t, char const* format) {
+void error::_insert_with_snprintf(T& t, char const* format) {
   int wc;
   if (snprintf(
         _buffer + _current,

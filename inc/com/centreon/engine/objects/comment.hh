@@ -173,7 +173,6 @@ int      sort_comments();
 }
 
 #    include <ostream>
-#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 comment_struct const& obj1,

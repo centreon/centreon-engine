@@ -34,6 +34,7 @@
 #  include "com/centreon/engine/nebmods.hh"
 #  include "com/centreon/engine/notifications.hh"
 #  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/downtimes/downtime.hh"
 #  include "com/centreon/engine/utils.hh"
 
 #  ifdef __cplusplus
@@ -152,8 +153,8 @@ extern int                       defer_comment_sorting;
 extern char*                     macro_x_names[];
 extern char*                     macro_user[];
 
-extern scheduled_downtime*       scheduled_downtime_list;
-extern int                       defer_downtime_sorting;
+extern std::multimap<time_t, std::shared_ptr<com::centreon::engine::downtimes::downtime>>
+                                 scheduled_downtime_list;
 
 extern FILE*                     debug_file_fp;
 
