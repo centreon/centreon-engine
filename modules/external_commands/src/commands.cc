@@ -45,6 +45,7 @@
 #include "mmap.h"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 
@@ -61,7 +62,7 @@ int check_for_external_commands() {
     return ERROR;
 
   /* update last command check time */
-  last_command_check = time(NULL);
+  last_command_check = time(nullptr);
 
   /* update the status log with new program information */
   /* go easy on the frequency of this if we're checking often - only update program status every 10 seconds.... */
@@ -71,7 +72,7 @@ int check_for_external_commands() {
   }
 
   /* process all commands found in the buffer */
-  char* buffer(NULL);
+  char* buffer(nullptr);
   while (1) {
 
     /* get a lock on the buffer */
@@ -84,7 +85,7 @@ int check_for_external_commands() {
     }
 
     buffer = ((char**)external_command_buffer.buffer)[external_command_buffer.tail];
-    ((char**)external_command_buffer.buffer)[external_command_buffer.tail] = NULL;
+    ((char**)external_command_buffer.buffer)[external_command_buffer.tail] = nullptr;
 
     /* adjust tail counter and number of items */
     external_command_buffer.tail = (external_command_buffer.tail + 1)
@@ -128,8 +129,8 @@ int process_external_commands_from_file(
     << " deleted after processing.";
 
   /* open the config file for reading */
-  mmapfile* thefile(NULL);
-  if ((thefile = mmap_fopen(file)) == NULL) {
+  mmapfile* thefile(nullptr);
+  if ((thefile = mmap_fopen(file)) == nullptr) {
     logger(log_info_message, basic)
       << "Error: Cannot open file '" << file
       << "' to process external commands!";
@@ -137,14 +138,14 @@ int process_external_commands_from_file(
   }
 
   /* process all commands in the file */
-  char* input(NULL);
+  char* input(nullptr);
   while (1) {
 
     /* free memory */
     delete[] input;
 
     /* read the next line */
-    if ((input = mmap_fgets(thefile)) == NULL)
+    if ((input = mmap_fgets(thefile)) == nullptr)
       break;
 
     /* process the command */
@@ -173,38 +174,43 @@ int process_external_command(char const* cmd) {
 
 /* adds a host or service comment to the status log */
 int cmd_add_comment(int cmd, time_t entry_time, char* args) {
-  char* temp_ptr(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  service* temp_service(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
-  char* user(NULL);
-  char* comment_data(NULL);
+  char* temp_ptr(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  service* temp_service(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
+  char* user(nullptr);
+  char* comment_data(nullptr);
   int persistent(0);
   int result(0);
 
   /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
+  if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* if we're adding a service comment...  */
   if (cmd == CMD_ADD_SVC_COMMENT) {
 
     /* get the service description */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
+    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
       return ERROR;
   }
 
   /* else verify that the host is valid */
-  if ((temp_host = find_host(host_name)) == NULL)
+  temp_host = nullptr;
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+  if (it != configuration::applier::state::instance().hosts().end())
+    temp_host = it->second.get();
+  if (temp_host  == nullptr)
     return ERROR;
 
   /* get the persistent flag */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
   persistent = atoi(temp_ptr);
   if (persistent > 1)
@@ -213,11 +219,11 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
     persistent = 0;
 
   /* get the name of the user who entered the comment */
-  if ((user = my_strtok(NULL, ";")) == NULL)
+  if ((user = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
 
   /* get the comment */
-  if ((comment_data = my_strtok(NULL, "\n")) == NULL)
+  if ((comment_data = my_strtok(nullptr, "\n")) == nullptr)
     return ERROR;
 
   /* add the comment */
@@ -233,7 +239,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
              COMMENTSOURCE_EXTERNAL,
              false,
              (time_t)0,
-             NULL);
+             nullptr);
   if (result < 0)
     return ERROR;
   return OK;
@@ -244,7 +250,7 @@ int cmd_delete_comment(int cmd, char* args) {
   unsigned long comment_id(0);
 
   /* get the comment id we should delete */
-  if ((comment_id = strtoul(args, NULL, 10)) == 0)
+  if ((comment_id = strtoul(args, nullptr, 10)) == 0)
     return ERROR;
 
   /* delete the specified comment */
@@ -258,29 +264,34 @@ int cmd_delete_comment(int cmd, char* args) {
 
 /* removes all comments associated with a host or service from the status log */
 int cmd_delete_all_comments(int cmd, char* args) {
-  service* temp_service(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
+  service* temp_service(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
 
   /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
+  if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* if we're deleting service comments...  */
   if (cmd == CMD_DEL_ALL_SVC_COMMENTS) {
 
     /* get the service description */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
+    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
       return ERROR;
   }
 
   /* else verify that the host is valid */
-  if ((temp_host = find_host(host_name)) == NULL)
+  temp_host = nullptr;
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+  if (it != configuration::applier::state::instance().hosts().end())
+    temp_host = it->second.get();
+  if (temp_host  == nullptr)
     return ERROR;
 
   /* delete comments */
@@ -293,39 +304,44 @@ int cmd_delete_all_comments(int cmd, char* args) {
 
 /* delays a host or service notification for given number of minutes */
 int cmd_delay_notification(int cmd, char* args) {
-  char* temp_ptr(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  service* temp_service(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
+  char* temp_ptr(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  service* temp_service(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
   time_t delay_time(0);
 
   /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
+  if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* if this is a service notification delay...  */
   if (cmd == CMD_DELAY_SVC_NOTIFICATION) {
 
     /* get the service description */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
+    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
       return ERROR;
   }
 
   /* else verify that the host is valid */
   else {
-    if ((temp_host = find_host(host_name)) == NULL)
+    temp_host = nullptr;
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+    if (it != configuration::applier::state::instance().hosts().end())
+      temp_host = it->second.get();
+    if (temp_host  == nullptr)
       return ERROR;
   }
 
   /* get the time that we should delay until... */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, "\n")) == nullptr)
     return ERROR;
-  delay_time = strtoul(temp_ptr, NULL, 10);
+  delay_time = strtoul(temp_ptr, nullptr, 10);
 
   /* delay the next notification... */
   if (cmd == CMD_DELAY_HOST_NOTIFICATION)
@@ -338,16 +354,16 @@ int cmd_delay_notification(int cmd, char* args) {
 
 /* schedules a host check at a particular time */
 int cmd_schedule_check(int cmd, char* args) {
-  char* temp_ptr(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  service* temp_service(NULL);
-  servicesmember* temp_servicesmember(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
+  char* temp_ptr(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  service* temp_service(nullptr);
+  servicesmember* temp_servicesmember(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
   time_t delay_time(0);
 
   /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
+  if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   if (cmd == CMD_SCHEDULE_HOST_CHECK
@@ -356,25 +372,30 @@ int cmd_schedule_check(int cmd, char* args) {
       || cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS) {
 
     /* verify that the host is valid */
-    if ((temp_host = find_host(host_name)) == NULL)
+    temp_host = nullptr;
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+    if (it != configuration::applier::state::instance().hosts().end())
+      temp_host = it->second.get();
+    if (temp_host  == nullptr)
       return ERROR;
   }
 
   else {
 
     /* get the service description */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
+    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
       return ERROR;
   }
 
   /* get the next check time */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, "\n")) == nullptr)
     return ERROR;
-  delay_time = strtoul(temp_ptr, NULL, 10);
+  delay_time = strtoul(temp_ptr, nullptr, 10);
 
   /* schedule the host check */
   if (cmd == CMD_SCHEDULE_HOST_CHECK
@@ -389,9 +410,9 @@ int cmd_schedule_check(int cmd, char* args) {
   else if (cmd == CMD_SCHEDULE_HOST_SVC_CHECKS
            || cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS) {
     for (temp_servicesmember = temp_host->services;
-         temp_servicesmember != NULL;
+         temp_servicesmember != nullptr;
          temp_servicesmember = temp_servicesmember->next) {
-      if ((temp_service = temp_servicesmember->service_ptr) == NULL)
+      if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
         continue;
       schedule_service_check(
         temp_service, delay_time,
@@ -410,33 +431,38 @@ int cmd_schedule_check(int cmd, char* args) {
 
 /* schedules all service checks on a host for a particular time */
 int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
-  char* temp_ptr(NULL);
-  service* temp_service(NULL);
-  servicesmember* temp_servicesmember(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  char* host_name(NULL);
+  char* temp_ptr(nullptr);
+  service* temp_service(nullptr);
+  servicesmember* temp_servicesmember(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  char* host_name(nullptr);
   time_t delay_time(0);
 
   (void)cmd;
 
   /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
+  if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* verify that the host is valid */
-  if ((temp_host = find_host(host_name)) == NULL)
+  temp_host = nullptr;
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+   it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+  if (it != configuration::applier::state::instance().hosts().end())
+    temp_host = it->second.get();
+  if (temp_host  == nullptr)
     return ERROR;
 
   /* get the next check time */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, "\n")) == nullptr)
     return ERROR;
-  delay_time = strtoul(temp_ptr, NULL, 10);
+  delay_time = strtoul(temp_ptr, nullptr, 10);
 
   /* reschedule all services on the specified host */
   for (temp_servicesmember = temp_host->services;
-       temp_servicesmember != NULL;
+       temp_servicesmember != nullptr;
        temp_servicesmember = temp_servicesmember->next) {
-    if ((temp_service = temp_servicesmember->service_ptr) == NULL)
+    if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
       continue;
     schedule_service_check(
       temp_service,
@@ -450,13 +476,13 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
 /* schedules a program shutdown or restart */
 void cmd_signal_process(int cmd, char* args) {
   time_t scheduled_time(0);
-  char* temp_ptr(NULL);
+  char* temp_ptr(nullptr);
 
   /* get the time to schedule the event */
-  if ((temp_ptr = my_strtok(args, "\n")) == NULL)
+  if ((temp_ptr = my_strtok(args, "\n")) == nullptr)
     scheduled_time = 0L;
   else
-    scheduled_time = strtoul(temp_ptr, NULL, 10);
+    scheduled_time = strtoul(temp_ptr, nullptr, 10);
 
   /* add a scheduled program shutdown or restart to the event list */
   schedule_new_event(
@@ -465,10 +491,10 @@ void cmd_signal_process(int cmd, char* args) {
     scheduled_time,
     false,
     0,
-    NULL,
+    nullptr,
     false,
-    NULL,
-    NULL,
+    nullptr,
+    nullptr,
     0);
 }
 
@@ -515,7 +541,7 @@ int cmd_process_service_check_result(
   }
   else
     output = "";
-  int return_code(strtol(delimiter, NULL, 0));
+  int return_code(strtol(delimiter, nullptr, 0));
 
   // Submit the passive check result.
   return (process_passive_service_check(
@@ -533,32 +559,41 @@ int process_passive_service_check(
       char const* svc_description,
       int return_code,
       char const* output) {
-  com::centreon::engine::host* temp_host(NULL);
-  service* temp_service(NULL);
-  char const* real_host_name(NULL);
+  com::centreon::engine::host* temp_host(nullptr);
+  service* temp_service(nullptr);
+  char const* real_host_name(nullptr);
 
   /* skip this service check result if we aren't accepting passive service checks */
   if (config->accept_passive_service_checks() == false)
     return ERROR;
 
   /* make sure we have all required data */
-  if (host_name == NULL || svc_description == NULL || output == NULL)
+  if (host_name == nullptr || svc_description == nullptr || output == nullptr)
     return ERROR;
 
   /* find the host by its name or address */
-  if (find_host(host_name) != NULL)
+  temp_host = nullptr;
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+  if (it != configuration::applier::state::instance().hosts().end())
+    temp_host = it->second.get();
+  if (temp_host != nullptr)
     real_host_name = host_name;
   else {
-    for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
-      if (temp_host->get_address() == host_name) {
-        real_host_name = temp_host->get_name().c_str();
+    for (host_map::iterator
+           it(com::centreon::engine::host::hosts.begin()),
+           end(com::centreon::engine::host::hosts.end());
+         it != end;
+         ++it) {
+      if (it->second->get_address() == host_name) {
+        real_host_name = it->first.c_str();
         break ;
       }
     }
   }
 
   /* we couldn't find the host */
-  if (real_host_name == NULL) {
+  if (real_host_name == nullptr) {
     logger(log_runtime_warning, basic)
       << "Warning:  Passive check result was received for service '"
       << svc_description << "' on host '" << host_name
@@ -567,7 +602,7 @@ int process_passive_service_check(
   }
 
   /* make sure the service exists */
-  if ((temp_service = find_service(real_host_name, svc_description)) == NULL) {
+  if ((temp_service = find_service(real_host_name, svc_description)) == nullptr) {
     logger(log_runtime_warning, basic)
       << "Warning:  Passive check result was received for service '"
       << svc_description << "' on host '" << host_name
@@ -580,7 +615,7 @@ int process_passive_service_check(
     return ERROR;
 
   timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
 
   check_result result;
   result.object_check_type = SERVICE_CHECK;
@@ -590,8 +625,8 @@ int process_passive_service_check(
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
   result.reschedule_check = false;
-  result.output_file = NULL;
-  result.output_file_fp = NULL;
+  result.output_file = nullptr;
+  result.output_file_fp = nullptr;
   result.output_file_fd = -1;
   result.latency = (double)((double)(tv.tv_sec - check_time)
 			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
@@ -603,7 +638,7 @@ int process_passive_service_check(
   result.exited_ok = true;
   result.return_code = return_code;
   result.output = string::dup(output);
-  result.next = NULL;
+  result.next = nullptr;
   // result.check_time = check_time;
 
   /* make sure the return code is within bounds */
@@ -654,7 +689,7 @@ int cmd_process_host_check_result(
   }
   else
     output = "";
-  int return_code(strtol(delimiter, NULL, 0));
+  int return_code(strtol(delimiter, nullptr, 0));
 
   // Submit the check result.
   return (process_passive_host_check(
@@ -670,15 +705,15 @@ int process_passive_host_check(
       char const* host_name,
       int return_code,
       char const* output) {
-  host const* temp_host(NULL);
-  char const* real_host_name(NULL);
+  host const* temp_host(nullptr);
+  char const* real_host_name(nullptr);
 
   /* skip this host check result if we aren't accepting passive host checks */
   if (config->accept_passive_service_checks() == false)
     return ERROR;
 
   /* make sure we have all required data */
-  if (host_name == NULL || output == NULL)
+  if (host_name == nullptr || output == nullptr)
     return ERROR;
 
   /* make sure we have a reasonable return code */
@@ -686,19 +721,28 @@ int process_passive_host_check(
     return ERROR;
 
   /* find the host by its name or address */
-  if ((temp_host = find_host(host_name)) != NULL)
+  temp_host = nullptr;
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+  if (it != configuration::applier::state::instance().hosts().end())
+    temp_host = it->second.get();
+  if (temp_host != nullptr)
     real_host_name = host_name;
   else {
-    for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
-      if (temp_host->get_address() == host_name) {
-        real_host_name = temp_host->get_name().c_str();
+    for (host_map::iterator
+           it(com::centreon::engine::host::hosts.begin()),
+           end(com::centreon::engine::host::hosts.end());
+         it != end;
+         ++it) {
+      if (it->second->get_address() == host_name) {
+        real_host_name = it->first.c_str();
         break;
       }
     }
   }
 
   /* we couldn't find the host */
-  if (temp_host == NULL) {
+  if (temp_host == nullptr) {
     logger(log_runtime_warning, basic)
       << "Warning:  Passive check result was received for host '"
       << host_name << "', but the host could not be found!";
@@ -710,18 +754,18 @@ int process_passive_host_check(
     return ERROR;
 
   timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
 
   check_result result;
   result.object_check_type = HOST_CHECK;
   result.host_name = string::dup(real_host_name);
-  result.service_description = NULL;
+  result.service_description = nullptr;
   result.check_type = HOST_CHECK_PASSIVE;
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
   result.reschedule_check = false;
-  result.output_file = NULL;
-  result.output_file_fp = NULL;
+  result.output_file = nullptr;
+  result.output_file_fp = nullptr;
   result.output_file_fd = -1;
   result.latency = (double)((double)(tv.tv_sec - check_time)
 			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
@@ -733,7 +777,7 @@ int process_passive_host_check(
   result.exited_ok = true;
   result.return_code = return_code;
   result.output = string::dup(output);
-  result.next = NULL;
+  result.next = nullptr;
   // result.check_time = check_time;
 
   /* make sure the return code is within bounds */
@@ -752,59 +796,64 @@ int process_passive_host_check(
 
 /* acknowledges a host or service problem */
 int cmd_acknowledge_problem(int cmd, char* args) {
-  service* temp_service(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
-  char* ack_author(NULL);
-  char* ack_data(NULL);
-  char* temp_ptr(NULL);
+  service* temp_service(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
+  char* ack_author(nullptr);
+  char* ack_data(nullptr);
+  char* temp_ptr(nullptr);
   int type(ACKNOWLEDGEMENT_NORMAL);
   int notify(true);
   int persistent(true);
 
   /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
+  if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* verify that the host is valid */
-  if ((temp_host = find_host(host_name)) == NULL)
+  temp_host = nullptr;
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+  if (it != configuration::applier::state::instance().hosts().end())
+    temp_host = it->second.get();
+  if (temp_host  == nullptr)
     return ERROR;
 
   /* this is a service acknowledgement */
   if (cmd == CMD_ACKNOWLEDGE_SVC_PROBLEM) {
 
     /* get the service name */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(temp_host->get_name().c_str(), svc_description)) == NULL)
+    if ((temp_service = find_service(temp_host->get_name().c_str(), svc_description)) == nullptr)
       return ERROR;
   }
 
   /* get the type */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
   type = atoi(temp_ptr);
 
   /* get the notification option */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
   notify = (atoi(temp_ptr) > 0) ? true : false;
 
   /* get the persistent option */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
   persistent = (atoi(temp_ptr) > 0) ? true : false;
 
   /* get the acknowledgement author */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
   ack_author = string::dup(temp_ptr);
 
   /* get the acknowledgement data */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
+  if ((temp_ptr = my_strtok(nullptr, "\n")) == nullptr) {
     delete[] ack_author;
     return ERROR;
   }
@@ -838,24 +887,29 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
 /* removes a host or service acknowledgement */
 int cmd_remove_acknowledgement(int cmd, char* args) {
-  service* temp_service(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
+  service* temp_service(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
 
   /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
+  if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* verify that the host is valid */
-  if ((temp_host = find_host(host_name)) == NULL)
+  temp_host = nullptr;
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+  if (it != configuration::applier::state::instance().hosts().end())
+    temp_host = it->second.get();
+  if (temp_host  == nullptr)
     return ERROR;
 
   /* we are removing a service acknowledgement */
   if (cmd == CMD_REMOVE_SVC_ACKNOWLEDGEMENT) {
 
     /* get the service name */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
@@ -876,37 +930,41 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
 /* schedules downtime for a specific host or service */
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
-  servicesmember* temp_servicesmember(NULL);
-  service* temp_service(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  com::centreon::engine::host* last_host(NULL);
-  hostgroup* temp_hostgroup(NULL);
-  hostsmember* temp_hgmember(NULL);
-  servicegroup* temp_servicegroup(NULL);
-  servicesmember* temp_sgmember(NULL);
-  char* host_name(NULL);
-  char* hostgroup_name(NULL);
-  char* servicegroup_name(NULL);
-  char* svc_description(NULL);
-  char* temp_ptr(NULL);
+  servicesmember* temp_servicesmember(nullptr);
+  service* temp_service(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  com::centreon::engine::host* last_host(nullptr);
+  hostgroup* temp_hostgroup(nullptr);
+  servicegroup* temp_servicegroup(nullptr);
+  servicesmember* temp_sgmember(nullptr);
+  char* host_name(nullptr);
+  char* hostgroup_name(nullptr);
+  char* servicegroup_name(nullptr);
+  char* svc_description(nullptr);
+  char* temp_ptr(nullptr);
   time_t start_time(0);
   time_t end_time(0);
   int fixed(0);
   unsigned long triggered_by(0);
   unsigned long duration(0);
-  char* author(NULL);
-  char* comment_data(NULL);
+  char* author(nullptr);
+  char* comment_data(nullptr);
   unsigned long downtime_id(0);
 
   if (cmd == CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME
       || cmd == CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME) {
 
     /* get the hostgroup name */
-    if ((hostgroup_name = my_strtok(args, ";")) == NULL)
+    if ((hostgroup_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
+    temp_hostgroup = nullptr;
+    hostgroup_map::const_iterator
+      it(state::instance().hostgroups().find(hostgroup_name));
+    if (it != state::instance().hostgroups().end())
+      temp_hostgroup = it->second.get();
     /* verify that the hostgroup is valid */
-    if ((temp_hostgroup = find_hostgroup(hostgroup_name)) == NULL)
+    if (temp_hostgroup == nullptr)
       return ERROR;
   }
 
@@ -914,74 +972,79 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
            || cmd == CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME) {
 
     /* get the servicegroup name */
-    if ((servicegroup_name = my_strtok(args, ";")) == NULL)
+    if ((servicegroup_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* verify that the servicegroup is valid */
-    if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == NULL)
+    if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == nullptr)
       return ERROR;
   }
 
   else {
 
     /* get the host name */
-    if ((host_name = my_strtok(args, ";")) == NULL)
+    if ((host_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* verify that the host is valid */
-    if ((temp_host = find_host(host_name)) == NULL)
+    temp_host = nullptr;
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
+    if (it != configuration::applier::state::instance().hosts().end())
+      temp_host = it->second.get();
+    if (temp_host  == nullptr)
       return ERROR;
 
     /* this is a service downtime */
     if (cmd == CMD_SCHEDULE_SVC_DOWNTIME) {
 
       /* get the service name */
-      if ((svc_description = my_strtok(NULL, ";")) == NULL)
+      if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
         return ERROR;
 
       /* verify that the service is valid */
-      if ((temp_service = find_service(temp_host->get_name().c_str(), svc_description)) == NULL)
+      if ((temp_service = find_service(temp_host->get_name().c_str(), svc_description)) == nullptr)
         return ERROR;
     }
   }
 
   /* get the start time */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
-  start_time = (time_t)strtoul(temp_ptr, NULL, 10);
+  start_time = (time_t)strtoul(temp_ptr, nullptr, 10);
 
   /* get the end time */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
-  end_time = (time_t)strtoul(temp_ptr, NULL, 10);
+  end_time = (time_t)strtoul(temp_ptr, nullptr, 10);
 
   /* get the fixed flag */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
   fixed = atoi(temp_ptr);
 
   /* get the trigger id */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
-  triggered_by = strtoul(temp_ptr, NULL, 10);
+  triggered_by = strtoul(temp_ptr, nullptr, 10);
 
   /* get the duration */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
-  duration = strtoul(temp_ptr, NULL, 10);
+  duration = strtoul(temp_ptr, nullptr, 10);
 
   /* get the author */
-  if ((author = my_strtok(NULL, ";")) == NULL)
+  if ((author = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
 
   /* get the comment */
-  if ((comment_data = my_strtok(NULL, ";")) == NULL)
+  if ((comment_data = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
 
   /* check if flexible downtime demanded and duration set to non-zero.
   ** according to the documentation, a flexible downtime is started
   ** between start and end time and will last for "duration" seconds.
-  ** strtoul converts a NULL value to 0 so if set to 0, bail out as a
+  ** strtoul converts a nullptr value to 0 so if set to 0, bail out as a
   ** duration>0 is needed.
   */
   if ((0 == fixed) && (0 == duration))
@@ -998,7 +1061,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
-      NULL,
+      nullptr,
       entry_time,
       author,
       comment_data,
@@ -1028,9 +1091,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_HOST_SVC_DOWNTIME:
     for (temp_servicesmember = temp_host->services;
-         temp_servicesmember != NULL;
+         temp_servicesmember != nullptr;
          temp_servicesmember = temp_servicesmember->next) {
-      if ((temp_service = temp_servicesmember->service_ptr) == NULL)
+      if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
         continue;
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
@@ -1049,13 +1112,15 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME:
-    for (temp_hgmember = temp_hostgroup->members;
-         temp_hgmember != NULL;
-         temp_hgmember = temp_hgmember->next)
+    for (host_map::iterator
+           it(temp_hostgroup->members.begin()),
+           end(temp_hostgroup->members.end());
+         it != end;
+         ++it)
       downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
-        temp_hgmember->host_name,
-        NULL,
+        it->first,
+        nullptr,
         entry_time,
         author,
         comment_data,
@@ -1068,15 +1133,17 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME:
-    for (temp_hgmember = temp_hostgroup->members;
-         temp_hgmember != NULL;
-         temp_hgmember = temp_hgmember->next) {
-      if ((temp_host = temp_hgmember->host_ptr) == NULL)
+    for (host_map::iterator
+           it(temp_hostgroup->members.begin()),
+           end(temp_hostgroup->members.end());
+         it != end;
+         ++it) {
+      if (it->second == nullptr)
         continue;
-      for (temp_servicesmember = temp_host->services;
-           temp_servicesmember != NULL;
+      for (temp_servicesmember = it->second->services;
+           temp_servicesmember != nullptr;
            temp_servicesmember = temp_servicesmember->next) {
-        if ((temp_service = temp_servicesmember->service_ptr) == NULL)
+        if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
           continue;
         downtime_manager::instance().schedule_downtime(
           SERVICE_DOWNTIME,
@@ -1095,19 +1162,23 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME:
-    last_host = NULL;
+    last_host = nullptr;
     for (temp_sgmember = temp_servicegroup->members;
-         temp_sgmember != NULL;
+         temp_sgmember != nullptr;
          temp_sgmember = temp_sgmember->next) {
-      temp_host = find_host(temp_sgmember->host_name);
-      if (temp_host == NULL)
+      temp_host = nullptr;
+      umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+        it(configuration::applier::state::instance().hosts().find(get_host_id(temp_sgmember->host_name)));
+      if (it != configuration::applier::state::instance().hosts().end())
+        temp_host = it->second.get();
+      if (temp_host  == nullptr)
         continue;
       if (last_host == temp_host)
         continue;
       downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
         temp_sgmember->host_name,
-        NULL,
+        nullptr,
         entry_time,
         author,
         comment_data,
@@ -1123,7 +1194,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME:
     for (temp_sgmember = temp_servicegroup->members;
-         temp_sgmember != NULL;
+         temp_sgmember != nullptr;
          temp_sgmember = temp_sgmember->next)
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
@@ -1144,7 +1215,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
-      NULL,
+      nullptr,
       entry_time,
       author,
       comment_data,
@@ -1173,7 +1244,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
-      NULL,
+      nullptr,
       entry_time,
       author,
       comment_data,
@@ -1206,13 +1277,13 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 /* deletes scheduled host or service downtime */
 int cmd_delete_downtime(int cmd, char* args) {
   unsigned long downtime_id(0);
-  char* temp_ptr(NULL);
+  char* temp_ptr(nullptr);
 
   /* Get the id of the downtime to delete. */
-  if (NULL == (temp_ptr = my_strtok(args,"\n")))
+  if (nullptr == (temp_ptr = my_strtok(args,"\n")))
     return ERROR;
 
-  downtime_id = strtoul(temp_ptr, NULL, 10);
+  downtime_id = strtoul(temp_ptr, nullptr, 10);
 
   if (CMD_DEL_HOST_DOWNTIME == cmd)
     downtime_manager::instance().unschedule_downtime(HOST_DOWNTIME, downtime_id);
@@ -1229,7 +1300,7 @@ int cmd_delete_downtime(int cmd, char* args) {
  *  @param[in] args  Command arguments.
  */
 int cmd_delete_downtime_full(int cmd, char* args) {
-  char* temp_ptr(NULL);
+  char* temp_ptr(nullptr);
   downtime_finder::criteria_set criterias;
 
   // Host name.
@@ -1241,7 +1312,7 @@ int cmd_delete_downtime_full(int cmd, char* args) {
   int downtime_type;
   if (cmd == CMD_DEL_SVC_DOWNTIME_FULL) {
     downtime_type = SERVICE_DOWNTIME;
-    if (!(temp_ptr = my_strtok(NULL, ";")))
+    if (!(temp_ptr = my_strtok(nullptr, ";")))
       return ERROR;
     if (*temp_ptr)
       criterias.push_back(downtime_finder::criteria("service", temp_ptr));
@@ -1251,37 +1322,37 @@ int cmd_delete_downtime_full(int cmd, char* args) {
     criterias.push_back(downtime_finder::criteria("service", ""));
   }
   // Start time.
-  if (!(temp_ptr = my_strtok(NULL, ";")))
+  if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("start", temp_ptr));
   // End time.
-  if (!(temp_ptr = my_strtok(NULL, ";")))
+  if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("end", temp_ptr));
   // Fixed.
-  if (!(temp_ptr = my_strtok(NULL, ";")))
+  if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("fixed", temp_ptr));
   // Trigger ID.
-  if (!(temp_ptr = my_strtok(NULL, ";")))
+  if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("triggered_by", temp_ptr));
   // Duration.
-  if (!(temp_ptr = my_strtok(NULL, ";")))
+  if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("duration", temp_ptr));
   // Author.
-  if (!(temp_ptr = my_strtok(NULL, ";")))
+  if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("author", temp_ptr));
   // Comment.
-  if (!(temp_ptr = my_strtok(NULL, ";")))
+  if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("comment", temp_ptr));
@@ -1305,11 +1376,11 @@ int cmd_delete_downtime_full(int cmd, char* args) {
 ** and optionally other filter arguments.
 */
 int cmd_delete_downtime_by_host_name(int cmd, char* args) {
-  char *temp_ptr(NULL);
-  char *end_ptr(NULL);
-  char *hostname(NULL);
-  char *service_description(NULL);
-  char *downtime_comment(NULL);
+  char *temp_ptr(nullptr);
+  char *end_ptr(nullptr);
+  char *hostname(nullptr);
+  char *service_description(nullptr);
+  char *downtime_comment(nullptr);
   time_t downtime_start_time(0L);
   int deleted(0);
 
@@ -1317,24 +1388,24 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
 
   /* Get the host name of the downtime to delete. */
   temp_ptr = my_strtok(args, ";");
-  if (NULL == temp_ptr)
+  if (nullptr == temp_ptr)
     return ERROR;
   hostname = temp_ptr;
 
   /* Get the optional service name. */
-  temp_ptr = my_strtok(NULL,";");
-  if (temp_ptr != NULL) {
+  temp_ptr = my_strtok(nullptr,";");
+  if (temp_ptr != nullptr) {
     if (*temp_ptr != '\0')
       service_description = temp_ptr;
 
     /* Get the optional start time. */
-    temp_ptr = my_strtok(NULL, ";");
-    if (temp_ptr != NULL) {
+    temp_ptr = my_strtok(nullptr, ";");
+    if (temp_ptr != nullptr) {
       downtime_start_time = strtoul(temp_ptr, &end_ptr, 10);
 
       /* Get the optional comment. */
-      temp_ptr = my_strtok(NULL, ";");
-      if (temp_ptr != NULL) {
+      temp_ptr = my_strtok(nullptr, ";");
+      if (temp_ptr != nullptr) {
         if (*temp_ptr != '\0')
           downtime_comment = temp_ptr;
       }
@@ -1353,14 +1424,13 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
 
 /* Deletes scheduled host and service downtime based on hostgroup and optionally other filter arguments. */
 int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
-  char *temp_ptr(NULL);
-  char *end_ptr(NULL);
-  host *temp_host(NULL);
-  hostgroup *temp_hostgroup(NULL);
-  hostsmember *temp_member(NULL);
-  char *service_description(NULL);
-  char *downtime_comment(NULL);
-  char *host_name(NULL);
+  char *temp_ptr(nullptr);
+  char *end_ptr(nullptr);
+  host *temp_host(nullptr);
+  hostgroup *temp_hostgroup(nullptr);
+  char *service_description(nullptr);
+  char *downtime_comment(nullptr);
+  char *host_name(nullptr);
   time_t downtime_start_time(0L);
   int deleted(0);
 
@@ -1368,33 +1438,37 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
 
   /* Get the host group name of the downtime to delete. */
   temp_ptr = my_strtok(args, ";");
-  if (NULL == temp_ptr)
+  if (nullptr == temp_ptr)
     return ERROR;
 
-  temp_hostgroup = find_hostgroup(temp_ptr);
-  if (NULL == temp_hostgroup)
+  temp_hostgroup = nullptr;
+  hostgroup_map::const_iterator
+    it(state::instance().hostgroups().find(temp_ptr));
+  if (it != state::instance().hostgroups().end())
+    temp_hostgroup = it->second.get();
+  if (temp_hostgroup == nullptr)
     return ERROR;
 
   /* Get the optional host name. */
-  temp_ptr = my_strtok(NULL, ";");
-  if (temp_ptr != NULL) {
+  temp_ptr = my_strtok(nullptr, ";");
+  if (temp_ptr != nullptr) {
     if (*temp_ptr != '\0')
       host_name = temp_ptr;
 
     /* Get the optional service name. */
-    temp_ptr = my_strtok(NULL, ";");
-    if (temp_ptr != NULL) {
+    temp_ptr = my_strtok(nullptr, ";");
+    if (temp_ptr != nullptr) {
       if (*temp_ptr != '\0')
         service_description = temp_ptr;
 
       /* Get the optional start time. */
-      temp_ptr = my_strtok(NULL, ";");
-      if (temp_ptr != NULL) {
+      temp_ptr = my_strtok(nullptr, ";");
+      if (temp_ptr != nullptr) {
         downtime_start_time = strtoul(temp_ptr, &end_ptr, 10);
 
         /* Get the optional comment. */
-        temp_ptr = my_strtok(NULL, ";");
-        if (temp_ptr != NULL) {
+        temp_ptr = my_strtok(nullptr, ";");
+        if (temp_ptr != nullptr) {
           if (*temp_ptr != '\0')
             downtime_comment = temp_ptr;
         }
@@ -1402,19 +1476,19 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
     }
 
     /* Get the optional service name. */
-    temp_ptr = my_strtok(NULL, ";");
-    if (temp_ptr != NULL) {
+    temp_ptr = my_strtok(nullptr, ";");
+    if (temp_ptr != nullptr) {
       if (*temp_ptr != '\0')
         service_description = temp_ptr;
 
       /* Get the optional start time. */
-      temp_ptr = my_strtok(NULL, ";");
-      if (temp_ptr != NULL) {
+      temp_ptr = my_strtok(nullptr, ";");
+      if (temp_ptr != nullptr) {
         downtime_start_time = strtoul(temp_ptr, &end_ptr, 10);
 
         /* Get the optional comment. */
-        temp_ptr = my_strtok(NULL, ";");
-        if (temp_ptr != NULL) {
+        temp_ptr = my_strtok(nullptr, ";");
+        if (temp_ptr != nullptr) {
           if (*temp_ptr != '\0')
             downtime_comment = temp_ptr;
         }
@@ -1422,15 +1496,17 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
     }
   }
 
-  for (temp_member = temp_hostgroup->members;
-       temp_member != NULL;
-       temp_member = temp_member->next) {
-    if (NULL == (temp_host = temp_member->host_ptr))
+  for (host_map::iterator
+         it(temp_hostgroup->members.begin()),
+         end(temp_hostgroup->members.end());
+       it != end;
+       ++it) {
+    if (it->second == nullptr)
       continue ;
-    if ((host_name != NULL) && (temp_host->get_name() != host_name))
+    if (host_name != nullptr && it->first != host_name)
       continue ;
     deleted = downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
-                temp_host->get_name().c_str(),
+                it->first.c_str(),
                 service_description,
                 downtime_start_time,
                 downtime_comment);
@@ -1445,31 +1521,31 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
 /* Delete downtimes based on start time and/or comment. */
 int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
   time_t downtime_start_time(0L);
-  char *downtime_comment(NULL);
-  char *temp_ptr(NULL);
-  char *end_ptr(NULL);
+  char *downtime_comment(nullptr);
+  char *temp_ptr(nullptr);
+  char *end_ptr(nullptr);
   int deleted(0);
 
   (void)cmd;
 
   /* Get start time if set. */
   temp_ptr = my_strtok(args, ";");
-  if (temp_ptr != NULL)
+  if (temp_ptr != nullptr)
     /* This will be set to 0 if no start_time is entered or data is bad. */
     downtime_start_time = strtoul(temp_ptr, &end_ptr, 10);
 
   /* Get comment - not sure if this should be also tokenised by ; */
-  temp_ptr = my_strtok(NULL, "\n");
-  if ((temp_ptr != NULL) && (*temp_ptr != '\0'))
+  temp_ptr = my_strtok(nullptr, "\n");
+  if ((temp_ptr != nullptr) && (*temp_ptr != '\0'))
     downtime_comment = temp_ptr;
 
   /* No args should give an error. */
-  if ((0 == downtime_start_time) && (NULL == downtime_comment))
+  if ((0 == downtime_start_time) && (nullptr == downtime_comment))
     return ERROR;
 
   deleted = downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
-              NULL,
-              NULL,
+              "",
+              nullptr,
               downtime_start_time,
               downtime_comment);
 
@@ -1481,13 +1557,13 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd, char* args) {
-  service* temp_service(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  contact* temp_contact(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
-  char* contact_name(NULL);
-  char const* temp_ptr(NULL);
+  service* temp_service(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  contact* temp_contact(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
+  char* contact_name(nullptr);
+  char const* temp_ptr(nullptr);
   int intval(0);
   double dval(0.0);
   double old_dval(0.0);
@@ -1496,6 +1572,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
   unsigned long attr(MODATTR_NONE);
   unsigned long hattr(MODATTR_NONE);
   unsigned long sattr(MODATTR_NONE);
+  umap<unsigned int,
+       std::shared_ptr<com::centreon::engine::host>>::const_iterator it;
 
   switch (cmd) {
 
@@ -1505,15 +1583,15 @@ int cmd_change_object_int_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_MODATTR:
 
     /* get the host name */
-    if ((host_name = my_strtok(args, ";")) == NULL)
+    if ((host_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* get the service name */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
+    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
       return ERROR;
     break;
 
@@ -1522,11 +1600,15 @@ int cmd_change_object_int_var(int cmd, char* args) {
   case CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS:
   case CMD_CHANGE_HOST_MODATTR:
     /* get the host name */
-    if ((host_name = my_strtok(args, ";")) == NULL)
+    if ((host_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* verify that the host is valid */
-    if ((temp_host = find_host(host_name)) == NULL)
+    temp_host = nullptr;
+    it = configuration::applier::state::instance().hosts().find(get_host_id(host_name));
+    if (it != configuration::applier::state::instance().hosts().end())
+      temp_host = it->second.get();
+    if (temp_host == nullptr)
       return ERROR;
     break;
 
@@ -1534,11 +1616,11 @@ int cmd_change_object_int_var(int cmd, char* args) {
   case CMD_CHANGE_CONTACT_MODHATTR:
   case CMD_CHANGE_CONTACT_MODSATTR:
     /* get the contact name */
-    if ((contact_name = my_strtok(args, ";")) == NULL)
+    if ((contact_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* verify that the contact is valid */
-    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == NULL)
+    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == nullptr)
       return ERROR;
     break;
 
@@ -1549,12 +1631,12 @@ int cmd_change_object_int_var(int cmd, char* args) {
   }
 
   /* get the value */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
+  if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
     return ERROR;
-  intval = (int)strtol(temp_ptr, NULL, 0);
+  intval = (int)strtol(temp_ptr, nullptr, 0);
   if (intval < 0 || (intval == 0 && errno == EINVAL))
     return ERROR;
-  dval = (int)strtod(temp_ptr, NULL);
+  dval = (int)strtod(temp_ptr, nullptr);
 
   switch (cmd) {
 
@@ -1699,7 +1781,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       temp_service,
       cmd, attr,
       temp_service->modified_attributes,
-      NULL);
+      nullptr);
 
     /* update the status log with the service info */
     update_service_status(temp_service, false);
@@ -1725,7 +1807,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       cmd,
       attr,
       temp_host->get_modified_attributes(),
-      NULL);
+      nullptr);
 
     /* update the status log with the host info */
     update_host_status(temp_host, false);
@@ -1764,7 +1846,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       temp_contact->get_modified_host_attributes(),
       sattr,
       temp_contact->get_modified_service_attributes(),
-      NULL);
+      nullptr);
 
     /* update the status log with the contact info */
     temp_contact->update_status_info(false);
@@ -1779,20 +1861,22 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd, char* args) {
-  service* temp_service(NULL);
-  com::centreon::engine::host* temp_host(NULL);
-  contact* temp_contact(NULL);
-  timeperiod* temp_timeperiod(NULL);
-  commands::command* temp_command(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
-  char* contact_name(NULL);
-  char* charval(NULL);
-  char* temp_ptr(NULL);
-  char* temp_ptr2(NULL);
+  service* temp_service(nullptr);
+  com::centreon::engine::host* temp_host(nullptr);
+  contact* temp_contact(nullptr);
+  timeperiod* temp_timeperiod(nullptr);
+  commands::command* temp_command(nullptr);
+  char* host_name(nullptr);
+  char* svc_description(nullptr);
+  char* contact_name(nullptr);
+  char* charval(nullptr);
+  char* temp_ptr(nullptr);
+  char* temp_ptr2(nullptr);
   unsigned long attr(MODATTR_NONE);
   unsigned long hattr(MODATTR_NONE);
   unsigned long sattr(MODATTR_NONE);
+  umap<unsigned int,
+       std::shared_ptr<com::centreon::engine::host>>::const_iterator it;
 
   /* SECURITY PATCH - disable these for the time being */
   switch (cmd) {
@@ -1810,7 +1894,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER:
   case CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER:
-    if ((charval = my_strtok(args, "\n")) == NULL)
+    if ((charval = my_strtok(args, "\n")) == nullptr)
       return ERROR;
     break;
 
@@ -1819,14 +1903,18 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_HOST_CHECK_TIMEPERIOD:
   case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
     /* get the host name */
-    if ((host_name = my_strtok(args, ";")) == NULL)
+    if ((host_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* verify that the host is valid */
-    if ((temp_host = find_host(host_name)) == NULL)
+    temp_host = nullptr;
+    it = configuration::applier::state::instance().hosts().find(get_host_id(host_name));
+    if (it != configuration::applier::state::instance().hosts().end())
+      temp_host = it->second.get();
+    if (temp_host  == nullptr)
       return ERROR;
 
-    if ((charval = my_strtok(NULL, "\n")) == NULL)
+    if ((charval = my_strtok(nullptr, "\n")) == nullptr)
       return ERROR;
     break;
 
@@ -1835,32 +1923,32 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_CHECK_TIMEPERIOD:
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
     /* get the host name */
-    if ((host_name = my_strtok(args, ";")) == NULL)
+    if ((host_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* get the service name */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
+    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
+    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
       return ERROR;
 
-    if ((charval = my_strtok(NULL, "\n")) == NULL)
+    if ((charval = my_strtok(nullptr, "\n")) == nullptr)
       return ERROR;
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     /* get the contact name */
-    if ((contact_name = my_strtok(args, ";")) == NULL)
+    if ((contact_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
     /* verify that the contact is valid */
-    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == NULL)
+    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == nullptr)
       return ERROR;
 
-    if ((charval = my_strtok(NULL, "\n")) == NULL)
+    if ((charval = my_strtok(nullptr, "\n")) == nullptr)
       return ERROR;
     break;
 
@@ -1882,7 +1970,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     /* make sure the timeperiod is valid */
-    if ((temp_timeperiod = find_timeperiod(temp_ptr)) == NULL) {
+    if ((temp_timeperiod = find_timeperiod(temp_ptr)) == nullptr) {
       delete[] temp_ptr;
       return ERROR;
     }
@@ -1896,7 +1984,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_CHECK_COMMAND:
     /* make sure the command exists */
     temp_ptr2 = my_strtok(temp_ptr, "!");
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_ptr2)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_ptr2)) == nullptr) {
       delete[] temp_ptr;
       return ERROR;
     }
@@ -2009,7 +2097,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       modified_host_process_attributes,
       MODATTR_NONE,
       modified_service_process_attributes,
-      NULL);
+      nullptr);
     /* update program status */
     update_program_status(false);
     break;
@@ -2028,7 +2116,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       modified_host_process_attributes,
       attr,
       modified_service_process_attributes,
-      NULL);
+      nullptr);
 
     /* update program status */
     update_program_status(false);
@@ -2051,7 +2139,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       cmd,
       attr,
       temp_service->modified_attributes,
-      NULL);
+      nullptr);
 
     /* update the status log with the service info */
     update_service_status(temp_service, false);
@@ -2074,7 +2162,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       cmd,
       attr,
       temp_host->get_modified_attributes(),
-      NULL);
+      nullptr);
 
     /* update the status log with the host info */
     update_host_status(temp_host, false);
@@ -2103,7 +2191,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       temp_contact->get_modified_host_attributes(),
       sattr,
       temp_contact->get_modified_service_attributes(),
-      NULL);
+      nullptr);
 
     /* update the status log with the contact info */
     temp_contact->update_status_info(false);
@@ -2118,9 +2206,9 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
 /* changes a custom host or service variable */
 int cmd_change_object_custom_var(int cmd, char* args) {
-  com::centreon::engine::host* temp_host(NULL);
-  service* temp_service(NULL);
-  contact* temp_contact(NULL);
+  com::centreon::engine::host* temp_host(nullptr);
+  service* temp_service(nullptr);
+  contact* temp_contact(nullptr);
 
   /* get the host or contact name */
   char* temp_ptr(index(args, ';'));
@@ -2163,7 +2251,12 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   switch (cmd) {
   case CMD_CHANGE_CUSTOM_HOST_VAR:
     {
-      if ((temp_host = find_host(name1.c_str())) == NULL)
+      temp_host = nullptr;
+      umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it_h(configuration::applier::state::instance().hosts().find(get_host_id(name1.c_str())));
+      if (it_h != configuration::applier::state::instance().hosts().end())
+        temp_host = it_h->second.get();
+      if (temp_host  == nullptr)
         return ERROR;
       std::unordered_map<std::string, customvariable>::iterator it(temp_host->custom_variables.find(varname));
       if (it == temp_host->custom_variables.end())
@@ -2179,7 +2272,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     break;
   case CMD_CHANGE_CUSTOM_SVC_VAR:
     {
-      if ((temp_service = find_service(name1.c_str(), name2.c_str())) == NULL)
+      if ((temp_service = find_service(name1.c_str(), name2.c_str())) == nullptr)
         return ERROR;
       std::unordered_map<std::string, customvariable>::iterator it(temp_service->custom_variables.find(varname));
       if (it == temp_service->custom_variables.end())
@@ -2196,7 +2289,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     break;
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
     {
-      if ((temp_contact = configuration::applier::state::instance().find_contact(name1)) == NULL)
+      if ((temp_contact = configuration::applier::state::instance().find_contact(name1)) == nullptr)
         return ERROR;
       std::unordered_map<std::string, customvariable>::iterator it(temp_contact->custom_variables.find(varname));
       if (it == temp_contact->custom_variables.end())
@@ -2222,19 +2315,19 @@ int cmd_change_object_custom_var(int cmd, char* args) {
 
 /* processes an external host command */
 int cmd_process_external_commands_from_file(int cmd, char* args) {
-  char* fname(NULL);
-  char* temp_ptr(NULL);
+  char* fname(nullptr);
+  char* temp_ptr(nullptr);
   int delete_file(false);
 
   (void)cmd;
 
   /* get the file name */
-  if ((temp_ptr = my_strtok(args, ";")) == NULL)
+  if ((temp_ptr = my_strtok(args, ";")) == nullptr)
     return ERROR;
   fname = string::dup(temp_ptr);
 
   /* find the deletion option */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
+  if ((temp_ptr = my_strtok(nullptr, "\n")) == nullptr) {
     delete[] fname;
     return ERROR;
   }
@@ -2280,7 +2373,7 @@ void disable_service_checks(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, false);
@@ -2334,7 +2427,7 @@ void enable_service_checks(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, false);
@@ -2365,7 +2458,7 @@ void enable_all_notifications(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -2396,7 +2489,7 @@ void disable_all_notifications(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -2425,7 +2518,7 @@ void enable_service_notifications(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, false);
@@ -2454,7 +2547,7 @@ void disable_service_notifications(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, false);
@@ -2484,7 +2577,7 @@ void enable_host_notifications(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new host state */
   update_host_status(hst, false);
@@ -2514,7 +2607,7 @@ void disable_host_notifications(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new host state */
   update_host_status(hst, false);
@@ -2527,26 +2620,27 @@ void enable_and_propagate_notifications(
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  com::centreon::engine::host* child_host(NULL);
-  service* temp_service(NULL);
-  servicesmember* temp_servicesmember(NULL);
-  hostsmember* temp_hostsmember(NULL);
+  com::centreon::engine::host* child_host(nullptr);
+  service* temp_service(nullptr);
+  servicesmember* temp_servicesmember(nullptr);
 
   /* enable notification for top level host */
   if (affect_top_host && level == 0)
     enable_host_notifications(hst);
 
   /* check all child hosts... */
-  for (temp_hostsmember = hst->child_hosts;
-       temp_hostsmember != NULL;
-       temp_hostsmember = temp_hostsmember->next) {
+  for (host_map::iterator
+         it(hst->child_hosts.begin()),
+         end(hst->child_hosts.end());
+       it != end;
+       ++it) {
 
-    if ((child_host = temp_hostsmember->host_ptr) == NULL)
+    if (it->second == nullptr)
       continue;
 
     /* recurse... */
     enable_and_propagate_notifications(
-      child_host,
+      it->second.get(),
       level + 1,
       affect_top_host,
       affect_hosts,
@@ -2554,14 +2648,14 @@ void enable_and_propagate_notifications(
 
     /* enable notifications for this host */
     if (affect_hosts)
-      enable_host_notifications(child_host);
+      enable_host_notifications(it->second.get());
 
     /* enable notifications for all services on this host... */
     if (affect_services) {
-      for (temp_servicesmember = child_host->services;
-           temp_servicesmember != NULL;
+      for (temp_servicesmember = it->second->services;
+           temp_servicesmember != nullptr;
            temp_servicesmember = temp_servicesmember->next) {
-        if ((temp_service = temp_servicesmember->service_ptr) == NULL)
+        if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
           continue;
         enable_service_notifications(temp_service);
       }
@@ -2576,12 +2670,11 @@ void disable_and_propagate_notifications(
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  com::centreon::engine::host* child_host(NULL);
-  service* temp_service(NULL);
-  servicesmember* temp_servicesmember(NULL);
-  hostsmember* temp_hostsmember(NULL);
+  com::centreon::engine::host* child_host(nullptr);
+  service* temp_service(nullptr);
+  servicesmember* temp_servicesmember(nullptr);
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return;
 
   /* disable notifications for top host */
@@ -2589,16 +2682,18 @@ void disable_and_propagate_notifications(
     disable_host_notifications(hst);
 
   /* check all child hosts... */
-  for (temp_hostsmember = hst->child_hosts;
-       temp_hostsmember != NULL;
-       temp_hostsmember = temp_hostsmember->next) {
+  for (host_map::iterator
+         it(hst->child_hosts.begin()),
+         end(hst->child_hosts.begin());
+       it != end;
+       ++it) {
 
-    if ((child_host = temp_hostsmember->host_ptr) == NULL)
+    if (it->second == nullptr)
       continue;
 
     /* recurse... */
     disable_and_propagate_notifications(
-      child_host,
+      it->second.get(),
       level + 1,
       affect_top_host,
       affect_hosts,
@@ -2606,14 +2701,14 @@ void disable_and_propagate_notifications(
 
     /* disable notifications for this host */
     if (affect_hosts)
-      disable_host_notifications(child_host);
+      disable_host_notifications(it->second.get());
 
     /* disable notifications for all services on this host... */
     if (affect_services) {
-      for (temp_servicesmember = child_host->services;
-           temp_servicesmember != NULL;
+      for (temp_servicesmember = it->second->services;
+           temp_servicesmember != nullptr;
            temp_servicesmember = temp_servicesmember->next) {
-        if ((temp_service = temp_servicesmember->service_ptr) == NULL)
+        if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
           continue;
         disable_service_notifications(temp_service);
       }
@@ -2649,7 +2744,7 @@ void enable_contact_host_notifications(contact* cntct) {
     cntct->get_modified_host_attributes(),
     MODATTR_NONE,
     cntct->get_modified_service_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2684,7 +2779,7 @@ void disable_contact_host_notifications(contact* cntct) {
     cntct->get_modified_host_attributes(),
     MODATTR_NONE,
     cntct->get_modified_service_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2719,7 +2814,7 @@ void enable_contact_service_notifications(contact* cntct) {
     cntct->get_modified_host_attributes(),
     attr,
     cntct->get_modified_service_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2754,7 +2849,7 @@ void disable_contact_service_notifications(contact* cntct) {
     cntct->get_modified_host_attributes(),
     attr,
     cntct->get_modified_service_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2771,20 +2866,21 @@ void schedule_and_propagate_downtime(
        int fixed,
        unsigned long triggered_by,
        unsigned long duration) {
-  com::centreon::engine::host* child_host(NULL);
-  hostsmember* temp_hostsmember(NULL);
+  com::centreon::engine::host* child_host(nullptr);
 
   /* check all child hosts... */
-  for (temp_hostsmember = temp_host->child_hosts;
-       temp_hostsmember != NULL;
-       temp_hostsmember = temp_hostsmember->next) {
+  for (host_map::iterator
+         it(temp_host->child_hosts.begin()),
+         end(temp_host->child_hosts.end());
+       it != end;
+       ++it) {
 
-    if ((child_host = temp_hostsmember->host_ptr) == NULL)
+    if (it->second == nullptr)
       continue;
 
     /* recurse... */
     schedule_and_propagate_downtime(
-      child_host,
+      it->second.get(),
       entry_time,
       author,
       comment_data,
@@ -2797,8 +2893,8 @@ void schedule_and_propagate_downtime(
     /* schedule downtime for this host */
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
-      child_host->get_name().c_str(),
-      NULL,
+      it->first,
+      nullptr,
       entry_time,
       author,
       comment_data,
@@ -2807,7 +2903,7 @@ void schedule_and_propagate_downtime(
       fixed,
       triggered_by,
       duration,
-      NULL);
+      nullptr);
   }
 }
 
@@ -2831,7 +2927,7 @@ void acknowledge_host_problem(
     ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL);
 
   /* schedule acknowledgement expiration */
-  time_t current_time(time(NULL));
+  time_t current_time(time(nullptr));
   host_other_props[hst->get_name()].last_acknowledgement = current_time;
   schedule_acknowledgement_expiration(hst);
 
@@ -2847,7 +2943,7 @@ void acknowledge_host_problem(
     type,
     notify,
     persistent,
-    NULL);
+    nullptr);
 
   /* send out an acknowledgement notification */
   if (notify)
@@ -2872,7 +2968,7 @@ void acknowledge_host_problem(
     COMMENTSOURCE_INTERNAL,
     false,
     (time_t)0,
-    NULL);
+    nullptr);
 }
 
 /* acknowledges a service problem */
@@ -2895,7 +2991,7 @@ void acknowledge_service_problem(
     ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
 
   /* schedule acknowledgement expiration */
-  time_t current_time(time(NULL));
+  time_t current_time(time(nullptr));
   service_other_props[std::make_pair(
                              svc->host_ptr->get_name(),
                              svc->description)].last_acknowledgement = current_time;
@@ -2913,7 +3009,7 @@ void acknowledge_service_problem(
     type,
     notify,
     persistent,
-    NULL);
+    nullptr);
 
   /* send out an acknowledgement notification */
   if (notify)
@@ -2939,7 +3035,7 @@ void acknowledge_service_problem(
     COMMENTSOURCE_INTERNAL,
     false,
     (time_t)0,
-    NULL);
+    nullptr);
 }
 
 /* removes a host acknowledgement */
@@ -2990,7 +3086,7 @@ void start_executing_service_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3020,7 +3116,7 @@ void stop_executing_service_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3050,7 +3146,7 @@ void start_accepting_passive_service_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3080,7 +3176,7 @@ void stop_accepting_passive_service_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3109,7 +3205,7 @@ void enable_passive_service_checks(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the service info */
   update_service_status(svc, false);
@@ -3138,7 +3234,7 @@ void disable_passive_service_checks(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the service info */
   update_service_status(svc, false);
@@ -3168,7 +3264,7 @@ void start_executing_host_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3198,7 +3294,7 @@ void stop_executing_host_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3228,7 +3324,7 @@ void start_accepting_passive_host_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3258,7 +3354,7 @@ void stop_accepting_passive_host_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
   /* update the status log with the program info */
   update_program_status(false);
 }
@@ -3287,7 +3383,7 @@ void enable_passive_host_checks(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -3317,7 +3413,7 @@ void disable_passive_host_checks(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -3348,7 +3444,7 @@ void start_using_event_handlers(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3379,7 +3475,7 @@ void stop_using_event_handlers(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3408,7 +3504,7 @@ void enable_service_event_handler(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the service info */
   update_service_status(svc, false);
@@ -3437,7 +3533,7 @@ void disable_service_event_handler(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the service info */
   update_service_status(svc, false);
@@ -3467,7 +3563,7 @@ void enable_host_event_handler(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -3497,7 +3593,7 @@ void disable_host_event_handler(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -3528,7 +3624,7 @@ void disable_host_checks(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -3578,7 +3674,7 @@ void enable_host_checks(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -3608,7 +3704,7 @@ void start_obsessing_over_service_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3638,7 +3734,7 @@ void stop_obsessing_over_service_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3668,7 +3764,7 @@ void start_obsessing_over_host_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3698,7 +3794,7 @@ void stop_obsessing_over_host_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3728,7 +3824,7 @@ void enable_service_freshness_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3758,7 +3854,7 @@ void disable_service_freshness_checks(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3788,7 +3884,7 @@ void enable_host_freshness_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
   /* update the status log with the program info */
   update_program_status(false);
 }
@@ -3817,7 +3913,7 @@ void disable_host_freshness_checks(void) {
     modified_host_process_attributes,
     MODATTR_NONE,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3847,7 +3943,7 @@ void enable_performance_data(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -3877,7 +3973,7 @@ void disable_performance_data(void) {
     modified_host_process_attributes,
     attr,
     modified_service_process_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -3906,7 +4002,7 @@ void start_obsessing_over_service(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the service info */
   update_service_status(svc, false);
@@ -3935,7 +4031,7 @@ void stop_obsessing_over_service(service* svc) {
     CMD_NONE,
     attr,
     svc->modified_attributes,
-    NULL);
+    nullptr);
 
   /* update the status log with the service info */
   update_service_status(svc, false);
@@ -3965,7 +4061,7 @@ void start_obsessing_over_host(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -3995,7 +4091,7 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);

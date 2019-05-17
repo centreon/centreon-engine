@@ -19,6 +19,7 @@
 */
 
 #include <cstdlib>
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/grab_value.hh"
@@ -27,6 +28,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
 /**************************************
@@ -56,10 +58,20 @@ static int handle_host_macro(
              char** output,
              int* free_macro) {
   int retval;
-  if (arg2 == NULL) {
+  if (arg2 == nullptr) {
     // Find the host for on-demand macros
     // or use saved host pointer.
-    host* hst(arg1 ? find_host(arg1) : mac->host_ptr);
+    host *hst = nullptr;
+
+    if(arg1) {
+      umap < unsigned int, std::shared_ptr < com::centreon::engine::host >> ::const_iterator
+        it(state::instance().hosts().find(get_host_id(arg1)));
+      if (it != state::instance().hosts().end())
+        hst = it->second.get();
+    }
+    else
+      hst = mac->host_ptr;
+
     if (hst)
       // Get the host macro value.
       retval = grab_standard_host_macro_r(
@@ -73,28 +85,34 @@ static int handle_host_macro(
   }
   // A host macro with a hostgroup name and delimiter.
   else {
-    hostgroup* hg(find_hostgroup(arg1));
+    hostgroup* hg(nullptr);
+    hostgroup_map::const_iterator
+      it(state::instance().hostgroups().find(arg1));
+    if (it != state::instance().hostgroups().end())
+      hg = it->second.get();
+
     if (hg) {
       size_t delimiter_len(strlen(arg2));
 
       // Concatenate macro values for all hostgroup members.
-      for (hostsmember* temp_hostsmember = hg->members;
-           temp_hostsmember != NULL;
-           temp_hostsmember = temp_hostsmember->next) {
-        host* hst(temp_hostsmember->host_ptr);
-        if (hst) {
+      for (host_map::iterator
+             it(hg->members.begin()),
+             end(hg->members.begin());
+           it != end;
+           ++it) {
+        if (it->second) {
           // Get the macro value for this host.
-          char* buffer(NULL);
+          char* buffer(nullptr);
           int free_sub_macro(false);
           grab_standard_host_macro_r(
             mac,
             macro_type,
-            hst,
+            it->second.get(),
             &buffer,
             &free_sub_macro);
           if (buffer) {
             // Add macro value to already running macro.
-            if (*output == NULL)
+            if (*output == nullptr)
               *output = string::dup(buffer);
             else {
               *output
@@ -145,7 +163,16 @@ static int handle_hostgroup_macro(
 
   // Use the saved hostgroup pointer
   // or find the hostgroup for on-demand macros.
-  hostgroup* hg(arg1 ? find_hostgroup(arg1) : mac->hostgroup_ptr);
+  hostgroup* hg(nullptr);
+  if (arg1) {
+    hostgroup_map::const_iterator
+      it(state::instance().hostgroups().find(arg1));
+    if(it != state::instance().hostgroups().end())
+      hg = it->second.get();
+  }
+  else
+    hg = mac->hostgroup_ptr;
+
   if (hg) {
     // Get the hostgroup macro value.
     retval = grab_standard_hostgroup_macro_r(
@@ -239,12 +266,12 @@ static int handle_service_macro(
 
           // Concatenate macro values for all servicegroup members.
           for (servicesmember* temp_servicesmember = sg->members;
-               temp_servicesmember != NULL;
+               temp_servicesmember != nullptr;
                temp_servicesmember = temp_servicesmember->next) {
             svc = temp_servicesmember->service_ptr;
             if (svc) {
               // Get the macro value for this service.
-              char* buffer(NULL);
+              char* buffer(nullptr);
               int free_sub_macro(false);
               grab_standard_service_macro_r(
                 mac,
@@ -254,7 +281,7 @@ static int handle_service_macro(
                 &free_sub_macro);
               if (buffer) {
                 // Add macro value to already running macro.
-                if (*output == NULL)
+                if (*output == nullptr)
                   *output = string::dup(buffer);
                 else {
                   *output = resize_string(
@@ -268,7 +295,7 @@ static int handle_service_macro(
                 }
                 if (free_sub_macro != false) {
                   delete[] buffer;
-                  buffer = NULL;
+                  buffer = nullptr;
                 }
               }
             }
@@ -351,7 +378,7 @@ static int handle_contact_macro(
   // Return value.
   int retval;
 
-  if (arg2 == NULL) {
+  if (arg2 == nullptr) {
     // Find the contact for on-demand macros
     // or use saved contact pointer.
     contact* cntct(arg1 ? configuration::applier::state::instance().find_contact(arg1) : mac->contact_ptr);
@@ -385,7 +412,7 @@ static int handle_contact_macro(
         contact* cntct(it->second);
         if (cntct) {
           // Get the macro value for this contact.
-          char* buffer(NULL);
+          char* buffer(nullptr);
           grab_standard_contact_macro_r(
             mac,
             macro_type,
@@ -393,7 +420,7 @@ static int handle_contact_macro(
             &buffer);
           if (buffer) {
             // Add macro value to already running macro.
-            if (*output == NULL)
+            if (*output == nullptr)
               *output = string::dup(buffer);
             else {
               *output = resize_string(
@@ -406,7 +433,7 @@ static int handle_contact_macro(
               strcat(*output, buffer);
             }
             delete[] buffer;
-            buffer = NULL;
+            buffer = nullptr;
           }
         }
       }
@@ -582,36 +609,38 @@ static int handle_summary_macro(
     unsigned int hosts_unreachable(0);
     unsigned int hosts_unreachable_unhandled(0);
     unsigned int hosts_up(0);
-    for (host* temp_host = host_list;
-         temp_host != NULL;
-         temp_host = temp_host->next) {
+    for (host_map::iterator
+           it(com::centreon::engine::host::hosts.begin()),
+           end(com::centreon::engine::host::hosts.end());
+         it != end;
+         ++it) {
       // Filter totals based on contact if necessary.
       bool authorized(
              mac->contact_ptr
-             ? is_contact_for_host(temp_host, mac->contact_ptr)
+             ? is_contact_for_host(it->second.get(), mac->contact_ptr)
              : true);
       if (authorized) {
         bool problem(true);
-        if ((temp_host->get_current_state() == HOST_UP)
-            && temp_host->get_has_been_checked())
+        if ((it->second->get_current_state() == HOST_UP)
+            && it->second->get_has_been_checked())
           hosts_up++;
-        else if (temp_host->get_current_state() == HOST_DOWN) {
-          if (temp_host->get_scheduled_downtime_depth() > 0)
+        else if (it->second->get_current_state() == HOST_DOWN) {
+          if (it->second->get_scheduled_downtime_depth() > 0)
             problem = false;
-          if (temp_host->get_problem_has_been_acknowledged())
+          if (it->second->get_problem_has_been_acknowledged())
             problem = false;
-          if (!temp_host->get_checks_enabled())
+          if (!it->second->get_checks_enabled())
             problem = false;
           if (problem)
             hosts_down_unhandled++;
           hosts_down++;
         }
-        else if (temp_host->get_current_state() == HOST_UNREACHABLE) {
-          if (temp_host->get_scheduled_downtime_depth() > 0)
+        else if (it->second->get_current_state() == HOST_UNREACHABLE) {
+          if (it->second->get_scheduled_downtime_depth() > 0)
             problem = false;
-          if (temp_host->get_problem_has_been_acknowledged())
+          if (it->second->get_problem_has_been_acknowledged())
             problem = false;
-          if (!temp_host->get_checks_enabled())
+          if (!it->second->get_checks_enabled())
             problem = false;
           if (problem)
             hosts_down_unhandled++;
@@ -634,7 +663,7 @@ static int handle_summary_macro(
     unsigned int services_warning(0);
     unsigned int services_warning_unhandled(0);
     for (service* temp_service = service_list;
-         temp_service != NULL;
+         temp_service != nullptr;
          temp_service = temp_service->next) {
       // Filter totals based on contact if necessary.
       bool authorized(
@@ -649,8 +678,13 @@ static int handle_summary_macro(
             && temp_service->has_been_checked == true)
           services_ok++;
         else if (temp_service->current_state == STATE_WARNING) {
-          host* temp_host(find_host(temp_service->host_name));
-          if (temp_host != NULL
+          host* temp_host(nullptr);
+          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+            it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+          if (it != state::instance().hosts().end())
+              temp_host = it->second.get();
+
+          if (temp_host != nullptr
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
@@ -665,8 +699,13 @@ static int handle_summary_macro(
           services_warning++;
         }
         else if (temp_service->current_state == STATE_UNKNOWN) {
-          host* temp_host(find_host(temp_service->host_name));
-          if (temp_host != NULL
+          host* temp_host(nullptr);
+          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+          it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+          if (it != state::instance().hosts().end())
+            temp_host = it->second.get();
+
+          if (temp_host != nullptr
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
@@ -681,8 +720,13 @@ static int handle_summary_macro(
           services_unknown++;
         }
         else if (temp_service->current_state == STATE_CRITICAL) {
-          host* temp_host(find_host(temp_service->host_name));
-          if (temp_host != NULL
+          host* temp_host(nullptr);
+          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+          it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+          if (it != state::instance().hosts().end())
+            temp_host = it->second.get();
+
+          if (temp_host != nullptr
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
@@ -1002,26 +1046,26 @@ int grab_macro_value_r(
       char** output,
       int* clean_options,
       int* free_macro) {
-  char* buf = NULL;
-  char* ptr = NULL;
-  char* macro_name = NULL;
-  char* arg[2] = { NULL, NULL };
-  contact* temp_contact = NULL;
-  contactgroup* temp_contactgroup = NULL;
-  char* temp_buffer = NULL;
+  char* buf = nullptr;
+  char* ptr = nullptr;
+  char* macro_name = nullptr;
+  char* arg[2] = { nullptr, nullptr };
+  contact* temp_contact = nullptr;
+  contactgroup* temp_contactgroup = nullptr;
+  char* temp_buffer = nullptr;
   int delimiter_len = 0;
   unsigned int x;
   int result = OK;
 
-  if (output == NULL)
+  if (output == nullptr)
     return (ERROR);
 
   /* clear the old macro value */
   delete[] *output;
-  *output = NULL;
+  *output = nullptr;
 
-  if (macro_buffer == NULL || clean_options == NULL
-      || free_macro == NULL)
+  if (macro_buffer == nullptr || clean_options == nullptr
+      || free_macro == nullptr)
     return (ERROR);
 
   /* work with a copy of the original buffer */
@@ -1054,7 +1098,7 @@ int grab_macro_value_r(
   /***** X MACROS *****/
   /* see if this is an x macro */
   for (x = 0; x < MACRO_X_COUNT; x++) {
-    if (macro_x_names[x] == NULL)
+    if (macro_x_names[x] == nullptr)
       continue;
 
     if (!strcmp(macro_name, macro_x_names[x])) {
@@ -1129,9 +1173,9 @@ int grab_macro_value_r(
     x = atoi(macro_name + 14) - 1;
 
     /* regular macro */
-    if (arg[0] == NULL) {
+    if (arg[0] == nullptr) {
       /* use the saved pointer */
-      if ((temp_contact = mac->contact_ptr) == NULL) {
+      if ((temp_contact = mac->contact_ptr) == nullptr) {
         delete[] buf;
         return (ERROR);
       }
@@ -1142,8 +1186,8 @@ int grab_macro_value_r(
     /* on-demand macro */
     else {
       /* on-demand contact macro with a contactgroup and a delimiter */
-      if (arg[1] != NULL) {
-        if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(arg[0])) == NULL)
+      if (arg[1] != nullptr) {
+        if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(arg[0])) == nullptr)
           return (ERROR);
 
         delimiter_len = strlen(arg[1]);
@@ -1154,19 +1198,19 @@ int grab_macro_value_r(
             end(temp_contactgroup->get_members().end());
             it != end;
             ++it) {
-          if (it->second == NULL)
+          if (it->second == nullptr)
             continue;
-          if ((temp_contact = configuration::applier::state::instance().find_contact(it->second->get_name())) == NULL)
+          if ((temp_contact = configuration::applier::state::instance().find_contact(it->second->get_name())) == nullptr)
             continue;
 
           /* get the macro value for this contact */
           grab_contact_address_macro(x, temp_contact, &temp_buffer);
 
-          if (temp_buffer == NULL)
+          if (temp_buffer == nullptr)
             continue;
 
           /* add macro value to already running macro */
-          if (*output == NULL)
+          if (*output == nullptr)
             *output = string::dup(temp_buffer);
           else {
             *output = resize_string(
@@ -1179,13 +1223,13 @@ int grab_macro_value_r(
             strcat(*output, temp_buffer);
           }
           delete[] temp_buffer;
-          temp_buffer = NULL;
+          temp_buffer = nullptr;
         }
       }
       /* else on-demand contact macro */
       else {
         /* find the contact */
-        if ((temp_contact = configuration::applier::state::instance().find_contact(arg[0])) == NULL) {
+        if ((temp_contact = configuration::applier::state::instance().find_contact(arg[0])) == nullptr) {
           delete[] buf;
           return (ERROR);
         }

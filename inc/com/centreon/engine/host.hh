@@ -41,14 +41,77 @@ struct timeperiod_struct;
 };
 
 CCE_BEGIN()
+class host;
 namespace commands {
   class command;
 }
+CCE_END()
 
-class                  host {
+typedef std::unordered_map<std::string,
+  std::shared_ptr<com::centreon::engine::host>> host_map;
+
+CCE_BEGIN()
+class                host {
  public:
-  host();
+                      host(unsigned int host_id,
+                           std::string const& name,
+                           std::string const& display_name,
+                           std::string const& alias,
+                           std::string const& address,
+                           std::string const& check_period,
+                           int initial_state,
+                           double check_interval,
+                           double retry_interval,
+                           int max_attempts,
+                           int notify_up,
+                           int notify_down,
+                           int notify_unreachable,
+                           int notify_flapping,
+                           int notify_downtime,
+                           double notification_interval,
+                           double first_notification_delay,
+                           std::string const& notification_period,
+                           int notifications_enabled,
+                           std::string const& check_command,
+                           int checks_enabled,
+                           int accept_passive_checks,
+                           std::string const& event_handler,
+                           int event_handler_enabled,
+                           int flap_detection_enabled,
+                           double low_flap_threshold,
+                           double high_flap_threshold,
+                           int flap_detection_on_up,
+                           int flap_detection_on_down,
+                           int flap_detection_on_unreachable,
+                           int stalk_on_up,
+                           int stalk_on_down,
+                           int stalk_on_unreachable,
+                           int process_perfdata,
+                           int check_freshness,
+                           int freshness_threshold,
+                           std::string const& notes,
+                           std::string const& notes_url,
+                           std::string const& action_url,
+                           std::string const& icon_image,
+                           std::string const& icon_image_alt,
+                           std::string const& vrml_image,
+                           std::string const& statusmap_image,
+                           int x_2d,
+                           int y_2d,
+                           int have_2d_coords,
+                           double x_3d,
+                           double y_3d,
+                           double z_3d,
+                           int have_3d_coords,
+                           int should_be_drawn,
+                           int retain_status_information,
+                           int retain_nonstatus_information,
+                           int obsess_over_host);
 
+  void               add_child_link(host* child);
+  void               add_parent_host(std::string const& host_name);
+
+  // setters / getters
   std::string const& get_name() const;
   void               set_name(std::string const& name);
   std::string const& get_display_name() const;
@@ -262,238 +325,193 @@ class                  host {
 
   contactgroup_map   contact_groups;
   contact_map        contacts;
+  host_map           parent_hosts;
+  host_map           child_hosts;
+  static host_map    hosts;
+
   std::unordered_map<std::string, com::centreon::engine::customvariable>
                      custom_variables;
 
-  int                           state_history[MAX_STATE_HISTORY_ENTRIES];
-  hostsmember_struct*           parent_hosts;
-  hostsmember_struct*           child_hosts;
-  servicesmember_struct*        services;
+  com::centreon::engine::commands::command*
+                      event_handler_ptr;
+  com::centreon::engine::commands::command*
+                      check_command_ptr;
 
-  com::centreon::engine::commands::command*
-                                event_handler_ptr;
-  com::centreon::engine::commands::command*
-                                check_command_ptr;
-  timeperiod_struct*            check_period_ptr;
-  timeperiod_struct*            notification_period_ptr;
-  objectlist_struct*            hostgroups_ptr;
-  com::centreon::engine::host*  next;
-  com::centreon::engine::host*  nexthash;
+  int                 state_history[MAX_STATE_HISTORY_ENTRIES];
+  servicesmember_struct*
+                      services;
+  timeperiod_struct*  check_period_ptr;
+  timeperiod_struct*  notification_period_ptr;
+  objectlist_struct*  hostgroups_ptr;
+
 private:
-  std::string   _name;
-  std::string   _display_name;
-  std::string   _alias;
-  std::string   _address;
-  std::string   _host_check_command;
-  int           _initial_state;
-  double        _check_interval;
-  double        _retry_interval;
-  int           _max_attempts;
-  std::string   _event_handler;
-  double        _notification_interval;
-  double        _first_notification_delay;
-  int           _notify_on_down;
-  int           _notify_on_unreachable;
-  int           _notify_on_recovery;
-  int           _notify_on_flapping;
-  int           _notify_on_downtime;
-  std::string   _notification_period;
-  std::string   _check_period;
-  bool          _flap_detection_enabled;
-  double        _low_flap_threshold;
-  double        _high_flap_threshold;
-  bool          _flap_detection_on_up;
-  bool          _flap_detection_on_down;
-  bool          _flap_detection_on_unreachable;
-  bool          _stalk_on_down;
-  bool          _stalk_on_unreachable;
-  bool          _stalk_on_up;
-  int           _check_freshness;
-  int           _freshness_threshold;
-  bool          _process_performance_data;
-  bool          _checks_enabled;
-  int           _accept_passive_host_checks;
-  bool          _event_handler_enabled;
-  int           _retain_status_information;
-  int           _retain_nonstatus_information;
-  bool          _failure_prediction_enabled;
-  std::string   _failure_prediction_options;
-  int           _obsess_over_host;
-  std::string   _notes;
-  std::string   _notes_url;
-  std::string   _action_url;
-  std::string   _icon_image;
-  std::string   _icon_image_alt;
-  std::string   _vrml_image;
-  std::string   _statusmap_image;
-  bool          _have_2d_coords;
-  bool          _have_3d_coords;
-  int           _x_2d;
-  int           _y_2d;
-  int           _x_3d;
-  int           _y_3d;
-  int           _z_3d;
-  int           _should_be_drawn;
-  int           _problem_has_been_acknowledged;
-  int           _acknowledgement_type;
-  int           _check_type;
-  int           _current_state;
-  int           _last_state;
-  int           _last_hard_state;
-  std::string   _plugin_output;
-  std::string   _long_plugin_output;
-  std::string   _perf_data;
-  int           _state_type;
-  int           _current_attempt;
-  unsigned long _current_event_id;
-  unsigned long _last_event_id;
-  unsigned long _current_problem_id;
-  unsigned long _last_problem_id;
-  double        _latency;
-  double        _execution_time;
-  bool          _is_executing;
-  int           _check_options;
-  bool          _notifications_enabled;
-  time_t        _last_host_notification;
-  time_t        _next_host_notification;
-  time_t        _next_check;
-  int           _should_be_scheduled;
-  time_t        _last_check;
-  time_t        _last_state_change;
-  time_t        _last_hard_state_change;
-  time_t        _last_time_down;
-  time_t        _last_time_unreachable;
-  time_t        _last_time_up;
-  bool          _has_been_checked;
-  bool          _is_being_freshened;
-  bool          _notified_on_down;
-  bool          _notified_on_unreachable;
-  int           _current_notification_number;
-  int           _no_more_notifications;
-  unsigned long _current_notification_id;
-  int           _check_flapping_recovery_notification;
-  int           _scheduled_downtime_depth;
-  int           _pending_flex_downtime;
-  unsigned int  _state_history_index;
-  time_t        _last_state_history_update;
-  bool          _is_flapping;
-  unsigned long _flapping_comment_id;
-  double        _percent_state_change;
-  int           _total_services;
-  unsigned long _total_service_check_interval;
-  unsigned long _modified_attributes;
-  int           _circular_path_checked;
-  bool          _contains_circular_path;
+  std::string         _name;
+  std::string         _display_name;
+  std::string         _alias;
+  std::string         _address;
+  std::string         _host_check_command;
+  int                 _initial_state;
+  double              _check_interval;
+  double              _retry_interval;
+  int                 _max_attempts;
+  std::string         _event_handler;
+  double              _notification_interval;
+  double              _first_notification_delay;
+  int                 _notify_on_down;
+  int                 _notify_on_unreachable;
+  int                 _notify_on_recovery;
+  int                 _notify_on_flapping;
+  int                 _notify_on_downtime;
+  std::string         _notification_period;
+  std::string         _check_period;
+  bool                _flap_detection_enabled;
+  double              _low_flap_threshold;
+  double              _high_flap_threshold;
+  bool                _flap_detection_on_up;
+  bool                _flap_detection_on_down;
+  bool                _flap_detection_on_unreachable;
+  bool                _stalk_on_down;
+  bool                _stalk_on_unreachable;
+  bool                _stalk_on_up;
+  int                 _check_freshness;
+  int                 _freshness_threshold;
+  bool                _process_performance_data;
+  bool                _checks_enabled;
+  int                 _accept_passive_host_checks;
+  bool                _event_handler_enabled;
+  int                 _retain_status_information;
+  int                 _retain_nonstatus_information;
+  bool                _failure_prediction_enabled;
+  std::string         _failure_prediction_options;
+  int                 _obsess_over_host;
+  std::string         _notes;
+  std::string         _notes_url;
+  std::string         _action_url;
+  std::string         _icon_image;
+  std::string         _icon_image_alt;
+  std::string         _vrml_image;
+  std::string         _statusmap_image;
+  bool                _have_2d_coords;
+  bool                _have_3d_coords;
+  int                 _x_2d;
+  int                 _y_2d;
+  int                 _x_3d;
+  int                 _y_3d;
+  int                 _z_3d;
+  int                 _should_be_drawn;
+  int                 _problem_has_been_acknowledged;
+  int                 _acknowledgement_type;
+  int                 _check_type;
+  int                 _current_state;
+  int                 _last_state;
+  int                 _last_hard_state;
+  std::string         _plugin_output;
+  std::string         _long_plugin_output;
+  std::string         _perf_data;
+  int                 _state_type;
+  int                 _current_attempt;
+  unsigned long       _current_event_id;
+  unsigned long       _last_event_id;
+  unsigned long       _current_problem_id;
+  unsigned long       _last_problem_id;
+  double              _latency;
+  double              _execution_time;
+  bool                _is_executing;
+  int                 _check_options;
+  bool                _notifications_enabled;
+  time_t              _last_host_notification;
+  time_t              _next_host_notification;
+  time_t              _next_check;
+  int                 _should_be_scheduled;
+  time_t              _last_check;
+  time_t              _last_state_change;
+  time_t              _last_hard_state_change;
+  time_t              _last_time_down;
+  time_t              _last_time_unreachable;
+  time_t              _last_time_up;
+  bool                _has_been_checked;
+  bool                _is_being_freshened;
+  bool                _notified_on_down;
+  bool                _notified_on_unreachable;
+  int                 _current_notification_number;
+  int                 _no_more_notifications;
+  unsigned long       _current_notification_id;
+  int                 _check_flapping_recovery_notification;
+  int                 _scheduled_downtime_depth;
+  int                 _pending_flex_downtime;
+  unsigned int        _state_history_index;
+  time_t              _last_state_history_update;
+  bool                _is_flapping;
+  unsigned long       _flapping_comment_id;
+  double              _percent_state_change;
+  int                 _total_services;
+  unsigned long       _total_service_check_interval;
+  unsigned long       _modified_attributes;
+  int                 _circular_path_checked;
+  bool                _contains_circular_path;
 };
 CCE_END()
 
 /* Other HOST structure. */
-struct                          host_other_properties {
-  time_t                        initial_notif_time;
-  bool                          should_reschedule_current_check;
-  std::string                   timezone;
-  unsigned int                  host_id;
-  int                           acknowledgement_timeout;
-  time_t                        last_acknowledgement;
-  unsigned int                  recovery_notification_delay;
-  bool                          recovery_been_sent;
+struct                host_other_properties {
+  time_t              initial_notif_time;
+  bool                should_reschedule_current_check;
+  std::string         timezone;
+  unsigned int        host_id;
+  int                 acknowledgement_timeout;
+  time_t              last_acknowledgement;
+  unsigned int        recovery_notification_delay;
+  bool                recovery_been_sent;
 };
 
 /* Hash structures. */
-typedef struct                  host_cursor_struct {
-  int                           host_hashchain_iterator;
-  com::centreon::engine::host*  current_host_pointer;
-}                               host_cursor;
+typedef struct        host_cursor_struct {
+  int                 host_hashchain_iterator;
+  com::centreon::engine::host*
+                      current_host_pointer;
+}                     host_cursor;
 
-com::centreon::engine::host* add_host(
-        unsigned int host_id,
-        char const* name,
-        char const* display_name,
-        char const* alias,
-        char const* address,
-        char const* check_period,
-        int initial_state,
-        double check_interval,
-        double retry_interval,
-        int max_attempts,
-        int notify_up,
-        int notify_down,
-        int notify_unreachable,
-        int notify_flapping,
-        int notify_downtime,
-        double notification_interval,
-        double first_notification_delay,
-        char const* notification_period,
-        int notifications_enabled,
-        char const* check_command,
-        int checks_enabled,
-        int accept_passive_checks,
-        char const* event_handler,
-        int event_handler_enabled,
-        int flap_detection_enabled,
-        double low_flap_threshold,
-        double high_flap_threshold,
-        int flap_detection_on_up,
-        int flap_detection_on_down,
-        int flap_detection_on_unreachable,
-        int stalk_on_up,
-        int stalk_on_down,
-        int stalk_on_unreachable,
-        int process_perfdata,
-        int failure_prediction_enabled,
-        char const* failure_prediction_options,
-        int check_freshness,
-        int freshness_threshold,
-        char const* notes,
-        char const* notes_url,
-        char const* action_url,
-        char const* icon_image,
-        char const* icon_image_alt,
-        char const* vrml_image,
-        char const* statusmap_image,
-        int x_2d,
-        int y_2d,
-        int have_2d_coords,
-        double x_3d,
-        double y_3d,
-        double z_3d,
-        int have_3d_coords,
-        int should_be_drawn,
-        int retain_status_information,
-        int retain_nonstatus_information,
-        int obsess_over_host);
-int   get_host_count();
-int   is_contact_for_host(com::centreon::engine::host* hst,
+int                   is_contact_for_host(com::centreon::engine::host* hst,
                           com::centreon::engine::contact* cntct);
-int   is_escalated_contact_for_host(com::centreon::engine::host* hst,
+int                   is_escalated_contact_for_host(
+                                    com::centreon::engine::host* hst,
                                     com::centreon::engine::contact* cntct);
-int   is_host_immediate_child_of_host(com::centreon::engine::host* parent,
-                                      com::centreon::engine::host* child);
-int   is_host_immediate_parent_of_host(com::centreon::engine::host* child,
-                                       com::centreon::engine::host* parent);
-int   number_of_immediate_child_hosts(com::centreon::engine::host* hst);
-int   number_of_immediate_parent_hosts(com::centreon::engine::host* hst);
-int   number_of_total_child_hosts(com::centreon::engine::host* hst);
-int   number_of_total_parent_hosts(com::centreon::engine::host* hst);
+int                   is_host_immediate_child_of_host(
+                                    com::centreon::engine::host* parent,
+                                    com::centreon::engine::host* child);
+int                   is_host_immediate_parent_of_host(
+                                    com::centreon::engine::host* child,
+                                    com::centreon::engine::host* parent);
+int                   number_of_immediate_child_hosts(
+                                    com::centreon::engine::host* hst);
+int                   number_of_immediate_parent_hosts(
+                                    com::centreon::engine::host* hst);
+int                   number_of_total_child_hosts(
+                                    com::centreon::engine::host* hst);
+int                   number_of_total_parent_hosts(
+                                    com::centreon::engine::host* hst);
 
-bool          operator==(
-                com::centreon::engine::host const& obj1,
-                com::centreon::engine::host const& obj2) throw ();
-bool          operator!=(
-                com::centreon::engine::host const& obj1,
-                com::centreon::engine::host const& obj2) throw ();
-std::ostream& operator<<(std::ostream& os, 
-                         com::centreon::engine::host const& obj);
+bool                  operator==(
+                            com::centreon::engine::host const& obj1,
+                            com::centreon::engine::host const& obj2) throw ();
+bool                  operator!=(
+                            com::centreon::engine::host const& obj1,
+                            com::centreon::engine::host const& obj2) throw ();
+std::ostream&         operator<<(std::ostream& os,
+                            com::centreon::engine::host const& obj);
+std::ostream&         operator<<(std::ostream& os, host_map const& obj);
 
 CCE_BEGIN()
 
-void          check_for_expired_acknowledgement(com::centreon::engine::host* h);
+void                  check_for_expired_acknowledgement(
+                            com::centreon::engine::host* h);
 com::centreon::engine::host&
-              find_host(unsigned int host_id);
-char const*   get_host_timezone(std::string const& name);
-bool          is_host_exist(unsigned int host_id) throw ();
-unsigned int  get_host_id(std::string const& name);
-void          schedule_acknowledgement_expiration(com::centreon::engine::host* h);
+                      find_host(unsigned int host_id);
+char const*           get_host_timezone(std::string const& name);
+bool                  is_host_exist(unsigned int host_id) throw ();
+unsigned int          get_host_id(std::string const& name);
+void                  schedule_acknowledgement_expiration(
+                            com::centreon::engine::host* h);
 
 CCE_END()
 

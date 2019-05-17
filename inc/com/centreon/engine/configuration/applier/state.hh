@@ -35,10 +35,8 @@ CCE_BEGIN()
 CCE_END()
 
 // Forward declaration.
-struct contactgroup_struct;
 struct hostdependency_struct;
 struct hostescalation_struct;
-struct hostgroup_struct;
 struct service_struct;
 struct servicedependency_struct;
 struct serviceescalation_struct;
@@ -102,21 +100,21 @@ namespace           configuration {
                     find_connector(configuration::connector::key_type const& k) const;
       commands::connector*
                     find_connector(configuration::connector::key_type const& k);
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>> const&
+      contact_map const&
                     contacts() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>&
+      contact_map&
                     contacts() throw ();
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>::const_iterator
+      contact_map::const_iterator
                     contacts_find(configuration::contact::key_type const& k) const;
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>::iterator
+      contact_map::iterator
                     contacts_find(configuration::contact::key_type const& k);
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>> const&
+      contactgroup_map const&
                     contactgroups() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>&
+      contactgroup_map&
                     contactgroups() throw ();
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>::const_iterator
+      contactgroup_map::const_iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k) const;
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>::iterator
+      contactgroup_map::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
       std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>> const&
                     hosts() const throw ();
@@ -142,13 +140,13 @@ namespace           configuration {
                     hostescalations_find(configuration::hostescalation::key_type const& k) const;
       umultimap<std::string, std::shared_ptr<hostescalation_struct>>::iterator
                     hostescalations_find(configuration::hostescalation::key_type const& k);
-      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>> const&
+      hostgroup_map const&
                     hostgroups() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>&
+      hostgroup_map&
                     hostgroups() throw ();
-      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>::const_iterator
+      hostgroup_map::const_iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k) const;
-      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>::iterator
+      hostgroup_map::iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k);
       std::unordered_map<std::pair<unsigned int, unsigned int>, std::shared_ptr<service_struct>> const&
                     services() const throw ();
@@ -246,8 +244,7 @@ namespace           configuration {
                     _hostdependencies;
       umultimap<std::string, std::shared_ptr<hostescalation_struct>>
                     _hostescalations;
-      std::unordered_map<std::string, std::shared_ptr<hostgroup_struct>>
-                    _hostgroups;
+      hostgroup_map _hostgroups;
       concurrency::mutex
                     _lock;
       processing_state

@@ -276,8 +276,12 @@ void log_host_state(unsigned int type, com::centreon::engine::host* hst) {
  */
 int log_host_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-  for (com::centreon::engine::host* hst(host_list); hst; hst = hst->next)
-    log_host_state(type, hst);
+  for (host_map::iterator
+         it(com::centreon::engine::host::hosts.begin()),
+         end(com::centreon::engine::host::hosts.end());
+       it != end;
+       ++it)
+    log_host_state(type, it->second.get());
   return (OK);
 }
 

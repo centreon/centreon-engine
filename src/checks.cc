@@ -2087,7 +2087,6 @@ unsigned int check_host_dependencies(com::centreon::engine::host* hst, int depen
 
 /* check for hosts that never returned from a check... */
 void check_for_orphaned_hosts() {
-  com::centreon::engine::host* temp_host = NULL;
   time_t current_time = 0L;
   time_t expected_time = 0L;
 
@@ -2098,21 +2097,23 @@ void check_for_orphaned_hosts() {
   time(&current_time);
 
   /* check all hosts... */
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it) {
 
     /* skip hosts that don't have a set check interval (on-demand checks are missed by the orphan logic) */
-    if (temp_host->get_next_check() == (time_t)0L)
+    if (it->second->get_next_check() == (time_t)0L)
       continue;
 
     /* skip hosts that are not currently executing */
-    if (!temp_host->get_is_executing())
+    if (!it->second->get_is_executing())
       continue;
 
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
     expected_time
-      = (time_t)(temp_host->get_next_check() + temp_host->get_latency()
+      = (time_t)(it->second->get_next_check() + it->second->get_latency()
                  + config->host_check_timeout()
                  + config->check_reaper_interval() + 600);
 
@@ -2121,12 +2122,12 @@ void check_for_orphaned_hosts() {
 
       /* log a warning */
       logger(log_runtime_warning, basic)
-        << "Warning: The check of host '" << temp_host->get_name()
+        << "Warning: The check of host '" << it->second->get_name()
         << "' looks like it was orphaned (results never came back).  "
         "I'm scheduling an immediate check of the host...";
 
       logger(dbg_checks, more)
-        << "Host '" << temp_host->get_name()
+        << "Host '" << it->second->get_name()
         << "' was orphaned, so we're scheduling an immediate check...";
 
       /* decrement the number of running host checks */
@@ -2134,11 +2135,11 @@ void check_for_orphaned_hosts() {
         currently_running_host_checks--;
 
       /* disable the executing flag */
-      temp_host->set_is_executing(false);
+      it->second->set_is_executing(false);
 
       /* schedule an immediate check of the host */
       schedule_host_check(
-        temp_host,
+        it->second.get(),
         current_time,
         CHECK_OPTION_ORPHAN_CHECK);
     }
@@ -2148,7 +2149,6 @@ void check_for_orphaned_hosts() {
 
 /* check freshness of host results */
 void check_host_result_freshness() {
-  com::centreon::engine::host* temp_host = NULL;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic)
@@ -2167,45 +2167,47 @@ void check_host_result_freshness() {
   time(&current_time);
 
   /* check all hosts... */
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it) {
 
-    /* skip hosts we shouldn't be checking for freshness */
-    if (!temp_host->get_check_freshness())
+      /* skip hosts we shouldn't be checking for freshness */
+    if (!it->second->get_check_freshness())
       continue;
 
     /* skip hosts that have both active and passive checks disabled */
-    if (!temp_host->get_checks_enabled()
-        && !temp_host->get_accept_passive_host_checks())
+    if (!it->second->get_checks_enabled()
+        && !it->second->get_accept_passive_host_checks())
       continue;
 
     /* skip hosts that are currently executing (problems here will be caught by orphaned host check) */
-    if (temp_host->get_is_executing())
+    if (it->second->get_is_executing())
       continue;
 
     /* skip hosts that are already being freshened */
-    if (temp_host->get_is_being_freshened())
+    if (it->second->get_is_being_freshened())
       continue;
 
     // See if the time is right...
     {
-      timezone_locker lock(get_host_timezone(temp_host->get_name()));
+      timezone_locker lock(get_host_timezone(it->second->get_name()));
       if (check_time_against_period(
             current_time,
-            temp_host->check_period_ptr) == ERROR)
+            it->second->check_period_ptr) == ERROR)
         continue ;
     }
 
     /* the results for the last check of this host are stale */
-    if (!is_host_result_fresh(temp_host, current_time, true)) {
+    if (!is_host_result_fresh(it->second.get(), current_time, true)) {
 
       /* set the freshen flag */
-      temp_host->set_is_being_freshened(true);
+      it->second->set_is_being_freshened(true);
 
       /* schedule an immediate forced check of the host */
       schedule_host_check(
-        temp_host, current_time,
+        it->second.get(), current_time,
         CHECK_OPTION_FORCE_EXECUTION |
         CHECK_OPTION_FRESHNESS_CHECK);
     }
@@ -2846,7 +2848,6 @@ int process_host_check_result_3x(
       int reschedule_check,
       int use_cached_result,
       unsigned long check_timestamp_horizon) {
-  hostsmember* temp_hostsmember = NULL;
   com::centreon::engine::host* child_host = NULL;
   com::centreon::engine::host* parent_host = NULL;
   com::centreon::engine::host* master_host = NULL;
@@ -2859,6 +2860,7 @@ int process_host_check_result_3x(
   time_t preferred_time = 0L;
   time_t next_valid_time = 0L;
   int run_async_check = true;
+  bool has_parent;
 
   logger(dbg_functions, basic)
     << "process_host_check_result_3x()";
@@ -2930,15 +2932,17 @@ int process_host_check_result_3x(
       logger(dbg_checks, more)
         << "Propagating checks to parent host(s)...";
 
-      for (temp_hostsmember = hst->parent_hosts;
-           temp_hostsmember != NULL;
-           temp_hostsmember = temp_hostsmember->next) {
-        if ((parent_host = temp_hostsmember->host_ptr) == NULL)
+      for (host_map::iterator
+             it(hst->parent_hosts.begin()),
+             end(hst->parent_hosts.end());
+           it != end;
+           it++) {
+        if (it->second == nullptr)
           continue;
-        if (parent_host->get_current_state() != HOST_UP) {
+        if (it->second->get_current_state() != HOST_UP) {
           logger(dbg_checks, more)
-            << "Check of parent host '" << parent_host->get_name() << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)parent_host);
+            << "Check of parent host '" << it->first << "' queued.";
+          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
         }
       }
 
@@ -2947,15 +2951,17 @@ int process_host_check_result_3x(
       logger(dbg_checks, more)
         << "Propagating checks to child host(s)...";
 
-      for (temp_hostsmember = hst->child_hosts;
-           temp_hostsmember != NULL;
-           temp_hostsmember = temp_hostsmember->next) {
-        if ((child_host = temp_hostsmember->host_ptr) == NULL)
+      for (host_map::iterator
+             it(hst->child_hosts.begin()),
+             end(hst->child_hosts.end());
+           it != end;
+           it++) {
+        if (it->second == nullptr)
           continue;
-        if (child_host->get_current_state() != HOST_UP) {
+        if (it->second->get_current_state() != HOST_UP) {
           logger(dbg_checks, more)
-            << "Check of child host '" << child_host->get_name() << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)child_host);
+            << "Check of child host '" << it->first << "' queued.";
+          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
         }
       }
     }
@@ -3074,25 +3080,30 @@ int process_host_check_result_3x(
         /* check all parent hosts to see if we're DOWN or UNREACHABLE */
         /* only do this for ACTIVE checks, as PASSIVE checks contain a pre-determined state */
         if (hst->get_check_type() == HOST_CHECK_ACTIVE) {
+          has_parent = false;
 
           logger(dbg_checks, more)
             << "** WARNING: Max attempts = 1, so we have to run serial "
             "checks of all parent hosts!";
 
-          for (temp_hostsmember = hst->parent_hosts;
-               temp_hostsmember != NULL;
-               temp_hostsmember = temp_hostsmember->next) {
+          for (host_map::iterator
+                 it(hst->parent_hosts.begin()),
+                 end(hst->parent_hosts.end());
+               it != end;
+               it++) {
 
-            if ((parent_host = temp_hostsmember->host_ptr) == NULL)
+            if (it->second == nullptr)
               continue;
+
+            has_parent = true;
 
             logger(dbg_checks, more)
               << "Running serial check parent host '"
-              << parent_host->get_name() << "'...";
+              << it->first << "'...";
 
             /* run an immediate check of the parent host */
             run_sync_host_check_3x(
-              parent_host, &parent_state,
+              it->second.get(), &parent_state,
               check_options, use_cached_result,
               check_timestamp_horizon);
 
@@ -3107,9 +3118,9 @@ int process_host_check_result_3x(
             }
           }
 
-          if (temp_hostsmember == NULL) {
+          if (!has_parent) {
             /* host has no parents, so its up */
-            if (hst->parent_hosts == NULL) {
+            if (hst->parent_hosts.size() == 0) {
               logger(dbg_checks, more)
                 << "Host has no parents, so it's DOWN.";
               hst->set_current_state(HOST_DOWN);
@@ -3140,18 +3151,20 @@ int process_host_check_result_3x(
         logger(dbg_checks, more)
           << "Propagating check to immediate non-UNREACHABLE child hosts...";
 
-        for (temp_hostsmember = hst->child_hosts;
-             temp_hostsmember != NULL;
-             temp_hostsmember = temp_hostsmember->next) {
-          if ((child_host = temp_hostsmember->host_ptr) == NULL)
+        for (host_map::iterator
+               it(hst->child_hosts.begin()),
+               end(hst->child_hosts.end());
+             it != end;
+             it++) {
+          if (it->second == nullptr)
             continue;
-          if (child_host->get_current_state() != HOST_UNREACHABLE) {
+          if (it->second->get_current_state() != HOST_UNREACHABLE) {
             logger(dbg_checks, more)
               << "Check of child host '"
-              << child_host->get_name() << "' queued.";
+              << it->first << "' queued.";
             add_object_to_objectlist(
               &check_hostlist,
-              (void*)child_host);
+              it->second.get());
           }
         }
       }
@@ -3209,17 +3222,19 @@ int process_host_check_result_3x(
           << "Propagating checks to immediate parent hosts that "
           "are UP...";
 
-        for (temp_hostsmember = hst->parent_hosts;
-             temp_hostsmember != NULL;
-             temp_hostsmember = temp_hostsmember->next) {
-          if ((parent_host = temp_hostsmember->host_ptr) == NULL)
+        for (host_map::iterator
+               it(hst->parent_hosts.begin()),
+               end(hst->parent_hosts.end());
+             it != end;
+             it++) {
+          if (it->second == nullptr)
             continue;
-          if (parent_host->get_current_state() == HOST_UP) {
+          if (it->second->get_current_state() == HOST_UP) {
             add_object_to_objectlist(
               &check_hostlist,
-              (void*)parent_host);
+              it->second.get());
             logger(dbg_checks, more)
-              << "Check of host '" << parent_host->get_name() << "' queued.";
+              << "Check of host '" << it->first << "' queued.";
           }
         }
 
@@ -3229,18 +3244,20 @@ int process_host_check_result_3x(
           << "Propagating checks to immediate non-UNREACHABLE "
           "child hosts...";
 
-        for (temp_hostsmember = hst->child_hosts;
-             temp_hostsmember != NULL;
-             temp_hostsmember = temp_hostsmember->next) {
-          if ((child_host = temp_hostsmember->host_ptr) == NULL)
+        for (host_map::iterator
+               it(hst->child_hosts.begin()),
+               end(hst->child_hosts.end());
+             it != end;
+             it++) {
+          if (it->second == nullptr)
             continue;
-          if (child_host->get_current_state() != HOST_UNREACHABLE) {
+          if (it->second->get_current_state() != HOST_UNREACHABLE) {
             logger(dbg_checks, more)
               << "Check of child host '"
-              << child_host->get_name() << "' queued.";
+              << it->first << "' queued.";
             add_object_to_objectlist(
               &check_hostlist,
-              (void*)child_host);
+              it->second.get());
           }
         }
 
@@ -3510,8 +3527,7 @@ int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
 /* determination of the host's state based on route availability*//* used only to determine difference between DOWN and UNREACHABLE states */
 int determine_host_reachability(com::centreon::engine::host* hst) {
   int state = HOST_DOWN;
-  com::centreon::engine::host* parent_host = NULL;
-  hostsmember* temp_hostsmember = NULL;
+  bool is_host_present = false;
 
   logger(dbg_functions, basic)
     << "determine_host_reachability()";
@@ -3531,7 +3547,7 @@ int determine_host_reachability(com::centreon::engine::host* hst) {
   }
 
   /* host has no parents, so it is DOWN */
-  else if (hst->parent_hosts == NULL) {
+  else if (hst->parent_hosts.size() == 0) {
     state = HOST_DOWN;
     logger(dbg_checks, most)
       << "Host has no parents, so it is DOWN.";
@@ -3540,25 +3556,28 @@ int determine_host_reachability(com::centreon::engine::host* hst) {
   /* check all parent hosts to see if we're DOWN or UNREACHABLE */
   else {
 
-    for (temp_hostsmember = hst->parent_hosts;
-	 temp_hostsmember != NULL;
-         temp_hostsmember = temp_hostsmember->next) {
+    for (host_map::iterator
+           it(hst->parent_hosts.begin()),
+           end(hst->parent_hosts.end());
+         it != end;
+         it++) {
 
-      if ((parent_host = temp_hostsmember->host_ptr) == NULL)
+      if (it->second == nullptr)
         continue;
 
+      is_host_present = true;
       /* bail out as soon as we find one parent host that is UP */
-      if (parent_host->get_current_state() == HOST_UP) {
+      if (it->second->get_current_state() == HOST_UP) {
         /* set the current state */
         state = HOST_DOWN;
         logger(dbg_checks, most)
-          << "At least one parent (" << parent_host->get_name()
+          << "At least one parent (" << it->first
           << ") is up, so host is DOWN.";
         break;
       }
     }
     /* no parents were up, so this host is UNREACHABLE */
-    if (temp_hostsmember == NULL) {
+    if (!is_host_present) {
       state = HOST_UNREACHABLE;
       logger(dbg_checks, most)
         << "No parents were up, so host is UNREACHABLE.";

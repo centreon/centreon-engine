@@ -24,7 +24,7 @@
 # include "com/centreon/engine/contact.hh"
 # include "com/centreon/engine/contactgroup.hh"
 # include "com/centreon/engine/host.hh"
-# include "com/centreon/engine/objects/hostgroup.hh"
+# include "com/centreon/engine/hostgroup.hh"
 # include "com/centreon/engine/objects/service.hh"
 # include "com/centreon/engine/objects/servicegroup.hh"
 
@@ -209,7 +209,7 @@ struct                                  nagios_macros {
   char*                                 contactaddress[MAX_CONTACT_ADDRESSES];
   char*                                 ondemand;
   com::centreon::engine::host*          host_ptr;
-  hostgroup*                            hostgroup_ptr;
+  com::centreon::engine::hostgroup*     hostgroup_ptr;
   service*                              service_ptr;
   servicegroup*                         servicegroup_ptr;
   com::centreon::engine::contact*       contact_ptr;

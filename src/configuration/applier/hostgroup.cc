@@ -17,12 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <memory>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -77,19 +77,20 @@ void applier::hostgroup::add_object(
   config->hostgroups().insert(obj);
 
   // Add hostgroup id to the other props.
-  hostgroup_other_props[obj.hostgroup_name()].hostgroup_id
-    = obj.hostgroup_id();
+  engine::hostgroup::hostgroups[obj.hostgroup_name()]->set_id(obj.hostgroup_id());
 
   // Create host group.
-  hostgroup_struct* hg(add_hostgroup(
-                         obj.hostgroup_name().c_str(),
-                         NULL_IF_EMPTY(obj.alias()),
-                         NULL_IF_EMPTY(obj.notes()),
-                         NULL_IF_EMPTY(obj.notes_url()),
-                         NULL_IF_EMPTY(obj.action_url())));
-  if (!hg)
-    throw (engine_error() << "Could not register host group '"
-           << obj.hostgroup_name() << "'");
+  std::shared_ptr<com::centreon::engine::hostgroup> hg =
+    std::make_shared<com::centreon::engine::hostgroup>(
+      obj.hostgroup_name(),
+      obj.alias(),
+      obj.notes(),
+      obj.notes_url(),
+      obj.action_url());
+
+  // Add new items to the configuration state.
+  state::instance().hostgroups()[obj.hostgroup_name()] = hg;
+  com::centreon::engine::hostgroup::hostgroups.insert({hg->get_group_name(),  hg});
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -97,7 +98,7 @@ void applier::hostgroup::add_object(
     NEBTYPE_HOSTGROUP_ADD,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hg,
+    hg.get(),
     &tv);
 
   // Apply resolved hosts on hostgroup.
@@ -106,10 +107,7 @@ void applier::hostgroup::add_object(
          end(obj.members().end());
        it != end;
        ++it)
-    if (!add_host_to_hostgroup(hg, it->c_str()))
-      throw (engine_error() << "Could not add host member '"
-             << *it << "' to host group '" << obj.hostgroup_name()
-             << "'");
+    hg->members.insert({*it, nullptr});
 
   return ;
 }
@@ -161,64 +159,50 @@ void applier::hostgroup::modify_object(
            << "host group '" << obj.hostgroup_name() << "'");
 
   // Find host group object.
-  umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator
+  hostgroup_map::iterator
     it_obj(applier::state::instance().hostgroups_find(obj.key()));
   if (it_obj == applier::state::instance().hostgroups().end())
     throw (engine_error() << "Could not modify non-existing "
            << "host group object '" << obj.hostgroup_name() << "'");
-  hostgroup_struct* hg(it_obj->second.get());
+  com::centreon::engine::hostgroup* hg(it_obj->second.get());
 
   // Update the global configuration set.
   configuration::hostgroup old_cfg(*it_cfg);
   config->hostgroups().erase(it_cfg);
   config->hostgroups().insert(obj);
 
-  // Modify properties.
-  modify_if_different(
-    hg->action_url,
-    NULL_IF_EMPTY(obj.action_url()));
-  modify_if_different(
-    hg->alias,
-    (obj.alias().empty() ? obj.hostgroup_name() : obj.alias()).c_str());
-  modify_if_different(
-    hg->notes,
-    NULL_IF_EMPTY(obj.notes()));
-  modify_if_different(
-    hg->notes_url,
-    NULL_IF_EMPTY(obj.notes_url()));
-  hostgroup_other_props[obj.hostgroup_name()].hostgroup_id = obj.hostgroup_id();
+  hg->set_action_url(obj.action_url());
+  hg->set_alias(obj.alias());
+  hg->set_notes(obj.notes());
+  hg->set_notes_url(obj.notes_url());
+
+  engine::hostgroup::hostgroups[obj.hostgroup_name()]->set_id(obj.hostgroup_id());
 
   // Were members modified ?
   if (obj.members() != old_cfg.members()) {
     // Delete all old host group members.
-    for (hostsmember* m(it_obj->second->members);
-         m;
-         m = m->next) {
+    for(host_map::iterator
+          it(it_obj->second->members.begin()),
+          end(it_obj->second->members.end());
+        it != end;
+        ++end) {
       timeval tv(get_broker_timestamp(NULL));
       broker_group_member(
         NEBTYPE_HOSTGROUPMEMBER_DELETE,
         NEBFLAG_NONE,
         NEBATTR_NONE,
-        m,
+        it->second.get(),
         hg,
         &tv);
     }
-    deleter::listmember(
-      (*it_obj).second->members,
-      &deleter::hostsmember);
 
-    // Create new host group members.
+    (*it_obj).second->members.clear();
     for (set_string::const_iterator
            it(obj.members().begin()),
            end(obj.members().end());
          it != end;
          ++it)
-      if (!add_host_to_hostgroup(
-             hg,
-             it->c_str()))
-        throw (engine_error() << "Could not add host member '"
-               << *it << "' to host group '" << obj.hostgroup_name()
-               << "'");
+      hg->members.insert({*it, nullptr});
   }
 
   // Notify event broker.
@@ -246,13 +230,12 @@ void applier::hostgroup::remove_object(
     << "Removing host group '" << obj.hostgroup_name() << "'";
 
   // Find host group.
-  umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator
+  hostgroup_map::iterator
     it(applier::state::instance().hostgroups_find(obj.key()));
   if (it != applier::state::instance().hostgroups().end()) {
-    hostgroup_struct* grp(it->second.get());
+    com::centreon::engine::hostgroup* grp(it->second.get());
 
-    // Remove host group from its list.
-    unregister_object<hostgroup_struct>(&hostgroup_list, grp);
+   com::centreon::engine::hostgroup::hostgroups.erase(grp->get_group_name());
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -264,7 +247,7 @@ void applier::hostgroup::remove_object(
       &tv);
 
     // Erase host group object (will effectively delete the object).
-    hostgroup_other_props.erase(obj.hostgroup_name());
+    engine::hostgroup::hostgroups.erase(obj.hostgroup_name());
     applier::state::instance().hostgroups().erase(it);
   }
 
@@ -286,7 +269,7 @@ void applier::hostgroup::resolve_object(
     << "Resolving host group '" << obj.hostgroup_name() << "'";
 
   // Find host group.
-  umap<std::string, std::shared_ptr<hostgroup_struct> >::iterator
+  hostgroup_map::iterator
     it(applier::state::instance().hostgroups_find(obj.key()));
   if (applier::state::instance().hostgroups().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

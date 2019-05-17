@@ -37,19 +37,20 @@
 #include "find.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
-static commands::command*        xpddefault_host_perfdata_command_ptr(NULL);
-static commands::command*        xpddefault_service_perfdata_command_ptr(NULL);
+static commands::command*        xpddefault_host_perfdata_command_ptr(nullptr);
+static commands::command*        xpddefault_service_perfdata_command_ptr(nullptr);
 
-static char*           xpddefault_host_perfdata_file_template(NULL);
-static char*           xpddefault_service_perfdata_file_template(NULL);
+static char*           xpddefault_host_perfdata_file_template(nullptr);
+static char*           xpddefault_service_perfdata_file_template(nullptr);
 
-static commands::command*        xpddefault_host_perfdata_file_processing_command_ptr(NULL);
-static commands::command*        xpddefault_service_perfdata_file_processing_command_ptr(NULL);
+static commands::command*        xpddefault_host_perfdata_file_processing_command_ptr(nullptr);
+static commands::command*        xpddefault_service_perfdata_file_processing_command_ptr(nullptr);
 
-static FILE*           xpddefault_host_perfdata_fp(NULL);
-static FILE*           xpddefault_service_perfdata_fp(NULL);
+static FILE*           xpddefault_host_perfdata_fp(nullptr);
+static FILE*           xpddefault_service_perfdata_fp(nullptr);
 static int             xpddefault_host_perfdata_fd(-1);
 static int             xpddefault_service_perfdata_fd(-1);
 
@@ -62,14 +63,14 @@ static pthread_mutex_t xpddefault_service_perfdata_fp_lock;
 
 // initializes performance data.
 int xpddefault_initialize_performance_data() {
-  char* temp_command_name(NULL);
-  commands::command* temp_command(NULL);
+  char* temp_command_name(nullptr);
+  commands::command* temp_command(nullptr);
 
   // reset vars.
-  xpddefault_host_perfdata_command_ptr = NULL;
-  xpddefault_service_perfdata_command_ptr = NULL;
-  xpddefault_host_perfdata_file_processing_command_ptr = NULL;
-  xpddefault_service_perfdata_file_processing_command_ptr = NULL;
+  xpddefault_host_perfdata_command_ptr = nullptr;
+  xpddefault_service_perfdata_command_ptr = nullptr;
+  xpddefault_host_perfdata_file_processing_command_ptr = nullptr;
+  xpddefault_service_perfdata_file_processing_command_ptr = nullptr;
 
   // grab config info from main config file.
   xpddefault_host_perfdata_file_template = string::dup(config->host_perfdata_file_template());
@@ -90,7 +91,7 @@ int xpddefault_initialize_performance_data() {
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
 
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
       logger(log_runtime_warning, basic)
         << "Warning: Host performance command '" << temp_command_name
         << "' was not found - host performance data will not "
@@ -108,7 +109,7 @@ int xpddefault_initialize_performance_data() {
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
 
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
       logger(log_runtime_warning, basic)
         << "Warning: Service performance command '" << temp_command_name
         << "' was not found - service performance data will not "
@@ -128,7 +129,7 @@ int xpddefault_initialize_performance_data() {
 
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
       logger(log_runtime_warning, basic)
         << "Warning: Host performance file processing command '"
         << temp_command_name << "' was not found - host performance "
@@ -148,7 +149,7 @@ int xpddefault_initialize_performance_data() {
 
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == NULL) {
+    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
       logger(log_runtime_warning, basic)
         << "Warning: Service performance file processing command '"
         << temp_command_name << "' was not found - service performance "
@@ -172,8 +173,8 @@ int xpddefault_cleanup_performance_data() {
   delete[] xpddefault_host_perfdata_file_template;
   delete[] xpddefault_service_perfdata_file_template;
 
-  xpddefault_host_perfdata_file_template = NULL;
-  xpddefault_service_perfdata_file_template = NULL;
+  xpddefault_host_perfdata_file_template = nullptr;
+  xpddefault_service_perfdata_file_template = nullptr;
 
   // close the files.
   xpddefault_close_host_perfdata_file();
@@ -189,7 +190,6 @@ int xpddefault_cleanup_performance_data() {
 // updates service performance data.
 int xpddefault_update_service_performance_data(service* svc) {
   nagios_macros mac;
-  host* hst(NULL);
 
   /*
    * bail early if we've got nothing to do so we don't spend a lot
@@ -207,7 +207,13 @@ int xpddefault_update_service_performance_data(service* svc) {
    * macros and get busy
    */
   memset(&mac, 0, sizeof(mac));
-  hst = find_host(svc->host_name);
+
+  host* hst(nullptr);
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(state::instance().hosts().find(get_host_id(svc->host_name)));
+  if (it != state::instance().hosts().end())
+    hst = it->second.get();
+
   grab_host_macros_r(&mac, hst);
   grab_service_macros_r(&mac, svc);
 
@@ -269,8 +275,8 @@ int xpddefault_update_host_performance_data(host* hst) {
 int xpddefault_run_service_performance_data_command(
       nagios_macros* mac,
       service* svc) {
-  char* raw_command_line(NULL);
-  char* processed_command_line(NULL);
+  char* raw_command_line(nullptr);
+  char* processed_command_line(nullptr);
   int early_timeout(false);
   double exectime;
   int result(OK);
@@ -279,7 +285,7 @@ int xpddefault_run_service_performance_data_command(
   logger(dbg_functions, basic)
     << "run_service_performance_data_command()";
 
-  if (svc == NULL)
+  if (svc == nullptr)
     return (ERROR);
 
   // we don't have a command.
@@ -293,7 +299,7 @@ int xpddefault_run_service_performance_data_command(
     config->service_perfdata_command().c_str(),
     &raw_command_line,
     macro_options);
-  if (raw_command_line == NULL)
+  if (raw_command_line == nullptr)
     return (ERROR);
 
   logger(dbg_perfdata, most)
@@ -306,7 +312,7 @@ int xpddefault_run_service_performance_data_command(
     raw_command_line,
     &processed_command_line,
     macro_options);
-  if (processed_command_line == NULL)
+  if (processed_command_line == nullptr)
     return (ERROR);
 
   logger(dbg_perfdata, most)
@@ -321,7 +327,7 @@ int xpddefault_run_service_performance_data_command(
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      NULL,
+      nullptr,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -349,8 +355,8 @@ int xpddefault_run_service_performance_data_command(
 int xpddefault_run_host_performance_data_command(
       nagios_macros* mac,
       host* hst) {
-  char* raw_command_line(NULL);
-  char* processed_command_line(NULL);
+  char* raw_command_line(nullptr);
+  char* processed_command_line(nullptr);
   int early_timeout(false);
   double exectime;
   int result(OK);
@@ -359,7 +365,7 @@ int xpddefault_run_host_performance_data_command(
   logger(dbg_functions, basic)
     << "run_host_performance_data_command()";
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return (ERROR);
 
   // we don't have a command.
@@ -373,7 +379,7 @@ int xpddefault_run_host_performance_data_command(
     config->host_perfdata_command().c_str(),
     &raw_command_line,
     macro_options);
-  if (raw_command_line == NULL)
+  if (raw_command_line == nullptr)
     return (ERROR);
 
   logger(dbg_perfdata, most)
@@ -398,7 +404,7 @@ int xpddefault_run_host_performance_data_command(
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      NULL,
+      nullptr,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -406,7 +412,7 @@ int xpddefault_run_host_performance_data_command(
       << processed_command_line << "' : " << e.what();
   }
 
-  if (processed_command_line == NULL)
+  if (processed_command_line == nullptr)
     return (ERROR);
 
   // check to see if the command timed out.
@@ -444,7 +450,7 @@ int xpddefault_open_host_perfdata_file() {
             config->host_perfdata_file().c_str(),
             (config->host_perfdata_file_mode() == configuration::state::mode_file) ? "w" : "a");
 
-    if (xpddefault_host_perfdata_fp == NULL) {
+    if (xpddefault_host_perfdata_fp == nullptr) {
       logger(log_runtime_warning, basic)
         << "Warning: File '" << xpddefault_host_perfdata_fp
         << "' could not be opened - host performance data will not "
@@ -473,7 +479,7 @@ int xpddefault_open_service_perfdata_file() {
           config->service_perfdata_file().c_str(),
           (config->service_perfdata_file_mode() == configuration::state::mode_file) ? "w" : "a");
 
-    if (xpddefault_service_perfdata_fp == NULL) {
+    if (xpddefault_service_perfdata_fp == nullptr) {
       logger(log_runtime_warning, basic)
         << "Warning: File '" << config->service_perfdata_file()
         << "' could not be opened - service performance data will not "
@@ -488,7 +494,7 @@ int xpddefault_open_service_perfdata_file() {
 
 // close the host performance data file.
 int xpddefault_close_host_perfdata_file() {
-  if (xpddefault_host_perfdata_fp != NULL)
+  if (xpddefault_host_perfdata_fp != nullptr)
     fclose(xpddefault_host_perfdata_fp);
   if (xpddefault_host_perfdata_fd >= 0) {
     close(xpddefault_host_perfdata_fd);
@@ -500,7 +506,7 @@ int xpddefault_close_host_perfdata_file() {
 
 // close the service performance data file.
 int xpddefault_close_service_perfdata_file() {
-  if (xpddefault_service_perfdata_fp != NULL)
+  if (xpddefault_service_perfdata_fp != nullptr)
     fclose(xpddefault_service_perfdata_fp);
   if (xpddefault_service_perfdata_fd >= 0) {
     close(xpddefault_service_perfdata_fd);
@@ -551,19 +557,19 @@ void xpddefault_preprocess_file_templates(char* tmpl) {
 int xpddefault_update_service_performance_data_file(
       nagios_macros* mac,
       service* svc) {
-  char* raw_output(NULL);
-  char* processed_output(NULL);
+  char* raw_output(nullptr);
+  char* processed_output(nullptr);
   int result(OK);
 
   logger(dbg_functions, basic)
     << "update_service_performance_data_file()";
 
-  if (svc == NULL)
+  if (svc == nullptr)
     return (ERROR);
 
   // we don't have a file to write to.
-  if (xpddefault_service_perfdata_fp == NULL
-      || xpddefault_service_perfdata_file_template == NULL)
+  if (xpddefault_service_perfdata_fp == nullptr
+      || xpddefault_service_perfdata_file_template == nullptr)
     return (OK);
 
   // get the raw line to write.
@@ -574,7 +580,7 @@ int xpddefault_update_service_performance_data_file(
 
   // process any macros in the raw output line.
   process_macros_r(mac, raw_output, &processed_output, 0);
-  if (processed_output == NULL)
+  if (processed_output == nullptr)
     return (ERROR);
 
   logger(dbg_perfdata, most)
@@ -599,19 +605,19 @@ int xpddefault_update_service_performance_data_file(
 int xpddefault_update_host_performance_data_file(
       nagios_macros* mac,
       host* hst) {
-  char* raw_output(NULL);
-  char* processed_output(NULL);
+  char* raw_output(nullptr);
+  char* processed_output(nullptr);
   int result(OK);
 
   logger(dbg_functions, basic)
     << "update_host_performance_data_file()";
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return (ERROR);
 
   // we don't have a host perfdata file.
-  if (xpddefault_host_perfdata_fp == NULL
-      || xpddefault_host_perfdata_file_template == NULL)
+  if (xpddefault_host_perfdata_fp == nullptr
+      || xpddefault_host_perfdata_file_template == nullptr)
     return (OK);
 
   // get the raw output.
@@ -622,7 +628,7 @@ int xpddefault_update_host_performance_data_file(
 
   // process any macros in the raw output.
   process_macros_r(mac, raw_output, &processed_output, 0);
-  if (processed_output == NULL)
+  if (processed_output == nullptr)
     return (ERROR);
 
   logger(dbg_perfdata, most)
@@ -645,8 +651,8 @@ int xpddefault_update_host_performance_data_file(
 
 // periodically process the host perf data file.
 int xpddefault_process_host_perfdata_file() {
-  char* raw_command_line(NULL);
-  char* processed_command_line(NULL);
+  char* raw_command_line(nullptr);
+  char* processed_command_line(nullptr);
   int early_timeout(false);
   double exectime(0.0);
   int result(OK);
@@ -670,7 +676,7 @@ int xpddefault_process_host_perfdata_file() {
     config->host_perfdata_file_processing_command().c_str(),
     &raw_command_line,
     macro_options);
-  if (raw_command_line == NULL) {
+  if (raw_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
@@ -685,7 +691,7 @@ int xpddefault_process_host_perfdata_file() {
     raw_command_line,
     &processed_command_line,
     macro_options);
-  if (processed_command_line == NULL) {
+  if (processed_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
@@ -706,7 +712,7 @@ int xpddefault_process_host_perfdata_file() {
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      NULL,
+      nullptr,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -736,8 +742,8 @@ int xpddefault_process_host_perfdata_file() {
 
 // periodically process the service perf data file.
 int xpddefault_process_service_perfdata_file() {
-  char* raw_command_line(NULL);
-  char* processed_command_line(NULL);
+  char* raw_command_line(nullptr);
+  char* processed_command_line(nullptr);
   int early_timeout(false);
   double exectime(0.0);
   int result(OK);
@@ -761,7 +767,7 @@ int xpddefault_process_service_perfdata_file() {
     config->service_perfdata_file_processing_command().c_str(),
     &raw_command_line,
     macro_options);
-  if (raw_command_line == NULL) {
+  if (raw_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
@@ -776,7 +782,7 @@ int xpddefault_process_service_perfdata_file() {
     raw_command_line,
     &processed_command_line,
     macro_options);
-  if (processed_command_line == NULL) {
+  if (processed_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
@@ -797,7 +803,7 @@ int xpddefault_process_service_perfdata_file() {
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      NULL,
+      nullptr,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)

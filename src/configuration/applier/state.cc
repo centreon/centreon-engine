@@ -259,8 +259,7 @@ engine::contact const* applier::state::find_contact(configuration::contact::key_
   if (k.empty())
     return NULL;
 
-  std::unordered_map<std::string, std::shared_ptr<engine::contact>>::const_iterator
-    it(_contacts.find(k));
+  contact_map::const_iterator it(_contacts.find(k));
 
   if (it != _contacts.end())
     return it->second.get();
@@ -278,8 +277,7 @@ engine::contact* applier::state::find_contact(configuration::contact::key_type c
   if (k.empty())
     return NULL;
 
-  std::unordered_map<std::string, std::shared_ptr<engine::contact>>::const_iterator
-    it(_contacts.find(k));
+  contact_map::const_iterator it(_contacts.find(k));
 
   if (it != _contacts.end())
     return it->second.get();
@@ -297,8 +295,7 @@ engine::contactgroup const* applier::state::find_contactgroup(configuration::con
   if (k.empty())
     return NULL;
 
-  std::unordered_map<std::string, std::shared_ptr<engine::contactgroup>>::const_iterator
-    it(_contactgroups.find(k));
+  contactgroup_map::const_iterator it(_contactgroups.find(k));
 
   if (it != _contactgroups.end())
     return it->second.get();
@@ -316,8 +313,7 @@ engine::contactgroup* applier::state::find_contactgroup(configuration::contact::
   if (k.empty())
     return NULL;
 
-  std::unordered_map<std::string, std::shared_ptr<engine::contactgroup>>::const_iterator
-    it(_contactgroups.find(k));
+  contactgroup_map::const_iterator it(_contactgroups.find(k));
 
   if (it != _contactgroups.end())
     return it->second.get();
@@ -384,7 +380,7 @@ commands::connector* applier::state::find_connector(configuration::connector::ke
  *
  *  @return The current contacts.
  */
-std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact> > const& applier::state::contacts() const throw () {
+contact_map const& applier::state::contacts() const throw () {
   return _contacts;
 }
 
@@ -393,7 +389,7 @@ std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact> 
  *
  *  @return The current contacts.
  */
-std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact> >& applier::state::contacts() throw () {
+contact_map& applier::state::contacts() throw () {
   return _contacts;
 }
 
@@ -402,7 +398,7 @@ std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact> 
  *
  *  @return The current contactgroups.
  */
-std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> > const& applier::state::contactgroups() const throw () {
+contactgroup_map const& applier::state::contactgroups() const throw () {
   return _contactgroups;
 }
 
@@ -411,7 +407,7 @@ std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgr
  *
  *  @return The current contactgroups.
  */
-std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> >& applier::state::contactgroups() throw () {
+contactgroup_map& applier::state::contactgroups() throw () {
   return _contactgroups;
 }
 
@@ -423,7 +419,7 @@ std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgr
  *  @return Iterator to the element if found, contactgroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
+contactgroup_map::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
   return _contactgroups.find(k);
 }
 
@@ -435,7 +431,7 @@ std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgr
  *  @return Iterator to the element if found, contactgroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
+contactgroup_map::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
   return _contactgroups.find(k);
 }
 
@@ -661,7 +657,7 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator applie
  *
  *  @return The current hostgroups.
  */
-std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> > const& applier::state::hostgroups() const throw () {
+hostgroup_map const& applier::state::hostgroups() const throw () {
   return _hostgroups;
 }
 
@@ -670,7 +666,7 @@ std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> > const& appli
  *
  *  @return The current hostgroups.
  */
-std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >& applier::state::hostgroups() throw () {
+hostgroup_map& applier::state::hostgroups() throw () {
   return _hostgroups;
 }
 
@@ -682,7 +678,8 @@ std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >& applier::st
  *  @return Iterator to the element if found, hostgroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) const {
+hostgroup_map::const_iterator applier::state::hostgroups_find(
+  configuration::hostgroup::key_type const& k) const {
   return _hostgroups.find(k);
 }
 
@@ -694,7 +691,8 @@ std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >::const_itera
  *  @return Iterator to the element if found, hostgroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<hostgroup_struct> >::iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) {
+hostgroup_map::iterator applier::state::hostgroups_find(
+  configuration::hostgroup::key_type const& k) {
   return _hostgroups.find(k);
 }
 
@@ -913,7 +911,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
          it != end;
          ++it)
       current.contacts().insert(it->first);
-    for (contactgroup_map::iterator 
+    for (contactgroup_map::iterator
            it(p.first->second->contact_groups.begin()),
            end(p.first->second->contact_groups.end());
          it != end;

@@ -20,14 +20,12 @@
 
 #ifndef CCE_OBJECTS_HH
 #  define CCE_OBJECTS_HH
-
+#  include "com/centreon/engine/hostgroup.hh"
 #  include "com/centreon/engine/objects/comment.hh"
 #  include "com/centreon/engine/objects/daterange.hh"
 #  include "com/centreon/engine/downtimes/downtime.hh"
 #  include "com/centreon/engine/objects/hostdependency.hh"
 #  include "com/centreon/engine/objects/hostescalation.hh"
-#  include "com/centreon/engine/objects/hostgroup.hh"
-#  include "com/centreon/engine/objects/hostsmember.hh"
 #  include "com/centreon/engine/objects/objectlist.hh"
 #  include "com/centreon/engine/objects/servicedependency.hh"
 #  include "com/centreon/engine/objects/serviceescalation.hh"

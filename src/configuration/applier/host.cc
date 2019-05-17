@@ -25,7 +25,6 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
@@ -83,14 +82,14 @@ void applier::host::add_object(
   config->hosts().insert(obj);
 
   // Create host.
-  com::centreon::engine::host*
-    h(add_host(
+  std::shared_ptr<com::centreon::engine::host> h =
+    std::make_shared<com::centreon::engine::host>(
         obj.host_id(),
-        obj.host_name().c_str(),
-        NULL_IF_EMPTY(obj.display_name()),
-        NULL_IF_EMPTY(obj.alias()),
-        NULL_IF_EMPTY(obj.address()),
-        NULL_IF_EMPTY(obj.check_period()),
+        obj.host_name(),
+        obj.display_name(),
+        obj.alias(),
+        obj.address(),
+        obj.check_period(),
         obj.initial_state(),
         obj.check_interval(),
         obj.retry_interval(),
@@ -107,12 +106,12 @@ void applier::host::add_object(
                           & configuration::host::downtime),
         obj.notification_interval(),
         obj.first_notification_delay(),
-        NULL_IF_EMPTY(obj.notification_period()),
+        obj.notification_period(),
         obj.notifications_enabled(),
-        NULL_IF_EMPTY(obj.check_command()),
+        obj.check_command(),
         obj.checks_active(),
         obj.checks_passive(),
-        NULL_IF_EMPTY(obj.event_handler()),
+        obj.event_handler(),
         obj.event_handler_enabled(),
         obj.flap_detection_enabled(),
         obj.low_flap_threshold(),
@@ -130,17 +129,15 @@ void applier::host::add_object(
         static_cast<bool>(obj.stalking_options()
                           & configuration::host::unreachable),
         obj.process_perf_data(),
-        false, // failure_prediction_enabled
-        NULL, // failure_prediction_options
         obj.check_freshness(),
         obj.freshness_threshold(),
-        NULL_IF_EMPTY(obj.notes()),
-        NULL_IF_EMPTY(obj.notes_url()),
-        NULL_IF_EMPTY(obj.action_url()),
-        NULL_IF_EMPTY(obj.icon_image()),
-        NULL_IF_EMPTY(obj.icon_image_alt()),
-        NULL_IF_EMPTY(obj.vrml_image()),
-        NULL_IF_EMPTY(obj.statusmap_image()),
+        obj.notes(),
+        obj.notes_url(),
+        obj.action_url(),
+        obj.icon_image(),
+        obj.icon_image_alt(),
+        obj.vrml_image(),
+        obj.statusmap_image(),
         obj.coords_2d().x(),
         obj.coords_2d().y(),
         obj.have_coords_2d(),
@@ -151,10 +148,12 @@ void applier::host::add_object(
         true, // should_be_drawn, enabled by Nagios
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
-        obj.obsess_over_host()));
-  if (!h)
-    throw (engine_error() << "Could not register host '"
-           << obj.host_name() << "'");
+        obj.obsess_over_host());
+
+
+  state::instance().hosts()[obj.host_id()] = h;
+  com::centreon::engine::host::hosts.insert({h->get_name(), h});
+
   host_other_props[obj.host_name()].initial_notif_time = 0;
   host_other_props[obj.host_name()].should_reschedule_current_check = false;
   host_other_props[obj.host_name()].timezone = obj.timezone();
@@ -197,9 +196,7 @@ void applier::host::add_object(
          end(obj.parents().end());
        it != end;
        ++it)
-    if (!add_parent_host_to_host(h, it->c_str()))
-      throw (engine_error() << "Could not add parent '"
-             << *it << "' to host '" << obj.host_name() << "'");
+    h->add_parent_host(*it);
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -207,7 +204,7 @@ void applier::host::add_object(
     NEBTYPE_HOST_ADD,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    h,
+    h.get(),
     CMD_NONE,
     MODATTR_ALL,
     MODATTR_ALL,
@@ -417,20 +414,22 @@ void applier::host::modify_object(
     // Delete old parents.
     {
       timeval tv(get_broker_timestamp(NULL));
-      for (hostsmember* p(h->parent_hosts);
-           p;
-           p = p->next)
+      for (host_map::iterator
+             it(h->parent_hosts.begin()),
+             end(h->parent_hosts.end());
+           it != end;
+           it++)
         broker_relation_data(
           NEBTYPE_PARENT_DELETE,
           NEBFLAG_NONE,
           NEBATTR_NONE,
-          p->host_ptr,
+          it->second.get(),
           NULL,
           h,
           NULL,
           &tv);
     }
-    deleter::listmember(h->parent_hosts, &deleter::hostsmember);
+    h->parent_hosts.clear();
 
     // Create parents.
     for (set_string::const_iterator
@@ -438,9 +437,7 @@ void applier::host::modify_object(
            end(obj.parents().end());
          it != end;
          ++it)
-      if (!add_parent_host_to_host(h, it->c_str()))
-        throw (engine_error() << "Could not add parent '"
-               << *it << "' to host '" << obj.host_name() << "'");
+      h->add_parent_host(*it);
   }
 
   // Notify event broker.
@@ -480,7 +477,7 @@ void applier::host::remove_object(
 
     // Remove host downtimes.
     downtimes::downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
-      obj.host_name().c_str(),
+      obj.host_name(),
       NULL,
       (time_t)0,
       NULL);
@@ -489,7 +486,7 @@ void applier::host::remove_object(
     applier::scheduler::instance().remove_host(obj);
 
     // Remove host from its list.
-    unregister_object<com::centreon::engine::host>(&host_list, hst);
+    com::centreon::engine::host::hosts.erase(hst->get_name());
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -534,7 +531,7 @@ void applier::host::resolve_object(
               std::shared_ptr<com::centreon::engine::host> >::iterator
          it(applier::state::instance().hosts().begin()),
          end(applier::state::instance().hosts().end()); it != end; ++it)
-      deleter::listmember(it->second->child_hosts, &deleter::hostsmember);
+      it->second->child_hosts.clear();
   }
 
   // Find host.

@@ -102,17 +102,10 @@ extern time_t                    event_start;
 
 extern int                       embedded_perl_initialized;
 
-extern com::centreon::engine::host*
-                                 host_list;
-extern com::centreon::engine::host*
-                                 host_list_tail;
 extern std::map<std::string, host_other_properties> host_other_props;
 extern service*                  service_list;
 extern service*                  service_list_tail;
 extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-extern hostgroup*                hostgroup_list;
-extern hostgroup*                hostgroup_list_tail;
-extern std::map<std::string, hostgroup_other_properties> hostgroup_other_props;
 extern servicegroup*             servicegroup_list;
 extern servicegroup*             servicegroup_list_tail;
 extern std::map<std::string, servicegroup_other_properties> servicegroup_other_props;

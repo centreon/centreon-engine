@@ -265,8 +265,12 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
  *  @return The output stream.
  */
 std::ostream& dump::hosts(std::ostream& os) {
-  for (com::centreon::engine::host* obj(host_list); obj; obj = obj->next)
-    dump::host(os, *obj);
+  for (host_map::iterator
+         it(com::centreon::engine::host::hosts.begin()),
+         end(com::centreon::engine::host::hosts.end());
+       it != end;
+       ++it)
+    dump::host(os, *it->second);
   return os;
 }
 
