@@ -22,7 +22,7 @@
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/host.hh"
-#include "com/centreon/engine/objects/hostgroup.hh"
+#include "com/centreon/engine/hostgroup.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
@@ -37,42 +37,6 @@ struct serviceescalation_struct;
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
-
-/**
- *  Given a host name, find it in the list in memory.
- *
- *  @param[in] name Host name.
- *
- *  @return Host object if found, NULL otherwise.
- */
-host* find_host(char const* name) {
-  if (!name)
-    return NULL;
-
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(name)));
-  if (it != state::instance().hosts().end())
-    return it->second.get();
-  return NULL;
-}
-
-/**
- *  Find a hostgroup from the list in memory.
- *
- *  @param[in] name Host group name.
- *
- *  @return Host group object if found, NULL otherwise.
- */
-hostgroup* find_hostgroup(char const* name) {
-  if (!name)
-    return NULL;
-
-  umap<std::string, std::shared_ptr<hostgroup_struct> >::const_iterator
-    it(state::instance().hostgroups().find(name));
-  if (it != state::instance().hostgroups().end())
-    return it->second.get();
-  return NULL;
-}
 
 /**
  *  Given a host/service name, find the service in the list in memory.

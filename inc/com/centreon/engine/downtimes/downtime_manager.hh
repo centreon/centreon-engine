@@ -43,7 +43,7 @@ class                               downtime_manager {
   void                              clear_scheduled_downtimes();
   int                               check_for_expired_downtime();
   int                               delete_downtime_by_hostname_service_description_start_time_comment(
-                                      char const* hostname,
+                                      std::string const& hostname,
                                       char const* service_description,
                                       time_t start_time,
                                       char const* comment);

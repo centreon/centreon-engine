@@ -30,23 +30,14 @@ extern "C" {
 #  endif // C++
 
 struct command_struct;
-struct contactgroup_struct;
-struct hostdependency_struct;
 struct hostdependency_struct;
 struct hostescalation_struct;
-struct hostescalation_struct;
-struct hostgroup_struct;
 struct service_struct;
 struct servicedependency_struct;
-struct servicedependency_struct;
-struct serviceescalation_struct;
 struct serviceescalation_struct;
 struct servicegroup_struct;
 struct timeperiod_struct;
 
-com::centreon::engine::host*
-                          find_host(char const* name);
-hostgroup_struct*         find_hostgroup(char const* name);
 service_struct*           find_service(
                             char const* host_name,
                             char const* svc_desc);

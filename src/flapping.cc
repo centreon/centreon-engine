@@ -694,10 +694,12 @@ void enable_flap_detection_routines() {
   update_program_status(false);
 
   /* check for flapping */
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next)
-    check_for_host_flapping(temp_host, false, false, true);
+  for (host_map::iterator
+         it(com::centreon::engine::host::hosts.begin()),
+         end(com::centreon::engine::host::hosts.end());
+       it != end;
+       ++it)
+    check_for_host_flapping(it->second.get(), false, false, true);
   for (temp_service = service_list;
        temp_service != NULL;
        temp_service = temp_service->next)
@@ -740,10 +742,12 @@ void disable_flap_detection_routines() {
   update_program_status(false);
 
   /* handle the details... */
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next)
-    handle_host_flap_detection_disabled(temp_host);
+  for (host_map::iterator
+         it(com::centreon::engine::host::hosts.begin()),
+         end(com::centreon::engine::host::hosts.end());
+       it != end;
+       ++it)
+    handle_host_flap_detection_disabled(it->second.get());
   for (temp_service = service_list;
        temp_service != NULL;
        temp_service = temp_service->next)

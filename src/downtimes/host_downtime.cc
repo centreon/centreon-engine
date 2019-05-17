@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/host_downtime.hh"
 #include "com/centreon/engine/events/defines.hh"
@@ -30,6 +31,7 @@
 #include "compatibility/find.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::downtimes;
 
@@ -70,8 +72,11 @@ host_downtime::~host_downtime() {
 bool host_downtime::is_stale() const {
   bool retval{false};
 
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
+
   /* delete downtimes with invalid host names */
-  if (::find_host(get_hostname().c_str()) == NULL)
+  if (it == state::instance().hosts().end() || it->second == nullptr)
     retval = true;
   /* delete downtimes that have expired */
   else if (this->end_time < time(NULL))
@@ -119,9 +124,13 @@ void host_downtime::print(std::ostream& os) const {
 }
 
 int host_downtime::unschedule() {
-  host* hst;
-  if ((hst = ::find_host(get_hostname().c_str())) == NULL)
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
+
+  /* delete downtimes with invalid host names */
+  if (it == state::instance().hosts().end() || it->second == nullptr)
     return ERROR;
+  host* hst = it->second.get();
 
   /* decrement pending flex downtime if necessary ... */
   if (!this->fixed && this->incremented_pending_downtime)
@@ -180,11 +189,14 @@ int host_downtime::subscribe() {
   int seconds{0};
   char const* type_string(nullptr);
 
-  host* hst{::find_host(get_hostname().c_str())};
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
 
   /* find the host or service associated with this downtime */
-    if (hst == nullptr)
-      return ERROR;
+  if (it == state::instance().hosts().end() || it->second == nullptr)
+    return ERROR;
+
+  host* hst = it->second.get();
 
   /* create the comment */
   get_datetime_string(
@@ -282,8 +294,11 @@ int host_downtime::handle() {
   logger(dbg_functions, basic)
     << "handle_downtime()";
 
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
+
   /* find the host or service associated with this downtime */
-    if ((hst = ::find_host(get_hostname().c_str())) == NULL)
+  if (it == state::instance().hosts().end() || it->second == nullptr)
       return ERROR;
 
   /* if downtime if flexible and host/svc is in an ok state, don't do anything right now (wait for event handler to kick it off) */

@@ -29,7 +29,6 @@
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
-#include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
@@ -132,7 +131,7 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
     if (temp_hostgroup) {
       if (!buf.empty())
         buf.append(",");
-      buf.append(temp_hostgroup->group_name);
+      buf.append(temp_hostgroup->get_group_name());
     }
   }
   return (string::dup(buf));
@@ -184,9 +183,13 @@ static char* get_host_total_services(host& hst, nagios_macros* mac) {
 static char* get_host_parents(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
-  for (hostsmember* it = hst.parent_hosts; it != NULL; it = it->next) {
+  for (host_map::iterator
+         it(hst.parent_hosts.begin()),
+         end(hst.parent_hosts.end());
+       it != end;
+       it++) {
     if (!retval.empty())
-      retval.append(it->host_name);
+      retval.append(it->first);
     retval.append(",");
   }
   return (string::dup(retval.c_str()));
@@ -203,9 +206,13 @@ static char* get_host_parents(host& hst, nagios_macros* mac) {
 static char* get_host_children(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
-  for (hostsmember* it = hst.child_hosts; it != NULL; it = it->next) {
+  for (host_map::iterator
+         it(hst.child_hosts.begin()),
+         end(hst.child_hosts.end());
+       it != end;
+       it++) {
     if (!retval.empty())
-      retval.append(it->host_name);
+      retval.append(it->first);
     retval.append(",");
   }
   return (string::dup(retval.c_str()));

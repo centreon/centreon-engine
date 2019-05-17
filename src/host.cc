@@ -24,7 +24,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/host.hh"
-#include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
@@ -37,1047 +36,1134 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
-host::host() { }
+host_map com::centreon::engine::host::hosts;
 
-std::string const& host::get_name() const
-{
+/*
+ *  @param[in] name                          Host name.
+ *  @param[in] display_name                  Display name.
+ *  @param[in] alias                         Host alias.
+ *  @param[in] address                       Host address.
+ *  @param[in] check_period                  Check period.
+ *  @param[in] initial_state                 Initial host state.
+ *  @param[in] check_interval                Normal check interval.
+ *  @param[in] retry_interval                Retry check interval.
+ *  @param[in] max_attempts                  Max check attempts.
+ *  @param[in] notify_up                     Does this host notify when
+   *                                           up ?
+ *  @param[in] notify_down                   Does this host notify when
+   *                                           down ?
+ *  @param[in] notify_unreachable            Does this host notify when
+   *                                           unreachable ?
+ *  @param[in] notify_flapping               Does this host notify for
+ *                                           flapping ?
+ *  @param[in] notify_downtime               Does this host notify for
+ *                                           downtimes ?
+ *  @param[in] notification_interval         Notification interval.
+ *  @param[in] first_notification_delay      First notification delay.
+ *  @param[in] notification_period           Notification period.
+ *  @param[in] notifications_enabled         Whether notifications are
+ *                                           enabled for this host.
+ *  @param[in] check_command                 Active check command name.
+ *  @param[in] checks_enabled                Are active checks enabled ?
+ *  @param[in] accept_passive_checks         Can we submit passive check
+ *                                           results ?
+ *  @param[in] event_handler                 Event handler command name.
+ *  @param[in] event_handler_enabled         Whether event handler is
+   *                                           enabled or not.
+ *  @param[in] flap_detection_enabled        Whether flap detection is
+   *                                           enabled or not.
+ *  @param[in] low_flap_threshold            Low flap threshold.
+ *  @param[in] high_flap_threshold           High flap threshold.
+ *  @param[in] flap_detection_on_up          Is flap detection enabled
+ *                                           for up state ?
+ *  @param[in] flap_detection_on_down        Is flap detection enabled
+ *                                           for down state ?
+ *  @param[in] flap_detection_on_unreachable Is flap detection enabled
+ *                                           for unreachable state ?
+ *  @param[in] stalk_on_up                   Stalk on up ?
+ *  @param[in] stalk_on_down                 Stalk on down ?
+ *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
+ *  @param[in] process_perfdata              Should host perfdata be
+   *                                           processed ?
+ *  @param[in] failure_prediction_enabled    Deprecated.
+ *  @param[in] failure_prediction_options    Deprecated.
+ *  @param[in] check_freshness               Whether or not freshness
+   *                                           check is enabled.
+ *  @param[in] freshness_threshold           Freshness threshold.
+ *  @param[in] notes                         Notes.
+ *  @param[in] notes_url                     URL.
+ *  @param[in] action_url                    Action URL.
+ *  @param[in] icon_image                    Icon image.
+ *  @param[in] icon_image_alt                Alternative icon image.
+ *  @param[in] vrml_image                    VRML image.
+ *  @param[in] statusmap_image               Status-map image.
+ *  @param[in] x_2d                          2D x-coord.
+ *  @param[in] y_2d                          2D y-coord.
+ *  @param[in] have_2d_coords                Whether host has 2D coords.
+ *  @param[in] x_3d                          3D x-coord.
+ *  @param[in] y_3d                          3D y-coord.
+ *  @param[in] z_3d                          3D z-coord.
+ *  @param[in] have_3d_coords                Whether host has 3D coords.
+ *  @param[in] should_be_drawn               Whether this host should be
+   *                                           drawn.
+ *  @param[in] retain_status_information     Should Engine retain status
+   *                                           information of this host ?
+ *  @param[in] retain_nonstatus_information  Should Engine retain
+ *                                           non-status information of
+ *                                           this host ?
+ *  @param[in] obsess_over_host              Should we obsess over this
+ *                                           host ?
+ */
+host::host(unsigned int host_id,
+           std::string const& name,
+           std::string const& display_name,
+           std::string const& alias,
+           std::string const& address,
+           std::string const& check_period,
+           int initial_state,
+           double check_interval,
+           double retry_interval,
+           int max_attempts,
+           int notify_up,
+           int notify_down,
+           int notify_unreachable,
+           int notify_flapping,
+           int notify_downtime,
+           double notification_interval,
+           double first_notification_delay,
+           std::string const& notification_period,
+           int notifications_enabled,
+           std::string const& check_command,
+           int checks_enabled,
+           int accept_passive_checks,
+           std::string const& event_handler,
+           int event_handler_enabled,
+           int flap_detection_enabled,
+           double low_flap_threshold,
+           double high_flap_threshold,
+           int flap_detection_on_up,
+           int flap_detection_on_down,
+           int flap_detection_on_unreachable,
+           int stalk_on_up,
+           int stalk_on_down,
+           int stalk_on_unreachable,
+           int process_perfdata,
+           int check_freshness,
+           int freshness_threshold,
+           std::string const& notes,
+           std::string const& notes_url,
+           std::string const& action_url,
+           std::string const& icon_image,
+           std::string const& icon_image_alt,
+           std::string const& vrml_image,
+           std::string const& statusmap_image,
+           int x_2d,
+           int y_2d,
+           int have_2d_coords,
+           double x_3d,
+           double y_3d,
+           double z_3d,
+           int have_3d_coords,
+           int should_be_drawn,
+           int retain_status_information,
+           int retain_nonstatus_information,
+           int obsess_over_host) {
+  // Make sure we have the data we need.
+  if (name.empty() || address.empty()) {
+    logger(log_config_error, basic)
+    << "Error: Host name or address is NULL";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+  if (host_id == 0) {
+    logger(log_config_error, basic)
+      << "Error: Host must contain a host id because it comes from a database";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+  if (max_attempts <= 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid max_check_attempts value for host '"
+      << name << "'";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+  if (check_interval < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid check_interval value for host '"
+      << name << "'";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+  if (notification_interval < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid notification_interval value for host '"
+      << name << "'";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+  if (first_notification_delay < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid first_notification_delay value for host '"
+      << name << "'";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+  if (freshness_threshold < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid freshness_threshold value for host '"
+      << name << "'";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+
+  // Check if the host already exists.
+  unsigned int id(host_id);
+  if (is_host_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Host '" << name << "' has already been defined";
+    throw (engine_error() << "Could not register host '"
+                          << name << "'");
+  }
+
+  _should_be_scheduled = true;
+  _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+  _check_options = CHECK_OPTION_NONE;
+  _check_type = HOST_CHECK_ACTIVE;
+  _modified_attributes = MODATTR_NONE;
+  _state_type = HARD_STATE;
+
+  // Duplicate string vars.
+  _name = name;
+  _address = address;
+  _alias = !alias.empty() ? alias : name;
+  _display_name = !display_name.empty() ? display_name : name;
+  _action_url = action_url;
+  _check_period = check_period;
+  _event_handler = event_handler;
+  _host_check_command = check_command;
+  _icon_image = icon_image;
+  _icon_image_alt = icon_image_alt;
+  _notes = notes;
+  _notes_url = notes_url;
+  _notification_period = notification_period;
+  _statusmap_image = statusmap_image;
+  _vrml_image = vrml_image;
+
+  _accept_passive_host_checks = (accept_passive_checks > 0);
+  _check_freshness = (check_freshness > 0);
+  _check_interval = check_interval;
+  _checks_enabled = (checks_enabled > 0);
+  _current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
+  _current_state = initial_state;
+  _event_handler_enabled = (event_handler_enabled > 0);
+  _first_notification_delay = first_notification_delay;
+  _flap_detection_enabled = (flap_detection_enabled > 0);
+  _flap_detection_on_down = (flap_detection_on_down > 0);
+  _flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
+  _flap_detection_on_up = (flap_detection_on_up > 0);
+  _freshness_threshold = freshness_threshold;
+  _have_2d_coords = (have_2d_coords > 0);
+  _have_3d_coords = (have_3d_coords > 0);
+  _high_flap_threshold = high_flap_threshold;
+  _initial_state = initial_state;
+  _last_hard_state = initial_state;
+  _last_state = initial_state;
+  _low_flap_threshold = low_flap_threshold;
+  _max_attempts = max_attempts;
+  _notification_interval = notification_interval;
+  _notifications_enabled = (notifications_enabled > 0);
+  _notify_on_down = (notify_down > 0);
+  _notify_on_downtime = (notify_downtime > 0);
+  _notify_on_flapping = (notify_flapping > 0);
+  _notify_on_recovery = (notify_up > 0);
+  _notify_on_unreachable = (notify_unreachable > 0);
+  _obsess_over_host = (obsess_over_host > 0);
+  _process_performance_data = (process_perfdata > 0);
+  _retain_nonstatus_information = (retain_nonstatus_information > 0);
+  _retain_status_information = (retain_status_information > 0);
+  _retry_interval = retry_interval;
+  _should_be_drawn = (should_be_drawn > 0);
+  _stalk_on_down = (stalk_on_down > 0);
+  _stalk_on_unreachable = (stalk_on_unreachable > 0);
+  _stalk_on_up = (stalk_on_up > 0);
+  _x_2d = x_2d;
+  _x_3d = x_3d;
+  _y_2d = y_2d;
+  _y_3d = y_3d;
+  _z_3d = z_3d;
+}
+
+void host::add_child_link(host* child) {
+  // Make sure we have the data we need.
+  if (!child)
+      throw (engine_error() << "add child link called with NULL ptr");
+
+  child_hosts.insert({child->get_name(), std::make_shared<com::centreon::engine::host>(*child)});
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_relation_data(
+    NEBTYPE_PARENT_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    NULL,
+    child,
+    NULL,
+    &tv);
+}
+
+void host::add_parent_host(std::string const& host_name) {
+  // Make sure we have the data we need.
+  if (host_name.empty()) {
+    logger(log_config_error, basic) << "add child link called with bad host_name";
+    throw (engine_error() << "add child link called with bad host_name");
+  }
+
+  // A host cannot be a parent/child of itself.
+  if (_name == host_name) {
+    logger(log_config_error, basic)
+      << "Error: Host '" << _name
+      << "' cannot be a child/parent of itself";
+    throw (engine_error() << "host is child/parent itself");
+  }
+
+  parent_hosts.insert({host_name, nullptr});
+}
+
+std::string const& host::get_name() const {
   return _name;
 }
 
-void host::set_name(std::string const& name)
-{
+void host::set_name(std::string const& name) {
   _name = name;
 }
 
-std::string const& host::get_display_name() const
-{
+std::string const& host::get_display_name() const {
   return _display_name;
 }
 
-void host::set_display_name(std::string const& display_name)
-{
+void host::set_display_name(std::string const& display_name) {
   _display_name = display_name;
 }
 
-std::string const& host::get_alias() const
-{
+std::string const& host::get_alias() const {
   return _alias;
 }
 
-void host::set_alias(std::string const& alias)
-{
+void host::set_alias(std::string const& alias) {
   _alias = alias;
 }
 
-std::string const& host::get_address() const
-{
+std::string const& host::get_address() const {
   return _address;
 }
 
-void host::set_address(std::string const& address)
-{
+void host::set_address(std::string const& address) {
   _address = address;
 }
 
-std::string const& host::get_host_check_command() const
-{
+std::string const& host::get_host_check_command() const {
   return _host_check_command;
 }
 
-void host::set_host_check_command(std::string const& host_check_command)
-{
+void host::set_host_check_command(std::string const& host_check_command) {
   _host_check_command = host_check_command;
 }
 
-int host::get_initial_state() const
-{
+int host::get_initial_state() const {
   return _initial_state;
 }
 
-void host::set_initial_state(int initial_state)
-{
+void host::set_initial_state(int initial_state) {
   _initial_state = initial_state;
 }
 
-double host::get_check_interval() const
-{
+double host::get_check_interval() const {
   return _check_interval;
 }
 
-void host::set_check_interval(double check_interval)
-{
+void host::set_check_interval(double check_interval) {
   _check_interval = check_interval;
 }
 
-double host::get_retry_interval() const
-{
+double host::get_retry_interval() const {
   return _retry_interval;
 }
 
-void host::set_retry_interval(double retry_interval)
-{
+void host::set_retry_interval(double retry_interval) {
   _retry_interval = retry_interval;
 }
 
-int host::get_max_attempts() const
-{
+int host::get_max_attempts() const {
   return _max_attempts;
 }
 
-void host::set_max_attempts(int max_attempts)
-{
+void host::set_max_attempts(int max_attempts) {
   _max_attempts = max_attempts;
 }
 
-std::string const& host::get_event_handler() const
-{
+std::string const& host::get_event_handler() const {
   return _event_handler;
 }
 
-void host::set_event_handler(std::string const& event_handler)
-{
+void host::set_event_handler(std::string const& event_handler) {
   _event_handler = event_handler;
 }
 
-double host::get_notification_interval(void) const
-{
+double host::get_notification_interval(void) const {
   return _notification_interval;
 }
 
-void host::set_notification_interval(double notification_interval)
-{
+void host::set_notification_interval(double notification_interval) {
   _notification_interval = notification_interval;
 }
 
-double host::get_first_notification_delay(void) const
-{
+double host::get_first_notification_delay(void) const {
   return _first_notification_delay;
 }
 
-void host::set_first_notification_delay(double first_notification_delay)
-{
+void host::set_first_notification_delay(double first_notification_delay) {
   _first_notification_delay = first_notification_delay;
 }
 
-int host::get_notify_on_down() const
-{
+int host::get_notify_on_down() const {
   return _notify_on_down;
 }
 
-void host::set_notify_on_down(int notify_on_down)
-{
+void host::set_notify_on_down(int notify_on_down) {
   _notify_on_down = notify_on_down;
 }
 
-int host::get_notify_on_unreachable() const
-{
+int host::get_notify_on_unreachable() const {
   return _notify_on_unreachable;
 }
 
-void host::set_notify_on_unreachable(int notify_on_unreachable)
-{
+void host::set_notify_on_unreachable(int notify_on_unreachable) {
   _notify_on_unreachable = notify_on_unreachable;
 }
 
-int host::get_notify_on_recovery() const
-{
+int host::get_notify_on_recovery() const {
   return _notify_on_recovery;
 }
 
-void host::set_notify_on_recovery(int notify_on_recovery)
-{
+void host::set_notify_on_recovery(int notify_on_recovery) {
   notify_on_recovery = _notify_on_recovery;
 }
 
-int host::get_notify_on_flapping() const
-{
+int host::get_notify_on_flapping() const {
   return _notify_on_flapping;
 }
 
-void host::set_notify_on_flapping(int notify_on_flapping)
-{
+void host::set_notify_on_flapping(int notify_on_flapping) {
   _notify_on_flapping = notify_on_flapping;
 }
 
-int host::get_notify_on_downtime() const
-{
+int host::get_notify_on_downtime() const {
   return _notify_on_downtime;
 }
 
-void host::set_notify_on_downtime(int notify_on_downtime)
-{
+void host::set_notify_on_downtime(int notify_on_downtime) {
   _notify_on_downtime = notify_on_downtime;
 }
 
-std::string const& host::get_notification_period() const
-{
+std::string const& host::get_notification_period() const {
   return _notification_period;
 }
 
-void  host::set_notification_period(std::string const &notification_period)
-{
+void  host::set_notification_period(std::string const &notification_period) {
   _notification_period = _notification_period;
 }
 
-std::string const& host::get_check_period() const
-{
+std::string const& host::get_check_period() const {
   return _check_period;
 }
 
-void host::set_check_period(std::string const& check_period)
-{
+void host::set_check_period(std::string const& check_period) {
   _check_period = check_period;
 }
 
-bool host::get_flap_detection_enabled(void) const
-{
+bool host::get_flap_detection_enabled(void) const {
   return _flap_detection_enabled;
 }
 
-void host::set_flap_detection_enabled(bool flap_detection_enabled)
-{
+void host::set_flap_detection_enabled(bool flap_detection_enabled) {
   _flap_detection_enabled = flap_detection_enabled;
 }
 
-double host::get_low_flap_threshold() const
-{
+double host::get_low_flap_threshold() const {
   return _low_flap_threshold;
 }
 
-void host::set_low_flap_threshold(double low_flap_threshold)
-{
+void host::set_low_flap_threshold(double low_flap_threshold) {
   _low_flap_threshold = low_flap_threshold;
 }
 
-double host::get_high_flap_threshold() const
-{
+double host::get_high_flap_threshold() const {
   return _high_flap_threshold;
 }
 
-void host::set_high_flap_threshold(double high_flap_threshold)
-{
+void host::set_high_flap_threshold(double high_flap_threshold) {
   _high_flap_threshold = high_flap_threshold;
 }
 
-bool host::get_flap_detection_on_up() const
-{
+bool host::get_flap_detection_on_up() const {
   return _flap_detection_on_up;
 }
 
-void host::set_flap_detection_on_up(bool flap_detection_on_up)
-{
+void host::set_flap_detection_on_up(bool flap_detection_on_up) {
   _flap_detection_on_up = flap_detection_on_up;
 }
 
-bool host::get_flap_detection_on_down() const
-{
+bool host::get_flap_detection_on_down() const {
   return _flap_detection_on_down;
 }
 
-void host::set_flap_detection_on_down(bool flap_detection_on_down)
-{
+void host::set_flap_detection_on_down(bool flap_detection_on_down) {
   _flap_detection_on_down = flap_detection_on_down;
 }
 
-bool host::get_flap_detection_on_unreachable() const
-{
+bool host::get_flap_detection_on_unreachable() const {
   return _flap_detection_on_unreachable;
 }
 
-void host::set_flap_detection_on_unreachable(bool detection)
-{
+void host::set_flap_detection_on_unreachable(bool detection) {
   _flap_detection_on_unreachable = detection;
 }
 
-bool host::get_stalk_on_down() const
-{
+bool host::get_stalk_on_down() const {
   return _stalk_on_down;
 }
 
-void host::set_stalk_on_down(bool stalk)
-{
+void host::set_stalk_on_down(bool stalk) {
   _stalk_on_down = stalk;
 }
 
-bool host::get_stalk_on_unreachable() const
-{
+bool host::get_stalk_on_unreachable() const {
   return _stalk_on_unreachable;
 }
 
-void host::set_stalk_on_unreachable(bool stalk)
-{
+void host::set_stalk_on_unreachable(bool stalk) {
   _stalk_on_unreachable = stalk;
 }
 
-bool host::get_stalk_on_up() const
-{
+bool host::get_stalk_on_up() const {
   return _stalk_on_up;
 }
 
-void host::set_stalk_on_up(bool stalk)
-{
+void host::set_stalk_on_up(bool stalk) {
   _stalk_on_up = stalk;
 }
 
-int host::get_check_freshness() const
-{
+int host::get_check_freshness() const {
   return _check_freshness;
 }
 
-void host::set_check_freshness(int check_freshness)
-{
+void host::set_check_freshness(int check_freshness) {
   _check_freshness = check_freshness;
 }
 
-int host::get_freshness_threshold() const
-{
+int host::get_freshness_threshold() const {
   return _freshness_threshold;
 }
 
-void host::set_freshness_threshold(int freshness_threshold)
-{
+void host::set_freshness_threshold(int freshness_threshold) {
   _freshness_threshold = freshness_threshold;
 }
 
-bool host::get_process_performance_data() const
-{
+bool host::get_process_performance_data() const {
   return _process_performance_data;
 }
 
-void host::set_process_performance_data(bool process_performance_data)
-{
+void host::set_process_performance_data(bool process_performance_data) {
   _process_performance_data = process_performance_data;
 }
 
-bool host::get_checks_enabled() const
-{
+bool host::get_checks_enabled() const {
   return _checks_enabled;
 }
 
-void host::set_checks_enabled(bool checks_enabled)
-{
+void host::set_checks_enabled(bool checks_enabled) {
   _checks_enabled = checks_enabled;
 }
 
-int host::get_accept_passive_host_checks() const
-{
+int host::get_accept_passive_host_checks() const {
   return _accept_passive_host_checks;
 }
 
-void host::set_accept_passive_host_checks(bool accept_passive_host_checks)
-{
+void host::set_accept_passive_host_checks(bool accept_passive_host_checks) {
   _accept_passive_host_checks = accept_passive_host_checks;
 }
 
-bool host::get_event_handler_enabled() const
-{
+bool host::get_event_handler_enabled() const {
   return _event_handler_enabled;
 }
 
-void host::set_event_handler_enabled(bool event_handler_enabled)
-{
+void host::set_event_handler_enabled(bool event_handler_enabled) {
   _event_handler_enabled = event_handler_enabled;
 }
 
-int host::get_retain_status_information() const
-{
+int host::get_retain_status_information() const {
   return _retain_status_information;
 }
 
-void host::set_retain_status_information(int retain_status_information)
-{
+void host::set_retain_status_information(int retain_status_information) {
   _retain_status_information = retain_status_information;
 }
 
-int host::get_retain_nonstatus_information() const
-{
+int host::get_retain_nonstatus_information() const {
   return _retain_nonstatus_information;
 }
 
-void host::set_retain_nonstatus_information(int retain_nonstatus_information)
-{
+void host::set_retain_nonstatus_information(int retain_nonstatus_information) {
   _retain_nonstatus_information = retain_nonstatus_information;
 }
 
-bool host::get_failure_prediction_enabled() const
-{
+bool host::get_failure_prediction_enabled() const {
   return _failure_prediction_enabled;
 }
 
-void host::set_failure_prediction_enabled(bool failure_prediction_enabled)
-{
+void host::set_failure_prediction_enabled(bool failure_prediction_enabled) {
   _failure_prediction_enabled = failure_prediction_enabled;
 }
 
-std::string const& host::get_failure_prediction_options() const
-{
+std::string const& host::get_failure_prediction_options() const {
   return _failure_prediction_options;
 }
 
-void host::set_failure_prediction_options(std::string const& failure)
-{
+void host::set_failure_prediction_options(std::string const& failure) {
   _failure_prediction_options = failure;
 }
 
-int host::get_obsess_over_host() const
-{
+int host::get_obsess_over_host() const {
   return _obsess_over_host;
 }
 
-void host::set_obsess_over_host(int obsess_over_host)
-{
+void host::set_obsess_over_host(int obsess_over_host) {
   _obsess_over_host = obsess_over_host;
 }
 
-std::string const& host::get_notes() const
-{
+std::string const& host::get_notes() const {
   return _notes;
 }
 
-void host::set_notes(std::string const& notes)
-{
+void host::set_notes(std::string const& notes) {
   _notes = notes;
 }
 
-std::string const& host::get_notes_url() const
-{
+std::string const& host::get_notes_url() const {
   return _notes_url;
 }
 
-void host::set_notes_url(std::string const& notes_url)
-{
+void host::set_notes_url(std::string const& notes_url) {
   _notes_url = notes_url;
 }
 
-std::string const& host::get_action_url() const
-{
+std::string const& host::get_action_url() const {
   return _action_url;
 }
 
-void host::set_action_url(std::string const& action_url)
-{
+void host::set_action_url(std::string const& action_url) {
   _action_url = action_url;
 }
 
-std::string const& host::get_icon_image() const
-{
+std::string const& host::get_icon_image() const {
   return _icon_image;
 }
 
-void host::set_icon_image(std::string const& icon_image)
-{
+void host::set_icon_image(std::string const& icon_image) {
   _icon_image = icon_image;
 }
 
-std::string const& host::get_icon_image_alt() const
-{
+std::string const& host::get_icon_image_alt() const {
   return _icon_image_alt;
 }
 
-void host::set_icon_image_alt(std::string const& icon_image_alt)
-{
+void host::set_icon_image_alt(std::string const& icon_image_alt) {
   _icon_image_alt = icon_image_alt;
 }
 
-std::string const& host::get_vrml_image() const
-{
+std::string const& host::get_vrml_image() const {
   return _vrml_image;
 }
 
-void host::set_vrml_image(std::string const& image)
-{
+void host::set_vrml_image(std::string const& image) {
   _vrml_image = image;
 }
 
-std::string const& host::get_statusmap_image() const
-{
+std::string const& host::get_statusmap_image() const {
   return _statusmap_image;
 }
 
-void host::set_statusmap_image(std::string const& image)
-{
+void host::set_statusmap_image(std::string const& image) {
   _statusmap_image = image;
 }
 
-bool host::get_have_2d_coords() const
-{
+bool host::get_have_2d_coords() const {
   return _have_2d_coords;
 }
 
-void host::set_have_2d_coords(bool has_coords)
-{
+void host::set_have_2d_coords(bool has_coords) {
   _have_2d_coords = has_coords;
 }
 
-bool host::get_have_3d_coords() const
-{
+bool host::get_have_3d_coords() const {
   return _have_3d_coords;
 }
 
-void host::set_have_3d_coords(bool has_coords)
-{
+void host::set_have_3d_coords(bool has_coords) {
   _have_3d_coords = has_coords;
 }
 
-int host::get_x_2d() const
-{
+int host::get_x_2d() const {
   return _x_2d;
 }
 
-void host::set_x_2d(int x)
-{
+void host::set_x_2d(int x) {
   _x_2d = x;
 }
 
-int host::get_y_2d() const
-{
+int host::get_y_2d() const {
   return _y_2d;
 }
 
-void host::set_y_2d(int y)
-{
+void host::set_y_2d(int y) {
   _y_2d = y;
 }
 
-int host::get_x_3d() const
-{
+int host::get_x_3d() const {
   return _x_3d;
 }
 
-void host::set_x_3d(int x)
-{
+void host::set_x_3d(int x) {
   _x_3d = x;
 }
 
-int host::get_y_3d() const
-{
+int host::get_y_3d() const {
   return _y_3d;
 }
 
-void host::set_y_3d(int y)
-{
+void host::set_y_3d(int y) {
   _y_3d = y;
 }
 
-int host::get_z_3d() const
-{
+int host::get_z_3d() const {
   return _z_3d;
 }
 
-void host::set_z_3d(int z)
-{
+void host::set_z_3d(int z) {
    _z_3d = z;
 }
 
-int host::get_should_be_drawn() const
-{
+int host::get_should_be_drawn() const {
   return _should_be_drawn;
 }
 
-void host::set_should_be_drawn(int should_be_drawn)
-{
+void host::set_should_be_drawn(int should_be_drawn) {
   _should_be_drawn = should_be_drawn;
 }
 
-int host::get_problem_has_been_acknowledged() const
-{
+int host::get_problem_has_been_acknowledged() const {
   return _problem_has_been_acknowledged;
 }
 
-void host::set_problem_has_been_acknowledged(int problem_has_been_acknowledged)
-{
+void host::set_problem_has_been_acknowledged(int problem_has_been_acknowledged) {
   _problem_has_been_acknowledged = problem_has_been_acknowledged;
 }
 
-int host::get_acknowledgement_type() const
-{
+int host::get_acknowledgement_type() const {
   return _acknowledgement_type;
 }
 
-void host::set_acknowledgement_type(int acknowledgement_type)
-{
+void host::set_acknowledgement_type(int acknowledgement_type) {
   _acknowledgement_type = acknowledgement_type;
 }
 
-int host::get_check_type() const
-{
+int host::get_check_type() const {
   return _check_type;
 }
 
-void host::set_check_type(int check_type)
-{
+void host::set_check_type(int check_type) {
   _check_type = check_type;
 }
 
-int host::get_current_state() const
-{
+int host::get_current_state() const {
   return _current_state;
 }
 
-void host::set_current_state(int current_state)
-{
+void host::set_current_state(int current_state) {
   _current_state = current_state;
 }
 
-int host::get_last_state() const
-{
+int host::get_last_state() const {
   return _last_state;
 }
 
-void host::set_last_state(int last_state)
-{
+void host::set_last_state(int last_state) {
   _last_state = last_state;
 }
 
-int host::get_last_hard_state() const
-{
+int host::get_last_hard_state() const {
   return _last_hard_state;
 }
 
-void host::set_last_hard_state(int last_hard_state)
-{
+void host::set_last_hard_state(int last_hard_state) {
   _last_hard_state = last_hard_state;
 }
 
-std::string const& host::get_plugin_output() const
-{
+std::string const& host::get_plugin_output() const {
   return _plugin_output;
 }
 
-void host::set_plugin_output(std::string const& plugin_output)
-{
+void host::set_plugin_output(std::string const& plugin_output) {
   _plugin_output = plugin_output;
 }
 
-std::string const& host::get_long_plugin_output() const
-{
+std::string const& host::get_long_plugin_output() const {
   return _long_plugin_output;
 }
 
-void host::set_long_plugin_output(std::string const& long_plugin_output)
-{
+void host::set_long_plugin_output(std::string const& long_plugin_output) {
   _long_plugin_output = long_plugin_output;
 }
 
-std::string const& host::get_perf_data() const
-{
+std::string const& host::get_perf_data() const {
   return _perf_data;
 }
 
-void host::set_perf_data(std::string const& perf_data)
-{
+void host::set_perf_data(std::string const& perf_data) {
   _perf_data = perf_data;
 }
 
-int host::get_state_type() const
-{
+int host::get_state_type() const {
   return _state_type;
 }
 
-void host::set_state_type(int state_type)
-{
+void host::set_state_type(int state_type) {
   _state_type = state_type;
 }
 
-int host::get_current_attempt() const
-{
+int host::get_current_attempt() const {
   return _current_attempt;
 }
 
-void host::set_current_attempt(int current_attempt)
-{
+void host::set_current_attempt(int current_attempt) {
   _current_attempt = current_attempt;
 }
 
-unsigned long host::get_current_event_id() const
-{
+unsigned long host::get_current_event_id() const {
   return _current_event_id;
 }
 
-void host::set_current_event_id(unsigned long current_event_id)
-{
+void host::set_current_event_id(unsigned long current_event_id) {
   _current_event_id = current_event_id;
 }
 
-unsigned long host::get_last_event_id() const
-{
+unsigned long host::get_last_event_id() const {
   return _last_event_id;
 }
 
-void host::set_last_event_id(unsigned long last_event_id)
-{
+void host::set_last_event_id(unsigned long last_event_id) {
   _last_event_id = last_event_id;
 }
 
-unsigned long host::get_current_problem_id() const
-{
+unsigned long host::get_current_problem_id() const {
   return _current_problem_id;
 }
 
-void host::set_current_problem_id(unsigned long current_problem_id)
-{
+void host::set_current_problem_id(unsigned long current_problem_id) {
   _current_problem_id = current_problem_id;
 }
 
-unsigned long host::get_last_problem_id() const
-{
+unsigned long host::get_last_problem_id() const {
   return _last_problem_id;
 }
 
-void host::set_last_problem_id(unsigned long last_problem_id)
-{
+void host::set_last_problem_id(unsigned long last_problem_id) {
   _last_problem_id = last_problem_id;
 }
 
-double host::get_latency() const
-{
+double host::get_latency() const {
   return _latency;
 }
 
-void host::set_latency(double latency)
-{
+void host::set_latency(double latency) {
   _latency = latency;
 }
 
-double host::get_execution_time() const
-{
+double host::get_execution_time() const {
   return _execution_time;
 }
 
-void host::set_execution_time(double execution_time)
-{
+void host::set_execution_time(double execution_time) {
   _execution_time = execution_time;
 }
 
-bool host::get_is_executing() const
-{
+bool host::get_is_executing() const {
   return _is_executing;
 }
 
-void host::set_is_executing(bool is_executing)
-{
+void host::set_is_executing(bool is_executing) {
   _is_executing = is_executing;
 }
 
-int host::get_check_options() const
-{
+int host::get_check_options() const {
   return _check_options;
 }
 
-void host::set_check_options(int check_options)
-{
+void host::set_check_options(int check_options) {
   _check_options = check_options;
 }
 
-bool host::get_notifications_enabled() const
-{
+bool host::get_notifications_enabled() const {
   return _notifications_enabled;
 }
 
-void host::set_notifications_enabled(bool notifications_enabled)
-{
+void host::set_notifications_enabled(bool notifications_enabled) {
   _notifications_enabled = notifications_enabled;
 }
 
-time_t host::get_last_host_notification() const
-{
+time_t host::get_last_host_notification() const {
   return _last_host_notification;
 }
 
-void host::set_last_host_notification(time_t last_host_notification)
-{
+void host::set_last_host_notification(time_t last_host_notification) {
   _last_host_notification = last_host_notification;
 }
 
-time_t host::get_next_host_notification() const
-{
+time_t host::get_next_host_notification() const {
   return _next_host_notification;
 }
 
-void host::set_next_host_notification(time_t next_host_notification)
-{
+void host::set_next_host_notification(time_t next_host_notification) {
   _next_host_notification = next_host_notification;
 }
 
-time_t host::get_next_check() const
-{
+time_t host::get_next_check() const {
   return _next_check;
 }
 
-void host::set_next_check(time_t next_check)
-{
+void host::set_next_check(time_t next_check) {
   _next_check = next_check;
 }
 
-int host::get_should_be_scheduled() const
-{
+int host::get_should_be_scheduled() const {
   return _should_be_scheduled;
 }
 
-void host::set_should_be_scheduled(int should_be_scheduled)
-{
+void host::set_should_be_scheduled(int should_be_scheduled) {
   _should_be_scheduled = should_be_scheduled;
 }
 
-time_t host::get_last_check() const
-{
+time_t host::get_last_check() const {
   return _last_check;
 }
 
-void host::set_last_check(time_t last_check)
-{
+void host::set_last_check(time_t last_check) {
   _last_check = last_check;
 }
 
-time_t host::get_last_state_change() const
-{
+time_t host::get_last_state_change() const {
   return _last_state_change;
 }
 
-void host::set_last_state_change(time_t last_state_change)
-{
+void host::set_last_state_change(time_t last_state_change) {
   _last_state_change = last_state_change;
 }
 
-time_t host::get_last_hard_state_change() const
-{
+time_t host::get_last_hard_state_change() const {
   return _last_hard_state_change;
 }
 
-void host::set_last_hard_state_change(time_t last_hard_state_change)
-{
+void host::set_last_hard_state_change(time_t last_hard_state_change) {
   _last_hard_state_change = last_hard_state_change;
 }
 
-time_t host::get_last_time_down() const
-{
+time_t host::get_last_time_down() const {
   return _last_time_down;
 }
 
-void host::set_last_time_down(time_t last_time)
-{
+void host::set_last_time_down(time_t last_time) {
   _last_time_down = last_time;
 }
 
-time_t host::get_last_time_unreachable() const
-{
+time_t host::get_last_time_unreachable() const {
   return _last_time_unreachable;
 }
 
-void host::set_last_time_unreachable(time_t last_time)
-{
+void host::set_last_time_unreachable(time_t last_time) {
   _last_time_unreachable = last_time;
 }
 
-time_t host::get_last_time_up() const
-{
+time_t host::get_last_time_up() const {
   return _last_time_up;
 }
 
-void host::set_last_time_up(time_t last_time)
-{
+void host::set_last_time_up(time_t last_time) {
   _last_time_up = last_time;
 }
 
-bool host::get_has_been_checked() const
-{
+bool host::get_has_been_checked() const {
   return _has_been_checked;
 }
 
-void host::set_has_been_checked(bool has_been_checked)
-{
+void host::set_has_been_checked(bool has_been_checked) {
   _has_been_checked = has_been_checked;
 }
 
-bool host::get_is_being_freshened() const
-{
+bool host::get_is_being_freshened() const {
   return _is_being_freshened;
 }
 
-void host::set_is_being_freshened(bool is_being_freshened)
-{
+void host::set_is_being_freshened(bool is_being_freshened) {
   _is_being_freshened = is_being_freshened;
 }
 
-bool host::get_notified_on_down() const
-{
+bool host::get_notified_on_down() const {
   return _notified_on_down;
 }
 
-void host::set_notified_on_down(bool notified_on_down)
-{
+void host::set_notified_on_down(bool notified_on_down) {
   _notified_on_down = notified_on_down;
 }
 
-bool host::get_notified_on_unreachable() const
-{
+bool host::get_notified_on_unreachable() const {
   return _notified_on_unreachable;
 }
 
-void host::set_notified_on_unreachable(bool notified_on_unreachable)
-{
+void host::set_notified_on_unreachable(bool notified_on_unreachable) {
   _notified_on_unreachable = notified_on_unreachable;
 }
 
-int host::get_current_notification_number() const
-{
+int host::get_current_notification_number() const {
   return _current_notification_number;
 }
 
-void host::set_current_notification_number(int current_notification_number)
-{
+void host::set_current_notification_number(int current_notification_number) {
   _current_notification_number = current_notification_number;
 }
 
-int host::get_no_more_notifications() const
-{
+int host::get_no_more_notifications() const {
   return _no_more_notifications;
 }
 
-void host::set_no_more_notifications(int no_more_notifications)
-{
+void host::set_no_more_notifications(int no_more_notifications) {
   _no_more_notifications = no_more_notifications;
 }
 
-unsigned long host::get_current_notification_id() const
-{
+unsigned long host::get_current_notification_id() const {
   return _current_notification_id;
 }
 
-void host::set_current_notification_id(unsigned long current_notification_id)
-{
+void host::set_current_notification_id(unsigned long current_notification_id) {
   _current_notification_id = current_notification_id;
 }
 
-int host::get_check_flapping_recovery_notification() const
-{
+int host::get_check_flapping_recovery_notification() const {
   return _check_flapping_recovery_notification;
 }
 
-void host::set_check_flapping_recovery_notification(int check_flapping_recovery_notification)
-{
+void host::set_check_flapping_recovery_notification(int check_flapping_recovery_notification) {
   _check_flapping_recovery_notification = check_flapping_recovery_notification;
 }
 
-int host::get_scheduled_downtime_depth() const
-{
+int host::get_scheduled_downtime_depth() const {
   return _scheduled_downtime_depth;
 }
 
-void host::set_scheduled_downtime_depth(int scheduled_downtime_depth)
-{
+void host::set_scheduled_downtime_depth(int scheduled_downtime_depth) {
   _scheduled_downtime_depth = scheduled_downtime_depth;
 }
 
-int host::get_pending_flex_downtime() const
-{
+int host::get_pending_flex_downtime() const {
   return _pending_flex_downtime;
 }
 
-void host::set_pending_flex_downtime(int pending_flex_downtime)
-{
+void host::set_pending_flex_downtime(int pending_flex_downtime) {
   _pending_flex_downtime = pending_flex_downtime;
 }
 
-unsigned int host::get_state_history_index() const
-{
+unsigned int host::get_state_history_index() const {
   return _state_history_index;
 }
 
-void host::set_state_history_index(unsigned int state_history_index)
-{
+void host::set_state_history_index(unsigned int state_history_index) {
   _state_history_index = state_history_index;
 }
 
-time_t host::get_last_state_history_update() const
-{
+time_t host::get_last_state_history_update() const {
   return _last_state_history_update;
 }
 
-void host::set_last_state_history_update(time_t last_state_history_update)
-{
+void host::set_last_state_history_update(time_t last_state_history_update) {
   _last_state_history_update = last_state_history_update;
 }
 
-bool host::get_is_flapping() const
-{
+bool host::get_is_flapping() const {
   return _is_flapping;
 }
 
-void host::set_is_flapping(bool is_flapping)
-{
+void host::set_is_flapping(bool is_flapping) {
   _is_flapping = is_flapping;
 }
 
-unsigned long host::get_flapping_comment_id() const
-{
+unsigned long host::get_flapping_comment_id() const {
   return _flapping_comment_id;
 }
 
-void host::set_flapping_comment_id(unsigned long flapping_comment_id)
-{
+void host::set_flapping_comment_id(unsigned long flapping_comment_id) {
   _flapping_comment_id = flapping_comment_id;
 }
 
-double host::get_percent_state_change() const
-{
+double host::get_percent_state_change() const {
   return _percent_state_change;
 }
 
-void host::set_percent_state_change(double percent_state_change)
-{
+void host::set_percent_state_change(double percent_state_change) {
   _percent_state_change = percent_state_change;
 }
 
-int host::get_total_services() const
-{
+int host::get_total_services() const {
   return _total_services;
 }
 
-void host::set_total_services(int total_services)
-{
+void host::set_total_services(int total_services) {
   _total_services = total_services;
 }
 
-unsigned long host::get_total_service_check_interval() const
-{
+unsigned long host::get_total_service_check_interval() const {
   return _total_service_check_interval;
 }
 
-void host::set_total_service_check_interval(unsigned long total_service_check_interval)
-{
+void host::set_total_service_check_interval(unsigned long total_service_check_interval) {
   _total_service_check_interval = total_service_check_interval;
 }
 
-unsigned long host::get_modified_attributes() const
-{
+unsigned long host::get_modified_attributes() const {
   return _modified_attributes;
 }
 
-void host::set_modified_attributes(unsigned long modified_attributes)
-{
+void host::set_modified_attributes(unsigned long modified_attributes) {
   _modified_attributes = modified_attributes;
 }
 
-int host::get_circular_path_checked() const
-{
+int host::get_circular_path_checked() const {
   return _circular_path_checked;
 }
 
-void host::set_circular_path_checked(int check_level)
-{
+void host::set_circular_path_checked(int check_level) {
   _circular_path_checked = check_level;
 }
 
-bool host::get_contains_circular_path() const
-{
+bool host::get_contains_circular_path() const {
   return _contains_circular_path;
 }
 
-void host::set_contains_circular_path(bool contains_circular_path)
-{
+void host::set_contains_circular_path(bool contains_circular_path) {
   _contains_circular_path = contains_circular_path;
 }
+
 /**
  *  Equal operator.
  *
@@ -1093,7 +1179,10 @@ bool operator==(
           && obj1.get_display_name() == obj2.get_display_name()
           && obj1.get_alias() == obj2.get_alias()
           && obj1.get_address() == obj2.get_address()
-          && is_equal(obj1.parent_hosts, obj2.parent_hosts)
+           && ((obj1.parent_hosts.size() == obj2.parent_hosts.size()) &&
+               std::equal(obj1.parent_hosts.begin(),
+                          obj1.parent_hosts.end(),
+                          obj2.parent_hosts.begin()))
           // Children do not need to be tested, they are
           // created as parent back links.
           // Services do not need to be tested, they are
@@ -1222,6 +1311,21 @@ bool operator!=(
   return !operator==(obj1, obj2);
 }
 
+std::ostream& operator<<(std::ostream& os, host_map const& obj)
+{
+  for (host_map::const_iterator
+         it(obj.begin()), end(obj.end());
+       it != end;
+       ++it) {
+    os << it->first;
+    if (next(it) != end)
+      os << ", ";
+    else
+      os << "";
+  }
+  return (os);
+}
+
 /**
  *  Dump host content into the stream.
  *
@@ -1231,6 +1335,9 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, host const& obj) {
+  com::centreon::engine::hostgroup const* hg =
+    static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr);
+
   char const* evt_str(NULL);
   if (obj.event_handler_ptr)
     evt_str = obj.event_handler_ptr->get_name().c_str();
@@ -1243,12 +1350,11 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   char const* notif_period_str(NULL);
   if (obj.notification_period_ptr)
     notif_period_str = chkstr(obj.notification_period_ptr->name);
-  char const* hstgrp_str(NULL);
-  if (obj.hostgroups_ptr)
-    hstgrp_str = chkstr(static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr)->group_name);
 
   std::string cg_oss;
   std::string c_oss;
+  std::string p_oss;
+  std::string child_oss;
 
   if (obj.contact_groups.empty())
     cg_oss = "\"NULL\"";
@@ -1264,15 +1370,29 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     oss << obj.contacts;
     c_oss = oss.str();
   }
+  if (obj.parent_hosts.empty())
+    c_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.parent_hosts;
+    c_oss = oss.str();
+  }
 
+  if (obj.child_hosts.empty())
+    child_oss = "\"NULL\"";
+  else {
+    std::ostringstream oss;
+    oss << obj.child_hosts;
+    child_oss = oss.str();
+  }
 
   os << "host {\n"
     "  name:                                 " << obj.get_name() << "\n"
     "  display_name:                         " << obj.get_display_name() << "\n"
     "  alias:                                " << obj.get_alias() << "\n"
     "  address:                              " << obj.get_address() << "\n"
-    "  parent_hosts:                         " << chkobj(obj.parent_hosts) << "\n"
-    "  child_hosts:                          " << chkobj(obj.child_hosts) << "\n"
+    "  parent_hosts:                         " << p_oss << "\n"
+    "  child_hosts:                          " << child_oss << "\n"
     "  services:                             " << chkobj(obj.services) << "\n"
     "  host_check_command:                   " << obj.get_host_check_command() << "\n"
     "  initial_state:                        " << obj.get_initial_state() << "\n"
@@ -1386,313 +1506,13 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
     "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
-    "  hostgroups_ptr:                       " << chkstr(hstgrp_str) << "\n";
+    "  hostgroups_ptr:                       " << hg->get_group_name() << "\n";
 
   for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
     os << cv.first << " ; ";
 
   os << "\n}\n";
   return os;
-}
-
-/**
- *  Add a new host definition.
- *
- *  @param[in] name                          Host name.
- *  @param[in] display_name                  Display name.
- *  @param[in] alias                         Host alias.
- *  @param[in] address                       Host address.
- *  @param[in] check_period                  Check period.
- *  @param[in] initial_state                 Initial host state.
- *  @param[in] check_interval                Normal check interval.
- *  @param[in] retry_interval                Retry check interval.
- *  @param[in] max_attempts                  Max check attempts.
- *  @param[in] notify_up                     Does this host notify when
- *                                           up ?
- *  @param[in] notify_down                   Does this host notify when
- *                                           down ?
- *  @param[in] notify_unreachable            Does this host notify when
- *                                           unreachable ?
- *  @param[in] notify_flapping               Does this host notify for
- *                                           flapping ?
- *  @param[in] notify_downtime               Does this host notify for
- *                                           downtimes ?
- *  @param[in] notification_interval         Notification interval.
- *  @param[in] first_notification_delay      First notification delay.
- *  @param[in] notification_period           Notification period.
- *  @param[in] notifications_enabled         Whether notifications are
- *                                           enabled for this host.
- *  @param[in] check_command                 Active check command name.
- *  @param[in] checks_enabled                Are active checks enabled ?
- *  @param[in] accept_passive_checks         Can we submit passive check
- *                                           results ?
- *  @param[in] event_handler                 Event handler command name.
- *  @param[in] event_handler_enabled         Whether event handler is
- *                                           enabled or not.
- *  @param[in] flap_detection_enabled        Whether flap detection is
- *                                           enabled or not.
- *  @param[in] low_flap_threshold            Low flap threshold.
- *  @param[in] high_flap_threshold           High flap threshold.
- *  @param[in] flap_detection_on_up          Is flap detection enabled
- *                                           for up state ?
- *  @param[in] flap_detection_on_down        Is flap detection enabled
- *                                           for down state ?
- *  @param[in] flap_detection_on_unreachable Is flap detection enabled
- *                                           for unreachable state ?
- *  @param[in] stalk_on_up                   Stalk on up ?
- *  @param[in] stalk_on_down                 Stalk on down ?
- *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
- *  @param[in] process_perfdata              Should host perfdata be
- *                                           processed ?
- *  @param[in] failure_prediction_enabled    Deprecated.
- *  @param[in] failure_prediction_options    Deprecated.
- *  @param[in] check_freshness               Whether or not freshness
- *                                           check is enabled.
- *  @param[in] freshness_threshold           Freshness threshold.
- *  @param[in] notes                         Notes.
- *  @param[in] notes_url                     URL.
- *  @param[in] action_url                    Action URL.
- *  @param[in] icon_image                    Icon image.
- *  @param[in] icon_image_alt                Alternative icon image.
- *  @param[in] vrml_image                    VRML image.
- *  @param[in] statusmap_image               Status-map image.
- *  @param[in] x_2d                          2D x-coord.
- *  @param[in] y_2d                          2D y-coord.
- *  @param[in] have_2d_coords                Whether host has 2D coords.
- *  @param[in] x_3d                          3D x-coord.
- *  @param[in] y_3d                          3D y-coord.
- *  @param[in] z_3d                          3D z-coord.
- *  @param[in] have_3d_coords                Whether host has 3D coords.
- *  @param[in] should_be_drawn               Whether this host should be
- *                                           drawn.
- *  @param[in] retain_status_information     Should Engine retain status
- *                                           information of this host ?
- *  @param[in] retain_nonstatus_information  Should Engine retain
- *                                           non-status information of
- *                                           this host ?
- *  @param[in] obsess_over_host              Should we obsess over this
- *                                           host ?
- *
- *  @return New host.
- */
-com::centreon::engine::host* add_host(
-        unsigned int host_id,
-        char const* name,
-        char const* display_name,
-        char const* alias,
-        char const* address,
-        char const* check_period,
-        int initial_state,
-        double check_interval,
-        double retry_interval,
-        int max_attempts,
-        int notify_up,
-        int notify_down,
-        int notify_unreachable,
-        int notify_flapping,
-        int notify_downtime,
-        double notification_interval,
-        double first_notification_delay,
-        char const* notification_period,
-        int notifications_enabled,
-        char const* check_command,
-        int checks_enabled,
-        int accept_passive_checks,
-        char const* event_handler,
-        int event_handler_enabled,
-        int flap_detection_enabled,
-        double low_flap_threshold,
-        double high_flap_threshold,
-        int flap_detection_on_up,
-        int flap_detection_on_down,
-        int flap_detection_on_unreachable,
-        int stalk_on_up,
-        int stalk_on_down,
-        int stalk_on_unreachable,
-        int process_perfdata,
-        int failure_prediction_enabled,
-        char const* failure_prediction_options,
-        int check_freshness,
-        int freshness_threshold,
-        char const* notes,
-        char const* notes_url,
-        char const* action_url,
-        char const* icon_image,
-        char const* icon_image_alt,
-        char const* vrml_image,
-        char const* statusmap_image,
-        int x_2d,
-        int y_2d,
-        int have_2d_coords,
-        double x_3d,
-        double y_3d,
-        double z_3d,
-        int have_3d_coords,
-        int should_be_drawn,
-        int retain_status_information,
-        int retain_nonstatus_information,
-        int obsess_over_host) {
-  (void)failure_prediction_enabled;
-  (void)failure_prediction_options;
-
-  // Make sure we have the data we need.
-  if (!name || !name[0] || !address || !address[0]) {
-    logger(log_config_error, basic)
-      << "Error: Host name or address is NULL";
-    return NULL;
-  }
-  if (host_id == 0) {
-    logger(log_config_error, basic)
-      << "Error: Host must contain a host id because it comes from a database";
-    return NULL;
-  }
-  if (max_attempts <= 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid max_check_attempts value for host '"
-      << name << "'";
-    return NULL;
-  }
-  if (check_interval < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid check_interval value for host '"
-      << name << "'";
-    return NULL;
-  }
-  if (notification_interval < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid notification_interval value for host '"
-      << name << "'";
-    return NULL;
-  }
-  if (first_notification_delay < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid first_notification_delay value for host '"
-      << name << "'";
-    return NULL;
-  }
-  if (freshness_threshold < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid freshness_threshold value for host '"
-      << name << "'";
-    return NULL;
-  }
-
-  // Check if the host already exists.
-  unsigned int id(host_id);
-  if (is_host_exist(id)) {
-    logger(log_config_error, basic)
-      << "Error: Host '" << name << "' has already been defined";
-    return NULL;
-  }
-
-  // Allocate memory for a new host.
-  std::shared_ptr<host> obj(new host);
-
-  try {
-    // Duplicate string vars.
-    obj->set_name(name);
-    obj->set_address(address);
-    obj->set_alias(alias ? alias : name);
-    obj->set_display_name(display_name ? display_name : name);
-    if (action_url)
-      obj->set_action_url(action_url);
-    if (check_period)
-      obj->set_check_period(check_period);
-    if (event_handler)
-      obj->set_event_handler(event_handler);
-    if (check_command)
-      obj->set_host_check_command(check_command);
-    if (icon_image)
-      obj->set_icon_image(icon_image);
-    if (icon_image_alt)
-      obj->set_icon_image_alt(icon_image_alt);
-    if (notes)
-      obj->set_notes(notes);
-    if (notes_url)
-      obj->set_notes_url(notes_url);
-    if (notification_period)
-      obj->set_notification_period(notification_period);
-    if (statusmap_image)
-      obj->set_statusmap_image(statusmap_image);
-    if (vrml_image)
-      obj->set_vrml_image(vrml_image);
-
-    // Duplicate non-string vars.
-    obj->set_accept_passive_host_checks((accept_passive_checks > 0));
-    obj->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
-    obj->set_check_freshness((check_freshness > 0));
-    obj->set_check_interval(check_interval);
-    obj->set_check_options(CHECK_OPTION_NONE);
-    obj->set_check_type(HOST_CHECK_ACTIVE);
-    obj->set_checks_enabled((checks_enabled > 0));
-    obj->set_current_attempt((initial_state == HOST_UP) ? 1 : max_attempts);
-    obj->set_current_state(initial_state);
-    obj->set_event_handler_enabled((event_handler_enabled > 0));
-    obj->set_first_notification_delay(first_notification_delay);
-    obj->set_flap_detection_enabled((flap_detection_enabled > 0));
-    obj->set_flap_detection_on_down((flap_detection_on_down > 0));
-    obj->set_flap_detection_on_unreachable((flap_detection_on_unreachable > 0));
-    obj->set_flap_detection_on_up((flap_detection_on_up > 0));
-    obj->set_freshness_threshold(freshness_threshold);
-    obj->set_have_2d_coords((have_2d_coords > 0));
-    obj->set_have_3d_coords((have_3d_coords > 0));
-    obj->set_high_flap_threshold(high_flap_threshold);
-    obj->set_initial_state(initial_state);
-    obj->set_last_hard_state(initial_state);
-    obj->set_last_state(initial_state);
-    obj->set_low_flap_threshold(low_flap_threshold);
-    obj->set_max_attempts(max_attempts);
-    obj->set_modified_attributes(MODATTR_NONE);
-    obj->set_notification_interval(notification_interval);
-    obj->set_notifications_enabled((notifications_enabled > 0));
-    obj->set_notify_on_down((notify_down > 0));
-    obj->set_notify_on_downtime((notify_downtime > 0));
-    obj->set_notify_on_flapping((notify_flapping > 0));
-    obj->set_notify_on_recovery((notify_up > 0));
-    obj->set_notify_on_unreachable((notify_unreachable > 0));
-    obj->set_obsess_over_host((obsess_over_host > 0));
-    obj->set_process_performance_data((process_perfdata > 0));
-    obj->set_retain_nonstatus_information((retain_nonstatus_information > 0));
-    obj->set_retain_status_information((retain_status_information > 0));
-    obj->set_retry_interval(retry_interval);
-    obj->set_should_be_drawn((should_be_drawn > 0));
-    obj->set_should_be_scheduled(true);
-    obj->set_stalk_on_down((stalk_on_down > 0));
-    obj->set_stalk_on_unreachable((stalk_on_unreachable > 0));
-    obj->set_stalk_on_up((stalk_on_up > 0));
-    obj->set_state_type(HARD_STATE);
-    obj->set_x_2d(x_2d);
-    obj->set_x_3d(x_3d);
-    obj->set_y_2d(y_2d);
-    obj->set_y_3d(y_3d);
-    obj->set_z_3d(z_3d);
-
-    // STATE_OK = 0, so we don't need to set state_history (memset
-    // is used before).
-    // for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
-    //   obj->state_history[x] = STATE_OK;
-
-    // Add new items to the configuration state.
-    state::instance().hosts()[id] = obj;
-
-    // Add new items to the list.
-    obj->next = host_list;
-    host_list = obj.get();
-  }
-  catch (...) {
-    obj.reset();
-  }
-
-  return obj.get();
-}
-
-/**
- *  Get number of registered hosts.
- *
- *  @return Number of registered hosts.
- */
-int get_host_count() {
-  return state::instance().hosts().size();
 }
 
 /**
@@ -1765,7 +1585,7 @@ int is_escalated_contact_for_host(com::centreon::engine::host* hst,
          it(hstescalation->contact_groups.begin()),
          end(hstescalation->contact_groups.begin());
        it != end;
-       ++it) 
+       ++it)
     if (it->second->get_members().find(cntct->get_name()) ==
       it->second->get_members().end())
       return true;
@@ -1792,15 +1612,17 @@ int is_host_immediate_child_of_host(
 
   // Root/top-level hosts.
   if (!parent_host) {
-    if (!child_host->parent_hosts)
+    if (child_host->parent_hosts.size() == 0)
       return true;
   }
   // Mid-level/bottom hosts.
   else {
-    for (hostsmember* member(child_host->parent_hosts);
-         member;
-         member = member->next)
-      if (member->host_ptr == parent_host)
+    for (host_map::iterator
+           it(child_host->parent_hosts.begin()),
+           end(child_host->parent_hosts.end());
+         it != end;
+         it++)
+      if (it->second.get() == parent_host)
         return true;
   }
 
@@ -1835,8 +1657,12 @@ int is_host_immediate_parent_of_host(
  */
 int number_of_immediate_child_hosts(com::centreon::engine::host* hst) {
   int children(0);
-  for (com::centreon::engine::host* tmp(host_list); tmp; tmp = tmp->next)
-    if (is_host_immediate_child_of_host(hst, tmp))
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it)
+    if (is_host_immediate_child_of_host(hst, it->second.get()))
       ++children;
   return children;
 }
@@ -1852,8 +1678,12 @@ int number_of_immediate_child_hosts(com::centreon::engine::host* hst) {
  */
 int number_of_immediate_parent_hosts(com::centreon::engine::host* hst) {
   int parents(0);
-  for (com::centreon::engine::host* tmp(host_list); tmp; tmp = tmp->next)
-    if (is_host_immediate_parent_of_host(hst, tmp))
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it)
+    if (is_host_immediate_parent_of_host(hst, it->second.get()))
       ++parents;
   return parents;
 }
@@ -1869,9 +1699,13 @@ int number_of_immediate_parent_hosts(com::centreon::engine::host* hst) {
  */
 int number_of_total_child_hosts(com::centreon::engine::host* hst) {
   int children(0);
-  for (com::centreon::engine::host* tmp(host_list); tmp; tmp = tmp->next)
-    if (is_host_immediate_child_of_host(hst, tmp))
-      children += number_of_total_child_hosts(tmp) + 1;
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it)
+    if (is_host_immediate_child_of_host(hst, it->second.get()))
+      children += number_of_total_child_hosts(it->second.get()) + 1;
   return children;
 }
 
@@ -1886,9 +1720,13 @@ int number_of_total_child_hosts(com::centreon::engine::host* hst) {
  */
 int number_of_total_parent_hosts(com::centreon::engine::host* hst) {
   int parents(0);
-  for (com::centreon::engine::host* tmp(host_list); tmp; tmp = tmp->next)
-    if (is_host_immediate_parent_of_host(hst, tmp))
-      parents += number_of_total_parent_hosts(tmp) + 1;
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it)
+    if (is_host_immediate_parent_of_host(hst, it->second.get()))
+      parents += number_of_total_parent_hosts(it->second.get()) + 1;
   return parents;
 }
 

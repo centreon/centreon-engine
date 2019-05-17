@@ -78,52 +78,6 @@ std::ostream& operator<<(std::ostream& os, hostsmember const& obj) {
 }
 
 /**
- *  Adds a child host to a host definition.
- *
- *  @param[in] parent Parent host.
- *  @param[in] child  Child host.
- *
- *  @return Host member.
- */
-hostsmember* add_child_link_to_host(host* parent, host* child) {
-  // Make sure we have the data we need.
-  if (!parent || !child)
-    return (NULL);
-
-  // Allocate memory.
-  hostsmember* obj(new hostsmember);
-  memset(obj, 0, sizeof(*obj));
-
-  try {
-    // Initialize values.
-    obj->host_ptr = child;
-    obj->host_name = string::dup(child->get_name().c_str());
-
-    // Add the child entry to the host definition.
-    obj->next = parent->child_hosts;
-    parent->child_hosts = obj;
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_relation_data(
-      NEBTYPE_PARENT_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      parent,
-      NULL,
-      child,
-      NULL,
-      &tv);
-  }
-  catch (...) {
-    deleter::hostsmember(obj);
-    obj = NULL;
-  }
-
-  return (obj);
-}
-
-/**
  *  Add a new host to a host group.
  *
  *  @param[in] temp_hostgroup Host group object.
@@ -198,41 +152,6 @@ hostsmember* add_host_to_hostgroup(
 hostsmember* add_parent_host_to_host(
                host* hst,
                char const* host_name) {
-  // Make sure we have the data we need.
-  if (!hst || !host_name || !host_name[0]) {
-    logger(log_config_error, basic)
-      << "Error: Host is NULL or parent host name is NULL";
-    return (NULL);
-  }
 
-  // A host cannot be a parent/child of itself.
-  if (hst->get_name() == host_name) {
-    logger(log_config_error, basic)
-      << "Error: Host '" << hst->get_name()
-      << "' cannot be a child/parent of itself";
-    return (NULL);
-  }
-
-  // Allocate memory.
-  hostsmember* obj(new hostsmember);
-  memset(obj, 0, sizeof(*obj));
-
-  try {
-    // Duplicate string vars.
-    obj->host_name = string::dup(host_name);
-
-    // Add the parent host entry to the host definition */
-    obj->next = hst->parent_hosts;
-    hst->parent_hosts = obj;
-
-    // Warning: the notify event broker was call into the
-    // add_child_link_to_host, after the host configuration applier.
-  }
-  catch (...) {
-    deleter::hostsmember(obj);
-    obj = NULL;
-  }
-
-  return (obj);
 }
 

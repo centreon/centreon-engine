@@ -31,6 +31,7 @@
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
 /****************************************************************/
@@ -39,32 +40,32 @@ using namespace com::centreon::engine::logging;
 
 /* do a pre-flight check to make sure object relationships, etc. make sense */
 int pre_flight_check() {
-  host* temp_host(NULL);
-  char* buf(NULL);
-  service* temp_service(NULL);
-  commands::command* temp_command(NULL);
-  char* temp_command_name(NULL);
+  host* temp_host(nullptr);
+  char* buf(nullptr);
+  service* temp_service(nullptr);
+  commands::command* temp_command(nullptr);
+  char* temp_command_name(nullptr);
   int warnings(0);
   int errors(0);
   struct timeval tv[4];
   double runtime[4];
 
   if (test_scheduling)
-    gettimeofday(&tv[0], NULL);
+    gettimeofday(&tv[0], nullptr);
 
   /********************************************/
   /* check object relationships               */
   /********************************************/
   pre_flight_object_check(&warnings, &errors);
   if (test_scheduling)
-    gettimeofday(&tv[1], NULL);
+    gettimeofday(&tv[1], nullptr);
 
   /********************************************/
   /* check for circular paths between hosts   */
   /********************************************/
   pre_flight_circular_check(&warnings, &errors);
   if (test_scheduling)
-    gettimeofday(&tv[2], NULL);
+    gettimeofday(&tv[2], nullptr);
 
   /********************************************/
   /* check global event handler commands...   */
@@ -82,7 +83,7 @@ int pre_flight_check() {
 
     temp_command = configuration::applier::state::instance().find_command(
       temp_command_name);
-    if (temp_command == NULL) {
+    if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Global host event handler command '"
         << temp_command_name << "' is not defined anywhere!";
@@ -105,7 +106,7 @@ int pre_flight_check() {
 
     temp_command = configuration::applier::state::instance().find_command(
       temp_command_name);
-    if (temp_command == NULL) {
+    if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Global service event handler command '"
         << temp_command_name << "' is not defined anywhere!";
@@ -133,7 +134,7 @@ int pre_flight_check() {
 
     temp_command = configuration::applier::state::instance().find_command(
       temp_command_name);
-    if (temp_command == NULL) {
+    if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive service processor command '"
         << temp_command_name << "' is not defined anywhere!";
@@ -155,7 +156,7 @@ int pre_flight_check() {
 
     temp_command = configuration::applier::state::instance().find_command(
       temp_command_name);
-    if (temp_command == NULL) {
+    if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive host processor command '"
         << temp_command_name << "' is not defined anywhere!";
@@ -170,12 +171,15 @@ int pre_flight_check() {
 
   /* count number of services associated with each host (we need this for flap detection)... */
   for (temp_service = service_list;
-       temp_service != NULL;
+       temp_service != nullptr;
        temp_service = temp_service->next) {
-    if ((temp_host = find_host(temp_service->host_name))) {
-      temp_host->set_total_services(temp_host->get_total_services() + 1);
-      temp_host->set_total_service_check_interval(
-        temp_host->get_total_service_check_interval()
+
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+    if (it != state::instance().hosts().end() && it->second != nullptr) {
+      it->second->set_total_services(it->second->get_total_services() + 1);
+      it->second->set_total_service_check_interval(
+        it->second->get_total_service_check_interval()
         + static_cast<unsigned long>(temp_service->check_interval));
     }
   }
@@ -187,7 +191,7 @@ int pre_flight_check() {
   }
 
   if (test_scheduling)
-    gettimeofday(&tv[3], NULL);
+    gettimeofday(&tv[3], nullptr);
 
   if (test_scheduling) {
 
@@ -253,22 +257,26 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking hosts...";
   total_objects = 0;
-  for (host* temp_host(host_list);
-       temp_host;
-       temp_host = temp_host->next, ++total_objects)
-    check_host(temp_host, &warnings, &errors);
-  if (verify_config)
-    logger(log_info_message, basic)
-      << "\tChecked " << total_objects << " hosts.";
-
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it, ++total_objects) {
+    check_host(it->second.get(), &warnings, &errors);
+    if (verify_config)
+      logger(log_info_message, basic)
+        << "\tChecked " << total_objects << " hosts.";
+  }
   // Check each host group...
   if (verify_config)
     logger(log_info_message, basic) << "Checking host groups...";
   total_objects = 0;
-  for (hostgroup* temp_hostgroup(hostgroup_list);
-       temp_hostgroup;
-       temp_hostgroup = temp_hostgroup->next, ++total_objects)
-    check_hostgroup(temp_hostgroup, &warnings, &errors);
+  for (hostgroup_map::iterator
+         it(hostgroup::hostgroups.begin()),
+         end(hostgroup::hostgroups.end());
+       it != end;
+       ++it, ++total_objects)
+    check_hostgroup(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host groups.";
@@ -310,12 +318,12 @@ int pre_flight_object_check(int* w, int* e) {
          it(configuration::applier::state::instance().contactgroups().begin()),
          end(configuration::applier::state::instance().contactgroups().end());
        it != end;
-       ++it)
+       ++it) {
     check_contactgroup(it->second.get(), &warnings, &errors);
-  if (verify_config)
-    logger(log_info_message, basic)
-      << "\tChecked " << total_objects << " contact groups.";
-
+    if (verify_config)
+      logger(log_info_message, basic)
+        << "\tChecked " << total_objects << " contact groups.";
+  }
   // Check all service escalations...
   if (verify_config)
     logger(log_info_message, basic)
@@ -425,8 +433,6 @@ int pre_flight_object_check(int* w, int* e) {
  * http://en.wikipedia.org/wiki/Depth-first_search
  */
 static int dfs_host_path(host* root) {
-  hostsmember* child(NULL);
-
   if (!root)
     return (DFS_NEAR_LOOP);
 
@@ -437,17 +443,21 @@ static int dfs_host_path(host* root) {
   dfs_set_status(root, DFS_TEMP_CHECKED);
 
   /* We are scanning the children */
-  for (child = root->child_hosts; child != NULL; child = child->next) {
-    int child_status = dfs_get_status(child->host_ptr);
+  for (host_map::iterator
+         it(root->child_hosts.begin()),
+         end(root->child_hosts.end());
+       it != end;
+       it++) {
+    int child_status = dfs_get_status(it->second.get());
 
     /* If a child is not checked, check it */
     if (child_status == DFS_UNCHECKED)
-      child_status = dfs_host_path(child->host_ptr);
+      child_status = dfs_host_path(it->second.get());
 
     /* If a child already temporary checked, its a problem,
      * loop inside, and its a acked status */
     if (child_status == DFS_TEMP_CHECKED) {
-      dfs_set_status(child->host_ptr, DFS_LOOPY);
+      dfs_set_status(it->second.get(), DFS_LOOPY);
       dfs_set_status(root, DFS_LOOPY);
     }
 
@@ -458,7 +468,7 @@ static int dfs_host_path(host* root) {
         dfs_set_status(root, DFS_NEAR_LOOP);
 
       /* we already saw this child, it's a problem */
-      dfs_set_status(child->host_ptr, DFS_LOOPY);
+      dfs_set_status(it->second.get(), DFS_LOOPY);
     }
   }
 
@@ -474,11 +484,10 @@ static int dfs_host_path(host* root) {
 
 /* check for circular paths and dependencies */
 int pre_flight_circular_check(int* w, int* e) {
-  host* temp_host(NULL);
-  servicedependency* temp_sd(NULL);
-  servicedependency* temp_sd2(NULL);
-  hostdependency* temp_hd(NULL);
-  hostdependency* temp_hd2(NULL);
+  servicedependency* temp_sd(nullptr);
+  servicedependency* temp_sd2(nullptr);
+  hostdependency* temp_hd(nullptr);
+  hostdependency* temp_hd2(nullptr);
   int found(false);
   int warnings(0);
   int errors(0);
@@ -495,28 +504,32 @@ int pre_flight_circular_check(int* w, int* e) {
   found = false;
 
   /* We clean the dsf status from previous check */
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
-    dfs_set_status(temp_host, DFS_UNCHECKED);
-  }
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it)
+    dfs_set_status(it->second.get(), DFS_UNCHECKED);
 
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
-    if (dfs_host_path(temp_host) == DFS_LOOPY)
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it)
+    if (dfs_host_path(it->second.get()) == DFS_LOOPY)
       errors = 1;
-  }
 
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
-    if (dfs_get_status(temp_host) == DFS_LOOPY)
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it) {
+    if (dfs_get_status(it->second.get()) == DFS_LOOPY)
       logger(log_verification_error, basic)
-        << "Error: The host '" << temp_host->get_name()
+        << "Error: The host '" << it->first
         << "' is part of a circular parent/child chain!";
     /* clean DFS status */
-    dfs_set_status(temp_host, DFS_UNCHECKED);
+    dfs_set_status(it->second.get(), DFS_UNCHECKED);
   }
 
   /********************************************/
@@ -525,12 +538,12 @@ int pre_flight_circular_check(int* w, int* e) {
 
   /* check execution dependencies between all services */
   for (temp_sd = servicedependency_list;
-       temp_sd != NULL;
+       temp_sd != nullptr;
        temp_sd = temp_sd->next) {
 
     /* clear checked flag for all dependencies */
     for (temp_sd2 = servicedependency_list;
-	 temp_sd2 != NULL;
+	 temp_sd2 != nullptr;
          temp_sd2 = temp_sd2->next)
       temp_sd2->circular_path_checked = false;
 
@@ -550,12 +563,12 @@ int pre_flight_circular_check(int* w, int* e) {
 
   /* check notification dependencies between all services */
   for (temp_sd = servicedependency_list;
-       temp_sd != NULL;
+       temp_sd != nullptr;
        temp_sd = temp_sd->next) {
 
     /* clear checked flag for all dependencies */
     for (temp_sd2 = servicedependency_list;
-	 temp_sd2 != NULL;
+	 temp_sd2 != nullptr;
          temp_sd2 = temp_sd2->next)
       temp_sd2->circular_path_checked = false;
 
@@ -575,18 +588,18 @@ int pre_flight_circular_check(int* w, int* e) {
 
   /* clear checked flag for all dependencies */
   for (temp_sd = servicedependency_list;
-       temp_sd != NULL;
+       temp_sd != nullptr;
        temp_sd = temp_sd->next)
     temp_sd->circular_path_checked = false;
 
   /* check execution dependencies between all hosts */
   for (temp_hd = hostdependency_list;
-       temp_hd != NULL;
+       temp_hd != nullptr;
        temp_hd = temp_hd->next) {
 
     /* clear checked flag for all dependencies */
     for (temp_hd2 = hostdependency_list;
-	 temp_hd2 != NULL;
+	 temp_hd2 != nullptr;
          temp_hd2 = temp_hd2->next)
       temp_hd2->circular_path_checked = false;
 
@@ -605,12 +618,12 @@ int pre_flight_circular_check(int* w, int* e) {
 
   /* check notification dependencies between all hosts */
   for (temp_hd = hostdependency_list;
-       temp_hd != NULL;
+       temp_hd != nullptr;
        temp_hd = temp_hd->next) {
 
     /* clear checked flag for all dependencies */
     for (temp_hd2 = hostdependency_list;
-	 temp_hd2 != NULL;
+	 temp_hd2 != nullptr;
          temp_hd2 = temp_hd2->next)
       temp_hd2->circular_path_checked = false;
 
@@ -629,14 +642,14 @@ int pre_flight_circular_check(int* w, int* e) {
 
   /* clear checked flag for all dependencies */
   for (temp_hd = hostdependency_list;
-       temp_hd != NULL;
+       temp_hd != nullptr;
        temp_hd = temp_hd->next)
     temp_hd->circular_path_checked = false;
 
   /* update warning and error count */
-  if (w != NULL)
+  if (w != nullptr)
     *w += warnings;
-  if (e != NULL)
+  if (e != nullptr)
     *e += errors;
 
   return ((errors > 0) ? ERROR : OK);
@@ -647,11 +660,12 @@ int check_service(service* svc, int* w, int* e) {
   int warnings(0);
 
   /* check for a valid host */
-  host* temp_host = find_host(svc->host_name);
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(state::instance().hosts().find(get_host_id(svc->host_name)));
 
   /* we couldn't find an associated host! */
 
-  if (!temp_host) {
+  if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Host '" << svc->host_name << "' specified in service "
       "'" << svc->description << "' not defined anywhere!";
@@ -659,13 +673,16 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* save the host pointer for later */
-  svc->host_ptr = temp_host;
+  if (it == state::instance().hosts().end())
+    svc->host_ptr = nullptr;
+  else
+    svc->host_ptr = it->second.get();
 
   /* add a reverse link from the host to the service for faster lookups later */
-  add_service_link_to_host(temp_host, svc);
+  add_service_link_to_host(svc->host_ptr, svc);
 
   /* check the event handler command */
-  if (svc->event_handler != NULL) {
+  if (svc->event_handler != nullptr) {
 
     /* check the event handler command */
     char* buf = string::dup(svc->event_handler);
@@ -675,7 +692,7 @@ int check_service(service* svc, int* w, int* e) {
 
     commands::command* temp_command(
       configuration::applier::state::instance().find_command(temp_command_name));
-    if (temp_command == NULL) {
+    if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
         << "' specified in service '" << svc->description
@@ -696,7 +713,7 @@ int check_service(service* svc, int* w, int* e) {
   char* temp_command_name = my_strtok(buf, "!");
 
   commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
-  if (temp_command == NULL) {
+  if (temp_command == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Service check command '" << temp_command_name
       << "' specified in service '" << svc->description
@@ -752,7 +769,7 @@ int check_service(service* svc, int* w, int* e) {
       configuration::applier::state::instance().find_contactgroup(
         it->first));
 
-    if (temp_contactgroup == NULL) {
+    if (temp_contactgroup == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Contact group '" << it->first
         << "' specified in service '" << svc->description << "' for "
@@ -762,7 +779,7 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* verify service check timeperiod */
-  if (svc->check_period == NULL) {
+  if (svc->check_period == nullptr) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->description << "' on host '"
       << svc->host_name << "' has no check time period defined!";
@@ -770,7 +787,7 @@ int check_service(service* svc, int* w, int* e) {
   }
   else {
     timeperiod* temp_timeperiod = find_timeperiod(svc->check_period);
-    if (temp_timeperiod == NULL) {
+    if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Check period '" << svc->check_period
         << "' specified for service '" << svc->description
@@ -828,9 +845,9 @@ int check_service(service* svc, int* w, int* e) {
     errors++;
   }
 
-  if (w != NULL)
+  if (w != nullptr)
     *w += warnings;
-  if (e != NULL)
+  if (e != nullptr)
     *e += errors;
   return (errors == 0);
 }
@@ -875,7 +892,7 @@ int check_host(host* hst, int* w, int* e) {
     char* temp_command_name = my_strtok(buf, "!");
 
     commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
-    if (temp_command == NULL) {
+    if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
         << "' specified for host '" << hst->get_name()
@@ -899,7 +916,7 @@ int check_host(host* hst, int* w, int* e) {
     char* temp_command_name = my_strtok(buf, "!");
 
     commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
-    if (temp_command == NULL) {
+    if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Host check command '" << temp_command_name
         << "' specified for host '" << hst->get_name()
@@ -915,7 +932,7 @@ int check_host(host* hst, int* w, int* e) {
 
   if (!hst->get_check_period().empty()) {
     timeperiod* temp_timeperiod = find_timeperiod(hst->get_check_period().c_str());
-    if (temp_timeperiod == NULL) {
+    if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Check period '" << hst->get_check_period()
         << "' specified for host '" << hst->get_name()
@@ -936,7 +953,7 @@ int check_host(host* hst, int* w, int* e) {
     com::centreon::engine::contact* temp_contact
       = configuration::applier::state::instance().find_contact(it->first);
 
-    if (temp_contact == NULL) {
+    if (temp_contact == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in host '" << hst->get_name()
@@ -956,7 +973,7 @@ int check_host(host* hst, int* w, int* e) {
       configuration::applier::state::instance().find_contactgroup(
         it->first));
 
-    if (temp_contactgroup == NULL) {
+    if (temp_contactgroup == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
         << it->first
@@ -983,23 +1000,24 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* check all parent parent host */
-  for (hostsmember* temp_hostsmember = hst->parent_hosts;
-       temp_hostsmember != NULL;
-       temp_hostsmember = temp_hostsmember->next) {
+  for (host_map::iterator
+         it(hst->parent_hosts.begin()),
+         end(hst->parent_hosts.end());
+       it != end;
+       it++) {
 
-    host* hst2 = NULL;
-    if ((hst2 = find_host(temp_hostsmember->host_name)) == NULL) {
+    host* hst2 = nullptr;
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it_host(state::instance().hosts().find(get_host_id(it->first)));
+
+    if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
       logger(log_verification_error, basic)
-        << "Error: '" << temp_hostsmember->host_name << "' is not a "
+        << "Error: '" << it->first << "' is not a "
         "valid parent for host '" << hst->get_name() << "'!";
       errors++;
     }
-
-    /* save the parent host pointer for later */
-    temp_hostsmember->host_ptr = hst2;
-
-    /* add a reverse (child) link to make searches faster later on */
-    add_child_link_to_host(hst2, hst);
+    else
+      it_host->second->add_child_link(hst); //add a reverse (child) link to make searches faster later on
   }
 
   // Check for sane recovery options.
@@ -1022,9 +1040,9 @@ int check_host(host* hst, int* w, int* e) {
     errors++;
   }
 
-  if (w != NULL)
+  if (w != nullptr)
     *w += warnings;
-  if (e != NULL)
+  if (e != nullptr)
     *e += errors;
   return (errors == 0);
 }
@@ -1060,7 +1078,7 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
   else {
     timeperiod* temp_timeperiod
       = find_timeperiod(cntct->get_service_notification_period().c_str());
-    if (temp_timeperiod == NULL) {
+    if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Service notification period '"
         << cntct->get_service_notification_period()
@@ -1084,7 +1102,7 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
   else {
     timeperiod* temp_timeperiod
       = find_timeperiod(cntct->get_host_notification_period().c_str());
-    if (temp_timeperiod == NULL) {
+    if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Host notification period '"
         << cntct->get_host_notification_period()
@@ -1127,9 +1145,9 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
     errors++;
   }
 
-  if (w != NULL)
+  if (w != nullptr)
     *w += warnings;
-  if (e != NULL)
+  if (e != nullptr)
     *e += errors;
   return (errors == 0);
 }
@@ -1202,14 +1220,18 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
   int errors(0);
 
   // Check all group members.
-  for (hostsmember* temp_hostsmember(hg->members);
-       temp_hostsmember;
-       temp_hostsmember = temp_hostsmember->next) {
-    host* temp_host(find_host(temp_hostsmember->host_name));
-    if (!temp_host) {
+  for (host_map::iterator
+         it(hg->members.begin()),
+         end(hg->members.end());
+       it != end;
+       ++it) {
+
+    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it_host(state::instance().hosts().find(get_host_id(it->first.c_str())));
+    if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
       logger(log_verification_error, basic)
-        << "Error: Host '" << temp_hostsmember->host_name
-        << "' specified in host group '" << hg->group_name
+        << "Error: Host '" << it->first
+        << "' specified in host group '" << hg->get_group_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1217,16 +1239,13 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
     // Save a pointer to this hostgroup for faster host/group
     // membership lookups later.
     else
-      add_object_to_objectlist(&temp_host->hostgroups_ptr, hg);
-
-    // Save host pointer for later.
-    temp_hostsmember->host_ptr = temp_host;
+      add_object_to_objectlist(&it_host->second->hostgroups_ptr, hg);
   }
 
   // Check for illegal characters in hostgroup name.
-  if (contains_illegal_object_chars(hg->group_name)) {
+  if (contains_illegal_object_chars(hg->get_group_name().c_str())) {
     logger(log_verification_error, basic)
-      << "Error: The name of hostgroup '" << hg->group_name
+      << "Error: The name of hostgroup '" << hg->get_group_name()
       << "' contains one or more illegal characters.";
     errors++;
   }
@@ -1385,8 +1404,9 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
   int errors(0);
 
   // Find the dependent host.
-  host* temp_host(find_host(hd->dependent_host_name));
-  if (!temp_host) {
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(state::instance().hosts().find(get_host_id(hd->dependent_host_name)));
+  if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Dependent host specified in host dependency for "
          "host '" << hd->dependent_host_name
@@ -1395,11 +1415,14 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
   }
 
   // Save pointer for later.
-  hd->dependent_host_ptr = temp_host;
+  if (it == state::instance().hosts().end())
+    hd->dependent_host_ptr = nullptr;
+  else
+    hd->dependent_host_ptr = it->second.get();
 
   // Find the host we're depending on.
-  temp_host = find_host(hd->host_name);
-  if (!temp_host) {
+  it = state::instance().hosts().find(get_host_id(hd->host_name));
+  if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Host specified in host dependency for host '"
       << hd->dependent_host_name << "' is not defined anywhere!";
@@ -1407,7 +1430,10 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
   }
 
   // Save pointer for later.
-  hd->master_host_ptr = temp_host;
+  if (it == state::instance().hosts().end())
+    hd->master_host_ptr = nullptr;
+  else
+    hd->master_host_ptr = it->second.get();
 
   // Make sure they're not the same host.
   if (hd->dependent_host_ptr == hd->master_host_ptr) {
@@ -1544,8 +1570,9 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   int errors(0);
 
   // Find the host.
-  host* temp_host(find_host(he->host_name));
-  if (!temp_host) {
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(state::instance().hosts().find(get_host_id(he->host_name)));
+  if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Host '" << he->host_name
       << "' specified in host escalation is not defined anywhere!";
@@ -1553,7 +1580,10 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   }
 
   // Save the host pointer for later.
-  he->host_ptr = temp_host;
+  if (it == state::instance().hosts().end())
+    he->host_ptr = nullptr;
+  else
+    he->host_ptr = it->second.get();
 
   // Find the timeperiod.
   if (he->escalation_period) {

@@ -40,7 +40,7 @@ int check_service(service* svc, int* w, int* e);
 int check_host(com::centreon::engine::host* hst, int* w, int* e);
 int check_contact(com::centreon::engine::contact* cntct, int* w, int* e);
 int check_servicegroup(servicegroup* sg, int* w, int* e);
-int check_hostgroup(hostgroup* hg, int* w, int* e);
+int check_hostgroup(com::centreon::engine::hostgroup* hg, int* w, int* e);
 int check_contactgroup(com::centreon::engine::contactgroup* cg, int* w,
   int* e);
 int check_servicedependency(servicedependency* sd, int* w, int* e);

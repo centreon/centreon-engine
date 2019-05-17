@@ -20,6 +20,7 @@
 #include <map>
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
 #include "com/centreon/engine/events/defines.hh"
@@ -32,6 +33,7 @@
 #include "compatibility/find.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::downtimes;
 
@@ -71,21 +73,23 @@ service_downtime::~service_downtime() {
  * @return a boolean
  */
 bool service_downtime::is_stale() const {
-    bool retval{false};
+  bool retval{false};
+  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
 
-    /* delete downtimes with invalid host names */
-    if (::find_host(get_hostname().c_str()) == NULL)
-      retval = true;
-    /* delete downtimes with invalid service descriptions */
-    else if (::find_service(
-             get_hostname().c_str(),
-             get_service_description().c_str()) == NULL)
-      retval = true;
-    /* delete downtimes that have expired */
-    else if (this->end_time < time(NULL))
-      retval = true;
+  /* delete downtimes with invalid host names */
+  if (it == state::instance().hosts().end() || it->second == nullptr)
+    retval = true;
+  /* delete downtimes with invalid service descriptions */
+  else if (::find_service(
+           get_hostname().c_str(),
+           get_service_description().c_str()) == NULL)
+    retval = true;
+  /* delete downtimes that have expired */
+  else if (this->end_time < time(NULL))
+    retval = true;
 
-    return retval;
+  return retval;
 }
 
 /**

@@ -30,8 +30,7 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/objects/hostgroup.hh"
-#  include "com/centreon/engine/objects/hostsmember.hh"
+#  include "com/centreon/engine/hostgroup.hh"
 #  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/objects/servicegroup.hh"
 #  include "com/centreon/engine/objects/servicesmember.hh"
@@ -149,7 +148,13 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        host* hst(::find_host(name));
+
+        host* hst(nullptr);
+        umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+          it(configuration::applier::state::instance().hosts().find(get_host_id(name)));
+        if (it != configuration::applier::state::instance().hosts().end())
+          hst = it->second.get();
+
         if (!hst)
           return ;
         (*fptr)(hst);
@@ -164,7 +169,13 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        host* hst(::find_host(name));
+
+        host* hst(nullptr);
+        umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+          it(configuration::applier::state::instance().hosts().find(get_host_id(name)));
+        if (it != configuration::applier::state::instance().hosts().end())
+          hst = it->second.get();
+
         if (!hst)
           return ;
         (*fptr)(hst, args + strlen(name) + 1);
@@ -179,15 +190,22 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        hostgroup* group(::find_hostgroup(group_name));
+
+        hostgroup* group(nullptr);
+        hostgroup_map::const_iterator
+          it(configuration::applier::state::instance().hostgroups().find(group_name));
+        if (it != configuration::applier::state::instance().hostgroups().end())
+          group = it->second.get();
         if (!group)
           return ;
 
-        for (hostsmember* member = group->members;
-             member != NULL;
-             member = member->next)
-          if (member->host_ptr)
-            (*fptr)(member->host_ptr);
+        for (host_map::iterator
+               it(group->members.begin()),
+               end(group->members.begin());
+             it != end;
+             ++it)
+          if (it->second)
+            (*fptr)(it->second.get());
       }
 
       template <void (*fptr)(service*)>
@@ -259,7 +277,12 @@ namespace         modules {
         for (servicesmember* member = group->members;
              member != NULL;
              member = member->next) {
-          host* hst(::find_host(member->host_name));
+          host* hst(nullptr);
+          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+            it(configuration::applier::state::instance().hosts().find(get_host_id(member->host_name)));
+          if (it != configuration::applier::state::instance().hosts().end())
+            hst = it->second.get();
+
           if (!hst || hst == last_host)
             continue ;
           (*fptr)(hst);

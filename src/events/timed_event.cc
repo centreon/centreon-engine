@@ -610,13 +610,18 @@ void compensate_for_system_time_change(
   }
 
   // adjust host timestamps.
-  for (host* hst(host_list); hst; hst = hst->next) {
-    time_t last_host_notif(hst->get_last_host_notification());
-    time_t last_check(hst->get_last_check());
-    time_t next_check(hst->get_next_check());
-    time_t last_state_change(hst->get_last_state_change());
-    time_t last_hard_state_change(hst->get_last_hard_state_change());
-    time_t last_state_history_update(hst->get_last_state_history_update());
+  for (host_map::iterator
+         it(com::centreon::engine::host::hosts.begin()),
+         end(com::centreon::engine::host::hosts.end());
+       it != end;
+       ++it) {
+    time_t last_host_notif(it->second->get_last_host_notification());
+    time_t last_check(it->second->get_last_check());
+    time_t next_check(it->second->get_next_check());
+    time_t last_state_change(it->second->get_last_state_change());
+    time_t last_hard_state_change(it->second->get_last_hard_state_change());
+    time_t last_state_history_update(
+      it->second->get_last_state_history_update());
 
     adjust_timestamp_for_time_change(
       last_time,
@@ -652,27 +657,27 @@ void compensate_for_system_time_change(
       last_time,
       current_time,
       time_difference,
-      &host_other_props[hst->get_name()].initial_notif_time);
+      &host_other_props[it->second->get_name()].initial_notif_time);
     adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      &host_other_props[hst->get_name()].last_acknowledgement);
+      &host_other_props[it->second->get_name()].last_acknowledgement);
 
-    hst->set_last_host_notification(last_host_notif);
-    hst->set_last_check(last_check);
-    hst->set_next_check(next_check);
-    hst->set_last_state_change(last_state_change);
-    hst->set_last_hard_state_change(last_hard_state_change);
-    hst->set_last_state_history_update(last_state_history_update);
+    it->second->set_last_host_notification(last_host_notif);
+    it->second->set_last_check(last_check);
+    it->second->set_next_check(next_check);
+    it->second->set_last_state_change(last_state_change);
+    it->second->set_last_hard_state_change(last_hard_state_change);
+    it->second->set_last_state_history_update(last_state_history_update);
     // recalculate next re-notification time.
-    hst->set_next_host_notification(
+    it->second->set_next_host_notification(
     get_next_host_notification_time(
-        hst,
-        hst->get_last_host_notification()));
+      it->second.get(),
+      it->second->get_last_host_notification()));
 
     // update the status data.
-    update_host_status(hst, false);
+    update_host_status(it->second.get(), false);
   }
 
   // adjust program timestamps.
