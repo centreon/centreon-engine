@@ -104,8 +104,8 @@ host* find_host(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it(state::instance().hosts().find(name));
+  umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+    it(state::instance().hosts().find(get_host_id(name)));
   if (it != state::instance().hosts().end())
     return (it->second.get());
   return (NULL);
@@ -139,13 +139,14 @@ hostgroup* find_hostgroup(char const* name) {
  */
 service* find_service(char const* host_name, char const* svc_desc) {
   if (!host_name || !svc_desc)
-    return (NULL);
+    return NULL;
 
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
-    it(state::instance().services().find(std::make_pair(host_name, svc_desc)));
+  std::pair<unsigned int, unsigned int> id(get_host_and_service_id(host_name, svc_desc));
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
+    it(state::instance().services().find(id));
   if (it != state::instance().services().end())
-    return (&(*it->second));
-  return (NULL);
+    return &(*it->second);
+  return NULL;
 }
 
 /**

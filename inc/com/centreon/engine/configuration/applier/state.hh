@@ -107,13 +107,13 @@ namespace           configuration {
                     contactgroups_find(configuration::contactgroup::key_type const& k) const;
       umap<std::string, shared_ptr<contactgroup_struct> >::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
-      umap<std::string, shared_ptr<host_struct> > const&
+      umap<unsigned int, shared_ptr<host_struct> > const&
                     hosts() const throw ();
-      umap<std::string, shared_ptr<host_struct> >&
+      umap<unsigned int, shared_ptr<host_struct> >&
                     hosts() throw ();
-      umap<std::string, shared_ptr<host_struct> >::const_iterator
+      umap<unsigned int, shared_ptr<host_struct> >::const_iterator
                     hosts_find(configuration::host::key_type const& k) const;
-      umap<std::string, shared_ptr<host_struct> >::iterator
+      umap<unsigned int, shared_ptr<host_struct> >::iterator
                     hosts_find(configuration::host::key_type const& k);
       umultimap<std::string, shared_ptr<hostdependency_struct> > const&
                     hostdependencies() const throw ();
@@ -139,13 +139,13 @@ namespace           configuration {
                     hostgroups_find(configuration::hostgroup::key_type const& k) const;
       umap<std::string, shared_ptr<hostgroup_struct> >::iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k);
-      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
+      umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const&
                     services() const throw ();
-      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >&
+      umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >&
                     services() throw ();
-      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+      umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
                     services_find(configuration::service::key_type const& k) const;
-      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+      umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::iterator
                     services_find(configuration::service::key_type const& k);
       umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> > const&
                     servicedependencies() const throw ();
@@ -229,7 +229,7 @@ namespace           configuration {
                     _contactgroups;
       concurrency::condvar
                     _cv_lock;
-      umap<std::string, shared_ptr<host_struct> >
+      umap<unsigned int, shared_ptr<host_struct> >
                     _hosts;
       umultimap<std::string, shared_ptr<hostdependency_struct> >
                     _hostdependencies;
@@ -241,7 +241,7 @@ namespace           configuration {
                     _lock;
       processing_state
                     _processing_state;
-      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >
+      umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >
                     _services;
       umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >
                     _servicedependencies;

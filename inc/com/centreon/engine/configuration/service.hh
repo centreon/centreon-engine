@@ -46,7 +46,7 @@ namespace                  configuration {
       flapping = (1 << 4),
       downtime = (1 << 5)
     };
-    typedef                std::pair<std::string, std::string>
+    typedef                std::pair<unsigned int, unsigned int>
                            key_type;
 
                            service();
@@ -204,7 +204,6 @@ namespace                  configuration {
     opt<unsigned int>      _high_flap_threshold;
     group<set_string>      _hostgroups;
     group<set_string>      _hosts;
-    unsigned int           _host_id;
     std::string            _icon_image;
     std::string            _icon_image_alt;
     opt<unsigned int>      _initial_state;

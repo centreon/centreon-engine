@@ -12,6 +12,7 @@ define host{
   alias       Linksys SRW224P Switch  ; A longer name associated with the switch.
   address     192.168.1.253           ; IP address of the switch.
   hostgroups  switches                ; Host groups this switch is associated with.
+  _HOST_ID   3
 }
 
 
@@ -34,6 +35,7 @@ define service{
   check_command          check_ping!200.0,20%!600.0,60%  ; The command used to monitor the service.
   normal_check_interval  5                ; Check the service every 5 minutes under normal conditions.
   retry_check_interval   1                ; Re-check the service every minute until its final/hard state is determined.
+  _SERVICE_ID            11
 }
 
 # Monitor uptime via SNMP.
@@ -43,6 +45,7 @@ define service{
   host_name            linksys-srw224p
   service_description  Uptime
   check_command        check_snmp!-C public -o sysUpTime.0
+  _SERVICE_ID          12
 }
 
 # Monitor Port 1 status via SNMP.
@@ -52,6 +55,7 @@ define service{
   host_name            linksys-srw224p
   service_description  Port 1 Link Status
   check_command        check_snmp!-C public -o ifOperStatus.1 -r 1 -m RFC1213-MIB
+  _SERVICE_ID          13
 }
 
 # Monitor bandwidth via MRTG logs.
@@ -61,6 +65,7 @@ define service{
   host_name            linksys-srw224p
   service_description  Port 1 Bandwidth Usage
   check_command        check_local_mrtgtraf!/var/lib/mrtg/192.168.1.253_1.log!AVG!1000000,1000000!5000000,5000000!10
+  _SERVICE_ID          14
 }
 
 

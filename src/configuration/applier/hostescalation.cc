@@ -314,7 +314,7 @@ void applier::hostescalation::_inherits_special_vars(
       || !obj.escalation_period_defined()) {
     // Find host.
     configuration::set_host::const_iterator
-      it(s.hosts_find(*obj.hosts().begin()));
+      it(s.hosts_find(get_host_id(obj.hosts().begin()->c_str())));
     if (it == s.hosts().end())
       throw (engine_error()
              << "Could not inherit special variables from host '"

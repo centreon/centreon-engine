@@ -82,6 +82,7 @@ service::setters const service::_setters[] = {
   { "process_performance_data",             SETTER(int, _set_process_performance_data) },
   { "recovery_been_sent",                   SETTER(bool, _set_recovery_been_sent)},
   { "retry_check_interval",                 SETTER(unsigned int, _set_retry_check_interval) },
+  { "service_id",                           SETTER(unsigned long, _set_service_id) },
   { "service_description",                  SETTER(std::string const&, _set_service_description) },
   { "state_history",                        SETTER(std::string const&, _set_state_history) },
   { "state_type",                           SETTER(int, _set_state_type) }
@@ -171,6 +172,7 @@ service& service::operator=(service const& right) {
     _process_performance_data = right._process_performance_data;
     _recovery_been_sent = right._recovery_been_sent;
     _retry_check_interval = right._retry_check_interval;
+    _service_id = right._service_id;
     _service_description = right._service_description;
     _state_history = right._state_history;
     _state_type = right._state_type;
@@ -241,6 +243,7 @@ bool service::operator==(service const& right) const throw () {
           && _process_performance_data == right._process_performance_data
           && _recovery_been_sent == right._recovery_been_sent
           && _retry_check_interval == right._retry_check_interval
+          && _service_id == right._service_id
           && _service_description == right._service_description
           && _state_history == right._state_history
           && _state_type == right._state_type);
@@ -784,6 +787,15 @@ opt<bool> const& service::recovery_been_sent() const throw () {
  */
 opt<unsigned int> const& service::retry_check_interval() const throw () {
   return (_retry_check_interval);
+}
+
+/**
+ *  Get service_id.
+ *
+ *  @return The service_id.
+ */
+unsigned long service::service_id() const throw () {
+  return (_service_id);
 }
 
 /**
@@ -1353,6 +1365,16 @@ bool service::_set_recovery_been_sent(bool value) {
  */
 bool service::_set_retry_check_interval(unsigned int value) {
   _retry_check_interval = value;
+  return (true);
+}
+
+/**
+ *  Set service_id.
+ *
+ *  @param[in] value The new service_id.
+ */
+bool service::_set_service_id(unsigned long value) {
+  _service_id = value;
   return (true);
 }
 

@@ -124,7 +124,7 @@ static unsigned short const default_stalking_options(host::none);
  *
  *  @param[in] key The object key.
  */
-host::host(key_type const& key)
+host::host(host::key_type const& key)
   : object(object::host),
     _acknowledgement_timeout(0),
     _checks_active(default_checks_active),
@@ -137,8 +137,8 @@ host::host(key_type const& key)
     _flap_detection_options(default_flap_detection_options),
     _freshness_threshold(default_freshness_threshold),
     _high_flap_threshold(default_high_flap_threshold),
-    _host_id(0),
-    _host_name(key),
+    _host_id(key),
+    _host_name(""),
     _initial_state(default_initial_state),
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
@@ -307,9 +307,11 @@ bool host::operator!=(host const& other) const throw () {
  *  @return True if this object is less than right.
  */
 bool host::operator<(host const& other) const throw () {
-  // host_name has to be first in this operator.
+  // host_id has to be first in this operator.
   // The configuration diff mechanism relies on this.
-  if (_host_name != other._host_name)
+  if (_host_id != other._host_id)
+    return (_host_id < other._host_id);
+  else if (_host_name != other._host_name)
     return (_host_name < other._host_name);
   else if (_acknowledgement_timeout != other._acknowledgement_timeout)
     return (_acknowledgement_timeout < other._acknowledgement_timeout);
@@ -359,8 +361,6 @@ bool host::operator<(host const& other) const throw () {
     return (_freshness_threshold < other._freshness_threshold);
   else if (_high_flap_threshold != other._high_flap_threshold)
     return (_high_flap_threshold < other._high_flap_threshold);
-  else if (_host_id != other._host_id)
-    return (_host_id < other._host_id);
   else if (_hostgroups != other._hostgroups)
     return (_hostgroups < other._hostgroups);
   else if (_icon_image != other._icon_image)
@@ -434,7 +434,7 @@ void host::check_validity() const {
  *  @return Host name.
  */
 host::key_type const& host::key() const throw () {
-  return (_host_name);
+  return _host_id;
 }
 
 /**

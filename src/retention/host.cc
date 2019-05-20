@@ -48,6 +48,7 @@ host::setters const host::_setters[] = {
   { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
   { "flap_detection_enabled",               SETTER(bool, _set_flap_detection_enabled) },
   { "has_been_checked",                     SETTER(bool, _set_has_been_checked) },
+  { "host_id",                              SETTER(unsigned long, _set_host_id) },
   { "host_name",                            SETTER(std::string const&, _set_host_name) },
   { "is_flapping",                          SETTER(bool, _set_is_flapping) },
   { "last_acknowledgement",                 SETTER(time_t, _set_last_acknowledgement) },
@@ -134,6 +135,7 @@ host& host::operator=(host const& right) {
     _event_handler_enabled = right._event_handler_enabled;
     _flap_detection_enabled = right._flap_detection_enabled;
     _has_been_checked = right._has_been_checked;
+    _host_id = right._host_id;
     _host_name = right._host_name;
     _is_flapping = right._is_flapping;
     _last_acknowledgement = right._last_acknowledgement;
@@ -201,6 +203,7 @@ bool host::operator==(host const& right) const throw () {
           && _event_handler_enabled == right._event_handler_enabled
           && _flap_detection_enabled == right._flap_detection_enabled
           && _has_been_checked == right._has_been_checked
+          && _host_id == right._host_id
           && _host_name == right._host_name
           && _is_flapping == right._is_flapping
           && _last_acknowledgement == right._last_acknowledgement
@@ -447,6 +450,15 @@ opt<bool> const& host::flap_detection_enabled() const throw () {
  */
 opt<bool> const& host::has_been_checked() const throw () {
   return (_has_been_checked);
+}
+
+/**
+ *  Get host_id.
+ *
+ *  @return The host_id.
+ */
+unsigned long host::host_id() const throw () {
+  return (_host_id);
 }
 
 /**
@@ -952,6 +964,16 @@ bool host::_set_flap_detection_enabled(bool value) {
  */
 bool host::_set_has_been_checked(bool value) {
   _has_been_checked = value;
+  return (true);
+}
+
+/**
+ *  Set host_id.
+ *
+ *  @param[in] value The new host_id.
+ */
+bool host::_set_host_id(unsigned long value) {
+  _host_id = value;
   return (true);
 }
 
