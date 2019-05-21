@@ -208,8 +208,8 @@ int xpddefault_update_service_performance_data(service* svc) {
    */
   memset(&mac, 0, sizeof(mac));
 
-  host* hst(nullptr);
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  host* hst{nullptr};
+  umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(svc->host_name)));
   if (it != state::instance().hosts().end())
     hst = it->second.get();

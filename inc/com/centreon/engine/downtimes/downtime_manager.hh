@@ -35,69 +35,47 @@ class                               downtime_manager {
   std::multimap<time_t, std::shared_ptr<downtime>> const&
                                     get_scheduled_downtimes() const;
 
-  void                              delete_downtime(int type, unsigned long downtime_id);
-  int                               unschedule_downtime(int type, unsigned long downtime_id);
-  std::shared_ptr<downtime>         find_downtime(int type, unsigned long downtime_id);
+  void                              delete_downtime(int type, uint64_t downtime_id);
+  int                               unschedule_downtime(int type, uint64_t downtime_id);
+  std::shared_ptr<downtime>         find_downtime(int type, uint64_t downtime_id);
   int                               check_pending_flex_host_downtime(host* hst);
   int                               check_pending_flex_service_downtime(service* svc);
+  void                              add_downtime(downtime* dt);
   void                              clear_scheduled_downtimes();
   int                               check_for_expired_downtime();
   int                               delete_downtime_by_hostname_service_description_start_time_comment(
                                       std::string const& hostname,
-                                      char const* service_description,
+                                      std::string const& service_description,
                                       time_t start_time,
-                                      char const* comment);
+                                      std::string const& comment);
   void                              insert_downtime(std::shared_ptr<downtime> dt);
-  int                               delete_host_downtime(unsigned long downtime_id);
-  int                               delete_service_downtime(unsigned long downtime_id);
+  int                               delete_host_downtime(uint64_t downtime_id);
+  int                               delete_service_downtime(uint64_t downtime_id);
   void                              initialize_downtime_data();
   int                               xdddefault_validate_downtime_data();
-  unsigned long                     get_next_downtime_id();
-  std::shared_ptr<downtime>         add_host_downtime(
-                                      std::string const& host_name,
+  uint64_t                          get_next_downtime_id();
+  downtime*                         add_new_host_downtime(std::string const& host_name,
                                       time_t             entry_time,
                                       char const*        author,
                                       char const*        comment_data,
                                       time_t             start_time,
                                       time_t             end_time,
                                       bool               fixed,
-                                      unsigned long      triggered_by,
+                                      uint64_t           triggered_by,
                                       unsigned long      duration,
-                                      unsigned long      downtime_id);
-  std::shared_ptr<downtime>         add_new_host_downtime(std::string const& host_name,
-                                      time_t             entry_time,
-                                      char const*        author,
-                                      char const*        comment_data,
-                                      time_t             start_time,
-                                      time_t             end_time,
-                                      bool               fixed,
-                                      unsigned long      triggered_by,
-                                      unsigned long      duration,
-                                      unsigned long*     downtime_id);
-  std::shared_ptr<downtime>         add_service_downtime(
-                                      std::string const& host_name,
-                                      std::string const& svc_description,
-                                      time_t             entry_time,
-                                      char const*        author,
-                                      char const*        comment_data,
-                                      time_t             start_time,
-                                      time_t             end_time,
-                                      bool               fixed,
-                                      unsigned long      triggered_by,
-                                      unsigned long      duration,
-                                      unsigned long      downtime_id);
-  std::shared_ptr<downtime>         add_new_service_downtime(
+                                      uint64_t*          downtime_id);
+  downtime*                         add_new_service_downtime(
                                       std::string const& host_name,
                                       std::string const& service_description,
                                       time_t entry_time,
-                                      char const* author,
-                                      char const* comment_data,
+                                      std::string const& author,
+                                      std::string const& comment_data,
                                       time_t start_time,
                                       time_t end_time,
                                       bool fixed,
-                                      unsigned long triggered_by,
+                                      uint64_t triggered_by,
                                       unsigned long duration,
-                                      unsigned long* downtime_id);
+                                      uint64_t* downtime_id);
   int                               schedule_downtime(
                                       int                type,
                                       std::string const& host_name,
@@ -108,15 +86,16 @@ class                               downtime_manager {
                                       time_t             start_time,
                                       time_t             end_time,
                                       bool               fixed,
-                                      unsigned long      triggered_by,
+                                      uint64_t           triggered_by,
                                       unsigned long      duration,
-                                      unsigned long*     new_downtime_id);
+                                      uint64_t*          new_downtime_id);
+  int                               register_downtime(int type, uint64_t downtime_id);
 
  private:
                                     downtime_manager() = default;
   std::multimap<time_t, std::shared_ptr<downtime>>
                                     _scheduled_downtimes;
-  unsigned long                     _next_id;
+  uint64_t                          _next_id;
 };
 }
 

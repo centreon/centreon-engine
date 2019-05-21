@@ -110,10 +110,10 @@ typedef struct                  service_struct {
   int                           should_be_scheduled;
   time_t                        last_check;
   int                           current_attempt;
-  unsigned long                 current_event_id;
-  unsigned long                 last_event_id;
-  unsigned long                 current_problem_id;
-  unsigned long                 last_problem_id;
+  uint64_t                      current_event_id;
+  uint64_t                      last_event_id;
+  uint64_t                      current_problem_id;
+  uint64_t                      last_problem_id;
   time_t                        last_notification;
   time_t                        next_notification;
   int                           no_more_notifications;
@@ -130,7 +130,7 @@ typedef struct                  service_struct {
   int                           notified_on_warning;
   int                           notified_on_critical;
   int                           current_notification_number;
-  unsigned long                 current_notification_id;
+  uint64_t                      current_notification_id;
   double                        latency;
   double                        execution_time;
   int                           is_executing;
@@ -140,7 +140,7 @@ typedef struct                  service_struct {
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;
   int                           is_flapping;
-  unsigned long                 flapping_comment_id;
+  uint64_t                      flapping_comment_id;
   double                        percent_state_change;
   unsigned long                 modified_attributes;
 
@@ -162,8 +162,8 @@ typedef struct                  service_struct {
 struct                          service_other_properties {
   time_t                        initial_notif_time;
   std::string                   timezone;
-  unsigned int                  host_id;
-  unsigned int                  service_id;
+  uint64_t                      host_id;
+  uint64_t                      service_id;
   int                           acknowledgement_timeout;
   time_t                        last_acknowledgement;
   unsigned int                  recovery_notification_delay;
@@ -175,8 +175,8 @@ extern "C" {
 #  endif /* C++ */
 
 service* add_service(
-           unsigned int host_id,
-           unsigned int service_id,
+           uint64_t host_id,
+           uint64_t service_id,
            char const* host_name,
            char const* description,
            char const* display_name,
@@ -252,16 +252,16 @@ CCE_BEGIN()
 
 void          check_for_expired_acknowledgement(service* s);
 service&      find_service(
-                unsigned int host_id,
-                unsigned int service_id);
+                uint64_t host_id,
+                uint64_t service_id);
 char const*   get_service_timezone(char const* hst, char const* svc);
 bool          is_service_exist(
-                std::pair<unsigned int, unsigned int> const& id);
-std::pair<unsigned int, unsigned int>
+                std::pair<uint64_t, uint64_t> const& id);
+std::pair<uint64_t, uint64_t>
               get_host_and_service_id(
                 char const* host,
                 char const* svc);
-unsigned int  get_service_id(char const* host, char const* svc);
+uint64_t get_service_id(char const* host, char const* svc);
 void          schedule_acknowledgement_expiration(service* s);
 
 CCE_END()

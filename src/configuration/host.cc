@@ -36,8 +36,8 @@ using namespace com::centreon::engine::logging;
 
 host::setters const host::_setters[] = {
   { "host_name",                    SETTER(std::string const&, _set_host_name) },
-  { "host_id",                      SETTER(unsigned int, _set_host_id)},
-  { "_HOST_ID",                     SETTER(unsigned int, _set_host_id)},
+  { "host_id",                      SETTER(uint64_t, _set_host_id)},
+  { "_HOST_ID",                     SETTER(uint64_t, _set_host_id)},
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "alias",                        SETTER(std::string const&, _set_alias) },
   { "acknowledgement_timeout",      SETTER(int, set_acknowledgement_timeout) },
@@ -433,7 +433,7 @@ void host::check_validity() const {
  *
  *  @return Host name.
  */
-host::key_type const& host::key() const throw () {
+host::key_type const host::key() const throw () {
   return _host_id;
 }
 
@@ -779,7 +779,7 @@ set_string const& host::hostgroups() const throw () {
  *
  *  @return  The host id.
  */
-unsigned int host::host_id() const throw() {
+uint64_t host::host_id() const throw() {
   return _host_id;
 }
 
@@ -1368,7 +1368,7 @@ bool host::_set_high_flap_threshold(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_host_id(unsigned int value) {
+bool host::_set_host_id(uint64_t value) {
   _host_id = value;
   return true;
 }

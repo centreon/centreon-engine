@@ -458,7 +458,7 @@ void checker::run(
     retry = false;
     try {
       // Run command.
-      unsigned long id(cmd->run(
+      uint64_t id(cmd->run(
                               processed_cmd,
                               macros,
                               config->host_check_timeout()));
@@ -691,7 +691,7 @@ void checker::run(
     retry = false;
     try {
       // Run command.
-      unsigned long id(cmd->run(
+      uint64_t id(cmd->run(
                               processed_cmd,
                               macros,
                               config->service_check_timeout()));

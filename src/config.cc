@@ -174,7 +174,7 @@ int pre_flight_check() {
        temp_service != nullptr;
        temp_service = temp_service->next) {
 
-    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
     if (it != state::instance().hosts().end() && it->second != nullptr) {
       it->second->set_total_services(it->second->get_total_services() + 1);
@@ -670,7 +670,7 @@ int check_service(service* svc, int* w, int* e) {
   int warnings(0);
 
   /* check for a valid host */
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(svc->host_name)));
 
   /* we couldn't find an associated host! */
@@ -1017,7 +1017,7 @@ int check_host(host* hst, int* w, int* e) {
        it++) {
 
     host* hst2 = nullptr;
-    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first)));
 
     if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
@@ -1236,7 +1236,7 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
        it != end;
        ++it) {
 
-    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first.c_str())));
     if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
       logger(log_verification_error, basic)
@@ -1414,7 +1414,7 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
   int errors(0);
 
   // Find the dependent host.
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(hd->get_dependent_host_name())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
@@ -1580,7 +1580,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   int errors(0);
 
   // Find the host.
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(he->get_host_name())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)

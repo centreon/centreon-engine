@@ -40,8 +40,8 @@ service::setters const service::_setters[] = {
   { "hosts",                        SETTER(std::string const&, _set_hosts) },
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
   { "service_description",          SETTER(std::string const&, _set_service_description) },
-  { "service_id",                   SETTER(unsigned int, _set_service_id) },
-  { "_SERVICE_ID",                  SETTER(unsigned int, _set_service_id) },
+  { "service_id",                   SETTER(unsigned long, _set_service_id) },
+  { "_SERVICE_ID",                  SETTER(unsigned long, _set_service_id) },
   { "acknowledgement_timeout",      SETTER(int, set_acknowledgement_timeout) },
   { "description",                  SETTER(std::string const&, _set_service_description) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
@@ -789,8 +789,8 @@ set_string const& service::hosts() const throw () {
  *
  *  @return Service's host's ID.
  */
-unsigned int service::host_id() const throw () {
-  unsigned int host_id(get_host_id(_hosts->begin()->c_str()));
+unsigned long service::host_id() const throw () {
+  unsigned long host_id(get_host_id(_hosts->begin()->c_str()));
   return host_id;
 }
 
@@ -1035,7 +1035,7 @@ std::string const& service::service_description() const throw () {
  *
  *  @return  The service id.
  */
-unsigned int service::service_id() const throw() {
+unsigned long service::service_id() const throw() {
   return _service_id;
 }
 
@@ -1691,7 +1691,7 @@ bool service::_set_service_description(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool service::_set_service_id(unsigned int value) {
+bool service::_set_service_id(unsigned long value) {
   _service_id = value;
   return true;
 }

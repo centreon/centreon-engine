@@ -68,8 +68,8 @@ static char const* tab_service_state_str[] = {
 int service_notification(
       service* svc,
       unsigned int type,
-      char* not_author,
-      char* not_data,
+      char const* not_author,
+      char const* not_data,
       int options) {
   host* temp_host = nullptr;
   notification* temp_notification = nullptr;
@@ -934,8 +934,8 @@ int notify_contact_of_service(
       contact* cntct,
       service* svc,
       int type,
-      char* not_author,
-      char* not_data,
+      char const* not_author,
+      char const* not_data,
       int options,
       int escalated) {
   char* command_name_ptr(nullptr);
@@ -1429,8 +1429,8 @@ int create_notification_list_from_service(
 int host_notification(
       host* hst,
       unsigned int type,
-      char* not_author,
-      char* not_data,
+      char const* not_author,
+      char const* not_data,
       int options) {
   notification* temp_notification = nullptr;
   contact* temp_contact = nullptr;
@@ -2195,8 +2195,8 @@ int notify_contact_of_host(
       contact* cntct,
       host* hst,
       int type,
-      char* not_author,
-      char* not_data,
+      char const* not_author,
+      char const* not_data,
       int options,
       int escalated) {
   char* command_name = nullptr;

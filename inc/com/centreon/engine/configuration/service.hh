@@ -47,7 +47,7 @@ namespace                  configuration {
       flapping = (1 << 4),
       downtime = (1 << 5)
     };
-    typedef                std::pair<unsigned int, unsigned int>
+    typedef                std::pair<uint64_t, uint64_t>
                            key_type;
 
                            service();
@@ -93,8 +93,8 @@ namespace                  configuration {
     set_string const&      hostgroups() const throw ();
     set_string&            hosts() throw ();
     set_string const&      hosts() const throw ();
-    unsigned int           host_id() const throw ();
-    void                   host_id(unsigned int id);
+    uint64_t               host_id() const throw ();
+    void                   host_id(uint64_t id);
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();
     unsigned int           initial_state() const throw ();
@@ -123,7 +123,7 @@ namespace                  configuration {
     set_string const&      servicegroups() const throw ();
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
-    unsigned int           service_id() const throw();
+    uint64_t               service_id() const throw();
     unsigned short         stalking_options() const throw ();
     void                   timezone(std::string const& time_zone);
     std::string const&     timezone() const throw ();
@@ -179,7 +179,7 @@ namespace                  configuration {
     bool                   _set_recovery_notification_delay(unsigned int value);
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
-    bool                   _set_service_id(unsigned int value);
+    bool                   _set_service_id(uint64_t value);
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_timezone(std::string const& value);
 
@@ -225,7 +225,7 @@ namespace                  configuration {
     opt<unsigned int>      _recovery_notification_delay;
     group<set_string>      _servicegroups;
     std::string            _service_description;
-    unsigned int           _service_id;
+    uint64_t               _service_id;
     static setters const   _setters[];
     opt<unsigned short>    _stalking_options;
     opt<std::string>       _timezone;

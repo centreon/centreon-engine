@@ -38,26 +38,26 @@ host::setters const host::_setters[] = {
   { "check_period",                         SETTER(std::string const&, _set_check_period) },
   { "check_type",                           SETTER(int, _set_check_type) },
   { "current_attempt",                      SETTER(int, _set_current_attempt) },
-  { "current_event_id",                     SETTER(unsigned long, _set_current_event_id) },
-  { "current_notification_id",              SETTER(unsigned long, _set_current_notification_id) },
+  { "current_event_id",                     SETTER(uint64_t, _set_current_event_id) },
+  { "current_notification_id",              SETTER(uint64_t, _set_current_notification_id) },
   { "current_notification_number",          SETTER(int, _set_current_notification_number) },
-  { "current_problem_id",                   SETTER(unsigned long, _set_current_problem_id) },
+  { "current_problem_id",                   SETTER(uint64_t, _set_current_problem_id) },
   { "current_state",                        SETTER(int, _set_current_state) },
   { "event_handler",                        SETTER(std::string const&, _set_event_handler) },
   { "event_handler_enabled",                SETTER(bool, _set_event_handler_enabled) },
   { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
   { "flap_detection_enabled",               SETTER(bool, _set_flap_detection_enabled) },
   { "has_been_checked",                     SETTER(bool, _set_has_been_checked) },
-  { "host_id",                              SETTER(unsigned long, _set_host_id) },
+  { "host_id",                              SETTER(uint64_t, _set_host_id) },
   { "host_name",                            SETTER(std::string const&, _set_host_name) },
   { "is_flapping",                          SETTER(bool, _set_is_flapping) },
   { "last_acknowledgement",                 SETTER(time_t, _set_last_acknowledgement) },
   { "last_check",                           SETTER(time_t, _set_last_check) },
-  { "last_event_id",                        SETTER(unsigned long, _set_last_event_id) },
+  { "last_event_id",                        SETTER(uint64_t, _set_last_event_id) },
   { "last_hard_state",                      SETTER(time_t, _set_last_hard_state) },
   { "last_hard_state_change",               SETTER(time_t, _set_last_hard_state_change) },
   { "last_notification",                    SETTER(time_t, _set_last_notification) },
-  { "last_problem_id",                      SETTER(unsigned long, _set_last_problem_id) },
+  { "last_problem_id",                      SETTER(uint64_t, _set_last_problem_id) },
   { "last_state",                           SETTER(time_t, _set_last_state) },
   { "last_state_change",                    SETTER(time_t, _set_last_state_change) },
   { "last_time_down",                       SETTER(time_t, _set_last_time_down) },
@@ -171,7 +171,7 @@ host& host::operator=(host const& right) {
     _state_history = right._state_history;
     _state_type = right._state_type;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -248,7 +248,7 @@ bool host::operator==(host const& right) const throw () {
  *  @return True if is not the same object, otherwise false.
  */
 bool host::operator!=(host const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -264,7 +264,7 @@ bool host::set(char const* key, char const* value) {
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
     if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
+      return (_setters[i].func)(*this, value);
   if ((key[0] == '_') && (strlen(value) > 3)) {
     _customvariables.insert(std::make_pair(key + 1, customvariable(key + 1, value + 2)));
     return true;
@@ -278,7 +278,7 @@ bool host::set(char const* key, char const* value) {
  *  @return The acknowledgement_type.
  */
 opt<int> const& host::acknowledgement_type() const throw () {
-  return (_acknowledgement_type);
+  return _acknowledgement_type;
 }
 
 /**
@@ -287,7 +287,7 @@ opt<int> const& host::acknowledgement_type() const throw () {
  *  @return The active_checks_enabled.
  */
 opt<bool> const& host::active_checks_enabled() const throw () {
-  return (_active_checks_enabled);
+  return _active_checks_enabled;
 }
 
 /**
@@ -296,7 +296,7 @@ opt<bool> const& host::active_checks_enabled() const throw () {
  *  @return The check_command.
  */
 opt<std::string> const& host::check_command() const throw () {
-  return (_check_command);
+  return _check_command;
 }
 
 /**
@@ -305,7 +305,7 @@ opt<std::string> const& host::check_command() const throw () {
  *  @return The check_execution_time.
  */
 opt<double> const& host::check_execution_time() const throw () {
-  return (_check_execution_time);
+  return _check_execution_time;
 }
 
 /**
@@ -314,7 +314,7 @@ opt<double> const& host::check_execution_time() const throw () {
  *  @return The check_flapping_recovery_notification.
  */
 opt<int> const& host::check_flapping_recovery_notification() const throw () {
-  return (_check_flapping_recovery_notification);
+  return _check_flapping_recovery_notification;
 }
 
 /**
@@ -323,7 +323,7 @@ opt<int> const& host::check_flapping_recovery_notification() const throw () {
  *  @return The check_latency.
  */
 opt<double> const& host::check_latency() const throw () {
-  return (_check_latency);
+  return _check_latency;
 }
 
 /**
@@ -332,7 +332,7 @@ opt<double> const& host::check_latency() const throw () {
  *  @return The check_options.
  */
 opt<int> const& host::check_options() const throw () {
-  return (_check_options);
+  return _check_options;
 }
 
 /**
@@ -341,7 +341,7 @@ opt<int> const& host::check_options() const throw () {
  *  @return The check_period.
  */
 opt<std::string> const& host::check_period() const throw () {
-  return (_check_period);
+  return _check_period;
 }
 
 /**
@@ -350,7 +350,7 @@ opt<std::string> const& host::check_period() const throw () {
  *  @return The check_type.
  */
 opt<int> const& host::check_type() const throw () {
-  return (_check_type);
+  return _check_type;
 }
 
 /**
@@ -359,7 +359,7 @@ opt<int> const& host::check_type() const throw () {
  *  @return The current_attempt.
  */
 opt<int> const& host::current_attempt() const throw () {
-  return (_current_attempt);
+  return _current_attempt;
 }
 
 /**
@@ -367,8 +367,8 @@ opt<int> const& host::current_attempt() const throw () {
  *
  *  @return The current_event_id.
  */
-opt<unsigned long> const& host::current_event_id() const throw () {
-  return (_current_event_id);
+opt<uint64_t> const& host::current_event_id() const throw () {
+  return _current_event_id;
 }
 
 /**
@@ -376,8 +376,8 @@ opt<unsigned long> const& host::current_event_id() const throw () {
  *
  *  @return The current_notification_id.
  */
-opt<unsigned long> const& host::current_notification_id() const throw () {
-  return (_current_notification_id);
+opt<uint64_t> const& host::current_notification_id() const throw () {
+  return _current_notification_id;
 }
 
 /**
@@ -386,7 +386,7 @@ opt<unsigned long> const& host::current_notification_id() const throw () {
  *  @return The current_notification_number.
  */
 opt<int> const& host::current_notification_number() const throw () {
-  return (_current_notification_number);
+  return _current_notification_number;
 }
 
 /**
@@ -394,8 +394,8 @@ opt<int> const& host::current_notification_number() const throw () {
  *
  *  @return The current_problem_id.
  */
-opt<unsigned long> const& host::current_problem_id() const throw () {
-  return (_current_problem_id);
+opt<uint64_t> const& host::current_problem_id() const throw () {
+  return _current_problem_id;
 }
 
 /**
@@ -404,7 +404,7 @@ opt<unsigned long> const& host::current_problem_id() const throw () {
  *  @return The current_state.
  */
 opt<int> const& host::current_state() const throw () {
-  return (_current_state);
+  return _current_state;
 }
 
 /**
@@ -413,7 +413,7 @@ opt<int> const& host::current_state() const throw () {
  *  @return The customvariables.
  */
 map_customvar const& host::customvariables() const throw () {
-  return (_customvariables);
+  return _customvariables;
 }
 
 /**
@@ -422,7 +422,7 @@ map_customvar const& host::customvariables() const throw () {
  *  @return The event_handler.
  */
 opt<std::string> const& host::event_handler() const throw () {
-  return (_event_handler);
+  return _event_handler;
 }
 
 /**
@@ -431,7 +431,7 @@ opt<std::string> const& host::event_handler() const throw () {
  *  @return The event_handler_enabled.
  */
 opt<bool> const& host::event_handler_enabled() const throw () {
-  return (_event_handler_enabled);
+  return _event_handler_enabled;
 }
 
 /**
@@ -440,7 +440,7 @@ opt<bool> const& host::event_handler_enabled() const throw () {
  *  @return The flap_detection_enabled.
  */
 opt<bool> const& host::flap_detection_enabled() const throw () {
-  return (_flap_detection_enabled);
+  return _flap_detection_enabled;
 }
 
 /**
@@ -449,7 +449,7 @@ opt<bool> const& host::flap_detection_enabled() const throw () {
  *  @return The has_been_checked.
  */
 opt<bool> const& host::has_been_checked() const throw () {
-  return (_has_been_checked);
+  return _has_been_checked;
 }
 
 /**
@@ -457,8 +457,8 @@ opt<bool> const& host::has_been_checked() const throw () {
  *
  *  @return The host_id.
  */
-unsigned long host::host_id() const throw () {
-  return (_host_id);
+uint64_t host::host_id() const throw () {
+  return _host_id;
 }
 
 /**
@@ -467,7 +467,7 @@ unsigned long host::host_id() const throw () {
  *  @return The host_name.
  */
 std::string const& host::host_name() const throw () {
-  return (_host_name);
+  return _host_name;
 }
 
 /**
@@ -476,7 +476,7 @@ std::string const& host::host_name() const throw () {
  *  @return The is_flapping.
  */
 opt<bool> const& host::is_flapping() const throw () {
-  return (_is_flapping);
+  return _is_flapping;
 }
 
 /**
@@ -485,7 +485,7 @@ opt<bool> const& host::is_flapping() const throw () {
  *  @return The last acknowledgement.
  */
 opt<time_t> const& host::last_acknowledgement() const throw () {
-  return (_last_acknowledgement);
+  return _last_acknowledgement;
 }
 
 /**
@@ -494,7 +494,7 @@ opt<time_t> const& host::last_acknowledgement() const throw () {
  *  @return The last_check.
  */
 opt<time_t> const& host::last_check() const throw () {
-  return (_last_check);
+  return _last_check;
 }
 
 /**
@@ -502,8 +502,8 @@ opt<time_t> const& host::last_check() const throw () {
  *
  *  @return The last_event_id.
  */
-opt<unsigned long> const& host::last_event_id() const throw () {
-  return (_last_event_id);
+opt<uint64_t> const& host::last_event_id() const throw () {
+  return _last_event_id;
 }
 
 /**
@@ -512,7 +512,7 @@ opt<unsigned long> const& host::last_event_id() const throw () {
  *  @return The last_hard_state.
  */
 opt<time_t> const& host::last_hard_state() const throw () {
-  return (_last_hard_state);
+  return _last_hard_state;
 }
 
 /**
@@ -521,7 +521,7 @@ opt<time_t> const& host::last_hard_state() const throw () {
  *  @return The last_hard_state_change.
  */
 opt<time_t> const& host::last_hard_state_change() const throw () {
-  return (_last_hard_state_change);
+  return _last_hard_state_change;
 }
 
 /**
@@ -530,7 +530,7 @@ opt<time_t> const& host::last_hard_state_change() const throw () {
  *  @return The last_notification.
  */
 opt<time_t> const& host::last_notification() const throw () {
-  return (_last_notification);
+  return _last_notification;
 }
 
 /**
@@ -538,8 +538,8 @@ opt<time_t> const& host::last_notification() const throw () {
  *
  *  @return The last_problem_id.
  */
-opt<unsigned long> const& host::last_problem_id() const throw () {
-  return (_last_problem_id);
+opt<uint64_t> const& host::last_problem_id() const throw () {
+  return _last_problem_id;
 }
 
 /**
@@ -548,7 +548,7 @@ opt<unsigned long> const& host::last_problem_id() const throw () {
  *  @return The last_state.
  */
 opt<time_t> const& host::last_state() const throw () {
-  return (_last_state);
+  return _last_state;
 }
 
 /**
@@ -557,7 +557,7 @@ opt<time_t> const& host::last_state() const throw () {
  *  @return The last_state_change.
  */
 opt<time_t> const& host::last_state_change() const throw () {
-  return (_last_state_change);
+  return _last_state_change;
 }
 
 /**
@@ -566,7 +566,7 @@ opt<time_t> const& host::last_state_change() const throw () {
  *  @return The last_time_down.
  */
 opt<time_t> const& host::last_time_down() const throw () {
-  return (_last_time_down);
+  return _last_time_down;
 }
 
 /**
@@ -575,7 +575,7 @@ opt<time_t> const& host::last_time_down() const throw () {
  *  @return The last_time_unreachable.
  */
 opt<time_t> const& host::last_time_unreachable() const throw () {
-  return (_last_time_unreachable);
+  return _last_time_unreachable;
 }
 
 /**
@@ -584,7 +584,7 @@ opt<time_t> const& host::last_time_unreachable() const throw () {
  *  @return The last_time_up.
  */
 opt<time_t> const& host::last_time_up() const throw () {
-  return (_last_time_up);
+  return _last_time_up;
 }
 
 /**
@@ -593,7 +593,7 @@ opt<time_t> const& host::last_time_up() const throw () {
  *  @return The long_plugin_output.
  */
 opt<std::string> const& host::long_plugin_output() const throw () {
-  return (_long_plugin_output);
+  return _long_plugin_output;
 }
 
 /**
@@ -602,7 +602,7 @@ opt<std::string> const& host::long_plugin_output() const throw () {
  *  @return The max_attempts.
  */
 opt<unsigned int> const& host::max_attempts() const throw () {
-  return (_max_attempts);
+  return _max_attempts;
 }
 
 /**
@@ -611,7 +611,7 @@ opt<unsigned int> const& host::max_attempts() const throw () {
  *  @return The modified_attributes.
  */
 opt<unsigned long> const& host::modified_attributes() const throw () {
-  return (_modified_attributes);
+  return _modified_attributes;
 }
 
 /**
@@ -620,7 +620,7 @@ opt<unsigned long> const& host::modified_attributes() const throw () {
  *  @return The next_check.
  */
 opt<time_t> const& host::next_check() const throw () {
-  return (_next_check);
+  return _next_check;
 }
 
 /**
@@ -629,7 +629,7 @@ opt<time_t> const& host::next_check() const throw () {
  *  @return The normal_check_interval.
  */
 opt<unsigned int> const& host::normal_check_interval() const throw () {
-  return (_normal_check_interval);
+  return _normal_check_interval;
 }
 
 /**
@@ -638,7 +638,7 @@ opt<unsigned int> const& host::normal_check_interval() const throw () {
  *  @return The notification_period.
  */
 opt<std::string> const& host::notification_period() const throw () {
-  return (_notification_period);
+  return _notification_period;
 }
 
 /**
@@ -647,7 +647,7 @@ opt<std::string> const& host::notification_period() const throw () {
  *  @return The notifications_enabled.
  */
 opt<bool> const& host::notifications_enabled() const throw () {
-  return (_notifications_enabled);
+  return _notifications_enabled;
 }
 
 /**
@@ -656,7 +656,7 @@ opt<bool> const& host::notifications_enabled() const throw () {
  *  @return The notified_on_down.
  */
 opt<bool> const& host::notified_on_down() const throw () {
-  return (_notified_on_down);
+  return _notified_on_down;
 }
 
 /**
@@ -665,7 +665,7 @@ opt<bool> const& host::notified_on_down() const throw () {
  *  @return The notified_on_unreachable.
  */
 opt<bool> const& host::notified_on_unreachable() const throw () {
-  return (_notified_on_unreachable);
+  return _notified_on_unreachable;
 }
 
 /**
@@ -674,7 +674,7 @@ opt<bool> const& host::notified_on_unreachable() const throw () {
  *  @return The obsess_over_host.
  */
 opt<int> const& host::obsess_over_host() const throw () {
-  return (_obsess_over_host);
+  return _obsess_over_host;
 }
 
 /**
@@ -683,7 +683,7 @@ opt<int> const& host::obsess_over_host() const throw () {
  *  @return The passive_checks_enabled.
  */
 opt<bool> const& host::passive_checks_enabled() const throw () {
-  return (_passive_checks_enabled);
+  return _passive_checks_enabled;
 }
 
 /**
@@ -692,7 +692,7 @@ opt<bool> const& host::passive_checks_enabled() const throw () {
  *  @return The percent_state_change.
  */
 opt<double> const& host::percent_state_change() const throw () {
-  return (_percent_state_change);
+  return _percent_state_change;
 }
 
 /**
@@ -701,7 +701,7 @@ opt<double> const& host::percent_state_change() const throw () {
  *  @return The performance_data.
  */
 opt<std::string> const& host::performance_data() const throw () {
-  return (_performance_data);
+  return _performance_data;
 }
 
 /**
@@ -710,7 +710,7 @@ opt<std::string> const& host::performance_data() const throw () {
  *  @return The plugin_output.
  */
 opt<std::string> const& host::plugin_output() const throw () {
-  return (_plugin_output);
+  return _plugin_output;
 }
 
 /**
@@ -719,7 +719,7 @@ opt<std::string> const& host::plugin_output() const throw () {
  *  @return The problem_has_been_acknowledged.
  */
 opt<bool> const& host::problem_has_been_acknowledged() const throw () {
-  return (_problem_has_been_acknowledged);
+  return _problem_has_been_acknowledged;
 }
 
 /**
@@ -728,7 +728,7 @@ opt<bool> const& host::problem_has_been_acknowledged() const throw () {
  *  @return The process_performance_data.
  */
 opt<int> const& host::process_performance_data() const throw () {
-  return (_process_performance_data);
+  return _process_performance_data;
 }
 
 /**
@@ -737,7 +737,7 @@ opt<int> const& host::process_performance_data() const throw () {
  *  @return The recovery_been_sent.
  */
 opt<bool> const& host::recovery_been_sent() const throw () {
-  return (_recovery_been_sent);
+  return _recovery_been_sent;
 }
 
 /**
@@ -746,7 +746,7 @@ opt<bool> const& host::recovery_been_sent() const throw () {
  *  @return The retry_check_interval.
  */
 opt<unsigned int> const& host::retry_check_interval() const throw () {
-  return (_retry_check_interval);
+  return _retry_check_interval;
 }
 
 /**
@@ -755,7 +755,7 @@ opt<unsigned int> const& host::retry_check_interval() const throw () {
  *  @return The state_history.
  */
 opt<std::vector<int> > const& host::state_history() const throw () {
-  return (_state_history);
+  return _state_history;
 }
 
 /**
@@ -764,7 +764,7 @@ opt<std::vector<int> > const& host::state_history() const throw () {
  *  @return The state_type.
  */
 opt<int> const& host::state_type() const throw () {
-  return (_state_type);
+  return _state_type;
 }
 
 /**
@@ -774,7 +774,7 @@ opt<int> const& host::state_type() const throw () {
  */
 bool host::_set_acknowledgement_type(int value) {
   _acknowledgement_type = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -784,7 +784,7 @@ bool host::_set_acknowledgement_type(int value) {
  */
 bool host::_set_active_checks_enabled(bool value) {
   _active_checks_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -794,7 +794,7 @@ bool host::_set_active_checks_enabled(bool value) {
  */
 bool host::_set_check_command(std::string const& value) {
   _check_command = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -804,7 +804,7 @@ bool host::_set_check_command(std::string const& value) {
  */
 bool host::_set_check_execution_time(double value) {
   _check_execution_time = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -814,7 +814,7 @@ bool host::_set_check_execution_time(double value) {
  */
 bool host::_set_check_flapping_recovery_notification(int value) {
   _check_flapping_recovery_notification = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -824,7 +824,7 @@ bool host::_set_check_flapping_recovery_notification(int value) {
  */
 bool host::_set_check_latency(double value) {
   _check_latency = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -834,7 +834,7 @@ bool host::_set_check_latency(double value) {
  */
 bool host::_set_check_options(int value) {
   _check_options = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -844,7 +844,7 @@ bool host::_set_check_options(int value) {
  */
 bool host::_set_check_period(std::string const& value) {
   _check_period = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -854,7 +854,7 @@ bool host::_set_check_period(std::string const& value) {
  */
 bool host::_set_check_type(int value) {
   _check_type = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -864,7 +864,7 @@ bool host::_set_check_type(int value) {
  */
 bool host::_set_current_attempt(int value) {
   _current_attempt = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -872,9 +872,9 @@ bool host::_set_current_attempt(int value) {
  *
  *  @param[in] value The new current_event_id.
  */
-bool host::_set_current_event_id(unsigned long value) {
+bool host::_set_current_event_id(uint64_t value) {
   _current_event_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -882,9 +882,9 @@ bool host::_set_current_event_id(unsigned long value) {
  *
  *  @param[in] value The new current_notification_id.
  */
-bool host::_set_current_notification_id(unsigned long value) {
+bool host::_set_current_notification_id(uint64_t value) {
   _current_notification_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -894,7 +894,7 @@ bool host::_set_current_notification_id(unsigned long value) {
  */
 bool host::_set_current_notification_number(int value) {
   _current_notification_number = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -902,9 +902,9 @@ bool host::_set_current_notification_number(int value) {
  *
  *  @param[in] value The new current_problem_id.
  */
-bool host::_set_current_problem_id(unsigned long value) {
+bool host::_set_current_problem_id(uint64_t value) {
   _current_problem_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -914,7 +914,7 @@ bool host::_set_current_problem_id(unsigned long value) {
  */
 bool host::_set_current_state(int value) {
   _current_state = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -924,7 +924,7 @@ bool host::_set_current_state(int value) {
  */
 bool host::_set_event_handler(std::string const& value) {
   _event_handler = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -934,7 +934,7 @@ bool host::_set_event_handler(std::string const& value) {
  */
 bool host::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -944,7 +944,7 @@ bool host::_set_event_handler_enabled(bool value) {
  */
 bool host::_set_failure_prediction_enabled(bool value) {
   (void)value;
-  return (true);
+  return true;
 }
 
 /**
@@ -954,7 +954,7 @@ bool host::_set_failure_prediction_enabled(bool value) {
  */
 bool host::_set_flap_detection_enabled(bool value) {
   _flap_detection_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -964,7 +964,7 @@ bool host::_set_flap_detection_enabled(bool value) {
  */
 bool host::_set_has_been_checked(bool value) {
   _has_been_checked = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -972,9 +972,9 @@ bool host::_set_has_been_checked(bool value) {
  *
  *  @param[in] value The new host_id.
  */
-bool host::_set_host_id(unsigned long value) {
+bool host::_set_host_id(uint64_t value) {
   _host_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -984,7 +984,7 @@ bool host::_set_host_id(unsigned long value) {
  */
 bool host::_set_host_name(std::string const& value) {
   _host_name = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -994,7 +994,7 @@ bool host::_set_host_name(std::string const& value) {
  */
 bool host::_set_is_flapping(bool value) {
   _is_flapping = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1004,7 +1004,7 @@ bool host::_set_is_flapping(bool value) {
  */
 bool host::_set_last_acknowledgement(time_t value) {
   _last_acknowledgement = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1014,7 +1014,7 @@ bool host::_set_last_acknowledgement(time_t value) {
  */
 bool host::_set_last_check(time_t value) {
   _last_check = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1022,9 +1022,9 @@ bool host::_set_last_check(time_t value) {
  *
  *  @param[in] value The new last_event_id.
  */
-bool host::_set_last_event_id(unsigned long value) {
+bool host::_set_last_event_id(uint64_t value) {
   _last_event_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1034,7 +1034,7 @@ bool host::_set_last_event_id(unsigned long value) {
  */
 bool host::_set_last_hard_state(time_t value) {
   _last_hard_state = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1044,7 +1044,7 @@ bool host::_set_last_hard_state(time_t value) {
  */
 bool host::_set_last_hard_state_change(time_t value) {
   _last_hard_state_change = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1054,7 +1054,7 @@ bool host::_set_last_hard_state_change(time_t value) {
  */
 bool host::_set_last_notification(time_t value) {
   _last_notification = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1062,9 +1062,9 @@ bool host::_set_last_notification(time_t value) {
  *
  *  @param[in] value The new last_problem_id.
  */
-bool host::_set_last_problem_id(unsigned long value) {
+bool host::_set_last_problem_id(uint64_t value) {
   _last_problem_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1074,7 +1074,7 @@ bool host::_set_last_problem_id(unsigned long value) {
  */
 bool host::_set_last_state(time_t value) {
   _last_state = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1084,7 +1084,7 @@ bool host::_set_last_state(time_t value) {
  */
 bool host::_set_last_state_change(time_t value) {
   _last_state_change = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1094,7 +1094,7 @@ bool host::_set_last_state_change(time_t value) {
  */
 bool host::_set_last_time_down(time_t value) {
   _last_time_down = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1104,7 +1104,7 @@ bool host::_set_last_time_down(time_t value) {
  */
 bool host::_set_last_time_unreachable(time_t value) {
   _last_time_unreachable = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1114,7 +1114,7 @@ bool host::_set_last_time_unreachable(time_t value) {
  */
 bool host::_set_last_time_up(time_t value) {
   _last_time_up = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1124,7 +1124,7 @@ bool host::_set_last_time_up(time_t value) {
  */
 bool host::_set_long_plugin_output(std::string const& value) {
   _long_plugin_output = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1135,9 +1135,9 @@ bool host::_set_long_plugin_output(std::string const& value) {
 bool host::_set_max_attempts(unsigned int value) {
   if (value) {
     _max_attempts = value;
-    return (true);
+    return true;
   }
-  return (false);
+  return false;
 }
 
 /**
@@ -1147,7 +1147,7 @@ bool host::_set_max_attempts(unsigned int value) {
  */
 bool host::_set_modified_attributes(unsigned long value) {
   _modified_attributes = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1157,7 +1157,7 @@ bool host::_set_modified_attributes(unsigned long value) {
  */
 bool host::_set_next_check(time_t value) {
   _next_check = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1167,7 +1167,7 @@ bool host::_set_next_check(time_t value) {
  */
 bool host::_set_normal_check_interval(unsigned int value) {
   _normal_check_interval = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1177,7 +1177,7 @@ bool host::_set_normal_check_interval(unsigned int value) {
  */
 bool host::_set_notification_period(std::string const& value) {
   _notification_period = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1187,7 +1187,7 @@ bool host::_set_notification_period(std::string const& value) {
  */
 bool host::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1197,7 +1197,7 @@ bool host::_set_notifications_enabled(bool value) {
  */
 bool host::_set_notified_on_down(bool value) {
   _notified_on_down = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1207,7 +1207,7 @@ bool host::_set_notified_on_down(bool value) {
  */
 bool host::_set_notified_on_unreachable(bool value) {
   _notified_on_unreachable = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1217,7 +1217,7 @@ bool host::_set_notified_on_unreachable(bool value) {
  */
 bool host::_set_obsess_over_host(int value) {
   _obsess_over_host = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1227,7 +1227,7 @@ bool host::_set_obsess_over_host(int value) {
  */
 bool host::_set_passive_checks_enabled(bool value) {
   _passive_checks_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1237,7 +1237,7 @@ bool host::_set_passive_checks_enabled(bool value) {
  */
 bool host::_set_percent_state_change(double value) {
   _percent_state_change = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1247,7 +1247,7 @@ bool host::_set_percent_state_change(double value) {
  */
 bool host::_set_performance_data(std::string const& value) {
   _performance_data = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1257,7 +1257,7 @@ bool host::_set_performance_data(std::string const& value) {
  */
 bool host::_set_plugin_output(std::string const& value) {
   _plugin_output = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1267,7 +1267,7 @@ bool host::_set_plugin_output(std::string const& value) {
  */
 bool host::_set_problem_has_been_acknowledged(bool value) {
   _problem_has_been_acknowledged = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1277,7 +1277,7 @@ bool host::_set_problem_has_been_acknowledged(bool value) {
  */
 bool host::_set_process_performance_data(int value) {
   _process_performance_data = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1287,7 +1287,7 @@ bool host::_set_process_performance_data(int value) {
  */
 bool host::_set_recovery_been_sent(bool value) {
   _recovery_been_sent = value;
-  return (true);
+  return true;
 }
 
 
@@ -1298,7 +1298,7 @@ bool host::_set_recovery_been_sent(bool value) {
  */
 bool host::_set_retry_check_interval(unsigned int value) {
   _retry_check_interval = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -1318,12 +1318,12 @@ bool host::_set_state_history(std::string const& value) {
     int state(0);
     if (!string::to(it->c_str(), state)) {
       _state_history.reset();
-      return (false);
+      return false;
     }
     state_history.push_back(state);
   }
   _state_history.set(state_history);
-  return (true);
+  return true;
 }
 
 /**
@@ -1333,5 +1333,5 @@ bool host::_set_state_history(std::string const& value) {
  */
 bool host::_set_state_type(int value) {
   _state_type = value;
-  return (true);
+  return true;
 }

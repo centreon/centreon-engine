@@ -528,8 +528,8 @@ int broker_contact_notification_data(
       struct timeval end_time,
       void* data,
       contact* cntct,
-      char* ack_author,
-      char* ack_data,
+      char const* ack_author,
+      char const* ack_data,
       int escalated,
       struct timeval const* timestamp) {
   // Config check.
@@ -565,8 +565,8 @@ int broker_contact_notification_data(
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
-  ds.ack_author = ack_author;
-  ds.ack_data = ack_data;
+  ds.ack_author = const_cast<char*>(ack_author);
+  ds.ack_data = const_cast<char*>(ack_data);
   ds.escalated = escalated;
 
   // Make callbacks.
@@ -606,8 +606,8 @@ int broker_contact_notification_method_data(
       void* data,
       contact* cntct,
       char const* cmd,
-      char* ack_author,
-      char* ack_data,
+      char const* ack_author,
+      char const* ack_data,
       int escalated,
       struct timeval const* timestamp) {
   // Config check.
@@ -655,8 +655,8 @@ int broker_contact_notification_method_data(
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
-  ds.ack_author = ack_author;
-  ds.ack_data = ack_data;
+  ds.ack_author = const_cast<char*>(ack_author);
+  ds.ack_data = const_cast<char*>(ack_data);
   ds.escalated = escalated;
 
   // Make callbacks.
@@ -1315,8 +1315,8 @@ int broker_notification_data(
       struct timeval start_time,
       struct timeval end_time,
       void* data,
-      char* ack_author,
-      char* ack_data,
+      char const* ack_author,
+      char const* ack_data,
       int escalated,
       int contacts_notified,
       struct timeval const* timestamp) {
@@ -1351,8 +1351,8 @@ int broker_notification_data(
     ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
-  ds.ack_author = ack_author;
-  ds.ack_data = ack_data;
+  ds.ack_author = const_cast<char*>(ack_author);
+  ds.ack_data = const_cast<char*>(ack_data);
   ds.escalated = escalated;
   ds.contacts_notified = contacts_notified;
 

@@ -114,7 +114,7 @@ host_map com::centreon::engine::host::hosts;
  *  @param[in] obsess_over_host              Should we obsess over this
  *                                           host ?
  */
-host::host(unsigned int host_id,
+host::host(uint64_t host_id,
            std::string const& name,
            std::string const& display_name,
            std::string const& alias,
@@ -218,7 +218,7 @@ host::host(unsigned int host_id,
   }
 
   // Check if the host already exists.
-  unsigned int id(host_id);
+  uint64_t id{host_id};
   if (is_host_exist(id)) {
     logger(log_config_error, basic)
       << "Error: Host '" << name << "' has already been defined";
@@ -472,8 +472,9 @@ std::string const& host::get_notification_period() const {
   return _notification_period;
 }
 
-void  host::set_notification_period(std::string const &notification_period) {
-  _notification_period = _notification_period;
+void  host::set_notification_period(std::string const& notification_period)
+{
+  _notification_period = notification_period;
 }
 
 std::string const& host::get_check_period() const {
@@ -1755,19 +1756,19 @@ void engine::check_for_expired_acknowledgement(com::centreon::engine::host* h) {
 }
 
 /**
- *  Get host by name.
+ *  Get host by id.
  *
- *  @param[in] name The host name.
+ *  @param[in] host_id The host id.
  *
  *  @return The struct host or throw exception if the
  *          host is not found.
  */
-host& engine::find_host(unsigned int host_id) {
-  umap<unsigned int,
+host& engine::find_host(uint64_t host_id) {
+  umap<unsigned long,
        std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(host_id));
+    it{state::instance().hosts().find(host_id)};
   if (it == state::instance().hosts().end())
-    throw (engine_error() << "Host '" << host_id << "' was not found");
+    throw engine_error() << "Host '" << host_id << "' was not found";
   return *it->second;
 }
 
@@ -1790,8 +1791,8 @@ char const* engine::get_host_timezone(std::string const& name) {
  *
  *  @return True if the host is found, otherwise false.
  */
-bool engine::is_host_exist(unsigned int host_id) throw () {
-  umap<unsigned int,
+bool engine::is_host_exist(uint64_t host_id) throw () {
+  umap<unsigned long,
        std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(host_id));
   return it != state::instance().hosts().end();
@@ -1804,7 +1805,7 @@ bool engine::is_host_exist(unsigned int host_id) throw () {
  *
  *  @return  The host id or 0.
  */
-unsigned int engine::get_host_id(std::string const& name) {
+uint64_t engine::get_host_id(std::string const& name) {
   std::map<std::string, host_other_properties>::const_iterator
     found = host_other_props.find(name);
   return found != host_other_props.end() ? found->second.host_id : 0;

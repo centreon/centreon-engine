@@ -440,7 +440,7 @@ contactgroup_map::iterator applier::state::contactgroups_find(configuration::con
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
+std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
   return _hosts;
 }
 
@@ -449,7 +449,7 @@ std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>> c
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
+std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
   return _hosts;
 }
 
@@ -461,7 +461,7 @@ std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>& 
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
+std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
   return _hosts.find(k);
 }
 
@@ -473,7 +473,7 @@ std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
+std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
   return _hosts.find(k);
 }
 
@@ -699,7 +699,7 @@ hostgroup_map::iterator applier::state::hostgroups_find(
  *
  *  @return The current services.
  */
-std::unordered_map<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned long, unsigned long>,
      std::shared_ptr<service_struct> > const& applier::state::services() const throw () {
   return _services;
 }
@@ -709,7 +709,7 @@ std::unordered_map<std::pair<unsigned int, unsigned int>,
  *
  *  @return The current services.
  */
-std::unordered_map<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned long, unsigned long>,
      std::shared_ptr<service_struct> >& applier::state::services() throw () {
   return _services;
 }
@@ -722,7 +722,7 @@ std::unordered_map<std::pair<unsigned int, unsigned int>,
  *  @return Iterator to the element if found, services().end()
  *          otherwise.
  */
-std::unordered_map<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned long, unsigned long>,
      std::shared_ptr<service_struct> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
   return _services.find(k);
 }
@@ -735,7 +735,7 @@ std::unordered_map<std::pair<unsigned int, unsigned int>,
  *  @return Iterator to the element if found, services().end()
  *          otherwise.
  */
-std::unordered_map<std::pair<unsigned int, unsigned int>,
+std::unordered_map<std::pair<unsigned long, unsigned long>,
      std::shared_ptr<service_struct> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
   return _services.find(k);
 }
@@ -1784,7 +1784,7 @@ void applier::state::_processing(
              end(diff_hosts.added().end());
            it != end;
            ++it) {
-        std::unordered_map<unsigned int,
+        std::unordered_map<unsigned long,
                            std::shared_ptr<com::centreon::engine::host>>::const_iterator
           hst(hosts().find(it->host_id()));
         if (hst != hosts().end())
@@ -1795,7 +1795,7 @@ void applier::state::_processing(
              end(diff_services.added().end());
            it != end;
            ++it) {
-        std::unordered_map<std::pair<unsigned int, unsigned int>,
+        std::unordered_map<std::pair<unsigned long, unsigned long>,
              std::shared_ptr<service_struct> >::const_iterator
           svc(services().find(std::make_pair(
                                      it->host_id(),
