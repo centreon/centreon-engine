@@ -51,18 +51,19 @@ void applier::downtime::apply(list_downtime const& lst) {
  */
 void applier::downtime::_add_host_downtime(
        retention::downtime const& obj) throw () {
-  downtimes::downtime_manager::instance().add_host_downtime(
-    obj.host_name().c_str(),
+  downtimes::host_downtime* dt{new downtimes::host_downtime(
+    obj.host_name(),
     obj.entry_time(),
-    obj.author().c_str(),
-    obj.comment_data().c_str(),
+    obj.author(),
+    obj.comment_data(),
     obj.start_time(),
     obj.end_time(),
     obj.fixed(),
     obj.triggered_by(),
     obj.duration(),
-    obj.downtime_id());
-  register_downtime(HOST_DOWNTIME, obj.downtime_id());
+    obj.downtime_id())};
+  dt->schedule();
+  downtimes::downtime_manager::instance().register_downtime(HOST_DOWNTIME, obj.downtime_id());
 }
 
 /**
@@ -72,17 +73,18 @@ void applier::downtime::_add_host_downtime(
  */
 void applier::downtime::_add_service_downtime(
        retention::downtime const& obj) throw () {
-  downtimes::downtime_manager::instance().add_service_downtime(
-    obj.host_name().c_str(),
-    obj.service_description().c_str(),
+  downtimes::service_downtime* dt{new downtimes::service_downtime(
+    obj.host_name(),
+    obj.service_description(),
     obj.entry_time(),
-    obj.author().c_str(),
-    obj.comment_data().c_str(),
+    obj.author(),
+    obj.comment_data(),
     obj.start_time(),
     obj.end_time(),
     obj.fixed(),
     obj.triggered_by(),
     obj.duration(),
-    obj.downtime_id());
-  register_downtime(SERVICE_DOWNTIME, obj.downtime_id());
+    obj.downtime_id())};
+  dt->schedule();
+  downtimes::downtime_manager::instance().register_downtime(SERVICE_DOWNTIME, obj.downtime_id());
 }

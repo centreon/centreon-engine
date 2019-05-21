@@ -94,7 +94,7 @@ downtime_finder::result_set downtime_finder::find_matching_all(
 
     // If downtime matched all criterias, add it to the result set.
     if (matched_all)
-      result.push_back(dt.second->downtime_id);
+      result.push_back(dt.second->get_downtime_id());
   }
   return result;
 }
@@ -116,33 +116,30 @@ bool downtime_finder::_match_criteria(
   }
   else if (crit.first == "start") {
     time_t expected(strtoll(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.start_time);
+    retval = (expected == dt.get_start_time());
   }
   else if (crit.first == "end") {
     time_t expected(strtoll(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.end_time);
+    retval = (expected == dt.get_end_time());
   }
   else if (crit.first == "fixed") {
     bool expected(strtol(crit.second.c_str(), NULL, 0));
-    retval = (expected == static_cast<bool>(dt.fixed));
+    retval = (expected == static_cast<bool>(dt.is_fixed()));
   }
   else if (crit.first == "triggered_by") {
     unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.triggered_by);
+    retval = (expected == dt.get_triggered_by());
   }
   else if (crit.first == "duration") {
     unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.duration);
+    retval = (expected == dt.get_duration());
   }
-  else if (crit.first == "author") {
-    retval = ARE_STRINGS_MATCHING(crit.second, dt.author);
-  }
-  else if (crit.first == "comment") {
-    retval = ARE_STRINGS_MATCHING(crit.second, dt.comment);
-  }
-  else {
+  else if (crit.first == "author")
+    retval = (crit.second == dt.get_author());
+  else if (crit.first == "comment")
+    retval = (crit.second == dt.get_comment());
+  else
     retval = false;
-  }
   return retval;
 }
 
@@ -166,32 +163,29 @@ bool downtime_finder::_match_criteria(
   }
   else if (crit.first == "start") {
     time_t expected(strtoll(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.start_time);
+    retval = (expected == dt.get_start_time());
   }
   else if (crit.first == "end") {
     time_t expected(strtoll(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.end_time);
+    retval = (expected == dt.get_end_time());
   }
   else if (crit.first == "fixed") {
     bool expected(strtol(crit.second.c_str(), NULL, 0));
-    retval = (expected == static_cast<bool>(dt.fixed));
+    retval = (expected == static_cast<bool>(dt.is_fixed()));
   }
   else if (crit.first == "triggered_by") {
     unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.triggered_by);
+    retval = (expected == dt.get_triggered_by());
   }
   else if (crit.first == "duration") {
     unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
-    retval = (expected == dt.duration);
+    retval = (expected == dt.get_duration());
   }
-  else if (crit.first == "author") {
-    retval = ARE_STRINGS_MATCHING(crit.second, dt.author);
-  }
-  else if (crit.first == "comment") {
-    retval = ARE_STRINGS_MATCHING(crit.second, dt.comment);
-  }
-  else {
+  else if (crit.first == "author")
+    retval = (crit.second == dt.get_author());
+  else if (crit.first == "comment")
+    retval = (crit.second == dt.get_comment());
+  else
     retval = false;
-  }
   return retval;
 }

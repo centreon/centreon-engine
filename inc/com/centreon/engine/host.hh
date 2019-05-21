@@ -53,7 +53,7 @@ typedef std::unordered_map<std::string,
 CCE_BEGIN()
 class                host {
  public:
-                      host(unsigned int host_id,
+                      host(uint64_t host_id,
                            std::string const& name,
                            std::string const& display_name,
                            std::string const& alias,
@@ -457,7 +457,7 @@ struct                host_other_properties {
   time_t              initial_notif_time;
   bool                should_reschedule_current_check;
   std::string         timezone;
-  unsigned int        host_id;
+  uint64_t            host_id;
   int                 acknowledgement_timeout;
   time_t              last_acknowledgement;
   unsigned int        recovery_notification_delay;
@@ -506,10 +506,10 @@ CCE_BEGIN()
 void                  check_for_expired_acknowledgement(
                             com::centreon::engine::host* h);
 com::centreon::engine::host&
-                      find_host(unsigned int host_id);
+                      find_host(uint64_t host_id);
 char const*           get_host_timezone(std::string const& name);
-bool                  is_host_exist(unsigned int host_id) throw ();
-unsigned int          get_host_id(std::string const& name);
+bool                  is_host_exist(uint64_t host_id) throw ();
+uint64_t              get_host_id(std::string const& name);
 void                  schedule_acknowledgement_expiration(
                             com::centreon::engine::host* h);
 

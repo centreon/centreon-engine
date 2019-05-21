@@ -64,7 +64,7 @@ static int handle_host_macro(
     host *hst = nullptr;
 
     if(arg1) {
-      umap < unsigned int, std::shared_ptr < com::centreon::engine::host >> ::const_iterator
+      umap < unsigned long, std::shared_ptr < com::centreon::engine::host >> ::const_iterator
         it(state::instance().hosts().find(get_host_id(arg1)));
       if (it != state::instance().hosts().end())
         hst = it->second.get();
@@ -678,8 +678,8 @@ static int handle_summary_macro(
             && temp_service->has_been_checked == true)
           services_ok++;
         else if (temp_service->current_state == STATE_WARNING) {
-          host* temp_host(nullptr);
-          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+          host* temp_host{nullptr};
+          umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
             it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
           if (it != state::instance().hosts().end())
               temp_host = it->second.get();
@@ -699,8 +699,8 @@ static int handle_summary_macro(
           services_warning++;
         }
         else if (temp_service->current_state == STATE_UNKNOWN) {
-          host* temp_host(nullptr);
-          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+          host* temp_host{nullptr};
+          umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
           it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
           if (it != state::instance().hosts().end())
             temp_host = it->second.get();
@@ -720,8 +720,8 @@ static int handle_summary_macro(
           services_unknown++;
         }
         else if (temp_service->current_state == STATE_CRITICAL) {
-          host* temp_host(nullptr);
-          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+          host* temp_host{nullptr};
+          umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
           it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
           if (it != state::instance().hosts().end())
             temp_host = it->second.get();

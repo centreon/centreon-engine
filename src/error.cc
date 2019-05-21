@@ -128,6 +128,18 @@ error& error::operator<<(int i) throw () {
 /**
  *  Insertion operator.
  *
+ *  @param[in] u Unsigned long to concatenate to error message.
+ *
+ *  @return This object.
+ */
+error& error::operator<<(unsigned long u) throw () {
+  _insert_with_snprintf(u, "%u%n");
+  return *this;
+}
+
+/**
+ *  Insertion operator.
+ *
  *  @param[in] u Unsigned integer to concatenate to error message.
  *
  *  @return This object.

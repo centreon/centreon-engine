@@ -102,7 +102,7 @@ TEST_F(ApplierService, NewServiceFromConfig) {
 
   svc_aply.add_object(svc);
   svc_aply.expand_objects(*config);
-  umap<std::pair<unsigned int, unsigned int>,
+  umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 1);
@@ -145,11 +145,11 @@ TEST_F(ApplierService, ServicesEquality) {
   ASSERT_THROW(svc_aply.add_object(csvc), std::exception);
   ASSERT_TRUE(csvc.parse("service_id", "12346"));
   ASSERT_NO_THROW(svc_aply.add_object(csvc));
-  umap<std::pair<unsigned int, unsigned int>,
+  umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 2);
-  umap<std::pair<unsigned int, unsigned int>,
+  umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> >::
     const_iterator it(sm.begin());
   std::shared_ptr<service_struct> svc1(it->second);
@@ -209,12 +209,12 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   ASSERT_NO_THROW(csvc.check_validity());
   svc_aply.resolve_object(csvc);
 
-  umap<std::pair<unsigned int, unsigned int>,
+  umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 1);
 
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>> const& hm(
+  umap<unsigned long, std::shared_ptr<com::centreon::engine::host>> const& hm(
     configuration::applier::state::instance().hosts());
   ASSERT_EQ(sm.begin()->second->host_ptr, hm.begin()->second.get());
 }
