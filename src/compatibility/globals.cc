@@ -43,7 +43,7 @@ int verify_object_relationships(1);
 int bare_update_checks(0);
 int check_for_updates(0);
 int update_available(0);
-unsigned long update_uid(0);
+uint64_t update_uid(0);
 char const* last_program_version("");
 char const* new_program_version("");
 

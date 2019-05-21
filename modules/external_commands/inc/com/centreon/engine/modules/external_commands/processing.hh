@@ -150,7 +150,7 @@ namespace         modules {
         char* name(my_strtok(args, ";"));
 
         host* hst(nullptr);
-        umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+        umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
           it(configuration::applier::state::instance().hosts().find(get_host_id(name)));
         if (it != configuration::applier::state::instance().hosts().end())
           hst = it->second.get();
@@ -171,7 +171,7 @@ namespace         modules {
         char* name(my_strtok(args, ";"));
 
         host* hst(nullptr);
-        umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+        umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
           it(configuration::applier::state::instance().hosts().find(get_host_id(name)));
         if (it != configuration::applier::state::instance().hosts().end())
           hst = it->second.get();
@@ -274,17 +274,18 @@ namespace         modules {
           return ;
 
         host* last_host(NULL);
-        for (servicesmember* member = group->members;
-             member != NULL;
+        for (servicesmember* member = group->members; member != NULL;
              member = member->next) {
           host* hst(nullptr);
-          umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-            it(configuration::applier::state::instance().hosts().find(get_host_id(member->host_name)));
+          umap<uint64_t,
+               std::shared_ptr<com::centreon::engine::host>>::const_iterator
+              it(configuration::applier::state::instance().hosts().find(
+                  get_host_id(member->host_name)));
           if (it != configuration::applier::state::instance().hosts().end())
             hst = it->second.get();
 
           if (!hst || hst == last_host)
-            continue ;
+            continue;
           (*fptr)(hst);
           last_host = hst;
         }

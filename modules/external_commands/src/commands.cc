@@ -202,7 +202,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
 
   /* else verify that the host is valid */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
@@ -247,7 +247,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
 
 /* removes a host or service comment from the status log */
 int cmd_delete_comment(int cmd, char* args) {
-  unsigned long comment_id(0);
+  uint64_t comment_id{0};
 
   /* get the comment id we should delete */
   if ((comment_id = strtoul(args, nullptr, 10)) == 0)
@@ -287,7 +287,7 @@ int cmd_delete_all_comments(int cmd, char* args) {
 
   /* else verify that the host is valid */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
@@ -330,7 +330,7 @@ int cmd_delay_notification(int cmd, char* args) {
   /* else verify that the host is valid */
   else {
     temp_host = nullptr;
-    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
     if (it != configuration::applier::state::instance().hosts().end())
       temp_host = it->second.get();
@@ -373,7 +373,7 @@ int cmd_schedule_check(int cmd, char* args) {
 
     /* verify that the host is valid */
     temp_host = nullptr;
-    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
      it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
     if (it != configuration::applier::state::instance().hosts().end())
       temp_host = it->second.get();
@@ -446,7 +446,7 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
 
   /* verify that the host is valid */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
@@ -573,7 +573,7 @@ int process_passive_service_check(
 
   /* find the host by its name or address */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
@@ -722,7 +722,7 @@ int process_passive_host_check(
 
   /* find the host by its name or address */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
@@ -813,7 +813,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
   /* verify that the host is valid */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
@@ -898,7 +898,7 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
   /* verify that the host is valid */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
@@ -945,11 +945,11 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   time_t start_time(0);
   time_t end_time(0);
   int fixed(0);
-  unsigned long triggered_by(0);
+  uint64_t triggered_by(0);
   unsigned long duration(0);
   char* author(nullptr);
   char* comment_data(nullptr);
-  unsigned long downtime_id(0);
+  uint64_t downtime_id{0};
 
   if (cmd == CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME
       || cmd == CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME) {
@@ -988,7 +988,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
     /* verify that the host is valid */
     temp_host = nullptr;
-    umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
     if (it != configuration::applier::state::instance().hosts().end())
       temp_host = it->second.get();
@@ -1167,7 +1167,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
          temp_sgmember != nullptr;
          temp_sgmember = temp_sgmember->next) {
       temp_host = nullptr;
-      umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
         it(configuration::applier::state::instance().hosts().find(get_host_id(temp_sgmember->host_name)));
       if (it != configuration::applier::state::instance().hosts().end())
         temp_host = it->second.get();
@@ -1276,7 +1276,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
 /* deletes scheduled host or service downtime */
 int cmd_delete_downtime(int cmd, char* args) {
-  unsigned long downtime_id(0);
+  uint64_t downtime_id(0);
   char* temp_ptr(nullptr);
 
   /* Get the id of the downtime to delete. */
@@ -1358,7 +1358,7 @@ int cmd_delete_downtime_full(int cmd, char* args) {
     criterias.push_back(downtime_finder::criteria("comment", temp_ptr));
 
   // Find downtimes.
-  downtime_finder dtf(scheduled_downtime_list);
+  downtime_finder dtf(downtimes::downtime_manager::instance().get_scheduled_downtimes());
   downtime_finder::result_set result(dtf.find_matching_all(criterias));
   for (downtime_finder::result_set::const_iterator
          it(result.begin()), end(result.end());
@@ -1572,62 +1572,64 @@ int cmd_change_object_int_var(int cmd, char* args) {
   unsigned long attr(MODATTR_NONE);
   unsigned long hattr(MODATTR_NONE);
   unsigned long sattr(MODATTR_NONE);
-  umap<unsigned int,
-       std::shared_ptr<com::centreon::engine::host>>::const_iterator it;
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it;
 
   switch (cmd) {
+    case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
+    case CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL:
+    case CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS:
+    case CMD_CHANGE_SVC_MODATTR:
 
-  case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
-  case CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL:
-  case CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS:
-  case CMD_CHANGE_SVC_MODATTR:
+      /* get the host name */
+      if ((host_name = my_strtok(args, ";")) == nullptr)
+        return ERROR;
 
-    /* get the host name */
-    if ((host_name = my_strtok(args, ";")) == nullptr)
+      /* get the service name */
+      if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
+        return ERROR;
+
+      /* verify that the service is valid */
+      if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+        return ERROR;
+      break;
+
+    case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
+    case CMD_CHANGE_RETRY_HOST_CHECK_INTERVAL:
+    case CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS:
+    case CMD_CHANGE_HOST_MODATTR:
+      /* get the host name */
+      if ((host_name = my_strtok(args, ";")) == nullptr)
+        return ERROR;
+
+      /* verify that the host is valid */
+      temp_host = nullptr;
+      it = configuration::applier::state::instance().hosts().find(
+          get_host_id(host_name));
+      if (it != configuration::applier::state::instance().hosts().end())
+        temp_host = it->second.get();
+      if (temp_host == nullptr)
+        return ERROR;
+      break;
+
+    case CMD_CHANGE_CONTACT_MODATTR:
+    case CMD_CHANGE_CONTACT_MODHATTR:
+    case CMD_CHANGE_CONTACT_MODSATTR:
+      /* get the contact name */
+      if ((contact_name = my_strtok(args, ";")) == nullptr)
+        return ERROR;
+
+      /* verify that the contact is valid */
+      if ((temp_contact =
+               configuration::applier::state::instance().find_contact(
+                   contact_name)) == nullptr)
+        return ERROR;
+      break;
+
+    default:
+      /* unknown command */
       return ERROR;
-
-    /* get the service name */
-    if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
-      return ERROR;
-
-    /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
-      return ERROR;
-    break;
-
-  case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
-  case CMD_CHANGE_RETRY_HOST_CHECK_INTERVAL:
-  case CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS:
-  case CMD_CHANGE_HOST_MODATTR:
-    /* get the host name */
-    if ((host_name = my_strtok(args, ";")) == nullptr)
-      return ERROR;
-
-    /* verify that the host is valid */
-    temp_host = nullptr;
-    it = configuration::applier::state::instance().hosts().find(get_host_id(host_name));
-    if (it != configuration::applier::state::instance().hosts().end())
-      temp_host = it->second.get();
-    if (temp_host == nullptr)
-      return ERROR;
-    break;
-
-  case CMD_CHANGE_CONTACT_MODATTR:
-  case CMD_CHANGE_CONTACT_MODHATTR:
-  case CMD_CHANGE_CONTACT_MODSATTR:
-    /* get the contact name */
-    if ((contact_name = my_strtok(args, ";")) == nullptr)
-      return ERROR;
-
-    /* verify that the contact is valid */
-    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == nullptr)
-      return ERROR;
-    break;
-
-  default:
-    /* unknown command */
-    return ERROR;
-    break;
+      break;
   }
 
   /* get the value */
@@ -1861,22 +1863,22 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd, char* args) {
-  service* temp_service(nullptr);
-  com::centreon::engine::host* temp_host(nullptr);
-  contact* temp_contact(nullptr);
-  timeperiod* temp_timeperiod(nullptr);
-  commands::command* temp_command(nullptr);
-  char* host_name(nullptr);
-  char* svc_description(nullptr);
-  char* contact_name(nullptr);
-  char* charval(nullptr);
-  char* temp_ptr(nullptr);
-  char* temp_ptr2(nullptr);
-  unsigned long attr(MODATTR_NONE);
-  unsigned long hattr(MODATTR_NONE);
-  unsigned long sattr(MODATTR_NONE);
-  umap<unsigned int,
-       std::shared_ptr<com::centreon::engine::host>>::const_iterator it;
+  service* temp_service{nullptr};
+  com::centreon::engine::host* temp_host{nullptr};
+  contact* temp_contact{nullptr};
+  timeperiod* temp_timeperiod{nullptr};
+  commands::command* temp_command{nullptr};
+  char* host_name{nullptr};
+  char* svc_description{nullptr};
+  char* contact_name{nullptr};
+  char* charval{nullptr};
+  char* temp_ptr{nullptr};
+  char* temp_ptr2{nullptr};
+  unsigned long attr{MODATTR_NONE};
+  unsigned long hattr{MODATTR_NONE};
+  unsigned long sattr{MODATTR_NONE};
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      it;
 
   /* SECURITY PATCH - disable these for the time being */
   switch (cmd) {
@@ -2252,7 +2254,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   case CMD_CHANGE_CUSTOM_HOST_VAR:
     {
       temp_host = nullptr;
-      umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+      umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it_h(configuration::applier::state::instance().hosts().find(get_host_id(name1.c_str())));
       if (it_h != configuration::applier::state::instance().hosts().end())
         temp_host = it_h->second.get();

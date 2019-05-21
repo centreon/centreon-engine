@@ -47,6 +47,7 @@ public:
   error&       operator<<(char c) throw ();
   error&       operator<<(char const* str) throw ();
   error&       operator<<(int i) throw ();
+  error&       operator<<(unsigned long u) throw ();
   error&       operator<<(unsigned int u) throw ();
   error&       operator<<(long l) throw ();
   error&       operator<<(long long ll) throw ();

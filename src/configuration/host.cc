@@ -779,7 +779,7 @@ set_string const& host::hostgroups() const throw () {
  *
  *  @return  The host id.
  */
-unsigned int host::host_id() const throw() {
+unsigned long host::host_id() const throw() {
   return _host_id;
 }
 

@@ -27,45 +27,29 @@ CCE_BEGIN()
 namespace                           downtimes {
 class                               host_downtime : public downtime {
  public:
-                                    host_downtime(std::string const& host_name);
-                                    //host_downtime(downtime const& other);
-                                    //host_downtime(downtime&& other);
+                                    host_downtime(
+                                      std::string const& host_name,
+                                      time_t entry_time,
+                                      std::string const& author,
+                                      std::string const& comment,
+                                      time_t start_time,
+                                      time_t end_time,
+                                      bool fixed,
+                                      uint64_t triggered_by,
+                                      int32_t duration,
+                                      uint64_t downtime_id);
   virtual                           ~host_downtime();
 
   virtual bool                      is_stale() const override;
+  virtual void                      schedule() override;
   virtual int                       unschedule() override;
   virtual int                       subscribe() override;
   virtual int                       handle() override;
   virtual void                      print(std::ostream& os) const override;
   virtual void                      retention(std::ostream& os) const override;
-
 };
 }
 
 CCE_END()
-
-int                 add_host_downtime(
-                      std::string const& host_name,
-                      time_t entry_time,
-                      char const* author,
-                      char const* comment_data,
-                      time_t start_time,
-                      time_t end_time,
-                      int fixed,
-                      unsigned long triggered_by,
-                      unsigned long duration,
-                      unsigned long downtime_id);
-int                 add_new_host_downtime(
-                      std::string const& host_name,
-                      time_t entry_time,
-                      char const* author,
-                      char const* comment_data,
-                      time_t start_time,
-                      time_t end_time,
-                      int fixed,
-                      unsigned long triggered_by,
-                      unsigned long duration,
-                      unsigned long* downtime_id);
-com::centreon::engine::downtimes::downtime* find_host_downtime(unsigned long downtime_id);
 
 #endif // !CCE_DOWNTIMES_HOST_DOWTIME_HH

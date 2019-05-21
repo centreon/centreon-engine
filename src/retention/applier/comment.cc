@@ -54,7 +54,7 @@ void applier::comment::apply(list_comment const& lst) {
  */
 void applier::comment::_add_host_comment(
        retention::comment const& obj) throw () {
-  umap<unsigned int,
+  umap<unsigned long,
        std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(obj.host_name().c_str())));
   if (it == configuration::applier::state::instance().hosts().end())
@@ -100,7 +100,7 @@ void applier::comment::_add_service_comment(
 
   std::pair<unsigned int, unsigned int>
     id(get_host_and_service_id(obj.host_name().c_str(), obj.service_description().c_str()));
-  umap<std::pair<unsigned int, unsigned int>,
+  umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> >::const_iterator
     it_svc(configuration::applier::state::instance().services().find(id));
   if (it_svc == configuration::applier::state::instance().services().end())

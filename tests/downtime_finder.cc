@@ -24,6 +24,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
 
@@ -34,72 +35,27 @@ extern configuration::state* config;
 
 class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
 public:
-  void SetUp() override {
-    if (config == NULL)
-      config = new configuration::state;
-    configuration::applier::state::load();  // Needed to create a contact
-    _map.insert({123456789, std::shared_ptr<downtime>(new_downtime(
-             1,
-             "",
-             "test_service",
-             123456789,
-             134567892,
-             1,
-             6,
-             42,
-             "test_author",
-             "other_comment"))});
-    _map.insert({234567891, std::shared_ptr<downtime>(new_downtime(
-             2,
-             "test_host",
-             "",
-             234567891,
-             134567892,
-             1,
-             0,
-             84,
-             "other_author",
-             "test_comment"))});
-    _map.insert({123456789, std::shared_ptr<downtime>(new_downtime(
-             3,
-             "other_host",
-             "other_service",
-             123456789,
-             345678921,
-             0,
-             6,
-             42,
-             nullptr,
-             "test_comment"))});
-    _map.insert({234567891, std::shared_ptr<downtime>(new_downtime(
-             4,
-             "test_host",
-             "test_service",
-             234567891,
-             345678921,
-             0,
-             6,
-             84,
-             "test_author",
-             nullptr))});
-    _map.insert({123456789, std::shared_ptr<downtime>(new_downtime(
-             5,
-             "other_host",
-             "test_service",
-             123456789,
-             134567892,
-             1,
-             0,
-             42,
-             "test_author",
-             "test_comment"))});
-    _dtf.reset(new downtime_finder(_map));
-  }
+ void SetUp() override {
+   if (config == nullptr)
+     config = new configuration::state;
+   configuration::applier::state::load();  // Needed to create a contact
+   new_downtime(1, "first_host", "test_service", 123456789, 134567892, 1, 0, 42,
+                "test_author", "other_comment");
+   new_downtime(2, "test_host", "", 234567891, 134567892, 1, 0, 84,
+                "other_author", "test_comment");
+   new_downtime(3, "other_host", "other_service", 123456789, 345678921, 0, 2,
+                42, "", "test_comment");
+   new_downtime(4, "test_host", "test_service", 234567891, 345678921, 0, 2, 84,
+                "test_author", "");
+   new_downtime(5, "other_host", "test_service", 123456789, 134567892, 1, 2, 42,
+                "test_author", "test_comment");
+   _dtf.reset(new downtime_finder(downtime_manager::instance().get_scheduled_downtimes()));
+ }
 
   void TearDown() override {
-    _map.clear();
     _dtf.reset();
     configuration::applier::state::unload();
+    downtime_manager::instance().clear_scheduled_downtimes();
     delete config;
     config = NULL;
   }
@@ -111,23 +67,17 @@ public:
                          time_t end,
                          int fixed,
                          unsigned long triggered_by,
-                         unsigned long duration,
-                         char const* author,
-                         char const* comment) {
-    downtime* dt{static_cast<downtime*>(new service_downtime(host_name, service_description))};
-    dt->downtime_id = downtime_id;
-    dt->start_time = start;
-    dt->end_time = end;
-    dt->fixed = fixed;
-    dt->triggered_by = triggered_by;
-    dt->duration = duration;
-    dt->author = const_cast<char*>(author);
-    dt->comment = const_cast<char*>(comment);
+                         int32_t duration,
+                         std::string const& author,
+                         std::string const& comment) {
+    downtime* dt{static_cast<downtime*>(new service_downtime(
+        host_name, service_description, start, author, comment, start, end,
+        fixed, triggered_by, duration, downtime_id))};
+    dt->schedule();
     return dt;
   }
 
  protected:
-  std::multimap<time_t, std::shared_ptr<downtime>> _map;
   std::unique_ptr<downtime_finder> _dtf;
   downtime* dtl;
   downtime_finder::criteria_set criterias;
@@ -154,17 +104,6 @@ TEST_F(DowntimeFinderFindMatchingAllTest, NullHostNotFound) {
   criterias.push_back(downtime_finder::criteria("host", "anyhost"));
   result = _dtf->find_matching_all(criterias);
   ASSERT_TRUE(result.empty());
-}
-
-// Given a downtime_finder object with the test downtime list
-// And a downtime of the test list has a null host_name
-// When find_matching_all() is called with the criteria ("host", "")
-// Then the result_set contains the downtime
-TEST_F(DowntimeFinderFindMatchingAllTest, NullHostFound) {
-  criterias.push_back(downtime_finder::criteria("host", ""));
-  result = _dtf->find_matching_all(criterias);
-  expected.push_back(1);
-  ASSERT_EQ(result, expected);
 }
 
 // Given a downtime finder object with the test downtime list
@@ -294,7 +233,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleFixed) {
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleTriggeredBy) {
   criterias.push_back(downtime_finder::criteria("triggered_by", "0"));
   result = _dtf->find_matching_all(criterias);
-  expected.push_back(5);
+  expected.push_back(1);
   expected.push_back(2);
   ASSERT_EQ(result, expected);
 }

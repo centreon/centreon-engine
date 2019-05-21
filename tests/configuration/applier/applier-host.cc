@@ -81,7 +81,7 @@ TEST_F(ApplierHost, HostRenamed) {
   ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
   ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
   hst_aply.add_object(hst);
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host> > const&
+  umap<unsigned long, std::shared_ptr<engine::host> > const&
     hm(configuration::applier::state::instance().hosts());
   ASSERT_EQ(hm.size(), 1);
   std::shared_ptr<com::centreon::engine::host> h1(hm.begin()->second);

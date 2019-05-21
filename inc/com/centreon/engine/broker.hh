@@ -417,8 +417,8 @@ int            broker_contact_notification_data(
                  struct timeval end_time,
                  void* data,
                  com::centreon::engine::contact* cntct,
-                 char* ack_author,
-                 char* ack_data,
+                 char const* ack_author,
+                 char const* ack_data,
                  int escalated,
                  struct timeval const* timestamp);
 int            broker_contact_notification_method_data(
@@ -432,8 +432,8 @@ int            broker_contact_notification_method_data(
                  void* data,
                  com::centreon::engine::contact* cntct,
                  char const* cmd,
-                 char* ack_author,
-                 char* ack_data,
+                 char const* ack_author,
+                 char const* ack_data,
                  int escalated,
                  struct timeval const* timestamp);
 void           broker_contact_status(
@@ -568,8 +568,8 @@ int            broker_notification_data(
                  struct timeval start_time,
                  struct timeval end_time,
                  void* data,
-                 char* ack_author,
-                 char* ack_data,
+                 char const* ack_author,
+                 char const* ack_data,
                  int escalated,
                  int contacts_notified,
                  struct timeval const* timestamp);

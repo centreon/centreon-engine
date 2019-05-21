@@ -252,16 +252,16 @@ CCE_BEGIN()
 
 void          check_for_expired_acknowledgement(service* s);
 service&      find_service(
-                unsigned int host_id,
-                unsigned int service_id);
+                uint64_t host_id,
+                uint64_t service_id);
 char const*   get_service_timezone(char const* hst, char const* svc);
 bool          is_service_exist(
-                std::pair<unsigned int, unsigned int> const& id);
-std::pair<unsigned int, unsigned int>
+                std::pair<uint64_t, uint64_t> const& id);
+std::pair<uint64_t, uint64_t>
               get_host_and_service_id(
                 char const* host,
                 char const* svc);
-unsigned int  get_service_id(char const* host, char const* svc);
+unsigned long get_service_id(char const* host, char const* svc);
 void          schedule_acknowledgement_expiration(service* s);
 
 CCE_END()

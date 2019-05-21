@@ -22,7 +22,6 @@
 #  define CCE_DOWNTIMES_DOWTIME_HH
 
 #  include <sstream>
-//#  include <time.h>
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -31,48 +30,71 @@ CCE_BEGIN()
 namespace                      downtimes {
 class                          downtime {
  public:
-                               downtime(int type, std::string const& host_name);
+                               downtime(
+                                 int type,
+                                 std::string const& host_name,
+                                 time_t entry_time,
+                                 std::string const& author,
+                                 std::string const& comment,
+                                 time_t start_time,
+                                 time_t end_time,
+                                 bool fixed,
+                                 uint64_t triggered_by,
+                                 int32_t duration,
+                                 uint64_t downtime_id);
                                downtime(downtime const& other);
                                downtime(downtime&& other);
   virtual                      ~downtime();
 
   int                          get_type() const;
-  time_t                       entry_time;
-  time_t                       start_time;
-  time_t                       end_time;
-  int                          fixed;
-  unsigned long                triggered_by;
-  unsigned long                duration;
-  unsigned long                downtime_id;
-  char*                        author;
-  char*                        comment;
-  unsigned long                comment_id;
-  int                          is_in_effect;
-  int                          start_flex_downtime;
-  int                          incremented_pending_downtime;
   virtual bool                 is_stale() const = 0;
+  virtual void                 schedule() = 0;
   virtual int                  unschedule() = 0;
   virtual int                  subscribe() = 0;
   virtual int                  handle() = 0;
   std::string const&           get_hostname() const;
   virtual void                 print(std::ostream& os) const = 0;
   virtual void                 retention(std::ostream& os) const = 0;
+  std::string const&           get_author() const;
+  std::string const&           get_comment() const;
+  uint64_t                     get_downtime_id() const;
+  uint64_t                     get_triggered_by() const;
+  bool                         is_fixed() const;
+  time_t                       get_entry_time() const;
+  time_t                       get_start_time() const;
+  time_t                       get_end_time() const;
+  int32_t                      get_duration() const;
+  bool                         is_in_effect() const;
+  void                         start_flex_downtime();
 
  private:
   int                          _type;
 
  protected:
+  void                         _set_in_effect(bool in_effect);
+  uint64_t                     _get_comment_id() const;
+
   std::string                  _hostname;
+  time_t                       _entry_time;
+  std::string                  _author;
+  std::string                  _comment;
+  time_t                       _start_time;
+  time_t                       _end_time;
+  bool                         _fixed;
+  uint64_t                     _triggered_by;
+  int32_t                      _duration;
+  uint64_t                     _downtime_id;
+  bool                         _in_effect;
+  uint64_t                     _comment_id;
+  int                          _start_flex_downtime;
+  bool                         _incremented_pending_downtime;
 };
 }
 
 CCE_END()
 
-int                 handle_scheduled_downtime_by_id(
-                      unsigned long downtime_id);
-int                 register_downtime(
-                      int type,
-                      unsigned long downtime_id);
+int                            handle_scheduled_downtime_by_id(
+                                 uint64_t downtime_id);
 
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::downtimes::downtime const& dt);
 

@@ -289,7 +289,7 @@ void applier::host::modify_object(
            << obj.host_name() << "'");
 
   // Find host object.
-  umap<unsigned int,
+  umap<unsigned long,
        std::shared_ptr<com::centreon::engine::host>>::iterator
     it_obj(applier::state::instance().hosts_find(obj.key()));
   if (it_obj == applier::state::instance().hosts().end())
@@ -467,7 +467,7 @@ void applier::host::remove_object(
     << "Removing host '" << obj.host_name() << "'.";
 
   // Find host.
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host> >::iterator
+  umap<unsigned long, std::shared_ptr<com::centreon::engine::host> >::iterator
     it(applier::state::instance().hosts_find(obj.key()));
   if (it != applier::state::instance().hosts().end()) {
     com::centreon::engine::host* hst(it->second.get());
@@ -527,7 +527,7 @@ void applier::host::resolve_object(
   // It is necessary to do it only once to prevent the removal
   // of valid child backlinks.
   if (obj == *config->hosts().begin()) {
-    for (umap<unsigned int,
+    for (umap<unsigned long,
               std::shared_ptr<com::centreon::engine::host> >::iterator
          it(applier::state::instance().hosts().begin()),
          end(applier::state::instance().hosts().end()); it != end; ++it)
@@ -535,7 +535,7 @@ void applier::host::resolve_object(
   }
 
   // Find host.
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host> >::iterator
+  umap<unsigned long, std::shared_ptr<com::centreon::engine::host> >::iterator
     it(applier::state::instance().hosts_find(obj.key()));
   if (applier::state::instance().hosts().end() == it)
     throw (engine_error() << "Cannot resolve non-existing host '"

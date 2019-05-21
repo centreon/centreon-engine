@@ -69,7 +69,7 @@ hostdependency::hostdependency(std::string const& dependent_host_name,
 
   _dependent_host_name = dependent_host_name;
   _host_name = host_name;
-  _dependency_type == EXECUTION_DEPENDENCY ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY;
+  _dependency_type = (dependency_type == EXECUTION_DEPENDENCY ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY);
   _inherits_parent = inherits_parent;
   _fail_on_up = fail_on_up;
   _fail_on_down = fail_on_down;

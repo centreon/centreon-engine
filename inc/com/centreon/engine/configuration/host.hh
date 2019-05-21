@@ -88,7 +88,7 @@ namespace                  configuration {
     unsigned int           high_flap_threshold() const throw ();
     set_string&            hostgroups() throw ();
     set_string const&      hostgroups() const throw ();
-    unsigned int           host_id() const throw();
+    unsigned long          host_id() const throw();
     std::string const&     host_name() const throw ();
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();

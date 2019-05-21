@@ -749,11 +749,11 @@ void engine::check_for_expired_acknowledgement(service* s) {
  *          service is not found.
  */
 service& engine::find_service(
-           unsigned int host_id,
-           unsigned int service_id) {
-  std::pair<unsigned int, unsigned int>
+           unsigned long host_id,
+           unsigned long service_id) {
+  std::pair<unsigned long, unsigned long>
     id(std::make_pair(host_id, service_id));
-  umap<std::pair<unsigned int, unsigned int>,
+  umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   if (it == state::instance().services().end())
@@ -788,8 +788,8 @@ char const* engine::get_service_timezone(
  *  @return True if the service is found, otherwise false.
  */
 bool engine::is_service_exist(
-       std::pair<unsigned int, unsigned int> const& id) {
-  umap<std::pair<unsigned int, unsigned int>,
+       std::pair<unsigned long, unsigned long> const& id) {
+  umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   return it != state::instance().services().end();
@@ -803,7 +803,7 @@ bool engine::is_service_exist(
  *
  *  @return  Pair of ID if found, pair of 0 otherwise.
  */
-std::pair<unsigned int, unsigned int> engine::get_host_and_service_id(
+std::pair<unsigned long, unsigned long> engine::get_host_and_service_id(
                                                 char const* host,
                                                 char const* svc) {
   std::map<std::pair<std::string, std::string>, service_other_properties>::const_iterator
@@ -821,7 +821,7 @@ std::pair<unsigned int, unsigned int> engine::get_host_and_service_id(
  *
  *  @return The service ID if found, 0 otherwise.
  */
-unsigned int engine::get_service_id(char const* host, char const* svc) {
+unsigned long engine::get_service_id(char const* host, char const* svc) {
   return get_host_and_service_id(host, svc).second;
 }
 

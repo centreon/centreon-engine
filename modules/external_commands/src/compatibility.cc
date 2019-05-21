@@ -47,7 +47,7 @@ int process_external_command1(char* cmd) {
     << "process_external_command1()";
 
   if (cmd == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* strip the command of newlines and carriage returns */
   strip(cmd);
@@ -57,14 +57,14 @@ int process_external_command1(char* cmd) {
 
   /* get the command entry time */
   if ((temp_ptr = my_strtok(cmd, "[")) == nullptr)
-    return (ERROR);
+    return ERROR;
   if ((temp_ptr = my_strtok(nullptr, "]")) == nullptr)
-    return (ERROR);
+    return ERROR;
   entry_time = (time_t)strtoul(temp_ptr, nullptr, 10);
 
   /* get the command identifier */
   if ((temp_ptr = my_strtok(nullptr, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
   command_id = string::dup(temp_ptr + 1);
 
   /* get the command arguments */
@@ -540,7 +540,7 @@ int process_external_command1(char* cmd) {
     delete[] command_id;
     delete[] args;
 
-    return (ERROR);
+    return ERROR;
   }
 
   /* update statistics for external commands */
@@ -588,7 +588,7 @@ int process_external_command1(char* cmd) {
   delete[] command_id;
   delete[] args;
 
-  return (OK);
+  return OK;
 }
 
 int process_external_command2(int cmd,
@@ -987,10 +987,10 @@ int process_external_command2(int cmd,
     break;
 
   default:
-    return (ERROR);
+    return ERROR;
   }
 
-  return (OK);
+  return OK;
 }
 
 int process_hostgroup_command(int cmd,
@@ -1006,7 +1006,7 @@ int process_hostgroup_command(int cmd,
 
   /* get the hostgroup name */
   if ((hostgroup_name = my_strtok(args, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* find the hostgroup */
   temp_hostgroup = nullptr;
@@ -1015,7 +1015,7 @@ int process_hostgroup_command(int cmd,
   if (it != state::instance().hostgroups().end())
     temp_hostgroup = it->second.get();
   if (temp_hostgroup == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* loop through all hosts in the hostgroup */
   for (host_map::iterator
@@ -1095,7 +1095,7 @@ int process_hostgroup_command(int cmd,
       break;
     }
   }
-  return (OK);
+  return OK;
 }
 
 int process_host_command(int cmd,
@@ -1113,16 +1113,16 @@ int process_host_command(int cmd,
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* find the host */
   temp_host = nullptr;
-  umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it = configuration::applier::state::instance().hosts().find(get_host_id(host_name));
   if (it != configuration::applier::state::instance().hosts().end())
     temp_host = it->second.get();
   if (temp_host == nullptr)
-    return (ERROR);
+    return ERROR;
 
   switch (cmd) {
   case CMD_ENABLE_HOST_NOTIFICATIONS:
@@ -1241,7 +1241,7 @@ int process_host_command(int cmd,
     break;
   }
 
-  return (OK);
+  return OK;
 }
 
 int process_service_command(int cmd,
@@ -1258,15 +1258,15 @@ int process_service_command(int cmd,
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* get the service description */
   if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* find the service */
   if ((temp_service = find_service(host_name, svc_description)) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   switch (cmd) {
   case CMD_ENABLE_SVC_NOTIFICATIONS:
@@ -1345,28 +1345,28 @@ int process_service_command(int cmd,
     break;
   }
 
-  return (OK);
+  return OK;
 }
 
 int process_servicegroup_command(int cmd,
                                  time_t entry_time,
                                  char* args) {
-  char* servicegroup_name = nullptr;
-  servicegroup* temp_servicegroup = nullptr;
-  servicesmember* temp_member = nullptr;
-  host* temp_host = nullptr;
-  host* last_host = nullptr;
-  service* temp_service = nullptr;
-
   (void)entry_time;
+
+  char* servicegroup_name{nullptr};
+  servicegroup* temp_servicegroup{nullptr};
+  servicesmember* temp_member{nullptr};
+  host* temp_host{nullptr};
+  host* last_host{nullptr};
+  service* temp_service{nullptr};
 
   /* get the servicegroup name */
   if ((servicegroup_name = my_strtok(args, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* find the servicegroup */
   if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   switch (cmd) {
 
@@ -1426,13 +1426,13 @@ int process_servicegroup_command(int cmd,
   case CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
     /* loop through all hosts that have services belonging to the servicegroup */
     last_host = nullptr;
-    for (temp_member = temp_servicegroup->members;
-         temp_member != nullptr;
+    for (temp_member = temp_servicegroup->members; temp_member != nullptr;
          temp_member = temp_member->next) {
-
       temp_host = nullptr;
-      umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-        it = configuration::applier::state::instance().hosts().find(get_host_id(temp_member->host_name));
+      umap<uint64_t,
+           std::shared_ptr<com::centreon::engine::host>>::const_iterator it =
+          configuration::applier::state::instance().hosts().find(
+              get_host_id(temp_member->host_name));
       if (it != configuration::applier::state::instance().hosts().end())
         temp_host = it->second.get();
       if (temp_host == nullptr)
@@ -1442,33 +1442,32 @@ int process_servicegroup_command(int cmd,
         continue;
 
       switch (cmd) {
+        case CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
+          enable_host_notifications(temp_host);
+          break;
 
-      case CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
-        enable_host_notifications(temp_host);
-        break;
+        case CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
+          disable_host_notifications(temp_host);
+          break;
 
-      case CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
-        disable_host_notifications(temp_host);
-        break;
+        case CMD_ENABLE_SERVICEGROUP_HOST_CHECKS:
+          enable_host_checks(temp_host);
+          break;
 
-      case CMD_ENABLE_SERVICEGROUP_HOST_CHECKS:
-        enable_host_checks(temp_host);
-        break;
+        case CMD_DISABLE_SERVICEGROUP_HOST_CHECKS:
+          disable_host_checks(temp_host);
+          break;
 
-      case CMD_DISABLE_SERVICEGROUP_HOST_CHECKS:
-        disable_host_checks(temp_host);
-        break;
+        case CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
+          enable_passive_host_checks(temp_host);
+          break;
 
-      case CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
-        enable_passive_host_checks(temp_host);
-        break;
+        case CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
+          disable_passive_host_checks(temp_host);
+          break;
 
-      case CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
-        disable_passive_host_checks(temp_host);
-        break;
-
-      default:
-        break;
+        default:
+          break;
       }
 
       last_host = temp_host;
@@ -1478,7 +1477,7 @@ int process_servicegroup_command(int cmd,
   default:
     break;
   }
-  return (OK);
+  return OK;
 }
 
 int process_contact_command(int cmd,
@@ -1491,11 +1490,11 @@ int process_contact_command(int cmd,
 
   /* get the contact name */
   if ((contact_name = my_strtok(args, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* find the contact */
   if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   switch (cmd) {
 
@@ -1518,7 +1517,7 @@ int process_contact_command(int cmd,
   default:
     break;
   }
-  return (OK);
+  return OK;
 }
 
 int process_contactgroup_command(int cmd,
@@ -1532,11 +1531,11 @@ int process_contactgroup_command(int cmd,
 
   /* get the contactgroup name */
   if ((contactgroup_name = my_strtok(args, ";")) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* find the contactgroup */
   if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(contactgroup_name)) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   switch (cmd) {
 
@@ -1582,5 +1581,5 @@ int process_contactgroup_command(int cmd,
   default:
     break;
   }
-  return (OK);
+  return OK;
 }

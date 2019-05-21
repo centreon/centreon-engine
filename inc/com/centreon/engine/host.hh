@@ -506,10 +506,10 @@ CCE_BEGIN()
 void                  check_for_expired_acknowledgement(
                             com::centreon::engine::host* h);
 com::centreon::engine::host&
-                      find_host(unsigned int host_id);
+                      find_host(unsigned long host_id);
 char const*           get_host_timezone(std::string const& name);
-bool                  is_host_exist(unsigned int host_id) throw ();
-unsigned int          get_host_id(std::string const& name);
+bool                  is_host_exist(unsigned long host_id) throw ();
+unsigned long         get_host_id(std::string const& name);
 void                  schedule_acknowledgement_expiration(
                             com::centreon::engine::host* h);
 

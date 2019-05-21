@@ -48,7 +48,7 @@ static char const* tab_initial_state[] = {
 };
 
 static struct {
-  unsigned long id;
+  uint64_t id;
   char const* str;
 } tab_host_states[] = {
   { NSLOG_HOST_UP,          "UP"          },
@@ -57,7 +57,7 @@ static struct {
 };
 
 static struct {
-  unsigned long id;
+  uint64_t id;
   char const* str;
 } tab_service_states[] = {
   { NSLOG_SERVICE_OK,       "OK"       },
