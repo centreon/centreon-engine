@@ -29,7 +29,6 @@ set(
   # Sources.
   "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/daterange.cc"
-  "${SRC_DIR}/hostescalation.cc"
   "${SRC_DIR}/objectlist.cc"
   "${SRC_DIR}/service.cc"
   "${SRC_DIR}/servicedependency.cc"
@@ -44,7 +43,6 @@ set(
   "${INC_DIR}/comment.hh"
   "${INC_DIR}/daterange.hh"
   "${INC_DIR}/defines.hh"
-  "${INC_DIR}/hostescalation.hh"
   "${INC_DIR}/objectlist.hh"
   "${INC_DIR}/service.hh"
   "${INC_DIR}/servicedependency.hh"

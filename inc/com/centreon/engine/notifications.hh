@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -26,7 +26,7 @@
 #  include "com/centreon/engine/macros/defines.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/objects/hostescalation.hh"
+#  include "com/centreon/engine/hostescalation.hh"
 #  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/objects/serviceescalation.hh"
 
@@ -129,7 +129,7 @@ int notify_contact_of_host(
 // checks if an escalation entry is valid for a particular host notification
 int is_valid_escalation_for_host_notification(
       com::centreon::engine::host* hst,
-      hostescalation* he,
+      com::centreon::engine::hostescalation* he,
       int options);
 // checks if a host notification should be escalated
 int should_host_notification_be_escalated(com::centreon::engine::host* hst);

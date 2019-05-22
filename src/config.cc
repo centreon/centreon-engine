@@ -354,10 +354,12 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking host escalations...";
   total_objects = 0;
-  for (hostescalation* temp_he(hostescalation_list);
-       temp_he;
-       temp_he = temp_he->next, ++total_objects)
-    check_hostescalation(temp_he, &warnings, &errors);
+  for (hostescalation_mmap::iterator
+         it(hostescalation::hostescalations.begin()),
+         end(hostescalation::hostescalations.end());
+       it != end;
+       ++it)
+    check_hostescalation(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host escalations.";
@@ -495,7 +497,7 @@ int pre_flight_circular_check(int* w, int* e) {
   int errors(0);
 
   /* bail out if we aren't supposed to verify circular paths */
-  if (verify_circular_paths == false)
+  if (!verify_circular_paths)
     return (OK);
 
   /********************************************/
@@ -1579,10 +1581,10 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
 
   // Find the host.
   umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(he->host_name)));
+    it(state::instance().hosts().find(get_host_id(he->get_host_name())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
-      << "Error: Host '" << he->host_name
+      << "Error: Host '" << he->get_host_name()
       << "' specified in host escalation is not defined anywhere!";
     errors++;
   }
@@ -1594,13 +1596,13 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
     he->host_ptr = it->second.get();
 
   // Find the timeperiod.
-  if (he->escalation_period) {
-    timeperiod* temp_timeperiod(find_timeperiod(he->escalation_period));
+  if (!he->get_escalation_period().empty()) {
+    timeperiod* temp_timeperiod(find_timeperiod(he->get_escalation_period().c_str()));
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Escalation period '" << he->escalation_period
+        << "Error: Escalation period '" << he->get_escalation_period()
         << "' specified in host escalation for host '"
-        << he->host_name << "' is not defined anywhere!";
+        << he->get_host_name() << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1621,7 +1623,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in host escalation for host '"
-        << he->host_name << "' is not defined anywhere!";
+        << he->get_host_name() << "' is not defined anywhere!";
       errors++;
     }
   }
@@ -1642,7 +1644,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
         << "Error: Contact group '"
         << it->first
         << "' specified in host escalation for host '"
-        << he->host_name << "' is not defined anywhere!";
+        << he->get_host_name() << "' is not defined anywhere!";
       errors++;
     }
   }

@@ -57,7 +57,7 @@ applier::hostescalation::~hostescalation() throw () {}
 applier::hostescalation& applier::hostescalation::operator=(
                            applier::hostescalation const& right) {
   (void)right;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -82,9 +82,9 @@ void applier::hostescalation::add_object(
   config->hostescalations().insert(obj);
 
   // Create host escalation.
-  hostescalation_struct*
-    he(add_host_escalation(
-         obj.hosts().begin()->c_str(),
+  std::shared_ptr<com::centreon::engine::hostescalation> he =
+    std::make_shared<com::centreon::engine::hostescalation>(
+         *obj.hosts().begin(),
          obj.first_notification(),
          obj.last_notification(),
          obj.notification_interval(),
@@ -97,10 +97,24 @@ void applier::hostescalation::add_object(
            & configuration::hostescalation::unreachable),
          static_cast<bool>(
            obj.escalation_options()
-           & configuration::hostescalation::recovery)));
-  if (!he)
-    throw (engine_error() << "Could not create escalation "
-           << "on host '" << *obj.hosts().begin() << "'");
+           & configuration::hostescalation::recovery));
+
+  // Add new items to the configuration state.
+  state::instance().hostescalations()
+    .insert(std::make_pair(he->get_host_name(), he));
+
+  // Add new items to the list.
+  engine::hostescalation::hostescalations
+    .insert(std::make_pair(he->get_host_name(), he));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_escalation_data(
+    NEBTYPE_HOSTESCALATION_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    he.get(),
+    &tv);
 
   // Add contacts to host escalation.
   for (set_string::const_iterator
@@ -117,8 +131,6 @@ void applier::hostescalation::add_object(
        it != end;
        ++it)
     he->contact_groups.insert({*it, nullptr});
-
-  return ;
 }
 
 /**
@@ -161,8 +173,6 @@ void applier::hostescalation::expand_objects(configuration::state& s) {
 
   // Set expanded host escalations in configuration state.
   s.hostescalations().swap(expanded);
-
-  return ;
 }
 
 /**
@@ -180,7 +190,6 @@ void applier::hostescalation::modify_object(
          << "host escalation objects can only be added or removed, "
          << "this is likely a software bug that you should report to "
          << "Centreon Engine developers");
-  return ;
 }
 
 /**
@@ -196,15 +205,14 @@ void applier::hostescalation::remove_object(
     << "Removing a host escalation.";
 
   // Find host escalation.
-  umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator
-    it(applier::state::instance().hostescalations_find(obj.key()));
+  umultimap<std::string,
+    std::shared_ptr<com::centreon::engine::hostescalation>>::iterator
+      it(applier::state::instance().hostescalations_find(obj.key()));
   if (it != applier::state::instance().hostescalations().end()) {
-    hostescalation_struct* escalation(it->second.get());
+    com::centreon::engine::hostescalation* escalation(it->second.get());
 
     // Remove host escalation from its list.
-    unregister_object<hostescalation_struct>(
-      &hostescalation_list,
-      escalation);
+    engine::hostescalation::hostescalations.erase(it->first);
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -214,7 +222,6 @@ void applier::hostescalation::remove_object(
       NEBATTR_NONE,
       escalation,
       &tv);
-
 
     // Erase host escalation (will effectively delete the object).
     applier::state::instance().hostescalations().erase(it);
@@ -238,8 +245,9 @@ void applier::hostescalation::resolve_object(
     << "Resolving a host escalation.";
 
   // Find host escalation.
-  umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator
-    it(applier::state::instance().hostescalations_find(obj.key()));
+  umultimap<std::string,
+    std::shared_ptr<com::centreon::engine::hostescalation>>::iterator
+      it(applier::state::instance().hostescalations_find(obj.key()));
   if (applier::state::instance().hostescalations().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "
            << "host escalation");

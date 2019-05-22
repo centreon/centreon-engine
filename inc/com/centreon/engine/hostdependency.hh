@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -80,12 +80,18 @@ class                           hostdependency {
                                   hostdependency* dep,
                                   int dependency_type);
 
-
   static hostdependency_mmap    hostdependencies;
 
   com::centreon::engine::host*  master_host_ptr;
   com::centreon::engine::host*  dependent_host_ptr;
   timeperiod_struct*            dependency_period_ptr;
+
+  bool                          operator==(
+    com::centreon::engine::hostdependency const& obj) throw ();
+  bool                          operator!=(
+    com::centreon::engine::hostdependency const& obj) throw ();
+  bool          operator<(
+    com::centreon::engine::hostdependency const& obj) throw ();
 
  private:
   int                           _dependency_type;
@@ -104,16 +110,6 @@ class                           hostdependency {
 CCE_END()
 
 
-
-bool          operator==(
-                com::centreon::engine::hostdependency const& obj1,
-                com::centreon::engine::hostdependency const& obj2) throw ();
-bool          operator!=(
-                com::centreon::engine::hostdependency const& obj1,
-                com::centreon::engine::hostdependency const& obj2) throw ();
-bool          operator<(
-                com::centreon::engine::hostdependency const& obj1,
-                com::centreon::engine::hostdependency const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::hostdependency const& obj);
 
 #endif // !CCE_OBJECTS_HOSTDEPENDENCY_HH
