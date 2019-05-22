@@ -366,10 +366,12 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking host dependencies...";
   total_objects = 0;
-  for (hostdependency* temp_hd(hostdependency_list);
-       temp_hd;
-       temp_hd = temp_hd->next, ++total_objects)
-    check_hostdependency(temp_hd, &warnings, &errors);
+  for (hostdependency_mmap::iterator
+         it(hostdependency::hostdependencies.begin()),
+         end(hostdependency::hostdependencies.end());
+       it != end;
+       ++it)
+    check_hostdependency(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host dependencies.";
@@ -543,7 +545,7 @@ int pre_flight_circular_check(int* w, int* e) {
 
     /* clear checked flag for all dependencies */
     for (temp_sd2 = servicedependency_list;
-	 temp_sd2 != nullptr;
+         temp_sd2 != nullptr;
          temp_sd2 = temp_sd2->next)
       temp_sd2->circular_path_checked = false;
 
@@ -568,7 +570,7 @@ int pre_flight_circular_check(int* w, int* e) {
 
     /* clear checked flag for all dependencies */
     for (temp_sd2 = servicedependency_list;
-	 temp_sd2 != nullptr;
+	       temp_sd2 != nullptr;
          temp_sd2 = temp_sd2->next)
       temp_sd2->circular_path_checked = false;
 
@@ -593,58 +595,64 @@ int pre_flight_circular_check(int* w, int* e) {
     temp_sd->circular_path_checked = false;
 
   /* check execution dependencies between all hosts */
-  for (temp_hd = hostdependency_list;
-       temp_hd != nullptr;
-       temp_hd = temp_hd->next) {
+  for (hostdependency_mmap::iterator
+         it(hostdependency::hostdependencies.begin()),
+         end(hostdependency::hostdependencies.end());
+       it != end;
+       ++it) {
 
     /* clear checked flag for all dependencies */
-    for (temp_hd2 = hostdependency_list;
-	 temp_hd2 != nullptr;
-         temp_hd2 = temp_hd2->next)
-      temp_hd2->circular_path_checked = false;
+    for (hostdependency_mmap::iterator
+           it2(hostdependency::hostdependencies.begin()),
+           end2(hostdependency::hostdependencies.end());
+         it2 != end2;
+         ++it2)
+      it2->second->set_circular_path_checked(false);
 
-    found = check_for_circular_hostdependency_path(
-              temp_hd,
-              temp_hd,
-              EXECUTION_DEPENDENCY);
+    found = it->second->check_for_circular_hostdependency_path(
+      it->second.get(), EXECUTION_DEPENDENCY);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could "
         "result in a deadlock) exists for host '"
-        << temp_hd->host_name << "'!";
+        << temp_hd->get_host_name() << "'!";
       errors++;
     }
   }
 
   /* check notification dependencies between all hosts */
-  for (temp_hd = hostdependency_list;
-       temp_hd != nullptr;
-       temp_hd = temp_hd->next) {
+  for (hostdependency_mmap::iterator
+         it(hostdependency::hostdependencies.begin()),
+         end(hostdependency::hostdependencies.end());
+       it != end;
+       ++it) {
 
     /* clear checked flag for all dependencies */
-    for (temp_hd2 = hostdependency_list;
-	 temp_hd2 != nullptr;
-         temp_hd2 = temp_hd2->next)
-      temp_hd2->circular_path_checked = false;
+    for (hostdependency_mmap::iterator
+           it2(hostdependency::hostdependencies.begin()),
+           end2(hostdependency::hostdependencies.end());
+         it2 != end2;
+         ++it2)
+      it2->second->set_circular_path_checked(false);
 
-    found = check_for_circular_hostdependency_path(
-              temp_hd,
-              temp_hd,
-              NOTIFICATION_DEPENDENCY);
+    found = it->second->check_for_circular_hostdependency_path(
+      it->second.get(), NOTIFICATION_DEPENDENCY);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "
         "result in a deadlock) exists for host '"
-        << temp_hd->host_name << "'!";
+        << it->first << "'!";
       errors++;
     }
   }
 
   /* clear checked flag for all dependencies */
-  for (temp_hd = hostdependency_list;
-       temp_hd != nullptr;
-       temp_hd = temp_hd->next)
-    temp_hd->circular_path_checked = false;
+  for (hostdependency_mmap::iterator
+         it(hostdependency::hostdependencies.begin()),
+         end(hostdependency::hostdependencies.end());
+       it != end;
+       ++it)
+      it->second->set_circular_path_checked(false);
 
   /* update warning and error count */
   if (w != nullptr)
@@ -1405,11 +1413,11 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
 
   // Find the dependent host.
   umap<unsigned int, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(hd->dependent_host_name)));
+    it(state::instance().hosts().find(get_host_id(hd->get_dependent_host_name())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Dependent host specified in host dependency for "
-         "host '" << hd->dependent_host_name
+         "host '" << hd->get_dependent_host_name()
       << "' is not defined anywhere!";
     errors++;
   }
@@ -1421,11 +1429,11 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
     hd->dependent_host_ptr = it->second.get();
 
   // Find the host we're depending on.
-  it = state::instance().hosts().find(get_host_id(hd->host_name));
+  it = state::instance().hosts().find(get_host_id(hd->get_host_name()));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Host specified in host dependency for host '"
-      << hd->dependent_host_name << "' is not defined anywhere!";
+      << hd->get_dependent_host_name() << "' is not defined anywhere!";
     errors++;
   }
 
@@ -1439,19 +1447,19 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
   if (hd->dependent_host_ptr == hd->master_host_ptr) {
     logger(log_verification_error, basic)
       << "Error: Host dependency definition for host '"
-      << hd->dependent_host_name
+      << hd->get_dependent_host_name()
       << "' is circular (it depends on itself)!";
     errors++;
   }
 
   // Find the timeperiod.
-  if (hd->dependency_period) {
-    timeperiod* temp_timeperiod(find_timeperiod(hd->dependency_period));
+  if (!hd->get_dependency_period().empty()) {
+    timeperiod* temp_timeperiod(find_timeperiod(hd->get_dependency_period().c_str()));
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Dependency period '" << hd->dependency_period
+        << "Error: Dependency period '" << hd->get_dependency_period()
         << "' specified in host dependency for host '"
-        << hd->dependent_host_name
+        << hd->get_dependent_host_name()
         << "' is not defined anywhere!";
       errors++;
     }

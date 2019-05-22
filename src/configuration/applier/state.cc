@@ -482,7 +482,7 @@ std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::
  *
  *  @return The current hostdependencies.
  */
-umultimap<std::string, std::shared_ptr<hostdependency_struct> > const& applier::state::hostdependencies() const throw () {
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> > const& applier::state::hostdependencies() const throw () {
   return _hostdependencies;
 }
 
@@ -491,7 +491,7 @@ umultimap<std::string, std::shared_ptr<hostdependency_struct> > const& applier::
  *
  *  @return The current hostdependencies.
  */
-umultimap<std::string, std::shared_ptr<hostdependency_struct> >& applier::state::hostdependencies() throw () {
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >& applier::state::hostdependencies() throw () {
   return _hostdependencies;
 }
 
@@ -503,7 +503,7 @@ umultimap<std::string, std::shared_ptr<hostdependency_struct> >& applier::state:
  *  @return Iterator to the element if found, hostdependencies().end()
  *          otherwise.
  */
-umultimap<std::string, std::shared_ptr<hostdependency_struct> >::const_iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) const {
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >::const_iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) const {
   return const_cast<state*>(this)->hostdependencies_find(k);
 }
 
@@ -515,34 +515,34 @@ umultimap<std::string, std::shared_ptr<hostdependency_struct> >::const_iterator 
  *  @return Iterator to the element if found, hostdependencies().end()
  *          otherwise.
  */
-umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
-  typedef umultimap<std::string, std::shared_ptr<hostdependency_struct> > collection;
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
+  typedef umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _hostdependencies.equal_range(*k.dependent_hosts().begin());
   while (p.first != p.second) {
     configuration::hostdependency current;
     current.configuration::object::operator=(k);
     current.dependent_hosts().insert(
-                                p.first->second->dependent_host_name);
-    current.hosts().insert(p.first->second->host_name);
-    current.dependency_period(p.first->second->dependency_period
-                              ? p.first->second->dependency_period
-                              : "");
-    current.inherits_parent(p.first->second->inherits_parent);
+                                p.first->second->get_dependent_host_name());
+    current.hosts().insert(p.first->second->get_host_name());
+    current.dependency_period((!p.first->second->get_dependency_period().empty()
+                              ? p.first->second->get_dependency_period().c_str()
+                              : ""));
+    current.inherits_parent(p.first->second->get_inherits_parent());
     unsigned int options(
-      (p.first->second->fail_on_up
+      (p.first->second->get_fail_on_up()
        ? configuration::hostdependency::up
        : 0)
-      | (p.first->second->fail_on_down
+      | (p.first->second->get_fail_on_down()
          ? configuration::hostdependency::down
          : 0)
-      | (p.first->second->fail_on_unreachable
+      | (p.first->second->get_fail_on_unreachable()
          ? configuration::hostdependency::unreachable
          : 0)
-      | (p.first->second->fail_on_pending
+      | (p.first->second->get_fail_on_pending()
          ? configuration::hostdependency::pending
          : 0));
-    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
+    if (p.first->second->get_dependency_type() == NOTIFICATION_DEPENDENCY) {
       current.dependency_type(
                 configuration::hostdependency::notification_dependency);
       current.notification_failure_options(options);

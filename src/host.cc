@@ -171,7 +171,7 @@ host::host(unsigned int host_id,
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic)
-    << "Error: Host name or address is NULL";
+    << "Error: Host name or address is nullptr";
     throw (engine_error() << "Could not register host '"
                           << name << "'");
   }
@@ -297,20 +297,20 @@ host::host(unsigned int host_id,
 void host::add_child_link(host* child) {
   // Make sure we have the data we need.
   if (!child)
-      throw (engine_error() << "add child link called with NULL ptr");
+      throw (engine_error() << "add child link called with nullptr ptr");
 
   child_hosts.insert({child->get_name(), std::make_shared<com::centreon::engine::host>(*child)});
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv(get_broker_timestamp(nullptr));
   broker_relation_data(
     NEBTYPE_PARENT_ADD,
     NEBFLAG_NONE,
     NEBATTR_NONE,
     this,
-    NULL,
+    nullptr,
     child,
-    NULL,
+    nullptr,
     &tv);
 }
 
@@ -1323,7 +1323,7 @@ std::ostream& operator<<(std::ostream& os, host_map const& obj)
     else
       os << "";
   }
-  return (os);
+  return os;
 }
 
 /**
@@ -1338,16 +1338,16 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   com::centreon::engine::hostgroup const* hg =
     static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr);
 
-  char const* evt_str(NULL);
+  char const* evt_str(nullptr);
   if (obj.event_handler_ptr)
     evt_str = obj.event_handler_ptr->get_name().c_str();
-  char const* cmd_str(NULL);
+  char const* cmd_str(nullptr);
   if (obj.check_command_ptr)
     cmd_str = obj.check_command_ptr->get_name().c_str();
-  char const* chk_period_str(NULL);
+  char const* chk_period_str(nullptr);
   if (obj.check_period_ptr)
     chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* notif_period_str(NULL);
+  char const* notif_period_str(nullptr);
   if (obj.notification_period_ptr)
     notif_period_str = chkstr(obj.notification_period_ptr->name);
 
@@ -1534,7 +1534,7 @@ int is_contact_for_host(com::centreon::engine::host* hst, contact* cntct) {
        it != end;
        ++it)
     if (it->second.get() == cntct)
-      return (true);
+      return true;
 
   for (contactgroup_map::iterator
          it(hst->contact_groups.begin()),
@@ -1578,7 +1578,7 @@ int is_escalated_contact_for_host(com::centreon::engine::host* hst,
        it != end;
        ++it)
     if (it->second.get() == cntct)
-      return (true);
+      return true;
 
   // Search all contactgroups of this host escalation.
   for (contactgroup_map::iterator
@@ -1641,7 +1641,7 @@ int is_host_immediate_child_of_host(
 int is_host_immediate_parent_of_host(
       com::centreon::engine::host* child_host,
       com::centreon::engine::host* parent_host) {
-  if (is_host_immediate_child_of_host(parent_host, child_host) == true)
+  if (is_host_immediate_child_of_host(parent_host, child_host))
     return true;
   return false;
 }
@@ -1741,7 +1741,7 @@ void engine::check_for_expired_acknowledgement(com::centreon::engine::host* h) {
           host_other_props[h->get_name()].acknowledgement_timeout);
     if (acknowledgement_timeout > 0) {
       time_t last_ack(host_other_props[h->get_name()].last_acknowledgement);
-      time_t now(time(NULL));
+      time_t now(time(nullptr));
       if (last_ack + acknowledgement_timeout >= now) {
         logger(log_info_message, basic)
           << "Acknowledgement of host '" << h->get_name() << "' just expired";
@@ -1780,7 +1780,7 @@ host& engine::find_host(unsigned int host_id) {
  */
 char const* engine::get_host_timezone(std::string const& name) {
   std::string const& timezone(host_other_props[name].timezone);
-  return timezone.empty() ? NULL : timezone.c_str();
+  return timezone.empty() ? nullptr : timezone.c_str();
 }
 
 /**
@@ -1825,10 +1825,10 @@ void engine::schedule_acknowledgement_expiration(com::centreon::engine::host* h)
       last_ack + ack_timeout,
       false,
       0,
-      NULL,
+      nullptr,
       true,
       h,
-      NULL,
+      nullptr,
       0);
   }
   return ;

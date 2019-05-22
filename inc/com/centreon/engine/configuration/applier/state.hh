@@ -27,15 +27,16 @@
 #  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
+#  include "com/centreon/engine/hostdependency.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
   class contact;
   class host;
+  class hostdependency;
 CCE_END()
 
 // Forward declaration.
-struct hostdependency_struct;
 struct hostescalation_struct;
 struct service_struct;
 struct servicedependency_struct;
@@ -124,13 +125,13 @@ namespace           configuration {
                     hosts_find(configuration::host::key_type const& k) const;
       std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>::iterator
                     hosts_find(configuration::host::key_type const& k);
-      umultimap<std::string, std::shared_ptr<hostdependency_struct>> const&
+      hostdependency_mmap const&
                     hostdependencies() const throw ();
-      umultimap<std::string, std::shared_ptr<hostdependency_struct>>&
+      hostdependency_mmap&
                     hostdependencies() throw ();
-      umultimap<std::string, std::shared_ptr<hostdependency_struct>>::const_iterator
+      hostdependency_mmap::const_iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
-      umultimap<std::string, std::shared_ptr<hostdependency_struct>>::iterator
+      hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
       umultimap<std::string, std::shared_ptr<hostescalation_struct>> const&
                     hostescalations() const throw ();
@@ -240,7 +241,7 @@ namespace           configuration {
                     _cv_lock;
       std::unordered_map<unsigned int, std::shared_ptr<com::centreon::engine::host>>
                     _hosts;
-      umultimap<std::string, std::shared_ptr<hostdependency_struct>>
+      hostdependency_mmap
                     _hostdependencies;
       umultimap<std::string, std::shared_ptr<hostescalation_struct>>
                     _hostescalations;
