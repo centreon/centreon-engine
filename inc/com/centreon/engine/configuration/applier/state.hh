@@ -28,16 +28,10 @@
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/hostdependency.hh"
+#  include "com/centreon/engine/hostescalation.hh"
 #  include "com/centreon/engine/namespace.hh"
 
-CCE_BEGIN()
-  class contact;
-  class host;
-  class hostdependency;
-CCE_END()
-
 // Forward declaration.
-struct hostescalation_struct;
 struct service_struct;
 struct servicedependency_struct;
 struct serviceescalation_struct;
@@ -133,13 +127,13 @@ namespace           configuration {
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      umultimap<std::string, std::shared_ptr<hostescalation_struct>> const&
+      hostescalation_mmap const&
                     hostescalations() const throw ();
-      umultimap<std::string, std::shared_ptr<hostescalation_struct>>&
+      hostescalation_mmap&
                     hostescalations() throw ();
-      umultimap<std::string, std::shared_ptr<hostescalation_struct>>::const_iterator
+      hostescalation_mmap::const_iterator
                     hostescalations_find(configuration::hostescalation::key_type const& k) const;
-      umultimap<std::string, std::shared_ptr<hostescalation_struct>>::iterator
+      hostescalation_mmap::iterator
                     hostescalations_find(configuration::hostescalation::key_type const& k);
       hostgroup_map const&
                     hostgroups() const throw ();
@@ -243,7 +237,7 @@ namespace           configuration {
                     _hosts;
       hostdependency_mmap
                     _hostdependencies;
-      umultimap<std::string, std::shared_ptr<hostescalation_struct>>
+      hostescalation_mmap
                     _hostescalations;
       hostgroup_map _hostgroups;
       concurrency::mutex
