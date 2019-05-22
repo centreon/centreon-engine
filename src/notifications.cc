@@ -71,9 +71,9 @@ int service_notification(
       char* not_author,
       char* not_data,
       int options) {
-  host* temp_host = NULL;
-  notification* temp_notification = NULL;
-  contact* temp_contact = NULL;
+  host* temp_host = nullptr;
+  notification* temp_notification = nullptr;
+  contact* temp_contact = nullptr;
   time_t current_time;
   struct timeval start_time;
   struct timeval end_time;
@@ -88,7 +88,7 @@ int service_notification(
 
   /* get the current time */
   time(&current_time);
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   logger(dbg_notifications, basic)
     << "** Service Notification Attempt ** Host: '" << svc->host_name
@@ -98,7 +98,7 @@ int service_notification(
     << ", Last Notification: " << my_ctime(&svc->last_notification);
 
   /* if we couldn't find the host, return an error */
-  if ((temp_host = svc->host_ptr) == NULL) {
+  if ((temp_host = svc->host_ptr) == nullptr) {
     logger(dbg_notifications, basic)
       << "Couldn't find the host associated with this service, so we "
       "won't send a notification!";
@@ -159,7 +159,7 @@ int service_notification(
     not_data,
     escalated,
     0,
-    NULL);
+    nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
     free_notification_list();
     return ERROR;
@@ -170,7 +170,7 @@ int service_notification(
   }
 
   /* we have contacts to notify... */
-  if (notification_list != NULL) {
+  if (notification_list != nullptr) {
 
     /* grab the macro variables */
     grab_host_macros_r(&mac, temp_host);
@@ -180,11 +180,11 @@ int service_notification(
      * if this notification has an author, attempt to lookup the
      * associated contact
      */
-    if (not_author != NULL) {
+    if (not_author != nullptr) {
 
       /* see if we can find the contact - first by name, then by alias */
 
-      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == NULL) {
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == nullptr) {
         for (std::unordered_map<std::string,
                                 std::shared_ptr<contact> >::const_iterator
                it(state::instance().contacts().begin()),
@@ -272,7 +272,7 @@ int service_notification(
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
-         temp_notification != NULL;
+         temp_notification != nullptr;
          temp_notification = temp_notification->next) {
 
       /* grab the macro variables for this contact */
@@ -367,7 +367,7 @@ int service_notification(
   }
 
   /* get the time we finished */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* send data to event broker */
   broker_notification_data(
@@ -383,7 +383,7 @@ int service_notification(
     not_data,
     escalated,
     contacts_notified,
-    NULL);
+    nullptr);
 
   /* update the status log with the service information */
   update_service_status(svc, false);
@@ -432,7 +432,7 @@ int check_service_notification_viability(
   }
 
   /* find the host this service is associated with */
-  if ((temp_host = (host*)svc->host_ptr) == NULL) {
+  if ((temp_host = (host*)svc->host_ptr) == nullptr) {
     logger(dbg_notifications, more)
       << "Couldn't find the host associated with this service, "
       "so we won't send a notification.";
@@ -441,7 +441,7 @@ int check_service_notification_viability(
 
   /* if the service has no notification period, inherit one from the host */
   temp_period = svc->notification_period_ptr;
-  if (temp_period == NULL)
+  if (temp_period == nullptr)
     temp_period = svc->host_ptr->notification_period_ptr;
 
   // See if the service can have notifications sent out at this time.
@@ -681,7 +681,7 @@ int check_service_notification_viability(
 
     /* if not set, set it to now */
     if (!initial_notif_time)
-      initial_notif_time = time(NULL);
+      initial_notif_time = time(nullptr);
 
     double notification_delay = (svc->current_state != STATE_OK ?
              svc->first_notification_delay
@@ -819,7 +819,7 @@ int check_contact_service_notification_viability(
   {
     timezone_locker lock(cntct->get_timezone().c_str());
     if (check_time_against_period(
-          time(NULL),
+          time(nullptr),
           cntct->service_notification_period_ptr) == ERROR) {
       logger(dbg_notifications, most)
         << "This contact shouldn't be notified at this time.";
@@ -938,9 +938,9 @@ int notify_contact_of_service(
       char* not_data,
       int options,
       int escalated) {
-  char* command_name_ptr(NULL);
-  char* raw_command = NULL;
-  char* processed_command = NULL;
+  char* command_name_ptr(nullptr);
+  char* raw_command = nullptr;
+  char* processed_command = nullptr;
   int early_timeout = false;
   double exectime;
   struct timeval start_time, end_time;
@@ -969,7 +969,7 @@ int notify_contact_of_service(
     << "** Notifying contact '" << cntct->get_name() << "'";
 
   /* get start time */
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   /* send data to event broker */
   end_time.tv_sec = 0L;
@@ -987,7 +987,7 @@ int notify_contact_of_service(
                  not_author,
                  not_data,
                  escalated,
-                 NULL);
+                 nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
     return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -997,7 +997,7 @@ int notify_contact_of_service(
   for (std::shared_ptr<commands::command> const& cmd :
         cntct->get_service_notification_commands()) {
     /* get start time */
-    gettimeofday(&method_start_time, NULL);
+    gettimeofday(&method_start_time, nullptr);
 
     /* send data to event broker */
     method_end_time.tv_sec = 0L;
@@ -1016,7 +1016,7 @@ int notify_contact_of_service(
                    not_author,
                    not_data,
                    escalated,
-                   NULL);
+                   nullptr);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -1029,7 +1029,7 @@ int notify_contact_of_service(
       cmd->get_command_line().c_str(),
       &raw_command,
       macro_options);
-    if (raw_command == NULL)
+    if (raw_command == nullptr)
       continue;
 
     logger(dbg_notifications, most)
@@ -1041,7 +1041,7 @@ int notify_contact_of_service(
       raw_command,
       &processed_command,
       macro_options);
-    if (processed_command == NULL)
+    if (processed_command == nullptr)
       continue;
 
     /* run the notification command... */
@@ -1100,7 +1100,7 @@ int notify_contact_of_service(
         config->notification_timeout(),
         &early_timeout,
         &exectime,
-        NULL,
+        nullptr,
         0);
     } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
@@ -1122,7 +1122,7 @@ int notify_contact_of_service(
     delete[] processed_command;
 
     /* get end time */
-    gettimeofday(&method_end_time, NULL);
+    gettimeofday(&method_end_time, nullptr);
 
     /* send data to event broker */
     broker_contact_notification_method_data(
@@ -1139,11 +1139,11 @@ int notify_contact_of_service(
       not_author,
       not_data,
       escalated,
-      NULL);
+      nullptr);
   }
 
   /* get end time */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* update the contact's last service notification time */
   cntct->set_last_service_notification(start_time.tv_sec);
@@ -1162,7 +1162,7 @@ int notify_contact_of_service(
     not_author,
     not_data,
     escalated,
-    NULL);
+    nullptr);
   return OK;
 }
 
@@ -1176,7 +1176,7 @@ int is_valid_escalation_for_service_notification(
       int options) {
   int notification_number = 0;
   time_t current_time = 0L;
-  service* temp_service = NULL;
+  service* temp_service = nullptr;
 
   logger(dbg_functions, basic)
     << "is_valid_escalation_for_service_notification()";
@@ -1195,7 +1195,7 @@ int is_valid_escalation_for_service_notification(
 
   /* this entry if it is not for this service */
   temp_service = se->service_ptr;
-  if (temp_service == NULL || temp_service != svc)
+  if (temp_service == nullptr || temp_service != svc)
     return false;
 
   /*** EXCEPTION ***/
@@ -1216,7 +1216,7 @@ int is_valid_escalation_for_service_notification(
    * skip this escalation if it has a timeperiod and the current time isn't
    * valid
    */
-  if (se->escalation_period != NULL
+  if (se->escalation_period != nullptr
       && check_time_against_period(
            current_time,
            se->escalation_period_ptr) == ERROR)
@@ -1432,8 +1432,8 @@ int host_notification(
       char* not_author,
       char* not_data,
       int options) {
-  notification* temp_notification = NULL;
-  contact* temp_contact = NULL;
+  notification* temp_notification = nullptr;
+  contact* temp_contact = nullptr;
   time_t current_time;
   struct timeval start_time;
   struct timeval end_time;
@@ -1445,7 +1445,7 @@ int host_notification(
 
   /* get the current time */
   time(&current_time);
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   time_t time = hst->get_last_host_notification();
   logger(dbg_notifications, basic)
@@ -1511,7 +1511,7 @@ int host_notification(
     not_data,
     escalated,
     0,
-    NULL);
+    nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
     free_notification_list();
     return ERROR;
@@ -1522,7 +1522,7 @@ int host_notification(
   }
 
   /* there are contacts to be notified... */
-  if (notification_list != NULL) {
+  if (notification_list != nullptr) {
 
     /* grab the macro variables */
     grab_host_macros_r(&mac, hst);
@@ -1531,10 +1531,10 @@ int host_notification(
      * if this notification has an author, attempt to lookup the associated
      * contact
      */
-    if (not_author != NULL) {
+    if (not_author != nullptr) {
 
       /* see if we can find the contact - first by name, then by alias */
-      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == NULL) {
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == nullptr) {
         for (std::unordered_map<std::string, std::shared_ptr<contact> >::const_iterator
                it(state::instance().contacts().begin()),
                end(state::instance().contacts().end());
@@ -1621,7 +1621,7 @@ int host_notification(
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
-         temp_notification != NULL;
+         temp_notification != nullptr;
          temp_notification = temp_notification->next) {
 
       /* grab the macro variables for this contact */
@@ -1720,7 +1720,7 @@ int host_notification(
   }
 
   /* get the time we finished */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* send data to event broker */
   broker_notification_data(
@@ -1736,7 +1736,7 @@ int host_notification(
     not_data,
     escalated,
     contacts_notified,
-    NULL);
+    nullptr);
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -1992,7 +1992,7 @@ int check_host_notification_viability(
 
     /* if not set, set it to now */
     if (!initial_notif_time)
-      initial_notif_time = time(NULL);
+      initial_notif_time = time(nullptr);
 
     double notification_delay = (hst->get_current_state() != HOST_UP ?
              hst->get_first_notification_delay()
@@ -2092,7 +2092,7 @@ int check_contact_host_notification_viability(
   {
     timezone_locker lock(cntct->get_timezone().c_str());
     if (check_time_against_period(
-          time(NULL),
+          time(nullptr),
           cntct->host_notification_period_ptr) == ERROR) {
       logger(dbg_notifications, most)
         << "This contact shouldn't be notified at this time.";
@@ -2199,9 +2199,9 @@ int notify_contact_of_host(
       char* not_data,
       int options,
       int escalated) {
-  char* command_name = NULL;
-  char* raw_command = NULL;
-  char* processed_command = NULL;
+  char* command_name = nullptr;
+  char* raw_command = nullptr;
+  char* processed_command = nullptr;
   int early_timeout = false;
   double exectime;
   struct timeval start_time;
@@ -2232,7 +2232,7 @@ int notify_contact_of_host(
     << "** Notifying contact '" << cntct->get_name() << "'";
 
   /* get start time */
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   /* send data to event broker */
   end_time.tv_sec = 0L;
@@ -2250,7 +2250,7 @@ int notify_contact_of_host(
                  not_author,
                  not_data,
                  escalated,
-                 NULL);
+                 nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
     return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -2261,7 +2261,7 @@ int notify_contact_of_host(
         cntct->get_host_notification_commands()) {
 
     /* get start time */
-    gettimeofday(&method_start_time, NULL);
+    gettimeofday(&method_start_time, nullptr);
 
     /* send data to event broker */
     method_end_time.tv_sec = 0L;
@@ -2280,7 +2280,7 @@ int notify_contact_of_host(
                    not_author,
                    not_data,
                    escalated,
-                   NULL);
+                   nullptr);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -2293,7 +2293,7 @@ int notify_contact_of_host(
       cmd->get_command_line().c_str(),
       &raw_command,
       macro_options);
-    if (raw_command == NULL)
+    if (raw_command == nullptr)
       continue;
 
     logger(dbg_notifications, most)
@@ -2305,7 +2305,7 @@ int notify_contact_of_host(
       raw_command,
       &processed_command,
       macro_options);
-    if (processed_command == NULL)
+    if (processed_command == nullptr)
       continue;
 
     /* get the command name */
@@ -2365,7 +2365,7 @@ int notify_contact_of_host(
         config->notification_timeout(),
         &early_timeout,
         &exectime,
-        NULL,
+        nullptr,
         0);
     } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
@@ -2387,7 +2387,7 @@ int notify_contact_of_host(
     delete[] processed_command;
 
     /* get end time */
-    gettimeofday(&method_end_time, NULL);
+    gettimeofday(&method_end_time, nullptr);
 
     /* send data to event broker */
     broker_contact_notification_method_data(
@@ -2404,11 +2404,11 @@ int notify_contact_of_host(
       not_author,
       not_data,
       escalated,
-      NULL);
+      nullptr);
   }
 
   /* get end time */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* update the contact's last host notification time */
   cntct->set_last_host_notification(start_time.tv_sec);
@@ -2427,7 +2427,7 @@ int notify_contact_of_host(
     not_author,
     not_data,
     escalated,
-    NULL);
+    nullptr);
 
   return OK;
 }
@@ -2442,7 +2442,7 @@ int is_valid_escalation_for_host_notification(
       int options) {
   int notification_number = 0;
   time_t current_time = 0L;
-  host* temp_host = NULL;
+  host* temp_host = nullptr;
 
   logger(dbg_functions, basic)
     << "is_valid_escalation_for_host_notification()";
@@ -2461,7 +2461,7 @@ int is_valid_escalation_for_host_notification(
 
   /* find the host this escalation entry is associated with */
   temp_host = he->host_ptr;
-  if (temp_host == NULL || temp_host != hst)
+  if (temp_host == nullptr || temp_host != hst)
     return false;
 
   /*** EXCEPTION ***/
@@ -2470,19 +2470,19 @@ int is_valid_escalation_for_host_notification(
     return true;
 
   /* skip this escalation if it happens later */
-  if (he->first_notification > notification_number)
+  if (he->get_first_notification() > notification_number)
     return false;
 
   /* skip this escalation if it has already passed */
-  if (he->last_notification != 0
-      && he->last_notification < notification_number)
+  if (he->get_last_notification() != 0
+      && he->get_last_notification() < notification_number)
     return false;
 
   /*
    * skip this escalation if it has a timeperiod and the current time
    * isn't valid
    */
-  if (he->escalation_period != NULL
+  if (!he->get_escalation_period().empty()
       && check_time_against_period(
            current_time,
            he->escalation_period_ptr) == ERROR)
@@ -2490,13 +2490,13 @@ int is_valid_escalation_for_host_notification(
 
   /* skip this escalation if the state options don't match */
   if (hst->get_current_state() == HOST_UP
-      && he->escalate_on_recovery == false)
+      && !he->get_escalate_on_recovery())
     return false;
   else if (hst->get_current_state() == HOST_DOWN
-           && he->escalate_on_down == false)
+           && !he->get_escalate_on_down())
     return false;
   else if (hst->get_current_state() == HOST_UNREACHABLE
-           && he->escalate_on_unreachable == false)
+           && !he->get_escalate_on_unreachable())
     return false;
 
   return true;
@@ -2507,7 +2507,7 @@ int should_host_notification_be_escalated(host* hst) {
   logger(dbg_functions, basic)
     << "should_host_notification_be_escalated()";
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return false;
 
   std::string id(hst->get_name());
@@ -2689,7 +2689,7 @@ int create_notification_list_from_host(
 time_t get_next_service_notification_time(service* svc, time_t offset) {
   time_t next_notification = 0L;
   double interval_to_use = 0.0;
-  serviceescalation* temp_se = NULL;
+  serviceescalation* temp_se = nullptr;
   int have_escalated_interval = false;
 
   logger(dbg_functions, basic)
@@ -2708,7 +2708,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
    * its current notification number)
    */
   for (temp_se = serviceescalation_list;
-       temp_se != NULL;
+       temp_se != nullptr;
        temp_se = temp_se->next) {
 
     /* interval < 0 means to use non-escalated interval */
@@ -2766,7 +2766,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
 time_t get_next_host_notification_time(host* hst, time_t offset) {
   time_t next_notification = 0L;
   double interval_to_use = 0.0;
-  hostescalation* temp_he = NULL;
+  hostescalation* temp_he = nullptr;
   int have_escalated_interval = false;
 
   logger(dbg_functions, basic)
@@ -2784,24 +2784,26 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
    * check all the host escalation entries for valid matches for this host
    * (at its current notification number)
    */
-  for (temp_he = hostescalation_list;
-       temp_he != NULL;
-       temp_he = temp_he->next) {
+    for (hostescalation_mmap::iterator
+           it(hostescalation::hostescalations.begin()),
+           end(hostescalation::hostescalations.begin());
+         it != end;
+         ++it) {
 
     /* interval < 0 means to use non-escalated interval */
-    if (temp_he->notification_interval < 0.0)
+    if (it->second->get_notification_interval() < 0.0)
       continue;
 
     /* skip this entry if it isn't appropriate */
     if (is_valid_escalation_for_host_notification(
           hst,
-          temp_he,
+          it->second.get(),
           NOTIFICATION_OPTION_NONE) == false)
       continue;
 
     logger(dbg_notifications, most)
       << "Found a valid escalation w/ interval of "
-      << temp_he->notification_interval;
+      << temp_he->get_notification_interval();
 
     /*
      * if we haven't used a notification interval from an escalation yet,
@@ -2809,12 +2811,12 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
      */
     if (have_escalated_interval == false) {
       have_escalated_interval = true;
-      interval_to_use = temp_he->notification_interval;
+      interval_to_use = it->second->get_notification_interval();
     }
 
     /* else use the shortest of all valid escalation intervals  */
-    else if (temp_he->notification_interval < interval_to_use)
-      interval_to_use = temp_he->notification_interval;
+    else if (it->second->get_notification_interval() < interval_to_use)
+      interval_to_use = it->second->get_notification_interval();
 
     logger(dbg_notifications, most)
       << "New interval: " << interval_to_use;
@@ -2849,18 +2851,18 @@ notification* find_notification(contact* cntct) {
   logger(dbg_functions, basic)
     << "find_notification()";
 
-  if (cntct == NULL)
-    return NULL;
+  if (cntct == nullptr)
+    return nullptr;
 
   for (notification* temp_notification = notification_list;
-       temp_notification != NULL;
+       temp_notification != nullptr;
        temp_notification = temp_notification->next) {
     if (temp_notification->cntct == cntct)
       return temp_notification;
   }
 
   /* we couldn't find the contact in the notification list */
-  return NULL;
+  return nullptr;
 }
 
 /* add a new notification to the list in memory */
@@ -2868,7 +2870,7 @@ int add_notification(nagios_macros* mac, contact* cntct) {
   logger(dbg_functions, basic)
     << "add_notification()";
 
-  if (cntct == NULL)
+  if (cntct == nullptr)
     return ERROR;
 
   logger(dbg_notifications, most)

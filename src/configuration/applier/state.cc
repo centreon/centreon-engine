@@ -59,7 +59,7 @@ using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
 static bool            has_already_been_loaded(false);
-static applier::state* _instance(NULL);
+static applier::state* _instance(nullptr);
 
 /**
  *  Apply new configuration.
@@ -165,7 +165,7 @@ void applier::state::load() {
  */
 void applier::state::unload() {
   delete _instance;
-  _instance = NULL;
+  _instance = nullptr;
   return ;
 }
 
@@ -173,7 +173,7 @@ void applier::state::unload() {
  *  Default constructor.
  */
 applier::state::state()
-  : _config(NULL),
+  : _config(nullptr),
     _processing_state(state_ready) {
   applier::logging::load();
   applier::globals::load();
@@ -215,18 +215,18 @@ std::unordered_map<std::string, std::shared_ptr<commands::command>>& applier::st
  *
  *  @param[in] k Command name.
  *
- *  @return Command object if found, NULL otherwise.
+ *  @return Command object if found, nullptr otherwise.
  */
 commands::command const* applier::state::find_command(configuration::command::key_type const& k) const {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
     it(_commands.find(k));
 
   if (it != _commands.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -234,18 +234,18 @@ commands::command const* applier::state::find_command(configuration::command::ke
  *
  *  @param[in] k Command name.
  *
- *  @return Command object if found, NULL otherwise.
+ *  @return Command object if found, nullptr otherwise.
  */
 commands::command* applier::state::find_command(configuration::command::key_type const& k) {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
     it(_commands.find(k));
 
   if (it != _commands.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -253,17 +253,17 @@ commands::command* applier::state::find_command(configuration::command::key_type
  *
  *  @param[in] k Contact name.
  *
- *  @return Contact object if found, NULL otherwise.
+ *  @return Contact object if found, nullptr otherwise.
  */
 engine::contact const* applier::state::find_contact(configuration::contact::key_type const& k) const {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   contact_map::const_iterator it(_contacts.find(k));
 
   if (it != _contacts.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -271,17 +271,17 @@ engine::contact const* applier::state::find_contact(configuration::contact::key_
  *
  *  @param[in] k Contact name.
  *
- *  @return Contact object if found, NULL otherwise.
+ *  @return Contact object if found, nullptr otherwise.
  */
 engine::contact* applier::state::find_contact(configuration::contact::key_type const& k) {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   contact_map::const_iterator it(_contacts.find(k));
 
   if (it != _contacts.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -289,17 +289,17 @@ engine::contact* applier::state::find_contact(configuration::contact::key_type c
  *
  *  @param[in] name Contact name.
  *
- *  @return Contact object if found, NULL otherwise.
+ *  @return Contact object if found, nullptr otherwise.
  */
 engine::contactgroup const* applier::state::find_contactgroup(configuration::contact::key_type const& k) const {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   contactgroup_map::const_iterator it(_contactgroups.find(k));
 
   if (it != _contactgroups.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -307,17 +307,17 @@ engine::contactgroup const* applier::state::find_contactgroup(configuration::con
  *
  *  @param[in] name Contact name.
  *
- *  @return Contact object if found, NULL otherwise.
+ *  @return Contact object if found, nullptr otherwise.
  */
 engine::contactgroup* applier::state::find_contactgroup(configuration::contact::key_type const& k) {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   contactgroup_map::const_iterator it(_contactgroups.find(k));
 
   if (it != _contactgroups.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 /**
  *  Get the current connectors.
@@ -342,18 +342,18 @@ std::unordered_map<std::string, std::shared_ptr<commands::connector> >& applier:
  *
  *  @param[in] k Command name.
  *
- *  @return Command object if found, NULL otherwise.
+ *  @return Command object if found, nullptr otherwise.
  */
 commands::connector const* applier::state::find_connector(configuration::connector::key_type const& k) const {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   std::unordered_map<std::string, std::shared_ptr<commands::connector>>::const_iterator
     it(_connectors.find(k));
 
   if (it != _connectors.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -361,18 +361,18 @@ commands::connector const* applier::state::find_connector(configuration::connect
  *
  *  @param[in] k Command name.
  *
- *  @return Command object if found, NULL otherwise.
+ *  @return Command object if found, nullptr otherwise.
  */
 commands::connector* applier::state::find_connector(configuration::connector::key_type const& k) {
   if (k.empty())
-    return NULL;
+    return nullptr;
 
   std::unordered_map<std::string, std::shared_ptr<commands::connector>>::const_iterator
     it(_connectors.find(k));
 
   if (it != _connectors.end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -564,7 +564,7 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
  *
  *  @return The current hostescalations.
  */
-umultimap<std::string, std::shared_ptr<hostescalation_struct> > const& applier::state::hostescalations() const throw () {
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> > const& applier::state::hostescalations() const throw () {
   return _hostescalations;
 }
 
@@ -573,7 +573,7 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> > const& applier::
  *
  *  @return The current hostescalations.
  */
-umultimap<std::string, std::shared_ptr<hostescalation_struct> >& applier::state::hostescalations() throw () {
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >& applier::state::hostescalations() throw () {
   return _hostescalations;
 }
 
@@ -585,7 +585,7 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >& applier::state:
  *  @return Iterator to the element if found, hostescalations().end()
  *          otherwise.
  */
-umultimap<std::string, std::shared_ptr<hostescalation_struct> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
   return const_cast<state*>(this)->hostescalations_find(k);
 }
 
@@ -597,35 +597,33 @@ umultimap<std::string, std::shared_ptr<hostescalation_struct> >::const_iterator 
  *  @return Iterator to the element if found, hostescalations().end()
  *          otherwise.
  */
-umultimap<std::string, std::shared_ptr<hostescalation_struct> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
+umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
   // Copy host escalation configuration to sort some
   // members (used for comparison below).
   configuration::hostescalation hesc(k);
 
   // Browse escalations matching target host.
-  typedef umultimap<std::string, std::shared_ptr<hostescalation_struct> > collection;
+  typedef umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _hostescalations.equal_range(*k.hosts().begin());
   while (p.first != p.second) {
     // Create host escalation configuration from object.
     configuration::hostescalation current;
     current.configuration::object::operator=(k);
-    current.hosts().insert(p.first->second->host_name);
-    current.first_notification(p.first->second->first_notification);
-    current.last_notification(p.first->second->last_notification);
+    current.hosts().insert(p.first->second->get_host_name());
+    current.first_notification(p.first->second->get_first_notification());
+    current.last_notification(p.first->second->get_last_notification());
     current.notification_interval(
-              static_cast<unsigned int>(p.first->second->notification_interval));
-    current.escalation_period(p.first->second->escalation_period
-                              ? p.first->second->escalation_period
-                              : "");
+              static_cast<unsigned int>(p.first->second->get_notification_interval()));
+    current.escalation_period(p.first->second->get_escalation_period());
     unsigned int options(
-                   (p.first->second->escalate_on_recovery
+                   (p.first->second->get_escalate_on_recovery()
                     ? configuration::hostescalation::recovery
                     : 0)
-                   | (p.first->second->escalate_on_down
+                   | (p.first->second->get_escalate_on_down()
                       ? configuration::hostescalation::down
                       : 0)
-                   | (p.first->second->escalate_on_unreachable
+                   | (p.first->second->get_escalate_on_unreachable()
                       ? configuration::hostescalation::unreachable
                       : 0));
     current.escalation_options(options);
@@ -1476,12 +1474,12 @@ void applier::state::_processing(
       NEBTYPE_PROCESS_PRELAUNCH,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      NULL);
+      nullptr);
 
   //
   // Expand all objects.
   //
-  gettimeofday(tv, NULL);
+  gettimeofday(tv, nullptr);
 
   // Expand timeperiods.
   _expand<configuration::timeperiod, applier::timeperiod>(
@@ -1618,7 +1616,7 @@ void applier::state::_processing(
     new_cfg.serviceescalations());
 
   // Timing.
-  gettimeofday(tv + 1, NULL);
+  gettimeofday(tv + 1, nullptr);
 
   if (waiting_thread && _processing_state == state_ready) {
     concurrency::locker lock(&_lock);
@@ -1639,7 +1637,7 @@ void applier::state::_processing(
     applier::macros::instance().apply(new_cfg);
 
     // Timing.
-    gettimeofday(tv + 2, NULL);
+    gettimeofday(tv + 2, nullptr);
 
     if (!has_already_been_loaded
         && !verify_config
@@ -1761,7 +1759,7 @@ void applier::state::_processing(
     }
 
     // Timing.
-    gettimeofday(tv + 3, NULL);
+    gettimeofday(tv + 3, nullptr);
 
     // Check for circular paths between hosts.
     pre_flight_circular_check(&config_warnings, &config_errors);
@@ -1774,7 +1772,7 @@ void applier::state::_processing(
         NEBTYPE_PROCESS_START,
         NEBFLAG_NONE,
         NEBATTR_NONE,
-        NULL);
+        nullptr);
     }
     else
       neb_reload_all_modules();
@@ -1808,7 +1806,7 @@ void applier::state::_processing(
     }
 
     // Timing.
-    gettimeofday(tv + 4, NULL);
+    gettimeofday(tv + 4, nullptr);
     if (test_scheduling) {
       double runtimes[5];
       runtimes[4] = 0.0;
