@@ -2029,18 +2029,18 @@ unsigned int check_host_dependencies(com::centreon::engine::host* hst, int depen
     << "check_host_dependencies()";
 
   std::string id(hst->get_name());
-  umultimap<std::string, std::shared_ptr<hostdependency> > const&
+  umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> > const&
     dependencies(state::instance().hostdependencies());
 
   /* check all dependencies... */
-  for (umultimap<std::string, std::shared_ptr<hostdependency> >::const_iterator
+  for (umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >::const_iterator
          it(dependencies.find(id)), end(dependencies.end());
        it != end && it->first == id;
        ++it) {
          hostdependency* temp_dependency(&*it->second);
 
     /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->dependency_type != dependency_type)
+    if (temp_dependency->get_dependency_type() != dependency_type)
       continue;
 
     /* find the host we depend on... */
@@ -2049,7 +2049,7 @@ unsigned int check_host_dependencies(com::centreon::engine::host* hst, int depen
 
     /* skip this dependency if it has a timeperiod and the current time isn't valid */
     time(&current_time);
-    if (temp_dependency->dependency_period != NULL
+    if (!temp_dependency->get_dependency_period().empty()
         && check_time_against_period(
              current_time,
              temp_dependency->dependency_period_ptr) == ERROR)
@@ -2063,19 +2063,19 @@ unsigned int check_host_dependencies(com::centreon::engine::host* hst, int depen
       state = temp_host->get_current_state();
 
     /* is the host we depend on in state that fails the dependency tests? */
-    if (state == HOST_UP && temp_dependency->fail_on_up)
+    if (state == HOST_UP && temp_dependency->get_fail_on_up())
       return DEPENDENCIES_FAILED;
-    if (state == HOST_DOWN && temp_dependency->fail_on_down)
+    if (state == HOST_DOWN && temp_dependency->get_fail_on_down())
       return DEPENDENCIES_FAILED;
     if (state == HOST_UNREACHABLE
-        && temp_dependency->fail_on_unreachable)
+        && temp_dependency->get_fail_on_unreachable())
       return DEPENDENCIES_FAILED;
     if ((state == HOST_UP && !temp_host->get_has_been_checked())
-        && temp_dependency->fail_on_pending)
+        && temp_dependency->get_fail_on_pending())
       return DEPENDENCIES_FAILED;
 
     /* immediate dependencies ok at this point - check parent dependencies if necessary */
-    if (temp_dependency->inherits_parent) {
+    if (temp_dependency->get_inherits_parent()) {
       if (check_host_dependencies(
             temp_host,
             dependency_type) != DEPENDENCIES_OK)

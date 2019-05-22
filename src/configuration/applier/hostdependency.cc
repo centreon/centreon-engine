@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2017 Centreon
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -92,56 +92,38 @@ void applier::hostdependency::add_object(
   // Add dependency to the global configuration set.
   config->hostdependencies().insert(obj);
 
-  // Create execution dependency.
-  if (obj.dependency_type()
-      == configuration::hostdependency::execution_dependency) {
-    if (!add_host_dependency(
-           obj.dependent_hosts().begin()->c_str(),
-           obj.hosts().begin()->c_str(),
-           EXECUTION_DEPENDENCY,
-           obj.inherits_parent(),
-           static_cast<bool>(
-             obj.execution_failure_options()
-             & configuration::hostdependency::up),
-           static_cast<bool>(
-             obj.execution_failure_options()
-             & configuration::hostdependency::down),
-           static_cast<bool>(
-             obj.execution_failure_options()
-             & configuration::hostdependency::unreachable),
-           static_cast<bool>(
-             obj.execution_failure_options()
-             & configuration::hostdependency::pending),
-           NULL_IF_EMPTY(obj.dependency_period())))
-      throw (engine_error() << "Could not create host execution "
-             << "dependency of '" << *obj.dependent_hosts().begin()
-             << "' on '" << *obj.hosts().begin() << "'");
-  }
-  // Create notification dependency.
-  else
-    if (!add_host_dependency(
-           obj.dependent_hosts().begin()->c_str(),
-           obj.hosts().begin()->c_str(),
-           NOTIFICATION_DEPENDENCY,
-           obj.inherits_parent(),
-           static_cast<bool>(
-             obj.notification_failure_options()
-             & configuration::hostdependency::up),
-           static_cast<bool>(
-             obj.notification_failure_options()
-             & configuration::hostdependency::down),
-           static_cast<bool>(
-             obj.notification_failure_options()
-             & configuration::hostdependency::unreachable),
-           static_cast<bool>(
-             obj.notification_failure_options()
-             & configuration::hostdependency::pending),
-           NULL_IF_EMPTY(obj.dependency_period())))
-      throw (engine_error() << "Could not create host "
-             << "notification dependency of '"
-             << *obj.dependent_hosts().begin() << "' on '"
-             << *obj.hosts().begin() << "'");
+  std::shared_ptr<engine::hostdependency> hd =
+    std::make_shared<engine::hostdependency>(
+       *obj.dependent_hosts().begin(),
+       *obj.hosts().begin(),
+       obj.dependency_type() == configuration::hostdependency::execution_dependency ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY,
+       obj.inherits_parent(),
+       static_cast<bool>(
+         obj.execution_failure_options()
+         & configuration::hostdependency::up),
+       static_cast<bool>(
+         obj.execution_failure_options()
+         & configuration::hostdependency::down),
+       static_cast<bool>(
+         obj.execution_failure_options()
+         & configuration::hostdependency::unreachable),
+       static_cast<bool>(
+         obj.execution_failure_options()
+         & configuration::hostdependency::pending),
+       obj.dependency_period());
 
+  state::instance().hostdependencies().insert(
+    {*obj.dependent_hosts().begin(), hd});
+  engine::hostdependency::hostdependencies.insert(
+    {*obj.dependent_hosts().begin(), hd});
+
+  timeval tv(get_broker_timestamp(nullptr));
+  broker_adaptive_dependency_data(
+    NEBTYPE_HOSTDEPENDENCY_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    hd.get(),
+    &tv);
   return ;
 }
 
@@ -257,18 +239,16 @@ void applier::hostdependency::remove_object(
     << "Removing a host dependency.";
 
   // Find host dependency.
-  umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >::iterator
     it(applier::state::instance().hostdependencies_find(obj.key()));
   if (it != applier::state::instance().hostdependencies().end()) {
-    hostdependency_struct* dependency(it->second.get());
+    com::centreon::engine::hostdependency* dependency(it->second.get());
 
     // Remove host dependency from its list.
-    unregister_object<hostdependency_struct>(
-      &hostdependency_list,
-      dependency);
+    engine::hostdependency::hostdependencies.erase(it->first);
 
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
+    timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_dependency_data(
       NEBTYPE_HOSTDEPENDENCY_DELETE,
       NEBFLAG_NONE,
@@ -298,7 +278,7 @@ void applier::hostdependency::resolve_object(
     << "Resolving a host dependency.";
 
   // Find host dependency.
-  umultimap<std::string, std::shared_ptr<hostdependency_struct> >::iterator
+  umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >::iterator
     it(applier::state::instance().hostdependencies_find(obj.key()));
   if (applier::state::instance().hostdependencies().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

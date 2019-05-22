@@ -115,8 +115,6 @@ extern serviceescalation*        serviceescalation_list;
 extern serviceescalation*        serviceescalation_list_tail;
 extern servicedependency*        servicedependency_list;
 extern servicedependency*        servicedependency_list_tail;
-extern hostdependency*           hostdependency_list;
-extern hostdependency*           hostdependency_list_tail;
 extern hostescalation*           hostescalation_list;
 extern hostescalation*           hostescalation_list_tail;
 

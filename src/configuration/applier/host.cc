@@ -199,7 +199,7 @@ void applier::host::add_object(
     h->add_parent_host(*it);
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv(get_broker_timestamp(nullptr));
   broker_adaptive_host_data(
     NEBTYPE_HOST_ADD,
     NEBFLAG_NONE,
@@ -413,7 +413,7 @@ void applier::host::modify_object(
   if (obj.parents() != obj_old.parents()) {
     // Delete old parents.
     {
-      timeval tv(get_broker_timestamp(NULL));
+      timeval tv(get_broker_timestamp(nullptr));
       for (host_map::iterator
              it(h->parent_hosts.begin()),
              end(h->parent_hosts.end());
@@ -424,9 +424,9 @@ void applier::host::modify_object(
           NEBFLAG_NONE,
           NEBATTR_NONE,
           it->second.get(),
-          NULL,
+          nullptr,
           h,
-          NULL,
+          nullptr,
           &tv);
     }
     h->parent_hosts.clear();
@@ -441,7 +441,7 @@ void applier::host::modify_object(
   }
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv(get_broker_timestamp(nullptr));
   broker_adaptive_host_data(
     NEBTYPE_HOST_UPDATE,
     NEBFLAG_NONE,
@@ -478,9 +478,9 @@ void applier::host::remove_object(
     // Remove host downtimes.
     downtimes::downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
       obj.host_name(),
-      NULL,
+      nullptr,
       (time_t)0,
-      NULL);
+      nullptr);
 
     // Remove events related to this host.
     applier::scheduler::instance().remove_host(obj);
@@ -489,7 +489,7 @@ void applier::host::remove_object(
     com::centreon::engine::host::hosts.erase(hst->get_name());
 
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
+    timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_host_data(
       NEBTYPE_HOST_DELETE,
       NEBFLAG_NONE,
