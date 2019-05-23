@@ -176,7 +176,7 @@ int process_external_command(char const* cmd) {
 int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   char* user(nullptr);
@@ -261,7 +261,7 @@ int cmd_delete_comment(int cmd, char* args) {
 
 /* removes all comments associated with a host or service from the status log */
 int cmd_delete_all_comments(int cmd, char* args) {
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -304,7 +304,7 @@ int cmd_delete_all_comments(int cmd, char* args) {
 int cmd_delay_notification(int cmd, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
@@ -354,7 +354,7 @@ int cmd_delay_notification(int cmd, char* args) {
 int cmd_schedule_check(int cmd, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -430,7 +430,7 @@ int cmd_schedule_check(int cmd, char* args) {
 /* schedules all service checks on a host for a particular time */
 int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   char* temp_ptr(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
@@ -558,7 +558,7 @@ int process_passive_service_check(
       int return_code,
       char const* output) {
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   char const* real_host_name(nullptr);
 
   /* skip this service check result if we aren't accepting passive service checks */
@@ -794,7 +794,7 @@ int process_passive_host_check(
 
 /* acknowledges a host or service problem */
 int cmd_acknowledge_problem(int cmd, char* args) {
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -885,7 +885,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
 /* removes a host or service acknowledgement */
 int cmd_remove_acknowledgement(int cmd, char* args) {
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -929,7 +929,7 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 /* schedules downtime for a specific host or service */
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   servicesmember* temp_servicesmember(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   com::centreon::engine::host* last_host(nullptr);
   hostgroup* temp_hostgroup(nullptr);
@@ -1555,7 +1555,7 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd, char* args) {
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   contact* temp_contact(nullptr);
   char* host_name(nullptr);
@@ -1861,7 +1861,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd, char* args) {
-  service* temp_service{nullptr};
+  service2* temp_service{nullptr};
   com::centreon::engine::host* temp_host{nullptr};
   contact* temp_contact{nullptr};
   timeperiod* temp_timeperiod{nullptr};
@@ -2207,7 +2207,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
 /* changes a custom host or service variable */
 int cmd_change_object_custom_var(int cmd, char* args) {
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   contact* temp_contact(nullptr);
 
   /* get the host or contact name */
@@ -2350,7 +2350,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
 /******************************************************************/
 
 /* temporarily disables a service check */
-void disable_service_checks(service* svc) {
+void disable_service_checks(service2* svc) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -2380,7 +2380,7 @@ void disable_service_checks(service* svc) {
 }
 
 /* enables a service check */
-void enable_service_checks(service* svc) {
+void enable_service_checks(service2* svc) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -2496,7 +2496,7 @@ void disable_all_notifications(void) {
 }
 
 /* enables notifications for a service */
-void enable_service_notifications(service* svc) {
+void enable_service_notifications(service2* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2525,7 +2525,7 @@ void enable_service_notifications(service* svc) {
 }
 
 /* disables notifications for a service */
-void disable_service_notifications(service* svc) {
+void disable_service_notifications(service2* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2621,7 +2621,7 @@ void enable_and_propagate_notifications(
        int affect_hosts,
        int affect_services) {
   com::centreon::engine::host* child_host(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
 
   /* enable notification for top level host */
@@ -2671,7 +2671,7 @@ void disable_and_propagate_notifications(
        int affect_hosts,
        int affect_services) {
   com::centreon::engine::host* child_host(nullptr);
-  service* temp_service(nullptr);
+  service2* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
 
   if (hst == nullptr)
@@ -2976,7 +2976,7 @@ void acknowledge_host_problem(
 
 /* acknowledges a service problem */
 void acknowledge_service_problem(
-       service* svc,
+       service2* svc,
        char* ack_author,
        char* ack_data,
        int type,
@@ -3056,7 +3056,7 @@ void remove_host_acknowledgement(com::centreon::engine::host* hst) {
 }
 
 /* removes a service acknowledgement */
-void remove_service_acknowledgement(service* svc) {
+void remove_service_acknowledgement(service2* svc) {
   /* set the acknowledgement flag */
   svc->problem_has_been_acknowledged = false;
 
@@ -3188,7 +3188,7 @@ void stop_accepting_passive_service_checks(void) {
 }
 
 /* enables passive service checks for a particular service */
-void enable_passive_service_checks(service* svc) {
+void enable_passive_service_checks(service2* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3217,7 +3217,7 @@ void enable_passive_service_checks(service* svc) {
 }
 
 /* disables passive service checks for a particular service */
-void disable_passive_service_checks(service* svc) {
+void disable_passive_service_checks(service2* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3487,7 +3487,7 @@ void stop_using_event_handlers(void) {
 }
 
 /* enables the event handler for a particular service */
-void enable_service_event_handler(service* svc) {
+void enable_service_event_handler(service2* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3516,7 +3516,7 @@ void enable_service_event_handler(service* svc) {
 }
 
 /* disables the event handler for a particular service */
-void disable_service_event_handler(service* svc) {
+void disable_service_event_handler(service2* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3985,7 +3985,7 @@ void disable_performance_data(void) {
 }
 
 /* start obsessing over a particular service */
-void start_obsessing_over_service(service* svc) {
+void start_obsessing_over_service(service2* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4014,7 +4014,7 @@ void start_obsessing_over_service(service* svc) {
 }
 
 /* stop obsessing over a particular service */
-void stop_obsessing_over_service(service* svc) {
+void stop_obsessing_over_service(service2* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4112,7 +4112,7 @@ void set_host_notification_number(com::centreon::engine::host* hst, int num) {
 }
 
 /* sets the current notification number for a specific service */
-void set_service_notification_number(service* svc, int num) {
+void set_service_notification_number(service2* svc, int num) {
   /* set the notification number */
   svc->current_notification_number = num;
 

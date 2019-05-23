@@ -31,16 +31,16 @@ extern "C" {
 int grab_standard_service_macro_r(
       nagios_macros* mac,
       int macro_type,
-      service* svc,
+      service2* svc,
       char** output,
       int* free_macro);
 int grab_standard_service_macro(
       int macro_type,
-      service* svc,
+      service2* svc,
       char** output,
       int* free_macro);
-int grab_service_macros_r(nagios_macros* mac, service* svc);
-int grab_service_macros(service* svc);
+int grab_service_macros_r(nagios_macros* mac, service2* svc);
+int grab_service_macros(service2* svc);
 
 #  ifdef __cplusplus
 }

@@ -144,7 +144,7 @@ void service_downtime::print(std::ostream& os) const {
 }
 
 int service_downtime::unschedule() {
-  service* svc;
+  service2* svc;
 
   /* find the host or service associated with this downtime */
   if ((svc = ::find_service(get_hostname().c_str(), get_service_description().c_str())) == nullptr)
@@ -204,7 +204,7 @@ int service_downtime::subscribe() {
   logger(dbg_functions, basic)
     << "service_downtime::subscribe()";
 
-  service* svc{
+  service2* svc{
     ::find_service(get_hostname().c_str(), get_service_description().c_str())};
 
   /* find the host or service associated with this downtime */
@@ -309,7 +309,7 @@ int service_downtime::subscribe() {
 }
 
 int service_downtime::handle() {
-  service* svc(nullptr);
+  service2* svc(nullptr);
   time_t event_time(0L);
   int attr(0);
 

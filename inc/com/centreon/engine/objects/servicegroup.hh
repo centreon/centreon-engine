@@ -24,7 +24,7 @@
 CCE_BEGIN()
   class host;
 CCE_END()
-struct service_struct;
+struct service2;
 struct servicesmember_struct;
 
 typedef struct                servicegroup_struct {
@@ -58,7 +58,7 @@ int           is_host_member_of_servicegroup(
                 com::centreon::engine::host* hst);
 int           is_service_member_of_servicegroup(
                 servicegroup_struct* group,
-                service_struct* svc);
+                service2* svc);
 
 #  ifdef __cplusplus
 }

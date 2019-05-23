@@ -36,7 +36,7 @@ void deleter::service(void* ptr) throw () {
   if (!ptr)
     return;
 
-  service_struct* obj(static_cast<service_struct*>(ptr));
+  service2* obj(static_cast<service2*>(ptr));
 
   obj->contact_groups.clear();
   listmember(obj->servicegroups_ptr, &objectlist);

@@ -59,7 +59,7 @@ int grab_standard_hostgroup_macro(
       char** output);
 int grab_standard_service_macro(
       int macro_type,
-      service* temp_service,
+      service2* temp_service,
       char** output,
       int* free_macro);
 int grab_standard_servicegroup_macro(

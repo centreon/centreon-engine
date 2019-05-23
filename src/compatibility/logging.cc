@@ -188,7 +188,7 @@ int write_to_syslog(char const* buffer, unsigned long type) {
  *
  *  @return Return true on success.
  */
-int log_service_event(service const* svc) {
+int log_service_event(service2 const* svc) {
   if (svc->state_type == SOFT_STATE
       && !config->log_service_retries())
     return (OK);
@@ -291,7 +291,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
  *  @param[in] type  State logging type.
  *  @param[in] svc   Service object.
  */
-void log_service_state(unsigned int type, service* svc) {
+void log_service_state(unsigned int type, service2* svc) {
   if (svc->host_name && svc->description) {
     char const* type_str(tab_initial_state[type]);
     char const* state("UNKNOWN");
@@ -320,7 +320,7 @@ void log_service_state(unsigned int type, service* svc) {
  */
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-  for (service* svc(service_list); svc; svc = svc->next)
+  for (service2* svc(service_list); svc; svc = svc->next)
     log_service_state(type, svc);
   return (OK);
 }

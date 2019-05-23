@@ -36,7 +36,7 @@ extern "C" {
 
 // determines whether or not a service is "flapping" between states
 void check_for_service_flapping(
-       service* svc,
+       service2* svc,
        int update,
        int allow_flapstart_notification);
 // determines whether or not a host is "flapping" between states
@@ -47,14 +47,14 @@ void check_for_host_flapping(
        int allow_flapstart_notification);
 // handles a service that is flapping
 void set_service_flap(
-       service* svc,
+       service2* svc,
        double percent_change,
        double high_threshold,
        double low_threshold,
        int allow_flapstart_notification);
 // handles a service that has stopped flapping
 void clear_service_flap(
-       service* svc,
+       service2* svc,
        double percent_change,
        double high_threshold,
        double low_threshold);
@@ -82,11 +82,11 @@ void disable_host_flap_detection(com::centreon::engine::host* hst);
 // handles the details when flap detection is disabled globally or on a per-host basis
 void handle_host_flap_detection_disabled(com::centreon::engine::host* hst);
 // enables flap detection for a particular service
-void enable_service_flap_detection(service* svc);
+void enable_service_flap_detection(service2* svc);
 // disables flap detection for a particular service
-void disable_service_flap_detection(service* svc);
+void disable_service_flap_detection(service2* svc);
 // handles the details when flap detection is disabled globally or on a per-service basis
-void handle_service_flap_detection_disabled(service* svc);
+void handle_service_flap_detection_disabled(service2* svc);
 
 #  ifdef __cplusplus
 }

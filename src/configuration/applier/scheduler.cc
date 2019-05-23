@@ -104,9 +104,9 @@ void applier::scheduler::apply(
          end(diff_services.modified().end());
        it != end;
        ++it) {
-    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> > const&
+    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2> > const&
       services(applier::state::instance().services());
-    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
+    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2> >::const_iterator
       svc(services.find(std::make_pair(
                                it->host_id(),   //*it->hosts().begin(),
                                it->service_id())));
@@ -138,7 +138,7 @@ void applier::scheduler::apply(
 
   // Remove deleted service check from the scheduler.
   {
-    std::vector<service_struct*> old_services;
+    std::vector<service2*> old_services;
     _get_services(svc_to_unschedule, old_services, false);
     _unschedule_service_events(old_services);
   }
@@ -177,7 +177,7 @@ void applier::scheduler::apply(
 
     // Get and schedule new services.
     {
-      std::vector<service_struct*> new_services;
+      std::vector<service2*> new_services;
       _get_services(svc_to_schedule, new_services, true);
       _schedule_service_events(new_services);
     }
@@ -227,14 +227,14 @@ void applier::scheduler::remove_host(configuration::host const& h) {
  */
 void applier::scheduler::remove_service(
                            configuration::service const& s) {
-  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> > const&
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2> > const&
     services(applier::state::instance().services());
-  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2> >::const_iterator
     svc(services.find(std::make_pair(
                              s.host_id(),
                              s.service_id())));
   if (svc != services.end()) {
-    std::vector<service_struct*> svec;
+    std::vector<service2*> svec;
     svec.push_back(svc->second.get());
     _unschedule_service_events(svec);
   }
@@ -702,12 +702,12 @@ void applier::scheduler::_calculate_service_scheduling_params() {
 
   // get total services and total scheduled services.
   for (umap<std::pair<uint64_t, uint64_t>,
-            std::shared_ptr<service_struct> >::const_iterator
+            std::shared_ptr<service2> >::const_iterator
          it(applier::state::instance().services().begin()),
          end(applier::state::instance().services().end());
        it != end;
        ++it) {
-    service_struct& svc(*it->second);
+    service2& svc(*it->second);
 
     bool schedule_check(true);
     if (!svc.check_interval || !svc.checks_enabled)
@@ -846,10 +846,10 @@ void applier::scheduler::_get_hosts(
  */
 void applier::scheduler::_get_services(
        set_service const& svc_cfg,
-       std::vector<service_struct*>& svc_obj,
+       std::vector<service2*>& svc_obj,
        bool throw_if_not_found) {
   umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<service_struct> > const&
+       std::shared_ptr<service2> > const&
     services(applier::state::instance().services());
   for (set_service::const_reverse_iterator
          it(svc_cfg.rbegin()), end(svc_cfg.rend());
@@ -860,7 +860,7 @@ void applier::scheduler::_get_services(
     std::string const& host_name(*it->hosts().begin());
     std::string const& service_description(it->service_description());
     umap<std::pair<uint64_t, uint64_t>,
-         std::shared_ptr<service_struct> >::const_iterator
+         std::shared_ptr<service2> >::const_iterator
       svc(services.find(std::make_pair(host_id, service_id)));
     if (svc == services.end()) {
       if (throw_if_not_found)
@@ -1015,7 +1015,7 @@ void applier::scheduler::_schedule_host_events(
  *  @param[in] services  The list of services to schedule.
  */
 void applier::scheduler::_schedule_service_events(
-       std::vector<service_struct*> const& services) {
+       std::vector<service2*> const& services) {
   logger(dbg_events, most)
     << "Scheduling service checks...";
 
@@ -1038,7 +1038,7 @@ void applier::scheduler::_schedule_service_events(
   if (scheduling_info.service_interleave_factor > 0) {
     int interleave_block_index(0);
     for (unsigned int i(0); i < end; ++i) {
-      service_struct& svc(*services[i]);
+      service2& svc(*services[i]);
       if (interleave_block_index >= scheduling_info.service_interleave_factor) {
         ++current_interleave_block;
         interleave_block_index = 0;
@@ -1082,11 +1082,11 @@ void applier::scheduler::_schedule_service_events(
   }
 
   // Need to optimize add_event insert.
-  std::multimap<time_t, service_struct*> services_to_schedule;
+  std::multimap<time_t, service2*> services_to_schedule;
 
   // add scheduled service checks to event queue.
   for (unsigned int i(0); i < end; ++i) {
-    service_struct& svc(*services[i]);
+    service2& svc(*services[i]);
 
     // update status of all services (scheduled or not).
     update_service_status(&svc, false);
@@ -1104,12 +1104,12 @@ void applier::scheduler::_schedule_service_events(
   }
 
   // Schedule events list.
-  for (std::multimap<time_t, service_struct*>::const_iterator
+  for (std::multimap<time_t, service2*>::const_iterator
          it(services_to_schedule.begin()),
          end(services_to_schedule.end());
        it != end;
        ++it) {
-    service_struct& svc(*it->second);
+    service2& svc(*it->second);
     // Create a new service check event.
     events::schedule(
               EVENT_SERVICE_CHECK,
@@ -1171,8 +1171,8 @@ void applier::scheduler::_unschedule_host_events(
  *  @param[in] services  The list of services to unschedule.
  */
 void applier::scheduler::_unschedule_service_events(
-                           std::vector<service_struct*> const& services) {
-  for (std::vector<service_struct*>::const_iterator
+                           std::vector<service2*> const& services) {
+  for (std::vector<service2*>::const_iterator
          it(services.begin()),
          end(services.end());
        it != end;

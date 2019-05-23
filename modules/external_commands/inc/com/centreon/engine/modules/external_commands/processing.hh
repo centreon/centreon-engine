@@ -85,10 +85,10 @@ namespace         modules {
       static void _wrapper_enable_passive_service_checks(host* hst);
       static void _wrapper_disable_passive_service_checks(host* hst);
       static void _wrapper_set_service_notification_number(
-                    service* svc,
+                    service2* svc,
                     char* args);
       static void _wrapper_send_custom_service_notification(
-                    service* svc,
+                    service2* svc,
                     char* args);
 
       template <void (*fptr)()>
@@ -208,7 +208,7 @@ namespace         modules {
             (*fptr)(it->second.get());
       }
 
-      template <void (*fptr)(service*)>
+      template <void (*fptr)(service2*)>
       static void _redirector_service(
                     int id,
                     time_t entry_time,
@@ -218,13 +218,13 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
-        service* svc(::find_service(name, description));
+        service2* svc(::find_service(name, description));
         if (!svc)
           return ;
         (*fptr)(svc);
       }
 
-      template <void (*fptr)(service*, char*)>
+      template <void (*fptr)(service2*, char*)>
       static void _redirector_service(
                     int id,
                     time_t entry_time,
@@ -234,13 +234,13 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
-        service* svc(::find_service(name, description));
+        service2* svc(::find_service(name, description));
         if (!svc)
           return ;
         (*fptr)(svc, args + strlen(name) + strlen(description) + 2);
       }
 
-      template <void (*fptr)(service*)>
+      template <void (*fptr)(service2*)>
       static void _redirector_servicegroup(
                     int id,
                     time_t entry_time,

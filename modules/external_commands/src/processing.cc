@@ -826,7 +826,7 @@ void processing::_wrapper_disable_passive_service_checks(host* hst) {
 }
 
 void processing::_wrapper_set_service_notification_number(
-       service* svc,
+       service2* svc,
        char* args) {
   char* str(my_strtok(args, ";"));
   if (str)
@@ -834,7 +834,7 @@ void processing::_wrapper_set_service_notification_number(
 }
 
 void processing::_wrapper_send_custom_service_notification(
-       service* svc,
+       service2* svc,
        char* args) {
   char* buf[3] = { NULL, NULL, NULL };
   if ((buf[0] = my_strtok(args, ";"))

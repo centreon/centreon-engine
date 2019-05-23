@@ -210,7 +210,7 @@ struct                                  nagios_macros {
   char*                                 ondemand;
   com::centreon::engine::host*          host_ptr;
   com::centreon::engine::hostgroup*     hostgroup_ptr;
-  service*                              service_ptr;
+  service2*                              service_ptr;
   servicegroup*                         servicegroup_ptr;
   com::centreon::engine::contact*       contact_ptr;
   com::centreon::engine::contactgroup*  contactgroup_ptr;

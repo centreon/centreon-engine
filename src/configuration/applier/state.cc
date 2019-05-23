@@ -700,7 +700,7 @@ hostgroup_map::iterator applier::state::hostgroups_find(
  *  @return The current services.
  */
 std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<service_struct> > const& applier::state::services() const throw () {
+     std::shared_ptr<service2> > const& applier::state::services() const throw () {
   return _services;
 }
 
@@ -710,7 +710,7 @@ std::unordered_map<std::pair<unsigned long, unsigned long>,
  *  @return The current services.
  */
 std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<service_struct> >& applier::state::services() throw () {
+     std::shared_ptr<service2> >& applier::state::services() throw () {
   return _services;
 }
 
@@ -723,7 +723,7 @@ std::unordered_map<std::pair<unsigned long, unsigned long>,
  *          otherwise.
  */
 std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<service_struct> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
+     std::shared_ptr<service2> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
   return _services.find(k);
 }
 
@@ -736,7 +736,7 @@ std::unordered_map<std::pair<unsigned long, unsigned long>,
  *          otherwise.
  */
 std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<service_struct> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
+     std::shared_ptr<service2> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
   return _services.find(k);
 }
 
@@ -1796,7 +1796,7 @@ void applier::state::_processing(
            it != end;
            ++it) {
         std::unordered_map<std::pair<unsigned long, unsigned long>,
-             std::shared_ptr<service_struct> >::const_iterator
+             std::shared_ptr<service2> >::const_iterator
           svc(services().find(std::make_pair(
                                      it->host_id(),
                                      it->service_id())));

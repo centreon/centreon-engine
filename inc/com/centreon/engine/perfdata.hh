@@ -33,7 +33,7 @@ int initialize_performance_data();
 // cleans up performance data
 int cleanup_performance_data();
 // updates service performance data
-int update_service_performance_data(service* svc);
+int update_service_performance_data(service2* svc);
 // updates host performance data
 int update_host_performance_data(com::centreon::engine::host* hst);
 

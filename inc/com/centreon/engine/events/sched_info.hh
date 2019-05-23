@@ -26,7 +26,7 @@
 #  include <time.h>
 
 // Forward declaration.
-struct service_struct;
+struct service2;
 struct timed_event_struct;
 
 typedef struct  sched_info_struct {

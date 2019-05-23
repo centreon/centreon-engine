@@ -21,7 +21,7 @@
 #  define CCE_OBJECTS_SERVICEDEPENDENCY_HH
 
 /* Forward declaration. */
-struct service_struct;
+struct service2;
 struct timeperiod_struct;
 
 typedef struct                     servicedependency_struct {
@@ -40,8 +40,8 @@ typedef struct                     servicedependency_struct {
   int                              circular_path_checked;
   int                              contains_circular_path;
 
-  service_struct*                  master_service_ptr;
-  service_struct*                  dependent_service_ptr;
+  service2*                  master_service_ptr;
+  service2*                  dependent_service_ptr;
   timeperiod_struct*               dependency_period_ptr;
   struct servicedependency_struct* next;
   struct servicedependency_struct* nexthash;

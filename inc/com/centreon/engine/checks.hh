@@ -66,11 +66,11 @@ int reap_check_results();
 // Service Check Functions
 
 int run_scheduled_service_check(
-      service* svc,
+      service2* svc,
       int check_options,
       double latency);
 int run_async_service_check(
-      service* svc,
+      service2* svc,
       int check_options,
       double latency,
       int scheduled_check,
@@ -78,10 +78,10 @@ int run_async_service_check(
       int* time_is_valid,
       time_t* preferred_time);
 int handle_async_service_check_result(
-      service* temp_service,
+      service2* temp_service,
       check_result* queued_check_result);
 int check_service_check_viability(
-      service* svc,
+      service2* svc,
       int check_options,
       int* time_is_valid,
       time_t* new_time);
@@ -90,7 +90,7 @@ int check_service_check_viability(
 
 // schedules an immediate or delayed service check
 void schedule_service_check(
-       service* svc,
+       service2* svc,
        time_t check_time,
        int options);
 // schedules an immediate or delayed host check
@@ -103,7 +103,7 @@ void schedule_host_check(
 
 // checks service dependencies
 unsigned int check_service_dependencies(
-               service* svc,
+               service2* svc,
                int dependency_type);
 // checks for orphaned services
 void check_for_orphaned_services();
@@ -111,7 +111,7 @@ void check_for_orphaned_services();
 void check_service_result_freshness();
 // determines if a service's check results are fresh
 int is_service_result_fresh(
-      service* temp_service,
+      service2* temp_service,
       time_t current_time,
       int log_this);
 // checks host dependencie

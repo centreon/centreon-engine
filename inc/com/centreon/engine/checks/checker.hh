@@ -59,7 +59,7 @@ namespace                checks {
                            int* time_is_valid = NULL,
                            time_t* preferred_time = NULL);
     void                 run(
-                           service* svc,
+                           service2* svc,
                            int check_options = CHECK_OPTION_NONE,
                            double latency = 0.0,
                            bool scheduled_check = false,

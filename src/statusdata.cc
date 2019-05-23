@@ -90,7 +90,7 @@ int update_host_status(com::centreon::engine::host* hst,
 }
 
 /* updates service status info */
-int update_service_status(service* svc, int aggregated_dump) {
+int update_service_status(service2* svc, int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
   if (aggregated_dump == false)
     broker_service_status(

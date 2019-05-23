@@ -166,7 +166,7 @@ void checker::reap() {
           unsigned int service_id(get_service_id(
                                     result.host_name,
                                     result.service_description));
-          service& svc(find_service(host_id, service_id));
+          service2& svc(find_service(host_id, service_id));
           // Process the check result.
           logger(dbg_checks, more)
             << "Handling check result for service '"
@@ -509,7 +509,7 @@ void checker::run(
  *  @return True is the check start correctly.
  */
 void checker::run(
-                service* svc,
+                service2* svc,
                 int check_options,
                 double latency,
                 bool scheduled_check,

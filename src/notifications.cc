@@ -66,7 +66,7 @@ static char const* tab_service_state_str[] = {
 
 /* notify contacts about a service problem or recovery */
 int service_notification(
-      service* svc,
+      service2* svc,
       unsigned int type,
       char const* not_author,
       char const* not_data,
@@ -402,7 +402,7 @@ int service_notification(
 
 /* checks the viability of sending out a service alert (top level filters) */
 int check_service_notification_viability(
-      service* svc,
+      service2* svc,
       unsigned int type,
       int options) {
   host* temp_host;
@@ -789,7 +789,7 @@ int check_service_notification_viability(
  */
 int check_contact_service_notification_viability(
       contact* cntct,
-      service* svc,
+      service2* svc,
       unsigned int type,
       int options) {
 
@@ -932,7 +932,7 @@ int check_contact_service_notification_viability(
 int notify_contact_of_service(
       nagios_macros* mac,
       contact* cntct,
-      service* svc,
+      service2* svc,
       int type,
       char const* not_author,
       char const* not_data,
@@ -1171,12 +1171,12 @@ int notify_contact_of_service(
  * service notification
  */
 int is_valid_escalation_for_service_notification(
-      service* svc,
+      service2* svc,
       serviceescalation* se,
       int options) {
   int notification_number = 0;
   time_t current_time = 0L;
-  service* temp_service = nullptr;
+  service2* temp_service = nullptr;
 
   logger(dbg_functions, basic)
     << "is_valid_escalation_for_service_notification()";
@@ -1247,7 +1247,7 @@ int is_valid_escalation_for_service_notification(
  *  @return true if service notification should be escalated, false if
  *          it should not.
  */
-int should_service_notification_be_escalated(service* svc) {
+int should_service_notification_be_escalated(service2* svc) {
   // Debug.
   logger(dbg_functions, basic)
     << "should_service_notification_be_escalated()";
@@ -1284,7 +1284,7 @@ int should_service_notification_be_escalated(service* svc) {
  */
 int create_notification_list_from_service(
       nagios_macros* mac,
-      service* svc, int options,
+      service2* svc, int options,
       int* escalated) {
   int escalate_notification = false;
 
@@ -2686,7 +2686,7 @@ int create_notification_list_from_host(
 /******************************************************************/
 
 /* calculates next acceptable re-notification time for a service */
-time_t get_next_service_notification_time(service* svc, time_t offset) {
+time_t get_next_service_notification_time(service2* svc, time_t offset) {
   time_t next_notification = 0L;
   double interval_to_use = 0.0;
   serviceescalation* temp_se = nullptr;

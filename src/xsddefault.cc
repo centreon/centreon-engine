@@ -311,7 +311,7 @@ int xsddefault_save_status_data() {
   }
 
   // save service status data
-  for (service* svc = service_list; svc; svc = svc->next) {
+  for (service2* svc = service_list; svc; svc = svc->next) {
     stream
       << "servicestatus {\n"
          "\thost_name=" << svc->host_name << "\n"

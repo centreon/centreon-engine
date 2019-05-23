@@ -45,8 +45,8 @@ using namespace com::centreon::engine::string;
  *  @return True if is the same object, otherwise false.
  */
 bool operator==(
-       service const& obj1,
-       service const& obj2) throw () {
+       service2 const& obj1,
+       service2 const& obj2) throw () {
   return (is_equal(obj1.host_name, obj2.host_name)
           && is_equal(obj1.description, obj2.description)
           && is_equal(obj1.display_name, obj2.display_name)
@@ -164,8 +164,8 @@ bool operator==(
  *  @return True if is not the same object, otherwise false.
  */
 bool operator!=(
-       service const& obj1,
-       service const& obj2) throw () {
+       service2 const& obj1,
+       service2 const& obj2) throw () {
   return !operator==(obj1, obj2);
 }
 
@@ -177,7 +177,7 @@ bool operator!=(
  *
  *  @return The output stream.
  */
-std::ostream& operator<<(std::ostream& os, service const& obj) {
+std::ostream& operator<<(std::ostream& os, service2 const& obj) {
   char const* evt_str(NULL);
   if (obj.event_handler_ptr)
     evt_str = obj.event_handler_ptr->get_name().c_str();
@@ -410,7 +410,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *
  *  @return New service.
  */
-service* add_service(
+service2* add_service(
            uint64_t host_id,
            uint64_t service_id,
            char const* host_name,
@@ -527,7 +527,7 @@ service* add_service(
   }
 
   // Allocate memory.
-  std::shared_ptr<service> obj(new service, deleter::service);
+  std::shared_ptr<service2> obj(new service2, deleter::service);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -635,7 +635,7 @@ int get_service_count() {
  *
  *  @return true or false.
  */
-int is_contact_for_service(service* svc, contact* cntct) {
+int is_contact_for_service(service2* svc, contact* cntct) {
   if (!svc || !cntct)
     return false;
 
@@ -670,7 +670,7 @@ int is_contact_for_service(service* svc, contact* cntct) {
  *
  *  @return true or false.
  */
-int is_escalated_contact_for_service(service* svc, contact* cntct) {
+int is_escalated_contact_for_service(service2* svc, contact* cntct) {
   if (!svc || !cntct)
     return false;
 
@@ -714,7 +714,7 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
  *
  *  @param[in] s  Target service.
  */
-void engine::check_for_expired_acknowledgement(service* s) {
+void engine::check_for_expired_acknowledgement(service2* s) {
   if (s->problem_has_been_acknowledged) {
     int acknowledgement_timeout(
           service_other_props[std::make_pair(
@@ -748,13 +748,13 @@ void engine::check_for_expired_acknowledgement(service* s) {
  *  @return The struct service or throw exception if the
  *          service is not found.
  */
-service& engine::find_service(
+service2& engine::find_service(
            uint64_t host_id,
            uint64_t service_id) {
   std::pair<uint64_t, uint64_t>
     id(std::make_pair(host_id, service_id));
   umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<service_struct> >::const_iterator
+       std::shared_ptr<service2> >::const_iterator
     it(state::instance().services().find(id));
   if (it == state::instance().services().end())
     throw (engine_error() << "Service '" << service_id
@@ -790,7 +790,7 @@ char const* engine::get_service_timezone(
 bool engine::is_service_exist(
        std::pair<uint64_t, uint64_t> const& id) {
   umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<service_struct> >::const_iterator
+       std::shared_ptr<service2> >::const_iterator
     it(state::instance().services().find(id));
   return it != state::instance().services().end();
 }
@@ -830,7 +830,7 @@ uint64_t engine::get_service_id(char const* host, char const* svc) {
  *
  *  @param[in] s  Target service.
  */
-void engine::schedule_acknowledgement_expiration(service* s) {
+void engine::schedule_acknowledgement_expiration(service2* s) {
   std::pair<std::string, std::string>
     hs(std::make_pair(s->host_ptr->get_name(), s->description));
   int ack_timeout(service_other_props[hs].acknowledgement_timeout);

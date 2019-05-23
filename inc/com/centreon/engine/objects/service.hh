@@ -41,7 +41,7 @@ CCE_END()
 struct objectlist_struct;
 struct timeperiod_struct;
 
-typedef struct                  service_struct {
+typedef struct                  service2 {
   char*                         host_name;
   char*                         description;
   char*                         display_name;
@@ -154,9 +154,9 @@ typedef struct                  service_struct {
   timeperiod_struct*            check_period_ptr;
   timeperiod_struct*            notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
-  struct service_struct*        next;
-  struct service_struct*        nexthash;
-}                               service;
+  struct service2*        next;
+  struct service2*        nexthash;
+}                               service2;
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
@@ -174,7 +174,7 @@ struct                          service_other_properties {
 extern "C" {
 #  endif /* C++ */
 
-service* add_service(
+service2* add_service(
            uint64_t host_id,
            uint64_t service_id,
            char const* host_name,
@@ -228,10 +228,10 @@ service* add_service(
            int obsess_over_service);
 int      get_service_count();
 int      is_contact_for_service(
-           service_struct* svc,
+           service2* svc,
            com::centreon::engine::contact* cntct);
 int      is_escalated_contact_for_service(
-           service_struct* svc,
+           service2* svc,
            com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
@@ -241,17 +241,17 @@ int      is_escalated_contact_for_service(
 #    include <string>
 
 bool          operator==(
-                service const& obj1,
-                service const& obj2) throw ();
+                service2 const& obj1,
+                service2 const& obj2) throw ();
 bool          operator!=(
-                service_struct const& obj1,
-                service_struct const& obj2) throw ();
-std::ostream& operator<<(std::ostream& os, service const& obj);
+                service2 const& obj1,
+                service2 const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, service2 const& obj);
 
 CCE_BEGIN()
 
-void          check_for_expired_acknowledgement(service* s);
-service&      find_service(
+void          check_for_expired_acknowledgement(service2* s);
+service2&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
 char const*   get_service_timezone(char const* hst, char const* svc);
@@ -262,7 +262,7 @@ std::pair<uint64_t, uint64_t>
                 char const* host,
                 char const* svc);
 uint64_t get_service_id(char const* host, char const* svc);
-void          schedule_acknowledgement_expiration(service* s);
+void          schedule_acknowledgement_expiration(service2* s);
 
 CCE_END()
 

@@ -39,7 +39,7 @@ class                               downtime_manager {
   int                               unschedule_downtime(int type, uint64_t downtime_id);
   std::shared_ptr<downtime>         find_downtime(int type, uint64_t downtime_id);
   int                               check_pending_flex_host_downtime(host* hst);
-  int                               check_pending_flex_service_downtime(service* svc);
+  int                               check_pending_flex_service_downtime(service2* svc);
   void                              add_downtime(downtime* dt);
   void                              clear_scheduled_downtimes();
   int                               check_for_expired_downtime();
