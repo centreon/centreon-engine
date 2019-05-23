@@ -614,7 +614,7 @@ int check_service_notification_viability(
   /* check service notification dependencies */
   if (check_service_dependencies(
         svc,
-        NOTIFICATION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+        hostdependency::notification) == DEPENDENCIES_FAILED) {
     logger(dbg_notifications, more)
       << "Service notification dependencies for this service "
       "have failed, so we won't sent a notification out.";
@@ -624,7 +624,7 @@ int check_service_notification_viability(
   /* check host notification dependencies */
   if (check_host_dependencies(
         temp_host,
-        NOTIFICATION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+        hostdependency::notification) == DEPENDENCIES_FAILED) {
     logger(dbg_notifications, more)
       << "Host notification dependencies for this service have failed, "
       "so we won't sent a notification out.";
@@ -1943,7 +1943,7 @@ int check_host_notification_viability(
   /* check notification dependencies */
   if (check_host_dependencies(
         hst,
-        NOTIFICATION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+        hostdependency::notification) == DEPENDENCIES_FAILED) {
     logger(dbg_notifications, more)
       << "Notification dependencies for this host have failed, "
       "so we won't sent a notification out!";

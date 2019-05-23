@@ -68,7 +68,6 @@ com::centreon::engine::commands::command*
                     ochp_command_ptr(NULL);
 com::centreon::engine::commands::command*
                     ocsp_command_ptr(NULL);
-comment*            comment_list(NULL);
 contactgroup*       contactgroup_list(NULL);
 contactgroup*       contactgroup_list_tail(NULL);
 dbuf                check_result_dbuf;
@@ -92,7 +91,6 @@ int                 caught_signal(false);
 int                 command_check_interval(-1);
 int                 config_errors(0);
 int                 config_warnings(0);
-int                 defer_comment_sorting(0);
 int                 defer_downtime_sorting(0);
 int                 embedded_perl_initialized(false);
 int                 external_command_buffer_slots(4096);
@@ -220,7 +218,6 @@ unsigned long       max_check_result_file_age(3600);
 unsigned long       max_debug_file_size(1000000);
 unsigned long       modified_host_process_attributes(MODATTR_NONE);
 unsigned long       modified_service_process_attributes(MODATTR_NONE);
-unsigned long       next_comment_id(0L);
 unsigned long       next_event_id(1);
 unsigned long       next_notification_id(1);
 unsigned long       next_problem_id(0L);

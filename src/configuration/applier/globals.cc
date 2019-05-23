@@ -33,7 +33,6 @@ static applier::globals* _instance = NULL;
  */
 void applier::globals::apply(state& config) {
   _set_global(::check_result_path, config.check_result_path());
-  _set_global(::command_file, config.command_file());
   _set_global(::debug_file, config.debug_file());
   _set_global(::global_host_event_handler, config.global_host_event_handler());
   _set_global(::global_service_event_handler, config.global_service_event_handler());
@@ -163,7 +162,6 @@ applier::globals::globals() {
  */
 applier::globals::~globals() throw() {
   delete[] ::check_result_path;
-  delete[] ::command_file;
   delete[] ::debug_file;
   delete[] ::global_host_event_handler;
   delete[] ::global_service_event_handler;
@@ -175,7 +173,6 @@ applier::globals::~globals() throw() {
   delete[] ::use_timezone;
 
   ::check_result_path = NULL;
-  ::command_file = NULL;
   ::debug_file = NULL;
   ::global_host_event_handler = NULL;
   ::global_service_event_handler = NULL;

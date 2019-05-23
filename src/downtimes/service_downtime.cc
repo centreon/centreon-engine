@@ -20,6 +20,7 @@
 #include <map>
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
@@ -27,7 +28,6 @@
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "compatibility/find.hh"
@@ -59,7 +59,7 @@ downtime* find_service_downtime(uint64_t downtime_id) {
 }
 
 service_downtime::~service_downtime() {
-  delete_service_comment(_get_comment_id());
+  comment::delete_comment(_get_comment_id());
   /* send data to event broker */
   broker_downtime_data(
       NEBTYPE_DOWNTIME_DELETE, NEBFLAG_NONE, NEBATTR_NONE, SERVICE_DOWNTIME,
@@ -260,19 +260,22 @@ int service_downtime::subscribe() {
 
   /* add a non-persistent comment to the host or service regarding the scheduled
    * outage */
-  add_new_comment(
-    SERVICE_COMMENT,
-    DOWNTIME_COMMENT,
-    svc->host_name,
-    svc->description,
-    time(nullptr),
-    "(Centreon Engine Process)",
-    oss.str().c_str(),
-    0,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    &_comment_id);
+  std::shared_ptr<comment> com =
+    std::make_shared<comment>(
+      comment::service,
+      comment::downtime,
+      svc->host_name,
+      svc->description,
+      time(nullptr),
+      "(Centreon Engine Process)",
+      oss.str(),
+      false,
+      comment::internal,
+      false,
+      (time_t)0);
+
+  comment::comments.insert({com->get_comment_id(), com});
+  _comment_id = com->get_comment_id();
 
   /*** SCHEDULE DOWNTIME - FLEXIBLE (NON-FIXED) DOWNTIME IS HANDLED AT A LATER
    * POINT ***/

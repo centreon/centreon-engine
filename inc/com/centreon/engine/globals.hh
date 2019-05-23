@@ -73,7 +73,6 @@ extern time_t                    last_log_rotation;
 extern unsigned long             modified_host_process_attributes;
 extern unsigned long             modified_service_process_attributes;
 
-extern unsigned long             next_comment_id;
 extern unsigned long             next_downtime_id;
 extern unsigned long             next_event_id;
 extern unsigned long             next_problem_id;
@@ -136,9 +135,6 @@ extern timed_event*              event_list_high;
 extern timed_event*              event_list_high_tail;
 extern sched_info                scheduling_info;
 
-extern comment*                  comment_list;
-extern int                       defer_comment_sorting;
-
 extern char*                     macro_x_names[];
 extern char*                     macro_user[];
 
@@ -156,7 +152,6 @@ extern unsigned int debug_level;
 extern unsigned int debug_verbosity;
 extern char* debug_file;
 extern unsigned long max_debug_file_size;
-extern char* command_file;
 extern char* global_host_event_handler;
 extern char* global_service_event_handler;
 extern char* ocsp_command;

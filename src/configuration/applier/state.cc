@@ -542,7 +542,7 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
       | (p.first->second->get_fail_on_pending()
          ? configuration::hostdependency::pending
          : 0));
-    if (p.first->second->get_dependency_type() == NOTIFICATION_DEPENDENCY) {
+    if (p.first->second->get_dependency_type() == engine::hostdependency::notification) {
       current.dependency_type(
                 configuration::hostdependency::notification_dependency);
       current.notification_failure_options(options);
@@ -812,7 +812,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
                    | (p.first->second->fail_on_pending
                       ? configuration::servicedependency::pending
                       : 0));
-    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
+    if (p.first->second->dependency_type == engine::hostdependency::notification) {
       current.dependency_type(
         configuration::servicedependency::notification_dependency);
       current.notification_failure_options(options);

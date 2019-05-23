@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
@@ -28,7 +29,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/retention/dump.hh"
 
 using namespace com::centreon::engine::configuration::applier;
@@ -44,23 +44,23 @@ using namespace com::centreon::engine::retention;
  *
  *  @return The output stream.
  */
-std::ostream& dump::comment(std::ostream& os, comment_struct const& obj) {
-  if (obj.comment_type == HOST_COMMENT)
+std::ostream& dump::comment(std::ostream& os, com::centreon::engine::comment const& obj) {
+  if (obj.get_comment_type() == com::centreon::engine::comment::host)
     os << "hostcomment {\n";
   else
     os << "servicecomment {\n";
-  os << "host_name=" << obj.host_name << "\n";
-  if (obj.comment_type == SERVICE_COMMENT)
-    os << "service_description=" << obj.service_description << "\n";
-  os << "author=" << obj.author << "\n"
-    "comment_data=" << obj.comment_data << "\n"
-    "comment_id=" << obj.comment_id << "\n"
-    "entry_time=" << static_cast<unsigned long>(obj.entry_time) << "\n"
-    "expire_time=" << static_cast<unsigned long>(obj.expire_time) << "\n"
-    "expires=" << obj.expires << "\n"
-    "persistent=" << obj.persistent << "\n"
-    "source=" << obj.source << "\n"
-    "entry_type=" << obj.entry_type << "\n"
+  os << "host_name=" << obj.get_host_name() << "\n";
+  if (obj.get_comment_type() == com::centreon::engine::comment::service)
+    os << "service_description=" << obj.get_service_description() << "\n";
+  os << "author=" << obj.get_author() << "\n"
+    "comment_data=" << obj.get_comment_data() << "\n"
+    "comment_id=" << obj.get_comment_id() << "\n"
+    "entry_time=" << static_cast<unsigned long>(obj.get_entry_time()) << "\n"
+    "expire_time=" << static_cast<unsigned long>(obj.get_expire_time()) << "\n"
+    "expires=" << obj.get_expires() << "\n"
+    "persistent=" << obj.get_persistent() << "\n"
+    "source=" << obj.get_source() << "\n"
+    "entry_type=" << obj.get_entry_type() << "\n"
     "}\n";
   return os;
 }
@@ -73,8 +73,12 @@ std::ostream& dump::comment(std::ostream& os, comment_struct const& obj) {
  *  @return The output stream.
  */
 std::ostream& dump::comments(std::ostream& os) {
-  for (comment_struct* obj(comment_list); obj; obj = obj->next)
-    dump::comment(os, *obj);
+  for (comment_map::iterator
+         it(comment::comments.begin()),
+         end(comment::comments.end());
+       it != end;
+       ++it)
+    dump::comment(os, *it->second);
   return os;
 }
 
@@ -308,7 +312,7 @@ std::ostream& dump::program(std::ostream& os) {
     "global_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
     "modified_host_attributes=" << (modified_host_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
     "modified_service_attributes=" << (modified_service_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
-    "next_comment_id=" << next_comment_id << "\n"
+    "next_comment_id=" << comment::get_next_comment_id() << "\n"
     "next_event_id=" << next_event_id << "\n"
     "next_notification_id=" << next_notification_id << "\n"
     "next_problem_id=" << next_problem_id << "\n"

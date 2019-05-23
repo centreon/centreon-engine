@@ -239,7 +239,7 @@ servicedependency* add_service_dependency(
     if (dependency_period)
       obj->dependency_period = string::dup(dependency_period);
 
-    obj->dependency_type = (dependency_type == EXECUTION_DEPENDENCY) ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY;
+    obj->dependency_type = dependency_type;
     obj->fail_on_critical = (fail_on_critical == 1);
     obj->fail_on_ok = (fail_on_ok == 1);
     obj->fail_on_pending = (fail_on_pending == 1);
@@ -319,7 +319,7 @@ int check_for_circular_servicedependency_path(
 
   // Notification dependencies are ok at this point as long as they
   // don't inherit.
-  if ((dependency_type == NOTIFICATION_DEPENDENCY)
+  if ((dependency_type == hostdependency::notification)
       && (dep->inherits_parent == false))
     return (false);
 

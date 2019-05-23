@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,13 +21,14 @@
 #include <iomanip>
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/statusdata.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -392,18 +393,23 @@ void set_service_flap(
       << "% threshold).  When the service state stabilizes and the "
     "flapping " << "stops, notifications will be re-enabled.";
 
-  add_new_service_comment(
-    FLAPPING_COMMENT,
-    svc->host_name,
-    svc->description,
-    time(NULL),
-    "(Centreon Engine Process)",
-    oss.str().c_str(),
-    0,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    &(svc->flapping_comment_id));
+  std::shared_ptr<comment> com =
+    std::make_shared<comment>(
+      comment::service,
+      comment::flapping,
+      svc->host_name,
+      svc->description,
+      time(NULL),
+      "(Centreon Engine Process)",
+      oss.str(),
+      false,
+      comment::internal,
+      false,
+      (time_t)0);
+
+  comment::comments.insert({com->get_comment_id(), com});
+
+  svc->flapping_comment_id = com->get_comment_id();
 
   /* set the flapping indicator */
   svc->is_flapping = true;
@@ -466,7 +472,7 @@ void clear_service_flap(
 
   /* delete the comment we added earlier */
   if (svc->flapping_comment_id != 0)
-    delete_service_comment(svc->flapping_comment_id);
+    comment::delete_comment(svc->flapping_comment_id);
   svc->flapping_comment_id = 0;
 
   /* clear the flapping indicator */
@@ -542,17 +548,23 @@ void set_host_flap(
 
   unsigned long comment_id;
   comment_id = hst->get_flapping_comment_id();
-  add_new_host_comment(
-    FLAPPING_COMMENT,
-    hst->get_name().c_str(),
-    time(NULL),
-    "(Centreon Engine Process)",
-    oss.str().c_str(),
-    0,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    &comment_id);
+  std::shared_ptr<comment> com =
+    std::make_shared<comment>(
+      comment::host,
+      comment::flapping,
+      hst->get_name(),
+      "",
+      time(NULL),
+      "(Centreon Engine Process)",
+      oss.str(),
+      false,
+      comment::internal,
+      false,
+      (time_t)0);
+
+  comment::comments.insert({com->get_comment_id(), com});
+
+  comment_id = com->get_comment_id();
   hst->set_flapping_comment_id(comment_id);
 
   /* set the flapping indicator */
@@ -614,7 +626,7 @@ void clear_host_flap(
 
   /* delete the comment we added earlier */
   if (hst->get_flapping_comment_id() != 0)
-    delete_host_comment(hst->get_flapping_comment_id());
+    comment::delete_comment(hst->get_flapping_comment_id());
   hst->set_flapping_comment_id(0);
 
   /* clear the flapping indicator */
@@ -850,7 +862,7 @@ void handle_host_flap_detection_disabled(com::centreon::engine::host* hst) {
 
     /* delete the original comment we added earlier */
     if (hst->get_flapping_comment_id() != 0)
-      delete_host_comment(hst->get_flapping_comment_id());
+      comment::delete_comment(hst->get_flapping_comment_id());
     hst->set_flapping_comment_id(0);
 
     /* log a notice - this one is parsed by the history CGI */
@@ -994,7 +1006,7 @@ void handle_service_flap_detection_disabled(service* svc) {
 
     /* delete the original comment we added earlier */
     if (svc->flapping_comment_id != 0)
-      delete_service_comment(svc->flapping_comment_id);
+      comment::delete_comment(svc->flapping_comment_id);
     svc->flapping_comment_id = 0;
 
     /* log a notice - this one is parsed by the history CGI */

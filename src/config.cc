@@ -554,7 +554,7 @@ int pre_flight_circular_check(int* w, int* e) {
     found = check_for_circular_servicedependency_path(
               temp_sd,
               temp_sd,
-              EXECUTION_DEPENDENCY);
+              hostdependency::execution);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could result "
@@ -579,7 +579,7 @@ int pre_flight_circular_check(int* w, int* e) {
     found = check_for_circular_servicedependency_path(
               temp_sd,
               temp_sd,
-              NOTIFICATION_DEPENDENCY);
+              hostdependency::notification);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "
@@ -612,7 +612,7 @@ int pre_flight_circular_check(int* w, int* e) {
       it2->second->set_circular_path_checked(false);
 
     found = it->second->check_for_circular_hostdependency_path(
-      it->second.get(), EXECUTION_DEPENDENCY);
+      it->second.get(), hostdependency::execution);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could "
@@ -638,7 +638,7 @@ int pre_flight_circular_check(int* w, int* e) {
       it2->second->set_circular_path_checked(false);
 
     found = it->second->check_for_circular_hostdependency_path(
-      it->second.get(), NOTIFICATION_DEPENDENCY);
+      it->second.get(), hostdependency::notification);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "

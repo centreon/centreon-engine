@@ -27,7 +27,6 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/objectlist.cc"
   "${SRC_DIR}/service.cc"
@@ -40,7 +39,6 @@ set(
   "${SRC_DIR}/timerange.cc"
 
   # Headers.
-  "${INC_DIR}/comment.hh"
   "${INC_DIR}/daterange.hh"
   "${INC_DIR}/defines.hh"
   "${INC_DIR}/objectlist.hh"

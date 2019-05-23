@@ -20,6 +20,7 @@
 
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/globals.hh"
@@ -28,11 +29,11 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 
@@ -1069,7 +1070,7 @@ int handle_host_state(com::centreon::engine::host* hst) {
       hst->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
       /* remove any non-persistant comments associated with the ack */
-      delete_host_acknowledgement_comments(hst);
+      comment::delete_host_acknowledgement_comments(hst);
     }
     else if (hst->get_acknowledgement_type() == ACKNOWLEDGEMENT_STICKY
              && hst->get_current_state() == HOST_UP) {
@@ -1078,7 +1079,7 @@ int handle_host_state(com::centreon::engine::host* hst) {
       hst->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
       /* remove any non-persistant comments associated with the ack */
-      delete_host_acknowledgement_comments(hst);
+      comment::delete_host_acknowledgement_comments(hst);
     }
 
     /* reset the next and last notification times */

@@ -473,7 +473,7 @@ void applier::host::remove_object(
     com::centreon::engine::host* hst(it->second.get());
 
     // Remove host comments.
-    delete_all_host_comments(obj.host_name().c_str());
+    comment::delete_host_comments(obj.host_name());
 
     // Remove host downtimes.
     downtimes::downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
