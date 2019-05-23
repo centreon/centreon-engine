@@ -670,7 +670,7 @@ int check_service(service* svc, int* w, int* e) {
   int warnings(0);
 
   /* check for a valid host */
-  umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(svc->host_name)));
 
   /* we couldn't find an associated host! */

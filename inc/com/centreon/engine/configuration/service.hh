@@ -93,7 +93,7 @@ namespace                  configuration {
     set_string const&      hostgroups() const throw ();
     set_string&            hosts() throw ();
     set_string const&      hosts() const throw ();
-    uint64_t          host_id() const throw ();
+    uint64_t               host_id() const throw ();
     void                   host_id(uint64_t id);
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();

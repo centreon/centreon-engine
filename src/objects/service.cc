@@ -753,7 +753,7 @@ service& engine::find_service(
            uint64_t service_id) {
   std::pair<uint64_t, uint64_t>
     id(std::make_pair(host_id, service_id));
-  umap<std::pair<unsigned long, unsigned long>,
+  umap<std::pair<uint64_t, uint64_t>,
        std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   if (it == state::instance().services().end())
@@ -788,8 +788,8 @@ char const* engine::get_service_timezone(
  *  @return True if the service is found, otherwise false.
  */
 bool engine::is_service_exist(
-       std::pair<unsigned long, unsigned long> const& id) {
-  umap<std::pair<unsigned long, unsigned long>,
+       std::pair<uint64_t, uint64_t> const& id) {
+  umap<std::pair<uint64_t, uint64_t>,
        std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   return it != state::instance().services().end();
