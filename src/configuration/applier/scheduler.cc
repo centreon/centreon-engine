@@ -76,9 +76,9 @@ void applier::scheduler::apply(
          end(diff_hosts.modified().end());
        it != end;
        ++it) {
-    umap<unsigned long, std::shared_ptr<com::centreon::engine::host>> const&
+    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>> const&
       hosts{applier::state::instance().hosts()};
-    umap<unsigned long,
+    umap<uint64_t,
          std::shared_ptr<com::centreon::engine::host>>::const_iterator
       hst(hosts.find(get_host_id(it->host_name().c_str())));
     if (hst != hosts.end()) {
@@ -104,9 +104,9 @@ void applier::scheduler::apply(
          end(diff_services.modified().end());
        it != end;
        ++it) {
-    umap<std::pair<unsigned long, unsigned long>, std::shared_ptr<service_struct> > const&
+    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> > const&
       services(applier::state::instance().services());
-    umap<std::pair<unsigned long, unsigned long>, std::shared_ptr<service_struct> >::const_iterator
+    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(
                                it->host_id(),   //*it->hosts().begin(),
                                it->service_id())));
@@ -207,9 +207,9 @@ void applier::scheduler::load() {
  *  @param[in] h  Host configuration.
  */
 void applier::scheduler::remove_host(configuration::host const& h) {
-  umap<unsigned long, std::shared_ptr<com::centreon::engine::host> > const&
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host> > const&
     hosts(applier::state::instance().hosts());
-  umap<unsigned long,
+  umap<uint64_t,
        std::shared_ptr<com::centreon::engine::host>>::const_iterator
     hst(hosts.find(get_host_id(h.host_name().c_str())));
   if (hst != hosts.end()) {
@@ -227,9 +227,9 @@ void applier::scheduler::remove_host(configuration::host const& h) {
  */
 void applier::scheduler::remove_service(
                            configuration::service const& s) {
-  umap<std::pair<unsigned long, unsigned long>, std::shared_ptr<service_struct> > const&
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> > const&
     services(applier::state::instance().services());
-  umap<std::pair<unsigned long, unsigned long>, std::shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
     svc(services.find(std::make_pair(
                              s.host_id(),
                              s.service_id())));
@@ -544,7 +544,7 @@ void applier::scheduler::_calculate_host_scheduling_params() {
   time_t const now(time(NULL));
 
   // get total hosts and total scheduled hosts.
-  for (umap<unsigned long,
+  for (umap<uint64_t,
             std::shared_ptr<com::centreon::engine::host>>::const_iterator
          it(applier::state::instance().hosts().begin()),
          end(applier::state::instance().hosts().end());
@@ -701,7 +701,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
   time_t const now(time(NULL));
 
   // get total services and total scheduled services.
-  for (umap<std::pair<unsigned long, unsigned long>,
+  for (umap<std::pair<uint64_t, uint64_t>,
             std::shared_ptr<service_struct> >::const_iterator
          it(applier::state::instance().services().begin()),
          end(applier::state::instance().services().end());
@@ -814,16 +814,16 @@ void applier::scheduler::_get_hosts(
        set_host const& hst_cfg,
        std::vector<com::centreon::engine::host*>& hst_obj,
        bool throw_if_not_found) {
-  umap<unsigned long, std::shared_ptr<com::centreon::engine::host> > const&
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host> > const&
     hosts{applier::state::instance().hosts()};
   for (set_host::const_reverse_iterator
          it(hst_cfg.rbegin()),
          end(hst_cfg.rend());
        it != end;
        ++it) {
-    unsigned long host_id(it->host_id());
+    uint64_t host_id(it->host_id());
     std::string const& host_name(it->host_name());
-    umap<unsigned long, std::shared_ptr<com::centreon::engine::host> >::const_iterator
+    umap<uint64_t, std::shared_ptr<com::centreon::engine::host> >::const_iterator
       hst(hosts.find(host_id));
     if (hst == hosts.end()) {
       if (throw_if_not_found)
@@ -848,18 +848,18 @@ void applier::scheduler::_get_services(
        set_service const& svc_cfg,
        std::vector<service_struct*>& svc_obj,
        bool throw_if_not_found) {
-  umap<std::pair<unsigned long, unsigned long>,
+  umap<std::pair<uint64_t, uint64_t>,
        std::shared_ptr<service_struct> > const&
     services(applier::state::instance().services());
   for (set_service::const_reverse_iterator
          it(svc_cfg.rbegin()), end(svc_cfg.rend());
        it != end;
        ++it) {
-    unsigned long host_id(it->host_id());
-    unsigned long service_id(it->service_id());
+    uint64_t host_id(it->host_id());
+    uint64_t service_id(it->service_id());
     std::string const& host_name(*it->hosts().begin());
     std::string const& service_description(it->service_description());
-    umap<std::pair<unsigned long, unsigned long>,
+    umap<std::pair<uint64_t, uint64_t>,
          std::shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(host_id, service_id)));
     if (svc == services.end()) {

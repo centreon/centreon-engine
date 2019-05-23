@@ -50,8 +50,8 @@ service* find_service(char const* host_name, char const* svc_desc) {
   if (!host_name || !svc_desc)
     return NULL;
 
-  std::pair<unsigned long, unsigned long> id(get_host_and_service_id(host_name, svc_desc));
-  umap<std::pair<unsigned long, unsigned long>, std::shared_ptr<service_struct> >::const_iterator
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(host_name, svc_desc));
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   if (it != state::instance().services().end())
     return &(*it->second);

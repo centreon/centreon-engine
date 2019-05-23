@@ -123,7 +123,7 @@ namespace                  configuration {
     set_string const&      servicegroups() const throw ();
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
-    uint64_t          service_id() const throw();
+    uint64_t               service_id() const throw();
     unsigned short         stalking_options() const throw ();
     void                   timezone(std::string const& time_zone);
     std::string const&     timezone() const throw ();
@@ -225,7 +225,7 @@ namespace                  configuration {
     opt<unsigned int>      _recovery_notification_delay;
     group<set_string>      _servicegroups;
     std::string            _service_description;
-    uint64_t          _service_id;
+    uint64_t               _service_id;
     static setters const   _setters[];
     opt<unsigned short>    _stalking_options;
     opt<std::string>       _timezone;

@@ -411,8 +411,8 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @return New service.
  */
 service* add_service(
-           unsigned int host_id,
-           unsigned int service_id,
+           uint64_t host_id,
+           uint64_t service_id,
            char const* host_name,
            char const* description,
            char const* display_name,
@@ -517,7 +517,7 @@ service* add_service(
   }
 
   // Check if the service is already exist.
-  std::pair<unsigned int, unsigned int>
+  std::pair<uint64_t, uint64_t>
     id(std::make_pair(host_id, service_id));
   if (is_service_exist(id)) {
     logger(log_config_error, basic)
@@ -749,9 +749,9 @@ void engine::check_for_expired_acknowledgement(service* s) {
  *          service is not found.
  */
 service& engine::find_service(
-           unsigned long host_id,
-           unsigned long service_id) {
-  std::pair<unsigned long, unsigned long>
+           uint64_t host_id,
+           uint64_t service_id) {
+  std::pair<uint64_t, uint64_t>
     id(std::make_pair(host_id, service_id));
   umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<service_struct> >::const_iterator
@@ -803,14 +803,14 @@ bool engine::is_service_exist(
  *
  *  @return  Pair of ID if found, pair of 0 otherwise.
  */
-std::pair<unsigned long, unsigned long> engine::get_host_and_service_id(
+std::pair<uint64_t, uint64_t> engine::get_host_and_service_id(
                                                 char const* host,
                                                 char const* svc) {
   std::map<std::pair<std::string, std::string>, service_other_properties>::const_iterator
     found = service_other_props.find(std::make_pair(std::string(host), std::string(svc)));
-  return (found != service_other_props.end()
-          ? std::make_pair(found->second.host_id, found->second.service_id)
-          : std::make_pair(0u, 0u));
+  return found != service_other_props.end()
+          ? std::pair<uint64_t, uint64_t>{found->second.host_id, found->second.service_id}
+          : std::pair<uint64_t, uint64_t>{0u, 0u};
 }
 
 /**
@@ -821,7 +821,7 @@ std::pair<unsigned long, unsigned long> engine::get_host_and_service_id(
  *
  *  @return The service ID if found, 0 otherwise.
  */
-unsigned long engine::get_service_id(char const* host, char const* svc) {
+uint64_t engine::get_service_id(char const* host, char const* svc) {
   return get_host_and_service_id(host, svc).second;
 }
 
