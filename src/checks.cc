@@ -32,6 +32,7 @@
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/checks/viability_failure.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
@@ -40,7 +41,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/perfdata.hh"
@@ -604,7 +604,7 @@ int handle_async_service_check_result(
       temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
       /* remove any non-persistant comments associated with the ack */
-      delete_service_acknowledgement_comments(temp_service);
+      comment::delete_service_acknowledgement_comments(temp_service);
     }
     else if (temp_service->acknowledgement_type == ACKNOWLEDGEMENT_STICKY
              && temp_service->current_state == STATE_OK) {
@@ -612,7 +612,7 @@ int handle_async_service_check_result(
       temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
       /* remove any non-persistant comments associated with the ack */
-      delete_service_acknowledgement_comments(temp_service);
+      comment::delete_service_acknowledgement_comments(temp_service);
     }
 
     /*
@@ -1506,7 +1506,7 @@ int check_service_check_viability(
     /* check service dependencies for execution */
     if (check_service_dependencies(
           svc,
-          EXECUTION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+          hostdependency::execution) == DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
 
@@ -3477,7 +3477,7 @@ int check_host_check_viability_3x(
     /* check host dependencies for execution */
     if (check_host_dependencies(
           hst,
-          EXECUTION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+          hostdependency::execution) == DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
     }

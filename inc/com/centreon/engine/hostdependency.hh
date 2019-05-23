@@ -37,10 +37,15 @@ typedef std::unordered_multimap<std::string,
 CCE_BEGIN()
 class                           hostdependency {
  public:
+    enum                        types {
+      notification = 1,
+      execution
+    };
+
                                 hostdependency(
                                   std::string const& dependent_host_name,
                                   std::string const& host_name,
-                                  int dependency_type,
+                                  types dependency_type,
                                   bool inherits_parent,
                                   bool fail_on_up,
                                   bool fail_on_down,
@@ -48,8 +53,8 @@ class                           hostdependency {
                                   bool fail_on_pending,
                                   std::string const& dependency_period);
 
-  int                           get_dependency_type() const;
-  void                          set_dependency_type(int dependency_type);
+  types                         get_dependency_type() const;
+  void                          set_dependency_type(types dependency_type);
   std::string const&            get_dependent_host_name() const;
   void                          set_dependent_host_name(
                                   std::string const& dependent_host_name);
@@ -78,7 +83,7 @@ class                           hostdependency {
 
   bool                          check_for_circular_hostdependency_path(
                                   hostdependency* dep,
-                                  int dependency_type);
+                                  types dependency_type);
 
   static hostdependency_mmap    hostdependencies;
 
@@ -94,7 +99,7 @@ class                           hostdependency {
     com::centreon::engine::hostdependency const& obj) throw ();
 
  private:
-  int                           _dependency_type;
+  types                         _dependency_type;
   std::string                   _dependent_host_name;
   std::string                   _host_name;
   std::string                   _dependency_period;

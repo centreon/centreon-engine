@@ -113,7 +113,7 @@ void applier::servicedependency::add_object(
            obj.dependent_service_description().front().c_str(),
            obj.hosts().front().c_str(),
            obj.service_description().front().c_str(),
-           EXECUTION_DEPENDENCY,
+           engine::hostdependency::execution,
            obj.inherits_parent(),
            static_cast<bool>(
              obj.execution_failure_options()
@@ -145,7 +145,7 @@ void applier::servicedependency::add_object(
            obj.dependent_service_description().front().c_str(),
            obj.hosts().front().c_str(),
            obj.service_description().front().c_str(),
-           NOTIFICATION_DEPENDENCY,
+           engine::hostdependency::notification,
            obj.inherits_parent(),
            static_cast<bool>(
              obj.notification_failure_options()

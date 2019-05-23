@@ -52,7 +52,7 @@ hostdependency_mmap hostdependency::hostdependencies;
  */
 hostdependency::hostdependency(std::string const& dependent_host_name,
                                std::string const& host_name,
-                               int dependency_type,
+                               types dependency_type,
                                bool inherits_parent,
                                bool fail_on_up,
                                bool fail_on_down,
@@ -69,7 +69,7 @@ hostdependency::hostdependency(std::string const& dependent_host_name,
 
   _dependent_host_name = dependent_host_name;
   _host_name = host_name;
-  _dependency_type = (dependency_type == EXECUTION_DEPENDENCY ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY);
+  _dependency_type = dependency_type;
   _inherits_parent = inherits_parent;
   _fail_on_up = fail_on_up;
   _fail_on_down = fail_on_down;
@@ -84,11 +84,11 @@ hostdependency::hostdependency(std::string const& dependent_host_name,
 
 }
 
-int hostdependency::get_dependency_type() const {
+hostdependency::types hostdependency::get_dependency_type() const {
  return _dependency_type;
 }
 
-void hostdependency::set_dependency_type(int dependency_type) {
+void hostdependency::set_dependency_type(types dependency_type) {
   _dependency_type = dependency_type;
 }
 
@@ -292,7 +292,7 @@ std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
  */
 bool hostdependency::check_for_circular_hostdependency_path(
       hostdependency* dep,
-      int dependency_type) {
+      types dependency_type) {
   if (!dep)
     return false;
 
@@ -326,7 +326,7 @@ bool hostdependency::check_for_circular_hostdependency_path(
 
   // Notification dependencies are ok at this point as long as they
   // don't inherit.
-  if ((dependency_type == NOTIFICATION_DEPENDENCY)
+  if ((dependency_type == hostdependency::notification)
       && !dep->get_inherits_parent())
     return false;
 

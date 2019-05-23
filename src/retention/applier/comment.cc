@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/retention/applier/comment.hh"
 
 using namespace com::centreon::engine::retention;
@@ -32,7 +32,6 @@ using namespace com::centreon::engine;
  */
 void applier::comment::apply(list_comment const& lst) {
   // Big speedup when reading retention.dat in bulk.
-  defer_comment_sorting = 1;
 
   for (list_comment::const_iterator it(lst.begin()), end(lst.end());
        it != end;
@@ -42,9 +41,6 @@ void applier::comment::apply(list_comment const& lst) {
     else
       _add_service_comment(**it);
   }
-
-  // Sort all comments.
-  sort_comments();
 }
 
 /**
@@ -62,30 +58,33 @@ void applier::comment::_add_host_comment(
   com::centreon::engine::host* hst(it->second.get());
 
   // add the comment.
-  add_comment(
-    HOST_COMMENT,
-    obj.entry_type(),
-    obj.host_name().c_str(),
-    NULL,
-    obj.entry_time(),
-    obj.author().c_str(),
-    obj.comment_data().c_str(),
-    obj.comment_id(),
-    obj.persistent(),
-    obj.expires(),
-    obj.expire_time(),
-    obj.source());
+  std::shared_ptr<engine::comment> com =
+    std::make_shared<engine::comment>(
+      engine::comment::host,
+      static_cast<engine::comment::e_type>(obj.entry_type()),
+      obj.host_name(),
+      "",
+      obj.entry_time(),
+      obj.author(),
+      obj.comment_data(),
+      obj.persistent(),
+      static_cast<engine::comment::src>(obj.source()),
+      obj.expires(),
+      obj.expire_time(),
+      obj.comment_id());
+
+  engine::comment::comments.insert({com->get_comment_id(), com});
 
   // acknowledgement comments get deleted if they're not persistent
   // and the original problem is no longer acknowledged.
-  if (obj.entry_type() == ACKNOWLEDGEMENT_COMMENT) {
+  if (obj.entry_type() == com::centreon::engine::comment::acknowledgment) {
     if (!hst->get_problem_has_been_acknowledged() && !obj.persistent())
-      delete_comment(HOST_COMMENT, obj.comment_id());
+      engine::comment::delete_comment(obj.comment_id());
   }
   // non-persistent comments don't last past restarts UNLESS
   // they're acks (see above).
   else if (!obj.persistent())
-    delete_comment(HOST_COMMENT, obj.comment_id());
+    engine::comment::delete_comment(obj.comment_id());
 }
 
 /**
@@ -108,28 +107,31 @@ void applier::comment::_add_service_comment(
   service_struct* svc(&*it_svc->second);
 
   // add the comment.
-  add_comment(
-    SERVICE_COMMENT,
-    obj.entry_type(),
-    obj.host_name().c_str(),
-    obj.service_description().c_str(),
-    obj.entry_time(),
-    obj.author().c_str(),
-    obj.comment_data().c_str(),
-    obj.comment_id(),
-    obj.persistent(),
-    obj.expires(),
-    obj.expire_time(),
-    obj.source());
+  std::shared_ptr<engine::comment> com =
+    std::make_shared<engine::comment>(
+      engine::comment::service,
+      static_cast<engine::comment::e_type>(obj.entry_type()),
+      obj.host_name(),
+      obj.service_description(),
+      obj.entry_time(),
+      obj.author(),
+      obj.comment_data(),
+      obj.persistent(),
+      static_cast<engine::comment::src>(obj.source()),
+      obj.expires(),
+      obj.expire_time(),
+      obj.comment_id());
+
+  engine::comment::comments.insert({com->get_comment_id(), com});
 
   // acknowledgement comments get deleted if they're not persistent
   // and the original problem is no longer acknowledged.
-  if (obj.entry_type() == ACKNOWLEDGEMENT_COMMENT) {
+  if (obj.entry_type() == com::centreon::engine::comment::acknowledgment) {
     if (!svc->problem_has_been_acknowledged && !obj.persistent())
-      delete_comment(SERVICE_COMMENT, obj.comment_id());
+      engine::comment::delete_comment(obj.comment_id());
   }
   // non-persistent comments don't last past restarts UNLESS
   // they're acks (see above).
   else if (!obj.persistent())
-    delete_comment(SERVICE_COMMENT, obj.comment_id());
+    engine::comment::delete_comment(obj.comment_id());
 }

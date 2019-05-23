@@ -242,10 +242,6 @@
 #  define ACKNOWLEDGEMENT_NORMAL  1
 #  define ACKNOWLEDGEMENT_STICKY  2
 
-/* Dependency types. */
-#  define NOTIFICATION_DEPENDENCY 1
-#  define EXECUTION_DEPENDENCY    2
-
 /* Host/service check options. */
 #  define CHECK_OPTION_NONE            0 /* No check options. */
 #  define CHECK_OPTION_FORCE_EXECUTION 1 /* Force execution of a check (ignores disabled services/hosts, invalid timeperiods). */

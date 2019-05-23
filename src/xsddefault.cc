@@ -29,12 +29,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -159,7 +159,7 @@ int xsddefault_save_status_data() {
        "\tprocess_performance_data=" << config->process_performance_data() << "\n"
        "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
-       "\tnext_comment_id=" << next_comment_id << "\n"
+       "\tnext_comment_id=" << comment::get_next_comment_id() << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
        "\tnext_notification_id=" << next_notification_id << "\n"
@@ -406,24 +406,28 @@ int xsddefault_save_status_data() {
   }
 
   // save all comments
-  for (comment* com = comment_list; com; com = com->next) {
-    if (com->comment_type == HOST_COMMENT)
+  for (comment_map::iterator
+         it(comment::comments.begin()),
+         end(comment::comments.end());
+       it != end;
+       ++it) {
+    if (it->second->get_comment_type() == com::centreon::engine::comment::host)
       stream << "hostcomment {\n";
     else
       stream << "servicecomment {\n";
-    stream << "\thost_name=" << com->host_name << "\n";
-    if (com->comment_type == SERVICE_COMMENT)
-      stream << "\tservice_description=" << com->service_description << "\n";
+    stream << "\thost_name=" << it->second->get_host_name() << "\n";
+    if (it->second->get_comment_type() == com::centreon::engine::comment::service)
+      stream << "\tservice_description=" << it->second->get_service_description() << "\n";
     stream
-      << "\tentry_type=" << com->entry_type << "\n"
-         "\tcomment_id=" << com->comment_id << "\n"
-         "\tsource=" << com->source << "\n"
-         "\tpersistent=" << com->persistent << "\n"
-         "\tentry_time=" << static_cast<unsigned long>(com->entry_time) << "\n"
-         "\texpires=" << com->expires << "\n"
-         "\texpire_time=" << static_cast<unsigned long>(com->expire_time) << "\n"
-         "\tauthor=" << com->author << "\n"
-         "\tcomment_data=" << com->comment_data << "\n"
+      << "\tentry_type=" << it->second->get_entry_type() << "\n"
+         "\tcomment_id=" << it->first << "\n"
+         "\tsource=" << it->second->get_source() << "\n"
+         "\tpersistent=" << it->second->get_persistent() << "\n"
+         "\tentry_time=" << static_cast<unsigned long>(it->second->get_entry_time()) << "\n"
+         "\texpires=" << it->second->get_expires() << "\n"
+         "\texpire_time=" << static_cast<unsigned long>(it->second->get_expire_time()) << "\n"
+         "\tauthor=" << it->second->get_author() << "\n"
+         "\tcomment_data=" << it->second->get_comment_data() << "\n"
          "\t}\n\n";
   }
 

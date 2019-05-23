@@ -96,7 +96,7 @@ void applier::hostdependency::add_object(
     std::make_shared<engine::hostdependency>(
        *obj.dependent_hosts().begin(),
        *obj.hosts().begin(),
-       obj.dependency_type() == configuration::hostdependency::execution_dependency ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY,
+       static_cast<engine::hostdependency::types>(obj.dependency_type()),
        obj.inherits_parent(),
        static_cast<bool>(
          obj.execution_failure_options()

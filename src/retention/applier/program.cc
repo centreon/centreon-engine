@@ -109,7 +109,7 @@ void applier::program::apply(
       string::setstr(global_service_event_handler, *obj.global_service_event_handler());
 
     if (obj.next_comment_id().is_set())
-      next_comment_id = *obj.next_comment_id();
+      comment::set_next_comment_id(*obj.next_comment_id());
 
     if (obj.next_event_id().is_set())
       next_event_id = *obj.next_event_id();

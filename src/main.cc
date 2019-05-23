@@ -40,6 +40,7 @@
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/set.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
@@ -55,7 +56,6 @@
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/retention/dump.hh"
@@ -378,9 +378,6 @@ int main(int argc, char* argv[]) {
 
         // Initialize status data.
         initialize_status_data();
-
-        // Initialize comment data.
-        initialize_comment_data();
 
         // Initialize scheduled downtime data.
         downtimes::downtime_manager::instance().initialize_downtime_data();

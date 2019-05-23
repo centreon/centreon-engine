@@ -673,6 +673,7 @@ set(
   # Sources.
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
+  "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/config.cc"
   "${SRC_DIR}/contact.cc"
   "${SRC_DIR}/contactgroup.cc"
@@ -697,7 +698,6 @@ set(
   "${SRC_DIR}/timezone_locker.cc"
   "${SRC_DIR}/timezone_manager.cc"
   "${SRC_DIR}/utils.cc"
-  "${SRC_DIR}/xcddefault.cc"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
 
@@ -705,6 +705,7 @@ set(
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
   "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
+  "${INC_DIR}/com/centreon/engine/comment.hh"
   "${INC_DIR}/com/centreon/engine/common.hh"
   "${INC_DIR}/com/centreon/engine/config.hh"
   "${INC_DIR}/com/centreon/engine/contact.hh"
@@ -737,7 +738,6 @@ set(
   "${INC_DIR}/com/centreon/engine/timezone_manager.hh"
   "${INC_DIR}/com/centreon/engine/utils.hh"
   "${INC_DIR}/com/centreon/engine/version.hh"
-  "${INC_DIR}/com/centreon/engine/xcddefault.hh"
   "${INC_DIR}/com/centreon/engine/xpddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )

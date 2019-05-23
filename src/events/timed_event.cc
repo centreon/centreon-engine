@@ -291,7 +291,7 @@ static void _exec_event_expire_comment(timed_event* event) {
     << "** Expire Comment Event";
 
   // check for expired comment.
-  check_for_expired_comment((unsigned long)event->event_data);
+  comment::remove_if_expired_comment((unsigned long)event->event_data);
 }
 
 /**

@@ -25,6 +25,7 @@
 #include <sys/time.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include "com/centreon/engine/events/defines.hh"
@@ -36,7 +37,6 @@
 #include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -227,21 +227,21 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
     return ERROR;
 
   /* add the comment */
-  result = add_new_comment(
-             (cmd == CMD_ADD_HOST_COMMENT) ? HOST_COMMENT : SERVICE_COMMENT,
-             USER_COMMENT,
+  std::shared_ptr<comment> com =
+    std::make_shared<comment>(
+             (cmd == CMD_ADD_HOST_COMMENT) ? comment::host : comment::service,
+             comment::user,
              host_name,
              svc_description,
              entry_time,
              user,
              comment_data,
              persistent,
-             COMMENTSOURCE_EXTERNAL,
+             comment::external,
              false,
-             (time_t)0,
-             nullptr);
-  if (result < 0)
-    return ERROR;
+             (time_t)0);
+  comment::comments.insert({com->get_comment_id(), com});
+
   return OK;
 }
 
@@ -254,10 +254,7 @@ int cmd_delete_comment(int cmd, char* args) {
     return ERROR;
 
   /* delete the specified comment */
-  if (cmd == CMD_DEL_HOST_COMMENT)
-    delete_host_comment(comment_id);
-  else
-    delete_service_comment(comment_id);
+  comment::delete_comment(comment_id);
 
   return OK;
 }
@@ -295,10 +292,11 @@ int cmd_delete_all_comments(int cmd, char* args) {
     return ERROR;
 
   /* delete comments */
-  delete_all_comments(
-    (cmd == CMD_DEL_ALL_HOST_COMMENTS) ? HOST_COMMENT : SERVICE_COMMENT,
-    host_name,
-    svc_description);
+  if (cmd == CMD_DEL_ALL_HOST_COMMENTS)
+    comment::delete_host_comments(host_name);
+  else
+    comment::delete_service_comments(host_name, svc_description);
+
   return OK;
 }
 
@@ -2960,17 +2958,20 @@ void acknowledge_host_problem(
   update_host_status(hst, false);
 
   /* add a comment for the acknowledgement */
-  add_new_host_comment(
-    ACKNOWLEDGEMENT_COMMENT,
-    hst->get_name().c_str(),
-    current_time,
-    ack_author,
-    ack_data,
-    persistent,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    nullptr);
+  std::shared_ptr<comment> com =
+    std::make_shared<comment>(
+      comment::host,
+      comment::acknowledgment,
+      hst->get_name().c_str(),
+      "",
+      current_time,
+      ack_author,
+      ack_data,
+      persistent,
+      comment::internal,
+      false,
+      (time_t)0);
+  comment::comments.insert({com->get_comment_id(), com});
 }
 
 /* acknowledges a service problem */
@@ -3026,18 +3027,20 @@ void acknowledge_service_problem(
   update_service_status(svc, false);
 
   /* add a comment for the acknowledgement */
-  add_new_service_comment(
-    ACKNOWLEDGEMENT_COMMENT,
-    svc->host_name,
-    svc->description,
-    current_time,
-    ack_author,
-    ack_data,
-    persistent,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    nullptr);
+  std::shared_ptr<comment> com =
+    std::make_shared<comment>(
+      comment::service,
+      comment::acknowledgment,
+      svc->host_name,
+      svc->description,
+      current_time,
+      ack_author,
+      ack_data,
+      persistent,
+      comment::internal,
+      false,
+      (time_t)0);
+  comment::comments.insert({com->get_comment_id(), com});
 }
 
 /* removes a host acknowledgement */
@@ -3049,7 +3052,7 @@ void remove_host_acknowledgement(com::centreon::engine::host* hst) {
   update_host_status(hst, false);
 
   /* remove any non-persistant comments associated with the ack */
-  delete_host_acknowledgement_comments(hst);
+  comment::delete_host_acknowledgement_comments(hst);
 }
 
 /* removes a service acknowledgement */
@@ -3061,7 +3064,7 @@ void remove_service_acknowledgement(service* svc) {
   update_service_status(svc, false);
 
   /* remove any non-persistant comments associated with the ack */
-  delete_service_acknowledgement_comments(svc);
+  comment::delete_service_acknowledgement_comments(svc);
 }
 
 /* starts executing service checks */
