@@ -27,7 +27,8 @@ CCE_BEGIN()
 class                         notifier {
  public:
                               notifier(std::string const& display_name,
-                                       std::string const& check_command);
+                                       std::string const& check_command,
+                                       int initial_state);
   virtual                     ~notifier() {};
 
   std::string const&          get_display_name() const;
@@ -35,10 +36,13 @@ class                         notifier {
   std::string const&          get_check_command() const;
   void                        set_check_command(
                                 std::string const& check_command);
+  int                         get_initial_state() const;
+  void                        set_initial_state(int initial_state);
 
  protected:
   std::string                 _display_name;
   std::string                 _check_command;
+  int                         _initial_state;
 
 };
 CCE_END()

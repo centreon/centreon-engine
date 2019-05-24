@@ -22,8 +22,11 @@
 using namespace com::centreon::engine;
 
 notifier::notifier(std::string const& display_name,
-                   std::string const& check_command)
-    : _display_name{display_name}, _check_command{check_command} {}
+                   std::string const& check_command,
+                   int initial_state)
+    : _display_name{display_name},
+      _check_command{check_command},
+      _initial_state{initial_state} {}
 
 std::string const& notifier::get_display_name() const {
   return _display_name;
@@ -39,4 +42,12 @@ std::string const& notifier::get_check_command() const {
 
 void notifier::set_check_command(std::string const& check_command) {
   _check_command = check_command;
+}
+
+int notifier::get_initial_state() const {
+  return _initial_state;
+}
+
+void notifier::set_initial_state(int initial_state) {
+  _initial_state = initial_state;
 }

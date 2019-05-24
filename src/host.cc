@@ -168,7 +168,7 @@ host::host(uint64_t host_id,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_host)
-    : notifier{!display_name.empty() ? display_name : name, check_command} {
+    : notifier{!display_name.empty() ? display_name : name, check_command, initial_state} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -253,7 +253,6 @@ host::host(uint64_t host_id,
   _have_2d_coords = (have_2d_coords > 0);
   _have_3d_coords = (have_3d_coords > 0);
   _high_flap_threshold = high_flap_threshold;
-  _initial_state = initial_state;
   _last_hard_state = initial_state;
   _last_state = initial_state;
   _low_flap_threshold = low_flap_threshold;
@@ -341,14 +340,6 @@ std::string const& host::get_address() const {
 
 void host::set_address(std::string const& address) {
   _address = address;
-}
-
-int host::get_initial_state() const {
-  return _initial_state;
-}
-
-void host::set_initial_state(int initial_state) {
-  _initial_state = initial_state;
 }
 
 double host::get_check_interval() const {

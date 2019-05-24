@@ -384,9 +384,7 @@ void applier::service::modify_object(
   modify_if_different(
     s->event_handler_enabled,
     static_cast<int>(obj.event_handler_enabled()));
-  modify_if_different(
-    s->initial_state,
-    static_cast<int>(obj.initial_state()));
+  s->set_initial_state(obj.initial_state());
   modify_if_different(
     s->check_interval,
     static_cast<double>(obj.check_interval()));

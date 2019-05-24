@@ -41,8 +41,11 @@ using namespace com::centreon::engine::string;
 service::service(std::string const& hostname,
                  std::string const& description,
                  std::string const& display_name,
-                 std::string const& check_command)
-    : notifier{display_name, check_command}, _hostname{hostname}, _description{description} {}
+                 std::string const& check_command,
+                 int initial_state)
+    : notifier{display_name, check_command, initial_state},
+      _hostname{hostname},
+      _description{description} {}
 
 service::~service() {
   this->contact_groups.clear();
@@ -94,7 +97,7 @@ bool operator==(
           && obj1.get_display_name() == obj2.get_display_name()
           && obj1.get_check_command() == obj2.get_check_command()
           && is_equal(obj1.event_handler, obj2.event_handler)
-          && obj1.initial_state == obj2.initial_state
+          && obj1.get_initial_state() == obj2.get_initial_state()
           && obj1.check_interval == obj2.check_interval
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
@@ -260,7 +263,7 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const&
     "  display_name:                         " << obj.get_display_name() << "\n"
     "  service_check_command:                " << obj.get_check_command() << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
-    "  initial_state:                        " << obj.initial_state << "\n"
+    "  initial_state:                        " << obj.get_initial_state() << "\n"
     "  check_interval:                       " << obj.check_interval << "\n"
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
@@ -569,9 +572,9 @@ com::centreon::engine::service* add_service(
   }
 
   // Allocate memory.
-  std::shared_ptr<service> obj{
-      new service(host_name, description,
-                  display_name ? display_name : description, check_command)};
+  std::shared_ptr<service> obj{new service(
+      host_name, description, display_name ? display_name : description,
+      check_command, initial_state)};
 
   try {
     // Duplicate vars.
@@ -610,7 +613,6 @@ com::centreon::engine::service* add_service(
     obj->flap_detection_on_warning = (flap_detection_on_warning > 0);
     obj->freshness_threshold = freshness_threshold;
     obj->high_flap_threshold = high_flap_threshold;
-    obj->initial_state = initial_state;
     obj->is_volatile = (is_volatile > 0);
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;
