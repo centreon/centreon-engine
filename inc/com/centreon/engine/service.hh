@@ -23,9 +23,10 @@
 #  include <memory>
 #  include <string>
 #  include <time.h>
-#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/contactgroup.hh"
+#  include "com/centreon/engine/customvariable.hh"
+#  include "com/centreon/engine/notifier.hh"
 
 /* Forward declaration. */
 extern "C" {
@@ -40,7 +41,7 @@ CCE_BEGIN()
   class contact;
   class host;
 
-class                           service2 {
+class                           service2 : public notifier {
  public:
   char*                         host_name;
   char*                         description;
