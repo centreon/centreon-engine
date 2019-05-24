@@ -210,7 +210,7 @@ int xpddefault_update_service_performance_data(com::centreon::engine::service2* 
 
   host* hst{nullptr};
   umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(svc->host_name)));
+    it(state::instance().hosts().find(get_host_id(svc->get_hostname())));
   if (it != state::instance().hosts().end())
     hst = it->second.get();
 
@@ -341,7 +341,7 @@ int xpddefault_run_service_performance_data_command(
       << "Warning: Service performance data command '"
       << processed_command_line << "' for service '"
       << svc->description << "' on host '"
-      << svc->host_name << "' timed out after "
+      << svc->get_hostname() << "' timed out after "
       << config->perfdata_timeout() << " seconds";
 
   // free memory.

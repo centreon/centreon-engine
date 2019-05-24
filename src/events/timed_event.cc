@@ -51,7 +51,7 @@ static void _exec_event_service_check(timed_event* event) {
                             + (double)(tv.tv_usec / 1000) / 1000.0);
 
   logger(dbg_events, basic)
-    << "** Service Check Event ==> Host: '" << svc->host_name
+    << "** Service Check Event ==> Host: '" << svc->get_hostname()
     << "', Service: '" << svc->description << "', Options: "
     << event->event_options << ", Latency: " << latency << " sec";
 
@@ -753,7 +753,7 @@ int handle_timed_event(timed_event* event) {
   else if (event->event_type == EVENT_USER_FUNCTION)
     _exec_event_user_function(event);
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -969,7 +969,7 @@ timed_event* events::schedule(
     add_event(evt, &event_list_high, &event_list_high_tail);
   else
     add_event(evt, &event_list_low, &event_list_low_tail);
-  return (evt);
+  return evt;
 }
 
 /**
@@ -1005,12 +1005,12 @@ std::string const& events::name(timed_event const& evt) {
   };
 
   if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
-    return (event_names[evt.event_type]);
+    return event_names[evt.event_type];
   if (evt.event_type == EVENT_SLEEP)
-    return (event_sleep);
+    return event_sleep;
   if (evt.event_type == EVENT_USER_FUNCTION)
-    return (event_user_function);
-  return (event_unknown);
+    return event_user_function;
+  return event_unknown;
 }
 
 /**
@@ -1025,7 +1025,7 @@ bool operator==(
        timed_event const& obj1,
        timed_event const& obj2) throw () {
   if (obj1.event_type != obj2.event_type)
-    return (false);
+    return false;
 
   bool is_not_null(obj1.event_data && obj2.event_data);
   if (is_not_null
@@ -1034,16 +1034,16 @@ bool operator==(
     host& hst1(*(host*)obj1.event_data);
     host& hst2(*(host*)obj2.event_data);
     if (hst1.get_name() != hst2.get_name())
-      return (false);
+      return false;
   }
   else if (is_not_null
            && ((obj1.event_type == EVENT_SERVICE_CHECK)
                || (obj1.event_type == EVENT_EXPIRE_SERVICE_ACK))) {
     com::centreon::engine::service2& svc1(*(com::centreon::engine::service2*)obj1.event_data);
     com::centreon::engine::service2& svc2(*(com::centreon::engine::service2*)obj2.event_data);
-    if (strcmp(svc1.host_name, svc2.host_name)
+    if (svc1.get_hostname() != svc2.get_hostname()
         || strcmp(svc1.description, svc2.description))
-      return (false);
+      return false;
   }
   else if (is_not_null
            && (obj1.event_type == EVENT_SCHEDULED_DOWNTIME
@@ -1051,10 +1051,10 @@ bool operator==(
     unsigned long id1(*(unsigned long*)obj1.event_data);
     unsigned long id2(*(unsigned long*)obj2.event_data);
     if (id1 != id2)
-      return (false);
+      return false;
   }
   else if (obj1.event_data != obj2.event_data)
-    return (false);
+    return false;
 
   return (obj1.run_time == obj2.run_time
           && obj1.recurring == obj2.recurring
@@ -1076,7 +1076,7 @@ bool operator==(
 bool operator!=(
        timed_event const& obj1,
        timed_event const& obj2) throw () {
-  return (!operator==(obj1, obj2));
+  return !operator==(obj1, obj2);
 }
 
 /**
@@ -1108,7 +1108,7 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
            || obj.event_type == EVENT_EXPIRE_SERVICE_ACK) {
     com::centreon::engine::service2& svc(*(com::centreon::engine::service2*)obj.event_data);
     os << "  event_data:                 "
-       << svc.host_name << ", " << svc.description << "\n";
+       << svc.get_hostname() << ", " << svc.description << "\n";
   }
   else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME
            || obj.event_type == EVENT_EXPIRE_COMMENT) {
@@ -1122,5 +1122,5 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
     "  event_args:                 " << obj.event_args << "\n"
     "  event_options:              " << obj.event_options << "\n"
     "}\n";
-  return (os);
+  return os;
 }

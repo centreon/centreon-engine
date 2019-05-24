@@ -19,13 +19,17 @@
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/objectlist.hh"
+#include "com/centreon/engine/deleter/service.hh"
 #include "com/centreon/engine/deleter/service.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/service.hh"
+#include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -35,6 +39,46 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
+
+service2::~service2() {
+  this->contact_groups.clear();
+  deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
+
+  delete[] this->description;
+  this->description = NULL;
+  delete[] this->display_name;
+  this->display_name = NULL;
+  delete[] this->service_check_command;
+  this->service_check_command = NULL;
+  delete[] this->event_handler;
+  this->event_handler = NULL;
+  delete[] this->notification_period;
+  this->notification_period = NULL;
+  delete[] this->check_period;
+  this->check_period = NULL;
+  delete[] this->failure_prediction_options;
+  this->failure_prediction_options = NULL;
+  delete[] this->notes;
+  this->notes = NULL;
+  delete[] this->notes_url;
+  this->notes_url = NULL;
+  delete[] this->action_url;
+  this->action_url = NULL;
+  delete[] this->icon_image;
+  this->icon_image = NULL;
+  delete[] this->icon_image_alt;
+  this->icon_image_alt = NULL;
+  delete[] this->plugin_output;
+  this->plugin_output = NULL;
+  delete[] this->long_plugin_output;
+  this->long_plugin_output = NULL;
+  delete[] this->perf_data;
+  this->perf_data = NULL;
+  delete[] this->event_handler_args;
+  this->event_handler_args = NULL;
+  delete[] this->check_command_args;
+  this->check_command_args = NULL;
+}
 
 /**
  *  Equal operator.
@@ -47,7 +91,7 @@ using namespace com::centreon::engine::string;
 bool operator==(
        com::centreon::engine::service2 const& obj1,
        com::centreon::engine::service2 const& obj2) throw () {
-  return (is_equal(obj1.host_name, obj2.host_name)
+  return obj1.get_hostname() == obj2.get_hostname()
           && is_equal(obj1.description, obj2.description)
           && is_equal(obj1.display_name, obj2.display_name)
           && is_equal(obj1.service_check_command, obj2.service_check_command)
@@ -152,7 +196,7 @@ bool operator==(
           && obj1.percent_state_change == obj2.percent_state_change
           && obj1.modified_attributes == obj2.modified_attributes
           && is_equal(obj1.event_handler_args, obj2.event_handler_args)
-          && is_equal(obj1.check_command_args, obj2.check_command_args));
+          && is_equal(obj1.check_command_args, obj2.check_command_args);
 }
 
 /**
@@ -178,19 +222,19 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const& obj) {
-  char const* evt_str(NULL);
+  char const* evt_str(nullptr);
   if (obj.event_handler_ptr)
     evt_str = obj.event_handler_ptr->get_name().c_str();
-  char const* cmd_str(NULL);
+  char const* cmd_str(nullptr);
   if (obj.check_command_ptr)
     cmd_str = obj.check_command_ptr->get_name().c_str();
-  char const* chk_period_str(NULL);
+  char const* chk_period_str(nullptr);
   if (obj.check_period_ptr)
     chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* notif_period_str(NULL);
+  char const* notif_period_str(nullptr);
   if (obj.notification_period_ptr)
     notif_period_str = chkstr(obj.notification_period_ptr->name);
-  char const* svcgrp_str(NULL);
+  char const* svcgrp_str(nullptr);
   if (obj.servicegroups_ptr)
     svcgrp_str = chkstr(static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)->group_name);
 
@@ -198,14 +242,14 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const
   std::string c_oss;
 
   if (obj.contact_groups.empty())
-    cg_oss = "\"NULL\"";
+    cg_oss = "\"nullptr\"";
   else {
     std::ostringstream oss;
     oss << obj.contact_groups;
     cg_oss = oss.str();
   }
   if (obj.contacts.empty())
-    c_oss = "\"NULL\"";
+    c_oss = "\"nullptr\"";
   else {
     std::ostringstream oss;
     oss << obj.contacts;
@@ -213,7 +257,7 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const
   }
 
   os << "service {\n"
-    "  host_name:                            " << chkstr(obj.host_name) << "\n"
+    "  host_name:                            " << obj.get_hostname() << "\n"
     "  description:                          " << chkstr(obj.description) << "\n"
     "  display_name:                         " << chkstr(obj.display_name) << "\n"
     "  service_check_command:                " << chkstr(obj.service_check_command) << "\n"
@@ -317,7 +361,7 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const
     "  flapping_comment_id:                  " << obj.flapping_comment_id << "\n"
     "  percent_state_change:                 " << obj.percent_state_change << "\n"
     "  modified_attributes:                  " << obj.modified_attributes << "\n"
-    "  host_ptr:                             " << (obj.host_ptr ? obj.host_ptr->get_name() : "\"NULL\"") << "\n"
+    "  host_ptr:                             " << (obj.host_ptr ? obj.host_ptr->get_name() : "\"nullptr\"") << "\n"
     "  event_handler_ptr:                    " << chkstr(evt_str) << "\n"
     "  event_handler_args:                   " << chkstr(obj.event_handler_args) << "\n"
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
@@ -470,24 +514,24 @@ com::centreon::engine::service2* add_service(
     logger(log_config_error, basic)
       << "Error: Service comes from a database, therefore its service id "
       << "must not be null";
-    return NULL;
+    return nullptr;
   }
   else if (!description || !description[0]) {
     logger(log_config_error, basic)
       << "Error: Service description is not set";
-    return NULL;
+    return nullptr;
   }
   else if (!host_name || !host_name[0]) {
     logger(log_config_error, basic)
       << "Error: Host name of service '"
       << description << "' is not set";
-    return NULL;
+    return nullptr;
   }
   else if (!check_command || !check_command[0]) {
     logger(log_config_error, basic)
       << "Error: Check command of service '" << description
       << "' on host '" << host_name << "' is not set";
-    return NULL;
+    return nullptr;
   }
 
   host_id = get_host_id(host_name);
@@ -495,7 +539,7 @@ com::centreon::engine::service2* add_service(
     logger(log_config_error, basic)
       << "Error: The service '" << description << "' cannot be created because"
       << " host '" << host_name << "' does not exist (host_id is null)";
-    return NULL;
+    return nullptr;
   }
 
   // Check values.
@@ -507,13 +551,13 @@ com::centreon::engine::service2* add_service(
       << "Error: Invalid max_attempts, check_interval, retry_interval"
          ", or notification_interval value for service '"
       << description << "' on host '" << host_name << "'";
-    return NULL;
+    return nullptr;
   }
   if (first_notification_delay < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid first_notification_delay value for service '"
       << description << "' on host '" << host_name << "'";
-    return NULL;
+    return nullptr;
   }
 
   // Check if the service is already exist.
@@ -523,16 +567,15 @@ com::centreon::engine::service2* add_service(
     logger(log_config_error, basic)
       << "Error: Service '" << description << "' on host '"
       << host_name << "' has already been defined";
-    return NULL;
+    return nullptr;
   }
 
   // Allocate memory.
   std::shared_ptr<com::centreon::engine::service2> obj(new com::centreon::engine::service2, deleter::service);
-  memset(obj.get(), 0, sizeof(*obj));
 
   try {
     // Duplicate vars.
-    obj->host_name = string::dup(host_name);
+    obj->set_hostname(host_name);
     obj->description = string::dup(description);
     obj->display_name = string::dup(display_name ? display_name : description);
     obj->service_check_command = string::dup(check_command);
@@ -675,7 +718,7 @@ int is_escalated_contact_for_service(com::centreon::engine::service2* svc, conta
     return false;
 
   std::pair<std::string, std::string>
-    id(std::make_pair(svc->host_name, svc->description));
+    id(std::make_pair(svc->get_hostname(), svc->description));
   umultimap<std::pair<std::string, std::string>,
             std::shared_ptr<serviceescalation> > const&
     escalations(state::instance().serviceescalations());
@@ -725,7 +768,7 @@ void engine::check_for_expired_acknowledgement(com::centreon::engine::service2* 
                service_other_props[std::make_pair(
                                           s->host_ptr->get_name().c_str(),
                                           s->description)].last_acknowledgement);
-      time_t now(time(NULL));
+      time_t now(time(nullptr));
       if (last_ack + acknowledgement_timeout >= now) {
         logger(log_info_message, basic)
           << "Acknowledgement of service '" << s->description
@@ -771,13 +814,10 @@ com::centreon::engine::service2& engine::find_service(
  *  @return Service timezone.
  */
 char const* engine::get_service_timezone(
-                      char const* hst,
-                      char const* svc) {
-  std::string const& timezone(service_other_props[
-                                std::make_pair<std::string, std::string>(
-                                  hst,
-                                  svc)].timezone);
-  return timezone.empty() ? NULL : timezone.c_str();
+                      std::string const& hst,
+                      std::string const& svc) {
+  std::string const& timezone(service_other_props[{hst, svc}].timezone);
+  return timezone.empty() ? nullptr : timezone.c_str();
 }
 
 /**
@@ -804,10 +844,10 @@ bool engine::is_service_exist(
  *  @return  Pair of ID if found, pair of 0 otherwise.
  */
 std::pair<uint64_t, uint64_t> engine::get_host_and_service_id(
-                                                char const* host,
+                                                std::string const& host,
                                                 char const* svc) {
   std::map<std::pair<std::string, std::string>, service_other_properties>::const_iterator
-    found = service_other_props.find(std::make_pair(std::string(host), std::string(svc)));
+    found = service_other_props.find({host, std::string(svc)});
   return found != service_other_props.end()
           ? std::pair<uint64_t, uint64_t>{found->second.host_id, found->second.service_id}
           : std::pair<uint64_t, uint64_t>{0u, 0u};
@@ -821,7 +861,7 @@ std::pair<uint64_t, uint64_t> engine::get_host_and_service_id(
  *
  *  @return The service ID if found, 0 otherwise.
  */
-uint64_t engine::get_service_id(char const* host, char const* svc) {
+uint64_t engine::get_service_id(std::string const& host, char const* svc) {
   return get_host_and_service_id(host, svc).second;
 }
 
@@ -842,11 +882,24 @@ void engine::schedule_acknowledgement_expiration(com::centreon::engine::service2
       last_ack + ack_timeout,
       false,
       0,
-      NULL,
+      nullptr,
       true,
       s,
-      NULL,
+      nullptr,
       0);
   }
   return ;
+}
+
+void service2::set_hostname(std::string const& name) {
+  _hostname = name;
+}
+
+/**
+ * @brief Get the hostname of the host associated with this downtime.
+ *
+ * @return A string reference to the host name.
+ */
+std::string const& service2::get_hostname() const {
+  return _hostname;
 }

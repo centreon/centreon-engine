@@ -91,7 +91,7 @@ int service_notification(
   gettimeofday(&start_time, nullptr);
 
   logger(dbg_notifications, basic)
-    << "** Service Notification Attempt ** Host: '" << svc->host_name
+    << "** Service Notification Attempt ** Host: '" << svc->get_hostname()
     << "', Service: '" << svc->description
     << "', Type: " << type << ", Options: " << options
     << ", Current State: " << svc->current_state
@@ -447,7 +447,7 @@ int check_service_notification_viability(
   // See if the service can have notifications sent out at this time.
   {
     timezone_locker lock(get_service_timezone(
-                           svc->host_name,
+                           svc->get_hostname(),
                            svc->description));
     if (check_time_against_period(current_time, temp_period) == ERROR) {
       logger(dbg_notifications, more)
@@ -1085,7 +1085,7 @@ int notify_contact_of_service(
 
       logger(log_service_notification, basic)
         << "SERVICE NOTIFICATION: " << cntct->get_name() << ';'
-        << svc->host_name << ';' << svc->description << ';'
+        << svc->get_hostname() << ';' << svc->description << ';'
         << service_notification_state << ";"
         << cmd->get_name() << ';'
         << (svc->plugin_output ? svc->plugin_output : "")
@@ -1257,7 +1257,7 @@ int should_service_notification_be_escalated(com::centreon::engine::service2* sv
                     std::shared_ptr<serviceescalation> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = state::instance().serviceescalations().equal_range(
-        std::make_pair(svc->host_name, svc->description));
+        std::make_pair(svc->get_hostname(), svc->description));
   while (p.first != p.second) {
     serviceescalation* temp_se(p.first->second.get());
 
@@ -1317,7 +1317,7 @@ int create_notification_list_from_service(
       "notification list.";
 
     std::pair<std::string, std::string>
-      id(std::make_pair(svc->host_name, svc->description));
+      id(std::make_pair(svc->get_hostname(), svc->description));
     umultimap<std::pair<std::string, std::string>,
               std::shared_ptr<serviceescalation> > const&
       escalations(state::instance().serviceescalations());

@@ -390,7 +390,7 @@ std::ostream& dump::service(std::ostream& os, service2 const& obj) {
     hostname = obj.host_ptr->get_name();
 
   os << "service {\n"
-    "host_name=" << obj.host_name << "\n"
+    "host_name=" << obj.get_hostname() << "\n"
     "service_description=" << obj.description << "\n"
     "host_id=" << service_other_props[std::make_pair(hostname, obj.description)].host_id << "\n"
     "service_id=" << service_other_props[std::make_pair(hostname, obj.description)].service_id << "\n"

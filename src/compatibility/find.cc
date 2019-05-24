@@ -65,10 +65,7 @@ com::centreon::engine::service2* find_service(char const* host_name, char const*
  *
  *  @return Service group object if found, NULL otherwise.
  */
-servicegroup* find_servicegroup(char const* name) {
-  if (!name)
-    return NULL;
-
+servicegroup* find_servicegroup(std::string const& name) {
   umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())

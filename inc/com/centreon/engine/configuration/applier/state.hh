@@ -32,7 +32,6 @@
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
-struct service2;
 struct servicedependency_struct;
 struct serviceescalation_struct;
 struct servicegroup_struct;
@@ -44,6 +43,7 @@ CCE_BEGIN()
 namespace commands {
   class   command;
   class   connector;
+  class   service2;
 }
 
 namespace retention {

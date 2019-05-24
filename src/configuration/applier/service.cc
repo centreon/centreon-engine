@@ -623,7 +623,7 @@ void applier::service::remove_object(
 
     // Unregister service.
     for (service2** s(&service_list); *s; s = &(*s)->next)
-      if (!strcmp((*s)->host_name, host_name.c_str())
+      if ((*s)->get_hostname() == host_name
           && !strcmp(
                 (*s)->description,
                 service_description.c_str())) {

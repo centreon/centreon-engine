@@ -314,7 +314,7 @@ int xsddefault_save_status_data() {
   for (com::centreon::engine::service2* svc = service_list; svc; svc = svc->next) {
     stream
       << "servicestatus {\n"
-         "\thost_name=" << svc->host_name << "\n"
+         "\thost_name=" << svc->get_hostname() << "\n"
          "\tservice_description=" << svc->description << "\n"
          "\tmodified_attributes=" << svc->modified_attributes << "\n"
          "\tcheck_command=" << (svc->service_check_command ? svc->service_check_command : "") << "\n"

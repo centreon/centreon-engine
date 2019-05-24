@@ -41,8 +41,6 @@ void deleter::service(void* ptr) throw () {
   obj->contact_groups.clear();
   listmember(obj->servicegroups_ptr, &objectlist);
 
-  delete[] obj->host_name;
-  obj->host_name = NULL;
   delete[] obj->description;
   obj->description = NULL;
   delete[] obj->display_name;

@@ -1365,7 +1365,7 @@ int process_servicegroup_command(int cmd,
     return ERROR;
 
   /* find the servicegroup */
-  if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == nullptr)
+  if ((temp_servicegroup = ::find_servicegroup(servicegroup_name)) == nullptr)
     return ERROR;
 
   switch (cmd) {

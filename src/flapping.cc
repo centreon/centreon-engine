@@ -62,7 +62,7 @@ void check_for_service_flapping(
 
   logger(dbg_flapping, more)
     << "Checking service '" << svc->description
-    << "' on host '" << svc->host_name << "' for flapping...";
+    << "' on host '" << svc->get_hostname() << "' for flapping...";
 
   /* if this is a soft service state and not a soft recovery, don't record this in the history */
   /* only hard states and soft recoveries get recorded for flap detection */
@@ -373,12 +373,12 @@ void set_service_flap(
 
   logger(dbg_flapping, more)
     << "Service '" << svc->description << "' on host '"
-    << svc->host_name << "' started flapping!";
+    << svc->get_hostname() << "' started flapping!";
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_runtime_warning, basic)
     << com::centreon::logging::setprecision(1)
-    << "SERVICE FLAPPING ALERT: " << svc->host_name
+    << "SERVICE FLAPPING ALERT: " << svc->get_hostname()
     << ";" << svc->description
     << ";STARTED; Service appears to have started flapping ("
     << percent_change << "% change >= " << high_threshold
@@ -459,12 +459,12 @@ void clear_service_flap(
 
   logger(dbg_flapping, more)
     << "Service '" << svc->description << "' on host '"
-    << svc->host_name << "' stopped flapping.";
+    << svc->get_hostname() << "' stopped flapping.";
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_info_message, basic)
     << com::centreon::logging::setprecision(1)
-    << "SERVICE FLAPPING ALERT: " << svc->host_name
+    << "SERVICE FLAPPING ALERT: " << svc->get_hostname()
     << ";" << svc->description
     << ";STOPPED; Service appears to have stopped flapping ("
     << percent_change << "% change < " << low_threshold
@@ -921,7 +921,7 @@ void enable_service_flap_detection(com::centreon::engine::service2* svc) {
 
   logger(dbg_flapping, more)
     << "Enabling flap detection for service '" << svc->description
-    << "' on host '" << svc->host_name << "'.";
+    << "' on host '" << svc->get_hostname() << "'.";
 
   /* nothing to do... */
   if (svc->flap_detection_enabled)
@@ -964,7 +964,7 @@ void disable_service_flap_detection(com::centreon::engine::service2* svc) {
 
   logger(dbg_flapping, more)
     << "Disabling flap detection for service '" << svc->description
-    << "' on host '" << svc->host_name << "'.";
+    << "' on host '" << svc->get_hostname() << "'.";
 
   /* nothing to do... */
   if (!svc->flap_detection_enabled)
@@ -1011,7 +1011,7 @@ void handle_service_flap_detection_disabled(com::centreon::engine::service2* svc
 
     /* log a notice - this one is parsed by the history CGI */
     logger(log_info_message, basic)
-      << "SERVICE FLAPPING ALERT: " << svc->host_name
+      << "SERVICE FLAPPING ALERT: " << svc->get_hostname()
       << ";" << svc->description
       << ";DISABLED; Flap detection has been disabled";
 

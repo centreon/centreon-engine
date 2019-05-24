@@ -22,6 +22,8 @@
 
 CCE_BEGIN()
 class                         notifier {
+ public:
+  virtual                     ~notifier() {};
 
 };
 CCE_END()

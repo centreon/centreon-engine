@@ -715,7 +715,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
 
     {
       timezone_locker
-        lock(get_service_timezone(svc.host_name, svc.description));
+        lock(get_service_timezone(svc.get_hostname(), svc.description));
       if (check_time_against_period(now, svc.check_period_ptr)
           == ERROR) {
         time_t next_valid_time(0);
@@ -737,7 +737,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
     else {
       svc.should_be_scheduled = false;
       logger(dbg_events, more)
-        << "Service " << svc.description << " on host " << svc.host_name
+        << "Service " << svc.description << " on host " << svc.get_hostname()
         << " should not be scheduled.";
     }
     ++scheduling_info.total_services;
@@ -1060,7 +1060,7 @@ void applier::scheduler::_schedule_service_events(
       // Make sure the service can actually be scheduled when we want.
       {
         timezone_locker
-          lock(get_service_timezone(svc.host_name, svc.description));
+          lock(get_service_timezone(svc.get_hostname(), svc.description));
         if (check_time_against_period(
               svc.next_check,
               svc.check_period_ptr) == ERROR) {

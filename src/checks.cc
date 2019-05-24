@@ -99,7 +99,7 @@ int run_scheduled_service_check(
     << "run_scheduled_service_check()";
   logger(dbg_checks, basic)
     << "Attempting to run scheduled check of service '"
-    << svc->description << "' on host '" << svc->host_name
+    << svc->description << "' on host '" << svc->get_hostname()
     << "': check options=" << check_options << ", latency=" << latency;
 
   /* attempt to run the check */
@@ -135,7 +135,7 @@ int run_scheduled_service_check(
       // Make sure we rescheduled the next service check at a valid time.
       {
         timezone_locker
-          lock(get_service_timezone(svc->host_name, svc->description));
+          lock(get_service_timezone(svc->get_hostname(), svc->description));
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
@@ -149,7 +149,7 @@ int run_scheduled_service_check(
           svc->next_check = (time_t)(next_valid_time + (60 * 60 * 24 * 7));
           logger(log_runtime_warning, basic)
             << "Warning: Check of service '" << svc->description
-            << "' on host '" << svc->host_name << "' could not be "
+            << "' on host '" << svc->get_hostname() << "' could not be "
                "rescheduled properly. Scheduling check for next week...";
           logger(dbg_checks, more)
             << "Unable to find any valid times to reschedule the next "
@@ -253,9 +253,9 @@ int handle_async_service_check_result(
 
   logger(dbg_checks, basic)
     << "** Handling check result for service '" << temp_service->description
-    << "' on host '" << temp_service->host_name << "'...";
+    << "' on host '" << temp_service->get_hostname() << "'...";
   logger(dbg_checks, more)
-    << "HOST: " << temp_service->host_name
+    << "HOST: " << temp_service->get_hostname()
     << ", SERVICE: " << temp_service->description
     << ", CHECK TYPE: " << (queued_check_result->check_type ==
         SERVICE_CHECK_ACTIVE ? "Active" : "Passive")
@@ -375,7 +375,7 @@ int handle_async_service_check_result(
 
     logger(log_runtime_warning, basic)
       << "Warning:  Check of service '" << temp_service->description
-      << "' on host '" << temp_service->host_name
+      << "' on host '" << temp_service->get_hostname()
       << "' did not exit properly!";
 
     temp_service->plugin_output
@@ -390,7 +390,7 @@ int handle_async_service_check_result(
     logger(log_runtime_warning, basic)
       << "Warning: return (code of " << queued_check_result->return_code
       << " for check of service '" << temp_service->description
-      << "' on host '" << temp_service->host_name
+      << "' on host '" << temp_service->get_hostname()
       << "' was out of bounds."
       << (queued_check_result->return_code == 126
           ? "Make sure the plugin you're trying to run is executable."
@@ -484,7 +484,7 @@ int handle_async_service_check_result(
   if (temp_service->check_type == SERVICE_CHECK_PASSIVE) {
     if (config->log_passive_checks())
       logger(log_passive_check, basic)
-        << "PASSIVE SERVICE CHECK: " << temp_service->host_name << ";"
+        << "PASSIVE SERVICE CHECK: " << temp_service->get_hostname() << ";"
         << temp_service->description << ";" << temp_service->current_state
         << ";" << temp_service->plugin_output;
   }
@@ -1065,7 +1065,7 @@ int handle_async_service_check_result(
         /* check services that THIS ONE depends on for notification AND execution */
         /* we do this because we might be sending out a notification soon and we want the dependency logic to be accurate */
         std::pair<std::string, std::string>
-          id(std::make_pair(temp_service->host_name, temp_service->description));
+          id(std::make_pair(temp_service->get_hostname(), temp_service->description));
         umultimap<std::pair<std::string, std::string>,
                   std::shared_ptr<servicedependency> > const&
           dependencies(state::instance().servicedependencies());
@@ -1082,7 +1082,7 @@ int handle_async_service_check_result(
             logger(dbg_checks, most)
               << "Predictive check of service '"
               << master_service->description << "' on host '"
-              << master_service->host_name << "' queued.";
+              << master_service->get_hostname() << "' queued.";
             add_object_to_objectlist(
               &check_servicelist,
               (void*)master_service);
@@ -1177,7 +1177,7 @@ int handle_async_service_check_result(
     // Make sure we rescheduled the next service check at a valid time.
     {
       timezone_locker lock(get_service_timezone(
-                             temp_service->host_name,
+                             temp_service->get_hostname(),
                              temp_service->description));
       preferred_time = temp_service->next_check;
       get_next_valid_time(
@@ -1322,7 +1322,7 @@ void schedule_service_check(com::centreon::engine::service2* svc, time_t check_t
   logger(dbg_checks, basic) << "Scheduling a "
     << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
     << ", active check of service '" << svc->description
-    << "' on host '" << svc->host_name
+    << "' on host '" << svc->get_hostname()
     << "' @ " << my_ctime(&check_time);
 
   // Don't schedule a check if active checks
@@ -1488,7 +1488,7 @@ int check_service_check_viability(
     // Make sure this is a valid time to check the service.
     {
       timezone_locker lock(get_service_timezone(
-                             svc->host_name,
+                             svc->get_hostname(),
                              svc->description));
       if (check_time_against_period(
             (unsigned long)current_time,
@@ -1535,7 +1535,7 @@ unsigned int check_service_dependencies(
     << "check_service_dependencies()";
 
   std::pair<std::string, std::string>
-    id(svc->host_name, svc->description);
+    id(svc->get_hostname(), svc->description);
   umultimap<std::pair<std::string, std::string>,
             std::shared_ptr<servicedependency> > const&
     dependencies(state::instance().servicedependencies());
@@ -1630,13 +1630,13 @@ void check_for_orphaned_services() {
       logger(log_runtime_warning, basic)
         << "Warning: The check of service '"
         << temp_service->description << "' on host '"
-        << temp_service->host_name << "' looks like it was orphaned "
+        << temp_service->get_hostname() << "' looks like it was orphaned "
         "(results never came back).  I'm scheduling an immediate check "
         "of the service...";
 
       logger(dbg_checks, more)
         << "Service '" << temp_service->description
-        << "' on host '" << temp_service->host_name
+        << "' on host '" << temp_service->get_hostname()
         << "' was orphaned, so we're scheduling an immediate check...";
 
       /* decrement the number of running service checks */
@@ -1700,7 +1700,7 @@ void check_service_result_freshness() {
     // See if the time is right...
     {
       timezone_locker lock(get_service_timezone(
-                             temp_service->host_name,
+                             temp_service->get_hostname(),
                              temp_service->description));
       if (check_time_against_period(
             current_time,
@@ -1750,7 +1750,7 @@ int is_service_result_fresh(
 
   logger(dbg_checks, most)
     << "Checking freshness of service '" << temp_service->description
-    << "' on host '" << temp_service->host_name << "'...";
+    << "' on host '" << temp_service->get_hostname() << "'...";
 
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
   if (temp_service->freshness_threshold == 0) {
@@ -1817,7 +1817,7 @@ int is_service_result_fresh(
     if (log_this)
       logger(log_runtime_warning, basic)
         << "Warning: The results of service '" << temp_service->description
-        << "' on host '" << temp_service->host_name << "' are stale by "
+        << "' on host '" << temp_service->get_hostname() << "' are stale by "
         << days << "d " << hours << "h " << minutes << "m " << seconds
         << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
         << "m " << tseconds << "s).  I'm forcing an immediate check "
@@ -1825,7 +1825,7 @@ int is_service_result_fresh(
 
     logger(dbg_checks, more)
       << "Check results for service '" << temp_service->description
-      << "' on host '" << temp_service->host_name << "' are stale by "
+      << "' on host '" << temp_service->get_hostname() << "' are stale by "
       << days << "d " << hours << "h " << minutes << "m " << seconds
       << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
       << "m " << tseconds << "s).  Forcing an immediate check of "
@@ -1836,7 +1836,7 @@ int is_service_result_fresh(
 
   logger(dbg_checks, more)
     << "Check results for service '" << temp_service->description
-    << "' on host '" << temp_service->host_name << "' are fresh.";
+    << "' on host '" << temp_service->get_hostname() << "' are fresh.";
 
   return true;
 }

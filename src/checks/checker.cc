@@ -536,7 +536,7 @@ void checker::run(
 
   logger(dbg_checks, basic)
     << "** Running async check of service '" << svc->description
-    << "' on host '" << svc->host_name << "'...";
+    << "' on host '" << svc->get_hostname() << "'...";
 
   // Check if the service is viable now.
   if (check_service_check_viability(
@@ -545,7 +545,7 @@ void checker::run(
         time_is_valid,
         preferred_time) == ERROR)
     throw (checks_viability_failure() << "Check of service '"
-           << svc->description << "' on host '" << svc->host_name
+           << svc->description << "' on host '" << svc->get_hostname()
            << "' is not viable");
 
   // Send broker event.
@@ -578,13 +578,13 @@ void checker::run(
                            * config->interval_length());
     throw (engine_error()
            << "Some broker module cancelled check of service '"
-           << svc->description << "' on host '" << svc->host_name);
+           << svc->description << "' on host '" << svc->get_hostname());
   }
   // Service check was override by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res) {
     logger(dbg_functions, basic)
       << "Some broker module overrode check of service '"
-      << svc->description << "' on host '" << svc->host_name
+      << svc->description << "' on host '" << svc->get_hostname()
       << "' so we'll bail out";
     return ;
   }
@@ -592,7 +592,7 @@ void checker::run(
   // Checking starts.
   logger(dbg_checks, basic)
     << "Checking service '" << svc->description
-    << "' on host '" << svc->host_name << "'...";
+    << "' on host '" << svc->get_hostname() << "'...";
 
   // Clear check options.
   if (scheduled_check)
@@ -639,7 +639,7 @@ void checker::run(
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = NULL;
   check_result_info.output_file = NULL;
-  check_result_info.host_name = string::dup(svc->host_name);
+  check_result_info.host_name = string::dup(svc->get_hostname());
   check_result_info.service_description = string::dup(svc->description);
   check_result_info.latency = latency;
   check_result_info.next = NULL;

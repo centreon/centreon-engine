@@ -205,7 +205,7 @@ int downtime_manager::check_pending_flex_service_downtime(service2* svc) {
       if (dt.get_start_time() <= current_time && current_time <= dt.get_end_time()) {
         logger(dbg_downtime, basic)
             << "Flexible downtime (id=" << dt.get_downtime_id() << ") for service '"
-            << svc->description << "' on host '" << svc->host_name
+            << svc->description << "' on host '" << svc->get_hostname()
             << "' starting now...";
 
         dt.start_flex_downtime();

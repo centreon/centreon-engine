@@ -225,7 +225,7 @@ int grab_custom_macro_value_r(
       }
       /* else we have a service macro with a servicegroup name and a delimiter... */
       else {
-        if ((temp_servicegroup = find_servicegroup(arg1)) == nullptr)
+        if ((temp_servicegroup = ::find_servicegroup(arg1)) == nullptr)
           return ERROR;
 
         delimiter_len = strlen(arg2);
@@ -242,7 +242,7 @@ int grab_custom_macro_value_r(
           grab_custom_macro_value_r(
             mac,
             macro_name,
-            temp_service->host_name,
+            temp_service->get_hostname().c_str(),
             temp_service->description,
             &temp_buffer);
 

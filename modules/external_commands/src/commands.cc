@@ -974,7 +974,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       return ERROR;
 
     /* verify that the servicegroup is valid */
-    if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == nullptr)
+    if ((temp_servicegroup = ::find_servicegroup(servicegroup_name)) == nullptr)
       return ERROR;
   }
 
@@ -1145,7 +1145,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
           continue;
         downtime_manager::instance().schedule_downtime(
           SERVICE_DOWNTIME,
-          temp_service->host_name,
+          temp_service->get_hostname(),
           temp_service->description,
           entry_time, author,
           comment_data,

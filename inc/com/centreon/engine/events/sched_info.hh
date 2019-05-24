@@ -23,10 +23,14 @@
 #ifndef CCE_EVENTS_SCHED_INFO_HH
 #  define CCE_EVENTS_SCHED_INFO_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include <time.h>
 
 // Forward declaration.
-struct service2;
+CCE_BEGIN()
+class service2;
+CCE_END()
+
 struct timed_event_struct;
 
 typedef struct  sched_info_struct {

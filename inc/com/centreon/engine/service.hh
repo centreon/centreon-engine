@@ -43,7 +43,10 @@ CCE_BEGIN()
 
 class                           service2 : public notifier {
  public:
-  char*                         host_name;
+  virtual                       ~service2() override;
+  void                          set_hostname(std::string const& name);
+  std::string const&            get_hostname() const;
+
   char*                         description;
   char*                         display_name;
   char*                         service_check_command;
@@ -157,6 +160,8 @@ class                           service2 : public notifier {
   objectlist_struct*            servicegroups_ptr;
   struct service2*        next;
   struct service2*        nexthash;
+ private:
+  std::string                   _hostname;
 };
 CCE_END()
 
@@ -256,14 +261,14 @@ void          check_for_expired_acknowledgement(com::centreon::engine::service2*
 com::centreon::engine::service2&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
-char const*   get_service_timezone(char const* hst, char const* svc);
+char const*   get_service_timezone(std::string const& hst, std::string const& svc);
 bool          is_service_exist(
                 std::pair<uint64_t, uint64_t> const& id);
 std::pair<uint64_t, uint64_t>
               get_host_and_service_id(
-                char const* host,
+                std::string const& host,
                 char const* svc);
-uint64_t get_service_id(char const* host, char const* svc);
+uint64_t get_service_id(std::string const& host, char const* svc);
 void          schedule_acknowledgement_expiration(com::centreon::engine::service2* s);
 
 CCE_END()

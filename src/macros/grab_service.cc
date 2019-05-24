@@ -119,7 +119,7 @@ static char* get_service_state(com::centreon::engine::service2& svc, nagios_macr
 static char* get_service_id(com::centreon::engine::service2& svc, nagios_macros* mac) {
   (void)mac;
   return (string::dup(string::from(com::centreon::engine::get_service_id(
-                                             svc.host_name,
+                                             svc.get_hostname(),
                                              svc.description)).c_str()));
 }
 
@@ -133,7 +133,7 @@ static char* get_service_id(com::centreon::engine::service2& svc, nagios_macros*
  */
 static char* get_service_macro_timezone(com::centreon::engine::service2& svc, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(get_service_timezone(svc.host_name, svc.description)));
+  return (string::dup(get_service_timezone(svc.get_hostname(), svc.description)));
 }
 
 /**************************************
