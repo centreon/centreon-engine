@@ -199,6 +199,13 @@ namespace  macros {
     return (string::dup((t.*member)()));
   }
 
+  template <typename T, typename U, typename V, U (V::* member)() const>
+  char*    get_member_as_string(T& t, nagios_macros* mac) {
+    (void)mac;
+    V* v{&t};
+    return (string::dup((v->*member)()));
+  }
+
   /**
    *  Get string copy of object member.
    *

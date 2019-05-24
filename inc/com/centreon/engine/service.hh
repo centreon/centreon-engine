@@ -43,13 +43,13 @@ CCE_BEGIN()
 
 class                           service : public notifier {
  public:
+                                service(std::string const& display_name);
   virtual                       ~service() override;
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
   std::string const&            get_description() const;
 
-  char*                         display_name;
   char*                         service_check_command;
   char*                         event_handler;
   int                           initial_state;

@@ -167,63 +167,52 @@ host::host(uint64_t host_id,
            int should_be_drawn,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_host) {
+           int obsess_over_host)
+    : notifier{!display_name.empty() ? display_name : name} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
-    logger(log_config_error, basic)
-    << "Error: Host name or address is nullptr";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+    logger(log_config_error, basic) << "Error: Host name or address is nullptr";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (host_id == 0) {
-    logger(log_config_error, basic)
-      << "Error: Host must contain a host id because it comes from a database";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+    logger(log_config_error, basic) << "Error: Host must contain a host id "
+                                       "because it comes from a database";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (max_attempts <= 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid max_check_attempts value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid max_check_attempts value for host '" << name << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (check_interval < 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid check_interval value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid check_interval value for host '" << name << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (notification_interval < 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid notification_interval value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid notification_interval value for host '" << name
+        << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (first_notification_delay < 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid first_notification_delay value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid first_notification_delay value for host '" << name
+        << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (freshness_threshold < 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid freshness_threshold value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid freshness_threshold value for host '" << name << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
 
   // Check if the host already exists.
   uint64_t id{host_id};
   if (is_host_exist(id)) {
     logger(log_config_error, basic)
-      << "Error: Host '" << name << "' has already been defined";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Host '" << name << "' has already been defined";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
 
   _should_be_scheduled = true;
@@ -237,7 +226,6 @@ host::host(uint64_t host_id,
   _name = name;
   _address = address;
   _alias = !alias.empty() ? alias : name;
-  _display_name = !display_name.empty() ? display_name : name;
   _action_url = action_url;
   _check_period = check_period;
   _event_handler = event_handler;
@@ -338,14 +326,6 @@ std::string const& host::get_name() const {
 
 void host::set_name(std::string const& name) {
   _name = name;
-}
-
-std::string const& host::get_display_name() const {
-  return _display_name;
-}
-
-void host::set_display_name(std::string const& display_name) {
-  _display_name = display_name;
 }
 
 std::string const& host::get_alias() const {

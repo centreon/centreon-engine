@@ -38,12 +38,13 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
+service::service(std::string const& display_name)
+ : notifier{display_name} {}
+
 service::~service() {
   this->contact_groups.clear();
   deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
 
-  delete[] this->display_name;
-  this->display_name = NULL;
   delete[] this->service_check_command;
   this->service_check_command = NULL;
   delete[] this->event_handler;
@@ -89,7 +90,7 @@ bool operator==(
        com::centreon::engine::service const& obj2) throw () {
   return obj1.get_hostname() == obj2.get_hostname()
           && obj1.get_description() == obj2.get_description()
-          && is_equal(obj1.display_name, obj2.display_name)
+          && obj1.get_display_name() == obj2.get_display_name()
           && is_equal(obj1.service_check_command, obj2.service_check_command)
           && is_equal(obj1.event_handler, obj2.event_handler)
           && obj1.initial_state == obj2.initial_state
@@ -255,7 +256,7 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const&
   os << "service {\n"
     "  host_name:                            " << obj.get_hostname() << "\n"
     "  description:                          " << obj.get_description() << "\n"
-    "  display_name:                         " << chkstr(obj.display_name) << "\n"
+    "  display_name:                         " << obj.get_display_name() << "\n"
     "  service_check_command:                " << chkstr(obj.service_check_command) << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
     "  initial_state:                        " << obj.initial_state << "\n"
@@ -567,13 +568,12 @@ com::centreon::engine::service* add_service(
   }
 
   // Allocate memory.
-  std::shared_ptr<service> obj{new service};
+  std::shared_ptr<service> obj{new service(display_name ? display_name : description)};
 
   try {
     // Duplicate vars.
     obj->set_hostname(host_name);
     obj->set_description(description);
-    obj->display_name = string::dup(display_name ? display_name : description);
     obj->service_check_command = string::dup(check_command);
     if (event_handler)
       obj->event_handler = string::dup(event_handler);

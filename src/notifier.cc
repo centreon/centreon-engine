@@ -17,4 +17,17 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/notifier.hh"
 
+using namespace com::centreon::engine;
+
+notifier::notifier(std::string const& display_name)
+    : _display_name{display_name} {}
+
+std::string const& notifier::get_display_name() const {
+  return _display_name;
+}
+
+void notifier::set_display_name(std::string const& display_name) {
+  _display_name = display_name;
+}

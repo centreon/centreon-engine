@@ -20,10 +20,20 @@
 #ifndef CCE_NOTIFIER_HH
 # define CCE_NOTIFIER_HH
 
+# include <string>
+# include "com/centreon/engine/namespace.hh"
+
 CCE_BEGIN()
 class                         notifier {
  public:
+                              notifier(std::string const& display_name);
   virtual                     ~notifier() {};
+
+  std::string const&          get_display_name() const;
+  void                        set_display_name(std::string const& name);
+
+ protected:
+  std::string                 _display_name;
 
 };
 CCE_END()

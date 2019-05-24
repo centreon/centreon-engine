@@ -144,141 +144,252 @@ static char* get_service_macro_timezone(com::centreon::engine::service& svc, nag
 
 // Redirection object.
 struct grab_service_redirection {
-  typedef umap<unsigned int, std::pair<char* (*)(com::centreon::engine::service&, nagios_macros* mac), bool> > entry;
-  entry routines;
-  grab_service_redirection() {
-    // Description.
-    routines[MACRO_SERVICEDESC] = {&get_member_as_string<com::centreon::engine::service, std::string const&, &com::centreon::engine::service::get_description>, true};
-    // Display name.
-    routines[MACRO_SERVICEDISPLAYNAME].first = &get_member_as_string<com::centreon::engine::service, char*, &com::centreon::engine::service::display_name>;
-    routines[MACRO_SERVICEDISPLAYNAME].second = true;
-    // Output.
-    routines[MACRO_SERVICEOUTPUT].first = &get_member_as_string<com::centreon::engine::service, char*, &com::centreon::engine::service::plugin_output>;
-    routines[MACRO_SERVICEOUTPUT].second = true;
-    // Long output.
-    routines[MACRO_LONGSERVICEOUTPUT].first = &get_member_as_string<com::centreon::engine::service, char*, &com::centreon::engine::service::long_plugin_output>;
-    routines[MACRO_LONGSERVICEOUTPUT].second = true;
-    // Perfdata.
-    routines[MACRO_SERVICEPERFDATA].first = &get_member_as_string<com::centreon::engine::service, char*, &com::centreon::engine::service::perf_data>;
-    routines[MACRO_SERVICEPERFDATA].second = true;
-    // Check command.
-    routines[MACRO_SERVICECHECKCOMMAND].first = &get_member_as_string<com::centreon::engine::service, char*, &com::centreon::engine::service::service_check_command>;
-    routines[MACRO_SERVICECHECKCOMMAND].second = true;
-    // Check type.
-    routines[MACRO_SERVICECHECKTYPE].first = &get_service_check_type;
-    routines[MACRO_SERVICECHECKTYPE].second = true;
-    // State type.
-    routines[MACRO_SERVICESTATETYPE].first = &get_state_type_old<com::centreon::engine::service>;
-    routines[MACRO_SERVICESTATETYPE].second = true;
-    // State.
-    routines[MACRO_SERVICESTATE].first = &get_service_state<&com::centreon::engine::service::current_state>;
-    routines[MACRO_SERVICESTATE].second = true;
-    // State ID.
-    routines[MACRO_SERVICESTATEID].first = &get_member_as_string<com::centreon::engine::service, int, &com::centreon::engine::service::current_state>;
-    routines[MACRO_SERVICESTATEID].second = true;
-    // Last state.
-    routines[MACRO_LASTSERVICESTATE].first = &get_service_state<&com::centreon::engine::service::last_state>;
-    routines[MACRO_LASTSERVICESTATE].second = true;
-    // Last state ID.
-    routines[MACRO_LASTSERVICESTATEID].first = &get_member_as_string<com::centreon::engine::service, int, &com::centreon::engine::service::last_state>;
-    routines[MACRO_LASTSERVICESTATEID].second = true;
-    // Is volatile.
-    routines[MACRO_SERVICEISVOLATILE].first = &get_member_as_string<com::centreon::engine::service, int, &com::centreon::engine::service::is_volatile>;
-    routines[MACRO_SERVICEISVOLATILE].second = true;
-    // Attempt.
-    routines[MACRO_SERVICEATTEMPT].first = &get_member_as_string<com::centreon::engine::service, int, &com::centreon::engine::service::current_attempt>;
-    routines[MACRO_SERVICEATTEMPT].second = true;
-    // Max attempts.
-    routines[MACRO_MAXSERVICEATTEMPTS].first = &get_member_as_string<com::centreon::engine::service, int, &com::centreon::engine::service::max_attempts>;
-    routines[MACRO_MAXSERVICEATTEMPTS].second = true;
-    // Execution time.
-    routines[MACRO_SERVICEEXECUTIONTIME].first = &get_double<com::centreon::engine::service, &com::centreon::engine::service::execution_time, 3>;
-    routines[MACRO_SERVICEEXECUTIONTIME].second = true;
-    // Latency.
-    routines[MACRO_SERVICELATENCY].first = &get_double<com::centreon::engine::service, &com::centreon::engine::service::latency, 3>;
-    routines[MACRO_SERVICELATENCY].second = true;
-    // Last check.
-    routines[MACRO_LASTSERVICECHECK].first = &get_member_as_string<com::centreon::engine::service, time_t, &com::centreon::engine::service::last_check>;
-    routines[MACRO_LASTSERVICECHECK].second = true;
-    // Last state change.
-    routines[MACRO_LASTSERVICESTATECHANGE].first = &get_member_as_string<com::centreon::engine::service, time_t, &com::centreon::engine::service::last_state_change>;
-    routines[MACRO_LASTSERVICESTATECHANGE].second = true;
-    // Last time ok.
-    routines[MACRO_LASTSERVICEOK].first = &get_member_as_string<com::centreon::engine::service, time_t, &com::centreon::engine::service::last_time_ok>;
-    routines[MACRO_LASTSERVICEOK].second = true;
-    // Last time warning.
-    routines[MACRO_LASTSERVICEWARNING].first = &get_member_as_string<com::centreon::engine::service, time_t, &com::centreon::engine::service::last_time_warning>;
-    routines[MACRO_LASTSERVICEWARNING].second = true;
-    // Last time unknown.
-    routines[MACRO_LASTSERVICEUNKNOWN].first = &get_member_as_string<com::centreon::engine::service, time_t, &com::centreon::engine::service::last_time_unknown>;
-    routines[MACRO_LASTSERVICEUNKNOWN].second = true;
-    // Last time critical.
-    routines[MACRO_LASTSERVICECRITICAL].first = &get_member_as_string<com::centreon::engine::service, time_t, &com::centreon::engine::service::last_time_critical>;
-    routines[MACRO_LASTSERVICECRITICAL].second = true;
-    // Downtime.
-    routines[MACRO_SERVICEDOWNTIME].first = &get_member_as_string<com::centreon::engine::service, int, &com::centreon::engine::service::scheduled_downtime_depth>;
-    routines[MACRO_SERVICEDOWNTIME].second = true;
-    // Percent state change.
-    routines[MACRO_SERVICEPERCENTCHANGE].first = &get_double<com::centreon::engine::service, &com::centreon::engine::service::percent_state_change, 2>;
-    routines[MACRO_SERVICEPERCENTCHANGE].second = true;
-    // Duration.
-    routines[MACRO_SERVICEDURATION].first = &get_duration_old<com::centreon::engine::service>;
-    routines[MACRO_SERVICEDURATION].second = true;
-    // Duration in seconds.
-    routines[MACRO_SERVICEDURATIONSEC].first = &get_duration_sec_old<com::centreon::engine::service>;
-    routines[MACRO_SERVICEDURATIONSEC].second = true;
-    // Notification number.
-    routines[MACRO_SERVICENOTIFICATIONNUMBER].first = &get_member_as_string<com::centreon::engine::service, int, &com::centreon::engine::service::current_notification_number>;
-    routines[MACRO_SERVICENOTIFICATIONNUMBER].second = true;
-    // Notification ID.
-    routines[MACRO_SERVICENOTIFICATIONID].first = &get_member_as_string<com::centreon::engine::service, unsigned long, &com::centreon::engine::service::current_notification_id>;
-    routines[MACRO_SERVICENOTIFICATIONID].second = true;
-    // Event ID.
-    routines[MACRO_SERVICEEVENTID].first = &get_member_as_string<com::centreon::engine::service, unsigned long, &com::centreon::engine::service::current_event_id>;
-    routines[MACRO_SERVICEEVENTID].second = true;
-    // Last event ID.
-    routines[MACRO_LASTSERVICEEVENTID].first = &get_member_as_string<com::centreon::engine::service, unsigned long, &com::centreon::engine::service::last_event_id>;
-    routines[MACRO_LASTSERVICEEVENTID].second = true;
-    // Problem ID.
-    routines[MACRO_SERVICEPROBLEMID].first = &get_member_as_string<com::centreon::engine::service, unsigned long, &com::centreon::engine::service::current_problem_id>;
-    routines[MACRO_SERVICEPROBLEMID].second = true;
-    // Last problem ID.
-    routines[MACRO_LASTSERVICEPROBLEMID].first = &get_member_as_string<com::centreon::engine::service, unsigned long, &com::centreon::engine::service::last_problem_id>;
-    routines[MACRO_LASTSERVICEPROBLEMID].second = true;
-    // Action URL.
-    routines[MACRO_SERVICEACTIONURL].first = &get_recursive<com::centreon::engine::service, &com::centreon::engine::service::action_url, URL_ENCODE_MACRO_CHARS>;
-    routines[MACRO_SERVICEACTIONURL].second = true;
-    // Notes URL.
-    routines[MACRO_SERVICENOTESURL].first = &get_recursive<com::centreon::engine::service, &com::centreon::engine::service::notes_url, URL_ENCODE_MACRO_CHARS>;
-    routines[MACRO_SERVICENOTESURL].second = true;
-    // Notes.
-    routines[MACRO_SERVICENOTES].first = &get_recursive<com::centreon::engine::service, &com::centreon::engine::service::notes, 0>;
-    routines[MACRO_SERVICENOTES].second = true;
-    // Group names.
-    routines[MACRO_SERVICEGROUPNAMES].first = &get_service_group_names;
-    routines[MACRO_SERVICEGROUPNAMES].second = true;
-    // Acknowledgement author.
-    routines[MACRO_SERVICEACKAUTHOR].first = &get_macro_copy<com::centreon::engine::service, MACRO_SERVICEACKAUTHOR>;
-    routines[MACRO_SERVICEACKAUTHOR].second = true;
-    // Acknowledgement author name.
-    routines[MACRO_SERVICEACKAUTHORNAME].first = &get_macro_copy<com::centreon::engine::service, MACRO_SERVICEACKAUTHORNAME>;
-    routines[MACRO_SERVICEACKAUTHORNAME].second = true;
-    // Acknowledgement author alias.
-    routines[MACRO_SERVICEACKAUTHORALIAS].first = &get_macro_copy<com::centreon::engine::service, MACRO_SERVICEACKAUTHORALIAS>;
-    routines[MACRO_SERVICEACKAUTHORALIAS].second = true;
-    // Acknowledgement comment.
-    routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<com::centreon::engine::service, MACRO_SERVICEACKCOMMENT>;
-    routines[MACRO_SERVICEACKCOMMENT].second = true;
-    // Service id.
-    routines[MACRO_SERVICEID].first = &get_service_id;
-    routines[MACRO_SERVICEID].second = true;
-    // Acknowledgement comment.
-    routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<com::centreon::engine::service, MACRO_SERVICEACKCOMMENT>;
-    routines[MACRO_SERVICEACKCOMMENT].second = true;
-    // Acknowledgement comment.
-    routines[MACRO_SERVICETIMEZONE].first = &get_service_macro_timezone;
-    routines[MACRO_SERVICETIMEZONE].second = true;
-  }
+  typedef umap<
+      unsigned int,
+      std::pair<char* (*)(com::centreon::engine::service&, nagios_macros* mac),
+                bool>>
+      entry;
+  entry routines{
+      // Description.
+      {MACRO_SERVICEDESC,
+       {&get_member_as_string<com::centreon::engine::service,
+                              std::string const&,
+                              &com::centreon::engine::service::get_description>,
+        true}},
+      // Display name.
+      {MACRO_SERVICEDISPLAYNAME,
+       {&get_member_as_string<service,
+                              std::string const&,
+                              notifier,
+                              &notifier::get_display_name>,
+        true}},
+      // Output.
+      {MACRO_SERVICEOUTPUT,
+       {&get_member_as_string<com::centreon::engine::service,
+                              char*,
+                              &com::centreon::engine::service::plugin_output>,
+        true}},
+      // Long output.
+      {MACRO_LONGSERVICEOUTPUT,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            char*,
+            &com::centreon::engine::service::long_plugin_output>,
+        true}},
+      // Perfdata.
+      {MACRO_SERVICEPERFDATA,
+       {&get_member_as_string<com::centreon::engine::service,
+                              char*,
+                              &com::centreon::engine::service::perf_data>,
+        true}},
+      // Check command.
+      {MACRO_SERVICECHECKCOMMAND,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            char*,
+            &com::centreon::engine::service::service_check_command>,
+        true}},
+      // Check type.
+      {MACRO_SERVICECHECKTYPE, {&get_service_check_type, true}},
+      // State type.
+      {MACRO_SERVICESTATETYPE,
+       {&get_state_type_old<com::centreon::engine::service>, true}},
+      // State.
+      {MACRO_SERVICESTATE,
+       {&get_service_state<&com::centreon::engine::service::current_state>,
+        true}},
+      // State ID.
+      {MACRO_SERVICESTATEID,
+       {&get_member_as_string<com::centreon::engine::service,
+                              int,
+                              &com::centreon::engine::service::current_state>,
+        true}},
+      // Last state.
+      {MACRO_LASTSERVICESTATE,
+       {&get_service_state<&com::centreon::engine::service::last_state>, true}},
+      // Last state ID.
+      {MACRO_LASTSERVICESTATEID,
+       {&get_member_as_string<com::centreon::engine::service,
+                              int,
+                              &com::centreon::engine::service::last_state>,
+        true}},
+      // Is volatile.
+      {MACRO_SERVICEISVOLATILE,
+       {&get_member_as_string<com::centreon::engine::service,
+                              int,
+                              &com::centreon::engine::service::is_volatile>,
+        true}},
+      // Attempt.
+      {MACRO_SERVICEATTEMPT,
+       {&get_member_as_string<com::centreon::engine::service,
+                              int,
+                              &com::centreon::engine::service::current_attempt>,
+        true}},
+      // Max attempts.
+      {MACRO_MAXSERVICEATTEMPTS,
+       {&get_member_as_string<com::centreon::engine::service,
+                              int,
+                              &com::centreon::engine::service::max_attempts>,
+        true}},
+      // Execution time.
+      {MACRO_SERVICEEXECUTIONTIME,
+       {&get_double<com::centreon::engine::service,
+                    &com::centreon::engine::service::execution_time,
+                    3>,
+        true}},
+      // Latency.
+      {MACRO_SERVICELATENCY,
+       {&get_double<com::centreon::engine::service,
+                    &com::centreon::engine::service::latency,
+                    3>,
+        true}},
+      // Last check.
+      {MACRO_LASTSERVICECHECK,
+       {&get_member_as_string<com::centreon::engine::service,
+                              time_t,
+                              &com::centreon::engine::service::last_check>,
+        true}},
+      // Last state change.
+      {MACRO_LASTSERVICESTATECHANGE,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            time_t,
+            &com::centreon::engine::service::last_state_change>,
+        true}},
+      // Last time ok.
+      {MACRO_LASTSERVICEOK,
+       {&get_member_as_string<com::centreon::engine::service,
+                              time_t,
+                              &com::centreon::engine::service::last_time_ok>,
+        true}},
+      // Last time warning.
+      {MACRO_LASTSERVICEWARNING,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            time_t,
+            &com::centreon::engine::service::last_time_warning>,
+        true}},
+      // Last time unknown.
+      {MACRO_LASTSERVICEUNKNOWN,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            time_t,
+            &com::centreon::engine::service::last_time_unknown>,
+        true}},
+      // Last time critical.
+      {MACRO_LASTSERVICECRITICAL,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            time_t,
+            &com::centreon::engine::service::last_time_critical>,
+        true}},
+      // Downtime.
+      {MACRO_SERVICEDOWNTIME,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            int,
+            &com::centreon::engine::service::scheduled_downtime_depth>,
+        true}},
+      // Percent state change.
+      {MACRO_SERVICEPERCENTCHANGE,
+       {&get_double<com::centreon::engine::service,
+                    &com::centreon::engine::service::percent_state_change,
+                    2>,
+        true}},
+      // Duration.
+      {MACRO_SERVICEDURATION,
+       {&get_duration_old<com::centreon::engine::service>, true}},
+      // Duration in seconds.
+      {MACRO_SERVICEDURATIONSEC,
+       {&get_duration_sec_old<com::centreon::engine::service>, true}},
+      // Notification number.
+      {MACRO_SERVICENOTIFICATIONNUMBER,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            int,
+            &com::centreon::engine::service::current_notification_number>,
+        true}},
+      // Notification ID.
+      {MACRO_SERVICENOTIFICATIONID,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            unsigned long,
+            &com::centreon::engine::service::current_notification_id>,
+        true}},
+      // Event ID.
+      {MACRO_SERVICEEVENTID,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            unsigned long,
+            &com::centreon::engine::service::current_event_id>,
+        true}},
+      // Last event ID.
+      {MACRO_LASTSERVICEEVENTID,
+       {&get_member_as_string<com::centreon::engine::service,
+                              unsigned long,
+                              &com::centreon::engine::service::last_event_id>,
+        true}},
+      // Problem ID.
+      {MACRO_SERVICEPROBLEMID,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            unsigned long,
+            &com::centreon::engine::service::current_problem_id>,
+        true}},
+      // Last problem ID.
+      {MACRO_LASTSERVICEPROBLEMID,
+       {&get_member_as_string<com::centreon::engine::service,
+                              unsigned long,
+                              &com::centreon::engine::service::last_problem_id>,
+        true}},
+      // Action URL.
+      {MACRO_SERVICEACTIONURL,
+       {&get_recursive<com::centreon::engine::service,
+                       &com::centreon::engine::service::action_url,
+                       URL_ENCODE_MACRO_CHARS>,
+        true}},
+      // Notes URL.
+      {MACRO_SERVICENOTESURL,
+       {&get_recursive<com::centreon::engine::service,
+                       &com::centreon::engine::service::notes_url,
+                       URL_ENCODE_MACRO_CHARS>,
+        true}},
+      // Notes.
+      {MACRO_SERVICENOTES,
+       {&get_recursive<com::centreon::engine::service,
+                       &com::centreon::engine::service::notes,
+                       0>,
+        true}},
+      // Group names.
+      {MACRO_SERVICEGROUPNAMES, {&get_service_group_names, true}},
+      // Acknowledgement author.
+      {MACRO_SERVICEACKAUTHOR,
+       {&get_macro_copy<com::centreon::engine::service, MACRO_SERVICEACKAUTHOR>,
+        true}},
+      // Acknowledgement author name.
+      {MACRO_SERVICEACKAUTHORNAME,
+       {&get_macro_copy<com::centreon::engine::service,
+                        MACRO_SERVICEACKAUTHORNAME>,
+        true}},
+      // Acknowledgement author alias.
+      {MACRO_SERVICEACKAUTHORALIAS,
+       {&get_macro_copy<com::centreon::engine::service,
+                        MACRO_SERVICEACKAUTHORALIAS>,
+        true}},
+      // Acknowledgement comment.
+      {MACRO_SERVICEACKCOMMENT,
+       {&get_macro_copy<com::centreon::engine::service,
+                        MACRO_SERVICEACKCOMMENT>,
+        true}},
+      // Service id.
+      {MACRO_SERVICEID, {&get_service_id, true}},
+      // Acknowledgement comment.
+      {MACRO_SERVICEACKCOMMENT,
+       {&get_macro_copy<com::centreon::engine::service,
+                        MACRO_SERVICEACKCOMMENT>,
+        true}},
+      // Acknowledgement comment.
+      {MACRO_SERVICETIMEZONE, {&get_service_macro_timezone, true}}};
 } static const redirector;
 
 /**************************************

@@ -30,6 +30,7 @@
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/notifier.hh"
 
 
 /* Forward declaration. */
@@ -50,7 +51,7 @@ typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::host>> host_map;
 
 CCE_BEGIN()
-class                 host {
+class                 host : public notifier {
  public:
                       host(uint64_t host_id,
                            std::string const& name,
@@ -113,8 +114,6 @@ class                 host {
   // setters / getters
   std::string const& get_name() const;
   void               set_name(std::string const& name);
-  std::string const& get_display_name() const;
-  void               set_display_name(std::string const& name);
   std::string const& get_alias() const;
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
@@ -345,7 +344,6 @@ class                 host {
 
 private:
   std::string         _name;
-  std::string         _display_name;
   std::string         _alias;
   std::string         _address;
   std::string         _host_check_command;

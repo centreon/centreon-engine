@@ -376,9 +376,7 @@ void applier::service::modify_object(
 
   // Modify properties.
   s->set_description(obj.service_description());
-  modify_if_different(
-    s->display_name,
-    NULL_IF_EMPTY(obj.display_name()));
+  s->set_display_name(obj.display_name()),
   modify_if_different(
     s->service_check_command,
     NULL_IF_EMPTY(obj.check_command()));
