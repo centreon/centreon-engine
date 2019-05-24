@@ -384,7 +384,7 @@ bool dump::save(std::string const& path) {
  *
  *  @return The output stream.
  */
-std::ostream& dump::service(std::ostream& os, service2 const& obj) {
+std::ostream& dump::service(std::ostream& os, class service const& obj) {
   std::string hostname;
   if (obj.host_ptr)
     hostname = obj.host_ptr->get_name();
@@ -467,7 +467,7 @@ std::ostream& dump::service(std::ostream& os, service2 const& obj) {
  *  @return The output stream.
  */
 std::ostream& dump::services(std::ostream& os) {
-  for (service2* obj(service_list); obj; obj = obj->next)
+  for (class service* obj(service_list); obj; obj = obj->next)
     dump::service(os, *obj);
   return os;
 }

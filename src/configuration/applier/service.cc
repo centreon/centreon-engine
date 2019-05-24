@@ -115,7 +115,7 @@ void applier::service::add_object(
   config->services().insert(obj);
 
   // Create service.
-  service2* svc(add_service(
+  engine::service* svc(add_service(
     obj.host_id(), obj.service_id(),
     obj.hosts().begin()->c_str(),
     obj.service_description().c_str(),
@@ -361,13 +361,13 @@ void applier::service::modify_object(
 
   // Find service object.
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service2> >::iterator
+       std::shared_ptr<engine::service> >::iterator
     it_obj(applier::state::instance().services_find(obj.key()));
   if (it_obj == applier::state::instance().services().end())
     throw (engine_error() << "Could not modify non-existing "
            << "service object '" << service_description
            << "' of host '" << host_name << "'");
-  service2* s(it_obj->second.get());
+  engine::service* s(it_obj->second.get());
 
   // Update the global configuration set.
   configuration::service obj_old(*it_cfg);
@@ -601,10 +601,10 @@ void applier::service::remove_object(
   std::pair<std::string, std::string>
     id(std::make_pair(host_name, service_description));
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service2> >::iterator
+       std::shared_ptr<engine::service> >::iterator
     it(applier::state::instance().services_find(obj.key()));
   if (it != applier::state::instance().services().end()) {
-    service2* svc(it->second.get());
+    engine::service* svc(it->second.get());
 
     // Remove service comments.
     comment::delete_service_comments(host_name, service_description);
@@ -620,7 +620,7 @@ void applier::service::remove_object(
     applier::scheduler::instance().remove_service(obj);
 
     // Unregister service.
-    for (service2** s(&service_list); *s; s = &(*s)->next)
+    for (engine::service** s(&service_list); *s; s = &(*s)->next)
       if ((*s)->get_hostname() == host_name
           && (*s)->get_description() == service_description) {
         *s = (*s)->next;
@@ -666,7 +666,7 @@ void applier::service::resolve_object(
 
   // Find service.
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service2> >::iterator
+       std::shared_ptr<engine::service> >::iterator
     it(applier::state::instance().services_find(obj.key()));
   if (applier::state::instance().services().end() == it)
     throw (engine_error() << "Cannot resolve non-existing service '"

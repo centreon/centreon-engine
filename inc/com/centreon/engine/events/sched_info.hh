@@ -28,7 +28,7 @@
 
 // Forward declaration.
 CCE_BEGIN()
-class service2;
+class service;
 CCE_END()
 
 struct timed_event_struct;

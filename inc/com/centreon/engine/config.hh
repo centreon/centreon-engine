@@ -36,7 +36,7 @@ int pre_flight_object_check(int* w, int* e);
 // Detects circular dependencies and paths.
 int pre_flight_circular_check(int* w, int* e);
 
-int check_service(com::centreon::engine::service2* svc, int* w, int* e);
+int check_service(com::centreon::engine::service* svc, int* w, int* e);
 int check_host(com::centreon::engine::host* hst, int* w, int* e);
 int check_contact(com::centreon::engine::contact* cntct, int* w, int* e);
 int check_servicegroup(servicegroup* sg, int* w, int* e);

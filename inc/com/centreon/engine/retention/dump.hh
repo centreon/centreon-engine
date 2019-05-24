@@ -27,9 +27,10 @@
 // Forward declaration.
 
 CCE_BEGIN()
+class comment;
 class contact;
 class customvariable;
-class comment;
+class service;
 namespace downtimes {
   class downtime;
 }
@@ -50,7 +51,7 @@ namespace         retention {
     std::ostream& info(std::ostream& os);
     std::ostream& program(std::ostream& os);
     bool          save(std::string const& path);
-    std::ostream& service(std::ostream& os, service2 const& obj);
+    std::ostream& service(std::ostream& os, com::centreon::engine::service const& obj);
     std::ostream& services(std::ostream& os);
   }
 }

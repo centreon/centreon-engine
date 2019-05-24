@@ -43,7 +43,7 @@ CCE_BEGIN()
 namespace commands {
   class   command;
   class   connector;
-  class   service2;
+  class   service;
 }
 
 namespace retention {
@@ -143,13 +143,13 @@ namespace           configuration {
                     hostgroups_find(configuration::hostgroup::key_type const& k) const;
       hostgroup_map::iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k);
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2>> const&
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>> const&
                     services() const throw ();
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2>>&
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>&
                     services() throw ();
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2>>::const_iterator
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::const_iterator
                     services_find(configuration::service::key_type const& k) const;
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service2>>::iterator
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator
                     services_find(configuration::service::key_type const& k);
       umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>> const&
                     servicedependencies() const throw ();
@@ -245,7 +245,7 @@ namespace           configuration {
       processing_state
                     _processing_state;
       std::unordered_map<std::pair<uint64_t, uint64_t>,
-                         std::shared_ptr<service2>>
+                         std::shared_ptr<engine::service>>
                     _services;
       umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>>
                     _servicedependencies;

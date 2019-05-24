@@ -50,7 +50,7 @@ void applier::service::apply(
       std::pair<unsigned int, unsigned int> id(get_host_and_service_id(
             (*it)->host_name().c_str(),
             (*it)->service_description().c_str()));
-      service2& svc(find_service(id.first, id.second));
+      engine::service& svc(find_service(id.first, id.second));
       _update(config, **it, svc, scheduling_info_is_ok);
     }
     catch (...) {
@@ -71,7 +71,7 @@ void applier::service::apply(
 void applier::service::_update(
        configuration::state const& config,
        retention::service const& state,
-       service2& obj,
+       engine::service& obj,
        bool scheduling_info_is_ok) {
   if (state.modified_attributes().is_set()) {
     obj.modified_attributes = *state.modified_attributes();

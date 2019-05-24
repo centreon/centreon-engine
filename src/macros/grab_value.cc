@@ -229,7 +229,7 @@ static int handle_service_macro(
       if (!mac->host_ptr)
         retval = ERROR;
       else if (arg2) {
-        com::centreon::engine::service2* svc(find_service(mac->host_ptr->get_name().c_str(), arg2));
+        com::centreon::engine::service* svc(find_service(mac->host_ptr->get_name().c_str(), arg2));
         if (!svc)
           retval = ERROR;
         else
@@ -246,7 +246,7 @@ static int handle_service_macro(
     }
     else if (arg1 && arg2) {
       // On-demand macro with both host and service name.
-      com::centreon::engine::service2* svc(find_service(arg1, arg2));
+      com::centreon::engine::service* svc(find_service(arg1, arg2));
       if (svc)
         // Get the service macro value.
         retval = grab_standard_service_macro_r(
@@ -662,7 +662,7 @@ static int handle_summary_macro(
     unsigned int services_unknown_unhandled(0);
     unsigned int services_warning(0);
     unsigned int services_warning_unhandled(0);
-    for (com::centreon::engine::service2* temp_service = service_list;
+    for (com::centreon::engine::service* temp_service = service_list;
          temp_service != nullptr;
          temp_service = temp_service->next) {
       // Filter totals based on contact if necessary.

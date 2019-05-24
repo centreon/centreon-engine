@@ -23,7 +23,7 @@
 
 CCE_BEGIN()
 class contact;
-class service2;
+class service;
 CCE_END()
 
 #  ifdef __cplusplus
@@ -38,7 +38,7 @@ struct serviceescalation_struct;
 struct servicegroup_struct;
 struct timeperiod_struct;
 
-com::centreon::engine::service2*           find_service(
+com::centreon::engine::service*           find_service(
                             char const* host_name,
                             char const* svc_desc);
 servicegroup_struct*      find_servicegroup(std::string const& name);

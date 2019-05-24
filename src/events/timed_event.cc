@@ -42,7 +42,7 @@ using namespace com::centreon::engine;
  *  @param[in] event The event to execute.
  */
 static void _exec_event_service_check(timed_event* event) {
-  com::centreon::engine::service2* svc(reinterpret_cast<com::centreon::engine::service2*>(event->event_data));
+  com::centreon::engine::service* svc(reinterpret_cast<com::centreon::engine::service*>(event->event_data));
 
   // get check latency.
   timeval tv;
@@ -316,7 +316,7 @@ static void _exec_event_expire_service_ack(timed_event* event) {
   logger(dbg_events, basic)
     << "** Expire Service Acknowledgement Event";
   check_for_expired_acknowledgement(
-    static_cast<com::centreon::engine::service2*>(event->event_data));
+    static_cast<com::centreon::engine::service*>(event->event_data));
   return ;
 }
 
@@ -558,7 +558,7 @@ void compensate_for_system_time_change(
   resort_event_list(&event_list_low, &event_list_low_tail);
 
   // adjust service timestamps.
-  for (com::centreon::engine::service2* svc(service_list); svc; svc = svc->next) {
+  for (com::centreon::engine::service* svc(service_list); svc; svc = svc->next) {
     adjust_timestamp_for_time_change(
       last_time,
       current_time,
@@ -1035,8 +1035,8 @@ bool operator==(
   else if (is_not_null
            && ((obj1.event_type == EVENT_SERVICE_CHECK)
                || (obj1.event_type == EVENT_EXPIRE_SERVICE_ACK))) {
-    com::centreon::engine::service2& svc1(*(com::centreon::engine::service2*)obj1.event_data);
-    com::centreon::engine::service2& svc2(*(com::centreon::engine::service2*)obj2.event_data);
+    com::centreon::engine::service& svc1(*(com::centreon::engine::service*)obj1.event_data);
+    com::centreon::engine::service& svc2(*(com::centreon::engine::service*)obj2.event_data);
     if (svc1.get_hostname() != svc2.get_hostname()
         || svc1.get_description() != svc2.get_description())
       return false;
@@ -1102,7 +1102,7 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
   }
   else if (obj.event_type == EVENT_SERVICE_CHECK
            || obj.event_type == EVENT_EXPIRE_SERVICE_ACK) {
-    com::centreon::engine::service2& svc(*(com::centreon::engine::service2*)obj.event_data);
+    com::centreon::engine::service& svc(*(com::centreon::engine::service*)obj.event_data);
     os << "  event_data:                 "
        << svc.get_hostname() << ", " << svc.get_description() << "\n";
   }

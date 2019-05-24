@@ -59,27 +59,27 @@ extern "C" {
 
 // notify all contacts about a service (problem or recovery)
 int service_notification(
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       unsigned int type,
       char const* not_author,
       char const* not_data,
       int options);
 // checks viability of notifying all contacts about a service
 int check_service_notification_viability(
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       unsigned int type,
       int options);
 // checks viability of notifying a contact about a service
 int check_contact_service_notification_viability(
       com::centreon::engine::contact* cntct,
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       unsigned int type,
       int options);
 // notify a single contact about a service
 int notify_contact_of_service(
       nagios_macros* mac,
       com::centreon::engine::contact* cntct,
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       int type,
       char const* not_author,
       char const* not_data,
@@ -87,15 +87,15 @@ int notify_contact_of_service(
       int escalated);
 // checks if an escalation entry is valid for a particular service notification
 int is_valid_escalation_for_service_notification(
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       serviceescalation* se,
       int options);
 // checks if a service notification should be escalated
-int should_service_notification_be_escalated(com::centreon::engine::service2* svc);
+int should_service_notification_be_escalated(com::centreon::engine::service* svc);
 // given a service, create list of contacts to be notified (remove duplicates)
 int create_notification_list_from_service(
       nagios_macros* mac,
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       int options,
       int* escalated);
 // notify all contacts about a host (problem or recovery)
@@ -140,7 +140,7 @@ int create_notification_list_from_host(
       int options,
       int* escalated);
 // calculates nex acceptable re-notification time for a service
-time_t get_next_service_notification_time(com::centreon::engine::service2* svc, time_t offset);
+time_t get_next_service_notification_time(com::centreon::engine::service* svc, time_t offset);
 // calculates nex acceptable re-notification time for a host
 time_t get_next_host_notification_time(com::centreon::engine::host* hst, time_t offset);
 // finds a notification object

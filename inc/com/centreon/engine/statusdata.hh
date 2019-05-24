@@ -40,7 +40,7 @@ int update_program_status(int aggregated_dump);
 // updates host status data
 int update_host_status(com::centreon::engine::host* hst,int aggregated_dump);
 // updates service status data
-int update_service_status(com::centreon::engine::service2* svc,int aggregated_dump);
+int update_service_status(com::centreon::engine::service* svc,int aggregated_dump);
 
 #  ifdef __cplusplus
 }

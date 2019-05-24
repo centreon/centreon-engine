@@ -187,7 +187,7 @@ int write_to_syslog(char const* buffer, unsigned long type) {
  *
  *  @return Return true on success.
  */
-int log_service_event(com::centreon::engine::service2 const* svc) {
+int log_service_event(com::centreon::engine::service const* svc) {
   if (svc->state_type == SOFT_STATE
       && !config->log_service_retries())
     return OK;
@@ -289,7 +289,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
  *  @param[in] type  State logging type.
  *  @param[in] svc   Service object.
  */
-void log_service_state(unsigned int type, com::centreon::engine::service2* svc) {
+void log_service_state(unsigned int type, com::centreon::engine::service* svc) {
   char const* type_str(tab_initial_state[type]);
   char const* state("UNKNOWN");
   if ((svc->current_state >= 0)
@@ -315,7 +315,7 @@ void log_service_state(unsigned int type, com::centreon::engine::service2* svc) 
  */
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-  for (com::centreon::engine::service2* svc(service_list); svc; svc = svc->next)
+  for (com::centreon::engine::service* svc(service_list); svc; svc = svc->next)
     log_service_state(type, svc);
   return OK;
 }

@@ -38,15 +38,15 @@ extern "C" {
 // Event Handler Functions
 
 // distributed monitoring craziness...
-int obsessive_compulsive_service_check_processor(com::centreon::engine::service2* svc);
+int obsessive_compulsive_service_check_processor(com::centreon::engine::service* svc);
 // distributed monitoring craziness...
 int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst);
 // top level service event logic
-int handle_service_event(com::centreon::engine::service2* svc);
+int handle_service_event(com::centreon::engine::service* svc);
 // runs the global service event handler
-int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::service2* svc);
+int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc);
 // runs the event handler for a specific service
-int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service2* svc);
+int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc);
 // top level host event logic
 int handle_host_event(com::centreon::engine::host* hst);
 // runs the global host event handler

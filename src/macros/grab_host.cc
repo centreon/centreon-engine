@@ -62,7 +62,7 @@ static void generate_host_total_services(
     for (servicesmember* temp_servicesmember = hst.services;
          temp_servicesmember != NULL;
          temp_servicesmember = temp_servicesmember->next) {
-      com::centreon::engine::service2* temp_service(temp_servicesmember->service_ptr);
+      com::centreon::engine::service* temp_service(temp_servicesmember->service_ptr);
       if (temp_service) {
         total_host_services++;
         switch (temp_service->current_state) {

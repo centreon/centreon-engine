@@ -90,7 +90,7 @@ std::ostream& operator<<(std::ostream& os, servicesmember const& obj) {
  *
  *  @return Host-service relation.
  */
-servicesmember* add_service_link_to_host(host* hst, com::centreon::engine::service2* svc) {
+servicesmember* add_service_link_to_host(host* hst, com::centreon::engine::service* svc) {
   // Make sure we have the data we need.
   if (!hst || !svc)
     return (NULL);

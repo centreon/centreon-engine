@@ -251,8 +251,8 @@ void loop::_dispatching() {
       // Run a few checks before executing a service check...
       if (event_list_low->event_type == EVENT_SERVICE_CHECK) {
         int nudge_seconds(0);
-        service2* temp_service(
-                   static_cast<service2*>(event_list_low->event_data));
+        service* temp_service(
+                   static_cast<service*>(event_list_low->event_data));
 
         // Don't run a service check if we're already maxed out on the
         // number of parallel service checks...

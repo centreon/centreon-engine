@@ -41,9 +41,9 @@ CCE_BEGIN()
   class contact;
   class host;
 
-class                           service2 : public notifier {
+class                           service : public notifier {
  public:
-  virtual                       ~service2() override;
+  virtual                       ~service() override;
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
@@ -159,8 +159,8 @@ class                           service2 : public notifier {
   timeperiod_struct*            check_period_ptr;
   timeperiod_struct*            notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
-  struct service2*        next;
-  struct service2*        nexthash;
+  service*        next;
+  service*        nexthash;
  private:
   std::string                   _hostname;
   std::string                   _description;
@@ -183,7 +183,7 @@ struct                          service_other_properties {
 extern "C" {
 #  endif /* C++ */
 
-com::centreon::engine::service2* add_service(
+com::centreon::engine::service* add_service(
            uint64_t host_id,
            uint64_t service_id,
            std::string const& host_name,
@@ -237,10 +237,10 @@ com::centreon::engine::service2* add_service(
            int obsess_over_service);
 int      get_service_count();
 int      is_contact_for_service(
-           com::centreon::engine::service2* svc,
+           com::centreon::engine::service* svc,
            com::centreon::engine::contact* cntct);
 int      is_escalated_contact_for_service(
-           com::centreon::engine::service2* svc,
+           com::centreon::engine::service* svc,
            com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
@@ -250,17 +250,17 @@ int      is_escalated_contact_for_service(
 #    include <string>
 
 bool          operator==(
-                com::centreon::engine::service2 const& obj1,
-                com::centreon::engine::service2 const& obj2) throw ();
+                com::centreon::engine::service const& obj1,
+                com::centreon::engine::service const& obj2) throw ();
 bool          operator!=(
-                com::centreon::engine::service2 const& obj1,
-                com::centreon::engine::service2 const& obj2) throw ();
-std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const& obj);
+                com::centreon::engine::service const& obj1,
+                com::centreon::engine::service const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
 
 CCE_BEGIN()
 
-void          check_for_expired_acknowledgement(com::centreon::engine::service2* s);
-com::centreon::engine::service2&      find_service(
+void          check_for_expired_acknowledgement(com::centreon::engine::service* s);
+com::centreon::engine::service&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
 char const*   get_service_timezone(std::string const& hst, std::string const& svc);
@@ -271,7 +271,7 @@ std::pair<uint64_t, uint64_t>
                 std::string const& host,
                 std::string const& svc);
 uint64_t      get_service_id(std::string const& host, std::string const& svc);
-void          schedule_acknowledgement_expiration(com::centreon::engine::service2* s);
+void          schedule_acknowledgement_expiration(com::centreon::engine::service* s);
 
 CCE_END()
 

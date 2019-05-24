@@ -484,10 +484,10 @@ typedef struct   nebstruct_relation_struct {
 
   com::centreon::engine::host*
                  hst;
-  com::centreon::engine::service2*       svc;
+  com::centreon::engine::service*       svc;
   com::centreon::engine::host*
                  dep_hst;
-  com::centreon::engine::service2*       dep_svc;
+  com::centreon::engine::service*       dep_svc;
 }                nebstruct_relation_data;
 
 /* Retention data structure. */

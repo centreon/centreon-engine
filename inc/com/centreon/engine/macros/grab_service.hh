@@ -31,16 +31,16 @@ extern "C" {
 int grab_standard_service_macro_r(
       nagios_macros* mac,
       int macro_type,
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       char** output,
       int* free_macro);
 int grab_standard_service_macro(
       int macro_type,
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       char** output,
       int* free_macro);
-int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service2* svc);
-int grab_service_macros(com::centreon::engine::service2* svc);
+int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* svc);
+int grab_service_macros(com::centreon::engine::service* svc);
 
 #  ifdef __cplusplus
 }

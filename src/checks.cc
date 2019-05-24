@@ -83,7 +83,7 @@ int reap_check_results() {
 
 /* executes a scheduled service check */
 int run_scheduled_service_check(
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       int check_options,
       double latency) {
   int result = OK;
@@ -186,7 +186,7 @@ int run_scheduled_service_check(
  * service check result
  */
 int run_async_service_check(
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       int check_options,
       double latency,
       int scheduled_check,
@@ -218,7 +218,7 @@ int run_async_service_check(
 
 /* handles asynchronous service check results */
 int handle_async_service_check_result(
-      com::centreon::engine::service2* temp_service,
+      com::centreon::engine::service* temp_service,
       check_result* queued_check_result) {
   com::centreon::engine::host* temp_host = NULL;
   time_t next_service_check = 0L;
@@ -235,7 +235,7 @@ int handle_async_service_check_result(
   char* temp_ptr = NULL;
   objectlist* check_servicelist = NULL;
   objectlist* servicelist_item = NULL;
-  com::centreon::engine::service2* master_service = NULL;
+  com::centreon::engine::service* master_service = NULL;
   int run_async_check = true;
   /* TODO - 09/23/07 move this to a global variable */
   int state_changes_use_cached_state = true;
@@ -1079,7 +1079,7 @@ int handle_async_service_check_result(
 
           if (temp_dependency->dependent_service_ptr == temp_service
               && temp_dependency->master_service_ptr != NULL) {
-            master_service = (com::centreon::engine::service2*)temp_dependency->master_service_ptr;
+            master_service = (com::centreon::engine::service*)temp_dependency->master_service_ptr;
             logger(dbg_checks, most)
               << "Predictive check of service '"
               << master_service->get_description() << "' on host '"
@@ -1277,7 +1277,7 @@ int handle_async_service_check_result(
        servicelist_item != NULL;
        servicelist_item = servicelist_item->next) {
     run_async_check = true;
-    temp_service = (com::centreon::engine::service2*)servicelist_item->object_ptr;
+    temp_service = (com::centreon::engine::service*)servicelist_item->object_ptr;
 
     /* we can get by with a cached state, so don't check the service */
     if (static_cast<unsigned long>(current_time - temp_service->last_check) <= config->cached_service_check_horizon()) {
@@ -1313,7 +1313,7 @@ int handle_async_service_check_result(
  *  @param[in] check_time  Desired check time.
  *  @param[in] options     Check options (FORCED, FRESHNESS, ...).
  */
-void schedule_service_check(com::centreon::engine::service2* svc, time_t check_time, int options) {
+void schedule_service_check(com::centreon::engine::service* svc, time_t check_time, int options) {
   logger(dbg_functions, basic)
     << "schedule_service_check()";
 
@@ -1446,7 +1446,7 @@ void schedule_service_check(com::centreon::engine::service2* svc, time_t check_t
 
 /* checks viability of performing a service check */
 int check_service_check_viability(
-      com::centreon::engine::service2* svc,
+      com::centreon::engine::service* svc,
       int check_options,
       int* time_is_valid,
       time_t* new_time) {
@@ -1526,9 +1526,9 @@ int check_service_check_viability(
 
 /* checks service dependencies */
 unsigned int check_service_dependencies(
-               com::centreon::engine::service2* svc,
+               com::centreon::engine::service* svc,
                int dependency_type) {
-  com::centreon::engine::service2* temp_service = NULL;
+  com::centreon::engine::service* temp_service = NULL;
   int state = STATE_OK;
   time_t current_time = 0L;
 
@@ -1599,7 +1599,7 @@ unsigned int check_service_dependencies(
 
 /* check for services that never returned from a check... */
 void check_for_orphaned_services() {
-  com::centreon::engine::service2* temp_service = NULL;
+  com::centreon::engine::service* temp_service = NULL;
   time_t current_time = 0L;
   time_t expected_time = 0L;
 
@@ -1659,7 +1659,7 @@ void check_for_orphaned_services() {
 
 /* check freshness of service results */
 void check_service_result_freshness() {
-  com::centreon::engine::service2* temp_service = NULL;
+  com::centreon::engine::service* temp_service = NULL;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic)
@@ -1735,7 +1735,7 @@ void check_service_result_freshness() {
 
 /* tests whether or not a service's check results are fresh */
 int is_service_result_fresh(
-      com::centreon::engine::service2* temp_service,
+      com::centreon::engine::service* temp_service,
       time_t current_time,
       int log_this) {
   int freshness_threshold = 0;

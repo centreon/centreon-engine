@@ -32,19 +32,19 @@ extern "C" {
 int xpddefault_initialize_performance_data();
 int xpddefault_cleanup_performance_data();
 
-int xpddefault_update_service_performance_data(com::centreon::engine::service2* svc);
+int xpddefault_update_service_performance_data(com::centreon::engine::service* svc);
 int xpddefault_update_host_performance_data(com::centreon::engine::host* hst);
 
 int xpddefault_run_service_performance_data_command(
       nagios_macros* mac,
-      com::centreon::engine::service2* svc);
+      com::centreon::engine::service* svc);
 int xpddefault_run_host_performance_data_command(
       nagios_macros* mac,
       com::centreon::engine::host* hst);
 
 int xpddefault_update_service_performance_data_file(
       nagios_macros* mac,
-      com::centreon::engine::service2* svc);
+      com::centreon::engine::service* svc);
 int xpddefault_update_host_performance_data_file(
       nagios_macros* mac,
       com::centreon::engine::host* hst);

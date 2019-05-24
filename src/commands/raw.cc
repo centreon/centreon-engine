@@ -453,7 +453,7 @@ void raw::_build_custom_service_macro_environment(
             nagios_macros& macros,
             environment& env) {
   // Build custom service variable.
-  service2* svc(macros.service_ptr);
+  service* svc(macros.service_ptr);
   if (svc) {
     for (std::pair<std::string, customvariable> const& cv : svc->custom_variables) {
       if (!cv.first.empty()) {

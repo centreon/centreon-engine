@@ -143,7 +143,7 @@ private:
   umap<std::string, std::shared_ptr<hostgroup_struct> >
                _hostgroups;
   umap<std::pair<std::string, std::string>,
-    std::shared_ptr<service2> >
+    std::shared_ptr<engine::service> >
                _services;
   umultimap<std::pair<std::string, std::string>,
     std::shared_ptr<servicedependency_struct> >

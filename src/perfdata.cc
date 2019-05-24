@@ -27,7 +27,7 @@
 /******************************************************************/
 
 /* updates service performance data */
-int update_service_performance_data(com::centreon::engine::service2* svc) {
+int update_service_performance_data(com::centreon::engine::service* svc) {
   /* should we be processing performance data for anything? */
   if (!config->process_performance_data())
     return OK;
