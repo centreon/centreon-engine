@@ -3031,8 +3031,8 @@ void acknowledge_service_problem(
     std::make_shared<comment>(
       comment::service,
       comment::acknowledgment,
-      svc->host_name,
-      svc->description,
+      svc->get_hostname(),
+      svc->get_description(),
       current_time,
       ack_author,
       ack_data,

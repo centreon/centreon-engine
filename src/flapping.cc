@@ -397,8 +397,8 @@ void set_service_flap(
     std::make_shared<comment>(
       comment::service,
       comment::flapping,
-      svc->host_name,
-      svc->description,
+      svc->get_hostname(),
+      svc->get_description(),
       time(NULL),
       "(Centreon Engine Process)",
       oss.str(),

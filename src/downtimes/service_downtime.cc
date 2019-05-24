@@ -264,8 +264,8 @@ int service_downtime::subscribe() {
     std::make_shared<comment>(
       comment::service,
       comment::downtime,
-      svc->host_name,
-      svc->description,
+      svc->get_hostname(),
+      svc->get_description(),
       time(nullptr),
       "(Centreon Engine Process)",
       oss.str(),

@@ -239,8 +239,8 @@ void comment::delete_service_acknowledgement_comments(::service* svc) {
 
     while (it != comments.end()) {
       if (it->second->get_comment_type() == comment::service
-          && it->second->get_host_name() == svc->host_name
-          && it->second->get_service_description() == svc->description
+          && it->second->get_host_name() == svc->get_hostname()
+          && it->second->get_service_description() == svc->get_description()
           && it->second->get_entry_type() == com::centreon::engine::comment::acknowledgment
           && !it->second->get_persistent()) {
         broker_comment_data(
