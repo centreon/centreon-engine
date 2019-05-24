@@ -531,11 +531,11 @@ void checker::run(
            << "Attempt to run check on service with invalid host");
   if (!svc->check_command_ptr)
     throw (engine_error() << "Attempt to run active check on service '"
-           << svc->description << "' on host '" << svc->host_ptr->get_name()
+           << svc->get_description() << "' on host '" << svc->host_ptr->get_name()
            << "' with no check command");
 
   logger(dbg_checks, basic)
-    << "** Running async check of service '" << svc->description
+    << "** Running async check of service '" << svc->get_description()
     << "' on host '" << svc->get_hostname() << "'...";
 
   // Check if the service is viable now.
@@ -545,7 +545,7 @@ void checker::run(
         time_is_valid,
         preferred_time) == ERROR)
     throw (checks_viability_failure() << "Check of service '"
-           << svc->description << "' on host '" << svc->get_hostname()
+           << svc->get_description() << "' on host '" << svc->get_hostname()
            << "' is not viable");
 
   // Send broker event.
@@ -578,20 +578,20 @@ void checker::run(
                            * config->interval_length());
     throw (engine_error()
            << "Some broker module cancelled check of service '"
-           << svc->description << "' on host '" << svc->get_hostname());
+           << svc->get_description() << "' on host '" << svc->get_hostname());
   }
   // Service check was override by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res) {
     logger(dbg_functions, basic)
       << "Some broker module overrode check of service '"
-      << svc->description << "' on host '" << svc->get_hostname()
+      << svc->get_description() << "' on host '" << svc->get_hostname()
       << "' so we'll bail out";
     return ;
   }
 
   // Checking starts.
   logger(dbg_checks, basic)
-    << "Checking service '" << svc->description
+    << "Checking service '" << svc->get_description()
     << "' on host '" << svc->get_hostname() << "'...";
 
   // Clear check options.
@@ -640,7 +640,7 @@ void checker::run(
   check_result_info.output_file_fp = NULL;
   check_result_info.output_file = NULL;
   check_result_info.host_name = string::dup(svc->get_hostname());
-  check_result_info.service_description = string::dup(svc->description);
+  check_result_info.service_description = string::dup(svc->get_description());
   check_result_info.latency = latency;
   check_result_info.next = NULL;
 

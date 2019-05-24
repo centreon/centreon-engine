@@ -184,7 +184,7 @@ int service_downtime::unschedule() {
     if (svc->scheduled_downtime_depth == 0) {
       logger(log_info_message, basic)
         << "SERVICE DOWNTIME ALERT: " << svc->get_hostname() << ";"
-        << svc->description
+        << svc->get_description()
         << ";CANCELLED; Scheduled downtime "
            "for service has been cancelled.";
 
@@ -249,7 +249,7 @@ int service_downtime::subscribe() {
                               << svc->get_hostname()
                               << "\n"
                                  " Service:     "
-                              << svc->description;
+                              << svc->get_description();
   logger(dbg_downtime, basic)
     << " Fixed/Flex:  " << (is_fixed() ? "Fixed\n" : "Flexible\n")
     << " Start:       " << start_time_string << "\n"
@@ -381,14 +381,14 @@ int service_downtime::handle() {
     if (svc->scheduled_downtime_depth == 0) {
 
       logger(dbg_downtime, basic)
-        << "Service '" << svc->description << "' on host '"
+        << "Service '" << svc->get_description() << "' on host '"
         << svc->get_hostname() << "' has exited from a period of "
         "scheduled downtime (id=" << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
         << "SERVICE DOWNTIME ALERT: " << svc->get_hostname()
-        << ";" << svc->description
+        << ";" << svc->get_description()
         << ";STOPPED; Service has exited from a period of scheduled "
         "downtime";
 
@@ -466,14 +466,14 @@ int service_downtime::handle() {
     if (svc->scheduled_downtime_depth == 0) {
 
       logger(dbg_downtime, basic)
-        << "Service '" << svc->description << "' on host '"
+        << "Service '" << svc->get_description() << "' on host '"
         << svc->get_hostname() << "' has entered a period of scheduled "
         "downtime (id=" << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
         << "SERVICE DOWNTIME ALERT: " << svc->get_hostname()
-        << ";" << svc->description
+        << ";" << svc->get_description()
         << ";STARTED; Service has entered a period of scheduled "
         "downtime";
 

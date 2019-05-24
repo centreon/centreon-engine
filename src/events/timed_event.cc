@@ -52,7 +52,7 @@ static void _exec_event_service_check(timed_event* event) {
 
   logger(dbg_events, basic)
     << "** Service Check Event ==> Host: '" << svc->get_hostname()
-    << "', Service: '" << svc->description << "', Options: "
+    << "', Service: '" << svc->get_description() << "', Options: "
     << event->event_options << ", Latency: " << latency << " sec";
 
   // run the service check.
@@ -585,19 +585,15 @@ void compensate_for_system_time_change(
       time_difference,
       &svc->last_hard_state_change);
     adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &service_other_props[std::make_pair(
-                                  svc->host_ptr->get_name(),
-                                  svc->description)].initial_notif_time);
+        last_time, current_time, time_difference,
+        &service_other_props[{svc->host_ptr->get_name(),
+                              svc->get_description()}]
+             .initial_notif_time);
     adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &service_other_props[std::make_pair(
-                                  svc->host_ptr->get_name(),
-                                  svc->description)].last_acknowledgement);
+        last_time, current_time, time_difference,
+        &service_other_props[{svc->host_ptr->get_name(),
+                              svc->get_description()}]
+             .last_acknowledgement);
 
     // recalculate next re-notification time.
     svc->next_notification
@@ -1042,7 +1038,7 @@ bool operator==(
     com::centreon::engine::service2& svc1(*(com::centreon::engine::service2*)obj1.event_data);
     com::centreon::engine::service2& svc2(*(com::centreon::engine::service2*)obj2.event_data);
     if (svc1.get_hostname() != svc2.get_hostname()
-        || strcmp(svc1.description, svc2.description))
+        || svc1.get_description() != svc2.get_description())
       return false;
   }
   else if (is_not_null
@@ -1108,7 +1104,7 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
            || obj.event_type == EVENT_EXPIRE_SERVICE_ACK) {
     com::centreon::engine::service2& svc(*(com::centreon::engine::service2*)obj.event_data);
     os << "  event_data:                 "
-       << svc.get_hostname() << ", " << svc.description << "\n";
+       << svc.get_hostname() << ", " << svc.get_description() << "\n";
   }
   else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME
            || obj.event_type == EVENT_EXPIRE_COMMENT) {

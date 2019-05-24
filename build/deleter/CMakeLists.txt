@@ -29,7 +29,6 @@ set(
   # Sources.
   "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/objectlist.cc"
-  "${SRC_DIR}/service.cc"
   "${SRC_DIR}/servicedependency.cc"
   "${SRC_DIR}/serviceescalation.cc"
   "${SRC_DIR}/servicegroup.cc"
@@ -43,7 +42,6 @@ set(
   "${INC_DIR}/daterange.hh"
   "${INC_DIR}/listmember.hh"
   "${INC_DIR}/objectlist.hh"
-  "${INC_DIR}/service.hh"
   "${INC_DIR}/servicedependency.hh"
   "${INC_DIR}/serviceescalation.hh"
   "${INC_DIR}/servicegroup.hh"

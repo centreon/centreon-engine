@@ -99,7 +99,7 @@ int run_scheduled_service_check(
     << "run_scheduled_service_check()";
   logger(dbg_checks, basic)
     << "Attempting to run scheduled check of service '"
-    << svc->description << "' on host '" << svc->get_hostname()
+    << svc->get_description() << "' on host '" << svc->get_hostname()
     << "': check options=" << check_options << ", latency=" << latency;
 
   /* attempt to run the check */
@@ -135,7 +135,7 @@ int run_scheduled_service_check(
       // Make sure we rescheduled the next service check at a valid time.
       {
         timezone_locker
-          lock(get_service_timezone(svc->get_hostname(), svc->description));
+          lock(get_service_timezone(svc->get_hostname(), svc->get_description()));
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
@@ -148,7 +148,7 @@ int run_scheduled_service_check(
                                 svc->check_period_ptr) == ERROR) {
           svc->next_check = (time_t)(next_valid_time + (60 * 60 * 24 * 7));
           logger(log_runtime_warning, basic)
-            << "Warning: Check of service '" << svc->description
+            << "Warning: Check of service '" << svc->get_description()
             << "' on host '" << svc->get_hostname() << "' could not be "
                "rescheduled properly. Scheduling check for next week...";
           logger(dbg_checks, more)
@@ -252,11 +252,11 @@ int handle_async_service_check_result(
   time(&current_time);
 
   logger(dbg_checks, basic)
-    << "** Handling check result for service '" << temp_service->description
+    << "** Handling check result for service '" << temp_service->get_description()
     << "' on host '" << temp_service->get_hostname() << "'...";
   logger(dbg_checks, more)
     << "HOST: " << temp_service->get_hostname()
-    << ", SERVICE: " << temp_service->description
+    << ", SERVICE: " << temp_service->get_description()
     << ", CHECK TYPE: " << (queued_check_result->check_type ==
         SERVICE_CHECK_ACTIVE ? "Active" : "Passive")
     << ", OPTIONS: " << queued_check_result->check_options
@@ -374,7 +374,7 @@ int handle_async_service_check_result(
   if (!queued_check_result->exited_ok) {
 
     logger(log_runtime_warning, basic)
-      << "Warning:  Check of service '" << temp_service->description
+      << "Warning:  Check of service '" << temp_service->get_description()
       << "' on host '" << temp_service->get_hostname()
       << "' did not exit properly!";
 
@@ -389,7 +389,7 @@ int handle_async_service_check_result(
 
     logger(log_runtime_warning, basic)
       << "Warning: return (code of " << queued_check_result->return_code
-      << " for check of service '" << temp_service->description
+      << " for check of service '" << temp_service->get_description()
       << "' on host '" << temp_service->get_hostname()
       << "' was out of bounds."
       << (queued_check_result->return_code == 126
@@ -485,7 +485,7 @@ int handle_async_service_check_result(
     if (config->log_passive_checks())
       logger(log_passive_check, basic)
         << "PASSIVE SERVICE CHECK: " << temp_service->get_hostname() << ";"
-        << temp_service->description << ";" << temp_service->current_state
+        << temp_service->get_description() << ";" << temp_service->current_state
         << ";" << temp_service->plugin_output;
   }
 
@@ -734,12 +734,12 @@ int handle_async_service_check_result(
       state_was_logged = true;
 
       /* Set the recovery been sent parameter. */
-      service_other_props[std::make_pair(
-            temp_service->host_ptr->get_name(),
-            temp_service->description)].recovery_been_sent = false;
-      service_other_props[std::make_pair(
-            temp_service->host_ptr->get_name(),
-            temp_service->description)].initial_notif_time = 0;
+      service_other_props[{temp_service->host_ptr->get_name(),
+                           temp_service->get_description()}]
+          .recovery_been_sent = false;
+      service_other_props[{temp_service->host_ptr->get_name(),
+                           temp_service->get_description()}]
+          .initial_notif_time = 0;
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
@@ -781,9 +781,10 @@ int handle_async_service_check_result(
         << "Service did not change state.";
 
     /* Check if we need to send a recovery notification */
-    if(!service_other_props[std::make_pair(
-               temp_service->host_ptr->get_name(),
-               temp_service->description)].recovery_been_sent && !hard_state_change) {
+    if (!service_other_props[{temp_service->host_ptr->get_name(),
+                              temp_service->get_description()}]
+             .recovery_been_sent &&
+        !hard_state_change) {
       service_notification(
         temp_service,
         NOTIFICATION_NORMAL,
@@ -805,14 +806,14 @@ int handle_async_service_check_result(
     temp_service->next_notification = (time_t)0;
     if (service_other_props[std::make_pair(
           temp_service->host_ptr->get_name(),
-          temp_service->description)].recovery_been_sent) {
+          temp_service->get_description())].recovery_been_sent) {
       temp_service->current_notification_number = 0;
       temp_service->notified_on_unknown = false;
       temp_service->notified_on_warning = false;
       temp_service->notified_on_critical = false;
       service_other_props[std::make_pair(
             temp_service->host_ptr->get_name(),
-            temp_service->description)].initial_notif_time = 0;
+            temp_service->get_description())].initial_notif_time = 0;
     }
     temp_service->problem_has_been_acknowledged = false;
     temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
@@ -1065,7 +1066,7 @@ int handle_async_service_check_result(
         /* check services that THIS ONE depends on for notification AND execution */
         /* we do this because we might be sending out a notification soon and we want the dependency logic to be accurate */
         std::pair<std::string, std::string>
-          id(std::make_pair(temp_service->get_hostname(), temp_service->description));
+          id(std::make_pair(temp_service->get_hostname(), temp_service->get_description()));
         umultimap<std::pair<std::string, std::string>,
                   std::shared_ptr<servicedependency> > const&
           dependencies(state::instance().servicedependencies());
@@ -1081,7 +1082,7 @@ int handle_async_service_check_result(
             master_service = (com::centreon::engine::service2*)temp_dependency->master_service_ptr;
             logger(dbg_checks, most)
               << "Predictive check of service '"
-              << master_service->description << "' on host '"
+              << master_service->get_description() << "' on host '"
               << master_service->get_hostname() << "' queued.";
             add_object_to_objectlist(
               &check_servicelist,
@@ -1178,7 +1179,7 @@ int handle_async_service_check_result(
     {
       timezone_locker lock(get_service_timezone(
                              temp_service->get_hostname(),
-                             temp_service->description));
+                             temp_service->get_description()));
       preferred_time = temp_service->next_check;
       get_next_valid_time(
         preferred_time,
@@ -1321,7 +1322,7 @@ void schedule_service_check(com::centreon::engine::service2* svc, time_t check_t
 
   logger(dbg_checks, basic) << "Scheduling a "
     << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
-    << ", active check of service '" << svc->description
+    << ", active check of service '" << svc->get_description()
     << "' on host '" << svc->get_hostname()
     << "' @ " << my_ctime(&check_time);
 
@@ -1489,7 +1490,7 @@ int check_service_check_viability(
     {
       timezone_locker lock(get_service_timezone(
                              svc->get_hostname(),
-                             svc->description));
+                             svc->get_description()));
       if (check_time_against_period(
             (unsigned long)current_time,
             svc->check_period_ptr) == ERROR) {
@@ -1535,7 +1536,7 @@ unsigned int check_service_dependencies(
     << "check_service_dependencies()";
 
   std::pair<std::string, std::string>
-    id(svc->get_hostname(), svc->description);
+    id(svc->get_hostname(), svc->get_description());
   umultimap<std::pair<std::string, std::string>,
             std::shared_ptr<servicedependency> > const&
     dependencies(state::instance().servicedependencies());
@@ -1629,13 +1630,13 @@ void check_for_orphaned_services() {
       /* log a warning */
       logger(log_runtime_warning, basic)
         << "Warning: The check of service '"
-        << temp_service->description << "' on host '"
+        << temp_service->get_description() << "' on host '"
         << temp_service->get_hostname() << "' looks like it was orphaned "
         "(results never came back).  I'm scheduling an immediate check "
         "of the service...";
 
       logger(dbg_checks, more)
-        << "Service '" << temp_service->description
+        << "Service '" << temp_service->get_description()
         << "' on host '" << temp_service->get_hostname()
         << "' was orphaned, so we're scheduling an immediate check...";
 
@@ -1701,7 +1702,7 @@ void check_service_result_freshness() {
     {
       timezone_locker lock(get_service_timezone(
                              temp_service->get_hostname(),
-                             temp_service->description));
+                             temp_service->get_description()));
       if (check_time_against_period(
             current_time,
             temp_service->check_period_ptr) == ERROR)
@@ -1749,7 +1750,7 @@ int is_service_result_fresh(
   int tseconds = 0;
 
   logger(dbg_checks, most)
-    << "Checking freshness of service '" << temp_service->description
+    << "Checking freshness of service '" << temp_service->get_description()
     << "' on host '" << temp_service->get_hostname() << "'...";
 
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
@@ -1816,7 +1817,7 @@ int is_service_result_fresh(
     /* log a warning */
     if (log_this)
       logger(log_runtime_warning, basic)
-        << "Warning: The results of service '" << temp_service->description
+        << "Warning: The results of service '" << temp_service->get_description()
         << "' on host '" << temp_service->get_hostname() << "' are stale by "
         << days << "d " << hours << "h " << minutes << "m " << seconds
         << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
@@ -1824,7 +1825,7 @@ int is_service_result_fresh(
         "of the service.";
 
     logger(dbg_checks, more)
-      << "Check results for service '" << temp_service->description
+      << "Check results for service '" << temp_service->get_description()
       << "' on host '" << temp_service->get_hostname() << "' are stale by "
       << days << "d " << hours << "h " << minutes << "m " << seconds
       << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
@@ -1835,7 +1836,7 @@ int is_service_result_fresh(
   }
 
   logger(dbg_checks, more)
-    << "Check results for service '" << temp_service->description
+    << "Check results for service '" << temp_service->get_description()
     << "' on host '" << temp_service->get_hostname() << "' are fresh.";
 
   return true;

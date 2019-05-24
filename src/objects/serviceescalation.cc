@@ -144,7 +144,7 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
   if (obj.service_ptr) {
     svc_str = obj.service_ptr->get_hostname();
     svc_str += ", ";
-    svc_str += chkstr(obj.service_ptr->description);
+    svc_str += obj.service_ptr->get_description();
   }
 
   std::string cg_oss;

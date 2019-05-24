@@ -85,7 +85,6 @@ void logit(int type, int display, char const* fmt, ...) {
     logger(type, basic) << buffer;
   }
   va_end(ap);
-  return;
 }
 
 /**
@@ -125,7 +124,7 @@ int log_debug_info(
       << "[pid=" << getpid() << "] " << buffer;
   }
   va_end(ap);
-  return (OK);
+  return OK;
 }
 
 /**
@@ -141,7 +140,7 @@ int write_to_all_logs(char const* buffer, unsigned long type) {
   if (buffer != NULL) {
     logger(type, basic) << buffer;
   }
-  return (OK);
+  return OK;
 }
 
 /**
@@ -162,7 +161,7 @@ int write_to_log(
 
   if (buffer)
     logger(type, basic) << buffer;
-  return (OK);
+  return OK;
 }
 
 /**
@@ -177,7 +176,7 @@ int write_to_log(
 int write_to_syslog(char const* buffer, unsigned long type) {
   if (buffer)
     logger(type, basic) << buffer;
-  return (OK);
+  return OK;
 }
 
 /**
@@ -191,10 +190,10 @@ int write_to_syslog(char const* buffer, unsigned long type) {
 int log_service_event(com::centreon::engine::service2 const* svc) {
   if (svc->state_type == SOFT_STATE
       && !config->log_service_retries())
-    return (OK);
+    return OK;
 
-  if (!svc->host_ptr || !svc->description)
-    return (ERROR);
+  if (!svc->host_ptr)
+    return ERROR;
 
   unsigned long log_options(NSLOG_SERVICE_UNKNOWN);
   char const* state("UNKNOWN");
@@ -208,10 +207,10 @@ int log_service_event(com::centreon::engine::service2 const* svc) {
   char const* output(svc->plugin_output ? svc->plugin_output : "");
 
   logger(log_options, basic)
-    << "SERVICE ALERT: " << svc->get_hostname() << ";" << svc->description
+    << "SERVICE ALERT: " << svc->get_hostname() << ";" << svc->get_description()
     << ";" << state << ";" << state_type << ";" << svc->current_attempt
     << ";" << output;
-  return (OK);
+  return OK;
 }
 
 /**
@@ -224,7 +223,7 @@ int log_service_event(com::centreon::engine::service2 const* svc) {
  */
 int log_host_event(com::centreon::engine::host const* hst) {
   if (!hst)
-    return (ERROR);
+    return ERROR;
 
   unsigned long log_options(NSLOG_HOST_UP);
   char const* state("UP");
@@ -241,7 +240,7 @@ int log_host_event(com::centreon::engine::host const* hst) {
     << state_type << ";" << hst->get_current_attempt() << ";"
     << hst->get_plugin_output();
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -262,7 +261,6 @@ void log_host_state(unsigned int type, com::centreon::engine::host* hst) {
     << type_str << " HOST STATE: " << hst->get_name() << ";" << state
     << ";" << state_type << ";" << hst->get_current_attempt() << ";"
     << hst->get_plugin_output();
-  return ;
 }
 
 /**
@@ -282,7 +280,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
        it != end;
        ++it)
     log_host_state(type, it->second.get());
-  return (OK);
+  return OK;
 }
 
 /**
@@ -292,21 +290,18 @@ int log_host_states(unsigned int type, time_t* timestamp) {
  *  @param[in] svc   Service object.
  */
 void log_service_state(unsigned int type, com::centreon::engine::service2* svc) {
-  if (svc->description) {
-    char const* type_str(tab_initial_state[type]);
-    char const* state("UNKNOWN");
-    if ((svc->current_state >= 0)
-        && ((unsigned int)svc->current_state
-            < sizeof(tab_service_states) / sizeof(*tab_service_states)))
-      state = tab_service_states[svc->current_state].str;
-    char const* state_type(tab_state_type[svc->state_type]);
-    char const* output(svc->plugin_output ? svc->plugin_output : "");
-    logger(log_info_message, basic)
-      << type_str << " SERVICE STATE: " << svc->get_hostname() << ";"
-      << svc->description << ";" << state << ";" << state_type
-      << ";" << svc->current_attempt << ";" << output;
-  }
-  return ;
+  char const* type_str(tab_initial_state[type]);
+  char const* state("UNKNOWN");
+  if ((svc->current_state >= 0)
+      && ((unsigned int)svc->current_state
+          < sizeof(tab_service_states) / sizeof(*tab_service_states)))
+    state = tab_service_states[svc->current_state].str;
+  char const* state_type(tab_state_type[svc->state_type]);
+  char const* output(svc->plugin_output ? svc->plugin_output : "");
+  logger(log_info_message, basic)
+    << type_str << " SERVICE STATE: " << svc->get_hostname() << ";"
+    << svc->get_description() << ";" << state << ";" << state_type
+    << ";" << svc->current_attempt << ";" << output;
 }
 
 /**
@@ -322,7 +317,7 @@ int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
   for (com::centreon::engine::service2* svc(service_list); svc; svc = svc->next)
     log_service_state(type, svc);
-  return (OK);
+  return OK;
 }
 
 /**
@@ -335,7 +330,7 @@ int log_service_states(unsigned int type, time_t* timestamp) {
  */
 int rotate_log_file(time_t rotation_time) {
   (void)rotation_time;
-  return (ERROR);
+  return ERROR;
 }
 
 /**
@@ -351,7 +346,7 @@ int write_log_file_info(time_t* timestamp) {
 
   logger(log_process_info, basic)
     <<  "LOG VERSION: " << LOG_VERSION_2;
-  return (OK);
+  return OK;
 }
 
 /**
@@ -361,7 +356,7 @@ int write_log_file_info(time_t* timestamp) {
  *  @return Return true on success.
  */
 int open_debug_log() {
-  return (OK);
+  return OK;
 }
 
 /**
@@ -371,5 +366,5 @@ int open_debug_log() {
  *  @return Return true on success.
  */
 int close_debug_log() {
-  return (OK);
+  return OK;
 }

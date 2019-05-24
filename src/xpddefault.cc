@@ -340,7 +340,7 @@ int xpddefault_run_service_performance_data_command(
     logger(log_runtime_warning, basic)
       << "Warning: Service performance data command '"
       << processed_command_line << "' for service '"
-      << svc->description << "' on host '"
+      << svc->get_description() << "' on host '"
       << svc->get_hostname() << "' timed out after "
       << config->perfdata_timeout() << " seconds";
 

@@ -128,7 +128,7 @@ int obsessive_compulsive_service_check_processor(com::centreon::engine::service2
   if (early_timeout == true)
     logger(log_runtime_warning, basic)
       << "Warning: OCSP command '" << processed_command
-      << "' for service '" << svc->description << "' on host '"
+      << "' for service '" << svc->get_description() << "' on host '"
       << svc->get_hostname() << "' timed out after "
       << config->ocsp_timeout() << " seconds";
 
@@ -324,7 +324,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
 
   logger(dbg_eventhandlers, more)
     << "Running global event handler for service '"
-    << svc->description << "' on host '" << svc->get_hostname() << "'...";
+    << svc->get_description() << "' on host '" << svc->get_hostname() << "'...";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -355,7 +355,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
   if (config->log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->get_hostname() << ';'
-	<< svc->description
+	<< svc->get_description()
         << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
         << config->global_service_event_handler();
     process_macros_r(
@@ -480,7 +480,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     return (ERROR);
 
   logger(dbg_eventhandlers, more)
-    << "Running event handler for service '" << svc->description
+    << "Running event handler for service '" << svc->get_description()
     << "' on host '" << svc->get_hostname() <<"'...";
 
   /* get start time */
@@ -515,7 +515,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
   if (config->log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "SERVICE EVENT HANDLER: " << svc->get_hostname() << ';'
-	<< svc->description
+	<< svc->get_description()
 	<< ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
 	<< svc->event_handler;
     process_macros_r(

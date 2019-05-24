@@ -315,7 +315,7 @@ int xsddefault_save_status_data() {
     stream
       << "servicestatus {\n"
          "\thost_name=" << svc->get_hostname() << "\n"
-         "\tservice_description=" << svc->description << "\n"
+         "\tservice_description=" << svc->get_description() << "\n"
          "\tmodified_attributes=" << svc->modified_attributes << "\n"
          "\tcheck_command=" << (svc->service_check_command ? svc->service_check_command : "") << "\n"
          "\tcheck_period=" << (svc->check_period ? svc->check_period : "") << "\n"

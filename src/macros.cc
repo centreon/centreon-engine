@@ -243,7 +243,7 @@ int grab_custom_macro_value_r(
             mac,
             macro_name,
             temp_service->get_hostname().c_str(),
-            temp_service->description,
+            temp_service->get_description().c_str(),
             &temp_buffer);
 
           if (temp_buffer == nullptr)

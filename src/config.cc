@@ -678,7 +678,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Host '" << svc->get_hostname() << "' specified in service "
-      "'" << svc->description << "' not defined anywhere!";
+      "'" << svc->get_description() << "' not defined anywhere!";
     errors++;
   }
 
@@ -705,7 +705,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
     if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
-        << "' specified in service '" << svc->description
+        << "' specified in service '" << svc->get_description()
         << "' for host '" << svc->get_hostname() << "' not defined anywhere";
       errors++;
     }
@@ -726,7 +726,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
   if (temp_command == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Service check command '" << temp_command_name
-      << "' specified in service '" << svc->description
+      << "' specified in service '" << svc->get_description()
       << "' for host '" << svc->get_hostname() << "' not defined anywhere!";
     errors++;
   }
@@ -743,7 +743,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
       && !svc->notify_on_critical) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in service '"
-      << svc->description << "' for host '" << svc->get_hostname()
+      << svc->get_description() << "' for host '" << svc->get_hostname()
       << "' doesn't make any sense - specify warning and/or critical "
          "options as well";
     warnings++;
@@ -761,7 +761,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
     if (temp_contact == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
-        << "' specified in service '" << svc->description << "' for "
+        << "' specified in service '" << svc->get_description() << "' for "
         "host '" << svc->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
@@ -782,7 +782,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
     if (temp_contactgroup == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Contact group '" << it->first
-        << "' specified in service '" << svc->description << "' for "
+        << "' specified in service '" << svc->get_description() << "' for "
         "host '" << svc->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
@@ -791,7 +791,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
   /* verify service check timeperiod */
   if (svc->check_period == nullptr) {
     logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
+      << "Warning: Service '" << svc->get_description() << "' on host '"
       << svc->get_hostname() << "' has no check time period defined!";
     warnings++;
   }
@@ -800,7 +800,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
     if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Check period '" << svc->check_period
-        << "' specified for service '" << svc->description
+        << "' specified for service '" << svc->get_description()
         << "' on host '" << svc->get_hostname()
         << "' is not defined anywhere!";
       errors++;
@@ -817,7 +817,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << svc->notification_period
-        << "' specified for service '" << svc->description << "' on "
+        << "' specified for service '" << svc->get_description() << "' on "
         "host '" << svc->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
@@ -827,7 +827,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
   }
   else if (svc->notifications_enabled) {
     logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host "
+      << "Warning: Service '" << svc->get_description() << "' on host "
       "'" << svc->get_hostname() << "' has no notification time period "
       "defined!";
     warnings++;
@@ -838,7 +838,7 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
       && svc->notification_interval
       && (svc->notification_interval < svc->check_interval)) {
     logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
+      << "Warning: Service '" << svc->get_description() << "' on host '"
       << svc->get_hostname() << "'  has a notification interval less than "
          "its check interval!  Notifications are only re-sent after "
          "checks are made, so the effective notification interval will "
@@ -847,10 +847,10 @@ int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
   }
 
   /* check for illegal characters in service description */
-  if (contains_illegal_object_chars(svc->description)) {
+  if (contains_illegal_object_chars(svc->get_description().c_str())) {
     logger(log_verification_error, basic)
       << "Error: The description string for service '"
-      << svc->description << "' on host '" << svc->get_hostname()
+      << svc->get_description() << "' on host '" << svc->get_hostname()
       << "' contains one or more illegal characters.";
     errors++;
   }

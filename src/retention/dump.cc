@@ -391,9 +391,9 @@ std::ostream& dump::service(std::ostream& os, service2 const& obj) {
 
   os << "service {\n"
     "host_name=" << obj.get_hostname() << "\n"
-    "service_description=" << obj.description << "\n"
-    "host_id=" << service_other_props[std::make_pair(hostname, obj.description)].host_id << "\n"
-    "service_id=" << service_other_props[std::make_pair(hostname, obj.description)].service_id << "\n"
+    "service_description=" << obj.get_description() << "\n"
+    "host_id=" << service_other_props[{hostname, obj.get_description()}].host_id << "\n"
+    "service_id=" << service_other_props[{hostname, obj.get_description()}].service_id << "\n"
     "acknowledgement_type=" << obj.acknowledgement_type << "\n"
     "active_checks_enabled=" << obj.checks_enabled << "\n"
     "check_command=" << (obj.service_check_command ? obj.service_check_command : "") << "\n"
@@ -414,7 +414,7 @@ std::ostream& dump::service(std::ostream& os, service2 const& obj) {
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"
-    "last_acknowledgement=" << service_other_props[std::make_pair(hostname, obj.description)].last_acknowledgement << "\n"
+    "last_acknowledgement=" << service_other_props[{hostname, obj.get_description()}].last_acknowledgement << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"
@@ -447,7 +447,7 @@ std::ostream& dump::service(std::ostream& os, service2 const& obj) {
     "retry_check_interval=" << obj.retry_interval << "\n"
     "state_type=" << obj.state_type << "\n"
     "recovery_been_sent=" << service_other_props[
-                               std::make_pair(hostname, obj.description)].recovery_been_sent << "\n";
+                               std::make_pair(hostname, obj.get_description())].recovery_been_sent << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)

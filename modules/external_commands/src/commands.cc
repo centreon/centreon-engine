@@ -1096,7 +1096,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
         host_name,
-        temp_service->description,
+        temp_service->get_description(),
         entry_time,
         author,
         comment_data,
@@ -1146,7 +1146,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         downtime_manager::instance().schedule_downtime(
           SERVICE_DOWNTIME,
           temp_service->get_hostname(),
-          temp_service->description,
+          temp_service->get_description(),
           entry_time, author,
           comment_data,
           start_time,
@@ -2995,9 +2995,8 @@ void acknowledge_service_problem(
 
   /* schedule acknowledgement expiration */
   time_t current_time(time(nullptr));
-  service_other_props[std::make_pair(
-                             svc->host_ptr->get_name(),
-                             svc->description)].last_acknowledgement = current_time;
+  service_other_props[{svc->host_ptr->get_name(), svc->get_description()}]
+      .last_acknowledgement = current_time;
   schedule_acknowledgement_expiration(svc);
 
   /* send data to event broker */

@@ -76,7 +76,7 @@ void broker_acknowledgement_data(
   if (acknowledgement_type == SERVICE_ACKNOWLEDGEMENT) {
     temp_service = (com::centreon::engine::service2*)data;
     ds.host_name = const_cast<char *>(temp_service->get_hostname().c_str());
-    ds.service_description = temp_service->description;
+    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->current_state;
   }
   else {
@@ -552,7 +552,7 @@ int broker_contact_notification_data(
   if (notification_type == SERVICE_NOTIFICATION) {
     temp_service = (com::centreon::engine::service2*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = temp_service->description;
+    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->current_state;
     ds.output = temp_service->plugin_output;
   }
@@ -642,7 +642,7 @@ int broker_contact_notification_method_data(
   if (notification_type == SERVICE_NOTIFICATION) {
     temp_service = (com::centreon::engine::service2*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = temp_service->description;
+    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->current_state;
     ds.output = temp_service->plugin_output;
   }
@@ -878,7 +878,7 @@ int broker_event_handler(
       || (eventhandler_type == GLOBAL_SERVICE_EVENTHANDLER)) {
     temp_service = (com::centreon::engine::service2*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = temp_service->description;
+    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
   }
   else {
     temp_host = (host*)data;
@@ -991,7 +991,7 @@ void broker_flapping_data(
   if (flapping_type == SERVICE_FLAPPING) {
     temp_service = (com::centreon::engine::service2*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = temp_service->description;
+    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.comment_id = temp_service->flapping_comment_id;
   }
   else {
@@ -1339,7 +1339,7 @@ int broker_notification_data(
   if (notification_type == SERVICE_NOTIFICATION) {
     temp_service = (com::centreon::engine::service2*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = temp_service->description;
+    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->current_state;
     ds.output = temp_service->plugin_output;
   }
@@ -1579,7 +1579,7 @@ int broker_service_check(
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.host_name = const_cast<char*>(svc->get_hostname().c_str());
-  ds.service_description = svc->description;
+  ds.service_description = const_cast<char*>(svc->get_description().c_str());
   ds.object_ptr = svc;
   ds.check_type = check_type;
   ds.current_attempt = svc->current_attempt;
@@ -1684,7 +1684,7 @@ void broker_statechange_data(
   if (statechange_type == SERVICE_STATECHANGE) {
     temp_service = (com::centreon::engine::service2*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = temp_service->description;
+    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.output = temp_service->plugin_output;
   }
   else {

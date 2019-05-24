@@ -268,7 +268,7 @@ void loop::_dispatching() {
             << config->max_parallel_service_checks()
             << ") has been reached!  Nudging "
             << temp_service->get_hostname() << ":"
-            << temp_service->description << " by "
+            << temp_service->get_description() << " by "
             << nudge_seconds << " seconds...";
           logger(log_runtime_warning, basic)
             << "\tMax concurrent service checks ("
@@ -276,7 +276,7 @@ void loop::_dispatching() {
             << config->max_parallel_service_checks()
             << ") has been reached.  Nudging "
             << temp_service->get_hostname() << ":"
-            << temp_service->description << " by "
+            << temp_service->get_description() << " by "
             << nudge_seconds << " seconds...";
           run_event = false;
         }

@@ -46,8 +46,9 @@ class                           service2 : public notifier {
   virtual                       ~service2() override;
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
+  void                          set_description(std::string const& desc);
+  std::string const&            get_description() const;
 
-  char*                         description;
   char*                         display_name;
   char*                         service_check_command;
   char*                         event_handler;
@@ -162,6 +163,7 @@ class                           service2 : public notifier {
   struct service2*        nexthash;
  private:
   std::string                   _hostname;
+  std::string                   _description;
 };
 CCE_END()
 
@@ -184,8 +186,8 @@ extern "C" {
 com::centreon::engine::service2* add_service(
            uint64_t host_id,
            uint64_t service_id,
-           char const* host_name,
-           char const* description,
+           std::string const& host_name,
+           std::string const& description,
            char const* display_name,
            char const* check_period,
            int initial_state,
@@ -267,8 +269,8 @@ bool          is_service_exist(
 std::pair<uint64_t, uint64_t>
               get_host_and_service_id(
                 std::string const& host,
-                char const* svc);
-uint64_t get_service_id(std::string const& host, char const* svc);
+                std::string const& svc);
+uint64_t      get_service_id(std::string const& host, std::string const& svc);
 void          schedule_acknowledgement_expiration(com::centreon::engine::service2* s);
 
 CCE_END()

@@ -92,7 +92,7 @@ int service_notification(
 
   logger(dbg_notifications, basic)
     << "** Service Notification Attempt ** Host: '" << svc->get_hostname()
-    << "', Service: '" << svc->description
+    << "', Service: '" << svc->get_description()
     << "', Type: " << type << ", Options: " << options
     << ", Current State: " << svc->current_state
     << ", Last Notification: " << my_ctime(&svc->last_notification);
@@ -395,7 +395,7 @@ int service_notification(
   if (svc->current_state == STATE_OK)
     service_other_props[std::make_pair(
                         svc->host_ptr->get_name(),
-                        svc->description)].recovery_been_sent = true;
+                        svc->get_description())].recovery_been_sent = true;
 
   return OK;
 }
@@ -448,7 +448,7 @@ int check_service_notification_viability(
   {
     timezone_locker lock(get_service_timezone(
                            svc->get_hostname(),
-                           svc->description));
+                           svc->get_description()));
     if (check_time_against_period(current_time, temp_period) == ERROR) {
       logger(dbg_notifications, more)
         << "This service shouldn't have notifications sent out "
@@ -671,13 +671,13 @@ int check_service_notification_viability(
           || (svc->current_state == STATE_OK
                 && !service_other_props[std::make_pair(
                     svc->host_ptr->get_name(),
-                    svc->description)].recovery_been_sent))) {
+                    svc->get_description())].recovery_been_sent))) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(
               service_other_props[std::make_pair(
                                          svc->host_ptr->get_name(),
-                                         svc->description)].initial_notif_time);
+                                         svc->get_description())].initial_notif_time);
 
     /* if not set, set it to now */
     if (!initial_notif_time)
@@ -687,7 +687,7 @@ int check_service_notification_viability(
              svc->first_notification_delay
              : service_other_props[std::make_pair(
                  svc->host_ptr->get_name(),
-                 svc->description)].recovery_notification_delay)
+                 svc->get_description())].recovery_notification_delay)
         * config->interval_length();
 
     if (current_time
@@ -1085,7 +1085,7 @@ int notify_contact_of_service(
 
       logger(log_service_notification, basic)
         << "SERVICE NOTIFICATION: " << cntct->get_name() << ';'
-        << svc->get_hostname() << ';' << svc->description << ';'
+        << svc->get_hostname() << ';' << svc->get_description() << ';'
         << service_notification_state << ";"
         << cmd->get_name() << ';'
         << (svc->plugin_output ? svc->plugin_output : "")
@@ -1257,7 +1257,7 @@ int should_service_notification_be_escalated(com::centreon::engine::service2* sv
                     std::shared_ptr<serviceescalation> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = state::instance().serviceescalations().equal_range(
-        std::make_pair(svc->get_hostname(), svc->description));
+        std::make_pair(svc->get_hostname(), svc->get_description()));
   while (p.first != p.second) {
     serviceescalation* temp_se(p.first->second.get());
 
@@ -1317,7 +1317,7 @@ int create_notification_list_from_service(
       "notification list.";
 
     std::pair<std::string, std::string>
-      id(std::make_pair(svc->get_hostname(), svc->description));
+      id(std::make_pair(svc->get_hostname(), svc->get_description()));
     umultimap<std::pair<std::string, std::string>,
               std::shared_ptr<serviceescalation> > const&
       escalations(state::instance().serviceescalations());

@@ -375,9 +375,7 @@ void applier::service::modify_object(
   config->services().insert(obj);
 
   // Modify properties.
-  modify_if_different(
-    s->description,
-    NULL_IF_EMPTY(obj.service_description()));
+  s->set_description(obj.service_description());
   modify_if_different(
     s->display_name,
     NULL_IF_EMPTY(obj.display_name()));
@@ -624,9 +622,7 @@ void applier::service::remove_object(
     // Unregister service.
     for (service2** s(&service_list); *s; s = &(*s)->next)
       if ((*s)->get_hostname() == host_name
-          && !strcmp(
-                (*s)->description,
-                service_description.c_str())) {
+          && (*s)->get_description() == service_description) {
         *s = (*s)->next;
         break ;
       }

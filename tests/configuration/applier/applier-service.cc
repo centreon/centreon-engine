@@ -111,7 +111,7 @@ TEST_F(ApplierService, NewServiceFromConfig) {
 
   // Service is not resolved, host is null now.
   ASSERT_TRUE(sm.begin()->second->host_ptr == NULL);
-  ASSERT_TRUE(strcmp(sm.begin()->second->description, "test description") == 0);
+  ASSERT_TRUE(sm.begin()->second->get_description() == "test description");
 }
 
 // Given a service configuration,

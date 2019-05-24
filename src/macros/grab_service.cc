@@ -118,9 +118,9 @@ static char* get_service_state(com::centreon::engine::service2& svc, nagios_macr
  */
 static char* get_service_id(com::centreon::engine::service2& svc, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(string::from(com::centreon::engine::get_service_id(
+  return string::dup(string::from(com::centreon::engine::get_service_id(
                                              svc.get_hostname(),
-                                             svc.description)).c_str()));
+                                             svc.get_description())).c_str());
 }
 
 /**
@@ -133,7 +133,7 @@ static char* get_service_id(com::centreon::engine::service2& svc, nagios_macros*
  */
 static char* get_service_macro_timezone(com::centreon::engine::service2& svc, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(get_service_timezone(svc.get_hostname(), svc.description)));
+  return (string::dup(get_service_timezone(svc.get_hostname(), svc.get_description())));
 }
 
 /**************************************
@@ -148,8 +148,7 @@ struct grab_service_redirection {
   entry routines;
   grab_service_redirection() {
     // Description.
-    routines[MACRO_SERVICEDESC].first = &get_member_as_string<com::centreon::engine::service2, char*, &com::centreon::engine::service2::description>;
-    routines[MACRO_SERVICEDESC].second = true;
+    routines[MACRO_SERVICEDESC] = {&get_member_as_string<com::centreon::engine::service2, std::string const&, &com::centreon::engine::service2::get_description>, true};
     // Display name.
     routines[MACRO_SERVICEDISPLAYNAME].first = &get_member_as_string<com::centreon::engine::service2, char*, &com::centreon::engine::service2::display_name>;
     routines[MACRO_SERVICEDISPLAYNAME].second = true;

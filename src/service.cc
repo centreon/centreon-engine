@@ -21,8 +21,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
-#include "com/centreon/engine/deleter/service.hh"
-#include "com/centreon/engine/deleter/service.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
@@ -44,8 +42,6 @@ service2::~service2() {
   this->contact_groups.clear();
   deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
 
-  delete[] this->description;
-  this->description = NULL;
   delete[] this->display_name;
   this->display_name = NULL;
   delete[] this->service_check_command;
@@ -92,7 +88,7 @@ bool operator==(
        com::centreon::engine::service2 const& obj1,
        com::centreon::engine::service2 const& obj2) throw () {
   return obj1.get_hostname() == obj2.get_hostname()
-          && is_equal(obj1.description, obj2.description)
+          && obj1.get_description() == obj2.get_description()
           && is_equal(obj1.display_name, obj2.display_name)
           && is_equal(obj1.service_check_command, obj2.service_check_command)
           && is_equal(obj1.event_handler, obj2.event_handler)
@@ -258,7 +254,7 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const
 
   os << "service {\n"
     "  host_name:                            " << obj.get_hostname() << "\n"
-    "  description:                          " << chkstr(obj.description) << "\n"
+    "  description:                          " << obj.get_description() << "\n"
     "  display_name:                         " << chkstr(obj.display_name) << "\n"
     "  service_check_command:                " << chkstr(obj.service_check_command) << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
@@ -457,8 +453,8 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const
 com::centreon::engine::service2* add_service(
            uint64_t host_id,
            uint64_t service_id,
-           char const* host_name,
-           char const* description,
+           std::string const& host_name,
+           std::string const& description,
            char const* display_name,
            char const* check_period,
            int initial_state,
@@ -516,12 +512,12 @@ com::centreon::engine::service2* add_service(
       << "must not be null";
     return nullptr;
   }
-  else if (!description || !description[0]) {
+  else if (description.empty()) {
     logger(log_config_error, basic)
       << "Error: Service description is not set";
     return nullptr;
   }
-  else if (!host_name || !host_name[0]) {
+  else if (host_name.empty()) {
     logger(log_config_error, basic)
       << "Error: Host name of service '"
       << description << "' is not set";
@@ -571,12 +567,12 @@ com::centreon::engine::service2* add_service(
   }
 
   // Allocate memory.
-  std::shared_ptr<com::centreon::engine::service2> obj(new com::centreon::engine::service2, deleter::service);
+  std::shared_ptr<service2> obj{new service2};
 
   try {
     // Duplicate vars.
     obj->set_hostname(host_name);
-    obj->description = string::dup(description);
+    obj->set_description(description);
     obj->display_name = string::dup(display_name ? display_name : description);
     obj->service_check_command = string::dup(check_command);
     if (event_handler)
@@ -718,7 +714,7 @@ int is_escalated_contact_for_service(com::centreon::engine::service2* svc, conta
     return false;
 
   std::pair<std::string, std::string>
-    id(std::make_pair(svc->get_hostname(), svc->description));
+    id(std::make_pair(svc->get_hostname(), svc->get_description()));
   umultimap<std::pair<std::string, std::string>,
             std::shared_ptr<serviceescalation> > const&
     escalations(state::instance().serviceescalations());
@@ -762,16 +758,16 @@ void engine::check_for_expired_acknowledgement(com::centreon::engine::service2* 
     int acknowledgement_timeout(
           service_other_props[std::make_pair(
                                      s->host_ptr->get_name().c_str(),
-                                     s->description)].acknowledgement_timeout);
+                                     s->get_description())].acknowledgement_timeout);
     if (acknowledgement_timeout > 0) {
       time_t last_ack(
                service_other_props[std::make_pair(
                                           s->host_ptr->get_name().c_str(),
-                                          s->description)].last_acknowledgement);
+                                          s->get_description())].last_acknowledgement);
       time_t now(time(nullptr));
       if (last_ack + acknowledgement_timeout >= now) {
         logger(log_info_message, basic)
-          << "Acknowledgement of service '" << s->description
+          << "Acknowledgement of service '" << s->get_description()
           << "' on host '" << s->host_ptr->get_name() << "' just expired";
         s->problem_has_been_acknowledged = false;
         s->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
@@ -845,7 +841,7 @@ bool engine::is_service_exist(
  */
 std::pair<uint64_t, uint64_t> engine::get_host_and_service_id(
                                                 std::string const& host,
-                                                char const* svc) {
+                                                std::string const& svc) {
   std::map<std::pair<std::string, std::string>, service_other_properties>::const_iterator
     found = service_other_props.find({host, std::string(svc)});
   return found != service_other_props.end()
@@ -861,7 +857,7 @@ std::pair<uint64_t, uint64_t> engine::get_host_and_service_id(
  *
  *  @return The service ID if found, 0 otherwise.
  */
-uint64_t engine::get_service_id(std::string const& host, char const* svc) {
+uint64_t engine::get_service_id(std::string const& host, std::string const& svc) {
   return get_host_and_service_id(host, svc).second;
 }
 
@@ -872,7 +868,7 @@ uint64_t engine::get_service_id(std::string const& host, char const* svc) {
  */
 void engine::schedule_acknowledgement_expiration(com::centreon::engine::service2* s) {
   std::pair<std::string, std::string>
-    hs(std::make_pair(s->host_ptr->get_name(), s->description));
+    hs(std::make_pair(s->host_ptr->get_name(), s->get_description()));
   int ack_timeout(service_other_props[hs].acknowledgement_timeout);
   time_t last_ack(service_other_props[hs].last_acknowledgement);
   if ((ack_timeout > 0) && (last_ack != (time_t)0)) {
@@ -902,4 +898,17 @@ void service2::set_hostname(std::string const& name) {
  */
 std::string const& service2::get_hostname() const {
   return _hostname;
+}
+
+void service2::set_description(std::string const& desc) {
+  _description = desc;
+}
+
+/**
+ * @brief Get the description of the service.
+ *
+ * @return A string reference to the description.
+ */
+std::string const& service2::get_description() const {
+  return _description;
 }
