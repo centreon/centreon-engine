@@ -42,7 +42,7 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* handles service check results in an obsessive compulsive manner... */
-int obsessive_compulsive_service_check_processor(service2* svc) {
+int obsessive_compulsive_service_check_processor(com::centreon::engine::service2* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
   com::centreon::engine::host* temp_host = NULL;
@@ -234,7 +234,7 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
 /******************************************************************/
 
 /* handles changes in the state of a service */
-int handle_service_event(service2* svc) {
+int handle_service_event(com::centreon::engine::service2* svc) {
   com::centreon::engine::host* temp_host = NULL;
   nagios_macros mac;
 
@@ -295,7 +295,7 @@ int handle_service_event(service2* svc) {
 }
 
 /* runs the global service event handler */
-int run_global_service_event_handler(nagios_macros* mac, service2* svc) {
+int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::service2* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
   char* processed_logentry = NULL;
@@ -455,7 +455,7 @@ int run_global_service_event_handler(nagios_macros* mac, service2* svc) {
 }
 
 /* runs a service event handler command */
-int run_service_event_handler(nagios_macros* mac, service2* svc) {
+int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service2* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
   char* processed_logentry = NULL;

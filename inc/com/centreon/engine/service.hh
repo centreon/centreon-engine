@@ -1,6 +1,4 @@
 /*
-struct contactgroupsmember_struct;
-struct contactgroupsmember_struct;
 ** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
@@ -19,8 +17,8 @@ struct contactgroupsmember_struct;
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_OBJECTS_SERVICE_HH
-#  define CCE_OBJECTS_SERVICE_HH
+#ifndef CCE_SERVICE_HH
+#  define CCE_SERVICE_HH
 
 #  include <memory>
 #  include <string>
@@ -30,18 +28,20 @@ struct contactgroupsmember_struct;
 #  include "com/centreon/engine/contactgroup.hh"
 
 /* Forward declaration. */
+extern "C" {
+struct objectlist_struct;
+struct timeperiod_struct;
+};
+
 CCE_BEGIN()
   namespace commands {
     class command;
   }
   class contact;
   class host;
-CCE_END()
 
-struct objectlist_struct;
-struct timeperiod_struct;
-
-typedef struct                  service2 {
+class                           service2 {
+ public:
   char*                         host_name;
   char*                         description;
   char*                         display_name;
@@ -156,7 +156,8 @@ typedef struct                  service2 {
   objectlist_struct*            servicegroups_ptr;
   struct service2*        next;
   struct service2*        nexthash;
-}                               service2;
+};
+CCE_END()
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
@@ -174,7 +175,7 @@ struct                          service_other_properties {
 extern "C" {
 #  endif /* C++ */
 
-service2* add_service(
+com::centreon::engine::service2* add_service(
            uint64_t host_id,
            uint64_t service_id,
            char const* host_name,
@@ -228,10 +229,10 @@ service2* add_service(
            int obsess_over_service);
 int      get_service_count();
 int      is_contact_for_service(
-           service2* svc,
+           com::centreon::engine::service2* svc,
            com::centreon::engine::contact* cntct);
 int      is_escalated_contact_for_service(
-           service2* svc,
+           com::centreon::engine::service2* svc,
            com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
@@ -241,17 +242,17 @@ int      is_escalated_contact_for_service(
 #    include <string>
 
 bool          operator==(
-                service2 const& obj1,
-                service2 const& obj2) throw ();
+                com::centreon::engine::service2 const& obj1,
+                com::centreon::engine::service2 const& obj2) throw ();
 bool          operator!=(
-                service2 const& obj1,
-                service2 const& obj2) throw ();
-std::ostream& operator<<(std::ostream& os, service2 const& obj);
+                com::centreon::engine::service2 const& obj1,
+                com::centreon::engine::service2 const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, com::centreon::engine::service2 const& obj);
 
 CCE_BEGIN()
 
-void          check_for_expired_acknowledgement(service2* s);
-service2&      find_service(
+void          check_for_expired_acknowledgement(com::centreon::engine::service2* s);
+com::centreon::engine::service2&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
 char const*   get_service_timezone(char const* hst, char const* svc);
@@ -262,10 +263,10 @@ std::pair<uint64_t, uint64_t>
                 char const* host,
                 char const* svc);
 uint64_t get_service_id(char const* host, char const* svc);
-void          schedule_acknowledgement_expiration(service2* s);
+void          schedule_acknowledgement_expiration(com::centreon::engine::service2* s);
 
 CCE_END()
 
 #  endif /* C++ */
 
-#endif // !CCE_OBJECTS_SERVICE_HH
+#endif // !CCE_SERVICE_HH

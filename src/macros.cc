@@ -194,7 +194,7 @@ int grab_custom_macro_value_r(
   }
   /***** CUSTOM SERVICE MACRO *****/
   else if (strstr(macro_name, "_SERVICE") == macro_name) {
-    service2* temp_service(nullptr);
+    com::centreon::engine::service2* temp_service(nullptr);
 
     /* use saved service pointer */
     if (arg1 == nullptr && arg2 == nullptr) {
@@ -1469,7 +1469,7 @@ int set_argv_macro_environment_vars(bool set) {
 /* sets or unsets custom host/service/contact macro environment variables */
 int set_custom_macro_environment_vars_r(nagios_macros* mac, bool set) {
   host* temp_host = nullptr;
-  service2* temp_service = nullptr;
+  com::centreon::engine::service2* temp_service = nullptr;
   contact* temp_contact = nullptr;
 
   /***** CUSTOM HOST VARIABLES *****/

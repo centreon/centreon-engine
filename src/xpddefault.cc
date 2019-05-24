@@ -31,7 +31,7 @@
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "find.hh"
@@ -188,7 +188,7 @@ int xpddefault_cleanup_performance_data() {
 /******************************************************************/
 
 // updates service performance data.
-int xpddefault_update_service_performance_data(service2* svc) {
+int xpddefault_update_service_performance_data(com::centreon::engine::service2* svc) {
   nagios_macros mac;
 
   /*
@@ -274,7 +274,7 @@ int xpddefault_update_host_performance_data(host* hst) {
 // runs the service performance data command.
 int xpddefault_run_service_performance_data_command(
       nagios_macros* mac,
-      service2* svc) {
+      com::centreon::engine::service2* svc) {
   char* raw_command_line(nullptr);
   char* processed_command_line(nullptr);
   int early_timeout(false);
@@ -556,7 +556,7 @@ void xpddefault_preprocess_file_templates(char* tmpl) {
 // updates service performance data file.
 int xpddefault_update_service_performance_data_file(
       nagios_macros* mac,
-      service2* svc) {
+      com::centreon::engine::service2* svc) {
   char* raw_output(nullptr);
   char* processed_output(nullptr);
   int result(OK);

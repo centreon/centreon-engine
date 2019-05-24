@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_OBJECTS_HOST_HH
-#  define CCE_OBJECTS_HOST_HH
+#ifndef CCE_HOST_HH
+#  define CCE_HOST_HH
 
 #  include <list>
 #  include <unordered_map>
@@ -34,7 +34,6 @@
 
 /* Forward declaration. */
 extern "C" {
-struct hostsmember_struct;
 struct objectlist_struct;
 struct servicesmember_struct;
 struct timeperiod_struct;
@@ -51,7 +50,7 @@ typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::host>> host_map;
 
 CCE_BEGIN()
-class                host {
+class                 host {
  public:
                       host(uint64_t host_id,
                            std::string const& name,
@@ -515,4 +514,4 @@ void                  schedule_acknowledgement_expiration(
 
 CCE_END()
 
-#endif // !CCE_OBJECTS_HOST_HH
+#endif // !CCE_HOST_HH

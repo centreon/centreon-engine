@@ -103,7 +103,7 @@ TEST_F(ApplierService, NewServiceFromConfig) {
   svc_aply.add_object(svc);
   svc_aply.expand_objects(*config);
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service2> > const&
+       std::shared_ptr<com::centreon::engine::service2> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 1);
   ASSERT_EQ(sm.begin()->first.first, 1);
@@ -146,15 +146,15 @@ TEST_F(ApplierService, ServicesEquality) {
   ASSERT_TRUE(csvc.parse("service_id", "12346"));
   ASSERT_NO_THROW(svc_aply.add_object(csvc));
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service2> > const&
+       std::shared_ptr<com::centreon::engine::service2> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 2);
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service2> >::
+       std::shared_ptr<com::centreon::engine::service2> >::
     const_iterator it(sm.begin());
-  std::shared_ptr<service2> svc1(it->second);
+  std::shared_ptr<com::centreon::engine::service2> svc1(it->second);
   ++it;
-  std::shared_ptr<service2> svc2(it->second);
+  std::shared_ptr<com::centreon::engine::service2> svc2(it->second);
   configuration::service csvc1(csvc);
   ASSERT_EQ(csvc, csvc1);
   ASSERT_TRUE(csvc1.parse("recovery_notification_delay", "120"));
@@ -210,7 +210,7 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   svc_aply.resolve_object(csvc);
 
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service2> > const&
+       std::shared_ptr<com::centreon::engine::service2> > const&
     sm(configuration::applier::state::instance().services());
   ASSERT_EQ(sm.size(), 1);
 

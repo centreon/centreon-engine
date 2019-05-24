@@ -19,9 +19,13 @@
 
 #ifndef CCE_OBJECTS_SERVICEDEPENDENCY_HH
 #  define CCE_OBJECTS_SERVICEDEPENDENCY_HH
+#include "com/centreon/engine/namespace.hh"
 
 /* Forward declaration. */
-struct service2;
+CCE_BEGIN()
+class service2;
+CCE_END()
+
 struct timeperiod_struct;
 
 typedef struct                     servicedependency_struct {
@@ -40,8 +44,8 @@ typedef struct                     servicedependency_struct {
   int                              circular_path_checked;
   int                              contains_circular_path;
 
-  service2*                  master_service_ptr;
-  service2*                  dependent_service_ptr;
+  com::centreon::engine::service2*                  master_service_ptr;
+  com::centreon::engine::service2*                  dependent_service_ptr;
   timeperiod_struct*               dependency_period_ptr;
   struct servicedependency_struct* next;
   struct servicedependency_struct* nexthash;

@@ -27,7 +27,7 @@
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/file.hh"
 
@@ -188,7 +188,7 @@ int write_to_syslog(char const* buffer, unsigned long type) {
  *
  *  @return Return true on success.
  */
-int log_service_event(service2 const* svc) {
+int log_service_event(com::centreon::engine::service2 const* svc) {
   if (svc->state_type == SOFT_STATE
       && !config->log_service_retries())
     return (OK);
@@ -291,7 +291,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
  *  @param[in] type  State logging type.
  *  @param[in] svc   Service object.
  */
-void log_service_state(unsigned int type, service2* svc) {
+void log_service_state(unsigned int type, com::centreon::engine::service2* svc) {
   if (svc->host_name && svc->description) {
     char const* type_str(tab_initial_state[type]);
     char const* state("UNKNOWN");
@@ -320,7 +320,7 @@ void log_service_state(unsigned int type, service2* svc) {
  */
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-  for (service2* svc(service_list); svc; svc = svc->next)
+  for (com::centreon::engine::service2* svc(service_list); svc; svc = svc->next)
     log_service_state(type, svc);
   return (OK);
 }

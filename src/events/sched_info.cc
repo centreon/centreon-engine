@@ -48,7 +48,7 @@ void adjust_check_scheduling() {
   int total_checks(0);
   time_t last_check_time(0L);
   host* hst(NULL);
-  service2* svc(NULL);
+  com::centreon::engine::service2* svc(NULL);
 
   logger(dbg_functions, basic)
     << "adjust_check_scheduling()";
@@ -94,7 +94,7 @@ void adjust_check_scheduling() {
     }
 
     else if (tmp->event_type == EVENT_SERVICE_CHECK) {
-      if (!(svc = (service2*)tmp->event_data))
+      if (!(svc = (com::centreon::engine::service2*)tmp->event_data))
         continue;
 
       // ignore forced checks.
@@ -161,7 +161,7 @@ void adjust_check_scheduling() {
            * exec_time_factor);
     }
     else if (tmp->event_type == EVENT_SERVICE_CHECK) {
-      if (!(svc = (service2*)tmp->event_data))
+      if (!(svc = (com::centreon::engine::service2*)tmp->event_data))
         continue;
 
       // ignore forced checks.

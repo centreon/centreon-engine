@@ -18,14 +18,14 @@
 */
 
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/deleter/servicesmember.hh"
-#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/contact.hh"
+#include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/host.hh"
-#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -90,7 +90,7 @@ std::ostream& operator<<(std::ostream& os, servicesmember const& obj) {
  *
  *  @return Host-service relation.
  */
-servicesmember* add_service_link_to_host(host* hst, service2* svc) {
+servicesmember* add_service_link_to_host(host* hst, com::centreon::engine::service2* svc) {
   // Make sure we have the data we need.
   if (!hst || !svc)
     return (NULL);

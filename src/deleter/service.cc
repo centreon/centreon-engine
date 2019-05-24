@@ -23,7 +23,7 @@
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/service.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
-#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/service.hh"
 
 using namespace com::centreon::engine;
 

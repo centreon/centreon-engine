@@ -184,7 +184,7 @@ int is_host_member_of_servicegroup(servicegroup* group, host* hst) {
  */
 int is_service_member_of_servicegroup(
       servicegroup* group,
-      service2* svc) {
+      com::centreon::engine::service2* svc) {
   if (!group || !svc)
     return (false);
 

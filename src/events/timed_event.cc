@@ -42,7 +42,7 @@ using namespace com::centreon::engine;
  *  @param[in] event The event to execute.
  */
 static void _exec_event_service_check(timed_event* event) {
-  service2* svc(reinterpret_cast<service2*>(event->event_data));
+  com::centreon::engine::service2* svc(reinterpret_cast<com::centreon::engine::service2*>(event->event_data));
 
   // get check latency.
   timeval tv;
@@ -316,7 +316,7 @@ static void _exec_event_expire_service_ack(timed_event* event) {
   logger(dbg_events, basic)
     << "** Expire Service Acknowledgement Event";
   check_for_expired_acknowledgement(
-    static_cast<service2*>(event->event_data));
+    static_cast<com::centreon::engine::service2*>(event->event_data));
   return ;
 }
 
@@ -558,7 +558,7 @@ void compensate_for_system_time_change(
   resort_event_list(&event_list_low, &event_list_low_tail);
 
   // adjust service timestamps.
-  for (service2* svc(service_list); svc; svc = svc->next) {
+  for (com::centreon::engine::service2* svc(service_list); svc; svc = svc->next) {
     adjust_timestamp_for_time_change(
       last_time,
       current_time,
@@ -1039,8 +1039,8 @@ bool operator==(
   else if (is_not_null
            && ((obj1.event_type == EVENT_SERVICE_CHECK)
                || (obj1.event_type == EVENT_EXPIRE_SERVICE_ACK))) {
-    service2& svc1(*(service2*)obj1.event_data);
-    service2& svc2(*(service2*)obj2.event_data);
+    com::centreon::engine::service2& svc1(*(com::centreon::engine::service2*)obj1.event_data);
+    com::centreon::engine::service2& svc2(*(com::centreon::engine::service2*)obj2.event_data);
     if (strcmp(svc1.host_name, svc2.host_name)
         || strcmp(svc1.description, svc2.description))
       return (false);
@@ -1106,7 +1106,7 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
   }
   else if (obj.event_type == EVENT_SERVICE_CHECK
            || obj.event_type == EVENT_EXPIRE_SERVICE_ACK) {
-    service2& svc(*(service2*)obj.event_data);
+    com::centreon::engine::service2& svc(*(com::centreon::engine::service2*)obj.event_data);
     os << "  event_data:                 "
        << svc.host_name << ", " << svc.description << "\n";
   }

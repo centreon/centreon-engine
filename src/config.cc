@@ -42,7 +42,7 @@ using namespace com::centreon::engine::logging;
 int pre_flight_check() {
   host* temp_host(nullptr);
   char* buf(nullptr);
-  service2* temp_service(nullptr);
+  com::centreon::engine::service2* temp_service(nullptr);
   commands::command* temp_command(nullptr);
   char* temp_command_name(nullptr);
   int warnings(0);
@@ -245,7 +245,7 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking services...";
   int total_objects(0);
-  for (service2* temp_service(service_list);
+  for (com::centreon::engine::service2* temp_service(service_list);
        temp_service;
        temp_service = temp_service->next, ++total_objects)
     check_service(temp_service, &warnings, &errors);
@@ -665,7 +665,7 @@ int pre_flight_circular_check(int* w, int* e) {
   return ((errors > 0) ? ERROR : OK);
 }
 
-int check_service(service2* svc, int* w, int* e) {
+int check_service(com::centreon::engine::service2* svc, int* w, int* e) {
   int errors(0);
   int warnings(0);
 
@@ -875,7 +875,7 @@ int check_host(host* hst, int* w, int* e) {
   // modified.
   if (!use_large_installation_tweaks) {
     bool found(false);
-    for (service2* temp_service(service_list);
+    for (com::centreon::engine::service2* temp_service(service_list);
 	       temp_service;
 	       temp_service = temp_service->next)
       if (hst->get_name() != temp_service->host_name) {
@@ -1179,7 +1179,7 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
   for (servicesmember* temp_servicesmember(sg->members);
        temp_servicesmember;
        temp_servicesmember = temp_servicesmember->next) {
-    service2* temp_service(find_service(
+    com::centreon::engine::service2* temp_service(find_service(
                             temp_servicesmember->host_name,
                             temp_servicesmember->service_description));
     if (!temp_service) {
@@ -1333,7 +1333,7 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
   int errors(0);
 
   // Find the dependent service.
-  service2* temp_service(find_service(
+  com::centreon::engine::service2* temp_service(find_service(
                           sd->dependent_host_name,
                           sd->dependent_service_description));
   if (!temp_service) {
@@ -1491,7 +1491,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   int errors(0);
 
   // Find the service.
-  service2* temp_service(find_service(se->host_name, se->description));
+  com::centreon::engine::service2* temp_service(find_service(se->host_name, se->description));
   if (!temp_service) {
     logger(log_verification_error, basic) << "Error: Service '"
         << se->description << "' on host '" << se->host_name

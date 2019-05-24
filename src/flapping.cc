@@ -37,7 +37,7 @@ using namespace com::centreon::engine::logging;
 
 /* detects service flapping */
 void check_for_service_flapping(
-       service2* svc,
+       com::centreon::engine::service2* svc,
        int update,
        int allow_flapstart_notification) {
   int update_history = true;
@@ -360,7 +360,7 @@ void check_for_host_flapping(
 
 /* handles a service that is flapping */
 void set_service_flap(
-       service2* svc,
+       com::centreon::engine::service2* svc,
        double percent_change,
        double high_threshold,
        double low_threshold,
@@ -446,7 +446,7 @@ void set_service_flap(
 
 /* handles a service that has stopped flapping */
 void clear_service_flap(
-       service2* svc,
+       com::centreon::engine::service2* svc,
        double percent_change,
        double high_threshold,
        double low_threshold) {
@@ -674,7 +674,7 @@ void clear_host_flap(
 /* enables flap detection on a program wide basis */
 void enable_flap_detection_routines() {
   com::centreon::engine::host* temp_host = NULL;
-  service2* temp_service = NULL;
+  com::centreon::engine::service2* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)
@@ -722,7 +722,7 @@ void enable_flap_detection_routines() {
 /* disables flap detection on a program wide basis */
 void disable_flap_detection_routines() {
   com::centreon::engine::host* temp_host = NULL;
-  service2* temp_service = NULL;
+  com::centreon::engine::service2* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)
@@ -910,7 +910,7 @@ void handle_host_flap_detection_disabled(com::centreon::engine::host* hst) {
 }
 
 /* enables flap detection for a specific service */
-void enable_service_flap_detection(service2* svc) {
+void enable_service_flap_detection(com::centreon::engine::service2* svc) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)
@@ -953,7 +953,7 @@ void enable_service_flap_detection(service2* svc) {
 }
 
 /* disables flap detection for a specific service */
-void disable_service_flap_detection(service2* svc) {
+void disable_service_flap_detection(com::centreon::engine::service2* svc) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)
@@ -993,7 +993,7 @@ void disable_service_flap_detection(service2* svc) {
 }
 
 /* handles the details for a service when flap detection is disabled (globally or per-service) */
-void handle_service_flap_detection_disabled(service2* svc) {
+void handle_service_flap_detection_disabled(com::centreon::engine::service2* svc) {
   logger(dbg_functions, basic)
     << "handle_service_flap_detection_disabled()";
 

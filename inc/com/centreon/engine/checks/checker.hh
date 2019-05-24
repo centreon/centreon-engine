@@ -28,7 +28,7 @@
 #  include "com/centreon/engine/commands/result.hh"
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/service.hh"
 #  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
