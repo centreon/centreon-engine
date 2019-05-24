@@ -199,7 +199,7 @@ void applier::service::_update(
     if (state.check_command().is_set()
         && (obj.modified_attributes & MODATTR_CHECK_COMMAND)) {
       if (utils::is_command_exist(*state.check_command()))
-        string::setstr(obj.service_check_command, *state.check_command());
+        obj.set_check_command(*state.check_command());
       else
         obj.modified_attributes -= MODATTR_CHECK_COMMAND;
     }

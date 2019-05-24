@@ -323,7 +323,7 @@ void checker::run(
             hst->get_state_type(),
             start_time,
             end_time,
-            hst->get_host_check_command().c_str(),
+            hst->get_check_command().c_str(),
             hst->get_latency(),
             0.0,
             config->host_check_timeout(),
@@ -370,7 +370,7 @@ void checker::run(
   get_raw_command_line_r(
     &macros,
     hst->check_command_ptr,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     NULL,
     0);
 
@@ -427,7 +427,7 @@ void checker::run(
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     hst->get_latency(),
     0.0,
     config->host_check_timeout(),
@@ -561,7 +561,7 @@ void checker::run(
             SERVICE_CHECK_ACTIVE,
             start_time,
             end_time,
-            svc->service_check_command,
+            svc->get_check_command().c_str(),
             svc->latency,
             0.0,
             0,
@@ -610,7 +610,7 @@ void checker::run(
   get_raw_command_line_r(
     &macros,
     svc->check_command_ptr,
-    svc->service_check_command,
+    svc->get_check_command().c_str(),
     NULL,
     0);
 
@@ -660,7 +660,7 @@ void checker::run(
           SERVICE_CHECK_ACTIVE,
           start_time,
           end_time,
-          svc->service_check_command,
+          svc->get_check_command().c_str(),
           svc->latency,
           0.0,
           config->service_check_timeout(),
@@ -848,7 +848,7 @@ void checker::run_sync(
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     hst->get_latency(),
     0.0,
     config->host_check_timeout(),
@@ -896,7 +896,7 @@ void checker::run_sync(
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     hst->get_latency(),
     hst->get_execution_time(),
     config->host_check_timeout(),
@@ -1016,7 +1016,7 @@ int checker::_execute_sync(host* hst) {
             hst->get_state_type(),
             start_time,
             end_time,
-            hst->get_host_check_command().c_str(),
+            hst->get_check_command().c_str(),
             hst->get_latency(),
             0.0,
             config->host_check_timeout(),
@@ -1040,7 +1040,7 @@ int checker::_execute_sync(host* hst) {
   get_raw_command_line_r(
     &macros,
     hst->check_command_ptr,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     NULL,
     0);
 
@@ -1068,7 +1068,7 @@ int checker::_execute_sync(host* hst) {
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     0.0,
     0.0,
     config->host_check_timeout(),
@@ -1211,7 +1211,7 @@ int checker::_execute_sync(host* hst) {
   delete perfdata_output_str;
 
   // A NULL host check command means we should assume the host is UP.
-  if (hst->get_host_check_command().empty()) {
+  if (hst->get_check_command().empty()) {
     hst->set_plugin_output("(Host assumed to be UP)");
     res.exit_code = STATE_OK;
   }
@@ -1250,7 +1250,7 @@ int checker::_execute_sync(host* hst) {
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     0.0,
     execution_time,
     config->host_check_timeout(),

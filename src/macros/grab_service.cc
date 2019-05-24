@@ -184,10 +184,10 @@ struct grab_service_redirection {
         true}},
       // Check command.
       {MACRO_SERVICECHECKCOMMAND,
-       {&get_member_as_string<
-            com::centreon::engine::service,
-            char*,
-            &com::centreon::engine::service::service_check_command>,
+       {&get_member_as_string<service,
+                              std::string const&,
+                              notifier,
+                              &notifier::get_check_command>,
         true}},
       // Check type.
       {MACRO_SERVICECHECKTYPE, {&get_service_check_type, true}},

@@ -192,7 +192,7 @@ void applier::host::_update(
     if (state.check_command().is_set()
         && (obj.get_modified_attributes() & MODATTR_CHECK_COMMAND)) {
       if (utils::is_command_exist(*state.check_command()))
-        obj.set_host_check_command(*state.check_command());
+        obj.set_check_command(*state.check_command());
       else
         obj.set_modified_attributes(obj.get_modified_attributes()
           - MODATTR_CHECK_COMMAND);
@@ -219,7 +219,7 @@ void applier::host::_update(
     if (state.event_handler().is_set()
         && (obj.get_modified_attributes() & MODATTR_EVENT_HANDLER_COMMAND)) {
       if (utils::is_command_exist(*state.event_handler()))
-        obj.set_host_check_command(*state.event_handler());
+        obj.set_check_command(*state.event_handler());
       else
         obj.set_modified_attributes(obj.get_modified_attributes()
           - MODATTR_CHECK_COMMAND);

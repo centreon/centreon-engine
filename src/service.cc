@@ -38,15 +38,16 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
-service::service(std::string const& display_name)
- : notifier{display_name} {}
+service::service(std::string const& hostname,
+                 std::string const& description,
+                 std::string const& display_name,
+                 std::string const& check_command)
+    : notifier{display_name, check_command}, _hostname{hostname}, _description{description} {}
 
 service::~service() {
   this->contact_groups.clear();
   deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
 
-  delete[] this->service_check_command;
-  this->service_check_command = NULL;
   delete[] this->event_handler;
   this->event_handler = NULL;
   delete[] this->notification_period;
@@ -91,7 +92,7 @@ bool operator==(
   return obj1.get_hostname() == obj2.get_hostname()
           && obj1.get_description() == obj2.get_description()
           && obj1.get_display_name() == obj2.get_display_name()
-          && is_equal(obj1.service_check_command, obj2.service_check_command)
+          && obj1.get_check_command() == obj2.get_check_command()
           && is_equal(obj1.event_handler, obj2.event_handler)
           && obj1.initial_state == obj2.initial_state
           && obj1.check_interval == obj2.check_interval
@@ -257,7 +258,7 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const&
     "  host_name:                            " << obj.get_hostname() << "\n"
     "  description:                          " << obj.get_description() << "\n"
     "  display_name:                         " << obj.get_display_name() << "\n"
-    "  service_check_command:                " << chkstr(obj.service_check_command) << "\n"
+    "  service_check_command:                " << obj.get_check_command() << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
     "  initial_state:                        " << obj.initial_state << "\n"
     "  check_interval:                       " << obj.check_interval << "\n"
@@ -568,13 +569,12 @@ com::centreon::engine::service* add_service(
   }
 
   // Allocate memory.
-  std::shared_ptr<service> obj{new service(display_name ? display_name : description)};
+  std::shared_ptr<service> obj{
+      new service(host_name, description,
+                  display_name ? display_name : description, check_command)};
 
   try {
     // Duplicate vars.
-    obj->set_hostname(host_name);
-    obj->set_description(description);
-    obj->service_check_command = string::dup(check_command);
     if (event_handler)
       obj->event_handler = string::dup(event_handler);
     if (notification_period)

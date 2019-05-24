@@ -717,7 +717,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   }
 
   /* check the service check_command */
-  char* buf = string::dup(svc->service_check_command);
+  char* buf = string::dup(svc->get_check_command());
 
   /* get the command name, leave any arguments behind */
   char* temp_command_name = my_strtok(buf, "!");
@@ -917,10 +917,10 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* hosts that don't have check commands defined shouldn't ever be checked... */
-  if (!hst->get_host_check_command().empty()) {
+  if (!hst->get_check_command().empty()) {
 
     /* check the host check_command */
-    char* buf = string::dup(hst->get_host_check_command());
+    char* buf = string::dup(hst->get_check_command());
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");

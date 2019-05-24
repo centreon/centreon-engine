@@ -168,7 +168,7 @@ host::host(uint64_t host_id,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_host)
-    : notifier{!display_name.empty() ? display_name : name} {
+    : notifier{!display_name.empty() ? display_name : name, check_command} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -229,7 +229,6 @@ host::host(uint64_t host_id,
   _action_url = action_url;
   _check_period = check_period;
   _event_handler = event_handler;
-  _host_check_command = check_command;
   _icon_image = icon_image;
   _icon_image_alt = icon_image_alt;
   _notes = notes;
@@ -342,14 +341,6 @@ std::string const& host::get_address() const {
 
 void host::set_address(std::string const& address) {
   _address = address;
-}
-
-std::string const& host::get_host_check_command() const {
-  return _host_check_command;
-}
-
-void host::set_host_check_command(std::string const& host_check_command) {
-  _host_check_command = host_check_command;
 }
 
 int host::get_initial_state() const {
@@ -1168,7 +1159,7 @@ bool operator==(
           // created as parent back links.
           // Services do not need to be tested, they are
           // created as services back links.
-          && obj1.get_host_check_command() == obj2.get_host_check_command()
+          && obj1.get_check_command() == obj2.get_check_command()
           && obj1.get_initial_state() == obj2.get_initial_state()
           && obj1.get_check_interval() == obj2.get_check_interval()
           && obj1.get_retry_interval() == obj2.get_retry_interval()
@@ -1375,7 +1366,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  parent_hosts:                         " << p_oss << "\n"
     "  child_hosts:                          " << child_oss << "\n"
     "  services:                             " << chkobj(obj.services) << "\n"
-    "  host_check_command:                   " << obj.get_host_check_command() << "\n"
+    "  host_check_command:                   " << obj.get_check_command() << "\n"
     "  initial_state:                        " << obj.get_initial_state() << "\n"
     "  check_interval:                       " << obj.get_check_interval() << "\n"
     "  retry_interval:                       " << obj.get_retry_interval() << "\n"

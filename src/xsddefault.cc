@@ -223,7 +223,7 @@ int xsddefault_save_status_data() {
          "\thost_name=" << it->second->get_name() << "\n"
          "\tmodified_attributes=" << it->second->get_modified_attributes()
                                   << "\n"
-         "\tcheck_command=" << it->second->get_host_check_command() << "\n"
+         "\tcheck_command=" << it->second->get_check_command() << "\n"
          "\tcheck_period=" << it->second->get_check_period() << "\n"
          "\tnotification_period=" << it->second->get_notification_period()
                                   << "\n"
@@ -317,7 +317,7 @@ int xsddefault_save_status_data() {
          "\thost_name=" << svc->get_hostname() << "\n"
          "\tservice_description=" << svc->get_description() << "\n"
          "\tmodified_attributes=" << svc->modified_attributes << "\n"
-         "\tcheck_command=" << (svc->service_check_command ? svc->service_check_command : "") << "\n"
+         "\tcheck_command=" << svc->get_check_command() << "\n"
          "\tcheck_period=" << (svc->check_period ? svc->check_period : "") << "\n"
          "\tnotification_period=" << (svc->notification_period ? svc->notification_period : "") << "\n"
          "\tcheck_interval=" << svc->check_interval << "\n"

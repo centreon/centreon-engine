@@ -2019,7 +2019,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_HOST_CHECK_COMMAND:
-    temp_host->set_host_check_command(temp_ptr);
+    temp_host->set_check_command(temp_ptr);
     temp_host->check_command_ptr = temp_command;
     attr = MODATTR_CHECK_COMMAND;
     break;
@@ -2032,6 +2032,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
     temp_host->set_notification_period(temp_ptr);
+    delete[] temp_ptr;
     temp_host->notification_period_ptr = temp_timeperiod;
     attr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
@@ -2044,8 +2045,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_SVC_CHECK_COMMAND:
-    delete[] temp_service->service_check_command;
-    temp_service->service_check_command = temp_ptr;
+    temp_service->set_check_command(temp_ptr);
+    delete[] temp_ptr;
     temp_service->check_command_ptr = temp_command;
     attr = MODATTR_CHECK_COMMAND;
     break;

@@ -118,9 +118,6 @@ class                 host : public notifier {
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  std::string const& get_host_check_command() const;
-  void               set_host_check_command(
-                       std::string const& host_check_command);
   int                get_initial_state() const;
   void               set_initial_state(int initial_state);
   double             get_check_interval() const;

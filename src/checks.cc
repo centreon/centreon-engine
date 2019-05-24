@@ -2766,7 +2766,7 @@ int handle_async_host_check_result_3x(
     }
 
     /* a NULL host check command means we should assume the host is UP */
-    if (temp_host->get_host_check_command().empty()) {
+    if (temp_host->get_check_command().empty()) {
       temp_host->set_plugin_output("(Host assumed to be UP)");
       result = STATE_OK;
     }
@@ -2826,7 +2826,7 @@ int handle_async_host_check_result_3x(
     temp_host->get_state_type(),
     start_time_hires,
     end_time_hires,
-    temp_host->get_host_check_command().c_str(),
+    temp_host->get_check_command().c_str(),
     temp_host->get_latency(),
     temp_host->get_execution_time(),
     config->host_check_timeout(),

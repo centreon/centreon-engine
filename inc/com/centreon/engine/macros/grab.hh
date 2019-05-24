@@ -45,7 +45,7 @@ namespace  macros {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision)
         << (t.*member)();
-    return (string::dup(oss.str()));
+    return string::dup(oss.str());
   }
 
   /**
@@ -63,7 +63,7 @@ namespace  macros {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision)
         << t.*member;
-    return (string::dup(oss.str()));
+    return string::dup(oss.str());
   }
 
   /**
@@ -96,7 +96,7 @@ namespace  macros {
         << hours << "h "
         << minutes << "m "
         << duration << "s";
-    return (string::dup(oss.str()));
+    return string::dup(oss.str());
   }
 
   /**
@@ -130,7 +130,7 @@ namespace  macros {
         << hours << "h "
         << minutes << "m "
         << duration << "s";
-    return (string::dup(oss.str()));
+    return string::dup(oss.str());
   }
 
   /**
@@ -148,7 +148,7 @@ namespace  macros {
     // Get duration.
     time_t now(time(NULL));
     unsigned long duration(now - t.get_last_state_change());
-    return (string::dup(duration));
+    return string::dup(duration);
   }
 
   /**
@@ -167,7 +167,7 @@ namespace  macros {
     // Get duration.
     time_t now(time(NULL));
     unsigned long duration(now - t.last_state_change);
-    return (string::dup(duration));
+    return string::dup(duration);
   }
 
   /**
@@ -181,7 +181,7 @@ namespace  macros {
   template <typename T, unsigned int macro_id>
   char*    get_macro_copy(T& t, nagios_macros* mac) {
     (void)t;
-    return (string::dup(mac->x[macro_id] ? mac->x[macro_id] : ""));
+    return string::dup(mac->x[macro_id] ? mac->x[macro_id] : "");
   }
 
   /**
@@ -192,18 +192,25 @@ namespace  macros {
    *
    *  @return String copy of object member.
    */
-
   template <typename T, typename U, U (T::* member)() const>
   char*    get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
-    return (string::dup((t.*member)()));
+    return string::dup((t.*member)());
   }
 
+  /**
+   *  Get string copy of object member.
+   *
+   *  @param[in] t   Base object.
+   *  @param[in] mac Unused.
+   *
+   *  @return String copy of object member.
+   */
   template <typename T, typename U, typename V, U (V::* member)() const>
   char*    get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
     V* v{&t};
-    return (string::dup((v->*member)()));
+    return string::dup((v->*member)());
   }
 
   /**
@@ -218,7 +225,7 @@ namespace  macros {
   template <typename T, typename U, U (T::* member)>
   char*    get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
-    return (string::dup(t.*member));
+    return string::dup(t.*member);
   }
 
   /**
@@ -236,7 +243,7 @@ namespace  macros {
     // Get copy of string with macros processed.
     char* buffer(NULL);
     process_macros_r(mac, (t.*member)().c_str(), &buffer, options);
-    return (buffer);
+    return buffer;
   }
 
   /**
@@ -255,7 +262,7 @@ namespace  macros {
     // Get copy of string with macros processed.
     char* buffer(NULL);
     process_macros_r(mac, t.*member, &buffer, options);
-    return (buffer);
+    return buffer;
   }
   /**
    *  Extract state type.
