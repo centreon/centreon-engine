@@ -322,7 +322,7 @@ void loop::_dispatching() {
             else
               temp_service->next_check
                 = (time_t)(temp_service->next_check
-                           + (temp_service->check_interval
+                           + (temp_service->get_check_interval()
                               * config->interval_length()));
           }
           temp_event->run_time = temp_service->next_check;

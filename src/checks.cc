@@ -129,8 +129,12 @@ int run_scheduled_service_check(
        * minutes from now
        * */
       if (current_time >= preferred_time)
-        preferred_time = current_time + static_cast<time_t>(svc->check_interval
-          <= 0 ? 300 : svc->check_interval * config->interval_length());
+        preferred_time =
+            current_time +
+            static_cast<time_t>(svc->get_check_interval() <= 0
+                                    ? 300
+                                    : svc->get_check_interval() *
+                                          config->interval_length());
 
       // Make sure we rescheduled the next service check at a valid time.
       {
@@ -822,7 +826,7 @@ int handle_async_service_check_result(
     if (reschedule_check)
       next_service_check
         = (time_t)(temp_service->last_check
-                   + (temp_service->check_interval
+                   + (temp_service->get_check_interval()
                       * config->interval_length()));
   }
 
@@ -1019,7 +1023,7 @@ int handle_async_service_check_result(
         if (reschedule_check)
           next_service_check
             = (time_t)(temp_service->last_check
-                       + (temp_service->check_interval
+                       + (temp_service->get_check_interval()
                           * config->interval_length()));
 
         /* log the problem as a hard state if the host just went down */
@@ -1148,7 +1152,7 @@ int handle_async_service_check_result(
       if (reschedule_check)
         next_service_check
           = (time_t)(temp_service->last_check
-                     + (temp_service->check_interval
+                     + (temp_service->get_check_interval()
                         * config->interval_length()));
     }
 
@@ -1189,7 +1193,7 @@ int handle_async_service_check_result(
     }
 
     /* services with non-recurring intervals do not get rescheduled */
-    if (temp_service->check_interval == 0)
+    if (temp_service->get_check_interval() == 0)
       temp_service->should_be_scheduled = false;
 
     /* services with active checks disabled do not get rescheduled */
@@ -1466,7 +1470,7 @@ int check_service_check_viability(
   if (svc->state_type == SOFT_STATE && svc->current_state != STATE_OK)
     check_interval = static_cast<int>(svc->retry_interval * config->interval_length());
   else
-    check_interval = static_cast<int>(svc->check_interval * config->interval_length());
+    check_interval = static_cast<int>(svc->get_check_interval() * config->interval_length());
 
   /* get the current time */
   time(&current_time);
@@ -1711,8 +1715,8 @@ void check_service_result_freshness() {
 
     /* EXCEPTION */
     /* don't check freshness of services without regular check intervals if we're using auto-freshness threshold */
-    if (temp_service->check_interval == 0
-        && temp_service->freshness_threshold == 0)
+    if (temp_service->get_check_interval() == 0 &&
+        temp_service->freshness_threshold == 0)
       continue;
 
     /* the results for the last check of this service are stale! */
@@ -1755,15 +1759,16 @@ int is_service_result_fresh(
 
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
   if (temp_service->freshness_threshold == 0) {
-    if (temp_service->state_type == HARD_STATE
-        || temp_service->current_state == STATE_OK)
-      freshness_threshold = static_cast<int>((temp_service->check_interval * config->interval_length())
-					     + temp_service->latency + config->additional_freshness_latency());
+    if (temp_service->state_type == HARD_STATE ||
+        temp_service->current_state == STATE_OK)
+      freshness_threshold = static_cast<int>(
+          (temp_service->get_check_interval() * config->interval_length()) +
+          temp_service->latency + config->additional_freshness_latency());
     else
-      freshness_threshold = static_cast<int>((temp_service->retry_interval * config->interval_length())
-					     + temp_service->latency + config->additional_freshness_latency());
-  }
-  else
+      freshness_threshold = static_cast<int>(
+          (temp_service->retry_interval * config->interval_length()) +
+          temp_service->latency + config->additional_freshness_latency());
+  } else
     freshness_threshold = temp_service->freshness_threshold;
 
   logger(dbg_checks, most)

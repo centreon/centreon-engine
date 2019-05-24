@@ -17,16 +17,29 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifier.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 notifier::notifier(std::string const& display_name,
                    std::string const& check_command,
-                   int initial_state)
+                   int initial_state,
+                   double check_interval)
     : _display_name{display_name},
       _check_command{check_command},
-      _initial_state{initial_state} {}
+      _initial_state{initial_state},
+      _check_interval{check_interval} {
+  if (check_interval < 0) {
+    logger(log_config_error, basic)
+        << "Error: Invalid check_interval value for notifier '" << display_name
+        << "'";
+    throw engine_error() << "Could not register notifier '" << display_name
+                         << "'";
+  }
+}
 
 std::string const& notifier::get_display_name() const {
   return _display_name;
@@ -50,4 +63,12 @@ int notifier::get_initial_state() const {
 
 void notifier::set_initial_state(int initial_state) {
   _initial_state = initial_state;
+}
+
+double notifier::get_check_interval() const {
+  return _check_interval;
+}
+
+void notifier::set_check_interval(double check_interval) {
+  _check_interval = check_interval;
 }

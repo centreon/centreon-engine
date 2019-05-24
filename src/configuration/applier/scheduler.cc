@@ -710,7 +710,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
     engine::service& svc(*it->second);
 
     bool schedule_check(true);
-    if (!svc.check_interval || !svc.checks_enabled)
+    if (!svc.get_check_interval() || !svc.checks_enabled)
       schedule_check = false;
 
     {
@@ -732,7 +732,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
       svc.should_be_scheduled = true;
       ++scheduling_info.total_scheduled_services;
       scheduling_info.service_check_interval_total
-        += static_cast<unsigned long>(svc.check_interval);
+        += static_cast<unsigned long>(svc.get_check_interval());
     }
     else {
       svc.should_be_scheduled = false;

@@ -385,9 +385,7 @@ void applier::service::modify_object(
     s->event_handler_enabled,
     static_cast<int>(obj.event_handler_enabled()));
   s->set_initial_state(obj.initial_state());
-  modify_if_different(
-    s->check_interval,
-    static_cast<double>(obj.check_interval()));
+  s->set_check_interval(obj.check_interval());
   modify_if_different(
     s->retry_interval,
     static_cast<double>(obj.retry_interval()));
@@ -680,7 +678,7 @@ void applier::service::resolve_object(
     hst->second->set_total_services(hst->second->get_total_services() + 1);
     hst->second->set_total_service_check_interval(
       hst->second->get_total_service_check_interval() +
-      static_cast<unsigned long>(it->second->check_interval));
+      static_cast<unsigned long>(it->second->get_check_interval()));
   }
 
   // Resolve service.

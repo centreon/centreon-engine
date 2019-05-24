@@ -118,8 +118,6 @@ class                 host : public notifier {
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  double             get_check_interval() const;
-  void               set_check_interval(double check_interval);
   double             get_retry_interval() const;
   void               set_retry_interval(double retry_interval);
   int                get_max_attempts() const;
@@ -341,7 +339,6 @@ private:
   std::string         _name;
   std::string         _alias;
   std::string         _address;
-  double              _check_interval;
   double              _retry_interval;
   int                 _max_attempts;
   std::string         _event_handler;

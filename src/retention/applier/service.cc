@@ -230,7 +230,7 @@ void applier::service::_update(
 
     if (state.normal_check_interval().is_set()
         && (obj.modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL))
-      obj.check_interval = *state.normal_check_interval();
+      obj.set_check_interval(*state.normal_check_interval());
 
     if (state.retry_check_interval().is_set()
         && (obj.modified_attributes & MODATTR_RETRY_CHECK_INTERVAL))

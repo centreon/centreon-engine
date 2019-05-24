@@ -180,7 +180,7 @@ int pre_flight_check() {
       it->second->set_total_services(it->second->get_total_services() + 1);
       it->second->set_total_service_check_interval(
         it->second->get_total_service_check_interval()
-        + static_cast<unsigned long>(temp_service->check_interval));
+        + static_cast<unsigned long>(temp_service->get_check_interval()));
     }
   }
 
@@ -836,7 +836,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   // See if the notification interval is less than the check interval.
   if (svc->notifications_enabled
       && svc->notification_interval
-      && (svc->notification_interval < svc->check_interval)) {
+      && (svc->notification_interval < svc->get_check_interval())) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->get_description() << "' on host '"
       << svc->get_hostname() << "'  has a notification interval less than "

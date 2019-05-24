@@ -1692,15 +1692,15 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
   case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
     /* save the old check interval */
-    old_dval = temp_service->check_interval;
+    old_dval = temp_service->get_check_interval();
 
     /* modify the check interval */
-    temp_service->check_interval = dval;
+    temp_service->set_check_interval(dval);
     attr = MODATTR_NORMAL_CHECK_INTERVAL;
 
     /* schedule a service check if previous interval was 0 (checks were not regularly scheduled) */
     if (old_dval == 0 && temp_service->checks_enabled
-        && temp_service->check_interval != 0) {
+        && temp_service->get_check_interval() != 0) {
 
       /* set the service check flag */
       temp_service->should_be_scheduled = true;
@@ -2398,7 +2398,7 @@ void enable_service_checks(com::centreon::engine::service* svc) {
   svc->should_be_scheduled = true;
 
   /* services with no check intervals don't get checked */
-  if (svc->check_interval == 0)
+  if (svc->get_check_interval() == 0)
     svc->should_be_scheduled = false;
 
   /* schedule a check for right now (or as soon as possible) */

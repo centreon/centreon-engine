@@ -168,7 +168,7 @@ host::host(uint64_t host_id,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_host)
-    : notifier{!display_name.empty() ? display_name : name, check_command, initial_state} {
+    : notifier{!display_name.empty() ? display_name : name, check_command, initial_state, check_interval} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -182,11 +182,6 @@ host::host(uint64_t host_id,
   if (max_attempts <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid max_check_attempts value for host '" << name << "'";
-    throw(engine_error() << "Could not register host '" << name << "'");
-  }
-  if (check_interval < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid check_interval value for host '" << name << "'";
     throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (notification_interval < 0) {
@@ -239,7 +234,6 @@ host::host(uint64_t host_id,
 
   _accept_passive_host_checks = (accept_passive_checks > 0);
   _check_freshness = (check_freshness > 0);
-  _check_interval = check_interval;
   _checks_enabled = (checks_enabled > 0);
   _current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
   _current_state = initial_state;
@@ -340,14 +334,6 @@ std::string const& host::get_address() const {
 
 void host::set_address(std::string const& address) {
   _address = address;
-}
-
-double host::get_check_interval() const {
-  return _check_interval;
-}
-
-void host::set_check_interval(double check_interval) {
-  _check_interval = check_interval;
 }
 
 double host::get_retry_interval() const {

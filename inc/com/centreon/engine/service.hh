@@ -47,7 +47,8 @@ class                           service : public notifier {
                                         std::string const& description,
                                         std::string const& display_name,
                                         std::string const& check_command,
-                                        int initial_state);
+                                        int initial_state,
+                                        double check_interval);
   virtual                       ~service() override;
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
@@ -55,7 +56,6 @@ class                           service : public notifier {
   std::string const&            get_description() const;
 
   char*                         event_handler;
-  double                        check_interval;
   double                        retry_interval;
   int                           max_attempts;
   int                           parallelize;

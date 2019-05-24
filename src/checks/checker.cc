@@ -574,7 +574,7 @@ void checker::run(
   if (NEBERROR_CALLBACKCANCEL == res) {
     if (preferred_time != NULL)
       *preferred_time += static_cast<time_t>(
-                           svc->check_interval
+                           svc->get_check_interval()
                            * config->interval_length());
     throw (engine_error()
            << "Some broker module cancelled check of service '"

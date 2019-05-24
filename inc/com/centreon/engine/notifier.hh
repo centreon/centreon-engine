@@ -28,7 +28,8 @@ class                         notifier {
  public:
                               notifier(std::string const& display_name,
                                        std::string const& check_command,
-                                       int initial_state);
+                                       int initial_state,
+                                       double check_interval);
   virtual                     ~notifier() {};
 
   std::string const&          get_display_name() const;
@@ -38,11 +39,14 @@ class                         notifier {
                                 std::string const& check_command);
   int                         get_initial_state() const;
   void                        set_initial_state(int initial_state);
+  double                      get_check_interval() const;
+  void                        set_check_interval(double check_interval);
 
  protected:
   std::string                 _display_name;
   std::string                 _check_command;
   int                         _initial_state;
+  double                      _check_interval;
 
 };
 CCE_END()

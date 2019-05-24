@@ -42,8 +42,9 @@ service::service(std::string const& hostname,
                  std::string const& description,
                  std::string const& display_name,
                  std::string const& check_command,
-                 int initial_state)
-    : notifier{display_name, check_command, initial_state},
+                 int initial_state,
+                 double check_interval)
+    : notifier{display_name, check_command, initial_state, check_interval},
       _hostname{hostname},
       _description{description} {}
 
@@ -98,7 +99,7 @@ bool operator==(
           && obj1.get_check_command() == obj2.get_check_command()
           && is_equal(obj1.event_handler, obj2.event_handler)
           && obj1.get_initial_state() == obj2.get_initial_state()
-          && obj1.check_interval == obj2.check_interval
+          && obj1.get_check_interval() == obj2.get_check_interval()
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
           && obj1.parallelize == obj2.parallelize
@@ -264,7 +265,7 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const&
     "  service_check_command:                " << obj.get_check_command() << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
     "  initial_state:                        " << obj.get_initial_state() << "\n"
-    "  check_interval:                       " << obj.check_interval << "\n"
+    "  check_interval:                       " << obj.get_check_interval() << "\n"
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  parallelize:                          " << obj.parallelize << "\n"
@@ -574,7 +575,7 @@ com::centreon::engine::service* add_service(
   // Allocate memory.
   std::shared_ptr<service> obj{new service(
       host_name, description, display_name ? display_name : description,
-      check_command, initial_state)};
+      check_command, initial_state, check_interval)};
 
   try {
     // Duplicate vars.
@@ -598,7 +599,6 @@ com::centreon::engine::service* add_service(
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_freshness = (check_freshness > 0);
-    obj->check_interval = check_interval;
     obj->check_options = CHECK_OPTION_NONE;
     obj->check_type = SERVICE_CHECK_ACTIVE;
     obj->checks_enabled = (checks_enabled > 0);

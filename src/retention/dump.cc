@@ -431,7 +431,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "max_attempts=" << obj.max_attempts << "\n"
     "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
-    "normal_check_interval=" << obj.check_interval << "\n"
+    "normal_check_interval=" << obj.get_check_interval() << "\n"
     "notification_period=" << (obj.notification_period ? obj.notification_period : "") << "\n"
     "notifications_enabled=" << obj.notifications_enabled << "\n"
     "notified_on_critical=" << obj.notified_on_critical << "\n"
