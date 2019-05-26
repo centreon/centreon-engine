@@ -1610,7 +1610,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        */
       /* this should be done before a notification is sent out to ensure the
        * host didn't just start flapping */
-      check_for_service_flapping(true, true);
+      check_for_flapping(true, true);
       temp_host->check_for_flapping(true, false, true);
       flapping_check_done = true;
 
@@ -1971,7 +1971,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        */
       /* this should be done before a notification is sent out to ensure the
        * host didn't just start flapping */
-      check_for_service_flapping(true, true);
+      check_for_flapping(true, true);
       temp_host->check_for_flapping(true, false, true);
       flapping_check_done = true;
 
@@ -2075,7 +2075,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /* check to see if the service and/or associate host is flapping */
   if (!flapping_check_done) {
-    check_for_service_flapping(true, true);
+    check_for_flapping(true, true);
     temp_host->check_for_flapping(true, false, true);
   }
 
@@ -2146,7 +2146,7 @@ int service::log_event() {
 
 // int service::get_check_viability(...)  << check_service_check_viability()
 /* detects service flapping */
-void service::check_for_service_flapping(int update,
+void service::check_for_flapping(int update,
                                          int allow_flapstart_notification) {
   int update_history = true;
   int is_flapping = false;
@@ -2163,7 +2163,7 @@ void service::check_for_service_flapping(int update,
   /* large install tweaks skips all flap detection logic - including state
    * change calculation */
 
-  logger(dbg_functions, basic) << "check_for_service_flapping()";
+  logger(dbg_functions, basic) << "check_for_flapping()";
 
   logger(dbg_flapping, more)
       << "Checking service '" << get_description() << "' on host '"
@@ -2729,9 +2729,6 @@ void service::clear_flap(double percent_change,
                          double low_threshold) {
   logger(dbg_functions, basic) << "clear_service_flap()";
 
-  if (this == NULL)
-    return;
-
   logger(dbg_flapping, more)
       << "Service '" << this->get_description() << "' on host '"
       << this->get_hostname() << "' stopped flapping.";
@@ -2771,3 +2768,77 @@ void service::clear_flap(double percent_change,
   this->check_flapping_recovery_notification = false;
 }
 
+/* enables flap detection for a specific service */
+void service::enable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "enable_service_flap_detection()";
+
+  logger(dbg_flapping, more)
+    << "Enabling flap detection for service '" << this->get_description()
+    << "' on host '" << this->get_hostname() << "'.";
+
+  /* nothing to do... */
+  if (this->flap_detection_enabled)
+    return;
+
+  /* set the attribute modified flag */
+  this->modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  this->flap_detection_enabled = true;
+
+  /* send data to event broker */
+  broker_adaptive_service_data(
+    NEBTYPE_ADAPTIVESERVICE_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    this->modified_attributes,
+    NULL);
+
+  /* check for flapping */
+  check_for_flapping(false, true);
+
+  /* update service status */
+  update_service_status(this, false);
+}
+
+/* disables flap detection for a specific service */
+void service::disable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "disable_service_flap_detection()";
+
+  logger(dbg_flapping, more)
+    << "Disabling flap detection for service '" << get_description()
+    << "' on host '" << get_hostname() << "'.";
+
+  /* nothing to do... */
+  if (!this->flap_detection_enabled)
+    return;
+
+  /* set the attribute modified flag */
+  this->modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  this->flap_detection_enabled = false;
+
+  /* send data to event broker */
+  broker_adaptive_service_data(
+    NEBTYPE_ADAPTIVESERVICE_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    this->modified_attributes,
+    NULL);
+
+  /* handle the details... */
+  handle_service_flap_detection_disabled(this);
+}

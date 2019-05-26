@@ -302,9 +302,7 @@ static void _exec_event_expire_comment(timed_event* event) {
 static void _exec_event_expire_host_ack(timed_event* event) {
   logger(dbg_events, basic)
     << "** Expire Host Acknowledgement Event";
-  check_for_expired_acknowledgement(
-    static_cast<host*>(event->event_data));
-  return ;
+  static_cast<host*>(event->event_data)->check_for_expired_acknowledgement();
 }
 
 /**
@@ -673,7 +671,7 @@ void compensate_for_system_time_change(
       it->second->get_last_host_notification()));
 
     // update the status data.
-    update_host_status(it->second.get(), false);
+    it->second->update_status(false);
   }
 
   // adjust program timestamps.

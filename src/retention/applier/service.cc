@@ -304,7 +304,7 @@ void applier::service::_update(
     allow_flapstart_notification = !state.is_flapping();
 
     // check for flapping.
-    obj.check_for_service_flapping(
+    obj.check_for_flapping(
       false,
       allow_flapstart_notification);
 

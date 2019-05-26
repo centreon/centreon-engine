@@ -375,7 +375,7 @@ void loop::_dispatching() {
                             * config->interval_length())));
           temp_event->run_time = temp_host->get_next_check();
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
-          update_host_status(temp_host, false);
+          temp_host->update_status(false);
           run_event = false;
         }
       }

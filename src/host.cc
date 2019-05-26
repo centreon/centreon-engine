@@ -1685,30 +1685,6 @@ int number_of_total_parent_hosts(com::centreon::engine::host* hst) {
 }
 
 /**
- *  Check if acknowledgement on host expired.
- *
- *  @param[in] h  Target host.
- */
-void engine::check_for_expired_acknowledgement(com::centreon::engine::host* h) {
-  if (h->get_problem_has_been_acknowledged()) {
-    int acknowledgement_timeout(
-          host_other_props[h->get_name()].acknowledgement_timeout);
-    if (acknowledgement_timeout > 0) {
-      time_t last_ack(host_other_props[h->get_name()].last_acknowledgement);
-      time_t now(time(nullptr));
-      if (last_ack + acknowledgement_timeout >= now) {
-        logger(log_info_message, basic)
-          << "Acknowledgement of host '" << h->get_name() << "' just expired";
-        h->set_problem_has_been_acknowledged(false);
-        h->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
-        update_host_status(h, false);
-      }
-    }
-  }
-  return ;
-}
-
-/**
  *  Get host by id.
  *
  *  @param[in] host_id The host id.
@@ -2208,7 +2184,7 @@ int host::run_scheduled_check(
     }
 
     /* update the status log */
-    update_host_status(this, false);
+    update_status(false);
 
     /* reschedule the next host check - unless we couldn't find a valid next check time */
     /* 10/19/07 EG - keep original check options */
@@ -2388,7 +2364,7 @@ void host::schedule_check(time_t check_time,
   }
 
   /* update the status log */
-  update_host_status(this, false);
+  update_status(false);
 }
 
 /* detects host flapping */
@@ -2688,3 +2664,111 @@ void host::clear_flap(
   /* clear the recovery notification flag */
   this->set_check_flapping_recovery_notification(false);
 }
+
+/* enables flap detection for a specific host */
+void host::enable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "enable_host_flap_detection()";
+
+  logger(dbg_flapping, more)
+    << "Enabling flap detection for host '" << this->get_name() << "'.";
+
+  /* nothing to do... */
+  if (get_flap_detection_enabled())
+    return;
+
+  /* set the attribute modified flag */
+  _modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  set_flap_detection_enabled(true);
+
+  /* send data to event broker */
+  broker_adaptive_host_data(
+    NEBTYPE_ADAPTIVEHOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    get_modified_attributes(),
+    NULL);
+
+  /* check for flapping */
+  this->check_for_flapping(false, false, true);
+
+  /* update host status */
+  update_status(false);
+}
+
+/* disables flap detection for a specific host */
+void host::disable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "disable_host_flap_detection()";
+
+  logger(dbg_functions, more)
+    << "Disabling flap detection for host '" << get_name() << "'.";
+
+  /* nothing to do... */
+  if (!this->get_flap_detection_enabled())
+    return;
+
+  /* set the attribute modified flag */
+  _modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  set_flap_detection_enabled(false);
+
+  /* send data to event broker */
+  broker_adaptive_host_data(
+    NEBTYPE_ADAPTIVEHOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    this->get_modified_attributes(),
+    NULL);
+
+  /* handle the details... */
+  handle_host_flap_detection_disabled(this);
+}
+
+/* updates host status info */
+void host::update_status(bool aggregated_dump) {
+  /* send data to event broker (non-aggregated dumps only) */
+  if (!aggregated_dump)
+    broker_host_status(
+      NEBTYPE_HOSTSTATUS_UPDATE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      this,
+      nullptr);
+}
+
+/**
+ *  Check if acknowledgement on host expired.
+ *
+ */
+void host::check_for_expired_acknowledgement() {
+  if (get_problem_has_been_acknowledged()) {
+    int acknowledgement_timeout(
+          host_other_props[get_name()].acknowledgement_timeout);
+    if (acknowledgement_timeout > 0) {
+      time_t last_ack(host_other_props[get_name()].last_acknowledgement);
+      time_t now(time(nullptr));
+      if (last_ack + acknowledgement_timeout >= now) {
+        logger(log_info_message, basic)
+          << "Acknowledgement of host '" << get_name() << "' just expired";
+        set_problem_has_been_acknowledged(false);
+        set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+        update_status(false);
+      }
+    }
+  }
+}
+

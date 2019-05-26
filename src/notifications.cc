@@ -1739,7 +1739,7 @@ int host_notification(
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 
   /* clear volatile macros */
   clear_volatile_macros_r(&mac);

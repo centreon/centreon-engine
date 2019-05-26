@@ -165,7 +165,7 @@ int host_downtime::unschedule() {
       nullptr);
 
     hst->set_scheduled_downtime_depth(hst->get_scheduled_downtime_depth() - 1);
-    update_host_status(hst, false);
+    hst->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
     if (hst->get_scheduled_downtime_depth() == 0) {
@@ -390,7 +390,7 @@ int host_downtime::handle() {
       }
 
     /* update the status data */
-      update_host_status(hst, false);
+      hst->update_status(false);
 
     /* decrement pending flex downtime if necessary */
     if (!is_fixed()
@@ -478,7 +478,7 @@ int host_downtime::handle() {
     _set_in_effect(true);
 
     /* update the status data */
-    update_host_status(hst, false);
+    hst->update_status(false);
 
     /* schedule an event */
     if (!is_fixed())

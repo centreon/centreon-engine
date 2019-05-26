@@ -63,7 +63,7 @@ class                           service : public notifier {
   int                           handle_async_check_result(
                                   check_result* queued_check_result);
   int                           log_event();
-  void                          check_for_service_flapping(
+  void                          check_for_flapping(
                                               int update,
                                               int allow_flapstart_notification);
   int                           handle_service_event();
@@ -78,14 +78,16 @@ class                           service : public notifier {
                                                 time_t* preferred_time);
   void                          schedule_check(time_t check_time,
                                                int options);
-  void set_flap(double percent_change,
-                double high_threshold,
-                double low_threshold,
-                int allow_flapstart_notification);
+  void                          set_flap(double percent_change,
+                                         double high_threshold,
+                                         double low_threshold,
+                                         int allow_flapstart_notification);
   // handles a service that has stopped flapping
-  void clear_flap(double percent_change,
-                  double high_threshold,
-                  double low_threshold);
+  void                          clear_flap(double percent_change,
+                                           double high_threshold,
+                                           double low_threshold);
+  void                          enable_flap_detection();
+  void                          disable_flap_detection();
 
   char*                         event_handler;
   int                           max_attempts;

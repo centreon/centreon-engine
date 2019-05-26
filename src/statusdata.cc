@@ -75,20 +75,6 @@ int update_program_status(int aggregated_dump) {
   return OK;
 }
 
-/* updates host status info */
-int update_host_status(com::centreon::engine::host* hst,
-                       int aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == false)
-    broker_host_status(
-      NEBTYPE_HOSTSTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      hst,
-      NULL);
-  return OK;
-}
-
 /* updates service status info */
 int update_service_status(com::centreon::engine::service* svc, int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */

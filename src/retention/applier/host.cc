@@ -318,5 +318,5 @@ void applier::host::_update(
     host_other_props[obj.get_name()].recovery_been_sent = *state.recovery_been_sent();
 
   // update host status.
-  update_host_status(&obj, false);
+  obj.update_status(false);
 }

@@ -1389,7 +1389,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
 
   /* update host status - for both active (scheduled) and passive
    * (non-scheduled) hosts */
-  update_host_status(hst, false);
+  hst->update_status(false);
 
   /* run async checks of all hosts we added above */
   /* don't run a check if one is already executing or we can get by with a

@@ -185,7 +185,7 @@ void adjust_check_scheduling() {
     if (tmp->event_type == EVENT_HOST_CHECK) {
       tmp->run_time = new_run_time;
       hst->set_next_check(new_run_time);
-      update_host_status(hst, false);
+      hst->update_status(false);
     }
     else {
       tmp->run_time = new_run_time;

@@ -32,16 +32,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
-/******************** FLAP DETECTION FUNCTIONS ********************/
-/******************************************************************/
-
-/******************************************************************/
-/********************* FLAP HANDLING FUNCTIONS ********************/
-/******************************************************************/
-
-/* handles a service that is flapping */
-/* handles a host that is flapping */
-/******************************************************************/
 /***************** FLAP DETECTION STATUS FUNCTIONS ****************/
 /******************************************************************/
 
@@ -89,7 +79,7 @@ void enable_flap_detection_routines() {
   for (temp_service = service_list;
        temp_service != NULL;
        temp_service = temp_service->next)
-    temp_service->check_for_service_flapping(false, true);
+    temp_service->check_for_flapping(false, true);
 }
 
 /* disables flap detection on a program wide basis */
@@ -137,87 +127,6 @@ void disable_flap_detection_routines() {
        temp_service != NULL;
        temp_service = temp_service->next)
     handle_service_flap_detection_disabled(temp_service);
-  return;
-}
-
-/* enables flap detection for a specific host */
-void enable_host_flap_detection(com::centreon::engine::host* hst) {
-  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
-
-  logger(dbg_functions, basic)
-    << "enable_host_flap_detection()";
-
-  if (hst == NULL)
-    return;
-
-  logger(dbg_flapping, more)
-    << "Enabling flap detection for host '" << hst->get_name() << "'.";
-
-  /* nothing to do... */
-  if (hst->get_flap_detection_enabled())
-    return;
-
-  /* set the attribute modified flag */
-  hst->set_modified_attributes(hst->get_modified_attributes() | attr);
-
-  /* set the flap detection enabled flag */
-  hst->set_flap_detection_enabled(true);
-
-  /* send data to event broker */
-  broker_adaptive_host_data(
-    NEBTYPE_ADAPTIVEHOST_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    hst,
-    CMD_NONE,
-    attr,
-    hst->get_modified_attributes(),
-    NULL);
-
-  /* check for flapping */
-  hst->check_for_flapping(false, false, true);
-
-  /* update host status */
-  update_host_status(hst, false);
-  return;
-}
-
-/* disables flap detection for a specific host */
-void disable_host_flap_detection(com::centreon::engine::host* hst) {
-  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
-
-  logger(dbg_functions, basic)
-    << "disable_host_flap_detection()";
-
-  if (hst == NULL)
-    return;
-
-  logger(dbg_functions, more)
-    << "Disabling flap detection for host '" << hst->get_name() << "'.";
-
-  /* nothing to do... */
-  if (!hst->get_flap_detection_enabled())
-    return;
-
-  /* set the attribute modified flag */
-  hst->set_modified_attributes(hst->get_modified_attributes() | attr);
-
-  /* set the flap detection enabled flag */
-  hst->set_flap_detection_enabled(false);
-
-  /* send data to event broker */
-  broker_adaptive_host_data(
-    NEBTYPE_ADAPTIVEHOST_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    hst,
-    CMD_NONE,
-    attr,
-    hst->get_modified_attributes(),
-    NULL);
-
-  /* handle the details... */
-  handle_host_flap_detection_disabled(hst);
   return;
 }
 
@@ -278,90 +187,7 @@ void handle_host_flap_detection_disabled(com::centreon::engine::host* hst) {
   }
 
   /* update host status */
-  update_host_status(hst, false);
-  return;
-}
-
-/* enables flap detection for a specific service */
-void enable_service_flap_detection(com::centreon::engine::service* svc) {
-  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
-
-  logger(dbg_functions, basic)
-    << "enable_service_flap_detection()";
-
-  if (svc == NULL)
-    return;
-
-  logger(dbg_flapping, more)
-    << "Enabling flap detection for service '" << svc->get_description()
-    << "' on host '" << svc->get_hostname() << "'.";
-
-  /* nothing to do... */
-  if (svc->flap_detection_enabled)
-    return;
-
-  /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
-
-  /* set the flap detection enabled flag */
-  svc->flap_detection_enabled = true;
-
-  /* send data to event broker */
-  broker_adaptive_service_data(
-    NEBTYPE_ADAPTIVESERVICE_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    svc,
-    CMD_NONE,
-    attr,
-    svc->modified_attributes,
-    NULL);
-
-  /* check for flapping */
-  svc->check_for_service_flapping(false, true);
-
-  /* update service status */
-  update_service_status(svc, false);
-}
-
-/* disables flap detection for a specific service */
-void disable_service_flap_detection(com::centreon::engine::service* svc) {
-  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
-
-  logger(dbg_functions, basic)
-    << "disable_service_flap_detection()";
-
-  if (svc == NULL)
-    return;
-
-  logger(dbg_flapping, more)
-    << "Disabling flap detection for service '" << svc->get_description()
-    << "' on host '" << svc->get_hostname() << "'.";
-
-  /* nothing to do... */
-  if (!svc->flap_detection_enabled)
-    return;
-
-  /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
-
-  /* set the flap detection enabled flag */
-  svc->flap_detection_enabled = false;
-
-  /* send data to event broker */
-  broker_adaptive_service_data(
-    NEBTYPE_ADAPTIVESERVICE_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    svc,
-    CMD_NONE,
-    attr,
-    svc->modified_attributes,
-    NULL);
-
-  /* handle the details... */
-  handle_service_flap_detection_disabled(svc);
-  return;
+  hst->update_status(false);
 }
 
 /* handles the details for a service when flap detection is disabled (globally or per-service) */

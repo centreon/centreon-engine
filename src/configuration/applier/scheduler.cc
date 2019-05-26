@@ -964,7 +964,7 @@ void applier::scheduler::_schedule_host_events(
     com::centreon::engine::host& hst(*hosts[i]);
 
     // update status of all hosts (scheduled or not).
-    update_host_status(&hst, false);
+    hst.update_status(false);
 
     // skip most hosts that shouldn't be scheduled.
     if (!hst.get_should_be_scheduled()) {

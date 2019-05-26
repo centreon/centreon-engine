@@ -136,6 +136,10 @@ class                 host : public notifier {
   void               clear_flap(double percent_change,
                                 double high_threshold,
                                 double low_threshold);
+  void               enable_flap_detection();
+  void               disable_flap_detection();
+  void               update_status(bool aggregated_dump);
+  void               check_for_expired_acknowledgement();
 
   // setters / getters
   std::string const& get_name() const;

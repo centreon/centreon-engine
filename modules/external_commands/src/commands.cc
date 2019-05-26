@@ -1808,7 +1808,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the host info */
-    update_host_status(temp_host, false);
+    temp_host->update_status(false);
     break;
 
   case CMD_CHANGE_CONTACT_MODATTR:
@@ -2164,7 +2164,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the host info */
-    update_host_status(temp_host, false);
+    temp_host->update_status(false);
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
@@ -2266,7 +2266,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       /* set the modified attributes and update the status of the object */
       temp_host->set_modified_attributes(
         temp_host->get_modified_attributes() | MODATTR_CUSTOM_VARIABLE);
-      update_host_status(temp_host, false);
+      temp_host->update_status(false);
     }
     break;
   case CMD_CHANGE_CUSTOM_SVC_VAR:
@@ -2579,7 +2579,7 @@ void enable_host_notifications(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log to reflect the new host state */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables notifications for a host */
@@ -2609,7 +2609,7 @@ void disable_host_notifications(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log to reflect the new host state */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* enables notifications for all hosts and services "beyond" a given host */
@@ -2954,7 +2954,7 @@ void acknowledge_host_problem(
       NOTIFICATION_OPTION_NONE);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com =
@@ -3047,7 +3047,7 @@ void remove_host_acknowledgement(com::centreon::engine::host* hst) {
   hst->set_problem_has_been_acknowledged(false);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
   comment::delete_host_acknowledgement_comments(hst);
@@ -3389,7 +3389,7 @@ void enable_passive_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables passive host checks for a particular host */
@@ -3419,7 +3419,7 @@ void disable_passive_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* enables event handlers on a program-wide basis */
@@ -3569,7 +3569,7 @@ void enable_host_event_handler(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables the event handler for a particular host */
@@ -3599,7 +3599,7 @@ void disable_host_event_handler(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables checks of a particular host */
@@ -3630,7 +3630,7 @@ void disable_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* enables checks of a particular host */
@@ -3680,7 +3680,7 @@ void enable_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* start obsessing over service check results */
@@ -4067,7 +4067,7 @@ void start_obsessing_over_host(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* stop obsessing over a particular host */
@@ -4097,7 +4097,7 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* sets the current notification number for a specific host */
@@ -4106,7 +4106,7 @@ void set_host_notification_number(com::centreon::engine::host* hst, int num) {
   hst->set_current_notification_number(num);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* sets the current notification number for a specific service */
