@@ -398,8 +398,7 @@ int cmd_schedule_check(int cmd, char* args) {
   /* schedule the host check */
   if (cmd == CMD_SCHEDULE_HOST_CHECK
       || cmd == CMD_SCHEDULE_FORCED_HOST_CHECK)
-    schedule_host_check(
-      temp_host,
+    temp_host->schedule_check(
       delay_time,
       (cmd == CMD_SCHEDULE_FORCED_HOST_CHECK)
       ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
@@ -412,15 +411,15 @@ int cmd_schedule_check(int cmd, char* args) {
          temp_servicesmember = temp_servicesmember->next) {
       if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
         continue;
-      schedule_service_check(
-        temp_service, delay_time,
+      temp_service->schedule_check(
+        delay_time,
         (cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS)
         ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
     }
   }
   else
-    schedule_service_check(
-      temp_service, delay_time,
+    temp_service->schedule_check(
+      delay_time,
       (cmd == CMD_SCHEDULE_FORCED_SVC_CHECK)
       ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
 
@@ -462,8 +461,7 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
        temp_servicesmember = temp_servicesmember->next) {
     if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
       continue;
-    schedule_service_check(
-      temp_service,
+    temp_service->schedule_check(
       delay_time,
       (force) ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
   }
@@ -1670,7 +1668,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* schedule a check if we should */
       if (temp_host->get_should_be_scheduled())
-        schedule_host_check(temp_host, temp_host->get_next_check(), CHECK_OPTION_NONE);
+        temp_host->schedule_check(temp_host->get_next_check(), CHECK_OPTION_NONE);
     }
     break;
 
@@ -1721,12 +1719,12 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* schedule a check if we should */
       if (temp_service->should_be_scheduled)
-        schedule_service_check(temp_service, temp_service->next_check, CHECK_OPTION_NONE);
+        temp_service->schedule_check(temp_service->next_check, CHECK_OPTION_NONE);
     }
     break;
 
   case CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL:
-    temp_service->retry_interval = dval;
+    temp_service->set_retry_interval(dval);
     attr = MODATTR_RETRY_CHECK_INTERVAL;
     break;
 
@@ -2417,7 +2415,7 @@ void enable_service_checks(com::centreon::engine::service* svc) {
 
   /* schedule a check if we should */
   if (svc->should_be_scheduled)
-    schedule_service_check(svc, svc->next_check, CHECK_OPTION_NONE);
+    svc->schedule_check(svc->next_check, CHECK_OPTION_NONE);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -3668,7 +3666,7 @@ void enable_host_checks(com::centreon::engine::host* hst) {
 
   /* schedule a check if we should */
   if (hst->get_should_be_scheduled())
-    schedule_host_check(hst, hst->get_next_check(), CHECK_OPTION_NONE);
+    hst->schedule_check(hst->get_next_check(), CHECK_OPTION_NONE);
 
   /* send data to event broker */
   broker_adaptive_host_data(

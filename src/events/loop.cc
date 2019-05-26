@@ -313,17 +313,17 @@ void loop::_dispatching() {
           // Otherwise reschedule (TODO: This should be smarter as it
           // doesn't consider its timeperiod).
           else {
-            if ((SOFT_STATE == temp_service->state_type)
-                && (temp_service->current_state != STATE_OK))
-              temp_service->next_check
-                = (time_t)(temp_service->next_check
-                           + (temp_service->retry_interval
-                              * config->interval_length()));
+            if (SOFT_STATE == temp_service->state_type &&
+                temp_service->current_state != STATE_OK)
+              temp_service->next_check =
+                  (time_t)(temp_service->next_check +
+                           temp_service->get_retry_interval() *
+                               config->interval_length());
             else
-              temp_service->next_check
-                = (time_t)(temp_service->next_check
-                           + (temp_service->get_check_interval()
-                              * config->interval_length()));
+              temp_service->next_check =
+                  (time_t)(temp_service->next_check +
+                           (temp_service->get_check_interval() *
+                            config->interval_length()));
           }
           temp_event->run_time = temp_service->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);

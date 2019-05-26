@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdint>
 #include <climits>
 #include <cstddef>
 #include "globals.h"

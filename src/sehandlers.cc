@@ -41,104 +41,6 @@ using namespace com::centreon::engine::logging;
 /************* OBSESSIVE COMPULSIVE HANDLER FUNCTIONS *************/
 /******************************************************************/
 
-/* handles service check results in an obsessive compulsive manner... */
-int obsessive_compulsive_service_check_processor(com::centreon::engine::service* svc) {
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  com::centreon::engine::host* temp_host = NULL;
-  int early_timeout = false;
-  double exectime = 0.0;
-  int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
-  nagios_macros mac;
-
-  logger(dbg_functions, basic)
-    << "obsessive_compulsive_service_check_processor()";
-
-  if (svc == NULL)
-    return (ERROR);
-
-  /* bail out if we shouldn't be obsessing */
-  if (config->obsess_over_services() == false)
-    return (OK);
-  if (svc->obsess_over_service == false)
-    return (OK);
-
-  /* if there is no valid command, exit */
-  if (config->ocsp_command().empty())
-    return (ERROR);
-
-  /* find the associated host */
-  if ((temp_host = (com::centreon::engine::host*) svc->host_ptr) == NULL)
-    return (ERROR);
-
-  /* update service macros */
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, temp_host);
-  grab_service_macros_r(&mac, svc);
-
-  /* get the raw command line */
-  get_raw_command_line_r(
-    &mac,
-    ocsp_command_ptr,
-    config->ocsp_command().c_str(),
-    &raw_command, macro_options);
-  if (raw_command == NULL) {
-    clear_volatile_macros_r(&mac);
-    return (ERROR);
-  }
-
-  logger(dbg_checks, most)
-    << "Raw obsessive compulsive service processor "
-    "command line: " << raw_command;
-
-  /* process any macros in the raw command line */
-  process_macros_r(
-    &mac,
-    raw_command,
-    &processed_command,
-    macro_options);
-  if (processed_command == NULL) {
-    clear_volatile_macros_r(&mac);
-    return (ERROR);
-  }
-
-  logger(dbg_checks, most)
-    << "Processed obsessive compulsive service "
-    "processor command line: " << processed_command;
-
-  /* run the command */
-  try {
-      my_system_r(
-      &mac,
-      processed_command,
-      config->ocsp_timeout(),
-      &early_timeout,
-      &exectime,
-      NULL,
-      0);
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
-      << "Error: can't execute compulsive service processor command line '"
-      << processed_command << "' : " << e.what();
-  }
-
-  clear_volatile_macros_r(&mac);
-
-  /* check to see if the command timed out */
-  if (early_timeout == true)
-    logger(log_runtime_warning, basic)
-      << "Warning: OCSP command '" << processed_command
-      << "' for service '" << svc->get_description() << "' on host '"
-      << svc->get_hostname() << "' timed out after "
-      << config->ocsp_timeout() << " seconds";
-
-  /* free memory */
-  delete[] raw_command;
-  delete[] processed_command;
-
-  return (OK);
-}
-
 /* handles host check results in an obsessive compulsive manner... */
 int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) {
   char* raw_command = NULL;
@@ -232,67 +134,6 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
 /******************************************************************/
 /**************** SERVICE EVENT HANDLER FUNCTIONS *****************/
 /******************************************************************/
-
-/* handles changes in the state of a service */
-int handle_service_event(com::centreon::engine::service* svc) {
-  com::centreon::engine::host* temp_host = NULL;
-  nagios_macros mac;
-
-  logger(dbg_functions, basic)
-    << "handle_service_event()";
-
-  if (svc == NULL)
-    return (ERROR);
-
-  /* send event data to broker */
-  broker_statechange_data(
-    NEBTYPE_STATECHANGE_END,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    SERVICE_STATECHANGE,
-    (void*)svc,
-    svc->current_state,
-    svc->state_type,
-    svc->current_attempt,
-    svc->max_attempts,
-    NULL);
-
-  /* bail out if we shouldn't be running event handlers */
-  if (config->enable_event_handlers() == false)
-    return (OK);
-  if (svc->event_handler_enabled == false)
-    return (OK);
-
-  /* find the host */
-  if ((temp_host = (com::centreon::engine::host*)svc->host_ptr) == NULL)
-    return (ERROR);
-
-  /* update service macros */
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, temp_host);
-  grab_service_macros_r(&mac, svc);
-
-  /* run the global service event handler */
-  run_global_service_event_handler(&mac, svc);
-
-  /* run the event handler command if there is one */
-  if (svc->event_handler != NULL)
-    run_service_event_handler(&mac, svc);
-  clear_volatile_macros_r(&mac);
-
-  /* send data to event broker */
-  broker_external_command(
-    NEBTYPE_EXTERNALCOMMAND_CHECK,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    time(NULL),
-    NULL,
-    NULL,
-    NULL);
-
-  return (OK);
-}
 
 /* runs the global service event handler */
 int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc) {
@@ -1093,7 +934,7 @@ int handle_host_state(com::centreon::engine::host* hst) {
     if (hst->get_state_type() == HARD_STATE
         || (hst->get_state_type() == SOFT_STATE
             && config->log_host_retries() == true))
-      log_host_event(hst);
+      hst->log_event();
 
     /* check for start of flexible (non-fixed) scheduled downtime */
     /* CHANGED 08-05-2010 EG flex downtime can now start on soft states */
@@ -1159,7 +1000,7 @@ int handle_host_state(com::centreon::engine::host* hst) {
     /* if we're in a soft state and we should log host retries, do so now... */
     if (hst->get_state_type() == SOFT_STATE
         && config->log_host_retries() == true)
-      log_host_event(hst);
+      hst->log_event();
   }
 
   return (OK);

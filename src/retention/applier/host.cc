@@ -298,8 +298,7 @@ void applier::host::_update(
     allow_flapstart_notification = !state.is_flapping();
 
     // check for flapping.
-    check_for_host_flapping(
-      &obj,
+    obj.check_for_flapping(
       false,
       false,
       allow_flapstart_notification);

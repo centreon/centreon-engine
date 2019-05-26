@@ -21,6 +21,7 @@
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/customvariable.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -28,7 +29,6 @@ extern int config_warnings;
 extern int config_errors;
 
 using namespace com::centreon;
-using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
@@ -672,7 +672,7 @@ bool service::contacts_defined() const throw () {
  *
  *  @return The customvariables.
  */
-map_customvar const& service::customvariables() const throw () {
+com::centreon::engine::map_customvar const& service::customvariables() const throw () {
   return _customvariables;
 }
 

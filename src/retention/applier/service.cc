@@ -234,7 +234,7 @@ void applier::service::_update(
 
     if (state.retry_check_interval().is_set()
         && (obj.modified_attributes & MODATTR_RETRY_CHECK_INTERVAL))
-      obj.retry_interval = *state.retry_check_interval();
+      obj.set_retry_interval(*state.retry_check_interval());
 
     if (state.max_attempts().is_set()
         && (obj.modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS)) {
@@ -304,8 +304,7 @@ void applier::service::_update(
     allow_flapstart_notification = !state.is_flapping();
 
     // check for flapping.
-    check_for_service_flapping(
-      &obj,
+    obj.check_for_service_flapping(
       false,
       allow_flapstart_notification);
 

@@ -321,7 +321,7 @@ int xsddefault_save_status_data() {
          "\tcheck_period=" << (svc->check_period ? svc->check_period : "") << "\n"
          "\tnotification_period=" << (svc->notification_period ? svc->notification_period : "") << "\n"
          "\tcheck_interval=" << svc->get_check_interval() << "\n"
-         "\tretry_interval=" << svc->retry_interval << "\n"
+         "\tretry_interval=" << svc->get_retry_interval() << "\n"
          "\tevent_handler=" << (svc->event_handler ? svc->event_handler : "") << "\n"
          "\thas_been_checked=" << svc->has_been_checked << "\n"
          "\tshould_be_scheduled=" << svc->should_be_scheduled << "\n"

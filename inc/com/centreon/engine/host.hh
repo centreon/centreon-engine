@@ -27,10 +27,12 @@
 #  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/logging.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/notifier.hh"
+#  include "com/centreon/engine/checks.hh"
 
 
 /* Forward declaration. */
@@ -53,6 +55,8 @@ typedef std::unordered_map<std::string,
 CCE_BEGIN()
 class                 host : public notifier {
  public:
+  static std::array<std::pair<uint32_t, std::string>, 3> const tab_host_states;
+
                       host(uint64_t host_id,
                            std::string const& name,
                            std::string const& display_name,
@@ -110,6 +114,28 @@ class                 host : public notifier {
 
   void               add_child_link(host* child);
   void               add_parent_host(std::string const& host_name);
+  int                log_event();
+  int                handle_async_check_result_3x(
+                       check_result* queued_check_result);
+  int                run_scheduled_check(int check_options, double latency);
+  int                run_async_check(int check_options,
+                                     double latency,
+                                     int scheduled_check,
+                                     int reschedule_check,
+                                     int* time_is_valid,
+                                     time_t* preferred_time);
+  void               schedule_check(time_t check_time,
+                                    int options);
+  void               check_for_flapping(int update,
+                                        int actual_check,
+                                        int allow_flapstart_notification);
+  void               set_flap(double percent_change,
+                              double high_threshold,
+                              double low_threshold,
+                              int allow_flapstart_notification);
+  void               clear_flap(double percent_change,
+                                double high_threshold,
+                                double low_threshold);
 
   // setters / getters
   std::string const& get_name() const;
@@ -118,8 +144,6 @@ class                 host : public notifier {
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  double             get_retry_interval() const;
-  void               set_retry_interval(double retry_interval);
   int                get_max_attempts() const;
   void               set_max_attempts(int max_attempts);
   std::string const& get_event_handler() const;
@@ -339,7 +363,6 @@ private:
   std::string         _name;
   std::string         _alias;
   std::string         _address;
-  double              _retry_interval;
   int                 _max_attempts;
   std::string         _event_handler;
   double              _notification_interval;
@@ -437,6 +460,7 @@ private:
   int                 _circular_path_checked;
   bool                _contains_circular_path;
 };
+
 CCE_END()
 
 /* Other HOST structure. */

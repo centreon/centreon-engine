@@ -27,42 +27,21 @@
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/file.hh"
 
 // using namespace com::centreon::engine;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 static const unsigned int BUFFER_SIZE = 4096;
-
-static char const* tab_state_type[] = {
-  "SOFT",
-  "HARD"
-};
 
 static char const* tab_initial_state[] = {
   "UNKNOWN",
   "INITIAL",
   "CURRENT"
-};
-
-static struct {
-  uint64_t id;
-  char const* str;
-} tab_host_states[] = {
-  { NSLOG_HOST_UP,          "UP"          },
-  { NSLOG_HOST_DOWN,        "DOWN"        },
-  { NSLOG_HOST_UNREACHABLE, "UNREACHABLE" }
-};
-
-static struct {
-  uint64_t id;
-  char const* str;
-} tab_service_states[] = {
-  { NSLOG_SERVICE_OK,       "OK"       },
-  { NSLOG_SERVICE_WARNING,  "WARNING"  },
-  { NSLOG_SERVICE_CRITICAL, "CRITICAL" }
 };
 
 /**
@@ -180,70 +159,6 @@ int write_to_syslog(char const* buffer, unsigned long type) {
 }
 
 /**
- *  Log service event information.
- *  This function has been DEPRECATED.
- *
- *  @param[in] svc The service to log.
- *
- *  @return Return true on success.
- */
-int log_service_event(com::centreon::engine::service const* svc) {
-  if (svc->state_type == SOFT_STATE
-      && !config->log_service_retries())
-    return OK;
-
-  if (!svc->host_ptr)
-    return ERROR;
-
-  unsigned long log_options(NSLOG_SERVICE_UNKNOWN);
-  char const* state("UNKNOWN");
-  if (svc->current_state >= 0
-      && (unsigned int)svc->current_state
-      < sizeof(tab_service_states) / sizeof(*tab_service_states)) {
-    log_options = tab_service_states[svc->current_state].id;
-    state = tab_service_states[svc->current_state].str;
-  }
-  char const* state_type(tab_state_type[svc->state_type]);
-  char const* output(svc->plugin_output ? svc->plugin_output : "");
-
-  logger(log_options, basic)
-    << "SERVICE ALERT: " << svc->get_hostname() << ";" << svc->get_description()
-    << ";" << state << ";" << state_type << ";" << svc->current_attempt
-    << ";" << output;
-  return OK;
-}
-
-/**
- *  Log host event information.
- *  This function has been DEPRECATED.
- *
- *  @param[in] hst The host to log.
- *
- *  @return Return true on success.
- */
-int log_host_event(com::centreon::engine::host const* hst) {
-  if (!hst)
-    return ERROR;
-
-  unsigned long log_options(NSLOG_HOST_UP);
-  char const* state("UP");
-  if (hst->get_current_state() > 0
-      && (unsigned int)hst->get_current_state()
-      < sizeof(tab_host_states) / sizeof(*tab_host_states)) {
-    log_options = tab_host_states[hst->get_current_state()].id;
-    state = tab_host_states[hst->get_current_state()].str;
-  }
-  char const* state_type(tab_state_type[hst->get_state_type()]);
-
-  logger(log_options, basic)
-    << "HOST ALERT: " << hst->get_name() << ";" << state << ";"
-    << state_type << ";" << hst->get_current_attempt() << ";"
-    << hst->get_plugin_output();
-
-  return OK;
-}
-
-/**
  *  Log host state information.
  *
  *  @param[in] type  State logging type.
@@ -252,11 +167,10 @@ int log_host_event(com::centreon::engine::host const* hst) {
 void log_host_state(unsigned int type, com::centreon::engine::host* hst) {
   char const* type_str(tab_initial_state[type]);
   char const* state("UP");
-  if ((hst->get_current_state() > 0)
-      && ((unsigned int)hst->get_current_state()
-          < sizeof(tab_host_states) / sizeof(*tab_host_states)))
-    state = tab_host_states[hst->get_current_state()].str;
-  char const* state_type(tab_state_type[hst->get_state_type()]);
+  if (hst->get_current_state() > 0
+      && (unsigned int)hst->get_current_state() < host::tab_host_states.size())
+    state = host::tab_host_states[hst->get_current_state()].second.c_str();
+  std::string const& state_type{host::tab_state_type[hst->get_state_type()]};
   logger(log_info_message, basic)
     << type_str << " HOST STATE: " << hst->get_name() << ";" << state
     << ";" << state_type << ";" << hst->get_current_attempt() << ";"
@@ -292,11 +206,10 @@ int log_host_states(unsigned int type, time_t* timestamp) {
 void log_service_state(unsigned int type, com::centreon::engine::service* svc) {
   char const* type_str(tab_initial_state[type]);
   char const* state("UNKNOWN");
-  if ((svc->current_state >= 0)
-      && ((unsigned int)svc->current_state
-          < sizeof(tab_service_states) / sizeof(*tab_service_states)))
-    state = tab_service_states[svc->current_state].str;
-  char const* state_type(tab_state_type[svc->state_type]);
+  if (svc->current_state >= 0
+      && (unsigned int)svc->current_state < service::tab_service_states.size())
+    state = service::tab_service_states[svc->current_state].second.c_str();
+  std::string const& state_type(service::tab_state_type[svc->state_type]);
   char const* output(svc->plugin_output ? svc->plugin_output : "");
   logger(log_info_message, basic)
     << type_str << " SERVICE STATE: " << svc->get_hostname() << ";"

@@ -56,7 +56,7 @@ static void _exec_event_service_check(timed_event* event) {
     << event->event_options << ", Latency: " << latency << " sec";
 
   // run the service check.
-  run_scheduled_service_check(svc, event->event_options, latency);
+  svc->run_scheduled_check(event->event_options, latency);
 }
 
 /**

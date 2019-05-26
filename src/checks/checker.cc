@@ -172,7 +172,7 @@ void checker::reap() {
             << "Handling check result for service '"
             << result.service_description << "' on host '"
             << result.host_name << "'...";
-          handle_async_service_check_result(&svc, &result);
+          svc.handle_async_check_result(&result);
         }
         catch (std::exception const& e) {
           logger(log_runtime_warning, basic)
@@ -191,7 +191,7 @@ void checker::reap() {
           logger(dbg_checks, more)
             << "Handling check result for host '"
             << result.host_name << "'...";
-          handle_async_host_check_result_3x(&hst, &result);
+          hst.handle_async_check_result_3x(&result);
         }
         catch (std::exception const& e) {
           // Check if the host exists.

@@ -24,20 +24,36 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
+std::array<std::string, 2> const notifier::tab_state_type {{
+  "SOFT",
+  "HARD"
+}};
+
 notifier::notifier(std::string const& display_name,
                    std::string const& check_command,
                    int initial_state,
-                   double check_interval)
+                   double check_interval,
+                   double retry_interval)
     : _display_name{display_name},
       _check_command{check_command},
       _initial_state{initial_state},
-      _check_interval{check_interval} {
+      _check_interval{check_interval},
+      _retry_interval{retry_interval} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
         << "'";
     throw engine_error() << "Could not register notifier '" << display_name
                          << "'";
+  }
+
+  if (check_interval < 0 || retry_interval <= 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid max_attempts, check_interval, retry_interval"
+         ", or notification_interval value for notifier '"
+      << display_name << "'";
+    throw engine_error() << "Could not register notifier '" << display_name
+      << "'";
   }
 }
 
@@ -72,3 +88,12 @@ double notifier::get_check_interval() const {
 void notifier::set_check_interval(double check_interval) {
   _check_interval = check_interval;
 }
+
+double notifier::get_retry_interval() const {
+  return _retry_interval;
+}
+
+void notifier::set_retry_interval(double retry_interval) {
+  _retry_interval = retry_interval;
+}
+

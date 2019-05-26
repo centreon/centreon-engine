@@ -20,16 +20,20 @@
 #ifndef CCE_NOTIFIER_HH
 # define CCE_NOTIFIER_HH
 
+# include <array>
 # include <string>
 # include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 class                         notifier {
  public:
+  static std::array<std::string, 2> const tab_state_type;
+
                               notifier(std::string const& display_name,
                                        std::string const& check_command,
                                        int initial_state,
-                                       double check_interval);
+                                       double check_interval,
+                                       double retry_interval);
   virtual                     ~notifier() {};
 
   std::string const&          get_display_name() const;
@@ -41,14 +45,18 @@ class                         notifier {
   void                        set_initial_state(int initial_state);
   double                      get_check_interval() const;
   void                        set_check_interval(double check_interval);
+  double                      get_retry_interval() const;
+  void                        set_retry_interval(double retry_interval);
 
  protected:
   std::string                 _display_name;
   std::string                 _check_command;
   int                         _initial_state;
   double                      _check_interval;
+  double                      _retry_interval;
 
 };
+
 CCE_END()
 
 #endif // !CCE_NOTIFIER_HH

@@ -444,7 +444,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"
     "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
     "process_performance_data=" << obj.process_performance_data << "\n"
-    "retry_check_interval=" << obj.retry_interval << "\n"
+    "retry_check_interval=" << obj.get_retry_interval() << "\n"
     "state_type=" << obj.state_type << "\n"
     "recovery_been_sent=" << service_other_props[
                                std::make_pair(hostname, obj.get_description())].recovery_been_sent << "\n";

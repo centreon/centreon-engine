@@ -21,9 +21,9 @@
 #ifndef CCE_CHECKS_HH
 #  define CCE_CHECKS_HH
 
+#  include <cstdio>
 #  include <sys/time.h>
-#  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/service.hh"
+#  include "com/centreon/engine/namespace.hh"
 
 // Service dependency values
 #  define DEPENDENCIES_OK     0
@@ -32,6 +32,11 @@
 // Object check types
 #  define SERVICE_CHECK       0
 #  define HOST_CHECK          1
+
+CCE_BEGIN()
+  class host;
+  class service;
+CCE_END()
 
 // CHECK_RESULT structure
 typedef struct                check_result_struct {
@@ -65,39 +70,11 @@ int reap_check_results();
 
 // Service Check Functions
 
-int run_scheduled_service_check(
-      com::centreon::engine::service* svc,
-      int check_options,
-      double latency);
-int run_async_service_check(
-      com::centreon::engine::service* svc,
-      int check_options,
-      double latency,
-      int scheduled_check,
-      int reschedule_check,
-      int* time_is_valid,
-      time_t* preferred_time);
-int handle_async_service_check_result(
-      com::centreon::engine::service* temp_service,
-      check_result* queued_check_result);
 int check_service_check_viability(
       com::centreon::engine::service* svc,
       int check_options,
       int* time_is_valid,
       time_t* new_time);
-
-// Internal Command Implementations
-
-// schedules an immediate or delayed service check
-void schedule_service_check(
-       com::centreon::engine::service* svc,
-       time_t check_time,
-       int options);
-// schedules an immediate or delayed host check
-void schedule_host_check(
-       com::centreon::engine::host* hst,
-       time_t check_time,
-       int options);
 
 // Monitoring/Event Handler Functions
 
@@ -152,21 +129,6 @@ int run_sync_host_check_3x(
       int use_cached_result,
       unsigned long check_timestamp_horizon);
 int execute_sync_host_check_3x(com::centreon::engine::host* hst);
-int run_scheduled_host_check_3x(
-      com::centreon::engine::host* hst,
-      int check_options,
-      double latency);
-int run_async_host_check_3x(
-      com::centreon::engine::host* hst,
-      int check_options,
-      double latency,
-      int scheduled_check,
-      int reschedule_check,
-      int* time_is_valid,
-      time_t* preferred_time);
-int handle_async_host_check_result_3x(
-      com::centreon::engine::host* temp_host,
-      check_result* queued_check_result);
 int process_host_check_result_3x(
       com::centreon::engine::host* hst,
       int new_state,

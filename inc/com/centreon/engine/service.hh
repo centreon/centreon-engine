@@ -20,13 +20,17 @@
 #ifndef CCE_SERVICE_HH
 #  define CCE_SERVICE_HH
 
+#  include <array>
 #  include <memory>
 #  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
+#  include "com/centreon/engine/logging.hh"
 #  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/notifier.hh"
+#  include "com/centreon/engine/checks.hh"
 
 /* Forward declaration. */
 extern "C" {
@@ -38,25 +42,52 @@ CCE_BEGIN()
   namespace commands {
     class command;
   }
-  class contact;
   class host;
 
 class                           service : public notifier {
  public:
+  static std::array<std::pair<uint32_t, std::string>, 3> const tab_service_states;
+
                                 service(std::string const& hostname,
                                         std::string const& description,
                                         std::string const& display_name,
                                         std::string const& check_command,
                                         int initial_state,
-                                        double check_interval);
+                                        double check_interval,
+                                        double retry_interval);
   virtual                       ~service() override;
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
   std::string const&            get_description() const;
+  int                           handle_async_check_result(
+                                  check_result* queued_check_result);
+  int                           log_event();
+  void                          check_for_service_flapping(
+                                              int update,
+                                              int allow_flapstart_notification);
+  int                           handle_service_event();
+  int                           obsessive_compulsive_service_check_processor();
+  int                           update_service_performance_data();
+  int                           run_scheduled_check(int check_options, double latency);
+  int                           run_async_check(int check_options,
+                                                double latency,
+                                                int scheduled_check,
+                                                int reschedule_check,
+                                                int* time_is_valid,
+                                                time_t* preferred_time);
+  void                          schedule_check(time_t check_time,
+                                               int options);
+  void set_flap(double percent_change,
+                double high_threshold,
+                double low_threshold,
+                int allow_flapstart_notification);
+  // handles a service that has stopped flapping
+  void clear_flap(double percent_change,
+                  double high_threshold,
+                  double low_threshold);
 
   char*                         event_handler;
-  double                        retry_interval;
   int                           max_attempts;
   int                           parallelize;
   contactgroup_map              contact_groups;

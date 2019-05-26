@@ -386,9 +386,7 @@ void applier::service::modify_object(
     static_cast<int>(obj.event_handler_enabled()));
   s->set_initial_state(obj.initial_state());
   s->set_check_interval(obj.check_interval());
-  modify_if_different(
-    s->retry_interval,
-    static_cast<double>(obj.retry_interval()));
+  s->set_retry_interval(obj.retry_interval());
   modify_if_different(
     s->max_attempts,
     static_cast<int>(obj.max_check_attempts()));
