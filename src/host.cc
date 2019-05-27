@@ -41,7 +41,6 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 
 using namespace com::centreon;
@@ -1209,18 +1208,18 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   com::centreon::engine::hostgroup const* hg =
     static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr);
 
-  char const* evt_str(nullptr);
+  std::string evt_str;
   if (obj.event_handler_ptr)
-    evt_str = obj.event_handler_ptr->get_name().c_str();
-  char const* cmd_str(nullptr);
+    evt_str = obj.event_handler_ptr->get_name();
+  std::string cmd_str;
   if (obj.check_command_ptr)
-    cmd_str = obj.check_command_ptr->get_name().c_str();
-  char const* chk_period_str(nullptr);
+    cmd_str = obj.check_command_ptr->get_name();
+  std::string chk_period_str;
   if (obj.check_period_ptr)
-    chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* notif_period_str(nullptr);
+    chk_period_str = obj.check_period_ptr->get_name();
+  std::string notif_period_str;
   if (obj.notification_period_ptr)
-    notif_period_str = chkstr(obj.notification_period_ptr->name);
+    notif_period_str = obj.notification_period_ptr->get_name();
 
   std::string cg_oss;
   std::string c_oss;
@@ -1373,10 +1372,10 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  modified_attributes:                  " << obj.get_modified_attributes() << "\n"
     "  circular_path_checked:                " << obj.get_circular_path_checked() << "\n"
     "  contains_circular_path:               " << obj.get_contains_circular_path() << "\n"
-    "  event_handler_ptr:                    " << chkstr(evt_str) << "\n"
-    "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
-    "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
-    "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
+    "  event_handler_ptr:                    " << evt_str << "\n"
+    "  check_command_ptr:                    " << cmd_str << "\n"
+    "  check_period_ptr:                     " << chk_period_str << "\n"
+    "  notification_period_ptr:              " << notif_period_str << "\n"
     "  hostgroups_ptr:                       " << hg->get_group_name() << "\n";
 
   for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)

@@ -25,9 +25,8 @@
 /* Forward declaration. */
 CCE_BEGIN()
   class service;
+  class timeperiod;
 CCE_END()
-
-struct timeperiod_struct;
 
 typedef struct                     serviceescalation_struct {
   char*                            host_name;
@@ -42,8 +41,9 @@ typedef struct                     serviceescalation_struct {
   int                              escalate_on_critical;
   contactgroup_map                 contact_groups;
   contact_map                      contacts;
-  com::centreon::engine::service*                  service_ptr;
-  timeperiod_struct*               escalation_period_ptr;
+  com::centreon::engine::service*  service_ptr;
+  com::centreon::engine::timeperiod*
+                                   escalation_period_ptr;
   struct serviceescalation_struct* next;
   struct serviceescalation_struct* nexthash;
 }                                  serviceescalation;

@@ -79,7 +79,15 @@ void applier::contact::_update(
   if (obj->get_retain_nonstatus_information()) {
     if (state.host_notification_period().is_set()) {
       if (obj->get_modified_host_attributes() & MODATTR_NOTIFICATION_TIMEPERIOD) {
-        if (!find_timeperiod(state.host_notification_period()->c_str()))
+        timeperiod* temp_timeperiod(nullptr);
+        timeperiod_map::const_iterator
+          found(configuration::applier::state::instance().timeperiods().find(
+            state.host_notification_period()));
+
+        if (found != configuration::applier::state::instance().timeperiods().end())
+          temp_timeperiod = found->second.get();
+
+        if (!temp_timeperiod)
           obj->set_modified_host_attributes(
                 obj->get_modified_host_attributes()
                 - MODATTR_NOTIFICATION_TIMEPERIOD);
@@ -90,7 +98,15 @@ void applier::contact::_update(
     if (state.service_notification_period().is_set()) {
       if (obj->get_modified_service_attributes()
           & MODATTR_NOTIFICATION_TIMEPERIOD) {
-        if (!find_timeperiod(state.service_notification_period()->c_str()))
+        timeperiod* temp_timeperiod(nullptr);
+        timeperiod_map::const_iterator
+          found(configuration::applier::state::instance().timeperiods().find(
+          state.host_notification_period()));
+
+        if (found != configuration::applier::state::instance().timeperiods().end())
+          temp_timeperiod = found->second.get();
+
+        if (!temp_timeperiod)
           obj->set_modified_service_attributes(
                 obj->get_modified_service_attributes()
                 - MODATTR_NOTIFICATION_TIMEPERIOD);

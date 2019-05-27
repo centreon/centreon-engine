@@ -22,11 +22,10 @@
 #  include <ostream>
 
 /* Forward declaration. */
-struct timeperiod_struct;
-
 CCE_BEGIN()
 class host;
 class hostescalation;
+struct timeperiod;
 CCE_END()
 
 typedef std::unordered_multimap<std::string,
@@ -72,7 +71,7 @@ class                 hostescalation {
   contactgroup_map    contact_groups;
   contact_map         contacts;
   host*               host_ptr;
-  timeperiod_struct*  escalation_period_ptr;
+  timeperiod*         escalation_period_ptr;
   static hostescalation_mmap
                       hostescalations;
 

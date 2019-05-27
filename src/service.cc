@@ -43,7 +43,6 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 #include "compatibility/xpddefault.h"
 
@@ -248,18 +247,18 @@ bool operator!=(com::centreon::engine::service const& obj1,
  */
 std::ostream& operator<<(std::ostream& os,
                          com::centreon::engine::service const& obj) {
-  char const* evt_str(nullptr);
+  std::string evt_str;
   if (obj.event_handler_ptr)
-    evt_str = obj.event_handler_ptr->get_name().c_str();
-  char const* cmd_str(nullptr);
+    evt_str = obj.event_handler_ptr->get_name();
+  std::string cmd_str;
   if (obj.check_command_ptr)
-    cmd_str = obj.check_command_ptr->get_name().c_str();
-  char const* chk_period_str(nullptr);
+    cmd_str = obj.check_command_ptr->get_name();
+  std::string chk_period_str;
   if (obj.check_period_ptr)
-    chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* notif_period_str(nullptr);
+    chk_period_str = obj.check_period_ptr->get_name();
+  std::string notif_period_str;
   if (obj.notification_period_ptr)
-    notif_period_str = chkstr(obj.notification_period_ptr->name);
+    notif_period_str = obj.notification_period_ptr->get_name();
   char const* svcgrp_str(nullptr);
   if (obj.servicegroups_ptr)
     svcgrp_str = chkstr(
@@ -582,22 +581,22 @@ std::ostream& operator<<(std::ostream& os,
      << (obj.host_ptr ? obj.host_ptr->get_name() : "\"nullptr\"")
      << "\n"
         "  event_handler_ptr:                    "
-     << chkstr(evt_str)
+     << evt_str
      << "\n"
         "  event_handler_args:                   "
      << chkstr(obj.event_handler_args)
      << "\n"
         "  check_command_ptr:                    "
-     << chkstr(cmd_str)
+     << cmd_str
      << "\n"
         "  check_command_args:                   "
      << chkstr(obj.check_command_args)
      << "\n"
         "  check_period_ptr:                     "
-     << chkstr(chk_period_str)
+     << chk_period_str
      << "\n"
         "  notification_period_ptr:              "
-     << chkstr(notif_period_str)
+     << notif_period_str
      << "\n"
         "  servicegroups_ptr:                    "
      << chkstr(svcgrp_str) << "\n";

@@ -254,9 +254,9 @@ bool operator<(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
-  char const* dependency_period_str(nullptr);
+  std::string dependency_period_str;
   if (obj.dependency_period_ptr)
-    dependency_period_str = chkstr(obj.dependency_period_ptr->name);
+    dependency_period_str = obj.dependency_period_ptr->get_name();
 
   os << "hostdependency {\n"
     "  dependency_type:        " << obj.get_dependency_type() << "\n"
@@ -276,7 +276,7 @@ std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
     "  dependent_host_ptr:     " << (obj.dependent_host_ptr ?
                                       obj.dependent_host_ptr->get_name() :
                                       "\"NULL\"") << "\n"
-    "  dependency_period_ptr:  " << chkstr(dependency_period_str) << "\n"
+    "  dependency_period_ptr:  " << dependency_period_str << "\n"
     "}\n";
   return os;
 }

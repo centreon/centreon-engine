@@ -25,7 +25,7 @@
 #include "com/centreon/engine/hostgroup.hh"
 #include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
-#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/timeperiod.hh"
 #include "find.hh"
 
 // forward declaration.
@@ -69,24 +69,6 @@ servicegroup* find_servicegroup(std::string const& name) {
   umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a timeperiod name, find the timeperiod from the list in memory.
- *
- *  @param[in] name Timeperiod name.
- *
- *  @return Timeperiod object if found, nullptr otherwise.
- */
-timeperiod* find_timeperiod(std::string const& name) {
-  if (name.empty())
-    return nullptr;
-
-  umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator
-    it(state::instance().timeperiods().find(name));
-  if (it != state::instance().timeperiods().end())
     return it->second.get();
   return nullptr;
 }

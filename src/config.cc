@@ -405,10 +405,12 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking time periods...";
   total_objects = 0;
-  for (timeperiod* temp_timeperiod(timeperiod_list);
-       temp_timeperiod;
-       temp_timeperiod = temp_timeperiod->next, ++total_objects)
-    check_timeperiod(temp_timeperiod, &warnings, &errors);
+  for (timeperiod_map::iterator
+         it(timeperiod::timeperiods.begin()),
+         end(timeperiod::timeperiods.end());
+       it != end;
+       ++it)
+    check_timeperiod(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_verification_error, basic)
       << "\tChecked " << total_objects << " time periods.";
@@ -796,7 +798,13 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
     warnings++;
   }
   else {
-    timeperiod* temp_timeperiod = find_timeperiod(svc->get_check_period());
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(svc->get_check_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Check period '" << svc->get_check_period()
@@ -812,8 +820,13 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
 
   // Check service notification timeperiod.
   if (!svc->get_notification_period().empty()) {
-    timeperiod* temp_timeperiod{
-      find_timeperiod(svc->get_notification_period())};
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(svc->get_notification_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << svc->get_notification_period()
@@ -941,7 +954,13 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   if (!hst->get_check_period().empty()) {
-    timeperiod* temp_timeperiod = find_timeperiod(hst->get_check_period().c_str());
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(hst->get_check_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Check period '" << hst->get_check_period()
@@ -995,8 +1014,13 @@ int check_host(host* hst, int* w, int* e) {
 
   // Check notification timeperiod.
   if (hst->get_notification_period().empty()) {
-    timeperiod* temp_timeperiod(
-                  find_timeperiod(hst->get_notification_period().c_str()));
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(hst->get_notification_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << hst->get_notification_period()
@@ -1086,8 +1110,13 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
   }
 
   else {
-    timeperiod* temp_timeperiod
-      = find_timeperiod(cntct->get_service_notification_period().c_str());
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(cntct->get_service_notification_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Service notification period '"
@@ -1110,8 +1139,13 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
   }
 
   else {
-    timeperiod* temp_timeperiod
-      = find_timeperiod(cntct->get_host_notification_period().c_str());
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(cntct->get_host_notification_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Host notification period '"
@@ -1379,7 +1413,13 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
 
   // Find the timeperiod.
   if (sd->dependency_period) {
-    timeperiod* temp_timeperiod(find_timeperiod(sd->dependency_period));
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(sd->dependency_period));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Dependency period '" << sd->dependency_period
@@ -1456,7 +1496,13 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
 
   // Find the timeperiod.
   if (!hd->get_dependency_period().empty()) {
-    timeperiod* temp_timeperiod(find_timeperiod(hd->get_dependency_period().c_str()));
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(hd->get_dependency_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Dependency period '" << hd->get_dependency_period()
@@ -1504,7 +1550,13 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
 
   // Find the timeperiod.
   if (se->escalation_period) {
-    timeperiod* temp_timeperiod(find_timeperiod(se->escalation_period));
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(se->escalation_period));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Escalation period '" << se->escalation_period
@@ -1597,7 +1649,13 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
 
   // Find the timeperiod.
   if (!he->get_escalation_period().empty()) {
-    timeperiod* temp_timeperiod(find_timeperiod(he->get_escalation_period().c_str()));
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it(state::instance().timeperiods().find(he->get_escalation_period()));
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Escalation period '" << he->get_escalation_period()
@@ -1669,32 +1727,33 @@ int check_timeperiod(timeperiod* tp, int* w, int* e) {
   int errors(0);
 
   // Check for illegal characters in timeperiod name.
-  if (contains_illegal_object_chars(tp->name)) {
+  if (contains_illegal_object_chars(tp->get_name().c_str())) {
     logger(log_verification_error, basic)
-      << "Error: The name of time period '" << tp->name
+      << "Error: The name of time period '" << tp->get_name()
       << "' contains one or more illegal characters.";
     errors++;
   }
 
   // Check for valid timeperiod names in exclusion list.
-  for (timeperiodexclusion*
-         temp_timeperiodexclusion(tp->exclusions);
-       temp_timeperiodexclusion;
-       temp_timeperiodexclusion = temp_timeperiodexclusion->next) {
-    timeperiod* temp_timeperiod2(
-                  find_timeperiod(
-                    temp_timeperiodexclusion->timeperiod_name));
-    if (!temp_timeperiod2) {
+  for (timeperiodexclusion::iterator
+         it(tp->exclusions.begin()),
+         end(tp->exclusions.end());
+       it != end;
+       ++it) {
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      found(state::instance().timeperiods().find(it->first));
+
+    if (found == state::instance().timeperiods().end()) {
       logger(log_verification_error, basic)
         << "Error: Excluded time period '"
-        << temp_timeperiodexclusion->timeperiod_name
-        << "' specified in timeperiod '" << tp->name
+        << it->first
+        << "' specified in timeperiod '" << tp->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
 
-    // Save the timeperiod pointer for later.
-    temp_timeperiodexclusion->timeperiod_ptr = temp_timeperiod2;
+    it->second = found->second;
   }
 
   // Add errors.

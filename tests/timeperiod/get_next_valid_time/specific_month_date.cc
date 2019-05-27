@@ -19,7 +19,6 @@
 
 #include <cstring>
 #include <gtest/gtest.h>
-#include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
