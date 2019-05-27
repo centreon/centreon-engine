@@ -30,10 +30,10 @@
 #  define MAX_CONTACT_ADDRESSES 6
 
 /* Forward declaration. */
-struct timeperiod_struct;
 struct objectlist_struct;
 
 CCE_BEGIN()
+class timeperiod;
 
 namespace commands {
   class command;
@@ -169,8 +169,8 @@ class                           contact {
   std::unordered_map<std::string, customvariable>
                                 custom_variables;
 
-  timeperiod_struct*            host_notification_period_ptr;
-  timeperiod_struct*            service_notification_period_ptr;
+  timeperiod*                   host_notification_period_ptr;
+  timeperiod*                   service_notification_period_ptr;
   objectlist_struct*            contactgroups_ptr;
 };
 

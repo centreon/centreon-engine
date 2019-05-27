@@ -39,11 +39,11 @@
 extern "C" {
 struct objectlist_struct;
 struct servicesmember_struct;
-struct timeperiod_struct;
 };
 
 CCE_BEGIN()
 class host;
+class timeperiod;
 namespace commands {
   class command;
 }
@@ -357,8 +357,8 @@ class                 host : public notifier {
   int                 state_history[MAX_STATE_HISTORY_ENTRIES];
   servicesmember_struct*
                       services;
-  timeperiod_struct*  check_period_ptr;
-  timeperiod_struct*  notification_period_ptr;
+  timeperiod          *check_period_ptr;
+  timeperiod          *notification_period_ptr;
   objectlist_struct*  hostgroups_ptr;
 
 private:

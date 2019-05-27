@@ -129,9 +129,9 @@ bool operator<(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
-  char const* dependency_period_str(NULL);
+  std::string dependency_period_str(NULL);
   if (obj.dependency_period_ptr)
-    dependency_period_str = chkstr(obj.dependency_period_ptr->name);
+    dependency_period_str = obj.dependency_period_ptr->get_name();
   std::string dependent_svc_str("\"NULL\"");
   if (obj.dependent_service_ptr) {
     dependent_svc_str = obj.dependent_service_ptr->get_hostname();
@@ -162,7 +162,7 @@ std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
     "  contains_circular_path:        " << obj.contains_circular_path << "\n"
     "  master_service_ptr:            " << master_svc_str << "\n"
     "  dependent_service_ptr:         " << dependent_svc_str << "\n"
-    "  dependency_period_ptr:         " << chkstr(dependency_period_str) << "\n"
+    "  dependency_period_ptr:         " << dependency_period_str << "\n"
     "}\n";
   return (os);
 }

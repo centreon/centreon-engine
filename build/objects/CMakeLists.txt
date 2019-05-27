@@ -27,27 +27,19 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/objectlist.cc"
   "${SRC_DIR}/servicedependency.cc"
   "${SRC_DIR}/serviceescalation.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/servicesmember.cc"
-  "${SRC_DIR}/timeperiod.cc"
-  "${SRC_DIR}/timeperiodexclusion.cc"
-  "${SRC_DIR}/timerange.cc"
 
   # Headers.
-  "${INC_DIR}/daterange.hh"
   "${INC_DIR}/defines.hh"
   "${INC_DIR}/objectlist.hh"
   "${INC_DIR}/servicedependency.hh"
   "${INC_DIR}/serviceescalation.hh"
   "${INC_DIR}/servicegroup.hh"
   "${INC_DIR}/servicesmember.hh"
-  "${INC_DIR}/timeperiod.hh"
-  "${INC_DIR}/timeperiodexclusion.hh"
-  "${INC_DIR}/timerange.hh"
   "${INC_DIR}/tool.hh"
 
   PARENT_SCOPE

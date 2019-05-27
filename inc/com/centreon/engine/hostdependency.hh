@@ -24,11 +24,10 @@
 #  include <string>
 
 /* Forward declaration. */
-struct timeperiod_struct;
-
 CCE_BEGIN()
   class host;
   class hostdependency;
+  class timeperiod;
 CCE_END()
 
 typedef std::unordered_multimap<std::string,
@@ -89,13 +88,14 @@ class                           hostdependency {
 
   com::centreon::engine::host*  master_host_ptr;
   com::centreon::engine::host*  dependent_host_ptr;
-  timeperiod_struct*            dependency_period_ptr;
+  com::centreon::engine::timeperiod*
+                                dependency_period_ptr;
 
   bool                          operator==(
     com::centreon::engine::hostdependency const& obj) throw ();
   bool                          operator!=(
     com::centreon::engine::hostdependency const& obj) throw ();
-  bool          operator<(
+  bool                          operator<(
     com::centreon::engine::hostdependency const& obj) throw ();
 
  private:

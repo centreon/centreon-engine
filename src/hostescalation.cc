@@ -234,9 +234,9 @@ bool hostescalation::operator<(hostescalation const& obj) {
  */
 std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
   char const* hst_str(nullptr);
-  char const* escalation_period_str(nullptr);
+  std::string escalation_period_str;
   if (obj.escalation_period_ptr)
-    escalation_period_str = chkstr(obj.escalation_period_ptr->name);
+    escalation_period_str = obj.escalation_period_ptr->get_name();
 
   std::string cg_oss;
   std::string c_oss;
@@ -270,7 +270,7 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     "  host_ptr:                " << (obj.host_ptr ?
                                         obj.host_ptr->get_name() :
                                         "\"nullptr\"") << "\n"
-    "  escalation_period_ptr:   " << chkstr(escalation_period_str) << "\n"
+    "  escalation_period_ptr:   " << escalation_period_str << "\n"
     "}\n";
   return os;
 }

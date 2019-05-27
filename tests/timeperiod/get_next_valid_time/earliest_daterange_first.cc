@@ -18,7 +18,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -27,10 +27,15 @@ using namespace com::centreon::engine;
 class     GetNextValidTimeEarliestDaterangeFirstTest : public testing::Test {
  public:
   void    SetUp() override {
+    configuration::applier::state::load();
     // All dateranges are based on the same day : 2016-11-07.
     _creator.new_timeperiod();
     _now = strtotimet("2016-11-07 00:00:00");
     set_time(_now);
+  }
+
+  void TearDown() override {
+    configuration::applier::state::unload();
   }
 
   // monday 06:00-07:00

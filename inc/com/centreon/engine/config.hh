@@ -23,7 +23,7 @@
 
 #  include "com/centreon/engine/objects.hh"
 #  include "com/centreon/engine/objects/servicegroup.hh"
-#  include "com/centreon/engine/objects/timeperiod.hh"
+#  include "com/centreon/engine/timeperiod.hh"
 
 #  ifdef __cplusplus
 extern "C" {
@@ -47,7 +47,7 @@ int check_servicedependency(servicedependency* sd, int* w, int* e);
 int check_hostdependency(com::centreon::engine::hostdependency* hd, int* w, int* e);
 int check_serviceescalation(serviceescalation* se, int* w, int* e);
 int check_hostescalation(com::centreon::engine::hostescalation* he, int* w, int* e);
-int check_timeperiod(timeperiod* tp, int* w, int* e);
+int check_timeperiod(com::centreon::engine::timeperiod* tp, int* w, int* e);
 
 #  ifdef __cplusplus
 }

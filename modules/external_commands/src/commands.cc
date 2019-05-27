@@ -41,7 +41,6 @@
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/timeperiod.hh"
 #include "mmap.h"
 
 using namespace com::centreon::engine;
@@ -1958,6 +1957,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   temp_ptr = string::dup(charval);
 
+  timeperiod_map::const_iterator found;
+
   /* do some validation */
   switch (cmd) {
 
@@ -1968,7 +1969,15 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     /* make sure the timeperiod is valid */
-    if ((temp_timeperiod = find_timeperiod(temp_ptr)) == nullptr) {
+
+    temp_timeperiod = nullptr;
+    found = configuration::applier::state::instance().timeperiods().find(
+      temp_ptr);
+
+    if (found != configuration::applier::state::instance().timeperiods().end())
+      temp_timeperiod = found->second.get();
+
+    if (temp_timeperiod == nullptr) {
       delete[] temp_ptr;
       return ERROR;
     }

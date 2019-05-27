@@ -973,7 +973,7 @@ std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::iterator
  *
  *  @return The current timeperiods.
  */
-std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> > const& applier::state::timeperiods() const throw () {
+timeperiod_map const& applier::state::timeperiods() const throw () {
   return _timeperiods;
 }
 
@@ -982,7 +982,7 @@ std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> > const& appl
  *
  *  @return The current timeperiods.
  */
-std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >& applier::state::timeperiods() throw () {
+timeperiod_map& applier::state::timeperiods() throw () {
   return _timeperiods;
 }
 
@@ -994,7 +994,7 @@ std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >& applier::s
  *  @return Iterator to the element if found, timeperiods().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) const {
+timeperiod_map::const_iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) const {
   return _timeperiods.find(k);
 }
 
@@ -1006,7 +1006,7 @@ std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >::const_iter
  *  @return Iterator to the element if found, timeperiods().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<timeperiod_struct> >::iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) {
+timeperiod_map::iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) {
   return _timeperiods.find(k);
 }
 

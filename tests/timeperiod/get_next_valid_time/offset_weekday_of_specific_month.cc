@@ -19,7 +19,7 @@
 
 #include <cstring>
 #include <gtest/gtest.h>
-#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -27,6 +27,14 @@ using namespace com::centreon::engine;
 
 class         GetNextValidTimeOffsetWeekdayOfSpecificMonthTest : public ::testing::Test {
  public:
+  void SetUp() override {
+    configuration::applier::state::load();
+  }
+
+  void TearDown() override {
+    configuration::applier::state::unload();
+  }
+
   void        default_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);

@@ -108,8 +108,6 @@ extern std::map<std::pair<std::string, std::string>, service_other_properties> s
 extern servicegroup*             servicegroup_list;
 extern servicegroup*             servicegroup_list_tail;
 extern std::map<std::string, servicegroup_other_properties> servicegroup_other_props;
-extern timeperiod*               timeperiod_list;
-extern timeperiod*               timeperiod_list_tail;
 extern serviceescalation*        serviceescalation_list;
 extern serviceescalation*        serviceescalation_list_tail;
 extern servicedependency*        servicedependency_list;

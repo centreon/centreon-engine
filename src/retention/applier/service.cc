@@ -21,11 +21,11 @@
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/retention/applier/service.hh"
 #include "com/centreon/engine/retention/applier/utils.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timeperiod.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
@@ -205,7 +205,9 @@ void applier::service::_update(
 
     if (state.check_period().is_set()
         && (obj.modified_attributes & MODATTR_CHECK_TIMEPERIOD)) {
-      if (is_timeperiod_exist(*state.check_period()))
+      timeperiod_map::const_iterator
+        it(configuration::applier::state::instance().timeperiods().find(*state.check_period()));
+      if (it != configuration::applier::state::instance().timeperiods().end())
         obj.set_check_period(*state.check_period());
       else
         obj.modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
@@ -213,7 +215,9 @@ void applier::service::_update(
 
     if (state.notification_period().is_set()
         && (obj.modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD)) {
-      if (is_timeperiod_exist(*state.notification_period()))
+      timeperiod_map::const_iterator
+        it(configuration::applier::state::instance().timeperiods().find(*state.notification_period()));
+      if (it != configuration::applier::state::instance().timeperiods().end())
         obj.set_notification_period(*state.notification_period());
       else
         obj.modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
