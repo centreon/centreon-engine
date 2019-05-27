@@ -175,8 +175,7 @@ int host_downtime::unschedule() {
            "cancelled.";
 
       /* send a notification */
-      host_notification(
-        hst,
+      hst->notify(
         NOTIFICATION_DOWNTIMECANCELLED,
         nullptr,
         nullptr,
@@ -381,8 +380,7 @@ int host_downtime::handle() {
         "downtime";
 
       /* send a notification */
-      host_notification(
-        hst,
+      hst->notify(
         NOTIFICATION_DOWNTIMEEND,
         get_author().c_str(),
         get_comment().c_str(),
@@ -463,8 +461,7 @@ int host_downtime::handle() {
         << ";STARTED; Host has entered a period of scheduled downtime";
 
       /* send a notification */
-      host_notification(
-        hst,
+      hst->notify(
         NOTIFICATION_DOWNTIMESTART,
         get_author().c_str(),
         get_comment().c_str(),

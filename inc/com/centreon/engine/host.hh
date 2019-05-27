@@ -140,6 +140,13 @@ class                 host : public notifier {
   void               disable_flap_detection();
   void               update_status(bool aggregated_dump);
   void               check_for_expired_acknowledgement();
+  void               set_notification_number(int num);
+  int                notify(unsigned int type,
+                            char const* not_author,
+                            char const* not_data,
+                            int options);
+  int                check_notification_viability(unsigned int type,
+                                                  int options);
 
   // setters / getters
   std::string const& get_name() const;

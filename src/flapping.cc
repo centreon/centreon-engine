@@ -165,8 +165,7 @@ void handle_host_flap_detection_disabled(com::centreon::engine::host* hst) {
       NULL);
 
     /* send a notification */
-    host_notification(
-      hst,
+    hst->notify(
       NOTIFICATION_FLAPPINGDISABLED,
       NULL,
       NULL,
@@ -175,8 +174,7 @@ void handle_host_flap_detection_disabled(com::centreon::engine::host* hst) {
     /* should we send a recovery notification? */
     if (hst->get_check_flapping_recovery_notification()
         && hst->get_current_state() == HOST_UP)
-      host_notification(
-        hst,
+      hst->notify(
         NOTIFICATION_NORMAL,
         NULL,
         NULL,
@@ -226,8 +224,7 @@ void handle_service_flap_detection_disabled(com::centreon::engine::service* svc)
       NULL);
 
     /* send a notification */
-    service_notification(
-      svc,
+    svc->notify(
       NOTIFICATION_FLAPPINGDISABLED,
       NULL,
       NULL,
@@ -236,8 +233,7 @@ void handle_service_flap_detection_disabled(com::centreon::engine::service* svc)
     /* should we send a recovery notification? */
     if (svc->check_flapping_recovery_notification
         && svc->current_state == STATE_OK)
-      service_notification(
-        svc,
+      svc->notify(
         NOTIFICATION_NORMAL,
         NULL,
         NULL,
@@ -249,5 +245,4 @@ void handle_service_flap_detection_disabled(com::centreon::engine::service* svc)
 
   /* update service status */
   update_service_status(svc, false);
-  return;
 }

@@ -23,7 +23,10 @@
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -2595,8 +2598,7 @@ void host::set_flap(
 
   /* send a notification */
   if (allow_flapstart_notification)
-    host_notification(
-      this,
+    notify(
       NOTIFICATION_FLAPPINGSTART,
       NULL,
       NULL,
@@ -2644,8 +2646,7 @@ void host::clear_flap(
     NULL);
 
   /* send a notification */
-  host_notification(
-    this,
+  notify(
     NOTIFICATION_FLAPPINGSTOP,
     NULL,
     NULL,
@@ -2654,8 +2655,7 @@ void host::clear_flap(
   /* should we send a recovery notification? */
   if (this->get_check_flapping_recovery_notification()
       && this->get_current_state() == HOST_UP)
-    host_notification(
-      this,
+    notify(
       NOTIFICATION_NORMAL,
       NULL,
       NULL,
@@ -2770,5 +2770,648 @@ void host::check_for_expired_acknowledgement() {
       }
     }
   }
+}
+
+/* sets the current notification number for a specific host */
+void host::set_notification_number(int num) {
+  /* set the notification number */
+  set_current_notification_number(num);
+
+  /* update the status log with the host info */
+  update_status(false);
+}
+
+/* notify all contacts for a host that the entire host is down or up */
+int host::notify(
+      unsigned int type,
+      char const* not_author,
+      char const* not_data,
+      int options) {
+  notification* temp_notification = nullptr;
+  contact* temp_contact = nullptr;
+  time_t current_time;
+  struct timeval start_time;
+  struct timeval end_time;
+  int escalated = false;
+  int contacts_notified = 0;
+  int increment_notification_number = false;
+  nagios_macros mac;
+  int neb_result;
+
+  /* get the current time */
+  time(&current_time);
+  gettimeofday(&start_time, nullptr);
+
+  time_t time = this->get_last_host_notification();
+  logger(dbg_notifications, basic)
+    << "** Host Notification Attempt ** Host: '" << this->get_name()
+    << "', Type: " << type << ", Options: " << options
+    << ", Current State: " << this->get_current_state()
+    << ", Last Notification: "
+    << my_ctime(&time);
+
+
+  /* check viability of sending out a host notification */
+  if (check_notification_viability(type, options) == ERROR) {
+    logger(dbg_notifications, basic)
+      << "Notification viability test failed.  No notification will "
+      "be sent out.";
+    return OK;
+  }
+
+  /* allocate memory for local macro */
+  memset(&mac, 0, sizeof(mac));
+
+  logger(dbg_notifications, basic)
+    << "Notification viability test passed.";
+
+  /* should the notification number be increased? */
+  if (type == NOTIFICATION_NORMAL
+      || (options & NOTIFICATION_OPTION_INCREMENT)) {
+    this->set_current_notification_number(this->get_current_notification_number()
+                                         + 1);
+    increment_notification_number = true;
+  }
+
+  logger(dbg_notifications, more)
+    << "Current notification number: "
+    << this->get_current_notification_number()
+    << " ("
+    << (increment_notification_number == true ? "incremented" : "unchanged")
+    << ")";
+
+  /* save and increase the current notification id */
+  this->set_current_notification_id(next_notification_id);
+  next_notification_id++;
+
+  logger(dbg_notifications, most)
+    << "Creating list of contacts to be notified.";
+
+  /* create the contact notification list for this host */
+  create_notification_list_from_host(&mac, this, options, &escalated);
+
+  /* send data to event broker */
+  end_time.tv_sec = 0L;
+  end_time.tv_usec = 0L;
+  neb_result = broker_notification_data(
+    NEBTYPE_NOTIFICATION_START,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    HOST_NOTIFICATION,
+    type,
+    start_time,
+    end_time,
+    (void*)this,
+    not_author,
+    not_data,
+    escalated,
+    0,
+    nullptr);
+  if (NEBERROR_CALLBACKCANCEL == neb_result) {
+    free_notification_list();
+    return ERROR;
+  }
+  else if (NEBERROR_CALLBACKOVERRIDE == neb_result) {
+    free_notification_list();
+    return OK;
+  }
+
+  /* there are contacts to be notified... */
+  if (notification_list != nullptr) {
+
+    /* grab the macro variables */
+    grab_host_macros_r(&mac, this);
+
+    /*
+     * if this notification has an author, attempt to lookup the associated
+     * contact
+     */
+    if (not_author != nullptr) {
+
+      /* see if we can find the contact - first by name, then by alias */
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == nullptr) {
+        for (std::unordered_map<std::string, std::shared_ptr<contact> >::const_iterator
+               it(state::instance().contacts().begin()),
+               end(state::instance().contacts().end());
+             it != end;
+             ++it) {
+          if (!strcmp(it->second->get_alias().c_str(), not_author)) {
+            temp_contact = it->second.get();
+            break;
+          }
+        }
+      }
+    }
+
+    /* get author and comment macros */
+    string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
+    string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
+    if (temp_contact) {
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME],
+        temp_contact->get_name());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS],
+        temp_contact->get_alias());
+    }
+    else {
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
+    }
+
+    /*
+     * NOTE: these macros are deprecated and will likely disappear in next
+     * major release
+     * if this is an acknowledgement, get author and comment macros
+     */
+    if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
+      string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
+      string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
+      if (temp_contact) {
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME],
+          temp_contact->get_name());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS],
+          temp_contact->get_alias());
+      }
+      else {
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS]);
+      }
+    }
+
+    /* set the notification type macro */
+    if (type == NOTIFICATION_ACKNOWLEDGEMENT)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "ACKNOWLEDGEMENT");
+    else if (type == NOTIFICATION_FLAPPINGSTART)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTART");
+    else if (type == NOTIFICATION_FLAPPINGSTOP)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
+    else if (type == NOTIFICATION_FLAPPINGDISABLED)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGDISABLED");
+    else if (type == NOTIFICATION_DOWNTIMESTART)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMESTART");
+    else if (type == NOTIFICATION_DOWNTIMEEND)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMEEND");
+    else if (type == NOTIFICATION_DOWNTIMECANCELLED)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
+    else if (type == NOTIFICATION_CUSTOM)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
+    else if (this->get_current_state() == HOST_UP)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
+    else
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
+
+    /* set the notification number macro */
+    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONNUMBER],
+      this->get_current_notification_number());
+
+    /*
+     * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability
+     */
+    char const* notificationnumber(mac.x[MACRO_HOSTNOTIFICATIONNUMBER]);
+    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER],
+      notificationnumber ? notificationnumber : "");
+
+    /* set the notification id macro */
+    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID],
+      this->get_current_notification_id());
+
+    /* notify each contact (duplicates have been removed) */
+    for (temp_notification = notification_list;
+         temp_notification != nullptr;
+         temp_notification = temp_notification->next) {
+
+      /* grab the macro variables for this contact */
+      grab_contact_macros_r(&mac, temp_notification->cntct);
+
+      /* clear summary macros (they are customized for each contact) */
+      clear_summary_macros_r(&mac);
+
+      /* notify this contact */
+      int result = notify_contact_of_host(
+                     &mac,
+                     temp_notification->cntct,
+                     this,
+                     type,
+                     not_author,
+                     not_data,
+                     options,
+                     escalated);
+
+      /* keep track of how many contacts were notified */
+      if (result == OK)
+        contacts_notified++;
+    }
+
+    /* free memory allocated to the notification list */
+    free_notification_list();
+
+    /*
+     * clear summary macros so they will be regenerated without contact
+     * filters when needednext
+     */
+    clear_summary_macros_r(&mac);
+
+    if (type == NOTIFICATION_NORMAL) {
+
+      /*
+       * adjust last/next notification time and notification flags if we
+       * notified someone
+       */
+      if (contacts_notified > 0) {
+
+        /* calculate the next acceptable re-notification time */
+        this->set_next_host_notification(get_next_host_notification_time(
+                                        this,
+                                        current_time));
+
+        /*
+         * update the last notification time for this host (this is needed for
+         * scheduling the next problem notification)
+         */
+        this->set_last_host_notification(current_time);
+
+        /* update notifications flags */
+        if (this->get_current_state() == HOST_DOWN)
+          this->set_notified_on_down(true);
+        else if (this->get_current_state() == HOST_UNREACHABLE)
+          this->set_notified_on_unreachable(true);
+
+        time_t time = this->get_next_host_notification();
+        logger(dbg_notifications, basic)
+          << contacts_notified << " contacts were notified.  "
+          "Next possible notification time: "
+          << my_ctime(&time);
+      }
+
+      /* we didn't end up notifying anyone */
+      else if (increment_notification_number == true) {
+
+        /* adjust current notification number */
+        this->set_current_notification_number(
+          this->get_current_notification_number() - 1);
+
+        time_t time = this->get_next_host_notification();
+        logger(dbg_notifications, basic)
+          << "No contacts were notified.  Next possible "
+          "notification time: "
+          << my_ctime(&time);
+      }
+    }
+
+    logger(dbg_notifications, basic)
+      << contacts_notified << " contacts were notified.";
+  }
+
+  /* there were no contacts, so no notification really occurred... */
+  else {
+
+    /* adjust notification number, since no notification actually went out */
+    if (increment_notification_number == true)
+      this->set_current_notification_number(
+        this->get_current_notification_number() - 1);
+
+    logger(dbg_notifications, basic)
+      << "No contacts were found for notification purposes.  "
+      "No notification was sent out.";
+  }
+
+  /* get the time we finished */
+  gettimeofday(&end_time, nullptr);
+
+  /* send data to event broker */
+  broker_notification_data(
+    NEBTYPE_NOTIFICATION_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    HOST_NOTIFICATION,
+    type,
+    start_time,
+    end_time,
+    (void*)this,
+    not_author,
+    not_data,
+    escalated,
+    contacts_notified,
+    nullptr);
+
+  /* update the status log with the host info */
+  this->update_status(false);
+
+  /* clear volatile macros */
+  clear_volatile_macros_r(&mac);
+
+  /* Update recovery been sent parameter */
+  if (this->get_current_state() == HOST_UP)
+    host_other_props[this->get_name()].recovery_been_sent = true;
+
+  return OK;
+}
+
+/* checks viability of sending a host notification */
+int host::check_notification_viability(
+      unsigned int type,
+      int options) {
+  time_t current_time;
+  time_t timeperiod_start;
+
+  logger(dbg_functions, basic)
+    << "check_host_notification_viability()";
+
+  /* forced notifications bust through everything */
+  if (options & NOTIFICATION_OPTION_FORCED) {
+    logger(dbg_notifications, more)
+      << "This is a forced host notification, so we'll send it out.";
+    return OK;
+  }
+
+  /* get current time */
+  time(&current_time);
+
+  /* are notifications enabled? */
+  if (config->enable_notifications() == false) {
+    logger(dbg_notifications, more)
+      << "Notifications are disabled, so host notifications will not "
+      "be sent out.";
+    return ERROR;
+  }
+
+  // See if the host can have notifications sent out at this time.
+  {
+    timezone_locker lock(get_host_timezone(this->get_name()));
+    if (check_time_against_period(
+          current_time,
+          this->notification_period_ptr) == ERROR) {
+      logger(dbg_notifications, more)
+        << "This host shouldn't have notifications sent out at "
+           "this time.";
+
+      // If this is a normal notification, calculate the next acceptable
+      // notification time, once the next valid time range arrives...
+      if (type == NOTIFICATION_NORMAL) {
+        get_next_valid_time(
+          current_time,
+          &timeperiod_start,
+          this->notification_period_ptr);
+
+        // It looks like there is no notification time defined, so
+        // schedule next one far into the future (one year)...
+        if (timeperiod_start == (time_t)0)
+          this->set_next_host_notification(
+            (time_t)(current_time + (60 * 60 * 24 * 365)));
+        // Else use the next valid notification time.
+        else
+          this->set_next_host_notification(timeperiod_start);
+
+        time_t time = this->get_next_host_notification();
+        logger(dbg_notifications, more)
+          << "Next possible notification time: "
+          << my_ctime(&time);
+      }
+      return ERROR;
+    }
+  }
+
+  /* are notifications temporarily disabled for this host? */
+  if (!this->get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+      << "Notifications are temporarily disabled for this host, "
+      "so we won't send one out.";
+    return ERROR;
+  }
+
+  /*********************************************/
+  /*** SPECIAL CASE FOR CUSTOM NOTIFICATIONS ***/
+  /*********************************************/
+
+  /* custom notifications are good to go at this point... */
+  if (type == NOTIFICATION_CUSTOM) {
+    if (this->get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+        << "We shouldn't send custom notification during "
+        "scheduled downtime.";
+      return ERROR;
+    }
+    return OK;
+  }
+
+  /****************************************/
+  /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
+  /****************************************/
+
+  /*
+   * acknowledgements only have to pass three general filters, although they
+   * have another test of their own...
+   */
+  if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
+
+    /* don't send an acknowledgement if there isn't a problem... */
+    if (this->get_current_state() == HOST_UP) {
+      logger(dbg_notifications, more)
+        << "The host is currently UP, so we won't send "
+        "an acknowledgement.";
+      return ERROR;
+    }
+
+    /*
+     * acknowledgement viability test passed, so the notification can be sent
+     * out
+     */
+    return OK;
+  }
+
+  /*****************************************/
+  /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
+  /*****************************************/
+
+  /* flapping notifications only have to pass three general filters */
+  if (type == NOTIFICATION_FLAPPINGSTART
+      || type == NOTIFICATION_FLAPPINGSTOP
+      || type == NOTIFICATION_FLAPPINGDISABLED) {
+
+    /* don't send a notification if we're not supposed to... */
+    if (!this->get_notify_on_flapping()) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about FLAPPING events for this host.";
+      return ERROR;
+    }
+
+    /* don't send notifications during scheduled downtime */
+    if (this->get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about FLAPPING events during "
+        "scheduled downtime.";
+      return ERROR;
+    }
+
+    /* flapping viability test passed, so the notification can be sent out */
+    return OK;
+  }
+
+  /*****************************************/
+  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
+  /*****************************************/
+
+  /* flapping notifications only have to pass three general filters */
+  if (type == NOTIFICATION_DOWNTIMESTART
+      || type == NOTIFICATION_DOWNTIMEEND
+      || type == NOTIFICATION_DOWNTIMECANCELLED) {
+
+    /* don't send a notification if we're not supposed to... */
+    if (!this->get_notify_on_downtime()) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about DOWNTIME events for this host.";
+      return ERROR;
+    }
+
+    /* don't send notifications during scheduled downtime */
+    if (this->get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about DOWNTIME events during "
+        "scheduled downtime!";
+      return ERROR;
+    }
+
+    /* downtime viability test passed, so the notification can be sent out */
+    return OK;
+  }
+
+  /****************************************/
+  /*** NORMAL NOTIFICATIONS ***************/
+  /****************************************/
+
+  /* is this a hard problem/recovery? */
+  if (this->get_state_type() == SOFT_STATE) {
+    logger(dbg_notifications, more)
+      << "This host is in a soft state, so we won't send "
+      "a notification out.";
+    return ERROR;
+  }
+
+  /* has this problem already been acknowledged? */
+  if (this->get_problem_has_been_acknowledged()) {
+    logger(dbg_notifications, more)
+      << "This host problem has already been acknowledged, "
+      "so we won't send a notification out!";
+    return ERROR;
+  }
+
+  /* check notification dependencies */
+  if (check_host_dependencies(
+        this,
+        hostdependency::notification) == DEPENDENCIES_FAILED) {
+    logger(dbg_notifications, more)
+      << "Notification dependencies for this host have failed, "
+      "so we won't sent a notification out!";
+    return ERROR;
+  }
+
+  /* see if we should notify about problems with this host */
+  if (this->get_current_state() == HOST_UNREACHABLE
+      && !this->get_notify_on_unreachable()) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about UNREACHABLE status for this host.";
+    return ERROR;
+  }
+  if (this->get_current_state() == HOST_DOWN
+      && !this->get_notify_on_down()) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about DOWN states for this host.";
+    return ERROR;
+  }
+  if (this->get_current_state() == HOST_UP) {
+
+    if (!this->get_notify_on_recovery()) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about RECOVERY states for this host.";
+      return ERROR;
+    }
+    if (!(this->get_notified_on_down()
+          || this->get_notified_on_unreachable())) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about this recovery.";
+      return ERROR;
+    }
+
+  }
+
+  /* see if enough time has elapsed for first notification */
+  if (type == NOTIFICATION_NORMAL
+      && (this->get_current_notification_number() == 0
+         || (this->get_current_state() == HOST_UP &&
+             !host_other_props[
+               std::string(this->get_name())].recovery_been_sent))) {
+
+    /* get the time at which a notification should have been sent */
+    time_t& initial_notif_time(
+      host_other_props[this->get_name()].initial_notif_time);
+
+    /* if not set, set it to now */
+    if (!initial_notif_time)
+      initial_notif_time = time(nullptr);
+
+    double notification_delay = (this->get_current_state() != HOST_UP ?
+             this->get_first_notification_delay()
+             : host_other_props[this->get_name()].recovery_notification_delay)
+        * config->interval_length();
+
+    if (current_time
+        < (time_t)(initial_notif_time
+                   + (time_t)(notification_delay))) {
+      if (this->get_current_state() == HOST_UP)
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the host changed to an "
+          "UP state (or since program start), so we shouldn't notify "
+          "about this problem yet.";
+      else
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the host changed to a "
+          "non-UP state (or since program start), so we shouldn't notify "
+          "about this problem yet.";
+      return ERROR;
+    }
+  }
+
+  /* if this host is currently flapping, don't send the notification */
+  if (this->get_is_flapping()) {
+    logger(dbg_notifications, more)
+      << "This host is currently flapping, so we won't "
+      "send notifications.";
+    return ERROR;
+  }
+
+  /*
+   * if this host is currently in a scheduled downtime period,
+   * don't send the notification
+   */
+  if (this->get_scheduled_downtime_depth() > 0) {
+    logger(dbg_notifications, more)
+      << "This host is currently in a scheduled downtime, "
+      "so we won't send notifications.";
+    return ERROR;
+  }
+
+  /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
+  if (this->get_current_state() == HOST_UP)
+    return OK;
+
+  /* check if we shouldn't renotify contacts about the host problem */
+  if (this->get_no_more_notifications()) {
+    logger(dbg_notifications, more)
+      << "We shouldn't re-notify contacts about this host problem.";
+    return ERROR;
+  }
+
+  /* check if its time to re-notify the contacts about the host... */
+  if (current_time < this->get_next_host_notification()) {
+    logger(dbg_notifications, more)
+      << "Its not yet time to re-notify the contacts "
+      "about this host problem...";
+    time_t time = this->get_next_host_notification();
+    logger(dbg_notifications, more)
+      << "Next acceptable notification time: "
+      << my_ctime(&time);
+    return ERROR;
+  }
+
+  return OK;
 }
 

@@ -948,8 +948,7 @@ int handle_host_state(com::centreon::engine::host* hst) {
 
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (hst->get_state_type() == HARD_STATE)
-      host_notification(
-        hst,
+      hst->notify(
         NOTIFICATION_NORMAL,
         NULL,
         NULL,
@@ -981,8 +980,7 @@ int handle_host_state(com::centreon::engine::host* hst) {
          (hst->get_current_state() == HOST_UP
           && !host_other_props[hst->get_name()].recovery_been_sent))
         && hst->get_state_type() == HARD_STATE)
-      host_notification(
-        hst,
+      hst->notify(
         NOTIFICATION_NORMAL,
         NULL,
         NULL,

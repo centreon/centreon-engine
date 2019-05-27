@@ -18,7 +18,6 @@
 */
 
 #include <iomanip>
-#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/checks/viability_failure.hh"
@@ -36,9 +35,11 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
+#include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/sehandlers.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -1615,7 +1616,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
-      service_notification(this, NOTIFICATION_NORMAL, NULL, NULL,
+      notify(NOTIFICATION_NORMAL, NULL, NULL,
                            NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler to handle the hard state change */
@@ -1646,7 +1647,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                               this->get_description()}]
              .recovery_been_sent &&
         !hard_state_change) {
-      service_notification(this, NOTIFICATION_NORMAL, NULL, NULL,
+      notify(NOTIFICATION_NORMAL, NULL, NULL,
                            NOTIFICATION_OPTION_NONE);
     }
 
@@ -1793,7 +1794,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         route_result = temp_host->get_current_state();
 
         /* possibly re-send host notifications... */
-        host_notification(temp_host, NOTIFICATION_NORMAL, NULL, NULL,
+        temp_host->notify(NOTIFICATION_NORMAL, NULL, NULL,
                           NOTIFICATION_OPTION_NONE);
       }
     }
@@ -1977,7 +1978,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* (re)send notifications out about this service problem if the host is up
        * (and was at last check also) and the dependencies were okay... */
-      service_notification(this, NOTIFICATION_NORMAL, NULL, NULL,
+      notify(NOTIFICATION_NORMAL, NULL, NULL,
                            NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler if we changed state from the last hard
@@ -2719,7 +2720,7 @@ void service::set_flap(double percent_change,
 
   /* send a notification */
   if (allow_flapstart_notification)
-    service_notification(this, NOTIFICATION_FLAPPINGSTART, NULL, NULL,
+    notify(NOTIFICATION_FLAPPINGSTART, NULL, NULL,
                          NOTIFICATION_OPTION_NONE);
 }
 
@@ -2755,13 +2756,13 @@ void service::clear_flap(double percent_change,
                        percent_change, high_threshold, low_threshold, NULL);
 
   /* send a notification */
-  service_notification(this, NOTIFICATION_FLAPPINGSTOP, NULL, NULL,
+  notify(NOTIFICATION_FLAPPINGSTOP, NULL, NULL,
                        NOTIFICATION_OPTION_NONE);
 
   /* should we send a recovery notification? */
   if (this->check_flapping_recovery_notification &&
       this->current_state == STATE_OK)
-    service_notification(this, NOTIFICATION_NORMAL, NULL, NULL,
+    notify(NOTIFICATION_NORMAL, NULL, NULL,
                          NOTIFICATION_OPTION_NONE);
 
   /* clear the recovery notification flag */
@@ -2842,3 +2843,719 @@ void service::disable_flap_detection() {
   /* handle the details... */
   handle_service_flap_detection_disabled(this);
 }
+
+/* notify contacts about a service problem or recovery */
+int service::notify(unsigned int type,
+      char const* not_author,
+      char const* not_data,
+      int options) {
+  host* temp_host = nullptr;
+  notification* temp_notification = nullptr;
+  contact* temp_contact = nullptr;
+  time_t current_time;
+  struct timeval start_time;
+  struct timeval end_time;
+  int escalated = false;
+  int contacts_notified = 0;
+  int increment_notification_number = false;
+  nagios_macros mac;
+  int neb_result;
+
+  logger(dbg_functions, basic)
+    << "service_notification()";
+
+  /* get the current time */
+  time(&current_time);
+  gettimeofday(&start_time, nullptr);
+
+  logger(dbg_notifications, basic)
+    << "** Service Notification Attempt ** Host: '" << this->get_hostname()
+    << "', Service: '" << this->get_description()
+    << "', Type: " << type << ", Options: " << options
+    << ", Current State: " << this->current_state
+    << ", Last Notification: " << my_ctime(&this->last_notification);
+
+  /* if we couldn't find the host, return an error */
+  if ((temp_host = this->host_ptr) == nullptr) {
+    logger(dbg_notifications, basic)
+      << "Couldn't find the host associated with this service, so we "
+      "won't send a notification!";
+    return ERROR;
+  }
+
+  /* check the viability of sending out a service notification */
+  if (check_notification_viability(
+        type,
+        options) == ERROR) {
+    logger(dbg_notifications, basic)
+      << "Notification viability test failed.  No notification will "
+      "be sent out.";
+    return OK;
+  }
+
+  logger(dbg_notifications, basic)
+    << "Notification viability test passed.";
+
+  /* should the notification number be increased? */
+  if (type == NOTIFICATION_NORMAL
+      || (options & NOTIFICATION_OPTION_INCREMENT)) {
+    this->current_notification_number++;
+    increment_notification_number = true;
+  }
+
+  logger(dbg_notifications, more)
+    << "Current notification number: "
+    << this->current_notification_number
+    << " ("
+    << (increment_notification_number == true ? "incremented)" : "unchanged)");
+
+  /* save and increase the current notification id */
+  this->current_notification_id = next_notification_id;
+  next_notification_id++;
+
+  logger(dbg_notifications, most)
+    << "Creating list of contacts to be notified.";
+
+  /* create the contact notification list for this service */
+  memset(&mac, 0, sizeof(mac));
+  create_notification_list_from_service(&mac, this, options, &escalated);
+
+  /* send data to event broker */
+  end_time.tv_sec = 0L;
+  end_time.tv_usec = 0L;
+  neb_result = broker_notification_data(
+    NEBTYPE_NOTIFICATION_START,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    SERVICE_NOTIFICATION,
+    type,
+    start_time,
+    end_time,
+    (void*)this,
+    not_author,
+    not_data,
+    escalated,
+    0,
+    nullptr);
+  if (NEBERROR_CALLBACKCANCEL == neb_result) {
+    free_notification_list();
+    return ERROR;
+  }
+  else if (NEBERROR_CALLBACKOVERRIDE == neb_result) {
+    free_notification_list();
+    return OK;
+  }
+
+  /* we have contacts to notify... */
+  if (notification_list != nullptr) {
+
+    /* grab the macro variables */
+    grab_host_macros_r(&mac, temp_host);
+    grab_service_macros_r(&mac, this);
+
+    /*
+     * if this notification has an author, attempt to lookup the
+     * associated contact
+     */
+    if (not_author != nullptr) {
+
+      /* see if we can find the contact - first by name, then by alias */
+
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) == nullptr) {
+        for (std::unordered_map<std::string,
+                                std::shared_ptr<contact> >::const_iterator
+               it(state::instance().contacts().begin()),
+               end(state::instance().contacts().end());
+             it != end;
+             ++it) {
+          if (!strcmp(it->second->get_alias().c_str(), not_author)) {
+            temp_contact = it->second.get();
+            break;
+          }
+        }
+      }
+    }
+
+    /* get author and comment macros */
+    string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
+    string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
+    if (temp_contact) {
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME],
+        temp_contact->get_name());
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS],
+        temp_contact->get_alias());
+    }
+    else {
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
+    }
+
+    /*
+     * NOTE: these macros are deprecated and will likely disappear in next
+     * major release, If this is an acknowledgement, get author and comment
+     * macros
+     */
+    if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
+      string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
+      string::setstr(mac.x[MACRO_SERVICEACKCOMMENT], not_data);
+      if (temp_contact) {
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME],
+          temp_contact->get_name());
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS],
+          temp_contact->get_alias());
+      }
+      else {
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS]);
+      }
+    }
+
+    /* set the notification type macro */
+    if (type == NOTIFICATION_ACKNOWLEDGEMENT)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "ACKNOWLEDGEMENT");
+    else if (type == NOTIFICATION_FLAPPINGSTART)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTART");
+    else if (type == NOTIFICATION_FLAPPINGSTOP)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
+    else if (type == NOTIFICATION_FLAPPINGDISABLED)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGDISABLED");
+    else if (type == NOTIFICATION_DOWNTIMESTART)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMESTART");
+    else if (type == NOTIFICATION_DOWNTIMEEND)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMEEND");
+    else if (type == NOTIFICATION_DOWNTIMECANCELLED)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
+    else if (type == NOTIFICATION_CUSTOM)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
+    else if (this->current_state == STATE_OK)
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
+    else
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
+
+    /* set the notification number macro */
+    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONNUMBER],
+      this->current_notification_number);
+
+    /*
+     * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability
+     */
+    char const* notificationnumber(mac.x[MACRO_SERVICENOTIFICATIONNUMBER]);
+    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER],
+      notificationnumber ? notificationnumber : "");
+
+    /* set the notification id macro */
+    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONID],
+      this->current_notification_id);
+
+    /* notify each contact (duplicates have been removed) */
+    for (temp_notification = notification_list;
+         temp_notification != nullptr;
+         temp_notification = temp_notification->next) {
+
+      /* grab the macro variables for this contact */
+      grab_contact_macros_r(&mac, temp_notification->cntct);
+
+      /* clear summary macros (they are customized for each contact) */
+      clear_summary_macros_r(&mac);
+
+      /* notify this contact */
+      int result = notify_contact_of_service(
+                     &mac,
+                     temp_notification->cntct,
+                     this,
+                     type,
+                     not_author,
+                     not_data,
+                     options,
+                     escalated);
+
+      /* keep track of how many contacts were notified */
+      if (result == OK)
+        contacts_notified++;
+    }
+
+    /* free memory allocated to the notification list */
+    free_notification_list();
+
+    /*
+     * clear summary macros so they will be regenerated without contact
+     * filters when needed next
+     */
+    clear_summary_macros_r(&mac);
+
+    if (type == NOTIFICATION_NORMAL) {
+
+      /*
+       * adjust last/next notification time and notification flags if we
+       * notified someone
+       */
+      if (contacts_notified > 0) {
+
+        /* calculate the next acceptable re-notification time */
+        this->next_notification = get_next_service_notification_time(
+                                   this,
+                                   current_time);
+
+        logger(dbg_notifications, basic)
+          << contacts_notified << " contacts were notified.  "
+          "Next possible notification time: "
+          << my_ctime(&this->next_notification);
+
+        /*
+         * update the last notification time for this service (this is needed
+         * for rescheduling later notifications)
+         * */
+        this->last_notification = current_time;
+
+        /* update notifications flags */
+        if (this->current_state == STATE_UNKNOWN)
+          this->notified_on_unknown = true;
+        else if (this->current_state == STATE_WARNING)
+          this->notified_on_warning = true;
+        else if (this->current_state == STATE_CRITICAL)
+          this->notified_on_critical = true;
+      }
+
+      /* we didn't end up notifying anyone */
+      else if (increment_notification_number == true) {
+
+        /* adjust current notification number */
+        this->current_notification_number--;
+
+        logger(dbg_notifications, basic)
+          << "No contacts were notified.  Next possible "
+          "notification time: " << my_ctime(&this->next_notification);
+      }
+    }
+
+    logger(dbg_notifications, basic)
+      << contacts_notified << " contacts were notified.";
+  }
+
+  /* there were no contacts, so no notification really occurred... */
+  else {
+    /* readjust current notification number, since one didn't go out */
+    if (increment_notification_number == true)
+      this->current_notification_number--;
+
+    logger(dbg_notifications, basic)
+      << "No contacts were found for notification purposes.  "
+      "No notification was sent out.";
+  }
+
+  /* get the time we finished */
+  gettimeofday(&end_time, nullptr);
+
+  /* send data to event broker */
+  broker_notification_data(
+    NEBTYPE_NOTIFICATION_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    SERVICE_NOTIFICATION,
+    type,
+    start_time,
+    end_time,
+    (void*)this,
+    not_author,
+    not_data,
+    escalated,
+    contacts_notified,
+    nullptr);
+
+  /* update the status log with the service information */
+  update_service_status(this, false);
+
+  /* clear volatile macros */
+  clear_volatile_macros_r(&mac);
+
+  /* Update recovery been sent parameter */
+  if (this->current_state == STATE_OK)
+    service_other_props[std::make_pair(
+                        this->host_ptr->get_name(),
+                        this->get_description())].recovery_been_sent = true;
+
+  return OK;
+}
+
+/* checks the viability of sending out a service alert (top level filters) */
+int service::check_notification_viability(
+      unsigned int type,
+      int options) {
+  host* temp_host;
+  timeperiod* temp_period;
+  time_t current_time;
+  time_t timeperiod_start;
+
+  logger(dbg_functions, basic)
+    << "check_service_notification_viability()";
+
+  /* forced notifications bust through everything */
+  if (options & NOTIFICATION_OPTION_FORCED) {
+    logger(dbg_notifications, more)
+      << "This is a forced service notification, so we'll send it out.";
+    return OK;
+  }
+
+  /* get current time */
+  time(&current_time);
+
+  /* are notifications enabled? */
+  if (config->enable_notifications() == false) {
+    logger(dbg_notifications, more)
+      << "Notifications are disabled, so service notifications will "
+      "not be sent out.";
+    return ERROR;
+  }
+
+  /* find the host this service is associated with */
+  if ((temp_host = (host*)this->host_ptr) == nullptr) {
+    logger(dbg_notifications, more)
+      << "Couldn't find the host associated with this service, "
+      "so we won't send a notification.";
+    return ERROR;
+  }
+
+  /* if the service has no notification period, inherit one from the host */
+  temp_period = this->notification_period_ptr;
+  if (temp_period == nullptr)
+    temp_period = this->host_ptr->notification_period_ptr;
+
+  // See if the service can have notifications sent out at this time.
+  {
+    timezone_locker lock(get_service_timezone(
+                           this->get_hostname(),
+                           this->get_description()));
+    if (check_time_against_period(current_time, temp_period) == ERROR) {
+      logger(dbg_notifications, more)
+        << "This service shouldn't have notifications sent out "
+        "at this time.";
+
+      // Calculate the next acceptable notification time,
+      // once the next valid time range arrives...
+      if (type == NOTIFICATION_NORMAL) {
+        get_next_valid_time(
+          current_time,
+          &timeperiod_start,
+          this->notification_period_ptr);
+
+        // Looks like there are no valid notification times defined, so
+        // schedule the next one far into the future (one year)...
+        if (timeperiod_start == (time_t)0)
+          this->next_notification
+            = (time_t)(current_time + (60 * 60 * 24 * 365));
+        // Else use the next valid notification time.
+        else
+          this->next_notification = timeperiod_start;
+        logger(dbg_notifications, more)
+          << "Next possible notification time: "
+          << my_ctime(&this->next_notification);
+      }
+
+      return ERROR;
+    }
+  }
+
+  /* are notifications temporarily disabled for this service? */
+  if (this->notifications_enabled == false) {
+    logger(dbg_notifications, more)
+      << "Notifications are temporarily disabled for "
+      "this service, so we won't send one out.";
+    return ERROR;
+  }
+
+  /*********************************************/
+  /*** SPECIAL CASE FOR CUSTOM NOTIFICATIONS ***/
+  /*********************************************/
+
+  /* custom notifications are good to go at this point... */
+  if (type == NOTIFICATION_CUSTOM) {
+    if (this->scheduled_downtime_depth > 0
+        || temp_host->get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+        << "We shouldn't send custom notification during "
+        "scheduled downtime.";
+      return ERROR;
+    }
+    return OK;
+  }
+
+  /****************************************/
+  /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
+  /****************************************/
+
+  /*
+   * acknowledgements only have to pass three general filters, although they
+   * have another test of their own...
+   */
+  if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
+
+    /* don't send an acknowledgement if there isn't a problem... */
+    if (this->current_state == STATE_OK) {
+      logger(dbg_notifications, more)
+        << "The service is currently OK, so we won't send an "
+        "acknowledgement.";
+      return ERROR;
+    }
+
+    /*
+     * acknowledgement viability test passed, so the notification can be sent
+     * out
+     */
+    return OK;
+  }
+
+
+  /****************************************/
+  /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
+  /****************************************/
+
+  /* flapping notifications only have to pass three general filters */
+  if (type == NOTIFICATION_FLAPPINGSTART
+      || type == NOTIFICATION_FLAPPINGSTOP
+      || type == NOTIFICATION_FLAPPINGDISABLED) {
+
+    /* don't send a notification if we're not supposed to... */
+    if (this->notify_on_flapping == false) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about FLAPPING events for this "
+        "service.";
+      return ERROR;
+    }
+
+    /* don't send notifications during scheduled downtime */
+    if (this->scheduled_downtime_depth > 0
+        || temp_host->get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about FLAPPING events during "
+        "scheduled downtime.";
+      return ERROR;
+    }
+
+    /* flapping viability test passed, so the notification can be sent out */
+    return OK;
+  }
+
+  /****************************************/
+  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
+  /****************************************/
+
+  /* downtime notifications only have to pass three general filters */
+  if (type == NOTIFICATION_DOWNTIMESTART
+      || type == NOTIFICATION_DOWNTIMEEND
+      || type == NOTIFICATION_DOWNTIMECANCELLED) {
+
+    /* don't send a notification if we're not supposed to... */
+    if (this->notify_on_downtime == false) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about DOWNTIME events for "
+        "this service.";
+      return ERROR;
+    }
+
+    /*
+     * don't send notifications during scheduled downtime (for service only,
+     * not host)
+     */
+    if (this->scheduled_downtime_depth > 0) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about DOWNTIME events during "
+        "scheduled downtime.";
+      return ERROR;
+    }
+
+    /* downtime viability test passed, so the notification can be sent out */
+    return OK;
+  }
+
+  /****************************************/
+  /*** NORMAL NOTIFICATIONS ***************/
+  /****************************************/
+
+  /* is this a hard problem/recovery? */
+  if (this->state_type == SOFT_STATE) {
+    logger(dbg_notifications, more)
+      << "This service is in a soft state, so we won't send a "
+      "notification out.";
+    return ERROR;
+  }
+
+  /* has this problem already been acknowledged? */
+  if (this->problem_has_been_acknowledged == true) {
+    logger(dbg_notifications, more)
+      << "This service problem has already been acknowledged, "
+      "so we won't send a notification out.";
+    return ERROR;
+  }
+
+  /* check service notification dependencies */
+  if (check_service_dependencies(
+        this,
+        hostdependency::notification) == DEPENDENCIES_FAILED) {
+    logger(dbg_notifications, more)
+      << "Service notification dependencies for this service "
+      "have failed, so we won't sent a notification out.";
+    return ERROR;
+  }
+
+  /* check host notification dependencies */
+  if (check_host_dependencies(
+        temp_host,
+        hostdependency::notification) == DEPENDENCIES_FAILED) {
+    logger(dbg_notifications, more)
+      << "Host notification dependencies for this service have failed, "
+      "so we won't sent a notification out.";
+    return ERROR;
+  }
+
+  /* see if we should notify about problems with this service */
+  if (this->current_state == STATE_UNKNOWN
+      && this->notify_on_unknown == false) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about UNKNOWN states for this service.";
+    return ERROR;
+  }
+  if (this->current_state == STATE_WARNING
+      && this->notify_on_warning == false) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about WARNING states for this service.";
+    return ERROR;
+  }
+  if (this->current_state == STATE_CRITICAL
+      && this->notify_on_critical == false) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about CRITICAL states for this service.";
+    return ERROR;
+  }
+  if (this->current_state == STATE_OK) {
+    if (this->notify_on_recovery == false) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about RECOVERY states for this service.";
+      return ERROR;
+    }
+    if (!(this->notified_on_unknown == true
+          || this->notified_on_warning == true
+          || this->notified_on_critical == true)) {
+      logger(dbg_notifications, more)
+        << "We shouldn't notify about this recovery.";
+      return ERROR;
+    }
+  }
+
+  /* see if enough time has elapsed for first notification */
+  if (type == NOTIFICATION_NORMAL
+      && (this->current_notification_number == 0
+          || (this->current_state == STATE_OK
+                && !service_other_props[std::make_pair(
+                    this->host_ptr->get_name(),
+                    this->get_description())].recovery_been_sent))) {
+
+    /* get the time at which a notification should have been sent */
+    time_t& initial_notif_time(
+              service_other_props[std::make_pair(
+                                         this->host_ptr->get_name(),
+                                         this->get_description())].initial_notif_time);
+
+    /* if not set, set it to now */
+    if (!initial_notif_time)
+      initial_notif_time = time(nullptr);
+
+    double notification_delay = (this->current_state != STATE_OK ?
+             this->first_notification_delay
+             : service_other_props[std::make_pair(
+                 this->host_ptr->get_name(),
+                 this->get_description())].recovery_notification_delay)
+        * config->interval_length();
+
+    if (current_time
+        < (time_t)(initial_notif_time
+                   + (time_t)(notification_delay))) {
+      if (this->current_state == STATE_OK)
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the service changed to a "
+          "OK state, so we should not notify about this problem yet";
+      else
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the service changed to a "
+          "non-OK state, so we should not notify about this problem yet";
+      return ERROR;
+    }
+  }
+
+  /* if this service is currently flapping, don't send the notification */
+  if (this->is_flapping == true) {
+    logger(dbg_notifications, more)
+      << "This service is currently flapping, so we won't send "
+      "notifications.";
+    return ERROR;
+  }
+
+  /*
+   * if this service is currently in a scheduled downtime period, don't send
+   * the notification
+   */
+  if (this->scheduled_downtime_depth > 0) {
+    logger(dbg_notifications, more)
+      << "This service is currently in a scheduled downtime, so "
+      "we won't send notifications.";
+    return ERROR;
+  }
+
+  /*
+   * if this host is currently in a scheduled downtime period, don't send the
+   * notification
+   * */
+  if (temp_host->get_scheduled_downtime_depth() > 0) {
+    logger(dbg_notifications, more)
+      << "The host this service is associated with is currently in "
+      "a scheduled downtime, so we won't send notifications.";
+    return ERROR;
+  }
+
+  /*
+   ***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT IF ANY OTHER *****
+   ***** NOTIFICATION WAS SENT                                            *****
+   */
+  if (this->current_state == STATE_OK)
+    return ((this->current_notification_number > 0)
+            ? OK
+            : ERROR);
+
+  /*
+   * don't notify contacts about this service problem again if the notification
+   * interval is set to 0
+   */
+  if (this->no_more_notifications == true) {
+    logger(dbg_notifications, more)
+      << "We shouldn't re-notify contacts about this service problem.";
+    return ERROR;
+  }
+
+  /*
+   * if the host is down or unreachable, don't notify contacts about service
+   * failures
+   */
+  if (temp_host->get_current_state() != HOST_UP) {
+    logger(dbg_notifications, more)
+      << "The host is either down or unreachable, so we won't "
+      "notify contacts about this service.";
+    return ERROR;
+  }
+
+  /*
+   * don't notify if we haven't waited long enough since the last time (and
+   * the service is not marked as being volatile)
+   */
+  if ((current_time < this->next_notification)
+      && this->is_volatile == false) {
+    logger(dbg_notifications, more)
+      << "We haven't waited long enough to re-notify contacts "
+      "about this service.";
+    logger(dbg_notifications, more)
+      << "Next valid notification time: "
+      << my_ctime(&this->next_notification);
+    return ERROR;
+  }
+
+  return OK;
+}
+

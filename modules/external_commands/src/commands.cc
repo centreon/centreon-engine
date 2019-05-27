@@ -3014,8 +3014,7 @@ void acknowledge_service_problem(
 
   /* send out an acknowledgement notification */
   if (notify)
-    service_notification(
-      svc,
+    svc->notify(
       NOTIFICATION_ACKNOWLEDGEMENT,
       ack_author,
       ack_data,
@@ -4095,15 +4094,6 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
     attr,
     hst->get_modified_attributes(),
     nullptr);
-
-  /* update the status log with the host info */
-  hst->update_status(false);
-}
-
-/* sets the current notification number for a specific host */
-void set_host_notification_number(com::centreon::engine::host* hst, int num) {
-  /* set the notification number */
-  hst->set_current_notification_number(num);
 
   /* update the status log with the host info */
   hst->update_status(false);

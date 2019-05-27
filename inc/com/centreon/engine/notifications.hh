@@ -57,18 +57,6 @@ extern "C" {
 
 // Notification Functions
 
-// notify all contacts about a service (problem or recovery)
-int service_notification(
-      com::centreon::engine::service* svc,
-      unsigned int type,
-      char const* not_author,
-      char const* not_data,
-      int options);
-// checks viability of notifying all contacts about a service
-int check_service_notification_viability(
-      com::centreon::engine::service* svc,
-      unsigned int type,
-      int options);
 // checks viability of notifying a contact about a service
 int check_contact_service_notification_viability(
       com::centreon::engine::contact* cntct,
@@ -104,11 +92,6 @@ int host_notification(
       unsigned int type,
       char const* not_author,
       char const* not_data,
-      int options);
-// checks viability of notifying all contacts about a host
-int check_host_notification_viability(
-      com::centreon::engine::host* hst,
-      unsigned int type,
       int options);
 // checks viability of notifying a contact about a host
 int check_contact_host_notification_viability(

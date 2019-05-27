@@ -189,8 +189,7 @@ int service_downtime::unschedule() {
            "for service has been cancelled.";
 
       /* send a notification */
-      service_notification(
-        svc,
+      svc->notify(
         NOTIFICATION_DOWNTIMECANCELLED,
         nullptr,
         nullptr,
@@ -393,8 +392,7 @@ int service_downtime::handle() {
         "downtime";
 
       /* send a notification */
-      service_notification(
-        svc,
+      svc->notify(
         NOTIFICATION_DOWNTIMEEND,
         get_author().c_str(),
         get_comment().c_str(),
@@ -478,8 +476,7 @@ int service_downtime::handle() {
         "downtime";
 
       /* send a notification */
-      service_notification(
-        svc,
+      svc->notify(
         NOTIFICATION_DOWNTIMESTART,
         get_author().c_str(),
         get_comment().c_str(),

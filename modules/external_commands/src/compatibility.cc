@@ -1334,7 +1334,7 @@ int process_service_command(int cmd,
     if (str)
       buf[1] = string::dup(str);
     if (buf[0] && buf[1])
-      service_notification(temp_service,
+      temp_service->notify(
                            NOTIFICATION_CUSTOM,
                            buf[0],
                            buf[1],

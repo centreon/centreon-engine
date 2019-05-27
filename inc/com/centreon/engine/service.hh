@@ -88,6 +88,12 @@ class                           service : public notifier {
                                            double low_threshold);
   void                          enable_flap_detection();
   void                          disable_flap_detection();
+  int                           notify(unsigned int type,
+                                       char const* not_author,
+                                       char const* not_data,
+                                       int options);
+  int                           check_notification_viability(unsigned int type,
+                                                             int options);
 
   char*                         event_handler;
   int                           max_attempts;
