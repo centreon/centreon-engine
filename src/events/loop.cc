@@ -327,7 +327,7 @@ void loop::_dispatching() {
           }
           temp_event->run_time = temp_service->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
-          update_service_status(temp_service, false);
+          temp_service->update_status(false);
           run_event = false;
         }
       }

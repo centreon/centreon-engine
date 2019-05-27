@@ -600,7 +600,7 @@ void compensate_for_system_time_change(
           svc->last_notification);
 
     // update the status data.
-    update_service_status(svc, false);
+    svc->update_status(false);
   }
 
   // adjust host timestamps.

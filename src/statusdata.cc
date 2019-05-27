@@ -75,15 +75,3 @@ int update_program_status(int aggregated_dump) {
   return OK;
 }
 
-/* updates service status info */
-int update_service_status(com::centreon::engine::service* svc, int aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == false)
-    broker_service_status(
-      NEBTYPE_SERVICESTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      svc,
-      NULL);
-  return OK;
-}

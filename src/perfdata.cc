@@ -26,17 +26,3 @@
 /****************** PERFORMANCE DATA FUNCTIONS ********************/
 /******************************************************************/
 
-/* updates host performance data */
-int update_host_performance_data(com::centreon::engine::host* hst) {
-  /* should we be processing performance data for anything? */
-  if (!config->process_performance_data())
-    return OK;
-
-  /* should we process performance data for this host? */
-  if (!hst->get_process_performance_data())
-    return OK;
-
-  /* process the performance data! */
-  xpddefault_update_host_performance_data(hst);
-  return OK;
-}

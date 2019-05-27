@@ -178,7 +178,7 @@ int service_downtime::unschedule() {
       nullptr);
 
     svc->scheduled_downtime_depth--;
-    update_service_status(svc, false);
+    svc->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
     if (svc->scheduled_downtime_depth == 0) {
@@ -400,7 +400,7 @@ int service_downtime::handle() {
     }
 
     /* update the status data */
-    update_service_status(svc, false);
+    svc->update_status(false);
 
     /* decrement pending flex downtime if necessary */
     if (!is_fixed()
@@ -490,7 +490,7 @@ int service_downtime::handle() {
     _set_in_effect(true);
 
     /* update the status data */
-    update_service_status(svc, false);
+    svc->update_status(false);
 
     /* schedule an event */
     if (!is_fixed())

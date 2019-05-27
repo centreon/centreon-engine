@@ -1782,7 +1782,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the service info */
-    update_service_status(temp_service, false);
+    temp_service->update_status(false);
     break;
 
   case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
@@ -2141,7 +2141,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the service info */
-    update_service_status(temp_service, false);
+    temp_service->update_status(false);
     break;
 
   case CMD_CHANGE_HOST_EVENT_HANDLER:
@@ -2283,7 +2283,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       temp_service->custom_variables.insert(
           {std::move(varname), customvariable(std::move(varvalue))});
       temp_service->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-      update_service_status(temp_service, false);
+      temp_service->update_status(false);
     }
     break;
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
@@ -2375,7 +2375,7 @@ void disable_service_checks(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enables a service check */
@@ -2429,7 +2429,7 @@ void enable_service_checks(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enable notifications on a program-wide basis */
@@ -2520,7 +2520,7 @@ void enable_service_notifications(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* disables notifications for a service */
@@ -2549,7 +2549,7 @@ void disable_service_notifications(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enables notifications for a host */
@@ -3021,7 +3021,7 @@ void acknowledge_service_problem(
       NOTIFICATION_OPTION_NONE);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com =
@@ -3058,7 +3058,7 @@ void remove_service_acknowledgement(com::centreon::engine::service* svc) {
   svc->problem_has_been_acknowledged = false;
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
   comment::delete_service_acknowledgement_comments(svc);
@@ -3210,7 +3210,7 @@ void enable_passive_service_checks(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* disables passive service checks for a particular service */
@@ -3239,7 +3239,7 @@ void disable_passive_service_checks(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* starts executing host checks */
@@ -3509,7 +3509,7 @@ void enable_service_event_handler(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* disables the event handler for a particular service */
@@ -3538,7 +3538,7 @@ void disable_service_event_handler(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enables the event handler for a particular host */
@@ -4007,7 +4007,7 @@ void start_obsessing_over_service(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* stop obsessing over a particular service */
@@ -4036,7 +4036,7 @@ void stop_obsessing_over_service(com::centreon::engine::service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* start obsessing over a particular host */
@@ -4099,11 +4099,3 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
   hst->update_status(false);
 }
 
-/* sets the current notification number for a specific service */
-void set_service_notification_number(com::centreon::engine::service* svc, int num) {
-  /* set the notification number */
-  svc->current_notification_number = num;
-
-  /* update the status log with the service info */
-  update_service_status(svc, false);
-}

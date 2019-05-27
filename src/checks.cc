@@ -82,86 +82,6 @@ int reap_check_results() {
 /******************************************************************/
 
 /* handles asynchronous service check results */
-/* checks viability of performing a service check */
-int check_service_check_viability(
-      com::centreon::engine::service* svc,
-      int check_options,
-      int* time_is_valid,
-      time_t* new_time) {
-  int perform_check = true;
-  time_t current_time = 0L;
-  time_t preferred_time = 0L;
-  int check_interval = 0;
-
-  logger(dbg_functions, basic)
-    << "check_service_check_viability()";
-
-  /* make sure we have a service */
-  if (svc == NULL)
-    return ERROR;
-
-  /* get the check interval to use if we need to reschedule the check */
-  if (svc->state_type == SOFT_STATE && svc->current_state != STATE_OK)
-    check_interval = static_cast<int>(svc->get_retry_interval() * config->interval_length());
-  else
-    check_interval = static_cast<int>(svc->get_check_interval() * config->interval_length());
-
-  /* get the current time */
-  time(&current_time);
-
-  /* initialize the next preferred check time */
-  preferred_time = current_time;
-
-  /* can we check the host right now? */
-  if (!(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-
-    /* if checks of the service are currently disabled... */
-    if (!svc->checks_enabled) {
-      preferred_time = current_time + check_interval;
-      perform_check = false;
-
-      logger(dbg_checks, most)
-        << "Active checks of the service are currently disabled.";
-    }
-
-    // Make sure this is a valid time to check the service.
-    {
-      timezone_locker lock(get_service_timezone(
-                             svc->get_hostname(),
-                             svc->get_description()));
-      if (check_time_against_period(
-            (unsigned long)current_time,
-            svc->check_period_ptr) == ERROR) {
-        preferred_time = current_time;
-        if (time_is_valid)
-          *time_is_valid = false;
-        perform_check = false;
-        logger(dbg_checks, most)
-          << "This is not a valid time for this service to be actively "
-             "checked.";
-      }
-    }
-
-    /* check service dependencies for execution */
-    if (check_service_dependencies(
-          svc,
-          hostdependency::execution) == DEPENDENCIES_FAILED) {
-      preferred_time = current_time + check_interval;
-      perform_check = false;
-
-      logger(dbg_checks, most)
-        << "Execution dependencies for this service failed, so it will "
-        "not be actively checked.";
-    }
-  }
-
-  /* pass back the next viable check time */
-  if (new_time)
-    *new_time = preferred_time;
-
-  return ((perform_check) ? OK : ERROR);
-}
-
 /* checks service dependencies */
 unsigned int check_service_dependencies(
                com::centreon::engine::service* svc,
@@ -876,11 +796,6 @@ int run_sync_host_check_3x(
   return OK;
 }
 
-int execute_sync_host_check_3x(com::centreon::engine::host* hst) {
-  (void)hst;
-  return ERROR;
-}
-
 /* processes the result of a synchronous or asynchronous host check */
 int process_host_check_result_3x(com::centreon::engine::host* hst,
                                  int new_state,
@@ -1312,7 +1227,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
                            << ", Final State=" << hst->get_current_state();
 
   /* handle the host state */
-  handle_host_state(hst);
+  hst->handle_state();
 
   logger(dbg_checks, more) << "Post-handle_host_state() Host: "
                            << hst->get_name()
@@ -1419,82 +1334,6 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
   }
   free_objectlist(&check_hostlist);
   return OK;
-}
-
-/* checks viability of performing a host check */
-int check_host_check_viability_3x(
-      com::centreon::engine::host* hst,
-      int check_options,
-      int* time_is_valid,
-      time_t* new_time) {
-  int result = OK;
-  int perform_check = true;
-  time_t current_time = 0L;
-  time_t preferred_time = 0L;
-  int check_interval = 0;
-
-  logger(dbg_functions, basic)
-    << "check_host_check_viability_3x()";
-
-  /* make sure we have a host */
-  if (hst == NULL)
-    return ERROR;
-
-  /* get the check interval to use if we need to reschedule the check */
-  if (hst->get_state_type() == SOFT_STATE && hst->get_current_state() != HOST_UP)
-    check_interval
-      = static_cast<int>(hst->get_retry_interval() * config->interval_length());
-  else
-    check_interval
-      = static_cast<int>(hst->get_check_interval() * config->interval_length());
-
-  /* make sure check interval is positive - otherwise use 5 minutes out for next check */
-  if (check_interval <= 0)
-    check_interval = 300;
-
-  /* get the current time */
-  time(&current_time);
-
-  /* initialize the next preferred check time */
-  preferred_time = current_time;
-
-  /* can we check the host right now? */
-  if (!(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-
-    /* if checks of the host are currently disabled... */
-    if (!hst->get_checks_enabled()) {
-      preferred_time = current_time + check_interval;
-      perform_check = false;
-    }
-
-    // Make sure this is a valid time to check the host.
-    {
-      timezone_locker lock(get_host_timezone(hst->get_name()));
-      if (check_time_against_period(
-            static_cast<unsigned long>(current_time),
-            hst->check_period_ptr) == ERROR) {
-        preferred_time = current_time;
-        if (time_is_valid)
-          *time_is_valid = false;
-        perform_check = false;
-      }
-    }
-
-    /* check host dependencies for execution */
-    if (check_host_dependencies(
-          hst,
-          hostdependency::execution) == DEPENDENCIES_FAILED) {
-      preferred_time = current_time + check_interval;
-      perform_check = false;
-    }
-  }
-
-  /* pass back the next viable check time */
-  if (new_time)
-    *new_time = preferred_time;
-
-  result = (perform_check) ? OK : ERROR;
-  return result;
 }
 
 /* adjusts current host check attempt before a new check is performed */

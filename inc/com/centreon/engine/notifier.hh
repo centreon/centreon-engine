@@ -47,6 +47,8 @@ class                         notifier {
   void                        set_check_interval(double check_interval);
   double                      get_retry_interval() const;
   void                        set_retry_interval(double retry_interval);
+  void                        set_notification_number(int num);
+  virtual void                update_status(bool aggregated_dump) = 0;
 
  protected:
   std::string                 _display_name;
@@ -54,7 +56,7 @@ class                         notifier {
   int                         _initial_state;
   double                      _check_interval;
   double                      _retry_interval;
-
+  int                         _current_notification_number;
 };
 
 CCE_END()

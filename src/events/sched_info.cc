@@ -190,7 +190,7 @@ void adjust_check_scheduling() {
     else {
       tmp->run_time = new_run_time;
       svc->next_check = new_run_time;
-      update_service_status(svc, false);
+      svc->update_status(false);
     }
 
     current_icd_offset += inter_check_delay;

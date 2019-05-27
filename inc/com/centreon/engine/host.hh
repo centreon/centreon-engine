@@ -138,15 +138,19 @@ class                 host : public notifier {
                                 double low_threshold);
   void               enable_flap_detection();
   void               disable_flap_detection();
-  void               update_status(bool aggregated_dump);
+  void               update_status(bool aggregated_dump) override;
   void               check_for_expired_acknowledgement();
-  void               set_notification_number(int num);
   int                notify(unsigned int type,
                             char const* not_author,
                             char const* not_data,
                             int options);
   int                check_notification_viability(unsigned int type,
                                                   int options);
+  int                handle_state();
+  void               update_performance_data();
+  int                verify_check_viability(int check_options,
+                                            int* time_is_valid,
+                                            time_t* new_time);
 
   // setters / getters
   std::string const& get_name() const;
@@ -454,7 +458,6 @@ private:
   bool                _is_being_freshened;
   bool                _notified_on_down;
   bool                _notified_on_unreachable;
-  int                 _current_notification_number;
   int                 _no_more_notifications;
   unsigned long       _current_notification_id;
   int                 _check_flapping_recovery_notification;

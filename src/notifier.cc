@@ -97,3 +97,15 @@ void notifier::set_retry_interval(double retry_interval) {
   _retry_interval = retry_interval;
 }
 
+/**
+ * @brief Set the current notification number and update the notifier status.
+ *
+ * @param num The notification number.
+ */
+void notifier::set_notification_number(int num) {
+  /* set the notification number */
+  _current_notification_number = num;
+
+  /* update the status log with the host info */
+  update_status(false);
+}

@@ -1089,7 +1089,7 @@ void applier::scheduler::_schedule_service_events(
     engine::service& svc(*services[i]);
 
     // update status of all services (scheduled or not).
-    update_service_status(&svc, false);
+    svc.update_status(false);
 
     // skip most services that shouldn't be scheduled.
     if (!svc.should_be_scheduled) {

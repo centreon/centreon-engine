@@ -68,14 +68,6 @@ extern "C" {
 
 int reap_check_results();
 
-// Service Check Functions
-
-int check_service_check_viability(
-      com::centreon::engine::service* svc,
-      int check_options,
-      int* time_is_valid,
-      time_t* new_time);
-
 // Monitoring/Event Handler Functions
 
 // checks service dependencies
@@ -128,7 +120,6 @@ int run_sync_host_check_3x(
       int check_options,
       int use_cached_result,
       unsigned long check_timestamp_horizon);
-int execute_sync_host_check_3x(com::centreon::engine::host* hst);
 int process_host_check_result_3x(
       com::centreon::engine::host* hst,
       int new_state,
@@ -137,11 +128,6 @@ int process_host_check_result_3x(
       int reschedule_check,
       int use_cached_result,
       unsigned long check_timestamp_horizon);
-int check_host_check_viability_3x(
-      com::centreon::engine::host* hst,
-      int check_options,
-      int* time_is_valid,
-      time_t* new_time);
 int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
                                  int is_active);
 int determine_host_reachability(com::centreon::engine::host* hst);

@@ -324,5 +324,5 @@ void applier::service::_update(
         .recovery_been_sent = *state.recovery_been_sent();
 
   // update service status.
-  update_service_status(&obj, false);
+  obj.update_status(false);
 }

@@ -244,5 +244,5 @@ void handle_service_flap_detection_disabled(com::centreon::engine::service* svc)
   }
 
   /* update service status */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }

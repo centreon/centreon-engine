@@ -88,12 +88,17 @@ class                           service : public notifier {
                                            double low_threshold);
   void                          enable_flap_detection();
   void                          disable_flap_detection();
+  void                          update_status(bool aggregated_dump) override;
+  void                          set_notification_number(int num);
   int                           notify(unsigned int type,
                                        char const* not_author,
                                        char const* not_data,
                                        int options);
   int                           check_notification_viability(unsigned int type,
                                                              int options);
+  int                           verify_check_viability(int check_options,
+                                                       int* time_is_valid,
+                                                       time_t* new_time);
 
   char*                         event_handler;
   int                           max_attempts;
