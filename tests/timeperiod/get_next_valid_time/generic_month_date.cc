@@ -19,7 +19,7 @@
 
 #include <cstring>
 #include <gtest/gtest.h>
-#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -27,12 +27,21 @@ using namespace com::centreon::engine;
 
 class         GetNextValidTimeGenericMonthDateTest : public ::testing::Test {
  public:
+  void SetUp() override {
+    configuration::applier::state::load();
+  }
+
+  void TearDown() override {
+    configuration::applier::state::unload();
+  }
+
   void        default_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);
     // day 25 10:45-14:25
     dr = _creator.new_generic_month_date(25, 25);
     _creator.new_timerange(10, 45, 14, 25, dr);
+
     // day 27-day 28 08:30-12:30,18:30-21:15
     dr = _creator.new_generic_month_date(27, 28);
     _creator.new_timerange(8, 30, 12, 30, dr);

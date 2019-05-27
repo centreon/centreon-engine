@@ -22,10 +22,11 @@
 #  define CCE_BROKER_HH
 
 #  include <sys/time.h>
+#  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/service.hh"
-#  include "com/centreon/engine/commands/command.hh"
+#  include "com/centreon/engine/timeperiod.hh"
 
 /* Event broker options. */
 #  define BROKER_NOTHING                           0
@@ -376,7 +377,7 @@ void           broker_adaptive_timeperiod_data(
                  int type,
                  int flags,
                  int attr,
-                 timeperiod_struct* tp,
+                 com::centreon::engine::timeperiod* tp,
                  int command_type,
                  struct timeval const* timestamp);
 void           broker_aggregated_status_data(

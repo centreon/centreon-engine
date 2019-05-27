@@ -18,7 +18,6 @@
 */
 
 #include <gtest/gtest.h>
-#include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -42,19 +41,19 @@ class    GetNextValidTimeSkipIntervalTest : public ::testing::Test {
                              10,
                              1));
     _creator.new_timerange(8, 0, 17, 0, dr);
-    dr->skip_interval = 5;
+    dr->set_skip_interval(5);
   }
 
   void   specific_month_date_skip() {
     daterange* dr(_creator.new_specific_month_date(10, 19, 11, 24));
     _creator.new_timerange(8, 0, 17, 0, dr);
-    dr->skip_interval = 5;
+    dr->set_skip_interval(5);
   }
 
   void   generic_month_date_skip() {
     daterange* dr(_creator.new_generic_month_date(19, 30));
     _creator.new_timerange(8, 0, 17, 0, dr);
-    dr->skip_interval = 5;
+    dr->set_skip_interval(5);
   }
 
   void   offset_weekday_of_specific_month_skip() {
@@ -66,7 +65,7 @@ class    GetNextValidTimeSkipIntervalTest : public ::testing::Test {
                              6,
                              -1));
     _creator.new_timerange(8, 0, 17, 0, dr);
-    dr->skip_interval = 5;
+    dr->set_skip_interval(5);
   }
 
   void   offset_weekday_of_generic_month_skip() {
@@ -76,7 +75,7 @@ class    GetNextValidTimeSkipIntervalTest : public ::testing::Test {
                              6,
                              -1));
     _creator.new_timerange(8, 0, 17, 0, dr);
-    dr->skip_interval = 5;
+    dr->set_skip_interval(5);
   }
 
  protected:

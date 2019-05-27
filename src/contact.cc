@@ -301,12 +301,12 @@ bool operator!=(
 std::ostream& operator<<(std::ostream& os, contact const& obj) {
   std::string cg_name(static_cast<contactgroup const*>(
       obj.contactgroups_ptr->object_ptr)->get_name());
-  char const* hst_notif_str(NULL);
+  std::string hst_notif_str;
   if (obj.host_notification_period_ptr)
-    hst_notif_str = chkstr(obj.host_notification_period_ptr->name);
-  char const* svc_notif_str(NULL);
+    hst_notif_str = obj.host_notification_period_ptr->get_name();
+  std::string svc_notif_str;
   if (obj.service_notification_period_ptr)
-    svc_notif_str = chkstr(obj.service_notification_period_ptr->name);
+    svc_notif_str = obj.service_notification_period_ptr->get_name();
 
   os << "contact {\n"
     "  name:                            " << obj.get_name() << "\n"
@@ -349,8 +349,8 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  modified_attributes:             " << obj.get_modified_attributes() << "\n"
     "  modified_host_attributes:        " << obj.get_modified_host_attributes() << "\n"
     "  modified_service_attributes:     " << obj.get_modified_service_attributes() << "\n"
-    "  host_notification_period_ptr:    " << chkstr(hst_notif_str) << "\n"
-    "  service_notification_period_ptr: " << chkstr(svc_notif_str) << "\n"
+    "  host_notification_period_ptr:    " << hst_notif_str << "\n"
+    "  service_notification_period_ptr: " << svc_notif_str << "\n"
     "  contactgroups_ptr:               " << cg_name << "\n"
     "  customvariables:                 ";
   for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
@@ -433,7 +433,7 @@ contact* add_contact(
   if (name.empty()) {
     logger(log_config_error, basic)
       << "Error: Contact name is empty";
-    return NULL;
+    return nullptr;
   }
 
   // Check if the contact already exist.
@@ -441,7 +441,7 @@ contact* add_contact(
   if (configuration::applier::state::instance().contacts().count(id)) {
     logger(log_config_error, basic)
       << "Error: Contact '" << name << "' has already been defined";
-    return NULL;
+    return nullptr;
   }
 
   // Allocate memory for a new contact.
@@ -492,7 +492,7 @@ contact* add_contact(
     state::instance().contacts()[id] = obj;
 
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
+    timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_contact_data(
       NEBTYPE_CONTACT_ADD,
       NEBFLAG_NONE,
@@ -751,7 +751,7 @@ void contact::update_status_info(bool aggregated_dump) {
       NEBFLAG_NONE,
       NEBATTR_NONE,
       this,
-      NULL);
+      nullptr);
 }
 
 std::list<std::shared_ptr<commands::command>> const&

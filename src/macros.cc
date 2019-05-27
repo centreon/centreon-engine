@@ -28,7 +28,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine;
@@ -359,6 +358,7 @@ int grab_datetime_macro_r(
   timeperiod* temp_timeperiod = nullptr;
   time_t test_time = 0L;
   time_t next_valid_time = 0L;
+  timeperiod_map::const_iterator it;
 
   (void)mac;
 
@@ -373,8 +373,15 @@ int grab_datetime_macro_r(
   case MACRO_ISVALIDTIME:
   case MACRO_NEXTVALIDTIME:
     /* find the timeperiod */
-    if ((temp_timeperiod = find_timeperiod(arg1)) == nullptr)
+    temp_timeperiod = nullptr;
+    it = state::instance().timeperiods().find(arg1);
+
+    if (it != state::instance().timeperiods().end())
+      temp_timeperiod = it->second.get();
+
+    if (temp_timeperiod == nullptr)
       return ERROR;
+
     /* what timestamp should we use? */
     if (arg2)
       test_time = (time_t)strtoul(arg2, nullptr, 0);

@@ -19,29 +19,25 @@
 
 #include <cstring>
 #include <ctime>
-#include "com/centreon/engine/deleter/timeperiod.hh"
+#include <memory>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/objects/timeperiodexclusion.hh"
-#include "com/centreon/engine/objects/timerange.hh"
+#include "com/centreon/engine/timerange.hh"
 #include "tests/timeperiod/utils.hh"
 
+using namespace com::centreon::engine;
 // Global time.
 static time_t gl_now((time_t)-1);
 
 /**
  *  Create new timeperiod creator.
  */
-timeperiod_creator::timeperiod_creator() : _timeperiods(NULL) {}
+timeperiod_creator::timeperiod_creator() {}
 
 /**
  *  Delete timeperiod creator and associated timeperiods.
  */
 timeperiod_creator::~timeperiod_creator() {
-  while (_timeperiods) {
-    timeperiod* to_delete(_timeperiods);
-    _timeperiods = _timeperiods->next;
-    com::centreon::engine::deleter::timeperiod(to_delete);
-  }
+  _timeperiods.clear();
 }
 
 /**
@@ -50,7 +46,12 @@ timeperiod_creator::~timeperiod_creator() {
  *  @return Timeperiods list.
  */
 timeperiod* timeperiod_creator::get_timeperiods() {
-  return (_timeperiods);
+  return (_timeperiods.begin()->get());
+}
+
+
+std::shared_ptr<timeperiod> timeperiod_creator::get_timeperiods_shared() {
+  return (*_timeperiods.begin());
 }
 
 /**
@@ -59,11 +60,9 @@ timeperiod* timeperiod_creator::get_timeperiods() {
  *  @return The newly created timeperiod.
  */
 timeperiod* timeperiod_creator::new_timeperiod() {
-  timeperiod* tp(new timeperiod());
-  memset(tp, 0, sizeof(*tp));
-  tp->next = _timeperiods;
-  _timeperiods = tp;
-  return (tp);
+  std::shared_ptr<timeperiod> tp{new timeperiod("test", "test")};
+  _timeperiods.push_front(tp);
+  return (tp.get());
 }
 
 /**
@@ -73,15 +72,12 @@ timeperiod* timeperiod_creator::new_timeperiod() {
  *  @param[out] target    Target timeperiod.
  */
 void timeperiod_creator::new_exclusion(
-                           timeperiod* excluded,
+                           std::shared_ptr<timeperiod> excluded,
                            timeperiod* target) {
   if (!target)
-    target = _timeperiods;
-  timeperiodexclusion* exclusion(new timeperiodexclusion());
-  memset(exclusion, 0, sizeof(*exclusion));
-  exclusion->timeperiod_ptr = excluded;
-  exclusion->next = target->exclusions;
-  target->exclusions = exclusion;
+    target = _timeperiods.begin()->get();
+
+  target->exclusions.insert({excluded->get_name(), excluded});
   return ;
 }
 
@@ -107,21 +103,25 @@ daterange* timeperiod_creator::new_calendar_date(
                                  int end_day,
                                  timeperiod* target) {
   if (!target)
-    target = _timeperiods;
-  return (add_exception_to_timeperiod(
-            target,
-            DATERANGE_CALENDAR_DATE,
-            start_year,
-            start_month,
-            start_day,
-            0,
-            0,
-            end_year,
-            end_month,
-            end_day,
-            0,
-            0,
-            0));
+    target = _timeperiods.begin()->get();
+
+    std::shared_ptr<daterange> dr{
+      new daterange(
+        DATERANGE_CALENDAR_DATE,
+        start_year,
+        start_month,
+        start_day,
+        0,
+        0,
+        end_year,
+        end_month,
+        end_day,
+        0,
+        0,
+        0)};
+
+  target->exceptions[DATERANGE_CALENDAR_DATE].push_back(dr);
+  return dr.get();
 }
 
 /**
@@ -142,21 +142,25 @@ daterange* timeperiod_creator::new_specific_month_date(
                                  int end_day,
                                  timeperiod* target) {
   if (!target)
-    target = _timeperiods;
-  return (add_exception_to_timeperiod(
-            target,
-            DATERANGE_MONTH_DATE,
-            0,
-            start_month,
-            start_day,
-            0,
-            0,
-            0,
-            end_month,
-            end_day,
-            0,
-            0,
-            0));
+    target = _timeperiods.begin()->get();
+
+  std::shared_ptr<daterange> dr{
+    new daterange(
+      DATERANGE_MONTH_DATE,
+      0,
+      start_month,
+      start_day,
+      0,
+      0,
+      0,
+      end_month,
+      end_day,
+      0,
+      0,
+      0)};
+
+  target->exceptions[DATERANGE_MONTH_DATE].push_back(dr);
+  return dr.get();
 }
 
 /**
@@ -173,21 +177,25 @@ daterange* timeperiod_creator::new_generic_month_date(
                                  int end_day,
                                  timeperiod* target) {
   if (!target)
-    target = _timeperiods;
-  return (add_exception_to_timeperiod(
-            target,
-            DATERANGE_MONTH_DAY,
-            0,
-            0,
-            start_day,
-            0,
-            0,
-            0,
-            0,
-            end_day,
-            0,
-            0,
-            0));
+    target = _timeperiods.begin()->get();
+
+  std::shared_ptr<daterange> dr{
+    new daterange(
+      DATERANGE_MONTH_DAY,
+      0,
+      0,
+      start_day,
+      0,
+      0,
+      0,
+      0,
+      end_day,
+      0,
+      0,
+      0)};
+
+  target->exceptions[DATERANGE_MONTH_DAY].push_back(dr);
+  return dr.get();
 }
 
 /**
@@ -212,21 +220,25 @@ daterange* timeperiod_creator::new_offset_weekday_of_specific_month(
                                  int end_offset,
                                  timeperiod* target) {
   if (!target)
-    target = _timeperiods;
-  return (add_exception_to_timeperiod(
-            target,
-            DATERANGE_MONTH_WEEK_DAY,
-            0,
-            start_month,
-            0,
-            start_wday,
-            start_offset,
-            0,
-            end_month,
-            0,
-            end_wday,
-            end_offset,
-            0));
+    target = _timeperiods.begin()->get();
+
+  std::shared_ptr<daterange> dr{
+    new daterange(
+      DATERANGE_MONTH_WEEK_DAY,
+      0,
+      start_month,
+      0,
+      start_wday,
+      start_offset,
+      0,
+      end_month,
+      0,
+      end_wday,
+      end_offset,
+      0)};
+
+  target->exceptions[DATERANGE_MONTH_WEEK_DAY].push_back(dr);
+  return dr.get();
 }
 
 /**
@@ -247,21 +259,25 @@ daterange* timeperiod_creator::new_offset_weekday_of_generic_month(
                                  int end_offset,
                                  timeperiod* target) {
   if (!target)
-    target = _timeperiods;
-  return (add_exception_to_timeperiod(
-            target,
-            DATERANGE_WEEK_DAY,
-            0,
-            0,
-            0,
-            start_wday,
-            start_offset,
-            0,
-            0,
-            0,
-            end_wday,
-            end_offset,
-            0));
+    target = _timeperiods.begin()->get();
+
+  std::shared_ptr<daterange> dr{
+    new daterange(
+       DATERANGE_WEEK_DAY,
+       0,
+       0,
+       0,
+       start_wday,
+       start_offset,
+       0,
+       0,
+       0,
+       end_wday,
+       end_offset,
+       0)};
+
+  target->exceptions[DATERANGE_WEEK_DAY].push_back(dr);
+  return dr.get();
 }
 
 /**
@@ -279,10 +295,15 @@ void timeperiod_creator::new_timerange(
                            int end_hour,
                            int end_minute,
                            daterange* target) {
-  add_timerange_to_daterange(
-    target,
-    hmtos(start_hour, start_minute),
-    hmtos(end_hour, end_minute));
+  if (!target)
+    return;
+
+  std::shared_ptr <timerange> tr{
+    new timerange(
+      hmtos(start_hour, start_minute),
+      hmtos(end_hour, end_minute))};
+
+  target->times.push_back(tr);
   return ;
 }
 
@@ -303,13 +324,16 @@ void timeperiod_creator::new_timerange(
                            int end_minute,
                            int day,
                            timeperiod* target) {
-  if (!target)
-    target = _timeperiods;
-  add_timerange_to_timeperiod(
-    target,
-    day,
-    hmtos(start_hour, start_minute),
-    hmtos(end_hour, end_minute));
+  if(!target)
+    target = _timeperiods.begin()->get();
+
+  std::shared_ptr <timerange> tr{
+    new timerange(
+      hmtos(start_hour, start_minute),
+      hmtos(end_hour, end_minute))};
+
+  target->days[day].push_back(tr);
+
   return ;
 }
 

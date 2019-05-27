@@ -30,12 +30,12 @@
 #  include "com/centreon/engine/hostdependency.hh"
 #  include "com/centreon/engine/hostescalation.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/timeperiod.hh"
 
 // Forward declaration.
 struct servicedependency_struct;
 struct serviceescalation_struct;
 struct servicegroup_struct;
-struct timeperiod_struct;
 
 CCE_BEGIN()
 
@@ -175,13 +175,13 @@ namespace           configuration {
                     servicegroups_find(configuration::servicegroup::key_type const& k) const;
       std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>::iterator
                     servicegroups_find(configuration::servicegroup::key_type const& k);
-      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>> const&
+      timeperiod_map const&
                     timeperiods() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>&
+      timeperiod_map &
                     timeperiods() throw ();
-      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>::const_iterator
+      timeperiod_map::const_iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k) const;
-      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>::iterator
+      timeperiod_map::iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k);
       std::unordered_map<std::string, std::string>&
                     user_macros();
@@ -253,7 +253,7 @@ namespace           configuration {
                     _serviceescalations;
       std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>
                     _servicegroups;
-      std::unordered_map<std::string, std::shared_ptr<timeperiod_struct>>
+      timeperiod_map
                     _timeperiods;
       std::unordered_map<std::string, std::string>
                     _user_macros;

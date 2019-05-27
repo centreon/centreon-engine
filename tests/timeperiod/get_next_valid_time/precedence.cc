@@ -18,7 +18,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -28,6 +28,7 @@ class     GetNextValidTimePrecedenceTest : public testing::Test {
  public:
   void    SetUp() override {
     // All dateranges are based on the same day : 2016-11-07.
+    configuration::applier::state::load();
     _creator.new_timeperiod();
     _now = strtotimet("2016-11-07 00:00:00");
     set_time(_now);
@@ -38,6 +39,7 @@ class     GetNextValidTimePrecedenceTest : public testing::Test {
     daterange* dr(_creator.new_calendar_date(2016, 10, 7, 2016, 10, 7));
     _creator.new_timerange(6, 0, 7, 0, dr);
     specific_month_date_and_lower();
+    configuration::applier::state::unload();
   }
 
   // November 7 05:00-06:00

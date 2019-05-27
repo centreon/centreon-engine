@@ -72,7 +72,7 @@ void applier::host::_update(
   if (state.modified_attributes().is_set()) {
     obj.set_modified_attributes(*state.modified_attributes());
     // mask out attributes we don't want to retain.
-    obj.set_modified_attributes(obj.get_modified_attributes() & 
+    obj.set_modified_attributes(obj.get_modified_attributes() &
       ~config.retained_host_attribute_mask());
   }
 
@@ -200,7 +200,10 @@ void applier::host::_update(
 
     if (state.check_period().is_set()
         && (obj.get_modified_attributes() & MODATTR_CHECK_TIMEPERIOD)) {
-      if (is_timeperiod_exist(*state.check_period()))
+
+      timeperiod_map::const_iterator
+        it(configuration::applier::state::instance().timeperiods().find(*state.check_period()));
+      if (it != configuration::applier::state::instance().timeperiods().end())
         obj.set_check_period(*state.check_period());
       else
         obj.set_modified_attributes(obj.get_modified_attributes()
@@ -209,7 +212,10 @@ void applier::host::_update(
 
     if (state.notification_period().is_set()
         && (obj.get_modified_attributes() & MODATTR_NOTIFICATION_TIMEPERIOD)) {
-      if (is_timeperiod_exist(*state.notification_period()))
+
+      timeperiod_map::const_iterator
+        it(configuration::applier::state::instance().timeperiods().find(*state.notification_period()));
+      if (it != configuration::applier::state::instance().timeperiods().end())
         obj.set_notification_period(*state.notification_period());
       else
         obj.set_modified_attributes(obj.get_modified_attributes()

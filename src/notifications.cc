@@ -28,7 +28,6 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/utils.hh"
 

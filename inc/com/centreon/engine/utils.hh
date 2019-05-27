@@ -23,9 +23,8 @@
 
 #  include <sys/time.h>
 #  include "com/centreon/engine/checks.hh"
+#  include "com/centreon/engine/daterange.hh"
 #  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/objects/daterange.hh"
-#  include "com/centreon/engine/objects/timeperiod.hh"
 
 // DBUF structure - dynamic string storage
 typedef struct  dbuf_struct {

@@ -35,7 +35,6 @@
 /* Forward declaration. */
 extern "C" {
 struct objectlist_struct;
-struct timeperiod_struct;
 };
 
 CCE_BEGIN()
@@ -43,6 +42,7 @@ CCE_BEGIN()
     class command;
   }
   class host;
+class timeperiod;
 
 class                           service : public notifier {
  public:
@@ -211,11 +211,11 @@ class                           service : public notifier {
   com::centreon::engine::commands::command*
                                 check_command_ptr;
   char*                         check_command_args;
-  timeperiod_struct*            check_period_ptr;
-  timeperiod_struct*            notification_period_ptr;
+  timeperiod*                   check_period_ptr;
+  timeperiod*                   notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
-  service*        next;
-  service*        nexthash;
+  service*                      next;
+  service*                      nexthash;
  private:
   std::string                   _hostname;
   std::string                   _description;
