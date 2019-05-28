@@ -511,3 +511,12 @@ time_t notifier::get_last_acknowledgement() const {
 bool notifier::get_recovery_been_sent() const {
   return _recovery_been_sent;
 }
+
+double notifier::get_notification_interval(void) const {
+  return _notification_interval;
+}
+
+void notifier::set_notification_interval(double notification_interval) {
+  _notification_interval = notification_interval;
+}
+

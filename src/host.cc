@@ -358,14 +358,6 @@ void host::set_event_handler(std::string const& event_handler) {
   _event_handler = event_handler;
 }
 
-double host::get_notification_interval(void) const {
-  return _notification_interval;
-}
-
-void host::set_notification_interval(double notification_interval) {
-  _notification_interval = notification_interval;
-}
-
 double host::get_first_notification_delay(void) const {
   return _first_notification_delay;
 }

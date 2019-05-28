@@ -158,8 +158,6 @@ class                 host : public notifier {
   void               set_address(std::string const& address);
   std::string const& get_event_handler() const;
   void               set_event_handler(std::string const& event_handler);
-  double             get_notification_interval(void) const;
-  void               set_notification_interval(double notification_interval);
   double             get_first_notification_delay(void) const;
   void               set_first_notification_delay(double notification_delay);
   int                get_notify_on_down() const;
@@ -379,7 +377,6 @@ private:
   std::string         _alias;
   std::string         _address;
   std::string         _event_handler;
-  double              _notification_interval;
   double              _first_notification_delay;
   int                 _notify_on_down;
   int                 _notify_on_unreachable;

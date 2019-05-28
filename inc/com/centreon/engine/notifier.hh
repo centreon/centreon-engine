@@ -33,6 +33,8 @@ class                         notifier {
   static std::array<std::string, 8> const tab_notification_str;
   static std::array<std::string, 2> const tab_state_type;
 
+  static void                 inc_next_notification_id();
+
                               notifier(int notification_type,
                                        std::string const& display_name,
                                        std::string const& check_command,
@@ -64,7 +66,6 @@ class                         notifier {
                                      std::string const& not_data,
                                      int options);
 
-  static void                 inc_next_notification_id();
   void                        set_current_notification_id(uint64_t id);
   uint64_t                    get_current_notification_id() const;
   virtual int                 create_notification_list(nagios_macros* mac,
@@ -94,6 +95,9 @@ class                         notifier {
   void                        set_recovery_notification_delay(uint32_t delay);
   void                        set_recovery_been_sent(bool sent);
   bool                        get_recovery_been_sent() const;
+  double                      get_notification_interval(void) const;
+  void                        set_notification_interval(
+                                               double notification_interval);
 
  protected:
   int                         _notification_type;
@@ -104,7 +108,6 @@ class                         notifier {
   double                      _retry_interval;
   int                         _current_notification_number;
   int                         _max_attempts;
-  static uint64_t             _next_notification_id;
   uint64_t                    _current_notification_id;
   time_t                      _next_notification;
   time_t                      _last_notification;
@@ -115,6 +118,10 @@ class                         notifier {
   time_t                      _last_acknowledgement;
   uint32_t                    _recovery_notification_delay;
   bool                        _recovery_been_sent;
+  double                      _notification_interval;
+
+ private:
+  static uint64_t             _next_notification_id;
 };
 
 CCE_END()

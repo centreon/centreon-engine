@@ -3658,18 +3658,18 @@ void service::update_notification_flags() {
 
 /* calculates next acceptable re-notification time for a service */
 time_t service::get_next_notification_time(time_t offset) {
-  time_t next_notification = 0L;
-  double interval_to_use = 0.0;
-  serviceescalation* temp_se = nullptr;
-  int have_escalated_interval = false;
+  time_t next_notification{0L};
+  double interval_to_use{0.0};
+  serviceescalation* temp_se{nullptr};
+  bool have_escalated_interval{false};
 
   logger(dbg_functions, basic)
-    << "get_next_notification_time()";
+    << "service::get_next_notification_time()";
   logger(dbg_notifications, most)
     << "Calculating next valid notification time...";
 
   /* default notification interval */
-  interval_to_use = this->notification_interval;
+  interval_to_use = get_notification_interval();
 
   logger(dbg_notifications, most)
     << "Default interval: " << interval_to_use;
@@ -3732,4 +3732,3 @@ time_t service::get_next_notification_time(time_t offset) {
     config->interval_length());
   return next_notification;
 }
-
