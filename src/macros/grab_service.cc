@@ -345,8 +345,8 @@ struct grab_service_redirection {
         true}},
       // Action URL.
       {MACRO_SERVICEACTIONURL,
-       {&get_recursive<com::centreon::engine::service,
-                       &com::centreon::engine::service::action_url,
+       {&get_recursive<service, notifier,
+                       &notifier::get_action_url,
                        URL_ENCODE_MACRO_CHARS>,
         true}},
       // Notes URL.

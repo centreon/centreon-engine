@@ -41,7 +41,12 @@ class                         notifier {
                                        int initial_state,
                                        double check_interval,
                                        double retry_interval,
-                                       int max_attempts);
+                                       int max_attempts,
+                                       std::string const& notification_period,
+                                       std::string const& check_period,
+                                       std::string const& action_url,
+                                       std::string const& icon_image,
+                                       std::string const& icon_image_alt);
   virtual                     ~notifier() {}
 
   std::string const&          get_display_name() const;
@@ -98,6 +103,17 @@ class                         notifier {
   double                      get_notification_interval(void) const;
   void                        set_notification_interval(
                                                double notification_interval);
+  std::string const&          get_notification_period() const;
+  void                        set_notification_period(
+                                std::string const &notification_period);
+  std::string const&          get_check_period() const;
+  void                        set_check_period(std::string const& check_period);
+  std::string const&          get_action_url() const;
+  void                        set_action_url(std::string const& action_url);
+  std::string const&          get_icon_image() const;
+  void                        set_icon_image(std::string const& icon_image);
+  std::string const&          get_icon_image_alt() const;
+  void                        set_icon_image_alt(std::string const& icon_image_alt);
 
  protected:
   int                         _notification_type;
@@ -119,9 +135,14 @@ class                         notifier {
   uint32_t                    _recovery_notification_delay;
   bool                        _recovery_been_sent;
   double                      _notification_interval;
+  std::string                 _notification_period;
 
  private:
   static uint64_t             _next_notification_id;
+  std::string                 _check_period;
+  std::string                 _action_url;
+  std::string                 _icon_image;
+  std::string                 _icon_image_alt;
 };
 
 CCE_END()

@@ -55,7 +55,12 @@ class                           service : public notifier {
                                         int initial_state,
                                         double check_interval,
                                         double retry_interval,
-                                        int max_attempts);
+                                        int max_attempts,
+                                        std::string const& notification_period,
+                                        std::string const& check_period,
+                                        std::string const& action_url,
+                                        std::string const& icon_image,
+                                        std::string const& icon_image_alt);
                                 ~service();
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
@@ -129,8 +134,6 @@ class                           service : public notifier {
   int                           stalk_on_unknown;
   int                           stalk_on_critical;
   int                           is_volatile;
-  char*                         notification_period;
-  char*                         check_period;
   int                           flap_detection_enabled;
   double                        low_flap_threshold;
   double                        high_flap_threshold;
@@ -152,9 +155,6 @@ class                           service : public notifier {
   char*                         failure_prediction_options;
   char*                         notes;
   char*                         notes_url;
-  char*                         action_url;
-  char*                         icon_image;
-  char*                         icon_image_alt;
   std::unordered_map<std::string, com::centreon::engine::customvariable>
                                 custom_variables;
   int                           problem_has_been_acknowledged;
@@ -239,8 +239,8 @@ com::centreon::engine::service* add_service(
            uint64_t service_id,
            std::string const& host_name,
            std::string const& description,
-           char const* display_name,
-           char const* check_period,
+           std::string const& display_name,
+           std::string const& check_period,
            int initial_state,
            int max_attempts,
            int parallelize,
@@ -249,7 +249,7 @@ com::centreon::engine::service* add_service(
            double retry_interval,
            double notification_interval,
            double first_notification_delay,
-           char const* notification_period,
+           std::string const& notification_period,
            int notify_recovery,
            int notify_unknown,
            int notify_warning,
@@ -280,9 +280,9 @@ com::centreon::engine::service* add_service(
            int freshness_threshold,
            char const* notes,
            char const* notes_url,
-           char const* action_url,
-           char const* icon_image,
-           char const* icon_image_alt,
+           std::string const& action_url,
+           std::string const& icon_image,
+           std::string const& icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_service);

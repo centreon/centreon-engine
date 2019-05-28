@@ -57,14 +57,23 @@ notifier::notifier(int notification_type,
                    int initial_state,
                    double check_interval,
                    double retry_interval,
-                   int max_attempts)
+                   int max_attempts,
+                   std::string const& notification_period,
+                   std::string const& check_period,
+                   std::string const& action_url,
+                   std::string const& icon_image,
+                   std::string const& icon_image_alt)
     : _notification_type{notification_type},
       _display_name{display_name},
       _check_command{check_command},
       _initial_state{initial_state},
       _check_interval{check_interval},
       _retry_interval{retry_interval},
-      _max_attempts{max_attempts} {
+      _max_attempts{max_attempts},
+      _notification_period{notification_period},
+      _check_period{check_period},
+      _icon_image{icon_image},
+      _icon_image_alt{icon_image_alt} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -75,17 +84,19 @@ notifier::notifier(int notification_type,
 
   if (check_interval < 0 || retry_interval <= 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid max_attempts, check_interval, retry_interval"
-         ", or notification_interval value for notifier '"
-      << display_name << "'";
+        << "Error: Invalid max_attempts, check_interval, retry_interval"
+           ", or notification_interval value for notifier '"
+        << display_name << "'";
     throw engine_error() << "Could not register notifier '" << display_name
-      << "'";
+                         << "'";
   }
 
   if (max_attempts <= 0) {
     logger(log_config_error, basic)
-        << "Error: Invalid max_check_attempts value for notifier '" << display_name << "'";
-    throw engine_error() << "Could not register notifier '" << display_name << "'";
+        << "Error: Invalid max_check_attempts value for notifier '"
+        << display_name << "'";
+    throw engine_error() << "Could not register notifier '" << display_name
+                         << "'";
   }
 }
 
@@ -520,3 +531,43 @@ void notifier::set_notification_interval(double notification_interval) {
   _notification_interval = notification_interval;
 }
 
+std::string const& notifier::get_notification_period() const {
+  return _notification_period;
+}
+
+void  notifier::set_notification_period(std::string const& notification_period)
+{
+  _notification_period = notification_period;
+}
+
+std::string const& notifier::get_check_period() const {
+  return _check_period;
+}
+
+void notifier::set_check_period(std::string const& check_period) {
+  _check_period = check_period;
+}
+
+std::string const& notifier::get_action_url() const {
+  return _action_url;
+}
+
+void notifier::set_action_url(std::string const& action_url) {
+  _action_url = action_url;
+}
+
+std::string const& notifier::get_icon_image() const {
+  return _icon_image;
+}
+
+void notifier::set_icon_image(std::string const& icon_image) {
+  _icon_image = icon_image;
+}
+
+std::string const& notifier::get_icon_image_alt() const {
+  return _icon_image_alt;
+}
+
+void notifier::set_icon_image_alt(std::string const& icon_image_alt) {
+  _icon_image_alt = icon_image_alt;
+}

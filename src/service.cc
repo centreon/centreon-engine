@@ -67,9 +67,16 @@ service::service(std::string const& hostname,
                  int initial_state,
                  double check_interval,
                  double retry_interval,
-                 int max_attempts)
-    : notifier{SERVICE_NOTIFICATION, display_name, check_command, initial_state, check_interval,
-               retry_interval, max_attempts},
+                 int max_attempts,
+                 std::string const& notification_period,
+                 std::string const& check_period,
+                 std::string const& action_url,
+                 std::string const& icon_image,
+                 std::string const& icon_image_alt)
+    : notifier{SERVICE_NOTIFICATION, display_name,        check_command,
+               initial_state,        check_interval,      retry_interval,
+               max_attempts,         notification_period, check_period,
+               action_url,           icon_image,          icon_image_alt},
       _hostname{hostname},
       _description{description} {}
 
@@ -79,22 +86,12 @@ service::~service() {
 
   delete[] this->event_handler;
   this->event_handler = nullptr;
-  delete[] this->notification_period;
-  this->notification_period = nullptr;
-  delete[] this->check_period;
-  this->check_period = nullptr;
   delete[] this->failure_prediction_options;
   this->failure_prediction_options = nullptr;
   delete[] this->notes;
   this->notes = nullptr;
   delete[] this->notes_url;
   this->notes_url = nullptr;
-  delete[] this->action_url;
-  this->action_url = nullptr;
-  delete[] this->icon_image;
-  this->icon_image = nullptr;
-  delete[] this->icon_image_alt;
-  this->icon_image_alt = nullptr;
   delete[] this->plugin_output;
   this->plugin_output = nullptr;
   delete[] this->long_plugin_output;
@@ -146,8 +143,8 @@ bool operator==(com::centreon::engine::service const& obj1,
          obj1.stalk_on_unknown == obj2.stalk_on_unknown &&
          obj1.stalk_on_critical == obj2.stalk_on_critical &&
          obj1.is_volatile == obj2.is_volatile &&
-         is_equal(obj1.notification_period, obj2.notification_period) &&
-         is_equal(obj1.check_period, obj2.check_period) &&
+         obj1.get_notification_period() == obj2.get_notification_period() &&
+         obj1.get_check_period() == obj2.get_check_period() &&
          obj1.flap_detection_enabled == obj2.flap_detection_enabled &&
          obj1.low_flap_threshold == obj2.low_flap_threshold &&
          obj1.high_flap_threshold == obj2.high_flap_threshold &&
@@ -169,9 +166,9 @@ bool operator==(com::centreon::engine::service const& obj1,
          obj1.obsess_over_service == obj2.obsess_over_service &&
          is_equal(obj1.notes, obj2.notes) &&
          is_equal(obj1.notes_url, obj2.notes_url) &&
-         is_equal(obj1.action_url, obj2.action_url) &&
-         is_equal(obj1.icon_image, obj2.icon_image) &&
-         is_equal(obj1.icon_image_alt, obj2.icon_image_alt) &&
+         obj1.get_action_url() == obj2.get_action_url() &&
+         obj1.get_icon_image() == obj2.get_icon_image() &&
+         obj1.get_icon_image_alt() == obj2.get_icon_image_alt() &&
          obj1.custom_variables == obj2.custom_variables &&
          obj1.problem_has_been_acknowledged ==
              obj2.problem_has_been_acknowledged &&
@@ -364,10 +361,10 @@ std::ostream& operator<<(std::ostream& os,
      << obj.is_volatile
      << "\n"
         "  notification_period:                  "
-     << chkstr(obj.notification_period)
+     << obj.get_notification_period()
      << "\n"
         "  check_period:                         "
-     << chkstr(obj.check_period)
+     << obj.get_check_period()
      << "\n"
         "  flap_detection_enabled:               "
      << obj.flap_detection_enabled
@@ -427,13 +424,13 @@ std::ostream& operator<<(std::ostream& os,
      << chkstr(obj.notes_url)
      << "\n"
         "  action_url:                           "
-     << chkstr(obj.action_url)
+     << obj.get_action_url()
      << "\n"
         "  icon_image:                           "
-     << chkstr(obj.icon_image)
+     << obj.get_icon_image()
      << "\n"
         "  icon_image_alt:                       "
-     << chkstr(obj.icon_image_alt)
+     << obj.get_icon_image_alt()
      << "\n"
         "  problem_has_been_acknowledged:        "
      << obj.problem_has_been_acknowledged
@@ -694,8 +691,8 @@ com::centreon::engine::service* add_service(
     uint64_t service_id,
     std::string const& host_name,
     std::string const& description,
-    char const* display_name,
-    char const* check_period,
+    std::string const& display_name,
+    std::string const& check_period,
     int initial_state,
     int max_attempts,
     int parallelize,
@@ -704,7 +701,7 @@ com::centreon::engine::service* add_service(
     double retry_interval,
     double notification_interval,
     double first_notification_delay,
-    char const* notification_period,
+    std::string const& notification_period,
     int notify_recovery,
     int notify_unknown,
     int notify_warning,
@@ -735,9 +732,9 @@ com::centreon::engine::service* add_service(
     int freshness_threshold,
     char const* notes,
     char const* notes_url,
-    char const* action_url,
-    char const* icon_image,
-    char const* icon_image_alt,
+    std::string const& action_url,
+    std::string const& icon_image,
+    std::string const& icon_image_alt,
     int retain_status_information,
     int retain_nonstatus_information,
     int obsess_over_service) {
@@ -800,27 +797,19 @@ com::centreon::engine::service* add_service(
 
   // Allocate memory.
   std::shared_ptr<service> obj{new service(
-      host_name, description, display_name ? display_name : description,
-      check_command, initial_state, check_interval, retry_interval, max_attempts)};
+      host_name, description, display_name.empty() ? description : display_name,
+      check_command, initial_state, check_interval, retry_interval,
+      max_attempts, notification_period, check_period, action_url, icon_image,
+      icon_image_alt)};
 
   try {
     // Duplicate vars.
     if (event_handler)
       obj->event_handler = string::dup(event_handler);
-    if (notification_period)
-      obj->notification_period = string::dup(notification_period);
-    if (check_period)
-      obj->check_period = string::dup(check_period);
     if (notes)
       obj->notes = string::dup(notes);
     if (notes_url)
       obj->notes_url = string::dup(notes_url);
-    if (action_url)
-      obj->action_url = string::dup(action_url);
-    if (icon_image)
-      obj->icon_image = string::dup(icon_image);
-    if (icon_image_alt)
-      obj->icon_image_alt = string::dup(icon_image_alt);
 
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;

@@ -245,6 +245,24 @@ namespace  macros {
     process_macros_r(mac, (t.*member)().c_str(), &buffer, options);
     return buffer;
   }
+  /**
+   *  Recursively process macros.
+   *
+   *  @param[in] hst Host object.
+   *  @param[in] mac Unused.
+   *
+   *  @return Newly allocated string with macros processed.
+   */
+  template <typename T, typename V, std::string const& (V::* member)() const, unsigned int options>
+  char* get_recursive(T& t, nagios_macros* mac) {
+    (void)mac;
+
+    // Get copy of string with macros processed.
+    char* buffer(NULL);
+    V* v{&t};
+    process_macros_r(mac, (v->*member)().c_str(), &buffer, options);
+    return buffer;
+  }
 
   /**
    *  Recursively process macros.

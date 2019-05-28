@@ -170,11 +170,6 @@ class                 host : public notifier {
   void               set_notify_on_flapping(int notify_on_flapping);
   int                get_notify_on_downtime() const;
   void               set_notify_on_downtime(int notify_on_downtime);
-  std::string const& get_notification_period() const;
-  void               set_notification_period(
-                       std::string const &notification_period);
-  std::string const& get_check_period() const;
-  void               set_check_period(std::string const& check_period);
   bool               get_flap_detection_enabled(void) const;
   void               set_flap_detection_enabled(bool flap_detection_enabled);
   double             get_low_flap_threshold() const;
@@ -219,12 +214,6 @@ class                 host : public notifier {
   void               set_notes(std::string const& notes);
   std::string const& get_notes_url() const;
   void               set_notes_url(std::string const& notes_url);
-  std::string const& get_action_url() const;
-  void               set_action_url(std::string const& action_url);
-  std::string const& get_icon_image() const;
-  void               set_icon_image(std::string const& icon_image);
-  std::string const& get_icon_image_alt() const;
-  void               set_icon_image_alt(std::string const& icon_image_alt);
   std::string const& get_vrml_image() const;
   void               set_vrml_image(std::string const& image);
   std::string const& get_statusmap_image() const;
@@ -383,8 +372,6 @@ private:
   int                 _notify_on_recovery;
   int                 _notify_on_flapping;
   int                 _notify_on_downtime;
-  std::string         _notification_period;
-  std::string         _check_period;
   bool                _flap_detection_enabled;
   double              _low_flap_threshold;
   double              _high_flap_threshold;
@@ -407,7 +394,6 @@ private:
   int                 _obsess_over_host;
   std::string         _notes;
   std::string         _notes_url;
-  std::string         _action_url;
   std::string         _icon_image;
   std::string         _icon_image_alt;
   std::string         _vrml_image;

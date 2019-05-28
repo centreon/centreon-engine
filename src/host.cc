@@ -189,7 +189,12 @@ host::host(uint64_t host_id,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_host)
-    : notifier{HOST_NOTIFICATION, !display_name.empty() ? display_name : name, check_command, initial_state, check_interval, retry_interval, max_attempts} {
+    : notifier{HOST_NOTIFICATION, !display_name.empty() ? display_name : name,
+               check_command,     initial_state,
+               check_interval,    retry_interval,
+               max_attempts,      notification_period,
+               check_period,      action_url,
+               icon_image,        icon_image_alt} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -237,14 +242,9 @@ host::host(uint64_t host_id,
   _name = name;
   _address = address;
   _alias = !alias.empty() ? alias : name;
-  _action_url = action_url;
-  _check_period = check_period;
   _event_handler = event_handler;
-  _icon_image = icon_image;
-  _icon_image_alt = icon_image_alt;
   _notes = notes;
   _notes_url = notes_url;
-  _notification_period = notification_period;
   _statusmap_image = statusmap_image;
   _vrml_image = vrml_image;
 
@@ -404,23 +404,6 @@ int host::get_notify_on_downtime() const {
 
 void host::set_notify_on_downtime(int notify_on_downtime) {
   _notify_on_downtime = notify_on_downtime;
-}
-
-std::string const& host::get_notification_period() const {
-  return _notification_period;
-}
-
-void  host::set_notification_period(std::string const& notification_period)
-{
-  _notification_period = notification_period;
-}
-
-std::string const& host::get_check_period() const {
-  return _check_period;
-}
-
-void host::set_check_period(std::string const& check_period) {
-  _check_period = check_period;
 }
 
 bool host::get_flap_detection_enabled(void) const {
@@ -597,30 +580,6 @@ std::string const& host::get_notes_url() const {
 
 void host::set_notes_url(std::string const& notes_url) {
   _notes_url = notes_url;
-}
-
-std::string const& host::get_action_url() const {
-  return _action_url;
-}
-
-void host::set_action_url(std::string const& action_url) {
-  _action_url = action_url;
-}
-
-std::string const& host::get_icon_image() const {
-  return _icon_image;
-}
-
-void host::set_icon_image(std::string const& icon_image) {
-  _icon_image = icon_image;
-}
-
-std::string const& host::get_icon_image_alt() const {
-  return _icon_image_alt;
-}
-
-void host::set_icon_image_alt(std::string const& icon_image_alt) {
-  _icon_image_alt = icon_image_alt;
 }
 
 std::string const& host::get_vrml_image() const {

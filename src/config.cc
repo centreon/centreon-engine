@@ -789,17 +789,17 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   }
 
   /* verify service check timeperiod */
-  if (svc->check_period == nullptr) {
+  if (svc->get_check_period().empty()) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->get_description() << "' on host '"
       << svc->get_hostname() << "' has no check time period defined!";
     warnings++;
   }
   else {
-    timeperiod* temp_timeperiod = find_timeperiod(svc->check_period);
+    timeperiod* temp_timeperiod = find_timeperiod(svc->get_check_period());
     if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
-        << "Error: Check period '" << svc->check_period
+        << "Error: Check period '" << svc->get_check_period()
         << "' specified for service '" << svc->get_description()
         << "' on host '" << svc->get_hostname()
         << "' is not defined anywhere!";
@@ -811,12 +811,12 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   }
 
   // Check service notification timeperiod.
-  if (svc->notification_period) {
-    timeperiod* temp_timeperiod(
-      find_timeperiod(svc->notification_period));
+  if (!svc->get_notification_period().empty()) {
+    timeperiod* temp_timeperiod{
+      find_timeperiod(svc->get_notification_period())};
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Notification period '" << svc->notification_period
+        << "Error: Notification period '" << svc->get_notification_period()
         << "' specified for service '" << svc->get_description() << "' on "
         "host '" << svc->get_hostname() << "' is not defined anywhere!";
       errors++;

@@ -2050,15 +2050,13 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_SVC_CHECK_TIMEPERIOD:
-    delete[] temp_service->check_period;
-    temp_service->check_period = temp_ptr;
+    temp_service->set_check_period(temp_ptr);
     temp_service->check_period_ptr = temp_timeperiod;
     attr = MODATTR_CHECK_TIMEPERIOD;
     break;
 
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
-    delete[] temp_service->notification_period;
-    temp_service->notification_period = temp_ptr;
+    temp_service->set_notification_period(temp_ptr);
     temp_service->notification_period_ptr = temp_timeperiod;
     attr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;

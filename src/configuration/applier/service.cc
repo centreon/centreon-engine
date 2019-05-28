@@ -115,12 +115,12 @@ void applier::service::add_object(
   config->services().insert(obj);
 
   // Create service.
-  engine::service* svc(add_service(
+  engine::service* svc{add_service(
     obj.host_id(), obj.service_id(),
-    obj.hosts().begin()->c_str(),
-    obj.service_description().c_str(),
-    NULL_IF_EMPTY(obj.display_name()),
-    NULL_IF_EMPTY(obj.check_period()),
+    *obj.hosts().begin(),
+    obj.service_description(),
+    obj.display_name(),
+    obj.check_period(),
     obj.initial_state(),
     obj.max_check_attempts(),
     true, // parallelize, enabled by default in Nagios
@@ -129,7 +129,7 @@ void applier::service::add_object(
     obj.retry_interval(),
     obj.notification_interval(),
     obj.first_notification_delay(),
-    NULL_IF_EMPTY(obj.notification_period()),
+    obj.notification_period(),
     static_cast<bool>(obj.notification_options()
                       & configuration::service::ok),
     static_cast<bool>(obj.notification_options()
@@ -174,12 +174,12 @@ void applier::service::add_object(
     obj.freshness_threshold(),
     NULL_IF_EMPTY(obj.notes()),
     NULL_IF_EMPTY(obj.notes_url()),
-    NULL_IF_EMPTY(obj.action_url()),
-    NULL_IF_EMPTY(obj.icon_image()),
-    NULL_IF_EMPTY(obj.icon_image_alt()),
+    obj.action_url(),
+    obj.icon_image(),
+    obj.icon_image_alt(),
     obj.retain_status_information(),
     obj.retain_nonstatus_information(),
-    obj.obsess_over_service()));
+    obj.obsess_over_service())};
   if (!svc)
       throw (engine_error() << "Could not register service '"
              << obj.service_description()
@@ -424,12 +424,8 @@ void applier::service::modify_object(
     s->stalk_on_critical,
     static_cast<int>(static_cast<bool>(
       obj.stalking_options() & configuration::service::critical)));
-  modify_if_different(
-    s->notification_period,
-    NULL_IF_EMPTY(obj.notification_period()));
-  modify_if_different(
-    s->check_period,
-    NULL_IF_EMPTY(obj.check_period()));
+  s->set_notification_period(obj.notification_period());
+  s->set_check_period(obj.check_period());
   modify_if_different(
     s->flap_detection_enabled,
     static_cast<int>(obj.flap_detection_enabled()));
@@ -487,11 +483,9 @@ void applier::service::modify_object(
     static_cast<int>(obj.obsess_over_service()));
   modify_if_different(s->notes, NULL_IF_EMPTY(obj.notes()));
   modify_if_different(s->notes_url, NULL_IF_EMPTY(obj.notes_url()));
-  modify_if_different(s->action_url, NULL_IF_EMPTY(obj.action_url()));
-  modify_if_different(s->icon_image, NULL_IF_EMPTY(obj.icon_image()));
-  modify_if_different(
-    s->icon_image_alt,
-    NULL_IF_EMPTY(obj.icon_image_alt()));
+  s->set_action_url(obj.action_url());
+  s->set_icon_image(obj.icon_image());
+  s->set_icon_image_alt(obj.icon_image_alt());
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj.is_volatile()));

@@ -206,7 +206,7 @@ void applier::service::_update(
     if (state.check_period().is_set()
         && (obj.modified_attributes & MODATTR_CHECK_TIMEPERIOD)) {
       if (is_timeperiod_exist(*state.check_period()))
-        string::setstr(obj.check_period, *state.check_period());
+        obj.set_check_period(*state.check_period());
       else
         obj.modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
     }
@@ -214,7 +214,7 @@ void applier::service::_update(
     if (state.notification_period().is_set()
         && (obj.modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD)) {
       if (is_timeperiod_exist(*state.notification_period()))
-        string::setstr(obj.notification_period, *state.notification_period());
+        obj.set_notification_period(*state.notification_period());
       else
         obj.modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
     }
