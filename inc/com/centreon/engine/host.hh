@@ -111,7 +111,7 @@ class                 host : public notifier {
                            int retain_status_information,
                            int retain_nonstatus_information,
                            int obsess_over_host);
-
+                     ~host() {}
   void               add_child_link(host* child);
   void               add_parent_host(std::string const& host_name);
   int                log_event();
@@ -140,17 +140,14 @@ class                 host : public notifier {
   void               disable_flap_detection();
   void               update_status(bool aggregated_dump) override;
   void               check_for_expired_acknowledgement();
-  int                notify(unsigned int type,
-                            char const* not_author,
-                            char const* not_data,
-                            int options);
   int                check_notification_viability(unsigned int type,
-                                                  int options);
+                                                  int options) override;
   int                handle_state();
   void               update_performance_data();
   int                verify_check_viability(int check_options,
                                             int* time_is_valid,
                                             time_t* new_time);
+  void               grab_macros_r(nagios_macros* mac) override;
 
   // setters / getters
   std::string const& get_name() const;
@@ -159,8 +156,6 @@ class                 host : public notifier {
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  int                get_max_attempts() const;
-  void               set_max_attempts(int max_attempts);
   std::string const& get_event_handler() const;
   void               set_event_handler(std::string const& event_handler);
   double             get_notification_interval(void) const;
@@ -258,8 +253,6 @@ class                 host : public notifier {
   void               set_acknowledgement_type(int acknowledgement_type);
   int                get_check_type() const;
   void               set_check_type(int check_type);
-  int                get_current_state() const;
-  void               set_current_state(int current_state);
   int                get_last_state() const;
   void               set_last_state(int last_state);
   int                get_last_hard_state() const;
@@ -292,10 +285,6 @@ class                 host : public notifier {
   void               set_check_options(int check_options);
   bool               get_notifications_enabled() const;
   void               set_notifications_enabled(bool notifications_enabled);
-  time_t             get_last_host_notification() const;
-  void               set_last_host_notification(time_t last_host_notification);
-  time_t             get_next_host_notification() const;
-  void               set_next_host_notification(time_t next_host_notification);
   time_t             get_next_check() const;
   void               set_next_check(time_t next_check);
   int                get_should_be_scheduled() const;
@@ -324,8 +313,6 @@ class                 host : public notifier {
   void               set_current_notification_number(int current_notification_number);
   int                get_no_more_notifications() const;
   void               set_no_more_notifications(int no_more_notifications);
-  unsigned long      get_current_notification_id() const;
-  void               set_current_notification_id(unsigned long current_notification_id);
   int                get_check_flapping_recovery_notification() const;
   void               set_check_flapping_recovery_notification(int check_flapping_recovery_notification);
   int                get_scheduled_downtime_depth() const;
@@ -352,6 +339,19 @@ class                 host : public notifier {
   void               set_circular_path_checked(int check_level);
   bool               get_contains_circular_path() const;
   void               set_contains_circular_path(bool contains_circular_path);
+  int                create_notification_list(nagios_macros* mac,
+                                              int options,
+                                              bool* escalated) override;
+  int                notify_contact(nagios_macros* mac,
+                                    contact* cntct,
+                                    int type,
+                                    char const* not_author,
+                                    char const* not_data,
+                                    int options,
+                                    int escalated) override;
+  void               update_notification_flags() override;
+  time_t             get_next_notification_time(time_t offset) override;
+  void               schedule_acknowledgement_expiration();
 
   contactgroup_map   contact_groups;
   contact_map        contacts;
@@ -378,7 +378,6 @@ private:
   std::string         _name;
   std::string         _alias;
   std::string         _address;
-  int                 _max_attempts;
   std::string         _event_handler;
   double              _notification_interval;
   double              _first_notification_delay;
@@ -427,7 +426,6 @@ private:
   int                 _problem_has_been_acknowledged;
   int                 _acknowledgement_type;
   int                 _check_type;
-  int                 _current_state;
   int                 _last_state;
   int                 _last_hard_state;
   std::string         _plugin_output;
@@ -444,8 +442,6 @@ private:
   bool                _is_executing;
   int                 _check_options;
   bool                _notifications_enabled;
-  time_t              _last_host_notification;
-  time_t              _next_host_notification;
   time_t              _next_check;
   int                 _should_be_scheduled;
   time_t              _last_check;
@@ -459,7 +455,6 @@ private:
   bool                _notified_on_down;
   bool                _notified_on_unreachable;
   int                 _no_more_notifications;
-  unsigned long       _current_notification_id;
   int                 _check_flapping_recovery_notification;
   int                 _scheduled_downtime_depth;
   int                 _pending_flex_downtime;
@@ -473,20 +468,16 @@ private:
   unsigned long       _modified_attributes;
   int                 _circular_path_checked;
   bool                _contains_circular_path;
+
 };
 
 CCE_END()
 
 /* Other HOST structure. */
 struct                host_other_properties {
-  time_t              initial_notif_time;
   bool                should_reschedule_current_check;
   std::string         timezone;
   uint64_t            host_id;
-  int                 acknowledgement_timeout;
-  time_t              last_acknowledgement;
-  unsigned int        recovery_notification_delay;
-  bool                recovery_been_sent;
 };
 
 /* Hash structures. */
@@ -535,8 +526,6 @@ com::centreon::engine::host&
 char const*           get_host_timezone(std::string const& name);
 bool                  is_host_exist(uint64_t host_id) throw ();
 uint64_t              get_host_id(std::string const& name);
-void                  schedule_acknowledgement_expiration(
-                            com::centreon::engine::host* h);
 
 CCE_END()
 

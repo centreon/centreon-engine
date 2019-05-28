@@ -313,9 +313,7 @@ static void _exec_event_expire_host_ack(timed_event* event) {
 static void _exec_event_expire_service_ack(timed_event* event) {
   logger(dbg_events, basic)
     << "** Expire Service Acknowledgement Event";
-  check_for_expired_acknowledgement(
-    static_cast<com::centreon::engine::service*>(event->event_data));
-  return ;
+  static_cast<service*>(event->event_data)->check_for_expired_acknowledgement();
 }
 
 /**
@@ -417,32 +415,31 @@ void add_event(
  *  @param[in]  last_time       The last time.
  *  @param[in]  current_time    The current time.
  *  @param[in]  time_difference The time difference.
- *  @param[out] ts              The time struct to fill.
+ *  @param[in] ts              The time struct to fill.
+ *
+ *  @return the adjusted time.
  */
-void adjust_timestamp_for_time_change(
-       time_t last_time,
-       time_t current_time,
-       unsigned long time_difference,
-       time_t* ts) {
-  logger(dbg_functions, basic)
-    << "adjust_timestamp_for_time_change()";
+time_t adjust_timestamp_for_time_change(time_t last_time,
+                                        time_t current_time,
+                                        uint64_t time_difference,
+                                        time_t ts) {
+  logger(dbg_functions, basic) << "adjust_timestamp_for_time_change()";
 
   // we shouldn't do anything with epoch or invalid values.
-  if ((*ts == (time_t)0) || (*ts == (time_t)-1))
-    return ;
+  if (ts == (time_t)0 || ts == (time_t)-1)
+    return ts;
 
   // we moved back in time...
   if (last_time > current_time) {
     // we can't precede the UNIX epoch.
-    if (time_difference > (unsigned long)*ts)
-      *ts = (time_t)0;
+    if (time_difference > (uint32_t)ts)
+      return (time_t)0;
     else
-      *ts = (time_t)(*ts - time_difference);
+      return (time_t)(ts - time_difference);
   }
-
   // we moved into the future...
   else
-    *ts = (time_t)(*ts + time_difference);
+    return (time_t)(ts + time_difference);
 }
 
 /**
@@ -516,11 +513,11 @@ void compensate_for_system_time_change(
 
     // else use standard adjustment.
     else
-      adjust_timestamp_for_time_change(
+      tmp->run_time = adjust_timestamp_for_time_change(
         last_time,
         current_time,
         time_difference,
-        &tmp->run_time);
+        tmp->run_time);
   }
 
   // resort event list (some events may be out of order at this point).
@@ -545,11 +542,11 @@ void compensate_for_system_time_change(
 
     // else use standard adjustment.
     else
-      adjust_timestamp_for_time_change(
+      tmp->run_time = adjust_timestamp_for_time_change(
         last_time,
         current_time,
         time_difference,
-        &tmp->run_time);
+        tmp->run_time);
   }
 
   // resort event list (some events may be out of order at this point).
@@ -557,47 +554,43 @@ void compensate_for_system_time_change(
 
   // adjust service timestamps.
   for (com::centreon::engine::service* svc(service_list); svc; svc = svc->next) {
-    adjust_timestamp_for_time_change(
+    svc->set_last_notification(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      &svc->last_notification);
-    adjust_timestamp_for_time_change(
+      svc->get_last_notification()));
+    svc->last_check = adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      &svc->last_check);
-    adjust_timestamp_for_time_change(
+      svc->last_check);
+    svc->next_check = adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      &svc->next_check);
-    adjust_timestamp_for_time_change(
+      svc->next_check);
+    svc->last_state_change = adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      &svc->last_state_change);
-    adjust_timestamp_for_time_change(
+      svc->last_state_change);
+    svc->last_hard_state_change = adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      &svc->last_hard_state_change);
-    adjust_timestamp_for_time_change(
+      svc->last_hard_state_change);
+
+    svc->set_initial_notif_time(adjust_timestamp_for_time_change(
         last_time, current_time, time_difference,
-        &service_other_props[{svc->host_ptr->get_name(),
-                              svc->get_description()}]
-             .initial_notif_time);
-    adjust_timestamp_for_time_change(
+        svc->get_initial_notif_time()));
+    svc->set_last_acknowledgement(adjust_timestamp_for_time_change(
         last_time, current_time, time_difference,
-        &service_other_props[{svc->host_ptr->get_name(),
-                              svc->get_description()}]
-             .last_acknowledgement);
+        svc->get_last_acknowledgement()));
 
     // recalculate next re-notification time.
-    svc->next_notification
-      = get_next_service_notification_time(
-          svc,
-          svc->last_notification);
+    svc->set_next_notification(
+      svc->get_next_notification_time(
+          svc->get_last_notification()));
 
     // update the status data.
     svc->update_status(false);
@@ -609,87 +602,78 @@ void compensate_for_system_time_change(
          end(com::centreon::engine::host::hosts.end());
        it != end;
        ++it) {
-    time_t last_host_notif(it->second->get_last_host_notification());
-    time_t last_check(it->second->get_last_check());
-    time_t next_check(it->second->get_next_check());
-    time_t last_state_change(it->second->get_last_state_change());
-    time_t last_hard_state_change(it->second->get_last_hard_state_change());
-    time_t last_state_history_update(
-      it->second->get_last_state_history_update());
+    time_t last_host_notif{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_last_notification())};
+    time_t last_check{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_last_check())};
+    time_t next_check{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_next_check())};
+    time_t last_state_change{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_last_state_change())};
+    time_t last_hard_state_change{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_last_hard_state_change())};
+    time_t last_state_history_update{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_last_state_history_update())};
+    time_t init_notif{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_initial_notif_time())};
+    time_t last_ack{adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      it->second->get_last_acknowledgement())};
 
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &last_host_notif);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &last_check);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &next_check);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &last_state_change);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &last_hard_state_change);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &last_state_history_update);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &host_other_props[it->second->get_name()].initial_notif_time);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &host_other_props[it->second->get_name()].last_acknowledgement);
-
-    it->second->set_last_host_notification(last_host_notif);
+    it->second->set_last_notification(last_host_notif);
     it->second->set_last_check(last_check);
     it->second->set_next_check(next_check);
     it->second->set_last_state_change(last_state_change);
     it->second->set_last_hard_state_change(last_hard_state_change);
     it->second->set_last_state_history_update(last_state_history_update);
     // recalculate next re-notification time.
-    it->second->set_next_host_notification(
-    get_next_host_notification_time(
-      it->second.get(),
-      it->second->get_last_host_notification()));
+    it->second->set_next_notification(
+    it->second->get_next_notification_time(
+      it->second->get_last_notification()));
 
     // update the status data.
     it->second->update_status(false);
   }
 
   // adjust program timestamps.
-  adjust_timestamp_for_time_change(
+  program_start = adjust_timestamp_for_time_change(
     last_time,
     current_time,
     time_difference,
-    &program_start);
-  adjust_timestamp_for_time_change(
+    program_start);
+  event_start = adjust_timestamp_for_time_change(
     last_time,
     current_time,
     time_difference,
-    &event_start);
-  adjust_timestamp_for_time_change(
+    event_start);
+  last_command_check = adjust_timestamp_for_time_change(
     last_time,
     current_time,
     time_difference,
-    &last_command_check);
+    last_command_check);
 
   // update the status data.
   update_program_status(false);

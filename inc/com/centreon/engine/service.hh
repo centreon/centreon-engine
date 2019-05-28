@@ -54,8 +54,9 @@ class                           service : public notifier {
                                         std::string const& check_command,
                                         int initial_state,
                                         double check_interval,
-                                        double retry_interval);
-  virtual                       ~service() override;
+                                        double retry_interval,
+                                        int max_attempts);
+                                ~service();
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
@@ -90,18 +91,28 @@ class                           service : public notifier {
   void                          disable_flap_detection();
   void                          update_status(bool aggregated_dump) override;
   void                          set_notification_number(int num);
-  int                           notify(unsigned int type,
-                                       char const* not_author,
-                                       char const* not_data,
-                                       int options);
   int                           check_notification_viability(unsigned int type,
-                                                             int options);
+                                                             int options) override;
   int                           verify_check_viability(int check_options,
                                                        int* time_is_valid,
                                                        time_t* new_time);
+  int                           create_notification_list(nagios_macros* mac,
+                                                         int options,
+                                                         bool* escalated) override;
+  void                          grab_macros_r(nagios_macros* mac) override;
+  int                           notify_contact(nagios_macros* mac,
+                                               contact* cntct,
+                                               int type,
+                                               char const* not_author,
+                                               char const* not_data,
+                                               int options,
+                                               int escalated) override;
+  void                          update_notification_flags() override;
+  time_t                        get_next_notification_time(time_t offset) override;
+  void                          check_for_expired_acknowledgement();
+  void                          schedule_acknowledgement_expiration();
 
   char*                         event_handler;
-  int                           max_attempts;
   int                           parallelize;
   contactgroup_map              contact_groups;
   contact_map                   contacts;
@@ -165,8 +176,6 @@ class                           service : public notifier {
   uint64_t                      last_event_id;
   uint64_t                      current_problem_id;
   uint64_t                      last_problem_id;
-  time_t                        last_notification;
-  time_t                        next_notification;
   int                           no_more_notifications;
   int                           check_flapping_recovery_notification;
   time_t                        last_state_change;
@@ -210,19 +219,15 @@ class                           service : public notifier {
  private:
   std::string                   _hostname;
   std::string                   _description;
+
 };
 CCE_END()
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
-  time_t                        initial_notif_time;
   std::string                   timezone;
   uint64_t                      host_id;
   uint64_t                      service_id;
-  int                           acknowledgement_timeout;
-  time_t                        last_acknowledgement;
-  unsigned int                  recovery_notification_delay;
-  bool                          recovery_been_sent;
 };
 
 #  ifdef __cplusplus
@@ -305,7 +310,6 @@ std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const&
 
 CCE_BEGIN()
 
-void          check_for_expired_acknowledgement(com::centreon::engine::service* s);
 com::centreon::engine::service&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
@@ -317,7 +321,6 @@ std::pair<uint64_t, uint64_t>
                 std::string const& host,
                 std::string const& svc);
 uint64_t      get_service_id(std::string const& host, std::string const& svc);
-void          schedule_acknowledgement_expiration(com::centreon::engine::service* s);
 
 CCE_END()
 

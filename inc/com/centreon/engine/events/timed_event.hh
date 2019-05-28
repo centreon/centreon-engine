@@ -23,6 +23,7 @@
 #ifndef CCE_EVENTS_TIMED_EVENT_HH
 #  define CCE_EVENTS_TIMED_EVENT_HH
 
+#  include <stdint.h>
 #  include <time.h>
 
 typedef struct               timed_event_struct {
@@ -47,11 +48,11 @@ void add_event(
        timed_event* event,
        timed_event** event_list,
        timed_event** event_list_tail);
-void adjust_timestamp_for_time_change(
+time_t adjust_timestamp_for_time_change(
        time_t last_time,
        time_t current_time,
-       unsigned long time_difference,
-       time_t* ts);
+       uint64_t time_difference,
+       time_t ts);
 void compensate_for_system_time_change(
        unsigned long last_time,
        unsigned long current_time);

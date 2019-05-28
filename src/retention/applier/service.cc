@@ -125,8 +125,7 @@ void applier::service::_update(
     if (state.performance_data().is_set())
       string::setstr(obj.perf_data, *state.performance_data());
     if (state.last_acknowledgement().is_set())
-      service_other_props[{obj.host_ptr->get_name(), obj.get_description()}]
-          .last_acknowledgement = *state.last_acknowledgement();
+      obj.set_last_acknowledgement(*state.last_acknowledgement());
     if (state.last_check().is_set())
       obj.last_check = *state.last_check();
     if (state.next_check().is_set()
@@ -146,9 +145,9 @@ void applier::service::_update(
     if (state.current_notification_number().is_set())
       obj.current_notification_number = *state.current_notification_number();
     if (state.current_notification_id().is_set())
-      obj.current_notification_id = *state.current_notification_id();
+      obj.set_current_notification_id(*state.current_notification_id());
     if (state.last_notification().is_set())
-      obj.last_notification = *state.last_notification();
+      obj.set_last_notification(*state.last_notification());
     if (state.percent_state_change().is_set())
       obj.percent_state_change = *state.percent_state_change();
     if (state.check_flapping_recovery_notification().is_set())
@@ -238,13 +237,13 @@ void applier::service::_update(
 
     if (state.max_attempts().is_set()
         && (obj.modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS)) {
-      obj.max_attempts = *state.max_attempts();
+      obj.set_max_attempts(*state.max_attempts());
 
       // adjust current attempt number if in a hard state.
       if (obj.state_type == HARD_STATE
           && obj.current_state != STATE_OK
           && obj.current_attempt > 1)
-        obj.current_attempt = obj.max_attempts;
+        obj.current_attempt = obj.get_max_attempts();
     }
 
     if (!state.customvariables().empty()
@@ -276,11 +275,9 @@ void applier::service::_update(
   }
 
   // calculate next possible notification time.
-  if (obj.current_state != STATE_OK && obj.last_notification)
-    obj.next_notification
-      = get_next_service_notification_time(
-          &obj,
-          obj.last_notification);
+  if (obj.current_state != STATE_OK && obj.get_last_notification())
+    obj.set_next_notification(
+        obj.get_next_notification_time(obj.get_last_notification()));
 
   // fix old vars.
   if (!obj.has_been_checked && obj.state_type == SOFT_STATE)
@@ -290,7 +287,7 @@ void applier::service::_update(
   // in hard problem state (max attempts may have changed in config
   // since restart).
   if (obj.current_state != STATE_OK && obj.state_type == HARD_STATE)
-    obj.current_attempt = obj.max_attempts;
+    obj.current_attempt = obj.get_max_attempts();
 
 
   // ADDED 02/20/08 assume same flapping state if large
@@ -320,8 +317,7 @@ void applier::service::_update(
 
   // Handle recovery been sent
   if (state.recovery_been_sent().is_set())
-    service_other_props[{obj.get_description(), obj.host_ptr->get_name()}]
-        .recovery_been_sent = *state.recovery_been_sent();
+    obj.set_recovery_been_sent(*state.recovery_been_sent());
 
   // update service status.
   obj.update_status(false);

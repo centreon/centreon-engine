@@ -184,9 +184,7 @@ void applier::service::add_object(
       throw (engine_error() << "Could not register service '"
              << obj.service_description()
              << "' of host '" << *obj.hosts().begin() << "'");
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].initial_notif_time = 0;
+  svc->set_initial_notif_time(0);
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].timezone = obj.timezone();
@@ -196,19 +194,11 @@ void applier::service::add_object(
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].service_id = obj.service_id();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].acknowledgement_timeout
-    = obj.get_acknowledgement_timeout() * config->interval_length();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].last_acknowledgement = 0;
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].recovery_notification_delay = obj.recovery_notification_delay();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].recovery_been_sent = true;
+  svc->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
+                                   config->interval_length());
+  svc->set_last_acknowledgement(0);
+  svc->set_recovery_notification_delay(obj.recovery_notification_delay());
+  svc->set_recovery_been_sent(true);
 
   // Add contacts.
   for (set_string::const_iterator
@@ -387,9 +377,7 @@ void applier::service::modify_object(
   s->set_initial_state(obj.initial_state());
   s->set_check_interval(obj.check_interval());
   s->set_retry_interval(obj.retry_interval());
-  modify_if_different(
-    s->max_attempts,
-    static_cast<int>(obj.max_check_attempts()));
+  s->set_max_attempts(obj.max_check_attempts());
   modify_if_different(
     s->notification_interval,
     static_cast<double>(obj.notification_interval()));
@@ -516,14 +504,9 @@ void applier::service::modify_object(
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].service_id = obj.service_id();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].acknowledgement_timeout
-    = obj.get_acknowledgement_timeout() * config->interval_length();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].recovery_notification_delay
-    = obj.recovery_notification_delay();
+  s->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
+                                   config->interval_length());
+  s->set_recovery_notification_delay(obj.recovery_notification_delay());
 
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {

@@ -343,9 +343,9 @@ int cmd_delay_notification(int cmd, char* args) {
 
   /* delay the next notification... */
   if (cmd == CMD_DELAY_HOST_NOTIFICATION)
-    temp_host->set_next_host_notification(delay_time);
+    temp_host->set_next_notification(delay_time);
   else
-    temp_service->next_notification = delay_time;
+    temp_service->set_next_notification(delay_time);
 
   return OK;
 }
@@ -1729,14 +1729,14 @@ int cmd_change_object_int_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS:
-    temp_service->max_attempts = intval;
+    temp_service->set_max_attempts(intval);
     attr = MODATTR_MAX_CHECK_ATTEMPTS;
 
     /* adjust current attempt number if in a hard state */
     if (temp_service->state_type == HARD_STATE
         && temp_service->current_state != STATE_OK
         && temp_service->current_attempt > 1)
-      temp_service->current_attempt = temp_service->max_attempts;
+      temp_service->current_attempt = temp_service->get_max_attempts();
     break;
 
   case CMD_CHANGE_HOST_MODATTR:
@@ -2927,8 +2927,8 @@ void acknowledge_host_problem(
 
   /* schedule acknowledgement expiration */
   time_t current_time(time(nullptr));
-  host_other_props[hst->get_name()].last_acknowledgement = current_time;
-  schedule_acknowledgement_expiration(hst);
+  hst->set_last_acknowledgement(current_time);
+  hst->schedule_acknowledgement_expiration();
 
   /* send data to event broker */
   broker_acknowledgement_data(
@@ -2994,9 +2994,8 @@ void acknowledge_service_problem(
 
   /* schedule acknowledgement expiration */
   time_t current_time(time(nullptr));
-  service_other_props[{svc->host_ptr->get_name(), svc->get_description()}]
-      .last_acknowledgement = current_time;
-  schedule_acknowledgement_expiration(svc);
+  svc->set_last_acknowledgement(current_time);
+  svc->schedule_acknowledgement_expiration();
 
   /* send data to event broker */
   broker_acknowledgement_data(

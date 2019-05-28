@@ -1004,9 +1004,7 @@ void applier::scheduler::_schedule_host_events(
     << "Scheduling host acknowledgement expirations...";
   for (int i(0), end(hosts.size()); i < end; ++i)
     if (hosts[i]->get_problem_has_been_acknowledged())
-      schedule_acknowledgement_expiration(hosts[i]);
-
-  return ;
+      hosts[i]->schedule_acknowledgement_expiration();
 }
 
 /**
@@ -1129,7 +1127,7 @@ void applier::scheduler::_schedule_service_events(
     << "Scheduling service acknowledgement expirations...";
   for (int i(0), end(services.size()); i < end; ++i)
     if (services[i]->problem_has_been_acknowledged)
-      schedule_acknowledgement_expiration(services[i]);
+      services[i]->schedule_acknowledgement_expiration();
 
   return ;
 }

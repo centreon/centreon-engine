@@ -229,7 +229,8 @@ struct grab_service_redirection {
       {MACRO_MAXSERVICEATTEMPTS,
        {&get_member_as_string<com::centreon::engine::service,
                               int,
-                              &com::centreon::engine::service::max_attempts>,
+                              notifier,
+                              &notifier::get_max_attempts>,
         true}},
       // Execution time.
       {MACRO_SERVICEEXECUTIONTIME,

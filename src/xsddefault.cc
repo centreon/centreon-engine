@@ -267,9 +267,9 @@ int xsddefault_save_status_data() {
          "\tlast_time_unreachable=" << static_cast<unsigned long>(
            it->second->get_last_time_unreachable()) << "\n"
          "\tlast_notification=" << static_cast<unsigned long>(
-           it->second->get_last_host_notification()) << "\n"
+           it->second->get_last_notification()) << "\n"
          "\tnext_notification=" << static_cast<unsigned long>(
-           it->second->get_next_host_notification()) << "\n"
+           it->second->get_next_notification()) << "\n"
          "\tno_more_notifications=" << it->second->get_no_more_notifications()
                                     << "\n"
          "\tcurrent_notification_number=" <<
@@ -335,7 +335,7 @@ int xsddefault_save_status_data() {
          "\tcurrent_problem_id=" << svc->current_problem_id << "\n"
          "\tlast_problem_id=" << svc->last_problem_id << "\n"
          "\tcurrent_attempt=" << svc->current_attempt << "\n"
-         "\tmax_attempts=" << svc->max_attempts << "\n"
+         "\tmax_attempts=" << svc->get_max_attempts() << "\n"
          "\tstate_type=" << svc->state_type << "\n"
          "\tlast_state_change=" << static_cast<unsigned long>(svc->last_state_change) << "\n"
          "\tlast_hard_state_change=" << static_cast<unsigned long>(svc->last_hard_state_change) << "\n"
@@ -351,8 +351,8 @@ int xsddefault_save_status_data() {
          "\tcheck_options=" << svc->check_options << "\n"
          "\tcurrent_notification_number=" << svc->current_notification_number << "\n"
          "\tcurrent_notification_id=" << svc->current_notification_id << "\n"
-         "\tlast_notification=" << static_cast<unsigned long>(svc->last_notification) << "\n"
-         "\tnext_notification=" << static_cast<unsigned long>(svc->next_notification) << "\n"
+         "\tlast_notification=" << static_cast<unsigned long>(svc->get_last_notification()) << "\n"
+         "\tnext_notification=" << static_cast<unsigned long>(svc->get_next_notification()) << "\n"
          "\tno_more_notifications=" << svc->no_more_notifications << "\n"
          "\tnotifications_enabled=" << svc->notifications_enabled << "\n"
          "\tactive_checks_enabled=" << svc->checks_enabled << "\n"

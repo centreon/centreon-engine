@@ -98,7 +98,7 @@ void applier::host::_update(
     if (state.performance_data().is_set())
       obj.set_perf_data(*state.performance_data());
     if (state.last_acknowledgement().is_set())
-      host_other_props[obj.get_name()].last_acknowledgement = *state.last_acknowledgement();
+      obj.set_last_acknowledgement(*state.last_acknowledgement());
     if (state.last_check().is_set())
       obj.set_last_check(*state.last_check());
     if (state.next_check().is_set()
@@ -136,7 +136,7 @@ void applier::host::_update(
     if (state.notified_on_unreachable().is_set())
       obj.set_notified_on_unreachable(*state.notified_on_unreachable());
     if (state.last_notification().is_set())
-      obj.set_last_host_notification(*state.last_notification());
+      obj.set_last_notification(*state.last_notification());
     if (state.current_notification_number().is_set())
       obj.set_current_notification_number(*state.current_notification_number());
     if (state.current_notification_id().is_set())
@@ -275,11 +275,10 @@ void applier::host::_update(
   }
 
   // calculate next possible notification time.
-  if (obj.get_current_state() != HOST_UP && obj.get_last_host_notification())
-    obj.set_next_host_notification(
-      get_next_host_notification_time(
-        &obj,
-        obj.get_last_host_notification()));
+  if (obj.get_current_state() != HOST_UP && obj.get_last_notification())
+    obj.set_next_notification(
+      obj.get_next_notification_time(
+        obj.get_last_notification()));
 
   // ADDED 01/23/2009 adjust current check attempts if host in hard
   // problem state (max attempts may have changed in config
@@ -315,7 +314,7 @@ void applier::host::_update(
 
   // Handle recovery been sent
   if (state.recovery_been_sent().is_set())
-    host_other_props[obj.get_name()].recovery_been_sent = *state.recovery_been_sent();
+    obj.set_recovery_been_sent(*state.recovery_been_sent());
 
   // update host status.
   obj.update_status(false);

@@ -219,12 +219,12 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
     "flap_detection_enabled=" << obj.get_flap_detection_enabled() << "\n"
     "has_been_checked=" << obj.get_has_been_checked() << "\n"
     "is_flapping=" << obj.get_is_flapping() << "\n"
-    "last_acknowledgement=" << host_other_props[obj.get_name()].last_acknowledgement << "\n"
+    "last_acknowledgement=" << obj.get_last_acknowledgement() << "\n"
     "last_check=" << static_cast<unsigned long>(obj.get_last_check()) << "\n"
     "last_event_id=" << obj.get_last_event_id() << "\n"
     "last_hard_state=" << obj.get_last_hard_state() << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.get_last_hard_state_change()) << "\n"
-    "last_notification=" << static_cast<unsigned long>(obj.get_last_host_notification()) << "\n"
+    "last_notification=" << static_cast<unsigned long>(obj.get_last_notification()) << "\n"
     "last_problem_id=" << obj.get_last_problem_id() << "\n"
     "last_state=" << obj.get_last_state() << "\n"
     "last_state_change=" << static_cast<unsigned long>(obj.get_last_state_change()) << "\n"
@@ -249,7 +249,7 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
     "process_performance_data=" << obj.get_process_performance_data() << "\n"
     "retry_check_interval=" << obj.get_check_interval() << "\n"
     "state_type=" << obj.get_state_type ()<< "\n"
-    "recovery_been_sent=" << host_other_props[obj.get_name()].recovery_been_sent << "\n";
+    "recovery_been_sent=" << obj.get_recovery_been_sent() << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
@@ -414,12 +414,12 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"
-    "last_acknowledgement=" << service_other_props[{hostname, obj.get_description()}].last_acknowledgement << "\n"
+    "last_acknowledgement=" << obj.get_last_acknowledgement() << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.last_hard_state_change) << "\n"
-    "last_notification=" << static_cast<unsigned long>(obj.last_notification) << "\n"
+    "last_notification=" << static_cast<unsigned long>(obj.get_last_notification()) << "\n"
     "last_problem_id=" << obj.last_problem_id << "\n"
     "last_state=" << obj.last_state << "\n"
     "last_state_change=" << static_cast<unsigned long>(obj.last_state_change) << "\n"
@@ -428,7 +428,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "last_time_unknown=" << static_cast<unsigned long>(obj.last_time_unknown) << "\n"
     "last_time_warning=" << static_cast<unsigned long>(obj.last_time_warning) << "\n"
     "long_plugin_output=" << (obj.long_plugin_output ? obj.long_plugin_output : "") << "\n"
-    "max_attempts=" << obj.max_attempts << "\n"
+    "max_attempts=" << obj.get_max_attempts() << "\n"
     "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.get_check_interval() << "\n"
@@ -446,8 +446,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "process_performance_data=" << obj.process_performance_data << "\n"
     "retry_check_interval=" << obj.get_retry_interval() << "\n"
     "state_type=" << obj.state_type << "\n"
-    "recovery_been_sent=" << service_other_props[
-                               std::make_pair(hostname, obj.get_description())].recovery_been_sent << "\n";
+    "recovery_been_sent=" << obj.get_recovery_been_sent() << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
