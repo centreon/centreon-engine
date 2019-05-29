@@ -342,10 +342,12 @@ int pre_flight_object_check(int* w, int* e) {
     logger(log_info_message, basic)
       << "Checking service dependencies...";
   total_objects = 0;
-  for (servicedependency* temp_sd(servicedependency_list);
-       temp_sd;
-       temp_sd = temp_sd->next, ++total_objects)
-    check_servicedependency(temp_sd, &warnings, &errors);
+  for (servicedependency_mmap::iterator
+         it(servicedependency::servicedependencies.begin()),
+         end(servicedependency::servicedependencies.end());
+       it != end;
+       ++it)
+    check_servicedependency(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service dependencies.";
@@ -543,60 +545,68 @@ int pre_flight_circular_check(int* w, int* e) {
   /********************************************/
 
   /* check execution dependencies between all services */
-  for (temp_sd = servicedependency_list;
-       temp_sd != nullptr;
-       temp_sd = temp_sd->next) {
+  for (servicedependency_mmap::iterator
+         it(servicedependency::servicedependencies.begin()),
+         end(servicedependency::servicedependencies.end());
+       it != end;
+       ++it) {
 
     /* clear checked flag for all dependencies */
-    for (temp_sd2 = servicedependency_list;
-         temp_sd2 != nullptr;
-         temp_sd2 = temp_sd2->next)
-      temp_sd2->circular_path_checked = false;
+    for (servicedependency_mmap::iterator
+           it2(servicedependency::servicedependencies.begin()),
+           end2(servicedependency::servicedependencies.end());
+         it2 != end;
+         ++it2)
+      it2->second->set_circular_path_checked(false);
 
-    found = check_for_circular_servicedependency_path(
-              temp_sd,
-              temp_sd,
+    found = it->second->check_for_circular_servicedependency_path(
+              it->second.get(),
               hostdependency::execution);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could result "
         "in a deadlock) exists for service '"
-        << temp_sd->service_description << "' on host '"
-        << temp_sd->host_name << "'!";
+        << it->second->get_service_description() << "' on host '"
+        << it->second->get_host_name() << "'!";
       errors++;
     }
   }
 
   /* check notification dependencies between all services */
-  for (temp_sd = servicedependency_list;
-       temp_sd != nullptr;
-       temp_sd = temp_sd->next) {
+  for (servicedependency_mmap::iterator
+         it(servicedependency::servicedependencies.begin()),
+         end(servicedependency::servicedependencies.end());
+       it != end;
+       ++it) {
 
     /* clear checked flag for all dependencies */
-    for (temp_sd2 = servicedependency_list;
-	       temp_sd2 != nullptr;
-         temp_sd2 = temp_sd2->next)
-      temp_sd2->circular_path_checked = false;
+    for (servicedependency_mmap::iterator
+           it2(servicedependency::servicedependencies.begin()),
+           end2(servicedependency::servicedependencies.end());
+         it2 != end;
+         ++it2)
+      it2->second->set_circular_path_checked(false);
 
-    found = check_for_circular_servicedependency_path(
-              temp_sd,
-              temp_sd,
+    found = it->second->check_for_circular_servicedependency_path(
+              it->second.get(),
               hostdependency::notification);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "
         "result in a deadlock) exists for service '"
-        << temp_sd->service_description << "' on host '"
-        << temp_sd->host_name << "'!";
+        << it->second->get_service_description() << "' on host '"
+        << it->second->get_host_name() << "'!";
       errors++;
     }
   }
 
   /* clear checked flag for all dependencies */
-  for (temp_sd = servicedependency_list;
-       temp_sd != nullptr;
-       temp_sd = temp_sd->next)
-    temp_sd->circular_path_checked = false;
+  for (servicedependency_mmap::iterator
+         it(servicedependency::servicedependencies.begin()),
+         end(servicedependency::servicedependencies.end());
+       it != end;
+       ++it)
+    it->second->set_circular_path_checked(false);
 
   /* check execution dependencies between all hosts */
   for (hostdependency_mmap::iterator
@@ -1368,16 +1378,16 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
 
   // Find the dependent service.
   com::centreon::engine::service* temp_service(find_service(
-                          sd->dependent_host_name,
-                          sd->dependent_service_description));
+                          sd->get_dependent_host_name().c_str(),
+                          sd->get_dependent_service_description().c_str()));
   if (!temp_service) {
     logger(log_verification_error, basic)
       << "Error: Dependent service '"
-      << sd->dependent_service_description << "' on host '"
-      << sd->dependent_host_name
+      << sd->get_dependent_service_description() << "' on host '"
+      << sd->get_dependent_host_name()
       << "' specified in service dependency for service '"
-      << sd->service_description << "' on host '"
-      << sd->host_name << "' is not defined anywhere!";
+      << sd->get_service_description() << "' on host '"
+      << sd->get_host_name() << "' is not defined anywhere!";
     errors++;
   }
 
@@ -1386,15 +1396,15 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
 
   // Find the service we're depending on.
   temp_service = find_service(
-                   sd->host_name,
-                   sd->service_description);
+                   sd->get_host_name().c_str(),
+                   sd->get_service_description().c_str());
   if (!temp_service) {
     logger(log_verification_error, basic)
-      << "Error: Service '" << sd->service_description << "' on host '"
-      << sd->host_name
+      << "Error: Service '" << sd->get_service_description() << "' on host '"
+      << sd->get_host_name()
       << "' specified in service dependency for service '"
-      << sd->dependent_service_description << "' on host '"
-      << sd->dependent_host_name << "' is not defined anywhere!";
+      << sd->get_dependent_service_description() << "' on host '"
+      << sd->get_dependent_host_name() << "' is not defined anywhere!";
     errors++;
   }
 
@@ -1405,27 +1415,27 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
   if (sd->dependent_service_ptr == sd->master_service_ptr) {
     logger(log_verification_error, basic)
       << "Error: Service dependency definition for service '"
-      << sd->dependent_service_description << "' on host '"
-      << sd->dependent_host_name
+      << sd->get_dependent_service_description() << "' on host '"
+      << sd->get_dependent_host_name()
       << "' is circular (it depends on itself)!";
     errors++;
   }
 
   // Find the timeperiod.
-  if (sd->dependency_period) {
+  if (!sd->get_dependency_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(sd->dependency_period));
+      it(state::instance().timeperiods().find(sd->get_dependency_period()));
 
     if (it != state::instance().timeperiods().end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Dependency period '" << sd->dependency_period
+        << "Error: Dependency period '" << sd->get_dependency_period()
         << "' specified in service dependency for service '"
-        << sd->dependent_service_description << "' on host '"
-        << sd->dependent_host_name << "' is not defined anywhere!";
+        << sd->get_dependent_service_description() << "' on host '"
+        << sd->get_dependent_host_name() << "' is not defined anywhere!";
       errors++;
     }
 

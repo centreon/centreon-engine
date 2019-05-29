@@ -745,7 +745,7 @@ std::unordered_map<std::pair<unsigned long, unsigned long>,
  *
  *  @return The current servicedependencies.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> > const& applier::state::servicedependencies() const throw () {
+servicedependency_mmap const& applier::state::servicedependencies() const throw () {
   return _servicedependencies;
 }
 
@@ -754,7 +754,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
  *
  *  @return The current servicedependencies.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >& applier::state::servicedependencies() throw () {
+servicedependency_mmap& applier::state::servicedependencies() throw () {
   return _servicedependencies;
 }
 
@@ -766,7 +766,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
  *  @return Iterator to the element if found,
  *          servicedependencies().end() otherwise.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >::const_iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) const {
+servicedependency_mmap ::const_iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) const {
   return const_cast<state*>(this)->servicedependencies_find(k);
 }
 
@@ -778,41 +778,39 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency
  *  @return Iterator to the element if found,
  *          servicedependencies().end() otherwise.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> >::iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) {
-  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct> > collection;
+servicedependency_mmap ::iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) {
+  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::servicedependency> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _servicedependencies.equal_range(std::make_pair(k.dependent_hosts().front(), k.dependent_service_description().front()));
   while (p.first != p.second) {
     configuration::servicedependency current;
     current.configuration::object::operator=(k);
     current.dependent_hosts().push_back(
-                                p.first->second->dependent_host_name);
+                                p.first->second->get_dependent_host_name());
     current.dependent_service_description().push_back(
-              p.first->second->dependent_service_description);
-    current.hosts().push_back(p.first->second->host_name);
+              p.first->second->get_dependent_service_description());
+    current.hosts().push_back(p.first->second->get_host_name());
     current.service_description().push_back(
-              p.first->second->service_description);
-    current.dependency_period(p.first->second->dependency_period
-                              ? p.first->second->dependency_period
-                              : "");
-    current.inherits_parent(p.first->second->inherits_parent);
+              p.first->second->get_service_description());
+    current.dependency_period(p.first->second->get_dependency_period());
+    current.inherits_parent(p.first->second->get_inherits_parent());
     unsigned int options(
-                   (p.first->second->fail_on_ok
+                   (p.first->second->get_fail_on_ok()
                     ? configuration::servicedependency::ok
                     : 0)
-                   | (p.first->second->fail_on_warning
+                   | (p.first->second->get_fail_on_warning()
                       ? configuration::servicedependency::warning
                       : 0)
-                   | (p.first->second->fail_on_unknown
+                   | (p.first->second->get_fail_on_unknown()
                       ? configuration::servicedependency::unknown
                       : 0)
-                   | (p.first->second->fail_on_critical
+                   | (p.first->second->get_fail_on_critical()
                       ? configuration::servicedependency::critical
                       : 0)
-                   | (p.first->second->fail_on_pending
+                   | (p.first->second->get_fail_on_pending()
                       ? configuration::servicedependency::pending
                       : 0));
-    if (p.first->second->dependency_type == engine::hostdependency::notification) {
+    if (p.first->second->get_dependency_type() == engine::dependency::notification) {
       current.dependency_type(
         configuration::servicedependency::notification_dependency);
       current.notification_failure_options(options);
