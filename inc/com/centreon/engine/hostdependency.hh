@@ -22,6 +22,7 @@
 
 #  include <ostream>
 #  include <string>
+#  include "com/centreon/engine/dependency.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
@@ -34,17 +35,13 @@ typedef std::unordered_multimap<std::string,
   std::shared_ptr<com::centreon::engine::hostdependency>> hostdependency_mmap;
 
 CCE_BEGIN()
-class                           hostdependency {
+class                           hostdependency : public dependency {
  public:
-    enum                        types {
-      notification = 1,
-      execution
-    };
 
                                 hostdependency(
-                                  std::string const& dependent_host_name,
-                                  std::string const& host_name,
-                                  types dependency_type,
+                                  std::string const& dependent_hostname,
+                                  std::string const& hostname,
+                                  dependency::types dependency_type,
                                   bool inherits_parent,
                                   bool fail_on_up,
                                   bool fail_on_down,
@@ -52,18 +49,6 @@ class                           hostdependency {
                                   bool fail_on_pending,
                                   std::string const& dependency_period);
 
-  types                         get_dependency_type() const;
-  void                          set_dependency_type(types dependency_type);
-  std::string const&            get_dependent_host_name() const;
-  void                          set_dependent_host_name(
-                                  std::string const& dependent_host_name);
-  std::string const&            get_host_name() const;
-  void                          set_host_name(std::string const& host_name);
-  std::string const&            get_dependency_period() const;
-  void                          set_dependency_period(
-                                  std::string const& dependency_period);
-  bool                          get_inherits_parent() const;
-  void                          set_inherits_parent(bool inherits_parent);
   bool                          get_fail_on_up() const;
   void                          set_fail_on_up(bool fail_on_up);
   bool                          get_fail_on_down() const;
@@ -71,51 +56,29 @@ class                           hostdependency {
   bool                          get_fail_on_unreachable() const;
   void                          set_fail_on_unreachable(
                                   bool fail_on_unreachable);
-  bool                          get_fail_on_pending() const;
-  void                          set_fail_on_pending(bool fail_on_pending);
-  bool                          get_circular_path_checked() const;
-  void                          set_circular_path_checked(
-                                  bool circular_path_checked);
-  bool                          get_contains_circular_path() const;
-  void                          set_contains_circular_path(
-                                  bool contains_circular_path);
 
   bool                          check_for_circular_hostdependency_path(
                                   hostdependency* dep,
                                   types dependency_type);
 
+  bool                          operator==(hostdependency const& obj) throw ();
+  bool                          operator<(hostdependency const& obj) throw ();
+
   static hostdependency_mmap    hostdependencies;
 
-  com::centreon::engine::host*  master_host_ptr;
-  com::centreon::engine::host*  dependent_host_ptr;
-  com::centreon::engine::timeperiod*
-                                dependency_period_ptr;
-
-  bool                          operator==(
-    com::centreon::engine::hostdependency const& obj) throw ();
-  bool                          operator!=(
-    com::centreon::engine::hostdependency const& obj) throw ();
-  bool                          operator<(
-    com::centreon::engine::hostdependency const& obj) throw ();
+  host*                         master_host_ptr;
+  host*                         dependent_host_ptr;
 
  private:
-  types                         _dependency_type;
-  std::string                   _dependent_host_name;
-  std::string                   _host_name;
-  std::string                   _dependency_period;
-  int                           _inherits_parent;
-  int                           _fail_on_up;
-  int                           _fail_on_down;
-  int                           _fail_on_unreachable;
-  int                           _fail_on_pending;
-  int                           _circular_path_checked;
-  int                           _contains_circular_path;
+  bool                          _fail_on_up;
+  bool                          _fail_on_down;
+  bool                          _fail_on_unreachable;
 };
 
 CCE_END()
 
-
-std::ostream& operator<<(std::ostream& os, com::centreon::engine::hostdependency const& obj);
+std::ostream& operator<<(std::ostream& os,
+  com::centreon::engine::hostdependency const& obj);
 
 #endif // !CCE_OBJECTS_HOSTDEPENDENCY_HH
 

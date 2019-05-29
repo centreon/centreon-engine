@@ -2456,8 +2456,8 @@ void host::set_flap(
 
   unsigned long comment_id;
   comment_id = get_flapping_comment_id();
-  std::shared_ptr<comment> com =
-    std::make_shared<comment>(
+  std::shared_ptr<comment> com{
+    new comment(
       comment::host,
       comment::flapping,
       get_name(),
@@ -2468,7 +2468,7 @@ void host::set_flap(
       false,
       comment::internal,
       false,
-      (time_t)0);
+      (time_t)0)};
 
   comment::comments.insert({com->get_comment_id(), com});
 

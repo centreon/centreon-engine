@@ -259,8 +259,8 @@ int service_downtime::subscribe() {
 
   /* add a non-persistent comment to the host or service regarding the scheduled
    * outage */
-  std::shared_ptr<comment> com =
-    std::make_shared<comment>(
+  std::shared_ptr<comment> com{
+    new comment(
       comment::service,
       comment::downtime,
       svc->get_hostname(),
@@ -271,7 +271,7 @@ int service_downtime::subscribe() {
       false,
       comment::internal,
       false,
-      (time_t)0);
+      (time_t)0)};
 
   comment::comments.insert({com->get_comment_id(), com});
   _comment_id = com->get_comment_id();

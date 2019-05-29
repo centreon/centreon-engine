@@ -110,8 +110,6 @@ extern servicegroup*             servicegroup_list_tail;
 extern std::map<std::string, servicegroup_other_properties> servicegroup_other_props;
 extern serviceescalation*        serviceescalation_list;
 extern serviceescalation*        serviceescalation_list_tail;
-extern servicedependency*        servicedependency_list;
-extern servicedependency*        servicedependency_list_tail;
 
 extern int                       __nagios_object_structure_version;
 

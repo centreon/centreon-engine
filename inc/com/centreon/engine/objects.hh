@@ -26,11 +26,11 @@
 #  include "com/centreon/engine/hostgroup.hh"
 #  include "com/centreon/engine/hostdependency.hh"
 #  include "com/centreon/engine/hostescalation.hh"
-#  include "com/centreon/engine/timerange.hh"
 #  include "com/centreon/engine/objects/objectlist.hh"
-#  include "com/centreon/engine/objects/servicedependency.hh"
 #  include "com/centreon/engine/objects/serviceescalation.hh"
 #  include "com/centreon/engine/objects/servicesmember.hh"
+#  include "com/centreon/engine/servicedependency.hh"
+#  include "com/centreon/engine/timerange.hh"
 #  include "find.hh"
 
 /*

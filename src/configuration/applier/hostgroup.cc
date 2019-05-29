@@ -80,13 +80,13 @@ void applier::hostgroup::add_object(
   engine::hostgroup::hostgroups[obj.hostgroup_name()]->set_id(obj.hostgroup_id());
 
   // Create host group.
-  std::shared_ptr<com::centreon::engine::hostgroup> hg =
-    std::make_shared<com::centreon::engine::hostgroup>(
+  std::shared_ptr<com::centreon::engine::hostgroup> hg{
+    new engine::hostgroup(
       obj.hostgroup_name(),
       obj.alias(),
       obj.notes(),
       obj.notes_url(),
-      obj.action_url());
+      obj.action_url())};
 
   // Add new items to the configuration state.
   state::instance().hostgroups()[obj.hostgroup_name()] = hg;
