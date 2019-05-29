@@ -57,7 +57,7 @@ applier::hostdependency::~hostdependency() throw () {}
 applier::hostdependency& applier::hostdependency::operator=(
                            applier::hostdependency const& right) {
   (void)right;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -92,8 +92,8 @@ void applier::hostdependency::add_object(
   // Add dependency to the global configuration set.
   config->hostdependencies().insert(obj);
 
-  std::shared_ptr<engine::hostdependency> hd =
-    std::make_shared<engine::hostdependency>(
+  std::shared_ptr<engine::hostdependency> hd{
+    new engine::hostdependency(
        *obj.dependent_hosts().begin(),
        *obj.hosts().begin(),
        static_cast<engine::hostdependency::types>(obj.dependency_type()),
@@ -110,7 +110,7 @@ void applier::hostdependency::add_object(
        static_cast<bool>(
          obj.execution_failure_options()
          & configuration::hostdependency::pending),
-       obj.dependency_period());
+       obj.dependency_period())};
 
   state::instance().hostdependencies().insert(
     {*obj.dependent_hosts().begin(), hd});

@@ -104,7 +104,7 @@ unsigned int check_service_dependencies(
     servicedependency* temp_dependency(&*it->second);
 
     /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->dependency_type != dependency_type)
+    if (temp_dependency->get_dependency_type() != dependency_type)
       continue;
 
     /* find the service we depend on... */
@@ -113,8 +113,7 @@ unsigned int check_service_dependencies(
 
     /* skip this dependency if it has a timeperiod and the current time isn't valid */
     time(&current_time);
-    if (temp_dependency->dependency_period != NULL
-        && check_time_against_period(
+    if (check_time_against_period(
              current_time,
              temp_dependency->dependency_period_ptr) == ERROR)
       return DEPENDENCIES_OK;
@@ -127,23 +126,23 @@ unsigned int check_service_dependencies(
       state = temp_service->current_state;
 
     /* is the service we depend on in state that fails the dependency tests? */
-    if (state == STATE_OK && temp_dependency->fail_on_ok)
+    if (state == STATE_OK && temp_dependency->get_fail_on_ok())
       return DEPENDENCIES_FAILED;
     if (state == STATE_WARNING
-        && temp_dependency->fail_on_warning)
+        && temp_dependency->get_fail_on_warning())
       return DEPENDENCIES_FAILED;
     if (state == STATE_UNKNOWN
-        && temp_dependency->fail_on_unknown)
+        && temp_dependency->get_fail_on_unknown())
       return DEPENDENCIES_FAILED;
     if (state == STATE_CRITICAL
-        && temp_dependency->fail_on_critical)
+        && temp_dependency->get_fail_on_critical())
       return DEPENDENCIES_FAILED;
     if ((state == STATE_OK && !temp_service->has_been_checked)
-        && temp_dependency->fail_on_pending)
+        && temp_dependency->get_fail_on_pending())
       return DEPENDENCIES_FAILED;
 
     /* immediate dependencies ok at this point - check parent dependencies if necessary */
-    if (temp_dependency->inherits_parent) {
+    if (temp_dependency->get_inherits_parent()) {
       if (check_service_dependencies(
             temp_service,
             dependency_type) != DEPENDENCIES_OK)

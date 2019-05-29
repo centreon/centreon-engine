@@ -60,7 +60,7 @@ applier::servicedependency::~servicedependency() throw () {}
 applier::servicedependency& applier::servicedependency::operator=(
                               applier::servicedependency const& right) {
   (void)right;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -105,15 +105,17 @@ void applier::servicedependency::add_object(
   // Add dependency to the global configuration set.
   config->servicedependencies().insert(obj);
 
+  std::shared_ptr<engine::servicedependency> sd;
+
   // Create execution dependency.
   if (obj.dependency_type()
       == configuration::servicedependency::execution_dependency) {
-    if (!add_service_dependency(
-           obj.dependent_hosts().front().c_str(),
-           obj.dependent_service_description().front().c_str(),
-           obj.hosts().front().c_str(),
-           obj.service_description().front().c_str(),
-           engine::hostdependency::execution,
+    sd = std::make_shared<engine::servicedependency>(
+           obj.dependent_hosts().front(),
+           obj.dependent_service_description().front(),
+           obj.hosts().front(),
+           obj.service_description().front(),
+           dependency::execution,
            obj.inherits_parent(),
            static_cast<bool>(
              obj.execution_failure_options()
@@ -130,22 +132,16 @@ void applier::servicedependency::add_object(
            static_cast<bool>(
              obj.execution_failure_options()
              & configuration::servicedependency::pending),
-           NULL_IF_EMPTY(obj.dependency_period())))
-      throw (engine_error() << "Could not create service "
-             << "execution dependency of service '"
-             << obj.dependent_service_description().front()
-             << "' of host '" << obj.dependent_hosts().front()
-             << "' on service '" << obj.service_description().front()
-             << "' of host '" << obj.hosts().front() << "'");
+           obj.dependency_period());
   }
   // Create notification dependency.
   else
-    if (!add_service_dependency(
-           obj.dependent_hosts().front().c_str(),
-           obj.dependent_service_description().front().c_str(),
-           obj.hosts().front().c_str(),
-           obj.service_description().front().c_str(),
-           engine::hostdependency::notification,
+    sd = std::make_shared<engine::servicedependency>(
+           obj.dependent_hosts().front(),
+           obj.dependent_service_description().front(),
+           obj.hosts().front(),
+           obj.service_description().front(),
+           dependency::notification,
            obj.inherits_parent(),
            static_cast<bool>(
              obj.notification_failure_options()
@@ -162,13 +158,19 @@ void applier::servicedependency::add_object(
            static_cast<bool>(
              obj.notification_failure_options()
              & configuration::servicedependency::pending),
-           NULL_IF_EMPTY(obj.dependency_period())))
-      throw (engine_error() << "Could not create service "
-             << "notification dependency of service '"
-             << obj.dependent_service_description().front()
-             << "' of host '" << obj.dependent_hosts().front()
-             << "' on service '" << obj.service_description().front()
-             << "' of host '" << obj.hosts().front() << "'");
+           obj.dependency_period());
+
+  std::pair<std::string, std::string> id{sd->get_dependent_hostname(), sd->get_dependent_service_description()};
+  configuration::applier::state::instance().servicedependencies().insert({id, sd});
+  engine::servicedependency::servicedependencies.insert({id, sd});
+
+  timeval tv(get_broker_timestamp(nullptr));
+  broker_adaptive_dependency_data(
+    NEBTYPE_SERVICEDEPENDENCY_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    sd.get(),
+    &tv);
 
   return ;
 }
@@ -302,23 +304,20 @@ void applier::servicedependency::remove_object(
 
   // Find service dependency.
   umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<servicedependency_struct> >::iterator
+            std::shared_ptr<com::centreon::engine::servicedependency> >::iterator
     it(applier::state::instance().servicedependencies_find(obj.key()));
   if (it != applier::state::instance().servicedependencies().end()) {
-    servicedependency_struct* dependency(it->second.get());
 
     // Remove service dependency from its list.
-    unregister_object<servicedependency_struct>(
-      &servicedependency_list,
-      dependency);
+    engine::servicedependency::servicedependencies.erase(it);
 
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
+    timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_dependency_data(
       NEBTYPE_SERVICEDEPENDENCY_DELETE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      dependency,
+      it->second.get(),
       &tv);
 
     // Erase service dependency (will effectively delete the object).
@@ -344,7 +343,7 @@ void applier::servicedependency::resolve_object(
 
   // Find service dependency.
   umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<servicedependency_struct> >::iterator
+            std::shared_ptr<engine::servicedependency> >::iterator
     it(applier::state::instance().servicedependencies_find(obj.key()));
   if (applier::state::instance().servicedependencies().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "

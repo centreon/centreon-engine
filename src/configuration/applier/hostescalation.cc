@@ -82,8 +82,8 @@ void applier::hostescalation::add_object(
   config->hostescalations().insert(obj);
 
   // Create host escalation.
-  std::shared_ptr<com::centreon::engine::hostescalation> he =
-    std::make_shared<com::centreon::engine::hostescalation>(
+  std::shared_ptr<com::centreon::engine::hostescalation> he{
+    new engine::hostescalation(
          *obj.hosts().begin(),
          obj.first_notification(),
          obj.last_notification(),
@@ -97,7 +97,7 @@ void applier::hostescalation::add_object(
            & configuration::hostescalation::unreachable),
          static_cast<bool>(
            obj.escalation_options()
-           & configuration::hostescalation::recovery));
+           & configuration::hostescalation::recovery))};
 
   // Add new items to the configuration state.
   state::instance().hostescalations()

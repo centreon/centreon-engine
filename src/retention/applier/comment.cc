@@ -58,8 +58,8 @@ void applier::comment::_add_host_comment(
   com::centreon::engine::host* hst(it->second.get());
 
   // add the comment.
-  std::shared_ptr<engine::comment> com =
-    std::make_shared<engine::comment>(
+  std::shared_ptr<engine::comment> com{
+    new engine::comment(
       engine::comment::host,
       static_cast<engine::comment::e_type>(obj.entry_type()),
       obj.host_name(),
@@ -71,7 +71,7 @@ void applier::comment::_add_host_comment(
       static_cast<engine::comment::src>(obj.source()),
       obj.expires(),
       obj.expire_time(),
-      obj.comment_id());
+      obj.comment_id())};
 
   engine::comment::comments.insert({com->get_comment_id(), com});
 
@@ -107,8 +107,8 @@ void applier::comment::_add_service_comment(
   engine::service* svc(&*it_svc->second);
 
   // add the comment.
-  std::shared_ptr<engine::comment> com =
-    std::make_shared<engine::comment>(
+  std::shared_ptr<engine::comment> com{
+    new engine::comment(
       engine::comment::service,
       static_cast<engine::comment::e_type>(obj.entry_type()),
       obj.host_name(),
@@ -120,7 +120,7 @@ void applier::comment::_add_service_comment(
       static_cast<engine::comment::src>(obj.source()),
       obj.expires(),
       obj.expire_time(),
-      obj.comment_id());
+      obj.comment_id())};
 
   engine::comment::comments.insert({com->get_comment_id(), com});
 

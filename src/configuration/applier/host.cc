@@ -82,8 +82,8 @@ void applier::host::add_object(
   config->hosts().insert(obj);
 
   // Create host.
-  std::shared_ptr<com::centreon::engine::host> h =
-    std::make_shared<com::centreon::engine::host>(
+  std::shared_ptr<com::centreon::engine::host> h{
+    new engine::host(
         obj.host_id(),
         obj.host_name(),
         obj.display_name(),
@@ -148,7 +148,7 @@ void applier::host::add_object(
         true, // should_be_drawn, enabled by Nagios
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
-        obj.obsess_over_host());
+        obj.obsess_over_host())};
 
 
   state::instance().hosts()[obj.host_id()] = h;
