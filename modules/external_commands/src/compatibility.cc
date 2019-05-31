@@ -999,7 +999,7 @@ int process_hostgroup_command(int cmd,
   char* hostgroup_name = nullptr;
   hostgroup* temp_hostgroup = nullptr;
   host* temp_host = nullptr;
-  service* temp_service = nullptr;
+  com::centreon::engine::service* temp_service = nullptr;
   servicesmember* temp_servicesmember = nullptr;
 
   (void)entry_time;
@@ -1103,7 +1103,7 @@ int process_host_command(int cmd,
                          char* args) {
   char* host_name = nullptr;
   host* temp_host = nullptr;
-  service* temp_service = nullptr;
+  com::centreon::engine::service* temp_service = nullptr;
   servicesmember* temp_servicesmember = nullptr;
   char* str = nullptr;
   char* buf[2] = { nullptr, nullptr };
@@ -1249,7 +1249,7 @@ int process_service_command(int cmd,
                             char* args) {
   char* host_name = nullptr;
   char* svc_description = nullptr;
-  service* temp_service = nullptr;
+  com::centreon::engine::service* temp_service = nullptr;
   char* str = nullptr;
   char* buf[2] = { nullptr, nullptr };
   int intval = 0;
@@ -1334,7 +1334,7 @@ int process_service_command(int cmd,
     if (str)
       buf[1] = string::dup(str);
     if (buf[0] && buf[1])
-      service_notification(temp_service,
+      temp_service->notify(
                            NOTIFICATION_CUSTOM,
                            buf[0],
                            buf[1],
@@ -1358,14 +1358,14 @@ int process_servicegroup_command(int cmd,
   servicesmember* temp_member{nullptr};
   host* temp_host{nullptr};
   host* last_host{nullptr};
-  service* temp_service{nullptr};
+  com::centreon::engine::service* temp_service{nullptr};
 
   /* get the servicegroup name */
   if ((servicegroup_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* find the servicegroup */
-  if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == nullptr)
+  if ((temp_servicegroup = ::find_servicegroup(servicegroup_name)) == nullptr)
     return ERROR;
 
   switch (cmd) {

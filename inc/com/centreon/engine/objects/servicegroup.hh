@@ -23,8 +23,8 @@
 /* Forward declaration. */
 CCE_BEGIN()
   class host;
+  class service;
 CCE_END()
-struct service_struct;
 struct servicesmember_struct;
 
 typedef struct                servicegroup_struct {
@@ -58,7 +58,7 @@ int           is_host_member_of_servicegroup(
                 com::centreon::engine::host* hst);
 int           is_service_member_of_servicegroup(
                 servicegroup_struct* group,
-                service_struct* svc);
+                com::centreon::engine::service* svc);
 
 #  ifdef __cplusplus
 }

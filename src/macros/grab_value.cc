@@ -229,7 +229,7 @@ static int handle_service_macro(
       if (!mac->host_ptr)
         retval = ERROR;
       else if (arg2) {
-        service* svc(find_service(mac->host_ptr->get_name().c_str(), arg2));
+        com::centreon::engine::service* svc(find_service(mac->host_ptr->get_name().c_str(), arg2));
         if (!svc)
           retval = ERROR;
         else
@@ -246,7 +246,7 @@ static int handle_service_macro(
     }
     else if (arg1 && arg2) {
       // On-demand macro with both host and service name.
-      service* svc(find_service(arg1, arg2));
+      com::centreon::engine::service* svc(find_service(arg1, arg2));
       if (svc)
         // Get the service macro value.
         retval = grab_standard_service_macro_r(
@@ -258,7 +258,7 @@ static int handle_service_macro(
       // Else we have a service macro with a
       // servicegroup name and a delimiter...
       else {
-        servicegroup* sg(find_servicegroup(arg1));
+        servicegroup* sg(::find_servicegroup(arg1));
         if (!sg)
           retval = ERROR;
         else {
@@ -338,7 +338,7 @@ static int handle_servicegroup_macro(
 
   // Use the saved servicegroup pointer
   // or find the servicegroup for on-demand macros.
-  servicegroup* sg(arg1 ? find_servicegroup(arg1) : mac->servicegroup_ptr);
+  servicegroup* sg(arg1 ? ::find_servicegroup(arg1) : mac->servicegroup_ptr);
   if (!sg)
     retval = ERROR;
   else {
@@ -662,7 +662,7 @@ static int handle_summary_macro(
     unsigned int services_unknown_unhandled(0);
     unsigned int services_warning(0);
     unsigned int services_warning_unhandled(0);
-    for (service* temp_service = service_list;
+    for (com::centreon::engine::service* temp_service = service_list;
          temp_service != nullptr;
          temp_service = temp_service->next) {
       // Filter totals based on contact if necessary.
@@ -680,7 +680,7 @@ static int handle_summary_macro(
         else if (temp_service->current_state == STATE_WARNING) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-            it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+            it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
           if (it != state::instance().hosts().end())
               temp_host = it->second.get();
 
@@ -701,7 +701,7 @@ static int handle_summary_macro(
         else if (temp_service->current_state == STATE_UNKNOWN) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-          it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+          it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
           if (it != state::instance().hosts().end())
             temp_host = it->second.get();
 
@@ -722,7 +722,7 @@ static int handle_summary_macro(
         else if (temp_service->current_state == STATE_CRITICAL) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-          it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+          it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
           if (it != state::instance().hosts().end())
             temp_host = it->second.get();
 

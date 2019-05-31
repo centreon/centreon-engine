@@ -134,22 +134,22 @@ std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
     dependency_period_str = chkstr(obj.dependency_period_ptr->name);
   std::string dependent_svc_str("\"NULL\"");
   if (obj.dependent_service_ptr) {
-    dependent_svc_str = obj.dependent_service_ptr->host_name;
+    dependent_svc_str = obj.dependent_service_ptr->get_hostname();
     dependent_svc_str += ", ";
-    dependent_svc_str += obj.dependent_service_ptr->description;
+    dependent_svc_str += obj.dependent_service_ptr->get_description();
   }
   std::string master_svc_str("\"NULL\"");
   if (obj.master_service_ptr) {
-    master_svc_str = obj.master_service_ptr->host_name;
+    master_svc_str = obj.master_service_ptr->get_hostname();
     master_svc_str += ", ";
-    master_svc_str += obj.master_service_ptr->description;
+    master_svc_str += obj.master_service_ptr->get_description();
   }
 
   os << "servicedependency {\n"
     "  dependency_type:               " << obj.dependency_type << "\n"
     "  dependent_host_name:           " << chkstr(obj.dependent_host_name) << "\n"
     "  dependent_service_description: " << chkstr(obj.dependent_service_description) << "\n"
-    "  host_name:                     " << chkstr(obj.host_name) << "\n"
+    "  host_name:                     " << obj.host_name << "\n"
     "  service_description:           " << chkstr(obj.service_description) << "\n"
     "  dependency_period:             " << chkstr(obj.dependency_period) << "\n"
     "  inherits_parent:               " << obj.inherits_parent << "\n"

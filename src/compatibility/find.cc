@@ -23,7 +23,7 @@
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/hostgroup.hh"
-#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "find.hh"
@@ -44,18 +44,18 @@ using namespace com::centreon::engine::configuration::applier;
  *  @param[in] host_name Host name.
  *  @param[in] svc_desc  Service description.
  *
- *  @return Service object if found, NULL otherwise.
+ *  @return Service object if found, nullptr otherwise.
  */
-service* find_service(char const* host_name, char const* svc_desc) {
+com::centreon::engine::service* find_service(char const* host_name, char const* svc_desc) {
   if (!host_name || !svc_desc)
-    return NULL;
+    return nullptr;
 
   std::pair<uint64_t, uint64_t> id(get_host_and_service_id(host_name, svc_desc));
-  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<com::centreon::engine::service> >::const_iterator
     it(state::instance().services().find(id));
   if (it != state::instance().services().end())
     return &(*it->second);
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -63,17 +63,14 @@ service* find_service(char const* host_name, char const* svc_desc) {
  *
  *  @param[in] name Service group name.
  *
- *  @return Service group object if found, NULL otherwise.
+ *  @return Service group object if found, nullptr otherwise.
  */
-servicegroup* find_servicegroup(char const* name) {
-  if (!name)
-    return NULL;
-
+servicegroup* find_servicegroup(std::string const& name) {
   umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -81,17 +78,17 @@ servicegroup* find_servicegroup(char const* name) {
  *
  *  @param[in] name Timeperiod name.
  *
- *  @return Timeperiod object if found, NULL otherwise.
+ *  @return Timeperiod object if found, nullptr otherwise.
  */
-timeperiod* find_timeperiod(char const* name) {
-  if (!name)
-    return NULL;
+timeperiod* find_timeperiod(std::string const& name) {
+  if (name.empty())
+    return nullptr;
 
   umap<std::string, std::shared_ptr<timeperiod_struct> >::const_iterator
     it(state::instance().timeperiods().find(name));
   if (it != state::instance().timeperiods().end())
     return it->second.get();
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -100,14 +97,14 @@ timeperiod* find_timeperiod(char const* name) {
  *  @param[in]  host_name Unused.
  *  @param[out] ptr       Unused.
  *
- *  @return NULL.
+ *  @return nullptr.
  */
 hostdependency_struct* get_first_host_dependency_by_dependent_host(
                          char const* host_name,
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -116,14 +113,14 @@ hostdependency_struct* get_first_host_dependency_by_dependent_host(
  *  @param[in]  host_name Unused.
  *  @param[out] ptr       Unused.
  *
- *  @return NULL.
+ *  @return nullptr.
  */
 hostescalation_struct* get_first_host_escalation_by_host(
                          char const* host_name,
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -133,7 +130,7 @@ hostescalation_struct* get_first_host_escalation_by_host(
  *  @param[in]  svc_description Unused.
  *  @param[out] ptr             Unused.
  *
- *  @return NULL.
+ *  @return nullptr.
  */
 servicedependency_struct* get_first_service_dependency_by_dependent_service(
                             char const* host_name,
@@ -142,7 +139,7 @@ servicedependency_struct* get_first_service_dependency_by_dependent_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -152,7 +149,7 @@ servicedependency_struct* get_first_service_dependency_by_dependent_service(
  *  @param[in]  svc_description Unused.
  *  @param[out] ptr             Unused.
  *
- *  @return NULL.
+ *  @return nullptr.
  */
 serviceescalation_struct* get_first_service_escalation_by_service(
                             char const* host_name,
@@ -161,7 +158,7 @@ serviceescalation_struct* get_first_service_escalation_by_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -170,14 +167,14 @@ serviceescalation_struct* get_first_service_escalation_by_service(
  *  @param[in]     host_name Unused.
  *  @param[in,out] ptr       Unused.
  *
- *  @return NULL.
+ *  @return nullptr.
  */
 hostdependency_struct* get_next_host_dependency_by_dependent_host(
                          char const* host_name,
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -186,14 +183,14 @@ hostdependency_struct* get_next_host_dependency_by_dependent_host(
  *  @param[in]     host_name Unused.
  *  @param[in,out] ptr       Unused.
  *
- *  @return NULL.
+ *  @return nullptr.
  */
 hostescalation_struct* get_next_host_escalation_by_host(
                          char const* host_name,
                          void** ptr) {
   (void)host_name;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -203,7 +200,7 @@ hostescalation_struct* get_next_host_escalation_by_host(
  *  @param[in]     svc_description Unused.
  *  @param[in,out] ptr             Unused.
  *
- *  @return NULL.
+ *  @return nullptr.
  */
 servicedependency_struct* get_next_service_dependency_by_dependent_service(
                             char const* host_name,
@@ -212,7 +209,7 @@ servicedependency_struct* get_next_service_dependency_by_dependent_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -222,7 +219,7 @@ servicedependency_struct* get_next_service_dependency_by_dependent_service(
  *  @param[in]     svc_description Unused.
  *  @param[in,out] ptr             Unused.
  *
- *  @return NULL
+ *  @return nullptr
  */
 serviceescalation_struct* get_next_service_escalation_by_service(
                             char const* host_name,
@@ -231,5 +228,5 @@ serviceescalation_struct* get_next_service_escalation_by_service(
   (void)host_name;
   (void)svc_description;
   (void)ptr;
-  return NULL;
+  return nullptr;
 }

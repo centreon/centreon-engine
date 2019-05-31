@@ -1,6 +1,4 @@
 /*
-struct contactgroupsmember_struct;
-struct contactgroupsmember_struct;
 ** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
@@ -19,38 +17,107 @@ struct contactgroupsmember_struct;
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_OBJECTS_SERVICE_HH
-#  define CCE_OBJECTS_SERVICE_HH
+#ifndef CCE_SERVICE_HH
+#  define CCE_SERVICE_HH
 
+#  include <array>
 #  include <memory>
 #  include <string>
 #  include <time.h>
-#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
+#  include "com/centreon/engine/logging.hh"
+#  include "com/centreon/engine/customvariable.hh"
+#  include "com/centreon/engine/notifier.hh"
+#  include "com/centreon/engine/checks.hh"
 
 /* Forward declaration. */
+extern "C" {
+struct objectlist_struct;
+struct timeperiod_struct;
+};
+
 CCE_BEGIN()
   namespace commands {
     class command;
   }
-  class contact;
   class host;
-CCE_END()
 
-struct objectlist_struct;
-struct timeperiod_struct;
+class                           service : public notifier {
+ public:
+  static std::array<std::pair<uint32_t, std::string>, 3> const tab_service_states;
 
-typedef struct                  service_struct {
-  char*                         host_name;
-  char*                         description;
-  char*                         display_name;
-  char*                         service_check_command;
+                                service(std::string const& hostname,
+                                        std::string const& description,
+                                        std::string const& display_name,
+                                        std::string const& check_command,
+                                        int initial_state,
+                                        double check_interval,
+                                        double retry_interval,
+                                        int max_attempts,
+                                        std::string const& notification_period,
+                                        std::string const& check_period,
+                                        std::string const& action_url,
+                                        std::string const& icon_image,
+                                        std::string const& icon_image_alt);
+                                ~service();
+  void                          set_hostname(std::string const& name);
+  std::string const&            get_hostname() const;
+  void                          set_description(std::string const& desc);
+  std::string const&            get_description() const;
+  int                           handle_async_check_result(
+                                  check_result* queued_check_result);
+  int                           log_event();
+  void                          check_for_flapping(
+                                              int update,
+                                              int allow_flapstart_notification);
+  int                           handle_service_event();
+  int                           obsessive_compulsive_service_check_processor();
+  int                           update_service_performance_data();
+  int                           run_scheduled_check(int check_options, double latency);
+  int                           run_async_check(int check_options,
+                                                double latency,
+                                                int scheduled_check,
+                                                int reschedule_check,
+                                                int* time_is_valid,
+                                                time_t* preferred_time);
+  void                          schedule_check(time_t check_time,
+                                               int options);
+  void                          set_flap(double percent_change,
+                                         double high_threshold,
+                                         double low_threshold,
+                                         int allow_flapstart_notification);
+  // handles a service that has stopped flapping
+  void                          clear_flap(double percent_change,
+                                           double high_threshold,
+                                           double low_threshold);
+  void                          enable_flap_detection();
+  void                          disable_flap_detection();
+  void                          update_status(bool aggregated_dump) override;
+  void                          set_notification_number(int num);
+  int                           check_notification_viability(unsigned int type,
+                                                             int options) override;
+  int                           verify_check_viability(int check_options,
+                                                       int* time_is_valid,
+                                                       time_t* new_time);
+  int                           create_notification_list(nagios_macros* mac,
+                                                         int options,
+                                                         bool* escalated) override;
+  void                          grab_macros_r(nagios_macros* mac) override;
+  int                           notify_contact(nagios_macros* mac,
+                                               contact* cntct,
+                                               int type,
+                                               char const* not_author,
+                                               char const* not_data,
+                                               int options,
+                                               int escalated) override;
+  void                          update_notification_flags() override;
+  time_t                        get_next_notification_time(time_t offset) override;
+  void                          check_for_expired_acknowledgement();
+  void                          schedule_acknowledgement_expiration();
+
   char*                         event_handler;
-  int                           initial_state;
-  double                        check_interval;
-  double                        retry_interval;
-  int                           max_attempts;
   int                           parallelize;
   contactgroup_map              contact_groups;
   contact_map                   contacts;
@@ -67,8 +134,6 @@ typedef struct                  service_struct {
   int                           stalk_on_unknown;
   int                           stalk_on_critical;
   int                           is_volatile;
-  char*                         notification_period;
-  char*                         check_period;
   int                           flap_detection_enabled;
   double                        low_flap_threshold;
   double                        high_flap_threshold;
@@ -90,9 +155,6 @@ typedef struct                  service_struct {
   char*                         failure_prediction_options;
   char*                         notes;
   char*                         notes_url;
-  char*                         action_url;
-  char*                         icon_image;
-  char*                         icon_image_alt;
   std::unordered_map<std::string, com::centreon::engine::customvariable>
                                 custom_variables;
   int                           problem_has_been_acknowledged;
@@ -114,8 +176,6 @@ typedef struct                  service_struct {
   uint64_t                      last_event_id;
   uint64_t                      current_problem_id;
   uint64_t                      last_problem_id;
-  time_t                        last_notification;
-  time_t                        next_notification;
   int                           no_more_notifications;
   int                           check_flapping_recovery_notification;
   time_t                        last_state_change;
@@ -154,33 +214,33 @@ typedef struct                  service_struct {
   timeperiod_struct*            check_period_ptr;
   timeperiod_struct*            notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
-  struct service_struct*        next;
-  struct service_struct*        nexthash;
-}                               service;
+  service*        next;
+  service*        nexthash;
+ private:
+  std::string                   _hostname;
+  std::string                   _description;
+
+};
+CCE_END()
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
-  time_t                        initial_notif_time;
   std::string                   timezone;
   uint64_t                      host_id;
   uint64_t                      service_id;
-  int                           acknowledgement_timeout;
-  time_t                        last_acknowledgement;
-  unsigned int                  recovery_notification_delay;
-  bool                          recovery_been_sent;
 };
 
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* C++ */
 
-service* add_service(
+com::centreon::engine::service* add_service(
            uint64_t host_id,
            uint64_t service_id,
-           char const* host_name,
-           char const* description,
-           char const* display_name,
-           char const* check_period,
+           std::string const& host_name,
+           std::string const& description,
+           std::string const& display_name,
+           std::string const& check_period,
            int initial_state,
            int max_attempts,
            int parallelize,
@@ -189,7 +249,7 @@ service* add_service(
            double retry_interval,
            double notification_interval,
            double first_notification_delay,
-           char const* notification_period,
+           std::string const& notification_period,
            int notify_recovery,
            int notify_unknown,
            int notify_warning,
@@ -220,18 +280,18 @@ service* add_service(
            int freshness_threshold,
            char const* notes,
            char const* notes_url,
-           char const* action_url,
-           char const* icon_image,
-           char const* icon_image_alt,
+           std::string const& action_url,
+           std::string const& icon_image,
+           std::string const& icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_service);
 int      get_service_count();
 int      is_contact_for_service(
-           service_struct* svc,
+           com::centreon::engine::service* svc,
            com::centreon::engine::contact* cntct);
 int      is_escalated_contact_for_service(
-           service_struct* svc,
+           com::centreon::engine::service* svc,
            com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
@@ -241,31 +301,29 @@ int      is_escalated_contact_for_service(
 #    include <string>
 
 bool          operator==(
-                service const& obj1,
-                service const& obj2) throw ();
+                com::centreon::engine::service const& obj1,
+                com::centreon::engine::service const& obj2) throw ();
 bool          operator!=(
-                service_struct const& obj1,
-                service_struct const& obj2) throw ();
-std::ostream& operator<<(std::ostream& os, service const& obj);
+                com::centreon::engine::service const& obj1,
+                com::centreon::engine::service const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
 
 CCE_BEGIN()
 
-void          check_for_expired_acknowledgement(service* s);
-service&      find_service(
+com::centreon::engine::service&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
-char const*   get_service_timezone(char const* hst, char const* svc);
+char const*   get_service_timezone(std::string const& hst, std::string const& svc);
 bool          is_service_exist(
                 std::pair<uint64_t, uint64_t> const& id);
 std::pair<uint64_t, uint64_t>
               get_host_and_service_id(
-                char const* host,
-                char const* svc);
-uint64_t get_service_id(char const* host, char const* svc);
-void          schedule_acknowledgement_expiration(service* s);
+                std::string const& host,
+                std::string const& svc);
+uint64_t      get_service_id(std::string const& host, std::string const& svc);
 
 CCE_END()
 
 #  endif /* C++ */
 
-#endif // !CCE_OBJECTS_SERVICE_HH
+#endif // !CCE_SERVICE_HH

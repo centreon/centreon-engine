@@ -100,11 +100,11 @@ void applier::comment::_add_service_comment(
   std::pair<unsigned int, unsigned int>
     id(get_host_and_service_id(obj.host_name().c_str(), obj.service_description().c_str()));
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service_struct> >::const_iterator
+       std::shared_ptr<engine::service> >::const_iterator
     it_svc(configuration::applier::state::instance().services().find(id));
   if (it_svc == configuration::applier::state::instance().services().end())
     return;
-  service_struct* svc(&*it_svc->second);
+  engine::service* svc(&*it_svc->second);
 
   // add the comment.
   std::shared_ptr<engine::comment> com =

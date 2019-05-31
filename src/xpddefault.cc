@@ -31,7 +31,7 @@
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "find.hh"
@@ -188,7 +188,7 @@ int xpddefault_cleanup_performance_data() {
 /******************************************************************/
 
 // updates service performance data.
-int xpddefault_update_service_performance_data(service* svc) {
+int xpddefault_update_service_performance_data(com::centreon::engine::service* svc) {
   nagios_macros mac;
 
   /*
@@ -210,7 +210,7 @@ int xpddefault_update_service_performance_data(service* svc) {
 
   host* hst{nullptr};
   umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(svc->host_name)));
+    it(state::instance().hosts().find(get_host_id(svc->get_hostname())));
   if (it != state::instance().hosts().end())
     hst = it->second.get();
 
@@ -274,7 +274,7 @@ int xpddefault_update_host_performance_data(host* hst) {
 // runs the service performance data command.
 int xpddefault_run_service_performance_data_command(
       nagios_macros* mac,
-      service* svc) {
+      com::centreon::engine::service* svc) {
   char* raw_command_line(nullptr);
   char* processed_command_line(nullptr);
   int early_timeout(false);
@@ -340,8 +340,8 @@ int xpddefault_run_service_performance_data_command(
     logger(log_runtime_warning, basic)
       << "Warning: Service performance data command '"
       << processed_command_line << "' for service '"
-      << svc->description << "' on host '"
-      << svc->host_name << "' timed out after "
+      << svc->get_description() << "' on host '"
+      << svc->get_hostname() << "' timed out after "
       << config->perfdata_timeout() << " seconds";
 
   // free memory.
@@ -556,7 +556,7 @@ void xpddefault_preprocess_file_templates(char* tmpl) {
 // updates service performance data file.
 int xpddefault_update_service_performance_data_file(
       nagios_macros* mac,
-      service* svc) {
+      com::centreon::engine::service* svc) {
   char* raw_output(nullptr);
   char* processed_output(nullptr);
   int result(OK);

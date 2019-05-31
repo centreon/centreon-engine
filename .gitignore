@@ -1,3 +1,4 @@
+*.swp
 build/**/CMakeFiles
 build/**/Makefile
 build/**/cmake_install.cmake
@@ -7,9 +8,9 @@ build/centenginestats
 build/install_manifest.txt
 build/libcce_core.a
 build/modules/external_commands/externalcmd.so
+build/test-coverage/*
 build/tests/googletest/*.a
 build/tests/ut
-build/test-coverage/*
 conf/centengine.cfg
 conf/objects/*.cfg
 conf/resource.cfg
@@ -19,5 +20,5 @@ inc/compatibility/common.h
 inc/compatibility/locations.h
 scripts/centengine.pc
 scripts/centengine.sh
+src/simumod/neb.cc
 tags
-*.swp

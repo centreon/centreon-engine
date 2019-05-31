@@ -23,6 +23,7 @@
 
 CCE_BEGIN()
 class contact;
+class service;
 CCE_END()
 
 #  ifdef __cplusplus
@@ -32,17 +33,16 @@ extern "C" {
 struct command_struct;
 struct hostdependency_struct;
 struct hostescalation_struct;
-struct service_struct;
 struct servicedependency_struct;
 struct serviceescalation_struct;
 struct servicegroup_struct;
 struct timeperiod_struct;
 
-service_struct*           find_service(
+com::centreon::engine::service*           find_service(
                             char const* host_name,
                             char const* svc_desc);
-servicegroup_struct*      find_servicegroup(char const* name);
-timeperiod_struct*        find_timeperiod(char const* name);
+servicegroup_struct*      find_servicegroup(std::string const& name);
+timeperiod_struct*        find_timeperiod(std::string const& name);
 
 hostdependency_struct*    get_first_host_dependency_by_dependent_host(
                             char const* host_name,

@@ -25,10 +25,11 @@
 #  include <time.h>
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/objects/service.hh"
+//#  include "com/centreon/engine/service.hh"
 
 CCE_BEGIN()
 class comment;
+class service;
 CCE_END()
 
 typedef std::map<uint64_t,
@@ -105,7 +106,7 @@ class             comment{
   static void        delete_service_comments(std::string const& host_name,
                        const std::string& svc_description);
   static void        delete_host_acknowledgement_comments(engine::host* hst);
-  static void        delete_service_acknowledgement_comments(::service* svc);
+  static void        delete_service_acknowledgement_comments(engine::service* svc);
   static void        remove_if_expired_comment(uint64_t comment_id);
   static int         number_of_host_comments(std::string const& host_name);
   static int         number_of_service_comments(

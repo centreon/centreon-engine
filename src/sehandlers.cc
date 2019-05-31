@@ -29,7 +29,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"
 
@@ -40,104 +39,6 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 /************* OBSESSIVE COMPULSIVE HANDLER FUNCTIONS *************/
 /******************************************************************/
-
-/* handles service check results in an obsessive compulsive manner... */
-int obsessive_compulsive_service_check_processor(service* svc) {
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  com::centreon::engine::host* temp_host = NULL;
-  int early_timeout = false;
-  double exectime = 0.0;
-  int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
-  nagios_macros mac;
-
-  logger(dbg_functions, basic)
-    << "obsessive_compulsive_service_check_processor()";
-
-  if (svc == NULL)
-    return (ERROR);
-
-  /* bail out if we shouldn't be obsessing */
-  if (config->obsess_over_services() == false)
-    return (OK);
-  if (svc->obsess_over_service == false)
-    return (OK);
-
-  /* if there is no valid command, exit */
-  if (config->ocsp_command().empty())
-    return (ERROR);
-
-  /* find the associated host */
-  if ((temp_host = (com::centreon::engine::host*) svc->host_ptr) == NULL)
-    return (ERROR);
-
-  /* update service macros */
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, temp_host);
-  grab_service_macros_r(&mac, svc);
-
-  /* get the raw command line */
-  get_raw_command_line_r(
-    &mac,
-    ocsp_command_ptr,
-    config->ocsp_command().c_str(),
-    &raw_command, macro_options);
-  if (raw_command == NULL) {
-    clear_volatile_macros_r(&mac);
-    return (ERROR);
-  }
-
-  logger(dbg_checks, most)
-    << "Raw obsessive compulsive service processor "
-    "command line: " << raw_command;
-
-  /* process any macros in the raw command line */
-  process_macros_r(
-    &mac,
-    raw_command,
-    &processed_command,
-    macro_options);
-  if (processed_command == NULL) {
-    clear_volatile_macros_r(&mac);
-    return (ERROR);
-  }
-
-  logger(dbg_checks, most)
-    << "Processed obsessive compulsive service "
-    "processor command line: " << processed_command;
-
-  /* run the command */
-  try {
-      my_system_r(
-      &mac,
-      processed_command,
-      config->ocsp_timeout(),
-      &early_timeout,
-      &exectime,
-      NULL,
-      0);
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
-      << "Error: can't execute compulsive service processor command line '"
-      << processed_command << "' : " << e.what();
-  }
-
-  clear_volatile_macros_r(&mac);
-
-  /* check to see if the command timed out */
-  if (early_timeout == true)
-    logger(log_runtime_warning, basic)
-      << "Warning: OCSP command '" << processed_command
-      << "' for service '" << svc->description << "' on host '"
-      << svc->host_name << "' timed out after "
-      << config->ocsp_timeout() << " seconds";
-
-  /* free memory */
-  delete[] raw_command;
-  delete[] processed_command;
-
-  return (OK);
-}
 
 /* handles host check results in an obsessive compulsive manner... */
 int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) {
@@ -233,69 +134,8 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
 /**************** SERVICE EVENT HANDLER FUNCTIONS *****************/
 /******************************************************************/
 
-/* handles changes in the state of a service */
-int handle_service_event(service* svc) {
-  com::centreon::engine::host* temp_host = NULL;
-  nagios_macros mac;
-
-  logger(dbg_functions, basic)
-    << "handle_service_event()";
-
-  if (svc == NULL)
-    return (ERROR);
-
-  /* send event data to broker */
-  broker_statechange_data(
-    NEBTYPE_STATECHANGE_END,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    SERVICE_STATECHANGE,
-    (void*)svc,
-    svc->current_state,
-    svc->state_type,
-    svc->current_attempt,
-    svc->max_attempts,
-    NULL);
-
-  /* bail out if we shouldn't be running event handlers */
-  if (config->enable_event_handlers() == false)
-    return (OK);
-  if (svc->event_handler_enabled == false)
-    return (OK);
-
-  /* find the host */
-  if ((temp_host = (com::centreon::engine::host*)svc->host_ptr) == NULL)
-    return (ERROR);
-
-  /* update service macros */
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, temp_host);
-  grab_service_macros_r(&mac, svc);
-
-  /* run the global service event handler */
-  run_global_service_event_handler(&mac, svc);
-
-  /* run the event handler command if there is one */
-  if (svc->event_handler != NULL)
-    run_service_event_handler(&mac, svc);
-  clear_volatile_macros_r(&mac);
-
-  /* send data to event broker */
-  broker_external_command(
-    NEBTYPE_EXTERNALCOMMAND_CHECK,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    time(NULL),
-    NULL,
-    NULL,
-    NULL);
-
-  return (OK);
-}
-
 /* runs the global service event handler */
-int run_global_service_event_handler(nagios_macros* mac, service* svc) {
+int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
   char* processed_logentry = NULL;
@@ -324,7 +164,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 
   logger(dbg_eventhandlers, more)
     << "Running global event handler for service '"
-    << svc->description << "' on host '" << svc->host_name << "'...";
+    << svc->get_description() << "' on host '" << svc->get_hostname() << "'...";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -354,8 +194,8 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 
   if (config->log_event_handlers() == true) {
     std::ostringstream oss;
-    oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
-	<< svc->description
+    oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->get_hostname() << ';'
+	<< svc->get_description()
         << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
         << config->global_service_event_handler();
     process_macros_r(
@@ -455,7 +295,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 }
 
 /* runs a service event handler command */
-int run_service_event_handler(nagios_macros* mac, service* svc) {
+int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
   char* processed_logentry = NULL;
@@ -480,8 +320,8 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
     return (ERROR);
 
   logger(dbg_eventhandlers, more)
-    << "Running event handler for service '" << svc->description
-    << "' on host '" << svc->host_name <<"'...";
+    << "Running event handler for service '" << svc->get_description()
+    << "' on host '" << svc->get_hostname() <<"'...";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -514,8 +354,8 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 
   if (config->log_event_handlers() == true) {
     std::ostringstream oss;
-    oss << "SERVICE EVENT HANDLER: " << svc->host_name << ';'
-	<< svc->description
+    oss << "SERVICE EVENT HANDLER: " << svc->get_hostname() << ';'
+	<< svc->get_description()
 	<< ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
 	<< svc->event_handler;
     process_macros_r(
@@ -992,175 +832,3 @@ int run_host_event_handler(nagios_macros* mac,
 /****************** HOST STATE HANDLER FUNCTIONS ******************/
 /******************************************************************/
 
-/* top level host state handler - occurs after every host check (soft/hard and active/passive) */
-int handle_host_state(com::centreon::engine::host* hst) {
-  int state_change = false;
-  time_t current_time = 0L;
-
-  logger(dbg_functions, basic)
-    << "handle_host_state()";
-
-  /* get current time */
-  time(&current_time);
-
-  /* obsess over this host check */
-  obsessive_compulsive_host_check_processor(hst);
-
-  /* update performance data */
-  update_host_performance_data(hst);
-
-  /* record latest time for current state */
-  switch (hst->get_current_state()) {
-  case HOST_UP:
-    hst->set_last_time_up(current_time);
-    break;
-
-  case HOST_DOWN:
-    hst->set_last_time_down(current_time);
-    break;
-
-  case HOST_UNREACHABLE:
-    hst->set_last_time_unreachable(current_time);
-    break;
-
-  default:
-    break;
-  }
-
-  /* has the host state changed? */
-  if (hst->get_last_state() != hst->get_current_state()
-      || hst->get_last_hard_state() != hst->get_current_state()
-      || (hst->get_current_state() == HOST_UP
-          && hst->get_state_type() == SOFT_STATE))
-    state_change = true;
-
-  /* if the host state has changed... */
-  if (state_change == true) {
-
-    /* update last state change times */
-    if (hst->get_state_type() == SOFT_STATE
-        || hst->get_last_state() != hst->get_current_state())
-      hst->set_last_state_change(current_time);
-    if (hst->get_state_type() == HARD_STATE)
-      hst->set_last_hard_state_change(current_time);
-
-    /* update the event id */
-    hst->set_last_event_id(hst->get_current_event_id());
-    hst->set_current_event_id(next_event_id);
-    next_event_id++;
-
-    /* update the problem id when transitioning to a problem state */
-    if (hst->get_last_state() == HOST_UP) {
-      /* don't reset last problem id, or it will be zero the next time a problem is encountered */
-      /*hst->get_last_problem_id=hst->get_current_problem_id; */
-      hst->set_current_problem_id(next_problem_id);
-      next_problem_id++;
-    }
-
-    /* clear the problem id when transitioning from a problem state to an UP state */
-    if (hst->get_current_state() == HOST_UP) {
-      hst->set_last_problem_id(hst->get_current_problem_id());
-      hst->set_current_problem_id(0L);
-    }
-
-    /* reset the acknowledgement flag if necessary */
-    if (hst->get_acknowledgement_type() == ACKNOWLEDGEMENT_NORMAL) {
-
-      hst->set_problem_has_been_acknowledged(false);
-      hst->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
-
-      /* remove any non-persistant comments associated with the ack */
-      comment::delete_host_acknowledgement_comments(hst);
-    }
-    else if (hst->get_acknowledgement_type() == ACKNOWLEDGEMENT_STICKY
-             && hst->get_current_state() == HOST_UP) {
-
-      hst->set_problem_has_been_acknowledged(false);
-      hst->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
-
-      /* remove any non-persistant comments associated with the ack */
-      comment::delete_host_acknowledgement_comments(hst);
-    }
-
-    /* reset the next and last notification times */
-    hst->set_last_host_notification((time_t)0);
-    hst->set_next_host_notification((time_t)0);
-
-    /* reset notification suppression option */
-    hst->set_no_more_notifications(false);
-
-    /* write the host state change to the main log file */
-    if (hst->get_state_type() == HARD_STATE
-        || (hst->get_state_type() == SOFT_STATE
-            && config->log_host_retries() == true))
-      log_host_event(hst);
-
-    /* check for start of flexible (non-fixed) scheduled downtime */
-    /* CHANGED 08-05-2010 EG flex downtime can now start on soft states */
-    /*if(hst->state_type==HARD_STATE) */
-    downtime_manager::instance().check_pending_flex_host_downtime(hst);
-
-    if (hst->get_current_state() == HOST_UP) {
-      host_other_props[hst->get_name()].recovery_been_sent = false;
-      host_other_props[hst->get_name()].initial_notif_time = 0;
-    }
-
-    /* notify contacts about the recovery or problem if its a "hard" state */
-    if (hst->get_state_type() == HARD_STATE)
-      host_notification(
-        hst,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
-
-    /* handle the host state change */
-    handle_host_event(hst);
-
-    /* the host just recovered, so reset the current host attempt */
-    if (hst->get_current_state() == HOST_UP)
-      hst->set_current_attempt(1);
-
-    /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
-    if (hst->get_current_state() == HOST_UP && host_other_props[hst->get_name()].recovery_been_sent) {
-      hst->set_current_notification_number(0);
-      hst->set_notified_on_down(false);
-      hst->set_notified_on_unreachable(false);
-    }
-  }
-
-  /* else the host state has not changed */
-  else {
-
-    bool old_recovery_been_sent
-           = host_other_props[hst->get_name()].recovery_been_sent;
-
-    /* notify contacts if needed */
-    if ((hst->get_current_state() != HOST_UP ||
-         (hst->get_current_state() == HOST_UP
-          && !host_other_props[hst->get_name()].recovery_been_sent))
-        && hst->get_state_type() == HARD_STATE)
-      host_notification(
-        hst,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
-
-    /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
-    if (!old_recovery_been_sent
-        && host_other_props[hst->get_name()].recovery_been_sent
-        && hst->get_current_state() == HOST_UP) {
-      hst->set_current_notification_number(0);
-      hst->set_notified_on_down(false);
-      hst->set_notified_on_unreachable(false);
-    }
-
-    /* if we're in a soft state and we should log host retries, do so now... */
-    if (hst->get_state_type() == SOFT_STATE
-        && config->log_host_retries() == true)
-      log_host_event(hst);
-  }
-
-  return (OK);
-}

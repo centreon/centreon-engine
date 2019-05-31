@@ -24,7 +24,7 @@
 #  include <sys/time.h>
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/service.hh"
 #  include "com/centreon/engine/commands/command.hh"
 
 /* Event broker options. */
@@ -367,7 +367,7 @@ void           broker_adaptive_service_data(
                  int type,
                  int flags,
                  int attr,
-                 service* svc,
+                 com::centreon::engine::service* svc,
                  int command_type,
                  unsigned long modattr,
                  unsigned long modattrs,
@@ -588,9 +588,9 @@ void           broker_relation_data(
                  int flags,
                  int attr,
                  com::centreon::engine::host* hst,
-                 service* svc,
+                 com::centreon::engine::service* svc,
                  com::centreon::engine::host* dep_hst,
-                 service* dep_svc,
+                 com::centreon::engine::service* dep_svc,
                  struct timeval const* timestamp);
 void           broker_retention_data(
                  int type,
@@ -601,7 +601,7 @@ int            broker_service_check(
                  int type,
                  int flags,
                  int attr,
-                 service* svc,
+                 com::centreon::engine::service* svc,
                  int check_type,
                  struct timeval start_time,
                  struct timeval end_time,
@@ -617,7 +617,7 @@ void           broker_service_status(
                  int type,
                  int flags,
                  int attr,
-                 service* svc,
+                 com::centreon::engine::service* svc,
                  struct timeval const* timestamp);
 void           broker_statechange_data(
                  int type,

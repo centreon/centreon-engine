@@ -223,7 +223,7 @@ int xsddefault_save_status_data() {
          "\thost_name=" << it->second->get_name() << "\n"
          "\tmodified_attributes=" << it->second->get_modified_attributes()
                                   << "\n"
-         "\tcheck_command=" << it->second->get_host_check_command() << "\n"
+         "\tcheck_command=" << it->second->get_check_command() << "\n"
          "\tcheck_period=" << it->second->get_check_period() << "\n"
          "\tnotification_period=" << it->second->get_notification_period()
                                   << "\n"
@@ -267,9 +267,9 @@ int xsddefault_save_status_data() {
          "\tlast_time_unreachable=" << static_cast<unsigned long>(
            it->second->get_last_time_unreachable()) << "\n"
          "\tlast_notification=" << static_cast<unsigned long>(
-           it->second->get_last_host_notification()) << "\n"
+           it->second->get_last_notification()) << "\n"
          "\tnext_notification=" << static_cast<unsigned long>(
-           it->second->get_next_host_notification()) << "\n"
+           it->second->get_next_notification()) << "\n"
          "\tno_more_notifications=" << it->second->get_no_more_notifications()
                                     << "\n"
          "\tcurrent_notification_number=" <<
@@ -311,17 +311,17 @@ int xsddefault_save_status_data() {
   }
 
   // save service status data
-  for (service* svc = service_list; svc; svc = svc->next) {
+  for (com::centreon::engine::service* svc = service_list; svc; svc = svc->next) {
     stream
       << "servicestatus {\n"
-         "\thost_name=" << svc->host_name << "\n"
-         "\tservice_description=" << svc->description << "\n"
+         "\thost_name=" << svc->get_hostname() << "\n"
+         "\tservice_description=" << svc->get_description() << "\n"
          "\tmodified_attributes=" << svc->modified_attributes << "\n"
-         "\tcheck_command=" << (svc->service_check_command ? svc->service_check_command : "") << "\n"
-         "\tcheck_period=" << (svc->check_period ? svc->check_period : "") << "\n"
-         "\tnotification_period=" << (svc->notification_period ? svc->notification_period : "") << "\n"
-         "\tcheck_interval=" << svc->check_interval << "\n"
-         "\tretry_interval=" << svc->retry_interval << "\n"
+         "\tcheck_command=" << svc->get_check_command() << "\n"
+         "\tcheck_period=" << svc->get_check_period() << "\n"
+         "\tnotification_period=" << svc->get_notification_period() << "\n"
+         "\tcheck_interval=" << svc->get_check_interval() << "\n"
+         "\tretry_interval=" << svc->get_retry_interval() << "\n"
          "\tevent_handler=" << (svc->event_handler ? svc->event_handler : "") << "\n"
          "\thas_been_checked=" << svc->has_been_checked << "\n"
          "\tshould_be_scheduled=" << svc->should_be_scheduled << "\n"
@@ -335,7 +335,7 @@ int xsddefault_save_status_data() {
          "\tcurrent_problem_id=" << svc->current_problem_id << "\n"
          "\tlast_problem_id=" << svc->last_problem_id << "\n"
          "\tcurrent_attempt=" << svc->current_attempt << "\n"
-         "\tmax_attempts=" << svc->max_attempts << "\n"
+         "\tmax_attempts=" << svc->get_max_attempts() << "\n"
          "\tstate_type=" << svc->state_type << "\n"
          "\tlast_state_change=" << static_cast<unsigned long>(svc->last_state_change) << "\n"
          "\tlast_hard_state_change=" << static_cast<unsigned long>(svc->last_hard_state_change) << "\n"
@@ -351,8 +351,8 @@ int xsddefault_save_status_data() {
          "\tcheck_options=" << svc->check_options << "\n"
          "\tcurrent_notification_number=" << svc->current_notification_number << "\n"
          "\tcurrent_notification_id=" << svc->current_notification_id << "\n"
-         "\tlast_notification=" << static_cast<unsigned long>(svc->last_notification) << "\n"
-         "\tnext_notification=" << static_cast<unsigned long>(svc->next_notification) << "\n"
+         "\tlast_notification=" << static_cast<unsigned long>(svc->get_last_notification()) << "\n"
+         "\tnext_notification=" << static_cast<unsigned long>(svc->get_next_notification()) << "\n"
          "\tno_more_notifications=" << svc->no_more_notifications << "\n"
          "\tnotifications_enabled=" << svc->notifications_enabled << "\n"
          "\tactive_checks_enabled=" << svc->checks_enabled << "\n"

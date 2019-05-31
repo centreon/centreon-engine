@@ -23,7 +23,7 @@
 
 #  include <sstream>
 #  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/service.hh"
 
 CCE_BEGIN()
 

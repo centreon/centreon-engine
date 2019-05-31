@@ -142,9 +142,9 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
     escalation_period_str = chkstr(obj.escalation_period_ptr->name);
   std::string svc_str("\"NULL\"");
   if (obj.service_ptr) {
-    svc_str = chkstr(obj.service_ptr->host_name);
+    svc_str = obj.service_ptr->get_hostname();
     svc_str += ", ";
-    svc_str += chkstr(obj.service_ptr->description);
+    svc_str += obj.service_ptr->get_description();
   }
 
   std::string cg_oss;
