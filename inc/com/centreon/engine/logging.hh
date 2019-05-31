@@ -22,6 +22,7 @@
 #  define CCE_LOGGING_HH
 
 #  include <time.h>
+#  include "com/centreon/engine/namespace.hh"
 
 // State Logging Types
 #  define INITIAL_STATES             1
@@ -84,6 +85,11 @@
 #  define DEBUGV_MORE                1
 #  define DEBUGV_MOST                2
 
+CCE_BEGIN()
+  class host;
+  class service;
+CCE_END()
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif // C++
@@ -106,14 +112,12 @@ int write_to_log(
 // write a string to the syslog facility
 int write_to_syslog(char const* buffer, unsigned long data_type);
 // logs a service event
-int log_service_event(service const* svc);
-// logs a host event
-int log_host_event(com::centreon::engine::host const* hst);
+int log_service_event(com::centreon::engine::service const* svc);
 // logs initial/current host states
 void log_host_state(unsigned int type, com::centreon::engine::host* hst);
 int log_host_states(unsigned int type, time_t* timestamp);
 // logs initial/current service states
-void log_service_state(unsigned int type, service* svc);
+void log_service_state(unsigned int type, com::centreon::engine::service* svc);
 int log_service_states(unsigned int type, time_t* timestamp);
 // rotates the main log file
 int rotate_log_file(time_t rotation_time);

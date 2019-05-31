@@ -104,9 +104,9 @@ void applier::scheduler::apply(
          end(diff_services.modified().end());
        it != end;
        ++it) {
-    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> > const&
+    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> > const&
       services(applier::state::instance().services());
-    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
+    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> >::const_iterator
       svc(services.find(std::make_pair(
                                it->host_id(),   //*it->hosts().begin(),
                                it->service_id())));
@@ -138,7 +138,7 @@ void applier::scheduler::apply(
 
   // Remove deleted service check from the scheduler.
   {
-    std::vector<service_struct*> old_services;
+    std::vector<engine::service*> old_services;
     _get_services(svc_to_unschedule, old_services, false);
     _unschedule_service_events(old_services);
   }
@@ -177,7 +177,7 @@ void applier::scheduler::apply(
 
     // Get and schedule new services.
     {
-      std::vector<service_struct*> new_services;
+      std::vector<engine::service*> new_services;
       _get_services(svc_to_schedule, new_services, true);
       _schedule_service_events(new_services);
     }
@@ -227,14 +227,14 @@ void applier::scheduler::remove_host(configuration::host const& h) {
  */
 void applier::scheduler::remove_service(
                            configuration::service const& s) {
-  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> > const&
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> > const&
     services(applier::state::instance().services());
-  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct> >::const_iterator
+  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> >::const_iterator
     svc(services.find(std::make_pair(
                              s.host_id(),
                              s.service_id())));
   if (svc != services.end()) {
-    std::vector<service_struct*> svec;
+    std::vector<engine::service*> svec;
     svec.push_back(svc->second.get());
     _unschedule_service_events(svec);
   }
@@ -702,20 +702,20 @@ void applier::scheduler::_calculate_service_scheduling_params() {
 
   // get total services and total scheduled services.
   for (umap<std::pair<uint64_t, uint64_t>,
-            std::shared_ptr<service_struct> >::const_iterator
+            std::shared_ptr<engine::service> >::const_iterator
          it(applier::state::instance().services().begin()),
          end(applier::state::instance().services().end());
        it != end;
        ++it) {
-    service_struct& svc(*it->second);
+    engine::service& svc(*it->second);
 
     bool schedule_check(true);
-    if (!svc.check_interval || !svc.checks_enabled)
+    if (!svc.get_check_interval() || !svc.checks_enabled)
       schedule_check = false;
 
     {
       timezone_locker
-        lock(get_service_timezone(svc.host_name, svc.description));
+        lock(get_service_timezone(svc.get_hostname(), svc.get_description()));
       if (check_time_against_period(now, svc.check_period_ptr)
           == ERROR) {
         time_t next_valid_time(0);
@@ -732,12 +732,12 @@ void applier::scheduler::_calculate_service_scheduling_params() {
       svc.should_be_scheduled = true;
       ++scheduling_info.total_scheduled_services;
       scheduling_info.service_check_interval_total
-        += static_cast<unsigned long>(svc.check_interval);
+        += static_cast<unsigned long>(svc.get_check_interval());
     }
     else {
       svc.should_be_scheduled = false;
       logger(dbg_events, more)
-        << "Service " << svc.description << " on host " << svc.host_name
+        << "Service " << svc.get_description() << " on host " << svc.get_hostname()
         << " should not be scheduled.";
     }
     ++scheduling_info.total_services;
@@ -846,10 +846,10 @@ void applier::scheduler::_get_hosts(
  */
 void applier::scheduler::_get_services(
        set_service const& svc_cfg,
-       std::vector<service_struct*>& svc_obj,
+       std::vector<engine::service*>& svc_obj,
        bool throw_if_not_found) {
   umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<service_struct> > const&
+       std::shared_ptr<engine::service> > const&
     services(applier::state::instance().services());
   for (set_service::const_reverse_iterator
          it(svc_cfg.rbegin()), end(svc_cfg.rend());
@@ -860,7 +860,7 @@ void applier::scheduler::_get_services(
     std::string const& host_name(*it->hosts().begin());
     std::string const& service_description(it->service_description());
     umap<std::pair<uint64_t, uint64_t>,
-         std::shared_ptr<service_struct> >::const_iterator
+         std::shared_ptr<engine::service> >::const_iterator
       svc(services.find(std::make_pair(host_id, service_id)));
     if (svc == services.end()) {
       if (throw_if_not_found)
@@ -964,7 +964,7 @@ void applier::scheduler::_schedule_host_events(
     com::centreon::engine::host& hst(*hosts[i]);
 
     // update status of all hosts (scheduled or not).
-    update_host_status(&hst, false);
+    hst.update_status(false);
 
     // skip most hosts that shouldn't be scheduled.
     if (!hst.get_should_be_scheduled()) {
@@ -1004,9 +1004,7 @@ void applier::scheduler::_schedule_host_events(
     << "Scheduling host acknowledgement expirations...";
   for (int i(0), end(hosts.size()); i < end; ++i)
     if (hosts[i]->get_problem_has_been_acknowledged())
-      schedule_acknowledgement_expiration(hosts[i]);
-
-  return ;
+      hosts[i]->schedule_acknowledgement_expiration();
 }
 
 /**
@@ -1015,7 +1013,7 @@ void applier::scheduler::_schedule_host_events(
  *  @param[in] services  The list of services to schedule.
  */
 void applier::scheduler::_schedule_service_events(
-       std::vector<service_struct*> const& services) {
+       std::vector<engine::service*> const& services) {
   logger(dbg_events, most)
     << "Scheduling service checks...";
 
@@ -1038,7 +1036,7 @@ void applier::scheduler::_schedule_service_events(
   if (scheduling_info.service_interleave_factor > 0) {
     int interleave_block_index(0);
     for (unsigned int i(0); i < end; ++i) {
-      service_struct& svc(*services[i]);
+      engine::service& svc(*services[i]);
       if (interleave_block_index >= scheduling_info.service_interleave_factor) {
         ++current_interleave_block;
         interleave_block_index = 0;
@@ -1060,7 +1058,7 @@ void applier::scheduler::_schedule_service_events(
       // Make sure the service can actually be scheduled when we want.
       {
         timezone_locker
-          lock(get_service_timezone(svc.host_name, svc.description));
+          lock(get_service_timezone(svc.get_hostname(), svc.get_description()));
         if (check_time_against_period(
               svc.next_check,
               svc.check_period_ptr) == ERROR) {
@@ -1082,14 +1080,14 @@ void applier::scheduler::_schedule_service_events(
   }
 
   // Need to optimize add_event insert.
-  std::multimap<time_t, service_struct*> services_to_schedule;
+  std::multimap<time_t, engine::service*> services_to_schedule;
 
   // add scheduled service checks to event queue.
   for (unsigned int i(0); i < end; ++i) {
-    service_struct& svc(*services[i]);
+    engine::service& svc(*services[i]);
 
     // update status of all services (scheduled or not).
-    update_service_status(&svc, false);
+    svc.update_status(false);
 
     // skip most services that shouldn't be scheduled.
     if (!svc.should_be_scheduled) {
@@ -1104,12 +1102,12 @@ void applier::scheduler::_schedule_service_events(
   }
 
   // Schedule events list.
-  for (std::multimap<time_t, service_struct*>::const_iterator
+  for (std::multimap<time_t, engine::service*>::const_iterator
          it(services_to_schedule.begin()),
          end(services_to_schedule.end());
        it != end;
        ++it) {
-    service_struct& svc(*it->second);
+    engine::service& svc(*it->second);
     // Create a new service check event.
     events::schedule(
               EVENT_SERVICE_CHECK,
@@ -1129,7 +1127,7 @@ void applier::scheduler::_schedule_service_events(
     << "Scheduling service acknowledgement expirations...";
   for (int i(0), end(services.size()); i < end; ++i)
     if (services[i]->problem_has_been_acknowledged)
-      schedule_acknowledgement_expiration(services[i]);
+      services[i]->schedule_acknowledgement_expiration();
 
   return ;
 }
@@ -1171,8 +1169,8 @@ void applier::scheduler::_unschedule_host_events(
  *  @param[in] services  The list of services to unschedule.
  */
 void applier::scheduler::_unschedule_service_events(
-                           std::vector<service_struct*> const& services) {
-  for (std::vector<service_struct*>::const_iterator
+                           std::vector<engine::service*> const& services) {
+  for (std::vector<engine::service*>::const_iterator
          it(services.begin()),
          end(services.end());
        it != end;

@@ -194,7 +194,7 @@ int grab_custom_macro_value_r(
   }
   /***** CUSTOM SERVICE MACRO *****/
   else if (strstr(macro_name, "_SERVICE") == macro_name) {
-    service* temp_service(nullptr);
+    com::centreon::engine::service* temp_service(nullptr);
 
     /* use saved service pointer */
     if (arg1 == nullptr && arg2 == nullptr) {
@@ -225,7 +225,7 @@ int grab_custom_macro_value_r(
       }
       /* else we have a service macro with a servicegroup name and a delimiter... */
       else {
-        if ((temp_servicegroup = find_servicegroup(arg1)) == nullptr)
+        if ((temp_servicegroup = ::find_servicegroup(arg1)) == nullptr)
           return ERROR;
 
         delimiter_len = strlen(arg2);
@@ -242,8 +242,8 @@ int grab_custom_macro_value_r(
           grab_custom_macro_value_r(
             mac,
             macro_name,
-            temp_service->host_name,
-            temp_service->description,
+            temp_service->get_hostname().c_str(),
+            temp_service->get_description().c_str(),
             &temp_buffer);
 
           if (temp_buffer == nullptr)
@@ -1469,7 +1469,7 @@ int set_argv_macro_environment_vars(bool set) {
 /* sets or unsets custom host/service/contact macro environment variables */
 int set_custom_macro_environment_vars_r(nagios_macros* mac, bool set) {
   host* temp_host = nullptr;
-  service* temp_service = nullptr;
+  com::centreon::engine::service* temp_service = nullptr;
   contact* temp_contact = nullptr;
 
   /***** CUSTOM HOST VARIABLES *****/

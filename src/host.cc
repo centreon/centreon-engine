@@ -17,24 +17,45 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <iomanip>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
+#include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/hash_timed_event.hh"
+#include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/logging.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/macros/grab_host.hh"
+#include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timeperiod.hh"
+#include "com/centreon/engine/timezone_locker.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::downtimes;
+using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
+
+std::array<std::pair<uint32_t, std::string>, 3> const host::tab_host_states{
+    {{NSLOG_HOST_UP,          "UP"         },
+     {NSLOG_HOST_DOWN,        "DOWN"       },
+     {NSLOG_HOST_UNREACHABLE, "UNREACHABLE"}}};
 
 host_map com::centreon::engine::host::hosts;
 
@@ -167,63 +188,47 @@ host::host(uint64_t host_id,
            int should_be_drawn,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_host) {
+           int obsess_over_host)
+    : notifier{HOST_NOTIFICATION, !display_name.empty() ? display_name : name,
+               check_command,     initial_state,
+               check_interval,    retry_interval,
+               max_attempts,      notification_period,
+               check_period,      action_url,
+               icon_image,        icon_image_alt} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
-    logger(log_config_error, basic)
-    << "Error: Host name or address is nullptr";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+    logger(log_config_error, basic) << "Error: Host name or address is nullptr";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (host_id == 0) {
-    logger(log_config_error, basic)
-      << "Error: Host must contain a host id because it comes from a database";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
-  }
-  if (max_attempts <= 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid max_check_attempts value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
-  }
-  if (check_interval < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid check_interval value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+    logger(log_config_error, basic) << "Error: Host must contain a host id "
+                                       "because it comes from a database";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (notification_interval < 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid notification_interval value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid notification_interval value for host '" << name
+        << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (first_notification_delay < 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid first_notification_delay value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid first_notification_delay value for host '" << name
+        << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
   if (freshness_threshold < 0) {
     logger(log_config_error, basic)
-      << "Error: Invalid freshness_threshold value for host '"
-      << name << "'";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Invalid freshness_threshold value for host '" << name << "'";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
 
   // Check if the host already exists.
   uint64_t id{host_id};
   if (is_host_exist(id)) {
     logger(log_config_error, basic)
-      << "Error: Host '" << name << "' has already been defined";
-    throw (engine_error() << "Could not register host '"
-                          << name << "'");
+        << "Error: Host '" << name << "' has already been defined";
+    throw(engine_error() << "Could not register host '" << name << "'");
   }
 
   _should_be_scheduled = true;
@@ -237,22 +242,14 @@ host::host(uint64_t host_id,
   _name = name;
   _address = address;
   _alias = !alias.empty() ? alias : name;
-  _display_name = !display_name.empty() ? display_name : name;
-  _action_url = action_url;
-  _check_period = check_period;
   _event_handler = event_handler;
-  _host_check_command = check_command;
-  _icon_image = icon_image;
-  _icon_image_alt = icon_image_alt;
   _notes = notes;
   _notes_url = notes_url;
-  _notification_period = notification_period;
   _statusmap_image = statusmap_image;
   _vrml_image = vrml_image;
 
   _accept_passive_host_checks = (accept_passive_checks > 0);
   _check_freshness = (check_freshness > 0);
-  _check_interval = check_interval;
   _checks_enabled = (checks_enabled > 0);
   _current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
   _current_state = initial_state;
@@ -266,11 +263,9 @@ host::host(uint64_t host_id,
   _have_2d_coords = (have_2d_coords > 0);
   _have_3d_coords = (have_3d_coords > 0);
   _high_flap_threshold = high_flap_threshold;
-  _initial_state = initial_state;
   _last_hard_state = initial_state;
   _last_state = initial_state;
   _low_flap_threshold = low_flap_threshold;
-  _max_attempts = max_attempts;
   _notification_interval = notification_interval;
   _notifications_enabled = (notifications_enabled > 0);
   _notify_on_down = (notify_down > 0);
@@ -282,7 +277,6 @@ host::host(uint64_t host_id,
   _process_performance_data = (process_perfdata > 0);
   _retain_nonstatus_information = (retain_nonstatus_information > 0);
   _retain_status_information = (retain_status_information > 0);
-  _retry_interval = retry_interval;
   _should_be_drawn = (should_be_drawn > 0);
   _stalk_on_down = (stalk_on_down > 0);
   _stalk_on_unreachable = (stalk_on_unreachable > 0);
@@ -340,14 +334,6 @@ void host::set_name(std::string const& name) {
   _name = name;
 }
 
-std::string const& host::get_display_name() const {
-  return _display_name;
-}
-
-void host::set_display_name(std::string const& display_name) {
-  _display_name = display_name;
-}
-
 std::string const& host::get_alias() const {
   return _alias;
 }
@@ -364,60 +350,12 @@ void host::set_address(std::string const& address) {
   _address = address;
 }
 
-std::string const& host::get_host_check_command() const {
-  return _host_check_command;
-}
-
-void host::set_host_check_command(std::string const& host_check_command) {
-  _host_check_command = host_check_command;
-}
-
-int host::get_initial_state() const {
-  return _initial_state;
-}
-
-void host::set_initial_state(int initial_state) {
-  _initial_state = initial_state;
-}
-
-double host::get_check_interval() const {
-  return _check_interval;
-}
-
-void host::set_check_interval(double check_interval) {
-  _check_interval = check_interval;
-}
-
-double host::get_retry_interval() const {
-  return _retry_interval;
-}
-
-void host::set_retry_interval(double retry_interval) {
-  _retry_interval = retry_interval;
-}
-
-int host::get_max_attempts() const {
-  return _max_attempts;
-}
-
-void host::set_max_attempts(int max_attempts) {
-  _max_attempts = max_attempts;
-}
-
 std::string const& host::get_event_handler() const {
   return _event_handler;
 }
 
 void host::set_event_handler(std::string const& event_handler) {
   _event_handler = event_handler;
-}
-
-double host::get_notification_interval(void) const {
-  return _notification_interval;
-}
-
-void host::set_notification_interval(double notification_interval) {
-  _notification_interval = notification_interval;
 }
 
 double host::get_first_notification_delay(void) const {
@@ -466,23 +404,6 @@ int host::get_notify_on_downtime() const {
 
 void host::set_notify_on_downtime(int notify_on_downtime) {
   _notify_on_downtime = notify_on_downtime;
-}
-
-std::string const& host::get_notification_period() const {
-  return _notification_period;
-}
-
-void  host::set_notification_period(std::string const& notification_period)
-{
-  _notification_period = notification_period;
-}
-
-std::string const& host::get_check_period() const {
-  return _check_period;
-}
-
-void host::set_check_period(std::string const& check_period) {
-  _check_period = check_period;
 }
 
 bool host::get_flap_detection_enabled(void) const {
@@ -661,30 +582,6 @@ void host::set_notes_url(std::string const& notes_url) {
   _notes_url = notes_url;
 }
 
-std::string const& host::get_action_url() const {
-  return _action_url;
-}
-
-void host::set_action_url(std::string const& action_url) {
-  _action_url = action_url;
-}
-
-std::string const& host::get_icon_image() const {
-  return _icon_image;
-}
-
-void host::set_icon_image(std::string const& icon_image) {
-  _icon_image = icon_image;
-}
-
-std::string const& host::get_icon_image_alt() const {
-  return _icon_image_alt;
-}
-
-void host::set_icon_image_alt(std::string const& icon_image_alt) {
-  _icon_image_alt = icon_image_alt;
-}
-
 std::string const& host::get_vrml_image() const {
   return _vrml_image;
 }
@@ -787,14 +684,6 @@ int host::get_check_type() const {
 
 void host::set_check_type(int check_type) {
   _check_type = check_type;
-}
-
-int host::get_current_state() const {
-  return _current_state;
-}
-
-void host::set_current_state(int current_state) {
-  _current_state = current_state;
 }
 
 int host::get_last_state() const {
@@ -925,22 +814,6 @@ void host::set_notifications_enabled(bool notifications_enabled) {
   _notifications_enabled = notifications_enabled;
 }
 
-time_t host::get_last_host_notification() const {
-  return _last_host_notification;
-}
-
-void host::set_last_host_notification(time_t last_host_notification) {
-  _last_host_notification = last_host_notification;
-}
-
-time_t host::get_next_host_notification() const {
-  return _next_host_notification;
-}
-
-void host::set_next_host_notification(time_t next_host_notification) {
-  _next_host_notification = next_host_notification;
-}
-
 time_t host::get_next_check() const {
   return _next_check;
 }
@@ -1053,13 +926,10 @@ void host::set_no_more_notifications(int no_more_notifications) {
   _no_more_notifications = no_more_notifications;
 }
 
-unsigned long host::get_current_notification_id() const {
-  return _current_notification_id;
-}
-
-void host::set_current_notification_id(unsigned long current_notification_id) {
-  _current_notification_id = current_notification_id;
-}
+//
+//void host::set_current_notification_id(unsigned long current_notification_id) {
+//  _current_notification_id = current_notification_id;
+//}
 
 int host::get_check_flapping_recovery_notification() const {
   return _check_flapping_recovery_notification;
@@ -1188,7 +1058,7 @@ bool operator==(
           // created as parent back links.
           // Services do not need to be tested, they are
           // created as services back links.
-          && obj1.get_host_check_command() == obj2.get_host_check_command()
+          && obj1.get_check_command() == obj2.get_check_command()
           && obj1.get_initial_state() == obj2.get_initial_state()
           && obj1.get_check_interval() == obj2.get_check_interval()
           && obj1.get_retry_interval() == obj2.get_retry_interval()
@@ -1265,8 +1135,8 @@ bool operator==(
           && obj1.get_is_executing() == obj2.get_is_executing()
           && obj1.get_check_options() == obj2.get_check_options()
           && obj1.get_notifications_enabled() == obj2.get_notifications_enabled()
-          && obj1.get_last_host_notification() == obj2.get_last_host_notification()
-          && obj1.get_next_host_notification() == obj2.get_next_host_notification()
+          && obj1.get_last_notification() == obj2.get_last_notification()
+          && obj1.get_next_notification() == obj2.get_next_notification()
           && obj1.get_next_check() == obj2.get_next_check()
           && obj1.get_should_be_scheduled() == obj2.get_should_be_scheduled()
           && obj1.get_last_check() == obj2.get_last_check()
@@ -1395,7 +1265,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  parent_hosts:                         " << p_oss << "\n"
     "  child_hosts:                          " << child_oss << "\n"
     "  services:                             " << chkobj(obj.services) << "\n"
-    "  host_check_command:                   " << obj.get_host_check_command() << "\n"
+    "  host_check_command:                   " << obj.get_check_command() << "\n"
     "  initial_state:                        " << obj.get_initial_state() << "\n"
     "  check_interval:                       " << obj.get_check_interval() << "\n"
     "  retry_interval:                       " << obj.get_retry_interval() << "\n"
@@ -1465,8 +1335,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  is_executing:                         " << obj.get_is_executing() << "\n"
     "  check_options:                        " << obj.get_check_options() << "\n"
     "  notifications_enabled:                " << obj.get_notifications_enabled() << "\n"
-    "  last_host_notification:               " << string::ctime(obj.get_last_host_notification()) << "\n"
-    "  next_host_notification:               " << string::ctime(obj.get_next_host_notification()) << "\n"
+    "  last_host_notification:               " << string::ctime(obj.get_last_notification()) << "\n"
+    "  next_host_notification:               " << string::ctime(obj.get_next_notification()) << "\n"
     "  next_check:                           " << string::ctime(obj.get_next_check()) << "\n"
     "  should_be_scheduled:                  " << obj.get_should_be_scheduled() << "\n"
     "  last_check:                           " << string::ctime(obj.get_last_check()) << "\n"
@@ -1732,30 +1602,6 @@ int number_of_total_parent_hosts(com::centreon::engine::host* hst) {
 }
 
 /**
- *  Check if acknowledgement on host expired.
- *
- *  @param[in] h  Target host.
- */
-void engine::check_for_expired_acknowledgement(com::centreon::engine::host* h) {
-  if (h->get_problem_has_been_acknowledged()) {
-    int acknowledgement_timeout(
-          host_other_props[h->get_name()].acknowledgement_timeout);
-    if (acknowledgement_timeout > 0) {
-      time_t last_ack(host_other_props[h->get_name()].last_acknowledgement);
-      time_t now(time(nullptr));
-      if (last_ack + acknowledgement_timeout >= now) {
-        logger(log_info_message, basic)
-          << "Acknowledgement of host '" << h->get_name() << "' just expired";
-        h->set_problem_has_been_acknowledged(false);
-        h->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
-        update_host_status(h, false);
-      }
-    }
-  }
-  return ;
-}
-
-/**
  *  Get host by id.
  *
  *  @param[in] host_id The host id.
@@ -1814,23 +1660,2032 @@ uint64_t engine::get_host_id(std::string const& name) {
 /**
  *  Schedule acknowledgement expiration.
  *
- *  @param[in] h  Target host.
  */
-void engine::schedule_acknowledgement_expiration(com::centreon::engine::host* h) {
-  int ack_timeout(host_other_props[h->get_name()].acknowledgement_timeout);
-  time_t last_ack(host_other_props[h->get_name()].last_acknowledgement);
-  if ((ack_timeout > 0) && (last_ack != (time_t)0)) {
-    schedule_new_event(
-      EVENT_EXPIRE_HOST_ACK,
-      false,
-      last_ack + ack_timeout,
-      false,
-      0,
-      nullptr,
-      true,
-      h,
-      nullptr,
-      0);
+void host::schedule_acknowledgement_expiration() {
+  if (_acknowledgement_timeout > 0 && _last_acknowledgement != (time_t)0) {
+    schedule_new_event(EVENT_EXPIRE_HOST_ACK, false,
+                       _last_acknowledgement + _acknowledgement_timeout, false,
+                       0, nullptr, true, this, nullptr, 0);
   }
-  return ;
+}
+
+/**
+ *  Log host event information.
+ *  This function has been DEPRECATED.
+ *
+ *  @param[in] hst The host to log.
+ *
+ *  @return Return true on success.
+ */
+int host::log_event() {
+  unsigned long log_options{NSLOG_HOST_UP};
+  char const* state("UP");
+  if (get_current_state() > 0
+      && (unsigned int)get_current_state() < tab_host_states.size()) {
+    log_options = tab_host_states[get_current_state()].first;
+    state = tab_host_states[get_current_state()].second.c_str();
+  }
+  std::string const& state_type(tab_state_type[get_state_type()]);
+
+  logger(log_options, basic)
+    << "HOST ALERT: " << get_name() << ";" << state << ";"
+    << state_type << ";" << get_current_attempt() << ";"
+    << get_plugin_output();
+
+  return OK;
+}
+
+/* process results of an asynchronous host check */
+int host::handle_async_check_result_3x(
+      check_result* queued_check_result) {
+  time_t current_time;
+  int result = STATE_OK;
+  int reschedule_check = false;
+  char* old_plugin_output = NULL;
+  struct timeval start_time_hires;
+  struct timeval end_time_hires;
+  double execution_time(0.0);
+
+  logger(dbg_functions, basic)
+    << "handle_async_host_check_result_3x()";
+
+  /* make sure we have what we need */
+  if (queued_check_result == NULL)
+    return ERROR;
+
+  time(&current_time);
+
+  execution_time
+    = (double)((double)(queued_check_result->finish_time.tv_sec
+                        - queued_check_result->start_time.tv_sec)
+               + (double)((queued_check_result->finish_time.tv_usec
+                           - queued_check_result->start_time.tv_usec)
+                          / 1000.0) / 1000.0);
+  if (execution_time < 0.0)
+    execution_time = 0.0;
+
+  logger(dbg_checks, more)
+    << "** Handling async check result for host '"
+    << get_name() << "'...";
+
+  logger(dbg_checks, most)
+    << "\tCheck Type:         "
+    << (queued_check_result->check_type == HOST_CHECK_ACTIVE ? "Active" : "Passive") << "\n"
+    << "\tCheck Options:      "
+    << queued_check_result->check_options << "\n"
+    << "\tScheduled Check?:   "
+    << (queued_check_result->scheduled_check ? "Yes" : "No") << "\n"
+    << "\tReschedule Check?:  "
+    << (queued_check_result->reschedule_check ? "Yes" : "No") << "\n"
+    << "\tShould Reschedule Current Host Check?:"
+    << host_other_props[get_name()].should_reschedule_current_check
+    << "\tExited OK?:         "
+    << (queued_check_result->exited_ok ? "Yes" : "No") << "\n"
+    << com::centreon::logging::setprecision(3)
+    << "\tExec Time:          " << execution_time << "\n"
+    << "\tLatency:            " << queued_check_result->latency << "\n"
+    << "\treturn Status:      " << queued_check_result->return_code << "\n"
+    << "\tOutput:             " << queued_check_result->output;
+
+  /* decrement the number of host checks still out there... */
+  if (queued_check_result->check_type == HOST_CHECK_ACTIVE
+      && currently_running_host_checks > 0)
+    currently_running_host_checks--;
+
+  /* skip this host check results if its passive and we aren't accepting passive check results */
+  if (queued_check_result->check_type == HOST_CHECK_PASSIVE) {
+    if (!config->accept_passive_host_checks()) {
+      logger(dbg_checks, basic)
+        << "Discarding passive host check result because passive host "
+        "checks are disabled globally.";
+      return ERROR;
+    }
+    if (!get_accept_passive_host_checks()) {
+      logger(dbg_checks, basic)
+        << "Discarding passive host check result because passive checks "
+        "are disabled for this host.";
+      return ERROR;
+    }
+  }
+
+  /* clear the freshening flag (it would have been set if this host was determined to be stale) */
+  if (queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK)
+    set_is_being_freshened(false);
+
+  /* DISCARD INVALID FRESHNESS CHECK RESULTS */
+  /* If a host goes stale, Engine will initiate a forced check in order
+  ** to freshen it. There is a race condition whereby a passive check
+  ** could arrive between the 1) initiation of the forced check and 2)
+  ** the time when the forced check result is processed here. This would
+  ** make the host fresh again, so we do a quick check to make sure the
+  ** host is still stale before we accept the check result.
+  */
+  if ((queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK)
+      && is_host_result_fresh(this, current_time, false)) {
+    logger(dbg_checks, basic)
+      << "Discarding host freshness check result because the host is "
+      "currently fresh (race condition avoided).";
+    return OK;
+  }
+
+  /* was this check passive or active? */
+  set_check_type((queued_check_result->check_type == HOST_CHECK_ACTIVE)
+    ? HOST_CHECK_ACTIVE : HOST_CHECK_PASSIVE);
+
+  /* update check statistics for passive results */
+  if (queued_check_result->check_type == HOST_CHECK_PASSIVE)
+    update_check_stats(
+      PASSIVE_HOST_CHECK_STATS,
+      queued_check_result->start_time.tv_sec);
+
+  /* should we reschedule the next check of the host? NOTE: this might be overridden later... */
+  reschedule_check = queued_check_result->reschedule_check;
+
+  // Inherit the should reschedule flag from the host. It is used when
+  // rescheduled checks were discarded because only one check can be executed
+  // on the same host at the same time. The flag is then set in the host
+  // and this check should be rescheduled regardless of what it was meant
+  // to initially.
+  if (host_other_props[get_name()].should_reschedule_current_check &&
+      !queued_check_result->reschedule_check)
+    reschedule_check = true;
+
+  // Clear the should reschedule flag.
+  host_other_props[get_name()].should_reschedule_current_check = false;
+
+  /* check latency is passed to us for both active and passive checks */
+  set_latency(queued_check_result->latency);
+
+  /* update the execution time for this check (millisecond resolution) */
+  set_execution_time(execution_time);
+
+  /* set the checked flag */
+  set_has_been_checked(true);
+
+  /* clear the execution flag if this was an active check */
+  if (queued_check_result->check_type == HOST_CHECK_ACTIVE)
+    set_is_executing(false);
+
+  /* get the last check time */
+  set_last_check(queued_check_result->start_time.tv_sec);
+
+  /* was this check passive or active? */
+  set_check_type((queued_check_result->check_type == HOST_CHECK_ACTIVE)
+    ? HOST_CHECK_ACTIVE : HOST_CHECK_PASSIVE);
+
+  /* save the old host state */
+  set_last_state(get_current_state());
+  if (get_state_type() == HARD_STATE)
+    set_last_hard_state(get_current_state());
+
+  /* save old plugin output */
+  if (!get_plugin_output().empty())
+    old_plugin_output = ::strdup(get_plugin_output().c_str());
+
+  /* clear the old plugin output and perf data buffers */
+  set_plugin_output("");
+  set_long_plugin_output("");
+  set_perf_data("");
+
+  /* parse check output to get: (1) short output, (2) long output, (3) perf data */
+  char *plugin_output = NULL;
+  char *long_plugin_output = NULL;
+  char *perf_data = NULL;
+  parse_check_output(
+    queued_check_result->output,
+    &plugin_output,
+    &long_plugin_output,
+    &perf_data,
+    true,
+    true);
+  if (plugin_output)
+    set_plugin_output(plugin_output);
+  if(long_plugin_output)
+    set_long_plugin_output(long_plugin_output);
+  if (perf_data)
+    set_perf_data(perf_data);
+
+  /* make sure we have some data */
+  if (get_plugin_output().empty()) {
+    set_plugin_output("(No output returned from host check)");
+  }
+
+  /* replace semicolons in plugin output (but not performance data) with colons */
+  std::string temp_str(get_plugin_output());
+  std::replace(temp_str.begin(), temp_str.end(), ';', ':');
+  set_plugin_output(temp_str);
+
+  logger(dbg_checks, most)
+    << "Parsing check output...\n"
+    << "Short Output:\n"
+    << (get_plugin_output().empty() ? "NULL" : get_plugin_output()) << "\n"
+    << "Long Output:\n"
+    << (get_long_plugin_output().empty() ? "NULL" : get_long_plugin_output()) << "\n"
+    << "Perf Data:\n"
+    << (get_perf_data().empty() ? "NULL" : get_perf_data());
+
+  /* get the unprocessed return code */
+  /* NOTE: for passive checks, this is the final/processed state */
+  result = queued_check_result->return_code;
+
+  /* adjust return code (active checks only) */
+  if (queued_check_result->check_type == HOST_CHECK_ACTIVE) {
+
+    /* if there was some error running the command, just skip it (this shouldn't be happening) */
+    if (!queued_check_result->exited_ok) {
+
+      logger(log_runtime_warning, basic)
+        << "Warning:  Check of host '" << get_name()
+        << "' did not exit properly!";
+
+      set_plugin_output("(Host check did not exit properly)");
+      set_long_plugin_output("");
+      set_perf_data("");
+
+      result = STATE_UNKNOWN;
+    }
+
+    /* make sure the return code is within bounds */
+    else if (queued_check_result->return_code < 0
+             || queued_check_result->return_code > 3) {
+
+      logger(log_runtime_warning, basic)
+        << "Warning: return (code of " << queued_check_result->return_code
+        << " for check of host '" << get_name() << "' was out of bounds."
+        << ((queued_check_result->return_code == 126
+             || queued_check_result->return_code == 127)
+            ? " Make sure the plugin you're trying to run actually exists." : "");
+
+      std::ostringstream oss;
+      oss << "(Return code of "
+	  << queued_check_result->return_code
+	  << " is out of bounds"
+	  << ((queued_check_result->return_code == 126
+	       || queued_check_result->return_code == 127)
+	      ? " - plugin may be missing" : "") << ")";
+
+      set_plugin_output(oss.str());
+      set_long_plugin_output("");
+      set_perf_data("");
+
+      result = STATE_UNKNOWN;
+    }
+
+    /* a NULL host check command means we should assume the host is UP */
+    if (get_check_command().empty()) {
+      set_plugin_output("(Host assumed to be UP)");
+      result = STATE_OK;
+    }
+  }
+
+  /* translate return code to basic UP/DOWN state - the DOWN/UNREACHABLE state determination is made later */
+  /* NOTE: only do this for active checks - passive check results already have the final state */
+  if (queued_check_result->check_type == HOST_CHECK_ACTIVE) {
+
+    /* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
+    if (!config->use_aggressive_host_checking()
+        && result == STATE_WARNING)
+      result = STATE_OK;
+
+    /* OK states means the host is UP */
+    if (result == STATE_OK)
+      result = HOST_UP;
+
+    /* any problem state indicates the host is not UP */
+    else
+      result = HOST_DOWN;
+  }
+
+  /******************* PROCESS THE CHECK RESULTS ******************/
+
+  /* process the host check result */
+  process_host_check_result_3x(
+    this,
+    result,
+    old_plugin_output,
+    CHECK_OPTION_NONE,
+    reschedule_check,
+    true,
+    config->cached_host_check_horizon());
+
+  /* free memory */
+  delete[] old_plugin_output;
+
+  logger(dbg_checks, more)
+    << "** Async check result for host '" << get_name()
+    << "' handled: new state=" << get_current_state();
+
+  /* high resolution start time for event broker */
+  start_time_hires = queued_check_result->start_time;
+
+  /* high resolution end time for event broker */
+  gettimeofday(&end_time_hires, NULL);
+
+  /* send data to event broker */
+  broker_host_check(
+    NEBTYPE_HOSTCHECK_PROCESSED,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    get_check_type(),
+    get_current_state(),
+    get_state_type(),
+    start_time_hires,
+    end_time_hires,
+    get_check_command().c_str(),
+    get_latency(),
+    get_execution_time(),
+    config->host_check_timeout(),
+    queued_check_result->early_timeout,
+    queued_check_result->return_code,
+    NULL,
+    const_cast<char*>(get_plugin_output().c_str()),
+    const_cast<char*>(get_long_plugin_output().c_str()),
+    const_cast<char*>(get_perf_data().c_str()),
+    NULL);
+  return OK;
+}
+
+/* run a scheduled host check asynchronously */
+int host::run_scheduled_check(
+      int check_options,
+      double latency) {
+  int result = OK;
+  time_t current_time = 0L;
+  time_t preferred_time = 0L;
+  time_t next_valid_time = 0L;
+  int time_is_valid = true;
+
+  logger(dbg_functions, basic)
+    << "run_scheduled_host_check_3x()";
+
+  logger(dbg_checks, basic)
+    << "Attempting to run scheduled check of host '" << get_name()
+    << "': check options=" << check_options << ", latency=" << latency;
+
+  /* attempt to run the check */
+  result = run_async_check(
+             check_options,
+             latency,
+             true,
+             true,
+             &time_is_valid,
+             &preferred_time);
+
+  /* an error occurred, so reschedule the check */
+  if (result == ERROR) {
+    logger(dbg_checks, more)
+      << "Unable to run scheduled host check at this time";
+
+    /* only attempt to (re)schedule checks that should get checked... */
+    if (get_should_be_scheduled()) {
+
+      /* get current time */
+      time(&current_time);
+
+      /* determine next time we should check the host if needed */
+      /* if host has no check interval, schedule it again for 5 minutes from now */
+      if (current_time >= preferred_time)
+        preferred_time
+          = current_time + static_cast<time_t>((get_check_interval() <= 0)
+                                               ? 300
+                                               : (get_check_interval() * config->interval_length()));
+
+      // Make sure we rescheduled the next host check at a valid time.
+      {
+        timezone_locker lock(get_host_timezone(get_name()));
+        get_next_valid_time(
+          preferred_time,
+          &next_valid_time,
+          this->check_period_ptr);
+      }
+
+      /* the host could not be rescheduled properly - set the next check time for next week */
+      if (!time_is_valid && next_valid_time == preferred_time) {
+        /*
+	  get_next_check()=(time_t)(next_valid_time+(60*60*24*365));
+	  get_should_be_scheduled()=false;
+	*/
+
+        set_next_check((time_t)(next_valid_time + (60 * 60 * 24 * 7)));
+
+        logger(log_runtime_warning, basic)
+          << "Warning: Check of host '" << get_name() << "' could not be "
+          "rescheduled properly.  Scheduling check for next week...";
+
+        logger(dbg_checks, more)
+          << "Unable to find any valid times to reschedule the next"
+          " host check!";
+      }
+      /* this service could be rescheduled... */
+      else {
+        set_next_check(next_valid_time);
+        set_should_be_scheduled(true);
+
+        logger(dbg_checks, more)
+          << "Rescheduled next host check for "
+          << my_ctime(&next_valid_time);
+      }
+    }
+
+    /* update the status log */
+    update_status(false);
+
+    /* reschedule the next host check - unless we couldn't find a valid next check time */
+    /* 10/19/07 EG - keep original check options */
+    if (get_should_be_scheduled())
+      schedule_check(get_next_check(), check_options);
+
+    return ERROR;
+  }
+  return OK;
+}
+
+/* perform an asynchronous check of a host */
+/* scheduled host checks will use this, as will some checks that result from on-demand checks... */
+int host::run_async_check(
+      int check_options,
+      double latency,
+      int scheduled_check,
+      int reschedule_check,
+      int* time_is_valid,
+      time_t* preferred_time) {
+  try {
+    checks::checker::instance().run(
+                                  this,
+                                  check_options,
+                                  latency,
+                                  scheduled_check,
+                                  reschedule_check,
+                                  time_is_valid,
+                                  preferred_time);
+  }
+  catch (checks::viability_failure const& e) {
+    // Do not log viability failures.
+    (void)e;
+    return ERROR;
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: " << e.what();
+    return ERROR;
+  }
+  return OK;
+}
+
+/* schedules an immediate or delayed host check */
+void host::schedule_check(time_t check_time,
+                          int options) {
+  timed_event* temp_event = NULL;
+  timed_event* new_event = NULL;
+  int use_original_event = true;
+
+  logger(dbg_functions, basic)
+    << "schedule_host_check()";
+
+  logger(dbg_checks, basic)
+    << "Scheduling a "
+    << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
+    << ", active check of host '" << get_name() << "' @ "
+    << my_ctime(&check_time);
+
+  /* don't schedule a check if active checks of this host are disabled */
+  if (!get_checks_enabled()
+      && !(options & CHECK_OPTION_FORCE_EXECUTION)) {
+    logger(dbg_checks, basic)
+      << "Active checks are disabled for this host.";
+    return;
+  }
+  /* allocate memory for a new event item */
+  new_event = new timed_event;
+
+  /* default is to use the new event */
+  use_original_event = false;
+
+#ifdef PERFORMANCE_INCREASE_BUT_VERY_BAD_IDEA_INDEED
+  /* WARNING! 1/19/07 on-demand async host checks will end up causing mutliple scheduled checks of a host to appear in the queue if the code below is skipped */
+  /* if(use_large_installation_tweaks==false)... skip code below */
+#endif
+
+  /* see if there are any other scheduled checks of this host in the queue */
+  temp_event = quick_timed_event.find(
+                                   hash_timed_event::low,
+                                   hash_timed_event::host_check,
+                                   this);
+
+  /* we found another host check event for this host in the queue - what should we do? */
+  if (temp_event != NULL) {
+
+    logger(dbg_checks, most)
+      << "Found another host check event for this host @ "
+      << my_ctime(&temp_event->run_time);
+
+    /* use the originally scheduled check unless we decide otherwise */
+    use_original_event = true;
+
+    /* the original event is a forced check... */
+    if ((temp_event->event_options & CHECK_OPTION_FORCE_EXECUTION)) {
+
+      /* the new event is also forced and its execution time is earlier than the original, so use it instead */
+      if ((options & CHECK_OPTION_FORCE_EXECUTION)
+          && (check_time < temp_event->run_time)) {
+        logger(dbg_checks, most)
+          << "New host check event is forced and occurs before the "
+          "existing event, so the new event be used instead.";
+        use_original_event = false;
+      }
+    }
+
+    /* the original event is not a forced check... */
+    else {
+
+      /* the new event is a forced check, so use it instead */
+      if ((options & CHECK_OPTION_FORCE_EXECUTION)) {
+        use_original_event = false;
+        logger(dbg_checks, most)
+          << "New host check event is forced, so it will be used "
+          "instead of the existing event.";
+      }
+
+      /* the new event is not forced either and its execution time is earlier than the original, so use it instead */
+      else if (check_time < temp_event->run_time) {
+        use_original_event = false;
+        logger(dbg_checks, most)
+          << "New host check event occurs before the existing (older) "
+          "event, so it will be used instead.";
+      }
+
+      /* the new event is older, so override the existing one */
+      else {
+        logger(dbg_checks, most)
+          << "New host check event occurs after the existing event, "
+          "so we'll ignore it.";
+      }
+    }
+
+    /* the originally queued event won the battle, so keep it */
+    if (use_original_event) {
+      delete new_event;
+    }
+
+    /* else use the new event, so remove the old */
+    else {
+      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      delete temp_event;
+    }
+  }
+
+  /* save check options for retention purposes */
+  set_check_options(options);
+
+  /* use the new event */
+  if (!use_original_event) {
+    logger(dbg_checks, most)
+      << "Scheduling new host check event.";
+
+    /* set the next host check time */
+    set_next_check(check_time);
+
+    /* place the new event in the event queue */
+    new_event->event_type = EVENT_HOST_CHECK;
+    new_event->event_data = (void*)this;
+    new_event->event_args = (void*)NULL;
+    new_event->event_options = options;
+    new_event->run_time = get_next_check();
+    new_event->recurring = false;
+    new_event->event_interval = 0L;
+    new_event->timing_func = NULL;
+    new_event->compensate_for_time_change = true;
+    reschedule_event(new_event, &event_list_low, &event_list_low_tail);
+  }
+
+  else {
+    /* reset the next check time (it may be out of sync) */
+    if (temp_event != NULL)
+      set_next_check(temp_event->run_time);
+
+    logger(dbg_checks, most)
+      << "Keeping original host check event (ignoring the new one).";
+  }
+
+  /* update the status log */
+  update_status(false);
+}
+
+/* detects host flapping */
+void host::check_for_flapping(
+       int update,
+       int actual_check,
+       int allow_flapstart_notification) {
+  int update_history = true;
+  int is_flapping = false;
+  unsigned int x = 0;
+  unsigned int y = 0;
+  int last_state_history_value = HOST_UP;
+  unsigned long wait_threshold = 0L;
+  double curved_changes = 0.0;
+  double curved_percent_change = 0.0;
+  time_t current_time = 0L;
+  double low_threshold = 0.0;
+  double high_threshold = 0.0;
+  double low_curve_value = 0.75;
+  double high_curve_value = 1.25;
+
+  logger(dbg_functions, basic)
+    << "host::check_for_flapping()";
+
+  logger(dbg_flapping, more)
+    << "Checking host '" << get_name() << "' for flapping...";
+
+  time(&current_time);
+
+  /* period to wait for updating archived state info if we have no state change */
+  if (get_total_services() == 0)
+    wait_threshold
+      = static_cast<unsigned long>(get_notification_interval()
+                                   * config->interval_length());
+  else
+    wait_threshold
+      = static_cast<unsigned long>((get_total_service_check_interval()
+                                    * config->interval_length())
+                                   / get_total_services());
+
+  update_history = update;
+
+  /* should we update state history for this state? */
+  if (update_history) {
+    if (get_current_state() == HOST_UP
+        && !get_flap_detection_on_up())
+      update_history = false;
+    if (get_current_state() == HOST_DOWN
+        && !get_flap_detection_on_down())
+      update_history = false;
+    if (get_current_state() == HOST_UNREACHABLE
+        && !get_flap_detection_on_unreachable())
+      update_history = false;
+  }
+
+  /* if we didn't have an actual check, only update if we've waited long enough */
+  if (update_history && !actual_check
+      && static_cast<unsigned long>(current_time - get_last_state_history_update()) < wait_threshold) {
+    update_history = false;
+  }
+
+  /* what thresholds should we use (global or host-specific)? */
+  low_threshold = (get_low_flap_threshold() <= 0.0)
+    ? config->low_host_flap_threshold() : get_low_flap_threshold();
+  high_threshold = (get_high_flap_threshold() <= 0.0)
+    ? config->high_host_flap_threshold() : get_high_flap_threshold();
+
+  /* record current host state */
+  if (update_history) {
+    /* update the last record time */
+    set_last_state_history_update(current_time);
+
+    /* record the current state in the state history */
+    this->state_history[get_state_history_index()] = get_current_state();
+
+    /* increment state history index to next available slot */
+    set_state_history_index(get_state_history_index() + 1);
+    if (get_state_history_index() >= MAX_STATE_HISTORY_ENTRIES)
+      set_state_history_index(0);
+  }
+
+  /* calculate overall changes in state */
+  for (x = 0, y = get_state_history_index();
+       x < MAX_STATE_HISTORY_ENTRIES;
+       x++) {
+
+    if (x == 0) {
+      last_state_history_value = this->state_history[y];
+      y++;
+      if (y >= MAX_STATE_HISTORY_ENTRIES)
+        y = 0;
+      continue;
+    }
+
+    if (last_state_history_value != this->state_history[y])
+      curved_changes
+        += (((double)(x - 1) * (high_curve_value - low_curve_value))
+            / ((double)(MAX_STATE_HISTORY_ENTRIES - 2))) + low_curve_value;
+
+    last_state_history_value = this->state_history[y];
+
+    y++;
+    if (y >= MAX_STATE_HISTORY_ENTRIES)
+      y = 0;
+  }
+
+  /* calculate overall percent change in state */
+  curved_percent_change
+    = (double)(((double)curved_changes * 100.0)
+               / (double)(MAX_STATE_HISTORY_ENTRIES - 1));
+
+  set_percent_state_change(curved_percent_change);
+
+  logger(dbg_flapping, most)
+    << com::centreon::logging::setprecision(2)
+    << "LFT=" << low_threshold
+    << ", HFT=" << high_threshold
+    << ", CPC=" << curved_percent_change
+    << ", PSC=" << curved_percent_change << "%";
+
+  /* don't do anything if we don't have flap detection enabled on a program-wide basis */
+  if (!config->enable_flap_detection())
+    return;
+
+  /* don't do anything if we don't have flap detection enabled for this host */
+  if (!get_flap_detection_enabled())
+    return;
+
+  /* are we flapping, undecided, or what?... */
+
+  /* we're undecided, so don't change the current flap state */
+  if (curved_percent_change > low_threshold
+      && curved_percent_change < high_threshold)
+    return;
+
+  /* we're below the lower bound, so we're not flapping */
+  else if (curved_percent_change <= low_threshold)
+    is_flapping = false;
+
+  /* else we're above the upper bound, so we are flapping */
+  else if (curved_percent_change >= high_threshold)
+    is_flapping = true;
+
+  logger(dbg_flapping, more)
+    << "Host " << (is_flapping ? "is" : "is not")
+    << " flapping (" << curved_percent_change << "% state change).";
+
+  /* did the host just start flapping? */
+  if (is_flapping && !get_is_flapping())
+    set_flap(curved_percent_change, high_threshold, low_threshold,
+             allow_flapstart_notification);
+
+  /* did the host just stop flapping? */
+  else if (!is_flapping && get_is_flapping())
+    clear_flap(curved_percent_change, high_threshold, low_threshold);
+}
+
+void host::set_flap(
+       double percent_change,
+       double high_threshold,
+       double low_threshold,
+       int allow_flapstart_notification) {
+  logger(dbg_functions, basic)
+    << "set_host_flap()";
+
+  logger(dbg_flapping, more)
+    << "Host '" << get_name() << "' started flapping!";
+
+  /* log a notice - this one is parsed by the history CGI */
+  logger(log_runtime_warning, basic)
+    << com::centreon::logging::setprecision(1)
+    << "HOST FLAPPING ALERT: " << get_name()
+    << ";STARTED; Host appears to have started flapping ("
+    << percent_change << "% change > "
+    << high_threshold << "% threshold)";
+
+  /* add a non-persistent comment to the host */
+  std::ostringstream oss;
+  oss << std::fixed << std::setprecision(1)
+      << "Notifications for this host are being suppressed because it "
+      "was detected as " << "having been flapping between different "
+      "states (" << percent_change << "% change > " << high_threshold
+      << "% threshold).  When the host state stabilizes and the "
+      << "flapping stops, notifications will be re-enabled.";
+
+  unsigned long comment_id;
+  comment_id = get_flapping_comment_id();
+  std::shared_ptr<comment> com =
+    std::make_shared<comment>(
+      comment::host,
+      comment::flapping,
+      get_name(),
+      "",
+      time(NULL),
+      "(Centreon Engine Process)",
+      oss.str(),
+      false,
+      comment::internal,
+      false,
+      (time_t)0);
+
+  comment::comments.insert({com->get_comment_id(), com});
+
+  comment_id = com->get_comment_id();
+  set_flapping_comment_id(comment_id);
+
+  /* set the flapping indicator */
+  set_is_flapping(true);
+
+  /* send data to event broker */
+  broker_flapping_data(
+    NEBTYPE_FLAPPING_START,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    HOST_FLAPPING,
+    this,
+    percent_change,
+    high_threshold,
+    low_threshold,
+    NULL);
+
+  /* see if we should check to send a recovery notification out when flapping stops */
+  if (get_current_state() != HOST_UP
+      && get_current_notification_number() > 0)
+    set_check_flapping_recovery_notification(true);
+  else
+    set_check_flapping_recovery_notification(false);
+
+  /* send a notification */
+  if (allow_flapstart_notification)
+    notify(
+      NOTIFICATION_FLAPPINGSTART,
+      NULL,
+      NULL,
+      NOTIFICATION_OPTION_NONE);
+}
+
+/* handles a host that has stopped flapping */
+void host::clear_flap(
+       double percent_change,
+       double high_threshold,
+       double low_threshold) {
+
+  logger(dbg_functions, basic)
+    << "host::clear_flap()";
+
+  logger(dbg_flapping, basic)
+    << "Host '" << get_name() << "' stopped flapping.";
+
+  /* log a notice - this one is parsed by the history CGI */
+  logger(log_info_message, basic)
+    << com::centreon::logging::setprecision(1)
+    << "HOST FLAPPING ALERT: " << get_name()
+    << ";STOPPED; Host appears to have stopped flapping ("
+    << percent_change << "% change < "
+    << low_threshold << "% threshold)";
+
+  /* delete the comment we added earlier */
+  if (get_flapping_comment_id() != 0)
+    comment::delete_comment(get_flapping_comment_id());
+  set_flapping_comment_id(0);
+
+  /* clear the flapping indicator */
+  set_is_flapping(false);
+
+  /* send data to event broker */
+  broker_flapping_data(
+    NEBTYPE_FLAPPING_STOP,
+    NEBFLAG_NONE,
+    NEBATTR_FLAPPING_STOP_NORMAL,
+    HOST_FLAPPING,
+    this,
+    percent_change,
+    high_threshold,
+    low_threshold,
+    NULL);
+
+  /* send a notification */
+  notify(
+    NOTIFICATION_FLAPPINGSTOP,
+    NULL,
+    NULL,
+    NOTIFICATION_OPTION_NONE);
+
+  /* should we send a recovery notification? */
+  if (get_check_flapping_recovery_notification()
+      && get_current_state() == HOST_UP)
+    notify(
+      NOTIFICATION_NORMAL,
+      NULL,
+      NULL,
+      NOTIFICATION_OPTION_NONE);
+
+  /* clear the recovery notification flag */
+  set_check_flapping_recovery_notification(false);
+}
+
+/* enables flap detection for a specific host */
+void host::enable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "enable_host_flap_detection()";
+
+  logger(dbg_flapping, more)
+    << "Enabling flap detection for host '" << get_name() << "'.";
+
+  /* nothing to do... */
+  if (get_flap_detection_enabled())
+    return;
+
+  /* set the attribute modified flag */
+  _modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  set_flap_detection_enabled(true);
+
+  /* send data to event broker */
+  broker_adaptive_host_data(
+    NEBTYPE_ADAPTIVEHOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    get_modified_attributes(),
+    NULL);
+
+  /* check for flapping */
+  check_for_flapping(false, false, true);
+
+  /* update host status */
+  update_status(false);
+}
+
+/* disables flap detection for a specific host */
+void host::disable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "disable_host_flap_detection()";
+
+  logger(dbg_functions, more)
+    << "Disabling flap detection for host '" << get_name() << "'.";
+
+  /* nothing to do... */
+  if (!get_flap_detection_enabled())
+    return;
+
+  /* set the attribute modified flag */
+  _modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  set_flap_detection_enabled(false);
+
+  /* send data to event broker */
+  broker_adaptive_host_data(
+    NEBTYPE_ADAPTIVEHOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    get_modified_attributes(),
+    NULL);
+
+  /* handle the details... */
+  handle_host_flap_detection_disabled(this);
+}
+
+/* updates host status info */
+void host::update_status(bool aggregated_dump) {
+  /* send data to event broker (non-aggregated dumps only) */
+  if (!aggregated_dump)
+    broker_host_status(
+      NEBTYPE_HOSTSTATUS_UPDATE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      this,
+      nullptr);
+}
+
+/**
+ *  Check if acknowledgement on host expired.
+ *
+ */
+void host::check_for_expired_acknowledgement() {
+  if (get_problem_has_been_acknowledged()) {
+    if (_acknowledgement_timeout > 0) {
+      time_t now(time(nullptr));
+      if (_last_acknowledgement + _acknowledgement_timeout >= now) {
+        logger(log_info_message, basic)
+          << "Acknowledgement of host '" << get_name() << "' just expired";
+        set_problem_has_been_acknowledged(false);
+        set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+        update_status(false);
+      }
+    }
+  }
+}
+
+/* checks viability of sending a host notification */
+int host::check_notification_viability(unsigned int type, int options) {
+  time_t current_time;
+  time_t timeperiod_start;
+
+  logger(dbg_functions, basic) << "check_host_notification_viability()";
+
+  /* forced notifications bust through everything */
+  if (options & NOTIFICATION_OPTION_FORCED) {
+    logger(dbg_notifications, more)
+        << "This is a forced host notification, so we'll send it out.";
+    return OK;
+  }
+
+  /* get current time */
+  time(&current_time);
+
+  /* are notifications enabled? */
+  if (config->enable_notifications() == false) {
+    logger(dbg_notifications, more)
+        << "Notifications are disabled, so host notifications will not "
+           "be sent out.";
+    return ERROR;
+  }
+
+  // See if the host can have notifications sent out at this time.
+  {
+    timezone_locker lock(get_host_timezone(get_name()));
+    if (check_time_against_period(current_time,
+                                  this->notification_period_ptr) == ERROR) {
+      logger(dbg_notifications, more)
+          << "This host shouldn't have notifications sent out at "
+             "this time.";
+
+      // If this is a normal notification, calculate the next acceptable
+      // notification time, once the next valid time range arrives...
+      if (type == NOTIFICATION_NORMAL) {
+        get_next_valid_time(current_time, &timeperiod_start,
+                            this->notification_period_ptr);
+
+        // It looks like there is no notification time defined, so
+        // schedule next one far into the future (one year)...
+        if (timeperiod_start == (time_t)0)
+          set_next_notification(
+              (time_t)(current_time + (60 * 60 * 24 * 365)));
+        // Else use the next valid notification time.
+        else
+          set_next_notification(timeperiod_start);
+
+        time_t time = get_next_notification();
+        logger(dbg_notifications, more)
+            << "Next possible notification time: " << my_ctime(&time);
+      }
+      return ERROR;
+    }
+  }
+
+  /* are notifications temporarily disabled for this host? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for this host, "
+           "so we won't send one out.";
+    return ERROR;
+  }
+
+  /*********************************************/
+  /*** SPECIAL CASE FOR CUSTOM NOTIFICATIONS ***/
+  /*********************************************/
+
+  /* custom notifications are good to go at this point... */
+  if (type == NOTIFICATION_CUSTOM) {
+    if (get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+          << "We shouldn't send custom notification during "
+             "scheduled downtime.";
+      return ERROR;
+    }
+    return OK;
+  }
+
+  /****************************************/
+  /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
+  /****************************************/
+
+  /*
+   * acknowledgements only have to pass three general filters, although they
+   * have another test of their own...
+   */
+  if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
+    /* don't send an acknowledgement if there isn't a problem... */
+    if (get_current_state() == HOST_UP) {
+      logger(dbg_notifications, more)
+          << "The host is currently UP, so we won't send "
+             "an acknowledgement.";
+      return ERROR;
+    }
+
+    /*
+     * acknowledgement viability test passed, so the notification can be sent
+     * out
+     */
+    return OK;
+  }
+
+  /*****************************************/
+  /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
+  /*****************************************/
+
+  /* flapping notifications only have to pass three general filters */
+  if (type == NOTIFICATION_FLAPPINGSTART || type == NOTIFICATION_FLAPPINGSTOP ||
+      type == NOTIFICATION_FLAPPINGDISABLED) {
+    /* don't send a notification if we're not supposed to... */
+    if (!get_notify_on_flapping()) {
+      logger(dbg_notifications, more)
+          << "We shouldn't notify about FLAPPING events for this host.";
+      return ERROR;
+    }
+
+    /* don't send notifications during scheduled downtime */
+    if (get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+          << "We shouldn't notify about FLAPPING events during "
+             "scheduled downtime.";
+      return ERROR;
+    }
+
+    /* flapping viability test passed, so the notification can be sent out */
+    return OK;
+  }
+
+  /*****************************************/
+  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
+  /*****************************************/
+
+  /* flapping notifications only have to pass three general filters */
+  if (type == NOTIFICATION_DOWNTIMESTART || type == NOTIFICATION_DOWNTIMEEND ||
+      type == NOTIFICATION_DOWNTIMECANCELLED) {
+    /* don't send a notification if we're not supposed to... */
+    if (!get_notify_on_downtime()) {
+      logger(dbg_notifications, more)
+          << "We shouldn't notify about DOWNTIME events for this host.";
+      return ERROR;
+    }
+
+    /* don't send notifications during scheduled downtime */
+    if (get_scheduled_downtime_depth() > 0) {
+      logger(dbg_notifications, more)
+          << "We shouldn't notify about DOWNTIME events during "
+             "scheduled downtime!";
+      return ERROR;
+    }
+
+    /* downtime viability test passed, so the notification can be sent out */
+    return OK;
+  }
+
+  /****************************************/
+  /*** NORMAL NOTIFICATIONS ***************/
+  /****************************************/
+
+  /* is this a hard problem/recovery? */
+  if (get_state_type() == SOFT_STATE) {
+    logger(dbg_notifications, more)
+        << "This host is in a soft state, so we won't send "
+           "a notification out.";
+    return ERROR;
+  }
+
+  /* has this problem already been acknowledged? */
+  if (get_problem_has_been_acknowledged()) {
+    logger(dbg_notifications, more)
+        << "This host problem has already been acknowledged, "
+           "so we won't send a notification out!";
+    return ERROR;
+  }
+
+  /* check notification dependencies */
+  if (check_host_dependencies(this, hostdependency::notification) ==
+      DEPENDENCIES_FAILED) {
+    logger(dbg_notifications, more)
+        << "Notification dependencies for this host have failed, "
+           "so we won't sent a notification out!";
+    return ERROR;
+  }
+
+  /* see if we should notify about problems with this host */
+  if (get_current_state() == HOST_UNREACHABLE &&
+      !get_notify_on_unreachable()) {
+    logger(dbg_notifications, more)
+        << "We shouldn't notify about UNREACHABLE status for this host.";
+    return ERROR;
+  }
+  if (get_current_state() == HOST_DOWN && !get_notify_on_down()) {
+    logger(dbg_notifications, more)
+        << "We shouldn't notify about DOWN states for this host.";
+    return ERROR;
+  }
+  if (get_current_state() == HOST_UP) {
+    if (!get_notify_on_recovery()) {
+      logger(dbg_notifications, more)
+          << "We shouldn't notify about RECOVERY states for this host.";
+      return ERROR;
+    }
+    if (!(get_notified_on_down() ||
+          get_notified_on_unreachable())) {
+      logger(dbg_notifications, more)
+          << "We shouldn't notify about this recovery.";
+      return ERROR;
+    }
+  }
+
+  /* see if enough time has elapsed for first notification */
+  if (type == NOTIFICATION_NORMAL &&
+      (get_current_notification_number() == 0 ||
+       (get_current_state() == HOST_UP &&
+        !_recovery_been_sent))) {
+    /* get the time at which a notification should have been sent */
+    time_t& initial_notif_time{_initial_notif_time};
+
+    /* if not set, set it to now */
+    if (!initial_notif_time)
+      initial_notif_time = time(nullptr);
+
+    double notification_delay =
+        (get_current_state() != HOST_UP ? get_first_notification_delay()
+                                        : _recovery_notification_delay) *
+        config->interval_length();
+
+    if (current_time <
+        (time_t)(initial_notif_time + (time_t)(notification_delay))) {
+      if (get_current_state() == HOST_UP)
+        logger(dbg_notifications, more)
+            << "Not enough time has elapsed since the host changed to an "
+               "UP state (or since program start), so we shouldn't notify "
+               "about this problem yet.";
+      else
+        logger(dbg_notifications, more)
+            << "Not enough time has elapsed since the host changed to a "
+               "non-UP state (or since program start), so we shouldn't notify "
+               "about this problem yet.";
+      return ERROR;
+    }
+  }
+
+  /* if this host is currently flapping, don't send the notification */
+  if (get_is_flapping()) {
+    logger(dbg_notifications, more)
+        << "This host is currently flapping, so we won't "
+           "send notifications.";
+    return ERROR;
+  }
+
+  /*
+   * if this host is currently in a scheduled downtime period,
+   * don't send the notification
+   */
+  if (get_scheduled_downtime_depth() > 0) {
+    logger(dbg_notifications, more)
+        << "This host is currently in a scheduled downtime, "
+           "so we won't send notifications.";
+    return ERROR;
+  }
+
+  /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
+  if (get_current_state() == HOST_UP)
+    return OK;
+
+  /* check if we shouldn't renotify contacts about the host problem */
+  if (get_no_more_notifications()) {
+    logger(dbg_notifications, more)
+        << "We shouldn't re-notify contacts about this host problem.";
+    return ERROR;
+  }
+
+  /* check if its time to re-notify the contacts about the host... */
+  if (current_time < get_next_notification()) {
+    logger(dbg_notifications, more)
+        << "Its not yet time to re-notify the contacts "
+           "about this host problem...";
+    time_t time = get_next_notification();
+    logger(dbg_notifications, more)
+        << "Next acceptable notification time: " << my_ctime(&time);
+    return ERROR;
+  }
+
+  return OK;
+}
+
+/* top level host state handler - occurs after every host check (soft/hard and active/passive) */
+int host::handle_state() {
+  int state_change = false;
+  time_t current_time = 0L;
+
+  logger(dbg_functions, basic)
+    << "handle_host_state()";
+
+  /* get current time */
+  time(&current_time);
+
+  /* obsess over this host check */
+  obsessive_compulsive_host_check_processor(this);
+
+  /* update performance data */
+  update_performance_data();
+
+  /* record latest time for current state */
+  switch (get_current_state()) {
+  case HOST_UP:
+    set_last_time_up(current_time);
+    break;
+
+  case HOST_DOWN:
+    set_last_time_down(current_time);
+    break;
+
+  case HOST_UNREACHABLE:
+    set_last_time_unreachable(current_time);
+    break;
+
+  default:
+    break;
+  }
+
+  /* has the host state changed? */
+  if (get_last_state() != get_current_state()
+      || get_last_hard_state() != get_current_state()
+      || (get_current_state() == HOST_UP
+          && get_state_type() == SOFT_STATE))
+    state_change = true;
+
+  /* if the host state has changed... */
+  if (state_change == true) {
+
+    /* update last state change times */
+    if (get_state_type() == SOFT_STATE
+        || get_last_state() != get_current_state())
+      set_last_state_change(current_time);
+    if (get_state_type() == HARD_STATE)
+      set_last_hard_state_change(current_time);
+
+    /* update the event id */
+    set_last_event_id(get_current_event_id());
+    set_current_event_id(next_event_id);
+    next_event_id++;
+
+    /* update the problem id when transitioning to a problem state */
+    if (get_last_state() == HOST_UP) {
+      /* don't reset last problem id, or it will be zero the next time a problem is encountered */
+      /*this->get_last_problem_id=this->get_current_problem_id; */
+      set_current_problem_id(next_problem_id);
+      next_problem_id++;
+    }
+
+    /* clear the problem id when transitioning from a problem state to an UP state */
+    if (get_current_state() == HOST_UP) {
+      set_last_problem_id(get_current_problem_id());
+      set_current_problem_id(0L);
+    }
+
+    /* reset the acknowledgement flag if necessary */
+    if (get_acknowledgement_type() == ACKNOWLEDGEMENT_NORMAL) {
+
+      set_problem_has_been_acknowledged(false);
+      set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+
+      /* remove any non-persistant comments associated with the ack */
+      comment::delete_host_acknowledgement_comments(this);
+    }
+    else if (get_acknowledgement_type() == ACKNOWLEDGEMENT_STICKY
+             && get_current_state() == HOST_UP) {
+
+      set_problem_has_been_acknowledged(false);
+      set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+
+      /* remove any non-persistant comments associated with the ack */
+      comment::delete_host_acknowledgement_comments(this);
+    }
+
+    /* reset the next and last notification times */
+    set_last_notification((time_t)0);
+    set_next_notification((time_t)0);
+
+    /* reset notification suppression option */
+    set_no_more_notifications(false);
+
+    /* write the host state change to the main log file */
+    if (get_state_type() == HARD_STATE
+        || (get_state_type() == SOFT_STATE
+            && config->log_host_retries() == true))
+      log_event();
+
+    /* check for start of flexible (non-fixed) scheduled downtime */
+    /* CHANGED 08-05-2010 EG flex downtime can now start on soft states */
+    /*if(this->state_type==HARD_STATE) */
+    downtime_manager::instance().check_pending_flex_host_downtime(this);
+
+    if (get_current_state() == HOST_UP) {
+      _recovery_been_sent = false;
+      _initial_notif_time = 0;
+    }
+
+    /* notify contacts about the recovery or problem if its a "hard" state */
+    if (get_state_type() == HARD_STATE)
+      notify(
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
+
+    /* handle the host state change */
+    handle_host_event(this);
+
+    /* the host just recovered, so reset the current host attempt */
+    if (get_current_state() == HOST_UP)
+      set_current_attempt(1);
+
+    /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
+    if (get_current_state() == HOST_UP && _recovery_been_sent) {
+      _current_notification_number = 0;
+      set_notified_on_down(false);
+      set_notified_on_unreachable(false);
+    }
+  }
+
+  /* else the host state has not changed */
+  else {
+
+    bool old_recovery_been_sent{_recovery_been_sent};
+
+    /* notify contacts if needed */
+    if ((get_current_state() != HOST_UP ||
+         (get_current_state() == HOST_UP && !_recovery_been_sent)) &&
+        get_state_type() == HARD_STATE)
+      notify(
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
+
+    /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
+    if (!old_recovery_been_sent
+        && _recovery_been_sent
+        && get_current_state() == HOST_UP) {
+      _current_notification_number = 0;
+      set_notified_on_down(false);
+      set_notified_on_unreachable(false);
+    }
+
+    /* if we're in a soft state and we should log host retries, do so now... */
+    if (get_state_type() == SOFT_STATE
+        && config->log_host_retries() == true)
+      log_event();
+  }
+
+  return OK;
+}
+
+/* updates host performance data */
+void host::update_performance_data() {
+  /* should we be processing performance data for anything? */
+  if (!config->process_performance_data())
+    return;
+
+  /* should we process performance data for this host? */
+  if (!get_process_performance_data())
+    return;
+
+  /* process the performance data! */
+  xpddefault_update_host_performance_data(this);
+}
+
+/* checks viability of performing a host check */
+int host::verify_check_viability(
+      int check_options,
+      int* time_is_valid,
+      time_t* new_time) {
+  int result = OK;
+  int perform_check = true;
+  time_t current_time = 0L;
+  time_t preferred_time = 0L;
+  int check_interval = 0;
+
+  logger(dbg_functions, basic)
+    << "check_host_check_viability_3x()";
+
+  /* get the check interval to use if we need to reschedule the check */
+  if (this->get_state_type() == SOFT_STATE && this->get_current_state() != HOST_UP)
+    check_interval
+      = static_cast<int>(this->get_retry_interval() * config->interval_length());
+  else
+    check_interval
+      = static_cast<int>(this->get_check_interval() * config->interval_length());
+
+  /* make sure check interval is positive - otherwise use 5 minutes out for next check */
+  if (check_interval <= 0)
+    check_interval = 300;
+
+  /* get the current time */
+  time(&current_time);
+
+  /* initialize the next preferred check time */
+  preferred_time = current_time;
+
+  /* can we check the host right now? */
+  if (!(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
+
+    /* if checks of the host are currently disabled... */
+    if (!this->get_checks_enabled()) {
+      preferred_time = current_time + check_interval;
+      perform_check = false;
+    }
+
+    // Make sure this is a valid time to check the host.
+    {
+      timezone_locker lock(get_host_timezone(this->get_name()));
+      if (check_time_against_period(
+            static_cast<unsigned long>(current_time),
+            this->check_period_ptr) == ERROR) {
+        preferred_time = current_time;
+        if (time_is_valid)
+          *time_is_valid = false;
+        perform_check = false;
+      }
+    }
+
+    /* check host dependencies for execution */
+    if (check_host_dependencies(
+          this,
+          hostdependency::execution) == DEPENDENCIES_FAILED) {
+      preferred_time = current_time + check_interval;
+      perform_check = false;
+    }
+  }
+
+  /* pass back the next viable check time */
+  if (new_time)
+    *new_time = preferred_time;
+
+  result = (perform_check) ? OK : ERROR;
+  return result;
+}
+
+/*
+ * given a host, create a list of contacts to be notified,
+ * removing duplicates
+ */
+int host::create_notification_list(
+      nagios_macros* mac,
+      int options,
+      bool* escalated) {
+  int escalate_notification = false;
+
+  logger(dbg_functions, basic)
+    << "create_notification_list_from_host()";
+
+  /* see if this notification should be escalated */
+  escalate_notification = should_host_notification_be_escalated(this);
+
+  /* set the escalation flag */
+  *escalated = escalate_notification;
+
+  /* make sure there aren't any leftover contacts */
+  free_notification_list();
+
+  /* set the escalation macro */
+  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
+
+  if (options & NOTIFICATION_OPTION_BROADCAST)
+    logger(dbg_notifications, more)
+      << "This notification will be BROADCAST to all (escalated and "
+      "normal) contacts...";
+
+  /* use escalated contacts for this notification */
+  if (escalate_notification == true
+      || (options & NOTIFICATION_OPTION_BROADCAST)) {
+
+    logger(dbg_notifications, more)
+      << "Adding contacts from host escalation(s) to "
+      "notification list.";
+
+    std::string id(this->get_name());
+    umultimap<std::string, std::shared_ptr<hostescalation> > const&
+      escalations(state::instance().hostescalations());
+    for (umultimap<std::string,
+                   std::shared_ptr<hostescalation> >::const_iterator
+           it(escalations.find(id)), end(escalations.end());
+         it != end && it->first == id;
+         ++it) {
+      hostescalation* temp_he(&*it->second);
+
+      /* see if this escalation if valid for this notification */
+      if (is_valid_escalation_for_host_notification(
+            this,
+            temp_he,
+            options) == false)
+        continue;
+
+      logger(dbg_notifications, most)
+        << "Adding individual contacts from host escalation(s) "
+        "to notification list.";
+
+      /* add all individual contacts for this escalation */
+      for(contact_map::iterator
+            it(temp_he->contacts.begin()),
+            end(temp_he->contacts.end());
+          it != end;
+          ++it)
+        add_notification(mac, it->second.get());
+
+      logger(dbg_notifications, most)
+        << "Adding members of contact groups from host "
+        "escalation(s) to notification list.";
+
+      /* add all contacts that belong to contactgroups for this escalation */
+      for (contactgroup_map::iterator
+             it(temp_he->contact_groups.begin()),
+             end(temp_he->contact_groups.end());
+           it != end;
+           ++it) {
+        logger(dbg_notifications, most)
+          << "Adding members of contact group '"
+          << it->first
+          << "' for host escalation to notification list.";
+
+        if (it->second == nullptr)
+          continue;
+        for (std::unordered_map<std::string, contact *>::const_iterator
+               itm(it->second->get_members().begin()),
+               endm(it->second->get_members().end());
+              itm != endm;
+              ++itm) {
+          if (itm->second == nullptr)
+            continue;
+          add_notification(mac, itm->second);
+        }
+      }
+    }
+  }
+
+  /* use normal, non-escalated contacts for this notification */
+  if (escalate_notification == false
+      || (options & NOTIFICATION_OPTION_BROADCAST)) {
+
+    logger(dbg_notifications, more)
+      << "Adding normal contacts for host to notification list.";
+
+    logger(dbg_notifications, most)
+      << "Adding individual contacts for host to notification list.";
+
+    /* add all individual contacts for this host */
+    for (contact_map::iterator
+           it(this->contacts.begin()),
+           end(this->contacts.end());
+         it != end;
+         ++it)
+      add_notification(mac, it->second.get());
+
+    logger(dbg_notifications, most)
+      << "Adding members of contact groups for host to "
+      "notification list.";
+
+    /* add all contacts that belong to contactgroups for this host */
+    for (contactgroup_map::iterator
+           it(this->contact_groups.begin()),
+           end(this->contact_groups.end());
+         it != end;
+         ++it) {
+      logger(dbg_notifications, most)
+        << "Adding members of contact group '"
+        << it->first
+        << "' for host to notification list.";
+
+      if (it->second == nullptr)
+        continue;
+      for (std::unordered_map<std::string, contact *>::const_iterator
+             itm(it->second->get_members().begin()),
+             endm(it->second->get_members().end());
+            itm != endm;
+            ++itm) {
+        if (itm->second == nullptr)
+          continue;
+        add_notification(mac, itm->second);
+      }
+    }
+  }
+
+  return OK;
+}
+
+void host::grab_macros_r(nagios_macros* mac) {
+  grab_host_macros_r(mac, this);
+}
+
+/* notify a specific contact that an entire host is down or up */
+int host::notify_contact(
+      nagios_macros* mac,
+      contact* cntct,
+      int type,
+      char const* not_author,
+      char const* not_data,
+      int options,
+      int escalated) {
+  char* command_name = nullptr;
+  char* raw_command = nullptr;
+  char* processed_command = nullptr;
+  int early_timeout = false;
+  double exectime;
+  struct timeval start_time;
+  struct timeval end_time;
+  struct timeval method_start_time;
+  struct timeval method_end_time;
+  int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
+  int neb_result;
+
+  logger(dbg_functions, basic)
+    << "notify_contact_of_host()";
+  logger(dbg_notifications, most)
+    << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
+
+  /*
+   * check viability of notifying this user about the host
+   * acknowledgements are no longer excluded from this test -
+   * added 8/19/02 Tom Bertelson
+   */
+  if (check_contact_host_notification_viability(
+        cntct,
+        this,
+        type,
+        options) == ERROR)
+    return ERROR;
+
+  logger(dbg_notifications, most)
+    << "** Notifying contact '" << cntct->get_name() << "'";
+
+  /* get start time */
+  gettimeofday(&start_time, nullptr);
+
+  /* send data to event broker */
+  end_time.tv_sec = 0L;
+  end_time.tv_usec = 0L;
+  neb_result = broker_contact_notification_data(
+                 NEBTYPE_CONTACTNOTIFICATION_START,
+                 NEBFLAG_NONE,
+                 NEBATTR_NONE,
+                 HOST_NOTIFICATION,
+                 type,
+                 start_time,
+                 end_time,
+                 (void*)this,
+                 cntct,
+                 not_author,
+                 not_data,
+                 escalated,
+                 nullptr);
+  if (NEBERROR_CALLBACKCANCEL == neb_result)
+    return ERROR;
+  else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
+    return OK;
+
+  /* process all the notification commands this user has */
+  for (std::shared_ptr<commands::command> const& cmd :
+        cntct->get_host_notification_commands()) {
+
+    /* get start time */
+    gettimeofday(&method_start_time, nullptr);
+
+    /* send data to event broker */
+    method_end_time.tv_sec = 0L;
+    method_end_time.tv_usec = 0L;
+    neb_result = broker_contact_notification_method_data(
+                   NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,
+                   NEBFLAG_NONE,
+                   NEBATTR_NONE,
+                   HOST_NOTIFICATION,
+                   type,
+                   method_start_time,
+                   method_end_time,
+                   (void*)this,
+                   cntct,
+                   cmd->get_command_line().c_str(),
+                   not_author,
+                   not_data,
+                   escalated,
+                   nullptr);
+    if (NEBERROR_CALLBACKCANCEL == neb_result)
+      break;
+    else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
+      continue;
+
+    /* get the raw command line */
+    get_raw_command_line_r(
+      mac,
+      cmd.get(),
+      cmd->get_command_line().c_str(),
+      &raw_command,
+      macro_options);
+    if (raw_command == nullptr)
+      continue;
+
+    logger(dbg_notifications, most)
+      << "Raw notification command: " << raw_command;
+
+    /* process any macros contained in the argument */
+    process_macros_r(
+      mac,
+      raw_command,
+      &processed_command,
+      macro_options);
+    if (processed_command == nullptr)
+      continue;
+
+    /* get the command name */
+    command_name = string::dup(cmd->get_command_line());
+
+    /* run the notification command... */
+
+    logger(dbg_notifications, most)
+      << "Processed notification command: " << processed_command;
+
+    /* log the notification to program log file */
+    if (config->log_notifications() == true) {
+      char const* host_state_str("UP");
+      if ((unsigned int)this->get_current_state() < tab_host_states.size())
+           //sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
+        host_state_str = tab_host_states[this->get_current_state()].second.c_str();
+
+      char const* notification_str("");
+      if ((unsigned int)type < tab_notification_str.size())
+        notification_str = tab_notification_str[type].c_str();
+
+      std::string info;
+      switch (type) {
+      case NOTIFICATION_CUSTOM:
+        notification_str = "CUSTOM";
+
+      case NOTIFICATION_ACKNOWLEDGEMENT:
+        info
+          .append(";").append(not_author ? not_author : "")
+          .append(";").append(not_data ? not_data : "");
+        break;
+      }
+
+      std::string host_notification_state;
+      if (strcmp(notification_str, "NORMAL") == 0)
+        host_notification_state.append(host_state_str);
+      else
+        host_notification_state
+          .append(notification_str)
+          .append(" (")
+          .append(host_state_str)
+          .append(")");
+
+      logger(log_host_notification, basic)
+        << "HOST NOTIFICATION: " << cntct->get_name()
+        << ';' << this->get_name() << ';' << host_notification_state
+        << ";" << cmd->get_name() << ';' << this->get_plugin_output()
+        << info;
+    }
+
+    /* run the notification command */
+    try {
+      my_system_r(
+        mac,
+        processed_command,
+        config->notification_timeout(),
+        &early_timeout,
+        &exectime,
+        nullptr,
+        0);
+    } catch (std::exception const& e) {
+      logger(log_runtime_error, basic)
+        << "Error: can't execute host notification '"
+        << cntct->get_name() << "' : " << e.what();
+    }
+
+    /* check to see if the notification timed out */
+    if (early_timeout == true) {
+      logger(log_host_notification | log_runtime_warning, basic)
+        << "Warning: Contact '" << cntct->get_name()
+        << "' host notification command '" << processed_command
+        << "' timed out after " << config->notification_timeout()
+        << " seconds";
+    }
+
+    /* free memory */
+    delete[] raw_command;
+    delete[] processed_command;
+
+    /* get end time */
+    gettimeofday(&method_end_time, nullptr);
+
+    /* send data to event broker */
+    broker_contact_notification_method_data(
+      NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      HOST_NOTIFICATION,
+      type,
+      method_start_time,
+      method_end_time,
+      (void*)this,
+      cntct,
+      cmd->get_command_line().c_str(),
+      not_author,
+      not_data,
+      escalated,
+      nullptr);
+  }
+
+  /* get end time */
+  gettimeofday(&end_time, nullptr);
+
+  /* update the contact's last host notification time */
+  cntct->set_last_host_notification(start_time.tv_sec);
+
+  /* send data to event broker */
+  broker_contact_notification_data(
+    NEBTYPE_CONTACTNOTIFICATION_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    HOST_NOTIFICATION,
+    type,
+    start_time,
+    end_time,
+    (void*)this,
+    cntct,
+    not_author,
+    not_data,
+    escalated,
+    nullptr);
+
+  return OK;
+}
+
+void host::update_notification_flags() {
+  /* update notifications flags */
+  if (get_current_state() == HOST_DOWN)
+    set_notified_on_down(true);
+  else if (get_current_state() == HOST_UNREACHABLE)
+    set_notified_on_unreachable(true);
+}
+
+/* calculates next acceptable re-notification time for a host */
+time_t host::get_next_notification_time(time_t offset) {
+  time_t next_notification = 0L;
+  double interval_to_use = 0.0;
+  hostescalation* temp_he = nullptr;
+  int have_escalated_interval = false;
+
+  logger(dbg_functions, basic)
+    << "get_next_notification_time()";
+  logger(dbg_notifications, most)
+    << "Calculating next valid notification time...";
+
+  /* default notification interval */
+  interval_to_use = this->get_notification_interval();
+
+  logger(dbg_notifications, most)
+    << "Default interval: " << interval_to_use;
+
+  /*
+   * check all the host escalation entries for valid matches for this host
+   * (at its current notification number)
+   */
+    for (hostescalation_mmap::iterator
+           it(hostescalation::hostescalations.begin()),
+           end(hostescalation::hostescalations.begin());
+         it != end;
+         ++it) {
+
+    /* interval < 0 means to use non-escalated interval */
+    if (it->second->get_notification_interval() < 0.0)
+      continue;
+
+    /* skip this entry if it isn't appropriate */
+    if (is_valid_escalation_for_host_notification(
+          this,
+          it->second.get(),
+          NOTIFICATION_OPTION_NONE) == false)
+      continue;
+
+    logger(dbg_notifications, most)
+      << "Found a valid escalation w/ interval of "
+      << temp_he->get_notification_interval();
+
+    /*
+     * if we haven't used a notification interval from an escalation yet,
+     * use this one
+     */
+    if (have_escalated_interval == false) {
+      have_escalated_interval = true;
+      interval_to_use = it->second->get_notification_interval();
+    }
+
+    /* else use the shortest of all valid escalation intervals  */
+    else if (it->second->get_notification_interval() < interval_to_use)
+      interval_to_use = it->second->get_notification_interval();
+
+    logger(dbg_notifications, most)
+      << "New interval: " << interval_to_use;
+  }
+
+  /* if interval is 0, no more notifications should be sent */
+  if (interval_to_use == 0.0)
+    this->set_no_more_notifications(true);
+  else
+    this->set_no_more_notifications(false);
+
+  logger(dbg_notifications, most)
+    << "Interval used for calculating next valid notification time: "
+    << interval_to_use;
+
+  /* calculate next notification time */
+  next_notification = static_cast<time_t>(offset +
+    (interval_to_use * config->interval_length()));
+
+  return next_notification;
 }

@@ -267,16 +267,16 @@ void loop::_dispatching() {
             << currently_running_service_checks << "/"
             << config->max_parallel_service_checks()
             << ") has been reached!  Nudging "
-            << temp_service->host_name << ":"
-            << temp_service->description << " by "
+            << temp_service->get_hostname() << ":"
+            << temp_service->get_description() << " by "
             << nudge_seconds << " seconds...";
           logger(log_runtime_warning, basic)
             << "\tMax concurrent service checks ("
             << currently_running_service_checks << "/"
             << config->max_parallel_service_checks()
             << ") has been reached.  Nudging "
-            << temp_service->host_name << ":"
-            << temp_service->description << " by "
+            << temp_service->get_hostname() << ":"
+            << temp_service->get_description() << " by "
             << nudge_seconds << " seconds...";
           run_event = false;
         }
@@ -313,21 +313,21 @@ void loop::_dispatching() {
           // Otherwise reschedule (TODO: This should be smarter as it
           // doesn't consider its timeperiod).
           else {
-            if ((SOFT_STATE == temp_service->state_type)
-                && (temp_service->current_state != STATE_OK))
-              temp_service->next_check
-                = (time_t)(temp_service->next_check
-                           + (temp_service->retry_interval
-                              * config->interval_length()));
+            if (SOFT_STATE == temp_service->state_type &&
+                temp_service->current_state != STATE_OK)
+              temp_service->next_check =
+                  (time_t)(temp_service->next_check +
+                           temp_service->get_retry_interval() *
+                               config->interval_length());
             else
-              temp_service->next_check
-                = (time_t)(temp_service->next_check
-                           + (temp_service->check_interval
-                              * config->interval_length()));
+              temp_service->next_check =
+                  (time_t)(temp_service->next_check +
+                           (temp_service->get_check_interval() *
+                            config->interval_length()));
           }
           temp_event->run_time = temp_service->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
-          update_service_status(temp_service, false);
+          temp_service->update_status(false);
           run_event = false;
         }
       }
@@ -375,7 +375,7 @@ void loop::_dispatching() {
                             * config->interval_length())));
           temp_event->run_time = temp_host->get_next_check();
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
-          update_host_status(temp_host, false);
+          temp_host->update_status(false);
           run_event = false;
         }
       }

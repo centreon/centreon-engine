@@ -23,14 +23,15 @@
 /* Forward declaration. */
 CCE_BEGIN()
   class host;
+  class service;
 CCE_END()
-struct service_struct;
+
 struct servicegroup_struct;
 
 typedef struct                  servicesmember_struct {
   char*                         host_name;
   char*                         service_description;
-  service_struct*               service_ptr;
+  com::centreon::engine::service*               service_ptr;
   struct servicesmember_struct* next;
 }                               servicesmember;
 
@@ -40,7 +41,7 @@ extern "C" {
 
 servicesmember* add_service_link_to_host(
                   com::centreon::engine::host* hst,
-                  service_struct* service_ptr);
+                  com::centreon::engine::service* service_ptr);
 servicesmember* add_service_to_servicegroup(
                   servicegroup_struct* temp_servicegroup,
                   char const* host_name,

@@ -24,9 +24,9 @@
 #  include "com/centreon/engine/retention/service.hh"
 
 // Forward declaration.
-struct service_struct;
 
 CCE_BEGIN()
+class service;
 
 // Forward declaration.
 namespace configuration {
@@ -46,7 +46,7 @@ namespace   retention {
       void  _update(
               configuration::state const& config,
               retention::service const& state,
-              service_struct& obj,
+              com::centreon::engine::service& obj,
               bool scheduling_info_is_ok);
     };
   }

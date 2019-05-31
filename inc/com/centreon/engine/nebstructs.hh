@@ -22,7 +22,7 @@
 #  define CCE_NEBSTRUCTS_HH
 
 #  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/service.hh"
 
 /* Acknowledgement structure. */
 typedef struct   nebstruct_acknowledgement_struct {
@@ -484,10 +484,10 @@ typedef struct   nebstruct_relation_struct {
 
   com::centreon::engine::host*
                  hst;
-  service*       svc;
+  com::centreon::engine::service*       svc;
   com::centreon::engine::host*
                  dep_hst;
-  service*       dep_svc;
+  com::centreon::engine::service*       dep_svc;
 }                nebstruct_relation_data;
 
 /* Retention data structure. */

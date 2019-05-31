@@ -27,10 +27,10 @@
 #  include "com/centreon/unordered_hash.hh"
 
 // Forward declaration.
-struct service_struct;
 struct timed_event_struct;
 
 CCE_BEGIN()
+class service;
 
 namespace                 configuration {
   namespace               applier {
@@ -78,19 +78,19 @@ namespace                 configuration {
                             bool throw_if_not_found = true);
       void                _get_services(
                             set_service const& svc_added,
-                            std::vector<service_struct*>& new_services,
+                            std::vector<engine::service*>& new_services,
                             bool throw_if_not_found = true);
       void                _remove_misc_event(timed_event_struct*& evt);
       void                _schedule_host_events(
                             std::vector<
                               com::centreon::engine::host*> const& hosts);
       void                _schedule_service_events(
-                            std::vector<service_struct*> const& services);
+                            std::vector<engine::service*> const& services);
       void                _unschedule_host_events(
                             std::vector<
                               com::centreon::engine::host*> const& hosts);
       void                _unschedule_service_events(
-                            std::vector<service_struct*> const& services);
+                            std::vector<engine::service*> const& services);
 
       state*              _config;
       timed_event_struct* _evt_check_reaper;

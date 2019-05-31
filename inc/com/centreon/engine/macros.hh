@@ -45,7 +45,7 @@ int grab_contact_macros(com::centreon::engine::contact* cntct);
 
 int grab_custom_macro_value(
       char* macro_name,
-      char const* arg1,
+      std::string const& arg1,
       char const* arg2,
       char** output);
 int grab_datetime_macro(
@@ -59,7 +59,7 @@ int grab_standard_hostgroup_macro(
       char** output);
 int grab_standard_service_macro(
       int macro_type,
-      service* temp_service,
+      com::centreon::engine::service* temp_service,
       char** output,
       int* free_macro);
 int grab_standard_servicegroup_macro(

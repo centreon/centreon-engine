@@ -176,7 +176,7 @@ int process_external_command(char const* cmd) {
 int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   char* user(nullptr);
@@ -261,7 +261,7 @@ int cmd_delete_comment(int cmd, char* args) {
 
 /* removes all comments associated with a host or service from the status log */
 int cmd_delete_all_comments(int cmd, char* args) {
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -304,7 +304,7 @@ int cmd_delete_all_comments(int cmd, char* args) {
 int cmd_delay_notification(int cmd, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
@@ -343,9 +343,9 @@ int cmd_delay_notification(int cmd, char* args) {
 
   /* delay the next notification... */
   if (cmd == CMD_DELAY_HOST_NOTIFICATION)
-    temp_host->set_next_host_notification(delay_time);
+    temp_host->set_next_notification(delay_time);
   else
-    temp_service->next_notification = delay_time;
+    temp_service->set_next_notification(delay_time);
 
   return OK;
 }
@@ -354,7 +354,7 @@ int cmd_delay_notification(int cmd, char* args) {
 int cmd_schedule_check(int cmd, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -398,8 +398,7 @@ int cmd_schedule_check(int cmd, char* args) {
   /* schedule the host check */
   if (cmd == CMD_SCHEDULE_HOST_CHECK
       || cmd == CMD_SCHEDULE_FORCED_HOST_CHECK)
-    schedule_host_check(
-      temp_host,
+    temp_host->schedule_check(
       delay_time,
       (cmd == CMD_SCHEDULE_FORCED_HOST_CHECK)
       ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
@@ -412,15 +411,15 @@ int cmd_schedule_check(int cmd, char* args) {
          temp_servicesmember = temp_servicesmember->next) {
       if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
         continue;
-      schedule_service_check(
-        temp_service, delay_time,
+      temp_service->schedule_check(
+        delay_time,
         (cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS)
         ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
     }
   }
   else
-    schedule_service_check(
-      temp_service, delay_time,
+    temp_service->schedule_check(
+      delay_time,
       (cmd == CMD_SCHEDULE_FORCED_SVC_CHECK)
       ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
 
@@ -430,7 +429,7 @@ int cmd_schedule_check(int cmd, char* args) {
 /* schedules all service checks on a host for a particular time */
 int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   char* temp_ptr(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
@@ -462,8 +461,7 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
        temp_servicesmember = temp_servicesmember->next) {
     if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
       continue;
-    schedule_service_check(
-      temp_service,
+    temp_service->schedule_check(
       delay_time,
       (force) ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
   }
@@ -558,7 +556,7 @@ int process_passive_service_check(
       int return_code,
       char const* output) {
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   char const* real_host_name(nullptr);
 
   /* skip this service check result if we aren't accepting passive service checks */
@@ -794,7 +792,7 @@ int process_passive_host_check(
 
 /* acknowledges a host or service problem */
 int cmd_acknowledge_problem(int cmd, char* args) {
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -885,7 +883,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
 /* removes a host or service acknowledgement */
 int cmd_remove_acknowledgement(int cmd, char* args) {
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -929,7 +927,7 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 /* schedules downtime for a specific host or service */
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   servicesmember* temp_servicesmember(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   com::centreon::engine::host* last_host(nullptr);
   hostgroup* temp_hostgroup(nullptr);
@@ -974,7 +972,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       return ERROR;
 
     /* verify that the servicegroup is valid */
-    if ((temp_servicegroup = find_servicegroup(servicegroup_name)) == nullptr)
+    if ((temp_servicegroup = ::find_servicegroup(servicegroup_name)) == nullptr)
       return ERROR;
   }
 
@@ -1096,7 +1094,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
         host_name,
-        temp_service->description,
+        temp_service->get_description(),
         entry_time,
         author,
         comment_data,
@@ -1145,8 +1143,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
           continue;
         downtime_manager::instance().schedule_downtime(
           SERVICE_DOWNTIME,
-          temp_service->host_name,
-          temp_service->description,
+          temp_service->get_hostname(),
+          temp_service->get_description(),
           entry_time, author,
           comment_data,
           start_time,
@@ -1555,7 +1553,7 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd, char* args) {
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   contact* temp_contact(nullptr);
   char* host_name(nullptr);
@@ -1670,7 +1668,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* schedule a check if we should */
       if (temp_host->get_should_be_scheduled())
-        schedule_host_check(temp_host, temp_host->get_next_check(), CHECK_OPTION_NONE);
+        temp_host->schedule_check(temp_host->get_next_check(), CHECK_OPTION_NONE);
     }
     break;
 
@@ -1692,15 +1690,15 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
   case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
     /* save the old check interval */
-    old_dval = temp_service->check_interval;
+    old_dval = temp_service->get_check_interval();
 
     /* modify the check interval */
-    temp_service->check_interval = dval;
+    temp_service->set_check_interval(dval);
     attr = MODATTR_NORMAL_CHECK_INTERVAL;
 
     /* schedule a service check if previous interval was 0 (checks were not regularly scheduled) */
     if (old_dval == 0 && temp_service->checks_enabled
-        && temp_service->check_interval != 0) {
+        && temp_service->get_check_interval() != 0) {
 
       /* set the service check flag */
       temp_service->should_be_scheduled = true;
@@ -1721,24 +1719,24 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* schedule a check if we should */
       if (temp_service->should_be_scheduled)
-        schedule_service_check(temp_service, temp_service->next_check, CHECK_OPTION_NONE);
+        temp_service->schedule_check(temp_service->next_check, CHECK_OPTION_NONE);
     }
     break;
 
   case CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL:
-    temp_service->retry_interval = dval;
+    temp_service->set_retry_interval(dval);
     attr = MODATTR_RETRY_CHECK_INTERVAL;
     break;
 
   case CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS:
-    temp_service->max_attempts = intval;
+    temp_service->set_max_attempts(intval);
     attr = MODATTR_MAX_CHECK_ATTEMPTS;
 
     /* adjust current attempt number if in a hard state */
     if (temp_service->state_type == HARD_STATE
         && temp_service->current_state != STATE_OK
         && temp_service->current_attempt > 1)
-      temp_service->current_attempt = temp_service->max_attempts;
+      temp_service->current_attempt = temp_service->get_max_attempts();
     break;
 
   case CMD_CHANGE_HOST_MODATTR:
@@ -1784,7 +1782,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the service info */
-    update_service_status(temp_service, false);
+    temp_service->update_status(false);
     break;
 
   case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
@@ -1810,7 +1808,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the host info */
-    update_host_status(temp_host, false);
+    temp_host->update_status(false);
     break;
 
   case CMD_CHANGE_CONTACT_MODATTR:
@@ -1861,7 +1859,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd, char* args) {
-  service* temp_service{nullptr};
+  com::centreon::engine::service* temp_service{nullptr};
   com::centreon::engine::host* temp_host{nullptr};
   contact* temp_contact{nullptr};
   timeperiod* temp_timeperiod{nullptr};
@@ -2019,7 +2017,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_HOST_CHECK_COMMAND:
-    temp_host->set_host_check_command(temp_ptr);
+    temp_host->set_check_command(temp_ptr);
     temp_host->check_command_ptr = temp_command;
     attr = MODATTR_CHECK_COMMAND;
     break;
@@ -2032,6 +2030,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
     temp_host->set_notification_period(temp_ptr);
+    delete[] temp_ptr;
     temp_host->notification_period_ptr = temp_timeperiod;
     attr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
@@ -2044,22 +2043,20 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_SVC_CHECK_COMMAND:
-    delete[] temp_service->service_check_command;
-    temp_service->service_check_command = temp_ptr;
+    temp_service->set_check_command(temp_ptr);
+    delete[] temp_ptr;
     temp_service->check_command_ptr = temp_command;
     attr = MODATTR_CHECK_COMMAND;
     break;
 
   case CMD_CHANGE_SVC_CHECK_TIMEPERIOD:
-    delete[] temp_service->check_period;
-    temp_service->check_period = temp_ptr;
+    temp_service->set_check_period(temp_ptr);
     temp_service->check_period_ptr = temp_timeperiod;
     attr = MODATTR_CHECK_TIMEPERIOD;
     break;
 
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
-    delete[] temp_service->notification_period;
-    temp_service->notification_period = temp_ptr;
+    temp_service->set_notification_period(temp_ptr);
     temp_service->notification_period_ptr = temp_timeperiod;
     attr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
@@ -2142,7 +2139,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the service info */
-    update_service_status(temp_service, false);
+    temp_service->update_status(false);
     break;
 
   case CMD_CHANGE_HOST_EVENT_HANDLER:
@@ -2165,7 +2162,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       nullptr);
 
     /* update the status log with the host info */
-    update_host_status(temp_host, false);
+    temp_host->update_status(false);
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
@@ -2207,7 +2204,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
 /* changes a custom host or service variable */
 int cmd_change_object_custom_var(int cmd, char* args) {
   com::centreon::engine::host* temp_host(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   contact* temp_contact(nullptr);
 
   /* get the host or contact name */
@@ -2267,7 +2264,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       /* set the modified attributes and update the status of the object */
       temp_host->set_modified_attributes(
         temp_host->get_modified_attributes() | MODATTR_CUSTOM_VARIABLE);
-      update_host_status(temp_host, false);
+      temp_host->update_status(false);
     }
     break;
   case CMD_CHANGE_CUSTOM_SVC_VAR:
@@ -2284,7 +2281,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       temp_service->custom_variables.insert(
           {std::move(varname), customvariable(std::move(varvalue))});
       temp_service->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-      update_service_status(temp_service, false);
+      temp_service->update_status(false);
     }
     break;
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
@@ -2350,7 +2347,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
 /******************************************************************/
 
 /* temporarily disables a service check */
-void disable_service_checks(service* svc) {
+void disable_service_checks(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -2376,11 +2373,11 @@ void disable_service_checks(service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enables a service check */
-void enable_service_checks(service* svc) {
+void enable_service_checks(com::centreon::engine::service* svc) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -2397,7 +2394,7 @@ void enable_service_checks(service* svc) {
   svc->should_be_scheduled = true;
 
   /* services with no check intervals don't get checked */
-  if (svc->check_interval == 0)
+  if (svc->get_check_interval() == 0)
     svc->should_be_scheduled = false;
 
   /* schedule a check for right now (or as soon as possible) */
@@ -2416,7 +2413,7 @@ void enable_service_checks(service* svc) {
 
   /* schedule a check if we should */
   if (svc->should_be_scheduled)
-    schedule_service_check(svc, svc->next_check, CHECK_OPTION_NONE);
+    svc->schedule_check(svc->next_check, CHECK_OPTION_NONE);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -2430,7 +2427,7 @@ void enable_service_checks(service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enable notifications on a program-wide basis */
@@ -2496,7 +2493,7 @@ void disable_all_notifications(void) {
 }
 
 /* enables notifications for a service */
-void enable_service_notifications(service* svc) {
+void enable_service_notifications(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2521,11 +2518,11 @@ void enable_service_notifications(service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* disables notifications for a service */
-void disable_service_notifications(service* svc) {
+void disable_service_notifications(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2550,7 +2547,7 @@ void disable_service_notifications(service* svc) {
     nullptr);
 
   /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enables notifications for a host */
@@ -2580,7 +2577,7 @@ void enable_host_notifications(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log to reflect the new host state */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables notifications for a host */
@@ -2610,7 +2607,7 @@ void disable_host_notifications(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log to reflect the new host state */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* enables notifications for all hosts and services "beyond" a given host */
@@ -2621,7 +2618,7 @@ void enable_and_propagate_notifications(
        int affect_hosts,
        int affect_services) {
   com::centreon::engine::host* child_host(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
 
   /* enable notification for top level host */
@@ -2671,7 +2668,7 @@ void disable_and_propagate_notifications(
        int affect_hosts,
        int affect_services) {
   com::centreon::engine::host* child_host(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   servicesmember* temp_servicesmember(nullptr);
 
   if (hst == nullptr)
@@ -2928,8 +2925,8 @@ void acknowledge_host_problem(
 
   /* schedule acknowledgement expiration */
   time_t current_time(time(nullptr));
-  host_other_props[hst->get_name()].last_acknowledgement = current_time;
-  schedule_acknowledgement_expiration(hst);
+  hst->set_last_acknowledgement(current_time);
+  hst->schedule_acknowledgement_expiration();
 
   /* send data to event broker */
   broker_acknowledgement_data(
@@ -2955,7 +2952,7 @@ void acknowledge_host_problem(
       NOTIFICATION_OPTION_NONE);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com =
@@ -2976,7 +2973,7 @@ void acknowledge_host_problem(
 
 /* acknowledges a service problem */
 void acknowledge_service_problem(
-       service* svc,
+       com::centreon::engine::service* svc,
        char* ack_author,
        char* ack_data,
        int type,
@@ -2995,10 +2992,8 @@ void acknowledge_service_problem(
 
   /* schedule acknowledgement expiration */
   time_t current_time(time(nullptr));
-  service_other_props[std::make_pair(
-                             svc->host_ptr->get_name(),
-                             svc->description)].last_acknowledgement = current_time;
-  schedule_acknowledgement_expiration(svc);
+  svc->set_last_acknowledgement(current_time);
+  svc->schedule_acknowledgement_expiration();
 
   /* send data to event broker */
   broker_acknowledgement_data(
@@ -3016,23 +3011,22 @@ void acknowledge_service_problem(
 
   /* send out an acknowledgement notification */
   if (notify)
-    service_notification(
-      svc,
+    svc->notify(
       NOTIFICATION_ACKNOWLEDGEMENT,
       ack_author,
       ack_data,
       NOTIFICATION_OPTION_NONE);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com =
     std::make_shared<comment>(
       comment::service,
       comment::acknowledgment,
-      svc->host_name,
-      svc->description,
+      svc->get_hostname(),
+      svc->get_description(),
       current_time,
       ack_author,
       ack_data,
@@ -3049,19 +3043,19 @@ void remove_host_acknowledgement(com::centreon::engine::host* hst) {
   hst->set_problem_has_been_acknowledged(false);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
   comment::delete_host_acknowledgement_comments(hst);
 }
 
 /* removes a service acknowledgement */
-void remove_service_acknowledgement(service* svc) {
+void remove_service_acknowledgement(com::centreon::engine::service* svc) {
   /* set the acknowledgement flag */
   svc->problem_has_been_acknowledged = false;
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
   comment::delete_service_acknowledgement_comments(svc);
@@ -3188,7 +3182,7 @@ void stop_accepting_passive_service_checks(void) {
 }
 
 /* enables passive service checks for a particular service */
-void enable_passive_service_checks(service* svc) {
+void enable_passive_service_checks(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3213,11 +3207,11 @@ void enable_passive_service_checks(service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* disables passive service checks for a particular service */
-void disable_passive_service_checks(service* svc) {
+void disable_passive_service_checks(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3242,7 +3236,7 @@ void disable_passive_service_checks(service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* starts executing host checks */
@@ -3391,7 +3385,7 @@ void enable_passive_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables passive host checks for a particular host */
@@ -3421,7 +3415,7 @@ void disable_passive_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* enables event handlers on a program-wide basis */
@@ -3487,7 +3481,7 @@ void stop_using_event_handlers(void) {
 }
 
 /* enables the event handler for a particular service */
-void enable_service_event_handler(service* svc) {
+void enable_service_event_handler(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3512,11 +3506,11 @@ void enable_service_event_handler(service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* disables the event handler for a particular service */
-void disable_service_event_handler(service* svc) {
+void disable_service_event_handler(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3541,7 +3535,7 @@ void disable_service_event_handler(service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* enables the event handler for a particular host */
@@ -3571,7 +3565,7 @@ void enable_host_event_handler(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables the event handler for a particular host */
@@ -3601,7 +3595,7 @@ void disable_host_event_handler(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* disables checks of a particular host */
@@ -3632,7 +3626,7 @@ void disable_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* enables checks of a particular host */
@@ -3668,7 +3662,7 @@ void enable_host_checks(com::centreon::engine::host* hst) {
 
   /* schedule a check if we should */
   if (hst->get_should_be_scheduled())
-    schedule_host_check(hst, hst->get_next_check(), CHECK_OPTION_NONE);
+    hst->schedule_check(hst->get_next_check(), CHECK_OPTION_NONE);
 
   /* send data to event broker */
   broker_adaptive_host_data(
@@ -3682,7 +3676,7 @@ void enable_host_checks(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* start obsessing over service check results */
@@ -3985,7 +3979,7 @@ void disable_performance_data(void) {
 }
 
 /* start obsessing over a particular service */
-void start_obsessing_over_service(service* svc) {
+void start_obsessing_over_service(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4010,11 +4004,11 @@ void start_obsessing_over_service(service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* stop obsessing over a particular service */
-void stop_obsessing_over_service(service* svc) {
+void stop_obsessing_over_service(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4039,7 +4033,7 @@ void stop_obsessing_over_service(service* svc) {
     nullptr);
 
   /* update the status log with the service info */
-  update_service_status(svc, false);
+  svc->update_status(false);
 }
 
 /* start obsessing over a particular host */
@@ -4069,7 +4063,7 @@ void start_obsessing_over_host(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
 /* stop obsessing over a particular host */
@@ -4099,23 +4093,6 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
     nullptr);
 
   /* update the status log with the host info */
-  update_host_status(hst, false);
+  hst->update_status(false);
 }
 
-/* sets the current notification number for a specific host */
-void set_host_notification_number(com::centreon::engine::host* hst, int num) {
-  /* set the notification number */
-  hst->set_current_notification_number(num);
-
-  /* update the status log with the host info */
-  update_host_status(hst, false);
-}
-
-/* sets the current notification number for a specific service */
-void set_service_notification_number(service* svc, int num) {
-  /* set the notification number */
-  svc->current_notification_number = num;
-
-  /* update the status log with the service info */
-  update_service_status(svc, false);
-}

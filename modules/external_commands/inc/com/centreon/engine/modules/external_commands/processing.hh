@@ -31,7 +31,7 @@
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/hostgroup.hh"
-#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/service.hh"
 #  include "com/centreon/engine/objects/servicegroup.hh"
 #  include "com/centreon/engine/objects/servicesmember.hh"
 #  include "find.hh"

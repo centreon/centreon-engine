@@ -154,19 +154,17 @@ void applier::host::add_object(
   state::instance().hosts()[obj.host_id()] = h;
   com::centreon::engine::host::hosts.insert({h->get_name(), h});
 
-  host_other_props[obj.host_name()].initial_notif_time = 0;
+  h->set_initial_notif_time(0);
   host_other_props[obj.host_name()].should_reschedule_current_check = false;
   host_other_props[obj.host_name()].timezone = obj.timezone();
   host_other_props[obj.host_name()].host_id = obj.host_id();
-  host_other_props[obj.host_name()].acknowledgement_timeout
-    = obj.get_acknowledgement_timeout() * config->interval_length();
-  host_other_props[obj.host_name()].last_acknowledgement = 0;
-  host_other_props[obj.host_name()].recovery_notification_delay
-    = obj.recovery_notification_delay();
-  host_other_props[obj.host_name()].recovery_been_sent
-    = true;
+  h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
+                                 config->interval_length());
+  h->set_last_acknowledgement(0);
+  h->set_recovery_notification_delay(obj.recovery_notification_delay());
+  h->set_recovery_been_sent(true);
 
-  // Contacts.
+  // Contacts
   for (set_string::const_iterator
          it(obj.contacts().begin()),
          end(obj.contacts().end());
@@ -330,7 +328,7 @@ void applier::host::modify_object(
   h->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
   h->set_notification_period(obj.notification_period());
   h->set_notifications_enabled(static_cast<int>(obj.notifications_enabled()));
-  h->set_host_check_command(obj.check_command());
+  h->set_check_command(obj.check_command());
   h->set_checks_enabled(static_cast<int>(obj.checks_active()));
   h->set_accept_passive_host_checks(static_cast<int>(obj.checks_passive()));
   h->set_event_handler(obj.event_handler());
@@ -372,10 +370,9 @@ void applier::host::modify_object(
   h->set_obsess_over_host(static_cast<int>(obj.obsess_over_host()));
   host_other_props[obj.host_name()].timezone = obj.timezone();
   host_other_props[obj.host_name()].host_id = obj.host_id();
-  host_other_props[obj.host_name()].acknowledgement_timeout
-    = obj.get_acknowledgement_timeout() * config->interval_length();
-  host_other_props[obj.host_name()].recovery_notification_delay
-    = obj.recovery_notification_delay();
+  h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
+                                 config->interval_length());
+  h->set_recovery_notification_delay(obj.recovery_notification_delay());
 
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
@@ -555,6 +552,4 @@ void applier::host::resolve_object(
   if (!check_host(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve host '"
            << obj.host_name() << "'");
-
-  return ;
 }

@@ -48,7 +48,7 @@ void adjust_check_scheduling() {
   int total_checks(0);
   time_t last_check_time(0L);
   host* hst(NULL);
-  service* svc(NULL);
+  com::centreon::engine::service* svc(NULL);
 
   logger(dbg_functions, basic)
     << "adjust_check_scheduling()";
@@ -94,7 +94,7 @@ void adjust_check_scheduling() {
     }
 
     else if (tmp->event_type == EVENT_SERVICE_CHECK) {
-      if (!(svc = (service*)tmp->event_data))
+      if (!(svc = (com::centreon::engine::service*)tmp->event_data))
         continue;
 
       // ignore forced checks.
@@ -161,7 +161,7 @@ void adjust_check_scheduling() {
            * exec_time_factor);
     }
     else if (tmp->event_type == EVENT_SERVICE_CHECK) {
-      if (!(svc = (service*)tmp->event_data))
+      if (!(svc = (com::centreon::engine::service*)tmp->event_data))
         continue;
 
       // ignore forced checks.
@@ -185,12 +185,12 @@ void adjust_check_scheduling() {
     if (tmp->event_type == EVENT_HOST_CHECK) {
       tmp->run_time = new_run_time;
       hst->set_next_check(new_run_time);
-      update_host_status(hst, false);
+      hst->update_status(false);
     }
     else {
       tmp->run_time = new_run_time;
       svc->next_check = new_run_time;
-      update_service_status(svc, false);
+      svc->update_status(false);
     }
 
     current_icd_offset += inter_check_delay;

@@ -22,7 +22,7 @@
 #  define CCE_MACROS_GRAB_SERVICE_HH
 
 #  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/service.hh"
 
 #  ifdef __cplusplus
 extern "C" {
@@ -31,16 +31,16 @@ extern "C" {
 int grab_standard_service_macro_r(
       nagios_macros* mac,
       int macro_type,
-      service* svc,
+      com::centreon::engine::service* svc,
       char** output,
       int* free_macro);
 int grab_standard_service_macro(
       int macro_type,
-      service* svc,
+      com::centreon::engine::service* svc,
       char** output,
       int* free_macro);
-int grab_service_macros_r(nagios_macros* mac, service* svc);
-int grab_service_macros(service* svc);
+int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* svc);
+int grab_service_macros(com::centreon::engine::service* svc);
 
 #  ifdef __cplusplus
 }

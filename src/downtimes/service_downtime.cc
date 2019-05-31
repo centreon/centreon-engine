@@ -178,19 +178,18 @@ int service_downtime::unschedule() {
       nullptr);
 
     svc->scheduled_downtime_depth--;
-    update_service_status(svc, false);
+    svc->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
     if (svc->scheduled_downtime_depth == 0) {
       logger(log_info_message, basic)
-        << "SERVICE DOWNTIME ALERT: " << svc->host_name << ";"
-        << svc->description
+        << "SERVICE DOWNTIME ALERT: " << svc->get_hostname() << ";"
+        << svc->get_description()
         << ";CANCELLED; Scheduled downtime "
            "for service has been cancelled.";
 
       /* send a notification */
-      service_notification(
-        svc,
+      svc->notify(
         NOTIFICATION_DOWNTIMECANCELLED,
         nullptr,
         nullptr,
@@ -246,10 +245,10 @@ int service_downtime::subscribe() {
   logger(dbg_downtime, basic) << "Scheduled Downtime Details:";
   logger(dbg_downtime, basic) << " Type:        Service Downtime\n"
                                  " Host:        "
-                              << svc->host_name
+                              << svc->get_hostname()
                               << "\n"
                                  " Service:     "
-                              << svc->description;
+                              << svc->get_description();
   logger(dbg_downtime, basic)
     << " Fixed/Flex:  " << (is_fixed() ? "Fixed\n" : "Flexible\n")
     << " Start:       " << start_time_string << "\n"
@@ -264,8 +263,8 @@ int service_downtime::subscribe() {
     std::make_shared<comment>(
       comment::service,
       comment::downtime,
-      svc->host_name,
-      svc->description,
+      svc->get_hostname(),
+      svc->get_description(),
       time(nullptr),
       "(Centreon Engine Process)",
       oss.str(),
@@ -381,20 +380,19 @@ int service_downtime::handle() {
     if (svc->scheduled_downtime_depth == 0) {
 
       logger(dbg_downtime, basic)
-        << "Service '" << svc->description << "' on host '"
-        << svc->host_name << "' has exited from a period of "
+        << "Service '" << svc->get_description() << "' on host '"
+        << svc->get_hostname() << "' has exited from a period of "
         "scheduled downtime (id=" << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "SERVICE DOWNTIME ALERT: " << svc->host_name
-        << ";" << svc->description
+        << "SERVICE DOWNTIME ALERT: " << svc->get_hostname()
+        << ";" << svc->get_description()
         << ";STOPPED; Service has exited from a period of scheduled "
         "downtime";
 
       /* send a notification */
-      service_notification(
-        svc,
+      svc->notify(
         NOTIFICATION_DOWNTIMEEND,
         get_author().c_str(),
         get_comment().c_str(),
@@ -402,7 +400,7 @@ int service_downtime::handle() {
     }
 
     /* update the status data */
-    update_service_status(svc, false);
+    svc->update_status(false);
 
     /* decrement pending flex downtime if necessary */
     if (!is_fixed()
@@ -466,20 +464,19 @@ int service_downtime::handle() {
     if (svc->scheduled_downtime_depth == 0) {
 
       logger(dbg_downtime, basic)
-        << "Service '" << svc->description << "' on host '"
-        << svc->host_name << "' has entered a period of scheduled "
+        << "Service '" << svc->get_description() << "' on host '"
+        << svc->get_hostname() << "' has entered a period of scheduled "
         "downtime (id=" << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "SERVICE DOWNTIME ALERT: " << svc->host_name
-        << ";" << svc->description
+        << "SERVICE DOWNTIME ALERT: " << svc->get_hostname()
+        << ";" << svc->get_description()
         << ";STARTED; Service has entered a period of scheduled "
         "downtime";
 
       /* send a notification */
-      service_notification(
-        svc,
+      svc->notify(
         NOTIFICATION_DOWNTIMESTART,
         get_author().c_str(),
         get_comment().c_str(),
@@ -493,7 +490,7 @@ int service_downtime::handle() {
     _set_in_effect(true);
 
     /* update the status data */
-    update_service_status(svc, false);
+    svc->update_status(false);
 
     /* schedule an event */
     if (!is_fixed())

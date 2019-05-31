@@ -452,7 +452,7 @@ bool chkdiff(global& g1, global& g2) {
     ret = false;
   reset_next_check(g1.services);
   reset_next_check(g2.services);
-  for (service_struct* s(g1.services); s; s = s->next)
+  for (service2* s(g1.services); s; s = s->next)
     sort_it_rev(s->custom_variables);
   if (!chkdiff(g1.services, g2.services))
     ret = false;

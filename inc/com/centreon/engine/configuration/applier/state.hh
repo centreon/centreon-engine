@@ -32,7 +32,6 @@
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
-struct service_struct;
 struct servicedependency_struct;
 struct serviceescalation_struct;
 struct servicegroup_struct;
@@ -44,6 +43,7 @@ CCE_BEGIN()
 namespace commands {
   class   command;
   class   connector;
+  class   service;
 }
 
 namespace retention {
@@ -143,13 +143,13 @@ namespace           configuration {
                     hostgroups_find(configuration::hostgroup::key_type const& k) const;
       hostgroup_map::iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k);
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct>> const&
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>> const&
                     services() const throw ();
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct>>&
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>&
                     services() throw ();
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct>>::const_iterator
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::const_iterator
                     services_find(configuration::service::key_type const& k) const;
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<service_struct>>::iterator
+      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator
                     services_find(configuration::service::key_type const& k);
       umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>> const&
                     servicedependencies() const throw ();
@@ -245,7 +245,7 @@ namespace           configuration {
       processing_state
                     _processing_state;
       std::unordered_map<std::pair<uint64_t, uint64_t>,
-                         std::shared_ptr<service_struct>>
+                         std::shared_ptr<engine::service>>
                     _services;
       umultimap<std::pair<std::string, std::string>, std::shared_ptr<servicedependency_struct>>
                     _servicedependencies;

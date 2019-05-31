@@ -42,7 +42,7 @@ using namespace com::centreon::engine::logging;
 int pre_flight_check() {
   host* temp_host(nullptr);
   char* buf(nullptr);
-  service* temp_service(nullptr);
+  com::centreon::engine::service* temp_service(nullptr);
   commands::command* temp_command(nullptr);
   char* temp_command_name(nullptr);
   int warnings(0);
@@ -175,12 +175,12 @@ int pre_flight_check() {
        temp_service = temp_service->next) {
 
     umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it(state::instance().hosts().find(get_host_id(temp_service->host_name)));
+      it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
     if (it != state::instance().hosts().end() && it->second != nullptr) {
       it->second->set_total_services(it->second->get_total_services() + 1);
       it->second->set_total_service_check_interval(
         it->second->get_total_service_check_interval()
-        + static_cast<unsigned long>(temp_service->check_interval));
+        + static_cast<unsigned long>(temp_service->get_check_interval()));
     }
   }
 
@@ -245,7 +245,7 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking services...";
   int total_objects(0);
-  for (service* temp_service(service_list);
+  for (com::centreon::engine::service* temp_service(service_list);
        temp_service;
        temp_service = temp_service->next, ++total_objects)
     check_service(temp_service, &warnings, &errors);
@@ -665,20 +665,20 @@ int pre_flight_circular_check(int* w, int* e) {
   return ((errors > 0) ? ERROR : OK);
 }
 
-int check_service(service* svc, int* w, int* e) {
+int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   int errors(0);
   int warnings(0);
 
   /* check for a valid host */
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(svc->host_name)));
+    it(state::instance().hosts().find(get_host_id(svc->get_hostname())));
 
   /* we couldn't find an associated host! */
 
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
-      << "Error: Host '" << svc->host_name << "' specified in service "
-      "'" << svc->description << "' not defined anywhere!";
+      << "Error: Host '" << svc->get_hostname() << "' specified in service "
+      "'" << svc->get_description() << "' not defined anywhere!";
     errors++;
   }
 
@@ -705,8 +705,8 @@ int check_service(service* svc, int* w, int* e) {
     if (temp_command == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
-        << "' specified in service '" << svc->description
-        << "' for host '" << svc->host_name << "' not defined anywhere";
+        << "' specified in service '" << svc->get_description()
+        << "' for host '" << svc->get_hostname() << "' not defined anywhere";
       errors++;
     }
 
@@ -717,7 +717,7 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check the service check_command */
-  char* buf = string::dup(svc->service_check_command);
+  char* buf = string::dup(svc->get_check_command());
 
   /* get the command name, leave any arguments behind */
   char* temp_command_name = my_strtok(buf, "!");
@@ -726,8 +726,8 @@ int check_service(service* svc, int* w, int* e) {
   if (temp_command == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Service check command '" << temp_command_name
-      << "' specified in service '" << svc->description
-      << "' for host '" << svc->host_name << "' not defined anywhere!";
+      << "' specified in service '" << svc->get_description()
+      << "' for host '" << svc->get_hostname() << "' not defined anywhere!";
     errors++;
   }
 
@@ -743,7 +743,7 @@ int check_service(service* svc, int* w, int* e) {
       && !svc->notify_on_critical) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in service '"
-      << svc->description << "' for host '" << svc->host_name
+      << svc->get_description() << "' for host '" << svc->get_hostname()
       << "' doesn't make any sense - specify warning and/or critical "
          "options as well";
     warnings++;
@@ -761,8 +761,8 @@ int check_service(service* svc, int* w, int* e) {
     if (temp_contact == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
-        << "' specified in service '" << svc->description << "' for "
-        "host '" << svc->host_name << "' is not defined anywhere!";
+        << "' specified in service '" << svc->get_description() << "' for "
+        "host '" << svc->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }
@@ -782,26 +782,26 @@ int check_service(service* svc, int* w, int* e) {
     if (temp_contactgroup == nullptr) {
       logger(log_verification_error, basic)
         << "Error: Contact group '" << it->first
-        << "' specified in service '" << svc->description << "' for "
-        "host '" << svc->host_name << "' is not defined anywhere!";
+        << "' specified in service '" << svc->get_description() << "' for "
+        "host '" << svc->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }
 
   /* verify service check timeperiod */
-  if (svc->check_period == nullptr) {
+  if (svc->get_check_period().empty()) {
     logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "' has no check time period defined!";
+      << "Warning: Service '" << svc->get_description() << "' on host '"
+      << svc->get_hostname() << "' has no check time period defined!";
     warnings++;
   }
   else {
-    timeperiod* temp_timeperiod = find_timeperiod(svc->check_period);
+    timeperiod* temp_timeperiod = find_timeperiod(svc->get_check_period());
     if (temp_timeperiod == nullptr) {
       logger(log_verification_error, basic)
-        << "Error: Check period '" << svc->check_period
-        << "' specified for service '" << svc->description
-        << "' on host '" << svc->host_name
+        << "Error: Check period '" << svc->get_check_period()
+        << "' specified for service '" << svc->get_description()
+        << "' on host '" << svc->get_hostname()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -811,14 +811,14 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   // Check service notification timeperiod.
-  if (svc->notification_period) {
-    timeperiod* temp_timeperiod(
-      find_timeperiod(svc->notification_period));
+  if (!svc->get_notification_period().empty()) {
+    timeperiod* temp_timeperiod{
+      find_timeperiod(svc->get_notification_period())};
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Notification period '" << svc->notification_period
-        << "' specified for service '" << svc->description << "' on "
-        "host '" << svc->host_name << "' is not defined anywhere!";
+        << "Error: Notification period '" << svc->get_notification_period()
+        << "' specified for service '" << svc->get_description() << "' on "
+        "host '" << svc->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
 
@@ -827,8 +827,8 @@ int check_service(service* svc, int* w, int* e) {
   }
   else if (svc->notifications_enabled) {
     logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host "
-      "'" << svc->host_name << "' has no notification time period "
+      << "Warning: Service '" << svc->get_description() << "' on host "
+      "'" << svc->get_hostname() << "' has no notification time period "
       "defined!";
     warnings++;
   }
@@ -836,10 +836,10 @@ int check_service(service* svc, int* w, int* e) {
   // See if the notification interval is less than the check interval.
   if (svc->notifications_enabled
       && svc->notification_interval
-      && (svc->notification_interval < svc->check_interval)) {
+      && (svc->notification_interval < svc->get_check_interval())) {
     logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "'  has a notification interval less than "
+      << "Warning: Service '" << svc->get_description() << "' on host '"
+      << svc->get_hostname() << "'  has a notification interval less than "
          "its check interval!  Notifications are only re-sent after "
          "checks are made, so the effective notification interval will "
          "be that of the check interval.";
@@ -847,10 +847,10 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check for illegal characters in service description */
-  if (contains_illegal_object_chars(svc->description)) {
+  if (contains_illegal_object_chars(svc->get_description().c_str())) {
     logger(log_verification_error, basic)
       << "Error: The description string for service '"
-      << svc->description << "' on host '" << svc->host_name
+      << svc->get_description() << "' on host '" << svc->get_hostname()
       << "' contains one or more illegal characters.";
     errors++;
   }
@@ -875,10 +875,10 @@ int check_host(host* hst, int* w, int* e) {
   // modified.
   if (!use_large_installation_tweaks) {
     bool found(false);
-    for (service* temp_service(service_list);
+    for (com::centreon::engine::service* temp_service(service_list);
 	       temp_service;
 	       temp_service = temp_service->next)
-      if (hst->get_name() != temp_service->host_name) {
+      if (hst->get_name() != temp_service->get_hostname()) {
         found = true;
         break ;
       }
@@ -917,10 +917,10 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* hosts that don't have check commands defined shouldn't ever be checked... */
-  if (!hst->get_host_check_command().empty()) {
+  if (!hst->get_check_command().empty()) {
 
     /* check the host check_command */
-    char* buf = string::dup(hst->get_host_check_command());
+    char* buf = string::dup(hst->get_check_command());
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -1179,7 +1179,7 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
   for (servicesmember* temp_servicesmember(sg->members);
        temp_servicesmember;
        temp_servicesmember = temp_servicesmember->next) {
-    service* temp_service(find_service(
+    com::centreon::engine::service* temp_service(find_service(
                             temp_servicesmember->host_name,
                             temp_servicesmember->service_description));
     if (!temp_service) {
@@ -1333,7 +1333,7 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
   int errors(0);
 
   // Find the dependent service.
-  service* temp_service(find_service(
+  com::centreon::engine::service* temp_service(find_service(
                           sd->dependent_host_name,
                           sd->dependent_service_description));
   if (!temp_service) {
@@ -1491,7 +1491,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   int errors(0);
 
   // Find the service.
-  service* temp_service(find_service(se->host_name, se->description));
+  com::centreon::engine::service* temp_service(find_service(se->host_name, se->description));
   if (!temp_service) {
     logger(log_verification_error, basic) << "Error: Service '"
         << se->description << "' on host '" << se->host_name

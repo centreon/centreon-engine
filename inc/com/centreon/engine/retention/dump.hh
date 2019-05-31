@@ -25,12 +25,12 @@
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
-struct service_struct;
 
 CCE_BEGIN()
+class comment;
 class contact;
 class customvariable;
-class comment;
+class service;
 namespace downtimes {
   class downtime;
 }
@@ -51,7 +51,7 @@ namespace         retention {
     std::ostream& info(std::ostream& os);
     std::ostream& program(std::ostream& os);
     bool          save(std::string const& path);
-    std::ostream& service(std::ostream& os, service_struct const& obj);
+    std::ostream& service(std::ostream& os, com::centreon::engine::service const& obj);
     std::ostream& services(std::ostream& os);
   }
 }

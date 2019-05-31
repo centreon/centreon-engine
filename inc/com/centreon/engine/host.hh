@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_OBJECTS_HOST_HH
-#  define CCE_OBJECTS_HOST_HH
+#ifndef CCE_HOST_HH
+#  define CCE_HOST_HH
 
 #  include <list>
 #  include <unordered_map>
@@ -27,14 +27,16 @@
 #  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/logging.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/notifier.hh"
+#  include "com/centreon/engine/checks.hh"
 
 
 /* Forward declaration. */
 extern "C" {
-struct hostsmember_struct;
 struct objectlist_struct;
 struct servicesmember_struct;
 struct timeperiod_struct;
@@ -51,8 +53,10 @@ typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::host>> host_map;
 
 CCE_BEGIN()
-class                host {
+class                 host : public notifier {
  public:
+  static std::array<std::pair<uint32_t, std::string>, 3> const tab_host_states;
+
                       host(uint64_t host_id,
                            std::string const& name,
                            std::string const& display_name,
@@ -107,34 +111,53 @@ class                host {
                            int retain_status_information,
                            int retain_nonstatus_information,
                            int obsess_over_host);
-
+                     ~host() {}
   void               add_child_link(host* child);
   void               add_parent_host(std::string const& host_name);
+  int                log_event();
+  int                handle_async_check_result_3x(
+                       check_result* queued_check_result);
+  int                run_scheduled_check(int check_options, double latency);
+  int                run_async_check(int check_options,
+                                     double latency,
+                                     int scheduled_check,
+                                     int reschedule_check,
+                                     int* time_is_valid,
+                                     time_t* preferred_time);
+  void               schedule_check(time_t check_time,
+                                    int options);
+  void               check_for_flapping(int update,
+                                        int actual_check,
+                                        int allow_flapstart_notification);
+  void               set_flap(double percent_change,
+                              double high_threshold,
+                              double low_threshold,
+                              int allow_flapstart_notification);
+  void               clear_flap(double percent_change,
+                                double high_threshold,
+                                double low_threshold);
+  void               enable_flap_detection();
+  void               disable_flap_detection();
+  void               update_status(bool aggregated_dump) override;
+  void               check_for_expired_acknowledgement();
+  int                check_notification_viability(unsigned int type,
+                                                  int options) override;
+  int                handle_state();
+  void               update_performance_data();
+  int                verify_check_viability(int check_options,
+                                            int* time_is_valid,
+                                            time_t* new_time);
+  void               grab_macros_r(nagios_macros* mac) override;
 
   // setters / getters
   std::string const& get_name() const;
   void               set_name(std::string const& name);
-  std::string const& get_display_name() const;
-  void               set_display_name(std::string const& name);
   std::string const& get_alias() const;
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  std::string const& get_host_check_command() const;
-  void               set_host_check_command(
-                       std::string const& host_check_command);
-  int                get_initial_state() const;
-  void               set_initial_state(int initial_state);
-  double             get_check_interval() const;
-  void               set_check_interval(double check_interval);
-  double             get_retry_interval() const;
-  void               set_retry_interval(double retry_interval);
-  int                get_max_attempts() const;
-  void               set_max_attempts(int max_attempts);
   std::string const& get_event_handler() const;
   void               set_event_handler(std::string const& event_handler);
-  double             get_notification_interval(void) const;
-  void               set_notification_interval(double notification_interval);
   double             get_first_notification_delay(void) const;
   void               set_first_notification_delay(double notification_delay);
   int                get_notify_on_down() const;
@@ -147,11 +170,6 @@ class                host {
   void               set_notify_on_flapping(int notify_on_flapping);
   int                get_notify_on_downtime() const;
   void               set_notify_on_downtime(int notify_on_downtime);
-  std::string const& get_notification_period() const;
-  void               set_notification_period(
-                       std::string const &notification_period);
-  std::string const& get_check_period() const;
-  void               set_check_period(std::string const& check_period);
   bool               get_flap_detection_enabled(void) const;
   void               set_flap_detection_enabled(bool flap_detection_enabled);
   double             get_low_flap_threshold() const;
@@ -196,12 +214,6 @@ class                host {
   void               set_notes(std::string const& notes);
   std::string const& get_notes_url() const;
   void               set_notes_url(std::string const& notes_url);
-  std::string const& get_action_url() const;
-  void               set_action_url(std::string const& action_url);
-  std::string const& get_icon_image() const;
-  void               set_icon_image(std::string const& icon_image);
-  std::string const& get_icon_image_alt() const;
-  void               set_icon_image_alt(std::string const& icon_image_alt);
   std::string const& get_vrml_image() const;
   void               set_vrml_image(std::string const& image);
   std::string const& get_statusmap_image() const;
@@ -228,8 +240,6 @@ class                host {
   void               set_acknowledgement_type(int acknowledgement_type);
   int                get_check_type() const;
   void               set_check_type(int check_type);
-  int                get_current_state() const;
-  void               set_current_state(int current_state);
   int                get_last_state() const;
   void               set_last_state(int last_state);
   int                get_last_hard_state() const;
@@ -262,10 +272,6 @@ class                host {
   void               set_check_options(int check_options);
   bool               get_notifications_enabled() const;
   void               set_notifications_enabled(bool notifications_enabled);
-  time_t             get_last_host_notification() const;
-  void               set_last_host_notification(time_t last_host_notification);
-  time_t             get_next_host_notification() const;
-  void               set_next_host_notification(time_t next_host_notification);
   time_t             get_next_check() const;
   void               set_next_check(time_t next_check);
   int                get_should_be_scheduled() const;
@@ -294,8 +300,6 @@ class                host {
   void               set_current_notification_number(int current_notification_number);
   int                get_no_more_notifications() const;
   void               set_no_more_notifications(int no_more_notifications);
-  unsigned long      get_current_notification_id() const;
-  void               set_current_notification_id(unsigned long current_notification_id);
   int                get_check_flapping_recovery_notification() const;
   void               set_check_flapping_recovery_notification(int check_flapping_recovery_notification);
   int                get_scheduled_downtime_depth() const;
@@ -322,6 +326,19 @@ class                host {
   void               set_circular_path_checked(int check_level);
   bool               get_contains_circular_path() const;
   void               set_contains_circular_path(bool contains_circular_path);
+  int                create_notification_list(nagios_macros* mac,
+                                              int options,
+                                              bool* escalated) override;
+  int                notify_contact(nagios_macros* mac,
+                                    contact* cntct,
+                                    int type,
+                                    char const* not_author,
+                                    char const* not_data,
+                                    int options,
+                                    int escalated) override;
+  void               update_notification_flags() override;
+  time_t             get_next_notification_time(time_t offset) override;
+  void               schedule_acknowledgement_expiration();
 
   contactgroup_map   contact_groups;
   contact_map        contacts;
@@ -346,24 +363,15 @@ class                host {
 
 private:
   std::string         _name;
-  std::string         _display_name;
   std::string         _alias;
   std::string         _address;
-  std::string         _host_check_command;
-  int                 _initial_state;
-  double              _check_interval;
-  double              _retry_interval;
-  int                 _max_attempts;
   std::string         _event_handler;
-  double              _notification_interval;
   double              _first_notification_delay;
   int                 _notify_on_down;
   int                 _notify_on_unreachable;
   int                 _notify_on_recovery;
   int                 _notify_on_flapping;
   int                 _notify_on_downtime;
-  std::string         _notification_period;
-  std::string         _check_period;
   bool                _flap_detection_enabled;
   double              _low_flap_threshold;
   double              _high_flap_threshold;
@@ -386,7 +394,6 @@ private:
   int                 _obsess_over_host;
   std::string         _notes;
   std::string         _notes_url;
-  std::string         _action_url;
   std::string         _icon_image;
   std::string         _icon_image_alt;
   std::string         _vrml_image;
@@ -402,7 +409,6 @@ private:
   int                 _problem_has_been_acknowledged;
   int                 _acknowledgement_type;
   int                 _check_type;
-  int                 _current_state;
   int                 _last_state;
   int                 _last_hard_state;
   std::string         _plugin_output;
@@ -419,8 +425,6 @@ private:
   bool                _is_executing;
   int                 _check_options;
   bool                _notifications_enabled;
-  time_t              _last_host_notification;
-  time_t              _next_host_notification;
   time_t              _next_check;
   int                 _should_be_scheduled;
   time_t              _last_check;
@@ -433,9 +437,7 @@ private:
   bool                _is_being_freshened;
   bool                _notified_on_down;
   bool                _notified_on_unreachable;
-  int                 _current_notification_number;
   int                 _no_more_notifications;
-  unsigned long       _current_notification_id;
   int                 _check_flapping_recovery_notification;
   int                 _scheduled_downtime_depth;
   int                 _pending_flex_downtime;
@@ -449,19 +451,16 @@ private:
   unsigned long       _modified_attributes;
   int                 _circular_path_checked;
   bool                _contains_circular_path;
+
 };
+
 CCE_END()
 
 /* Other HOST structure. */
 struct                host_other_properties {
-  time_t              initial_notif_time;
   bool                should_reschedule_current_check;
   std::string         timezone;
   uint64_t            host_id;
-  int                 acknowledgement_timeout;
-  time_t              last_acknowledgement;
-  unsigned int        recovery_notification_delay;
-  bool                recovery_been_sent;
 };
 
 /* Hash structures. */
@@ -510,9 +509,7 @@ com::centreon::engine::host&
 char const*           get_host_timezone(std::string const& name);
 bool                  is_host_exist(uint64_t host_id) throw ();
 uint64_t              get_host_id(std::string const& name);
-void                  schedule_acknowledgement_expiration(
-                            com::centreon::engine::host* h);
 
 CCE_END()
 
-#endif // !CCE_OBJECTS_HOST_HH
+#endif // !CCE_HOST_HH

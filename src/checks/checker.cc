@@ -45,7 +45,7 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::checks;
 
 // Class instance.
-static checker* _instance = NULL;
+static checker* _instance = nullptr;
 
 /**************************************
 *                                     *
@@ -103,7 +103,7 @@ void checker::reap() {
   // Keep compatibility with old check result list.
   if (check_result_list) {
     concurrency::locker lock(&_mut_reap);
-    check_result* cr(NULL);
+    check_result* cr(nullptr);
     while ((cr = read_check_result())) {
       _to_reap.push(*cr);
       delete cr;
@@ -172,7 +172,7 @@ void checker::reap() {
             << "Handling check result for service '"
             << result.service_description << "' on host '"
             << result.host_name << "'...";
-          handle_async_service_check_result(&svc, &result);
+          svc.handle_async_check_result(&result);
         }
         catch (std::exception const& e) {
           logger(log_runtime_warning, basic)
@@ -191,7 +191,7 @@ void checker::reap() {
           logger(dbg_checks, more)
             << "Handling check result for host '"
             << result.host_name << "'...";
-          handle_async_host_check_result_3x(&hst, &result);
+          hst.handle_async_check_result_3x(&result);
         }
         catch (std::exception const& e) {
           // Check if the host exists.
@@ -284,8 +284,7 @@ void checker::run(
     << "** Running async check of host '" << hst->get_name() << "'...";
 
   // Check if the host is viable now.
-  if (check_host_check_viability_3x(
-        hst,
+  if (hst->verify_check_viability(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
@@ -323,17 +322,17 @@ void checker::run(
             hst->get_state_type(),
             start_time,
             end_time,
-            hst->get_host_check_command().c_str(),
+            hst->get_check_command().c_str(),
             hst->get_latency(),
             0.0,
             config->host_check_timeout(),
             false,
             0,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL));
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr));
 
   // Host check was cancel by NEB module. Reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res)
@@ -370,12 +369,12 @@ void checker::run(
   get_raw_command_line_r(
     &macros,
     hst->check_command_ptr,
-    hst->get_host_check_command().c_str(),
-    NULL,
+    hst->get_check_command().c_str(),
+    nullptr,
     0);
 
   // Time to start command.
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   // Set check time for on-demand checks, so they're
   // not incorrectly detected as being orphaned.
@@ -400,14 +399,14 @@ void checker::run(
   check_result_info.early_timeout = false;
   check_result_info.exited_ok = true;
   check_result_info.return_code = STATE_OK;
-  check_result_info.output = NULL;
+  check_result_info.output = nullptr;
   check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = NULL;
-  check_result_info.output_file = NULL;
+  check_result_info.output_file_fp = nullptr;
+  check_result_info.output_file = nullptr;
   check_result_info.host_name = string::dup(hst->get_name());
-  check_result_info.service_description = NULL;
+  check_result_info.service_description = nullptr;
   check_result_info.latency = latency;
-  check_result_info.next = NULL;
+  check_result_info.next = nullptr;
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
@@ -427,17 +426,17 @@ void checker::run(
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     hst->get_latency(),
     0.0,
     config->host_check_timeout(),
     false,
     0,
     processed_cmd_ptr,
-    NULL,
-    NULL,
-    NULL,
-    NULL);
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr);
 
   delete[] processed_cmd_ptr;
 
@@ -531,21 +530,20 @@ void checker::run(
            << "Attempt to run check on service with invalid host");
   if (!svc->check_command_ptr)
     throw (engine_error() << "Attempt to run active check on service '"
-           << svc->description << "' on host '" << svc->host_ptr->get_name()
+           << svc->get_description() << "' on host '" << svc->host_ptr->get_name()
            << "' with no check command");
 
   logger(dbg_checks, basic)
-    << "** Running async check of service '" << svc->description
-    << "' on host '" << svc->host_name << "'...";
+    << "** Running async check of service '" << svc->get_description()
+    << "' on host '" << svc->get_hostname() << "'...";
 
   // Check if the service is viable now.
-  if (check_service_check_viability(
-        svc,
+  if (svc->verify_check_viability(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
     throw (checks_viability_failure() << "Check of service '"
-           << svc->description << "' on host '" << svc->host_name
+           << svc->get_description() << "' on host '" << svc->get_hostname()
            << "' is not viable");
 
   // Send broker event.
@@ -561,38 +559,38 @@ void checker::run(
             SERVICE_CHECK_ACTIVE,
             start_time,
             end_time,
-            svc->service_check_command,
+            svc->get_check_command().c_str(),
             svc->latency,
             0.0,
             0,
             false,
             0,
-            NULL,
-            NULL));
+            nullptr,
+            nullptr));
 
   // Service check was cancel by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
-    if (preferred_time != NULL)
+    if (preferred_time != nullptr)
       *preferred_time += static_cast<time_t>(
-                           svc->check_interval
+                           svc->get_check_interval()
                            * config->interval_length());
     throw (engine_error()
            << "Some broker module cancelled check of service '"
-           << svc->description << "' on host '" << svc->host_name);
+           << svc->get_description() << "' on host '" << svc->get_hostname());
   }
   // Service check was override by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res) {
     logger(dbg_functions, basic)
       << "Some broker module overrode check of service '"
-      << svc->description << "' on host '" << svc->host_name
+      << svc->get_description() << "' on host '" << svc->get_hostname()
       << "' so we'll bail out";
     return ;
   }
 
   // Checking starts.
   logger(dbg_checks, basic)
-    << "Checking service '" << svc->description
-    << "' on host '" << svc->host_name << "'...";
+    << "Checking service '" << svc->get_description()
+    << "' on host '" << svc->get_hostname() << "'...";
 
   // Clear check options.
   if (scheduled_check)
@@ -610,12 +608,12 @@ void checker::run(
   get_raw_command_line_r(
     &macros,
     svc->check_command_ptr,
-    svc->service_check_command,
-    NULL,
+    svc->get_check_command().c_str(),
+    nullptr,
     0);
 
   // Time to start command.
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   // Update the number of running service checks.
   ++currently_running_service_checks;
@@ -635,14 +633,14 @@ void checker::run(
   check_result_info.early_timeout = false;
   check_result_info.exited_ok = true;
   check_result_info.return_code = STATE_OK;
-  check_result_info.output = NULL;
+  check_result_info.output = nullptr;
   check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = NULL;
-  check_result_info.output_file = NULL;
-  check_result_info.host_name = string::dup(svc->host_name);
-  check_result_info.service_description = string::dup(svc->description);
+  check_result_info.output_file_fp = nullptr;
+  check_result_info.output_file = nullptr;
+  check_result_info.host_name = string::dup(svc->get_hostname());
+  check_result_info.service_description = string::dup(svc->get_description());
   check_result_info.latency = latency;
-  check_result_info.next = NULL;
+  check_result_info.next = nullptr;
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
@@ -660,14 +658,14 @@ void checker::run(
           SERVICE_CHECK_ACTIVE,
           start_time,
           end_time,
-          svc->service_check_command,
+          svc->get_check_command().c_str(),
           svc->latency,
           0.0,
           config->service_check_timeout(),
           false,
           0,
           processed_cmd_ptr,
-          NULL);
+          nullptr);
   delete[] processed_cmd_ptr;
 
   // Restore latency.
@@ -762,7 +760,7 @@ void checker::run_sync(
     << "** Run sync check of host '" << hst->get_name() << "'...";
 
   // Check if the host is viable now.
-  if (check_host_check_viability_3x(hst, check_options, NULL, NULL)
+  if (hst->verify_check_viability(check_options, nullptr, nullptr)
       == ERROR) {
     if (check_result_code)
       *check_result_code = hst->get_current_state();
@@ -773,7 +771,7 @@ void checker::run_sync(
 
   // Time to start command.
   timeval start_time;
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   // Can we use the last cached host state?
   if (use_cached_result
@@ -848,17 +846,17 @@ void checker::run_sync(
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     hst->get_latency(),
     0.0,
     config->host_check_timeout(),
     false,
     0,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL);
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr);
 
   // Execute command synchronously.
   int host_result(_execute_sync(hst));
@@ -883,7 +881,7 @@ void checker::run_sync(
     << "* Sync host check done: new state=" << hst->get_current_state();
 
   // Get the end time of command.
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   // Send event broker.
   broker_host_check(
@@ -896,17 +894,17 @@ void checker::run_sync(
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     hst->get_latency(),
     hst->get_execution_time(),
     config->host_check_timeout(),
     false,
     hst->get_current_state(),
-    NULL,
+    nullptr,
     const_cast<char*>(hst->get_plugin_output().c_str()),
     const_cast<char*>(hst->get_long_plugin_output().c_str()),
     const_cast<char*>(hst->get_perf_data().c_str()),
-    NULL);
+    nullptr);
 
   // End.
   return;
@@ -917,7 +915,7 @@ void checker::run_sync(
  */
 void checker::unload() {
   delete _instance;
-  _instance = NULL;
+  _instance = nullptr;
   return;
 }
 
@@ -1016,17 +1014,17 @@ int checker::_execute_sync(host* hst) {
             hst->get_state_type(),
             start_time,
             end_time,
-            hst->get_host_check_command().c_str(),
+            hst->get_check_command().c_str(),
             hst->get_latency(),
             0.0,
             config->host_check_timeout(),
             false,
             0,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL));
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr));
 
   // Host sync check was cancelled or overriden by NEB module.
   if ((NEBERROR_CALLBACKCANCEL == ret)
@@ -1040,12 +1038,12 @@ int checker::_execute_sync(host* hst) {
   get_raw_command_line_r(
     &macros,
     hst->check_command_ptr,
-    hst->get_host_check_command().c_str(),
-    NULL,
+    hst->get_check_command().c_str(),
+    nullptr,
     0);
 
   // Time to start command.
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   // Update last host check.
   hst->set_last_check(start_time.tv_sec);
@@ -1068,7 +1066,7 @@ int checker::_execute_sync(host* hst) {
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     0.0,
     0.0,
     config->host_check_timeout(),
@@ -1078,7 +1076,7 @@ int checker::_execute_sync(host* hst) {
     const_cast<char*>(hst->get_plugin_output().c_str()),
     const_cast<char*>(hst->get_long_plugin_output().c_str()),
     const_cast<char*>(hst->get_perf_data().c_str()),
-    NULL);
+    nullptr);
 
   // Debug messages.
   logger(dbg_commands, more)
@@ -1094,7 +1092,7 @@ int checker::_execute_sync(host* hst) {
   // Send broker event.
   timeval start_cmd;
   timeval end_cmd;
-  gettimeofday(&start_cmd, NULL);
+  gettimeofday(&start_cmd, nullptr);
   memset(&end_cmd, 0, sizeof(end_cmd));
   broker_system_command(
     NEBTYPE_SYSTEM_COMMAND_START,
@@ -1107,8 +1105,8 @@ int checker::_execute_sync(host* hst) {
     false,
     0,
     tmp_processed_cmd,
-    NULL,
-    NULL);
+    nullptr,
+    nullptr);
 
   // Run command.
   commands::result res;
@@ -1162,7 +1160,7 @@ int checker::_execute_sync(host* hst) {
     res.exit_code,
     tmp_processed_cmd,
     output,
-    NULL);
+    nullptr);
 
   // Cleanup.
   delete[] output;
@@ -1210,8 +1208,8 @@ int checker::_execute_sync(host* hst) {
   delete lpl_output_str;
   delete perfdata_output_str;
 
-  // A NULL host check command means we should assume the host is UP.
-  if (hst->get_host_check_command().empty()) {
+  // A nullptr host check command means we should assume the host is UP.
+  if (hst->get_check_command().empty()) {
     hst->set_plugin_output("(Host assumed to be UP)");
     res.exit_code = STATE_OK;
   }
@@ -1237,7 +1235,7 @@ int checker::_execute_sync(host* hst) {
         : HOST_DOWN);
 
   // Get the end time of command.
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   // Send broker event.
   broker_host_check(
@@ -1250,7 +1248,7 @@ int checker::_execute_sync(host* hst) {
     hst->get_state_type(),
     start_time,
     end_time,
-    hst->get_host_check_command().c_str(),
+    hst->get_check_command().c_str(),
     0.0,
     execution_time,
     config->host_check_timeout(),
@@ -1260,7 +1258,7 @@ int checker::_execute_sync(host* hst) {
     const_cast<char *>(hst->get_plugin_output().c_str()),
     const_cast<char *>(hst->get_long_plugin_output().c_str()),
     const_cast<char *>(hst->get_perf_data().c_str()),
-    NULL);
+    nullptr);
   delete[] tmp_processed_cmd;
 
   // Termination.

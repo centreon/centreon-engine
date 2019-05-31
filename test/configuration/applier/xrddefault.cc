@@ -680,7 +680,7 @@ int xrddefault_read_state_information() {
           /* calculate next possible notification time */
           if (temp_host->current_state != HOST_UP
               && temp_host->last_host_notification != (time_t)0)
-            temp_host->next_host_notification = get_next_host_notification_time(temp_host, temp_host->last_host_notification);
+            temp_host->next_host_notification = temp_host->get_next_notification_time(temp_host->last_host_notification);
 
           /* ADDED 01/23/2009 adjust current check attempts if host in hard problem state (max attempts may have changed in config since restart) */
           if (temp_host->current_state != HOST_UP
@@ -748,8 +748,7 @@ int xrddefault_read_state_information() {
           if (temp_service->current_state != STATE_OK
               && temp_service->last_notification != (time_t)0)
             temp_service->next_notification
-              = get_next_service_notification_time(
-                  temp_service,
+              = temp_service->get_next_notification_time(
                   temp_service->last_notification);
 
           /* fix old vars */

@@ -50,7 +50,7 @@ void applier::service::apply(
       std::pair<unsigned int, unsigned int> id(get_host_and_service_id(
             (*it)->host_name().c_str(),
             (*it)->service_description().c_str()));
-      service_struct& svc(find_service(id.first, id.second));
+      engine::service& svc(find_service(id.first, id.second));
       _update(config, **it, svc, scheduling_info_is_ok);
     }
     catch (...) {
@@ -71,7 +71,7 @@ void applier::service::apply(
 void applier::service::_update(
        configuration::state const& config,
        retention::service const& state,
-       service_struct& obj,
+       engine::service& obj,
        bool scheduling_info_is_ok) {
   if (state.modified_attributes().is_set()) {
     obj.modified_attributes = *state.modified_attributes();
@@ -125,8 +125,7 @@ void applier::service::_update(
     if (state.performance_data().is_set())
       string::setstr(obj.perf_data, *state.performance_data());
     if (state.last_acknowledgement().is_set())
-      service_other_props[std::make_pair(obj.host_ptr->get_name(),
-        obj.description)].last_acknowledgement = *state.last_acknowledgement();
+      obj.set_last_acknowledgement(*state.last_acknowledgement());
     if (state.last_check().is_set())
       obj.last_check = *state.last_check();
     if (state.next_check().is_set()
@@ -146,9 +145,9 @@ void applier::service::_update(
     if (state.current_notification_number().is_set())
       obj.current_notification_number = *state.current_notification_number();
     if (state.current_notification_id().is_set())
-      obj.current_notification_id = *state.current_notification_id();
+      obj.set_current_notification_id(*state.current_notification_id());
     if (state.last_notification().is_set())
-      obj.last_notification = *state.last_notification();
+      obj.set_last_notification(*state.last_notification());
     if (state.percent_state_change().is_set())
       obj.percent_state_change = *state.percent_state_change();
     if (state.check_flapping_recovery_notification().is_set())
@@ -199,7 +198,7 @@ void applier::service::_update(
     if (state.check_command().is_set()
         && (obj.modified_attributes & MODATTR_CHECK_COMMAND)) {
       if (utils::is_command_exist(*state.check_command()))
-        string::setstr(obj.service_check_command, *state.check_command());
+        obj.set_check_command(*state.check_command());
       else
         obj.modified_attributes -= MODATTR_CHECK_COMMAND;
     }
@@ -207,7 +206,7 @@ void applier::service::_update(
     if (state.check_period().is_set()
         && (obj.modified_attributes & MODATTR_CHECK_TIMEPERIOD)) {
       if (is_timeperiod_exist(*state.check_period()))
-        string::setstr(obj.check_period, *state.check_period());
+        obj.set_check_period(*state.check_period());
       else
         obj.modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
     }
@@ -215,7 +214,7 @@ void applier::service::_update(
     if (state.notification_period().is_set()
         && (obj.modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD)) {
       if (is_timeperiod_exist(*state.notification_period()))
-        string::setstr(obj.notification_period, *state.notification_period());
+        obj.set_notification_period(*state.notification_period());
       else
         obj.modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
     }
@@ -230,21 +229,21 @@ void applier::service::_update(
 
     if (state.normal_check_interval().is_set()
         && (obj.modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL))
-      obj.check_interval = *state.normal_check_interval();
+      obj.set_check_interval(*state.normal_check_interval());
 
     if (state.retry_check_interval().is_set()
         && (obj.modified_attributes & MODATTR_RETRY_CHECK_INTERVAL))
-      obj.retry_interval = *state.retry_check_interval();
+      obj.set_retry_interval(*state.retry_check_interval());
 
     if (state.max_attempts().is_set()
         && (obj.modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS)) {
-      obj.max_attempts = *state.max_attempts();
+      obj.set_max_attempts(*state.max_attempts());
 
       // adjust current attempt number if in a hard state.
       if (obj.state_type == HARD_STATE
           && obj.current_state != STATE_OK
           && obj.current_attempt > 1)
-        obj.current_attempt = obj.max_attempts;
+        obj.current_attempt = obj.get_max_attempts();
     }
 
     if (!state.customvariables().empty()
@@ -276,11 +275,9 @@ void applier::service::_update(
   }
 
   // calculate next possible notification time.
-  if (obj.current_state != STATE_OK && obj.last_notification)
-    obj.next_notification
-      = get_next_service_notification_time(
-          &obj,
-          obj.last_notification);
+  if (obj.current_state != STATE_OK && obj.get_last_notification())
+    obj.set_next_notification(
+        obj.get_next_notification_time(obj.get_last_notification()));
 
   // fix old vars.
   if (!obj.has_been_checked && obj.state_type == SOFT_STATE)
@@ -290,7 +287,7 @@ void applier::service::_update(
   // in hard problem state (max attempts may have changed in config
   // since restart).
   if (obj.current_state != STATE_OK && obj.state_type == HARD_STATE)
-    obj.current_attempt = obj.max_attempts;
+    obj.current_attempt = obj.get_max_attempts();
 
 
   // ADDED 02/20/08 assume same flapping state if large
@@ -304,8 +301,7 @@ void applier::service::_update(
     allow_flapstart_notification = !state.is_flapping();
 
     // check for flapping.
-    check_for_service_flapping(
-      &obj,
+    obj.check_for_flapping(
       false,
       allow_flapstart_notification);
 
@@ -321,10 +317,8 @@ void applier::service::_update(
 
   // Handle recovery been sent
   if (state.recovery_been_sent().is_set())
-    service_other_props[std::make_pair(obj.description,
-                                       obj.host_ptr->get_name())].recovery_been_sent
-      = *state.recovery_been_sent();
+    obj.set_recovery_been_sent(*state.recovery_been_sent());
 
   // update service status.
-  update_service_status(&obj, false);
+  obj.update_status(false);
 }

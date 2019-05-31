@@ -21,6 +21,8 @@
 #ifndef CCE_TIMEPERIOD_HH
 #  define CCE_TIMEPERIOD_HH
 
+#include "com/centreon/engine/objects/timeperiod.hh"
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif // C++

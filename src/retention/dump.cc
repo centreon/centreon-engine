@@ -201,7 +201,7 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
     "host_id=" << host_other_props[obj.get_name()].host_id << "\n"
     "acknowledgement_type=" << obj.get_acknowledgement_type() << "\n"
     "active_checks_enabled=" << obj.get_checks_enabled() << "\n"
-    "check_command=" << obj.get_host_check_command() << "\n"
+    "check_command=" << obj.get_check_command() << "\n"
     "check_execution_time=" << std::setprecision(3) << std::fixed << obj.get_execution_time() << "\n"
     "check_flapping_recovery_notification=" << obj.get_check_flapping_recovery_notification() << "\n"
     "check_latency=" << std::setprecision(3) << std::fixed << obj.get_latency() << "\n"
@@ -219,12 +219,12 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
     "flap_detection_enabled=" << obj.get_flap_detection_enabled() << "\n"
     "has_been_checked=" << obj.get_has_been_checked() << "\n"
     "is_flapping=" << obj.get_is_flapping() << "\n"
-    "last_acknowledgement=" << host_other_props[obj.get_name()].last_acknowledgement << "\n"
+    "last_acknowledgement=" << obj.get_last_acknowledgement() << "\n"
     "last_check=" << static_cast<unsigned long>(obj.get_last_check()) << "\n"
     "last_event_id=" << obj.get_last_event_id() << "\n"
     "last_hard_state=" << obj.get_last_hard_state() << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.get_last_hard_state_change()) << "\n"
-    "last_notification=" << static_cast<unsigned long>(obj.get_last_host_notification()) << "\n"
+    "last_notification=" << static_cast<unsigned long>(obj.get_last_notification()) << "\n"
     "last_problem_id=" << obj.get_last_problem_id() << "\n"
     "last_state=" << obj.get_last_state() << "\n"
     "last_state_change=" << static_cast<unsigned long>(obj.get_last_state_change()) << "\n"
@@ -249,7 +249,7 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
     "process_performance_data=" << obj.get_process_performance_data() << "\n"
     "retry_check_interval=" << obj.get_check_interval() << "\n"
     "state_type=" << obj.get_state_type ()<< "\n"
-    "recovery_been_sent=" << host_other_props[obj.get_name()].recovery_been_sent << "\n";
+    "recovery_been_sent=" << obj.get_recovery_been_sent() << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
@@ -384,24 +384,24 @@ bool dump::save(std::string const& path) {
  *
  *  @return The output stream.
  */
-std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
+std::ostream& dump::service(std::ostream& os, class service const& obj) {
   std::string hostname;
   if (obj.host_ptr)
     hostname = obj.host_ptr->get_name();
 
   os << "service {\n"
-    "host_name=" << obj.host_name << "\n"
-    "service_description=" << obj.description << "\n"
-    "host_id=" << service_other_props[std::make_pair(hostname, obj.description)].host_id << "\n"
-    "service_id=" << service_other_props[std::make_pair(hostname, obj.description)].service_id << "\n"
+    "host_name=" << obj.get_hostname() << "\n"
+    "service_description=" << obj.get_description() << "\n"
+    "host_id=" << service_other_props[{hostname, obj.get_description()}].host_id << "\n"
+    "service_id=" << service_other_props[{hostname, obj.get_description()}].service_id << "\n"
     "acknowledgement_type=" << obj.acknowledgement_type << "\n"
     "active_checks_enabled=" << obj.checks_enabled << "\n"
-    "check_command=" << (obj.service_check_command ? obj.service_check_command : "") << "\n"
+    "check_command=" << obj.get_check_command() << "\n"
     "check_execution_time=" << std::setprecision(3) << std::fixed << obj.execution_time << "\n"
     "check_flapping_recovery_notification=" << obj.check_flapping_recovery_notification << "\n"
     "check_latency=" << std::setprecision(3) << std::fixed << obj.latency << "\n"
     "check_options=" << obj.check_options << "\n"
-    "check_period=" << (obj.check_period ? obj.check_period : "") << "\n"
+    "check_period=" << obj.get_check_period() << "\n"
     "check_type=" << obj.check_type << "\n"
     "current_attempt=" << obj.current_attempt << "\n"
     "current_event_id=" << obj.current_event_id << "\n"
@@ -414,12 +414,12 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"
-    "last_acknowledgement=" << service_other_props[std::make_pair(hostname, obj.description)].last_acknowledgement << "\n"
+    "last_acknowledgement=" << obj.get_last_acknowledgement() << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.last_hard_state_change) << "\n"
-    "last_notification=" << static_cast<unsigned long>(obj.last_notification) << "\n"
+    "last_notification=" << static_cast<unsigned long>(obj.get_last_notification()) << "\n"
     "last_problem_id=" << obj.last_problem_id << "\n"
     "last_state=" << obj.last_state << "\n"
     "last_state_change=" << static_cast<unsigned long>(obj.last_state_change) << "\n"
@@ -428,11 +428,11 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "last_time_unknown=" << static_cast<unsigned long>(obj.last_time_unknown) << "\n"
     "last_time_warning=" << static_cast<unsigned long>(obj.last_time_warning) << "\n"
     "long_plugin_output=" << (obj.long_plugin_output ? obj.long_plugin_output : "") << "\n"
-    "max_attempts=" << obj.max_attempts << "\n"
+    "max_attempts=" << obj.get_max_attempts() << "\n"
     "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
-    "normal_check_interval=" << obj.check_interval << "\n"
-    "notification_period=" << (obj.notification_period ? obj.notification_period : "") << "\n"
+    "normal_check_interval=" << obj.get_check_interval() << "\n"
+    "notification_period=" << obj.get_notification_period() << "\n"
     "notifications_enabled=" << obj.notifications_enabled << "\n"
     "notified_on_critical=" << obj.notified_on_critical << "\n"
     "notified_on_unknown=" << obj.notified_on_unknown << "\n"
@@ -444,10 +444,9 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"
     "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
     "process_performance_data=" << obj.process_performance_data << "\n"
-    "retry_check_interval=" << obj.retry_interval << "\n"
+    "retry_check_interval=" << obj.get_retry_interval() << "\n"
     "state_type=" << obj.state_type << "\n"
-    "recovery_been_sent=" << service_other_props[
-                               std::make_pair(hostname, obj.description)].recovery_been_sent << "\n";
+    "recovery_been_sent=" << obj.get_recovery_been_sent() << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
@@ -467,7 +466,7 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
  *  @return The output stream.
  */
 std::ostream& dump::services(std::ostream& os) {
-  for (service_struct* obj(service_list); obj; obj = obj->next)
+  for (class service* obj(service_list); obj; obj = obj->next)
     dump::service(os, *obj);
   return os;
 }

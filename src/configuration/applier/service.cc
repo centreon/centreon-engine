@@ -115,12 +115,12 @@ void applier::service::add_object(
   config->services().insert(obj);
 
   // Create service.
-  service_struct* svc(add_service(
+  engine::service* svc{add_service(
     obj.host_id(), obj.service_id(),
-    obj.hosts().begin()->c_str(),
-    obj.service_description().c_str(),
-    NULL_IF_EMPTY(obj.display_name()),
-    NULL_IF_EMPTY(obj.check_period()),
+    *obj.hosts().begin(),
+    obj.service_description(),
+    obj.display_name(),
+    obj.check_period(),
     obj.initial_state(),
     obj.max_check_attempts(),
     true, // parallelize, enabled by default in Nagios
@@ -129,7 +129,7 @@ void applier::service::add_object(
     obj.retry_interval(),
     obj.notification_interval(),
     obj.first_notification_delay(),
-    NULL_IF_EMPTY(obj.notification_period()),
+    obj.notification_period(),
     static_cast<bool>(obj.notification_options()
                       & configuration::service::ok),
     static_cast<bool>(obj.notification_options()
@@ -174,19 +174,17 @@ void applier::service::add_object(
     obj.freshness_threshold(),
     NULL_IF_EMPTY(obj.notes()),
     NULL_IF_EMPTY(obj.notes_url()),
-    NULL_IF_EMPTY(obj.action_url()),
-    NULL_IF_EMPTY(obj.icon_image()),
-    NULL_IF_EMPTY(obj.icon_image_alt()),
+    obj.action_url(),
+    obj.icon_image(),
+    obj.icon_image_alt(),
     obj.retain_status_information(),
     obj.retain_nonstatus_information(),
-    obj.obsess_over_service()));
+    obj.obsess_over_service())};
   if (!svc)
       throw (engine_error() << "Could not register service '"
              << obj.service_description()
              << "' of host '" << *obj.hosts().begin() << "'");
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].initial_notif_time = 0;
+  svc->set_initial_notif_time(0);
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].timezone = obj.timezone();
@@ -196,19 +194,11 @@ void applier::service::add_object(
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].service_id = obj.service_id();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].acknowledgement_timeout
-    = obj.get_acknowledgement_timeout() * config->interval_length();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].last_acknowledgement = 0;
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].recovery_notification_delay = obj.recovery_notification_delay();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].recovery_been_sent = true;
+  svc->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
+                                   config->interval_length());
+  svc->set_last_acknowledgement(0);
+  svc->set_recovery_notification_delay(obj.recovery_notification_delay());
+  svc->set_recovery_been_sent(true);
 
   // Add contacts.
   for (set_string::const_iterator
@@ -361,13 +351,13 @@ void applier::service::modify_object(
 
   // Find service object.
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service_struct> >::iterator
+       std::shared_ptr<engine::service> >::iterator
     it_obj(applier::state::instance().services_find(obj.key()));
   if (it_obj == applier::state::instance().services().end())
     throw (engine_error() << "Could not modify non-existing "
            << "service object '" << service_description
            << "' of host '" << host_name << "'");
-  service_struct* s(it_obj->second.get());
+  engine::service* s(it_obj->second.get());
 
   // Update the global configuration set.
   configuration::service obj_old(*it_cfg);
@@ -375,33 +365,19 @@ void applier::service::modify_object(
   config->services().insert(obj);
 
   // Modify properties.
-  modify_if_different(
-    s->description,
-    NULL_IF_EMPTY(obj.service_description()));
-  modify_if_different(
-    s->display_name,
-    NULL_IF_EMPTY(obj.display_name()));
-  modify_if_different(
-    s->service_check_command,
-    NULL_IF_EMPTY(obj.check_command()));
+  s->set_description(obj.service_description());
+  s->set_display_name(obj.display_name()),
+  s->set_check_command(obj.check_command());
   modify_if_different(
     s->event_handler,
     NULL_IF_EMPTY(obj.event_handler()));
   modify_if_different(
     s->event_handler_enabled,
     static_cast<int>(obj.event_handler_enabled()));
-  modify_if_different(
-    s->initial_state,
-    static_cast<int>(obj.initial_state()));
-  modify_if_different(
-    s->check_interval,
-    static_cast<double>(obj.check_interval()));
-  modify_if_different(
-    s->retry_interval,
-    static_cast<double>(obj.retry_interval()));
-  modify_if_different(
-    s->max_attempts,
-    static_cast<int>(obj.max_check_attempts()));
+  s->set_initial_state(obj.initial_state());
+  s->set_check_interval(obj.check_interval());
+  s->set_retry_interval(obj.retry_interval());
+  s->set_max_attempts(obj.max_check_attempts());
   modify_if_different(
     s->notification_interval,
     static_cast<double>(obj.notification_interval()));
@@ -448,12 +424,8 @@ void applier::service::modify_object(
     s->stalk_on_critical,
     static_cast<int>(static_cast<bool>(
       obj.stalking_options() & configuration::service::critical)));
-  modify_if_different(
-    s->notification_period,
-    NULL_IF_EMPTY(obj.notification_period()));
-  modify_if_different(
-    s->check_period,
-    NULL_IF_EMPTY(obj.check_period()));
+  s->set_notification_period(obj.notification_period());
+  s->set_check_period(obj.check_period());
   modify_if_different(
     s->flap_detection_enabled,
     static_cast<int>(obj.flap_detection_enabled()));
@@ -511,11 +483,9 @@ void applier::service::modify_object(
     static_cast<int>(obj.obsess_over_service()));
   modify_if_different(s->notes, NULL_IF_EMPTY(obj.notes()));
   modify_if_different(s->notes_url, NULL_IF_EMPTY(obj.notes_url()));
-  modify_if_different(s->action_url, NULL_IF_EMPTY(obj.action_url()));
-  modify_if_different(s->icon_image, NULL_IF_EMPTY(obj.icon_image()));
-  modify_if_different(
-    s->icon_image_alt,
-    NULL_IF_EMPTY(obj.icon_image_alt()));
+  s->set_action_url(obj.action_url());
+  s->set_icon_image(obj.icon_image());
+  s->set_icon_image_alt(obj.icon_image_alt());
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj.is_volatile()));
@@ -528,14 +498,9 @@ void applier::service::modify_object(
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].service_id = obj.service_id();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].acknowledgement_timeout
-    = obj.get_acknowledgement_timeout() * config->interval_length();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].recovery_notification_delay
-    = obj.recovery_notification_delay();
+  s->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
+                                   config->interval_length());
+  s->set_recovery_notification_delay(obj.recovery_notification_delay());
 
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
@@ -603,10 +568,10 @@ void applier::service::remove_object(
   std::pair<std::string, std::string>
     id(std::make_pair(host_name, service_description));
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service_struct> >::iterator
+       std::shared_ptr<engine::service> >::iterator
     it(applier::state::instance().services_find(obj.key()));
   if (it != applier::state::instance().services().end()) {
-    service_struct* svc(it->second.get());
+    engine::service* svc(it->second.get());
 
     // Remove service comments.
     comment::delete_service_comments(host_name, service_description);
@@ -622,11 +587,9 @@ void applier::service::remove_object(
     applier::scheduler::instance().remove_service(obj);
 
     // Unregister service.
-    for (service_struct** s(&service_list); *s; s = &(*s)->next)
-      if (!strcmp((*s)->host_name, host_name.c_str())
-          && !strcmp(
-                (*s)->description,
-                service_description.c_str())) {
+    for (engine::service** s(&service_list); *s; s = &(*s)->next)
+      if ((*s)->get_hostname() == host_name
+          && (*s)->get_description() == service_description) {
         *s = (*s)->next;
         break ;
       }
@@ -670,7 +633,7 @@ void applier::service::resolve_object(
 
   // Find service.
   umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<service_struct> >::iterator
+       std::shared_ptr<engine::service> >::iterator
     it(applier::state::instance().services_find(obj.key()));
   if (applier::state::instance().services().end() == it)
     throw (engine_error() << "Cannot resolve non-existing service '"
@@ -690,7 +653,7 @@ void applier::service::resolve_object(
     hst->second->set_total_services(hst->second->get_total_services() + 1);
     hst->second->set_total_service_check_interval(
       hst->second->get_total_service_check_interval() +
-      static_cast<unsigned long>(it->second->check_interval));
+      static_cast<unsigned long>(it->second->get_check_interval()));
   }
 
   // Resolve service.
