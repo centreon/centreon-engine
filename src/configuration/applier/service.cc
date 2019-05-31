@@ -124,7 +124,6 @@ void applier::service::add_object(
     obj.check_period(),
     obj.initial_state(),
     obj.max_check_attempts(),
-    true, // parallelize, enabled by default in Nagios
     obj.checks_passive(),
     obj.check_interval(),
     obj.retry_interval(),

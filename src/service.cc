@@ -128,7 +128,6 @@ bool operator==(com::centreon::engine::service const& obj1,
          obj1.get_check_interval() == obj2.get_check_interval() &&
          obj1.get_retry_interval() == obj2.get_retry_interval() &&
          obj1.get_max_attempts() == obj2.get_max_attempts() &&
-         obj1.parallelize == obj2.parallelize &&
          ((obj1.contact_groups.size() == obj2.contact_groups.size()) &&
           std::equal(obj1.contact_groups.begin(), obj1.contact_groups.end(),
                      obj2.contact_groups.begin())) &&
@@ -316,9 +315,6 @@ std::ostream& operator<<(std::ostream& os,
      << "\n"
         "  max_attempts:                         "
      << obj.get_max_attempts()
-     << "\n"
-        "  parallelize:                          "
-     << obj.parallelize
      << "\n"
         "  contact_groups:                       "
      << cg_oss
@@ -624,8 +620,6 @@ std::ostream& operator<<(std::ostream& os,
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
- *  @param[in] parallelize                  Can active checks be
- *                                          parallelized ?
  *  @param[in] accept_passive_checks        Does this service accept
  *                                          check result submission ?
  *  @param[in] check_interval               Normal check interval.
@@ -698,7 +692,6 @@ com::centreon::engine::service* add_service(
     std::string const& check_period,
     int initial_state,
     int max_attempts,
-    bool parallelize,
     int accept_passive_checks,
     double check_interval,
     double retry_interval,
@@ -831,7 +824,6 @@ com::centreon::engine::service* add_service(
     obj->notify_on_unknown = (notify_unknown > 0);
     obj->notify_on_warning = (notify_warning > 0);
     obj->obsess_over_service = (obsess_over_service > 0);
-    obj->parallelize = (parallelize > 0);
     obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);

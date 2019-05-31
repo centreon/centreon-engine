@@ -123,7 +123,6 @@ class                           service : public notifier {
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
 
-  bool                          parallelize;
   contactgroup_map              contact_groups;
   contact_map                   contacts;
   double                        notification_interval;
@@ -238,7 +237,6 @@ com::centreon::engine::service* add_service(
            std::string const& check_period,
            int initial_state,
            int max_attempts,
-           bool parallelize,
            int accept_passive_checks,
            double check_interval,
            double retry_interval,

@@ -70,7 +70,6 @@ service::setters const service::_setters[] = {
   { "recovery_notification_delay",  SETTER(unsigned int, _set_recovery_notification_delay) },
   { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
   { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
-  { "parallelize_check",            SETTER(bool, _set_parallelize_check) },
   { "is_volatile",                  SETTER(bool, _set_is_volatile) },
   { "obsess_over_service",          SETTER(bool, _set_obsess_over_service) },
   { "event_handler_enabled",        SETTER(bool, _set_event_handler_enabled) },
@@ -1548,21 +1547,6 @@ bool service::_set_notification_period(std::string const& value) {
  */
 bool service::_set_obsess_over_service(bool value) {
   _obsess_over_service = value;
-  return true;
-}
-
-/**
- *  Set parallelize_check value.
- *
- *  @param[in] value The new parallelize_check value.
- *
- *  @return True on success, otherwise false.
- */
-bool service::_set_parallelize_check(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: service parallelize_check was ignored";
-  ++config_warnings;
   return true;
 }
 
