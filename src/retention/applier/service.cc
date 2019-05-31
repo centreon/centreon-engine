@@ -119,11 +119,11 @@ void applier::service::_update(
     if (state.last_time_critical().is_set())
       obj.last_time_critical = *state.last_time_critical();
     if (state.plugin_output().is_set())
-      string::setstr(obj.plugin_output, *state.plugin_output());
+      obj.set_plugin_output(*state.plugin_output());
     if (state.long_plugin_output().is_set())
-      string::setstr(obj.long_plugin_output, *state.long_plugin_output());
+      obj.set_long_plugin_output(*state.long_plugin_output());
     if (state.performance_data().is_set())
-      string::setstr(obj.perf_data, *state.performance_data());
+      obj.set_perf_data(*state.performance_data());
     if (state.last_acknowledgement().is_set())
       obj.set_last_acknowledgement(*state.last_acknowledgement());
     if (state.last_check().is_set())
@@ -226,7 +226,7 @@ void applier::service::_update(
     if (state.event_handler().is_set()
         && (obj.modified_attributes & MODATTR_EVENT_HANDLER_COMMAND)) {
       if (utils::is_command_exist(*state.event_handler()))
-        string::setstr(obj.event_handler, *state.event_handler());
+        obj.set_event_handler(*state.event_handler());
       else
         obj.modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
     }

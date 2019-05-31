@@ -704,10 +704,10 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   add_service_link_to_host(svc->host_ptr, svc);
 
   /* check the event handler command */
-  if (svc->event_handler != nullptr) {
+  if (!svc->get_event_handler().empty()) {
 
     /* check the event handler command */
-    char* buf = string::dup(svc->event_handler);
+    char* buf = string::dup(svc->get_event_handler());
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");

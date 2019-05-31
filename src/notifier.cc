@@ -60,6 +60,9 @@ notifier::notifier(int notification_type,
                    int max_attempts,
                    std::string const& notification_period,
                    std::string const& check_period,
+                   std::string const& event_handler,
+                   std::string const& notes,
+                   std::string const& notes_url,
                    std::string const& action_url,
                    std::string const& icon_image,
                    std::string const& icon_image_alt)
@@ -72,6 +75,10 @@ notifier::notifier(int notification_type,
       _max_attempts{max_attempts},
       _notification_period{notification_period},
       _check_period{check_period},
+      _event_handler{event_handler},
+      _notes{notes},
+      _notes_url{notes_url},
+      _action_url{action_url},
       _icon_image{icon_image},
       _icon_image_alt{icon_image_alt} {
   if (check_interval < 0) {
@@ -570,4 +577,52 @@ std::string const& notifier::get_icon_image_alt() const {
 
 void notifier::set_icon_image_alt(std::string const& icon_image_alt) {
   _icon_image_alt = icon_image_alt;
+}
+
+std::string const& notifier::get_event_handler() const {
+  return _event_handler;
+}
+
+void notifier::set_event_handler(std::string const& event_handler) {
+  _event_handler = event_handler;
+}
+
+std::string const& notifier::get_notes() const {
+  return _notes;
+}
+
+void notifier::set_notes(std::string const& notes) {
+  _notes = notes;
+}
+
+std::string const& notifier::get_notes_url() const {
+  return _notes_url;
+}
+
+void notifier::set_notes_url(std::string const& notes_url) {
+  _notes_url = notes_url;
+}
+
+std::string const& notifier::get_plugin_output() const {
+  return _plugin_output;
+}
+
+void notifier::set_plugin_output(std::string const& plugin_output) {
+  _plugin_output = plugin_output;
+}
+
+std::string const& notifier::get_long_plugin_output() const {
+  return _long_plugin_output;
+}
+
+void notifier::set_long_plugin_output(std::string const& long_plugin_output) {
+  _long_plugin_output = long_plugin_output;
+}
+
+std::string const& notifier::get_perf_data() const {
+  return _perf_data;
+}
+
+void notifier::set_perf_data(std::string const& perf_data) {
+  _perf_data = perf_data;
 }

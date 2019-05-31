@@ -56,7 +56,6 @@ service::setters const service::_setters[] = {
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
-  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "notes",                        SETTER(std::string const&, _set_notes) },
   { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
   { "action_url",                   SETTER(std::string const&, _set_action_url) },
@@ -87,7 +86,6 @@ service::setters const service::_setters[] = {
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
-  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
   { "timezone",                     SETTER(std::string const&, _set_timezone) }
@@ -1247,36 +1245,6 @@ bool service::_set_event_handler(std::string const& value) {
  */
 bool service::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
-  return true;
-}
-
-/**
- *  Set failure_prediction_enabled value.
- *
- *  @param[in] value The new failure_prediction_enabled value.
- *
- *  @return True on success, otherwise false.
- */
-bool service::_set_failure_prediction_enabled(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: service failure_prediction_enabled was ignored";
-  ++config_warnings;
-  return true;
-}
-
-/**
- *  Set failure_prediction_options value.
- *
- *  @param[in] value The new failure_prediction_options value.
- *
- *  @return True on success, otherwise false.
- */
-bool service::_set_failure_prediction_options(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: service failure_prediction_options was ignored";
-  ++config_warnings;
   return true;
 }
 

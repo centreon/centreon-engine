@@ -156,8 +156,6 @@ class                 host : public notifier {
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  std::string const& get_event_handler() const;
-  void               set_event_handler(std::string const& event_handler);
   double             get_first_notification_delay(void) const;
   void               set_first_notification_delay(double notification_delay);
   int                get_notify_on_down() const;
@@ -206,14 +204,8 @@ class                 host : public notifier {
   void               set_retain_nonstatus_information(int retain_nonstatus_information);
   bool               get_failure_prediction_enabled() const;
   void               set_failure_prediction_enabled(bool failure_prediction_enabled);
-  std::string const& get_failure_prediction_options() const;
-  void               set_failure_prediction_options(std::string const& failure);
   int                get_obsess_over_host() const;
   void               set_obsess_over_host(int obsess_over_host);
-  std::string const& get_notes() const;
-  void               set_notes(std::string const& notes);
-  std::string const& get_notes_url() const;
-  void               set_notes_url(std::string const& notes_url);
   std::string const& get_vrml_image() const;
   void               set_vrml_image(std::string const& image);
   std::string const& get_statusmap_image() const;
@@ -244,12 +236,6 @@ class                 host : public notifier {
   void               set_last_state(int last_state);
   int                get_last_hard_state() const;
   void               set_last_hard_state(int last_hard_state);
-  std::string const& get_plugin_output() const;
-  void               set_plugin_output(std::string const& plugin_output);
-  std::string const& get_long_plugin_output() const;
-  void               set_long_plugin_output(std::string const& long_plugin_output);
-  std::string const& get_perf_data() const;
-  void               set_perf_data(std::string const& perf_data);
   int                get_state_type() const;
   void               set_state_type(int state_type);
   int                get_current_attempt() const;
@@ -365,7 +351,6 @@ private:
   std::string         _name;
   std::string         _alias;
   std::string         _address;
-  std::string         _event_handler;
   double              _first_notification_delay;
   int                 _notify_on_down;
   int                 _notify_on_unreachable;
@@ -390,12 +375,7 @@ private:
   int                 _retain_status_information;
   int                 _retain_nonstatus_information;
   bool                _failure_prediction_enabled;
-  std::string         _failure_prediction_options;
   int                 _obsess_over_host;
-  std::string         _notes;
-  std::string         _notes_url;
-  std::string         _icon_image;
-  std::string         _icon_image_alt;
   std::string         _vrml_image;
   std::string         _statusmap_image;
   bool                _have_2d_coords;
@@ -411,9 +391,6 @@ private:
   int                 _check_type;
   int                 _last_state;
   int                 _last_hard_state;
-  std::string         _plugin_output;
-  std::string         _long_plugin_output;
-  std::string         _perf_data;
   int                 _state_type;
   int                 _current_attempt;
   unsigned long       _current_event_id;

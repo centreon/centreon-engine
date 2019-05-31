@@ -69,13 +69,27 @@ service::service(std::string const& hostname,
                  int max_attempts,
                  std::string const& notification_period,
                  std::string const& check_period,
+                 std::string const& event_handler,
+                 std::string const& notes,
+                 std::string const& notes_url,
                  std::string const& action_url,
                  std::string const& icon_image,
                  std::string const& icon_image_alt)
-    : notifier{SERVICE_NOTIFICATION, display_name,        check_command,
-               initial_state,        check_interval,      retry_interval,
-               max_attempts,         notification_period, check_period,
-               action_url,           icon_image,          icon_image_alt},
+    : notifier{SERVICE_NOTIFICATION,
+               display_name,
+               check_command,
+               initial_state,
+               check_interval,
+               retry_interval,
+               max_attempts,
+               notification_period,
+               check_period,
+               event_handler,
+               notes,
+               notes_url,
+               action_url,
+               icon_image,
+               icon_image_alt},
       _hostname{hostname},
       _description{description} {}
 
@@ -83,20 +97,6 @@ service::~service() {
   this->contact_groups.clear();
   deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
 
-  delete[] this->event_handler;
-  this->event_handler = nullptr;
-  delete[] this->failure_prediction_options;
-  this->failure_prediction_options = nullptr;
-  delete[] this->notes;
-  this->notes = nullptr;
-  delete[] this->notes_url;
-  this->notes_url = nullptr;
-  delete[] this->plugin_output;
-  this->plugin_output = nullptr;
-  delete[] this->long_plugin_output;
-  this->long_plugin_output = nullptr;
-  delete[] this->perf_data;
-  this->perf_data = nullptr;
   delete[] this->event_handler_args;
   this->event_handler_args = nullptr;
   delete[] this->check_command_args;
@@ -117,7 +117,7 @@ bool operator==(com::centreon::engine::service const& obj1,
          obj1.get_description() == obj2.get_description() &&
          obj1.get_display_name() == obj2.get_display_name() &&
          obj1.get_check_command() == obj2.get_check_command() &&
-         is_equal(obj1.event_handler, obj2.event_handler) &&
+         obj1.get_event_handler() == obj2.get_event_handler() &&
          obj1.get_initial_state() == obj2.get_initial_state() &&
          obj1.get_check_interval() == obj2.get_check_interval() &&
          obj1.get_retry_interval() == obj2.get_retry_interval() &&
@@ -163,8 +163,8 @@ bool operator==(com::centreon::engine::service const& obj1,
              obj2.retain_nonstatus_information &&
          obj1.notifications_enabled == obj2.notifications_enabled &&
          obj1.obsess_over_service == obj2.obsess_over_service &&
-         is_equal(obj1.notes, obj2.notes) &&
-         is_equal(obj1.notes_url, obj2.notes_url) &&
+         obj1.get_notes() == obj2.get_notes() &&
+         obj1.get_notes_url() == obj2.get_notes_url() &&
          obj1.get_action_url() == obj2.get_action_url() &&
          obj1.get_icon_image() == obj2.get_icon_image() &&
          obj1.get_icon_image_alt() == obj2.get_icon_image_alt() &&
@@ -177,9 +177,9 @@ bool operator==(com::centreon::engine::service const& obj1,
          obj1.current_state == obj2.current_state &&
          obj1.last_state == obj2.last_state &&
          obj1.last_hard_state == obj2.last_hard_state &&
-         is_equal(obj1.plugin_output, obj2.plugin_output) &&
-         is_equal(obj1.long_plugin_output, obj2.long_plugin_output) &&
-         is_equal(obj1.perf_data, obj2.perf_data) &&
+         obj1.get_plugin_output() == obj2.get_plugin_output() &&
+         obj1.get_long_plugin_output() == obj2.get_long_plugin_output() &&
+         obj1.get_perf_data() == obj2.get_perf_data() &&
          obj1.state_type == obj2.state_type &&
          obj1.next_check == obj2.next_check &&
          obj1.should_be_scheduled == obj2.should_be_scheduled &&
@@ -297,7 +297,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_check_command()
      << "\n"
         "  event_handler:                        "
-     << chkstr(obj.event_handler)
+     << obj.get_event_handler()
      << "\n"
         "  initial_state:                        "
      << obj.get_initial_state()
@@ -417,10 +417,10 @@ std::ostream& operator<<(std::ostream& os,
      << obj.obsess_over_service
      << "\n"
         "  notes:                                "
-     << chkstr(obj.notes)
+     << obj.get_notes()
      << "\n"
         "  notes_url:                            "
-     << chkstr(obj.notes_url)
+     << obj.get_notes_url()
      << "\n"
         "  action_url:                           "
      << obj.get_action_url()
@@ -453,13 +453,13 @@ std::ostream& operator<<(std::ostream& os,
      << obj.last_hard_state
      << "\n"
         "  plugin_output:                        "
-     << chkstr(obj.plugin_output)
+     << obj.get_plugin_output()
      << "\n"
         "  long_plugin_output:                   "
-     << chkstr(obj.long_plugin_output)
+     << obj.get_long_plugin_output()
      << "\n"
         "  perf_data:                            "
-     << chkstr(obj.perf_data)
+     << obj.get_perf_data()
      << "\n"
         "  state_type:                           "
      << obj.state_type
@@ -667,8 +667,6 @@ std::ostream& operator<<(std::ostream& os,
  *  @param[in] process_perfdata             Whether or not service
  *                                          performance data should be
  *                                          processed.
- *  @param[in] failure_prediction_enabled   Deprecated.
- *  @param[in] failure_prediction_options   Deprecated.
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
  *  @param[in] notes                        Notes.
@@ -694,51 +692,47 @@ com::centreon::engine::service* add_service(
     std::string const& check_period,
     int initial_state,
     int max_attempts,
-    int parallelize,
+    bool parallelize,
     int accept_passive_checks,
     double check_interval,
     double retry_interval,
     double notification_interval,
     double first_notification_delay,
     std::string const& notification_period,
-    int notify_recovery,
-    int notify_unknown,
-    int notify_warning,
-    int notify_critical,
-    int notify_flapping,
-    int notify_downtime,
-    int notifications_enabled,
-    int is_volatile,
-    char const* event_handler,
-    int event_handler_enabled,
-    char const* check_command,
-    int checks_enabled,
-    int flap_detection_enabled,
+    bool notify_recovery,
+    bool notify_unknown,
+    bool notify_warning,
+    bool notify_critical,
+    bool notify_flapping,
+    bool notify_downtime,
+    bool notifications_enabled,
+    bool is_volatile,
+    std::string const& event_handler,
+    bool event_handler_enabled,
+    std::string const& check_command,
+    bool checks_enabled,
+    bool flap_detection_enabled,
     double low_flap_threshold,
     double high_flap_threshold,
-    int flap_detection_on_ok,
-    int flap_detection_on_warning,
-    int flap_detection_on_unknown,
-    int flap_detection_on_critical,
-    int stalk_on_ok,
-    int stalk_on_warning,
-    int stalk_on_unknown,
-    int stalk_on_critical,
+    bool flap_detection_on_ok,
+    bool flap_detection_on_warning,
+    bool flap_detection_on_unknown,
+    bool flap_detection_on_critical,
+    bool stalk_on_ok,
+    bool stalk_on_warning,
+    bool stalk_on_unknown,
+    bool stalk_on_critical,
     int process_perfdata,
-    int failure_prediction_enabled,
-    char const* failure_prediction_options,
     int check_freshness,
     int freshness_threshold,
-    char const* notes,
-    char const* notes_url,
+    std::string const& notes,
+    std::string const& notes_url,
     std::string const& action_url,
     std::string const& icon_image,
     std::string const& icon_image_alt,
     int retain_status_information,
     int retain_nonstatus_information,
     int obsess_over_service) {
-  (void)failure_prediction_enabled;
-  (void)failure_prediction_options;
 
   // Make sure we have everything we need.
   if (!service_id) {
@@ -753,7 +747,7 @@ com::centreon::engine::service* add_service(
     logger(log_config_error, basic)
         << "Error: Host name of service '" << description << "' is not set";
     return nullptr;
-  } else if (!check_command || !check_command[0]) {
+  } else if (check_command.empty()) {
     logger(log_config_error, basic)
         << "Error: Check command of service '" << description << "' on host '"
         << host_name << "' is not set";
@@ -798,18 +792,10 @@ com::centreon::engine::service* add_service(
   std::shared_ptr<service> obj{new service(
       host_name, description, display_name.empty() ? description : display_name,
       check_command, initial_state, check_interval, retry_interval,
-      max_attempts, notification_period, check_period, action_url, icon_image,
-      icon_image_alt)};
+      max_attempts, notification_period, check_period, event_handler,
+      notes, notes_url, action_url, icon_image, icon_image_alt)};
 
   try {
-    // Duplicate vars.
-    if (event_handler)
-      obj->event_handler = string::dup(event_handler);
-    if (notes)
-      obj->notes = string::dup(notes);
-    if (notes_url)
-      obj->notes_url = string::dup(notes_url);
-
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_freshness = (check_freshness > 0);
@@ -897,7 +883,7 @@ int is_contact_for_service(com::centreon::engine::service* svc,
        end(svc->contacts.end());
        it != end; ++it)
     if (it->second.get() == cntct)
-      return (true);
+      return true;
 
   // Search all contactgroups of this service.
   for (contactgroup_map::iterator it(svc->contact_groups.begin()),
@@ -941,7 +927,7 @@ int is_escalated_contact_for_service(com::centreon::engine::service* svc,
          end(svcescalation->contacts.end());
          it != end; ++it)
       if (it->second.get() == cntct)
-        return (true);
+        return true;
 
     // Search all contactgroups of this service escalation.
     for (contactgroup_map::iterator it(svcescalation->contact_groups.begin()),
@@ -1106,7 +1092,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   int route_result = HOST_UP;
   time_t current_time = 0L;
   int state_was_logged = false;
-  char* old_plugin_output = nullptr;
+  std::string old_plugin_output;
   char* temp_ptr = nullptr;
   objectlist* check_servicelist = nullptr;
   objectlist* servicelist_item = nullptr;
@@ -1230,16 +1216,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   this->last_state = this->current_state;
 
   /* save old plugin output */
-  if (this->plugin_output)
-    old_plugin_output = this->plugin_output;
-
-  /* clear the old plugin output and perf data buffers */
-  delete[] this->long_plugin_output;
-  delete[] this->perf_data;
-
-  this->plugin_output = nullptr;
-  this->long_plugin_output = nullptr;
-  this->perf_data = nullptr;
+  old_plugin_output = get_plugin_output();
 
   /*
    * if there was some error running the command, just skip it (this
@@ -1250,7 +1227,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         << "Warning:  Check of service '" << this->get_description()
         << "' on host '" << this->get_hostname() << "' did not exit properly!";
 
-    this->plugin_output = string::dup("(Service check did not exit properly)");
+    set_plugin_output("(Service check did not exit properly)");
     this->current_state = STATE_UNKNOWN;
   }
 
@@ -1278,7 +1255,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                        : ""))
         << ')';
 
-    string::setstr(this->plugin_output, oss.str());
+    set_plugin_output(oss.str());
     this->current_state = STATE_UNKNOWN;
   }
 
@@ -1288,32 +1265,37 @@ int service::handle_async_check_result(check_result* queued_check_result) {
      * parse check output to get: (1) short output, (2) long output,
      * (3) perf data
      */
-    parse_check_output(queued_check_result->output, &this->plugin_output,
-                       &this->long_plugin_output, &this->perf_data, true, true);
+    std::string output{queued_check_result->output};
+    std::string plugin_output;
+    std::string long_plugin_output;
+    std::string perf_data;
+    parse_check_output(output, plugin_output,
+                       long_plugin_output, perf_data, true, true);
 
+    set_long_plugin_output(long_plugin_output);
+    set_perf_data(perf_data);
     /* make sure the plugin output isn't null */
-    if (this->plugin_output == nullptr)
-      this->plugin_output = string::dup("(No output returned from plugin)");
+    if (plugin_output.empty())
+      set_plugin_output("(No output returned from plugin)");
+    else {
+      std::replace(plugin_output.begin(), plugin_output.end(), ';', ':');
 
-    /*
-     * replace semicolons in plugin output (but not performance data) with
-     * colons
-     */
-    else if ((temp_ptr = this->plugin_output)) {
-      while ((temp_ptr = strchr(temp_ptr, ';')))
-        *temp_ptr = ':';
+      /*
+       * replace semicolons in plugin output (but not performance data) with
+       * colons
+       */
+      set_plugin_output(plugin_output);
     }
 
     logger(dbg_checks, most)
         << "Parsing check output...\n"
         << "Short Output:\n"
-        << (this->plugin_output == nullptr ? "nullptr" : this->plugin_output) << "\n"
+        << (get_plugin_output().empty() ? "NULL" : this->get_plugin_output()) << "\n"
         << "Long Output:\n"
-        << (this->long_plugin_output == nullptr ? "nullptr"
-                                             : this->long_plugin_output)
+        << (get_long_plugin_output().empty() ? "NULL" : get_long_plugin_output())
         << "\n"
         << "Perf Data:\n"
-        << (this->perf_data == nullptr ? "nullptr" : this->perf_data);
+        << (get_perf_data().empty() ? "NULL" : get_perf_data());
 
     /* grab the return code */
     this->current_state = queued_check_result->return_code;
@@ -1350,7 +1332,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       logger(log_passive_check, basic)
           << "PASSIVE SERVICE CHECK: " << this->get_hostname() << ";"
           << this->get_description() << ";" << this->current_state << ";"
-          << this->plugin_output;
+          << get_plugin_output();
   }
 
   /* get the host that this service runs on */
@@ -2001,7 +1983,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* if we're stalking this state type and state was not already logged AND the
    * plugin output changed since last check, log it now.. */
   if (this->state_type == HARD_STATE && !state_change && !state_was_logged &&
-      compare_strings(old_plugin_output, this->plugin_output)) {
+      old_plugin_output == get_plugin_output()) {
     if ((this->current_state == STATE_OK && this->stalk_on_ok))
       log_event();
 
@@ -2041,9 +2023,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /* update service performance info */
   update_service_performance_data();
-
-  /* free allocated memory */
-  delete[] old_plugin_output;
 
   /* run async checks of all services we added above */
   /* don't run a check if one is already executing or we can get by with a
@@ -2095,12 +2074,11 @@ int service::log_event() {
     state = tab_service_states[this->current_state].second.c_str();
   }
   std::string const& state_type{tab_state_type[this->state_type]};
-  char const* output(this->plugin_output ? this->plugin_output : "");
 
   logger(log_options, basic)
-      << "SERVICE ALERT: " << this->get_hostname() << ";"
-      << this->get_description() << ";" << state << ";" << state_type << ";"
-      << this->current_attempt << ";" << output;
+      << "SERVICE ALERT: " << get_hostname() << ";"
+      << get_description() << ";" << state << ";" << state_type << ";"
+      << this->current_attempt << ";" << get_plugin_output();
   return OK;
 }
 
@@ -2259,13 +2237,13 @@ int service::handle_service_event() {
 
   /* bail out if we shouldn't be running event handlers */
   if (config->enable_event_handlers() == false)
-    return (OK);
+    return OK;
   if (this->event_handler_enabled == false)
-    return (OK);
+    return OK;
 
   /* find the host */
   if ((temp_host = (com::centreon::engine::host*)this->host_ptr) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* update service macros */
   memset(&mac, 0, sizeof(mac));
@@ -2276,7 +2254,7 @@ int service::handle_service_event() {
   run_global_service_event_handler(&mac, this);
 
   /* run the event handler command if there is one */
-  if (this->event_handler != nullptr)
+  if (!get_event_handler().empty())
     run_service_event_handler(&mac, this);
   clear_volatile_macros_r(&mac);
 
@@ -2284,7 +2262,7 @@ int service::handle_service_event() {
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK, NEBFLAG_NONE,
                           NEBATTR_NONE, CMD_NONE, time(nullptr), nullptr, nullptr, nullptr);
 
-  return (OK);
+  return OK;
 }
 
 /* handles service check results in an obsessive compulsive manner... */
@@ -2302,17 +2280,17 @@ int service::obsessive_compulsive_service_check_processor() {
 
   /* bail out if we shouldn't be obsessing */
   if (config->obsess_over_services() == false)
-    return (OK);
+    return OK;
   if (this->obsess_over_service == false)
-    return (OK);
+    return OK;
 
   /* if there is no valid command, exit */
   if (config->ocsp_command().empty())
-    return (ERROR);
+    return ERROR;
 
   /* find the associated host */
   if ((temp_host = (com::centreon::engine::host*)this->host_ptr) == nullptr)
-    return (ERROR);
+    return ERROR;
 
   /* update service macros */
   memset(&mac, 0, sizeof(mac));
@@ -2324,7 +2302,7 @@ int service::obsessive_compulsive_service_check_processor() {
                          &raw_command, macro_options);
   if (raw_command == nullptr) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_checks, most) << "Raw obsessive compulsive service processor "
@@ -2335,7 +2313,7 @@ int service::obsessive_compulsive_service_check_processor() {
   process_macros_r(&mac, raw_command, &processed_command, macro_options);
   if (processed_command == nullptr) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_checks, most) << "Processed obsessive compulsive service "
@@ -2365,7 +2343,7 @@ int service::obsessive_compulsive_service_check_processor() {
   delete[] raw_command;
   delete[] processed_command;
 
-  return (OK);
+  return OK;
 }
 
 /* updates service performance data */
@@ -3137,7 +3115,7 @@ int service::check_notification_viability(unsigned int type, int options) {
    ***** NOTIFICATION WAS SENT                                            *****
    */
   if (this->current_state == STATE_OK)
-    return ((this->current_notification_number > 0) ? OK : ERROR);
+    return (this->current_notification_number > 0) ? OK : ERROR;
 
   /*
    * don't notify contacts about this service problem again if the notification
@@ -3248,7 +3226,7 @@ int service::verify_check_viability(
   if (new_time)
     *new_time = preferred_time;
 
-  return ((perform_check) ? OK : ERROR);
+  return (perform_check) ? OK : ERROR;
 }
 
 /*
@@ -3553,10 +3531,10 @@ int service::notify_contact(
 
       logger(log_service_notification, basic)
         << "SERVICE NOTIFICATION: " << cntct->get_name() << ';'
-        << this->get_hostname() << ';' << this->get_description() << ';'
+        << get_hostname() << ';' << get_description() << ';'
         << service_notification_state << ";"
         << cmd->get_name() << ';'
-        << (this->plugin_output ? this->plugin_output : "")
+        << get_plugin_output()
         << info;
     }
 

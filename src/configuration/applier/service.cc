@@ -46,7 +46,7 @@ public:
   }
 
   bool        operator()(std::shared_ptr<configuration::servicegroup> sg) {
-    return (_servicegroup_name == sg->servicegroup_name());
+    return _servicegroup_name == sg->servicegroup_name();
   }
 
 private:
@@ -82,7 +82,7 @@ applier::service::~service() throw () {}
 applier::service& applier::service::operator=(
                                       applier::service const& right) {
   (void)right;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -116,7 +116,8 @@ void applier::service::add_object(
 
   // Create service.
   engine::service* svc{add_service(
-    obj.host_id(), obj.service_id(),
+    obj.host_id(),
+    obj.service_id(),
     *obj.hosts().begin(),
     obj.service_description(),
     obj.display_name(),
@@ -144,9 +145,9 @@ void applier::service::add_object(
                       & configuration::service::downtime),
     obj.notifications_enabled(),
     obj.is_volatile(),
-    NULL_IF_EMPTY(obj.event_handler()),
+    obj.event_handler(),
     obj.event_handler_enabled(),
-    NULL_IF_EMPTY(obj.check_command()),
+    obj.check_command(),
     obj.checks_active(),
     obj.flap_detection_enabled(),
     obj.low_flap_threshold(),
@@ -168,12 +169,10 @@ void applier::service::add_object(
     static_cast<bool>(obj.stalking_options()
                       &configuration::service::critical),
     obj.process_perf_data(),
-    false, // failure_prediction_enabled
-    NULL, // failure_prediction_options
     obj.check_freshness(),
     obj.freshness_threshold(),
-    NULL_IF_EMPTY(obj.notes()),
-    NULL_IF_EMPTY(obj.notes_url()),
+    obj.notes(),
+    obj.notes_url(),
     obj.action_url(),
     obj.icon_image(),
     obj.icon_image_alt(),
@@ -181,9 +180,9 @@ void applier::service::add_object(
     obj.retain_nonstatus_information(),
     obj.obsess_over_service())};
   if (!svc)
-      throw (engine_error() << "Could not register service '"
+      throw engine_error() << "Could not register service '"
              << obj.service_description()
-             << "' of host '" << *obj.hosts().begin() << "'");
+             << "' of host '" << *obj.hosts().begin() << "'";
   svc->set_initial_notif_time(0);
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
@@ -235,8 +234,6 @@ void applier::service::add_object(
     MODATTR_ALL,
     MODATTR_ALL,
     &tv);
-
-  return ;
 }
 
 /**
@@ -368,9 +365,7 @@ void applier::service::modify_object(
   s->set_description(obj.service_description());
   s->set_display_name(obj.display_name()),
   s->set_check_command(obj.check_command());
-  modify_if_different(
-    s->event_handler,
-    NULL_IF_EMPTY(obj.event_handler()));
+  s->set_event_handler(obj.event_handler());
   modify_if_different(
     s->event_handler_enabled,
     static_cast<int>(obj.event_handler_enabled()));
@@ -463,9 +458,7 @@ void applier::service::modify_object(
   modify_if_different(
     s->accept_passive_service_checks,
     static_cast<int>(obj.checks_passive()));
-  modify_if_different(
-    s->event_handler,
-    NULL_IF_EMPTY(obj.event_handler()));
+  s->set_event_handler(obj.event_handler());
   modify_if_different(
     s->checks_enabled,
     static_cast<int>(obj.checks_active()));
@@ -481,8 +474,8 @@ void applier::service::modify_object(
   modify_if_different(
     s->obsess_over_service,
     static_cast<int>(obj.obsess_over_service()));
-  modify_if_different(s->notes, NULL_IF_EMPTY(obj.notes()));
-  modify_if_different(s->notes_url, NULL_IF_EMPTY(obj.notes_url()));
+  s->set_notes(obj.notes());
+  s->set_notes_url(obj.notes_url());
   s->set_action_url(obj.action_url());
   s->set_icon_image(obj.icon_image());
   s->set_icon_image_alt(obj.icon_image_alt());

@@ -210,7 +210,7 @@ void log_service_state(unsigned int type, com::centreon::engine::service* svc) {
       && (unsigned int)svc->current_state < service::tab_service_states.size())
     state = service::tab_service_states[svc->current_state].second.c_str();
   std::string const& state_type(service::tab_state_type[svc->state_type]);
-  char const* output(svc->plugin_output ? svc->plugin_output : "");
+  std::string const& output{svc->get_plugin_output()};
   logger(log_info_message, basic)
     << type_str << " SERVICE STATE: " << svc->get_hostname() << ";"
     << svc->get_description() << ";" << state << ";" << state_type

@@ -2045,8 +2045,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_SVC_EVENT_HANDLER:
-    delete[] temp_service->event_handler;
-    temp_service->event_handler = temp_ptr;
+    temp_service->set_event_handler(temp_ptr);
     temp_service->event_handler_ptr = temp_command;
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;

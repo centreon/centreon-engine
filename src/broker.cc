@@ -554,7 +554,7 @@ int broker_contact_notification_data(
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->current_state;
-    ds.output = temp_service->plugin_output;
+    ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
   }
   else {
     temp_host = (host*)data;
@@ -644,7 +644,7 @@ int broker_contact_notification_method_data(
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->current_state;
-    ds.output = temp_service->plugin_output;
+    ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
   }
   else {
     temp_host = (host*)data;
@@ -1341,7 +1341,7 @@ int broker_notification_data(
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->current_state;
-    ds.output = temp_service->plugin_output;
+    ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
   }
   else {
     temp_host = (host*)data;
@@ -1596,9 +1596,9 @@ int broker_service_check(
   ds.execution_time = exectime;
   ds.latency = latency;
   ds.return_code = retcode;
-  ds.output = svc->plugin_output;
-  ds.long_output = svc->long_plugin_output;
-  ds.perf_data = svc->perf_data;
+  ds.output = const_cast<char*>(svc->get_plugin_output().c_str());
+  ds.long_output = const_cast<char*>(svc->get_long_plugin_output().c_str());
+  ds.perf_data = const_cast<char*>(svc->get_perf_data().c_str());
 
   // Make callbacks.
   int return_code;
@@ -1685,7 +1685,7 @@ void broker_statechange_data(
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
-    ds.output = temp_service->plugin_output;
+    ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
   }
   else {
     temp_host = (host*)data;

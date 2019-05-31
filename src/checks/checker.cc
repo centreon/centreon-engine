@@ -1184,29 +1184,22 @@ int checker::_execute_sync(host* hst) {
   hst->set_check_type(HOST_CHECK_ACTIVE);
 
   // Get plugin output.
-  char* tmp_plugin_output(string::dup(res.output));
-
-  char *pl_output_str = ::strdup(hst->get_plugin_output().c_str());
-  char *lpl_output_str = ::strdup(hst->get_long_plugin_output().c_str());
-  char *perfdata_output_str = ::strdup(hst->get_perf_data().c_str());
+  std::string pl_output;
+  std::string lpl_output;
+  std::string perfdata_output;
 
   // Parse the output: short and long output, and perf data.
   parse_check_output(
-    tmp_plugin_output,
-    &pl_output_str,
-    &lpl_output_str,
-    &perfdata_output_str,
+    res.output,
+    pl_output,
+    lpl_output,
+    perfdata_output,
     true,
     true);
-  delete[] tmp_plugin_output;
 
-  hst->set_plugin_output(pl_output_str);
-  hst->set_long_plugin_output(lpl_output_str);
-  hst->set_perf_data(perfdata_output_str);
-
-  delete pl_output_str;
-  delete lpl_output_str;
-  delete perfdata_output_str;
+  hst->set_plugin_output(pl_output);
+  hst->set_long_plugin_output(lpl_output);
+  hst->set_perf_data(perfdata_output);
 
   // A nullptr host check command means we should assume the host is UP.
   if (hst->get_check_command().empty()) {

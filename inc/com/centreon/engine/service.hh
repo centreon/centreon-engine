@@ -58,6 +58,9 @@ class                           service : public notifier {
                                         int max_attempts,
                                         std::string const& notification_period,
                                         std::string const& check_period,
+                                        std::string const& event_handler,
+                                        std::string const& notes,
+                                        std::string const& notes_url,
                                         std::string const& action_url,
                                         std::string const& icon_image,
                                         std::string const& icon_image_alt);
@@ -117,7 +120,6 @@ class                           service : public notifier {
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
 
-  char*                         event_handler;
   int                           parallelize;
   contactgroup_map              contact_groups;
   contact_map                   contacts;
@@ -151,10 +153,6 @@ class                           service : public notifier {
   int                           retain_nonstatus_information;
   int                           notifications_enabled;
   int                           obsess_over_service;
-  int                           failure_prediction_enabled;
-  char*                         failure_prediction_options;
-  char*                         notes;
-  char*                         notes_url;
   std::unordered_map<std::string, com::centreon::engine::customvariable>
                                 custom_variables;
   int                           problem_has_been_acknowledged;
@@ -164,9 +162,6 @@ class                           service : public notifier {
   int                           current_state;
   int                           last_state;
   int                           last_hard_state;
-  char*                         plugin_output;
-  char*                         long_plugin_output;
-  char*                         perf_data;
   int                           state_type;
   time_t                        next_check;
   int                           should_be_scheduled;
@@ -243,43 +238,41 @@ com::centreon::engine::service* add_service(
            std::string const& check_period,
            int initial_state,
            int max_attempts,
-           int parallelize,
+           bool parallelize,
            int accept_passive_checks,
            double check_interval,
            double retry_interval,
            double notification_interval,
            double first_notification_delay,
            std::string const& notification_period,
-           int notify_recovery,
-           int notify_unknown,
-           int notify_warning,
-           int notify_critical,
-           int notify_flapping,
-           int notify_downtime,
-           int notifications_enabled,
-           int is_volatile,
-           char const* event_handler,
-           int event_handler_enabled,
-           char const* check_command,
-           int checks_enabled,
-           int flap_detection_enabled,
+           bool notify_recovery,
+           bool notify_unknown,
+           bool notify_warning,
+           bool notify_critical,
+           bool notify_flapping,
+           bool notify_downtime,
+           bool notifications_enabled,
+           bool is_volatile,
+           std::string const& event_handler,
+           bool event_handler_enabled,
+           std::string const& check_command,
+           bool checks_enabled,
+           bool flap_detection_enabled,
            double low_flap_threshold,
            double high_flap_threshold,
-           int flap_detection_on_ok,
-           int flap_detection_on_warning,
-           int flap_detection_on_unknown,
-           int flap_detection_on_critical,
-           int stalk_on_ok,
-           int stalk_on_warning,
-           int stalk_on_unknown,
-           int stalk_on_critical,
+           bool flap_detection_on_ok,
+           bool flap_detection_on_warning,
+           bool flap_detection_on_unknown,
+           bool flap_detection_on_critical,
+           bool stalk_on_ok,
+           bool stalk_on_warning,
+           bool stalk_on_unknown,
+           bool stalk_on_critical,
            int process_perfdata,
-           int failure_prediction_enabled,
-           char const* failure_prediction_options,
            int check_freshness,
            int freshness_threshold,
-           char const* notes,
-           char const* notes_url,
+           std::string const& notes,
+           std::string const& notes_url,
            std::string const& action_url,
            std::string const& icon_image,
            std::string const& icon_image_alt,

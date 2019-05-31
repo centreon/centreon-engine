@@ -164,7 +164,7 @@ int xpddefault_initialize_performance_data() {
       = temp_command;
   }
 
-  return (OK);
+  return OK;
 }
 
 // cleans up performance data.
@@ -180,7 +180,7 @@ int xpddefault_cleanup_performance_data() {
   xpddefault_close_host_perfdata_file();
   xpddefault_close_service_perfdata_file();
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -195,12 +195,12 @@ int xpddefault_update_service_performance_data(com::centreon::engine::service* s
    * bail early if we've got nothing to do so we don't spend a lot
    * of time calculating macros that never get used
    */
-  if (!svc || !svc->perf_data || !*svc->perf_data)
-    return (OK);
+  if (!svc || svc->get_perf_data().empty())
+    return OK;
   if ((!xpddefault_service_perfdata_fp
        || !xpddefault_service_perfdata_file_template)
       && config->service_perfdata_command().empty())
-    return (OK);
+    return OK;
 
   /*
    * we know we've got some work to do, so grab the necessary
@@ -229,7 +229,7 @@ int xpddefault_update_service_performance_data(com::centreon::engine::service* s
   // now free() it all.
   clear_volatile_macros_r(&mac);
 
-  return (OK);
+  return OK;
 }
 
 
@@ -242,11 +242,11 @@ int xpddefault_update_host_performance_data(host* hst) {
    * of time calculating macros that never get used
    */
   if (!hst || !hst->get_perf_data().empty())
-    return (OK);
+    return OK;
   if ((!xpddefault_host_perfdata_fp
        || !xpddefault_host_perfdata_file_template)
       && config->host_perfdata_command().empty())
-    return (OK);
+    return OK;
 
   // set up macros and get to work.
   memset(&mac, 0, sizeof(mac));
@@ -264,7 +264,7 @@ int xpddefault_update_host_performance_data(host* hst) {
   // free() all.
   clear_volatile_macros_r(&mac);
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -286,11 +286,11 @@ int xpddefault_run_service_performance_data_command(
     << "run_service_performance_data_command()";
 
   if (svc == nullptr)
-    return (ERROR);
+    return ERROR;
 
   // we don't have a command.
   if (config->service_perfdata_command().empty())
-    return (OK);
+    return OK;
 
   // get the raw command line.
   get_raw_command_line_r(
@@ -300,7 +300,7 @@ int xpddefault_run_service_performance_data_command(
     &raw_command_line,
     macro_options);
   if (raw_command_line == nullptr)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_perfdata, most)
     << "Raw service performance data command line: "
@@ -313,7 +313,7 @@ int xpddefault_run_service_performance_data_command(
     &processed_command_line,
     macro_options);
   if (processed_command_line == nullptr)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_perfdata, most)
     << "Processed service performance data "
@@ -348,7 +348,7 @@ int xpddefault_run_service_performance_data_command(
   delete[] raw_command_line;
   delete[] processed_command_line;
 
-  return (result);
+  return result;
 }
 
 // runs the host performance data command.
@@ -366,11 +366,11 @@ int xpddefault_run_host_performance_data_command(
     << "run_host_performance_data_command()";
 
   if (hst == nullptr)
-    return (ERROR);
+    return ERROR;
 
   // we don't have a command.
   if (config->host_perfdata_command().empty())
-    return (OK);
+    return OK;
 
   // get the raw command line.
   get_raw_command_line_r(
@@ -380,7 +380,7 @@ int xpddefault_run_host_performance_data_command(
     &raw_command_line,
     macro_options);
   if (raw_command_line == nullptr)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_perfdata, most)
     << "Raw host performance data command line: " << raw_command_line;
@@ -413,7 +413,7 @@ int xpddefault_run_host_performance_data_command(
   }
 
   if (processed_command_line == nullptr)
-    return (ERROR);
+    return ERROR;
 
   // check to see if the command timed out.
   if (early_timeout == true)
@@ -427,7 +427,7 @@ int xpddefault_run_host_performance_data_command(
   delete[] raw_command_line;
   delete[] processed_command_line;
 
-  return (result);
+  return result;
 }
 
 /******************************************************************/
@@ -456,11 +456,11 @@ int xpddefault_open_host_perfdata_file() {
         << "' could not be opened - host performance data will not "
         "be written to file!";
 
-      return (ERROR);
+      return ERROR;
     }
   }
 
-  return (OK);
+  return OK;
 }
 
 // open the service performance data file for writing.
@@ -485,11 +485,11 @@ int xpddefault_open_service_perfdata_file() {
         << "' could not be opened - service performance data will not "
         "be written to file!";
 
-      return (ERROR);
+      return ERROR;
     }
   }
 
-  return (OK);
+  return OK;
 }
 
 // close the host performance data file.
@@ -501,7 +501,7 @@ int xpddefault_close_host_perfdata_file() {
     xpddefault_host_perfdata_fd = -1;
   }
 
-  return (OK);
+  return OK;
 }
 
 // close the service performance data file.
@@ -513,7 +513,7 @@ int xpddefault_close_service_perfdata_file() {
     xpddefault_service_perfdata_fd = -1;
   }
 
-  return (OK);
+  return OK;
 }
 
 // processes delimiter characters in templates.
@@ -565,12 +565,12 @@ int xpddefault_update_service_performance_data_file(
     << "update_service_performance_data_file()";
 
   if (svc == nullptr)
-    return (ERROR);
+    return ERROR;
 
   // we don't have a file to write to.
   if (xpddefault_service_perfdata_fp == nullptr
       || xpddefault_service_perfdata_file_template == nullptr)
-    return (OK);
+    return OK;
 
   // get the raw line to write.
   raw_output = string::dup(xpddefault_service_perfdata_file_template);
@@ -581,7 +581,7 @@ int xpddefault_update_service_performance_data_file(
   // process any macros in the raw output line.
   process_macros_r(mac, raw_output, &processed_output, 0);
   if (processed_output == nullptr)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_perfdata, most)
     << "Processed service performance data file output: "
@@ -598,7 +598,7 @@ int xpddefault_update_service_performance_data_file(
   delete[] raw_output;
   delete[] processed_output;
 
-  return (result);
+  return result;
 }
 
 // updates host performance data file.
@@ -613,12 +613,12 @@ int xpddefault_update_host_performance_data_file(
     << "update_host_performance_data_file()";
 
   if (hst == nullptr)
-    return (ERROR);
+    return ERROR;
 
   // we don't have a host perfdata file.
   if (xpddefault_host_perfdata_fp == nullptr
       || xpddefault_host_perfdata_file_template == nullptr)
-    return (OK);
+    return OK;
 
   // get the raw output.
   raw_output = string::dup(xpddefault_host_perfdata_file_template);
@@ -629,7 +629,7 @@ int xpddefault_update_host_performance_data_file(
   // process any macros in the raw output.
   process_macros_r(mac, raw_output, &processed_output, 0);
   if (processed_output == nullptr)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_perfdata, most)
     << "Processed host performance data file output: "
@@ -646,7 +646,7 @@ int xpddefault_update_host_performance_data_file(
   delete[] raw_output;
   delete[] processed_output;
 
-  return (result);
+  return result;
 }
 
 // periodically process the host perf data file.
@@ -664,7 +664,7 @@ int xpddefault_process_host_perfdata_file() {
 
   // we don't have a command.
   if (config->host_perfdata_file_processing_command().empty())
-    return (OK);
+    return OK;
 
   // init macros.
   memset(&mac, 0, sizeof(mac));
@@ -678,7 +678,7 @@ int xpddefault_process_host_perfdata_file() {
     macro_options);
   if (raw_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_perfdata, most)
@@ -693,7 +693,7 @@ int xpddefault_process_host_perfdata_file() {
     macro_options);
   if (processed_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_perfdata, most)
@@ -737,7 +737,7 @@ int xpddefault_process_host_perfdata_file() {
   delete[] raw_command_line;
   delete[] processed_command_line;
 
-  return (result);
+  return result;
 }
 
 // periodically process the service perf data file.
@@ -755,7 +755,7 @@ int xpddefault_process_service_perfdata_file() {
 
   // we don't have a command.
   if (config->service_perfdata_file_processing_command().empty())
-    return (OK);
+    return OK;
 
   // init macros.
   memset(&mac, 0, sizeof(mac));
@@ -769,7 +769,7 @@ int xpddefault_process_service_perfdata_file() {
     macro_options);
   if (raw_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_perfdata, most)
@@ -784,7 +784,7 @@ int xpddefault_process_service_perfdata_file() {
     macro_options);
   if (processed_command_line == nullptr) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_perfdata, most)
@@ -829,5 +829,5 @@ int xpddefault_process_service_perfdata_file() {
   delete[] raw_command_line;
   delete[] processed_command_line;
 
-  return (result);
+  return result;
 }

@@ -154,7 +154,7 @@ struct grab_service_redirection {
       {MACRO_SERVICEDESC,
        {&get_member_as_string<com::centreon::engine::service,
                               std::string const&,
-                              &com::centreon::engine::service::get_description>,
+                              &service::get_description>,
         true}},
       // Display name.
       {MACRO_SERVICEDISPLAYNAME,
@@ -166,21 +166,21 @@ struct grab_service_redirection {
       // Output.
       {MACRO_SERVICEOUTPUT,
        {&get_member_as_string<com::centreon::engine::service,
-                              char*,
-                              &com::centreon::engine::service::plugin_output>,
+         std::string const&, notifier,
+                              &notifier::get_plugin_output>,
         true}},
       // Long output.
       {MACRO_LONGSERVICEOUTPUT,
        {&get_member_as_string<
             com::centreon::engine::service,
-            char*,
-            &com::centreon::engine::service::long_plugin_output>,
+            std::string const&, notifier,
+            &notifier::get_long_plugin_output>,
         true}},
       // Perfdata.
       {MACRO_SERVICEPERFDATA,
        {&get_member_as_string<com::centreon::engine::service,
-                              char*,
-                              &com::centreon::engine::service::perf_data>,
+         std::string const&, notifier,
+                              &notifier::get_perf_data>,
         true}},
       // Check command.
       {MACRO_SERVICECHECKCOMMAND,
@@ -351,14 +351,14 @@ struct grab_service_redirection {
         true}},
       // Notes URL.
       {MACRO_SERVICENOTESURL,
-       {&get_recursive<com::centreon::engine::service,
-                       &com::centreon::engine::service::notes_url,
+       {&get_recursive<service, notifier,
+                       &notifier::get_notes_url,
                        URL_ENCODE_MACRO_CHARS>,
         true}},
       // Notes.
       {MACRO_SERVICENOTES,
-       {&get_recursive<com::centreon::engine::service,
-                       &com::centreon::engine::service::notes,
+       {&get_recursive<service, notifier,
+                       &notifier::get_notes,
                        0>,
         true}},
       // Group names.

@@ -44,6 +44,9 @@ class                         notifier {
                                        int max_attempts,
                                        std::string const& notification_period,
                                        std::string const& check_period,
+                                       std::string const& event_handler,
+                                       std::string const& notes,
+                                       std::string const& notes_url,
                                        std::string const& action_url,
                                        std::string const& icon_image,
                                        std::string const& icon_image_alt);
@@ -114,6 +117,18 @@ class                         notifier {
   void                        set_icon_image(std::string const& icon_image);
   std::string const&          get_icon_image_alt() const;
   void                        set_icon_image_alt(std::string const& icon_image_alt);
+  std::string const&          get_event_handler() const;
+  void                        set_event_handler(std::string const& event_handler);
+  std::string const&          get_notes() const;
+  void                        set_notes(std::string const& notes);
+  std::string const&          get_notes_url() const;
+  void                        set_notes_url(std::string const& notes_url);
+  std::string const&          get_plugin_output() const;
+  void                        set_plugin_output(std::string const& plugin_output);
+  std::string const&          get_long_plugin_output() const;
+  void                        set_long_plugin_output(std::string const& long_plugin_output);
+  std::string const&          get_perf_data() const;
+  void                        set_perf_data(std::string const& perf_data);
 
  protected:
   int                         _notification_type;
@@ -140,9 +155,15 @@ class                         notifier {
  private:
   static uint64_t             _next_notification_id;
   std::string                 _check_period;
+  std::string                 _event_handler;
   std::string                 _action_url;
   std::string                 _icon_image;
   std::string                 _icon_image_alt;
+  std::string                 _notes;
+  std::string                 _notes_url;
+  std::string                 _plugin_output;
+  std::string                 _long_plugin_output;
+  std::string                 _perf_data;
 };
 
 CCE_END()

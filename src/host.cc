@@ -105,8 +105,6 @@ host_map com::centreon::engine::host::hosts;
  *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
  *  @param[in] process_perfdata              Should host perfdata be
    *                                           processed ?
- *  @param[in] failure_prediction_enabled    Deprecated.
- *  @param[in] failure_prediction_options    Deprecated.
  *  @param[in] check_freshness               Whether or not freshness
    *                                           check is enabled.
  *  @param[in] freshness_threshold           Freshness threshold.
@@ -188,12 +186,21 @@ host::host(uint64_t host_id,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_host)
-    : notifier{HOST_NOTIFICATION, !display_name.empty() ? display_name : name,
-               check_command,     initial_state,
-               check_interval,    retry_interval,
-               max_attempts,      notification_period,
-               check_period,      action_url,
-               icon_image,        icon_image_alt} {
+    : notifier{HOST_NOTIFICATION,
+               !display_name.empty() ? display_name : name,
+               check_command,
+               initial_state,
+               check_interval,
+               retry_interval,
+               max_attempts,
+               notification_period,
+               check_period,
+               event_handler,
+               notes,
+               notes_url,
+               action_url,
+               icon_image,
+               icon_image_alt} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -241,9 +248,6 @@ host::host(uint64_t host_id,
   _name = name;
   _address = address;
   _alias = !alias.empty() ? alias : name;
-  _event_handler = event_handler;
-  _notes = notes;
-  _notes_url = notes_url;
   _statusmap_image = statusmap_image;
   _vrml_image = vrml_image;
 
@@ -347,14 +351,6 @@ std::string const& host::get_address() const {
 
 void host::set_address(std::string const& address) {
   _address = address;
-}
-
-std::string const& host::get_event_handler() const {
-  return _event_handler;
-}
-
-void host::set_event_handler(std::string const& event_handler) {
-  _event_handler = event_handler;
 }
 
 double host::get_first_notification_delay(void) const {
@@ -549,36 +545,12 @@ void host::set_failure_prediction_enabled(bool failure_prediction_enabled) {
   _failure_prediction_enabled = failure_prediction_enabled;
 }
 
-std::string const& host::get_failure_prediction_options() const {
-  return _failure_prediction_options;
-}
-
-void host::set_failure_prediction_options(std::string const& failure) {
-  _failure_prediction_options = failure;
-}
-
 int host::get_obsess_over_host() const {
   return _obsess_over_host;
 }
 
 void host::set_obsess_over_host(int obsess_over_host) {
   _obsess_over_host = obsess_over_host;
-}
-
-std::string const& host::get_notes() const {
-  return _notes;
-}
-
-void host::set_notes(std::string const& notes) {
-  _notes = notes;
-}
-
-std::string const& host::get_notes_url() const {
-  return _notes_url;
-}
-
-void host::set_notes_url(std::string const& notes_url) {
-  _notes_url = notes_url;
 }
 
 std::string const& host::get_vrml_image() const {
@@ -701,29 +673,6 @@ void host::set_last_hard_state(int last_hard_state) {
   _last_hard_state = last_hard_state;
 }
 
-std::string const& host::get_plugin_output() const {
-  return _plugin_output;
-}
-
-void host::set_plugin_output(std::string const& plugin_output) {
-  _plugin_output = plugin_output;
-}
-
-std::string const& host::get_long_plugin_output() const {
-  return _long_plugin_output;
-}
-
-void host::set_long_plugin_output(std::string const& long_plugin_output) {
-  _long_plugin_output = long_plugin_output;
-}
-
-std::string const& host::get_perf_data() const {
-  return _perf_data;
-}
-
-void host::set_perf_data(std::string const& perf_data) {
-  _perf_data = perf_data;
-}
 
 int host::get_state_type() const {
   return _state_type;
@@ -1700,7 +1649,7 @@ int host::handle_async_check_result_3x(
   time_t current_time;
   int result = STATE_OK;
   int reschedule_check = false;
-  char* old_plugin_output = NULL;
+  std::string old_plugin_output;
   struct timeval start_time_hires;
   struct timeval end_time_hires;
   double execution_time(0.0);
@@ -1839,30 +1788,19 @@ int host::handle_async_check_result_3x(
 
   /* save old plugin output */
   if (!get_plugin_output().empty())
-    old_plugin_output = ::strdup(get_plugin_output().c_str());
-
-  /* clear the old plugin output and perf data buffers */
-  set_plugin_output("");
-  set_long_plugin_output("");
-  set_perf_data("");
+    old_plugin_output = get_plugin_output();
 
   /* parse check output to get: (1) short output, (2) long output, (3) perf data */
-  char *plugin_output = NULL;
-  char *long_plugin_output = NULL;
-  char *perf_data = NULL;
-  parse_check_output(
-    queued_check_result->output,
-    &plugin_output,
-    &long_plugin_output,
-    &perf_data,
-    true,
-    true);
-  if (plugin_output)
-    set_plugin_output(plugin_output);
-  if(long_plugin_output)
-    set_long_plugin_output(long_plugin_output);
-  if (perf_data)
-    set_perf_data(perf_data);
+
+  std::string output{queued_check_result->output};
+  std::string plugin_output;
+  std::string long_plugin_output;
+  std::string perf_data;
+  parse_check_output(output, plugin_output,
+                     long_plugin_output, perf_data, true, true);
+  set_plugin_output(plugin_output);
+  set_long_plugin_output(long_plugin_output);
+  set_perf_data(perf_data);
 
   /* make sure we have some data */
   if (get_plugin_output().empty()) {
@@ -1961,14 +1899,11 @@ int host::handle_async_check_result_3x(
   process_host_check_result_3x(
     this,
     result,
-    old_plugin_output,
+    const_cast<char*>(old_plugin_output.c_str()),
     CHECK_OPTION_NONE,
     reschedule_check,
     true,
     config->cached_host_check_horizon());
-
-  /* free memory */
-  delete[] old_plugin_output;
 
   logger(dbg_checks, more)
     << "** Async check result for host '" << get_name()
