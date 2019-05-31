@@ -360,7 +360,7 @@ int xsddefault_save_status_data() {
          "\tevent_handler_enabled=" << svc->event_handler_enabled << "\n"
          "\tproblem_has_been_acknowledged=" << svc->problem_has_been_acknowledged << "\n"
          "\tacknowledgement_type=" << svc->acknowledgement_type << "\n"
-         "\tflap_detection_enabled=" << svc->flap_detection_enabled << "\n"
+         "\tflap_detection_enabled=" << svc->get_flap_detection_enabled() << "\n"
          "\tprocess_performance_data=" << svc->process_performance_data << "\n"
          "\tobsess_over_service=" << svc->obsess_over_service << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"

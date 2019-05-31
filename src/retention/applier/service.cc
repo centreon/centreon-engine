@@ -185,7 +185,7 @@ void applier::service::_update(
 
     if (state.flap_detection_enabled().is_set()
         && (obj.modified_attributes & MODATTR_FLAP_DETECTION_ENABLED))
-      obj.flap_detection_enabled = *state.flap_detection_enabled();
+      obj.set_flap_detection_enabled(*state.flap_detection_enabled());
 
     if (state.process_performance_data().is_set()
         && (obj.modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED))

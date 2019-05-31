@@ -333,9 +333,9 @@ void applier::host::modify_object(
   h->set_accept_passive_host_checks(static_cast<int>(obj.checks_passive()));
   h->set_event_handler(obj.event_handler());
   h->set_event_handler_enabled(static_cast<int>(obj.event_handler_enabled()));
-  h->set_flap_detection_enabled(static_cast<int>(obj.flap_detection_enabled()));
-  h->set_low_flap_threshold(static_cast<double>(obj.low_flap_threshold()));
-  h->set_high_flap_threshold(static_cast<double>(obj.high_flap_threshold()));
+  h->set_flap_detection_enabled(obj.flap_detection_enabled());
+  h->set_low_flap_threshold(obj.low_flap_threshold());
+  h->set_high_flap_threshold(obj.high_flap_threshold());
   h->set_flap_detection_on_up(static_cast<int>(static_cast<bool>(
     obj.flap_detection_options() & configuration::host::up)));
   h->set_flap_detection_on_down(static_cast<int>(static_cast<bool>(

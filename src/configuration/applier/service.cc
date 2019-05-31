@@ -421,15 +421,9 @@ void applier::service::modify_object(
       obj.stalking_options() & configuration::service::critical)));
   s->set_notification_period(obj.notification_period());
   s->set_check_period(obj.check_period());
-  modify_if_different(
-    s->flap_detection_enabled,
-    static_cast<int>(obj.flap_detection_enabled()));
-  modify_if_different(
-    s->low_flap_threshold,
-    static_cast<double>(obj.low_flap_threshold()));
-  modify_if_different(
-    s->high_flap_threshold,
-    static_cast<double>(obj.high_flap_threshold()));
+  s->set_flap_detection_enabled(obj.flap_detection_enabled());
+  s->set_low_flap_threshold(obj.low_flap_threshold());
+  s->set_high_flap_threshold(obj.high_flap_threshold());
   modify_if_different(
     s->flap_detection_on_ok,
     static_cast<int>(static_cast<bool>(

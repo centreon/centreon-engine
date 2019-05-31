@@ -156,7 +156,7 @@ host::host(uint64_t host_id,
            int accept_passive_checks,
            std::string const& event_handler,
            int event_handler_enabled,
-           int flap_detection_enabled,
+           bool flap_detection_enabled,
            double low_flap_threshold,
            double high_flap_threshold,
            int flap_detection_on_up,
@@ -200,7 +200,10 @@ host::host(uint64_t host_id,
                notes_url,
                action_url,
                icon_image,
-               icon_image_alt} {
+               icon_image_alt,
+               flap_detection_enabled,
+               low_flap_threshold,
+               high_flap_threshold} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -258,17 +261,14 @@ host::host(uint64_t host_id,
   _current_state = initial_state;
   _event_handler_enabled = (event_handler_enabled > 0);
   _first_notification_delay = first_notification_delay;
-  _flap_detection_enabled = (flap_detection_enabled > 0);
   _flap_detection_on_down = (flap_detection_on_down > 0);
   _flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
   _flap_detection_on_up = (flap_detection_on_up > 0);
   _freshness_threshold = freshness_threshold;
   _have_2d_coords = (have_2d_coords > 0);
   _have_3d_coords = (have_3d_coords > 0);
-  _high_flap_threshold = high_flap_threshold;
   _last_hard_state = initial_state;
   _last_state = initial_state;
-  _low_flap_threshold = low_flap_threshold;
   _notification_interval = notification_interval;
   _notifications_enabled = (notifications_enabled > 0);
   _notify_on_down = (notify_down > 0);
@@ -399,30 +399,6 @@ int host::get_notify_on_downtime() const {
 
 void host::set_notify_on_downtime(int notify_on_downtime) {
   _notify_on_downtime = notify_on_downtime;
-}
-
-bool host::get_flap_detection_enabled(void) const {
-  return _flap_detection_enabled;
-}
-
-void host::set_flap_detection_enabled(bool flap_detection_enabled) {
-  _flap_detection_enabled = flap_detection_enabled;
-}
-
-double host::get_low_flap_threshold() const {
-  return _low_flap_threshold;
-}
-
-void host::set_low_flap_threshold(double low_flap_threshold) {
-  _low_flap_threshold = low_flap_threshold;
-}
-
-double host::get_high_flap_threshold() const {
-  return _high_flap_threshold;
-}
-
-void host::set_high_flap_threshold(double high_flap_threshold) {
-  _high_flap_threshold = high_flap_threshold;
 }
 
 bool host::get_flap_detection_on_up() const {
@@ -991,129 +967,135 @@ void host::set_contains_circular_path(bool contains_circular_path) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool operator==(
-       host const& obj1,
-       host const& obj2) throw () {
-  return (obj1.get_name() == obj2.get_name())
-          && obj1.get_display_name() == obj2.get_display_name()
-          && obj1.get_alias() == obj2.get_alias()
-          && obj1.get_address() == obj2.get_address()
-           && ((obj1.parent_hosts.size() == obj2.parent_hosts.size()) &&
-               std::equal(obj1.parent_hosts.begin(),
-                          obj1.parent_hosts.end(),
-                          obj2.parent_hosts.begin()))
-          // Children do not need to be tested, they are
-          // created as parent back links.
-          // Services do not need to be tested, they are
-          // created as services back links.
-          && obj1.get_check_command() == obj2.get_check_command()
-          && obj1.get_initial_state() == obj2.get_initial_state()
-          && obj1.get_check_interval() == obj2.get_check_interval()
-          && obj1.get_retry_interval() == obj2.get_retry_interval()
-          && obj1.get_max_attempts() == obj2.get_max_attempts()
-          && obj1.get_event_handler() == obj2.get_event_handler()
-          && ((obj1.contact_groups.size() == obj2.contact_groups.size()) &&
-               std::equal(obj1.contact_groups.begin(),
-                          obj1.contact_groups.end(),
-                          obj2.contact_groups.begin()))
-          && ((obj1.contacts.size() == obj2.contacts.size()) &&
-               std::equal(obj1.contacts.begin(),
-                          obj1.contacts.end(),
-                          obj2.contacts.begin()))
-          && obj1.get_notification_interval() == obj2.get_notification_interval()
-          && obj1.get_first_notification_delay() == obj2.get_first_notification_delay()
-          && obj1.get_notify_on_down() == obj2.get_notify_on_down()
-          && obj1.get_notify_on_unreachable() == obj2.get_notify_on_unreachable()
-          && obj1.get_notify_on_recovery() == obj2.get_notify_on_recovery()
-          && obj1.get_notify_on_flapping() == obj2.get_notify_on_flapping()
-          && obj1.get_notify_on_downtime() == obj2.get_notify_on_downtime()
-          && obj1.get_notification_period() == obj2.get_notification_period()
-          && obj1.get_check_period() == obj2.get_check_period()
-          && obj1.get_flap_detection_enabled() == obj2.get_flap_detection_enabled()
-          && obj1.get_low_flap_threshold() == obj2.get_low_flap_threshold()
-          && obj1.get_high_flap_threshold() == obj2.get_high_flap_threshold()
-          && obj1.get_flap_detection_on_up() == obj2.get_flap_detection_on_up()
-          && obj1.get_flap_detection_on_down() == obj2.get_flap_detection_on_down()
-          && obj1.get_flap_detection_on_unreachable() == obj2.get_flap_detection_on_unreachable()
-          && obj1.get_stalk_on_up() == obj2.get_stalk_on_up()
-          && obj1.get_stalk_on_down() == obj2.get_stalk_on_down()
-          && obj1.get_stalk_on_unreachable() == obj2.get_stalk_on_unreachable()
-          && obj1.get_check_freshness() == obj2.get_check_freshness()
-          && obj1.get_freshness_threshold() == obj2.get_freshness_threshold()
-          && obj1.get_process_performance_data() == obj2.get_process_performance_data()
-          && obj1.get_checks_enabled() == obj2.get_checks_enabled()
-          && obj1.get_accept_passive_host_checks() == obj2.get_accept_passive_host_checks()
-          && obj1.get_event_handler_enabled() == obj2.get_event_handler_enabled()
-          && obj1.get_retain_status_information() == obj2.get_retain_status_information()
-          && obj1.get_retain_nonstatus_information() == obj2.get_retain_nonstatus_information()
-          && obj1.get_obsess_over_host() == obj2.get_obsess_over_host()
-          && obj1.get_notes() == obj2.get_notes()
-          && obj1.get_notes_url() == obj2.get_notes_url()
-          && obj1.get_action_url() == obj2.get_action_url()
-          && obj1.get_icon_image() == obj2.get_icon_image()
-          && obj1.get_icon_image_alt() == obj2.get_icon_image_alt()
-          && obj1.get_vrml_image() == obj2.get_vrml_image()
-          && obj1.get_statusmap_image() == obj2.get_statusmap_image()
-          && obj1.get_have_2d_coords() == obj2.get_have_2d_coords()
-          && obj1.get_x_2d() == obj2.get_x_2d()
-          && obj1.get_y_2d() == obj2.get_y_2d()
-          && obj1.get_have_3d_coords() == obj2.get_have_3d_coords()
-          && obj1.get_x_3d() == obj2.get_x_3d()
-          && obj1.get_y_3d() == obj2.get_y_3d()
-          && obj1.get_z_3d() == obj2.get_z_3d()
-          && obj1.get_should_be_drawn() == obj2.get_should_be_drawn()
-          && obj1.custom_variables == obj2.custom_variables
-          && obj1.get_problem_has_been_acknowledged() == obj2.get_problem_has_been_acknowledged()
-          && obj1.get_acknowledgement_type() == obj2.get_acknowledgement_type()
-          && obj1.get_check_type() == obj2.get_check_type()
-          && obj1.get_current_state() == obj2.get_current_state()
-          && obj1.get_last_state() == obj2.get_last_state()
-          && obj1.get_last_hard_state() == obj2.get_last_hard_state()
-          && obj1.get_plugin_output() == obj2.get_plugin_output()
-          && obj1.get_long_plugin_output() == obj2.get_long_plugin_output()
-          && obj1.get_perf_data() == obj2.get_perf_data()
-          && obj1.get_state_type() == obj2.get_state_type()
-          && obj1.get_current_attempt() == obj2.get_current_attempt()
-          && obj1.get_current_event_id() == obj2.get_current_event_id()
-          && obj1.get_last_event_id() == obj2.get_last_event_id()
-          && obj1.get_current_problem_id() == obj2.get_current_problem_id()
-          && obj1.get_last_problem_id() == obj2.get_last_problem_id()
-          && obj1.get_latency() == obj2.get_latency()
-          && obj1.get_execution_time() == obj2.get_execution_time()
-          && obj1.get_is_executing() == obj2.get_is_executing()
-          && obj1.get_check_options() == obj2.get_check_options()
-          && obj1.get_notifications_enabled() == obj2.get_notifications_enabled()
-          && obj1.get_last_notification() == obj2.get_last_notification()
-          && obj1.get_next_notification() == obj2.get_next_notification()
-          && obj1.get_next_check() == obj2.get_next_check()
-          && obj1.get_should_be_scheduled() == obj2.get_should_be_scheduled()
-          && obj1.get_last_check() == obj2.get_last_check()
-          && obj1.get_last_state_change() == obj2.get_last_state_change()
-          && obj1.get_last_hard_state_change() == obj2.get_last_hard_state_change()
-          && obj1.get_last_time_up() == obj2.get_last_time_up()
-          && obj1.get_last_time_down() == obj2.get_last_time_down()
-          && obj1.get_last_time_unreachable() == obj2.get_last_time_unreachable()
-          && obj1.get_has_been_checked() == obj2.get_has_been_checked()
-          && obj1.get_is_being_freshened() == obj2.get_is_being_freshened()
-          && obj1.get_notified_on_down() == obj2.get_notified_on_down()
-          && obj1.get_notified_on_unreachable() == obj2.get_notified_on_unreachable()
-          && obj1.get_current_notification_number() == obj2.get_current_notification_number()
-          && obj1.get_no_more_notifications() == obj2.get_no_more_notifications()
-          && obj1.get_current_notification_id() == obj2.get_current_notification_id()
-          && obj1.get_check_flapping_recovery_notification() == obj2.get_check_flapping_recovery_notification()
-          && obj1.get_scheduled_downtime_depth() == obj2.get_scheduled_downtime_depth()
-          && obj1.get_pending_flex_downtime() == obj2.get_pending_flex_downtime()
-          && is_equal(obj1.state_history, obj2.state_history, MAX_STATE_HISTORY_ENTRIES)
-          && obj1.get_state_history_index() == obj2.get_state_history_index()
-          && obj1.get_last_state_history_update() == obj2.get_last_state_history_update()
-          && obj1.get_is_flapping() == obj2.get_is_flapping()
-          && obj1.get_flapping_comment_id() == obj2.get_flapping_comment_id()
-          && obj1.get_percent_state_change() == obj2.get_percent_state_change()
-          && obj1.get_total_services() == obj2.get_total_services()
-          && obj1.get_total_service_check_interval() == obj2.get_total_service_check_interval()
-          && obj1.get_modified_attributes() == obj2.get_modified_attributes()
-          && obj1.get_circular_path_checked() == obj2.get_circular_path_checked()
-          && obj1.get_contains_circular_path() == obj2.get_contains_circular_path();
+bool host::operator==(host const& other) throw() {
+  return get_name() == other.get_name() &&
+         get_display_name() == other.get_display_name() &&
+         get_alias() == other.get_alias() &&
+         get_address() == other.get_address() &&
+         ((parent_hosts.size() == other.parent_hosts.size()) &&
+          std::equal(parent_hosts.begin(), parent_hosts.end(),
+                     other.parent_hosts.begin()))
+         // Children do not need to be tested, they are
+         // created as parent back links.
+         // Services do not need to be tested, they are
+         // created as services back links.
+         && get_check_command() == other.get_check_command() &&
+         get_initial_state() == other.get_initial_state() &&
+         get_check_interval() == other.get_check_interval() &&
+         get_retry_interval() == other.get_retry_interval() &&
+         get_max_attempts() == other.get_max_attempts() &&
+         get_event_handler() == other.get_event_handler() &&
+         ((contact_groups.size() == other.contact_groups.size()) &&
+          std::equal(contact_groups.begin(), contact_groups.end(),
+                     other.contact_groups.begin())) &&
+         ((contacts.size() == other.contacts.size()) &&
+          std::equal(contacts.begin(), contacts.end(),
+                     other.contacts.begin())) &&
+         get_notification_interval() == other.get_notification_interval() &&
+         get_first_notification_delay() ==
+             other.get_first_notification_delay() &&
+         get_notify_on_down() == other.get_notify_on_down() &&
+         get_notify_on_unreachable() == other.get_notify_on_unreachable() &&
+         get_notify_on_recovery() == other.get_notify_on_recovery() &&
+         get_notify_on_flapping() == other.get_notify_on_flapping() &&
+         get_notify_on_downtime() == other.get_notify_on_downtime() &&
+         get_notification_period() == other.get_notification_period() &&
+         get_check_period() == other.get_check_period() &&
+         get_flap_detection_enabled() == other.get_flap_detection_enabled() &&
+         get_low_flap_threshold() == other.get_low_flap_threshold() &&
+         get_high_flap_threshold() == other.get_high_flap_threshold() &&
+         get_flap_detection_on_up() == other.get_flap_detection_on_up() &&
+         get_flap_detection_on_down() == other.get_flap_detection_on_down() &&
+         get_flap_detection_on_unreachable() ==
+             other.get_flap_detection_on_unreachable() &&
+         get_stalk_on_up() == other.get_stalk_on_up() &&
+         get_stalk_on_down() == other.get_stalk_on_down() &&
+         get_stalk_on_unreachable() == other.get_stalk_on_unreachable() &&
+         get_check_freshness() == other.get_check_freshness() &&
+         get_freshness_threshold() == other.get_freshness_threshold() &&
+         get_process_performance_data() ==
+             other.get_process_performance_data() &&
+         get_checks_enabled() == other.get_checks_enabled() &&
+         get_accept_passive_host_checks() ==
+             other.get_accept_passive_host_checks() &&
+         get_event_handler_enabled() == other.get_event_handler_enabled() &&
+         get_retain_status_information() ==
+             other.get_retain_status_information() &&
+         get_retain_nonstatus_information() ==
+             other.get_retain_nonstatus_information() &&
+         get_obsess_over_host() == other.get_obsess_over_host() &&
+         get_notes() == other.get_notes() &&
+         get_notes_url() == other.get_notes_url() &&
+         get_action_url() == other.get_action_url() &&
+         get_icon_image() == other.get_icon_image() &&
+         get_icon_image_alt() == other.get_icon_image_alt() &&
+         get_vrml_image() == other.get_vrml_image() &&
+         get_statusmap_image() == other.get_statusmap_image() &&
+         get_have_2d_coords() == other.get_have_2d_coords() &&
+         get_x_2d() == other.get_x_2d() && get_y_2d() == other.get_y_2d() &&
+         get_have_3d_coords() == other.get_have_3d_coords() &&
+         get_x_3d() == other.get_x_3d() && get_y_3d() == other.get_y_3d() &&
+         get_z_3d() == other.get_z_3d() &&
+         get_should_be_drawn() == other.get_should_be_drawn() &&
+         custom_variables == other.custom_variables &&
+         get_problem_has_been_acknowledged() ==
+             other.get_problem_has_been_acknowledged() &&
+         get_acknowledgement_type() == other.get_acknowledgement_type() &&
+         get_check_type() == other.get_check_type() &&
+         get_current_state() == other.get_current_state() &&
+         get_last_state() == other.get_last_state() &&
+         get_last_hard_state() == other.get_last_hard_state() &&
+         get_plugin_output() == other.get_plugin_output() &&
+         get_long_plugin_output() == other.get_long_plugin_output() &&
+         get_perf_data() == other.get_perf_data() &&
+         get_state_type() == other.get_state_type() &&
+         get_current_attempt() == other.get_current_attempt() &&
+         get_current_event_id() == other.get_current_event_id() &&
+         get_last_event_id() == other.get_last_event_id() &&
+         get_current_problem_id() == other.get_current_problem_id() &&
+         get_last_problem_id() == other.get_last_problem_id() &&
+         get_latency() == other.get_latency() &&
+         get_execution_time() == other.get_execution_time() &&
+         get_is_executing() == other.get_is_executing() &&
+         get_check_options() == other.get_check_options() &&
+         get_notifications_enabled() == other.get_notifications_enabled() &&
+         get_last_notification() == other.get_last_notification() &&
+         get_next_notification() == other.get_next_notification() &&
+         get_next_check() == other.get_next_check() &&
+         get_should_be_scheduled() == other.get_should_be_scheduled() &&
+         get_last_check() == other.get_last_check() &&
+         get_last_state_change() == other.get_last_state_change() &&
+         get_last_hard_state_change() == other.get_last_hard_state_change() &&
+         get_last_time_up() == other.get_last_time_up() &&
+         get_last_time_down() == other.get_last_time_down() &&
+         get_last_time_unreachable() == other.get_last_time_unreachable() &&
+         get_has_been_checked() == other.get_has_been_checked() &&
+         get_is_being_freshened() == other.get_is_being_freshened() &&
+         get_notified_on_down() == other.get_notified_on_down() &&
+         get_notified_on_unreachable() == other.get_notified_on_unreachable() &&
+         get_current_notification_number() ==
+             other.get_current_notification_number() &&
+         get_no_more_notifications() == other.get_no_more_notifications() &&
+         get_current_notification_id() == other.get_current_notification_id() &&
+         get_check_flapping_recovery_notification() ==
+             other.get_check_flapping_recovery_notification() &&
+         get_scheduled_downtime_depth() ==
+             other.get_scheduled_downtime_depth() &&
+         get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
+         is_equal(state_history, other.state_history,
+                  MAX_STATE_HISTORY_ENTRIES) &&
+         get_state_history_index() == other.get_state_history_index() &&
+         get_last_state_history_update() ==
+             other.get_last_state_history_update() &&
+         get_is_flapping() == other.get_is_flapping() &&
+         get_flapping_comment_id() == other.get_flapping_comment_id() &&
+         get_percent_state_change() == other.get_percent_state_change() &&
+         get_total_services() == other.get_total_services() &&
+         get_total_service_check_interval() ==
+             other.get_total_service_check_interval() &&
+         get_modified_attributes() == other.get_modified_attributes() &&
+         get_circular_path_checked() == other.get_circular_path_checked() &&
+         get_contains_circular_path() == other.get_contains_circular_path();
 }
 
 /**
@@ -1124,10 +1106,8 @@ bool operator==(
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool operator!=(
-       host const& obj1,
-       host const& obj2) throw () {
-  return !operator==(obj1, obj2);
+bool host::operator!=(host const& other) throw () {
+  return !operator==(other);
 }
 
 std::ostream& operator<<(std::ostream& os, host_map const& obj)
@@ -2501,79 +2481,6 @@ void host::clear_flap(
   set_check_flapping_recovery_notification(false);
 }
 
-/* enables flap detection for a specific host */
-void host::enable_flap_detection() {
-  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
-
-  logger(dbg_functions, basic)
-    << "enable_host_flap_detection()";
-
-  logger(dbg_flapping, more)
-    << "Enabling flap detection for host '" << get_name() << "'.";
-
-  /* nothing to do... */
-  if (get_flap_detection_enabled())
-    return;
-
-  /* set the attribute modified flag */
-  _modified_attributes |= attr;
-
-  /* set the flap detection enabled flag */
-  set_flap_detection_enabled(true);
-
-  /* send data to event broker */
-  broker_adaptive_host_data(
-    NEBTYPE_ADAPTIVEHOST_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    this,
-    CMD_NONE,
-    attr,
-    get_modified_attributes(),
-    NULL);
-
-  /* check for flapping */
-  check_for_flapping(false, false, true);
-
-  /* update host status */
-  update_status(false);
-}
-
-/* disables flap detection for a specific host */
-void host::disable_flap_detection() {
-  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
-
-  logger(dbg_functions, basic)
-    << "disable_host_flap_detection()";
-
-  logger(dbg_functions, more)
-    << "Disabling flap detection for host '" << get_name() << "'.";
-
-  /* nothing to do... */
-  if (!get_flap_detection_enabled())
-    return;
-
-  /* set the attribute modified flag */
-  _modified_attributes |= attr;
-
-  /* set the flap detection enabled flag */
-  set_flap_detection_enabled(false);
-
-  /* send data to event broker */
-  broker_adaptive_host_data(
-    NEBTYPE_ADAPTIVEHOST_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    this,
-    CMD_NONE,
-    attr,
-    get_modified_attributes(),
-    NULL);
-
-  /* handle the details... */
-  handle_host_flap_detection_disabled(this);
-}
-
 /* updates host status info */
 void host::update_status(bool aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
@@ -3622,4 +3529,77 @@ time_t host::get_next_notification_time(time_t offset) {
     (interval_to_use * config->interval_length()));
 
   return next_notification;
+}
+
+/* disables flap detection for a specific host */
+void host::disable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "disable_host_flap_detection()";
+
+  logger(dbg_functions, more)
+    << "Disabling flap detection for host '" << get_name() << "'.";
+
+  /* nothing to do... */
+  if (!get_flap_detection_enabled())
+    return;
+
+  /* set the attribute modified flag */
+  _modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  set_flap_detection_enabled(false);
+
+  /* send data to event broker */
+  broker_adaptive_host_data(
+    NEBTYPE_ADAPTIVEHOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    get_modified_attributes(),
+    NULL);
+
+  /* handle the details... */
+  handle_host_flap_detection_disabled(this);
+}
+
+/* enables flap detection for a specific host */
+void host::enable_flap_detection() {
+  unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
+
+  logger(dbg_functions, basic)
+    << "enable_host_flap_detection()";
+
+  logger(dbg_flapping, more)
+    << "Enabling flap detection for host '" << get_name() << "'.";
+
+  /* nothing to do... */
+  if (get_flap_detection_enabled())
+    return;
+
+  /* set the attribute modified flag */
+  _modified_attributes |= attr;
+
+  /* set the flap detection enabled flag */
+  set_flap_detection_enabled(true);
+
+  /* send data to event broker */
+  broker_adaptive_host_data(
+    NEBTYPE_ADAPTIVEHOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this,
+    CMD_NONE,
+    attr,
+    get_modified_attributes(),
+    NULL);
+
+  /* check for flapping */
+  check_for_flapping(false, false, true);
+
+  /* update host status */
+  update_status(false);
 }

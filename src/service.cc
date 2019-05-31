@@ -74,7 +74,10 @@ service::service(std::string const& hostname,
                  std::string const& notes_url,
                  std::string const& action_url,
                  std::string const& icon_image,
-                 std::string const& icon_image_alt)
+                 std::string const& icon_image_alt,
+                 bool flap_detection_enabled,
+                 double low_flap_threshold,
+                 double high_flap_threshold)
     : notifier{SERVICE_NOTIFICATION,
                display_name,
                check_command,
@@ -89,7 +92,10 @@ service::service(std::string const& hostname,
                notes_url,
                action_url,
                icon_image,
-               icon_image_alt},
+               icon_image_alt,
+               flap_detection_enabled,
+               low_flap_threshold,
+               high_flap_threshold},
       _hostname{hostname},
       _description{description} {}
 
@@ -144,9 +150,9 @@ bool operator==(com::centreon::engine::service const& obj1,
          obj1.is_volatile == obj2.is_volatile &&
          obj1.get_notification_period() == obj2.get_notification_period() &&
          obj1.get_check_period() == obj2.get_check_period() &&
-         obj1.flap_detection_enabled == obj2.flap_detection_enabled &&
-         obj1.low_flap_threshold == obj2.low_flap_threshold &&
-         obj1.high_flap_threshold == obj2.high_flap_threshold &&
+         obj1.get_flap_detection_enabled() == obj2.get_flap_detection_enabled() &&
+         obj1.get_low_flap_threshold() == obj2.get_low_flap_threshold() &&
+         obj1.get_high_flap_threshold() == obj2.get_high_flap_threshold() &&
          obj1.flap_detection_on_ok == obj2.flap_detection_on_ok &&
          obj1.flap_detection_on_warning == obj2.flap_detection_on_warning &&
          obj1.flap_detection_on_unknown == obj2.flap_detection_on_unknown &&
@@ -366,13 +372,13 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_check_period()
      << "\n"
         "  flap_detection_enabled:               "
-     << obj.flap_detection_enabled
+     << obj.get_flap_detection_enabled()
      << "\n"
         "  low_flap_threshold:                   "
-     << obj.low_flap_threshold
+     << obj.get_low_flap_threshold()
      << "\n"
         "  high_flap_threshold:                  "
-     << obj.high_flap_threshold
+     << obj.get_high_flap_threshold()
      << "\n"
         "  flap_detection_on_ok:                 "
      << obj.flap_detection_on_ok
@@ -792,8 +798,9 @@ com::centreon::engine::service* add_service(
   std::shared_ptr<service> obj{new service(
       host_name, description, display_name.empty() ? description : display_name,
       check_command, initial_state, check_interval, retry_interval,
-      max_attempts, notification_period, check_period, event_handler,
-      notes, notes_url, action_url, icon_image, icon_image_alt)};
+      max_attempts, notification_period, check_period, event_handler, notes,
+      notes_url, action_url, icon_image, icon_image_alt, flap_detection_enabled,
+      low_flap_threshold, high_flap_threshold)};
 
   try {
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
@@ -806,17 +813,14 @@ com::centreon::engine::service* add_service(
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
     obj->first_notification_delay = first_notification_delay;
-    obj->flap_detection_enabled = (flap_detection_enabled > 0);
     obj->flap_detection_on_critical = (flap_detection_on_critical > 0);
     obj->flap_detection_on_ok = (flap_detection_on_ok > 0);
     obj->flap_detection_on_unknown = (flap_detection_on_unknown > 0);
     obj->flap_detection_on_warning = (flap_detection_on_warning > 0);
     obj->freshness_threshold = freshness_threshold;
-    obj->high_flap_threshold = high_flap_threshold;
     obj->is_volatile = (is_volatile > 0);
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;
-    obj->low_flap_threshold = low_flap_threshold;
     obj->modified_attributes = MODATTR_NONE;
     obj->notification_interval = notification_interval;
     obj->notifications_enabled = (notifications_enabled > 0);
@@ -2114,12 +2118,12 @@ void service::check_for_flapping(int update,
     return;
 
   /* what threshold values should we use (global or service-specific)? */
-  low_threshold = (this->low_flap_threshold <= 0.0)
+  low_threshold = (get_low_flap_threshold() <= 0.0)
                       ? config->low_service_flap_threshold()
-                      : this->low_flap_threshold;
-  high_threshold = (this->high_flap_threshold <= 0.0)
+                      : get_low_flap_threshold();
+  high_threshold = (get_high_flap_threshold() <= 0.0)
                        ? config->high_service_flap_threshold()
-                       : this->high_flap_threshold;
+                       : get_high_flap_threshold();
 
   update_history = update;
 
@@ -2191,7 +2195,7 @@ void service::check_for_flapping(int update,
 
   /* don't do anything if we don't have flap detection enabled for this service
    */
-  if (!this->flap_detection_enabled)
+  if (get_flap_detection_enabled())
     return;
 
   /* are we flapping, undecided, or what?... */
@@ -2718,14 +2722,14 @@ void service::enable_flap_detection() {
     << "' on host '" << this->get_hostname() << "'.";
 
   /* nothing to do... */
-  if (this->flap_detection_enabled)
+  if (get_flap_detection_enabled())
     return;
 
   /* set the attribute modified flag */
   this->modified_attributes |= attr;
 
   /* set the flap detection enabled flag */
-  this->flap_detection_enabled = true;
+  set_flap_detection_enabled(true);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -2757,14 +2761,14 @@ void service::disable_flap_detection() {
     << "' on host '" << get_hostname() << "'.";
 
   /* nothing to do... */
-  if (!this->flap_detection_enabled)
+  if (!get_flap_detection_enabled())
     return;
 
   /* set the attribute modified flag */
   this->modified_attributes |= attr;
 
   /* set the flap detection enabled flag */
-  this->flap_detection_enabled = false;
+  set_flap_detection_enabled(false);
 
   /* send data to event broker */
   broker_adaptive_service_data(

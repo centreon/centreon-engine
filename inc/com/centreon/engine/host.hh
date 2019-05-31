@@ -81,7 +81,7 @@ class                 host : public notifier {
                            int accept_passive_checks,
                            std::string const& event_handler,
                            int event_handler_enabled,
-                           int flap_detection_enabled,
+                           bool flap_detection_enabled,
                            double low_flap_threshold,
                            double high_flap_threshold,
                            int flap_detection_on_up,
@@ -136,8 +136,6 @@ class                 host : public notifier {
   void               clear_flap(double percent_change,
                                 double high_threshold,
                                 double low_threshold);
-  void               enable_flap_detection();
-  void               disable_flap_detection();
   void               update_status(bool aggregated_dump) override;
   void               check_for_expired_acknowledgement();
   int                check_notification_viability(unsigned int type,
@@ -148,6 +146,8 @@ class                 host : public notifier {
                                             int* time_is_valid,
                                             time_t* new_time);
   void               grab_macros_r(nagios_macros* mac) override;
+  bool               operator==(host const& other) throw ();
+  bool               operator!=(host const& other) throw ();
 
   // setters / getters
   std::string const& get_name() const;
@@ -168,12 +168,6 @@ class                 host : public notifier {
   void               set_notify_on_flapping(int notify_on_flapping);
   int                get_notify_on_downtime() const;
   void               set_notify_on_downtime(int notify_on_downtime);
-  bool               get_flap_detection_enabled(void) const;
-  void               set_flap_detection_enabled(bool flap_detection_enabled);
-  double             get_low_flap_threshold() const;
-  void               set_low_flap_threshold(double low_flap_threshold);
-  double             get_high_flap_threshold() const;
-  void               set_high_flap_threshold(double high_flap_threshold);
   bool               get_flap_detection_on_up() const;
   void               set_flap_detection_on_up(bool flag_detection_on_up);
   bool               get_flap_detection_on_down() const;
@@ -300,6 +294,8 @@ class                 host : public notifier {
   void               set_is_flapping(bool is_flapping);
   unsigned long      get_flapping_comment_id() const;
   void               set_flapping_comment_id(unsigned long flapping_comment_id);
+  void               disable_flap_detection();
+  void               enable_flap_detection();
   double             get_percent_state_change() const;
   void               set_percent_state_change(double percent_state_change);
   int                get_total_services() const;
@@ -357,9 +353,6 @@ private:
   int                 _notify_on_recovery;
   int                 _notify_on_flapping;
   int                 _notify_on_downtime;
-  bool                _flap_detection_enabled;
-  double              _low_flap_threshold;
-  double              _high_flap_threshold;
   bool                _flap_detection_on_up;
   bool                _flap_detection_on_down;
   bool                _flap_detection_on_unreachable;
@@ -467,12 +460,6 @@ int                   number_of_total_child_hosts(
 int                   number_of_total_parent_hosts(
                                     com::centreon::engine::host* hst);
 
-bool                  operator==(
-                            com::centreon::engine::host const& obj1,
-                            com::centreon::engine::host const& obj2) throw ();
-bool                  operator!=(
-                            com::centreon::engine::host const& obj1,
-                            com::centreon::engine::host const& obj2) throw ();
 std::ostream&         operator<<(std::ostream& os,
                             com::centreon::engine::host const& obj);
 std::ostream&         operator<<(std::ostream& os, host_map const& obj);

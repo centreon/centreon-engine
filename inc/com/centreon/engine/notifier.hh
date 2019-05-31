@@ -49,7 +49,10 @@ class                         notifier {
                                        std::string const& notes_url,
                                        std::string const& action_url,
                                        std::string const& icon_image,
-                                       std::string const& icon_image_alt);
+                                       std::string const& icon_image_alt,
+                                       bool flap_detection_enabled,
+                                       double low_flap_threshold,
+                                       double high_flap_threshold);
   virtual                     ~notifier() {}
 
   std::string const&          get_display_name() const;
@@ -129,8 +132,17 @@ class                         notifier {
   void                        set_long_plugin_output(std::string const& long_plugin_output);
   std::string const&          get_perf_data() const;
   void                        set_perf_data(std::string const& perf_data);
+  bool                        get_flap_detection_enabled(void) const;
+  void                        set_flap_detection_enabled(bool flap_detection_enabled);
+  double                      get_low_flap_threshold() const;
+  void                        set_low_flap_threshold(double low_flap_threshold);
+  double                      get_high_flap_threshold() const;
+  void                        set_high_flap_threshold(double high_flap_threshold);
+
 
  protected:
+
+
   int                         _notification_type;
   std::string                 _display_name;
   std::string                 _check_command;
@@ -164,6 +176,9 @@ class                         notifier {
   std::string                 _plugin_output;
   std::string                 _long_plugin_output;
   std::string                 _perf_data;
+  bool                        _flap_detection_enabled;
+  double                      _low_flap_threshold;
+  double                      _high_flap_threshold;
 };
 
 CCE_END()

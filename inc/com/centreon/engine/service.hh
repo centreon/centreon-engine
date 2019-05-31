@@ -63,7 +63,10 @@ class                           service : public notifier {
                                         std::string const& notes_url,
                                         std::string const& action_url,
                                         std::string const& icon_image,
-                                        std::string const& icon_image_alt);
+                                        std::string const& icon_image_alt,
+                                        bool flap_detection_enabled,
+                                        double low_flap_threshold,
+                                        double high_flap_threshold);
                                 ~service();
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
@@ -120,7 +123,7 @@ class                           service : public notifier {
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
 
-  int                           parallelize;
+  bool                          parallelize;
   contactgroup_map              contact_groups;
   contact_map                   contacts;
   double                        notification_interval;
@@ -136,9 +139,6 @@ class                           service : public notifier {
   int                           stalk_on_unknown;
   int                           stalk_on_critical;
   int                           is_volatile;
-  int                           flap_detection_enabled;
-  double                        low_flap_threshold;
-  double                        high_flap_threshold;
   int                           flap_detection_on_ok;
   int                           flap_detection_on_warning;
   int                           flap_detection_on_unknown;

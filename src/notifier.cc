@@ -65,7 +65,10 @@ notifier::notifier(int notification_type,
                    std::string const& notes_url,
                    std::string const& action_url,
                    std::string const& icon_image,
-                   std::string const& icon_image_alt)
+                   std::string const& icon_image_alt,
+                   bool flap_detection_enabled,
+                   double low_flap_threshold,
+                   double high_flap_threshold)
     : _notification_type{notification_type},
       _display_name{display_name},
       _check_command{check_command},
@@ -80,7 +83,10 @@ notifier::notifier(int notification_type,
       _notes_url{notes_url},
       _action_url{action_url},
       _icon_image{icon_image},
-      _icon_image_alt{icon_image_alt} {
+      _icon_image_alt{icon_image_alt},
+      _flap_detection_enabled{flap_detection_enabled},
+      _low_flap_threshold{low_flap_threshold},
+      _high_flap_threshold{high_flap_threshold} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -626,3 +632,28 @@ std::string const& notifier::get_perf_data() const {
 void notifier::set_perf_data(std::string const& perf_data) {
   _perf_data = perf_data;
 }
+
+bool notifier::get_flap_detection_enabled(void) const {
+  return _flap_detection_enabled;
+}
+
+void notifier::set_flap_detection_enabled(bool flap_detection_enabled) {
+  _flap_detection_enabled = flap_detection_enabled;
+}
+
+double notifier::get_low_flap_threshold() const {
+  return _low_flap_threshold;
+}
+
+void notifier::set_low_flap_threshold(double low_flap_threshold) {
+  _low_flap_threshold = low_flap_threshold;
+}
+
+double notifier::get_high_flap_threshold() const {
+  return _high_flap_threshold;
+}
+
+void notifier::set_high_flap_threshold(double high_flap_threshold) {
+  _high_flap_threshold = high_flap_threshold;
+}
+
