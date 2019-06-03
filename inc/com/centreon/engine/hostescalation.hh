@@ -17,9 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_OBJECTS_HOSTESCALATION_HH
-#  define CCE_OBJECTS_HOSTESCALATION_HH
+#ifndef CCE_HOSTESCALATION_HH
+#  define CCE_HOSTESCALATION_HH
 #  include <ostream>
+#  include "com/centreon/engine/escalation.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
@@ -32,7 +33,7 @@ typedef std::unordered_multimap<std::string,
 std::shared_ptr<com::centreon::engine::hostescalation>> hostescalation_mmap;
 
 CCE_BEGIN()
-class                 hostescalation {
+class                 hostescalation : public escalation {
  public:
                       hostescalation(std::string const& host_name,
                                      int first_notification,
@@ -43,14 +44,8 @@ class                 hostescalation {
                                      bool escalate_on_unreachable,
                                      bool escalate_on_recovery);
 
-  std::string const&  get_host_name() const;
-  void                set_host_name(std::string const& host_name);
-  int                 get_first_notification() const;
-  void                set_first_notification(int first_notification);
-  int                 get_last_notification() const;
-  void                set_last_notification(int last_notification);
-  double              get_notification_interval() const;
-  void                set_notification_interval(double notification_interval);
+  std::string const&  get_hostname() const;
+  void                set_hostname(std::string const& host_name);
   std::string const&  get_escalation_period() const;
   void                set_escalation_period(
     std::string const& escalation_period);
@@ -77,9 +72,6 @@ class                 hostescalation {
 
  private:
   std::string         _host_name;
-  int                 _first_notification;
-  int                 _last_notification;
-  double              _notification_interval;
   std::string         _escalation_period;
   bool                _escalate_on_recovery;
   bool                _escalate_on_down;
@@ -101,6 +93,6 @@ std::ostream& operator<<(std::ostream& os,
 
 #  endif /* C++ */
 
-#endif // !CCE_OBJECTS_HOSTESCALATION_HH
+#endif // !CCE_HOSTESCALATION_HH
 
 

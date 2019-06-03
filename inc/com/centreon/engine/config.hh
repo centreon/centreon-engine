@@ -45,7 +45,7 @@ int check_contactgroup(com::centreon::engine::contactgroup* cg, int* w,
   int* e);
 int check_servicedependency(com::centreon::engine::servicedependency* sd, int* w, int* e);
 int check_hostdependency(com::centreon::engine::hostdependency* hd, int* w, int* e);
-int check_serviceescalation(serviceescalation* se, int* w, int* e);
+int check_serviceescalation(com::centreon::engine::serviceescalation* se, int* w, int* e);
 int check_hostescalation(com::centreon::engine::hostescalation* he, int* w, int* e);
 int check_timeperiod(com::centreon::engine::timeperiod* tp, int* w, int* e);
 

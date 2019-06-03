@@ -3621,7 +3621,7 @@ time_t service::get_next_notification_time(time_t offset) {
        temp_se = temp_se->next) {
 
     /* interval < 0 means to use non-escalated interval */
-    if (temp_se->notification_interval < 0.0)
+    if (temp_se->get_notification_interval() < 0.0)
       continue;
 
     /* skip this entry if it isn't appropriate */
@@ -3633,7 +3633,7 @@ time_t service::get_next_notification_time(time_t offset) {
 
     logger(dbg_notifications, most)
       << "Found a valid escalation w/ interval of "
-      << temp_se->notification_interval;
+      << temp_se->get_notification_interval();
 
     /*
      * if we haven't used a notification interval from an escalation yet,
@@ -3641,12 +3641,12 @@ time_t service::get_next_notification_time(time_t offset) {
      */
     if (have_escalated_interval == false) {
       have_escalated_interval = true;
-      interval_to_use = temp_se->notification_interval;
+      interval_to_use = temp_se->get_notification_interval();
     }
 
     /* else use the shortest of all valid escalation intervals */
-    else if (temp_se->notification_interval < interval_to_use)
-      interval_to_use = temp_se->notification_interval;
+    else if (temp_se->get_notification_interval() < interval_to_use)
+      interval_to_use = temp_se->get_notification_interval();
 
     logger(dbg_notifications, most)
       << "New interval: " << interval_to_use;

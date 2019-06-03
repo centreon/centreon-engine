@@ -34,10 +34,10 @@
 #  include "com/centreon/engine/timeperiod.hh"
 
 // Forward declaration.
-struct serviceescalation_struct;
 struct servicegroup_struct;
 
 CCE_BEGIN()
+class serviceescalation;
 
 // Forward declaration.
 namespace commands {
@@ -159,13 +159,13 @@ namespace           configuration {
                     servicedependencies_find(configuration::servicedependency::key_type const& k) const;
       servicedependency_mmap::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>> const&
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>> const&
                     serviceescalations() const throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>&
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>&
                     serviceescalations() throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>::const_iterator
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>::const_iterator
                     serviceescalations_find(configuration::serviceescalation::key_type const& k) const;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>::iterator
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>::iterator
                     serviceescalations_find(configuration::serviceescalation::key_type const& k);
       std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>> const&
                     servicegroups() const throw ();
@@ -249,7 +249,7 @@ namespace           configuration {
                     _services;
       servicedependency_mmap
                     _servicedependencies;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct>>
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>
                     _serviceescalations;
       std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>
                     _servicegroups;

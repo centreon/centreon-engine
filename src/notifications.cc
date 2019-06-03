@@ -223,19 +223,19 @@ int is_valid_escalation_for_service_notification(
     return true;
 
   /* skip this escalation if it happens later */
-  if (se->first_notification > notification_number)
+  if (se->get_first_notification() > notification_number)
     return false;
 
   /* skip this escalation if it has already passed */
-  if (se->last_notification != 0
-      && se->last_notification < notification_number)
+  if (se->get_last_notification() != 0
+      && se->get_last_notification() < notification_number)
     return false;
 
   /*
    * skip this escalation if it has a timeperiod and the current time isn't
    * valid
    */
-  if (se->escalation_period != nullptr
+  if (!se->get_escalation_period().empty()
       && check_time_against_period(
            current_time,
            se->escalation_period_ptr) == ERROR)

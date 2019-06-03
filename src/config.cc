@@ -1547,10 +1547,10 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   int errors(0);
 
   // Find the service.
-  com::centreon::engine::service* temp_service(find_service(se->host_name, se->description));
+  com::centreon::engine::service* temp_service(find_service(se->get_hostname().c_str(), se->get_description().c_str()));
   if (!temp_service) {
     logger(log_verification_error, basic) << "Error: Service '"
-        << se->description << "' on host '" << se->host_name
+        << se->get_description() << "' on host '" << se->get_hostname()
         << "' specified in service escalation is not defined anywhere!";
     errors++;
   }
@@ -1559,20 +1559,20 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   se->service_ptr = temp_service;
 
   // Find the timeperiod.
-  if (se->escalation_period) {
+  if (!se->get_escalation_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(se->escalation_period));
+      it(state::instance().timeperiods().find(se->get_escalation_period()));
 
     if (it != state::instance().timeperiods().end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Escalation period '" << se->escalation_period
+        << "Error: Escalation period '" << se->get_escalation_period()
         << "' specified in service escalation for service '"
-        << se->description << "' on host '"
-        << se->host_name << "' is not defined anywhere!";
+        << se->get_description() << "' on host '"
+        << se->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1593,8 +1593,8 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in service escalation for service '"
-        << se->description << "' on host '"
-        << se->host_name << "' is not defined anywhere!";
+        << se->get_description() << "' on host '"
+        << se->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }
@@ -1615,7 +1615,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
         << "Error: Contact group '"
         << it->first
         << "' specified in service escalation for service '"
-        << se->description << "' on host '" << se->host_name
+        << se->get_description() << "' on host '" << se->get_hostname()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1643,10 +1643,10 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
 
   // Find the host.
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(he->get_host_name())));
+    it(state::instance().hosts().find(get_host_id(he->get_hostname())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
-      << "Error: Host '" << he->get_host_name()
+      << "Error: Host '" << he->get_hostname()
       << "' specified in host escalation is not defined anywhere!";
     errors++;
   }
@@ -1670,7 +1670,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: Escalation period '" << he->get_escalation_period()
         << "' specified in host escalation for host '"
-        << he->get_host_name() << "' is not defined anywhere!";
+        << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1691,7 +1691,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in host escalation for host '"
-        << he->get_host_name() << "' is not defined anywhere!";
+        << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }
@@ -1712,7 +1712,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
         << "Error: Contact group '"
         << it->first
         << "' specified in host escalation for host '"
-        << he->get_host_name() << "' is not defined anywhere!";
+        << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }

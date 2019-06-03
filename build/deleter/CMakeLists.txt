@@ -28,7 +28,6 @@ set(
 
   # Sources.
   "${SRC_DIR}/objectlist.cc"
-  "${SRC_DIR}/serviceescalation.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/servicesmember.cc"
   "${SRC_DIR}/timedevent.cc"
@@ -36,7 +35,6 @@ set(
   # Headers.
   "${INC_DIR}/listmember.hh"
   "${INC_DIR}/objectlist.hh"
-  "${INC_DIR}/serviceescalation.hh"
   "${INC_DIR}/servicegroup.hh"
   "${INC_DIR}/servicesmember.hh"
   "${INC_DIR}/timedevent.hh"

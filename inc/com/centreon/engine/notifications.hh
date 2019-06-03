@@ -23,12 +23,12 @@
 #  define CCE_NOTIFICATIONS_HH
 
 #  include <sys/time.h>
-#  include "com/centreon/engine/macros/defines.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/hostescalation.hh"
+#  include "com/centreon/engine/macros/defines.hh"
 #  include "com/centreon/engine/service.hh"
-#  include "com/centreon/engine/objects/serviceescalation.hh"
+#  include "com/centreon/engine/serviceescalation.hh"
 
 // Notification Types
 #  define HOST_NOTIFICATION               0
@@ -76,7 +76,7 @@ int notify_contact_of_service(
 // checks if an escalation entry is valid for a particular service notification
 int is_valid_escalation_for_service_notification(
       com::centreon::engine::service* svc,
-      serviceescalation* se,
+      com::centreon::engine::serviceescalation* se,
       int options);
 // checks if a service notification should be escalated
 int should_service_notification_be_escalated(com::centreon::engine::service* svc);

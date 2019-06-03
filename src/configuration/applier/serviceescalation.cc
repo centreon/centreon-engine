@@ -87,7 +87,7 @@ void applier::serviceescalation::add_object(
   config->serviceescalations().insert(obj);
 
   // Create service escalation.
-  serviceescalation_struct*
+  engine::serviceescalation*
     se(add_service_escalation(
          obj.hosts().front().c_str(),
          obj.service_description().front().c_str(),
@@ -212,12 +212,12 @@ void applier::serviceescalation::remove_object(
 
   // Find service escalation.
   umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<serviceescalation_struct> >::iterator
+            std::shared_ptr<engine::serviceescalation>>::iterator
     it(applier::state::instance().serviceescalations_find(obj.key()));
   if (it != applier::state::instance().serviceescalations().end()) {
-    serviceescalation_struct* escalation(it->second.get());
+    engine::serviceescalation* escalation(it->second.get());
     // Remove service escalation from its list.
-    unregister_object<serviceescalation_struct>(
+    unregister_object<engine::serviceescalation>(
       &serviceescalation_list,
       escalation);
 
@@ -253,7 +253,7 @@ void applier::serviceescalation::resolve_object(
 
   // Find service escalation.
   umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<serviceescalation_struct> >::iterator
+            std::shared_ptr<engine::serviceescalation>>::iterator
     it(applier::state::instance().serviceescalations_find(obj.key()));
   if (applier::state::instance().serviceescalations().end() == it)
     throw (engine_error() << "Cannot resolve service escalation");

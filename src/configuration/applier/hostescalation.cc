@@ -101,11 +101,11 @@ void applier::hostescalation::add_object(
 
   // Add new items to the configuration state.
   state::instance().hostescalations()
-    .insert(std::make_pair(he->get_host_name(), he));
+    .insert(std::make_pair(he->get_hostname(), he));
 
   // Add new items to the list.
   engine::hostescalation::hostescalations
-    .insert(std::make_pair(he->get_host_name(), he));
+    .insert(std::make_pair(he->get_hostname(), he));
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));

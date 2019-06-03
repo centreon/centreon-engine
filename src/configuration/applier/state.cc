@@ -610,7 +610,7 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >:
     // Create host escalation configuration from object.
     configuration::hostescalation current;
     current.configuration::object::operator=(k);
-    current.hosts().insert(p.first->second->get_host_name());
+    current.hosts().insert(p.first->second->get_hostname());
     current.first_notification(p.first->second->get_first_notification());
     current.last_notification(p.first->second->get_last_notification());
     current.notification_interval(
@@ -832,7 +832,7 @@ servicedependency_mmap ::iterator applier::state::servicedependencies_find(confi
  *
  *  @return The current serviceescalations.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> > const& applier::state::serviceescalations() const throw () {
+umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>> const& applier::state::serviceescalations() const throw () {
   return _serviceescalations;
 }
 
@@ -841,7 +841,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
  *
  *  @return The current serviceescalations.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >& applier::state::serviceescalations() throw () {
+umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation> >& applier::state::serviceescalations() throw () {
   return _serviceescalations;
 }
 
@@ -853,7 +853,7 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
  *  @return Iterator to the element if found, serviceescalations().end()
  *          otherwise.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
+umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>>::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
   return const_cast<state*>(this)->serviceescalations_find(k);
 }
 
@@ -865,29 +865,27 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation
  *  @return Iterator to the element if found, serviceescalations().end()
  *          otherwise.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
+umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>>::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
   // Copy service escalation configuration to sort some
   // members (used for comparison below).
   configuration::serviceescalation sesc(k);
 
   // Browse escalations matching target service.
-  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> > collection;
+  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>> collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
   while (p.first != p.second) {
     // Create service escalation configuration from object.
     configuration::serviceescalation current;
     current.configuration::object::operator=(k);
-    current.hosts().push_back(p.first->second->host_name);
+    current.hosts().push_back(p.first->second->get_hostname());
     current.service_description().push_back(
-                                    p.first->second->description);
-    current.first_notification(p.first->second->first_notification);
-    current.last_notification(p.first->second->last_notification);
+                                    p.first->second->get_description());
+    current.first_notification(p.first->second->get_first_notification());
+    current.last_notification(p.first->second->get_last_notification());
     current.notification_interval(
-              static_cast<unsigned int>(p.first->second->notification_interval));
-    current.escalation_period(p.first->second->escalation_period
-                              ? p.first->second->escalation_period
-                              : "");
+              static_cast<unsigned int>(p.first->second->get_notification_interval()));
+    current.escalation_period(p.first->second->get_escalation_period());
     unsigned int options((p.first->second->escalate_on_recovery
                           ? configuration::serviceescalation::recovery
                           : 0)
