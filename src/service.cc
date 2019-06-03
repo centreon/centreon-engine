@@ -800,7 +800,7 @@ com::centreon::engine::service* add_service(
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_freshness = (check_freshness > 0);
     obj->check_options = CHECK_OPTION_NONE;
-    obj->check_type = SERVICE_CHECK_ACTIVE;
+    obj->check_type = check_active;
     obj->checks_enabled = (checks_enabled > 0);
     obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
@@ -1097,7 +1097,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   logger(dbg_checks, more)
       << "HOST: " << this->get_hostname()
       << ", SERVICE: " << this->get_description() << ", CHECK TYPE: "
-      << (queued_check_result->check_type == SERVICE_CHECK_ACTIVE ? "Active"
+      << (queued_check_result->check_type == check_active ? "Active"
                                                                   : "Passive")
       << ", OPTIONS: " << queued_check_result->check_options << ", SCHEDULED: "
       << (queued_check_result->scheduled_check ? "Yes" : "No")
@@ -1108,7 +1108,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       << ", OUTPUT: " << queued_check_result->output;
 
   /* decrement the number of service checks still out there... */
-  if (queued_check_result->check_type == SERVICE_CHECK_ACTIVE &&
+  if (queued_check_result->check_type == check_active &&
       currently_running_service_checks > 0)
     currently_running_service_checks--;
 
@@ -1116,7 +1116,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * skip this service check results if its passive and we aren't accepting
    * passive check results
    */
-  if (queued_check_result->check_type == SERVICE_CHECK_PASSIVE) {
+  if (queued_check_result->check_type == check_passive) {
     if (!config->accept_passive_service_checks()) {
       logger(dbg_checks, basic)
           << "Discarding passive service check result because passive "
@@ -1139,7 +1139,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     this->is_being_freshened = false;
 
   /* clear the execution flag if this was an active check */
-  if (queued_check_result->check_type == SERVICE_CHECK_ACTIVE)
+  if (queued_check_result->check_type == check_active)
     this->is_executing = false;
 
   /* DISCARD INVALID FRESHNESS CHECK RESULTS */
@@ -1177,12 +1177,12 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   this->last_check = queued_check_result->start_time.tv_sec;
 
   /* was this check passive or active? */
-  this->check_type = (queued_check_result->check_type == SERVICE_CHECK_ACTIVE)
-                         ? SERVICE_CHECK_ACTIVE
-                         : SERVICE_CHECK_PASSIVE;
+  this->check_type = (queued_check_result->check_type == check_active)
+                         ? check_active
+                         : check_passive;
 
   /* update check statistics for passive checks */
-  if (queued_check_result->check_type == SERVICE_CHECK_PASSIVE)
+  if (queued_check_result->check_type == check_passive)
     update_check_stats(PASSIVE_SERVICE_CHECK_STATS,
                        queued_check_result->start_time.tv_sec);
 
@@ -1307,7 +1307,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * log passive checks - we need to do this here, as some my bypass external
    * commands by getting dropped in checkresults dir
    */
-  if (this->check_type == SERVICE_CHECK_PASSIVE) {
+  if (this->check_type == check_passive) {
     if (config->log_passive_checks())
       logger(log_passive_check, basic)
           << "PASSIVE SERVICE CHECK: " << this->get_hostname() << ";"
@@ -2798,7 +2798,7 @@ int service::check_notification_viability(unsigned int type, int options) {
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config->enable_notifications() == false) {
+  if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
         << "Notifications are disabled, so service notifications will "
            "not be sent out.";

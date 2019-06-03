@@ -27,6 +27,7 @@
 #endif // HAVE_GETOPT_H
 #include <iostream>
 #include <unistd.h>
+#include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/version.hh"
@@ -592,7 +593,7 @@ int read_status_file() {
 
   double execution_time = 0.0;
   double latency = 0.0;
-  int check_type = SERVICE_CHECK_ACTIVE;
+  int check_type = check_active;
   int current_state = STATE_OK;
   double state_change = 0.0;
   int is_flapping = false;
@@ -659,7 +660,7 @@ int read_status_file() {
           have_max_host_state_change = true;
           max_host_state_change = state_change;
         }
-        if (check_type == HOST_CHECK_ACTIVE) {
+        if (check_type == check_active) {
           active_host_checks++;
           average_active_host_latency = (((average_active_host_latency * ((double)active_host_checks - 1.0)) + latency) / (double)active_host_checks);
           if (have_min_active_host_latency == false
@@ -773,7 +774,7 @@ int read_status_file() {
           have_max_service_state_change = true;
           max_service_state_change = state_change;
         }
-        if (check_type == SERVICE_CHECK_ACTIVE) {
+        if (check_type == check_active) {
           active_service_checks++;
           average_active_service_latency = (((average_active_service_latency
 					      * ((double)active_service_checks - 1.0))

@@ -38,6 +38,11 @@ CCE_BEGIN()
   class service;
 CCE_END()
 
+enum check_type {
+  check_active =  0,        /* Engine performed the check. */
+  check_passive = 1,        /* Check result submitted by an external source. */
+};
+
 // CHECK_RESULT structure
 typedef struct                check_result_struct {
   unsigned int                object_check_type;    // is this a service or a host check?

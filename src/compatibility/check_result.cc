@@ -108,7 +108,7 @@ extern "C" {
     info->object_check_type = HOST_CHECK;
     info->host_name = NULL;
     info->service_description = NULL;
-    info->check_type = HOST_CHECK_ACTIVE;
+    info->check_type = check_active;
     info->check_options = CHECK_OPTION_NONE;
     info->scheduled_check = false;
     info->reschedule_check = false;

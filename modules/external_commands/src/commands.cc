@@ -616,7 +616,7 @@ int process_passive_service_check(
   result.object_check_type = SERVICE_CHECK;
   result.host_name = string::dup(real_host_name);
   result.service_description = string::dup(svc_description);
-  result.check_type = SERVICE_CHECK_PASSIVE;
+  result.check_type = check_passive;
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
   result.reschedule_check = false;
@@ -755,7 +755,7 @@ int process_passive_host_check(
   result.object_check_type = HOST_CHECK;
   result.host_name = string::dup(real_host_name);
   result.service_description = nullptr;
-  result.check_type = HOST_CHECK_PASSIVE;
+  result.check_type = check_passive;
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
   result.reschedule_check = false;

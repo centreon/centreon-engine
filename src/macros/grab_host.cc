@@ -105,7 +105,7 @@ static void generate_host_total_services(
 static char* get_host_check_type(host& hst, nagios_macros* mac) {
   (void)mac;
   return (string::dup(
-           (HOST_CHECK_PASSIVE == hst.get_check_type()
+           (check_passive == hst.get_check_type()
             ? "PASSIVE"
             : "ACTIVE")));
 }

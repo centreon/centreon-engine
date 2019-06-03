@@ -211,13 +211,6 @@
 #  define CMD_DEL_SVC_DOWNTIME_FULL                          502
 #  define CMD_CUSTOM_COMMAND                                 999
 
-/* Service check types. */
-#  define SERVICE_CHECK_ACTIVE  0 /* Engine performed the service check. */
-#  define SERVICE_CHECK_PASSIVE 1 /* The service check result was submitted by an external source. */
-
-/* Host check types. */
-#  define HOST_CHECK_ACTIVE  0 /* Engine performed the host check. */
-#  define HOST_CHECK_PASSIVE 1 /* The host check result was submitted by an external source. */
 
 /* Service state types. */
 #  define SOFT_STATE 0

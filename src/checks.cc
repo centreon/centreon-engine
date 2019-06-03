@@ -819,7 +819,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
       << "HOST: " << hst->get_name()
       << ", ATTEMPT=" << hst->get_current_attempt() << "/"
       << hst->get_max_attempts() << ", CHECK TYPE="
-      << (hst->get_check_type() == HOST_CHECK_ACTIVE ? "ACTIVE" : "PASSIVE")
+      << (hst->get_check_type() == check_active ? "ACTIVE" : "PASSIVE")
       << ", STATE TYPE="
       << (hst->get_state_type() == HARD_STATE ? "HARD" : "SOFT")
       << ", OLD STATE=" << hst->get_current_state()
@@ -834,13 +834,13 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
 
   /* we have to adjust current attempt # for passive checks, as it isn't done
    * elsewhere */
-  if (hst->get_check_type() == HOST_CHECK_PASSIVE &&
+  if (hst->get_check_type() == check_passive &&
       config->passive_host_checks_are_soft())
     adjust_host_check_attempt_3x(hst, false);
 
   /* log passive checks - we need to do this here, as some my bypass external
    * commands by getting dropped in checkresults dir */
-  if (hst->get_check_type() == HOST_CHECK_PASSIVE) {
+  if (hst->get_check_type() == check_passive) {
     if (config->log_passive_checks())
       logger(log_passive_check, basic)
           << "PASSIVE HOST CHECK: " << hst->get_name() << ";" << new_state
@@ -860,7 +860,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
       /* set state type to HARD for passive checks and active checks that were
        * previously in a HARD STATE */
       if (hst->get_state_type() == HARD_STATE ||
-          (hst->get_check_type() == HOST_CHECK_PASSIVE &&
+          (hst->get_check_type() == check_passive &&
            !config->passive_host_checks_are_soft()))
         hst->set_state_type(HARD_STATE);
       else
@@ -917,7 +917,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
       logger(dbg_checks, more) << "Host is still DOWN/UNREACHABLE.";
 
       /* passive checks are treated as HARD states by default... */
-      if (hst->get_check_type() == HOST_CHECK_PASSIVE &&
+      if (hst->get_check_type() == check_passive &&
           !config->passive_host_checks_are_soft()) {
         /* set the state type */
         hst->set_state_type(HARD_STATE);
@@ -944,7 +944,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
       /* translate host state between DOWN/UNREACHABLE (only for passive checks
        * if enabled) */
       hst->set_current_state(new_state);
-      if (hst->get_check_type() == HOST_CHECK_ACTIVE ||
+      if (hst->get_check_type() == check_active ||
           config->translate_passive_host_checks())
         hst->set_current_state(determine_host_reachability(hst));
 
@@ -1016,7 +1016,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
         /* check all parent hosts to see if we're DOWN or UNREACHABLE */
         /* only do this for ACTIVE checks, as PASSIVE checks contain a
          * pre-determined state */
-        if (hst->get_check_type() == HOST_CHECK_ACTIVE) {
+        if (hst->get_check_type() == check_active) {
           has_parent = false;
 
           logger(dbg_checks, more)
@@ -1098,7 +1098,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
       else {
         /* active and (in some cases) passive check results are treated as SOFT
          * states */
-        if (hst->get_check_type() == HOST_CHECK_ACTIVE ||
+        if (hst->get_check_type() == check_active ||
             config->passive_host_checks_are_soft()) {
           /* set the state type */
           hst->set_state_type(SOFT_STATE);
@@ -1118,7 +1118,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
         /* translate host state between DOWN/UNREACHABLE (for passive checks
          * only if enabled) */
         hst->set_current_state(new_state);
-        if (hst->get_check_type() == HOST_CHECK_ACTIVE ||
+        if (hst->get_check_type() == check_active ||
             config->translate_passive_host_checks())
           hst->set_current_state(determine_host_reachability(hst));
 
@@ -1127,7 +1127,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
 
         /* schedule a re-check of the host at the retry interval because we
          * can't determine its final state yet... */
-        if (hst->get_check_type() == HOST_CHECK_ACTIVE ||
+        if (hst->get_check_type() == check_active ||
             config->passive_host_checks_are_soft())
           next_check =
               (unsigned long)(current_time + (hst->get_retry_interval() *

@@ -317,7 +317,7 @@ void checker::run(
             NEBFLAG_NONE,
             NEBATTR_NONE,
             hst,
-            HOST_CHECK_ACTIVE,
+            check_active,
             hst->get_current_state(),
             hst->get_state_type(),
             start_time,
@@ -390,7 +390,7 @@ void checker::run(
   // Init check result info.
   check_result check_result_info;
   check_result_info.object_check_type = HOST_CHECK;
-  check_result_info.check_type = HOST_CHECK_ACTIVE;
+  check_result_info.check_type = check_active;
   check_result_info.check_options = check_options;
   check_result_info.scheduled_check = scheduled_check;
   check_result_info.reschedule_check = reschedule_check;
@@ -421,7 +421,7 @@ void checker::run(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     hst->get_current_state(),
     hst->get_state_type(),
     start_time,
@@ -556,7 +556,7 @@ void checker::run(
             NEBFLAG_NONE,
             NEBATTR_NONE,
             svc,
-            SERVICE_CHECK_ACTIVE,
+            check_active,
             start_time,
             end_time,
             svc->get_check_command().c_str(),
@@ -624,7 +624,7 @@ void checker::run(
   // Init check result info.
   check_result check_result_info;
   check_result_info.object_check_type = SERVICE_CHECK;
-  check_result_info.check_type = SERVICE_CHECK_ACTIVE;
+  check_result_info.check_type = check_active;
   check_result_info.check_options = check_options;
   check_result_info.scheduled_check = scheduled_check;
   check_result_info.reschedule_check = reschedule_check;
@@ -655,7 +655,7 @@ void checker::run(
           NEBFLAG_NONE,
           NEBATTR_NONE,
           svc,
-          SERVICE_CHECK_ACTIVE,
+          check_active,
           start_time,
           end_time,
           svc->get_check_command().c_str(),
@@ -831,7 +831,7 @@ void checker::run_sync(
   hst->set_check_options(CHECK_OPTION_NONE);
 
   // Set the check type.
-  hst->set_check_type(HOST_CHECK_ACTIVE);
+  hst->set_check_type(check_active);
 
   // Send broker event.
   timeval end_time;
@@ -841,7 +841,7 @@ void checker::run_sync(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     hst->get_current_state(),
     hst->get_state_type(),
     start_time,
@@ -889,7 +889,7 @@ void checker::run_sync(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     hst->get_current_state(),
     hst->get_state_type(),
     start_time,
@@ -1009,7 +1009,7 @@ int checker::_execute_sync(host* hst) {
             NEBFLAG_NONE,
             NEBATTR_NONE,
             hst,
-            HOST_CHECK_ACTIVE,
+            check_active,
             hst->get_current_state(),
             hst->get_state_type(),
             start_time,
@@ -1061,7 +1061,7 @@ int checker::_execute_sync(host* hst) {
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     HOST_UP,
     hst->get_state_type(),
     start_time,
@@ -1181,7 +1181,7 @@ int checker::_execute_sync(host* hst) {
 
   // Update values.
   hst->set_execution_time(execution_time);
-  hst->set_check_type(HOST_CHECK_ACTIVE);
+  hst->set_check_type(check_active);
 
   // Get plugin output.
   std::string pl_output;
@@ -1236,7 +1236,7 @@ int checker::_execute_sync(host* hst) {
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     return_result,
     hst->get_state_type(),
     start_time,

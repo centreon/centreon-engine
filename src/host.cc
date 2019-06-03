@@ -242,7 +242,7 @@ host::host(uint64_t host_id,
   _should_be_scheduled = true;
   _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
   _check_options = CHECK_OPTION_NONE;
-  _check_type = HOST_CHECK_ACTIVE;
+  _check_type = check_active;
   _modified_attributes = MODATTR_NONE;
   _state_type = HARD_STATE;
 
@@ -1567,7 +1567,7 @@ int host::handle_async_check_result_3x(
 
   logger(dbg_checks, most)
     << "\tCheck Type:         "
-    << (queued_check_result->check_type == HOST_CHECK_ACTIVE ? "Active" : "Passive") << "\n"
+    << (queued_check_result->check_type == check_active ? "Active" : "Passive") << "\n"
     << "\tCheck Options:      "
     << queued_check_result->check_options << "\n"
     << "\tScheduled Check?:   "
@@ -1585,12 +1585,12 @@ int host::handle_async_check_result_3x(
     << "\tOutput:             " << queued_check_result->output;
 
   /* decrement the number of host checks still out there... */
-  if (queued_check_result->check_type == HOST_CHECK_ACTIVE
+  if (queued_check_result->check_type == check_active
       && currently_running_host_checks > 0)
     currently_running_host_checks--;
 
   /* skip this host check results if its passive and we aren't accepting passive check results */
-  if (queued_check_result->check_type == HOST_CHECK_PASSIVE) {
+  if (queued_check_result->check_type == check_passive) {
     if (!config->accept_passive_host_checks()) {
       logger(dbg_checks, basic)
         << "Discarding passive host check result because passive host "
@@ -1626,11 +1626,11 @@ int host::handle_async_check_result_3x(
   }
 
   /* was this check passive or active? */
-  set_check_type((queued_check_result->check_type == HOST_CHECK_ACTIVE)
-    ? HOST_CHECK_ACTIVE : HOST_CHECK_PASSIVE);
+  set_check_type((queued_check_result->check_type == check_active)
+    ? check_active : check_passive);
 
   /* update check statistics for passive results */
-  if (queued_check_result->check_type == HOST_CHECK_PASSIVE)
+  if (queued_check_result->check_type == check_passive)
     update_check_stats(
       PASSIVE_HOST_CHECK_STATS,
       queued_check_result->start_time.tv_sec);
@@ -1660,15 +1660,15 @@ int host::handle_async_check_result_3x(
   set_has_been_checked(true);
 
   /* clear the execution flag if this was an active check */
-  if (queued_check_result->check_type == HOST_CHECK_ACTIVE)
+  if (queued_check_result->check_type == check_active)
     set_is_executing(false);
 
   /* get the last check time */
   set_last_check(queued_check_result->start_time.tv_sec);
 
   /* was this check passive or active? */
-  set_check_type((queued_check_result->check_type == HOST_CHECK_ACTIVE)
-    ? HOST_CHECK_ACTIVE : HOST_CHECK_PASSIVE);
+  set_check_type((queued_check_result->check_type == check_active)
+    ? check_active : check_passive);
 
   /* save the old host state */
   set_last_state(get_current_state());
@@ -1715,7 +1715,7 @@ int host::handle_async_check_result_3x(
   result = queued_check_result->return_code;
 
   /* adjust return code (active checks only) */
-  if (queued_check_result->check_type == HOST_CHECK_ACTIVE) {
+  if (queued_check_result->check_type == check_active) {
 
     /* if there was some error running the command, just skip it (this shouldn't be happening) */
     if (!queued_check_result->exited_ok) {
@@ -1766,7 +1766,7 @@ int host::handle_async_check_result_3x(
 
   /* translate return code to basic UP/DOWN state - the DOWN/UNREACHABLE state determination is made later */
   /* NOTE: only do this for active checks - passive check results already have the final state */
-  if (queued_check_result->check_type == HOST_CHECK_ACTIVE) {
+  if (queued_check_result->check_type == check_active) {
 
     /* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
     if (!config->use_aggressive_host_checking()
@@ -2439,7 +2439,7 @@ int host::check_notification_viability(unsigned int type, int options) {
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config->enable_notifications() == false) {
+  if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
         << "Notifications are disabled, so host notifications will not "
            "be sent out.";

@@ -53,7 +53,7 @@ using namespace com::centreon::engine::logging;
 static char* get_service_check_type(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
   return (string::dup(
-            (SERVICE_CHECK_PASSIVE == svc.check_type
+            (check_passive == svc.check_type
              ? "PASSIVE"
              : "ACTIVE")));
 }
