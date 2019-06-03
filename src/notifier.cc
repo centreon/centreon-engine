@@ -70,7 +70,8 @@ notifier::notifier(int notifier_type,
                    std::string const& icon_image_alt,
                    bool flap_detection_enabled,
                    double low_flap_threshold,
-                   double high_flap_threshold)
+                   double high_flap_threshold,
+                   std::string const& timezone)
     : _notifier_type{notifier_type},
       _display_name{display_name},
       _check_command{check_command},
@@ -90,7 +91,8 @@ notifier::notifier(int notifier_type,
       _icon_image_alt{icon_image_alt},
       _flap_detection_enabled{flap_detection_enabled},
       _low_flap_threshold{low_flap_threshold},
-      _high_flap_threshold{high_flap_threshold} {
+      _high_flap_threshold{high_flap_threshold},
+      _timezone{timezone} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -724,3 +726,15 @@ void notifier::remove_notified_on(notification_type type) {
   _in_notification_type &= ~type;
 }
 
+/**
+ *  Get host timezone.
+ *
+ *  @return a reference to the notifier timezone.
+ */
+std::string const& notifier::get_timezone() const {
+  return _timezone;
+}
+
+void notifier::set_timezone(std::string const& timezone) {
+  _timezone = timezone;
+}

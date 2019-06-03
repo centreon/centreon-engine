@@ -251,9 +251,7 @@ void check_service_result_freshness() {
 
     // See if the time is right...
     {
-      timezone_locker lock(get_service_timezone(
-                             temp_service->get_hostname(),
-                             temp_service->get_description()));
+      timezone_locker lock(temp_service->get_timezone());
       if (check_time_against_period(
             current_time,
             temp_service->check_period_ptr) == ERROR)
@@ -597,7 +595,7 @@ void check_host_result_freshness() {
 
     // See if the time is right...
     {
-      timezone_locker lock(get_host_timezone(it->second->get_name()));
+      timezone_locker lock(it->second->get_timezone());
       if (check_time_against_period(
             current_time,
             it->second->check_period_ptr) == ERROR)
@@ -1275,7 +1273,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
 
     // Make sure we rescheduled the next host check at a valid time.
     {
-      timezone_locker lock(get_host_timezone(hst->get_name()));
+      timezone_locker lock{hst->get_timezone()};
       preferred_time = hst->get_next_check();
       get_next_valid_time(preferred_time, &next_valid_time,
                           hst->check_period_ptr);

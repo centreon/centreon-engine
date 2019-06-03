@@ -110,7 +110,8 @@ class                 host : public notifier {
                            int should_be_drawn,
                            int retain_status_information,
                            int retain_nonstatus_information,
-                           int obsess_over_host);
+                           int obsess_over_host,
+                           std::string const& timezone);
                      ~host() {}
   void               add_child_link(host* child);
   void               add_parent_host(std::string const& host_name);
@@ -398,7 +399,6 @@ private:
   unsigned long       _modified_attributes;
   int                 _circular_path_checked;
   bool                _contains_circular_path;
-
 };
 
 CCE_END()
@@ -406,7 +406,6 @@ CCE_END()
 /* Other HOST structure. */
 struct                host_other_properties {
   bool                should_reschedule_current_check;
-  std::string         timezone;
   uint64_t            host_id;
 };
 
@@ -447,7 +446,6 @@ void                  check_for_expired_acknowledgement(
                             com::centreon::engine::host* h);
 com::centreon::engine::host&
                       find_host(uint64_t host_id);
-char const*           get_host_timezone(std::string const& name);
 bool                  is_host_exist(uint64_t host_id) throw ();
 uint64_t              get_host_id(std::string const& name);
 

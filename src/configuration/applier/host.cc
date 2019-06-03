@@ -148,7 +148,8 @@ void applier::host::add_object(
         true, // should_be_drawn, enabled by Nagios
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
-        obj.obsess_over_host())};
+        obj.obsess_over_host(),
+        obj.timezone())};
 
 
   state::instance().hosts()[obj.host_id()] = h;
@@ -156,7 +157,6 @@ void applier::host::add_object(
 
   h->set_initial_notif_time(0);
   host_other_props[obj.host_name()].should_reschedule_current_check = false;
-  host_other_props[obj.host_name()].timezone = obj.timezone();
   host_other_props[obj.host_name()].host_id = obj.host_id();
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());
@@ -363,7 +363,7 @@ void applier::host::modify_object(
   h->set_retain_status_information(static_cast<int>(obj.retain_status_information()));
   h->set_retain_nonstatus_information(static_cast<int>(obj.retain_nonstatus_information()));
   h->set_obsess_over_host(static_cast<int>(obj.obsess_over_host()));
-  host_other_props[obj.host_name()].timezone = obj.timezone();
+  h->set_timezone(obj.timezone());
   host_other_props[obj.host_name()].host_id = obj.host_id();
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());

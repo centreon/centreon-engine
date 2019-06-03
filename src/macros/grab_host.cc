@@ -237,7 +237,7 @@ static char* get_host_id(host& hst, nagios_macros* mac) {
  */
 static char* get_host_macro_timezone(host& hst, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(get_host_timezone(hst.get_name())));
+  return string::dup(hst.get_timezone());
 }
 
 /**************************************

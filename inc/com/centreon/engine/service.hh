@@ -68,7 +68,8 @@ class                           service : public notifier {
                                         std::string const& icon_image_alt,
                                         bool flap_detection_enabled,
                                         double low_flap_threshold,
-                                        double high_flap_threshold);
+                                        double high_flap_threshold,
+                                        std::string const& timezone);
                                 ~service();
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
@@ -218,7 +219,6 @@ CCE_END()
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
-  std::string                   timezone;
   uint64_t                      host_id;
   uint64_t                      service_id;
 };
@@ -275,7 +275,8 @@ com::centreon::engine::service* add_service(
            std::string const& icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_service);
+           int obsess_over_service,
+           std::string const& timezone);
 int      get_service_count();
 int      is_contact_for_service(
            com::centreon::engine::service* svc,
@@ -297,7 +298,6 @@ CCE_BEGIN()
 com::centreon::engine::service&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
-char const*   get_service_timezone(std::string const& hst, std::string const& svc);
 bool          is_service_exist(
                 std::pair<uint64_t, uint64_t> const& id);
 std::pair<uint64_t, uint64_t>

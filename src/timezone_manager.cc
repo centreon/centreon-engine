@@ -32,7 +32,6 @@ timezone_manager* timezone_manager::_instance(NULL);
 void timezone_manager::load() {
   if (!_instance)
     _instance = new timezone_manager;
-  return ;
 }
 
 /**
@@ -43,13 +42,12 @@ void timezone_manager::pop_timezone() {
   if (!_tz.empty()) {
     // Timezone was set.
     if (_tz.top().is_set)
-      _set_timezone(_tz.top().tz_name.c_str());
+      _set_timezone(_tz.top().tz_name);
     // Timezone was not set.
     else
-      _set_timezone(NULL);
+      _set_timezone("");
     _tz.pop();
   }
-  return ;
 }
 
 /**
@@ -57,21 +55,19 @@ void timezone_manager::pop_timezone() {
  *
  *  @param[in] tz  New timezone.
  */
-void timezone_manager::push_timezone(char const* tz) {
+void timezone_manager::push_timezone(std::string const& tz) {
   // Backup previous timezone.
   tz_info info;
   _backup_timezone(&info);
   _tz.push(info);
 
   // Set new timezone.
-  if (tz)
+  if (!tz.empty())
     _set_timezone(tz);
   else if (_base.is_set)
-    _set_timezone(_base.tz_name.c_str());
+    _set_timezone(_base.tz_name);
   else
-    _set_timezone(NULL);
-
-  return ;
+    _set_timezone("");
 }
 
 /**
@@ -80,7 +76,6 @@ void timezone_manager::push_timezone(char const* tz) {
 void timezone_manager::unload() {
   delete _instance;
   _instance = NULL;
-  return ;
 }
 
 /**
@@ -96,7 +91,7 @@ timezone_manager::timezone_manager() {
  *  @param[in] other  Object to copy.
  */
 timezone_manager::timezone_manager(timezone_manager const& other)
-  : _tz(other._tz) {}
+  : _tz{other._tz} {}
 
 /**
  *  Destructor.
@@ -114,7 +109,7 @@ timezone_manager& timezone_manager::operator=(
                                       timezone_manager const& other) {
   if (this != &other)
     _tz = other._tz;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -131,7 +126,6 @@ void timezone_manager::_backup_timezone(
   }
   else
     info->is_set = false;
-  return ;
 }
 
 /**
@@ -139,11 +133,10 @@ void timezone_manager::_backup_timezone(
  *
  *  @param[in] info  Timezone information.
  */
-void timezone_manager::_set_timezone(char const* tz) {
-  if (tz)
-    setenv("TZ", tz, 1);
+void timezone_manager::_set_timezone(std::string const& tz) {
+  if (!tz.empty())
+    setenv("TZ", tz.c_str(), 1);
   else
     unsetenv("TZ");
   tzset();
-  return ;
 }

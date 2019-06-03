@@ -133,7 +133,7 @@ static char* get_service_id(com::centreon::engine::service& svc, nagios_macros* 
  */
 static char* get_service_macro_timezone(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(get_service_timezone(svc.get_hostname(), svc.get_description())));
+  return string::dup(svc.get_timezone());
 }
 
 /**************************************

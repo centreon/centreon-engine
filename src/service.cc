@@ -79,7 +79,8 @@ service::service(std::string const& hostname,
                  std::string const& icon_image_alt,
                  bool flap_detection_enabled,
                  double low_flap_threshold,
-                 double high_flap_threshold)
+                 double high_flap_threshold,
+                 std::string const& timezone)
     : notifier{SERVICE_NOTIFICATION,
                display_name,
                check_command,
@@ -99,7 +100,8 @@ service::service(std::string const& hostname,
                icon_image_alt,
                flap_detection_enabled,
                low_flap_threshold,
-               high_flap_threshold},
+               high_flap_threshold,
+               timezone},
       _hostname{hostname},
       _description{description} {}
 
@@ -727,7 +729,8 @@ com::centreon::engine::service* add_service(
     std::string const& icon_image_alt,
     int retain_status_information,
     int retain_nonstatus_information,
-    int obsess_over_service) {
+    int obsess_over_service,
+    std::string const& timezone) {
 
   // Make sure we have everything we need.
   if (!service_id) {
@@ -790,7 +793,7 @@ com::centreon::engine::service* add_service(
       max_attempts, first_notification_delay, notification_period,
       notifications_enabled, check_period, event_handler, notes, notes_url,
       action_url, icon_image, icon_image_alt, flap_detection_enabled,
-      low_flap_threshold, high_flap_threshold)};
+      low_flap_threshold, high_flap_threshold, timezone)};
 
   try {
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
@@ -971,20 +974,6 @@ com::centreon::engine::service& engine::find_service(uint64_t host_id,
     throw(engine_error() << "Service '" << service_id << "' on host '"
                          << host_id << "' was not found");
   return *it->second;
-}
-
-/**
- *  Get service timezone.
- *
- *  @param[in] hst  Host name.
- *  @param[in] svc  Service description.
- *
- *  @return Service timezone.
- */
-char const* engine::get_service_timezone(std::string const& hst,
-                                         std::string const& svc) {
-  std::string const& timezone(service_other_props[{hst, svc}].timezone);
-  return timezone.empty() ? nullptr : timezone.c_str();
 }
 
 /**
@@ -1948,8 +1937,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     // Make sure we rescheduled the next service check at a valid time.
     {
-      timezone_locker lock(
-          get_service_timezone(this->get_hostname(), this->get_description()));
+      timezone_locker lock(get_timezone());
       preferred_time = this->next_check;
       get_next_valid_time(preferred_time, &next_valid_time,
                           this->check_period_ptr);
@@ -2393,8 +2381,7 @@ int service::run_scheduled_check(int check_options, double latency) {
 
       // Make sure we rescheduled the next service check at a valid time.
       {
-        timezone_locker lock(get_service_timezone(this->get_hostname(),
-                                                  this->get_description()));
+        timezone_locker lock(get_timezone());
         get_next_valid_time(preferred_time, &next_valid_time,
                             this->check_period_ptr);
 
@@ -2833,8 +2820,7 @@ int service::check_notification_viability(unsigned int type, int options) {
 
   // See if the service can have notifications sent out at this time.
   {
-    timezone_locker lock(
-        get_service_timezone(this->get_hostname(), this->get_description()));
+    timezone_locker lock(get_timezone());
     if (check_time_against_period(current_time, temp_period) == ERROR) {
       logger(dbg_notifications, more)
           << "This service shouldn't have notifications sent out "
@@ -3181,9 +3167,7 @@ int service::verify_check_viability(
 
     // Make sure this is a valid time to check the service.
     {
-      timezone_locker lock(get_service_timezone(
-                             this->get_hostname(),
-                             this->get_description()));
+      timezone_locker lock(get_timezone());
       if (check_time_against_period(
             (unsigned long)current_time,
             this->check_period_ptr) == ERROR) {

@@ -177,15 +177,13 @@ void applier::service::add_object(
     obj.icon_image_alt(),
     obj.retain_status_information(),
     obj.retain_nonstatus_information(),
-    obj.obsess_over_service())};
+    obj.obsess_over_service(),
+    obj.timezone())};
   if (!svc)
       throw engine_error() << "Could not register service '"
              << obj.service_description()
              << "' of host '" << *obj.hosts().begin() << "'";
   svc->set_initial_notif_time(0);
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].timezone = obj.timezone();
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].host_id = obj.host_id();
@@ -471,9 +469,7 @@ void applier::service::modify_object(
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj.is_volatile()));
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].timezone = obj.timezone();
+  s->set_timezone(obj.timezone());
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].host_id = obj.host_id();

@@ -131,6 +131,7 @@ host_map com::centreon::engine::host::hosts;
  *                                           this host ?
  *  @param[in] obsess_over_host              Should we obsess over this
  *                                           host ?
+ *  @param[in] timezone                      The timezone to apply to the host
  */
 host::host(uint64_t host_id,
            std::string const& name,
@@ -185,7 +186,8 @@ host::host(uint64_t host_id,
            int should_be_drawn,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_host)
+           int obsess_over_host,
+           std::string const& timezone)
     : notifier{HOST_NOTIFICATION,
                !display_name.empty() ? display_name : name,
                check_command,
@@ -205,7 +207,8 @@ host::host(uint64_t host_id,
                icon_image_alt,
                flap_detection_enabled,
                low_flap_threshold,
-               high_flap_threshold} {
+               high_flap_threshold,
+               timezone} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -1465,18 +1468,6 @@ host& engine::find_host(uint64_t host_id) {
 }
 
 /**
- *  Get host timezone.
- *
- *  @param[in] name  Host name.
- *
- *  @return Host timezone.
- */
-char const* engine::get_host_timezone(std::string const& name) {
-  std::string const& timezone(host_other_props[name].timezone);
-  return timezone.empty() ? nullptr : timezone.c_str();
-}
-
-/**
  *  Get if host exist.
  *
  *  @param[in] name The host name.
@@ -1885,7 +1876,7 @@ int host::run_scheduled_check(
 
       // Make sure we rescheduled the next host check at a valid time.
       {
-        timezone_locker lock(get_host_timezone(get_name()));
+        timezone_locker lock(get_timezone());
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
@@ -2457,7 +2448,7 @@ int host::check_notification_viability(unsigned int type, int options) {
 
   // See if the host can have notifications sent out at this time.
   {
-    timezone_locker lock(get_host_timezone(get_name()));
+    timezone_locker lock(get_timezone());
     if (check_time_against_period(current_time,
                                   this->notification_period_ptr) == ERROR) {
       logger(dbg_notifications, more)
@@ -2942,7 +2933,7 @@ int host::verify_check_viability(
 
     // Make sure this is a valid time to check the host.
     {
-      timezone_locker lock(get_host_timezone(this->get_name()));
+      timezone_locker lock(get_timezone());
       if (check_time_against_period(
             static_cast<unsigned long>(current_time),
             this->check_period_ptr) == ERROR) {

@@ -68,7 +68,8 @@ class                         notifier {
                                        std::string const& icon_image_alt,
                                        bool flap_detection_enabled,
                                        double low_flap_threshold,
-                                       double high_flap_threshold);
+                                       double high_flap_threshold,
+                                       std::string const& timezone);
   virtual                     ~notifier() {}
 
   std::string const&          get_display_name() const;
@@ -168,6 +169,8 @@ class                         notifier {
   void                        set_first_notification_delay(double notification_delay);
   bool                        get_notifications_enabled() const;
   void                        set_notifications_enabled(bool notifications_enabled);
+  std::string const&          get_timezone() const;
+  void                        set_timezone(std::string const& timezone);
 
  protected:
   int                         _notifier_type;
@@ -210,6 +213,7 @@ class                         notifier {
   double                      _high_flap_threshold;
   double                      _first_notification_delay;
   bool                        _notifications_enabled;
+  std::string                 _timezone;
 };
 
 CCE_END()
