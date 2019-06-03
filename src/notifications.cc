@@ -185,78 +185,6 @@ int check_contact_service_notification_viability(
   return OK;
 }
 
-/*
- * checks to see if a service escalation entry is a match for the current
- * service notification
- */
-int is_valid_escalation_for_service_notification(
-      com::centreon::engine::service* svc,
-      serviceescalation* se,
-      int options) {
-  int notification_number = 0;
-  time_t current_time = 0L;
-  com::centreon::engine::service* temp_service = nullptr;
-
-  logger(dbg_functions, basic)
-    << "is_valid_escalation_for_service_notification()";
-
-  /* get the current time */
-  time(&current_time);
-
-  /*
-   * if this is a recovery, really we check for who got notified about a
-   * previous problem
-   */
-  if (svc->current_state == STATE_OK)
-    notification_number = svc->current_notification_number - 1;
-  else
-    notification_number = svc->current_notification_number;
-
-  /* this entry if it is not for this service */
-  temp_service = se->service_ptr;
-  if (temp_service == nullptr || temp_service != svc)
-    return false;
-
-  /*** EXCEPTION ***/
-  /* broadcast options go to everyone, so this escalation is valid */
-  if (options & NOTIFICATION_OPTION_BROADCAST)
-    return true;
-
-  /* skip this escalation if it happens later */
-  if (se->get_first_notification() > notification_number)
-    return false;
-
-  /* skip this escalation if it has already passed */
-  if (se->get_last_notification() != 0
-      && se->get_last_notification() < notification_number)
-    return false;
-
-  /*
-   * skip this escalation if it has a timeperiod and the current time isn't
-   * valid
-   */
-  if (!se->get_escalation_period().empty()
-      && check_time_against_period(
-           current_time,
-           se->escalation_period_ptr) == ERROR)
-    return false;
-
-  /* skip this escalation if the state options don't match */
-  if (svc->current_state == STATE_OK
-      && se->escalate_on_recovery == false)
-    return false;
-  else if (svc->current_state == STATE_WARNING
-           && se->escalate_on_warning == false)
-    return false;
-  else if (svc->current_state == STATE_UNKNOWN
-           && se->escalate_on_unknown == false)
-    return false;
-  else if (svc->current_state == STATE_CRITICAL
-           && se->escalate_on_critical == false)
-    return false;
-
-  return true;
-}
 
 /**
  *  Checks to see whether a service notification should be escalated.
@@ -281,10 +209,9 @@ int should_service_notification_be_escalated(com::centreon::engine::service* svc
     serviceescalation* temp_se(p.first->second.get());
 
     // We found a matching entry, so escalate this notification!
-    if (is_valid_escalation_for_service_notification(
-          svc,
+    if (svc->is_valid_escalation_for_notification(
           temp_se,
-          NOTIFICATION_OPTION_NONE) == true) {
+          NOTIFICATION_OPTION_NONE)) {
       logger(dbg_notifications, more)
         << "Service notification WILL be escalated.";
       return true;
@@ -429,76 +356,6 @@ int check_contact_host_notification_viability(
   return OK;
 }
 
-/*
- * checks to see if a host escalation entry is a match for the current host
- * notification
- */
-int is_valid_escalation_for_host_notification(
-      host* hst,
-      hostescalation* he,
-      int options) {
-  int notification_number = 0;
-  time_t current_time = 0L;
-  host* temp_host = nullptr;
-
-  logger(dbg_functions, basic)
-    << "is_valid_escalation_for_host_notification()";
-
-  /* get the current time */
-  time(&current_time);
-
-  /*
-   * if this is a recovery, really we check for who got notified about a
-   * previous problem
-   */
-  if (hst->get_current_state() == HOST_UP)
-    notification_number = hst->get_current_notification_number() - 1;
-  else
-    notification_number = hst->get_current_notification_number();
-
-  /* find the host this escalation entry is associated with */
-  temp_host = he->host_ptr;
-  if (temp_host == nullptr || temp_host != hst)
-    return false;
-
-  /*** EXCEPTION ***/
-  /* broadcast options go to everyone, so this escalation is valid */
-  if (options & NOTIFICATION_OPTION_BROADCAST)
-    return true;
-
-  /* skip this escalation if it happens later */
-  if (he->get_first_notification() > notification_number)
-    return false;
-
-  /* skip this escalation if it has already passed */
-  if (he->get_last_notification() != 0
-      && he->get_last_notification() < notification_number)
-    return false;
-
-  /*
-   * skip this escalation if it has a timeperiod and the current time
-   * isn't valid
-   */
-  if (!he->get_escalation_period().empty()
-      && check_time_against_period(
-           current_time,
-           he->escalation_period_ptr) == ERROR)
-    return false;
-
-  /* skip this escalation if the state options don't match */
-  if (hst->get_current_state() == HOST_UP
-      && !he->get_escalate_on_recovery())
-    return false;
-  else if (hst->get_current_state() == HOST_DOWN
-           && !he->get_escalate_on_down())
-    return false;
-  else if (hst->get_current_state() == HOST_UNREACHABLE
-           && !he->get_escalate_on_unreachable())
-    return false;
-
-  return true;
-}
-
 /* checks to see whether a host notification should be escalation */
 int should_host_notification_be_escalated(host* hst) {
   logger(dbg_functions, basic)
@@ -517,10 +374,9 @@ int should_host_notification_be_escalated(host* hst) {
     hostescalation* temp_he(&*it->second);
 
     /* we found a matching entry, so escalate this notification! */
-    if (is_valid_escalation_for_host_notification(
-          hst,
+    if (hst->is_valid_escalation_for_notification(
           temp_he,
-          NOTIFICATION_OPTION_NONE) == true)
+          NOTIFICATION_OPTION_NONE))
       return true;
   }
 

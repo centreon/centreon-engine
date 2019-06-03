@@ -83,53 +83,45 @@ void applier::hostescalation::add_object(
 
   // Create host escalation.
   std::shared_ptr<com::centreon::engine::hostescalation> he{
-    new engine::hostescalation(
-         *obj.hosts().begin(),
-         obj.first_notification(),
-         obj.last_notification(),
-         obj.notification_interval(),
-         NULL_IF_EMPTY(obj.escalation_period()),
-         static_cast<bool>(
-           obj.escalation_options()
-           & configuration::hostescalation::down),
-         static_cast<bool>(
-           obj.escalation_options()
-           & configuration::hostescalation::unreachable),
-         static_cast<bool>(
-           obj.escalation_options()
-           & configuration::hostescalation::recovery))};
+      new engine::hostescalation(
+          *obj.hosts().begin(), obj.first_notification(),
+          obj.last_notification(), obj.notification_interval(),
+          obj.escalation_period(),
+          ((obj.escalation_options() & configuration::hostescalation::down)
+               ? notifier::down
+               : notifier::none) |
+              ((obj.escalation_options() &
+                configuration::hostescalation::unreachable)
+                   ? notifier::unreachable
+                   : notifier::none) |
+              ((obj.escalation_options() &
+                configuration::hostescalation::recovery)
+                   ? notifier::recovery
+                   : notifier::none))};
 
   // Add new items to the configuration state.
-  state::instance().hostescalations()
-    .insert(std::make_pair(he->get_hostname(), he));
+  state::instance().hostescalations().insert(
+      std::make_pair(he->get_hostname(), he));
 
   // Add new items to the list.
-  engine::hostescalation::hostescalations
-    .insert(std::make_pair(he->get_hostname(), he));
+  engine::hostescalation::hostescalations.insert(
+      std::make_pair(he->get_hostname(), he));
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
-  broker_adaptive_escalation_data(
-    NEBTYPE_HOSTESCALATION_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    he.get(),
-    &tv);
+  broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_ADD, NEBFLAG_NONE,
+                                  NEBATTR_NONE, he.get(), &tv);
 
   // Add contacts to host escalation.
-  for (set_string::const_iterator
-         it(obj.contacts().begin()),
-         end(obj.contacts().end());
-       it != end;
-       ++it)
+  for (set_string::const_iterator it(obj.contacts().begin()),
+       end(obj.contacts().end());
+       it != end; ++it)
     he->contacts.insert({*it, nullptr});
 
   // Add contact groups to host escalation.
-  for (set_string::const_iterator
-         it(obj.contactgroups().begin()),
-         end(obj.contactgroups().end());
-       it != end;
-       ++it)
+  for (set_string::const_iterator it(obj.contactgroups().begin()),
+       end(obj.contactgroups().end());
+       it != end; ++it)
     he->contact_groups.insert({*it, nullptr});
 }
 

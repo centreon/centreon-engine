@@ -24,12 +24,14 @@ using namespace com::centreon::engine;
 escalation::escalation(int first_notification,
                        int last_notification,
                        double notification_interval,
-                       std::string const& escalation_period)
+                       std::string const& escalation_period,
+                       uint32_t escalate_on)
     : _first_notification{first_notification},
       _last_notification{last_notification},
       _notification_interval{
           (notification_interval < 0) ? 0 : notification_interval},
-      _escalation_period{escalation_period} {}
+      _escalation_period{escalation_period},
+      _escalate_on{escalate_on} {}
 
 std::string const& escalation::get_escalation_period() const {
   return _escalation_period;
@@ -59,3 +61,22 @@ void escalation::set_notification_interval(double notification_interval) {
   _notification_interval = notification_interval;
 }
 
+void escalation::add_escalate_on(notifier::notification_type type) {
+  _escalate_on |= type;
+}
+
+void escalation::remove_escalate_on(notifier::notification_type type) {
+  _escalate_on &= ~type;
+}
+
+uint32_t escalation::get_escalate_on() const {
+  return _escalate_on;
+}
+
+void escalation::set_escalate_on(uint32_t escalate_on) {
+  _escalate_on = escalate_on;
+}
+
+bool escalation::get_escalate_on(notifier::notification_type type) const {
+  return _escalate_on & type;
+}

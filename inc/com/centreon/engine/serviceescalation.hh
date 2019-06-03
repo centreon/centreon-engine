@@ -18,9 +18,11 @@
 */
 
 #ifndef CCE_SERVICEESCALATION_HH
-#  define CCE_SERVICEESCALATION_HH
+#define CCE_SERVICEESCALATION_HH
 
+#include <ostream>
 #include <string>
+
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/escalation.hh"
@@ -28,70 +30,34 @@
 
 /* Forward declaration. */
 CCE_BEGIN()
-  class service;
-  class timeperiod;
+class service;
+class timeperiod;
 
-class                              serviceescalation : public escalation {
+class serviceescalation : public escalation {
  public:
-                                   serviceescalation(
-                                       std::string const& hostname,
-                                       std::string const& description,
-                                       int first_notification,
-                                       int last_notification,
-                                       double notification_interval,
-                                       std::string const& escalation_period);
-                                   ~serviceescalation();
-  std::string const&               get_hostname() const;
-  std::string const&               get_description() const;
-  int                              escalate_on_recovery;
-  int                              escalate_on_warning;
-  int                              escalate_on_unknown;
-  int                              escalate_on_critical;
-  contactgroup_map                 contact_groups;
-  contact_map                      contacts;
-  service*                         service_ptr;
-  timeperiod*                      escalation_period_ptr;
-  serviceescalation*               next;
-  serviceescalation*               nexthash;
+  serviceescalation(std::string const& hostname,
+                    std::string const& description,
+                    int first_notification,
+                    int last_notification,
+                    double notification_interval,
+                    std::string const& escalation_period,
+                    uint32_t escalate_on);
+  ~serviceescalation();
+  std::string const& get_hostname() const;
+  std::string const& get_description() const;
+
+  contactgroup_map contact_groups;
+  contact_map contacts;
+  service* service_ptr;
+  timeperiod* escalation_period_ptr;
+  serviceescalation* next;
+  serviceescalation* nexthash;
+
  private:
-  std::string                      _hostname;
-  std::string                      _description;
+  std::string _hostname;
+  std::string _description;
 };
+
 CCE_END()
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* C++ */
-
-com::centreon::engine::serviceescalation* add_service_escalation(
-    std::string const& host_name,
-    std::string const& description,
-    int first_notification,
-    int last_notification,
-    double notification_interval,
-    std::string const& escalation_period,
-    int escalate_on_warning,
-    int escalate_on_unknown,
-    int escalate_on_critical,
-    int escalate_on_recovery);
-
-#  ifdef __cplusplus
-}
-
-#    include <ostream>
-
-bool operator==(com::centreon::engine::serviceescalation const& obj1,
-                com::centreon::engine::serviceescalation const& obj2) throw();
-bool          operator!=(
-                com::centreon::engine::serviceescalation const& obj1,
-                com::centreon::engine::serviceescalation const& obj2) throw ();
-bool          operator<(
-                com::centreon::engine::serviceescalation const& obj1,
-                com::centreon::engine::serviceescalation const& obj2) throw ();
-std::ostream& operator<<(
-                std::ostream& os,
-                com::centreon::engine::serviceescalation const& obj);
-
-#  endif /* C++ */
-
-#endif // !CCE_SERVICEESCALATION_HH
+#endif  // !CCE_SERVICEESCALATION_HH

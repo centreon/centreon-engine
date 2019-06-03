@@ -43,6 +43,7 @@ struct servicesmember_struct;
 
 CCE_BEGIN()
 class host;
+class hostescalation;
 class timeperiod;
 namespace commands {
   class command;
@@ -308,6 +309,9 @@ class                 host : public notifier {
   void               update_notification_flags() override;
   time_t             get_next_notification_time(time_t offset) override;
   void               schedule_acknowledgement_expiration();
+  int                is_valid_escalation_for_notification(
+                       hostescalation* he,
+                       int options);
 
   contactgroup_map   contact_groups;
   contact_map        contacts;

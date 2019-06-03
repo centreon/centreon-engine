@@ -24,6 +24,7 @@
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/notifier.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
@@ -35,7 +36,8 @@ class escalation {
   escalation(int first_notification,
              int last_notification,
              double notification_interval,
-             std::string const& escalation_period);
+             std::string const& escalation_period,
+             uint32_t escalate_on);
 
   std::string const& get_escalation_period() const;
   int get_first_notification() const;
@@ -44,12 +46,18 @@ class escalation {
   void set_last_notification(int last_notification);
   double get_notification_interval() const;
   void set_notification_interval(double notification_interval);
+  void add_escalate_on(notifier::notification_type type);
+  void remove_escalate_on(notifier::notification_type type);
+  uint32_t get_escalate_on() const;
+  bool get_escalate_on(notifier::notification_type type) const;
+  void set_escalate_on(uint32_t escalate_on);
 
  private:
   int _first_notification;
   int _last_notification;
   double _notification_interval;
   std::string _escalation_period;
+  uint32_t _escalate_on;
 };
 CCE_END()
 

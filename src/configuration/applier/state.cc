@@ -616,16 +616,15 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >:
     current.notification_interval(
               static_cast<unsigned int>(p.first->second->get_notification_interval()));
     current.escalation_period(p.first->second->get_escalation_period());
-    unsigned int options(
-                   (p.first->second->get_escalate_on_recovery()
-                    ? configuration::hostescalation::recovery
-                    : 0)
-                   | (p.first->second->get_escalate_on_down()
-                      ? configuration::hostescalation::down
-                      : 0)
-                   | (p.first->second->get_escalate_on_unreachable()
-                      ? configuration::hostescalation::unreachable
-                      : 0));
+    uint32_t options((p.first->second->get_escalate_on(notifier::recovery)
+                          ? configuration::hostescalation::recovery
+                          : 0) |
+                     (p.first->second->get_escalate_on(notifier::down)
+                          ? configuration::hostescalation::down
+                          : 0) |
+                     (p.first->second->get_escalate_on(notifier::unreachable)
+                          ? configuration::hostescalation::unreachable
+                          : 0));
     current.escalation_options(options);
     for (contact_map::iterator
            it(p.first->second->contacts.begin()),
@@ -886,16 +885,16 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::servicees
     current.notification_interval(
               static_cast<unsigned int>(p.first->second->get_notification_interval()));
     current.escalation_period(p.first->second->get_escalation_period());
-    unsigned int options((p.first->second->escalate_on_recovery
+    unsigned int options((p.first->second->get_escalate_on(notifier::recovery)
                           ? configuration::serviceescalation::recovery
                           : 0)
-                         | (p.first->second->escalate_on_warning
+                         | (p.first->second->get_escalate_on(notifier::warning)
                             ? configuration::serviceescalation::warning
                             : 0)
-                         | (p.first->second->escalate_on_unknown
+                         | (p.first->second->get_escalate_on(notifier::unknown)
                             ? configuration::serviceescalation::unknown
                             : 0)
-                         | (p.first->second->escalate_on_critical
+                         | (p.first->second->get_escalate_on(notifier::critical)
                             ? configuration::serviceescalation::critical
                             : 0));
     current.escalation_options(options);

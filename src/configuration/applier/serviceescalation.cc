@@ -87,26 +87,39 @@ void applier::serviceescalation::add_object(
   config->serviceescalations().insert(obj);
 
   // Create service escalation.
-  engine::serviceescalation*
-    se(add_service_escalation(
-         obj.hosts().front().c_str(),
-         obj.service_description().front().c_str(),
+  std::shared_ptr<engine::serviceescalation> se{
+    new engine::serviceescalation(
+         obj.hosts().front(),
+         obj.service_description().front(),
          obj.first_notification(),
          obj.last_notification(),
          obj.notification_interval(),
-         NULL_IF_EMPTY(obj.escalation_period()),
-         static_cast<bool>(
-           obj.escalation_options()
-           & configuration::serviceescalation::warning),
-         static_cast<bool>(
-           obj.escalation_options()
-           & configuration::serviceescalation::unknown),
-         static_cast<bool>(
-           obj.escalation_options()
-           & configuration::serviceescalation::critical),
-         static_cast<bool>(
-           obj.escalation_options()
-           & configuration::serviceescalation::recovery)));
+         obj.escalation_period(),
+         ((obj.escalation_options() & configuration::serviceescalation::warning)
+          ? notifier::warning
+          : notifier::none) |
+         ((obj.escalation_options() & configuration::serviceescalation::unknown)
+          ? notifier::unknown
+          : notifier::none) |
+         ((obj.escalation_options() & configuration::serviceescalation::critical)
+          ? notifier::critical
+          : notifier::none) |
+         ((obj.escalation_options() & configuration::serviceescalation::recovery)
+          ? notifier::recovery
+          : notifier::none))};
+
+  // Add new items to the configuration state.
+  state::instance().serviceescalations().insert(
+      {{se->get_hostname(), se->get_description()}, se});
+
+  // Add new items to tail the list.
+  se->next = serviceescalation_list;
+  serviceescalation_list = se.get();
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_ADD, NEBFLAG_NONE,
+                                  NEBATTR_NONE, se.get(), &tv);
   if (!se)
     throw (engine_error() << "Could not create escalation on "
            << "service '" << obj.service_description().front()

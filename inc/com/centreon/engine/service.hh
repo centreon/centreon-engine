@@ -42,7 +42,8 @@ CCE_BEGIN()
     class command;
   }
   class host;
-class timeperiod;
+  class serviceescalation;
+  class timeperiod;
 
 class                           service : public notifier {
  public:
@@ -127,6 +128,9 @@ class                           service : public notifier {
   void                          schedule_acknowledgement_expiration();
   bool                          operator==(service const& other) throw();
   bool                          operator!=(service const& other) throw();
+  int                           is_valid_escalation_for_notification(
+                                  serviceescalation* se,
+                                  int options);
 
   contactgroup_map              contact_groups;
   contact_map                   contacts;

@@ -3010,10 +3010,9 @@ int host::create_notification_list(
       hostescalation* temp_he(&*it->second);
 
       /* see if this escalation if valid for this notification */
-      if (is_valid_escalation_for_host_notification(
-            this,
+      if (!is_valid_escalation_for_notification(
             temp_he,
-            options) == false)
+            options))
         continue;
 
       logger(dbg_notifications, most)
@@ -3394,10 +3393,9 @@ time_t host::get_next_notification_time(time_t offset) {
       continue;
 
     /* skip this entry if it isn't appropriate */
-    if (is_valid_escalation_for_host_notification(
-          this,
+    if (!is_valid_escalation_for_notification(
           it->second.get(),
-          NOTIFICATION_OPTION_NONE) == false)
+          NOTIFICATION_OPTION_NONE))
       continue;
 
     logger(dbg_notifications, most)
@@ -3509,4 +3507,73 @@ void host::enable_flap_detection() {
 
   /* update host status */
   update_status(false);
+}
+
+/*
+ * checks to see if a host escalation entry is a match for the current host
+ * notification
+ */
+int host::is_valid_escalation_for_notification(
+      hostescalation* he,
+      int options) {
+  int notification_number = 0;
+  time_t current_time = 0L;
+  host* temp_host = nullptr;
+
+  logger(dbg_functions, basic)
+    << "is_valid_escalation_for_host_notification()";
+
+  /* get the current time */
+  time(&current_time);
+
+  /*
+   * if this is a recovery, really we check for who got notified about a
+   * previous problem
+   */
+  if (this->get_current_state() == HOST_UP)
+    notification_number = this->get_current_notification_number() - 1;
+  else
+    notification_number = this->get_current_notification_number();
+
+  /* find the host this escalation entry is associated with */
+  temp_host = he->host_ptr;
+  if (temp_host == nullptr || temp_host != this)
+    return false;
+
+  /*** EXCEPTION ***/
+  /* broadcast options go to everyone, so this escalation is valid */
+  if (options & NOTIFICATION_OPTION_BROADCAST)
+    return true;
+
+  /* skip this escalation if it happens later */
+  if (he->get_first_notification() > notification_number)
+    return false;
+
+  /* skip this escalation if it has already passed */
+  if (he->get_last_notification() != 0
+      && he->get_last_notification() < notification_number)
+    return false;
+
+  /*
+   * skip this escalation if it has a timeperiod and the current time
+   * isn't valid
+   */
+  if (!he->get_escalation_period().empty()
+      && check_time_against_period(
+           current_time,
+           he->escalation_period_ptr) == ERROR)
+    return false;
+
+  /* skip this escalation if the state options don't match */
+  if (get_current_state() == HOST_UP
+      && !he->get_escalate_on(notifier::recovery))
+    return false;
+  else if (get_current_state() == HOST_DOWN
+           && !he->get_escalate_on(notifier::down))
+    return false;
+  else if (get_current_state() == HOST_UNREACHABLE
+           && !he->get_escalate_on(notifier::unreachable))
+    return false;
+
+  return true;
 }

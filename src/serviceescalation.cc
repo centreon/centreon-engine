@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/serviceescalation.hh"
@@ -32,11 +33,19 @@ serviceescalation::serviceescalation(std::string const& hostname,
                                      int first_notification,
                                      int last_notification,
                                      double notification_interval,
-                                     std::string const& escalation_period)
+                                     std::string const& escalation_period,
+                                     uint32_t escalate_on)
     : escalation{first_notification, last_notification, notification_interval,
-                 escalation_period},
+                 escalation_period, escalate_on},
       _hostname{hostname},
-      _description{description} {}
+      _description{description} {
+  if (hostname.empty())
+    throw engine_error() << "Could not create escalation "
+                         << "on a host without name";
+  if (description.empty())
+    throw engine_error() << "Could not create escalation "
+                         << "on a service without description";
+}
 
 serviceescalation::~serviceescalation() {
   this->contact_groups.clear();
@@ -44,7 +53,6 @@ serviceescalation::~serviceescalation() {
 
   // service_ptr not free.
   // escalation_period_ptr not free.
-
 }
 
 /**
@@ -81,16 +89,15 @@ serviceescalation* add_service_escalation(std::string const& host_name,
   }
 
   // Allocate memory for a new service escalation entry.
-  std::shared_ptr<serviceescalation> obj(new serviceescalation(
+  std::shared_ptr<serviceescalation> obj{new serviceescalation(
       host_name, description, first_notification, last_notification,
-      notification_interval, escalation_period));
+      notification_interval, escalation_period,
+      (escalate_on_critical > 0 ? notifier::critical : notifier::none) |
+          (escalate_on_recovery > 0 ? notifier::recovery : notifier::recovery) |
+          (escalate_on_unknown > 0 ? notifier::unknown : notifier::unknown) |
+          (escalate_on_warning > 0 ? notifier::warning : notifier::warning))};
 
   try {
-    obj->escalate_on_critical = (escalate_on_critical > 0);
-    obj->escalate_on_recovery = (escalate_on_recovery > 0);
-    obj->escalate_on_unknown = (escalate_on_unknown > 0);
-    obj->escalate_on_warning = (escalate_on_warning > 0);
-
     // Add new items to the configuration state.
     state::instance().serviceescalations().insert(
         {{obj->get_hostname(), obj->get_description()}, obj});

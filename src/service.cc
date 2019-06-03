@@ -3252,10 +3252,9 @@ int service::create_notification_list(
       serviceescalation* temp_se(&*it->second);
 
       /* skip this entry if it isn't appropriate */
-      if (is_valid_escalation_for_service_notification(
-            this,
+      if (!is_valid_escalation_for_notification(
             temp_se,
-            options) == false)
+            options))
         continue;
 
       logger(dbg_notifications, most)
@@ -3625,10 +3624,9 @@ time_t service::get_next_notification_time(time_t offset) {
       continue;
 
     /* skip this entry if it isn't appropriate */
-    if (is_valid_escalation_for_service_notification(
-          this,
+    if (!is_valid_escalation_for_notification(
           temp_se,
-          NOTIFICATION_OPTION_NONE) == false)
+          NOTIFICATION_OPTION_NONE))
       continue;
 
     logger(dbg_notifications, most)
@@ -3669,4 +3667,76 @@ time_t service::get_next_notification_time(time_t offset) {
   next_notification = offset + static_cast<time_t>(interval_to_use *
     config->interval_length());
   return next_notification;
+}
+
+/*
+ * checks to see if a service escalation entry is a match for the current
+ * service notification
+ */
+int service::is_valid_escalation_for_notification(
+      serviceescalation* se,
+      int options) {
+  int notification_number = 0;
+  time_t current_time = 0L;
+  com::centreon::engine::service* temp_service = nullptr;
+
+  logger(dbg_functions, basic)
+    << "is_valid_escalation_for_service_notification()";
+
+  /* get the current time */
+  time(&current_time);
+
+  /*
+   * if this is a recovery, really we check for who got notified about a
+   * previous problem
+   */
+  if (this->current_state == STATE_OK)
+    notification_number = this->current_notification_number - 1;
+  else
+    notification_number = this->current_notification_number;
+
+  /* this entry if it is not for this service */
+  temp_service = se->service_ptr;
+  if (temp_service == nullptr || temp_service != this)
+    return false;
+
+  /*** EXCEPTION ***/
+  /* broadcast options go to everyone, so this escalation is valid */
+  if (options & NOTIFICATION_OPTION_BROADCAST)
+    return true;
+
+  /* skip this escalation if it happens later */
+  if (se->get_first_notification() > notification_number)
+    return false;
+
+  /* skip this escalation if it has already passed */
+  if (se->get_last_notification() != 0
+      && se->get_last_notification() < notification_number)
+    return false;
+
+  /*
+   * skip this escalation if it has a timeperiod and the current time isn't
+   * valid
+   */
+  if (!se->get_escalation_period().empty()
+      && check_time_against_period(
+           current_time,
+           se->escalation_period_ptr) == ERROR)
+    return false;
+
+  /* skip this escalation if the state options don't match */
+  if (this->current_state == STATE_OK
+      && !se->get_escalate_on(notifier::recovery))
+    return false;
+  else if (this->current_state == STATE_WARNING
+           && !se->get_escalate_on(notifier::warning))
+    return false;
+  else if (this->current_state == STATE_UNKNOWN
+           && !se->get_escalate_on(notifier::unknown))
+    return false;
+  else if (this->current_state == STATE_CRITICAL
+           && !se->get_escalate_on(notifier::critical))
+    return false;
+
+  return true;
 }

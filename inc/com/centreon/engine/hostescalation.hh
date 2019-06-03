@@ -40,12 +40,9 @@ class                 hostescalation : public escalation {
                                      int last_notification,
                                      double notification_interval,
                                      std::string const& escalation_period,
-                                     bool escalate_on_down,
-                                     bool escalate_on_unreachable,
-                                     bool escalate_on_recovery);
+                                     uint32_t escalate_on);
 
   std::string const&  get_hostname() const;
-  void                set_hostname(std::string const& host_name);
   std::string const&  get_escalation_period() const;
   void                set_escalation_period(
     std::string const& escalation_period);
@@ -71,19 +68,14 @@ class                 hostescalation : public escalation {
                       hostescalations;
 
  private:
-  std::string         _host_name;
+  std::string         _hostname;
   std::string         _escalation_period;
-  bool                _escalate_on_recovery;
-  bool                _escalate_on_down;
-  bool                _escalate_on_unreachable;
 };
 CCE_END()
 
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* C++ */
-
-
 
 #  ifdef __cplusplus
 }
