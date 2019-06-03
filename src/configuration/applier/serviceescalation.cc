@@ -131,7 +131,7 @@ void applier::serviceescalation::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    se->contacts.insert({*it, nullptr});
+    se->contacts().insert({*it, nullptr});
 
   // Add contact groups to service escalation.
   for (set_string::const_iterator

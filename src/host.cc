@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -1277,38 +1278,32 @@ int is_contact_for_host(com::centreon::engine::host* hst, contact* cntct) {
  *
  *  @return true or false.
  */
-int is_escalated_contact_for_host(com::centreon::engine::host* hst,
-                                  contact* cntct) {
-  if (!hst || !cntct)
+bool host::is_escalated_contact(contact* cntct) const {
+  if (!cntct)
     return false;
 
-  std::string id(hst->get_name());
-  umultimap<std::string, std::shared_ptr<hostescalation> > const&
-    escalations(state::instance().hostescalations());
+  std::string id(get_name());
+  auto range{state::instance().hostescalations().equal_range(id)};
 
-  for (umultimap<std::string, std::shared_ptr<hostescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-         it != end && it->first == id;
-       ++it) {
-    hostescalation* hstescalation(&*it->second);
+  for (umultimap<std::string, std::shared_ptr<hostescalation>>::const_iterator
+           it{range.first},
+           end{range.second};
+       it != end; ++it) {
+    std::shared_ptr<hostescalation> hstescalation{it->second};
     // Search all contacts of this host escalation.
-  for (contact_map::iterator
-         it(hstescalation->contacts.begin()),
-         end(hstescalation->contacts.end());
-       it != end;
-       ++it)
-    if (it->second.get() == cntct)
+    contact_map::const_iterator itt{hstescalation->contacts().find(cntct->get_name())};
+    if (itt != hstescalation->contacts().end()) {
+      assert(itt->second.get() == cntct);
       return true;
+    }
 
-  // Search all contactgroups of this host escalation.
-  for (contactgroup_map::iterator
-         it(hstescalation->contact_groups.begin()),
+    // Search all contactgroups of this host escalation.
+    for (contactgroup_map::iterator itt(hstescalation->contact_groups.begin()),
          end(hstescalation->contact_groups.begin());
-       it != end;
-       ++it)
-    if (it->second->get_members().find(cntct->get_name()) ==
-      it->second->get_members().end())
-      return true;
+         itt != end; ++itt)
+      if (itt->second->get_members().find(cntct->get_name()) !=
+          itt->second->get_members().end())
+        return true;
   }
 
   return false;
@@ -2965,17 +2960,13 @@ int host::verify_check_viability(
  * given a host, create a list of contacts to be notified,
  * removing duplicates
  */
-int host::create_notification_list(
-      nagios_macros* mac,
-      int options,
-      bool* escalated) {
-  int escalate_notification = false;
-
-  logger(dbg_functions, basic)
-    << "create_notification_list_from_host()";
+int host::create_notification_list(nagios_macros* mac,
+                                   int options,
+                                   bool* escalated) {
+  logger(dbg_functions, basic) << "host::create_notification_list()";
 
   /* see if this notification should be escalated */
-  escalate_notification = should_host_notification_be_escalated(this);
+  bool escalate_notification{should_notification_be_escalated()};
 
   /* set the escalation flag */
   *escalated = escalate_notification;
@@ -2988,68 +2979,57 @@ int host::create_notification_list(
 
   if (options & NOTIFICATION_OPTION_BROADCAST)
     logger(dbg_notifications, more)
-      << "This notification will be BROADCAST to all (escalated and "
-      "normal) contacts...";
+        << "This notification will be BROADCAST to all (escalated and "
+           "normal) contacts...";
 
   /* use escalated contacts for this notification */
-  if (escalate_notification == true
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
-
+  if (escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
     logger(dbg_notifications, more)
-      << "Adding contacts from host escalation(s) to "
-      "notification list.";
+        << "Adding contacts from host escalation(s) to "
+           "notification list.";
 
-    std::string id(this->get_name());
-    umultimap<std::string, std::shared_ptr<hostescalation> > const&
-      escalations(state::instance().hostescalations());
-    for (umultimap<std::string,
-                   std::shared_ptr<hostescalation> >::const_iterator
-           it(escalations.find(id)), end(escalations.end());
-         it != end && it->first == id;
-         ++it) {
-      hostescalation* temp_he(&*it->second);
+    std::string id{get_name()};
+    auto range{state::instance().hostescalations().equal_range(id)};
+
+    for (umultimap<std::string, std::shared_ptr<hostescalation>>::const_iterator
+             it{range.first},
+         end{range.second};
+         it != end; ++it) {
+      std::shared_ptr<hostescalation> temp_he{it->second};
 
       /* see if this escalation if valid for this notification */
-      if (!is_valid_escalation_for_notification(
-            temp_he,
-            options))
+      if (!is_valid_escalation_for_notification(temp_he.get(), options))
         continue;
 
       logger(dbg_notifications, most)
-        << "Adding individual contacts from host escalation(s) "
-        "to notification list.";
+          << "Adding individual contacts from host escalation(s) "
+             "to notification list.";
 
       /* add all individual contacts for this escalation */
-      for(contact_map::iterator
-            it(temp_he->contacts.begin()),
-            end(temp_he->contacts.end());
-          it != end;
-          ++it)
-        add_notification(mac, it->second.get());
+      for (contact_map::const_iterator itt{temp_he->contacts().begin()},
+           end{temp_he->contacts().end()};
+           itt != end; ++itt)
+        add_notification(mac, itt->second.get());
 
       logger(dbg_notifications, most)
-        << "Adding members of contact groups from host "
-        "escalation(s) to notification list.";
+          << "Adding members of contact groups from host "
+             "escalation(s) to notification list.";
 
       /* add all contacts that belong to contactgroups for this escalation */
-      for (contactgroup_map::iterator
-             it(temp_he->contact_groups.begin()),
-             end(temp_he->contact_groups.end());
-           it != end;
-           ++it) {
+      for (contactgroup_map::iterator itt(temp_he->contact_groups.begin()),
+           end(temp_he->contact_groups.end());
+           itt != end; ++itt) {
         logger(dbg_notifications, most)
-          << "Adding members of contact group '"
-          << it->first
-          << "' for host escalation to notification list.";
+            << "Adding members of contact group '" << itt->first
+            << "' for host escalation to notification list.";
 
-        if (it->second == nullptr)
+        if (!itt->second)
           continue;
-        for (std::unordered_map<std::string, contact *>::const_iterator
-               itm(it->second->get_members().begin()),
-               endm(it->second->get_members().end());
-              itm != endm;
-              ++itm) {
-          if (itm->second == nullptr)
+        for (std::unordered_map<std::string, contact*>::const_iterator
+                 itm(itt->second->get_members().begin()),
+             endm(itt->second->get_members().end());
+             itm != endm; ++itm) {
+          if (!itm->second)
             continue;
           add_notification(mac, itm->second);
         }
@@ -3058,46 +3038,31 @@ int host::create_notification_list(
   }
 
   /* use normal, non-escalated contacts for this notification */
-  if (escalate_notification == false
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
-
+  if (!escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
     logger(dbg_notifications, more)
-      << "Adding normal contacts for host to notification list.";
-
-    logger(dbg_notifications, most)
-      << "Adding individual contacts for host to notification list.";
+        << "Adding normal contacts for host to notification list.";
 
     /* add all individual contacts for this host */
-    for (contact_map::iterator
-           it(this->contacts.begin()),
-           end(this->contacts.end());
-         it != end;
-         ++it)
+    for (contact_map::iterator it(this->contacts.begin()),
+         end(this->contacts.end());
+         it != end; ++it)
       add_notification(mac, it->second.get());
 
-    logger(dbg_notifications, most)
-      << "Adding members of contact groups for host to "
-      "notification list.";
-
     /* add all contacts that belong to contactgroups for this host */
-    for (contactgroup_map::iterator
-           it(this->contact_groups.begin()),
-           end(this->contact_groups.end());
-         it != end;
-         ++it) {
+    for (contactgroup_map::iterator it(this->contact_groups.begin()),
+         end(this->contact_groups.end());
+         it != end; ++it) {
       logger(dbg_notifications, most)
-        << "Adding members of contact group '"
-        << it->first
-        << "' for host to notification list.";
+          << "Adding members of contact group '" << it->first
+          << "' for host to notification list.";
 
-      if (it->second == nullptr)
+      if (!it->second)
         continue;
-      for (std::unordered_map<std::string, contact *>::const_iterator
-             itm(it->second->get_members().begin()),
-             endm(it->second->get_members().end());
-            itm != endm;
-            ++itm) {
-        if (itm->second == nullptr)
+      for (std::unordered_map<std::string, contact*>::const_iterator
+               itm(it->second->get_members().begin()),
+           endm(it->second->get_members().end());
+           itm != endm; ++itm) {
+        if (!itm->second)
           continue;
         add_notification(mac, itm->second);
       }
@@ -3515,7 +3480,7 @@ void host::enable_flap_detection() {
  */
 int host::is_valid_escalation_for_notification(
       hostescalation* he,
-      int options) {
+      int options) const {
   int notification_number = 0;
   time_t current_time = 0L;
   host* temp_host = nullptr;
@@ -3576,4 +3541,29 @@ int host::is_valid_escalation_for_notification(
     return false;
 
   return true;
+}
+
+/* checks to see whether a host notification should be escalation */
+bool host::should_notification_be_escalated() const {
+  //Debug.
+  logger(dbg_functions, basic) << "host::should_notification_be_escalated()";
+
+  auto p{state::instance().hostescalations().equal_range(get_name())};
+  while (p.first != p.second) {
+    std::shared_ptr<hostescalation> const& temp_he{p.first->second};
+
+    /* we found a matching entry, so escalate this notification! */
+    if (is_valid_escalation_for_notification(
+          temp_he.get(),
+          NOTIFICATION_OPTION_NONE)) {
+      logger(dbg_notifications, more)
+          << "Host notification WILL be escalated.";
+      return true;
+    }
+
+    ++p.first;
+  }
+  logger(dbg_notifications, more)
+    << "Host notification will NOT be escalated.";
+  return false;
 }

@@ -94,10 +94,10 @@ bool hostescalation::operator==(
                std::equal(contact_groups.begin(),
                           contact_groups.end(),
                           obj.contact_groups.begin()))
-          && ((contacts.size() == obj.contacts.size()) &&
-               std::equal(contacts.begin(),
-                          contacts.end(),
-                          obj.contacts.begin()));
+          && (contacts().size() == obj.contacts().size() &&
+               std::equal(contacts().begin(),
+                          contacts().end(),
+                          obj.contacts().begin()));
 }
 
 /**
@@ -134,28 +134,28 @@ bool hostescalation::operator<(hostescalation const& obj) {
   else if (get_escalate_on() != obj.get_escalate_on())
     return (get_escalate_on() < obj.get_escalate_on());
   for (contactgroup_map::const_iterator
-         it1(contact_groups.begin()),
-         it2(obj.contact_groups.begin()),
-         end1(contact_groups.end()),
-         end2(obj.contact_groups.end());
+         it1{contact_groups.begin()},
+         it2{obj.contact_groups.begin()},
+         end1{contact_groups.end()},
+         end2{obj.contact_groups.end()};
        (it1 != end1) || (it2 != end2);
        ++it1, ++it2) {
-    if (it1->second == nullptr || it2->second == nullptr)
-      return (!!it1->second < !!it2->second);
+    if (!it1->second || !it2->second)
+      return !!it1->second < !!it2->second;
     else if (it1->second != it2->second)
-      return (it1->second < it2->second);
+      return it1->second < it2->second;
   }
   for (contact_map::const_iterator
-         it1(contacts.begin()),
-         it2(obj.contacts.begin()),
-         end1(contacts.end()),
-         end2(obj.contacts.end());
-       (it1 != end1) || (it2 != end2);
+         it1{contacts().begin()},
+         it2{obj.contacts().begin()},
+         end1{contacts().end()},
+         end2{obj.contacts().end()};
+       it1 != end1 || it2 != end2;
        ++it1, ++it2) {
-    if (it1->second == nullptr || it2->second == nullptr)
-      return (!!it1->second < !!it2->second);
+    if (!it1->second || !it2->second)
+      return !!it1->second < !!it2->second;
     else if (it1->second != it2->second)
-      return (it1->second < it2->second);
+      return it1->second < it2->second;
   }
   return false;
 }
@@ -184,11 +184,11 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     oss << obj.contact_groups;
     cg_oss = oss.str();
   }
-  if (obj.contacts.empty())
+  if (obj.contacts().empty())
     c_oss = "\"nullptr\"";
   else {
     std::ostringstream oss;
-    oss << obj.contacts;
+    oss << obj.contacts();
     c_oss = oss.str();
   }
 

@@ -23,7 +23,6 @@
 #include <ostream>
 #include <string>
 
-#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/escalation.hh"
 #include "com/centreon/engine/namespace.hh"
@@ -42,12 +41,10 @@ class serviceescalation : public escalation {
                     double notification_interval,
                     std::string const& escalation_period,
                     uint32_t escalate_on);
-  ~serviceescalation();
   std::string const& get_hostname() const;
   std::string const& get_description() const;
 
   contactgroup_map contact_groups;
-  contact_map contacts;
   service* service_ptr;
   timeperiod* escalation_period_ptr;
   serviceescalation* next;

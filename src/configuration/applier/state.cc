@@ -627,8 +627,8 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >:
                           : 0));
     current.escalation_options(options);
     for (contact_map::iterator
-           it(p.first->second->contacts.begin()),
-           end(p.first->second->contacts.end());
+           it(p.first->second->contacts().begin()),
+           end(p.first->second->contacts().end());
          it != end;
          ++it)
       current.contacts().insert(it->first);
@@ -899,8 +899,8 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::servicees
                             : 0));
     current.escalation_options(options);
     for (contact_map::iterator
-           it(p.first->second->contacts.begin()),
-           end(p.first->second->contacts.end());
+           it(p.first->second->contacts().begin()),
+           end(p.first->second->contacts().end());
          it != end;
          ++it)
       current.contacts().insert(it->first);

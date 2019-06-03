@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -899,36 +900,31 @@ int is_contact_for_service(com::centreon::engine::service* svc,
  *
  *  @return true or false.
  */
-int is_escalated_contact_for_service(com::centreon::engine::service* svc,
-                                     contact* cntct) {
-  if (!svc || !cntct)
+bool service::is_escalated_contact(contact* cntct) const {
+  if (!cntct)
     return false;
 
-  std::pair<std::string, std::string> id(
-      std::make_pair(svc->get_hostname(), svc->get_description()));
-  umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<serviceescalation> > const&
-      escalations(state::instance().serviceescalations());
+  std::pair<std::string, std::string> id{get_hostname(), get_description()};
+  auto range{state::instance().serviceescalations().equal_range(id)};
 
   for (umultimap<std::pair<std::string, std::string>,
-                 std::shared_ptr<serviceescalation> >::const_iterator
-           it(escalations.find(id)),
-       end(escalations.end());
-       it != end && it->first == id; ++it) {
-    serviceescalation* svcescalation(&*it->second);
+                 std::shared_ptr<serviceescalation>>::const_iterator
+           it{range.first}, end{range.second};
+       it != end; ++it) {
+    std::shared_ptr<serviceescalation> svcescalation{it->second};
     // Search all contacts of this service escalation.
-    for (contact_map::iterator it(svcescalation->contacts.begin()),
-         end(svcescalation->contacts.end());
-         it != end; ++it)
-      if (it->second.get() == cntct)
-        return true;
+    contact_map::const_iterator itt{svcescalation->contacts().find(cntct->get_name())};
+    if (itt != svcescalation->contacts().end()) {
+      assert(itt->second.get() == cntct);
+      return true;
+    }
 
     // Search all contactgroups of this service escalation.
-    for (contactgroup_map::iterator it(svcescalation->contact_groups.begin()),
-         end(svcescalation->contact_groups.end());
-         it != end; ++it)
-      if (it->second->get_members().find(cntct->get_name()) ==
-          it->second->get_members().end())
+    for (contactgroup_map::iterator itt{svcescalation->contact_groups.begin()},
+         end{svcescalation->contact_groups.end()};
+         itt != end; ++itt)
+      if (itt->second->get_members().find(cntct->get_name()) !=
+          itt->second->get_members().end())
         return true;
   }
 
@@ -3205,17 +3201,13 @@ int service::verify_check_viability(
  * given a service, create a list of contacts to be notified, removing
  * duplicates
  */
-int service::create_notification_list(
-      nagios_macros* mac,
-      int options,
-      bool* escalated) {
-  int escalate_notification = false;
-
-  logger(dbg_functions, basic)
-    << "create_notification_list_from_service()";
+int service::create_notification_list(nagios_macros* mac,
+                                      int options,
+                                      bool* escalated) {
+  logger(dbg_functions, basic) << "service::create_notification_list()";
 
   /* see if this notification should be escalated */
-  escalate_notification = should_service_notification_be_escalated(this);
+  bool escalate_notification{should_notification_be_escalated()};
 
   /* set the escalation flag */
   *escalated = escalate_notification;
@@ -3228,70 +3220,57 @@ int service::create_notification_list(
 
   if (options & NOTIFICATION_OPTION_BROADCAST)
     logger(dbg_notifications, more)
-      << "This notification will be BROADCAST to all "
-      "(escalated and normal) contacts...";
+        << "This notification will be BROADCAST to all "
+           "(escalated and normal) contacts...";
 
   /* use escalated contacts for this notification */
-  if (escalate_notification == true
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
-
+  if (escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
     logger(dbg_notifications, more)
-      << "Adding contacts from service escalation(s) to "
-      "notification list.";
+        << "Adding contacts from service escalation(s) to "
+           "notification list.";
 
-    std::pair<std::string, std::string>
-      id(std::make_pair(this->get_hostname(), this->get_description()));
-    umultimap<std::pair<std::string, std::string>,
-              std::shared_ptr<serviceescalation> > const&
-      escalations(state::instance().serviceescalations());
+    std::pair<std::string, std::string> id({get_hostname(), get_description()});
+    auto range{state::instance().serviceescalations().equal_range(id)};
+
     for (umultimap<std::pair<std::string, std::string>,
-                   std::shared_ptr<serviceescalation> >::const_iterator
-           it(escalations.find(id)), end(escalations.end());
-         it != end && it->first == id;
-         ++it) {
-      serviceescalation* temp_se(&*it->second);
+                   std::shared_ptr<serviceescalation>>::const_iterator
+             it{range.first}, end{range.second};
+             it != end; ++it) {
+      std::shared_ptr<serviceescalation> temp_se{it->second};
 
       /* skip this entry if it isn't appropriate */
-      if (!is_valid_escalation_for_notification(
-            temp_se,
-            options))
+      if (!is_valid_escalation_for_notification(temp_se.get(), options))
         continue;
 
       logger(dbg_notifications, most)
-        << "Adding individual contacts from service escalation(s) "
-        "to notification list.";
+          << "Adding individual contacts from service escalation(s) "
+             "to notification list.";
 
       /* add all individual contacts for this escalation entry */
-      for (contact_map::iterator
-             it(temp_se->contacts.begin()),
-             end(temp_se->contacts.end());
-           it != end;
-           ++it)
-        add_notification(mac, it->second.get());
+      for (contact_map::const_iterator itt(temp_se->contacts().begin()),
+           end(temp_se->contacts().end());
+           itt != end; ++itt)
+        add_notification(mac, itt->second.get());
 
       logger(dbg_notifications, most)
-        << "Adding members of contact groups from service escalation(s) "
-        "to notification list.";
+          << "Adding members of contact groups from service escalation(s) "
+             "to notification list.";
 
       /* add all contacts that belong to contactgroups for this escalation */
-      for (contactgroup_map::iterator
-             it(temp_se->contact_groups.begin()),
-             end(temp_se->contact_groups.end());
-           it != end;
-           ++it) {
+      for (contactgroup_map::iterator itt(temp_se->contact_groups.begin()),
+           end(temp_se->contact_groups.end());
+           itt != end; ++itt) {
         logger(dbg_notifications, most)
-          << "Adding members of contact group '"
-          << it->first
-          << "' for service escalation to notification list.";
+            << "Adding members of contact group '" << itt->first
+            << "' for service escalation to notification list.";
 
-        if (it->second == nullptr)
+        if (!itt->second)
           continue;
-        for (std::unordered_map<std::string, contact *>::const_iterator
-               itm(it->second->get_members().begin()),
-               mend(it->second->get_members().end());
-              itm != mend;
-              ++itm) {
-          if (itm->second == nullptr)
+        for (std::unordered_map<std::string, contact*>::const_iterator
+                 itm(itt->second->get_members().begin()),
+             endm(itt->second->get_members().end());
+             itm != endm; ++itm) {
+          if (!itm->second)
             continue;
           add_notification(mac, itm->second);
         }
@@ -3300,40 +3279,32 @@ int service::create_notification_list(
   }
 
   /* else use normal, non-escalated contacts */
-  if (escalate_notification == false
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
-
+  if (!escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
     logger(dbg_notifications, more)
-      << "Adding normal contacts for service to notification list.";
+        << "Adding normal contacts for service to notification list.";
 
     /* add all individual contacts for this service */
-    for (contact_map::iterator
-           it(this->contacts.begin()),
-           end(this->contacts.end());
-         it != end;
-         ++it) {
+    for (contact_map::iterator it(this->contacts.begin()),
+         end(this->contacts.end());
+         it != end; ++it) {
       add_notification(mac, it->second.get());
     }
 
     /* add all contacts that belong to contactgroups for this service */
-    for (contactgroup_map::iterator
-           it(this->contact_groups.begin()),
-           end(this->contact_groups.end());
-         it != end;
-         ++it) {
+    for (contactgroup_map::iterator it(this->contact_groups.begin()),
+         end(this->contact_groups.end());
+         it != end; ++it) {
       logger(dbg_notifications, most)
-        << "Adding members of contact group '"
-        << it->first
-        << "' for service to notification list.";
+          << "Adding members of contact group '" << it->first
+          << "' for service to notification list.";
 
-      if (it->second == nullptr)
+      if (!it->second)
         continue;
-      for (std::unordered_map<std::string, contact *>::const_iterator
-             itm(it->second->get_members().begin()),
-             mend(it->second->get_members().end());
-            itm != mend;
-            ++itm) {
-        if (itm->second == nullptr)
+      for (std::unordered_map<std::string, contact*>::const_iterator
+               itm(it->second->get_members().begin()),
+           mend(it->second->get_members().end());
+           itm != mend; ++itm) {
+        if (!itm->second)
           continue;
         add_notification(mac, itm->second);
       }
@@ -3675,7 +3646,7 @@ time_t service::get_next_notification_time(time_t offset) {
  */
 int service::is_valid_escalation_for_notification(
       serviceescalation* se,
-      int options) {
+      int options) const {
   int notification_number = 0;
   time_t current_time = 0L;
   com::centreon::engine::service* temp_service = nullptr;
@@ -3739,4 +3710,41 @@ int service::is_valid_escalation_for_notification(
     return false;
 
   return true;
+}
+
+/**
+ *  Checks to see whether a service notification should be escalated.
+ *
+ *  @param[in] svc Service.
+ *
+ *  @return true if service notification should be escalated, false if
+ *          it should not.
+ */
+bool service::should_notification_be_escalated() const {
+  // Debug.
+  logger(dbg_functions, basic) << "service::should_notification_be_escalated()";
+
+  // Browse service escalations related to this service.
+  typedef umultimap<std::pair<std::string, std::string>,
+                    std::shared_ptr<serviceescalation>>
+      collection;
+  std::pair<collection::iterator, collection::iterator> p{
+      state::instance().serviceescalations().equal_range(
+          {get_hostname(), get_description()})};
+  while (p.first != p.second) {
+    std::shared_ptr<serviceescalation> temp_se{p.first->second};
+
+    // We found a matching entry, so escalate this notification!
+    if (is_valid_escalation_for_notification(temp_se.get(),
+                                             NOTIFICATION_OPTION_NONE)) {
+      logger(dbg_notifications, more)
+          << "Service notification WILL be escalated.";
+      return true;
+    }
+
+    ++p.first;
+  }
+  logger(dbg_notifications, more)
+      << "Service notification will NOT be escalated.";
+  return false;
 }

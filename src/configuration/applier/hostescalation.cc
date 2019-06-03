@@ -116,7 +116,7 @@ void applier::hostescalation::add_object(
   for (set_string::const_iterator it(obj.contacts().begin()),
        end(obj.contacts().end());
        it != end; ++it)
-    he->contacts.insert({*it, nullptr});
+    he->contacts().insert({*it, nullptr});
 
   // Add contact groups to host escalation.
   for (set_string::const_iterator it(obj.contactgroups().begin()),

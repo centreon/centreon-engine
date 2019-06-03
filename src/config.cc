@@ -1581,17 +1581,12 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   }
 
   // Check all contacts.
-  for (contact_map::iterator
-         it(se->contacts.begin()),
-         end(se->contacts.end());
-       it != end;
-       ++it) {
-    // Find the contact.
-    contact* cntct(configuration::applier::state::instance().find_contact(
-      it->first));
-    if (cntct == nullptr) {
+  for (std::pair<std::string, std::shared_ptr<contact>> const& p : se->contacts()) {
+    contact* cntct{configuration::applier::state::instance().find_contact(
+      p.first)};
+    if (!cntct) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << it->first
+        << "Error: Contact '" << p.first
         << "' specified in service escalation for service '"
         << se->get_description() << "' on host '"
         << se->get_hostname() << "' is not defined anywhere!";
@@ -1679,17 +1674,13 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   }
 
   // Check all contacts.
-  for (contact_map::iterator
-         it(he->contacts.begin()),
-         end(he->contacts.end());
-       it != end;
-       ++it) {
+  for (std::pair<std::string, std::shared_ptr<contact>> const& p : he->contacts()) {
     // Find the contact.
-    contact* cntct(configuration::applier::state::instance().find_contact(
-                            it->first));
+    contact* cntct{configuration::applier::state::instance().find_contact(
+                            p.first)};
     if (!cntct) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << it->first
+        << "Error: Contact '" << p.first
         << "' specified in host escalation for host '"
         << he->get_hostname() << "' is not defined anywhere!";
       errors++;

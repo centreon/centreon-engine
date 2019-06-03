@@ -80,3 +80,11 @@ void escalation::set_escalate_on(uint32_t escalate_on) {
 bool escalation::get_escalate_on(notifier::notification_type type) const {
   return _escalate_on & type;
 }
+
+contact_map const& escalation::contacts() const {
+  return _contacts;
+}
+
+contact_map& escalation::contacts() {
+  return _contacts;
+}

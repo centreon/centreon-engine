@@ -150,6 +150,7 @@ class                 host : public notifier {
   void               grab_macros_r(nagios_macros* mac) override;
   bool               operator==(host const& other) throw ();
   bool               operator!=(host const& other) throw ();
+  int                is_escalated_contact(contact* cntct);
 
   // setters / getters
   std::string const& get_name() const;
@@ -311,7 +312,9 @@ class                 host : public notifier {
   void               schedule_acknowledgement_expiration();
   int                is_valid_escalation_for_notification(
                        hostescalation* he,
-                       int options);
+                       int options) const;
+  bool               is_escalated_contact(contact* cntct) const override;
+  bool               should_notification_be_escalated() const override;
 
   contactgroup_map   contact_groups;
   contact_map        contacts;
@@ -422,9 +425,6 @@ typedef struct        host_cursor_struct {
 
 int                   is_contact_for_host(com::centreon::engine::host* hst,
                           com::centreon::engine::contact* cntct);
-int                   is_escalated_contact_for_host(
-                                    com::centreon::engine::host* hst,
-                                    com::centreon::engine::contact* cntct);
 int                   is_host_immediate_child_of_host(
                                     com::centreon::engine::host* parent,
                                     com::centreon::engine::host* child);

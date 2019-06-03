@@ -130,7 +130,9 @@ class                           service : public notifier {
   bool                          operator!=(service const& other) throw();
   int                           is_valid_escalation_for_notification(
                                   serviceescalation* se,
-                                  int options);
+                                  int options) const;
+  bool                          is_escalated_contact(contact* cntct) const override;
+  bool                          should_notification_be_escalated() const override;
 
   contactgroup_map              contact_groups;
   contact_map                   contacts;

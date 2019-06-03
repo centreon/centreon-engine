@@ -51,6 +51,8 @@ class escalation {
   uint32_t get_escalate_on() const;
   bool get_escalate_on(notifier::notification_type type) const;
   void set_escalate_on(uint32_t escalate_on);
+  contact_map const& contacts() const;
+  contact_map& contacts();
 
  private:
   int _first_notification;
@@ -58,6 +60,7 @@ class escalation {
   double _notification_interval;
   std::string _escalation_period;
   uint32_t _escalate_on;
+  contact_map _contacts;
 };
 CCE_END()
 

@@ -61,7 +61,6 @@ class                 hostescalation : public escalation {
     com::centreon::engine::hostescalation const& obj);
 
   contactgroup_map    contact_groups;
-  contact_map         contacts;
   host*               host_ptr;
   timeperiod*         escalation_period_ptr;
   static hostescalation_mmap

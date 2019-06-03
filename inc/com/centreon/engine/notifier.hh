@@ -171,6 +171,8 @@ class                         notifier {
   void                        set_notifications_enabled(bool notifications_enabled);
   std::string const&          get_timezone() const;
   void                        set_timezone(std::string const& timezone);
+  virtual bool                is_escalated_contact(contact* cntct) const = 0;
+  virtual bool                should_notification_be_escalated() const = 0;
 
  protected:
   int                         _notifier_type;

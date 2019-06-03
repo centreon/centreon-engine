@@ -186,44 +186,6 @@ int check_contact_service_notification_viability(
 }
 
 
-/**
- *  Checks to see whether a service notification should be escalated.
- *
- *  @param[in] svc Service.
- *
- *  @return true if service notification should be escalated, false if
- *          it should not.
- */
-int should_service_notification_be_escalated(com::centreon::engine::service* svc) {
-  // Debug.
-  logger(dbg_functions, basic)
-    << "should_service_notification_be_escalated()";
-
-  // Browse service escalations related to this service.
-  typedef umultimap<std::pair<std::string, std::string>,
-                    std::shared_ptr<serviceescalation> > collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = state::instance().serviceescalations().equal_range(
-        std::make_pair(svc->get_hostname(), svc->get_description()));
-  while (p.first != p.second) {
-    serviceescalation* temp_se(p.first->second.get());
-
-    // We found a matching entry, so escalate this notification!
-    if (svc->is_valid_escalation_for_notification(
-          temp_se,
-          NOTIFICATION_OPTION_NONE)) {
-      logger(dbg_notifications, more)
-        << "Service notification WILL be escalated.";
-      return true;
-    }
-
-    ++p.first;
-  }
-  logger(dbg_notifications, more)
-    << "Service notification will NOT be escalated.";
-  return false;
-}
-
 /******************************************************************/
 /******************* HOST NOTIFICATION FUNCTIONS ******************/
 /******************************************************************/
@@ -354,36 +316,6 @@ int check_contact_host_notification_viability(
     << cntct->get_name() << "' PASSED.";
 
   return OK;
-}
-
-/* checks to see whether a host notification should be escalation */
-int should_host_notification_be_escalated(host* hst) {
-  logger(dbg_functions, basic)
-    << "should_host_notification_be_escalated()";
-
-  if (hst == nullptr)
-    return false;
-
-  std::string id(hst->get_name());
-  umultimap<std::string, std::shared_ptr<hostescalation> > const&
-    escalations(state::instance().hostescalations());
-  for (umultimap<std::string, std::shared_ptr<hostescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-       it != end && it->first == id;
-       ++it) {
-    hostescalation* temp_he(&*it->second);
-
-    /* we found a matching entry, so escalate this notification! */
-    if (hst->is_valid_escalation_for_notification(
-          temp_he,
-          NOTIFICATION_OPTION_NONE))
-      return true;
-  }
-
-  logger(dbg_notifications, more)
-    << "Host notification will NOT be escalated.";
-
-  return false;
 }
 
 /******************************************************************/
