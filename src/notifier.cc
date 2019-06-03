@@ -51,7 +51,7 @@ std::array<std::string, 2> const notifier::tab_state_type {{
 
 uint64_t notifier::_next_notification_id{0};
 
-notifier::notifier(int notification_type,
+notifier::notifier(int notifier_type,
                    std::string const& display_name,
                    std::string const& check_command,
                    int initial_state,
@@ -71,7 +71,7 @@ notifier::notifier(int notification_type,
                    bool flap_detection_enabled,
                    double low_flap_threshold,
                    double high_flap_threshold)
-    : _notifier_type{notification_type},
+    : _notifier_type{notifier_type},
       _display_name{display_name},
       _check_command{check_command},
       _initial_state{initial_state},
@@ -669,19 +669,23 @@ void notifier::set_high_flap_threshold(double high_flap_threshold) {
 }
 
 bool notifier::get_notify_on(notification_type type) const {
-  return _notification_type & type;
+  return _out_notification_type & type;
 }
 
 uint32_t notifier::get_notify_on() const {
-  return _notification_type;
+  return _out_notification_type;
 }
 
-void notifier::add_notification_on(notification_type type) {
-  _notification_type |= type;
+void notifier::add_notify_on(notification_type type) {
+  _out_notification_type |= type;
 }
 
-void notifier::remove_notification_on(notification_type type) {
-  _notification_type &= ~type;
+void notifier::set_notify_on(uint32_t type) {
+  _out_notification_type = type;
+}
+
+void notifier::remove_notify_on(notification_type type) {
+  _out_notification_type &= ~type;
 }
 
 double notifier::get_first_notification_delay(void) const {
@@ -699,3 +703,24 @@ bool notifier::get_notifications_enabled() const {
 void notifier::set_notifications_enabled(bool notifications_enabled) {
   _notifications_enabled = notifications_enabled;
 }
+
+bool notifier::get_notified_on(notification_type type) const {
+  return _in_notification_type & type;
+}
+
+uint32_t notifier::get_notified_on() const {
+  return _in_notification_type;
+}
+
+void notifier::add_notified_on(notification_type type) {
+  _in_notification_type |= type;
+}
+
+void notifier::set_notified_on(uint32_t type) {
+  _in_notification_type = type;
+}
+
+void notifier::remove_notified_on(notification_type type) {
+  _in_notification_type &= ~type;
+}
+

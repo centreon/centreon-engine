@@ -206,9 +206,7 @@ bool service::operator==(service const& other) throw() {
          this->last_time_critical == other.last_time_critical &&
          this->has_been_checked == other.has_been_checked &&
          this->is_being_freshened == other.is_being_freshened &&
-         this->notified_on_unknown == other.notified_on_unknown &&
-         this->notified_on_warning == other.notified_on_warning &&
-         this->notified_on_critical == other.notified_on_critical &&
+         get_notified_on() == other.get_notified_on() &&
          this->current_notification_number ==
              other.current_notification_number &&
          this->current_notification_id == other.current_notification_id &&
@@ -525,13 +523,13 @@ std::ostream& operator<<(std::ostream& os,
      << obj.is_being_freshened
      << "\n"
         "  notified_on_unknown:                  "
-     << obj.notified_on_unknown
+     << obj.get_notified_on(notifier::unknown)
      << "\n"
         "  notified_on_warning:                  "
-     << obj.notified_on_warning
+     << obj.get_notified_on(notifier::warning)
      << "\n"
         "  notified_on_critical:                 "
-     << obj.notified_on_critical
+     << obj.get_notified_on(notifier::critical)
      << "\n"
         "  current_notification_number:          "
      << obj.current_notification_number
@@ -1602,9 +1600,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     _next_notification = static_cast<time_t>(0);
     if (_recovery_been_sent) {
       this->current_notification_number = 0;
-      this->notified_on_unknown = false;
-      this->notified_on_warning = false;
-      this->notified_on_critical = false;
+      set_notified_on(notifier::none);
       _initial_notif_time = static_cast<time_t>(0);
     }
     this->problem_has_been_acknowledged = false;
@@ -3034,9 +3030,8 @@ int service::check_notification_viability(unsigned int type, int options) {
           << "We shouldn't notify about RECOVERY states for this service.";
       return ERROR;
     }
-    if (!(this->notified_on_unknown == true ||
-          this->notified_on_warning == true ||
-          this->notified_on_critical == true)) {
+    /* No notification in input */
+    if (get_notified_on() == 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about this recovery.";
       return ERROR;
@@ -3608,11 +3603,11 @@ int service::notify_contact(
 void service::update_notification_flags() {
   /* update notifications flags */
   if (this->current_state == STATE_UNKNOWN)
-    this->notified_on_unknown = true;
+    add_notified_on(notifier::unknown);
   else if (this->current_state == STATE_WARNING)
-    this->notified_on_warning = true;
+    add_notified_on(notifier::warning);
   else if (this->current_state == STATE_CRITICAL)
-    this->notified_on_critical = true;
+    add_notified_on(notifier::critical);
 }
 
 /* calculates next acceptable re-notification time for a service */

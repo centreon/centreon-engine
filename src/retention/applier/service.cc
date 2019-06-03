@@ -136,12 +136,17 @@ void applier::service::_update(
         && config.use_retained_scheduling_info()
         && scheduling_info_is_ok)
       obj.check_options = *state.check_options();
-    if (state.notified_on_unknown().is_set())
-      obj.notified_on_unknown = *state.notified_on_unknown();
-    if (state.notified_on_warning().is_set())
-      obj.notified_on_warning = *state.notified_on_warning();
-    if (state.notified_on_critical().is_set())
-      obj.notified_on_critical = *state.notified_on_critical();
+    obj.set_notified_on(
+        (state.notified_on_unknown().is_set() && *state.notified_on_unknown()
+             ? notifier::unknown
+             : notifier::none) |
+        (state.notified_on_warning().is_set() && *state.notified_on_warning()
+             ? notifier::warning
+             : notifier::none) |
+        (state.notified_on_critical().is_set() && *state.notified_on_critical()
+             ? notifier::critical
+             : notifier::none));
+
     if (state.current_notification_number().is_set())
       obj.current_notification_number = *state.current_notification_number();
     if (state.current_notification_id().is_set())

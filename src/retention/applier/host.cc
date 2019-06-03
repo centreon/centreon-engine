@@ -131,10 +131,14 @@ void applier::host::_update(
       obj.set_last_time_down(*state.last_time_down());
     if (state.last_time_unreachable().is_set())
       obj.set_last_time_unreachable(*state.last_time_unreachable());
-    if (state.notified_on_down().is_set())
-      obj.set_notified_on_down(*state.notified_on_down());
-    if (state.notified_on_unreachable().is_set())
-      obj.set_notified_on_unreachable(*state.notified_on_unreachable());
+    obj.set_notified_on(
+        (state.notified_on_down().is_set() && *state.notified_on_down()
+             ? notifier::down
+             : notifier::none) |
+        (state.notified_on_unreachable().is_set() &&
+                 *state.notified_on_unreachable()
+             ? notifier::unreachable
+             : notifier::none));
     if (state.last_notification().is_set())
       obj.set_last_notification(*state.last_notification());
     if (state.current_notification_number().is_set())

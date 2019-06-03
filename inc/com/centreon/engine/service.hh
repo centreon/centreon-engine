@@ -182,9 +182,6 @@ class                           service : public notifier {
   time_t                        last_time_critical;
   int                           has_been_checked;
   int                           is_being_freshened;
-  int                           notified_on_unknown;
-  int                           notified_on_warning;
-  int                           notified_on_critical;
   int                           current_notification_number;
   uint64_t                      current_notification_id;
   double                        latency;

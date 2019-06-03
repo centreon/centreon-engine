@@ -156,8 +156,14 @@ class                         notifier {
   void                        set_high_flap_threshold(double high_flap_threshold);
   bool                        get_notify_on(notification_type type) const;
   uint32_t                    get_notify_on() const;
-  void                        add_notification_on(notification_type type);
-  void                        remove_notification_on(notification_type type);
+  void                        set_notify_on(uint32_t type);
+  void                        add_notify_on(notification_type type);
+  void                        remove_notify_on(notification_type type);
+  bool                        get_notified_on(notification_type type) const;
+  uint32_t                    get_notified_on() const;
+  void                        set_notified_on(uint32_t type);
+  void                        add_notified_on(notification_type type);
+  void                        remove_notified_on(notification_type type);
   double                      get_first_notification_delay(void) const;
   void                        set_first_notification_delay(double notification_delay);
   bool                        get_notifications_enabled() const;
@@ -184,7 +190,8 @@ class                         notifier {
   bool                        _recovery_been_sent;
   double                      _notification_interval;
   std::string                 _notification_period;
-  uint32_t                    _notification_type;
+  uint32_t                    _out_notification_type;
+  uint32_t                    _in_notification_type;
 
  private:
   static uint64_t             _next_notification_id;

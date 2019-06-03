@@ -166,11 +166,11 @@ int check_contact_service_notification_viability(
       return ERROR;
     }
 
-    if (!((svc->notified_on_unknown == true
+    if (!((svc->get_notified_on(notifier::unknown)
            && cntct->notify_on_service_unknown())
-          || (svc->notified_on_warning == true
+          || (svc->get_notified_on(notifier::warning)
               && cntct->notify_on_service_warning())
-          || (svc->notified_on_critical == true
+          || (svc->get_notified_on(notifier::critical)
               && cntct->notify_on_service_critical()))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
@@ -411,9 +411,9 @@ int check_contact_host_notification_viability(
       return ERROR;
     }
 
-    if (!((hst->get_notified_on_down()
+    if (!((hst->get_notified_on(notifier::down)
            && cntct->notify_on_host_down())
-          || (hst->get_notified_on_unreachable()
+          || (hst->get_notified_on(notifier::unreachable)
               && cntct->notify_on_host_unreachable()))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";

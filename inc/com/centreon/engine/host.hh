@@ -384,8 +384,6 @@ private:
   time_t              _last_time_up;
   bool                _has_been_checked;
   bool                _is_being_freshened;
-  bool                _notified_on_down;
-  bool                _notified_on_unreachable;
   int                 _no_more_notifications;
   int                 _check_flapping_recovery_notification;
   int                 _scheduled_downtime_depth;

@@ -314,11 +314,11 @@ void applier::host::modify_object(
   h->set_check_interval(static_cast<double>(obj.check_interval()));
   h->set_retry_interval(static_cast<double>(obj.retry_interval()));
   h->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
-  h->add_notification_on(obj.notification_options() & configuration::host::up ? notifier::recovery : notifier::none);
-  h->add_notification_on(obj.notification_options() & configuration::host::down ? notifier::down : notifier::none);
-  h->add_notification_on(obj.notification_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
-  h->add_notification_on(obj.notification_options() & configuration::host::flapping ? notifier::flapping : notifier::none);
-  h->add_notification_on(obj.notification_options() & configuration::host::downtime ? notifier::downtime : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::up ? notifier::recovery : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::down ? notifier::down : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::flapping ? notifier::flapping : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::downtime ? notifier::downtime : notifier::none);
   h->set_notification_interval(static_cast<double>(obj.notification_interval()));
   h->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
   h->set_notification_period(obj.notification_period());

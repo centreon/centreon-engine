@@ -265,12 +265,12 @@ host::host(uint64_t host_id,
   _last_hard_state = initial_state;
   _last_state = initial_state;
   _notification_interval = notification_interval;
-  _notification_type = notifier::none;
-  _notification_type |= (notify_down > 0 ? notifier::down : 0);
-  _notification_type |= (notify_downtime > 0 ? notifier::downtime : 0);
-  _notification_type |= (notify_flapping > 0 ? notifier::flapping : 0);
-  _notification_type |= (notify_up > 0 ? notifier::recovery : 0);
-  _notification_type |= (notify_unreachable > 0 ? notifier::unreachable : 0);
+  _out_notification_type = notifier::none;
+  _out_notification_type |= (notify_down > 0 ? notifier::down : 0);
+  _out_notification_type |= (notify_downtime > 0 ? notifier::downtime : 0);
+  _out_notification_type |= (notify_flapping > 0 ? notifier::flapping : 0);
+  _out_notification_type |= (notify_up > 0 ? notifier::recovery : 0);
+  _out_notification_type |= (notify_unreachable > 0 ? notifier::unreachable : 0);
   _obsess_over_host = (obsess_over_host > 0);
   _process_performance_data = (process_perfdata > 0);
   _retain_nonstatus_information = (retain_nonstatus_information > 0);
@@ -757,22 +757,6 @@ void host::set_is_being_freshened(bool is_being_freshened) {
   _is_being_freshened = is_being_freshened;
 }
 
-bool host::get_notified_on_down() const {
-  return _notified_on_down;
-}
-
-void host::set_notified_on_down(bool notified_on_down) {
-  _notified_on_down = notified_on_down;
-}
-
-bool host::get_notified_on_unreachable() const {
-  return _notified_on_unreachable;
-}
-
-void host::set_notified_on_unreachable(bool notified_on_unreachable) {
-  _notified_on_unreachable = notified_on_unreachable;
-}
-
 int host::get_current_notification_number() const {
   return _current_notification_number;
 }
@@ -933,7 +917,7 @@ bool host::operator==(host const& other) throw() {
          get_notification_interval() == other.get_notification_interval() &&
          get_first_notification_delay() ==
              other.get_first_notification_delay() &&
-         _notification_type == other._notification_type &&
+         get_notify_on() == other.get_notify_on() &&
          get_notification_period() == other.get_notification_period() &&
          get_check_period() == other.get_check_period() &&
          get_flap_detection_enabled() == other.get_flap_detection_enabled() &&
@@ -1006,8 +990,7 @@ bool host::operator==(host const& other) throw() {
          get_last_time_unreachable() == other.get_last_time_unreachable() &&
          get_has_been_checked() == other.get_has_been_checked() &&
          get_is_being_freshened() == other.get_is_being_freshened() &&
-         get_notified_on_down() == other.get_notified_on_down() &&
-         get_notified_on_unreachable() == other.get_notified_on_unreachable() &&
+         get_notified_on() == other.get_notified_on() &&
          get_current_notification_number() ==
              other.get_current_notification_number() &&
          get_no_more_notifications() == other.get_no_more_notifications() &&
@@ -1210,8 +1193,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  last_time_unreachable:                " << string::ctime(obj.get_last_time_unreachable()) << "\n"
     "  has_been_checked:                     " << obj.get_has_been_checked() << "\n"
     "  is_being_freshened:                   " << obj.get_is_being_freshened() << "\n"
-    "  notified_on_down:                     " << obj.get_notified_on_down() << "\n"
-    "  notified_on_unreachable:              " << obj.get_notified_on_unreachable() << "\n"
+    "  notified_on_down:                     " << obj.get_notified_on(notifier::down) << "\n"
+    "  notified_on_unreachable:              " << obj.get_notified_on(notifier::unreachable) << "\n"
     "  current_notification_number:          " << obj.get_current_notification_number() << "\n"
     "  no_more_notifications:                " << obj.get_no_more_notifications() << "\n"
     "  current_notification_id:              " << obj.get_current_notification_id() << "\n"
@@ -2650,8 +2633,8 @@ int host::check_notification_viability(unsigned int type, int options) {
           << "We shouldn't notify about RECOVERY states for this host.";
       return ERROR;
     }
-    if (!(get_notified_on_down() ||
-          get_notified_on_unreachable())) {
+    /* No notification received */
+    if (get_notified_on() == 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about this recovery.";
       return ERROR;
@@ -2866,8 +2849,7 @@ int host::handle_state() {
     /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
     if (get_current_state() == HOST_UP && _recovery_been_sent) {
       _current_notification_number = 0;
-      set_notified_on_down(false);
-      set_notified_on_unreachable(false);
+      set_notified_on(notifier::none);
     }
   }
 
@@ -2891,8 +2873,7 @@ int host::handle_state() {
         && _recovery_been_sent
         && get_current_state() == HOST_UP) {
       _current_notification_number = 0;
-      set_notified_on_down(false);
-      set_notified_on_unreachable(false);
+      set_notified_on(notifier::none);
     }
 
     /* if we're in a soft state and we should log host retries, do so now... */
@@ -3384,9 +3365,9 @@ int host::notify_contact(
 void host::update_notification_flags() {
   /* update notifications flags */
   if (get_current_state() == HOST_DOWN)
-    set_notified_on_down(true);
+    add_notified_on(notifier::down);
   else if (get_current_state() == HOST_UNREACHABLE)
-    set_notified_on_unreachable(true);
+    add_notified_on(notifier::unreachable);
 }
 
 /* calculates next acceptable re-notification time for a host */
