@@ -433,7 +433,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.get_check_interval() << "\n"
     "notification_period=" << obj.get_notification_period() << "\n"
-    "notifications_enabled=" << obj.notifications_enabled << "\n"
+    "notifications_enabled=" << obj.get_notifications_enabled() << "\n"
     "notified_on_critical=" << obj.notified_on_critical << "\n"
     "notified_on_unknown=" << obj.notified_on_unknown << "\n"
     "notified_on_warning=" << obj.notified_on_warning << "\n"

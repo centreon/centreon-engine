@@ -30,6 +30,20 @@ struct nagios_macros;
 CCE_BEGIN()
 class                         notifier {
  public:
+  enum notification_type {
+    none =        0,
+    // Host
+    down =        1 << 0,
+    unreachable = 1 << 1,
+    // Service
+    warning =     1 << 2,
+    critical =    1 << 3,
+    unknown =     1 << 4,
+    // Common
+    recovery =    1 << 5,
+    flapping =    1 << 6,
+    downtime =    1 << 7,
+  };
   static std::array<std::string, 8> const tab_notification_str;
   static std::array<std::string, 2> const tab_state_type;
 
@@ -42,7 +56,9 @@ class                         notifier {
                                        double check_interval,
                                        double retry_interval,
                                        int max_attempts,
+                                       double first_notification_delay,
                                        std::string const& notification_period,
+                                       bool notifications_enabled,
                                        std::string const& check_period,
                                        std::string const& event_handler,
                                        std::string const& notes,
@@ -138,12 +154,17 @@ class                         notifier {
   void                        set_low_flap_threshold(double low_flap_threshold);
   double                      get_high_flap_threshold() const;
   void                        set_high_flap_threshold(double high_flap_threshold);
-
+  bool                        get_notify_on(notification_type type) const;
+  uint32_t                    get_notify_on() const;
+  void                        add_notification_on(notification_type type);
+  void                        remove_notification_on(notification_type type);
+  double                      get_first_notification_delay(void) const;
+  void                        set_first_notification_delay(double notification_delay);
+  bool                        get_notifications_enabled() const;
+  void                        set_notifications_enabled(bool notifications_enabled);
 
  protected:
-
-
-  int                         _notification_type;
+  int                         _notifier_type;
   std::string                 _display_name;
   std::string                 _check_command;
   int                         _initial_state;
@@ -163,6 +184,7 @@ class                         notifier {
   bool                        _recovery_been_sent;
   double                      _notification_interval;
   std::string                 _notification_period;
+  uint32_t                    _notification_type;
 
  private:
   static uint64_t             _next_notification_id;
@@ -179,6 +201,8 @@ class                         notifier {
   bool                        _flap_detection_enabled;
   double                      _low_flap_threshold;
   double                      _high_flap_threshold;
+  double                      _first_notification_delay;
+  bool                        _notifications_enabled;
 };
 
 CCE_END()

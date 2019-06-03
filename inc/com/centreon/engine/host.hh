@@ -75,7 +75,7 @@ class                 host : public notifier {
                            double notification_interval,
                            double first_notification_delay,
                            std::string const& notification_period,
-                           int notifications_enabled,
+                           bool notifications_enabled,
                            std::string const& check_command,
                            int checks_enabled,
                            int accept_passive_checks,
@@ -156,18 +156,6 @@ class                 host : public notifier {
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  double             get_first_notification_delay(void) const;
-  void               set_first_notification_delay(double notification_delay);
-  int                get_notify_on_down() const;
-  void               set_notify_on_down(int notify_on_down);
-  int                get_notify_on_unreachable() const;
-  void               set_notify_on_unreachable(int notify_on_unreachable);
-  int                get_notify_on_recovery() const;
-  void               set_notify_on_recovery(int notify_on_recovery);
-  int                get_notify_on_flapping() const;
-  void               set_notify_on_flapping(int notify_on_flapping);
-  int                get_notify_on_downtime() const;
-  void               set_notify_on_downtime(int notify_on_downtime);
   bool               get_flap_detection_on_up() const;
   void               set_flap_detection_on_up(bool flag_detection_on_up);
   bool               get_flap_detection_on_down() const;
@@ -250,8 +238,6 @@ class                 host : public notifier {
   void               set_is_executing(bool is_executing);
   int                get_check_options() const;
   void               set_check_options(int check_options);
-  bool               get_notifications_enabled() const;
-  void               set_notifications_enabled(bool notifications_enabled);
   time_t             get_next_check() const;
   void               set_next_check(time_t next_check);
   int                get_should_be_scheduled() const;
@@ -347,12 +333,6 @@ private:
   std::string         _name;
   std::string         _alias;
   std::string         _address;
-  double              _first_notification_delay;
-  int                 _notify_on_down;
-  int                 _notify_on_unreachable;
-  int                 _notify_on_recovery;
-  int                 _notify_on_flapping;
-  int                 _notify_on_downtime;
   bool                _flap_detection_on_up;
   bool                _flap_detection_on_down;
   bool                _flap_detection_on_unreachable;
@@ -394,7 +374,6 @@ private:
   double              _execution_time;
   bool                _is_executing;
   int                 _check_options;
-  bool                _notifications_enabled;
   time_t              _next_check;
   int                 _should_be_scheduled;
   time_t              _last_check;

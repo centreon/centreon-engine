@@ -56,7 +56,9 @@ class                           service : public notifier {
                                         double check_interval,
                                         double retry_interval,
                                         int max_attempts,
+                                        double first_notification_delay,
                                         std::string const& notification_period,
+                                        bool notifications_enabled,
                                         std::string const& check_period,
                                         std::string const& event_handler,
                                         std::string const& notes,
@@ -122,11 +124,12 @@ class                           service : public notifier {
   time_t                        get_next_notification_time(time_t offset) override;
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
+  bool                          operator==(service const& other) throw();
+  bool                          operator!=(service const& other) throw();
 
   contactgroup_map              contact_groups;
   contact_map                   contacts;
   double                        notification_interval;
-  double                        first_notification_delay;
   int                           notify_on_unknown;
   int                           notify_on_warning;
   int                           notify_on_critical;
@@ -150,7 +153,6 @@ class                           service : public notifier {
   int                           checks_enabled;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
-  int                           notifications_enabled;
   int                           obsess_over_service;
   std::unordered_map<std::string, com::centreon::engine::customvariable>
                                 custom_variables;
@@ -291,12 +293,6 @@ int      is_escalated_contact_for_service(
 #    include <ostream>
 #    include <string>
 
-bool          operator==(
-                com::centreon::engine::service const& obj1,
-                com::centreon::engine::service const& obj2) throw ();
-bool          operator!=(
-                com::centreon::engine::service const& obj1,
-                com::centreon::engine::service const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
 
 CCE_BEGIN()

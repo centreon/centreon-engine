@@ -2505,14 +2505,14 @@ void enable_service_notifications(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
-  if (svc->notifications_enabled)
+  if (svc->get_notifications_enabled())
     return;
 
   /* set the attribute modified flag */
   svc->modified_attributes |= attr;
 
   /* enable the service notifications... */
-  svc->notifications_enabled = true;
+  svc->set_notifications_enabled(true);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -2534,14 +2534,14 @@ void disable_service_notifications(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
-  if (svc->notifications_enabled == false)
+  if (!svc->get_notifications_enabled())
     return;
 
   /* set the attribute modified flag */
   svc->modified_attributes |= attr;
 
   /* disable the service notifications... */
-  svc->notifications_enabled = false;
+  svc->set_notifications_enabled(false);
 
   /* send data to event broker */
   broker_adaptive_service_data(

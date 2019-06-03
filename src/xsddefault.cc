@@ -354,7 +354,7 @@ int xsddefault_save_status_data() {
          "\tlast_notification=" << static_cast<unsigned long>(svc->get_last_notification()) << "\n"
          "\tnext_notification=" << static_cast<unsigned long>(svc->get_next_notification()) << "\n"
          "\tno_more_notifications=" << svc->no_more_notifications << "\n"
-         "\tnotifications_enabled=" << svc->notifications_enabled << "\n"
+         "\tnotifications_enabled=" << svc->get_notifications_enabled() << "\n"
          "\tactive_checks_enabled=" << svc->checks_enabled << "\n"
          "\tpassive_checks_enabled=" << svc->accept_passive_service_checks << "\n"
          "\tevent_handler_enabled=" << svc->event_handler_enabled << "\n"

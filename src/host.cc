@@ -150,7 +150,7 @@ host::host(uint64_t host_id,
            double notification_interval,
            double first_notification_delay,
            std::string const& notification_period,
-           int notifications_enabled,
+           bool notifications_enabled,
            std::string const& check_command,
            int checks_enabled,
            int accept_passive_checks,
@@ -193,7 +193,9 @@ host::host(uint64_t host_id,
                check_interval,
                retry_interval,
                max_attempts,
+               first_notification_delay,
                notification_period,
+               notifications_enabled,
                check_period,
                event_handler,
                notes,
@@ -217,12 +219,6 @@ host::host(uint64_t host_id,
   if (notification_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for host '" << name
-        << "'";
-    throw(engine_error() << "Could not register host '" << name << "'");
-  }
-  if (first_notification_delay < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid first_notification_delay value for host '" << name
         << "'";
     throw(engine_error() << "Could not register host '" << name << "'");
   }
@@ -260,7 +256,6 @@ host::host(uint64_t host_id,
   _current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
   _current_state = initial_state;
   _event_handler_enabled = (event_handler_enabled > 0);
-  _first_notification_delay = first_notification_delay;
   _flap_detection_on_down = (flap_detection_on_down > 0);
   _flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
   _flap_detection_on_up = (flap_detection_on_up > 0);
@@ -270,12 +265,12 @@ host::host(uint64_t host_id,
   _last_hard_state = initial_state;
   _last_state = initial_state;
   _notification_interval = notification_interval;
-  _notifications_enabled = (notifications_enabled > 0);
-  _notify_on_down = (notify_down > 0);
-  _notify_on_downtime = (notify_downtime > 0);
-  _notify_on_flapping = (notify_flapping > 0);
-  _notify_on_recovery = (notify_up > 0);
-  _notify_on_unreachable = (notify_unreachable > 0);
+  _notification_type = notifier::none;
+  _notification_type |= (notify_down > 0 ? notifier::down : 0);
+  _notification_type |= (notify_downtime > 0 ? notifier::downtime : 0);
+  _notification_type |= (notify_flapping > 0 ? notifier::flapping : 0);
+  _notification_type |= (notify_up > 0 ? notifier::recovery : 0);
+  _notification_type |= (notify_unreachable > 0 ? notifier::unreachable : 0);
   _obsess_over_host = (obsess_over_host > 0);
   _process_performance_data = (process_perfdata > 0);
   _retain_nonstatus_information = (retain_nonstatus_information > 0);
@@ -351,54 +346,6 @@ std::string const& host::get_address() const {
 
 void host::set_address(std::string const& address) {
   _address = address;
-}
-
-double host::get_first_notification_delay(void) const {
-  return _first_notification_delay;
-}
-
-void host::set_first_notification_delay(double first_notification_delay) {
-  _first_notification_delay = first_notification_delay;
-}
-
-int host::get_notify_on_down() const {
-  return _notify_on_down;
-}
-
-void host::set_notify_on_down(int notify_on_down) {
-  _notify_on_down = notify_on_down;
-}
-
-int host::get_notify_on_unreachable() const {
-  return _notify_on_unreachable;
-}
-
-void host::set_notify_on_unreachable(int notify_on_unreachable) {
-  _notify_on_unreachable = notify_on_unreachable;
-}
-
-int host::get_notify_on_recovery() const {
-  return _notify_on_recovery;
-}
-
-void host::set_notify_on_recovery(int notify_on_recovery) {
-  notify_on_recovery = _notify_on_recovery;
-}
-
-int host::get_notify_on_flapping() const {
-  return _notify_on_flapping;
-}
-
-void host::set_notify_on_flapping(int notify_on_flapping) {
-  _notify_on_flapping = notify_on_flapping;
-}
-
-int host::get_notify_on_downtime() const {
-  return _notify_on_downtime;
-}
-
-void host::set_notify_on_downtime(int notify_on_downtime) {
-  _notify_on_downtime = notify_on_downtime;
 }
 
 bool host::get_flap_detection_on_up() const {
@@ -730,14 +677,6 @@ void host::set_check_options(int check_options) {
   _check_options = check_options;
 }
 
-bool host::get_notifications_enabled() const {
-  return _notifications_enabled;
-}
-
-void host::set_notifications_enabled(bool notifications_enabled) {
-  _notifications_enabled = notifications_enabled;
-}
-
 time_t host::get_next_check() const {
   return _next_check;
 }
@@ -994,11 +933,7 @@ bool host::operator==(host const& other) throw() {
          get_notification_interval() == other.get_notification_interval() &&
          get_first_notification_delay() ==
              other.get_first_notification_delay() &&
-         get_notify_on_down() == other.get_notify_on_down() &&
-         get_notify_on_unreachable() == other.get_notify_on_unreachable() &&
-         get_notify_on_recovery() == other.get_notify_on_recovery() &&
-         get_notify_on_flapping() == other.get_notify_on_flapping() &&
-         get_notify_on_downtime() == other.get_notify_on_downtime() &&
+         _notification_type == other._notification_type &&
          get_notification_period() == other.get_notification_period() &&
          get_check_period() == other.get_check_period() &&
          get_flap_detection_enabled() == other.get_flap_detection_enabled() &&
@@ -1203,11 +1138,11 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  contacts:                             " << c_oss << "\n"
     "  notification_interval:                " << obj.get_notification_interval ()<< "\n"
     "  first_notification_delay:             " << obj.get_first_notification_delay() << "\n"
-    "  notify_on_down:                       " << obj.get_notify_on_down() << "\n"
-    "  notify_on_unreachable:                " << obj.get_notify_on_unreachable() << "\n"
-    "  notify_on_recovery:                   " << obj.get_notify_on_recovery() << "\n"
-    "  notify_on_flapping:                   " << obj.get_notify_on_flapping() << "\n"
-    "  notify_on_downtime:                   " << obj.get_notify_on_downtime() << "\n"
+    "  notify_on_down:                       " << obj.get_notify_on(notifier::down) << "\n"
+    "  notify_on_unreachable:                " << obj.get_notify_on(notifier::unreachable) << "\n"
+    "  notify_on_recovery:                   " << obj.get_notify_on(notifier::recovery) << "\n"
+    "  notify_on_flapping:                   " << obj.get_notify_on(notifier::flapping) << "\n"
+    "  notify_on_downtime:                   " << obj.get_notify_on(notifier::downtime) << "\n"
     "  notification_period:                  " << obj.get_notification_period() << "\n"
     "  check_period:                         " << obj.get_check_period() << "\n"
     "  flap_detection_enabled:               " << obj.get_flap_detection_enabled() << "\n"
@@ -2624,7 +2559,7 @@ int host::check_notification_viability(unsigned int type, int options) {
   if (type == NOTIFICATION_FLAPPINGSTART || type == NOTIFICATION_FLAPPINGSTOP ||
       type == NOTIFICATION_FLAPPINGDISABLED) {
     /* don't send a notification if we're not supposed to... */
-    if (!get_notify_on_flapping()) {
+    if (!get_notify_on(notifier::flapping)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events for this host.";
       return ERROR;
@@ -2650,7 +2585,7 @@ int host::check_notification_viability(unsigned int type, int options) {
   if (type == NOTIFICATION_DOWNTIMESTART || type == NOTIFICATION_DOWNTIMEEND ||
       type == NOTIFICATION_DOWNTIMECANCELLED) {
     /* don't send a notification if we're not supposed to... */
-    if (!get_notify_on_downtime()) {
+    if (!get_notify_on(notifier::downtime)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events for this host.";
       return ERROR;
@@ -2699,18 +2634,18 @@ int host::check_notification_viability(unsigned int type, int options) {
 
   /* see if we should notify about problems with this host */
   if (get_current_state() == HOST_UNREACHABLE &&
-      !get_notify_on_unreachable()) {
+      !get_notify_on(notifier::unreachable)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about UNREACHABLE status for this host.";
     return ERROR;
   }
-  if (get_current_state() == HOST_DOWN && !get_notify_on_down()) {
+  if (get_current_state() == HOST_DOWN && !get_notify_on(notifier::down)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about DOWN states for this host.";
     return ERROR;
   }
   if (get_current_state() == HOST_UP) {
-    if (!get_notify_on_recovery()) {
+    if (!get_notify_on(notifier::recovery)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about RECOVERY states for this host.";
       return ERROR;

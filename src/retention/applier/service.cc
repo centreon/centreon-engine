@@ -169,7 +169,7 @@ void applier::service::_update(
 
     if (state.notifications_enabled().is_set()
         && (obj.modified_attributes & MODATTR_NOTIFICATIONS_ENABLED))
-      obj.notifications_enabled = *state.notifications_enabled();
+      obj.set_notifications_enabled(*state.notifications_enabled());
 
     if (state.active_checks_enabled().is_set()
         && (obj.modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))

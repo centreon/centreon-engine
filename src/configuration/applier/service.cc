@@ -375,9 +375,7 @@ void applier::service::modify_object(
   modify_if_different(
     s->notification_interval,
     static_cast<double>(obj.notification_interval()));
-  modify_if_different(
-    s->first_notification_delay,
-    static_cast<double>(obj.first_notification_delay()));
+  s->set_first_notification_delay(obj.first_notification_delay());
   modify_if_different(
     s->notify_on_unknown,
     static_cast<int>(static_cast<bool>(
@@ -461,9 +459,7 @@ void applier::service::modify_object(
   modify_if_different(
     s->retain_nonstatus_information,
     static_cast<int>(obj.retain_nonstatus_information()));
-  modify_if_different(
-    s->notifications_enabled,
-    static_cast<int>(obj.notifications_enabled()));
+  s->set_notifications_enabled(obj.notifications_enabled());
   modify_if_different(
     s->obsess_over_service,
     static_cast<int>(obj.obsess_over_service()));

@@ -749,7 +749,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   svc->check_command_ptr = temp_command;
 
   // Check for sane recovery options.
-  if (svc->notifications_enabled
+  if (svc->get_notifications_enabled()
       && svc->notify_on_recovery
       && !svc->notify_on_warning
       && !svc->notify_on_critical) {
@@ -848,7 +848,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
     // Save the pointer to the notification timeperiod for later.
     svc->notification_period_ptr = temp_timeperiod;
   }
-  else if (svc->notifications_enabled) {
+  else if (svc->get_notifications_enabled()) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->get_description() << "' on host "
       "'" << svc->get_hostname() << "' has no notification time period "
@@ -857,7 +857,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   }
 
   // See if the notification interval is less than the check interval.
-  if (svc->notifications_enabled
+  if (svc->get_notifications_enabled()
       && svc->notification_interval
       && (svc->notification_interval < svc->get_check_interval())) {
     logger(log_verification_error, basic)
@@ -1066,9 +1066,9 @@ int check_host(host* hst, int* w, int* e) {
 
   // Check for sane recovery options.
   if (hst->get_notifications_enabled()
-      && hst->get_notify_on_recovery()
-      && !hst->get_notify_on_down()
-      && !hst->get_notify_on_unreachable()) {
+      && hst->get_notify_on(notifier::recovery)
+      && !hst->get_notify_on(notifier::down)
+      && !hst->get_notify_on(notifier::unreachable)) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in host '" << hst->get_name()
       << "' definition doesn't make any sense - specify down and/or "

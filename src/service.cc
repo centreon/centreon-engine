@@ -67,7 +67,9 @@ service::service(std::string const& hostname,
                  double check_interval,
                  double retry_interval,
                  int max_attempts,
+                 double first_notification_delay,
                  std::string const& notification_period,
+                 bool notifications_enabled,
                  std::string const& check_period,
                  std::string const& event_handler,
                  std::string const& notes,
@@ -85,7 +87,9 @@ service::service(std::string const& hostname,
                check_interval,
                retry_interval,
                max_attempts,
+               first_notification_delay,
                notification_period,
+               notifications_enabled,
                check_period,
                event_handler,
                notes,
@@ -117,129 +121,123 @@ service::~service() {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool operator==(com::centreon::engine::service const& obj1,
-                com::centreon::engine::service const& obj2) throw() {
-  return obj1.get_hostname() == obj2.get_hostname() &&
-         obj1.get_description() == obj2.get_description() &&
-         obj1.get_display_name() == obj2.get_display_name() &&
-         obj1.get_check_command() == obj2.get_check_command() &&
-         obj1.get_event_handler() == obj2.get_event_handler() &&
-         obj1.get_initial_state() == obj2.get_initial_state() &&
-         obj1.get_check_interval() == obj2.get_check_interval() &&
-         obj1.get_retry_interval() == obj2.get_retry_interval() &&
-         obj1.get_max_attempts() == obj2.get_max_attempts() &&
-         ((obj1.contact_groups.size() == obj2.contact_groups.size()) &&
-          std::equal(obj1.contact_groups.begin(), obj1.contact_groups.end(),
-                     obj2.contact_groups.begin())) &&
-         ((obj1.contacts.size() == obj2.contacts.size()) &&
-          std::equal(obj1.contacts.begin(), obj1.contacts.end(),
-                     obj2.contacts.begin())) &&
-         obj1.notification_interval == obj2.notification_interval &&
-         obj1.first_notification_delay == obj2.first_notification_delay &&
-         obj1.notify_on_unknown == obj2.notify_on_unknown &&
-         obj1.notify_on_warning == obj2.notify_on_warning &&
-         obj1.notify_on_critical == obj2.notify_on_critical &&
-         obj1.notify_on_recovery == obj2.notify_on_recovery &&
-         obj1.notify_on_flapping == obj2.notify_on_flapping &&
-         obj1.notify_on_downtime == obj2.notify_on_downtime &&
-         obj1.stalk_on_ok == obj2.stalk_on_ok &&
-         obj1.stalk_on_warning == obj2.stalk_on_warning &&
-         obj1.stalk_on_unknown == obj2.stalk_on_unknown &&
-         obj1.stalk_on_critical == obj2.stalk_on_critical &&
-         obj1.is_volatile == obj2.is_volatile &&
-         obj1.get_notification_period() == obj2.get_notification_period() &&
-         obj1.get_check_period() == obj2.get_check_period() &&
-         obj1.get_flap_detection_enabled() == obj2.get_flap_detection_enabled() &&
-         obj1.get_low_flap_threshold() == obj2.get_low_flap_threshold() &&
-         obj1.get_high_flap_threshold() == obj2.get_high_flap_threshold() &&
-         obj1.flap_detection_on_ok == obj2.flap_detection_on_ok &&
-         obj1.flap_detection_on_warning == obj2.flap_detection_on_warning &&
-         obj1.flap_detection_on_unknown == obj2.flap_detection_on_unknown &&
-         obj1.flap_detection_on_critical == obj2.flap_detection_on_critical &&
-         obj1.process_performance_data == obj2.process_performance_data &&
-         obj1.check_freshness == obj2.check_freshness &&
-         obj1.freshness_threshold == obj2.freshness_threshold &&
-         obj1.accept_passive_service_checks ==
-             obj2.accept_passive_service_checks &&
-         obj1.event_handler_enabled == obj2.event_handler_enabled &&
-         obj1.checks_enabled == obj2.checks_enabled &&
-         obj1.retain_status_information == obj2.retain_status_information &&
-         obj1.retain_nonstatus_information ==
-             obj2.retain_nonstatus_information &&
-         obj1.notifications_enabled == obj2.notifications_enabled &&
-         obj1.obsess_over_service == obj2.obsess_over_service &&
-         obj1.get_notes() == obj2.get_notes() &&
-         obj1.get_notes_url() == obj2.get_notes_url() &&
-         obj1.get_action_url() == obj2.get_action_url() &&
-         obj1.get_icon_image() == obj2.get_icon_image() &&
-         obj1.get_icon_image_alt() == obj2.get_icon_image_alt() &&
-         obj1.custom_variables == obj2.custom_variables &&
-         obj1.problem_has_been_acknowledged ==
-             obj2.problem_has_been_acknowledged &&
-         obj1.acknowledgement_type == obj2.acknowledgement_type &&
-         obj1.host_problem_at_last_check == obj2.host_problem_at_last_check &&
-         obj1.check_type == obj2.check_type &&
-         obj1.current_state == obj2.current_state &&
-         obj1.last_state == obj2.last_state &&
-         obj1.last_hard_state == obj2.last_hard_state &&
-         obj1.get_plugin_output() == obj2.get_plugin_output() &&
-         obj1.get_long_plugin_output() == obj2.get_long_plugin_output() &&
-         obj1.get_perf_data() == obj2.get_perf_data() &&
-         obj1.state_type == obj2.state_type &&
-         obj1.next_check == obj2.next_check &&
-         obj1.should_be_scheduled == obj2.should_be_scheduled &&
-         obj1.last_check == obj2.last_check &&
-         obj1.current_attempt == obj2.current_attempt &&
-         obj1.current_event_id == obj2.current_event_id &&
-         obj1.last_event_id == obj2.last_event_id &&
-         obj1.current_problem_id == obj2.current_problem_id &&
-         obj1.last_problem_id == obj2.last_problem_id &&
-         obj1.get_last_notification() == obj2.get_last_notification() &&
-         obj1.get_next_notification() == obj2.get_next_notification() &&
-         obj1.no_more_notifications == obj2.no_more_notifications &&
-         obj1.check_flapping_recovery_notification ==
-             obj2.check_flapping_recovery_notification &&
-         obj1.last_state_change == obj2.last_state_change &&
-         obj1.last_hard_state_change == obj2.last_hard_state_change &&
-         obj1.last_time_ok == obj2.last_time_ok &&
-         obj1.last_time_warning == obj2.last_time_warning &&
-         obj1.last_time_unknown == obj2.last_time_unknown &&
-         obj1.last_time_critical == obj2.last_time_critical &&
-         obj1.has_been_checked == obj2.has_been_checked &&
-         obj1.is_being_freshened == obj2.is_being_freshened &&
-         obj1.notified_on_unknown == obj2.notified_on_unknown &&
-         obj1.notified_on_warning == obj2.notified_on_warning &&
-         obj1.notified_on_critical == obj2.notified_on_critical &&
-         obj1.current_notification_number == obj2.current_notification_number &&
-         obj1.current_notification_id == obj2.current_notification_id &&
-         obj1.latency == obj2.latency &&
-         obj1.execution_time == obj2.execution_time &&
-         obj1.is_executing == obj2.is_executing &&
-         obj1.check_options == obj2.check_options &&
-         obj1.scheduled_downtime_depth == obj2.scheduled_downtime_depth &&
-         obj1.pending_flex_downtime == obj2.pending_flex_downtime &&
-         is_equal(obj1.state_history, obj2.state_history,
+bool service::operator==(service const& other) throw() {
+  return get_hostname() == other.get_hostname() &&
+         get_description() == other.get_description() &&
+         get_display_name() == other.get_display_name() &&
+         get_check_command() == other.get_check_command() &&
+         get_event_handler() == other.get_event_handler() &&
+         get_initial_state() == other.get_initial_state() &&
+         get_check_interval() == other.get_check_interval() &&
+         get_retry_interval() == other.get_retry_interval() &&
+         get_max_attempts() == other.get_max_attempts() &&
+         ((this->contact_groups.size() == other.contact_groups.size()) &&
+          std::equal(this->contact_groups.begin(), this->contact_groups.end(),
+                     other.contact_groups.begin())) &&
+         ((this->contacts.size() == other.contacts.size()) &&
+          std::equal(this->contacts.begin(), this->contacts.end(),
+                     other.contacts.begin())) &&
+         this->notification_interval == other.notification_interval &&
+         get_first_notification_delay() == get_first_notification_delay() &&
+         get_notify_on() == other.get_notify_on() &&
+         this->stalk_on_ok == other.stalk_on_ok &&
+         this->stalk_on_warning == other.stalk_on_warning &&
+         this->stalk_on_unknown == other.stalk_on_unknown &&
+         this->stalk_on_critical == other.stalk_on_critical &&
+         this->is_volatile == other.is_volatile &&
+         this->get_notification_period() == other.get_notification_period() &&
+         this->get_check_period() == other.get_check_period() &&
+         this->get_flap_detection_enabled() ==
+             other.get_flap_detection_enabled() &&
+         this->get_low_flap_threshold() == other.get_low_flap_threshold() &&
+         this->get_high_flap_threshold() == other.get_high_flap_threshold() &&
+         this->flap_detection_on_ok == other.flap_detection_on_ok &&
+         this->flap_detection_on_warning == other.flap_detection_on_warning &&
+         this->flap_detection_on_unknown == other.flap_detection_on_unknown &&
+         this->flap_detection_on_critical == other.flap_detection_on_critical &&
+         this->process_performance_data == other.process_performance_data &&
+         this->check_freshness == other.check_freshness &&
+         this->freshness_threshold == other.freshness_threshold &&
+         this->accept_passive_service_checks ==
+             other.accept_passive_service_checks &&
+         this->event_handler_enabled == other.event_handler_enabled &&
+         this->checks_enabled == other.checks_enabled &&
+         this->retain_status_information == other.retain_status_information &&
+         this->retain_nonstatus_information ==
+             other.retain_nonstatus_information &&
+         get_notifications_enabled() == other.get_notifications_enabled() &&
+         this->obsess_over_service == other.obsess_over_service &&
+         this->get_notes() == other.get_notes() &&
+         this->get_notes_url() == other.get_notes_url() &&
+         this->get_action_url() == other.get_action_url() &&
+         this->get_icon_image() == other.get_icon_image() &&
+         this->get_icon_image_alt() == other.get_icon_image_alt() &&
+         this->custom_variables == other.custom_variables &&
+         this->problem_has_been_acknowledged ==
+             other.problem_has_been_acknowledged &&
+         this->acknowledgement_type == other.acknowledgement_type &&
+         this->host_problem_at_last_check == other.host_problem_at_last_check &&
+         this->check_type == other.check_type &&
+         this->current_state == other.current_state &&
+         this->last_state == other.last_state &&
+         this->last_hard_state == other.last_hard_state &&
+         this->get_plugin_output() == other.get_plugin_output() &&
+         this->get_long_plugin_output() == other.get_long_plugin_output() &&
+         this->get_perf_data() == other.get_perf_data() &&
+         this->state_type == other.state_type &&
+         this->next_check == other.next_check &&
+         this->should_be_scheduled == other.should_be_scheduled &&
+         this->last_check == other.last_check &&
+         this->current_attempt == other.current_attempt &&
+         this->current_event_id == other.current_event_id &&
+         this->last_event_id == other.last_event_id &&
+         this->current_problem_id == other.current_problem_id &&
+         this->last_problem_id == other.last_problem_id &&
+         this->get_last_notification() == other.get_last_notification() &&
+         this->get_next_notification() == other.get_next_notification() &&
+         this->no_more_notifications == other.no_more_notifications &&
+         this->check_flapping_recovery_notification ==
+             other.check_flapping_recovery_notification &&
+         this->last_state_change == other.last_state_change &&
+         this->last_hard_state_change == other.last_hard_state_change &&
+         this->last_time_ok == other.last_time_ok &&
+         this->last_time_warning == other.last_time_warning &&
+         this->last_time_unknown == other.last_time_unknown &&
+         this->last_time_critical == other.last_time_critical &&
+         this->has_been_checked == other.has_been_checked &&
+         this->is_being_freshened == other.is_being_freshened &&
+         this->notified_on_unknown == other.notified_on_unknown &&
+         this->notified_on_warning == other.notified_on_warning &&
+         this->notified_on_critical == other.notified_on_critical &&
+         this->current_notification_number ==
+             other.current_notification_number &&
+         this->current_notification_id == other.current_notification_id &&
+         this->latency == other.latency &&
+         this->execution_time == other.execution_time &&
+         this->is_executing == other.is_executing &&
+         this->check_options == other.check_options &&
+         this->scheduled_downtime_depth == other.scheduled_downtime_depth &&
+         this->pending_flex_downtime == other.pending_flex_downtime &&
+         is_equal(this->state_history, other.state_history,
                   MAX_STATE_HISTORY_ENTRIES) &&
-         obj1.state_history_index == obj2.state_history_index &&
-         obj1.is_flapping == obj2.is_flapping &&
-         obj1.flapping_comment_id == obj2.flapping_comment_id &&
-         obj1.percent_state_change == obj2.percent_state_change &&
-         obj1.modified_attributes == obj2.modified_attributes &&
-         is_equal(obj1.event_handler_args, obj2.event_handler_args) &&
-         is_equal(obj1.check_command_args, obj2.check_command_args);
+         this->state_history_index == other.state_history_index &&
+         this->is_flapping == other.is_flapping &&
+         this->flapping_comment_id == other.flapping_comment_id &&
+         this->percent_state_change == other.percent_state_change &&
+         this->modified_attributes == other.modified_attributes &&
+         is_equal(this->event_handler_args, other.event_handler_args) &&
+         is_equal(this->check_command_args, other.check_command_args);
 }
 
 /**
  *  Not equal operator.
  *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
+ *  @param[in] other The first object to compare.
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool operator!=(com::centreon::engine::service const& obj1,
-                com::centreon::engine::service const& obj2) throw() {
-  return !operator==(obj1, obj2);
+bool service::operator!=(service const& other) throw() {
+  return !operator==(other);
 }
 
 /**
@@ -326,25 +324,25 @@ std::ostream& operator<<(std::ostream& os,
      << obj.notification_interval
      << "\n"
         "  first_notification_delay:             "
-     << obj.first_notification_delay
+     << obj.get_first_notification_delay()
      << "\n"
         "  notify_on_unknown:                    "
-     << obj.notify_on_unknown
+     << obj.get_notify_on(notifier::unknown)
      << "\n"
         "  notify_on_warning:                    "
-     << obj.notify_on_warning
+     << obj.get_notify_on(notifier::warning)
      << "\n"
         "  notify_on_critical:                   "
-     << obj.notify_on_critical
+     << obj.get_notify_on(notifier::critical)
      << "\n"
         "  notify_on_recovery:                   "
-     << obj.notify_on_recovery
+     << obj.get_notify_on(notifier::recovery)
      << "\n"
         "  notify_on_flapping:                   "
-     << obj.notify_on_flapping
+     << obj.get_notify_on(notifier::flapping)
      << "\n"
         "  notify_on_downtime:                   "
-     << obj.notify_on_downtime
+     << obj.get_notify_on(notifier::downtime)
      << "\n"
         "  stalk_on_ok:                          "
      << obj.stalk_on_ok
@@ -413,7 +411,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.retain_nonstatus_information
      << "\n"
         "  notifications_enabled:                "
-     << obj.notifications_enabled
+     << obj.get_notifications_enabled()
      << "\n"
         "  obsess_over_service:                  "
      << obj.obsess_over_service
@@ -791,8 +789,9 @@ com::centreon::engine::service* add_service(
   std::shared_ptr<service> obj{new service(
       host_name, description, display_name.empty() ? description : display_name,
       check_command, initial_state, check_interval, retry_interval,
-      max_attempts, notification_period, check_period, event_handler, notes,
-      notes_url, action_url, icon_image, icon_image_alt, flap_detection_enabled,
+      max_attempts, first_notification_delay, notification_period,
+      notifications_enabled, check_period, event_handler, notes, notes_url,
+      action_url, icon_image, icon_image_alt, flap_detection_enabled,
       low_flap_threshold, high_flap_threshold)};
 
   try {
@@ -805,7 +804,6 @@ com::centreon::engine::service* add_service(
     obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
-    obj->first_notification_delay = first_notification_delay;
     obj->flap_detection_on_critical = (flap_detection_on_critical > 0);
     obj->flap_detection_on_ok = (flap_detection_on_ok > 0);
     obj->flap_detection_on_unknown = (flap_detection_on_unknown > 0);
@@ -816,7 +814,6 @@ com::centreon::engine::service* add_service(
     obj->last_state = initial_state;
     obj->modified_attributes = MODATTR_NONE;
     obj->notification_interval = notification_interval;
-    obj->notifications_enabled = (notifications_enabled > 0);
     obj->notify_on_critical = (notify_critical > 0);
     obj->notify_on_downtime = (notify_downtime > 0);
     obj->notify_on_flapping = (notify_flapping > 0);
@@ -2869,7 +2866,7 @@ int service::check_notification_viability(unsigned int type, int options) {
   }
 
   /* are notifications temporarily disabled for this service? */
-  if (this->notifications_enabled == false) {
+  if (!get_notifications_enabled()) {
     logger(dbg_notifications, more)
         << "Notifications are temporarily disabled for "
            "this service, so we won't send one out.";
@@ -3058,7 +3055,7 @@ int service::check_notification_viability(unsigned int type, int options) {
       initial_notif_time = time(nullptr);
 
     double notification_delay =
-        (this->current_state != STATE_OK ? this->first_notification_delay
+        (this->current_state != STATE_OK ? get_first_notification_delay()
                                          : _recovery_notification_delay) *
         config->interval_length();
 

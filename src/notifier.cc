@@ -58,7 +58,9 @@ notifier::notifier(int notification_type,
                    double check_interval,
                    double retry_interval,
                    int max_attempts,
+                   double first_notification_delay,
                    std::string const& notification_period,
+                   bool notifications_enabled,
                    std::string const& check_period,
                    std::string const& event_handler,
                    std::string const& notes,
@@ -69,14 +71,16 @@ notifier::notifier(int notification_type,
                    bool flap_detection_enabled,
                    double low_flap_threshold,
                    double high_flap_threshold)
-    : _notification_type{notification_type},
+    : _notifier_type{notification_type},
       _display_name{display_name},
       _check_command{check_command},
       _initial_state{initial_state},
       _check_interval{check_interval},
       _retry_interval{retry_interval},
       _max_attempts{max_attempts},
+      _first_notification_delay{first_notification_delay},
       _notification_period{notification_period},
+      _notifications_enabled{notifications_enabled},
       _check_period{check_period},
       _event_handler{event_handler},
       _notes{notes},
@@ -102,6 +106,13 @@ notifier::notifier(int notification_type,
         << display_name << "'";
     throw engine_error() << "Could not register notifier '" << display_name
                          << "'";
+  }
+
+  if (first_notification_delay < 0) {
+    logger(log_config_error, basic)
+        << "Error: Invalid first_notification_delay value for host '"
+        << display_name << "'";
+    throw engine_error() << "Could not register host '" << display_name << "'";
   }
 
   if (max_attempts <= 0) {
@@ -194,7 +205,7 @@ int notifier::notify(unsigned int type,
   time_t last_notif{get_last_notification()};
   logger(dbg_notifications, basic)
       << "** Notifier Notification Attempt ** Notifier: '" << get_display_name()
-      << "', Notification Type: " << _notification_type
+      << "', Notification Type: " << _notifier_type
       << ", Type: " << type
       << ", Options: " << options << ", Current State: " << this->get_current_state()
       << ", Last Notification: " << my_ctime(&last_notif);
@@ -238,7 +249,7 @@ int notifier::notify(unsigned int type,
   end_time.tv_usec = 0L;
   int neb_result{broker_notification_data(
       NEBTYPE_NOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE,
-      _notification_type, type, start_time, end_time, (void*)this, not_author.c_str(), not_data.c_str(), escalated,
+      _notifier_type, type, start_time, end_time, (void*)this, not_author.c_str(), not_data.c_str(), escalated,
       0, nullptr)};
 
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
@@ -295,7 +306,7 @@ int notifier::notify(unsigned int type,
      * if this is an acknowledgement, get author and comment macros
      */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-      if (_notification_type == HOST_NOTIFICATION) {
+      if (_notifier_type == HOST_NOTIFICATION) {
         string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
         string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
       }
@@ -331,14 +342,14 @@ int notifier::notify(unsigned int type,
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
-    else if ((_notification_type == HOST_NOTIFICATION && get_current_state() == HOST_UP)
-             || (_notification_type == SERVICE_NOTIFICATION && get_current_state() == STATE_OK))
+    else if ((_notifier_type == HOST_NOTIFICATION && get_current_state() == HOST_UP)
+             || (_notifier_type == SERVICE_NOTIFICATION && get_current_state() == STATE_OK))
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
 
     /* set the notification number macro */
-    if (_notification_type == HOST_NOTIFICATION)
+    if (_notifier_type == HOST_NOTIFICATION)
       string::setstr(mac.x[MACRO_HOSTNOTIFICATIONNUMBER],
                      _current_notification_number);
     else
@@ -348,14 +359,14 @@ int notifier::notify(unsigned int type,
     /*
      * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
      */
-    char const* notificationnumber{_notification_type == HOST_NOTIFICATION ?
+    char const* notificationnumber{_notifier_type == HOST_NOTIFICATION ?
       mac.x[MACRO_HOSTNOTIFICATIONNUMBER] : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]};
 
     string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER],
                    notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
-    if (_notification_type == HOST_NOTIFICATION)
+    if (_notifier_type == HOST_NOTIFICATION)
       string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID],
                      _current_notification_id);
     else
@@ -448,7 +459,7 @@ int notifier::notify(unsigned int type,
 
   /* send data to event broker */
   broker_notification_data(NEBTYPE_NOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
-                           _notification_type, type, start_time, end_time,
+                           _notifier_type, type, start_time, end_time,
                            (void*)this, not_author.c_str(), not_data.c_str(), escalated,
                            contacts_notified, nullptr);
 
@@ -459,9 +470,9 @@ int notifier::notify(unsigned int type,
   clear_volatile_macros_r(&mac);
 
   /* Update recovery been sent parameter */
-  if ((_notification_type == HOST_NOTIFICATION &&
+  if ((_notifier_type == HOST_NOTIFICATION &&
        get_current_state() == HOST_UP) ||
-      (_notification_type == SERVICE_NOTIFICATION &&
+      (_notifier_type == SERVICE_NOTIFICATION &&
        get_current_state() == STATE_OK))
     _recovery_been_sent = true;
 
@@ -657,3 +668,34 @@ void notifier::set_high_flap_threshold(double high_flap_threshold) {
   _high_flap_threshold = high_flap_threshold;
 }
 
+bool notifier::get_notify_on(notification_type type) const {
+  return _notification_type & type;
+}
+
+uint32_t notifier::get_notify_on() const {
+  return _notification_type;
+}
+
+void notifier::add_notification_on(notification_type type) {
+  _notification_type |= type;
+}
+
+void notifier::remove_notification_on(notification_type type) {
+  _notification_type &= ~type;
+}
+
+double notifier::get_first_notification_delay(void) const {
+  return _first_notification_delay;
+}
+
+void notifier::set_first_notification_delay(double first_notification_delay) {
+  _first_notification_delay = first_notification_delay;
+}
+
+bool notifier::get_notifications_enabled() const {
+  return _notifications_enabled;
+}
+
+void notifier::set_notifications_enabled(bool notifications_enabled) {
+  _notifications_enabled = notifications_enabled;
+}
