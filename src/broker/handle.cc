@@ -123,7 +123,7 @@ void handle::close() {
           NEBMODULE_NEB_SHUTDOWN);
       _handle->unload();
     }
-    _handle.clear();
+    _handle.reset();
   }
   broker::compatibility::instance().unloaded_module(this);
   return;
@@ -227,7 +227,7 @@ void handle::open() {
     return;
 
   try {
-    _handle = shared_ptr<library>(new library(_filename));
+    _handle = std::shared_ptr<library>(new library(_filename));
     _handle->load();
 
     int api_version(*static_cast<int*>(

@@ -21,10 +21,10 @@
 #  define CCE_MODULES_LOADER_HH
 
 #  include <list>
+#  include <memory>
 #  include <string>
 #  include "com/centreon/engine/broker/handle.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -37,12 +37,12 @@ namespace                  broker {
    */
   class                    loader {
   public:
-    shared_ptr<handle>     add_module(
+    std::shared_ptr<handle>     add_module(
                              std::string const& filename = "",
                              std::string const& args = "");
     void                   del_module(
-                             shared_ptr<handle> const& mod);
-    std::list<shared_ptr<handle> > const&
+                             std::shared_ptr<handle> const& mod);
+    std::list<std::shared_ptr<handle> > const&
                            get_modules() const;
     static loader&         instance();
     static void            load();
@@ -56,7 +56,7 @@ namespace                  broker {
     virtual                ~loader() throw ();
     loader&                operator=(loader const& right);
 
-    std::list<shared_ptr<handle> >
+    std::list<std::shared_ptr<handle> >
                            _modules;
   };
 }

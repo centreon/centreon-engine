@@ -26,7 +26,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timeperiod.hh"
@@ -1188,7 +1187,8 @@ int should_service_notification_be_escalated(service* svc) {
     << "should_service_notification_be_escalated()";
 
   // Browse service escalations related to this service.
-  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > collection;
+  typedef umultimap<std::pair<std::string, std::string>,
+                    std::shared_ptr<serviceescalation> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = state::instance().serviceescalations().equal_range(
         std::make_pair(svc->host_name, svc->description));
@@ -1253,9 +1253,11 @@ int create_notification_list_from_service(
 
     std::pair<std::string, std::string>
       id(std::make_pair(svc->host_name, svc->description));
-    umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
+    umultimap<std::pair<std::string, std::string>,
+              std::shared_ptr<serviceescalation> > const&
       escalations(state::instance().serviceescalations());
-    for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
+    for (umultimap<std::pair<std::string, std::string>,
+                   std::shared_ptr<serviceescalation> >::const_iterator
            it(escalations.find(id)), end(escalations.end());
          it != end && it->first == id;
          ++it) {
@@ -2380,9 +2382,9 @@ int should_host_notification_be_escalated(host* hst) {
     return (false);
 
   std::string id(hst->name);
-  umultimap<std::string, shared_ptr<hostescalation> > const&
+  umultimap<std::string, std::shared_ptr<hostescalation> > const&
     escalations(state::instance().hostescalations());
-  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+  for (umultimap<std::string, std::shared_ptr<hostescalation> >::const_iterator
          it(escalations.find(id)), end(escalations.end());
        it != end && it->first == id;
        ++it) {
@@ -2443,9 +2445,10 @@ int create_notification_list_from_host(
       "notification list.";
 
     std::string id(hst->name);
-    umultimap<std::string, shared_ptr<hostescalation> > const&
+    umultimap<std::string, std::shared_ptr<hostescalation> > const&
       escalations(state::instance().hostescalations());
-    for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+    for (umultimap<std::string,
+                   std::shared_ptr<hostescalation> >::const_iterator
            it(escalations.find(id)), end(escalations.end());
          it != end && it->first == id;
          ++it) {

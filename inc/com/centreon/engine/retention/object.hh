@@ -20,10 +20,10 @@
 #ifndef CCE_RETENTION_OBJECT_HH
 #  define CCE_RETENTION_OBJECT_HH
 
+#  include <memory>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/string.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -46,7 +46,7 @@ namespace              retention {
     object&            operator=(object const& right);
     bool               operator==(object const& right) const throw ();
     bool               operator!=(object const& right) const throw ();
-    static shared_ptr<object>
+    static std::shared_ptr<object>
                        create(std::string const& type_name);
     virtual bool       set(char const* key, char const* value) = 0;
     type_id            type() const throw ();
@@ -74,7 +74,7 @@ namespace              retention {
     type_id            _type;
   };
 
-  typedef shared_ptr<object> object_ptr;
+  typedef std::shared_ptr<object> object_ptr;
 }
 
 CCE_END()

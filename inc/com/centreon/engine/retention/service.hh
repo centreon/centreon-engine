@@ -27,7 +27,6 @@
 #  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -228,8 +227,8 @@ namespace                         retention {
     opt<int>                      _state_type;
   };
 
-  typedef shared_ptr<service>    service_ptr;
-  typedef std::list<service_ptr> list_service;
+  typedef std::shared_ptr<service> service_ptr;
+  typedef std::list<service_ptr>   list_service;
 }
 
 CCE_END()

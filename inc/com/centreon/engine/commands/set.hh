@@ -20,10 +20,10 @@
 #ifndef CCE_COMMANDS_SET_HH
 #  define CCE_COMMANDS_SET_HH
 
+#  include <memory>
 #  include <string>
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
@@ -40,8 +40,8 @@ namespace       commands {
   public:
     void        add_command(command const& cmd);
     void        add_command(
-                            shared_ptr<command> cmd);
-    shared_ptr<command>
+                            std::shared_ptr<command> cmd);
+    std::shared_ptr<command>
                 get_command(std::string const& cmd_name);
     static set& instance();
     static void load();
@@ -54,7 +54,7 @@ namespace       commands {
                 ~set() throw ();
     set&        operator=(set const& right);
 
-    umap<std::string, shared_ptr<command> >
+    umap<std::string, std::shared_ptr<command> >
                 _list;
   };
 }

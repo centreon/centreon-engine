@@ -28,7 +28,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -207,7 +206,8 @@ serviceescalation* add_service_escalation(
   }
 
   // Allocate memory for a new service escalation entry.
-  shared_ptr<serviceescalation> obj(new serviceescalation, deleter::serviceescalation);
+  std::shared_ptr<serviceescalation> obj(new serviceescalation,
+    deleter::serviceescalation);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -245,7 +245,7 @@ serviceescalation* add_service_escalation(
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());

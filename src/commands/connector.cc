@@ -128,7 +128,7 @@ unsigned long connector::run(
 
   // Set query informations.
   unsigned long command_id(get_uniq_id());
-  shared_ptr<query_info> info(new query_info);
+  std::shared_ptr<query_info> info(new query_info);
   info->processed_cmd = processed_cmd;
   info->start_time = timestamp::now();
   info->timeout = timeout;
@@ -198,7 +198,7 @@ void connector::run(
 
   // Set query informations.
   unsigned long command_id(get_uniq_id());
-  shared_ptr<query_info> info(new query_info);
+  std::shared_ptr<query_info> info(new query_info);
   info->processed_cmd = processed_cmd;
   info->start_time = timestamp::now();
   info->timeout = timeout;
@@ -496,12 +496,12 @@ void connector::_connector_start() {
       << _queries.size();
 
     // Resend commands.
-    for (umap<unsigned long, shared_ptr<query_info> >::iterator
+    for (umap<unsigned long, std::shared_ptr<query_info> >::iterator
            it(_queries.begin()), end(_queries.end());
          it != end;
          ++it) {
       unsigned long command_id(it->first);
-      shared_ptr<query_info> info(it->second);
+      std::shared_ptr<query_info> info(it->second);
       _send_query_execute(
         info->processed_cmd,
         command_id,
@@ -615,12 +615,12 @@ void connector::_recv_query_execute(char const* data) {
     logger(dbg_commands, basic)
       << "connector::_recv_query_execute: id=" << command_id;
 
-    shared_ptr<query_info> info;
+    std::shared_ptr<query_info> info;
     {
       concurrency::locker lock(&_lock);
 
       // Get query information with the command_id.
-      umap<unsigned long, shared_ptr<query_info> >::iterator
+      umap<unsigned long, std::shared_ptr<query_info> >::iterator
         it(_queries.find(command_id));
       if (it == _queries.end()) {
         logger(dbg_commands, basic)
@@ -829,7 +829,7 @@ void connector::restart::_run() {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _c->_name << "': " << e.what();
 
-    umap<unsigned long, shared_ptr<query_info> > tmp_queries;
+    umap<unsigned long, std::shared_ptr<query_info> > tmp_queries;
     {
       concurrency::locker lock(&_c->_lock);
       _c->_try_to_restart = false;
@@ -838,12 +838,12 @@ void connector::restart::_run() {
     }
 
     // Resend commands.
-    for (umap<unsigned long, shared_ptr<query_info> >::iterator
+    for (umap<unsigned long, std::shared_ptr<query_info> >::iterator
            it(tmp_queries.begin()), end(tmp_queries.end());
          it != end;
          ++it) {
       unsigned long command_id(it->first);
-      shared_ptr<query_info> info(it->second);
+      std::shared_ptr<query_info> info(it->second);
 
       result res;
       res.command_id = command_id;

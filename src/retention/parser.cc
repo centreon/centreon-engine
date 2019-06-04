@@ -26,13 +26,13 @@
 using namespace com::centreon::engine::retention;
 
 parser::store parser::_store[] = {
-  &parser::_store_into_list<list_comment, &state::comments>,
-  &parser::_store_into_list<list_contact, &state::contacts>,
-  &parser::_store_into_list<list_downtime, &state::downtimes>,
-  &parser::_store_into_list<list_host, &state::hosts>,
+  &parser::_store_into_list<list_comment, comment, &state::comments>,
+  &parser::_store_into_list<list_contact, contact, &state::contacts>,
+  &parser::_store_into_list<list_downtime, downtime, &state::downtimes>,
+  &parser::_store_into_list<list_host, host, &state::hosts>,
   &parser::_store_object<info, &state::informations>,
   &parser::_store_object<program, &state::globals>,
-  &parser::_store_into_list<list_service, &state::services>
+  &parser::_store_into_list<list_service, service, &state::services>
 };
 
 /**
@@ -56,11 +56,11 @@ void parser::parse(std::string const& path, state& retention) {
     throw (engine_error() << "Parsing of retention file failed: "
            "Can't open file '" << path << "'");
 
-  shared_ptr<object> obj;
+  std::shared_ptr<object> obj;
   std::string input;
   unsigned int current_line(0);
   while (string::get_next_line(stream, input, current_line)) {
-    if (obj.is_null()) {
+    if (obj == nullptr) {
       std::size_t pos(input.find_first_of(" \t"));
       if (pos == std::string::npos)
         continue;
@@ -74,7 +74,7 @@ void parser::parse(std::string const& path, state& retention) {
     }
     else {
       (this->*_store[obj->type()])(retention, obj);
-      obj.clear();
+      obj.reset();
     }
   }
 }
@@ -85,9 +85,9 @@ void parser::parse(std::string const& path, state& retention) {
  *  @param[in] retention The state to fill.
  *  @param[in] obj       The object to store.
  */
-template<typename T, T& (state::*ptr)() throw ()>
+template<typename T, typename T2, T& (state::*ptr)() throw ()>
 void parser::_store_into_list(state& retention, object_ptr obj) {
-  (retention.*ptr)().push_back(obj);
+  (retention.*ptr)().push_back(std::static_pointer_cast<T2>(obj));
 }
 
 /**
@@ -98,5 +98,5 @@ void parser::_store_into_list(state& retention, object_ptr obj) {
  */
 template<typename T, T& (state::*ptr)() throw ()>
 void parser::_store_object(state& retention, object_ptr obj) {
-  (retention.*ptr)() = *shared_ptr<T>(obj);
+  (retention.*ptr)() = *std::static_pointer_cast<T>(obj);
 }

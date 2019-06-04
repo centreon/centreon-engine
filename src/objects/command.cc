@@ -27,7 +27,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -105,7 +104,7 @@ command* add_command(char const* name, char const* value) {
   }
 
   // Allocate memory for the new command.
-  shared_ptr<command> obj(new command, deleter::command);
+  std::shared_ptr<command> obj(new command, deleter::command);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -130,7 +129,7 @@ command* add_command(char const* name, char const* value) {
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -145,7 +144,7 @@ command* add_command(char const* name, char const* value) {
  *          command is not found.
  */
 command& engine::find_command(std::string const& name) {
-  umap<std::string, shared_ptr<command_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
     it(state::instance().commands().find(name));
   if (it == state::instance().commands().end())
     throw (engine_error() << "Command '" << name << "' was not found");
@@ -160,7 +159,7 @@ command& engine::find_command(std::string const& name) {
  *  @return True if the command is found, otherwise false.
  */
 bool engine::is_command_exist(std::string const& name) throw () {
-  umap<std::string, shared_ptr<command_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<command_struct> >::const_iterator
     it(state::instance().commands().find(name));
   return (it != state::instance().commands().end());
 }

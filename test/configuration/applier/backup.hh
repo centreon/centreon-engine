@@ -124,33 +124,36 @@ public:
   }
 
 private:
-  umap<std::string, cc::shared_ptr<command_struct> >
+  umap<std::string, std::shared_ptr<command_struct> >
                _commands;
   cce::configuration::state*
                _config;
-  umap<std::string, cc::shared_ptr<cce::commands::connector> >
+  umap<std::string, std::shared_ptr<cce::commands::connector> >
                _connectors;
-  umap<std::string, cc::shared_ptr<contact_struct> >
+  umap<std::string, std::shared_ptr<contact_struct> >
                _contacts;
-  umap<std::string, cc::shared_ptr<contactgroup_struct> >
+  umap<std::string, std::shared_ptr<contactgroup_struct> >
                _contactgroups;
-  umap<std::string, cc::shared_ptr<host_struct> >
+  umap<std::string, std::shared_ptr<host_struct> >
                _hosts;
-  umultimap<std::string, cc::shared_ptr<hostdependency_struct> >
+  umultimap<std::string, std::shared_ptr<hostdependency_struct> >
                _hostdependencies;
-  umultimap<std::string, cc::shared_ptr<hostescalation_struct> >
+  umultimap<std::string, std::shared_ptr<hostescalation_struct> >
                _hostescalations;
-  umap<std::string, cc::shared_ptr<hostgroup_struct> >
+  umap<std::string, std::shared_ptr<hostgroup_struct> >
                _hostgroups;
-  umap<std::pair<std::string, std::string>, cc::shared_ptr<service_struct> >
+  umap<std::pair<std::string, std::string>,
+    std::shared_ptr<service_struct> >
                _services;
-  umultimap<std::pair<std::string, std::string>, cc::shared_ptr<servicedependency_struct> >
+  umultimap<std::pair<std::string, std::string>,
+    std::shared_ptr<servicedependency_struct> >
                _servicedependencies;
-  umultimap<std::pair<std::string, std::string>, cc::shared_ptr<serviceescalation_struct> >
+  umultimap<std::pair<std::string, std::string>,
+    std::shared_ptr<serviceescalation_struct> >
                _serviceescalations;
-  umap<std::string, cc::shared_ptr<servicegroup_struct> >
+  umap<std::string, std::shared_ptr<servicegroup_struct> >
                _servicegroups;
-  umap<std::string, cc::shared_ptr<timeperiod_struct> >
+  umap<std::string, std::shared_ptr<timeperiod_struct> >
                _timeperiods;
 };
 

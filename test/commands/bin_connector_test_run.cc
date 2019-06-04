@@ -29,7 +29,6 @@
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/exceptions/basic.hh"
 #include "com/centreon/misc/command_line.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "com/centreon/timestamp.hh"
 #include "test/unittest.hh"
 

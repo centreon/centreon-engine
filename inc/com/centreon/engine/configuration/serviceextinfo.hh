@@ -82,8 +82,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<serviceextinfo>    serviceextinfo_ptr;
-  typedef std::list<serviceextinfo_ptr> list_serviceextinfo;
+  typedef std::shared_ptr<serviceextinfo> serviceextinfo_ptr;
+  typedef std::list<serviceextinfo_ptr>   list_serviceextinfo;
 }
 
 CCE_END()

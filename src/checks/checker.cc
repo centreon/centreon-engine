@@ -38,7 +38,6 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "compatibility/check_result.h"
 
 using namespace com::centreon;
@@ -412,7 +411,7 @@ void checker::run(
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  shared_ptr<commands::command>
+  std::shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
@@ -647,7 +646,7 @@ void checker::run(
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  shared_ptr<commands::command>
+  std::shared_ptr<commands::command>
     cmd(cmd_set.get_command(svc->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
@@ -1055,7 +1054,7 @@ int checker::_execute_sync(host* hst) {
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  shared_ptr<commands::command>
+  std::shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* tmp_processed_cmd(string::dup(processed_cmd));

@@ -28,7 +28,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -99,7 +98,7 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
 
   // Check if the contact group already exist.
   std::string id(name);
-  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator
     it(state::instance().contactgroups().find(id));
   if (it != state::instance().contactgroups().end()) {
     logger(log_config_error, basic)
@@ -108,7 +107,7 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
   }
 
   // Allocate memory for a new contactgroup entry.
-  shared_ptr<contactgroup> obj(new contactgroup, deleter::contactgroup);
+  std::shared_ptr<contactgroup> obj(new contactgroup, deleter::contactgroup);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -133,7 +132,7 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -177,7 +176,7 @@ int is_contact_member_of_contactgroup(
  *          contactgroup is not found.
  */
 contactgroup& engine::find_contactgroup(std::string const& name) {
-  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator
     it(state::instance().contactgroups().find(name));
   if (it == state::instance().contactgroups().end())
     throw (engine_error() << "Contact group '"
@@ -193,7 +192,7 @@ contactgroup& engine::find_contactgroup(std::string const& name) {
  *  @return True if the contactgroup is found, otherwise false.
  */
 bool engine::is_contactgroup_exist(std::string const& name) throw () {
-  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contactgroup_struct> >::const_iterator
     it(state::instance().contactgroups().find(name));
   return (it != state::instance().contactgroups().end());
 }

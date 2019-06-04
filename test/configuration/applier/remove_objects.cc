@@ -31,7 +31,6 @@
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/io/file_entry.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "find.hh"
 #include "test/unittest.hh"
 
@@ -185,13 +184,13 @@ public:
   }
 
   bool               find_into_applier() {
-    umultimap<std::string, shared_ptr<hostescalation_struct> > const&
+    umultimap<std::string, std::shared_ptr<hostescalation_struct> > const&
       escalations(configuration::applier::state::instance().hostescalations());
     for (list_string::const_iterator
            it(_all_hosts.begin()), end(_all_hosts.end());
          it != end;
          ++it) {
-      for (umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator
+      for (umultimap<std::string, std::shared_ptr<hostescalation_struct> >::const_iterator
              it_escalation(escalations.find(*it)), end(escalations.end());
            it_escalation != end;
            ++it_escalation) {

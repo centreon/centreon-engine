@@ -93,7 +93,7 @@ TEST_F(SimpleCommand, CommandAlreadyExisting) {
 // When sync executed
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandSync) {
-  shared_ptr<commands::raw> cmd(new raw("test", "/bin/echo bonjour"));
+  std::shared_ptr<commands::raw> cmd(new raw("test", "/bin/echo bonjour"));
   set::instance().add_command(cmd);
 
   nagios_macros mac;
@@ -111,8 +111,8 @@ TEST_F(SimpleCommand, NewCommandSync) {
 // When async executed
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandAsync) {
-  std::auto_ptr<my_listener> lstnr(new my_listener);
-  shared_ptr<commands::raw> cmd(new raw("test", "/bin/echo bonjour"));
+  std::unique_ptr<my_listener> lstnr(new my_listener);
+  std::shared_ptr<commands::raw> cmd(new raw("test", "/bin/echo bonjour"));
   cmd->set_listener(lstnr.get());
   set::instance().add_command(cmd);
 

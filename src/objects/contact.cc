@@ -29,7 +29,6 @@
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -243,7 +242,7 @@ contact* add_contact(
   }
 
   // Allocate memory for a new contact.
-  shared_ptr<contact> obj(new contact, deleter::contact);
+  std::shared_ptr<contact> obj(new contact, deleter::contact);
   memset(obj.get(), 0, sizeof(*obj));
 
   try {
@@ -309,7 +308,7 @@ contact* add_contact(
       &tv);
   }
   catch (...) {
-    obj.clear();
+    obj.reset();
   }
 
   return (obj.get());
@@ -324,7 +323,7 @@ contact* add_contact(
  *          contact is not found.
  */
 contact& engine::find_contact(std::string const& name) {
-  umap<std::string, shared_ptr<contact_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contact_struct> >::const_iterator
     it(state::instance().contacts().find(name));
   if (it == state::instance().contacts().end())
     throw (engine_error() << "Contact '" << name << "' was not found");
@@ -351,7 +350,7 @@ char const* engine::get_contact_timezone(char const* name) {
  *  @return True if the contact is found, otherwise false.
  */
 bool engine::is_contact_exist(std::string const& name) throw () {
-  umap<std::string, shared_ptr<contact_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<contact_struct> >::const_iterator
     it(state::instance().contacts().find(name));
   return (it != state::instance().contacts().end());
 }

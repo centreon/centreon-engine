@@ -21,7 +21,6 @@
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -57,9 +56,9 @@ int main_test(int argc, char** argv) {
   // Add commands.
   raw raw1("raw1", "raw1 argv1 argv2");
   cmd_set.add_command(raw1);
-  com::centreon::shared_ptr<commands::command> pcmd2(raw1.clone());
+  std::shared_ptr<commands::command> pcmd2(raw1.clone());
   cmd_set.add_command(pcmd2);
-  com::centreon::shared_ptr<commands::command>
+  std::shared_ptr<commands::command>
     pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
   cmd_set.add_command(pcmd3);
 
