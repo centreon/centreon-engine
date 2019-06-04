@@ -637,6 +637,13 @@ if (WITH_TESTING AND WITH_COVERAGE)
   APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
+# Simumod module to simulate cbmod and catch its output
+option(WITH_SIMU "Add a module only used for tests to see data that cbmod should receive" OFF)
+if (WITH_SIMU)
+  set(CMAKE_BUILD_TYPE "Debug")
+  add_subdirectory("simumod")
+endif ()
+
 # Configure files.
 configure_file("${INC_DIR}/compatibility/common.h.in"
   "${INC_DIR}/compatibility/common.h")
