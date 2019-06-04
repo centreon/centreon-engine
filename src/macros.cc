@@ -612,12 +612,12 @@ int grab_standard_servicegroup_macro_r(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_SERVICEGROUPNAME:
-    *output = string::dup(temp_servicegroup->group_name);
+    *output = string::dup(temp_servicegroup->get_group_name().c_str());
     break;
 
   case MACRO_SERVICEGROUPALIAS:
-    if (temp_servicegroup->alias)
-      *output = string::dup(temp_servicegroup->alias);
+    if (!temp_servicegroup->get_alias().empty())
+      *output = string::dup(temp_servicegroup->get_alias().c_str());
     break;
 
   case MACRO_SERVICEGROUPMEMBERS:
@@ -670,18 +670,18 @@ int grab_standard_servicegroup_macro_r(
     }
     break;
   case MACRO_SERVICEGROUPACTIONURL:
-    if (temp_servicegroup->action_url)
-      *output = string::dup(temp_servicegroup->action_url);
+    if (!temp_servicegroup->get_action_url().empty())
+      *output = string::dup(temp_servicegroup->get_action_url());
     break;
 
   case MACRO_SERVICEGROUPNOTESURL:
-    if (temp_servicegroup->notes_url)
-      *output = string::dup(temp_servicegroup->notes_url);
+    if (!temp_servicegroup->get_notes_url().empty())
+      *output = string::dup(temp_servicegroup->get_notes_url());
     break;
 
   case MACRO_SERVICEGROUPNOTES:
-    if (temp_servicegroup->notes)
-      *output = string::dup(temp_servicegroup->notes);
+    if (!temp_servicegroup->get_notes().empty())
+      *output = string::dup(temp_servicegroup->get_notes());
     break;
 
   default:

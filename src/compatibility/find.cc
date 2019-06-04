@@ -24,7 +24,7 @@
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/hostgroup.hh"
 #include "com/centreon/engine/service.hh"
-#include "com/centreon/engine/objects/servicegroup.hh"
+#include "com/centreon/engine/servicegroup.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "find.hh"
 
@@ -66,7 +66,7 @@ com::centreon::engine::service* find_service(char const* host_name, char const* 
  *  @return Service group object if found, nullptr otherwise.
  */
 servicegroup* find_servicegroup(std::string const& name) {
-  umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())
     return it->second.get();

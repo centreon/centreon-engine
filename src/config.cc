@@ -285,10 +285,12 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking service groups...";
   total_objects = 0;
-  for (servicegroup* temp_servicegroup(servicegroup_list);
-       temp_servicegroup;
-       temp_servicegroup = temp_servicegroup->next, ++total_objects)
-    check_servicegroup(temp_servicegroup, &warnings, &errors);
+  for (servicegroup_map::iterator
+         it(servicegroup::servicegroups.begin()),
+         end(servicegroup::servicegroups.end());
+       it != end;
+       ++it)
+    check_servicegroup(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service groups.";
@@ -1233,7 +1235,7 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
         << "Error: Service '"
         << temp_servicesmember->service_description
         << "' on host '" << temp_servicesmember->host_name
-        << "' specified in service group '" << sg->group_name
+        << "' specified in service group '" << sg->get_group_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1248,9 +1250,9 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
   }
 
   // Check for illegal characters in servicegroup name.
-  if (contains_illegal_object_chars(sg->group_name)) {
+  if (contains_illegal_object_chars(sg->get_group_name().c_str())) {
     logger(log_verification_error, basic)
-      << "Error: The name of servicegroup '" << sg->group_name
+      << "Error: The name of servicegroup '" << sg->get_group_name()
       << "' contains one or more illegal characters.";
     errors++;
   }

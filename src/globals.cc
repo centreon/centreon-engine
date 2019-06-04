@@ -30,7 +30,6 @@ configuration::state* config(NULL);
 events::hash_timed_event quick_timed_event;
 std::map<std::string, host_other_properties> host_other_props;
 std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-std::map<std::string, servicegroup_other_properties> servicegroup_other_props;
 
 char const*         sigs[] = {
   "EXIT", "HUP", "INT", "QUIT", "ILL",
@@ -101,8 +100,6 @@ com::centreon::engine::service*            service_list(NULL);
 com::centreon::engine::service*            service_list_tail(NULL);
 serviceescalation*  serviceescalation_list(NULL);
 serviceescalation*  serviceescalation_list_tail(NULL);
-servicegroup*       servicegroup_list(NULL);
-servicegroup*       servicegroup_list_tail(NULL);
 time_t              event_start((time_t)-1);
 time_t              last_command_check((time_t)-1);
 time_t              last_command_status_update((time_t)-1);

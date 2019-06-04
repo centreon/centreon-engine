@@ -263,11 +263,11 @@ std::ostream& operator<<(std::ostream& os,
   std::string notif_period_str;
   if (obj.notification_period_ptr)
     notif_period_str = obj.notification_period_ptr->get_name();
-  char const* svcgrp_str(nullptr);
+  std::string svcgrp_str;
   if (obj.servicegroups_ptr)
-    svcgrp_str = chkstr(
+    svcgrp_str =
         static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)
-            ->group_name);
+            ->get_group_name();
 
   std::string cg_oss;
   std::string c_oss;
@@ -600,7 +600,7 @@ std::ostream& operator<<(std::ostream& os,
      << notif_period_str
      << "\n"
         "  servicegroups_ptr:                    "
-     << chkstr(svcgrp_str) << "\n";
+     << svcgrp_str << "\n";
 
   for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
     os << cv.first << " ; ";

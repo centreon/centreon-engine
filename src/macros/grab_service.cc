@@ -79,7 +79,7 @@ static char* get_service_group_names(com::centreon::engine::service& svc, nagios
     if (temp_servicegroup) {
       if (!buf.empty())
         buf.append(",");
-      buf.append(temp_servicegroup->group_name);
+      buf.append(temp_servicegroup->get_group_name());
     }
   }
   return (string::dup(buf));

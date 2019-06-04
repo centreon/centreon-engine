@@ -91,14 +91,14 @@ TEST_F(ApplierServicegroup, ModifyServicegroupFromConfig) {
   configuration::servicegroup sg("test");
   ASSERT_TRUE(sg.parse("members", "host1,service1"));
   aply.add_object(sg);
-  umap<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
     it(configuration::applier::state::instance().servicegroups_find("test"));
-  ASSERT_TRUE(strcmp(it->second->alias, "test") == 0);
+  ASSERT_TRUE(it->second->get_alias() == "test");
 
   ASSERT_TRUE(sg.parse("alias", "test_renamed"));
   aply.modify_object(sg);
   it = configuration::applier::state::instance().servicegroups().find("test");
-  ASSERT_TRUE(strcmp(it->second->alias, "test_renamed") == 0);
+  ASSERT_TRUE(it->second->get_alias() == "test_renamed");
 }
 
 // Given an empty servicegroup

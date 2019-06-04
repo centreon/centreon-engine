@@ -899,7 +899,7 @@ servicedependency_mmap ::iterator applier::state::servicedependencies_find(confi
  *
  *  @return The current servicegroups.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> > const& applier::state::servicegroups() const throw () {
+servicegroup_map const& applier::state::servicegroups() const throw () {
   return _servicegroups;
 }
 
@@ -908,7 +908,7 @@ std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> > const& ap
  *
  *  @return The current servicegroups.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >& applier::state::servicegroups() throw () {
+servicegroup_map& applier::state::servicegroups() throw () {
   return _servicegroups;
 }
 
@@ -920,7 +920,7 @@ std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >& applier:
  *  @return Iterator to the element if found, servicegroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
+servicegroup_map::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
   return _servicegroups.find(k);
 }
 
@@ -932,7 +932,7 @@ std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::const_it
  *  @return Iterator to the element if found, servicegroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
+servicegroup_map::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
   return _servicegroups.find(k);
 }
 

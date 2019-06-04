@@ -24,9 +24,8 @@
 CCE_BEGIN()
   class host;
   class service;
+  class servicegroup;
 CCE_END()
-
-struct servicegroup_struct;
 
 typedef struct                  servicesmember_struct {
   char*                         host_name;
@@ -43,7 +42,7 @@ servicesmember* add_service_link_to_host(
                   com::centreon::engine::host* hst,
                   com::centreon::engine::service* service_ptr);
 servicesmember* add_service_to_servicegroup(
-                  servicegroup_struct* temp_servicegroup,
+                  com::centreon::engine::servicegroup* temp_servicegroup,
                   char const* host_name,
                   char const* svc_description);
 

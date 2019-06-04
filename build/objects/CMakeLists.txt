@@ -28,13 +28,11 @@ set(
 
   # Sources.
   "${SRC_DIR}/objectlist.cc"
-  "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/servicesmember.cc"
 
   # Headers.
   "${INC_DIR}/defines.hh"
   "${INC_DIR}/objectlist.hh"
-  "${INC_DIR}/servicegroup.hh"
   "${INC_DIR}/servicesmember.hh"
   "${INC_DIR}/tool.hh"
 

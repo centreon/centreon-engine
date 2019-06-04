@@ -33,9 +33,6 @@
 #  include "com/centreon/engine/servicedependency.hh"
 #  include "com/centreon/engine/timeperiod.hh"
 
-// Forward declaration.
-struct servicegroup_struct;
-
 CCE_BEGIN()
 class serviceescalation;
 
@@ -151,13 +148,21 @@ namespace           configuration {
                     servicedependencies_find(configuration::servicedependency::key_type const& k) const;
       servicedependency_mmap::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>> const&
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>> const&
+                    serviceescalations() const throw ();
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>&
+                    serviceescalations() throw ();
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>::const_iterator
+                    serviceescalations_find(configuration::serviceescalation::key_type const& k) const;
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>::iterator
+                    serviceescalations_find(configuration::serviceescalation::key_type const& k);
+      servicegroup_map const&
                     servicegroups() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>&
+      servicegroup_map&
                     servicegroups() throw ();
-      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>::const_iterator
+      servicegroup_map::const_iterator
                     servicegroups_find(configuration::servicegroup::key_type const& k) const;
-      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>::iterator
+      servicegroup_map::iterator
                     servicegroups_find(configuration::servicegroup::key_type const& k);
       timeperiod_map const&
                     timeperiods() const throw ();
@@ -233,7 +238,9 @@ namespace           configuration {
                     _services;
       servicedependency_mmap
                     _servicedependencies;
-      std::unordered_map<std::string, std::shared_ptr<servicegroup_struct>>
+      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>
+                    _serviceescalations;
+      servicegroup_map
                     _servicegroups;
       timeperiod_map
                     _timeperiods;
