@@ -164,6 +164,8 @@ extern "C" {
 #  endif /* C++ */
 
 service* add_service(
+           unsigned int host_id,
+           unsigned int service_id,
            char const* host_name,
            char const* description,
            char const* display_name,
@@ -240,11 +242,11 @@ CCE_BEGIN()
 
 void          check_for_expired_acknowledgement(service* s);
 service&      find_service(
-                std::string const& host_name,
-                std::string const& service_description);
+                unsigned int host_id,
+                unsigned int service_id);
 char const*   get_service_timezone(char const* hst, char const* svc);
 bool          is_service_exist(
-                std::pair<std::string, std::string> const& id);
+                std::pair<unsigned int, unsigned int> const& id);
 std::pair<unsigned int, unsigned int>
               get_host_and_service_id(
                 char const* host,

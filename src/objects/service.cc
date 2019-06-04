@@ -392,6 +392,8 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @return New service.
  */
 service* add_service(
+           unsigned int host_id,
+           unsigned int service_id,
            char const* host_name,
            char const* description,
            char const* display_name,
@@ -445,7 +447,13 @@ service* add_service(
   (void)failure_prediction_options;
 
   // Make sure we have everything we need.
-  if (!description || !description[0]) {
+  if (!service_id) {
+    logger(log_config_error, basic)
+      << "Error: Service comes from a database, therefore its service id "
+      << "must not be null";
+    return NULL;
+  }
+  else if (!description || !description[0]) {
     logger(log_config_error, basic)
       << "Error: Service description is not set";
     return (NULL);
@@ -461,6 +469,14 @@ service* add_service(
       << "Error: Check command of service '" << description
       << "' on host '" << host_name << "' is not set";
     return (NULL);
+  }
+
+  host_id = get_host_id(host_name);
+  if (!host_id) {
+    logger(log_config_error, basic)
+      << "Error: The service '" << description << "' cannot be created because"
+      << " host '" << host_name << "' does not exist (host_id is null)";
+    return NULL;
   }
 
   // Check values.
@@ -482,8 +498,8 @@ service* add_service(
   }
 
   // Check if the service is already exist.
-  std::pair<std::string, std::string>
-    id(std::make_pair(host_name, description));
+  std::pair<unsigned int, unsigned int>
+    id(std::make_pair(host_id, service_id));
   if (is_service_exist(id)) {
     logger(log_config_error, basic)
       << "Error: Service '" << description << "' on host '"
@@ -702,15 +718,15 @@ void engine::check_for_expired_acknowledgement(service* s) {
  *          service is not found.
  */
 service& engine::find_service(
-           std::string const& host_name,
-           std::string const& service_description) {
-  std::pair<std::string, std::string>
-    id(std::make_pair(host_name, service_description));
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+           unsigned int host_id,
+           unsigned int service_id) {
+  std::pair<unsigned int, unsigned int>
+    id(std::make_pair(host_id, service_id));
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   if (it == state::instance().services().end())
-    throw (engine_error() << "Service '" << service_description
-           << "' on host '" << host_name << "' was not found");
+    throw (engine_error() << "Service '" << service_id
+           << "' on host '" << host_id << "' was not found");
   return (*it->second);
 }
 
@@ -740,8 +756,8 @@ char const* engine::get_service_timezone(
  *  @return True if the service is found, otherwise false.
  */
 bool engine::is_service_exist(
-       std::pair<std::string, std::string> const& id) {
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+       std::pair<unsigned int, unsigned int> const& id) {
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   return (it != state::instance().services().end());
 }

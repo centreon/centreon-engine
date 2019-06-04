@@ -204,6 +204,7 @@ std::ostream& dump::header(std::ostream& os) {
 std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
   os << "host {\n"
     "host_name=" << obj.name << "\n"
+    "host_id=" << host_other_props[obj.name].host_id << "\n"
     "acknowledgement_type=" << obj.acknowledgement_type << "\n"
     "active_checks_enabled=" << obj.checks_enabled << "\n"
     "check_command=" << (obj.host_check_command ? obj.host_check_command : "") << "\n"
@@ -387,9 +388,15 @@ bool dump::save(std::string const& path) {
  *  @return The output stream.
  */
 std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
+  std::string hostname;
+  if (obj.host_ptr)
+    hostname = obj.host_ptr->name;
+
   os << "service {\n"
     "host_name=" << obj.host_name << "\n"
     "service_description=" << obj.description << "\n"
+    "host_id=" << service_other_props[std::make_pair(hostname, obj.description)].host_id << "\n"
+    "service_id=" << service_other_props[std::make_pair(hostname, obj.description)].service_id << "\n"
     "acknowledgement_type=" << obj.acknowledgement_type << "\n"
     "active_checks_enabled=" << obj.checks_enabled << "\n"
     "check_command=" << (obj.service_check_command ? obj.service_check_command : "") << "\n"
@@ -410,7 +417,7 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"
-    "last_acknowledgement=" << service_other_props[std::make_pair(obj.host_ptr->name, obj.description)].last_acknowledgement << "\n"
+    "last_acknowledgement=" << service_other_props[std::make_pair(hostname, obj.description)].last_acknowledgement << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"
@@ -443,8 +450,7 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "retry_check_interval=" << obj.retry_interval << "\n"
     "state_type=" << obj.state_type << "\n"
     "recovery_been_sent=" << service_other_props[
-                               std::make_pair(obj.description,
-                                              obj.host_ptr->name)].recovery_been_sent << "\n";
+                               std::make_pair(hostname, obj.description)].recovery_been_sent << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)

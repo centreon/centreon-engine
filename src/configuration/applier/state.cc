@@ -364,8 +364,8 @@ umap<std::string, shared_ptr<contactgroup_struct> >::iterator applier::state::co
  *
  *  @return The current hosts.
  */
-umap<std::string, shared_ptr<host_struct> > const& applier::state::hosts() const throw () {
-  return (_hosts);
+umap<unsigned int, shared_ptr<host_struct> > const& applier::state::hosts() const throw () {
+  return _hosts;
 }
 
 /**
@@ -373,8 +373,8 @@ umap<std::string, shared_ptr<host_struct> > const& applier::state::hosts() const
  *
  *  @return The current hosts.
  */
-umap<std::string, shared_ptr<host_struct> >& applier::state::hosts() throw () {
-  return (_hosts);
+umap<unsigned int, shared_ptr<host_struct> >& applier::state::hosts() throw () {
+  return _hosts;
 }
 
 /**
@@ -385,8 +385,8 @@ umap<std::string, shared_ptr<host_struct> >& applier::state::hosts() throw () {
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-umap<std::string, shared_ptr<host_struct> >::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
-  return (_hosts.find(k));
+umap<unsigned int, shared_ptr<host_struct> >::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
+  return _hosts.find(k);
 }
 
 /**
@@ -397,8 +397,8 @@ umap<std::string, shared_ptr<host_struct> >::const_iterator applier::state::host
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-umap<std::string, shared_ptr<host_struct> >::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
-  return (_hosts.find(k));
+umap<unsigned int, shared_ptr<host_struct> >::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
+  return _hosts.find(k);
 }
 
 /**
@@ -619,8 +619,8 @@ umap<std::string, shared_ptr<hostgroup_struct> >::iterator applier::state::hostg
  *
  *  @return The current services.
  */
-umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const& applier::state::services() const throw () {
-  return (_services);
+umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> > const& applier::state::services() const throw () {
+  return _services;
 }
 
 /**
@@ -628,7 +628,7 @@ umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const& ap
  *
  *  @return The current services.
  */
-umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >& applier::state::services() throw () {
+umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >& applier::state::services() throw () {
   return (_services);
 }
 
@@ -640,7 +640,7 @@ umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >& applier:
  *  @return Iterator to the element if found, services().end()
  *          otherwise.
  */
-umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
+umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
   return (_services.find(k));
 }
 
@@ -652,7 +652,7 @@ umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_it
  *  @return Iterator to the element if found, services().end()
  *          otherwise.
  */
-umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
+umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
   return (_services.find(k));
 }
 
@@ -1696,8 +1696,8 @@ void applier::state::_processing(
              end(diff_hosts.added().end());
            it != end;
            ++it) {
-        umap<std::string, shared_ptr<host_struct> >::const_iterator
-          hst(hosts().find(it->host_name()));
+        umap<unsigned int, shared_ptr<host_struct> >::const_iterator
+          hst(hosts().find(it->host_id()));
         if (hst != hosts().end())
           log_host_state(INITIAL_STATES, hst->second.get());
       }
@@ -1706,10 +1706,10 @@ void applier::state::_processing(
              end(diff_services.added().end());
            it != end;
            ++it) {
-        umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+        umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::const_iterator
           svc(services().find(std::make_pair(
-                                     *it->hosts().begin(),
-                                     it->service_description())));
+                                     it->host_id(),
+                                     it->service_id())));
         if (svc != services().end())
           log_service_state(INITIAL_STATES, svc->second.get());
       }

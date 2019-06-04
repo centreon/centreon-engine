@@ -93,14 +93,18 @@ applier::service& applier::service::operator=(
 void applier::service::add_object(
                          configuration::service const& obj) {
   // Check service.
-  if (obj.hosts().size() != 1)
-    throw (engine_error() << "Could not create service '"
+  if (obj.hosts().size() < 1)
+    throw engine_error() << "Could not create service '"
            << obj.service_description()
-           << "' with multiple hosts defined");
+           << "' with no host defined";
+  else if (obj.hosts().size() > 1)
+    throw engine_error() << "Could not create service '"
+           << obj.service_description()
+           << "' with multiple hosts defined";
   else if (!obj.hostgroups().empty())
-    throw (engine_error() << "Could not create service '"
+    throw engine_error() << "Could not create service '"
            << obj.service_description()
-           << "' with multiple host groups defined");
+           << "' with multiple host groups defined";
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -112,6 +116,7 @@ void applier::service::add_object(
 
   // Create service.
   service_struct* svc(add_service(
+    obj.host_id(), obj.service_id(),
     obj.hosts().begin()->c_str(),
     obj.service_description().c_str(),
     NULL_IF_EMPTY(obj.display_name()),
@@ -368,7 +373,7 @@ void applier::service::modify_object(
            << host_name << "'");
 
   // Find service object.
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::iterator
     it_obj(applier::state::instance().services_find(obj.key()));
   if (it_obj == applier::state::instance().services().end())
     throw (engine_error() << "Could not modify non-existing "
@@ -382,6 +387,9 @@ void applier::service::modify_object(
   config->services().insert(obj);
 
   // Modify properties.
+  modify_if_different(
+    s->description,
+    NULL_IF_EMPTY(obj.service_description()));
   modify_if_different(
     s->display_name,
     NULL_IF_EMPTY(obj.display_name()));
@@ -630,7 +638,7 @@ void applier::service::remove_object(
   // Find service.
   std::pair<std::string, std::string>
     id(std::make_pair(host_name, service_description));
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::iterator
     it(applier::state::instance().services_find(obj.key()));
   if (it != applier::state::instance().services().end()) {
     service_struct* svc(it->second.get());
@@ -698,7 +706,7 @@ void applier::service::resolve_object(
     << "' of host '" << *obj.hosts().begin() << "'.";
 
   // Find service.
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+  umap<std::pair<unsigned int, unsigned int>, shared_ptr<service_struct> >::iterator
     it(applier::state::instance().services_find(obj.key()));
   if (applier::state::instance().services().end() == it)
     throw (engine_error() << "Cannot resolve non-existing service '"
@@ -711,8 +719,9 @@ void applier::service::resolve_object(
     &deleter::objectlist);
 
   // Find host and adjust its counters.
-  umap<std::string, shared_ptr<host_struct> >::iterator
-    hst(applier::state::instance().hosts_find(it->second->host_name));
+  unsigned int host_id(it->first.first);
+  umap<unsigned int, shared_ptr<host_struct> >::iterator
+    hst(applier::state::instance().hosts_find(it->first.first));
   if (hst != applier::state::instance().hosts().end()) {
     ++hst->second->total_services;
     hst->second->total_service_check_interval
@@ -790,7 +799,7 @@ void applier::service::_inherits_special_vars(
       || !obj.timezone_defined()) {
     // Find host.
     configuration::set_host::const_iterator
-      it(s.hosts_find(*obj.hosts().begin()));
+      it(s.hosts_find(obj.hosts().begin()->c_str()));
     if (it == s.hosts().end())
       throw (engine_error()
              << "Could not inherit special variables for service '"
@@ -798,8 +807,6 @@ void applier::service::_inherits_special_vars(
              << *obj.hosts().begin() << "' does not exist");
 
     // Inherits variables.
-    if (!obj.host_id())
-      obj.host_id(it->host_id());
     if (!obj.contacts_defined() && !obj.contactgroups_defined()) {
       obj.contacts() = it->contacts();
       obj.contactgroups() = it->contactgroups();

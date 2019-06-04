@@ -21,6 +21,7 @@
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/string.hh"
 
 extern int config_warnings;
@@ -146,7 +147,6 @@ service::service()
     _flap_detection_options(default_flap_detection_options),
     _freshness_threshold(default_freshness_threshold),
     _high_flap_threshold(default_high_flap_threshold),
-    _host_id(0),
     _initial_state(default_initial_state),
     _is_volatile(default_is_volatile),
     _low_flap_threshold(default_low_flap_threshold),
@@ -207,7 +207,6 @@ service& service::operator=(service const& other) {
     _flap_detection_options = other._flap_detection_options;
     _freshness_threshold = other._freshness_threshold;
     _high_flap_threshold = other._high_flap_threshold;
-    _host_id = other._host_id;
     _hostgroups = other._hostgroups;
     _hosts = other._hosts;
     _icon_image = other._icon_image;
@@ -267,7 +266,6 @@ bool service::operator==(service const& other) const throw () {
           && _freshness_threshold == other._freshness_threshold
           && _high_flap_threshold == other._high_flap_threshold
           && _hostgroups == other._hostgroups
-          && _host_id == other._host_id
           && _hosts == other._hosts
           && _icon_image == other._icon_image
           && _icon_image_alt == other._icon_image_alt
@@ -365,8 +363,6 @@ bool service::operator<(service const& other) const throw () {
     return (_high_flap_threshold < other._high_flap_threshold);
   else if (_hostgroups != other._hostgroups)
     return (_hostgroups < other._hostgroups);
-  else if (_host_id != other._host_id)
-    return (_host_id < other._host_id);
   else if (_icon_image != other._icon_image)
     return (_icon_image < other._icon_image);
   else if (_icon_image_alt != other._icon_image_alt)
@@ -445,9 +441,9 @@ void service::check_validity() const {
 service::key_type service::key() const {
   key_type k;
   if (!_hosts->empty())
-    k.first = *_hosts->begin();
-  k.second = _service_description;
-  return (k);
+    k.first = get_host_id((*_hosts).begin()->c_str());
+  k.second = _service_id;
+  return k;
 }
 
 /**
@@ -789,17 +785,8 @@ set_string const& service::hosts() const throw () {
  *  @return Service's host's ID.
  */
 unsigned int service::host_id() const throw () {
-  return (_host_id);
-}
-
-/**
- *  Set service's host's ID.
- *
- *  @param[in] id  New host ID.
- */
-void service::host_id(unsigned int id) {
-  _host_id = id;
-  return ;
+  unsigned int host_id(get_host_id(_hosts->begin()->c_str()));
+  return host_id;
 }
 
 /**
