@@ -28,6 +28,8 @@
 struct nagios_macros;
 
 CCE_BEGIN()
+class escalation;
+
 class                         notifier {
  public:
   enum notification_type {
@@ -173,6 +175,9 @@ class                         notifier {
   void                        set_timezone(std::string const& timezone);
   virtual bool                is_escalated_contact(contact* cntct) const = 0;
   virtual bool                should_notification_be_escalated() const = 0;
+  std::list<std::shared_ptr<escalation>> const&
+                              get_escalations() const;
+  void                        add_escalation(std::shared_ptr<escalation> e);
 
  protected:
   int                         _notifier_type;
@@ -216,6 +221,8 @@ class                         notifier {
   double                      _first_notification_delay;
   bool                        _notifications_enabled;
   std::string                 _timezone;
+  std::list<std::shared_ptr<escalation>>
+                              _escalations;
 };
 
 CCE_END()

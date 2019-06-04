@@ -111,9 +111,9 @@ namespace           configuration {
                     contactgroups_find(configuration::contactgroup::key_type const& k) const;
       contactgroup_map::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
-      std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>> const&
+      std::unordered_map<uint64_t, std::shared_ptr<engine::host>> const&
                     hosts() const throw ();
-      std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>&
+      std::unordered_map<uint64_t, std::shared_ptr<engine::host>>&
                     hosts() throw ();
       std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
                     hosts_find(configuration::host::key_type const& k) const;
@@ -127,14 +127,6 @@ namespace           configuration {
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      hostescalation_mmap const&
-                    hostescalations() const throw ();
-      hostescalation_mmap&
-                    hostescalations() throw ();
-      hostescalation_mmap::const_iterator
-                    hostescalations_find(configuration::hostescalation::key_type const& k) const;
-      hostescalation_mmap::iterator
-                    hostescalations_find(configuration::hostescalation::key_type const& k);
       hostgroup_map const&
                     hostgroups() const throw ();
       hostgroup_map&

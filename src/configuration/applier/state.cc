@@ -440,7 +440,7 @@ contactgroup_map::iterator applier::state::contactgroups_find(configuration::con
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
+std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
   return _hosts;
 }
 
@@ -449,7 +449,7 @@ std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>> 
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
+std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
   return _hosts;
 }
 
@@ -564,18 +564,12 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
  *
  *  @return The current hostescalations.
  */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> > const& applier::state::hostescalations() const throw () {
-  return _hostescalations;
-}
 
 /**
  *  Get the current hostescalations.
  *
  *  @return The current hostescalations.
  */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >& applier::state::hostescalations() throw () {
-  return _hostescalations;
-}
 
 /**
  *  Find a host escalation by its key.
@@ -585,9 +579,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >&
  *  @return Iterator to the element if found, hostescalations().end()
  *          otherwise.
  */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
-  return const_cast<state*>(this)->hostescalations_find(k);
-}
 
 /**
  *  Find a host escalation by its key.
@@ -597,57 +588,57 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >:
  *  @return Iterator to the element if found, hostescalations().end()
  *          otherwise.
  */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
-  // Copy host escalation configuration to sort some
-  // members (used for comparison below).
-  configuration::hostescalation hesc(k);
-
-  // Browse escalations matching target host.
-  typedef umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> > collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = _hostescalations.equal_range(*k.hosts().begin());
-  while (p.first != p.second) {
-    // Create host escalation configuration from object.
-    configuration::hostescalation current;
-    current.configuration::object::operator=(k);
-    current.hosts().insert(p.first->second->get_hostname());
-    current.first_notification(p.first->second->get_first_notification());
-    current.last_notification(p.first->second->get_last_notification());
-    current.notification_interval(
-              static_cast<unsigned int>(p.first->second->get_notification_interval()));
-    current.escalation_period(p.first->second->get_escalation_period());
-    uint32_t options((p.first->second->get_escalate_on(notifier::recovery)
-                          ? configuration::hostescalation::recovery
-                          : 0) |
-                     (p.first->second->get_escalate_on(notifier::down)
-                          ? configuration::hostescalation::down
-                          : 0) |
-                     (p.first->second->get_escalate_on(notifier::unreachable)
-                          ? configuration::hostescalation::unreachable
-                          : 0));
-    current.escalation_options(options);
-    for (contact_map::iterator
-           it(p.first->second->contacts().begin()),
-           end(p.first->second->contacts().end());
-         it != end;
-         ++it)
-      current.contacts().insert(it->first);
-    for (contactgroup_map::iterator
-           it(p.first->second->contact_groups.begin()),
-           end(p.first->second->contact_groups.begin());
-         it != end;
-         ++it)
-      current.contactgroups().insert(it->second->get_name());
-
-    // Found !
-    if (current == hesc)
-      break ;
-
-    // Keep going.
-    ++p.first;
-  }
-  return (p.first == p.second) ? _hostescalations.end() : p.first;
-}
+//umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
+//  // Copy host escalation configuration to sort some
+//  // members (used for comparison below).
+//  configuration::hostescalation hesc(k);
+//
+//  // Browse escalations matching target host.
+//  typedef umultimap<std::string, std::shared_ptr<engine::hostescalation> > collection;
+//  std::pair<collection::iterator, collection::iterator> p;
+//  p = _hostescalations.equal_range{*k.hosts().begin()};
+//  while (p.first != p.second) {
+//    // Create host escalation configuration from object.
+//    configuration::hostescalation current;
+//    current.configuration::object::operator=(k);
+//    current.hosts().insert(p.first->second->get_hostname());
+//    current.first_notification(p.first->second->get_first_notification());
+//    current.last_notification(p.first->second->get_last_notification());
+//    current.notification_interval(
+//              static_cast<unsigned int>(p.first->second->get_notification_interval()));
+//    current.escalation_period(p.first->second->get_escalation_period());
+//    uint32_t options((p.first->second->get_escalate_on(notifier::recovery)
+//                          ? configuration::hostescalation::recovery
+//                          : 0) |
+//                     (p.first->second->get_escalate_on(notifier::down)
+//                          ? configuration::hostescalation::down
+//                          : 0) |
+//                     (p.first->second->get_escalate_on(notifier::unreachable)
+//                          ? configuration::hostescalation::unreachable
+//                          : 0));
+//    current.escalation_options(options);
+//    for (contact_map::iterator
+//           it(p.first->second->contacts().begin()),
+//           end(p.first->second->contacts().end());
+//         it != end;
+//         ++it)
+//      current.contacts().insert(it->first);
+//    for (contactgroup_map::iterator
+//           it(p.first->second->contact_groups.begin()),
+//           end(p.first->second->contact_groups.begin());
+//         it != end;
+//         ++it)
+//      current.contactgroups().insert(it->second->get_name());
+//
+//    // Found !
+//    if (current == hesc)
+//      break ;
+//
+//    // Keep going.
+//    ++p.first;
+//  }
+//  return (p.first == p.second) ? _hostescalations.end() : p.first;
+//}
 
 /**
  *  Get the current hostgroups.

@@ -738,3 +738,11 @@ std::string const& notifier::get_timezone() const {
 void notifier::set_timezone(std::string const& timezone) {
   _timezone = timezone;
 }
+
+std::list<std::shared_ptr<escalation>> const& notifier::get_escalations() const {
+  return _escalations;
+}
+
+void notifier::add_escalation(std::shared_ptr<escalation> e) {
+  _escalations.push_back(e);
+}
