@@ -30,8 +30,16 @@
 /* Forward declaration. */
 CCE_BEGIN()
 class service;
+class serviceescalation;
 class timeperiod;
+CCE_END()
 
+typedef std::unordered_multimap<
+    std::pair<std::string, std::string>,
+    std::shared_ptr<com::centreon::engine::serviceescalation>>
+    serviceescalation_mmap;
+
+CCE_BEGIN()
 class serviceescalation : public escalation {
  public:
   serviceescalation(std::string const& hostname,
@@ -44,11 +52,7 @@ class serviceescalation : public escalation {
   std::string const& get_hostname() const;
   std::string const& get_description() const;
 
-  contactgroup_map contact_groups;
-  service* service_ptr;
-  timeperiod* escalation_period_ptr;
-  serviceescalation* next;
-  serviceescalation* nexthash;
+  static serviceescalation_mmap serviceescalations;
 
  private:
   std::string _hostname;

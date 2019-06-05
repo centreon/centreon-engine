@@ -103,12 +103,11 @@ void applier::hostescalation::add_object(
   if (it != state::instance().hosts().end())
     it->second->add_escalation(he);
 
-//  // Add new items to the list.
-//  engine::hostescalation::hostescalations.insert(
-//      std::make_pair(he->get_hostname(), he));
+  // Add new items to the list.
+  engine::hostescalation::hostescalations.insert({he->get_hostname(), he});
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv(get_broker_timestamp(nullptr));
   broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_ADD, NEBFLAG_NONE,
                                   NEBATTR_NONE, he.get(), &tv);
 
@@ -196,33 +195,56 @@ void applier::hostescalation::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing a host escalation.";
 
-  //  FIXME DBR: I keep this code for now, but soon it should be removed except
-  //  if needed...
-//  // Find host escalation.
-//  umultimap<std::string,
-//    std::shared_ptr<engine::hostescalation>>::iterator
-//      it{applier::state::instance().hostescalations_find(obj.key())};
-//  if (it != applier::state::instance().hostescalations().end()) {
-//    engine::hostescalation* escalation(it->second.get());
-//
-//    // Remove host escalation from its list.
-//    engine::hostescalation::hostescalations.erase(it->first);
-//
-//    // Notify event broker.
-//    timeval tv(get_broker_timestamp(NULL));
-//    broker_adaptive_escalation_data(
-//      NEBTYPE_HOSTESCALATION_DELETE,
-//      NEBFLAG_NONE,
-//      NEBATTR_NONE,
-//      escalation,
-//      &tv);
-//
-//    // Erase host escalation (will effectively delete the object).
-//    applier::state::instance().hostescalations().erase(it);
-//  }
-//
-//  // Remove escalation from the global configuration set.
-//  config->hostescalations().erase(obj);
+  // Find host escalation.
+  std::string const& host_name{*obj.hosts().begin()};
+  uint64_t host_id{get_host_id(host_name)};
+  std::pair<hostescalation_mmap::iterator, hostescalation_mmap::iterator>
+    range{engine::hostescalation::hostescalations.equal_range(host_name)};
+  std::unordered_map<uint64_t, std::shared_ptr<engine::host>>::iterator hit{
+      state::instance().hosts().find(host_id)};
+
+  for (hostescalation_mmap::iterator it{range.first}, end{range.second};
+       it != end; ++it) {
+    std::list<std::shared_ptr<escalation>>& escalations{hit->second->get_escalations()};
+    for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
+             itt{escalations.begin()},
+         next_itt{escalations.begin()}, end{escalations.end()};
+         itt != end; itt = next_itt) {
+      ++next_itt;
+      /* It's a pity but for now we don't have any possibility or key to verify
+       * if the hostescalation is the good one. */
+      if ((*itt)->get_first_notification() == obj.first_notification() &&
+          (*itt)->get_last_notification() == obj.last_notification() &&
+          (*itt)->get_notification_interval() == obj.notification_interval() &&
+          (*itt)->get_escalation_period() == obj.escalation_period() &&
+          (*itt)->get_escalate_on(notifier::down) ==
+              (obj.escalation_options() &
+               configuration::hostescalation::down) &&
+          (*itt)->get_escalate_on(notifier::unreachable) ==
+              (obj.escalation_options() &
+               configuration::hostescalation::unreachable) &&
+          (*itt)->get_escalate_on(notifier::recovery) ==
+              (obj.escalation_options() &
+               configuration::hostescalation::recovery)) {
+        // We have the hostescalation to remove.
+        escalations.erase(itt);
+        break;
+      }
+    }
+    // Notify event broker.
+    timeval tv{get_broker_timestamp(nullptr)};
+    broker_adaptive_escalation_data(
+      NEBTYPE_HOSTESCALATION_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      it->second.get(),
+      &tv);
+
+    // Remove host escalation from its list.
+    engine::hostescalation::hostescalations.erase(it->first);
+  }
+
+  config->hostescalations().erase(obj);
 }
 
 /**

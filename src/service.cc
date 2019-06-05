@@ -732,7 +732,6 @@ com::centreon::engine::service* add_service(
     int retain_nonstatus_information,
     int obsess_over_service,
     std::string const& timezone) {
-
   // Make sure we have everything we need.
   if (!service_id) {
     logger(log_config_error, basic)
@@ -892,46 +891,6 @@ int is_contact_for_service(com::centreon::engine::service* svc,
 }
 
 /**
- *  Tests whether or not a contact is an escalated contact for a
- *  particular service.
- *
- *  @param[in] svc   Target service.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-bool service::is_escalated_contact(contact* cntct) const {
-  if (!cntct)
-    return false;
-
-  std::pair<std::string, std::string> id{get_hostname(), get_description()};
-  auto range{state::instance().serviceescalations().equal_range(id)};
-
-  for (umultimap<std::pair<std::string, std::string>,
-                 std::shared_ptr<serviceescalation>>::const_iterator
-           it{range.first}, end{range.second};
-       it != end; ++it) {
-    std::shared_ptr<serviceescalation> svcescalation{it->second};
-    // Search all contacts of this service escalation.
-    contact_map::const_iterator itt{svcescalation->contacts().find(cntct->get_name())};
-    if (itt != svcescalation->contacts().end()) {
-      assert(itt->second.get() == cntct);
-      return true;
-    }
-
-    // Search all contactgroups of this service escalation.
-    for (contactgroup_map::iterator itt{svcescalation->contact_groups.begin()},
-         end{svcescalation->contact_groups.end()};
-         itt != end; ++itt)
-      if (itt->second->get_members().find(cntct->get_name()) !=
-          itt->second->get_members().end())
-        return true;
-  }
-
-  return false;
-}
-
-/**
  *  Check if acknowledgement on service expired.
  *
  */
@@ -964,7 +923,7 @@ com::centreon::engine::service& engine::find_service(uint64_t host_id,
                                                      uint64_t service_id) {
   std::pair<uint64_t, uint64_t> id(std::make_pair(host_id, service_id));
   umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<com::centreon::engine::service> >::const_iterator
+       std::shared_ptr<com::centreon::engine::service>>::const_iterator
       it(state::instance().services().find(id));
   if (it == state::instance().services().end())
     throw(engine_error() << "Service '" << service_id << "' on host '"
@@ -981,7 +940,7 @@ com::centreon::engine::service& engine::find_service(uint64_t host_id,
  */
 bool engine::is_service_exist(std::pair<uint64_t, uint64_t> const& id) {
   umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<com::centreon::engine::service> >::const_iterator
+       std::shared_ptr<com::centreon::engine::service>>::const_iterator
       it(state::instance().services().find(id));
   return it != state::instance().services().end();
 }
@@ -1094,7 +1053,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       << "HOST: " << this->get_hostname()
       << ", SERVICE: " << this->get_description() << ", CHECK TYPE: "
       << (queued_check_result->check_type == check_active ? "Active"
-                                                                  : "Passive")
+                                                          : "Passive")
       << ", OPTIONS: " << queued_check_result->check_options << ", SCHEDULED: "
       << (queued_check_result->scheduled_check ? "Yes" : "No")
       << ", RESCHEDULE: "
@@ -1245,8 +1204,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     std::string plugin_output;
     std::string long_plugin_output;
     std::string perf_data;
-    parse_check_output(output, plugin_output,
-                       long_plugin_output, perf_data, true, true);
+    parse_check_output(output, plugin_output, long_plugin_output, perf_data,
+                       true, true);
 
     set_long_plugin_output(long_plugin_output);
     set_perf_data(perf_data);
@@ -1266,9 +1225,11 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     logger(dbg_checks, most)
         << "Parsing check output...\n"
         << "Short Output:\n"
-        << (get_plugin_output().empty() ? "NULL" : this->get_plugin_output()) << "\n"
+        << (get_plugin_output().empty() ? "NULL" : this->get_plugin_output())
+        << "\n"
         << "Long Output:\n"
-        << (get_long_plugin_output().empty() ? "NULL" : get_long_plugin_output())
+        << (get_long_plugin_output().empty() ? "NULL"
+                                             : get_long_plugin_output())
         << "\n"
         << "Perf Data:\n"
         << (get_perf_data().empty() ? "NULL" : get_perf_data());
@@ -1334,11 +1295,11 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * to be checked for real...
        * */
       if (config->use_aggressive_host_checking())
-        perform_on_demand_host_check(temp_host, nullptr, CHECK_OPTION_NONE, false,
-                                     0L);
+        perform_on_demand_host_check(temp_host, nullptr, CHECK_OPTION_NONE,
+                                     false, 0L);
       else
-        temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                                   nullptr);
+        temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+                                   nullptr, nullptr);
     }
   }
 
@@ -1488,8 +1449,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
       if (config->use_aggressive_host_checking())
-        perform_on_demand_host_check(temp_host, nullptr, CHECK_OPTION_NONE, true,
-                                     config->cached_host_check_horizon());
+        perform_on_demand_host_check(temp_host, nullptr, CHECK_OPTION_NONE,
+                                     true, config->cached_host_check_horizon());
       /* 09/23/07 EG don't launch a new host check if we already did so earlier
        */
       else if (first_host_check_initiated)
@@ -1513,8 +1474,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
         /* else launch an async (parallel) check of the host */
         else
-          temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                                     nullptr);
+          temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+                                     nullptr, nullptr);
       }
     }
 
@@ -1542,8 +1503,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
-      notify(NOTIFICATION_NORMAL, nullptr, nullptr,
-                           NOTIFICATION_OPTION_NONE);
+      notify(NOTIFICATION_NORMAL, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event();
@@ -1641,8 +1601,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         else if (state_change) {
           /* use current host state as route result */
           route_result = temp_host->get_current_state();
-          temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                                     nullptr);
+          temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+                                     nullptr, nullptr);
         }
 
         /* ADDED 02/15/08 */
@@ -1684,8 +1644,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* previous logic was to simply run a sync (serial) host check */
         /* use current host state as route result */
         route_result = temp_host->get_current_state();
-        temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                                   nullptr);
+        temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+                                   nullptr, nullptr);
         /*perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,true,config->cached_host_check_horizon());
          */
       }
@@ -1827,10 +1787,10 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         std::pair<std::string, std::string> id(
             std::make_pair(this->get_hostname(), this->get_description()));
         umultimap<std::pair<std::string, std::string>,
-                  std::shared_ptr<servicedependency> > const&
+                  std::shared_ptr<servicedependency>> const&
             dependencies(state::instance().servicedependencies());
         for (umultimap<std::pair<std::string, std::string>,
-                       std::shared_ptr<servicedependency> >::const_iterator
+                       std::shared_ptr<servicedependency>>::const_iterator
                  it(dependencies.find(id)),
              end(dependencies.end());
              it != end && it->first == id; ++it) {
@@ -1893,8 +1853,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* (re)send notifications out about this service problem if the host is up
        * (and was at last check also) and the dependencies were okay... */
-      notify(NOTIFICATION_NORMAL, nullptr, nullptr,
-                           NOTIFICATION_OPTION_NONE);
+      notify(NOTIFICATION_NORMAL, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler if we changed state from the last hard
        * state or if this service is flagged as being volatile */
@@ -2018,7 +1977,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       run_async_check = false;
 
     if (run_async_check)
-      svc->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr, nullptr);
+      svc->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                           nullptr);
   }
   free_objectlist(&check_servicelist);
   return OK;
@@ -2049,16 +2009,15 @@ int service::log_event() {
   std::string const& state_type{tab_state_type[this->state_type]};
 
   logger(log_options, basic)
-      << "SERVICE ALERT: " << get_hostname() << ";"
-      << get_description() << ";" << state << ";" << state_type << ";"
-      << this->current_attempt << ";" << get_plugin_output();
+      << "SERVICE ALERT: " << get_hostname() << ";" << get_description() << ";"
+      << state << ";" << state_type << ";" << this->current_attempt << ";"
+      << get_plugin_output();
   return OK;
 }
 
 // int service::get_check_viability(...)  << check_service_check_viability()
 /* detects service flapping */
-void service::check_for_flapping(int update,
-                                         int allow_flapstart_notification) {
+void service::check_for_flapping(int update, int allow_flapstart_notification) {
   int update_history = true;
   int is_flapping = false;
   unsigned int x = 0;
@@ -2233,7 +2192,8 @@ int service::handle_service_event() {
 
   /* send data to event broker */
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK, NEBFLAG_NONE,
-                          NEBATTR_NONE, CMD_NONE, time(nullptr), nullptr, nullptr, nullptr);
+                          NEBATTR_NONE, CMD_NONE, time(nullptr), nullptr,
+                          nullptr, nullptr);
 
   return OK;
 }
@@ -2630,7 +2590,7 @@ void service::set_flap(double percent_change,
   /* send a notification */
   if (allow_flapstart_notification)
     notify(NOTIFICATION_FLAPPINGSTART, nullptr, nullptr,
-                         NOTIFICATION_OPTION_NONE);
+           NOTIFICATION_OPTION_NONE);
 }
 
 /* handles a service that has stopped flapping */
@@ -2665,14 +2625,12 @@ void service::clear_flap(double percent_change,
                        percent_change, high_threshold, low_threshold, nullptr);
 
   /* send a notification */
-  notify(NOTIFICATION_FLAPPINGSTOP, nullptr, nullptr,
-                       NOTIFICATION_OPTION_NONE);
+  notify(NOTIFICATION_FLAPPINGSTOP, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 
   /* should we send a recovery notification? */
   if (this->check_flapping_recovery_notification &&
       this->current_state == STATE_OK)
-    notify(NOTIFICATION_NORMAL, nullptr, nullptr,
-                         NOTIFICATION_OPTION_NONE);
+    notify(NOTIFICATION_NORMAL, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 
   /* clear the recovery notification flag */
   this->check_flapping_recovery_notification = false;
@@ -2682,12 +2640,11 @@ void service::clear_flap(double percent_change,
 void service::enable_flap_detection() {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  logger(dbg_functions, basic)
-    << "enable_service_flap_detection()";
+  logger(dbg_functions, basic) << "enable_service_flap_detection()";
 
   logger(dbg_flapping, more)
-    << "Enabling flap detection for service '" << this->get_description()
-    << "' on host '" << this->get_hostname() << "'.";
+      << "Enabling flap detection for service '" << this->get_description()
+      << "' on host '" << this->get_hostname() << "'.";
 
   /* nothing to do... */
   if (get_flap_detection_enabled())
@@ -2700,15 +2657,9 @@ void service::enable_flap_detection() {
   set_flap_detection_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_service_data(
-    NEBTYPE_ADAPTIVESERVICE_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    this,
-    CMD_NONE,
-    attr,
-    this->modified_attributes,
-    nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, this, CMD_NONE, attr,
+                               this->modified_attributes, nullptr);
 
   /* check for flapping */
   check_for_flapping(false, true);
@@ -2721,12 +2672,11 @@ void service::enable_flap_detection() {
 void service::disable_flap_detection() {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  logger(dbg_functions, basic)
-    << "disable_service_flap_detection()";
+  logger(dbg_functions, basic) << "disable_service_flap_detection()";
 
   logger(dbg_flapping, more)
-    << "Disabling flap detection for service '" << get_description()
-    << "' on host '" << get_hostname() << "'.";
+      << "Disabling flap detection for service '" << get_description()
+      << "' on host '" << get_hostname() << "'.";
 
   /* nothing to do... */
   if (!get_flap_detection_enabled())
@@ -2739,15 +2689,9 @@ void service::disable_flap_detection() {
   set_flap_detection_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_service_data(
-    NEBTYPE_ADAPTIVESERVICE_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    this,
-    CMD_NONE,
-    attr,
-    this->modified_attributes,
-    nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, this, CMD_NONE, attr,
+                               this->modified_attributes, nullptr);
 
   /* handle the details... */
   handle_service_flap_detection_disabled(this);
@@ -2757,12 +2701,8 @@ void service::disable_flap_detection() {
 void service::update_status(bool aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
   if (!aggregated_dump)
-    broker_service_status(
-      NEBTYPE_SERVICESTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      this,
-      nullptr);
+    broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE, NEBFLAG_NONE,
+                          NEBATTR_NONE, this, nullptr);
 }
 
 /* sets the current notification number for a specific service */
@@ -2831,7 +2771,8 @@ int service::check_notification_viability(unsigned int type, int options) {
         // Looks like there are no valid notification times defined, so
         // schedule the next one far into the future (one year)...
         if (timeperiod_start == (time_t)0)
-          _next_notification = static_cast<time_t>(current_time + 60 * 60 * 24 * 365);
+          _next_notification =
+              static_cast<time_t>(current_time + 60 * 60 * 24 * 365);
         // Else use the next valid notification time.
         else
           _next_notification = timeperiod_start;
@@ -3116,8 +3057,8 @@ int service::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "We haven't waited long enough to re-notify contacts "
            "about this service.";
-    logger(dbg_notifications, more) << "Next valid notification time: "
-                                    << my_ctime(&_next_notification);
+    logger(dbg_notifications, more)
+        << "Next valid notification time: " << my_ctime(&_next_notification);
     return ERROR;
   }
 
@@ -3125,23 +3066,23 @@ int service::check_notification_viability(unsigned int type, int options) {
 }
 
 /* checks viability of performing a service check */
-int service::verify_check_viability(
-      int check_options,
-      int* time_is_valid,
-      time_t* new_time) {
+int service::verify_check_viability(int check_options,
+                                    int* time_is_valid,
+                                    time_t* new_time) {
   int perform_check = true;
   time_t current_time = 0L;
   time_t preferred_time = 0L;
   int check_interval = 0;
 
-  logger(dbg_functions, basic)
-    << "check_service_check_viability()";
+  logger(dbg_functions, basic) << "check_service_check_viability()";
 
   /* get the check interval to use if we need to reschedule the check */
   if (this->state_type == SOFT_STATE && this->current_state != STATE_OK)
-    check_interval = static_cast<int>(this->get_retry_interval() * config->interval_length());
+    check_interval = static_cast<int>(this->get_retry_interval() *
+                                      config->interval_length());
   else
-    check_interval = static_cast<int>(this->get_check_interval() * config->interval_length());
+    check_interval = static_cast<int>(this->get_check_interval() *
+                                      config->interval_length());
 
   /* get the current time */
   time(&current_time);
@@ -3151,42 +3092,39 @@ int service::verify_check_viability(
 
   /* can we check the host right now? */
   if (!(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-
     /* if checks of the service are currently disabled... */
     if (!this->checks_enabled) {
       preferred_time = current_time + check_interval;
       perform_check = false;
 
       logger(dbg_checks, most)
-        << "Active checks of the service are currently disabled.";
+          << "Active checks of the service are currently disabled.";
     }
 
     // Make sure this is a valid time to check the service.
     {
       timezone_locker lock(get_timezone());
-      if (check_time_against_period(
-            (unsigned long)current_time,
-            this->check_period_ptr) == ERROR) {
+      if (check_time_against_period((unsigned long)current_time,
+                                    this->check_period_ptr) == ERROR) {
         preferred_time = current_time;
         if (time_is_valid)
           *time_is_valid = false;
         perform_check = false;
         logger(dbg_checks, most)
-          << "This is not a valid time for this service to be actively "
-             "checked.";
+            << "This is not a valid time for this service to be actively "
+               "checked.";
       }
     }
 
     /* check service dependencies for execution */
-    if (check_service_dependencies(
-          this,
-          hostdependency::execution) == DEPENDENCIES_FAILED) {
+    if (check_service_dependencies(this, hostdependency::execution) ==
+        DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
 
       logger(dbg_checks, most)
-        << "Execution dependencies for this service failed, so it will "
-        "not be actively checked.";
+          << "Execution dependencies for this service failed, so it will "
+             "not be actively checked.";
     }
   }
 
@@ -3197,137 +3135,19 @@ int service::verify_check_viability(
   return (perform_check) ? OK : ERROR;
 }
 
-/*
- * given a service, create a list of contacts to be notified, removing
- * duplicates
- */
-int service::create_notification_list(nagios_macros* mac,
-                                      int options,
-                                      bool* escalated) {
-  logger(dbg_functions, basic) << "service::create_notification_list()";
-
-  /* see if this notification should be escalated */
-  bool escalate_notification{should_notification_be_escalated()};
-
-  /* set the escalation flag */
-  *escalated = escalate_notification;
-
-  /* make sure there aren't any leftover contacts */
-  free_notification_list();
-
-  /* set the escalation macro */
-  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
-
-  if (options & NOTIFICATION_OPTION_BROADCAST)
-    logger(dbg_notifications, more)
-        << "This notification will be BROADCAST to all "
-           "(escalated and normal) contacts...";
-
-  /* use escalated contacts for this notification */
-  if (escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
-    logger(dbg_notifications, more)
-        << "Adding contacts from service escalation(s) to "
-           "notification list.";
-
-    std::pair<std::string, std::string> id({get_hostname(), get_description()});
-    auto range{state::instance().serviceescalations().equal_range(id)};
-
-    for (umultimap<std::pair<std::string, std::string>,
-                   std::shared_ptr<serviceescalation>>::const_iterator
-             it{range.first}, end{range.second};
-             it != end; ++it) {
-      std::shared_ptr<serviceescalation> temp_se{it->second};
-
-      /* skip this entry if it isn't appropriate */
-      if (!is_valid_escalation_for_notification(temp_se.get(), options))
-        continue;
-
-      logger(dbg_notifications, most)
-          << "Adding individual contacts from service escalation(s) "
-             "to notification list.";
-
-      /* add all individual contacts for this escalation entry */
-      for (contact_map::const_iterator itt(temp_se->contacts().begin()),
-           end(temp_se->contacts().end());
-           itt != end; ++itt)
-        add_notification(mac, itt->second.get());
-
-      logger(dbg_notifications, most)
-          << "Adding members of contact groups from service escalation(s) "
-             "to notification list.";
-
-      /* add all contacts that belong to contactgroups for this escalation */
-      for (contactgroup_map::iterator itt(temp_se->contact_groups.begin()),
-           end(temp_se->contact_groups.end());
-           itt != end; ++itt) {
-        logger(dbg_notifications, most)
-            << "Adding members of contact group '" << itt->first
-            << "' for service escalation to notification list.";
-
-        if (!itt->second)
-          continue;
-        for (std::unordered_map<std::string, contact*>::const_iterator
-                 itm(itt->second->get_members().begin()),
-             endm(itt->second->get_members().end());
-             itm != endm; ++itm) {
-          if (!itm->second)
-            continue;
-          add_notification(mac, itm->second);
-        }
-      }
-    }
-  }
-
-  /* else use normal, non-escalated contacts */
-  if (!escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
-    logger(dbg_notifications, more)
-        << "Adding normal contacts for service to notification list.";
-
-    /* add all individual contacts for this service */
-    for (contact_map::iterator it(this->contacts.begin()),
-         end(this->contacts.end());
-         it != end; ++it) {
-      add_notification(mac, it->second.get());
-    }
-
-    /* add all contacts that belong to contactgroups for this service */
-    for (contactgroup_map::iterator it(this->contact_groups.begin()),
-         end(this->contact_groups.end());
-         it != end; ++it) {
-      logger(dbg_notifications, most)
-          << "Adding members of contact group '" << it->first
-          << "' for service to notification list.";
-
-      if (!it->second)
-        continue;
-      for (std::unordered_map<std::string, contact*>::const_iterator
-               itm(it->second->get_members().begin()),
-           mend(it->second->get_members().end());
-           itm != mend; ++itm) {
-        if (!itm->second)
-          continue;
-        add_notification(mac, itm->second);
-      }
-    }
-  }
-
-  return OK;
-}
-
 void service::grab_macros_r(nagios_macros* mac) {
   grab_host_macros_r(mac, this->host_ptr);
   grab_service_macros_r(mac, this);
 }
 
 /* notify a specific contact about a service problem or recovery */
-int service::notify_contact(
-      nagios_macros* mac,
-      contact* cntct,
-      int type,
-      char const* not_author,
-      char const* not_data,
-      int options,
-      int escalated) {
+int service::notify_contact(nagios_macros* mac,
+                            contact* cntct,
+                            int type,
+                            char const* not_author,
+                            char const* not_data,
+                            int options,
+                            int escalated) {
   char* command_name_ptr(nullptr);
   char* raw_command = nullptr;
   char* processed_command = nullptr;
@@ -3338,25 +3158,21 @@ int service::notify_contact(
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   int neb_result;
 
-  logger(dbg_functions, basic)
-    << "notify_contact_of_service()";
+  logger(dbg_functions, basic) << "notify_contact_of_service()";
   logger(dbg_notifications, most)
-    << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
+      << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
 
   /*
    * check viability of notifying this user
    * acknowledgements are no longer excluded from this test -
    * added 8/19/02 Tom Bertelson
    */
-  if (check_contact_service_notification_viability(
-        cntct,
-        this,
-        type,
-        options) == ERROR)
+  if (check_contact_service_notification_viability(cntct, this, type,
+                                                   options) == ERROR)
     return ERROR;
 
   logger(dbg_notifications, most)
-    << "** Notifying contact '" << cntct->get_name() << "'";
+      << "** Notifying contact '" << cntct->get_name() << "'";
 
   /* get start time */
   gettimeofday(&start_time, nullptr);
@@ -3365,19 +3181,9 @@ int service::notify_contact(
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
   neb_result = broker_contact_notification_data(
-                 NEBTYPE_CONTACTNOTIFICATION_START,
-                 NEBFLAG_NONE,
-                 NEBATTR_NONE,
-                 SERVICE_NOTIFICATION,
-                 type,
-                 start_time,
-                 end_time,
-                 (void*)this,
-                 cntct,
-                 not_author,
-                 not_data,
-                 escalated,
-                 nullptr);
+      NEBTYPE_CONTACTNOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE,
+      SERVICE_NOTIFICATION, type, start_time, end_time, (void*)this, cntct,
+      not_author, not_data, escalated, nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
     return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -3385,7 +3191,7 @@ int service::notify_contact(
 
   /* process all the notification commands this user has */
   for (std::shared_ptr<commands::command> const& cmd :
-        cntct->get_service_notification_commands()) {
+       cntct->get_service_notification_commands()) {
     /* get start time */
     gettimeofday(&method_start_time, nullptr);
 
@@ -3393,57 +3199,40 @@ int service::notify_contact(
     method_end_time.tv_sec = 0L;
     method_end_time.tv_usec = 0L;
     neb_result = broker_contact_notification_method_data(
-                   NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,
-                   NEBFLAG_NONE,
-                   NEBATTR_NONE,
-                   SERVICE_NOTIFICATION,
-                   type,
-                   method_start_time,
-                   method_end_time,
-                   (void*)this,
-                   cntct,
-                   cmd->get_command_line().c_str(),
-                   not_author,
-                   not_data,
-                   escalated,
-                   nullptr);
+        NEBTYPE_CONTACTNOTIFICATIONMETHOD_START, NEBFLAG_NONE, NEBATTR_NONE,
+        SERVICE_NOTIFICATION, type, method_start_time, method_end_time,
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author,
+        not_data, escalated, nullptr);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
       continue;
 
     /* get the raw command line */
-    get_raw_command_line_r(
-      mac,
-      cmd.get(),
-      cmd->get_command_line().c_str(),
-      &raw_command,
-      macro_options);
+    get_raw_command_line_r(mac, cmd.get(), cmd->get_command_line().c_str(),
+                           &raw_command, macro_options);
     if (raw_command == nullptr)
       continue;
 
     logger(dbg_notifications, most)
-      << "Raw notification command: " << raw_command;
+        << "Raw notification command: " << raw_command;
 
     /* process any macros contained in the argument */
-    process_macros_r(
-      mac,
-      raw_command,
-      &processed_command,
-      macro_options);
+    process_macros_r(mac, raw_command, &processed_command, macro_options);
     if (processed_command == nullptr)
       continue;
 
     /* run the notification command... */
 
     logger(dbg_notifications, most)
-      << "Processed notification command: " << processed_command;
+        << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
     if (config->log_notifications() == true) {
       char const* service_state_str("UNKNOWN");
       if ((unsigned int)this->current_state < tab_service_states.size())
-        service_state_str = tab_service_states[this->current_state].second.c_str();
+        service_state_str =
+            tab_service_states[this->current_state].second.c_str();
 
       char const* notification_str("");
       if ((unsigned int)type < tab_notification_str.size())
@@ -3451,58 +3240,50 @@ int service::notify_contact(
 
       std::string info;
       switch (type) {
-      case NOTIFICATION_CUSTOM:
-        notification_str = "CUSTOM";
+        case NOTIFICATION_CUSTOM:
+          notification_str = "CUSTOM";
 
-      case NOTIFICATION_ACKNOWLEDGEMENT:
-        info
-          .append(";").append(not_author ? not_author : "")
-          .append(";").append(not_data ? not_data : "");
-        break;
+        case NOTIFICATION_ACKNOWLEDGEMENT:
+          info.append(";")
+              .append(not_author ? not_author : "")
+              .append(";")
+              .append(not_data ? not_data : "");
+          break;
       }
 
       std::string service_notification_state;
       if (strcmp(notification_str, "NORMAL") == 0)
         service_notification_state.append(service_state_str);
       else
-        service_notification_state
-          .append(notification_str)
-          .append(" (")
-          .append(service_state_str)
-          .append(")");
+        service_notification_state.append(notification_str)
+            .append(" (")
+            .append(service_state_str)
+            .append(")");
 
       logger(log_service_notification, basic)
-        << "SERVICE NOTIFICATION: " << cntct->get_name() << ';'
-        << get_hostname() << ';' << get_description() << ';'
-        << service_notification_state << ";"
-        << cmd->get_name() << ';'
-        << get_plugin_output()
-        << info;
+          << "SERVICE NOTIFICATION: " << cntct->get_name() << ';'
+          << get_hostname() << ';' << get_description() << ';'
+          << service_notification_state << ";" << cmd->get_name() << ';'
+          << get_plugin_output() << info;
     }
 
     /* run the notification command */
     try {
-      my_system_r(
-        mac,
-        processed_command,
-        config->notification_timeout(),
-        &early_timeout,
-        &exectime,
-        nullptr,
-        0);
+      my_system_r(mac, processed_command, config->notification_timeout(),
+                  &early_timeout, &exectime, nullptr, 0);
     } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
-        << "Error: can't execute service notification '"
-        << cntct->get_name() << "' : " << e.what();
+          << "Error: can't execute service notification '" << cntct->get_name()
+          << "' : " << e.what();
     }
 
     /* check to see if the notification command timed out */
     if (early_timeout == true) {
       logger(log_service_notification | log_runtime_warning, basic)
-        << "Warning: Contact '" << cntct->get_name()
-        << "' service notification command '" << processed_command
-        << "' timed out after " << config->notification_timeout()
-        << " seconds";
+          << "Warning: Contact '" << cntct->get_name()
+          << "' service notification command '" << processed_command
+          << "' timed out after " << config->notification_timeout()
+          << " seconds";
     }
 
     /* free memory */
@@ -3514,20 +3295,10 @@ int service::notify_contact(
 
     /* send data to event broker */
     broker_contact_notification_method_data(
-      NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      SERVICE_NOTIFICATION,
-      type,
-      method_start_time,
-      method_end_time,
-      (void*)this,
-      cntct,
-      cmd->get_command_line().c_str(),
-      not_author,
-      not_data,
-      escalated,
-      nullptr);
+        NEBTYPE_CONTACTNOTIFICATIONMETHOD_END, NEBFLAG_NONE, NEBATTR_NONE,
+        SERVICE_NOTIFICATION, type, method_start_time, method_end_time,
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author,
+        not_data, escalated, nullptr);
   }
 
   /* get end time */
@@ -3538,19 +3309,9 @@ int service::notify_contact(
 
   /* send data to event broker */
   broker_contact_notification_data(
-    NEBTYPE_CONTACTNOTIFICATION_END,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    SERVICE_NOTIFICATION,
-    type,
-    start_time,
-    end_time,
-    (void*)this,
-    cntct,
-    not_author,
-    not_data,
-    escalated,
-    nullptr);
+      NEBTYPE_CONTACTNOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
+      SERVICE_NOTIFICATION, type, start_time, end_time, (void*)this, cntct,
+      not_author, not_data, escalated, nullptr);
   return OK;
 }
 
@@ -3566,59 +3327,48 @@ void service::update_notification_flags() {
 
 /* calculates next acceptable re-notification time for a service */
 time_t service::get_next_notification_time(time_t offset) {
-  time_t next_notification{0L};
-  double interval_to_use{0.0};
-  serviceescalation* temp_se{nullptr};
   bool have_escalated_interval{false};
 
-  logger(dbg_functions, basic)
-    << "service::get_next_notification_time()";
+  logger(dbg_functions, basic) << "service::get_next_notification_time()";
   logger(dbg_notifications, most)
-    << "Calculating next valid notification time...";
+      << "Calculating next valid notification time...";
 
   /* default notification interval */
-  interval_to_use = get_notification_interval();
+  double interval_to_use{get_notification_interval()};
 
-  logger(dbg_notifications, most)
-    << "Default interval: " << interval_to_use;
+  logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
 
   /*
    * search all the escalation entries for valid matches for this service (at
    * its current notification number)
    */
-  for (temp_se = serviceescalation_list;
-       temp_se != nullptr;
-       temp_se = temp_se->next) {
-
+  for (std::shared_ptr<escalation>& e : get_escalations()) {
     /* interval < 0 means to use non-escalated interval */
-    if (temp_se->get_notification_interval() < 0.0)
+    if (e->get_notification_interval() < 0.0)
       continue;
 
     /* skip this entry if it isn't appropriate */
-    if (!is_valid_escalation_for_notification(
-          temp_se,
-          NOTIFICATION_OPTION_NONE))
+    if (!is_valid_escalation_for_notification(e, NOTIFICATION_OPTION_NONE))
       continue;
 
     logger(dbg_notifications, most)
-      << "Found a valid escalation w/ interval of "
-      << temp_se->get_notification_interval();
+        << "Found a valid escalation w/ interval of "
+        << e->get_notification_interval();
 
     /*
      * if we haven't used a notification interval from an escalation yet,
      * use this one
      */
-    if (have_escalated_interval == false) {
+    if (!have_escalated_interval) {
       have_escalated_interval = true;
-      interval_to_use = temp_se->get_notification_interval();
+      interval_to_use = e->get_notification_interval();
     }
 
     /* else use the shortest of all valid escalation intervals */
-    else if (temp_se->get_notification_interval() < interval_to_use)
-      interval_to_use = temp_se->get_notification_interval();
+    else if (e->get_notification_interval() < interval_to_use)
+      interval_to_use = e->get_notification_interval();
 
-    logger(dbg_notifications, most)
-      << "New interval: " << interval_to_use;
+    logger(dbg_notifications, most) << "New interval: " << interval_to_use;
   }
 
   /*
@@ -3630,13 +3380,15 @@ time_t service::get_next_notification_time(time_t offset) {
   else
     this->no_more_notifications = false;
 
-  logger(dbg_notifications, most)
-    << "Interval used for calculating next valid "
-    "notification time: " << interval_to_use;
+  logger(dbg_notifications, most) << "Interval used for calculating next valid "
+                                     "notification time: "
+                                  << interval_to_use;
 
   /* calculate next notification time */
-  next_notification = offset + static_cast<time_t>(interval_to_use *
-    config->interval_length());
+  time_t next_notification{
+      offset +
+      static_cast<time_t>(interval_to_use * config->interval_length())};
+
   return next_notification;
 }
 
@@ -3644,15 +3396,13 @@ time_t service::get_next_notification_time(time_t offset) {
  * checks to see if a service escalation entry is a match for the current
  * service notification
  */
-int service::is_valid_escalation_for_notification(
-      serviceescalation* se,
-      int options) const {
-  int notification_number = 0;
-  time_t current_time = 0L;
-  com::centreon::engine::service* temp_service = nullptr;
+bool service::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
+                                                  int options) const {
+  int notification_number;
+  time_t current_time;
 
   logger(dbg_functions, basic)
-    << "is_valid_escalation_for_service_notification()";
+      << "service::is_valid_escalation_for_notification()";
 
   /* get the current time */
   time(&current_time);
@@ -3661,14 +3411,13 @@ int service::is_valid_escalation_for_notification(
    * if this is a recovery, really we check for who got notified about a
    * previous problem
    */
-  if (this->current_state == STATE_OK)
-    notification_number = this->current_notification_number - 1;
+  if (get_current_state() == STATE_OK)
+    notification_number = current_notification_number - 1;
   else
-    notification_number = this->current_notification_number;
+    notification_number = current_notification_number;
 
-  /* this entry if it is not for this service */
-  temp_service = se->service_ptr;
-  if (temp_service == nullptr || temp_service != this)
+  /* find the host this escalation entry is associated with */
+  if (e->notifier_ptr != this)
     return false;
 
   /*** EXCEPTION ***/
@@ -3677,74 +3426,36 @@ int service::is_valid_escalation_for_notification(
     return true;
 
   /* skip this escalation if it happens later */
-  if (se->get_first_notification() > notification_number)
+  if (e->get_first_notification() > notification_number)
     return false;
 
   /* skip this escalation if it has already passed */
-  if (se->get_last_notification() != 0
-      && se->get_last_notification() < notification_number)
+  if (e->get_last_notification() != 0 &&
+      e->get_last_notification() < notification_number)
     return false;
 
   /*
    * skip this escalation if it has a timeperiod and the current time isn't
    * valid
    */
-  if (!se->get_escalation_period().empty()
-      && check_time_against_period(
-           current_time,
-           se->escalation_period_ptr) == ERROR)
+  if (!e->get_escalation_period().empty() &&
+      check_time_against_period(current_time, e->escalation_period_ptr) ==
+          ERROR)
     return false;
 
   /* skip this escalation if the state options don't match */
-  if (this->current_state == STATE_OK
-      && !se->get_escalate_on(notifier::recovery))
+  if (this->current_state == STATE_OK &&
+      !e->get_escalate_on(notifier::recovery))
     return false;
-  else if (this->current_state == STATE_WARNING
-           && !se->get_escalate_on(notifier::warning))
+  else if (this->current_state == STATE_WARNING &&
+           !e->get_escalate_on(notifier::warning))
     return false;
-  else if (this->current_state == STATE_UNKNOWN
-           && !se->get_escalate_on(notifier::unknown))
+  else if (this->current_state == STATE_UNKNOWN &&
+           !e->get_escalate_on(notifier::unknown))
     return false;
-  else if (this->current_state == STATE_CRITICAL
-           && !se->get_escalate_on(notifier::critical))
+  else if (this->current_state == STATE_CRITICAL &&
+           !e->get_escalate_on(notifier::critical))
     return false;
 
   return true;
-}
-
-/**
- *  Checks to see whether a service notification should be escalated.
- *
- *  @param[in] svc Service.
- *
- *  @return true if service notification should be escalated, false if
- *          it should not.
- */
-bool service::should_notification_be_escalated() const {
-  // Debug.
-  logger(dbg_functions, basic) << "service::should_notification_be_escalated()";
-
-  // Browse service escalations related to this service.
-  typedef umultimap<std::pair<std::string, std::string>,
-                    std::shared_ptr<serviceescalation>>
-      collection;
-  std::pair<collection::iterator, collection::iterator> p{
-      state::instance().serviceescalations().equal_range(
-          {get_hostname(), get_description()})};
-  while (p.first != p.second) {
-    std::shared_ptr<serviceescalation> temp_se{p.first->second};
-
-    // We found a matching entry, so escalate this notification!
-    if (is_valid_escalation_for_notification(temp_se.get(),
-                                             NOTIFICATION_OPTION_NONE)) {
-      logger(dbg_notifications, more)
-          << "Service notification WILL be escalated.";
-      return true;
-    }
-
-    ++p.first;
-  }
-  logger(dbg_notifications, more)
-      << "Service notification will NOT be escalated.";
-  return false;
 }

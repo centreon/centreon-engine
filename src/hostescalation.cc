@@ -212,9 +212,9 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     "  escalate_on_unreachable: " << obj.get_escalate_on(notifier::unreachable) << "\n"
     "  contact_groups:          " << cg_oss << "\n"
     "  contacts:                " << c_oss << "\n"
-    "  host_ptr:                " << (obj.host_ptr ?
-                                        obj.host_ptr->get_name() :
-                                        "\"nullptr\"") << "\n"
+    "  notifier_ptr:            " << (obj.notifier_ptr ?
+                                      obj.notifier_ptr->get_display_name() :
+                                      "\"nullptr\"") << "\n"
     "  escalation_period_ptr:   " << escalation_period_str << "\n"
     "}\n";
   return os;

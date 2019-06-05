@@ -28,6 +28,8 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine;
 
+serviceescalation_mmap serviceescalation::serviceescalations;
+
 serviceescalation::serviceescalation(std::string const& hostname,
                                      std::string const& description,
                                      int first_notification,

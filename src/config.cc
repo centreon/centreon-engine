@@ -329,10 +329,12 @@ int pre_flight_object_check(int* w, int* e) {
     logger(log_info_message, basic)
       << "Checking service escalations...";
   total_objects = 0;
-  for (serviceescalation* temp_se(serviceescalation_list);
-       temp_se;
-       temp_se = temp_se->next, ++total_objects)
-    check_serviceescalation(temp_se, &warnings, &errors);
+  for (serviceescalation_mmap::iterator
+       it{serviceescalation::serviceescalations.begin()},
+       end{serviceescalation::serviceescalations.end()};
+       it != end;
+       ++it, ++total_objects)
+    check_serviceescalation(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service escalations.";
@@ -360,7 +362,7 @@ int pre_flight_object_check(int* w, int* e) {
          it(hostescalation::hostescalations.begin()),
          end(hostescalation::hostescalations.end());
        it != end;
-       ++it)
+       ++it, ++total_objects)
     check_hostescalation(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
@@ -1556,7 +1558,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   }
 
   // Save the service pointer for later.
-  se->service_ptr = temp_service;
+  se->notifier_ptr = temp_service;
 
   // Find the timeperiod.
   if (!se->get_escalation_period().empty()) {
@@ -1648,9 +1650,9 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
 
   // Save the host pointer for later.
   if (it == state::instance().hosts().end())
-    he->host_ptr = nullptr;
+    he->notifier_ptr = nullptr;
   else
-    he->host_ptr = it->second.get();
+    he->notifier_ptr = it->second.get();
 
   // Find the timeperiod.
   if (!he->get_escalation_period().empty()) {

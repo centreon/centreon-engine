@@ -55,15 +55,12 @@ class                 hostescalation : public escalation {
   void                set_escalate_on_unreachable(bool escalate_on_unreachable);
 
   bool                operator==(
-    com::centreon::engine::hostescalation const& obj) throw ();
+                           hostescalation const& obj) throw ();
   bool                operator!=(
-    com::centreon::engine::hostescalation const& obj) throw();
+                           hostescalation const& obj) throw();
   bool                operator<(
-    com::centreon::engine::hostescalation const& obj);
+                           hostescalation const& obj);
 
-  contactgroup_map    contact_groups;
-  host*               host_ptr;
-  timeperiod*         escalation_period_ptr;
   static hostescalation_mmap
                       hostescalations;
 

@@ -111,9 +111,6 @@ class                           service : public notifier {
   int                           verify_check_viability(int check_options,
                                                        int* time_is_valid,
                                                        time_t* new_time);
-  int                           create_notification_list(nagios_macros* mac,
-                                                         int options,
-                                                         bool* escalated) override;
   void                          grab_macros_r(nagios_macros* mac) override;
   int                           notify_contact(nagios_macros* mac,
                                                contact* cntct,
@@ -128,14 +125,10 @@ class                           service : public notifier {
   void                          schedule_acknowledgement_expiration();
   bool                          operator==(service const& other) throw();
   bool                          operator!=(service const& other) throw();
-  int                           is_valid_escalation_for_notification(
-                                  serviceescalation* se,
-                                  int options) const;
-  bool                          is_escalated_contact(contact* cntct) const override;
-  bool                          should_notification_be_escalated() const override;
+  bool                          is_valid_escalation_for_notification(
+                                  std::shared_ptr<escalation> e,
+                                  int options) const override;
 
-  contactgroup_map              contact_groups;
-  contact_map                   contacts;
   double                        notification_interval;
   int                           notify_on_unknown;
   int                           notify_on_warning;

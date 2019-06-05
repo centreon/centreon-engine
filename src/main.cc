@@ -259,22 +259,14 @@ int main(int argc, char* argv[]) {
           << "Checked " << applier.connectors().size() << " connectors.\n"
           << "Checked " << applier.contacts().size() << " contacts.\n"
           << "Checked " << applier.hostdependencies().size() << " host dependencies.\n"
+          << "Checked " << com::centreon::engine::hostescalation::hostescalations.size() << " host escalations.\n"
           << "Checked " << applier.hostgroups().size() << " host groups.\n"
           << "Checked " << applier.hosts().size() << " hosts.\n"
           << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
-          << "Checked " << applier.serviceescalations().size() << " service escalations.\n"
+          << "Checked " << com::centreon::engine::serviceescalation::serviceescalations.size() << " service escalations.\n"
           << "Checked " << applier.servicegroups().size() << " service groups.\n"
           << "Checked " << applier.services().size() << " services.\n"
           << "Checked " << applier.timeperiods().size() << " time periods.\n"
-          << "\n";
-
-        int he_count{0};
-        for (std::pair<uint64_t, std::shared_ptr<com::centreon::engine::host>> const& p : applier.hosts())
-          he_count += p.second->get_escalations().size();
-        logger(logging::log_info_message, logging::basic)
-          << "Checked " << he_count << " host escalations.\n";
-
-        logger(logging::log_info_message, logging::basic)
           << "\n"
           << "Total Warnings: " << config_warnings << "\n"
           << "Total Errors:   " << config_errors;

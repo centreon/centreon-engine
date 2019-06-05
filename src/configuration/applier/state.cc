@@ -818,22 +818,16 @@ servicedependency_mmap ::iterator applier::state::servicedependencies_find(confi
 }
 
 /**
- *  Get the current serviceescalations.
+ *  Find a service escalation by its key.
  *
- *  @return The current serviceescalations.
- */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>> const& applier::state::serviceescalations() const throw () {
-  return _serviceescalations;
-}
-
-/**
- *  Get the current serviceescalations.
+ *  @param[in] k Service escalation configuration object.
  *
- *  @return The current serviceescalations.
+ *  @return Iterator to the element if found, serviceescalations().end()
+ *          otherwise.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation> >& applier::state::serviceescalations() throw () {
-  return _serviceescalations;
-}
+//umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>>::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
+//  return const_cast<state*>(this)->serviceescalations_find(k);
+//}
 
 /**
  *  Find a service escalation by its key.
@@ -843,74 +837,62 @@ umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::servicees
  *  @return Iterator to the element if found, serviceescalations().end()
  *          otherwise.
  */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>>::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
-  return const_cast<state*>(this)->serviceescalations_find(k);
-}
-
-/**
- *  Find a service escalation by its key.
- *
- *  @param[in] k Service escalation configuration object.
- *
- *  @return Iterator to the element if found, serviceescalations().end()
- *          otherwise.
- */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>>::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
-  // Copy service escalation configuration to sort some
-  // members (used for comparison below).
-  configuration::serviceescalation sesc(k);
-
-  // Browse escalations matching target service.
-  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>> collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
-  while (p.first != p.second) {
-    // Create service escalation configuration from object.
-    configuration::serviceescalation current;
-    current.configuration::object::operator=(k);
-    current.hosts().push_back(p.first->second->get_hostname());
-    current.service_description().push_back(
-                                    p.first->second->get_description());
-    current.first_notification(p.first->second->get_first_notification());
-    current.last_notification(p.first->second->get_last_notification());
-    current.notification_interval(
-              static_cast<unsigned int>(p.first->second->get_notification_interval()));
-    current.escalation_period(p.first->second->get_escalation_period());
-    unsigned int options((p.first->second->get_escalate_on(notifier::recovery)
-                          ? configuration::serviceescalation::recovery
-                          : 0)
-                         | (p.first->second->get_escalate_on(notifier::warning)
-                            ? configuration::serviceescalation::warning
-                            : 0)
-                         | (p.first->second->get_escalate_on(notifier::unknown)
-                            ? configuration::serviceescalation::unknown
-                            : 0)
-                         | (p.first->second->get_escalate_on(notifier::critical)
-                            ? configuration::serviceescalation::critical
-                            : 0));
-    current.escalation_options(options);
-    for (contact_map::iterator
-           it(p.first->second->contacts().begin()),
-           end(p.first->second->contacts().end());
-         it != end;
-         ++it)
-      current.contacts().insert(it->first);
-    for (contactgroup_map::iterator
-           it(p.first->second->contact_groups.begin()),
-           end(p.first->second->contact_groups.end());
-         it != end;
-         ++it)
-      current.contactgroups().insert(it->first);
-
-    // Found !
-    if (current == sesc)
-      break ;
-
-    // Keep going.
-    ++p.first;
-  }
-  return (p.first == p.second) ? _serviceescalations.end() : p.first;
-}
+//umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>>::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
+//  // Copy service escalation configuration to sort some
+//  // members (used for comparison below).
+//  configuration::serviceescalation sesc(k);
+//
+//  // Browse escalations matching target service.
+//  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::serviceescalation>> collection;
+//  std::pair<collection::iterator, collection::iterator> p;
+//  p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
+//  while (p.first != p.second) {
+//    // Create service escalation configuration from object.
+//    configuration::serviceescalation current;
+//    current.configuration::object::operator=(k);
+//    current.hosts().push_back(p.first->second->get_hostname());
+//    current.service_description().push_back(
+//                                    p.first->second->get_description());
+//    current.first_notification(p.first->second->get_first_notification());
+//    current.last_notification(p.first->second->get_last_notification());
+//    current.notification_interval(
+//              static_cast<unsigned int>(p.first->second->get_notification_interval()));
+//    current.escalation_period(p.first->second->get_escalation_period());
+//    unsigned int options((p.first->second->get_escalate_on(notifier::recovery)
+//                          ? configuration::serviceescalation::recovery
+//                          : 0)
+//                         | (p.first->second->get_escalate_on(notifier::warning)
+//                            ? configuration::serviceescalation::warning
+//                            : 0)
+//                         | (p.first->second->get_escalate_on(notifier::unknown)
+//                            ? configuration::serviceescalation::unknown
+//                            : 0)
+//                         | (p.first->second->get_escalate_on(notifier::critical)
+//                            ? configuration::serviceescalation::critical
+//                            : 0));
+//    current.escalation_options(options);
+//    for (contact_map::iterator
+//           it(p.first->second->contacts().begin()),
+//           end(p.first->second->contacts().end());
+//         it != end;
+//         ++it)
+//      current.contacts().insert(it->first);
+//    for (contactgroup_map::iterator
+//           it(p.first->second->contact_groups.begin()),
+//           end(p.first->second->contact_groups.end());
+//         it != end;
+//         ++it)
+//      current.contactgroups().insert(it->first);
+//
+//    // Found !
+//    if (current == sesc)
+//      break ;
+//
+//    // Keep going.
+//    ++p.first;
+//  }
+//  return (p.first == p.second) ? _serviceescalations.end() : p.first;
+//}
 
 /**
  *  Get the current servicegroups.

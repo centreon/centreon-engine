@@ -53,6 +53,9 @@ class escalation {
   void set_escalate_on(uint32_t escalate_on);
   contact_map const& contacts() const;
   contact_map& contacts();
+  contactgroup_map contact_groups;
+  notifier* notifier_ptr;
+  timeperiod* escalation_period_ptr;
 
  private:
   int _first_notification;

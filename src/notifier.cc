@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -739,10 +740,188 @@ void notifier::set_timezone(std::string const& timezone) {
   _timezone = timezone;
 }
 
+std::list<std::shared_ptr<escalation>>& notifier::get_escalations() {
+  return _escalations;
+}
+
 std::list<std::shared_ptr<escalation>> const& notifier::get_escalations() const {
   return _escalations;
 }
 
 void notifier::add_escalation(std::shared_ptr<escalation> e) {
   _escalations.push_back(e);
+}
+
+/**
+ *  Tests whether or not a contact is an escalated contact for a
+ *  particular host.
+ *
+ *  @param[in] hst   Target host.
+ *  @param[in] cntct Target contact.
+ *
+ *  @return true or false.
+ */
+bool notifier::is_escalated_contact(contact* cntct) const {
+  if (!cntct)
+    return false;
+
+  for (std::shared_ptr<escalation> const& e : get_escalations()) {
+    // Search all contacts of this host escalation.
+    contact_map::const_iterator itt{e->contacts().find(cntct->get_name())};
+    if (itt != e->contacts().end()) {
+      assert(itt->second.get() == cntct);
+      return true;
+    }
+
+    // Search all contactgroups of this host escalation.
+    for (contactgroup_map::iterator itt(e->contact_groups.begin()),
+         end(e->contact_groups.begin());
+         itt != end; ++itt)
+      if (itt->second->get_members().find(cntct->get_name()) !=
+          itt->second->get_members().end())
+        return true;
+  }
+  return false;
+}
+
+/**
+ * @brief Create a list of contacts to be notified for this notifier.
+ * Remove also duplicates.
+ *
+ * @param mac
+ * @param options
+ * @param escalated
+ *
+ */
+void notifier::create_notification_list(nagios_macros* mac,
+                                       int options,
+                                       bool* escalated) {
+  logger(dbg_functions, basic) << "notifier::create_notification_list()";
+
+  /* see if this notification should be escalated */
+  bool escalate_notification{should_notification_be_escalated()};
+
+  /* set the escalation flag */
+  *escalated = escalate_notification;
+
+  /* make sure there aren't any leftover contacts */
+  free_notification_list();
+
+  /* set the escalation macro */
+  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
+
+  if (options & NOTIFICATION_OPTION_BROADCAST)
+    logger(dbg_notifications, more)
+        << "This notification will be BROADCAST to all (escalated and "
+           "normal) contacts...";
+
+  /* use escalated contacts for this notification */
+  if (escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
+    logger(dbg_notifications, more)
+        << "Adding contacts from notifier escalation(s) to "
+           "notification list.";
+
+    for (std::shared_ptr<escalation> const& e : get_escalations()) {
+      escalation* tmp_e{e.get()};
+
+      /* see if this escalation if valid for this notification */
+      if (!is_valid_escalation_for_notification(e, options))
+        continue;
+
+      logger(dbg_notifications, most)
+          << "Adding individual contacts from notifier escalation(s) "
+             "to notification list.";
+
+      /* add all individual contacts for this escalation entry */
+      for (contact_map::const_iterator itt{e->contacts().begin()},
+           end{e->contacts().end()};
+           itt != end; ++itt)
+        add_notification(mac, itt->second.get());
+
+      logger(dbg_notifications, most)
+          << "Adding members of contact groups from notifier escalation(s) "
+             "to notification list.";
+
+      /* add all contacts that belong to contactgroups for this escalation */
+      for (contactgroup_map::iterator itt(e->contact_groups.begin()),
+           end(e->contact_groups.end());
+           itt != end; ++itt) {
+        logger(dbg_notifications, most)
+            << "Adding members of contact group '" << itt->first
+            << "' for notifier escalation to notification list.";
+
+        if (!itt->second)
+          continue;
+        for (std::unordered_map<std::string, contact*>::const_iterator
+                 itm(itt->second->get_members().begin()),
+             endm(itt->second->get_members().end());
+             itm != endm; ++itm) {
+          if (!itm->second)
+            continue;
+          add_notification(mac, itm->second);
+        }
+      }
+    }
+  }
+
+  /* use normal, non-escalated contacts for this notification */
+  if (!escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
+    logger(dbg_notifications, more)
+        << "Adding normal contacts for notifier to notification list.";
+
+    /* add all individual contacts for this notifier */
+    for (contact_map::iterator it(this->contacts.begin()),
+         end(this->contacts.end());
+         it != end; ++it)
+      add_notification(mac, it->second.get());
+
+    /* add all contacts that belong to contactgroups for this notifier */
+    for (contactgroup_map::iterator it{this->contact_groups.begin()},
+         end{this->contact_groups.end()};
+         it != end; ++it) {
+      logger(dbg_notifications, most)
+          << "Adding members of contact group '" << it->first
+          << "' for notifier to notification list.";
+
+      if (!it->second)
+        continue;
+      for (std::unordered_map<std::string, contact*>::const_iterator
+               itm(it->second->get_members().begin()),
+           endm(it->second->get_members().end());
+           itm != endm; ++itm) {
+        if (!itm->second)
+          continue;
+        add_notification(mac, itm->second);
+      }
+    }
+  }
+}
+
+/**
+ *  Checks to see whether a service notification should be escalated.
+ *
+ *  @param[in] svc Service.
+ *
+ *  @return true if service notification should be escalated, false if
+ *          it should not.
+ */
+bool notifier::should_notification_be_escalated() const {
+  // Debug.
+  logger(dbg_functions, basic)
+      << "notifier::should_notification_be_escalated()";
+
+  for (std::shared_ptr<escalation> const& e : get_escalations()) {
+
+    // We found a matching entry, so escalate this notification!
+    if (is_valid_escalation_for_notification(e,
+                                             NOTIFICATION_OPTION_NONE)) {
+      logger(dbg_notifications, more)
+          << "Notifier notification WILL be escalated.";
+      return true;
+    }
+  }
+
+  logger(dbg_notifications, more)
+      << "Notifier notification will NOT be escalated.";
+  return false;
 }

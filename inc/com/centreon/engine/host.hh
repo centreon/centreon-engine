@@ -297,9 +297,6 @@ class                 host : public notifier {
   void               set_circular_path_checked(int check_level);
   bool               get_contains_circular_path() const;
   void               set_contains_circular_path(bool contains_circular_path);
-  int                create_notification_list(nagios_macros* mac,
-                                              int options,
-                                              bool* escalated) override;
   int                notify_contact(nagios_macros* mac,
                                     contact* cntct,
                                     int type,
@@ -310,14 +307,10 @@ class                 host : public notifier {
   void               update_notification_flags() override;
   time_t             get_next_notification_time(time_t offset) override;
   void               schedule_acknowledgement_expiration();
-  int                is_valid_escalation_for_notification(
-                       hostescalation* he,
-                       int options) const;
-  bool               is_escalated_contact(contact* cntct) const override;
-  bool               should_notification_be_escalated() const override;
+  bool               is_valid_escalation_for_notification(
+                       std::shared_ptr<escalation> e,
+                       int options) const override;
 
-  contactgroup_map   contact_groups;
-  contact_map        contacts;
   host_map           parent_hosts;
   host_map           child_hosts;
   static host_map    hosts;

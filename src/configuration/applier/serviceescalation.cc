@@ -67,81 +67,69 @@ applier::serviceescalation& applier::serviceescalation::operator=(
  *                  monitoring engine.
  */
 void applier::serviceescalation::add_object(
-       configuration::serviceescalation const& obj) {
+    configuration::serviceescalation const& obj) {
   // Check service escalation.
-  if ((obj.hosts().size() != 1)
-      || !obj.hostgroups().empty()
-      || (obj.service_description().size() != 1)
-      || !obj.servicegroups().empty())
-    throw (engine_error() << "Could not create service "
-           << "escalation with multiple hosts / host groups / services "
-           << "/ service groups");
+  if ((obj.hosts().size() != 1) || !obj.hostgroups().empty() ||
+      obj.service_description().size() != 1 || !obj.servicegroups().empty())
+    throw(engine_error()
+          << "Could not create service "
+          << "escalation with multiple hosts / host groups / services "
+          << "/ service groups");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new escalation for service '"
-    << obj.service_description().front() << "' of host '"
-    << obj.hosts().front() << "'";
+      << "Creating new escalation for service '"
+      << obj.service_description().front() << "' of host '"
+      << obj.hosts().front() << "'";
 
   // Add escalation to the global configuration set.
   config->serviceescalations().insert(obj);
 
   // Create service escalation.
-  std::shared_ptr<engine::serviceescalation> se{
-    new engine::serviceescalation(
-         obj.hosts().front(),
-         obj.service_description().front(),
-         obj.first_notification(),
-         obj.last_notification(),
-         obj.notification_interval(),
-         obj.escalation_period(),
-         ((obj.escalation_options() & configuration::serviceescalation::warning)
-          ? notifier::warning
-          : notifier::none) |
-         ((obj.escalation_options() & configuration::serviceescalation::unknown)
-          ? notifier::unknown
-          : notifier::none) |
-         ((obj.escalation_options() & configuration::serviceescalation::critical)
-          ? notifier::critical
-          : notifier::none) |
-         ((obj.escalation_options() & configuration::serviceescalation::recovery)
-          ? notifier::recovery
-          : notifier::none))};
+  std::shared_ptr<engine::serviceescalation> se{new engine::serviceescalation(
+      obj.hosts().front(), obj.service_description().front(),
+      obj.first_notification(), obj.last_notification(),
+      obj.notification_interval(), obj.escalation_period(),
+      ((obj.escalation_options() & configuration::serviceescalation::warning)
+           ? notifier::warning
+           : notifier::none) |
+          ((obj.escalation_options() &
+            configuration::serviceescalation::unknown)
+               ? notifier::unknown
+               : notifier::none) |
+          ((obj.escalation_options() &
+            configuration::serviceescalation::critical)
+               ? notifier::critical
+               : notifier::none) |
+          ((obj.escalation_options() &
+            configuration::serviceescalation::recovery)
+               ? notifier::recovery
+               : notifier::none))};
 
   // Add new items to the configuration state.
-  state::instance().serviceescalations().insert(
-      {{se->get_hostname(), se->get_description()}, se});
+  std::pair<uint64_t, uint64_t> service_id{
+      get_host_and_service_id(se->get_hostname(), se->get_description())};
 
   // Add new items to tail the list.
-  se->next = serviceescalation_list;
-  serviceescalation_list = se.get();
+  engine::serviceescalation::serviceescalations.insert(
+      {{se->get_hostname(), se->get_description()}, se});
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv{get_broker_timestamp(nullptr)};
   broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_ADD, NEBFLAG_NONE,
                                   NEBATTR_NONE, se.get(), &tv);
-  if (!se)
-    throw (engine_error() << "Could not create escalation on "
-           << "service '" << obj.service_description().front()
-           << "' of host '" << obj.hosts().front() << "'");
 
   // Add contacts to host escalation.
-  for (set_string::const_iterator
-         it(obj.contacts().begin()),
-         end(obj.contacts().end());
-       it != end;
-       ++it)
+  for (set_string::const_iterator it(obj.contacts().begin()),
+       end(obj.contacts().end());
+       it != end; ++it)
     se->contacts().insert({*it, nullptr});
 
   // Add contact groups to service escalation.
-  for (set_string::const_iterator
-         it(obj.contactgroups().begin()),
-         end(obj.contactgroups().end());
-       it != end;
-       ++it)
+  for (set_string::const_iterator it(obj.contactgroups().begin()),
+       end(obj.contactgroups().end());
+       it != end; ++it)
     se->contact_groups.insert({*it, nullptr});
-
-  return ;
 }
 
 /**
@@ -189,8 +177,6 @@ void applier::serviceescalation::expand_objects(configuration::state& s) {
 
   // Set expanded service escalations in configuration state.
   s.serviceescalations().swap(expanded);
-
-  return ;
 }
 
 /**
@@ -208,7 +194,6 @@ void applier::serviceescalation::modify_object(
          << "escalation: service escalation objects can only be added "
          << "or removed, this is likely a software bug that you should "
          << "report to Centreon Engine developers");
-  return ;
 }
 
 /**
@@ -224,33 +209,58 @@ void applier::serviceescalation::remove_object(
     << "Removing a service escalation.";
 
   // Find service escalation.
-  umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<engine::serviceescalation>>::iterator
-    it(applier::state::instance().serviceescalations_find(obj.key()));
-  if (it != applier::state::instance().serviceescalations().end()) {
-    engine::serviceescalation* escalation(it->second.get());
-    // Remove service escalation from its list.
-    unregister_object<engine::serviceescalation>(
-      &serviceescalation_list,
-      escalation);
+  std::string const& host_name{*obj.hosts().begin()};
+  std::string const& description{obj.service_description().front()};
+  std::pair<uint64_t, uint64_t> id{engine::get_host_and_service_id(host_name, description)};
+  std::pair<serviceescalation_mmap::iterator, serviceescalation_mmap::iterator>
+      range{engine::serviceescalation::serviceescalations.equal_range({host_name, description})};
+  std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator sit{
+    state::instance().services().find(id)};
 
+  for (serviceescalation_mmap::iterator
+       it{range.first}, end{range.second};
+       it != end; ++it) {
+    std::list<std::shared_ptr<escalation>>& escalations{sit->second->get_escalations()};
+    for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
+        itt{escalations.begin()},
+        next_itt{escalations.begin()},
+        end{escalations.end()};
+        itt != end; itt = next_itt) {
+      ++next_itt;
+      /* It's a pity but for now we don't have any possibility or key to verify
+       * if the hostescalation is the good one. */
+      if ((*itt)->get_first_notification() == obj.first_notification() &&
+          (*itt)->get_last_notification() == obj.last_notification() &&
+          (*itt)->get_notification_interval() == obj.notification_interval() &&
+          (*itt)->get_escalation_period() == obj.escalation_period() &&
+          (*itt)->get_escalate_on(notifier::down) ==
+              (obj.escalation_options() &
+               configuration::hostescalation::down) &&
+          (*itt)->get_escalate_on(notifier::unreachable) ==
+              (obj.escalation_options() &
+               configuration::hostescalation::unreachable) &&
+          (*itt)->get_escalate_on(notifier::recovery) ==
+              (obj.escalation_options() &
+               configuration::hostescalation::recovery)) {
+        // We have the hostescalation to remove.
+        escalations.erase(itt);
+        break;
+      }
+    }
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
+    timeval tv{get_broker_timestamp(nullptr)};
     broker_adaptive_escalation_data(
       NEBTYPE_SERVICEESCALATION_DELETE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      escalation,
+      it->second.get(),
       &tv);
 
-    // Erase service escalation (will effectively delete the object).
-    applier::state::instance().serviceescalations().erase(it);
+    // Remove escalation from the global configuration set.
+    engine::serviceescalation::serviceescalations.erase(it->first);
   }
 
-  // Remove escalation from the global configuration set.
   config->serviceescalations().erase(obj);
-
-  return ;
 }
 
 /**
@@ -262,23 +272,34 @@ void applier::serviceescalation::resolve_object(
        configuration::serviceescalation const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving a service escalation.";
+      << "Resolving a service escalation.";
 
-  // Find service escalation.
-  umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<engine::serviceescalation>>::iterator
-    it(applier::state::instance().serviceescalations_find(obj.key()));
-  if (applier::state::instance().serviceescalations().end() == it)
-    throw (engine_error() << "Cannot resolve service escalation");
-
-  // Check service escalation.
-  if (!check_serviceescalation(
-        it->second.get(),
-        &config_warnings,
-        &config_errors))
-    throw (engine_error() << "Cannot resolve service escalation");
-
-  return ;
+  std::pair<uint64_t, uint64_t> svc_id{get_host_and_service_id(*obj.hosts().begin(), obj.service_description().front())};
+  std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator it{
+    state::instance().services().find(svc_id)};
+  std::list<std::shared_ptr<engine::escalation>> const& se_list{
+    it->second->get_escalations()};
+  for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
+      itt{it->second->get_escalations().begin()},
+      end{it->second->get_escalations().end()};
+      itt != end;
+      ++itt) {
+    /* It's a pity but for now we don't have any idea or key to verify if
+     * the hostescalation is the good one. */
+    if ((*itt)->get_first_notification() == obj.first_notification() &&
+        (*itt)->get_last_notification() == obj.last_notification() &&
+        (*itt)->get_notification_interval() == obj.notification_interval() &&
+        (*itt)->get_escalation_period() == obj.escalation_period() &&
+        (*itt)->get_escalate_on(notifier::down) == (obj.escalation_options() & configuration::hostescalation::down) &&
+        (*itt)->get_escalate_on(notifier::unreachable) == (obj.escalation_options() & configuration::hostescalation::unreachable) &&
+        (*itt)->get_escalate_on(notifier::recovery) == (obj.escalation_options() & configuration::hostescalation::recovery)) {
+      // Resolve service escalation.
+      if (!check_serviceescalation(static_cast<engine::serviceescalation*>((*itt).get()), &config_warnings,
+                                &config_errors))
+        throw engine_error() << "Cannot resolve service escalation";
+    } else
+      throw engine_error() << "Cannot resolve non-existing service escalation";
+  }
 }
 
 /**
@@ -357,8 +378,6 @@ void applier::serviceescalation::_expand_services(
          ++it_member)
       expanded.insert(*it_member);
   }
-
-  return ;
 }
 
 /**
@@ -400,6 +419,4 @@ void applier::serviceescalation::_inherits_special_vars(
     if (!obj.escalation_period_defined())
       obj.escalation_period(it->notification_period());
   }
-
-  return ;
 }
