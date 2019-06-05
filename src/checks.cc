@@ -93,11 +93,9 @@ unsigned int check_service_dependencies(
 
   std::pair<std::string, std::string>
     id(svc->get_hostname(), svc->get_description());
-  umultimap<std::pair<std::string, std::string>,
-            std::shared_ptr<servicedependency> > const&
-    dependencies(state::instance().servicedependencies());
-  for (umultimap<std::pair<std::string, std::string>,
-                 std::shared_ptr<servicedependency> >::const_iterator
+  servicedependency_mmap const& dependencies(
+    state::instance().servicedependencies());
+  for (servicedependency_mmap::const_iterator
          it(dependencies.find(id)), end(dependencies.end());
        it != end && it->first == id;
        ++it) {

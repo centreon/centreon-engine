@@ -27,7 +27,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
-#include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -534,7 +533,7 @@ void applier::host::resolve_object(
            << obj.host_name() << "'");
 
   // Remove service backlinks.
-  deleter::listmember(it->second->services, &deleter::servicesmember);
+  it->second->services.clear();
 
   // Remove host group links.
   deleter::listmember(it->second->hostgroups_ptr, &deleter::objectlist);

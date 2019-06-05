@@ -33,7 +33,6 @@
 #  include "com/centreon/engine/hostgroup.hh"
 #  include "com/centreon/engine/service.hh"
 #  include "com/centreon/engine/servicegroup.hh"
-#  include "com/centreon/engine/objects/servicesmember.hh"
 #  include "find.hh"
 
 CCE_BEGIN()
@@ -253,11 +252,13 @@ namespace         modules {
         if (!group)
           return ;
 
-        for (servicesmember* member = group->members;
-             member != NULL;
-             member = member->next)
-          if (member->service_ptr)
-            (*fptr)(member->service_ptr);
+        for (service_map::iterator
+               it(group->members.begin()),
+               end(group->members.end());
+             it != end;
+             ++it)
+          if (it->second.get())
+            (*fptr)(it->second.get());
       }
 
       template <void (*fptr)(host*)>
@@ -274,15 +275,18 @@ namespace         modules {
           return ;
 
         host* last_host(NULL);
-        for (servicesmember* member = group->members; member != NULL;
-             member = member->next) {
+        for (service_map::iterator
+               it(group->members.begin()),
+               end(group->members.end());
+             it != end;
+             ++it) {
           host* hst(nullptr);
           umap<uint64_t,
                std::shared_ptr<com::centreon::engine::host>>::const_iterator
-              it(configuration::applier::state::instance().hosts().find(
-                  get_host_id(member->host_name)));
-          if (it != configuration::applier::state::instance().hosts().end())
-            hst = it->second.get();
+              found(configuration::applier::state::instance().hosts().find(
+                  get_host_id(it->first.first)));
+          if (found != configuration::applier::state::instance().hosts().end())
+            hst = found->second.get();
 
           if (!hst || hst == last_host)
             continue;

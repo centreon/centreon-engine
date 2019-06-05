@@ -25,14 +25,13 @@
 #  include <string>
 #  include <unordered_map>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/service.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
   class host;
-  class service;
   class servicegroup;
 CCE_END()
-struct servicesmember_struct;
 
 typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::servicegroup>> servicegroup_map;
@@ -62,7 +61,7 @@ class                     servicegroup {
   bool                    operator!=(servicegroup const& obj) throw ();
 
   static servicegroup_map servicegroups;
-  servicesmember_struct*  members;
+  service_map             members;
 
  private:
   uint64_t                _id;

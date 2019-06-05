@@ -22,8 +22,6 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -108,15 +106,18 @@ void applier::servicegroup::add_object(
          it(obj.members().begin()),
          end(obj.members().end());
        it != end;
-       ++it)
-    if (!add_service_to_servicegroup(
-           sg.get(),
-           it->first.c_str(),
-           it->second.c_str()))
-      throw (engine_error() << "Could not add service member '"
-             << it->second << "' of host '" << it->first
-             << "' to service group '" << obj.servicegroup_name()
-             << "'");
+       ++it) {
+    sg->members[{it->first, it->second}] = nullptr;
+    // Notify event broker.
+    tv = get_broker_timestamp(NULL);
+    broker_group_member(
+      NEBTYPE_SERVICEGROUPMEMBER_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      nullptr,
+      sg.get(),
+      &tv);
+  }
 
   return ;
 }
@@ -168,8 +169,9 @@ void applier::servicegroup::modify_object(
            << "service group '" << obj.servicegroup_name() << "'");
 
   // Find service group object.
-  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::iterator
-    it_obj(applier::state::instance().servicegroups_find(obj.key()));
+  servicegroup_map::iterator it_obj(
+    applier::state::instance().servicegroups_find(obj.key()));
+
   if (it_obj == applier::state::instance().servicegroups().end())
     throw (engine_error() << "Could not modify non-existing "
            << "service group object '" << obj.servicegroup_name()
@@ -191,36 +193,39 @@ void applier::servicegroup::modify_object(
   // Were members modified ?
   if (obj.members() != old_cfg.members()) {
     // Delete all old service group members.
-    for (servicesmember* m(it_obj->second->members);
-         m;
-         m = m->next) {
+      for (service_map::iterator
+             it(it_obj->second->members.begin()),
+             end(it_obj->second->members.end());
+           it != end;
+           ++it) {
       timeval tv(get_broker_timestamp(NULL));
       broker_group_member(
         NEBTYPE_SERVICEGROUPMEMBER_DELETE,
         NEBFLAG_NONE,
         NEBATTR_NONE,
-        m,
+        it->second.get(),
         sg,
         &tv);
     }
-    deleter::listmember(
-      it_obj->second->members,
-      &deleter::servicesmember);
+    it_obj->second->members.clear();
 
     // Create new service group members.
     for (set_pair_string::const_iterator
            it(obj.members().begin()),
            end(obj.members().end());
          it != end;
-         ++it)
-      if (!add_service_to_servicegroup(
-             sg,
-             it->first.c_str(),
-             it->second.c_str()))
-        throw (engine_error() << "Could not add service member '"
-               << it->second << "' of host '" << it->first
-               << "' to service group '" << obj.servicegroup_name()
-               << "'");
+         ++it) {
+      sg->members[{it->first, it->second}] = nullptr;
+      // Notify event broker.
+      timeval tv = get_broker_timestamp(NULL);
+      broker_group_member(
+        NEBTYPE_SERVICEGROUPMEMBER_ADD,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        nullptr,
+        sg,
+        &tv);
+    }
   }
 
   // Notify event broker.

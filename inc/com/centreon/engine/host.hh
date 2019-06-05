@@ -33,12 +33,12 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/notifier.hh"
 #  include "com/centreon/engine/checks.hh"
+#  include "com/centreon/engine/service.hh"
 
 
 /* Forward declaration. */
 extern "C" {
 struct objectlist_struct;
-struct servicesmember_struct;
 };
 
 CCE_BEGIN()
@@ -299,21 +299,18 @@ class                 host : public notifier {
                        std::shared_ptr<escalation> e,
                        int options) const override;
 
-  host_map           parent_hosts;
-  host_map           child_hosts;
-  static host_map    hosts;
+  host_map            parent_hosts;
+  host_map            child_hosts;
+  static host_map     hosts;
 
   std::unordered_map<std::string, customvariable>
-                     custom_variables;
+                      custom_variables;
 
-  com::centreon::engine::commands::command*
-                      event_handler_ptr;
-  com::centreon::engine::commands::command*
-                      check_command_ptr;
+  commands::command*  event_handler_ptr;
+  commands::command*  check_command_ptr;
 
   int                 state_history[MAX_STATE_HISTORY_ENTRIES];
-  servicesmember_struct*
-                      services;
+  service_map         services;
   timeperiod          *check_period_ptr;
   timeperiod          *notification_period_ptr;
   objectlist_struct*  hostgroups_ptr;
