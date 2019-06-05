@@ -1582,7 +1582,7 @@ int broker_service_check(
   ds.service_description = const_cast<char*>(svc->get_description().c_str());
   ds.object_ptr = svc;
   ds.check_type = check_type;
-  ds.current_attempt = svc->current_attempt;
+  ds.current_attempt = svc->get_current_attempt();
   ds.max_attempts = svc->get_max_attempts();
   ds.state = svc->current_state;
   ds.state_type = svc->state_type;

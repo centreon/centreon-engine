@@ -34,27 +34,25 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;
 
-std::array<std::string, 8> const notifier::tab_notification_str {{
-  "NORMAL",
-  "ACKNOWLEDGEMENT",
-  "FLAPPINGSTART",
-  "FLAPPINGSTOP",
-  "FLAPPINGDISABLED",
-  "DOWNTIMESTART",
-  "DOWNTIMEEND",
-  "DOWNTIMECANCELLED",
+std::array<std::string, 8> const notifier::tab_notification_str{{
+    "NORMAL",
+    "ACKNOWLEDGEMENT",
+    "FLAPPINGSTART",
+    "FLAPPINGSTOP",
+    "FLAPPINGDISABLED",
+    "DOWNTIMESTART",
+    "DOWNTIMEEND",
+    "DOWNTIMECANCELLED",
 }};
 
-std::array<std::string, 2> const notifier::tab_state_type {{
-  "SOFT",
-  "HARD"
-}};
+std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
 uint64_t notifier::_next_notification_id{0};
 
 notifier::notifier(int notifier_type,
                    std::string const& display_name,
                    std::string const& check_command,
+                   bool checks_enabled,
                    int initial_state,
                    double check_interval,
                    double retry_interval,
@@ -72,10 +70,12 @@ notifier::notifier(int notifier_type,
                    bool flap_detection_enabled,
                    double low_flap_threshold,
                    double high_flap_threshold,
+                   bool check_freshness,
                    std::string const& timezone)
     : _notifier_type{notifier_type},
       _display_name{display_name},
       _check_command{check_command},
+      _checks_enabled{checks_enabled},
       _initial_state{initial_state},
       _check_interval{check_interval},
       _retry_interval{retry_interval},
@@ -93,7 +93,10 @@ notifier::notifier(int notifier_type,
       _flap_detection_enabled{flap_detection_enabled},
       _low_flap_threshold{low_flap_threshold},
       _high_flap_threshold{high_flap_threshold},
-      _timezone{timezone} {
+      _check_freshness{check_freshness},
+      _timezone{timezone},
+      _check_type{check_active},
+      _problem_has_been_acknowledged{false} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -189,9 +192,9 @@ void notifier::set_max_attempts(int max_attempts) {
 }
 
 int notifier::notify(unsigned int type,
-    std::string const& not_author,
-    std::string const& not_data,
-    int options) {
+                     std::string const& not_author,
+                     std::string const& not_data,
+                     int options) {
   bool increment_notification_number{false};
   time_t current_time;
   struct timeval start_time;
@@ -208,9 +211,9 @@ int notifier::notify(unsigned int type,
   time_t last_notif{get_last_notification()};
   logger(dbg_notifications, basic)
       << "** Notifier Notification Attempt ** Notifier: '" << get_display_name()
-      << "', Notification Type: " << _notifier_type
-      << ", Type: " << type
-      << ", Options: " << options << ", Current State: " << this->get_current_state()
+      << "', Notification Type: " << _notifier_type << ", Type: " << type
+      << ", Options: " << options
+      << ", Current State: " << this->get_current_state()
       << ", Last Notification: " << my_ctime(&last_notif);
 
   nagios_macros mac;
@@ -232,8 +235,7 @@ int notifier::notify(unsigned int type,
   }
 
   logger(dbg_notifications, more)
-      << "Current notification number: "
-      << _current_notification_number << " ("
+      << "Current notification number: " << _current_notification_number << " ("
       << (increment_notification_number == true ? "incremented" : "unchanged")
       << ")";
 
@@ -251,9 +253,9 @@ int notifier::notify(unsigned int type,
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
   int neb_result{broker_notification_data(
-      NEBTYPE_NOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE,
-      _notifier_type, type, start_time, end_time, (void*)this, not_author.c_str(), not_data.c_str(), escalated,
-      0, nullptr)};
+      NEBTYPE_NOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE, _notifier_type,
+      type, start_time, end_time, (void*)this, not_author.c_str(),
+      not_data.c_str(), escalated, 0, nullptr)};
 
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
     free_notification_list();
@@ -280,7 +282,7 @@ int notifier::notify(unsigned int type,
         for (std::unordered_map<std::string,
                                 std::shared_ptr<contact>>::const_iterator
                  it{state::instance().contacts().begin()},
-                 end{state::instance().contacts().end()};
+             end{state::instance().contacts().end()};
              it != end; ++it) {
           if (it->second->get_alias() == not_author) {
             temp_contact = it->second.get();
@@ -312,8 +314,7 @@ int notifier::notify(unsigned int type,
       if (_notifier_type == HOST_NOTIFICATION) {
         string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
         string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
-      }
-      else {
+      } else {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
         string::setstr(mac.x[MACRO_SERVICEACKCOMMENT], not_data);
       }
@@ -345,8 +346,10 @@ int notifier::notify(unsigned int type,
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
-    else if ((_notifier_type == HOST_NOTIFICATION && get_current_state() == HOST_UP)
-             || (_notifier_type == SERVICE_NOTIFICATION && get_current_state() == STATE_OK))
+    else if ((_notifier_type == HOST_NOTIFICATION &&
+              get_current_state() == HOST_UP) ||
+             (_notifier_type == SERVICE_NOTIFICATION &&
+              get_current_state() == STATE_OK))
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
@@ -362,16 +365,17 @@ int notifier::notify(unsigned int type,
     /*
      * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
      */
-    char const* notificationnumber{_notifier_type == HOST_NOTIFICATION ?
-      mac.x[MACRO_HOSTNOTIFICATIONNUMBER] : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]};
+    char const* notificationnumber{
+        _notifier_type == HOST_NOTIFICATION
+            ? mac.x[MACRO_HOSTNOTIFICATIONNUMBER]
+            : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]};
 
     string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER],
                    notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
     if (_notifier_type == HOST_NOTIFICATION)
-      string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID],
-                     _current_notification_id);
+      string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID], _current_notification_id);
     else
       string::setstr(mac.x[MACRO_SERVICENOTIFICATIONID],
                      _current_notification_id);
@@ -412,8 +416,7 @@ int notifier::notify(unsigned int type,
        */
       if (contacts_notified > 0) {
         /* calculate the next acceptable re-notification time */
-        set_next_notification(
-            get_next_notification_time(current_time));
+        set_next_notification(get_next_notification_time(current_time));
 
         /*
          * update the last notification time for this host (this is needed for
@@ -424,9 +427,9 @@ int notifier::notify(unsigned int type,
 
         time_t time{get_next_notification()};
         logger(dbg_notifications, basic) << contacts_notified
-          << " contacts were notified. "
-             "Next possibile notification time: "
-          << my_ctime(&time);
+                                         << " contacts were notified. "
+                                            "Next possibile notification time: "
+                                         << my_ctime(&time);
       }
 
       /* we didn't end up notifying anyone */
@@ -443,7 +446,7 @@ int notifier::notify(unsigned int type,
     }
 
     logger(dbg_notifications, basic)
-      << contacts_notified << " contacts were notified.";
+        << contacts_notified << " contacts were notified.";
   }
 
   /* there were no contacts, so no notification really occurred... */
@@ -463,8 +466,8 @@ int notifier::notify(unsigned int type,
   /* send data to event broker */
   broker_notification_data(NEBTYPE_NOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
                            _notifier_type, type, start_time, end_time,
-                           (void*)this, not_author.c_str(), not_data.c_str(), escalated,
-                           contacts_notified, nullptr);
+                           (void*)this, not_author.c_str(), not_data.c_str(),
+                           escalated, contacts_notified, nullptr);
 
   /* update the status log with the host info */
   update_status(false);
@@ -473,8 +476,7 @@ int notifier::notify(unsigned int type,
   clear_volatile_macros_r(&mac);
 
   /* Update recovery been sent parameter */
-  if ((_notifier_type == HOST_NOTIFICATION &&
-       get_current_state() == HOST_UP) ||
+  if ((_notifier_type == HOST_NOTIFICATION && get_current_state() == HOST_UP) ||
       (_notifier_type == SERVICE_NOTIFICATION &&
        get_current_state() == STATE_OK))
     _recovery_been_sent = true;
@@ -562,8 +564,7 @@ std::string const& notifier::get_notification_period() const {
   return _notification_period;
 }
 
-void  notifier::set_notification_period(std::string const& notification_period)
-{
+void notifier::set_notification_period(std::string const& notification_period) {
   _notification_period = notification_period;
 }
 
@@ -756,7 +757,8 @@ std::list<std::shared_ptr<escalation>>& notifier::get_escalations() {
   return _escalations;
 }
 
-std::list<std::shared_ptr<escalation>> const& notifier::get_escalations() const {
+std::list<std::shared_ptr<escalation>> const& notifier::get_escalations()
+    const {
   return _escalations;
 }
 
@@ -806,8 +808,8 @@ bool notifier::is_escalated_contact(contact* cntct) const {
  *
  */
 void notifier::create_notification_list(nagios_macros* mac,
-                                       int options,
-                                       bool* escalated) {
+                                        int options,
+                                        bool* escalated) {
   logger(dbg_functions, basic) << "notifier::create_notification_list()";
 
   /* see if this notification should be escalated */
@@ -923,10 +925,8 @@ bool notifier::should_notification_be_escalated() const {
       << "notifier::should_notification_be_escalated()";
 
   for (std::shared_ptr<escalation> const& e : get_escalations()) {
-
     // We found a matching entry, so escalate this notification!
-    if (is_valid_escalation_for_notification(e,
-                                             NOTIFICATION_OPTION_NONE)) {
+    if (is_valid_escalation_for_notification(e, NOTIFICATION_OPTION_NONE)) {
       logger(dbg_notifications, more)
           << "Notifier notification WILL be escalated.";
       return true;
@@ -937,3 +937,49 @@ bool notifier::should_notification_be_escalated() const {
       << "Notifier notification will NOT be escalated.";
   return false;
 }
+
+bool notifier::get_checks_enabled() const {
+  return _checks_enabled;
+}
+
+void notifier::set_checks_enabled(bool checks_enabled) {
+  _checks_enabled = checks_enabled;
+}
+
+bool notifier::get_check_freshness() const {
+  return _check_freshness;
+}
+
+void notifier::set_check_freshness(bool check_freshness) {
+  _check_freshness = check_freshness;
+}
+
+int notifier::get_check_type() const {
+  return _check_type;
+}
+
+void notifier::set_check_type(int check_type) {
+  _check_type = check_type;
+}
+
+void notifier::set_current_attempt(int attempt) {
+  _current_attempt = attempt;
+}
+
+int notifier::get_current_attempt() const {
+  return _current_attempt;
+}
+
+void notifier::add_current_attempt(int num) {
+  _current_attempt += num;
+}
+
+bool notifier::get_problem_has_been_acknowledged() const {
+  return _problem_has_been_acknowledged;
+}
+
+void notifier::set_problem_has_been_acknowledged(
+    bool problem_has_been_acknowledged) {
+  _problem_has_been_acknowledged = problem_has_been_acknowledged;
+}
+

@@ -438,9 +438,7 @@ void applier::service::modify_object(
   modify_if_different(
     s->process_performance_data,
     static_cast<int>(obj.process_perf_data()));
-  modify_if_different(
-    s->check_freshness,
-    static_cast<int>(obj.check_freshness()));
+  s->set_check_freshness(obj.check_freshness());
   modify_if_different(
     s->freshness_threshold,
     static_cast<int>(obj.freshness_threshold()));
@@ -448,9 +446,7 @@ void applier::service::modify_object(
     s->accept_passive_service_checks,
     static_cast<int>(obj.checks_passive()));
   s->set_event_handler(obj.event_handler());
-  modify_if_different(
-    s->checks_enabled,
-    static_cast<int>(obj.checks_active()));
+  s->set_checks_enabled(obj.checks_active());
   modify_if_different(
     s->retain_status_information,
     static_cast<int>(obj.retain_status_information()));

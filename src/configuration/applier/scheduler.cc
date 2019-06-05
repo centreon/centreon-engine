@@ -709,7 +709,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
     engine::service& svc(*it->second);
 
     bool schedule_check(true);
-    if (!svc.get_check_interval() || !svc.checks_enabled)
+    if (!svc.get_check_interval() || !svc.get_checks_enabled())
       schedule_check = false;
 
     {
@@ -1090,7 +1090,7 @@ void applier::scheduler::_schedule_service_events(
     if (!svc.should_be_scheduled) {
       // passive checks are an exception if a forced check was
       // scheduled before Centreon Engine was restarted.
-      if (!(svc.checks_enabled == false
+      if (!(!svc.get_checks_enabled()
             && svc.next_check
             && (svc.check_options & CHECK_OPTION_FORCE_EXECUTION)))
         continue;
@@ -1123,7 +1123,7 @@ void applier::scheduler::_schedule_service_events(
   logger(dbg_events, most)
     << "Scheduling service acknowledgement expirations...";
   for (int i(0), end(services.size()); i < end; ++i)
-    if (services[i]->problem_has_been_acknowledged)
+    if (services[i]->get_problem_has_been_acknowledged())
       services[i]->schedule_acknowledgement_expiration();
 
   return ;

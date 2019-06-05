@@ -88,7 +88,7 @@ void applier::service::_update(
     if (state.check_latency().is_set())
       obj.latency = *state.check_latency();
     if (state.check_type().is_set())
-      obj.check_type = *state.check_type();
+      obj.set_check_type(*state.check_type());
     if (state.current_state().is_set())
       obj.current_state = *state.current_state();
     if (state.last_state().is_set())
@@ -96,7 +96,7 @@ void applier::service::_update(
     if (state.last_hard_state().is_set())
       obj.last_hard_state = *state.last_hard_state();
     if (state.current_attempt().is_set())
-      obj.current_attempt = *state.current_attempt();
+      obj.set_current_attempt(*state.current_attempt());
     if (state.current_event_id().is_set())
       obj.current_event_id = *state.current_event_id();
     if (state.last_event_id().is_set())
@@ -168,7 +168,7 @@ void applier::service::_update(
 
   if (obj.retain_nonstatus_information) {
     if (state.problem_has_been_acknowledged().is_set())
-      obj.problem_has_been_acknowledged = *state.problem_has_been_acknowledged();
+      obj.set_problem_has_been_acknowledged(*state.problem_has_been_acknowledged());
 
     if (state.acknowledgement_type().is_set())
       obj.acknowledgement_type = *state.acknowledgement_type();
@@ -179,7 +179,7 @@ void applier::service::_update(
 
     if (state.active_checks_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_ACTIVE_CHECKS_ENABLED))
-      obj.checks_enabled = *state.active_checks_enabled();
+      obj.set_checks_enabled(*state.active_checks_enabled());
 
     if (state.passive_checks_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_PASSIVE_CHECKS_ENABLED))
@@ -252,8 +252,8 @@ void applier::service::_update(
       // adjust current attempt number if in a hard state.
       if (obj.state_type == HARD_STATE
           && obj.current_state != STATE_OK
-          && obj.current_attempt > 1)
-        obj.current_attempt = obj.get_max_attempts();
+          && obj.get_current_attempt() > 1)
+        obj.set_current_attempt(obj.get_max_attempts());
     }
 
     if (!state.customvariables().empty()
@@ -297,7 +297,7 @@ void applier::service::_update(
   // in hard problem state (max attempts may have changed in config
   // since restart).
   if (obj.current_state != STATE_OK && obj.state_type == HARD_STATE)
-    obj.current_attempt = obj.get_max_attempts();
+    obj.set_current_attempt(obj.get_max_attempts());
 
 
   // ADDED 02/20/08 assume same flapping state if large

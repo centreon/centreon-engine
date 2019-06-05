@@ -64,6 +64,7 @@ service::service(std::string const& hostname,
                  std::string const& description,
                  std::string const& display_name,
                  std::string const& check_command,
+                 bool checks_enabled,
                  int initial_state,
                  double check_interval,
                  double retry_interval,
@@ -81,10 +82,12 @@ service::service(std::string const& hostname,
                  bool flap_detection_enabled,
                  double low_flap_threshold,
                  double high_flap_threshold,
+                 bool check_freshness,
                  std::string const& timezone)
     : notifier{SERVICE_NOTIFICATION,
                display_name,
                check_command,
+               checks_enabled > 0,
                initial_state,
                check_interval,
                retry_interval,
@@ -102,9 +105,12 @@ service::service(std::string const& hostname,
                flap_detection_enabled,
                low_flap_threshold,
                high_flap_threshold,
+               check_freshness,
                timezone},
       _hostname{hostname},
-      _description{description} {}
+      _description{description} {
+  set_current_attempt(initial_state == STATE_OK ? 1 : max_attempts);
+}
 
 service::~service() {
   this->contact_groups.clear();
@@ -159,12 +165,12 @@ bool service::operator==(service const& other) throw() {
          this->flap_detection_on_unknown == other.flap_detection_on_unknown &&
          this->flap_detection_on_critical == other.flap_detection_on_critical &&
          this->process_performance_data == other.process_performance_data &&
-         this->check_freshness == other.check_freshness &&
+         get_check_freshness() == other.get_check_freshness() &&
          this->freshness_threshold == other.freshness_threshold &&
          this->accept_passive_service_checks ==
              other.accept_passive_service_checks &&
          this->event_handler_enabled == other.event_handler_enabled &&
-         this->checks_enabled == other.checks_enabled &&
+         get_checks_enabled() == other.get_checks_enabled() &&
          this->retain_status_information == other.retain_status_information &&
          this->retain_nonstatus_information ==
              other.retain_nonstatus_information &&
@@ -176,11 +182,11 @@ bool service::operator==(service const& other) throw() {
          this->get_icon_image() == other.get_icon_image() &&
          this->get_icon_image_alt() == other.get_icon_image_alt() &&
          this->custom_variables == other.custom_variables &&
-         this->problem_has_been_acknowledged ==
-             other.problem_has_been_acknowledged &&
+         get_problem_has_been_acknowledged() ==
+             other.get_problem_has_been_acknowledged() &&
          this->acknowledgement_type == other.acknowledgement_type &&
          this->host_problem_at_last_check == other.host_problem_at_last_check &&
-         this->check_type == other.check_type &&
+         get_check_type() == other.get_check_type() &&
          this->current_state == other.current_state &&
          this->last_state == other.last_state &&
          this->last_hard_state == other.last_hard_state &&
@@ -191,7 +197,7 @@ bool service::operator==(service const& other) throw() {
          this->next_check == other.next_check &&
          this->should_be_scheduled == other.should_be_scheduled &&
          this->last_check == other.last_check &&
-         this->current_attempt == other.current_attempt &&
+         get_current_attempt() == other.get_current_attempt() &&
          this->current_event_id == other.current_event_id &&
          this->last_event_id == other.last_event_id &&
          this->current_problem_id == other.current_problem_id &&
@@ -391,7 +397,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.process_performance_data
      << "\n"
         "  check_freshness:                      "
-     << obj.check_freshness
+     << obj.get_check_freshness()
      << "\n"
         "  freshness_threshold:                  "
      << obj.freshness_threshold
@@ -400,64 +406,44 @@ std::ostream& operator<<(std::ostream& os,
      << obj.accept_passive_service_checks
      << "\n  event_handler_enabled:                "
      << obj.event_handler_enabled
-     << "\n  checks_enabled:                       "
-     << obj.checks_enabled
+     << "\n  checks_enabled:                       " << obj.get_checks_enabled()
      << "\n  retain_status_information:            "
      << obj.retain_status_information
      << "\n  retain_nonstatus_information:         "
      << obj.retain_nonstatus_information
      << "\n  notifications_enabled:                "
      << obj.get_notifications_enabled()
-     << "\n  obsess_over_service:                  "
-     << obj.obsess_over_service
-     << "\n  notes:                                "
-     << obj.get_notes()
-     << "\n  notes_url:                            "
-     << obj.get_notes_url()
-     << "\n  action_url:                           "
-     << obj.get_action_url()
-     << "\n  icon_image:                           "
-     << obj.get_icon_image()
-     << "\n  icon_image_alt:                       "
-     << obj.get_icon_image_alt()
+     << "\n  obsess_over_service:                  " << obj.obsess_over_service
+     << "\n  notes:                                " << obj.get_notes()
+     << "\n  notes_url:                            " << obj.get_notes_url()
+     << "\n  action_url:                           " << obj.get_action_url()
+     << "\n  icon_image:                           " << obj.get_icon_image()
+     << "\n  icon_image_alt:                       " << obj.get_icon_image_alt()
      << "\n  problem_has_been_acknowledged:        "
-     << obj.problem_has_been_acknowledged
-     << "\n  acknowledgement_type:                 "
-     << obj.acknowledgement_type
+     << obj.get_problem_has_been_acknowledged()
+     << "\n  acknowledgement_type:                 " << obj.acknowledgement_type
      << "\n  host_problem_at_last_check:           "
      << obj.host_problem_at_last_check
-     << "\n  check_type:                           "
-     << obj.check_type
-     << "\n  current_state:                        "
-     << obj.current_state
-     << "\n  last_state:                           "
-     << obj.last_state
-     << "\n  last_hard_state:                      "
-     << obj.last_hard_state
-     << "\n  plugin_output:                        "
-     << obj.get_plugin_output()
+     << "\n  check_type:                           " << obj.get_check_type()
+     << "\n  current_state:                        " << obj.current_state
+     << "\n  last_state:                           " << obj.last_state
+     << "\n  last_hard_state:                      " << obj.last_hard_state
+     << "\n  plugin_output:                        " << obj.get_plugin_output()
      << "\n  long_plugin_output:                   "
      << obj.get_long_plugin_output()
-     << "\n  perf_data:                            "
-     << obj.get_perf_data()
-     << "\n  state_type:                           "
-     << obj.state_type
+     << "\n  perf_data:                            " << obj.get_perf_data()
+     << "\n  state_type:                           " << obj.state_type
      << "\n  next_check:                           "
      << string::ctime(obj.next_check)
-     << "\n  should_be_scheduled:                  "
-     << obj.should_be_scheduled
+     << "\n  should_be_scheduled:                  " << obj.should_be_scheduled
      << "\n  last_check:                           "
      << string::ctime(obj.last_check)
      << "\n  current_attempt:                      "
-     << obj.current_attempt
-     << "\n  current_event_id:                     "
-     << obj.current_event_id
-     << "\n  last_event_id:                        "
-     << obj.last_event_id
-     << "\n  current_problem_id:                   "
-     << obj.current_problem_id
-     << "\n  last_problem_id:                      "
-     << obj.last_problem_id
+     << obj.get_current_attempt()
+     << "\n  current_event_id:                     " << obj.current_event_id
+     << "\n  last_event_id:                        " << obj.last_event_id
+     << "\n  current_problem_id:                   " << obj.current_problem_id
+     << "\n  last_problem_id:                      " << obj.last_problem_id
      << "\n  last_notification:                    "
      << string::ctime(obj.get_last_notification())
      << "\n  next_notification:                    "
@@ -478,10 +464,8 @@ std::ostream& operator<<(std::ostream& os,
      << string::ctime(obj.last_time_unknown)
      << "\n  last_time_critical:                   "
      << string::ctime(obj.last_time_critical)
-     << "\n  has_been_checked:                     "
-     << obj.has_been_checked
-     << "\n  is_being_freshened:                   "
-     << obj.is_being_freshened
+     << "\n  has_been_checked:                     " << obj.has_been_checked
+     << "\n  is_being_freshened:                   " << obj.is_being_freshened
      << "\n  notified_on_unknown:                  "
      << obj.get_notified_on(notifier::unknown)
      << "\n  notified_on_warning:                  "
@@ -492,14 +476,10 @@ std::ostream& operator<<(std::ostream& os,
      << obj.current_notification_number
      << "\n  current_notification_id:              "
      << obj.current_notification_id
-     << "\n  latency:                              "
-     << obj.latency
-     << "\n  execution_time:                       "
-     << obj.execution_time
-     << "\n  is_executing:                         "
-     << obj.is_executing
-     << "\n  check_options:                        "
-     << obj.check_options
+     << "\n  latency:                              " << obj.latency
+     << "\n  execution_time:                       " << obj.execution_time
+     << "\n  is_executing:                         " << obj.is_executing
+     << "\n  check_options:                        " << obj.check_options
      << "\n  scheduled_downtime_depth:             "
      << obj.scheduled_downtime_depth
      << "\n  pending_flex_downtime:                "
@@ -512,30 +492,22 @@ std::ostream& operator<<(std::ostream& os,
     os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
 
   os << "  state_history_index:                  " << obj.state_history_index
-     << "\n  is_flapping:                          "
-     << obj.is_flapping
-     << "\n  flapping_comment_id:                  "
-     << obj.flapping_comment_id
-     << "\n  percent_state_change:                 "
-     << obj.percent_state_change
+     << "\n  is_flapping:                          " << obj.is_flapping
+     << "\n  flapping_comment_id:                  " << obj.flapping_comment_id
+     << "\n  percent_state_change:                 " << obj.percent_state_change
      << "\n  modified_attributes:                  "
      << obj.get_modified_attributes()
      << "\n  host_ptr:                             "
      << (obj.host_ptr ? obj.host_ptr->get_name() : "\"nullptr\"")
-     << "\n  event_handler_ptr:                    "
-     << evt_str
+     << "\n  event_handler_ptr:                    " << evt_str
      << "\n  event_handler_args:                   "
      << chkstr(obj.event_handler_args)
-     << "\n  check_command_ptr:                    "
-     << cmd_str
+     << "\n  check_command_ptr:                    " << cmd_str
      << "\n  check_command_args:                   "
      << chkstr(obj.check_command_args)
-     << "\n  check_period_ptr:                     "
-     << chk_period_str
-     << "\n  notification_period_ptr:              "
-     << notif_period_str
-     << "\n  servicegroups_ptr:                    "
-     << svcgrp_str << "\n";
+     << "\n  check_period_ptr:                     " << chk_period_str
+     << "\n  notification_period_ptr:              " << notif_period_str
+     << "\n  servicegroups_ptr:                    " << svcgrp_str << "\n";
 
   for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
     os << cv.first << " ; ";
@@ -656,7 +628,7 @@ com::centreon::engine::service* add_service(
     bool stalk_on_unknown,
     bool stalk_on_critical,
     int process_perfdata,
-    int check_freshness,
+    bool check_freshness,
     int freshness_threshold,
     std::string const& notes,
     std::string const& notes_url,
@@ -724,20 +696,17 @@ com::centreon::engine::service* add_service(
   // Allocate memory.
   std::shared_ptr<service> obj{new service(
       host_name, description, display_name.empty() ? description : display_name,
-      check_command, initial_state, check_interval, retry_interval,
-      max_attempts, first_notification_delay, notification_period,
-      notifications_enabled, check_period, event_handler, notes, notes_url,
-      action_url, icon_image, icon_image_alt, flap_detection_enabled,
-      low_flap_threshold, high_flap_threshold, timezone)};
+      check_command, checks_enabled, initial_state, check_interval,
+      retry_interval, max_attempts, first_notification_delay,
+      notification_period, notifications_enabled, check_period, event_handler,
+      notes, notes_url, action_url, icon_image, icon_image_alt,
+      flap_detection_enabled, low_flap_threshold, high_flap_threshold,
+      check_freshness, timezone)};
 
   try {
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    obj->check_freshness = (check_freshness > 0);
     obj->check_options = CHECK_OPTION_NONE;
-    obj->check_type = check_active;
-    obj->checks_enabled = (checks_enabled > 0);
-    obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
     obj->flap_detection_on_critical = (flap_detection_on_critical > 0);
@@ -830,14 +799,14 @@ int is_contact_for_service(com::centreon::engine::service* svc,
  *
  */
 void service::check_for_expired_acknowledgement() {
-  if (this->problem_has_been_acknowledged) {
+  if (get_problem_has_been_acknowledged()) {
     if (_acknowledgement_timeout > 0) {
       time_t now(time(nullptr));
       if (_last_acknowledgement + _acknowledgement_timeout >= now) {
         logger(log_info_message, basic)
             << "Acknowledgement of service '" << get_description()
             << "' on host '" << this->host_ptr->get_name() << "' just expired";
-        this->problem_has_been_acknowledged = false;
+        set_problem_has_been_acknowledged(false);
         this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
         update_status(false);
       }
@@ -1067,9 +1036,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   this->last_check = queued_check_result->start_time.tv_sec;
 
   /* was this check passive or active? */
-  this->check_type = (queued_check_result->check_type == check_active)
-                         ? check_active
-                         : check_passive;
+  set_check_type((queued_check_result->check_type == check_active)
+                     ? check_active
+                     : check_passive);
 
   /* update check statistics for passive checks */
   if (queued_check_result->check_type == check_passive)
@@ -1199,7 +1168,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * log passive checks - we need to do this here, as some my bypass external
    * commands by getting dropped in checkresults dir
    */
-  if (this->check_type == check_passive) {
+  if (get_check_type() == check_passive) {
     if (config->log_passive_checks())
       logger(log_passive_check, basic)
           << "PASSIVE SERVICE CHECK: " << this->get_hostname() << ";"
@@ -1245,12 +1214,12 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * (service was rechecked)
    */
   if (this->state_type == SOFT_STATE &&
-      (this->current_attempt < get_max_attempts()))
-    this->current_attempt = this->current_attempt + 1;
+      get_current_attempt() < get_max_attempts())
+    add_current_attempt(1);
 
   logger(dbg_checks, most) << "ST: "
                            << (this->state_type == SOFT_STATE ? "SOFT" : "HARD")
-                           << "  CA: " << this->current_attempt
+                           << "  CA: " << get_current_attempt()
                            << "  MA: " << get_max_attempts()
                            << "  CS: " << this->current_state
                            << "  LS: " << this->last_state
@@ -1277,7 +1246,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * check for a "normal" hard state change where max check attempts is
    * reached
    */
-  if (this->current_attempt >= get_max_attempts() &&
+  if (get_current_attempt() >= get_max_attempts() &&
       this->current_state != this->last_hard_state) {
     logger(dbg_checks, most) << "Service had a HARD STATE CHANGE!!";
     hard_state_change = true;
@@ -1300,14 +1269,14 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     if (ACKNOWLEDGEMENT_NORMAL == this->acknowledgement_type &&
         (state_change || !hard_state_change)) {
-      this->problem_has_been_acknowledged = false;
+      set_problem_has_been_acknowledged(false);
       this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
       /* remove any non-persistant comments associated with the ack */
       comment::delete_service_acknowledgement_comments(this);
     } else if (this->acknowledgement_type == ACKNOWLEDGEMENT_STICKY &&
                this->current_state == STATE_OK) {
-      this->problem_has_been_acknowledged = false;
+      set_problem_has_been_acknowledged(false);
       this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
       /* remove any non-persistant comments associated with the ack */
@@ -1372,7 +1341,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* reset the acknowledgement flag (this should already have been done, but
      * just in case...) */
-    this->problem_has_been_acknowledged = false;
+    set_problem_has_been_acknowledged(false);
     this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
     /* verify the route to the host and send out host recovery notifications */
@@ -1473,7 +1442,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* reset all service variables because its okay now... */
     this->host_problem_at_last_check = false;
-    this->current_attempt = 1;
+    set_current_attempt(1);
     this->state_type = HARD_STATE;
     this->last_hard_state = STATE_OK;
     _last_notification = static_cast<time_t>(0);
@@ -1483,7 +1452,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       set_notified_on(notifier::none);
       _initial_notif_time = static_cast<time_t>(0);
     }
-    this->problem_has_been_acknowledged = false;
+    set_problem_has_been_acknowledged(false);
     this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     this->no_more_notifications = false;
 
@@ -1654,16 +1623,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* the hosts recovered.  This caused problems, so hopefully this will fix
        * it */
       if (this->state_type == SOFT_STATE)
-        this->current_attempt = 1;
+        set_current_attempt(1);
     }
 
     logger(dbg_checks, more)
-        << "Current/Max Attempt(s): " << this->current_attempt << '/'
+        << "Current/Max Attempt(s): " << get_current_attempt() << '/'
         << get_max_attempts();
 
     /* if we should retry the service check, do so (except it the host is down
      * or unreachable!) */
-    if (this->current_attempt < get_max_attempts()) {
+    if (get_current_attempt() < get_max_attempts()) {
       /* the host is down or unreachable, so don't attempt to retry the service
        * check */
       if (route_result != HOST_UP) {
@@ -1710,7 +1679,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* perform dependency checks on the second to last check of the service */
       if (config->enable_predictive_service_dependency_checks() &&
-          this->current_attempt == (get_max_attempts() - 1)) {
+          get_current_attempt() == (get_max_attempts() - 1)) {
         logger(dbg_checks, more)
             << "Looking for services to check for predictive "
                "dependency checks...";
@@ -1839,7 +1808,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       this->should_be_scheduled = false;
 
     /* services with active checks disabled do not get rescheduled */
-    if (!this->checks_enabled)
+    if (!get_checks_enabled())
       this->should_be_scheduled = false;
 
     /* schedule a non-forced check if we can */
@@ -1866,7 +1835,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /* send data to event broker */
   broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED, NEBFLAG_NONE,
-                       NEBATTR_NONE, this, this->check_type,
+                       NEBATTR_NONE, this, get_check_type(),
                        queued_check_result->start_time,
                        queued_check_result->finish_time, nullptr, this->latency,
                        this->execution_time, config->service_check_timeout(),
@@ -1875,7 +1844,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   if (!(reschedule_check && this->should_be_scheduled &&
         this->has_been_checked) ||
-      !this->checks_enabled) {
+      !get_checks_enabled()) {
     /* set the checked flag */
     this->has_been_checked = true;
     /* update the current service status log */
@@ -1945,7 +1914,7 @@ int service::log_event() {
 
   logger(log_options, basic)
       << "SERVICE ALERT: " << get_hostname() << ";" << get_description() << ";"
-      << state << ";" << state_type << ";" << this->current_attempt << ";"
+      << state << ";" << state_type << ";" << get_current_attempt() << ";"
       << get_plugin_output();
   return OK;
 }
@@ -2099,7 +2068,7 @@ int service::handle_service_event() {
   /* send event data to broker */
   broker_statechange_data(NEBTYPE_STATECHANGE_END, NEBFLAG_NONE, NEBATTR_NONE,
                           SERVICE_STATECHANGE, (void*)this, this->current_state,
-                          this->state_type, this->current_attempt,
+                          this->state_type, get_current_attempt(),
                           get_max_attempts(), nullptr);
 
   /* bail out if we shouldn't be running event handlers */
@@ -2360,7 +2329,7 @@ void service::schedule_check(time_t check_time, int options) {
 
   // Don't schedule a check if active checks
   // of this service are disabled.
-  if (!this->checks_enabled && !(options & CHECK_OPTION_FORCE_EXECUTION)) {
+  if (!get_checks_enabled() && !(options & CHECK_OPTION_FORCE_EXECUTION)) {
     logger(dbg_checks, basic) << "Active checks of this service are disabled.";
     return;
   }
@@ -2838,7 +2807,7 @@ int service::check_notification_viability(unsigned int type, int options) {
   }
 
   /* has this problem already been acknowledged? */
-  if (this->problem_has_been_acknowledged == true) {
+  if (get_problem_has_been_acknowledged()) {
     logger(dbg_notifications, more)
         << "This service problem has already been acknowledged, "
            "so we won't send a notification out.";
@@ -3028,7 +2997,7 @@ int service::verify_check_viability(int check_options,
   /* can we check the host right now? */
   if (!(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
     /* if checks of the service are currently disabled... */
-    if (!this->checks_enabled) {
+    if (!get_checks_enabled()) {
       preferred_time = current_time + check_interval;
       perform_check = false;
 
@@ -3331,8 +3300,9 @@ time_t service::get_next_notification_time(time_t offset) {
  * checks to see if a service escalation entry is a match for the current
  * service notification
  */
-bool service::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
-                                                  int options) const {
+bool service::is_valid_escalation_for_notification(
+    std::shared_ptr<escalation> e,
+    int options) const {
   int notification_number;
   time_t current_time;
 

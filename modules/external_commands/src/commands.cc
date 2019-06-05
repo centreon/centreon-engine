@@ -1696,7 +1696,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
     attr = MODATTR_NORMAL_CHECK_INTERVAL;
 
     /* schedule a service check if previous interval was 0 (checks were not regularly scheduled) */
-    if (old_dval == 0 && temp_service->checks_enabled
+    if (old_dval == 0 && temp_service->get_checks_enabled()
         && temp_service->get_check_interval() != 0) {
 
       /* set the service check flag */
@@ -1734,8 +1734,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
     /* adjust current attempt number if in a hard state */
     if (temp_service->state_type == HARD_STATE
         && temp_service->current_state != STATE_OK
-        && temp_service->current_attempt > 1)
-      temp_service->current_attempt = temp_service->get_max_attempts();
+        && temp_service->get_current_attempt() > 1)
+      temp_service->set_current_attempt(temp_service->get_max_attempts());
     break;
 
   case CMD_CHANGE_HOST_MODATTR:
@@ -2355,14 +2355,14 @@ void disable_service_checks(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
-  if (svc->checks_enabled == false)
+  if (!svc->get_checks_enabled())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* disable the service check... */
-  svc->checks_enabled = false;
+  svc->set_checks_enabled(false);
   svc->should_be_scheduled = false;
 
   /* send data to event broker */
@@ -2387,14 +2387,14 @@ void enable_service_checks(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already enabled */
-  if (svc->checks_enabled)
+  if (svc->get_checks_enabled())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* enable the service check... */
-  svc->checks_enabled = true;
+  svc->set_checks_enabled(true);
   svc->should_be_scheduled = true;
 
   /* services with no check intervals don't get checked */
@@ -2986,7 +2986,7 @@ void acknowledge_service_problem(
     return;
 
   /* set the acknowledgement flag */
-  svc->problem_has_been_acknowledged = true;
+  svc->set_problem_has_been_acknowledged(true);
 
   /* set the acknowledgement type */
   svc->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
@@ -3054,7 +3054,7 @@ void remove_host_acknowledgement(com::centreon::engine::host* hst) {
 /* removes a service acknowledgement */
 void remove_service_acknowledgement(com::centreon::engine::service* svc) {
   /* set the acknowledgement flag */
-  svc->problem_has_been_acknowledged = false;
+  svc->set_problem_has_been_acknowledged(false);
 
   /* update the status log with the service info */
   svc->update_status(false);

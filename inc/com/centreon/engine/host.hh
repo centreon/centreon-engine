@@ -92,7 +92,7 @@ class                 host : public notifier {
                            int stalk_on_down,
                            int stalk_on_unreachable,
                            int process_perfdata,
-                           int check_freshness,
+                           bool check_freshness,
                            int freshness_threshold,
                            std::string const& notes,
                            std::string const& notes_url,
@@ -171,14 +171,10 @@ class                 host : public notifier {
   void               set_stalk_on_unreachable(bool stalk);
   bool               get_stalk_on_up() const;
   void               set_stalk_on_up(bool stalk);
-  int                get_check_freshness() const;
-  void               set_check_freshness(int check_freshness);
   int                get_freshness_threshold() const;
   void               set_freshness_threshold(int freshness_threshold);
   bool               get_process_performance_data() const;
   void               set_process_performance_data(bool process_performance_data);
-  bool               get_checks_enabled() const;
-  void               set_checks_enabled(bool checks_enabled);
   int                get_accept_passive_host_checks() const;
   void               set_accept_passive_host_checks(bool accept_passive_host_checks);
   bool               get_event_handler_enabled() const;
@@ -211,20 +207,14 @@ class                 host : public notifier {
   void               set_z_3d(int z);
   int                get_should_be_drawn() const;
   void               set_should_be_drawn(int should_be_drawn);
-  int                get_problem_has_been_acknowledged() const;
-  void               set_problem_has_been_acknowledged(int problem_has_been_acknowledged);
   int                get_acknowledgement_type() const;
   void               set_acknowledgement_type(int acknowledgement_type);
-  int                get_check_type() const;
-  void               set_check_type(int check_type);
   int                get_last_state() const;
   void               set_last_state(int last_state);
   int                get_last_hard_state() const;
   void               set_last_hard_state(int last_hard_state);
   int                get_state_type() const;
   void               set_state_type(int state_type);
-  int                get_current_attempt() const;
-  void               set_current_attempt(int current_attempt);
   unsigned long      get_current_event_id() const;
   void               set_current_event_id(unsigned long current_event_id);
   unsigned long      get_last_event_id() const;
@@ -313,7 +303,7 @@ class                 host : public notifier {
   host_map           child_hosts;
   static host_map    hosts;
 
-  std::unordered_map<std::string, com::centreon::engine::customvariable>
+  std::unordered_map<std::string, customvariable>
                      custom_variables;
 
   com::centreon::engine::commands::command*
@@ -338,10 +328,8 @@ private:
   bool                _stalk_on_down;
   bool                _stalk_on_unreachable;
   bool                _stalk_on_up;
-  int                 _check_freshness;
   int                 _freshness_threshold;
   bool                _process_performance_data;
-  bool                _checks_enabled;
   int                 _accept_passive_host_checks;
   bool                _event_handler_enabled;
   int                 _retain_status_information;
@@ -358,13 +346,10 @@ private:
   int                 _y_3d;
   int                 _z_3d;
   int                 _should_be_drawn;
-  int                 _problem_has_been_acknowledged;
   int                 _acknowledgement_type;
-  int                 _check_type;
   int                 _last_state;
   int                 _last_hard_state;
   int                 _state_type;
-  int                 _current_attempt;
   unsigned long       _current_event_id;
   unsigned long       _last_event_id;
   unsigned long       _current_problem_id;

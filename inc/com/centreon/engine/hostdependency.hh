@@ -81,5 +81,3 @@ std::ostream& operator<<(std::ostream& os,
   com::centreon::engine::hostdependency const& obj);
 
 #endif // !CCE_OBJECTS_HOSTDEPENDENCY_HH
-
-

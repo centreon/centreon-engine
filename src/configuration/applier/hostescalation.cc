@@ -80,26 +80,27 @@ void applier::hostescalation::add_object(
   config->hostescalations().insert(obj);
 
   // Create host escalation.
-  std::shared_ptr<engine::hostescalation> he{
-      new engine::hostescalation(
-          *obj.hosts().begin(), obj.first_notification(),
-          obj.last_notification(), obj.notification_interval(),
-          obj.escalation_period(),
-          ((obj.escalation_options() & configuration::hostescalation::down)
-               ? notifier::down
+  std::shared_ptr<engine::hostescalation> he{new engine::hostescalation(
+      *obj.hosts().begin(),
+      obj.first_notification(),
+      obj.last_notification(),
+      obj.notification_interval(),
+      obj.escalation_period(),
+      ((obj.escalation_options() & configuration::hostescalation::down)
+           ? notifier::down
+           : notifier::none) |
+          ((obj.escalation_options() &
+            configuration::hostescalation::unreachable)
+               ? notifier::unreachable
                : notifier::none) |
-              ((obj.escalation_options() &
-                configuration::hostescalation::unreachable)
-                   ? notifier::unreachable
-                   : notifier::none) |
-              ((obj.escalation_options() &
-                configuration::hostescalation::recovery)
-                   ? notifier::recovery
-                   : notifier::none))};
+          ((obj.escalation_options() & configuration::hostescalation::recovery)
+               ? notifier::recovery
+               : notifier::none))};
 
   // Add new items to the configuration state.
   uint64_t host_id{get_host_id(he->get_hostname())};
-  std::unordered_map<uint64_t, std::shared_ptr<engine::host>>::iterator it{state::instance().hosts().find(host_id)};
+  std::unordered_map<uint64_t, std::shared_ptr<engine::host> >::iterator it{
+      state::instance().hosts().find(host_id)};
   if (it != state::instance().hosts().end())
     it->second->add_escalation(he);
 
@@ -108,19 +109,21 @@ void applier::hostescalation::add_object(
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_ADD, NEBFLAG_NONE,
-                                  NEBATTR_NONE, he.get(), &tv);
+  broker_adaptive_escalation_data(
+      NEBTYPE_HOSTESCALATION_ADD, NEBFLAG_NONE, NEBATTR_NONE, he.get(), &tv);
 
   // Add contacts to host escalation.
   for (set_string::const_iterator it(obj.contacts().begin()),
        end(obj.contacts().end());
-       it != end; ++it)
+       it != end;
+       ++it)
     he->contacts().insert({*it, nullptr});
 
   // Add contact groups to host escalation.
   for (set_string::const_iterator it(obj.contactgroups().begin()),
        end(obj.contactgroups().end());
-       it != end; ++it)
+       it != end;
+       ++it)
     he->contact_groups.insert({*it, nullptr});
 }
 
@@ -133,22 +136,17 @@ void applier::hostescalation::expand_objects(configuration::state& s) {
   // Browse all escalations.
   configuration::set_hostescalation expanded;
   for (configuration::set_hostescalation::const_iterator
-         it_esc(s.hostescalations().begin()),
-         end_esc(s.hostescalations().end());
+           it_esc(s.hostescalations().begin()),
+       end_esc(s.hostescalations().end());
        it_esc != end_esc;
        ++it_esc) {
     // Expanded hosts.
     std::set<std::string> expanded_hosts;
-    _expand_hosts(
-      it_esc->hosts(),
-      it_esc->hostgroups(),
-      s,
-      expanded_hosts);
+    _expand_hosts(it_esc->hosts(), it_esc->hostgroups(), s, expanded_hosts);
 
     // Browse all hosts.
-    for (std::set<std::string>::const_iterator
-           it(expanded_hosts.begin()),
-           end(expanded_hosts.end());
+    for (std::set<std::string>::const_iterator it(expanded_hosts.begin()),
+         end(expanded_hosts.end());
          it != end;
          ++it) {
       configuration::hostescalation hesc(*it_esc);
@@ -175,12 +173,13 @@ void applier::hostescalation::expand_objects(configuration::state& s) {
  *  @param[in] obj  Unused.
  */
 void applier::hostescalation::modify_object(
-       configuration::hostescalation const& obj) {
+    configuration::hostescalation const& obj) {
   (void)obj;
-  throw (engine_error() << "Could not modify a host escalation: "
-         << "host escalation objects can only be added or removed, "
-         << "this is likely a software bug that you should report to "
-         << "Centreon Engine developers");
+  throw(engine_error()
+        << "Could not modify a host escalation: "
+        << "host escalation objects can only be added or removed, "
+        << "this is likely a software bug that you should report to "
+        << "Centreon Engine developers");
 }
 
 /**
@@ -190,26 +189,29 @@ void applier::hostescalation::modify_object(
  *                  engine.
  */
 void applier::hostescalation::remove_object(
-       configuration::hostescalation const& obj) {
+    configuration::hostescalation const& obj) {
   // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Removing a host escalation.";
+  logger(logging::dbg_config, logging::more) << "Removing a host escalation.";
 
   // Find host escalation.
   std::string const& host_name{*obj.hosts().begin()};
   uint64_t host_id{get_host_id(host_name)};
-  std::pair<hostescalation_mmap::iterator, hostescalation_mmap::iterator>
-    range{engine::hostescalation::hostescalations.equal_range(host_name)};
-  std::unordered_map<uint64_t, std::shared_ptr<engine::host>>::iterator hit{
+  std::pair<hostescalation_mmap::iterator, hostescalation_mmap::iterator> range{
+      engine::hostescalation::hostescalations.equal_range(host_name)};
+  std::unordered_map<uint64_t, std::shared_ptr<engine::host> >::iterator hit{
       state::instance().hosts().find(host_id)};
 
   for (hostescalation_mmap::iterator it{range.first}, end{range.second};
-       it != end; ++it) {
-    std::list<std::shared_ptr<escalation>>& escalations{hit->second->get_escalations()};
-    for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
+       it != end;
+       ++it) {
+    std::list<std::shared_ptr<escalation> >& escalations(
+        hit->second->get_escalations());
+    for (std::list<std::shared_ptr<engine::escalation> >::iterator
              itt{escalations.begin()},
-         next_itt{escalations.begin()}, end{escalations.end()};
-         itt != end; itt = next_itt) {
+         next_itt{escalations.begin()},
+         end{escalations.end()};
+         itt != end;
+         itt = next_itt) {
       ++next_itt;
       /* It's a pity but for now we don't have any possibility or key to verify
        * if the hostescalation is the good one. */
@@ -232,13 +234,12 @@ void applier::hostescalation::remove_object(
       }
     }
     // Notify event broker.
-    timeval tv{get_broker_timestamp(nullptr)};
-    broker_adaptive_escalation_data(
-      NEBTYPE_HOSTESCALATION_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      it->second.get(),
-      &tv);
+    timeval tv(get_broker_timestamp(nullptr));
+    broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE,
+                                    NEBFLAG_NONE,
+                                    NEBATTR_NONE,
+                                    it->second.get(),
+                                    &tv);
 
     // Remove host escalation from its list.
     engine::hostescalation::hostescalations.erase(it->first);
@@ -258,12 +259,12 @@ void applier::hostescalation::resolve_object(
   logger(logging::dbg_config, logging::more) << "Resolving a host escalation.";
 
   uint64_t host_id{get_host_id(*obj.hosts().begin())};
-  std::unordered_map<uint64_t, std::shared_ptr<engine::host>>::iterator it{
+  std::unordered_map<uint64_t, std::shared_ptr<engine::host> >::iterator it{
       state::instance().hosts().find(host_id)};
-  std::list<std::shared_ptr<engine::escalation>> const& he_list{
+  std::list<std::shared_ptr<engine::escalation> > const& he_list{
       it->second->get_escalations()};
-  for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
-       itt{it->second->get_escalations().begin()},
+  for (std::list<std::shared_ptr<engine::escalation> >::const_iterator
+           itt{it->second->get_escalations().begin()},
        end{it->second->get_escalations().end()};
        itt != end;
        ++itt) {
@@ -273,12 +274,19 @@ void applier::hostescalation::resolve_object(
         (*itt)->get_last_notification() == obj.last_notification() &&
         (*itt)->get_notification_interval() == obj.notification_interval() &&
         (*itt)->get_escalation_period() == obj.escalation_period() &&
-        (*itt)->get_escalate_on(notifier::down) == (obj.escalation_options() & configuration::hostescalation::down) &&
-        (*itt)->get_escalate_on(notifier::unreachable) == (obj.escalation_options() & configuration::hostescalation::unreachable) &&
-        (*itt)->get_escalate_on(notifier::recovery) == (obj.escalation_options() & configuration::hostescalation::recovery)) {
+        (*itt)->get_escalate_on(notifier::down) ==
+            (obj.escalation_options() & configuration::hostescalation::down) &&
+        (*itt)->get_escalate_on(notifier::unreachable) ==
+            (obj.escalation_options() &
+             configuration::hostescalation::unreachable) &&
+        (*itt)->get_escalate_on(notifier::recovery) ==
+            (obj.escalation_options() &
+             configuration::hostescalation::recovery)) {
       // Resolve host escalation.
-      if (!check_hostescalation(static_cast<engine::hostescalation*>((*itt).get()), &config_warnings,
-                                &config_errors))
+      if (!check_hostescalation(
+               static_cast<engine::hostescalation*>((*itt).get()),
+               &config_warnings,
+               &config_errors))
         throw engine_error() << "Cannot resolve host escalation";
     } else
       throw engine_error() << "Cannot resolve non-existing host escalation";
@@ -294,30 +302,25 @@ void applier::hostescalation::resolve_object(
  *  @param[out]    expanded   Expanded hosts.
  */
 void applier::hostescalation::_expand_hosts(
-                                std::set<std::string> const& hosts,
-                                std::set<std::string> const& hostgroups,
-                                configuration::state const& s,
-                                std::set<std::string>& expanded) {
+    std::set<std::string> const& hosts,
+    std::set<std::string> const& hostgroups,
+    configuration::state const& s,
+    std::set<std::string>& expanded) {
   // Copy hosts.
   expanded = hosts;
 
   // Browse host groups.
-  for (set_string::const_iterator
-         it(hostgroups.begin()),
-         end(hostgroups.end());
+  for (set_string::const_iterator it(hostgroups.begin()), end(hostgroups.end());
        it != end;
        ++it) {
     // Find host group.
     set_hostgroup::const_iterator it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
-      throw (engine_error()
-             << "Could not expand non-existing host group '"
-             << *it << "'");
+      throw(engine_error() << "Could not expand non-existing host group '"
+                           << *it << "'");
 
     // Add host group members.
-    expanded.insert(
-               it_group->members().begin(),
-               it_group->members().end());
+    expanded.insert(it_group->members().begin(), it_group->members().end());
   }
 }
 
@@ -328,20 +331,18 @@ void applier::hostescalation::_expand_hosts(
  *  @param[in]     s    Configuration state.
  */
 void applier::hostescalation::_inherits_special_vars(
-                                configuration::hostescalation& obj,
-                                configuration::state& s) {
+    configuration::hostescalation& obj,
+    configuration::state& s) {
   // Detect if any special variable has not been defined.
-  if (!obj.contacts_defined()
-      || !obj.contactgroups_defined()
-      || !obj.notification_interval_defined()
-      || !obj.escalation_period_defined()) {
+  if (!obj.contacts_defined() || !obj.contactgroups_defined() ||
+      !obj.notification_interval_defined() ||
+      !obj.escalation_period_defined()) {
     // Find host.
-    configuration::set_host::const_iterator
-      it(s.hosts_find(get_host_id(obj.hosts().begin()->c_str())));
+    configuration::set_host::const_iterator it(
+        s.hosts_find(get_host_id(obj.hosts().begin()->c_str())));
     if (it == s.hosts().end())
-      throw (engine_error()
-             << "Could not inherit special variables from host '"
-             << *obj.hosts().begin() << "': host does not exist");
+      throw(engine_error() << "Could not inherit special variables from host '"
+                           << *obj.hosts().begin() << "': host does not exist");
 
     // Inherits variables.
     if (!obj.contacts_defined())

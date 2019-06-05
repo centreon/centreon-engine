@@ -233,7 +233,7 @@ void check_service_result_freshness() {
        temp_service = temp_service->next) {
 
     /* skip services we shouldn't be checking for freshness */
-    if (!temp_service->check_freshness)
+    if (!temp_service->get_check_freshness())
       continue;
 
     /* skip services that are currently executing (problems here will be caught by orphaned service check) */
@@ -241,7 +241,7 @@ void check_service_result_freshness() {
       continue;
 
     /* skip services that have both active and passive checks disabled */
-    if (!temp_service->checks_enabled
+    if (!temp_service->get_checks_enabled()
         && !temp_service->accept_passive_service_checks)
       continue;
 
@@ -328,7 +328,7 @@ int is_service_result_fresh(
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (services never go stale). */
   /* CHANGED 10/07/07 EG - Only match next condition for services that have active checks enabled... */
   /* CHANGED 10/07/07 EG - Added max_service_check_spread to expiration time as suggested by Altinity */
-  else if (temp_service->checks_enabled
+  else if (temp_service->get_checks_enabled()
            && event_start > temp_service->last_check
            && temp_service->freshness_threshold == 0)
     expiration_time

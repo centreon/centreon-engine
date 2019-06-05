@@ -54,6 +54,7 @@ class                         notifier {
                               notifier(int notification_type,
                                        std::string const& display_name,
                                        std::string const& check_command,
+                                       bool checks_enabled,
                                        int initial_state,
                                        double check_interval,
                                        double retry_interval,
@@ -71,6 +72,7 @@ class                         notifier {
                                        bool flap_detection_enabled,
                                        double low_flap_threshold,
                                        double high_flap_threshold,
+                                       bool check_freshness,
                                        std::string const& timezone);
   virtual                     ~notifier() {}
 
@@ -183,6 +185,17 @@ class                         notifier {
   void               add_modified_attributes(uint32_t attr);
   uint32_t           get_modified_attributes() const;
   void               set_modified_attributes(uint32_t modified_attributes);
+  bool               get_checks_enabled() const;
+  void               set_checks_enabled(bool checks_enabled);
+  bool               get_check_freshness() const;
+  void               set_check_freshness(bool check_freshness);
+  int                get_check_type() const;
+  void               set_check_type(int check_type);
+  int                get_current_attempt() const;
+  void               set_current_attempt(int current_attempt);
+  void               add_current_attempt(int num);
+  bool get_problem_has_been_acknowledged() const;
+  void set_problem_has_been_acknowledged(bool problem_has_been_acknowledged);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -230,6 +243,11 @@ class                         notifier {
   bool _notifications_enabled;
   std::string _timezone;
   std::list<std::shared_ptr<escalation>> _escalations;
+  bool _checks_enabled;
+  bool _check_freshness;
+  int                 _check_type;
+  int                 _current_attempt;
+  bool _problem_has_been_acknowledged;
 };
 
 CCE_END()

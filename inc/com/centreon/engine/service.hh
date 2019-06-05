@@ -53,6 +53,7 @@ class                           service : public notifier {
                                         std::string const& description,
                                         std::string const& display_name,
                                         std::string const& check_command,
+                                        bool checks_enabled,
                                         int initial_state,
                                         double check_interval,
                                         double retry_interval,
@@ -70,6 +71,7 @@ class                           service : public notifier {
                                         bool flap_detection_enabled,
                                         double low_flap_threshold,
                                         double high_flap_threshold,
+                                        bool check_freshness,
                                         std::string const& timezone);
                                 ~service();
   void                          set_hostname(std::string const& name);
@@ -146,20 +148,16 @@ class                           service : public notifier {
   int                           flap_detection_on_unknown;
   int                           flap_detection_on_critical;
   int                           process_performance_data;
-  int                           check_freshness;
   int                           freshness_threshold;
   int                           accept_passive_service_checks;
   int                           event_handler_enabled;
-  int                           checks_enabled;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
   int                           obsess_over_service;
-  std::unordered_map<std::string, com::centreon::engine::customvariable>
+  std::unordered_map<std::string, customvariable>
                                 custom_variables;
-  int                           problem_has_been_acknowledged;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;
-  int                           check_type;
   int                           current_state;
   int                           last_state;
   int                           last_hard_state;
@@ -167,7 +165,6 @@ class                           service : public notifier {
   time_t                        next_check;
   int                           should_be_scheduled;
   time_t                        last_check;
-  int                           current_attempt;
   uint64_t                      current_event_id;
   uint64_t                      last_event_id;
   uint64_t                      current_problem_id;
@@ -264,7 +261,7 @@ com::centreon::engine::service* add_service(
            bool stalk_on_unknown,
            bool stalk_on_critical,
            int process_perfdata,
-           int check_freshness,
+           bool check_freshness,
            int freshness_threshold,
            std::string const& notes,
            std::string const& notes_url,

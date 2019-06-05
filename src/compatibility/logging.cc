@@ -214,7 +214,7 @@ void log_service_state(unsigned int type, com::centreon::engine::service* svc) {
   logger(log_info_message, basic)
     << type_str << " SERVICE STATE: " << svc->get_hostname() << ";"
     << svc->get_description() << ";" << state << ";" << state_type
-    << ";" << svc->current_attempt << ";" << output;
+    << ";" << svc->get_current_attempt() << ";" << output;
 }
 
 /**

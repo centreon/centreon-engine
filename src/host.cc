@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/host.hh"
 #include <cassert>
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
@@ -30,6 +29,7 @@
 #include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
@@ -168,7 +168,7 @@ host::host(uint64_t host_id,
            int stalk_on_down,
            int stalk_on_unreachable,
            int process_perfdata,
-           int check_freshness,
+           bool check_freshness,
            int freshness_threshold,
            std::string const& notes,
            std::string const& notes_url,
@@ -192,6 +192,7 @@ host::host(uint64_t host_id,
     : notifier{HOST_NOTIFICATION,
                !display_name.empty() ? display_name : name,
                check_command,
+               checks_enabled > 0,
                initial_state,
                check_interval,
                retry_interval,
@@ -209,6 +210,7 @@ host::host(uint64_t host_id,
                flap_detection_enabled,
                low_flap_threshold,
                high_flap_threshold,
+               check_freshness,
                timezone} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
@@ -243,7 +245,6 @@ host::host(uint64_t host_id,
   _should_be_scheduled = true;
   _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
   _check_options = CHECK_OPTION_NONE;
-  _check_type = check_active;
   _modified_attributes = MODATTR_NONE;
   _state_type = HARD_STATE;
 
@@ -255,9 +256,7 @@ host::host(uint64_t host_id,
   _vrml_image = vrml_image;
 
   _accept_passive_host_checks = (accept_passive_checks > 0);
-  _check_freshness = (check_freshness > 0);
-  _checks_enabled = (checks_enabled > 0);
-  _current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
+  set_current_attempt(initial_state == HOST_UP ? 1 : max_attempts);
   _current_state = initial_state;
   _event_handler_enabled = (event_handler_enabled > 0);
   _flap_detection_on_down = (flap_detection_on_down > 0);
@@ -395,14 +394,6 @@ void host::set_stalk_on_up(bool stalk) {
   _stalk_on_up = stalk;
 }
 
-int host::get_check_freshness() const {
-  return _check_freshness;
-}
-
-void host::set_check_freshness(int check_freshness) {
-  _check_freshness = check_freshness;
-}
-
 int host::get_freshness_threshold() const {
   return _freshness_threshold;
 }
@@ -417,14 +408,6 @@ bool host::get_process_performance_data() const {
 
 void host::set_process_performance_data(bool process_performance_data) {
   _process_performance_data = process_performance_data;
-}
-
-bool host::get_checks_enabled() const {
-  return _checks_enabled;
-}
-
-void host::set_checks_enabled(bool checks_enabled) {
-  _checks_enabled = checks_enabled;
 }
 
 int host::get_accept_passive_host_checks() const {
@@ -555,29 +538,12 @@ void host::set_should_be_drawn(int should_be_drawn) {
   _should_be_drawn = should_be_drawn;
 }
 
-int host::get_problem_has_been_acknowledged() const {
-  return _problem_has_been_acknowledged;
-}
-
-void host::set_problem_has_been_acknowledged(
-    int problem_has_been_acknowledged) {
-  _problem_has_been_acknowledged = problem_has_been_acknowledged;
-}
-
 int host::get_acknowledgement_type() const {
   return _acknowledgement_type;
 }
 
 void host::set_acknowledgement_type(int acknowledgement_type) {
   _acknowledgement_type = acknowledgement_type;
-}
-
-int host::get_check_type() const {
-  return _check_type;
-}
-
-void host::set_check_type(int check_type) {
-  _check_type = check_type;
 }
 
 int host::get_last_state() const {
@@ -602,14 +568,6 @@ int host::get_state_type() const {
 
 void host::set_state_type(int state_type) {
   _state_type = state_type;
-}
-
-int host::get_current_attempt() const {
-  return _current_attempt;
-}
-
-void host::set_current_attempt(int current_attempt) {
-  _current_attempt = current_attempt;
 }
 
 unsigned long host::get_current_event_id() const {
@@ -3371,8 +3329,7 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
     return false;
 
   /* skip this escalation if the state options don't match */
-  if (get_current_state() == HOST_UP &&
-      !e->get_escalate_on(notifier::recovery))
+  if (get_current_state() == HOST_UP && !e->get_escalate_on(notifier::recovery))
     return false;
   else if (get_current_state() == HOST_DOWN &&
            !e->get_escalate_on(notifier::down))

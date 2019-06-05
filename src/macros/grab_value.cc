@@ -690,9 +690,9 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == true)
+          if (temp_service->get_problem_has_been_acknowledged())
             problem = false;
-          if (temp_service->checks_enabled == false)
+          if (!temp_service->get_checks_enabled())
             problem = false;
           if (problem)
             services_warning_unhandled++;
@@ -711,9 +711,9 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == true)
+          if (temp_service->get_problem_has_been_acknowledged())
             problem = false;
-          if (temp_service->checks_enabled == false)
+          if (!temp_service->get_checks_enabled())
             problem = false;
           if (problem)
             services_unknown_unhandled++;
@@ -732,9 +732,9 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == true)
+          if (temp_service->get_problem_has_been_acknowledged())
             problem = false;
-          if (temp_service->checks_enabled == false)
+          if (!temp_service->get_checks_enabled())
             problem = false;
           if (problem)
             services_critical_unhandled++;

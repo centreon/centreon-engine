@@ -70,11 +70,11 @@ hostgroup::hostgroup(std::string const& name,
   _notes_url = notes_url;
 }
 
-unsigned int hostgroup::get_id() const {
+uint64_t hostgroup::get_id() const {
   return _id;
 }
 
-void hostgroup::set_id(unsigned int id)
+void hostgroup::set_id(uint64_t id)
 {
   _id = id;
 }

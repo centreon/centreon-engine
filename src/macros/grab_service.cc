@@ -53,7 +53,7 @@ using namespace com::centreon::engine::logging;
 static char* get_service_check_type(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
   return (string::dup(
-            (check_passive == svc.check_type
+            (check_passive == svc.get_check_type()
              ? "PASSIVE"
              : "ACTIVE")));
 }
@@ -223,7 +223,8 @@ struct grab_service_redirection {
       {MACRO_SERVICEATTEMPT,
        {&get_member_as_string<com::centreon::engine::service,
                               int,
-                              &com::centreon::engine::service::current_attempt>,
+                              notifier,
+                              &notifier::get_current_attempt>,
         true}},
       // Max attempts.
       {MACRO_MAXSERVICEATTEMPTS,

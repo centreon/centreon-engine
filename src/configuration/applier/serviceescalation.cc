@@ -115,7 +115,7 @@ void applier::serviceescalation::add_object(
       {{se->get_hostname(), se->get_description()}, se});
 
   // Notify event broker.
-  timeval tv{get_broker_timestamp(nullptr)};
+  timeval tv(get_broker_timestamp(nullptr));
   broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_ADD, NEBFLAG_NONE,
                                   NEBATTR_NONE, se.get(), &tv);
 
@@ -220,8 +220,8 @@ void applier::serviceescalation::remove_object(
   for (serviceescalation_mmap::iterator
        it{range.first}, end{range.second};
        it != end; ++it) {
-    std::list<std::shared_ptr<escalation>>& escalations{sit->second->get_escalations()};
-    for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
+    std::list<std::shared_ptr<escalation>>& escalations(sit->second->get_escalations());
+    for (std::list<std::shared_ptr<engine::escalation>>::iterator
         itt{escalations.begin()},
         next_itt{escalations.begin()},
         end{escalations.end()};
@@ -248,7 +248,7 @@ void applier::serviceescalation::remove_object(
       }
     }
     // Notify event broker.
-    timeval tv{get_broker_timestamp(nullptr)};
+    timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_escalation_data(
       NEBTYPE_SERVICEESCALATION_DELETE,
       NEBFLAG_NONE,
