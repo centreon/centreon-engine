@@ -561,12 +561,7 @@ void applier::service::remove_object(
     applier::scheduler::instance().remove_service(obj);
 
     // Unregister service.
-    for (engine::service** s(&service_list); *s; s = &(*s)->next)
-      if ((*s)->get_hostname() == host_name
-          && (*s)->get_description() == service_description) {
-        *s = (*s)->next;
-        break ;
-      }
+    engine::service::services.erase({host_name, service_description});
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));

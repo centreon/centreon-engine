@@ -228,8 +228,12 @@ void log_service_state(unsigned int type, com::centreon::engine::service* svc) {
  */
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-  for (com::centreon::engine::service* svc(service_list); svc; svc = svc->next)
-    log_service_state(type, svc);
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it)
+    log_service_state(type, it->second.get());
   return OK;
 }
 

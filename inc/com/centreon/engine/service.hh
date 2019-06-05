@@ -220,12 +220,12 @@ class                           service : public notifier {
   timeperiod*                   check_period_ptr;
   timeperiod*                   notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
-  service*                      next;
+
+  static service_map            services;
 
  private:
   std::string                   _hostname;
   std::string                   _description;
-
 };
 CCE_END()
 

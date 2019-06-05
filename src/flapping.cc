@@ -76,10 +76,12 @@ void enable_flap_detection_routines() {
        it != end;
        ++it)
     it->second->check_for_flapping(false, false, true);
-  for (temp_service = service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next)
-    temp_service->check_for_flapping(false, true);
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it)
+    it->second->check_for_flapping(false, true);
 }
 
 /* disables flap detection on a program wide basis */
@@ -123,10 +125,12 @@ void disable_flap_detection_routines() {
        it != end;
        ++it)
     handle_host_flap_detection_disabled(it->second.get());
-  for (temp_service = service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next)
-    handle_service_flap_detection_disabled(temp_service);
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it)
+    handle_service_flap_detection_disabled(it->second.get());
   return;
 }
 

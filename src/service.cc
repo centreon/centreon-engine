@@ -60,6 +60,8 @@ std::array<std::pair<uint32_t, std::string>, 3> const
                                  {NSLOG_SERVICE_WARNING, "WARNING"},
                                  {NSLOG_SERVICE_CRITICAL, "CRITICAL"}}};
 
+service_map service::services;
+
 service::service(std::string const& hostname,
                  std::string const& description,
                  std::string const& display_name,
@@ -760,8 +762,7 @@ com::centreon::engine::service* add_service(
     state::instance().services()[id] = obj;
 
     // Add new items to the list.
-    obj->next = service_list;
-    service_list = obj.get();
+    service::services[{obj->get_hostname(), obj->get_description()}] = obj;
   } catch (...) {
     obj.reset();
   }

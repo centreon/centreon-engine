@@ -466,7 +466,11 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
  *  @return The output stream.
  */
 std::ostream& dump::services(std::ostream& os) {
-  for (class service* obj(service_list); obj; obj = obj->next)
-    dump::service(os, *obj);
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it)
+    dump::service(os, *it->second);
   return os;
 }

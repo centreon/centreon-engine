@@ -41,9 +41,7 @@ using namespace com::centreon::engine::logging;
 
 /* do a pre-flight check to make sure object relationships, etc. make sense */
 int pre_flight_check() {
-  host* temp_host(nullptr);
   char* buf(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   commands::command* temp_command(nullptr);
   char* temp_command_name(nullptr);
   int warnings(0);
@@ -171,17 +169,18 @@ int pre_flight_check() {
   }
 
   /* count number of services associated with each host (we need this for flap detection)... */
-  for (temp_service = service_list;
-       temp_service != nullptr;
-       temp_service = temp_service->next) {
-
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it) {
     umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
-    if (it != state::instance().hosts().end() && it->second != nullptr) {
-      it->second->set_total_services(it->second->get_total_services() + 1);
-      it->second->set_total_service_check_interval(
-        it->second->get_total_service_check_interval()
-        + static_cast<unsigned long>(temp_service->get_check_interval()));
+      found(state::instance().hosts().find(get_host_id(it->first.first)));
+    if (found != state::instance().hosts().end() && it->second != nullptr) {
+      found->second->set_total_services(found->second->get_total_services() + 1);
+      found->second->set_total_service_check_interval(
+        found->second->get_total_service_check_interval()
+        + static_cast<unsigned long>(it->second->get_check_interval()));
     }
   }
 
@@ -246,10 +245,12 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking services...";
   int total_objects(0);
-  for (com::centreon::engine::service* temp_service(service_list);
-       temp_service;
-       temp_service = temp_service->next, ++total_objects)
-    check_service(temp_service, &warnings, &errors);
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it, ++total_objects)
+    check_service(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " services.";
@@ -916,10 +917,12 @@ int check_host(host* hst, int* w, int* e) {
   // modified.
   if (!use_large_installation_tweaks) {
     bool found(false);
-    for (com::centreon::engine::service* temp_service(service_list);
-	       temp_service;
-	       temp_service = temp_service->next)
-      if (hst->get_name() != temp_service->get_hostname()) {
+    for (service_map::iterator
+           it(service::services.begin()),
+           end(service::services.end());
+         it != end;
+         ++it)
+      if (hst->get_name() != it->first.first) {
         found = true;
         break ;
       }

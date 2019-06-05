@@ -664,79 +664,82 @@ static int handle_summary_macro(
     unsigned int services_unknown_unhandled(0);
     unsigned int services_warning(0);
     unsigned int services_warning_unhandled(0);
-    for (com::centreon::engine::service* temp_service = service_list;
-         temp_service != nullptr;
-         temp_service = temp_service->next) {
+
+    for (service_map::iterator
+           it(service::services.begin()),
+           end(service::services.end());
+         it != end;
+         ++it) {
       // Filter totals based on contact if necessary.
       bool authorized(
              mac->contact_ptr
              ? is_contact_for_service(
-                 temp_service,
+                 it->second.get(),
                  mac->contact_ptr)
              : true);
       if (authorized) {
         bool problem(true);
-        if (temp_service->current_state == STATE_OK
-            && temp_service->has_been_checked == true)
+        if (it->second->current_state == STATE_OK
+            && it->second->has_been_checked == true)
           services_ok++;
-        else if (temp_service->current_state == STATE_WARNING) {
+        else if (it->second->current_state == STATE_WARNING) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-            it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
-          if (it != state::instance().hosts().end())
-              temp_host = it->second.get();
+            found(state::instance().hosts().find(get_host_id(it->second->get_hostname())));
+          if (found != state::instance().hosts().end())
+              temp_host = found->second.get();
 
           if (temp_host != nullptr
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
-          if (temp_service->scheduled_downtime_depth > 0)
+          if (it->second->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->get_problem_has_been_acknowledged())
+          if (it->second->get_problem_has_been_acknowledged())
             problem = false;
-          if (!temp_service->get_checks_enabled())
+          if (!it->second->get_checks_enabled())
             problem = false;
           if (problem)
             services_warning_unhandled++;
           services_warning++;
         }
-        else if (temp_service->current_state == STATE_UNKNOWN) {
+        else if (it->second->current_state == STATE_UNKNOWN) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-          it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
-          if (it != state::instance().hosts().end())
-            temp_host = it->second.get();
+            found(state::instance().hosts().find(get_host_id(it->second->get_hostname())));
+          if (found != state::instance().hosts().end())
+            temp_host = found->second.get();
 
           if (temp_host != nullptr
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
-          if (temp_service->scheduled_downtime_depth > 0)
+          if (it->second->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->get_problem_has_been_acknowledged())
+          if (it->second->get_problem_has_been_acknowledged())
             problem = false;
-          if (!temp_service->get_checks_enabled())
+          if (!it->second->get_checks_enabled())
             problem = false;
           if (problem)
             services_unknown_unhandled++;
           services_unknown++;
         }
-        else if (temp_service->current_state == STATE_CRITICAL) {
+        else if (it->second->current_state == STATE_CRITICAL) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-          it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
-          if (it != state::instance().hosts().end())
-            temp_host = it->second.get();
+            found(state::instance().hosts().find(get_host_id(it->second->get_hostname())));
+          if (found != state::instance().hosts().end())
+            temp_host = found->second.get();
 
           if (temp_host != nullptr
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
-          if (temp_service->scheduled_downtime_depth > 0)
+          if (it->second->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->get_problem_has_been_acknowledged())
+          if (it->second->get_problem_has_been_acknowledged())
             problem = false;
-          if (!temp_service->get_checks_enabled())
+          if (!it->second->get_checks_enabled())
             problem = false;
           if (problem)
             services_critical_unhandled++;

@@ -152,9 +152,8 @@ unsigned int check_service_dependencies(
 
 /* check for services that never returned from a check... */
 void check_for_orphaned_services() {
-  com::centreon::engine::service* temp_service = NULL;
-  time_t current_time = 0L;
-  time_t expected_time = 0L;
+  time_t current_time{0L};
+  time_t expected_time{0L};
 
   logger(dbg_functions, basic)
     << "check_for_orphaned_services()";
@@ -163,17 +162,19 @@ void check_for_orphaned_services() {
   time(&current_time);
 
   /* check all services... */
-  for (temp_service = service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next) {
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it) {
 
     /* skip services that are not currently executing */
-    if (!temp_service->is_executing)
+    if (!it->second->is_executing)
       continue;
 
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
     expected_time
-      = (time_t)(temp_service->next_check + temp_service->latency
+      = (time_t)(it->second->next_check + it->second->latency
                  + config->service_check_timeout()
                  + config->check_reaper_interval() + 600);
 
@@ -183,14 +184,14 @@ void check_for_orphaned_services() {
       /* log a warning */
       logger(log_runtime_warning, basic)
         << "Warning: The check of service '"
-        << temp_service->get_description() << "' on host '"
-        << temp_service->get_hostname() << "' looks like it was orphaned "
+        << it->first.second << "' on host '"
+        << it->first.first << "' looks like it was orphaned "
         "(results never came back).  I'm scheduling an immediate check "
         "of the service...";
 
       logger(dbg_checks, more)
-        << "Service '" << temp_service->get_description()
-        << "' on host '" << temp_service->get_hostname()
+        << "Service '" << it->first.second
+        << "' on host '" << it->first.first
         << "' was orphaned, so we're scheduling an immediate check...";
 
       /* decrement the number of running service checks */
@@ -198,18 +199,17 @@ void check_for_orphaned_services() {
         currently_running_service_checks--;
 
       /* disable the executing flag */
-      temp_service->is_executing = false;
+      it->second->is_executing = false;
 
       /* schedule an immediate check of the service */
-      temp_service->schedule_check(current_time, CHECK_OPTION_ORPHAN_CHECK);
+      it->second->schedule_check(current_time, CHECK_OPTION_ORPHAN_CHECK);
     }
   }
 }
 
 /* check freshness of service results */
 void check_service_result_freshness() {
-  com::centreon::engine::service* temp_service = NULL;
-  time_t current_time = 0L;
+  time_t current_time{0L};
 
   logger(dbg_functions, basic)
     << "check_service_result_freshness()";
@@ -226,52 +226,54 @@ void check_service_result_freshness() {
   time(&current_time);
 
   /* check all services... */
-  for (temp_service = service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next) {
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it) {
 
     /* skip services we shouldn't be checking for freshness */
-    if (!temp_service->get_check_freshness())
+    if (!it->second->get_check_freshness())
       continue;
 
     /* skip services that are currently executing (problems here will be caught by orphaned service check) */
-    if (temp_service->is_executing)
+    if (it->second->is_executing)
       continue;
 
     /* skip services that have both active and passive checks disabled */
-    if (!temp_service->get_checks_enabled()
-        && !temp_service->accept_passive_service_checks)
+    if (!it->second->get_checks_enabled()
+        && !it->second->accept_passive_service_checks)
       continue;
 
     /* skip services that are already being freshened */
-    if (temp_service->is_being_freshened)
+    if (it->second->is_being_freshened)
       continue;
 
     // See if the time is right...
     {
-      timezone_locker lock(temp_service->get_timezone());
+      timezone_locker lock(it->second->get_timezone());
       if (check_time_against_period(
             current_time,
-            temp_service->check_period_ptr) == ERROR)
+            it->second->check_period_ptr) == ERROR)
         continue ;
     }
 
     /* EXCEPTION */
     /* don't check freshness of services without regular check intervals if we're using auto-freshness threshold */
-    if (temp_service->get_check_interval() == 0 &&
-        temp_service->freshness_threshold == 0)
+    if (it->second->get_check_interval() == 0 &&
+      it->second->freshness_threshold == 0)
       continue;
 
     /* the results for the last check of this service are stale! */
     if (!is_service_result_fresh(
-          temp_service, current_time,
+      it->second.get(), current_time,
           true)) {
 
       /* set the freshen flag */
-      temp_service->is_being_freshened = true;
+      it->second->is_being_freshened = true;
 
       /* schedule an immediate forced check of the service */
-      temp_service->schedule_check(
+      it->second->schedule_check(
           current_time,
           CHECK_OPTION_FORCE_EXECUTION | CHECK_OPTION_FRESHNESS_CHECK);
     }

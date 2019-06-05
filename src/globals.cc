@@ -96,8 +96,6 @@ nebcallback*        neb_callback_list[NEBCALLBACK_NUMITEMS];
 notification*       notification_list(NULL);
 pthread_t           worker_threads[TOTAL_WORKER_THREADS];
 sched_info          scheduling_info;
-com::centreon::engine::service*            service_list(NULL);
-com::centreon::engine::service*            service_list_tail(NULL);
 serviceescalation*  serviceescalation_list(NULL);
 serviceescalation*  serviceescalation_list_tail(NULL);
 time_t              event_start((time_t)-1);
