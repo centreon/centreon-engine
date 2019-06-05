@@ -22,7 +22,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/servicesmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/servicegroup.hh"
 #include "com/centreon/engine/shared.hh"
@@ -126,7 +125,10 @@ void servicegroup::set_action_url(std::string const& action_url) {
 bool servicegroup::operator==(servicegroup const& obj) throw () {
   return (_group_name ==  obj.get_group_name()
           && _alias == obj.get_alias()
-          && is_equal(members, obj.members)
+          && ((members.size() == obj.members.size()) &&
+            std::equal(members.begin(),
+                       members.end(),
+                       obj.members.begin()))
           && _notes == obj.get_notes()
           && _notes_url == obj.get_notes_url()
           && _action_url == obj.get_action_url());
@@ -156,7 +158,7 @@ std::ostream& operator<<(std::ostream& os, servicegroup const& obj) {
   os << "servicegroup {\n"
     "  group_name: " << obj.get_group_name() << "\n"
     "  alias:      " << obj.get_alias() << "\n"
-    "  members:    " << chkobj(obj.members) << "\n"
+    "  members:    " << obj.members << "\n"
     "  notes:      " << obj.get_notes() << "\n"
     "  notes_url:  " << obj.get_notes_url() << "\n"
     "  action_url: " << obj.get_action_url() << "\n"

@@ -24,6 +24,8 @@
 #  include <memory>
 #  include <string>
 #  include <time.h>
+#  include <unordered_map>
+#  include <utility>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
@@ -42,8 +44,24 @@ CCE_BEGIN()
     class command;
   }
   class host;
+  class service;
   class serviceescalation;
   class timeperiod;
+CCE_END()
+
+//Needed by service to use pair<string, string> as umap key.
+//TODO SGA : check why servicedependency does not need it...
+struct pair_hash {
+  template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2> & pair) const {
+      return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
+    }
+};
+
+typedef std::unordered_map<std::pair<std::string, std::string>,
+  std::shared_ptr<com::centreon::engine::service>, pair_hash> service_map;
+
+CCE_BEGIN()
 
 class                           service : public notifier {
  public:
@@ -154,8 +172,7 @@ class                           service : public notifier {
   int                           retain_status_information;
   int                           retain_nonstatus_information;
   int                           obsess_over_service;
-  std::unordered_map<std::string, customvariable>
-                                custom_variables;
+  int                           problem_has_been_acknowledged;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;
   int                           current_state;
@@ -193,18 +210,19 @@ class                           service : public notifier {
   uint64_t                      flapping_comment_id;
   double                        percent_state_change;
 
-  com::centreon::engine::host*  host_ptr;
-  com::centreon::engine::commands::command*
-                                event_handler_ptr;
+  std::unordered_map<std::string, customvariable>
+    custom_variables;
+
+  host*                         host_ptr;
+  commands::command*            event_handler_ptr;
   char*                         event_handler_args;
-  com::centreon::engine::commands::command*
-                                check_command_ptr;
+  commands::command*            check_command_ptr;
   char*                         check_command_args;
   timeperiod*                   check_period_ptr;
   timeperiod*                   notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
   service*                      next;
-  service*                      nexthash;
+
  private:
   std::string                   _hostname;
   std::string                   _description;
@@ -287,6 +305,7 @@ int      is_escalated_contact_for_service(
 #    include <string>
 
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
+std::ostream& operator<<(std::ostream& os, service_map const& obj);
 
 CCE_BEGIN()
 

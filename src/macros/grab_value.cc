@@ -265,10 +265,12 @@ static int handle_service_macro(
           size_t delimiter_len(strlen(arg2));
 
           // Concatenate macro values for all servicegroup members.
-          for (servicesmember* temp_servicesmember = sg->members;
-               temp_servicesmember != nullptr;
-               temp_servicesmember = temp_servicesmember->next) {
-            svc = temp_servicesmember->service_ptr;
+          for (service_map::iterator
+                 it(sg->members.begin()),
+                 end(sg->members.end());
+               it != end;
+               ++it) {
+            svc = it->second.get();
             if (svc) {
               // Get the macro value for this service.
               char* buffer(nullptr);

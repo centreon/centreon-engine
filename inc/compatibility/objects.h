@@ -33,7 +33,6 @@
 #  include "com/centreon/engine/objects/defines.hh"
 #  include "com/centreon/engine/objects/objectlist.hh"
 #  include "com/centreon/engine/servicegroup.hh"
-#  include "com/centreon/engine/objects/servicesmember.hh"
 #  include "com/centreon/engine/service.hh"
 #  include "com/centreon/engine/servicedependency.hh"
 #  include "com/centreon/engine/serviceescalation.hh"

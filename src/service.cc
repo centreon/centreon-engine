@@ -248,6 +248,21 @@ bool service::operator!=(service const& other) throw() {
 }
 
 /**
+ *  Dump a service_map content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The service_map to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, service_map const& obj) {
+  for (service_map::const_iterator it(obj.begin()), end(obj.end()); it != end; ++it)
+    os << "(" << it->first.first << ", "
+       << it->first.second << (std::next(it) != obj.end() ? "), " : ")");
+  return os;
+}
+
+/**
  *  Dump service content into the stream.
  *
  *  @param[out] os  The output stream.

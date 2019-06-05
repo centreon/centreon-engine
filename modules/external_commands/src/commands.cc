@@ -354,7 +354,6 @@ int cmd_schedule_check(int cmd, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   com::centreon::engine::service* temp_service(nullptr);
-  servicesmember* temp_servicesmember(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
@@ -405,10 +404,12 @@ int cmd_schedule_check(int cmd, char* args) {
   /* schedule service checks */
   else if (cmd == CMD_SCHEDULE_HOST_SVC_CHECKS
            || cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS) {
-    for (temp_servicesmember = temp_host->services;
-         temp_servicesmember != nullptr;
-         temp_servicesmember = temp_servicesmember->next) {
-      if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+    for (service_map::iterator
+           it(temp_host->services.begin()),
+           end(temp_host->services.end());
+         it != end;
+         ++it) {
+      if ((temp_service = it->second.get()) == nullptr)
         continue;
       temp_service->schedule_check(
         delay_time,
@@ -429,7 +430,6 @@ int cmd_schedule_check(int cmd, char* args) {
 int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   char* temp_ptr(nullptr);
   com::centreon::engine::service* temp_service(nullptr);
-  servicesmember* temp_servicesmember(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   time_t delay_time(0);
@@ -455,10 +455,12 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   delay_time = strtoul(temp_ptr, nullptr, 10);
 
   /* reschedule all services on the specified host */
-  for (temp_servicesmember = temp_host->services;
-       temp_servicesmember != nullptr;
-       temp_servicesmember = temp_servicesmember->next) {
-    if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+  for (service_map::iterator
+         it(temp_host->services.begin()),
+         end(temp_host->services.end());
+       it != end;
+       ++it) {
+    if ((temp_service = it->second.get()) == nullptr)
       continue;
     temp_service->schedule_check(
       delay_time,
@@ -925,13 +927,11 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
 /* schedules downtime for a specific host or service */
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
-  servicesmember* temp_servicesmember(nullptr);
   com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   com::centreon::engine::host* last_host(nullptr);
   hostgroup* temp_hostgroup(nullptr);
   servicegroup* temp_servicegroup(nullptr);
-  servicesmember* temp_sgmember(nullptr);
   char* host_name(nullptr);
   char* hostgroup_name(nullptr);
   char* servicegroup_name(nullptr);
@@ -1085,10 +1085,12 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_HOST_SVC_DOWNTIME:
-    for (temp_servicesmember = temp_host->services;
-         temp_servicesmember != nullptr;
-         temp_servicesmember = temp_servicesmember->next) {
-      if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+    for (service_map::iterator
+           it(temp_host->services.begin()),
+           end(temp_host->services.end());
+         it != end;
+         ++it) {
+      if ((temp_service = it->second.get()) == nullptr)
         continue;
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
@@ -1135,10 +1137,12 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
          ++it) {
       if (it->second == nullptr)
         continue;
-      for (temp_servicesmember = it->second->services;
-           temp_servicesmember != nullptr;
-           temp_servicesmember = temp_servicesmember->next) {
-        if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+      for (service_map::iterator
+             it2(it->second->services.begin()),
+             end2(it->second->services.end());
+           it2 != end2;
+           ++it2) {
+        if ((temp_service = it2->second.get()) == nullptr)
           continue;
         downtime_manager::instance().schedule_downtime(
           SERVICE_DOWNTIME,
@@ -1158,21 +1162,24 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME:
     last_host = nullptr;
-    for (temp_sgmember = temp_servicegroup->members;
-         temp_sgmember != nullptr;
-         temp_sgmember = temp_sgmember->next) {
+      for (service_map::iterator
+             it(temp_servicegroup->members.begin()),
+             end(temp_servicegroup->members.end());
+           it != end;
+           ++it) {
       temp_host = nullptr;
       umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-        it(configuration::applier::state::instance().hosts().find(get_host_id(temp_sgmember->host_name)));
-      if (it != configuration::applier::state::instance().hosts().end())
-        temp_host = it->second.get();
+        found(configuration::applier::state::instance().hosts().find(
+          get_host_id(it->first.first)));
+      if (found != configuration::applier::state::instance().hosts().end())
+        temp_host = found->second.get();
       if (temp_host  == nullptr)
         continue;
       if (last_host == temp_host)
         continue;
       downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
-        temp_sgmember->host_name,
+        it->first.first.c_str(),
         nullptr,
         entry_time,
         author,
@@ -1188,13 +1195,15 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME:
-    for (temp_sgmember = temp_servicegroup->members;
-         temp_sgmember != nullptr;
-         temp_sgmember = temp_sgmember->next)
+    for (service_map::iterator
+           it(temp_servicegroup->members.begin()),
+           end(temp_servicegroup->members.end());
+         it != end;
+         ++it)
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
-        temp_sgmember->host_name,
-        temp_sgmember->service_description,
+        it->first.first.c_str(),
+        it->first.second.c_str(),
         entry_time, author,
         comment_data,
         start_time,
@@ -2621,7 +2630,6 @@ void enable_and_propagate_notifications(
        int affect_services) {
   com::centreon::engine::host* child_host(nullptr);
   com::centreon::engine::service* temp_service(nullptr);
-  servicesmember* temp_servicesmember(nullptr);
 
   /* enable notification for top level host */
   if (affect_top_host && level == 0)
@@ -2651,10 +2659,12 @@ void enable_and_propagate_notifications(
 
     /* enable notifications for all services on this host... */
     if (affect_services) {
-      for (temp_servicesmember = it->second->services;
-           temp_servicesmember != nullptr;
-           temp_servicesmember = temp_servicesmember->next) {
-        if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+      for (service_map::iterator
+             it2(it->second->services.begin()),
+             end2(it->second->services.end());
+           it2 != end2;
+           ++it2) {
+        if ((temp_service = it2->second.get()) == nullptr)
           continue;
         enable_service_notifications(temp_service);
       }
@@ -2671,7 +2681,6 @@ void disable_and_propagate_notifications(
        int affect_services) {
   com::centreon::engine::host* child_host(nullptr);
   com::centreon::engine::service* temp_service(nullptr);
-  servicesmember* temp_servicesmember(nullptr);
 
   if (hst == nullptr)
     return;
@@ -2704,10 +2713,12 @@ void disable_and_propagate_notifications(
 
     /* disable notifications for all services on this host... */
     if (affect_services) {
-      for (temp_servicesmember = it->second->services;
-           temp_servicesmember != nullptr;
-           temp_servicesmember = temp_servicesmember->next) {
-        if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+      for (service_map::iterator
+             it2(it->second->services.begin()),
+             end2(it->second->services.end());
+           it2 != end2;
+           ++it2) {
+        if ((temp_service = it2->second.get()) == nullptr)
           continue;
         disable_service_notifications(temp_service);
       }

@@ -28,7 +28,6 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
-#include "com/centreon/engine/objects/servicesmember.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
@@ -59,10 +58,12 @@ static void generate_host_total_services(
     unsigned long total_host_services_warning(0);
     unsigned long total_host_services_unknown(0);
     unsigned long total_host_services_critical(0);
-    for (servicesmember* temp_servicesmember = hst.services;
-         temp_servicesmember != NULL;
-         temp_servicesmember = temp_servicesmember->next) {
-      com::centreon::engine::service* temp_service(temp_servicesmember->service_ptr);
+    for (service_map::iterator
+           it(hst.services.begin()),
+           end(hst.services.end());
+         it != end;
+         ++it) {
+      service* temp_service(it->second.get());
       if (temp_service) {
         total_host_services++;
         switch (temp_service->current_state) {

@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
@@ -705,7 +706,20 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
     svc->host_ptr = it->second.get();
 
   /* add a reverse link from the host to the service for faster lookups later */
-  add_service_link_to_host(svc->host_ptr, svc);
+  svc->host_ptr->services[{svc->get_hostname(), svc->get_description()}] =
+    std::shared_ptr<com::centreon::engine::service>(svc);
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_relation_data(
+    NEBTYPE_PARENT_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    svc->host_ptr,
+    NULL,
+    NULL,
+    svc,
+    &tv);
 
   /* check the event handler command */
   if (!svc->get_event_handler().empty()) {
@@ -1224,17 +1238,19 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
   int errors(0);
 
   // Check all group members.
-  for (servicesmember* temp_servicesmember(sg->members);
-       temp_servicesmember;
-       temp_servicesmember = temp_servicesmember->next) {
-    com::centreon::engine::service* temp_service(find_service(
-                            temp_servicesmember->host_name,
-                            temp_servicesmember->service_description));
+  for (service_map::iterator
+         it(sg->members.begin()),
+         end(sg->members.end());
+       it != end;
+       ++it) {
+    service* temp_service(find_service(
+                            it->first.first.c_str(),
+                            it->first.second.c_str()));
     if (!temp_service) {
       logger(log_verification_error, basic)
         << "Error: Service '"
-        << temp_servicesmember->service_description
-        << "' on host '" << temp_servicesmember->host_name
+        << it->first.second
+        << "' on host '" << it->first.first
         << "' specified in service group '" << sg->get_group_name()
         << "' is not defined anywhere!";
       errors++;
@@ -1246,7 +1262,7 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
       add_object_to_objectlist(&temp_service->servicegroups_ptr, sg);
 
     // Save service pointer for later.
-    temp_servicesmember->service_ptr = temp_service;
+    sg->members[it->first] = std::shared_ptr<service>(temp_service);
   }
 
   // Check for illegal characters in servicegroup name.

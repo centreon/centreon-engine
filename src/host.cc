@@ -35,7 +35,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/objects/servicesmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/shared.hh"
@@ -1072,7 +1071,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << child_oss
      << "\n"
         "  services:                             "
-     << chkobj(obj.services)
+     << obj.services
      << "\n"
         "  host_check_command:                   "
      << obj.get_check_command()
