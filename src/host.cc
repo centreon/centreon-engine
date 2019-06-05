@@ -860,14 +860,6 @@ void host::set_total_service_check_interval(
   _total_service_check_interval = total_service_check_interval;
 }
 
-unsigned long host::get_modified_attributes() const {
-  return _modified_attributes;
-}
-
-void host::set_modified_attributes(unsigned long modified_attributes) {
-  _modified_attributes = modified_attributes;
-}
-
 int host::get_circular_path_checked() const {
   return _circular_path_checked;
 }
@@ -3300,7 +3292,7 @@ void host::disable_flap_detection() {
 void host::enable_flap_detection() {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  logger(dbg_functions, basic) << "enable_host_flap_detection()";
+  logger(dbg_functions, basic) << "host::enable_flap_detection()";
 
   logger(dbg_flapping, more)
       << "Enabling flap detection for host '" << get_name() << "'.";
@@ -3318,7 +3310,7 @@ void host::enable_flap_detection() {
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
                             NEBATTR_NONE, this, CMD_NONE, attr,
-                            get_modified_attributes(), NULL);
+                            get_modified_attributes(), nullptr);
 
   /* check for flapping */
   check_for_flapping(false, false, true);

@@ -429,7 +429,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "last_time_warning=" << static_cast<unsigned long>(obj.last_time_warning) << "\n"
     "long_plugin_output=" << obj.get_long_plugin_output() << "\n"
     "max_attempts=" << obj.get_max_attempts() << "\n"
-    "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
+    "modified_attributes=" << (obj.get_modified_attributes() & ~config->retained_host_attribute_mask()) << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.get_check_interval() << "\n"
     "notification_period=" << obj.get_notification_period() << "\n"

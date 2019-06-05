@@ -291,8 +291,6 @@ class                 host : public notifier {
   void               set_total_services(int total_services);
   unsigned long      get_total_service_check_interval() const;
   void               set_total_service_check_interval(unsigned long total_service_check_interval);
-  unsigned long      get_modified_attributes() const;
-  void               set_modified_attributes(unsigned long modified_attributes);
   int                get_circular_path_checked() const;
   void               set_circular_path_checked(int check_level);
   bool               get_contains_circular_path() const;
@@ -396,7 +394,6 @@ private:
   double              _percent_state_change;
   int                 _total_services;
   unsigned long       _total_service_check_interval;
-  unsigned long       _modified_attributes;
   int                 _circular_path_checked;
   bool                _contains_circular_path;
 };

@@ -225,7 +225,7 @@ bool service::operator==(service const& other) throw() {
          this->is_flapping == other.is_flapping &&
          this->flapping_comment_id == other.flapping_comment_id &&
          this->percent_state_change == other.percent_state_change &&
-         this->modified_attributes == other.modified_attributes &&
+         this->_modified_attributes == other._modified_attributes &&
          is_equal(this->event_handler_args, other.event_handler_args) &&
          is_equal(this->check_command_args, other.check_command_args);
 }
@@ -398,164 +398,111 @@ std::ostream& operator<<(std::ostream& os,
      << "\n"
         "  accept_passive_service_checks:        "
      << obj.accept_passive_service_checks
-     << "\n"
-        "  event_handler_enabled:                "
+     << "\n  event_handler_enabled:                "
      << obj.event_handler_enabled
-     << "\n"
-        "  checks_enabled:                       "
+     << "\n  checks_enabled:                       "
      << obj.checks_enabled
-     << "\n"
-        "  retain_status_information:            "
+     << "\n  retain_status_information:            "
      << obj.retain_status_information
-     << "\n"
-        "  retain_nonstatus_information:         "
+     << "\n  retain_nonstatus_information:         "
      << obj.retain_nonstatus_information
-     << "\n"
-        "  notifications_enabled:                "
+     << "\n  notifications_enabled:                "
      << obj.get_notifications_enabled()
-     << "\n"
-        "  obsess_over_service:                  "
+     << "\n  obsess_over_service:                  "
      << obj.obsess_over_service
-     << "\n"
-        "  notes:                                "
+     << "\n  notes:                                "
      << obj.get_notes()
-     << "\n"
-        "  notes_url:                            "
+     << "\n  notes_url:                            "
      << obj.get_notes_url()
-     << "\n"
-        "  action_url:                           "
+     << "\n  action_url:                           "
      << obj.get_action_url()
-     << "\n"
-        "  icon_image:                           "
+     << "\n  icon_image:                           "
      << obj.get_icon_image()
-     << "\n"
-        "  icon_image_alt:                       "
+     << "\n  icon_image_alt:                       "
      << obj.get_icon_image_alt()
-     << "\n"
-        "  problem_has_been_acknowledged:        "
+     << "\n  problem_has_been_acknowledged:        "
      << obj.problem_has_been_acknowledged
-     << "\n"
-        "  acknowledgement_type:                 "
+     << "\n  acknowledgement_type:                 "
      << obj.acknowledgement_type
-     << "\n"
-        "  host_problem_at_last_check:           "
+     << "\n  host_problem_at_last_check:           "
      << obj.host_problem_at_last_check
-     << "\n"
-        "  check_type:                           "
+     << "\n  check_type:                           "
      << obj.check_type
-     << "\n"
-        "  current_state:                        "
+     << "\n  current_state:                        "
      << obj.current_state
-     << "\n"
-        "  last_state:                           "
+     << "\n  last_state:                           "
      << obj.last_state
-     << "\n"
-        "  last_hard_state:                      "
+     << "\n  last_hard_state:                      "
      << obj.last_hard_state
-     << "\n"
-        "  plugin_output:                        "
+     << "\n  plugin_output:                        "
      << obj.get_plugin_output()
-     << "\n"
-        "  long_plugin_output:                   "
+     << "\n  long_plugin_output:                   "
      << obj.get_long_plugin_output()
-     << "\n"
-        "  perf_data:                            "
+     << "\n  perf_data:                            "
      << obj.get_perf_data()
-     << "\n"
-        "  state_type:                           "
+     << "\n  state_type:                           "
      << obj.state_type
-     << "\n"
-        "  next_check:                           "
+     << "\n  next_check:                           "
      << string::ctime(obj.next_check)
-     << "\n"
-        "  should_be_scheduled:                  "
+     << "\n  should_be_scheduled:                  "
      << obj.should_be_scheduled
-     << "\n"
-        "  last_check:                           "
+     << "\n  last_check:                           "
      << string::ctime(obj.last_check)
-     << "\n"
-        "  current_attempt:                      "
+     << "\n  current_attempt:                      "
      << obj.current_attempt
-     << "\n"
-        "  current_event_id:                     "
+     << "\n  current_event_id:                     "
      << obj.current_event_id
-     << "\n"
-        "  last_event_id:                        "
+     << "\n  last_event_id:                        "
      << obj.last_event_id
-     << "\n"
-        "  current_problem_id:                   "
+     << "\n  current_problem_id:                   "
      << obj.current_problem_id
-     << "\n"
-        "  last_problem_id:                      "
+     << "\n  last_problem_id:                      "
      << obj.last_problem_id
-     << "\n"
-        "  last_notification:                    "
+     << "\n  last_notification:                    "
      << string::ctime(obj.get_last_notification())
-     << "\n"
-        "  next_notification:                    "
+     << "\n  next_notification:                    "
      << string::ctime(obj.get_next_notification())
-     << "\n"
-        "  no_more_notifications:                "
+     << "\n  no_more_notifications:                "
      << obj.no_more_notifications
-     << "\n"
-        "  check_flapping_recovery_notification: "
+     << "\n  check_flapping_recovery_notification: "
      << obj.check_flapping_recovery_notification
-     << "\n"
-        "  last_state_change:                    "
+     << "\n  last_state_change:                    "
      << string::ctime(obj.last_state_change)
-     << "\n"
-        "  last_hard_state_change:               "
+     << "\n  last_hard_state_change:               "
      << string::ctime(obj.last_hard_state_change)
-     << "\n"
-        "  last_time_ok:                         "
+     << "\n  last_time_ok:                         "
      << string::ctime(obj.last_time_ok)
-     << "\n"
-        "  last_time_warning:                    "
+     << "\n  last_time_warning:                    "
      << string::ctime(obj.last_time_warning)
-     << "\n"
-        "  last_time_unknown:                    "
+     << "\n  last_time_unknown:                    "
      << string::ctime(obj.last_time_unknown)
-     << "\n"
-        "  last_time_critical:                   "
+     << "\n  last_time_critical:                   "
      << string::ctime(obj.last_time_critical)
-     << "\n"
-        "  has_been_checked:                     "
+     << "\n  has_been_checked:                     "
      << obj.has_been_checked
-     << "\n"
-        "  is_being_freshened:                   "
+     << "\n  is_being_freshened:                   "
      << obj.is_being_freshened
-     << "\n"
-        "  notified_on_unknown:                  "
+     << "\n  notified_on_unknown:                  "
      << obj.get_notified_on(notifier::unknown)
-     << "\n"
-        "  notified_on_warning:                  "
+     << "\n  notified_on_warning:                  "
      << obj.get_notified_on(notifier::warning)
-     << "\n"
-        "  notified_on_critical:                 "
+     << "\n  notified_on_critical:                 "
      << obj.get_notified_on(notifier::critical)
-     << "\n"
-        "  current_notification_number:          "
+     << "\n  current_notification_number:          "
      << obj.current_notification_number
-     << "\n"
-        "  current_notification_id:              "
+     << "\n  current_notification_id:              "
      << obj.current_notification_id
-     << "\n"
-        "  latency:                              "
+     << "\n  latency:                              "
      << obj.latency
-     << "\n"
-        "  execution_time:                       "
+     << "\n  execution_time:                       "
      << obj.execution_time
-     << "\n"
-        "  is_executing:                         "
+     << "\n  is_executing:                         "
      << obj.is_executing
-     << "\n"
-        "  check_options:                        "
+     << "\n  check_options:                        "
      << obj.check_options
-     << "\n"
-        "  scheduled_downtime_depth:             "
+     << "\n  scheduled_downtime_depth:             "
      << obj.scheduled_downtime_depth
-     << "\n"
-        "  pending_flex_downtime:                "
+     << "\n  pending_flex_downtime:                "
      << obj.pending_flex_downtime << "\n";
 
   os << "  state_history:                        ";
@@ -565,41 +512,29 @@ std::ostream& operator<<(std::ostream& os,
     os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
 
   os << "  state_history_index:                  " << obj.state_history_index
-     << "\n"
-        "  is_flapping:                          "
+     << "\n  is_flapping:                          "
      << obj.is_flapping
-     << "\n"
-        "  flapping_comment_id:                  "
+     << "\n  flapping_comment_id:                  "
      << obj.flapping_comment_id
-     << "\n"
-        "  percent_state_change:                 "
+     << "\n  percent_state_change:                 "
      << obj.percent_state_change
-     << "\n"
-        "  modified_attributes:                  "
-     << obj.modified_attributes
-     << "\n"
-        "  host_ptr:                             "
+     << "\n  modified_attributes:                  "
+     << obj.get_modified_attributes()
+     << "\n  host_ptr:                             "
      << (obj.host_ptr ? obj.host_ptr->get_name() : "\"nullptr\"")
-     << "\n"
-        "  event_handler_ptr:                    "
+     << "\n  event_handler_ptr:                    "
      << evt_str
-     << "\n"
-        "  event_handler_args:                   "
+     << "\n  event_handler_args:                   "
      << chkstr(obj.event_handler_args)
-     << "\n"
-        "  check_command_ptr:                    "
+     << "\n  check_command_ptr:                    "
      << cmd_str
-     << "\n"
-        "  check_command_args:                   "
+     << "\n  check_command_args:                   "
      << chkstr(obj.check_command_args)
-     << "\n"
-        "  check_period_ptr:                     "
+     << "\n  check_period_ptr:                     "
      << chk_period_str
-     << "\n"
-        "  notification_period_ptr:              "
+     << "\n  notification_period_ptr:              "
      << notif_period_str
-     << "\n"
-        "  servicegroups_ptr:                    "
+     << "\n  servicegroups_ptr:                    "
      << svcgrp_str << "\n";
 
   for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
@@ -813,7 +748,7 @@ com::centreon::engine::service* add_service(
     obj->is_volatile = (is_volatile > 0);
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;
-    obj->modified_attributes = MODATTR_NONE;
+    obj->set_modified_attributes(MODATTR_NONE);
     obj->notification_interval = notification_interval;
     obj->notify_on_critical = (notify_critical > 0);
     obj->notify_on_downtime = (notify_downtime > 0);
@@ -2640,18 +2575,18 @@ void service::clear_flap(double percent_change,
 void service::enable_flap_detection() {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  logger(dbg_functions, basic) << "enable_service_flap_detection()";
+  logger(dbg_functions, basic) << "service::enable_flap_detection()";
 
   logger(dbg_flapping, more)
-      << "Enabling flap detection for service '" << this->get_description()
-      << "' on host '" << this->get_hostname() << "'.";
+      << "Enabling flap detection for service '" << get_description()
+      << "' on host '" << get_hostname() << "'.";
 
   /* nothing to do... */
   if (get_flap_detection_enabled())
     return;
 
   /* set the attribute modified flag */
-  this->modified_attributes |= attr;
+  _modified_attributes |= attr;
 
   /* set the flap detection enabled flag */
   set_flap_detection_enabled(true);
@@ -2659,13 +2594,13 @@ void service::enable_flap_detection() {
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
                                NEBATTR_NONE, this, CMD_NONE, attr,
-                               this->modified_attributes, nullptr);
+                               get_modified_attributes(), nullptr);
 
   /* check for flapping */
   check_for_flapping(false, true);
 
   /* update service status */
-  this->update_status(false);
+  update_status(false);
 }
 
 /* disables flap detection for a specific service */
@@ -2683,7 +2618,7 @@ void service::disable_flap_detection() {
     return;
 
   /* set the attribute modified flag */
-  this->modified_attributes |= attr;
+  _modified_attributes |= attr;
 
   /* set the flap detection enabled flag */
   set_flap_detection_enabled(false);
@@ -2691,7 +2626,7 @@ void service::disable_flap_detection() {
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
                                NEBATTR_NONE, this, CMD_NONE, attr,
-                               this->modified_attributes, nullptr);
+                               _modified_attributes, nullptr);
 
   /* handle the details... */
   handle_service_flap_detection_disabled(this);
@@ -3416,7 +3351,7 @@ bool service::is_valid_escalation_for_notification(std::shared_ptr<escalation> e
   else
     notification_number = current_notification_number;
 
-  /* find the host this escalation entry is associated with */
+  /* find the service this escalation entry is associated with */
   if (e->notifier_ptr != this)
     return false;
 
@@ -3444,16 +3379,16 @@ bool service::is_valid_escalation_for_notification(std::shared_ptr<escalation> e
     return false;
 
   /* skip this escalation if the state options don't match */
-  if (this->current_state == STATE_OK &&
+  if (get_current_state() == STATE_OK &&
       !e->get_escalate_on(notifier::recovery))
     return false;
-  else if (this->current_state == STATE_WARNING &&
+  else if (get_current_state() == STATE_WARNING &&
            !e->get_escalate_on(notifier::warning))
     return false;
-  else if (this->current_state == STATE_UNKNOWN &&
+  else if (get_current_state() == STATE_UNKNOWN &&
            !e->get_escalate_on(notifier::unknown))
     return false;
-  else if (this->current_state == STATE_CRITICAL &&
+  else if (get_current_state() == STATE_CRITICAL &&
            !e->get_escalate_on(notifier::critical))
     return false;
 

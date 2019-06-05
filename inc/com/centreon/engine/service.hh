@@ -195,7 +195,6 @@ class                           service : public notifier {
   int                           is_flapping;
   uint64_t                      flapping_comment_id;
   double                        percent_state_change;
-  unsigned long                 modified_attributes;
 
   com::centreon::engine::host*  host_ptr;
   com::centreon::engine::commands::command*

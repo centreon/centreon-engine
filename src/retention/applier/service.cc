@@ -74,9 +74,10 @@ void applier::service::_update(
        engine::service& obj,
        bool scheduling_info_is_ok) {
   if (state.modified_attributes().is_set()) {
-    obj.modified_attributes = *state.modified_attributes();
+    obj.set_modified_attributes(*state.modified_attributes());
     // mask out attributes we don't want to retain.
-    obj.modified_attributes &= ~config.retained_host_attribute_mask();
+    obj.set_modified_attributes(obj.get_modified_attributes() &
+                                ~config.retained_host_attribute_mask());
   }
 
   if (obj.retain_status_information) {
@@ -173,79 +174,79 @@ void applier::service::_update(
       obj.acknowledgement_type = *state.acknowledgement_type();
 
     if (state.notifications_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_NOTIFICATIONS_ENABLED))
+        && (obj.get_modified_attributes() & MODATTR_NOTIFICATIONS_ENABLED))
       obj.set_notifications_enabled(*state.notifications_enabled());
 
     if (state.active_checks_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
+        && (obj.get_modified_attributes() & MODATTR_ACTIVE_CHECKS_ENABLED))
       obj.checks_enabled = *state.active_checks_enabled();
 
     if (state.passive_checks_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED))
+        && (obj.get_modified_attributes() & MODATTR_PASSIVE_CHECKS_ENABLED))
       obj.accept_passive_service_checks = *state.passive_checks_enabled();
 
     if (state.event_handler_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_EVENT_HANDLER_ENABLED))
+        && (obj.get_modified_attributes() & MODATTR_EVENT_HANDLER_ENABLED))
       obj.event_handler_enabled = *state.event_handler_enabled();
 
     if (state.flap_detection_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_FLAP_DETECTION_ENABLED))
+        && (obj.get_modified_attributes() & MODATTR_FLAP_DETECTION_ENABLED))
       obj.set_flap_detection_enabled(*state.flap_detection_enabled());
 
     if (state.process_performance_data().is_set()
-        && (obj.modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED))
+        && (obj.get_modified_attributes() & MODATTR_PERFORMANCE_DATA_ENABLED))
       obj.process_performance_data = *state.process_performance_data();
 
     if (state.obsess_over_service().is_set()
-        && (obj.modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED))
+        && (obj.get_modified_attributes() & MODATTR_OBSESSIVE_HANDLER_ENABLED))
       obj.obsess_over_service = *state.obsess_over_service();
 
     if (state.check_command().is_set()
-        && (obj.modified_attributes & MODATTR_CHECK_COMMAND)) {
+        && (obj.get_modified_attributes() & MODATTR_CHECK_COMMAND)) {
       if (utils::is_command_exist(*state.check_command()))
         obj.set_check_command(*state.check_command());
       else
-        obj.modified_attributes -= MODATTR_CHECK_COMMAND;
+        obj.set_modified_attributes(obj.get_modified_attributes() - MODATTR_CHECK_COMMAND);
     }
 
     if (state.check_period().is_set()
-        && (obj.modified_attributes & MODATTR_CHECK_TIMEPERIOD)) {
+        && (obj.get_modified_attributes() & MODATTR_CHECK_TIMEPERIOD)) {
       timeperiod_map::const_iterator
         it(configuration::applier::state::instance().timeperiods().find(*state.check_period()));
       if (it != configuration::applier::state::instance().timeperiods().end())
         obj.set_check_period(*state.check_period());
       else
-        obj.modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
+        obj.set_modified_attributes(obj.get_modified_attributes() - MODATTR_CHECK_TIMEPERIOD);
     }
 
     if (state.notification_period().is_set()
-        && (obj.modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD)) {
+        && (obj.get_modified_attributes() & MODATTR_NOTIFICATION_TIMEPERIOD)) {
       timeperiod_map::const_iterator
         it(configuration::applier::state::instance().timeperiods().find(*state.notification_period()));
       if (it != configuration::applier::state::instance().timeperiods().end())
         obj.set_notification_period(*state.notification_period());
       else
-        obj.modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
+        obj.set_modified_attributes(obj.get_modified_attributes() - MODATTR_NOTIFICATION_TIMEPERIOD);
     }
 
     if (state.event_handler().is_set()
-        && (obj.modified_attributes & MODATTR_EVENT_HANDLER_COMMAND)) {
+        && (obj.get_modified_attributes() & MODATTR_EVENT_HANDLER_COMMAND)) {
       if (utils::is_command_exist(*state.event_handler()))
         obj.set_event_handler(*state.event_handler());
       else
-        obj.modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
+        obj.set_modified_attributes(obj.get_modified_attributes() - MODATTR_EVENT_HANDLER_COMMAND);
     }
 
     if (state.normal_check_interval().is_set()
-        && (obj.modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL))
+        && (obj.get_modified_attributes() & MODATTR_NORMAL_CHECK_INTERVAL))
       obj.set_check_interval(*state.normal_check_interval());
 
     if (state.retry_check_interval().is_set()
-        && (obj.modified_attributes & MODATTR_RETRY_CHECK_INTERVAL))
+        && (obj.get_modified_attributes() & MODATTR_RETRY_CHECK_INTERVAL))
       obj.set_retry_interval(*state.retry_check_interval());
 
     if (state.max_attempts().is_set()
-        && (obj.modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS)) {
+        && (obj.get_modified_attributes() & MODATTR_MAX_CHECK_ATTEMPTS)) {
       obj.set_max_attempts(*state.max_attempts());
 
       // adjust current attempt number if in a hard state.
@@ -256,7 +257,7 @@ void applier::service::_update(
     }
 
     if (!state.customvariables().empty()
-        && (obj.modified_attributes & MODATTR_CUSTOM_VARIABLE)) {
+        && (obj.get_modified_attributes() & MODATTR_CUSTOM_VARIABLE)) {
       for (map_customvar::const_iterator
              it(state.customvariables().begin()),
              end(state.customvariables().end());
@@ -267,12 +268,12 @@ void applier::service::_update(
   }
   // Adjust modified attributes if necessary.
   else
-    obj.modified_attributes = MODATTR_NONE;
+    obj.set_modified_attributes(MODATTR_NONE);
 
   bool allow_flapstart_notification(true);
 
   // Adjust modified attributes if no custom variable has been changed.
-  if (obj.modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+  if (obj.get_modified_attributes() & MODATTR_CUSTOM_VARIABLE) {
     bool at_least_one_modified(false);
     for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
       if (cv.second.has_been_modified()) {
@@ -280,7 +281,7 @@ void applier::service::_update(
         break;
       }
     if (!at_least_one_modified)
-      obj.modified_attributes -= MODATTR_CUSTOM_VARIABLE;
+      obj.set_modified_attributes(obj.get_modified_attributes() - MODATTR_CUSTOM_VARIABLE);
   }
 
   // calculate next possible notification time.

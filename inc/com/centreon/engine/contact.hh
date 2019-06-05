@@ -62,8 +62,9 @@ class                           contact {
   void                          set_can_submit_commands(bool can_submit);
   std::string const&            get_email() const;
   void                          set_email(std::string const& email);
-  unsigned long                 get_modified_attributes() const;
-  void                          set_modified_attributes(unsigned long attr);
+  uint32_t                      get_modified_attributes() const;
+  void                          set_modified_attributes(uint32_t attr);
+  void                          add_modified_attributes(uint32_t attr);
   std::string const&            get_name() const;
   void                          set_name(std::string const& name);
   std::string const&            get_pager() const;

@@ -180,6 +180,9 @@ class                         notifier {
   virtual bool is_valid_escalation_for_notification(
       std::shared_ptr<escalation> e,
       int options) const = 0;
+  void               add_modified_attributes(uint32_t attr);
+  uint32_t           get_modified_attributes() const;
+  void               set_modified_attributes(uint32_t modified_attributes);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -206,6 +209,7 @@ class                         notifier {
   std::string _notification_period;
   uint32_t _out_notification_type;
   uint32_t _in_notification_type;
+  uint32_t _modified_attributes;
 
  private:
   static uint64_t _next_notification_id;

@@ -1766,9 +1766,9 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
     /* set the modified service attribute */
     if (cmd == CMD_CHANGE_SVC_MODATTR)
-      temp_service->modified_attributes = attr;
+      temp_service->set_modified_attributes(attr);
     else
-      temp_service->modified_attributes |= attr;
+      temp_service->set_modified_attributes(temp_service->get_modified_attributes() | attr);
 
     /* send data to event broker */
     broker_adaptive_service_data(
@@ -1777,7 +1777,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       NEBATTR_NONE,
       temp_service,
       cmd, attr,
-      temp_service->modified_attributes,
+      temp_service->get_modified_attributes(),
       nullptr);
 
     /* update the status log with the service info */
@@ -2133,7 +2133,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
 
     /* set the modified service attribute */
-    temp_service->modified_attributes |= attr;
+    temp_service->add_modified_attributes(attr);
 
     /* send data to event broker */
     broker_adaptive_service_data(
@@ -2143,7 +2143,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
       temp_service,
       cmd,
       attr,
-      temp_service->modified_attributes,
+      temp_service->get_modified_attributes(),
       nullptr);
 
     /* update the status log with the service info */
@@ -2155,8 +2155,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_HOST_CHECK_TIMEPERIOD:
   case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
     /* set the modified host attribute */
-    temp_host->set_modified_attributes(
-      temp_host->get_modified_attributes() | attr);
+    temp_host->add_modified_attributes(attr);
 
     /* send data to event broker */
     broker_adaptive_host_data(
@@ -2270,8 +2269,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
         it->second.update(std::move(varvalue));
 
       /* set the modified attributes and update the status of the object */
-      temp_host->set_modified_attributes(
-        temp_host->get_modified_attributes() | MODATTR_CUSTOM_VARIABLE);
+      temp_host->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
       temp_host->update_status(false);
     }
     break;
@@ -2288,7 +2286,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       /* set the modified attributes and update the status of the object */
       temp_service->custom_variables.insert(
           {std::move(varname), customvariable(std::move(varvalue))});
-      temp_service->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
+      temp_service->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
       temp_service->update_status(false);
     }
     break;
@@ -2305,9 +2303,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       /* set the modified attributes and update the status of the object */
       temp_contact->custom_variables.insert(
           {std::move(varname), customvariable(std::move(varvalue))});
-      temp_contact->set_modified_attributes(
-          temp_contact->get_modified_attributes()
-          | MODATTR_CUSTOM_VARIABLE);
+      temp_contact->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
       temp_contact->update_status_info(false);
     }
     break;
@@ -2363,7 +2359,7 @@ void disable_service_checks(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* disable the service check... */
   svc->checks_enabled = false;
@@ -2377,7 +2373,7 @@ void disable_service_checks(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log to reflect the new service state */
@@ -2395,7 +2391,7 @@ void enable_service_checks(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* enable the service check... */
   svc->checks_enabled = true;
@@ -2431,7 +2427,7 @@ void enable_service_checks(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log to reflect the new service state */
@@ -2509,7 +2505,7 @@ void enable_service_notifications(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* enable the service notifications... */
   svc->set_notifications_enabled(true);
@@ -2522,7 +2518,7 @@ void enable_service_notifications(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log to reflect the new service state */
@@ -2538,7 +2534,7 @@ void disable_service_notifications(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* disable the service notifications... */
   svc->set_notifications_enabled(false);
@@ -2551,7 +2547,7 @@ void disable_service_notifications(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log to reflect the new service state */
@@ -2567,8 +2563,7 @@ void enable_host_notifications(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* enable the host notifications... */
   hst->set_notifications_enabled(true);
@@ -2597,8 +2592,7 @@ void disable_host_notifications(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* disable the host notifications... */
   hst->set_notifications_enabled(false);
@@ -3198,7 +3192,7 @@ void enable_passive_service_checks(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* set the passive check flag */
   svc->accept_passive_service_checks = true;
@@ -3211,7 +3205,7 @@ void enable_passive_service_checks(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log with the service info */
@@ -3227,7 +3221,7 @@ void disable_passive_service_checks(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* set the passive check flag */
   svc->accept_passive_service_checks = false;
@@ -3240,7 +3234,7 @@ void disable_passive_service_checks(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log with the service info */
@@ -3375,8 +3369,7 @@ void enable_passive_host_checks(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the passive check flag */
   hst->set_accept_passive_host_checks(true);
@@ -3405,8 +3398,7 @@ void disable_passive_host_checks(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the passive check flag */
   hst->set_accept_passive_host_checks(false);
@@ -3497,7 +3489,7 @@ void enable_service_event_handler(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* set the event handler flag */
   svc->event_handler_enabled = true;
@@ -3510,7 +3502,7 @@ void enable_service_event_handler(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log with the service info */
@@ -3526,7 +3518,7 @@ void disable_service_event_handler(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* set the event handler flag */
   svc->event_handler_enabled = false;
@@ -3539,7 +3531,7 @@ void disable_service_event_handler(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log with the service info */
@@ -3555,8 +3547,7 @@ void enable_host_event_handler(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the event handler flag */
   hst->set_event_handler_enabled(true);
@@ -3585,8 +3576,7 @@ void disable_host_event_handler(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the event handler flag */
   hst->set_event_handler_enabled(false);
@@ -3615,8 +3605,7 @@ void disable_host_checks(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the host check flag */
   hst->set_checks_enabled(false);
@@ -3648,8 +3637,7 @@ void enable_host_checks(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the host check flag */
   hst->set_checks_enabled(true);
@@ -3995,7 +3983,7 @@ void start_obsessing_over_service(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* set the obsess over service flag */
   svc->obsess_over_service = true;
@@ -4008,7 +3996,7 @@ void start_obsessing_over_service(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log with the service info */
@@ -4024,7 +4012,7 @@ void stop_obsessing_over_service(com::centreon::engine::service* svc) {
     return;
 
   /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
+  svc->add_modified_attributes(attr);
 
   /* set the obsess over service flag */
   svc->obsess_over_service = false;
@@ -4037,7 +4025,7 @@ void stop_obsessing_over_service(com::centreon::engine::service* svc) {
     svc,
     CMD_NONE,
     attr,
-    svc->modified_attributes,
+    svc->get_modified_attributes(),
     nullptr);
 
   /* update the status log with the service info */
@@ -4053,8 +4041,7 @@ void start_obsessing_over_host(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the obsess over host flag */
   hst->set_obsess_over_host(true);
@@ -4083,8 +4070,7 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
     return;
 
   /* set the attribute modified flag */
-  hst->set_modified_attributes(
-    hst->get_modified_attributes() | attr);
+  hst->add_modified_attributes(attr);
 
   /* set the obsess over host flag */
   hst->set_obsess_over_host(false);
@@ -4103,4 +4089,3 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
   /* update the status log with the host info */
   hst->update_status(false);
 }
-

@@ -148,14 +148,6 @@ namespace           configuration {
                     servicedependencies_find(configuration::servicedependency::key_type const& k) const;
       servicedependency_mmap::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>> const&
-                    serviceescalations() const throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>&
-                    serviceescalations() throw ();
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>::const_iterator
-                    serviceescalations_find(configuration::serviceescalation::key_type const& k) const;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>::iterator
-                    serviceescalations_find(configuration::serviceescalation::key_type const& k);
       servicegroup_map const&
                     servicegroups() const throw ();
       servicegroup_map&
@@ -238,8 +230,6 @@ namespace           configuration {
                     _services;
       servicedependency_mmap
                     _servicedependencies;
-      umultimap<std::pair<std::string, std::string>, std::shared_ptr<com::centreon::engine::serviceescalation>>
-                    _serviceescalations;
       servicegroup_map
                     _servicegroups;
       timeperiod_map

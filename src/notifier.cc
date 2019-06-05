@@ -740,6 +740,18 @@ void notifier::set_timezone(std::string const& timezone) {
   _timezone = timezone;
 }
 
+uint32_t notifier::get_modified_attributes() const {
+  return _modified_attributes;
+}
+
+void notifier::set_modified_attributes(uint32_t modified_attributes) {
+  _modified_attributes = modified_attributes;
+}
+
+void notifier::add_modified_attributes(uint32_t attr) {
+  _modified_attributes |= attr;
+}
+
 std::list<std::shared_ptr<escalation>>& notifier::get_escalations() {
   return _escalations;
 }
