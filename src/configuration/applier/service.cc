@@ -368,71 +368,33 @@ void applier::service::modify_object(
   s->set_check_interval(obj.check_interval());
   s->set_retry_interval(obj.retry_interval());
   s->set_max_attempts(obj.max_check_attempts());
-  modify_if_different(
-    s->notification_interval,
-    static_cast<double>(obj.notification_interval()));
-  s->set_first_notification_delay(obj.first_notification_delay());
-  modify_if_different(
-    s->notify_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->notify_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::warning)));
-  modify_if_different(
-    s->notify_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::critical)));
-  modify_if_different(
-    s->notify_on_recovery,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::ok)));
-  modify_if_different(
-    s->notify_on_flapping,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::flapping)));
-  modify_if_different(
-    s->notify_on_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::downtime)));
-  modify_if_different(
-    s->stalk_on_ok,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::ok)));
-  modify_if_different(
-    s->stalk_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::warning)));
-  modify_if_different(
-    s->stalk_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->stalk_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::critical)));
+
+  s->add_notify_on(obj.notification_options() & configuration::service::unknown? notifier::unknown : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::warning ? notifier::warning : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::critical ? notifier::critical : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::ok ? notifier::recovery : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::flapping ? notifier::flapping : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::downtime ? notifier::downtime : notifier::none);
+
+  s->set_notification_interval(static_cast<double>(obj.notification_interval()));
+  s->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
+
+  s->add_stalk_on(obj.notification_options() & configuration::service::ok ? notifier::ok : notifier::none);
+  s->add_stalk_on(obj.notification_options() & configuration::service::warning ? notifier::warning : notifier::none);
+  s->add_stalk_on(obj.notification_options() & configuration::service::unknown ? notifier::unknown : notifier::none);
+  s->add_stalk_on(obj.notification_options() & configuration::service::critical ? notifier::critical : notifier::none);
+
   s->set_notification_period(obj.notification_period());
   s->set_check_period(obj.check_period());
   s->set_flap_detection_enabled(obj.flap_detection_enabled());
   s->set_low_flap_threshold(obj.low_flap_threshold());
   s->set_high_flap_threshold(obj.high_flap_threshold());
-  modify_if_different(
-    s->flap_detection_on_ok,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::ok)));
-  modify_if_different(
-    s->flap_detection_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::warning)));
-  modify_if_different(
-    s->flap_detection_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->flap_detection_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::critical)));
+
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::ok ? notifier::ok : notifier::none);
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::warning ? notifier::warning : notifier::none);
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::unknown ? notifier::unknown : notifier::none);
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::critical ? notifier::critical : notifier::none);
+
   modify_if_different(
     s->process_performance_data,
     static_cast<int>(obj.process_perf_data()));

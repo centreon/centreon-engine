@@ -766,9 +766,9 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
 
   // Check for sane recovery options.
   if (svc->get_notifications_enabled()
-      && svc->notify_on_recovery
-      && !svc->notify_on_warning
-      && !svc->notify_on_critical) {
+      && svc->get_notify_on(notifier::recovery)
+      && !svc->get_notify_on(notifier::warning)
+      && !svc->get_notify_on(notifier::critical)) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in service '"
       << svc->get_description() << "' for host '" << svc->get_hostname()

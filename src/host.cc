@@ -258,9 +258,10 @@ host::host(uint64_t host_id,
 
   set_current_attempt(initial_state == HOST_UP ? 1 : max_attempts);
   _current_state = initial_state;
-  _flap_detection_on_down = (flap_detection_on_down > 0);
-  _flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
-  _flap_detection_on_up = (flap_detection_on_up > 0);
+  _flap_type = notifier::none;
+  _flap_type |= (flap_detection_on_down > 0 ? notifier::down : 0);
+  _flap_type |= (flap_detection_on_unreachable > 0 ? notifier::unreachable : 0);
+  _flap_type |= (flap_detection_on_up > 0 ? notifier::up : 0);
   _freshness_threshold = freshness_threshold;
   _have_2d_coords = (have_2d_coords > 0);
   _have_3d_coords = (have_3d_coords > 0);
@@ -279,9 +280,10 @@ host::host(uint64_t host_id,
   _retain_nonstatus_information = (retain_nonstatus_information > 0);
   _retain_status_information = (retain_status_information > 0);
   _should_be_drawn = (should_be_drawn > 0);
-  _stalk_on_down = (stalk_on_down > 0);
-  _stalk_on_unreachable = (stalk_on_unreachable > 0);
-  _stalk_on_up = (stalk_on_up > 0);
+  _stalk_type = notifier::none;
+  _stalk_type |= (stalk_on_down > 0 ? notifier::down : 0);
+  _stalk_type |= (stalk_on_unreachable > 0 ? notifier::unreachable : 0);
+  _stalk_type |= (stalk_on_up > 0 ? notifier::up : 0);
   _x_2d = x_2d;
   _x_3d = x_3d;
   _y_2d = y_2d;
@@ -343,54 +345,6 @@ std::string const& host::get_address() const {
 
 void host::set_address(std::string const& address) {
   _address = address;
-}
-
-bool host::get_flap_detection_on_up() const {
-  return _flap_detection_on_up;
-}
-
-void host::set_flap_detection_on_up(bool flap_detection_on_up) {
-  _flap_detection_on_up = flap_detection_on_up;
-}
-
-bool host::get_flap_detection_on_down() const {
-  return _flap_detection_on_down;
-}
-
-void host::set_flap_detection_on_down(bool flap_detection_on_down) {
-  _flap_detection_on_down = flap_detection_on_down;
-}
-
-bool host::get_flap_detection_on_unreachable() const {
-  return _flap_detection_on_unreachable;
-}
-
-void host::set_flap_detection_on_unreachable(bool detection) {
-  _flap_detection_on_unreachable = detection;
-}
-
-bool host::get_stalk_on_down() const {
-  return _stalk_on_down;
-}
-
-void host::set_stalk_on_down(bool stalk) {
-  _stalk_on_down = stalk;
-}
-
-bool host::get_stalk_on_unreachable() const {
-  return _stalk_on_unreachable;
-}
-
-void host::set_stalk_on_unreachable(bool stalk) {
-  _stalk_on_unreachable = stalk;
-}
-
-bool host::get_stalk_on_up() const {
-  return _stalk_on_up;
-}
-
-void host::set_stalk_on_up(bool stalk) {
-  _stalk_on_up = stalk;
 }
 
 int host::get_freshness_threshold() const {
@@ -553,38 +507,6 @@ void host::set_state_type(int state_type) {
   _state_type = state_type;
 }
 
-unsigned long host::get_current_event_id() const {
-  return _current_event_id;
-}
-
-void host::set_current_event_id(unsigned long current_event_id) {
-  _current_event_id = current_event_id;
-}
-
-unsigned long host::get_last_event_id() const {
-  return _last_event_id;
-}
-
-void host::set_last_event_id(unsigned long last_event_id) {
-  _last_event_id = last_event_id;
-}
-
-unsigned long host::get_current_problem_id() const {
-  return _current_problem_id;
-}
-
-void host::set_current_problem_id(unsigned long current_problem_id) {
-  _current_problem_id = current_problem_id;
-}
-
-unsigned long host::get_last_problem_id() const {
-  return _last_problem_id;
-}
-
-void host::set_last_problem_id(unsigned long last_problem_id) {
-  _last_problem_id = last_problem_id;
-}
-
 double host::get_latency() const {
   return _latency;
 }
@@ -639,22 +561,6 @@ time_t host::get_last_check() const {
 
 void host::set_last_check(time_t last_check) {
   _last_check = last_check;
-}
-
-time_t host::get_last_state_change() const {
-  return _last_state_change;
-}
-
-void host::set_last_state_change(time_t last_state_change) {
-  _last_state_change = last_state_change;
-}
-
-time_t host::get_last_hard_state_change() const {
-  return _last_hard_state_change;
-}
-
-void host::set_last_hard_state_change(time_t last_hard_state_change) {
-  _last_hard_state_change = last_hard_state_change;
 }
 
 time_t host::get_last_time_down() const {
@@ -850,13 +756,8 @@ bool host::operator==(host const& other) throw() {
          get_flap_detection_enabled() == other.get_flap_detection_enabled() &&
          get_low_flap_threshold() == other.get_low_flap_threshold() &&
          get_high_flap_threshold() == other.get_high_flap_threshold() &&
-         get_flap_detection_on_up() == other.get_flap_detection_on_up() &&
-         get_flap_detection_on_down() == other.get_flap_detection_on_down() &&
-         get_flap_detection_on_unreachable() ==
-             other.get_flap_detection_on_unreachable() &&
-         get_stalk_on_up() == other.get_stalk_on_up() &&
-         get_stalk_on_down() == other.get_stalk_on_down() &&
-         get_stalk_on_unreachable() == other.get_stalk_on_unreachable() &&
+         _flap_type == other.get_flap_detection_on() &&
+         _stalk_type == other.get_stalk_on() &&
          get_check_freshness() == other.get_check_freshness() &&
          get_freshness_threshold() == other.get_freshness_threshold() &&
          get_process_performance_data() ==
@@ -1110,22 +1011,22 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << obj.get_high_flap_threshold()
      << "\n"
         "  flap_detection_on_up:                 "
-     << obj.get_flap_detection_on_up()
+     << obj.get_flap_detection_on(notifier::up)
      << "\n"
         "  flap_detection_on_down:               "
-     << obj.get_flap_detection_on_down()
+     << obj.get_flap_detection_on(notifier::down)
      << "\n"
         "  flap_detection_on_unreachable:        "
-     << obj.get_flap_detection_on_unreachable()
+     << obj.get_flap_detection_on(notifier::unreachable)
      << "\n"
         "  stalk_on_up:                          "
-     << obj.get_stalk_on_up()
+     << obj.get_stalk_on(notifier::up)
      << "\n"
         "  stalk_on_down:                        "
-     << obj.get_stalk_on_down()
+     << obj.get_stalk_on(notifier::down)
      << "\n"
         "  stalk_on_unreachable:                 "
-     << obj.get_stalk_on_unreachable()
+     << obj.get_stalk_on(notifier::unreachable)
      << "\n"
         "  check_freshness:                      "
      << obj.get_check_freshness()
@@ -2177,12 +2078,12 @@ void host::check_for_flapping(int update,
 
   /* should we update state history for this state? */
   if (update_history) {
-    if (get_current_state() == HOST_UP && !get_flap_detection_on_up())
+    if (get_current_state() == HOST_UP && !get_flap_detection_on(notifier::up))
       update_history = false;
-    if (get_current_state() == HOST_DOWN && !get_flap_detection_on_down())
+    if (get_current_state() == HOST_DOWN && !get_flap_detection_on(notifier::down))
       update_history = false;
     if (get_current_state() == HOST_UNREACHABLE &&
-        !get_flap_detection_on_unreachable())
+        !get_flap_detection_on(notifier::unreachable))
       update_history = false;
   }
 

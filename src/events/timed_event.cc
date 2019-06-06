@@ -573,16 +573,16 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       it->second->next_check);
-    it->second->last_state_change = adjust_timestamp_for_time_change(
+    it->second->set_last_state_change(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      it->second->last_state_change);
-    it->second->last_hard_state_change = adjust_timestamp_for_time_change(
+      it->second->get_last_state_change()));
+    it->second->set_last_hard_state_change(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      it->second->last_hard_state_change);
+      it->second->get_last_hard_state_change()));
 
     it->second->set_initial_notif_time(adjust_timestamp_for_time_change(
         last_time, current_time, time_difference,

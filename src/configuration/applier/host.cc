@@ -330,18 +330,12 @@ void applier::host::modify_object(
   h->set_flap_detection_enabled(obj.flap_detection_enabled());
   h->set_low_flap_threshold(obj.low_flap_threshold());
   h->set_high_flap_threshold(obj.high_flap_threshold());
-  h->set_flap_detection_on_up(static_cast<int>(static_cast<bool>(
-    obj.flap_detection_options() & configuration::host::up)));
-  h->set_flap_detection_on_down(static_cast<int>(static_cast<bool>(
-    obj.flap_detection_options() & configuration::host::down)));
-  h->set_flap_detection_on_unreachable(static_cast<int>(static_cast<bool>(
-    obj.flap_detection_options() & configuration::host::unreachable)));
-  h->set_stalk_on_up(static_cast<int>(static_cast<bool>(
-    obj.stalking_options() & configuration::host::up)));
-  h->set_stalk_on_down(static_cast<int>(static_cast<bool>(
-    obj.stalking_options() & configuration::host::down)));
-  h->set_stalk_on_unreachable(static_cast<int>(static_cast<bool>(
-    obj.stalking_options() & configuration::host::unreachable)));
+  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::up ? notifier::recovery : notifier::none);
+  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::down ? notifier::down : notifier::none);
+  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  h->add_stalk_on(obj.stalking_options() & configuration::host::up ? notifier::up : notifier::none);
+  h->add_stalk_on(obj.stalking_options() & configuration::host::down ? notifier::down : notifier::none);
+  h->add_stalk_on(obj.stalking_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
   h->set_process_performance_data(static_cast<int>(obj.process_perf_data()));
   h->set_check_freshness(static_cast<int>(obj.check_freshness()));
   h->set_freshness_threshold(static_cast<int>(obj.freshness_threshold()));

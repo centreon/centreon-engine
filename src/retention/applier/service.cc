@@ -98,27 +98,27 @@ void applier::service::_update(
     if (state.current_attempt().is_set())
       obj.set_current_attempt(*state.current_attempt());
     if (state.current_event_id().is_set())
-      obj.current_event_id = *state.current_event_id();
+      obj.set_current_event_id(*state.current_event_id());
     if (state.last_event_id().is_set())
-      obj.last_event_id = *state.last_event_id();
+      obj.set_last_event_id(*state.last_event_id());
     if (state.current_problem_id().is_set())
-      obj.current_problem_id = *state.current_problem_id();
+      obj.set_current_problem_id(*state.current_problem_id());
     if (state.last_problem_id().is_set())
-      obj.last_problem_id = *state.last_problem_id();
+      obj.set_last_problem_id(*state.last_problem_id());
     if (state.state_type().is_set())
       obj.state_type = *state.state_type();
     if (state.last_state_change().is_set())
-      obj.last_state_change = *state.last_state_change();
+      obj.set_last_state_change(*state.last_state_change());
     if (state.last_hard_state_change().is_set())
-      obj.last_hard_state_change = *state.last_hard_state_change();
+      obj.set_last_hard_state_change(*state.last_hard_state_change());
     if (state.last_time_ok().is_set())
-      obj.last_time_ok = *state.last_time_ok();
+      obj.set_last_time_ok(*state.last_time_ok());
     if (state.last_time_warning().is_set())
-      obj.last_time_warning = *state.last_time_warning();
+      obj.set_last_time_warning(*state.last_time_warning());
     if (state.last_time_unknown().is_set())
-      obj.last_time_unknown = *state.last_time_unknown();
+      obj.set_last_time_unknown(*state.last_time_unknown());
     if (state.last_time_critical().is_set())
-      obj.last_time_critical = *state.last_time_critical();
+      obj.set_last_time_critical(*state.last_time_critical());
     if (state.plugin_output().is_set())
       obj.set_plugin_output(*state.plugin_output());
     if (state.long_plugin_output().is_set())
@@ -322,8 +322,8 @@ void applier::service::_update(
   }
 
   // handle new vars added in 2.x.
-  if (obj.last_hard_state_change)
-    obj.last_hard_state_change = obj.last_state_change;
+  if (obj.get_last_hard_state_change())
+    obj.set_last_hard_state_change(obj.get_last_state_change());
 
   // Handle recovery been sent
   if (state.recovery_been_sent().is_set())

@@ -128,6 +128,38 @@ service::~service() {
   this->check_command_args = nullptr;
 }
 
+time_t service::get_last_time_ok() const {
+  return _last_time_ok;
+}
+
+void service::set_last_time_ok(time_t last_time) {
+  _last_time_ok = last_time;
+}
+
+time_t service::get_last_time_warning() const {
+  return _last_time_warning;
+}
+
+void service::set_last_time_warning(time_t last_time) {
+  _last_time_warning = last_time;
+}
+
+time_t service::get_last_time_unknown() const {
+  return _last_time_unknown;
+}
+
+void service::set_last_time_unknown(time_t last_time) {
+  _last_time_unknown = last_time;
+}
+
+time_t service::get_last_time_critical() const {
+  return _last_time_critical;
+}
+
+void service::set_last_time_critical(time_t last_time) {
+  _last_time_critical = last_time;
+}
+
 /**
  *  Equal operator.
  *
@@ -155,10 +187,7 @@ bool service::operator==(service const& other) throw() {
          this->notification_interval == other.notification_interval &&
          get_first_notification_delay() == get_first_notification_delay() &&
          get_notify_on() == other.get_notify_on() &&
-         this->stalk_on_ok == other.stalk_on_ok &&
-         this->stalk_on_warning == other.stalk_on_warning &&
-         this->stalk_on_unknown == other.stalk_on_unknown &&
-         this->stalk_on_critical == other.stalk_on_critical &&
+         get_stalk_on() == other.get_stalk_on() &&
          this->is_volatile == other.is_volatile &&
          this->get_notification_period() == other.get_notification_period() &&
          this->get_check_period() == other.get_check_period() &&
@@ -166,10 +195,7 @@ bool service::operator==(service const& other) throw() {
              other.get_flap_detection_enabled() &&
          this->get_low_flap_threshold() == other.get_low_flap_threshold() &&
          this->get_high_flap_threshold() == other.get_high_flap_threshold() &&
-         this->flap_detection_on_ok == other.flap_detection_on_ok &&
-         this->flap_detection_on_warning == other.flap_detection_on_warning &&
-         this->flap_detection_on_unknown == other.flap_detection_on_unknown &&
-         this->flap_detection_on_critical == other.flap_detection_on_critical &&
+         _flap_type == other.get_flap_detection_on() &&
          this->process_performance_data == other.process_performance_data &&
          get_check_freshness() == other.get_check_freshness() &&
          this->freshness_threshold == other.freshness_threshold &&
@@ -204,21 +230,21 @@ bool service::operator==(service const& other) throw() {
          this->should_be_scheduled == other.should_be_scheduled &&
          this->last_check == other.last_check &&
          get_current_attempt() == other.get_current_attempt() &&
-         this->current_event_id == other.current_event_id &&
-         this->last_event_id == other.last_event_id &&
-         this->current_problem_id == other.current_problem_id &&
-         this->last_problem_id == other.last_problem_id &&
+         _current_event_id == other.get_current_event_id() &&
+         _last_event_id == other.get_last_event_id() &&
+         _current_problem_id == other.get_current_problem_id() &&
+         _last_problem_id == other.get_last_problem_id() &&
          this->get_last_notification() == other.get_last_notification() &&
          this->get_next_notification() == other.get_next_notification() &&
          this->no_more_notifications == other.no_more_notifications &&
          this->check_flapping_recovery_notification ==
              other.check_flapping_recovery_notification &&
-         this->last_state_change == other.last_state_change &&
-         this->last_hard_state_change == other.last_hard_state_change &&
-         this->last_time_ok == other.last_time_ok &&
-         this->last_time_warning == other.last_time_warning &&
-         this->last_time_unknown == other.last_time_unknown &&
-         this->last_time_critical == other.last_time_critical &&
+         _last_state_change == other.get_last_state_change() &&
+         _last_hard_state_change == other.get_last_hard_state_change() &&
+         _last_time_ok == other.get_last_time_ok() &&
+         _last_time_warning == other.get_last_time_warning() &&
+         _last_time_unknown == other.get_last_time_unknown() &&
+         _last_time_critical == other.get_last_time_critical() &&
          get_has_been_checked() == other.get_has_been_checked() &&
          this->is_being_freshened == other.is_being_freshened &&
          get_notified_on() == other.get_notified_on() &&
@@ -373,16 +399,16 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_notify_on(notifier::downtime)
      << "\n"
         "  stalk_on_ok:                          "
-     << obj.stalk_on_ok
+     << obj.get_stalk_on(notifier::ok)
      << "\n"
         "  stalk_on_warning:                     "
-     << obj.stalk_on_warning
+     << obj.get_stalk_on(notifier::warning)
      << "\n"
         "  stalk_on_unknown:                     "
-     << obj.stalk_on_unknown
+     << obj.get_stalk_on(notifier::unknown)
      << "\n"
         "  stalk_on_critical:                    "
-     << obj.stalk_on_critical
+     << obj.get_stalk_on(notifier::critical)
      << "\n"
         "  is_volatile:                          "
      << obj.is_volatile
@@ -403,16 +429,16 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_high_flap_threshold()
      << "\n"
         "  flap_detection_on_ok:                 "
-     << obj.flap_detection_on_ok
+     << obj.get_flap_detection_on(notifier::ok)
      << "\n"
         "  flap_detection_on_warning:            "
-     << obj.flap_detection_on_warning
+     << obj.get_flap_detection_on(notifier::warning)
      << "\n"
         "  flap_detection_on_unknown:            "
-     << obj.flap_detection_on_unknown
+     << obj.get_flap_detection_on(notifier::unknown)
      << "\n"
         "  flap_detection_on_critical:           "
-     << obj.flap_detection_on_critical
+     << obj.get_flap_detection_on(notifier::critical)
      << "\n"
         "  process_performance_data:             "
      << obj.process_performance_data
@@ -461,10 +487,10 @@ std::ostream& operator<<(std::ostream& os,
      << string::ctime(obj.last_check)
      << "\n  current_attempt:                      "
      << obj.get_current_attempt()
-     << "\n  current_event_id:                     " << obj.current_event_id
-     << "\n  last_event_id:                        " << obj.last_event_id
-     << "\n  current_problem_id:                   " << obj.current_problem_id
-     << "\n  last_problem_id:                      " << obj.last_problem_id
+     << "\n  current_event_id:                     " << obj.get_current_event_id()
+     << "\n  last_event_id:                        " << obj.get_last_event_id()
+     << "\n  current_problem_id:                   " << obj.get_current_problem_id()
+     << "\n  last_problem_id:                      " << obj.get_last_problem_id()
      << "\n  last_notification:                    "
      << string::ctime(obj.get_last_notification())
      << "\n  next_notification:                    "
@@ -474,17 +500,17 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  check_flapping_recovery_notification: "
      << obj.check_flapping_recovery_notification
      << "\n  last_state_change:                    "
-     << string::ctime(obj.last_state_change)
+     << string::ctime(obj.get_last_state_change())
      << "\n  last_hard_state_change:               "
-     << string::ctime(obj.last_hard_state_change)
+     << string::ctime(obj.get_last_hard_state_change())
      << "\n  last_time_ok:                         "
-     << string::ctime(obj.last_time_ok)
+     << string::ctime(obj.get_last_time_ok())
      << "\n  last_time_warning:                    "
-     << string::ctime(obj.last_time_warning)
+     << string::ctime(obj.get_last_time_warning())
      << "\n  last_time_unknown:                    "
-     << string::ctime(obj.last_time_unknown)
+     << string::ctime(obj.get_last_time_unknown())
      << "\n  last_time_critical:                   "
-     << string::ctime(obj.last_time_critical)
+     << string::ctime(obj.get_last_time_critical())
      << "\n  has_been_checked:                     " << obj.get_has_been_checked()
      << "\n  is_being_freshened:                   " << obj.is_being_freshened
      << "\n  notified_on_unknown:                  "
@@ -728,31 +754,40 @@ com::centreon::engine::service* add_service(
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_options = CHECK_OPTION_NONE;
     obj->current_state = initial_state;
-    obj->flap_detection_on_critical = (flap_detection_on_critical > 0);
-    obj->flap_detection_on_ok = (flap_detection_on_ok > 0);
-    obj->flap_detection_on_unknown = (flap_detection_on_unknown > 0);
-    obj->flap_detection_on_warning = (flap_detection_on_warning > 0);
+    uint32_t flap_detection_on;
+    flap_detection_on = notifier::none;
+    flap_detection_on |= (flap_detection_on_critical > 0 ? notifier::critical : 0);
+    flap_detection_on |= (flap_detection_on_ok > 0 ? notifier::ok : 0);
+    flap_detection_on |= (flap_detection_on_unknown > 0 ? notifier::unknown : 0);
+    flap_detection_on |= (flap_detection_on_warning > 0 ? notifier::warning : 0);
+    obj->set_flap_detection_on(flap_detection_on);
     obj->freshness_threshold = freshness_threshold;
     obj->is_volatile = (is_volatile > 0);
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;
     obj->set_modified_attributes(MODATTR_NONE);
     obj->notification_interval = notification_interval;
-    obj->notify_on_critical = (notify_critical > 0);
-    obj->notify_on_downtime = (notify_downtime > 0);
-    obj->notify_on_flapping = (notify_flapping > 0);
-    obj->notify_on_recovery = (notify_recovery > 0);
-    obj->notify_on_unknown = (notify_unknown > 0);
-    obj->notify_on_warning = (notify_warning > 0);
+    uint32_t notify_on;
+    notify_on = notifier::none;
+    notify_on |= (notify_critical > 0 ? notifier::critical : 0);
+    notify_on |= (notify_downtime > 0 ? notifier::downtime : 0);
+    notify_on |= (notify_flapping > 0 ? notifier::flapping : 0);
+    notify_on |= (notify_recovery > 0 ? notifier::recovery : 0);
+    notify_on |= (notify_unknown > 0 ? notifier::unknown : 0);
+    notify_on |= (notify_warning > 0 ? notifier::warning : 0);
+    obj->set_notify_on(notify_on);
     obj->obsess_over_service = (obsess_over_service > 0);
     obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->should_be_scheduled = true;
-    obj->stalk_on_critical = (stalk_on_critical > 0);
-    obj->stalk_on_ok = (stalk_on_ok > 0);
-    obj->stalk_on_unknown = (stalk_on_unknown > 0);
-    obj->stalk_on_warning = (stalk_on_warning > 0);
+    uint32_t stalk_on;
+    stalk_on = notifier::none;
+    stalk_on |= (stalk_on_critical > 0 ? notifier::critical : 0);
+    stalk_on |= (stalk_on_ok > 0 ? notifier::ok : 0);
+    stalk_on |= (stalk_on_unknown > 0 ? notifier::warning: 0);
+    stalk_on |= (stalk_on_warning > 0 ? notifier::unknown : 0);
+    obj->set_stalk_on(stalk_on);
     obj->state_type = HARD_STATE;
 
     // STATE_OK = 0, so we don't need to set state_history (memset
@@ -1162,19 +1197,19 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* record the last state time */
   switch (this->current_state) {
     case STATE_OK:
-      this->last_time_ok = this->last_check;
+      set_last_time_ok(this->last_check);
       break;
 
     case STATE_WARNING:
-      this->last_time_warning = this->last_check;
+      set_last_time_warning(this->last_check);
       break;
 
     case STATE_UNKNOWN:
-      this->last_time_unknown = this->last_check;
+      set_last_time_unknown(this->last_check);
       break;
 
     case STATE_CRITICAL:
-      this->last_time_critical = this->last_check;
+      set_last_time_critical(this->last_check);
       break;
 
     default:
@@ -1309,10 +1344,10 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   }
 
   /* initialize the last host and service state change times if necessary */
-  if (this->last_state_change == (time_t)0)
-    this->last_state_change = this->last_check;
-  if (this->last_hard_state_change == (time_t)0)
-    this->last_hard_state_change = this->last_check;
+  if (get_last_state_change() == (time_t)0)
+    set_last_state_change(this->last_check);
+  if (get_last_hard_state_change() == (time_t)0)
+    set_last_hard_state_change(this->last_check);
   if (temp_host->get_last_state_change() == (time_t)0)
     temp_host->set_last_state_change(this->last_check);
   if (temp_host->get_last_hard_state_change() == (time_t)0)
@@ -1320,15 +1355,15 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /* update last service state change times */
   if (state_change)
-    this->last_state_change = this->last_check;
+    set_last_state_change(this->last_check);
   if (hard_state_change)
-    this->last_hard_state_change = this->last_check;
+    set_last_hard_state_change(this->last_check);
 
   /* update the event and problem ids */
   if (state_change) {
     /* always update the event id on a state change */
-    this->last_event_id = this->current_event_id;
-    this->current_event_id = next_event_id;
+    set_last_event_id(get_current_event_id());
+    set_current_event_id(next_event_id);
     next_event_id++;
 
     /* update the problem id when transitioning to a problem state */
@@ -1336,15 +1371,15 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* don't reset last problem id, or it will be zero the next time a problem
        * is encountered */
       /* this->last_problem_id=this->current_problem_id; */
-      this->current_problem_id = next_problem_id;
+      set_current_problem_id(next_problem_id);
       next_problem_id++;
     }
 
     /* clear the problem id when transitioning from a problem state to an OK
      * state */
     if (this->current_state == STATE_OK) {
-      this->last_problem_id = this->current_problem_id;
-      this->current_problem_id = 0L;
+      set_last_problem_id(this->get_current_problem_id());
+      set_current_problem_id(0L);
     }
   }
 
@@ -1610,9 +1645,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* update last state change times */
       if (state_change || hard_state_change)
-        this->last_state_change = this->last_check;
+        set_last_state_change(this->last_check);
       if (hard_state_change) {
-        this->last_hard_state_change = this->last_check;
+        set_last_hard_state_change(this->last_check);
         this->state_type = HARD_STATE;
         this->last_hard_state = this->current_state;
       }
@@ -1837,16 +1872,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * plugin output changed since last check, log it now.. */
   if (this->state_type == HARD_STATE && !state_change && !state_was_logged &&
       old_plugin_output == get_plugin_output()) {
-    if ((this->current_state == STATE_OK && this->stalk_on_ok))
+    if ((this->current_state == STATE_OK && this->get_stalk_on(notifier::ok)))
       log_event();
 
-    else if ((this->current_state == STATE_WARNING && this->stalk_on_warning))
+    else if ((this->current_state == STATE_WARNING && this->get_stalk_on(notifier::warning)))
       log_event();
 
-    else if ((this->current_state == STATE_UNKNOWN && this->stalk_on_unknown))
+    else if ((this->current_state == STATE_UNKNOWN && this->get_stalk_on(notifier::unknown)))
       log_event();
 
-    else if ((this->current_state == STATE_CRITICAL && this->stalk_on_critical))
+    else if ((this->current_state == STATE_CRITICAL && this->get_stalk_on(notifier::critical)))
       log_event();
   }
 
@@ -1978,16 +2013,16 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
 
   /* should we update state history for this state? */
   if (update_history) {
-    if (this->current_state == STATE_OK && !this->flap_detection_on_ok)
+    if (this->current_state == STATE_OK && !this->get_flap_detection_on(notifier::ok))
       update_history = false;
     if (this->current_state == STATE_WARNING &&
-        !this->flap_detection_on_warning)
+        !this->get_flap_detection_on(notifier::warning))
       update_history = false;
     if (this->current_state == STATE_UNKNOWN &&
-        !this->flap_detection_on_unknown)
+        !this->get_flap_detection_on(notifier::unknown))
       update_history = false;
     if (this->current_state == STATE_CRITICAL &&
-        !this->flap_detection_on_critical)
+        !this->get_flap_detection_on(notifier::critical))
       update_history = false;
   }
 
@@ -2761,7 +2796,7 @@ int service::check_notification_viability(unsigned int type, int options) {
   if (type == NOTIFICATION_FLAPPINGSTART || type == NOTIFICATION_FLAPPINGSTOP ||
       type == NOTIFICATION_FLAPPINGDISABLED) {
     /* don't send a notification if we're not supposed to... */
-    if (this->notify_on_flapping == false) {
+    if (!get_notify_on(notifier::flapping)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events for this "
              "service.";
@@ -2789,7 +2824,7 @@ int service::check_notification_viability(unsigned int type, int options) {
   if (type == NOTIFICATION_DOWNTIMESTART || type == NOTIFICATION_DOWNTIMEEND ||
       type == NOTIFICATION_DOWNTIMECANCELLED) {
     /* don't send a notification if we're not supposed to... */
-    if (this->notify_on_downtime == false) {
+    if (!get_notify_on(notifier::downtime)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events for "
              "this service.";
@@ -2851,25 +2886,25 @@ int service::check_notification_viability(unsigned int type, int options) {
 
   /* see if we should notify about problems with this service */
   if (this->current_state == STATE_UNKNOWN &&
-      this->notify_on_unknown == false) {
+    !get_notify_on(notifier::unknown)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about UNKNOWN states for this service.";
     return ERROR;
   }
   if (this->current_state == STATE_WARNING &&
-      this->notify_on_warning == false) {
+    !get_notify_on(notifier::warning)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about WARNING states for this service.";
     return ERROR;
   }
   if (this->current_state == STATE_CRITICAL &&
-      this->notify_on_critical == false) {
+    !get_notify_on(notifier::critical)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about CRITICAL states for this service.";
     return ERROR;
   }
   if (this->current_state == STATE_OK) {
-    if (this->notify_on_recovery == false) {
+    if (!get_notify_on(notifier::recovery)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about RECOVERY states for this service.";
       return ERROR;

@@ -114,7 +114,7 @@ namespace  macros {
 
     // Get duration.
     time_t now(time(NULL));
-    unsigned long duration(now - t.last_state_change);
+    unsigned long duration(now - t.get_last_state_change());
 
     // Break down duration.
     unsigned int days(duration / (24 * 60 * 60));
@@ -166,7 +166,7 @@ namespace  macros {
 
     // Get duration.
     time_t now(time(NULL));
-    unsigned long duration(now - t.last_state_change);
+    unsigned long duration(now - t.get_last_state_change());
     return string::dup(duration);
   }
 

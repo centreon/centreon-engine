@@ -1237,14 +1237,14 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
   if (hst->get_last_state() == hst->get_current_state() &&
       compare_strings(old_plugin_output,
                       const_cast<char*>(hst->get_plugin_output().c_str()))) {
-    if (hst->get_current_state() == HOST_UP && hst->get_stalk_on_up())
+    if (hst->get_current_state() == HOST_UP && hst->get_stalk_on(notifier::up))
       hst->log_event();
 
-    else if (hst->get_current_state() == HOST_DOWN && hst->get_stalk_on_down())
+    else if (hst->get_current_state() == HOST_DOWN && hst->get_stalk_on(notifier::down))
       hst->log_event();
 
     else if (hst->get_current_state() == HOST_UNREACHABLE &&
-             hst->get_stalk_on_unreachable())
+             hst->get_stalk_on(notifier::unreachable))
       hst->log_event();
   }
 

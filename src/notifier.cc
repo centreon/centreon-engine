@@ -176,6 +176,54 @@ void notifier::set_retry_interval(double retry_interval) {
   _retry_interval = retry_interval;
 }
 
+time_t notifier::get_last_state_change() const {
+  return _last_state_change;
+}
+
+void notifier::set_last_state_change(time_t last_state_change) {
+  _last_state_change = last_state_change;
+}
+
+time_t notifier::get_last_hard_state_change() const {
+  return _last_hard_state_change;
+}
+
+void notifier::set_last_hard_state_change(time_t last_hard_state_change) {
+  _last_hard_state_change = last_hard_state_change;
+}
+
+unsigned long notifier::get_current_event_id() const {
+  return _current_event_id;
+}
+
+void notifier::set_current_event_id(unsigned long current_event_id) {
+  _current_event_id = current_event_id;
+}
+
+unsigned long notifier::get_last_event_id() const {
+  return _last_event_id;
+}
+
+void notifier::set_last_event_id(unsigned long last_event_id) {
+  _last_event_id = last_event_id;
+}
+
+unsigned long notifier::get_current_problem_id() const {
+  return _current_notification_id;
+}
+
+void notifier::set_current_problem_id(unsigned long current_problem_id) {
+  _current_problem_id = current_problem_id;
+}
+
+unsigned long notifier::get_last_problem_id() const {
+  return _last_problem_id;
+}
+
+void notifier::set_last_problem_id(unsigned long last_problem_id) {
+  _last_problem_id = last_problem_id;
+}
+
 /**
  * @brief Set the current notification number and update the notifier status.
  *
@@ -732,6 +780,38 @@ void notifier::set_notified_on(uint32_t type) {
 
 void notifier::remove_notified_on(notification_type type) {
   _in_notification_type &= ~type;
+}
+
+bool notifier::get_flap_detection_on(notification_type type) const {
+  return _stalk_type & type;
+}
+
+uint32_t notifier::get_flap_detection_on() const {
+  return _stalk_type;
+}
+
+void notifier::set_flap_detection_on(uint32_t type) {
+  _stalk_type = type;
+}
+
+void notifier::add_flap_detection_on(notification_type type) {
+  _stalk_type |= type;
+}
+
+bool notifier::get_stalk_on(notification_type type) const {
+  return _stalk_type & type;
+}
+
+uint32_t notifier::get_stalk_on() const {
+  return _stalk_type;
+}
+
+void notifier::set_stalk_on(uint32_t type) {
+  _stalk_type = type;
+}
+
+void notifier::add_stalk_on(notification_type type) {
+  _stalk_type |= type;
 }
 
 /**

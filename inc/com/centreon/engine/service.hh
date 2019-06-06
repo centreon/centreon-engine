@@ -98,6 +98,15 @@ class                           service : public notifier {
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
   std::string const&            get_description() const;
+  time_t                        get_last_time_ok() const;
+  void                          set_last_time_ok(time_t last_time);
+  time_t                        get_last_time_warning() const;
+  void                          set_last_time_warning(time_t last_time);
+  time_t                        get_last_time_unknown() const;
+  void                          set_last_time_unknown(time_t last_time);
+  time_t                        get_last_time_critical() const;
+  void                          set_last_time_critical(time_t last_time);
+
   int                           handle_async_check_result(
                                   check_result* queued_check_result);
   int                           log_event();
@@ -152,21 +161,7 @@ class                           service : public notifier {
                                   int options) const override;
 
   double                        notification_interval;
-  int                           notify_on_unknown;
-  int                           notify_on_warning;
-  int                           notify_on_critical;
-  int                           notify_on_recovery;
-  int                           notify_on_flapping;
-  int                           notify_on_downtime;
-  int                           stalk_on_ok;
-  int                           stalk_on_warning;
-  int                           stalk_on_unknown;
-  int                           stalk_on_critical;
   int                           is_volatile;
-  int                           flap_detection_on_ok;
-  int                           flap_detection_on_warning;
-  int                           flap_detection_on_unknown;
-  int                           flap_detection_on_critical;
   int                           process_performance_data;
   int                           freshness_threshold;
   int                           accept_passive_service_checks;
@@ -182,18 +177,8 @@ class                           service : public notifier {
   time_t                        next_check;
   int                           should_be_scheduled;
   time_t                        last_check;
-  uint64_t                      current_event_id;
-  uint64_t                      last_event_id;
-  uint64_t                      current_problem_id;
-  uint64_t                      last_problem_id;
   int                           no_more_notifications;
   int                           check_flapping_recovery_notification;
-  time_t                        last_state_change;
-  time_t                        last_hard_state_change;
-  time_t                        last_time_ok;
-  time_t                        last_time_warning;
-  time_t                        last_time_unknown;
-  time_t                        last_time_critical;
   int                           is_being_freshened;
   int                           current_notification_number;
   uint64_t                      current_notification_id;
@@ -226,6 +211,11 @@ class                           service : public notifier {
  private:
   std::string                   _hostname;
   std::string                   _description;
+
+  time_t                        _last_time_ok;
+  time_t                        _last_time_warning;
+  time_t                        _last_time_unknown;
+  time_t                        _last_time_critical;
 };
 CCE_END()
 
