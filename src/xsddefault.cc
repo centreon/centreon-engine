@@ -370,7 +370,7 @@ int xsddefault_save_status_data() {
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << it->second->is_flapping << "\n"
          "\tpercent_state_change=" << std::setprecision(2) << std::fixed << it->second->percent_state_change << "\n"
-         "\tscheduled_downtime_depth=" << it->second->scheduled_downtime_depth << "\n";
+         "\tscheduled_downtime_depth=" << it->second->get_scheduled_downtime_depth() << "\n";
 
     // custom variables
     for (std::pair<std::string, customvariable> const& cv : it->second->custom_variables) {

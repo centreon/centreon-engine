@@ -255,7 +255,7 @@ bool service::operator==(service const& other) throw() {
          this->execution_time == other.execution_time &&
          this->is_executing == other.is_executing &&
          this->check_options == other.check_options &&
-         this->scheduled_downtime_depth == other.scheduled_downtime_depth &&
+         get_scheduled_downtime_depth() == other.get_scheduled_downtime_depth() &&
          this->pending_flex_downtime == other.pending_flex_downtime &&
          is_equal(this->state_history, other.state_history,
                   MAX_STATE_HISTORY_ENTRIES) &&
@@ -528,7 +528,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  is_executing:                         " << obj.is_executing
      << "\n  check_options:                        " << obj.check_options
      << "\n  scheduled_downtime_depth:             "
-     << obj.scheduled_downtime_depth
+     << obj.get_scheduled_downtime_depth()
      << "\n  pending_flex_downtime:                "
      << obj.pending_flex_downtime << "\n";
 
@@ -2754,7 +2754,7 @@ int service::check_notification_viability(unsigned int type, int options) {
 
   /* custom notifications are good to go at this point... */
   if (type == NOTIFICATION_CUSTOM) {
-    if (this->scheduled_downtime_depth > 0 ||
+    if (get_scheduled_downtime_depth() > 0 ||
         temp_host->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
           << "We shouldn't send custom notification during "
@@ -2804,7 +2804,7 @@ int service::check_notification_viability(unsigned int type, int options) {
     }
 
     /* don't send notifications during scheduled downtime */
-    if (this->scheduled_downtime_depth > 0 ||
+    if (get_scheduled_downtime_depth() > 0 ||
         temp_host->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events during "
@@ -2835,7 +2835,7 @@ int service::check_notification_viability(unsigned int type, int options) {
      * don't send notifications during scheduled downtime (for service only,
      * not host)
      */
-    if (this->scheduled_downtime_depth > 0) {
+    if (get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events during "
              "scheduled downtime.";
@@ -2959,7 +2959,7 @@ int service::check_notification_viability(unsigned int type, int options) {
    * if this service is currently in a scheduled downtime period, don't send
    * the notification
    */
-  if (this->scheduled_downtime_depth > 0) {
+  if (get_scheduled_downtime_depth() > 0) {
     logger(dbg_notifications, more)
         << "This service is currently in a scheduled downtime, so "
            "we won't send notifications.";

@@ -626,14 +626,6 @@ void host::set_check_flapping_recovery_notification(
   _check_flapping_recovery_notification = check_flapping_recovery_notification;
 }
 
-int host::get_scheduled_downtime_depth() const {
-  return _scheduled_downtime_depth;
-}
-
-void host::set_scheduled_downtime_depth(int scheduled_downtime_depth) {
-  _scheduled_downtime_depth = scheduled_downtime_depth;
-}
-
 int host::get_pending_flex_downtime() const {
   return _pending_flex_downtime;
 }

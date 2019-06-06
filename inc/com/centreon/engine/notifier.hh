@@ -235,6 +235,10 @@ class                notifier {
   void               set_accept_passive_checks(bool accept_passive_checks);
   bool               get_problem_has_been_acknowledged() const;
   void               set_problem_has_been_acknowledged(bool problem_has_been_acknowledged);
+  int                get_scheduled_downtime_depth() const;
+  void               set_scheduled_downtime_depth(int scheduled_downtime_depth);
+  void               dec_scheduled_downtime_depth();
+  void               inc_scheduled_downtime_depth();
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -300,6 +304,7 @@ class                notifier {
   bool               _problem_has_been_acknowledged;
   bool               _has_been_checked;
   bool               _event_handler_enabled;
+  int                 _scheduled_downtime_depth;
 };
 
 CCE_END()

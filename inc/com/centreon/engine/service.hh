@@ -186,7 +186,6 @@ class                           service : public notifier {
   double                        execution_time;
   int                           is_executing;
   int                           check_options;
-  int                           scheduled_downtime_depth;
   int                           pending_flex_downtime;
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;

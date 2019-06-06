@@ -227,8 +227,6 @@ class                 host : public notifier {
   void               set_no_more_notifications(int no_more_notifications);
   int                get_check_flapping_recovery_notification() const;
   void               set_check_flapping_recovery_notification(int check_flapping_recovery_notification);
-  int                get_scheduled_downtime_depth() const;
-  void               set_scheduled_downtime_depth(int scheduled_downtime_depth);
   int                get_pending_flex_downtime() const;
   void               set_pending_flex_downtime(int pending_flex_downtime);
   unsigned int       get_state_history_index() const;
@@ -318,7 +316,6 @@ private:
   bool                _is_being_freshened;
   int                 _no_more_notifications;
   int                 _check_flapping_recovery_notification;
-  int                 _scheduled_downtime_depth;
   int                 _pending_flex_downtime;
   unsigned int        _state_history_index;
   time_t              _last_state_history_update;

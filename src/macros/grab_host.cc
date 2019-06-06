@@ -303,7 +303,7 @@ struct grab_host_redirection {
       {MACRO_MAXHOSTATTEMPTS,
        {&get_member_as_string<host, int, notifier, &notifier::get_max_attempts>, true}},
       {MACRO_HOSTDOWNTIME,
-       {&get_member_as_string<host, int, &host::get_scheduled_downtime_depth>,
+       {&get_member_as_string<host, int, notifier, &notifier::get_scheduled_downtime_depth>,
         true}},
       {MACRO_HOSTPERCENTCHANGE,
        {&get_double<host, &host::get_percent_state_change, 2>, true}},

@@ -239,7 +239,11 @@ struct grab_service_redirection {
         true}},
       // Downtime.
       {MACRO_SERVICEDOWNTIME,
-       {&get_member_as_string< service, int, &service::scheduled_downtime_depth>,
+       {&get_member_as_string<
+            com::centreon::engine::service,
+            int,
+            com::centreon::engine::notifier,
+            &com::centreon::engine::notifier::get_scheduled_downtime_depth>,
         true}},
       // Percent state change.
       {MACRO_SERVICEPERCENTCHANGE,

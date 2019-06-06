@@ -693,7 +693,7 @@ static int handle_summary_macro(
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
-          if (it->second->scheduled_downtime_depth > 0)
+          if (it->second->get_scheduled_downtime_depth() > 0)
             problem = false;
           if (it->second->get_problem_has_been_acknowledged())
             problem = false;
@@ -714,7 +714,7 @@ static int handle_summary_macro(
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
-          if (it->second->scheduled_downtime_depth > 0)
+          if (it->second->get_scheduled_downtime_depth() > 0)
             problem = false;
           if (it->second->get_problem_has_been_acknowledged())
             problem = false;
@@ -735,7 +735,7 @@ static int handle_summary_macro(
               && (temp_host->get_current_state() == HOST_DOWN
                   || temp_host->get_current_state() == HOST_UNREACHABLE))
             problem = false;
-          if (it->second->scheduled_downtime_depth > 0)
+          if (it->second->get_scheduled_downtime_depth() > 0)
             problem = false;
           if (it->second->get_problem_has_been_acknowledged())
             problem = false;
