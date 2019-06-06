@@ -67,6 +67,7 @@ service::service(std::string const& hostname,
                  std::string const& display_name,
                  std::string const& check_command,
                  bool checks_enabled,
+                 bool accept_passive_checks,
                  int initial_state,
                  double check_interval,
                  double retry_interval,
@@ -76,6 +77,7 @@ service::service(std::string const& hostname,
                  bool notifications_enabled,
                  std::string const& check_period,
                  std::string const& event_handler,
+                 bool event_handler_enabled,
                  std::string const& notes,
                  std::string const& notes_url,
                  std::string const& action_url,
@@ -89,7 +91,8 @@ service::service(std::string const& hostname,
     : notifier{SERVICE_NOTIFICATION,
                display_name,
                check_command,
-               checks_enabled > 0,
+               checks_enabled,
+               accept_passive_checks,
                initial_state,
                check_interval,
                retry_interval,
@@ -99,6 +102,7 @@ service::service(std::string const& hostname,
                notifications_enabled,
                check_period,
                event_handler,
+               event_handler_enabled,
                notes,
                notes_url,
                action_url,
@@ -169,9 +173,9 @@ bool service::operator==(service const& other) throw() {
          this->process_performance_data == other.process_performance_data &&
          get_check_freshness() == other.get_check_freshness() &&
          this->freshness_threshold == other.freshness_threshold &&
-         this->accept_passive_service_checks ==
-             other.accept_passive_service_checks &&
-         this->event_handler_enabled == other.event_handler_enabled &&
+         get_accept_passive_checks() ==
+             other.get_accept_passive_checks() &&
+         get_event_handler_enabled() == other.get_event_handler_enabled() &&
          get_checks_enabled() == other.get_checks_enabled() &&
          this->retain_status_information == other.retain_status_information &&
          this->retain_nonstatus_information ==
@@ -420,9 +424,9 @@ std::ostream& operator<<(std::ostream& os,
      << obj.freshness_threshold
      << "\n"
         "  accept_passive_service_checks:        "
-     << obj.accept_passive_service_checks
+     << obj.get_accept_passive_checks()
      << "\n  event_handler_enabled:                "
-     << obj.event_handler_enabled
+     << obj.get_event_handler_enabled()
      << "\n  checks_enabled:                       " << obj.get_checks_enabled()
      << "\n  retain_status_information:            "
      << obj.retain_status_information
@@ -615,7 +619,6 @@ com::centreon::engine::service* add_service(
     std::string const& check_period,
     int initial_state,
     int max_attempts,
-    int accept_passive_checks,
     double check_interval,
     double retry_interval,
     double notification_interval,
@@ -633,6 +636,7 @@ com::centreon::engine::service* add_service(
     bool event_handler_enabled,
     std::string const& check_command,
     bool checks_enabled,
+    bool accept_passive_checks,
     bool flap_detection_enabled,
     double low_flap_threshold,
     double high_flap_threshold,
@@ -713,19 +717,17 @@ com::centreon::engine::service* add_service(
   // Allocate memory.
   std::shared_ptr<service> obj{new service(
       host_name, description, display_name.empty() ? description : display_name,
-      check_command, checks_enabled, initial_state, check_interval,
+      check_command, checks_enabled, accept_passive_checks, initial_state, check_interval,
       retry_interval, max_attempts, first_notification_delay,
-      notification_period, notifications_enabled, check_period, event_handler,
+      notification_period, notifications_enabled, check_period, event_handler, event_handler_enabled,
       notes, notes_url, action_url, icon_image, icon_image_alt,
       flap_detection_enabled, low_flap_threshold, high_flap_threshold,
       check_freshness, timezone)};
 
   try {
-    obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_options = CHECK_OPTION_NONE;
     obj->current_state = initial_state;
-    obj->event_handler_enabled = (event_handler_enabled > 0);
     obj->flap_detection_on_critical = (flap_detection_on_critical > 0);
     obj->flap_detection_on_ok = (flap_detection_on_ok > 0);
     obj->flap_detection_on_unknown = (flap_detection_on_unknown > 0);
@@ -997,7 +999,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
              "service checks are disabled globally.";
       return ERROR;
     }
-    if (!this->accept_passive_service_checks) {
+    if (!get_accept_passive_checks()) {
       logger(dbg_checks, basic)
           << "Discarding passive service check result because passive "
              "checks are disabled for this service.";
@@ -2089,7 +2091,7 @@ int service::handle_service_event() {
   /* bail out if we shouldn't be running event handlers */
   if (config->enable_event_handlers() == false)
     return OK;
-  if (this->event_handler_enabled == false)
+  if (!get_event_handler_enabled())
     return OK;
 
   /* find the host */

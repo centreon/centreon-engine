@@ -746,7 +746,7 @@ int process_passive_host_check(
   }
 
   /* skip this is we aren't accepting passive checks for this host */
-  if (!temp_host->get_accept_passive_host_checks())
+  if (!temp_host->get_accept_passive_checks())
     return ERROR;
 
   timeval tv;
@@ -3371,14 +3371,14 @@ void enable_passive_host_checks(com::centreon::engine::host* hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
-  if (hst->get_accept_passive_host_checks())
+  if (hst->get_accept_passive_checks())
     return;
 
   /* set the attribute modified flag */
   hst->add_modified_attributes(attr);
 
   /* set the passive check flag */
-  hst->set_accept_passive_host_checks(true);
+  hst->set_accept_passive_checks(true);
 
   /* send data to event broker */
   broker_adaptive_host_data(
@@ -3400,14 +3400,14 @@ void disable_passive_host_checks(com::centreon::engine::host* hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
-  if (!hst->get_accept_passive_host_checks())
+  if (!hst->get_accept_passive_checks())
     return;
 
   /* set the attribute modified flag */
   hst->add_modified_attributes(attr);
 
   /* set the passive check flag */
-  hst->set_accept_passive_host_checks(false);
+  hst->set_accept_passive_checks(false);
 
   /* send data to event broker */
   broker_adaptive_host_data(
@@ -3491,14 +3491,14 @@ void enable_service_event_handler(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
-  if (svc->event_handler_enabled)
+  if (svc->get_event_handler_enabled())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* set the event handler flag */
-  svc->event_handler_enabled = true;
+  svc->set_event_handler_enabled(true);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -3520,14 +3520,14 @@ void disable_service_event_handler(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
-  if (svc->event_handler_enabled == false)
+  if (!svc->get_event_handler_enabled())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* set the event handler flag */
-  svc->event_handler_enabled = false;
+  svc->set_event_handler_enabled(false);
 
   /* send data to event broker */
   broker_adaptive_service_data(

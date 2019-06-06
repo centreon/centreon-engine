@@ -78,10 +78,10 @@ class                 host : public notifier {
                            std::string const& notification_period,
                            bool notifications_enabled,
                            std::string const& check_command,
-                           int checks_enabled,
-                           int accept_passive_checks,
+                           bool checks_enabled,
+                           bool accept_passive_checks,
                            std::string const& event_handler,
-                           int event_handler_enabled,
+                           bool event_handler_enabled,
                            bool flap_detection_enabled,
                            double low_flap_threshold,
                            double high_flap_threshold,
@@ -175,10 +175,6 @@ class                 host : public notifier {
   void               set_freshness_threshold(int freshness_threshold);
   bool               get_process_performance_data() const;
   void               set_process_performance_data(bool process_performance_data);
-  int                get_accept_passive_host_checks() const;
-  void               set_accept_passive_host_checks(bool accept_passive_host_checks);
-  bool               get_event_handler_enabled() const;
-  void               set_event_handler_enabled(bool event_handler_enabled);
   int                get_retain_status_information() const;
   void               set_retain_status_information(int retain_status_information);
   int                get_retain_nonstatus_information() const;
@@ -325,8 +321,6 @@ private:
   bool                _stalk_on_up;
   int                 _freshness_threshold;
   bool                _process_performance_data;
-  int                 _accept_passive_host_checks;
-  bool                _event_handler_enabled;
   int                 _retain_status_information;
   int                 _retain_nonstatus_information;
   bool                _failure_prediction_enabled;

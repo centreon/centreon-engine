@@ -153,10 +153,10 @@ host::host(uint64_t host_id,
            std::string const& notification_period,
            bool notifications_enabled,
            std::string const& check_command,
-           int checks_enabled,
-           int accept_passive_checks,
+           bool checks_enabled,
+           bool accept_passive_checks,
            std::string const& event_handler,
-           int event_handler_enabled,
+           bool event_handler_enabled,
            bool flap_detection_enabled,
            double low_flap_threshold,
            double high_flap_threshold,
@@ -191,7 +191,8 @@ host::host(uint64_t host_id,
     : notifier{HOST_NOTIFICATION,
                !display_name.empty() ? display_name : name,
                check_command,
-               checks_enabled > 0,
+               checks_enabled,
+               accept_passive_checks,
                initial_state,
                check_interval,
                retry_interval,
@@ -201,6 +202,7 @@ host::host(uint64_t host_id,
                notifications_enabled,
                check_period,
                event_handler,
+               event_handler_enabled,
                notes,
                notes_url,
                action_url,
@@ -254,10 +256,8 @@ host::host(uint64_t host_id,
   _statusmap_image = statusmap_image;
   _vrml_image = vrml_image;
 
-  _accept_passive_host_checks = (accept_passive_checks > 0);
   set_current_attempt(initial_state == HOST_UP ? 1 : max_attempts);
   _current_state = initial_state;
-  _event_handler_enabled = (event_handler_enabled > 0);
   _flap_detection_on_down = (flap_detection_on_down > 0);
   _flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
   _flap_detection_on_up = (flap_detection_on_up > 0);
@@ -407,22 +407,6 @@ bool host::get_process_performance_data() const {
 
 void host::set_process_performance_data(bool process_performance_data) {
   _process_performance_data = process_performance_data;
-}
-
-int host::get_accept_passive_host_checks() const {
-  return _accept_passive_host_checks;
-}
-
-void host::set_accept_passive_host_checks(bool accept_passive_host_checks) {
-  _accept_passive_host_checks = accept_passive_host_checks;
-}
-
-bool host::get_event_handler_enabled() const {
-  return _event_handler_enabled;
-}
-
-void host::set_event_handler_enabled(bool event_handler_enabled) {
-  _event_handler_enabled = event_handler_enabled;
 }
 
 int host::get_retain_status_information() const {
@@ -878,8 +862,8 @@ bool host::operator==(host const& other) throw() {
          get_process_performance_data() ==
              other.get_process_performance_data() &&
          get_checks_enabled() == other.get_checks_enabled() &&
-         get_accept_passive_host_checks() ==
-             other.get_accept_passive_host_checks() &&
+         get_accept_passive_checks() ==
+             other.get_accept_passive_checks() &&
          get_event_handler_enabled() == other.get_event_handler_enabled() &&
          get_retain_status_information() ==
              other.get_retain_status_information() &&
@@ -1155,8 +1139,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
         "  checks_enabled:                       "
      << obj.get_checks_enabled()
      << "\n"
-        "  accept_passive_host_checks:           "
-     << obj.get_accept_passive_host_checks()
+        "  accept_passive_checks:           "
+     << obj.get_accept_passive_checks()
      << "\n"
         "  event_handler_enabled:                "
      << obj.get_event_handler_enabled()
@@ -1685,7 +1669,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
              "checks are disabled globally.";
       return ERROR;
     }
-    if (!get_accept_passive_host_checks()) {
+    if (!get_accept_passive_checks()) {
       logger(dbg_checks, basic)
           << "Discarding passive host check result because passive checks "
              "are disabled for this host.";

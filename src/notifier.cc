@@ -53,6 +53,7 @@ notifier::notifier(int notifier_type,
                    std::string const& display_name,
                    std::string const& check_command,
                    bool checks_enabled,
+                   bool accept_passive_checks,
                    int initial_state,
                    double check_interval,
                    double retry_interval,
@@ -62,6 +63,7 @@ notifier::notifier(int notifier_type,
                    bool notifications_enabled,
                    std::string const& check_period,
                    std::string const& event_handler,
+                   bool event_handler_enabled,
                    std::string const& notes,
                    std::string const& notes_url,
                    std::string const& action_url,
@@ -82,6 +84,7 @@ notifier::notifier(int notifier_type,
       _notification_period{notification_period},
       _check_period{check_period},
       _event_handler{event_handler},
+      _event_handler_enabled{event_handler_enabled},
       _action_url{action_url},
       _icon_image{icon_image},
       _icon_image_alt{icon_image_alt},
@@ -94,6 +97,7 @@ notifier::notifier(int notifier_type,
       _notifications_enabled{notifications_enabled},
       _timezone{timezone},
       _checks_enabled{checks_enabled},
+      _accept_passive_checks{accept_passive_checks},
       _check_freshness{check_freshness},
       _check_type{check_active},
       _current_attempt{0},
@@ -990,3 +994,20 @@ bool notifier::get_has_been_checked() const {
 void notifier::set_has_been_checked(bool has_been_checked) {
   _has_been_checked = has_been_checked;
 }
+
+bool notifier::get_event_handler_enabled() const {
+  return _event_handler_enabled;
+}
+
+void notifier::set_event_handler_enabled(bool event_handler_enabled) {
+  _event_handler_enabled = event_handler_enabled;
+}
+
+bool notifier::get_accept_passive_checks() const {
+  return _accept_passive_checks;
+}
+
+void notifier::set_accept_passive_checks(bool accept_passive_checks) {
+  _accept_passive_checks = accept_passive_checks;
+}
+

@@ -582,7 +582,7 @@ void check_host_result_freshness() {
 
     /* skip hosts that have both active and passive checks disabled */
     if (!it->second->get_checks_enabled()
-        && !it->second->get_accept_passive_host_checks())
+        && !it->second->get_accept_passive_checks())
       continue;
 
     /* skip hosts that are currently executing (problems here will be caught by orphaned host check) */

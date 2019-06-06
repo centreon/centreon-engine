@@ -55,6 +55,7 @@ class                         notifier {
                                        std::string const& display_name,
                                        std::string const& check_command,
                                        bool checks_enabled,
+                                       bool accept_passive_checks,
                                        int initial_state,
                                        double check_interval,
                                        double retry_interval,
@@ -64,6 +65,7 @@ class                         notifier {
                                        bool notifications_enabled,
                                        std::string const& check_period,
                                        std::string const& event_handler,
+                                       bool event_handler_enabled,
                                        std::string const& notes,
                                        std::string const& notes_url,
                                        std::string const& action_url,
@@ -198,6 +200,10 @@ class                         notifier {
   void set_problem_has_been_acknowledged(bool problem_has_been_acknowledged);
   bool               get_has_been_checked() const;
   void               set_has_been_checked(bool has_been_checked);
+  bool               get_event_handler_enabled() const;
+  void               set_event_handler_enabled(bool event_handler_enabled);
+  bool               get_accept_passive_checks() const;
+  void               set_accept_passive_checks(bool accept_passive_checks);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -246,11 +252,13 @@ class                         notifier {
   std::string _timezone;
   std::list<std::shared_ptr<escalation>> _escalations;
   bool _checks_enabled;
+  bool                _accept_passive_checks;
   bool _check_freshness;
   int                 _check_type;
   int                 _current_attempt;
   bool _problem_has_been_acknowledged;
   bool                _has_been_checked;
+  bool                _event_handler_enabled;
 };
 
 CCE_END()

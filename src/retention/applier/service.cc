@@ -187,7 +187,7 @@ void applier::service::_update(
 
     if (state.event_handler_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_EVENT_HANDLER_ENABLED))
-      obj.event_handler_enabled = *state.event_handler_enabled();
+      obj.set_event_handler_enabled(*state.event_handler_enabled());
 
     if (state.flap_detection_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_FLAP_DETECTION_ENABLED))

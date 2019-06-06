@@ -72,6 +72,7 @@ class                           service : public notifier {
                                         std::string const& display_name,
                                         std::string const& check_command,
                                         bool checks_enabled,
+                                        bool accept_passive_checks,
                                         int initial_state,
                                         double check_interval,
                                         double retry_interval,
@@ -81,6 +82,7 @@ class                           service : public notifier {
                                         bool notifications_enabled,
                                         std::string const& check_period,
                                         std::string const& event_handler,
+                                        bool event_handler_enabled,
                                         std::string const& notes,
                                         std::string const& notes_url,
                                         std::string const& action_url,
@@ -168,7 +170,6 @@ class                           service : public notifier {
   int                           process_performance_data;
   int                           freshness_threshold;
   int                           accept_passive_service_checks;
-  int                           event_handler_enabled;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
   int                           obsess_over_service;
@@ -247,7 +248,6 @@ com::centreon::engine::service* add_service(
            std::string const& check_period,
            int initial_state,
            int max_attempts,
-           int accept_passive_checks,
            double check_interval,
            double retry_interval,
            double notification_interval,
@@ -265,6 +265,7 @@ com::centreon::engine::service* add_service(
            bool event_handler_enabled,
            std::string const& check_command,
            bool checks_enabled,
+           bool accept_passive_checks,
            bool flap_detection_enabled,
            double low_flap_threshold,
            double high_flap_threshold,

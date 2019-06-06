@@ -324,7 +324,7 @@ void applier::host::modify_object(
   h->set_notifications_enabled(static_cast<int>(obj.notifications_enabled()));
   h->set_check_command(obj.check_command());
   h->set_checks_enabled(static_cast<int>(obj.checks_active()));
-  h->set_accept_passive_host_checks(static_cast<int>(obj.checks_passive()));
+  h->set_accept_passive_checks(static_cast<int>(obj.checks_passive()));
   h->set_event_handler(obj.event_handler());
   h->set_event_handler_enabled(static_cast<int>(obj.event_handler_enabled()));
   h->set_flap_detection_enabled(obj.flap_detection_enabled());

@@ -124,7 +124,6 @@ void applier::service::add_object(
     obj.check_period(),
     obj.initial_state(),
     obj.max_check_attempts(),
-    obj.checks_passive(),
     obj.check_interval(),
     obj.retry_interval(),
     obj.notification_interval(),
@@ -148,6 +147,7 @@ void applier::service::add_object(
     obj.event_handler_enabled(),
     obj.check_command(),
     obj.checks_active(),
+    obj.checks_passive(),
     obj.flap_detection_enabled(),
     obj.low_flap_threshold(),
     obj.high_flap_threshold(),
@@ -363,9 +363,7 @@ void applier::service::modify_object(
   s->set_display_name(obj.display_name()),
   s->set_check_command(obj.check_command());
   s->set_event_handler(obj.event_handler());
-  modify_if_different(
-    s->event_handler_enabled,
-    static_cast<int>(obj.event_handler_enabled()));
+  s->set_event_handler_enabled(obj.event_handler_enabled());
   s->set_initial_state(obj.initial_state());
   s->set_check_interval(obj.check_interval());
   s->set_retry_interval(obj.retry_interval());
