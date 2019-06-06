@@ -103,7 +103,8 @@ notifier::notifier(int notifier_type,
       _current_attempt{0},
       _problem_has_been_acknowledged{false},
       _has_been_checked{false},
-      _scheduled_downtime_depth{0} {
+      _scheduled_downtime_depth{0},
+      _execution_time{0.0} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -1107,3 +1108,12 @@ void notifier::inc_scheduled_downtime_depth() {
 void notifier::dec_scheduled_downtime_depth() {
   --_scheduled_downtime_depth;
 }
+
+double notifier::get_execution_time() const {
+  return _execution_time;
+}
+
+void notifier::set_execution_time(double execution_time) {
+  _execution_time = execution_time;
+}
+

@@ -84,7 +84,7 @@ void applier::service::_update(
     if (state.has_been_checked().is_set())
       obj.set_has_been_checked(*state.has_been_checked());
     if (state.check_execution_time().is_set())
-      obj.execution_time = *state.check_execution_time();
+      obj.set_execution_time(*state.check_execution_time());
     if (state.check_latency().is_set())
       obj.latency = *state.check_latency();
     if (state.check_type().is_set())

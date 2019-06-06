@@ -515,14 +515,6 @@ void host::set_latency(double latency) {
   _latency = latency;
 }
 
-double host::get_execution_time() const {
-  return _execution_time;
-}
-
-void host::set_execution_time(double execution_time) {
-  _execution_time = execution_time;
-}
-
 bool host::get_is_executing() const {
   return _is_executing;
 }
@@ -1506,7 +1498,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   std::string old_plugin_output;
   struct timeval start_time_hires;
   struct timeval end_time_hires;
-  double execution_time(0.0);
+  double execution_time{0.0};
 
   logger(dbg_functions, basic) << "handle_async_host_check_result_3x()";
 

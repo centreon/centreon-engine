@@ -183,7 +183,6 @@ class                           service : public notifier {
   int                           current_notification_number;
   uint64_t                      current_notification_id;
   double                        latency;
-  double                        execution_time;
   int                           is_executing;
   int                           check_options;
   int                           pending_flex_downtime;

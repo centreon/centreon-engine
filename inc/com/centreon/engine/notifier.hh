@@ -239,6 +239,8 @@ class                notifier {
   void               set_scheduled_downtime_depth(int scheduled_downtime_depth);
   void               dec_scheduled_downtime_depth();
   void               inc_scheduled_downtime_depth();
+  double             get_execution_time() const;
+  void               set_execution_time(double execution_time);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -305,6 +307,7 @@ class                notifier {
   bool               _has_been_checked;
   bool               _event_handler_enabled;
   int                 _scheduled_downtime_depth;
+  double              _execution_time;
 };
 
 CCE_END()

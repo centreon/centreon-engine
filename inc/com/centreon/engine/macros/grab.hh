@@ -48,6 +48,17 @@ namespace  macros {
     return string::dup(oss.str());
   }
 
+  template <typename T, typename V, double (V::* member)() const, unsigned int precision>
+  char*    get_double(T& t, nagios_macros* mac) {
+    (void)mac;
+
+    V* v{&t};
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(precision)
+        << (v->*member)();
+    return string::dup(oss.str());
+  }
+
   /**
    *  Extract double.
    *

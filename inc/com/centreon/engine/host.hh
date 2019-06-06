@@ -201,8 +201,6 @@ class                 host : public notifier {
   void               set_state_type(int state_type);
   double             get_latency() const;
   void               set_latency(double latency);
-  double             get_execution_time() const;
-  void               set_execution_time(double execution_time);
   bool               get_is_executing() const;
   void               set_is_executing(bool is_executing);
   int                get_check_options() const;
@@ -304,7 +302,6 @@ private:
   int                 _last_hard_state;
   int                 _state_type;
   double              _latency;
-  double              _execution_time;
   bool                _is_executing;
   int                 _check_options;
   time_t              _next_check;

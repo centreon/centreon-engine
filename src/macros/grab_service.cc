@@ -207,7 +207,9 @@ struct grab_service_redirection {
         true}},
       // Execution time.
       {MACRO_SERVICEEXECUTIONTIME,
-       {&get_double<service, &service::execution_time, 3>,
+       {&get_double<com::centreon::engine::service, com::centreon::engine::notifier,
+                    &com::centreon::engine::notifier::get_execution_time,
+                    3>,
         true}},
       // Latency.
       {MACRO_SERVICELATENCY,

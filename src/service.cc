@@ -252,7 +252,7 @@ bool service::operator==(service const& other) throw() {
              other.current_notification_number &&
          this->current_notification_id == other.current_notification_id &&
          this->latency == other.latency &&
-         this->execution_time == other.execution_time &&
+         get_execution_time() == other.get_execution_time() &&
          this->is_executing == other.is_executing &&
          this->check_options == other.check_options &&
          get_scheduled_downtime_depth() == other.get_scheduled_downtime_depth() &&
@@ -524,7 +524,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  current_notification_id:              "
      << obj.current_notification_id
      << "\n  latency:                              " << obj.latency
-     << "\n  execution_time:                       " << obj.execution_time
+     << "\n  execution_time:                       " << obj.get_execution_time()
      << "\n  is_executing:                         " << obj.is_executing
      << "\n  check_options:                        " << obj.check_options
      << "\n  scheduled_downtime_depth:             "
@@ -1074,15 +1074,15 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   this->latency = queued_check_result->latency;
 
   /* update the execution time for this check (millisecond resolution) */
-  this->execution_time =
+  set_execution_time(
       (double)((double)(queued_check_result->finish_time.tv_sec -
                         queued_check_result->start_time.tv_sec) +
                (double)((queued_check_result->finish_time.tv_usec -
                          queued_check_result->start_time.tv_usec) /
                         1000.0) /
-                   1000.0);
-  if (this->execution_time < 0.0)
-    this->execution_time = 0.0;
+                   1000.0));
+  if (get_execution_time() < 0.0)
+    set_execution_time(0.0);
 
   /* get the last check time */
   this->last_check = queued_check_result->start_time.tv_sec;
@@ -1890,7 +1890,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                        NEBATTR_NONE, this, get_check_type(),
                        queued_check_result->start_time,
                        queued_check_result->finish_time, nullptr, this->latency,
-                       this->execution_time, config->service_check_timeout(),
+                       get_execution_time(), config->service_check_timeout(),
                        queued_check_result->early_timeout,
                        queued_check_result->return_code, nullptr, nullptr);
 
