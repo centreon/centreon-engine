@@ -680,7 +680,7 @@ static int handle_summary_macro(
       if (authorized) {
         bool problem(true);
         if (it->second->current_state == STATE_OK
-            && it->second->has_been_checked == true)
+            && it->second->get_has_been_checked())
           services_ok++;
         else if (it->second->current_state == STATE_WARNING) {
           host* temp_host{nullptr};

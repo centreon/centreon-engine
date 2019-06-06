@@ -215,7 +215,7 @@ bool service::operator==(service const& other) throw() {
          this->last_time_warning == other.last_time_warning &&
          this->last_time_unknown == other.last_time_unknown &&
          this->last_time_critical == other.last_time_critical &&
-         this->has_been_checked == other.has_been_checked &&
+         get_has_been_checked() == other.get_has_been_checked() &&
          this->is_being_freshened == other.is_being_freshened &&
          get_notified_on() == other.get_notified_on() &&
          this->current_notification_number ==
@@ -481,7 +481,7 @@ std::ostream& operator<<(std::ostream& os,
      << string::ctime(obj.last_time_unknown)
      << "\n  last_time_critical:                   "
      << string::ctime(obj.last_time_critical)
-     << "\n  has_been_checked:                     " << obj.has_been_checked
+     << "\n  has_been_checked:                     " << obj.get_has_been_checked()
      << "\n  is_being_freshened:                   " << obj.is_being_freshened
      << "\n  notified_on_unknown:                  "
      << obj.get_notified_on(notifier::unknown)
@@ -1858,10 +1858,10 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                        queued_check_result->return_code, nullptr, nullptr);
 
   if (!(reschedule_check && this->should_be_scheduled &&
-        this->has_been_checked) ||
+        get_has_been_checked()) ||
       !get_checks_enabled()) {
     /* set the checked flag */
-    this->has_been_checked = true;
+    set_has_been_checked(true);
     /* update the current service status log */
     this->update_status(false);
   }

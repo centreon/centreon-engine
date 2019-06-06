@@ -193,7 +193,6 @@ class                           service : public notifier {
   time_t                        last_time_warning;
   time_t                        last_time_unknown;
   time_t                        last_time_critical;
-  int                           has_been_checked;
   int                           is_being_freshened;
   int                           current_notification_number;
   uint64_t                      current_notification_id;

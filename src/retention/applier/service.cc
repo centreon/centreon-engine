@@ -82,7 +82,7 @@ void applier::service::_update(
 
   if (obj.retain_status_information) {
     if (state.has_been_checked().is_set())
-      obj.has_been_checked = *state.has_been_checked();
+      obj.set_has_been_checked(*state.has_been_checked());
     if (state.check_execution_time().is_set())
       obj.execution_time = *state.check_execution_time();
     if (state.check_latency().is_set())
@@ -290,7 +290,7 @@ void applier::service::_update(
         obj.get_next_notification_time(obj.get_last_notification()));
 
   // fix old vars.
-  if (!obj.has_been_checked && obj.state_type == SOFT_STATE)
+  if (!obj.get_has_been_checked() && obj.state_type == SOFT_STATE)
     obj.state_type = HARD_STATE;
 
   // ADDED 01/23/2009 adjust current check attempt if service is

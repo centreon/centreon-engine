@@ -247,8 +247,6 @@ class                 host : public notifier {
   void               set_last_time_unreachable(time_t last_time);
   time_t             get_last_time_up() const;
   void               set_last_time_up(time_t last_time);
-  bool               get_has_been_checked() const;
-  void               set_has_been_checked(bool has_been_checked);
   bool               get_is_being_freshened() const;
   void               set_is_being_freshened(bool is_being_freshened);
   bool               get_notified_on_down() const;
@@ -363,7 +361,6 @@ private:
   time_t              _last_time_down;
   time_t              _last_time_unreachable;
   time_t              _last_time_up;
-  bool                _has_been_checked;
   bool                _is_being_freshened;
   int                 _no_more_notifications;
   int                 _check_flapping_recovery_notification;

@@ -79,7 +79,6 @@ notifier::notifier(int notifier_type,
       _check_interval{check_interval},
       _retry_interval{retry_interval},
       _max_attempts{max_attempts},
-
       _notification_period{notification_period},
       _check_period{check_period},
       _event_handler{event_handler},
@@ -98,7 +97,8 @@ notifier::notifier(int notifier_type,
       _check_freshness{check_freshness},
       _check_type{check_active},
       _current_attempt{0},
-      _problem_has_been_acknowledged{false} {
+      _problem_has_been_acknowledged{false},
+      _has_been_checked{false} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -983,3 +983,10 @@ void notifier::set_problem_has_been_acknowledged(
   _problem_has_been_acknowledged = problem_has_been_acknowledged;
 }
 
+bool notifier::get_has_been_checked() const {
+  return _has_been_checked;
+}
+
+void notifier::set_has_been_checked(bool has_been_checked) {
+  _has_been_checked = has_been_checked;
+}

@@ -697,14 +697,6 @@ void host::set_last_time_up(time_t last_time) {
   _last_time_up = last_time;
 }
 
-bool host::get_has_been_checked() const {
-  return _has_been_checked;
-}
-
-void host::set_has_been_checked(bool has_been_checked) {
-  _has_been_checked = has_been_checked;
-}
-
 bool host::get_is_being_freshened() const {
   return _is_being_freshened;
 }

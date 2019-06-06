@@ -196,6 +196,8 @@ class                         notifier {
   void               add_current_attempt(int num);
   bool get_problem_has_been_acknowledged() const;
   void set_problem_has_been_acknowledged(bool problem_has_been_acknowledged);
+  bool               get_has_been_checked() const;
+  void               set_has_been_checked(bool has_been_checked);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -248,6 +250,7 @@ class                         notifier {
   int                 _check_type;
   int                 _current_attempt;
   bool _problem_has_been_acknowledged;
+  bool                _has_been_checked;
 };
 
 CCE_END()

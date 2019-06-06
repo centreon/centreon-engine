@@ -135,7 +135,7 @@ unsigned int check_service_dependencies(
     if (state == STATE_CRITICAL
         && temp_dependency->get_fail_on_critical())
       return DEPENDENCIES_FAILED;
-    if ((state == STATE_OK && !temp_service->has_been_checked)
+    if ((state == STATE_OK && !temp_service->get_has_been_checked())
         && temp_dependency->get_fail_on_pending())
       return DEPENDENCIES_FAILED;
 
@@ -323,7 +323,7 @@ int is_service_result_fresh(
   /* calculate expiration time */
   /* CHANGED 11/10/05 EG - program start is only used in expiration time calculation if > last check AND active checks are enabled, so active checks can become stale immediately upon program startup */
   /* CHANGED 02/25/06 SG - passive checks also become stale, so remove dependence on active check logic */
-  if (!temp_service->has_been_checked)
+  if (!temp_service->get_has_been_checked())
     expiration_time = (time_t)(event_start + freshness_threshold);
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (services never go stale). */
   /* CHANGED 10/07/07 EG - Only match next condition for services that have active checks enabled... */
@@ -340,7 +340,7 @@ int is_service_result_fresh(
       = (time_t)(temp_service->last_check + freshness_threshold);
 
   logger(dbg_checks, most)
-    << "HBC: " << temp_service->has_been_checked
+    << "HBC: " << temp_service->get_has_been_checked()
     << ", PS: " << program_start
     << ", ES: " << event_start
     << ", LC: " << temp_service->last_check
