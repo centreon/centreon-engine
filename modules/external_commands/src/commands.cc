@@ -181,7 +181,6 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   char* user(nullptr);
   char* comment_data(nullptr);
   int persistent(0);
-  int result(0);
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -1430,7 +1429,6 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
 int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
   char *temp_ptr(nullptr);
   char *end_ptr(nullptr);
-  host *temp_host(nullptr);
   hostgroup *temp_hostgroup(nullptr);
   char *service_description(nullptr);
   char *downtime_comment(nullptr);
@@ -2628,7 +2626,6 @@ void enable_and_propagate_notifications(
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  com::centreon::engine::host* child_host(nullptr);
   com::centreon::engine::service* temp_service(nullptr);
 
   /* enable notification for top level host */
@@ -2679,7 +2676,6 @@ void disable_and_propagate_notifications(
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  com::centreon::engine::host* child_host(nullptr);
   com::centreon::engine::service* temp_service(nullptr);
 
   if (hst == nullptr)
@@ -2876,7 +2872,6 @@ void schedule_and_propagate_downtime(
        int fixed,
        unsigned long triggered_by,
        unsigned long duration) {
-  com::centreon::engine::host* child_host(nullptr);
 
   /* check all child hosts... */
   for (host_map::iterator

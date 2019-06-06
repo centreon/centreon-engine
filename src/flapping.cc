@@ -37,8 +37,6 @@ using namespace com::centreon::engine::logging;
 
 /* enables flap detection on a program wide basis */
 void enable_flap_detection_routines() {
-  com::centreon::engine::host* temp_host = NULL;
-  com::centreon::engine::service* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)
@@ -86,8 +84,6 @@ void enable_flap_detection_routines() {
 
 /* disables flap detection on a program wide basis */
 void disable_flap_detection_routines() {
-  com::centreon::engine::host* temp_host = NULL;
-  com::centreon::engine::service* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
   logger(dbg_functions, basic)

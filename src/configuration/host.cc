@@ -91,7 +91,6 @@ host::setters const host::_setters[] = {
 };
 
 // Default values.
-static int const            default_acknowledgement_timeout(0);
 static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);

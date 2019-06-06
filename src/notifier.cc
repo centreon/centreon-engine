@@ -75,27 +75,29 @@ notifier::notifier(int notifier_type,
     : _notifier_type{notifier_type},
       _display_name{display_name},
       _check_command{check_command},
-      _checks_enabled{checks_enabled},
       _initial_state{initial_state},
       _check_interval{check_interval},
       _retry_interval{retry_interval},
       _max_attempts{max_attempts},
-      _first_notification_delay{first_notification_delay},
+
       _notification_period{notification_period},
-      _notifications_enabled{notifications_enabled},
       _check_period{check_period},
       _event_handler{event_handler},
-      _notes{notes},
-      _notes_url{notes_url},
       _action_url{action_url},
       _icon_image{icon_image},
       _icon_image_alt{icon_image_alt},
+      _notes{notes},
+      _notes_url{notes_url},
       _flap_detection_enabled{flap_detection_enabled},
       _low_flap_threshold{low_flap_threshold},
       _high_flap_threshold{high_flap_threshold},
-      _check_freshness{check_freshness},
+      _first_notification_delay{first_notification_delay},
+      _notifications_enabled{notifications_enabled},
       _timezone{timezone},
+      _checks_enabled{checks_enabled},
+      _check_freshness{check_freshness},
       _check_type{check_active},
+      _current_attempt{0},
       _problem_has_been_acknowledged{false} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
@@ -836,8 +838,6 @@ void notifier::create_notification_list(nagios_macros* mac,
            "notification list.";
 
     for (std::shared_ptr<escalation> const& e : get_escalations()) {
-      escalation* tmp_e{e.get()};
-
       /* see if this escalation if valid for this notification */
       if (!is_valid_escalation_for_notification(e, options))
         continue;

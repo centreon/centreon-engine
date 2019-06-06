@@ -498,10 +498,7 @@ static int dfs_host_path(host* root) {
 
 /* check for circular paths and dependencies */
 int pre_flight_circular_check(int* w, int* e) {
-  servicedependency* temp_sd(nullptr);
-  servicedependency* temp_sd2(nullptr);
   hostdependency* temp_hd(nullptr);
-  hostdependency* temp_hd2(nullptr);
   int found(false);
   int warnings(0);
   int errors(0);
@@ -561,7 +558,7 @@ int pre_flight_circular_check(int* w, int* e) {
     for (servicedependency_mmap::iterator
            it2(servicedependency::servicedependencies.begin()),
            end2(servicedependency::servicedependencies.end());
-         it2 != end;
+         it2 != end2;
          ++it2)
       it2->second->set_circular_path_checked(false);
 
@@ -589,7 +586,7 @@ int pre_flight_circular_check(int* w, int* e) {
     for (servicedependency_mmap::iterator
            it2(servicedependency::servicedependencies.begin()),
            end2(servicedependency::servicedependencies.end());
-         it2 != end;
+         it2 != end2;
          ++it2)
       it2->second->set_circular_path_checked(false);
 
@@ -1071,7 +1068,6 @@ int check_host(host* hst, int* w, int* e) {
        it != end;
        it++) {
 
-    host* hst2 = nullptr;
     umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first)));
 
@@ -1764,7 +1760,6 @@ int check_timeperiod(timeperiod* tp, int* w, int* e) {
          end(tp->exclusions.end());
        it != end;
        ++it) {
-    timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
       found(state::instance().timeperiods().find(it->first));
 

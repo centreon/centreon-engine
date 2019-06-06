@@ -61,7 +61,7 @@ retention::object& retention::object::operator=(object const& right) {
   if (this != &right) {
     _type = right._type;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -72,7 +72,7 @@ retention::object& retention::object::operator=(object const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool retention::object::operator==(object const& right) const throw () {
-  return (_type == right._type);
+  return _type == right._type;
 }
 
 /**
@@ -83,7 +83,7 @@ bool retention::object::operator==(object const& right) const throw () {
  *  @return True if is not the same object, otherwise false.
  */
 bool retention::object::operator!=(object const& right) const throw () {
-  return (!operator!=(right));
+  return !operator==(right);
 }
 
 /**
@@ -111,7 +111,7 @@ retention::object_ptr retention::object::create(std::string const& type_name) {
     obj = object_ptr(new retention::info);
   else if (type_name == "program")
     obj = object_ptr(new retention::program);
-  return (obj);
+  return obj;
 }
 
 /**
@@ -120,7 +120,7 @@ retention::object_ptr retention::object::create(std::string const& type_name) {
  *  @return The object type.
  */
 retention::object::type_id retention::object::type() const throw () {
-  return (_type);
+  return _type;
 }
 
 /**
@@ -138,5 +138,5 @@ std::string const& retention::object::type_name() const throw () {
     "program",
     "service"
   };
-  return (tab[_type]);
+  return tab[_type];
 }

@@ -948,7 +948,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   time_t current_time = 0L;
   int state_was_logged = false;
   std::string old_plugin_output;
-  char* temp_ptr = nullptr;
   objectlist* check_servicelist = nullptr;
   objectlist* servicelist_item = nullptr;
   com::centreon::engine::service* master_service = nullptr;
@@ -3068,7 +3067,6 @@ int service::notify_contact(nagios_macros* mac,
                             char const* not_data,
                             int options,
                             int escalated) {
-  char* command_name_ptr(nullptr);
   char* raw_command = nullptr;
   char* processed_command = nullptr;
   int early_timeout = false;

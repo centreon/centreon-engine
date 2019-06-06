@@ -362,7 +362,7 @@ int xsddefault_save_status_data() {
          "\tactive_checks_enabled=" << it->second->get_checks_enabled() << "\n"
          "\tpassive_checks_enabled=" << it->second->accept_passive_service_checks << "\n"
          "\tevent_handler_enabled=" << it->second->event_handler_enabled << "\n"
-         "\tproblem_has_been_acknowledged=" << it->second->problem_has_been_acknowledged << "\n"
+         "\tproblem_has_been_acknowledged=" << it->second->get_problem_has_been_acknowledged() << "\n"
          "\tacknowledgement_type=" << it->second->acknowledgement_type << "\n"
          "\tflap_detection_enabled=" << it->second->get_flap_detection_enabled() << "\n"
          "\tprocess_performance_data=" << it->second->process_performance_data << "\n"

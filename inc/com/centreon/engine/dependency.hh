@@ -41,6 +41,7 @@ class                         dependency {
                                            bool inherits_parent,
                                            bool fail_on_pending,
                                            std::string const& dependency_period);
+  virtual                       ~dependency() {}
 
   types                         get_dependency_type() const;
   void                          set_dependency_type(types dependency_type);

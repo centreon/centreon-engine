@@ -178,7 +178,6 @@ bool hostescalation::operator<(hostescalation const& obj) {
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
-  char const* hst_str(nullptr);
   std::string escalation_period_str;
   if (obj.escalation_period_ptr)
     escalation_period_str = obj.escalation_period_ptr->get_name();

@@ -799,8 +799,6 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
                                  int reschedule_check,
                                  int use_cached_result,
                                  unsigned long check_timestamp_horizon) {
-  com::centreon::engine::host* child_host = NULL;
-  com::centreon::engine::host* parent_host = NULL;
   com::centreon::engine::host* master_host = NULL;
   com::centreon::engine::host* temp_host = NULL;
   objectlist* check_hostlist = NULL;

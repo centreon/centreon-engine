@@ -58,11 +58,7 @@ void downtime_manager::delete_downtime(int type, uint64_t downtime_id) {
 
 /* unschedules a host or service downtime */
 int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
-  downtime* next_downtime(nullptr);
-  host* hst(nullptr);
-  service* svc(nullptr);
   timed_event* temp_event(nullptr);
-  int attr(0);
   std::shared_ptr<downtime> temp_downtime{find_downtime(type, downtime_id)};
 
   logger(dbg_functions, basic) << "unschedule_downtime()";

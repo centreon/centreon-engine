@@ -636,16 +636,6 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       it->second->get_last_state_history_update())};
-    time_t init_notif{adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      it->second->get_initial_notif_time())};
-    time_t last_ack{adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      it->second->get_last_acknowledgement())};
 
     it->second->set_last_notification(last_host_notif);
     it->second->set_last_check(last_check);

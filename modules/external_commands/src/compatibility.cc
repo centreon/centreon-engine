@@ -998,7 +998,6 @@ int process_hostgroup_command(int cmd,
                               char* args) {
   char* hostgroup_name = nullptr;
   hostgroup* temp_hostgroup = nullptr;
-  host* temp_host = nullptr;
   com::centreon::engine::service* temp_service = nullptr;
 
   (void)entry_time;
@@ -1534,7 +1533,6 @@ int process_contactgroup_command(int cmd,
                                  char* args) {
   char* contactgroup_name = nullptr;
   contactgroup* temp_contactgroup = nullptr;
-  contact* temp_contact = nullptr;
 
   (void)entry_time;
 

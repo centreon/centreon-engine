@@ -615,7 +615,6 @@ void applier::service::resolve_object(
     &deleter::objectlist);
 
   // Find host and adjust its counters.
-  unsigned long host_id(it->first.first);
   umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::iterator
     hst(applier::state::instance().hosts_find(it->first.first));
   if (hst != applier::state::instance().hosts().end()) {

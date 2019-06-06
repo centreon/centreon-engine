@@ -26,7 +26,6 @@
 CCE_BEGIN()
 class host;
 class hostescalation;
-struct timeperiod;
 CCE_END()
 
 typedef std::unordered_multimap<std::string,

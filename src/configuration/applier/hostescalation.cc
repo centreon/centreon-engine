@@ -261,8 +261,6 @@ void applier::hostescalation::resolve_object(
   uint64_t host_id{get_host_id(*obj.hosts().begin())};
   std::unordered_map<uint64_t, std::shared_ptr<engine::host> >::iterator it{
       state::instance().hosts().find(host_id)};
-  std::list<std::shared_ptr<engine::escalation> > const& he_list{
-      it->second->get_escalations()};
   for (std::list<std::shared_ptr<engine::escalation> >::const_iterator
            itt{it->second->get_escalations().begin()},
        end{it->second->get_escalations().end()};

@@ -106,10 +106,6 @@ void applier::serviceescalation::add_object(
                ? notifier::recovery
                : notifier::none))};
 
-  // Add new items to the configuration state.
-  std::pair<uint64_t, uint64_t> service_id{
-      get_host_and_service_id(se->get_hostname(), se->get_description())};
-
   // Add new items to tail the list.
   engine::serviceescalation::serviceescalations.insert(
       {{se->get_hostname(), se->get_description()}, se});
@@ -277,8 +273,6 @@ void applier::serviceescalation::resolve_object(
   std::pair<uint64_t, uint64_t> svc_id{get_host_and_service_id(*obj.hosts().begin(), obj.service_description().front())};
   std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator it{
     state::instance().services().find(svc_id)};
-  std::list<std::shared_ptr<engine::escalation>> const& se_list{
-    it->second->get_escalations()};
   for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
       itt{it->second->get_escalations().begin()},
       end{it->second->get_escalations().end()};
