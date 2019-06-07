@@ -80,6 +80,7 @@ class                           service : public notifier {
                                         double first_notification_delay,
                                         std::string const& notification_period,
                                         bool notifications_enabled,
+                                        bool is_volatile,
                                         std::string const& check_period,
                                         std::string const& event_handler,
                                         bool event_handler_enabled,
@@ -162,9 +163,10 @@ class                           service : public notifier {
                                   int options) const override;
   bool                          is_result_fresh(time_t current_time, int log_this);
   void                          handle_flap_detection_disabled();
+  bool                          get_is_volatile() const;
+  void                          set_is_volatile(bool vol);
 
   double                        notification_interval;
-  int                           is_volatile;
   int                           process_performance_data;
   int                           accept_passive_service_checks;
   int                           retain_status_information;
@@ -215,6 +217,7 @@ class                           service : public notifier {
   time_t                        _last_time_warning;
   time_t                        _last_time_unknown;
   time_t                        _last_time_critical;
+  int                           _is_volatile;
 };
 CCE_END()
 

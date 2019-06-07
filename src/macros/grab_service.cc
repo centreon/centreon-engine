@@ -195,7 +195,7 @@ struct grab_service_redirection {
         true}},
       // Is volatile.
       {MACRO_SERVICEISVOLATILE,
-       {&get_member_as_string<service, int, &service::is_volatile>,
+       {&get_member_as_string<service, bool, &service::get_is_volatile>,
         true}},
       // Attempt.
       {MACRO_SERVICEATTEMPT,

@@ -420,9 +420,7 @@ void applier::service::modify_object(
   s->set_action_url(obj.action_url());
   s->set_icon_image(obj.icon_image());
   s->set_icon_image_alt(obj.icon_image_alt());
-  modify_if_different(
-    s->is_volatile,
-    static_cast<int>(obj.is_volatile()));
+  s->set_is_volatile(obj.is_volatile());
   s->set_timezone(obj.timezone());
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),

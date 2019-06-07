@@ -75,6 +75,7 @@ service::service(std::string const& hostname,
                  double first_notification_delay,
                  std::string const& notification_period,
                  bool notifications_enabled,
+                 bool is_volatile,
                  std::string const& check_period,
                  std::string const& event_handler,
                  bool event_handler_enabled,
@@ -116,7 +117,8 @@ service::service(std::string const& hostname,
                freshness_threshold,
                timezone},
       _hostname{hostname},
-      _description{description} {
+      _description{description},
+      _is_volatile{is_volatile} {
   set_current_attempt(initial_state == STATE_OK ? 1 : max_attempts);
 }
 
@@ -190,13 +192,13 @@ bool service::operator==(service const& other) throw() {
          get_first_notification_delay() == get_first_notification_delay() &&
          get_notify_on() == other.get_notify_on() &&
          get_stalk_on() == other.get_stalk_on() &&
-         this->is_volatile == other.is_volatile &&
-         this->get_notification_period() == other.get_notification_period() &&
-         this->get_check_period() == other.get_check_period() &&
-         this->get_flap_detection_enabled() ==
+         get_is_volatile() == other.get_is_volatile() &&
+         get_notification_period() == other.get_notification_period() &&
+         get_check_period() == other.get_check_period() &&
+         get_flap_detection_enabled() ==
              other.get_flap_detection_enabled() &&
-         this->get_low_flap_threshold() == other.get_low_flap_threshold() &&
-         this->get_high_flap_threshold() == other.get_high_flap_threshold() &&
+         get_low_flap_threshold() == other.get_low_flap_threshold() &&
+         get_high_flap_threshold() == other.get_high_flap_threshold() &&
          _flap_type == other.get_flap_detection_on() &&
          this->process_performance_data == other.process_performance_data &&
          get_check_freshness() == other.get_check_freshness() &&
@@ -413,7 +415,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_stalk_on(notifier::critical)
      << "\n"
         "  is_volatile:                          "
-     << obj.is_volatile
+     << obj.get_is_volatile()
      << "\n"
         "  notification_period:                  "
      << obj.get_notification_period()
@@ -747,7 +749,7 @@ com::centreon::engine::service* add_service(
       host_name, description, display_name.empty() ? description : display_name,
       check_command, checks_enabled, accept_passive_checks, initial_state, check_interval,
       retry_interval, max_attempts, first_notification_delay,
-      notification_period, notifications_enabled, check_period, event_handler, event_handler_enabled,
+      notification_period, notifications_enabled, is_volatile, check_period, event_handler, event_handler_enabled,
       notes, notes_url, action_url, icon_image, icon_image_alt,
       flap_detection_enabled, low_flap_threshold, high_flap_threshold,
       check_freshness, freshness_threshold, timezone)};
@@ -763,7 +765,6 @@ com::centreon::engine::service* add_service(
     flap_detection_on |= (flap_detection_on_unknown > 0 ? notifier::unknown : 0);
     flap_detection_on |= (flap_detection_on_warning > 0 ? notifier::warning : 0);
     obj->set_flap_detection_on(flap_detection_on);
-    obj->is_volatile = (is_volatile > 0);
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;
     obj->set_modified_attributes(MODATTR_NONE);
@@ -1787,7 +1788,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* else log the problem (again) if this service is flagged as being
          volatile */
-      else if (this->is_volatile) {
+      else if (get_is_volatile()) {
         log_event();
         state_was_logged = true;
       }
@@ -1814,7 +1815,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* run the service event handler if we changed state from the last hard
        * state or if this service is flagged as being volatile */
-      if (hard_state_change || this->is_volatile)
+      if (hard_state_change || get_is_volatile())
         handle_service_event();
 
       /* save the last hard state */
@@ -3010,7 +3011,7 @@ int service::check_notification_viability(unsigned int type, int options) {
    * don't notify if we haven't waited long enough since the last time (and
    * the service is not marked as being volatile)
    */
-  if (current_time < _next_notification && !this->is_volatile) {
+  if (current_time < _next_notification && !get_is_volatile()) {
     logger(dbg_notifications, more)
         << "We haven't waited long enough to re-notify contacts "
            "about this service.";
@@ -3331,7 +3332,7 @@ time_t service::get_next_notification_time(time_t offset) {
    * if notification interval is 0, we shouldn't send any more problem
    * notifications (unless service is volatile)
    */
-  if (interval_to_use == 0.0 && this->is_volatile == false)
+  if (interval_to_use == 0.0 && !get_is_volatile())
     this->no_more_notifications = true;
   else
     this->no_more_notifications = false;
@@ -3583,4 +3584,12 @@ void service::handle_flap_detection_disabled() {
 
   /* update service status */
   this->update_status(false);
+}
+
+bool service::get_is_volatile() const {
+  return _is_volatile;
+}
+
+void service::set_is_volatile(bool vol) {
+  _is_volatile = vol;
 }
