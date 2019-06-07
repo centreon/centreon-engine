@@ -563,11 +563,11 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       it->second->get_last_notification()));
-    it->second->last_check = adjust_timestamp_for_time_change(
+    it->second->set_last_check(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      it->second->last_check);
+      it->second->get_last_check()));
     it->second->next_check = adjust_timestamp_for_time_change(
       last_time,
       current_time,

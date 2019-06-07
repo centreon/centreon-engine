@@ -272,7 +272,7 @@ bool service::operator==(service const& other) throw() {
          _state_type == other.get_state_type() &&
          this->next_check == other.next_check &&
          this->should_be_scheduled == other.should_be_scheduled &&
-         this->last_check == other.last_check &&
+         get_last_check() == other.get_last_check() &&
          get_current_attempt() == other.get_current_attempt() &&
          _current_event_id == other.get_current_event_id() &&
          _last_event_id == other.get_last_event_id() &&
@@ -528,7 +528,7 @@ std::ostream& operator<<(std::ostream& os,
      << string::ctime(obj.next_check)
      << "\n  should_be_scheduled:                  " << obj.should_be_scheduled
      << "\n  last_check:                           "
-     << string::ctime(obj.last_check)
+     << string::ctime(obj.get_last_check())
      << "\n  current_attempt:                      "
      << obj.get_current_attempt()
      << "\n  current_event_id:                     " << obj.get_current_event_id()
@@ -1127,7 +1127,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_execution_time(0.0);
 
   /* get the last check time */
-  this->last_check = queued_check_result->start_time.tv_sec;
+  set_last_check(queued_check_result->start_time.tv_sec);
 
   /* was this check passive or active? */
   set_check_type((queued_check_result->check_type == check_active)
@@ -1239,19 +1239,19 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* record the last state time */
   switch (_current_state) {
     case service::state_ok:
-      set_last_time_ok(this->last_check);
+      set_last_time_ok(get_last_check());
       break;
 
     case service::state_warning:
-      set_last_time_warning(this->last_check);
+      set_last_time_warning(get_last_check());
       break;
 
     case service::state_unknown:
-      set_last_time_unknown(this->last_check);
+      set_last_time_unknown(get_last_check());
       break;
 
     case service::state_critical:
-      set_last_time_critical(this->last_check);
+      set_last_time_critical(get_last_check());
       break;
 
     default:
@@ -1386,20 +1386,20 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   }
 
   /* initialize the last host and service state change times if necessary */
-  if (_last_state_change == (time_t)0)
-    _last_state_change = this->last_check;
-  if (_last_hard_state_change == (time_t)0)
-    _last_hard_state_change = this->last_check;
+  if (get_last_state_change() == (time_t)0)
+    set_last_state_change(get_last_check());
+  if (get_last_hard_state_change() == (time_t)0)
+    set_last_hard_state_change(get_last_check());
   if (temp_host->get_last_state_change() == (time_t)0)
-    temp_host->set_last_state_change(this->last_check);
+    temp_host->set_last_state_change(get_last_check());
   if (temp_host->get_last_hard_state_change() == (time_t)0)
-    temp_host->set_last_hard_state_change(this->last_check);
+    temp_host->set_last_hard_state_change(get_last_check());
 
   /* update last service state change times */
   if (state_change)
-    set_last_state_change(this->last_check);
+    set_last_state_change(get_last_check());
   if (hard_state_change)
-    set_last_hard_state_change(this->last_check);
+    set_last_hard_state_change(get_last_check());
 
   /* update the event and problem ids */
   if (state_change) {
@@ -1552,8 +1552,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     if (reschedule_check)
       next_service_check =
-          (time_t)(this->last_check +
-                   (_check_interval * config->interval_length()));
+          (time_t)(get_last_check() +
+                   get_check_interval() * config->interval_length());
   }
 
   /*******************************************/
@@ -1660,7 +1660,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
          * historical reasons only, can probably be removed in the future */
         if (!temp_host->get_has_been_checked()) {
           temp_host->set_has_been_checked(true);
-          temp_host->set_last_check(this->last_check);
+          temp_host->set_last_check(get_last_check());
         }
 
         /* fake the route check result */
@@ -1687,9 +1687,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* update last state change times */
       if (state_change || hard_state_change)
-        set_last_state_change(this->last_check);
+        set_last_state_change(get_last_check());
       if (hard_state_change) {
-        _last_hard_state_change = this->last_check;
+        set_last_hard_state_change(get_last_check());
         _state_type = notifier::hard ;
         _last_hard_state = _current_state;
       }
@@ -1737,8 +1737,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
          * interval */
         if (reschedule_check)
           next_service_check =
-              (time_t)(this->last_check + (_check_interval *
-                                           config->interval_length()));
+              (time_t)(get_last_check() + get_check_interval() *
+                                           config->interval_length());
 
         /* log the problem as a hard state if the host just went down */
         if (hard_state_change) {
@@ -1767,8 +1767,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
         if (reschedule_check)
           next_service_check =
-              (time_t)(this->last_check +
-                       _retry_interval * config->interval_length());
+              (time_t)(get_last_check() +
+                       get_retry_interval() * config->interval_length());
       }
 
       /* perform dependency checks on the second to last check of the service */
@@ -1864,8 +1864,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* reschedule the next check at the regular interval */
       if (reschedule_check)
         next_service_check =
-            (time_t)(this->last_check +
-                     (_check_interval * config->interval_length()));
+            (time_t)(get_last_check() +
+                     get_check_interval() * config->interval_length());
     }
 
     /* should we obsessive over service checks? */
@@ -1963,7 +1963,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     service* svc = static_cast<service*>(servicelist_item->object_ptr);
 
     /* we can get by with a cached state, so don't check the service */
-    if (static_cast<unsigned long>(current_time - svc->last_check) <=
+    if (static_cast<unsigned long>(current_time - svc->get_last_check()) <=
         config->cached_service_check_horizon()) {
       run_async_check = false;
 
@@ -3505,7 +3505,7 @@ bool service::is_result_fresh(
   /* CHANGED 10/07/07 EG - Only match next condition for services that have active checks enabled... */
   /* CHANGED 10/07/07 EG - Added max_service_check_spread to expiration time as suggested by Altinity */
   else if (this->get_checks_enabled()
-           && event_start > this->last_check
+           && event_start > get_last_check()
            && this->get_freshness_threshold() == 0)
     expiration_time
       = (time_t)(event_start + freshness_threshold
@@ -3513,13 +3513,13 @@ bool service::is_result_fresh(
                     * config->interval_length()));
   else
     expiration_time
-      = (time_t)(this->last_check + freshness_threshold);
+      = (time_t)(get_last_check() + freshness_threshold);
 
   logger(dbg_checks, most)
     << "HBC: " << this->get_has_been_checked()
     << ", PS: " << program_start
     << ", ES: " << event_start
-    << ", LC: " << this->last_check
+    << ", LC: " << get_last_check()
     << ", CT: " << current_time
     << ", ET: " << expiration_time;
 

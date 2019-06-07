@@ -312,7 +312,7 @@ struct grab_host_redirection {
        {&get_double<host, notifier, &notifier::get_execution_time, 3>, true}},
       {MACRO_HOSTLATENCY, {&get_double<host, &host::get_latency, 3>, true}},
       {MACRO_LASTHOSTCHECK,
-       {&get_member_as_string<host, time_t, &host::get_last_check>, true}},
+       {&get_member_as_string<host, time_t, notifier, &notifier::get_last_check>, true}},
       {MACRO_LASTHOSTSTATECHANGE,
        {&get_member_as_string<host, time_t, notifier, &notifier::get_last_state_change>,
         true}},

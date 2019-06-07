@@ -105,7 +105,8 @@ notifier::notifier(int notifier_type,
       _has_been_checked{false},
       _scheduled_downtime_depth{0},
       _execution_time{0.0},
-      _is_flapping{false} {
+      _is_flapping{false},
+      _last_check{0} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -1143,3 +1144,12 @@ bool notifier::get_is_flapping() const {
 void notifier::set_is_flapping(bool is_flapping) {
   _is_flapping = is_flapping;
 }
+
+time_t notifier::get_last_check() const {
+  return _last_check;
+}
+
+void notifier::set_last_check(time_t last_check) {
+  _last_check = last_check;
+}
+

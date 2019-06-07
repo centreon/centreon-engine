@@ -218,7 +218,7 @@ struct grab_service_redirection {
         true}},
       // Last check.
       {MACRO_LASTSERVICECHECK,
-       {&get_member_as_string<service, time_t, &service::last_check>,
+       {&get_member_as_string<service, time_t, notifier, &notifier::get_last_check>,
         true}},
       // Last state change.
       {MACRO_LASTSERVICESTATECHANGE,

@@ -259,6 +259,8 @@ class                notifier {
   void               set_state_history_index(unsigned int state_history_index);
   virtual bool       recovered() const = 0;
   virtual int        get_current_state_int() const = 0;
+  time_t             get_last_check() const;
+  void               set_last_check(time_t last_check);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -331,6 +333,7 @@ class                notifier {
   int                _scheduled_downtime_depth;
   double             _execution_time;
   bool               _is_flapping;
+  time_t             _last_check;
 };
 
 CCE_END()

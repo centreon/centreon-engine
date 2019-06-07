@@ -350,7 +350,7 @@ int xsddefault_save_status_data() {
          "\tplugin_output=" << it->second->get_plugin_output() << "\n"
          "\tlong_plugin_output=" << it->second->get_long_plugin_output() << "\n"
          "\tperformance_data=" << it->second->get_perf_data() << "\n"
-         "\tlast_check=" << static_cast<unsigned long>(it->second->last_check) << "\n"
+         "\tlast_check=" << static_cast<unsigned long>(it->second->get_last_check()) << "\n"
          "\tnext_check=" << static_cast<unsigned long>(it->second->next_check) << "\n"
          "\tcheck_options=" << it->second->check_options << "\n"
          "\tcurrent_notification_number=" << it->second->current_notification_number << "\n"

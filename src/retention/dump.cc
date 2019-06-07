@@ -415,7 +415,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "has_been_checked=" << obj.get_has_been_checked() << "\n"
     "is_flapping=" << obj.get_is_flapping() << "\n"
     "last_acknowledgement=" << obj.get_last_acknowledgement() << "\n"
-    "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
+    "last_check=" << static_cast<unsigned long>(obj.get_last_check()) << "\n"
     "last_event_id=" << obj.get_last_event_id() << "\n"
     "last_hard_state=" << obj.get_last_hard_state() << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.get_last_hard_state_change()) << "\n"

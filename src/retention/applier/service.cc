@@ -128,7 +128,7 @@ void applier::service::_update(
     if (state.last_acknowledgement().is_set())
       obj.set_last_acknowledgement(*state.last_acknowledgement());
     if (state.last_check().is_set())
-      obj.last_check = *state.last_check();
+      obj.set_last_check(*state.last_check());
     if (state.next_check().is_set()
         && config.use_retained_scheduling_info()
         && scheduling_info_is_ok)

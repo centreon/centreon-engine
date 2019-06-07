@@ -511,14 +511,6 @@ void host::set_should_be_scheduled(int should_be_scheduled) {
   _should_be_scheduled = should_be_scheduled;
 }
 
-time_t host::get_last_check() const {
-  return _last_check;
-}
-
-void host::set_last_check(time_t last_check) {
-  _last_check = last_check;
-}
-
 time_t host::get_last_time_down() const {
   return _last_time_down;
 }
@@ -3227,7 +3219,7 @@ bool host::is_result_fresh(
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (hosts never go stale). */
   /* CHANGED 10/07/07 EG - Added max_host_check_spread to expiration time as suggested by Altinity */
   else if (this->get_checks_enabled()
-           && event_start > this->get_last_check()
+           && event_start > get_last_check()
            && this->get_freshness_threshold() == 0)
     expiration_time
       = (time_t)(event_start + freshness_threshold
@@ -3235,13 +3227,13 @@ bool host::is_result_fresh(
                     * config->interval_length()));
   else
     expiration_time
-      = (time_t)(this->get_last_check() + freshness_threshold);
+      = (time_t)(get_last_check() + freshness_threshold);
 
   logger(dbg_checks, most)
     << "HBC: " << this->get_has_been_checked()
     << ", PS: " << program_start
     << ", ES: " << event_start
-    << ", LC: " << this->get_last_check()
+    << ", LC: " << get_last_check()
     << ", CT: " << current_time
     << ", ET: " << expiration_time;
 

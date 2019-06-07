@@ -194,7 +194,6 @@ class                           service : public notifier {
   int                           host_problem_at_last_check;
   time_t                        next_check;
   int                           should_be_scheduled;
-  time_t                        last_check;
   int                           no_more_notifications;
   int                           check_flapping_recovery_notification;
   int                           is_being_freshened;

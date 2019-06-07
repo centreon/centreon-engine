@@ -232,8 +232,6 @@ class                host : public notifier {
   void               set_next_check(time_t next_check);
   int                get_should_be_scheduled() const;
   void               set_should_be_scheduled(int should_be_scheduled);
-  time_t             get_last_check() const;
-  void               set_last_check(time_t last_check);
   time_t             get_last_time_down() const;
   void               set_last_time_down(time_t last_time);
   time_t             get_last_time_unreachable() const;
@@ -327,7 +325,6 @@ private:
   int                 _check_options;
   time_t              _next_check;
   int                 _should_be_scheduled;
-  time_t              _last_check;
   time_t              _last_time_down;
   time_t              _last_time_unreachable;
   time_t              _last_time_up;
