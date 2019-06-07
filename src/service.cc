@@ -262,7 +262,7 @@ bool service::operator==(service const& other) throw() {
          is_equal(this->state_history, other.state_history,
                   MAX_STATE_HISTORY_ENTRIES) &&
          this->state_history_index == other.state_history_index &&
-         this->is_flapping == other.is_flapping &&
+         get_is_flapping() == other.get_is_flapping() &&
          this->flapping_comment_id == other.flapping_comment_id &&
          this->percent_state_change == other.percent_state_change &&
          this->_modified_attributes == other._modified_attributes &&
@@ -541,7 +541,7 @@ std::ostream& operator<<(std::ostream& os,
     os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
 
   os << "  state_history_index:                  " << obj.state_history_index
-     << "\n  is_flapping:                          " << obj.is_flapping
+     << "\n  is_flapping:                          " << obj.get_is_flapping()
      << "\n  flapping_comment_id:                  " << obj.flapping_comment_id
      << "\n  percent_state_change:                 " << obj.percent_state_change
      << "\n  modified_attributes:                  "
@@ -2102,12 +2102,12 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
       << curved_percent_change << "% state change).";
 
   /* did the service just start flapping? */
-  if (is_flapping && !this->is_flapping)
+  if (is_flapping && !get_is_flapping())
     set_flap(curved_percent_change, high_threshold, low_threshold,
              allow_flapstart_notification);
 
   /* did the service just stop flapping? */
-  else if (!is_flapping && this->is_flapping)
+  else if (!is_flapping && get_is_flapping())
     clear_flap(curved_percent_change, high_threshold, low_threshold);
 }
 
@@ -2530,7 +2530,7 @@ void service::set_flap(double percent_change,
   this->flapping_comment_id = com->get_comment_id();
 
   /* set the flapping indicator */
-  this->is_flapping = true;
+  set_is_flapping(true);
 
   /* send data to event broker */
   broker_flapping_data(NEBTYPE_FLAPPING_START, NEBFLAG_NONE, NEBATTR_NONE,
@@ -2574,7 +2574,7 @@ void service::clear_flap(double percent_change,
   this->flapping_comment_id = 0;
 
   /* clear the flapping indicator */
-  this->is_flapping = false;
+  set_is_flapping(false);
 
   /* send data to event broker */
   broker_flapping_data(NEBTYPE_FLAPPING_STOP, NEBFLAG_NONE,
@@ -2651,7 +2651,7 @@ void service::disable_flap_detection() {
                                _modified_attributes, nullptr);
 
   /* handle the details... */
-  handle_service_flap_detection_disabled(this);
+  handle_flap_detection_disabled();
 }
 
 /* updates service status info */
@@ -2949,7 +2949,7 @@ int service::check_notification_viability(unsigned int type, int options) {
   }
 
   /* if this service is currently flapping, don't send the notification */
-  if (this->is_flapping == true) {
+  if (get_is_flapping()) {
     logger(dbg_notifications, more)
         << "This service is currently flapping, so we won't send "
            "notifications.";
@@ -3526,3 +3526,61 @@ bool service::is_result_fresh(
   return true;
 }
 
+/* handles the details for a service when flap detection is disabled (globally or per-service) */
+void service::handle_flap_detection_disabled() {
+  logger(dbg_functions, basic)
+    << "handle_service_flap_detection_disabled()";
+
+  if (this == NULL)
+    return;
+
+  /* if the service was flapping, remove the flapping indicator */
+  if (get_is_flapping()) {
+    set_is_flapping(false);
+
+    /* delete the original comment we added earlier */
+    if (this->flapping_comment_id != 0)
+      comment::delete_comment(this->flapping_comment_id);
+    this->flapping_comment_id = 0;
+
+    /* log a notice - this one is parsed by the history CGI */
+    logger(log_info_message, basic)
+      << "SERVICE FLAPPING ALERT: " << this->get_hostname()
+      << ";" << this->get_description()
+      << ";DISABLED; Flap detection has been disabled";
+
+    /* send data to event broker */
+    broker_flapping_data(
+      NEBTYPE_FLAPPING_STOP,
+      NEBFLAG_NONE,
+      NEBATTR_FLAPPING_STOP_DISABLED,
+      SERVICE_FLAPPING,
+      this,
+      this->percent_state_change,
+      0.0,
+      0.0,
+      NULL);
+
+    /* send a notification */
+    this->notify(
+      NOTIFICATION_FLAPPINGDISABLED,
+      NULL,
+      NULL,
+      NOTIFICATION_OPTION_NONE);
+
+    /* should we send a recovery notification? */
+    if (this->check_flapping_recovery_notification
+        && this->current_state == STATE_OK)
+      this->notify(
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
+
+    /* clear the recovery notification flag */
+    this->check_flapping_recovery_notification = false;
+  }
+
+  /* update service status */
+  this->update_status(false);
+}

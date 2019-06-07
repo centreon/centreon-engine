@@ -106,7 +106,8 @@ notifier::notifier(int notifier_type,
       _problem_has_been_acknowledged{false},
       _has_been_checked{false},
       _scheduled_downtime_depth{0},
-      _execution_time{0.0} {
+      _execution_time{0.0},
+      _is_flapping{false} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -1131,4 +1132,12 @@ int notifier::get_freshness_threshold() const {
 
 void notifier::set_freshness_threshold(int freshness_threshold) {
   _freshness_threshold = freshness_threshold;
+}
+
+bool notifier::get_is_flapping() const {
+  return _is_flapping;
+}
+
+void notifier::set_is_flapping(bool is_flapping) {
+  _is_flapping = is_flapping;
 }

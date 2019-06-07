@@ -244,6 +244,8 @@ class                notifier {
   void               set_execution_time(double execution_time);
   int                get_freshness_threshold() const;
   void               set_freshness_threshold(int freshness_threshold);
+  bool               get_is_flapping() const;
+  void               set_is_flapping(bool is_flapping);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -312,6 +314,7 @@ class                notifier {
   bool               _event_handler_enabled;
   int                _scheduled_downtime_depth;
   double             _execution_time;
+  bool               _is_flapping;
 };
 
 CCE_END()

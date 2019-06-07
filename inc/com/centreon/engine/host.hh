@@ -230,8 +230,6 @@ class                 host : public notifier {
   void               set_state_history_index(unsigned int state_history_index);
   time_t             get_last_state_history_update() const;
   void               set_last_state_history_update(time_t last_state_history_update);
-  bool               get_is_flapping() const;
-  void               set_is_flapping(bool is_flapping);
   unsigned long      get_flapping_comment_id() const;
   void               set_flapping_comment_id(unsigned long flapping_comment_id);
   void               disable_flap_detection();
@@ -259,6 +257,7 @@ class                 host : public notifier {
   bool               is_valid_escalation_for_notification(
                        std::shared_ptr<escalation> e,
                        int options) const override;
+  void               handle_flap_detection_disabled();
 
   host_map            parent_hosts;
   host_map            child_hosts;
@@ -314,7 +313,6 @@ private:
   int                 _pending_flex_downtime;
   unsigned int        _state_history_index;
   time_t              _last_state_history_update;
-  bool                _is_flapping;
   unsigned long       _flapping_comment_id;
   double              _percent_state_change;
   int                 _total_services;

@@ -368,7 +368,7 @@ int xsddefault_save_status_data() {
          "\tprocess_performance_data=" << it->second->process_performance_data << "\n"
          "\tobsess_over_service=" << it->second->obsess_over_service << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
-         "\tis_flapping=" << it->second->is_flapping << "\n"
+         "\tis_flapping=" << it->second->get_is_flapping() << "\n"
          "\tpercent_state_change=" << std::setprecision(2) << std::fixed << it->second->percent_state_change << "\n"
          "\tscheduled_downtime_depth=" << it->second->get_scheduled_downtime_depth() << "\n";
 

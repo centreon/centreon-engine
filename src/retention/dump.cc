@@ -413,7 +413,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "event_handler_enabled=" << obj.get_event_handler_enabled() << "\n"
     "flap_detection_enabled=" << obj.get_flap_detection_enabled() << "\n"
     "has_been_checked=" << obj.get_has_been_checked() << "\n"
-    "is_flapping=" << obj.is_flapping << "\n"
+    "is_flapping=" << obj.get_is_flapping() << "\n"
     "last_acknowledgement=" << obj.get_last_acknowledgement() << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.get_last_event_id() << "\n"

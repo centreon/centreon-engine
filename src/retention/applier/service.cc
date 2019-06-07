@@ -303,7 +303,7 @@ void applier::service::_update(
   // ADDED 02/20/08 assume same flapping state if large
   // install tweaks enabled.
   if (config.use_large_installation_tweaks())
-    obj.is_flapping = state.is_flapping();
+    obj.set_is_flapping(state.is_flapping());
   // else use normal startup flap detection logic.
   else {
     // service was flapping before program started.
@@ -317,7 +317,7 @@ void applier::service::_update(
 
     // service was flapping before and isn't now, so clear
     // recovery check variable if service isn't flapping now.
-    if (state.is_flapping() && !obj.is_flapping)
+    if (state.is_flapping() && !obj.get_is_flapping())
       obj.check_flapping_recovery_notification = false;
   }
 

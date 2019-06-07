@@ -629,14 +629,6 @@ void host::set_last_state_history_update(time_t last_state_history_update) {
   _last_state_history_update = last_state_history_update;
 }
 
-bool host::get_is_flapping() const {
-  return _is_flapping;
-}
-
-void host::set_is_flapping(bool is_flapping) {
-  _is_flapping = is_flapping;
-}
-
 unsigned long host::get_flapping_comment_id() const {
   return _flapping_comment_id;
 }
@@ -3090,7 +3082,7 @@ void host::disable_flap_detection() {
                             get_modified_attributes(), NULL);
 
   /* handle the details... */
-  handle_host_flap_detection_disabled(this);
+  handle_flap_detection_disabled();
 }
 
 /* enables flap detection for a specific host */
@@ -3293,3 +3285,60 @@ bool host::is_result_fresh(
   return true;
 }
 
+/* handles the details for a host when flap detection is disabled (globally or per-host) */
+void host::handle_flap_detection_disabled() {
+  logger(dbg_functions, basic)
+    << "handle_host_flap_detection_disabled()";
+
+  if (this == NULL)
+    return;
+
+  /* if the host was flapping, remove the flapping indicator */
+  if (this->get_is_flapping()) {
+    this->set_is_flapping(false);
+
+    /* delete the original comment we added earlier */
+    if (this->get_flapping_comment_id() != 0)
+      comment::delete_comment(this->get_flapping_comment_id());
+    this->set_flapping_comment_id(0);
+
+    /* log a notice - this one is parsed by the history CGI */
+    logger(log_info_message, basic)
+      << "HOST FLAPPING ALERT: " << this->get_name()
+      << ";DISABLED; Flap detection has been disabled";
+
+    /* send data to event broker */
+    broker_flapping_data(
+      NEBTYPE_FLAPPING_STOP,
+      NEBFLAG_NONE,
+      NEBATTR_FLAPPING_STOP_DISABLED,
+      HOST_FLAPPING,
+      this,
+      this->get_percent_state_change(),
+      0.0,
+      0.0,
+      NULL);
+
+    /* send a notification */
+    this->notify(
+      NOTIFICATION_FLAPPINGDISABLED,
+      NULL,
+      NULL,
+      NOTIFICATION_OPTION_NONE);
+
+    /* should we send a recovery notification? */
+    if (this->get_check_flapping_recovery_notification()
+        && this->get_current_state() == HOST_UP)
+      this->notify(
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
+
+    /* clear the recovery notification flag */
+    this->set_check_flapping_recovery_notification(false);
+  }
+
+  /* update host status */
+  this->update_status(false);
+}

@@ -161,6 +161,7 @@ class                           service : public notifier {
                                   std::shared_ptr<escalation> e,
                                   int options) const override;
   bool                          is_result_fresh(time_t current_time, int log_this);
+  void                          handle_flap_detection_disabled();
 
   double                        notification_interval;
   int                           is_volatile;
@@ -189,7 +190,6 @@ class                           service : public notifier {
   int                           pending_flex_downtime;
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;
-  int                           is_flapping;
   uint64_t                      flapping_comment_id;
   double                        percent_state_change;
 
