@@ -76,12 +76,10 @@ void applier::hostgroup::add_object(
   // Add host group to the global configuration state.
   config->hostgroups().insert(obj);
 
-  // Add hostgroup id to the other props.
-  engine::hostgroup::hostgroups[obj.hostgroup_name()]->set_id(obj.hostgroup_id());
-
   // Create host group.
   std::shared_ptr<com::centreon::engine::hostgroup> hg{
     new engine::hostgroup(
+      obj.hostgroup_id(),
       obj.hostgroup_name(),
       obj.alias(),
       obj.notes(),

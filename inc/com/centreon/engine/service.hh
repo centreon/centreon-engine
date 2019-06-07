@@ -192,7 +192,6 @@ class                           service : public notifier {
   int                           retain_nonstatus_information;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;
-  int                           should_be_scheduled;
   int                           check_flapping_recovery_notification;
   int                           is_being_freshened;
   int                           current_notification_number;

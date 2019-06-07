@@ -98,7 +98,7 @@ class                host : public notifier {
                            int stalk_on_up,
                            int stalk_on_down,
                            int stalk_on_unreachable,
-                           int process_perfdata,
+                           bool process_perfdata,
                            bool check_freshness,
                            int freshness_threshold,
                            std::string const& notes,
@@ -110,14 +110,14 @@ class                host : public notifier {
                            std::string const& statusmap_image,
                            int x_2d,
                            int y_2d,
-                           int have_2d_coords,
+                           bool have_2d_coords,
                            double x_3d,
                            double y_3d,
                            double z_3d,
-                           int have_3d_coords,
-                           int should_be_drawn,
-                           int retain_status_information,
-                           int retain_nonstatus_information,
+                           bool have_3d_coords,
+                           bool should_be_drawn,
+                           bool retain_status_information,
+                           bool retain_nonstatus_information,
                            bool obsess_over_host,
                            std::string const& timezone);
                      ~host() {}
@@ -192,10 +192,10 @@ class                host : public notifier {
   void               set_address(std::string const& address);
   bool               get_process_performance_data() const;
   void               set_process_performance_data(bool process_performance_data);
-  int                get_retain_status_information() const;
-  void               set_retain_status_information(int retain_status_information);
-  int                get_retain_nonstatus_information() const;
-  void               set_retain_nonstatus_information(int retain_nonstatus_information);
+  bool               get_retain_status_information() const;
+  void               set_retain_status_information(bool retain_status_information);
+  bool               get_retain_nonstatus_information() const;
+  void               set_retain_nonstatus_information(bool retain_nonstatus_information);
   bool               get_failure_prediction_enabled() const;
   void               set_failure_prediction_enabled(bool failure_prediction_enabled);
   std::string const& get_vrml_image() const;
@@ -224,8 +224,6 @@ class                host : public notifier {
   void               set_is_executing(bool is_executing);
   int                get_check_options() const;
   void               set_check_options(int check_options);
-  int                get_should_be_scheduled() const;
-  void               set_should_be_scheduled(int should_be_scheduled);
   time_t             get_last_time_down() const;
   void               set_last_time_down(time_t last_time);
   time_t             get_last_time_unreachable() const;
@@ -250,8 +248,8 @@ class                host : public notifier {
   void               set_total_services(int total_services);
   unsigned long      get_total_service_check_interval() const;
   void               set_total_service_check_interval(unsigned long total_service_check_interval);
-  int                get_circular_path_checked() const;
-  void               set_circular_path_checked(int check_level);
+  bool               get_circular_path_checked() const;
+  void               set_circular_path_checked(bool check_level);
   bool               get_contains_circular_path() const;
   void               set_contains_circular_path(bool contains_circular_path);
   enum host_state    get_current_state() const;
@@ -310,7 +308,6 @@ private:
   int                 _acknowledgement_type;
   bool                _is_executing;
   int                 _check_options;
-  int                 _should_be_scheduled;
   time_t              _last_time_down;
   time_t              _last_time_unreachable;
   time_t              _last_time_up;
@@ -322,7 +319,7 @@ private:
   unsigned long       _flapping_comment_id;
   int                 _total_services;
   unsigned long       _total_service_check_interval;
-  int                 _circular_path_checked;
+  bool                 _circular_path_checked;
   bool                _contains_circular_path;
 
   enum host_state    _last_state;

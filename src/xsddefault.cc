@@ -328,7 +328,7 @@ int xsddefault_save_status_data() {
          "\tretry_interval=" << it->second->get_retry_interval() << "\n"
          "\tevent_handler=" << it->second->get_event_handler() << "\n"
          "\thas_been_checked=" << it->second->get_has_been_checked() << "\n"
-         "\tshould_be_scheduled=" << it->second->should_be_scheduled << "\n"
+         "\tshould_be_scheduled=" << it->second->get_should_be_scheduled() << "\n"
          "\tcheck_execution_time=" << std::setprecision(3) << std::fixed << it->second->get_execution_time() << "\n"
          "\tcheck_latency=" << std::setprecision(3) << std::fixed << it->second->get_latency() << "\n"
          "\tcheck_type=" << it->second->get_check_type() << "\n"

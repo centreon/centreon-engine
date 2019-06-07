@@ -727,13 +727,13 @@ void applier::scheduler::_calculate_service_scheduling_params() {
     }
 
     if (schedule_check) {
-      svc.should_be_scheduled = true;
+      svc.set_should_be_scheduled(true);
       ++scheduling_info.total_scheduled_services;
       scheduling_info.service_check_interval_total
         += static_cast<unsigned long>(svc.get_check_interval());
     }
     else {
-      svc.should_be_scheduled = false;
+      svc.set_should_be_scheduled(false);
       logger(dbg_events, more)
         << "Service " << svc.get_description() << " on host " << svc.get_hostname()
         << " should not be scheduled.";
@@ -1041,7 +1041,7 @@ void applier::scheduler::_schedule_service_events(
       }
 
       // skip this service if it shouldn't be scheduled.
-      if (!svc.should_be_scheduled)
+      if (!svc.get_should_be_scheduled())
         continue;
 
       int const mult_factor(
@@ -1087,7 +1087,7 @@ void applier::scheduler::_schedule_service_events(
     svc.update_status(false);
 
     // skip most services that shouldn't be scheduled.
-    if (!svc.should_be_scheduled) {
+    if (!svc.get_should_be_scheduled()) {
       // passive checks are an exception if a forced check was
       // scheduled before Centreon Engine was restarted.
       if (!(!svc.get_checks_enabled()

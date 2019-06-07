@@ -111,7 +111,8 @@ notifier::notifier(int notifier_type,
       _last_check{0},
       _latency{0.0},
       _next_check{0L},
-      _no_more_notifications{false} {
+      _no_more_notifications{false},
+      _should_be_scheduled{true} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -1188,4 +1189,12 @@ bool notifier::get_obsess_over() const {
 
 void notifier::set_obsess_over(bool obsess_over) {
   _obsess_over = obsess_over;
+}
+
+bool notifier::get_should_be_scheduled() const {
+  return _should_be_scheduled;
+}
+
+void notifier::set_should_be_scheduled(bool should_be_scheduled) {
+  _should_be_scheduled = should_be_scheduled;
 }

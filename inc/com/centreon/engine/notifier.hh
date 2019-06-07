@@ -270,6 +270,8 @@ class                notifier {
   void               set_no_more_notifications(bool no_more_notifications);
   bool               get_obsess_over() const;
   void               set_obsess_over(bool obsess_over_host);
+  bool               get_should_be_scheduled() const;
+  void               set_should_be_scheduled(bool should_be_scheduled);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -350,6 +352,7 @@ class                notifier {
   double             _latency;
   time_t             _next_check;
   bool               _no_more_notifications;
+  bool               _should_be_scheduled;
 };
 
 CCE_END()

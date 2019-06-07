@@ -1707,7 +1707,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
         && temp_service->get_check_interval() != 0) {
 
       /* set the service check flag */
-      temp_service->should_be_scheduled = true;
+      temp_service->set_should_be_scheduled(true);
 
       /* schedule a check for right now (or as soon as possible) */
       time(&preferred_time);
@@ -1724,7 +1724,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
         temp_service->set_next_check(preferred_time);
 
       /* schedule a check if we should */
-      if (temp_service->should_be_scheduled)
+      if (temp_service->get_should_be_scheduled())
         temp_service->schedule_check(temp_service->get_next_check(), CHECK_OPTION_NONE);
     }
     break;
@@ -2370,7 +2370,7 @@ void disable_service_checks(com::centreon::engine::service* svc) {
 
   /* disable the service check... */
   svc->set_checks_enabled(false);
-  svc->should_be_scheduled = false;
+  svc->set_should_be_scheduled(false);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -2402,11 +2402,11 @@ void enable_service_checks(com::centreon::engine::service* svc) {
 
   /* enable the service check... */
   svc->set_checks_enabled(true);
-  svc->should_be_scheduled = true;
+  svc->set_should_be_scheduled(true);
 
   /* services with no check intervals don't get checked */
   if (svc->get_check_interval() == 0)
-    svc->should_be_scheduled = false;
+    svc->set_should_be_scheduled(false);
 
   /* schedule a check for right now (or as soon as possible) */
   time(&preferred_time);
@@ -2423,7 +2423,7 @@ void enable_service_checks(com::centreon::engine::service* svc) {
     svc->set_next_check(preferred_time);
 
   /* schedule a check if we should */
-  if (svc->should_be_scheduled)
+  if (svc->get_should_be_scheduled())
     svc->schedule_check(svc->get_next_check(), CHECK_OPTION_NONE);
 
   /* send data to event broker */

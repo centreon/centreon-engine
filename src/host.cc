@@ -166,7 +166,7 @@ host::host(uint64_t host_id,
            int stalk_on_up,
            int stalk_on_down,
            int stalk_on_unreachable,
-           int process_perfdata,
+           bool process_perfdata,
            bool check_freshness,
            int freshness_threshold,
            std::string const& notes,
@@ -178,14 +178,14 @@ host::host(uint64_t host_id,
            std::string const& statusmap_image,
            int x_2d,
            int y_2d,
-           int have_2d_coords,
+           bool have_2d_coords,
            double x_3d,
            double y_3d,
            double z_3d,
-           int have_3d_coords,
-           int should_be_drawn,
-           int retain_status_information,
-           int retain_nonstatus_information,
+           bool have_3d_coords,
+           bool should_be_drawn,
+           bool retain_status_information,
+           bool retain_nonstatus_information,
            bool obsess_over_host,
            std::string const& timezone)
     : notifier{HOST_NOTIFICATION,
@@ -239,7 +239,6 @@ host::host(uint64_t host_id,
     throw(engine_error() << "Could not register host '" << name << "'");
   }
 
-  _should_be_scheduled = true;
   _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
   _check_options = CHECK_OPTION_NONE;
   _modified_attributes = MODATTR_NONE;
@@ -272,7 +271,7 @@ host::host(uint64_t host_id,
   _out_notification_type |= (notify_up > 0 ? notifier::recovery : 0);
   _out_notification_type |=
       (notify_unreachable > 0 ? notifier::unreachable : 0);
-  _process_performance_data = (process_perfdata > 0);
+  _process_performance_data = process_perfdata;
   _retain_nonstatus_information = (retain_nonstatus_information > 0);
   _retain_status_information = (retain_status_information > 0);
   _should_be_drawn = (should_be_drawn > 0);
@@ -351,19 +350,19 @@ void host::set_process_performance_data(bool process_performance_data) {
   _process_performance_data = process_performance_data;
 }
 
-int host::get_retain_status_information() const {
+bool host::get_retain_status_information() const {
   return _retain_status_information;
 }
 
-void host::set_retain_status_information(int retain_status_information) {
+void host::set_retain_status_information(bool retain_status_information) {
   _retain_status_information = retain_status_information;
 }
 
-int host::get_retain_nonstatus_information() const {
+bool host::get_retain_nonstatus_information() const {
   return _retain_nonstatus_information;
 }
 
-void host::set_retain_nonstatus_information(int retain_nonstatus_information) {
+void host::set_retain_nonstatus_information(bool retain_nonstatus_information) {
   _retain_nonstatus_information = retain_nonstatus_information;
 }
 
@@ -479,14 +478,6 @@ void host::set_check_options(int check_options) {
   _check_options = check_options;
 }
 
-int host::get_should_be_scheduled() const {
-  return _should_be_scheduled;
-}
-
-void host::set_should_be_scheduled(int should_be_scheduled) {
-  _should_be_scheduled = should_be_scheduled;
-}
-
 time_t host::get_last_time_down() const {
   return _last_time_down;
 }
@@ -526,12 +517,6 @@ int host::get_current_notification_number() const {
 void host::set_current_notification_number(int current_notification_number) {
   _current_notification_number = current_notification_number;
 }
-
-//
-// void host::set_current_notification_id(unsigned long current_notification_id)
-// {
-//  _current_notification_id = current_notification_id;
-//}
 
 int host::get_check_flapping_recovery_notification() const {
   return _check_flapping_recovery_notification;
@@ -583,11 +568,11 @@ void host::set_total_service_check_interval(
   _total_service_check_interval = total_service_check_interval;
 }
 
-int host::get_circular_path_checked() const {
+bool host::get_circular_path_checked() const {
   return _circular_path_checked;
 }
 
-void host::set_circular_path_checked(int check_level) {
+void host::set_circular_path_checked(bool check_level) {
   _circular_path_checked = check_level;
 }
 

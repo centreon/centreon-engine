@@ -273,7 +273,7 @@ bool service::operator==(service const& other) throw() {
          get_perf_data() == other.get_perf_data() &&
          _state_type == other.get_state_type() &&
          get_next_check() == other.get_next_check() &&
-         this->should_be_scheduled == other.should_be_scheduled &&
+         get_should_be_scheduled() == other.get_should_be_scheduled() &&
          get_last_check() == other.get_last_check() &&
          get_current_attempt() == other.get_current_attempt() &&
          _current_event_id == other.get_current_event_id() &&
@@ -528,7 +528,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  state_type:                           " << obj.get_state_type()
      << "\n  next_check:                           "
      << string::ctime(obj.get_next_check())
-     << "\n  should_be_scheduled:                  " << obj.should_be_scheduled
+     << "\n  should_be_scheduled:                  " << obj.get_should_be_scheduled()
      << "\n  last_check:                           "
      << string::ctime(obj.get_last_check())
      << "\n  current_attempt:                      "
@@ -822,7 +822,7 @@ com::centreon::engine::service* add_service(
     obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
-    obj->should_be_scheduled = true;
+    obj->set_should_be_scheduled(true);
     uint32_t stalk_on;
     stalk_on = notifier::none;
     stalk_on |= (stalk_on_critical > 0 ? notifier::critical : 0);
@@ -1879,7 +1879,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                              << my_ctime(&next_service_check);
 
     /* default is to reschedule service check unless a test below fails... */
-    this->should_be_scheduled = true;
+    set_should_be_scheduled(true);
 
     /* next check time was calculated above */
     set_next_check(next_service_check);
@@ -1899,14 +1899,14 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* services with non-recurring intervals do not get rescheduled */
     if (_check_interval == 0)
-      this->should_be_scheduled = false;
+      set_should_be_scheduled(false);
 
     /* services with active checks disabled do not get rescheduled */
     if (!get_checks_enabled())
-      this->should_be_scheduled = false;
+      set_should_be_scheduled(false);
 
     /* schedule a non-forced check if we can */
-    if (this->should_be_scheduled)
+    if (get_should_be_scheduled())
       schedule_check(get_next_check(), CHECK_OPTION_NONE);
   }
 
@@ -1936,7 +1936,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                        queued_check_result->early_timeout,
                        queued_check_result->return_code, nullptr, nullptr);
 
-  if (!(reschedule_check && this->should_be_scheduled &&
+  if (!(reschedule_check && get_should_be_scheduled() &&
         get_has_been_checked()) ||
       !get_checks_enabled()) {
     /* set the checked flag */
@@ -2316,7 +2316,7 @@ int service::run_scheduled_check(int check_options, double latency) {
         << "Unable to run scheduled service check at this time";
 
     /* only attempt to (re)schedule checks that should get checked... */
-    if (this->should_be_scheduled) {
+    if (get_should_be_scheduled()) {
       /* get current time */
       time(&current_time);
 
@@ -2357,7 +2357,7 @@ int service::run_scheduled_check(int check_options, double latency) {
         // This service could be rescheduled...
         else {
           set_next_check(next_valid_time);
-          this->should_be_scheduled = true;
+          set_should_be_scheduled(true);
           logger(dbg_checks, more) << "Rescheduled next service check for "
                                    << my_ctime(&next_valid_time);
         }
@@ -2369,7 +2369,7 @@ int service::run_scheduled_check(int check_options, double latency) {
      * next check time
      * 10/19/07 EG - keep original check options
      */
-    if (this->should_be_scheduled)
+    if (get_should_be_scheduled())
       schedule_check(get_next_check(), check_options);
 
     /* update the status log */
