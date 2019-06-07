@@ -54,7 +54,6 @@ notifier::notifier(int notifier_type,
                    std::string const& check_command,
                    bool checks_enabled,
                    bool accept_passive_checks,
-                   int initial_state,
                    double check_interval,
                    double retry_interval,
                    int max_attempts,
@@ -78,7 +77,6 @@ notifier::notifier(int notifier_type,
     : _notifier_type{notifier_type},
       _display_name{display_name},
       _check_command{check_command},
-      _initial_state{initial_state},
       _check_interval{check_interval},
       _retry_interval{retry_interval},
       _max_attempts{max_attempts},
@@ -161,14 +159,6 @@ std::string const& notifier::get_check_command() const {
 
 void notifier::set_check_command(std::string const& check_command) {
   _check_command = check_command;
-}
-
-int notifier::get_initial_state() const {
-  return _initial_state;
-}
-
-void notifier::set_initial_state(int initial_state) {
-  _initial_state = initial_state;
 }
 
 double notifier::get_check_interval() const {
@@ -278,7 +268,7 @@ int notifier::notify(unsigned int type,
       << "** Notifier Notification Attempt ** Notifier: '" << get_display_name()
       << "', Notification Type: " << _notifier_type << ", Type: " << type
       << ", Options: " << options
-      << ", Current State: " << this->get_current_state()
+      << ", Current State: " << get_current_state_int()
       << ", Last Notification: " << my_ctime(&last_notif);
 
   nagios_macros mac;
@@ -342,12 +332,12 @@ int notifier::notify(unsigned int type,
     contact* temp_contact{nullptr};
     if (!not_author.empty()) {
       /* see if we can find the contact - first by name, then by alias */
-      if ((temp_contact = state::instance().find_contact(not_author)) ==
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) ==
           nullptr) {
         for (std::unordered_map<std::string,
                                 std::shared_ptr<contact>>::const_iterator
-                 it{state::instance().contacts().begin()},
-             end{state::instance().contacts().end()};
+                 it{configuration::applier::state::instance().contacts().begin()},
+             end{configuration::applier::state::instance().contacts().end()};
              it != end; ++it) {
           if (it->second->get_alias() == not_author) {
             temp_contact = it->second.get();
@@ -411,10 +401,7 @@ int notifier::notify(unsigned int type,
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
-    else if ((_notifier_type == HOST_NOTIFICATION &&
-              get_current_state() == HOST_UP) ||
-             (_notifier_type == SERVICE_NOTIFICATION &&
-              get_current_state() == STATE_OK))
+    else if (recovered())
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
@@ -541,9 +528,7 @@ int notifier::notify(unsigned int type,
   clear_volatile_macros_r(&mac);
 
   /* Update recovery been sent parameter */
-  if ((_notifier_type == HOST_NOTIFICATION && get_current_state() == HOST_UP) ||
-      (_notifier_type == SERVICE_NOTIFICATION &&
-       get_current_state() == STATE_OK))
+  if(recovered())
     _recovery_been_sent = true;
 
   return OK;
@@ -575,14 +560,6 @@ time_t notifier::get_last_notification() const {
 
 void notifier::set_last_notification(time_t last_notification) {
   _last_notification = last_notification;
-}
-
-int notifier::get_current_state() const {
-  return _current_state;
-}
-
-void notifier::set_current_state(int current_state) {
-  _current_state = current_state;
 }
 
 void notifier::set_initial_notif_time(time_t notif_time) {
@@ -861,6 +838,31 @@ std::list<std::shared_ptr<escalation>> const& notifier::get_escalations()
 
 void notifier::add_escalation(std::shared_ptr<escalation> e) {
   _escalations.push_back(e);
+}
+
+enum notifier::state_type notifier::get_state_type() const {
+  return _state_type;
+}
+
+void notifier::set_state_type(enum notifier::state_type state_type) {
+  _state_type = state_type;
+}
+
+double notifier::get_percent_state_change() const {
+  return _percent_state_change;
+}
+
+void notifier::set_percent_state_change(double percent_state_change) {
+  _percent_state_change = percent_state_change;
+}
+
+
+unsigned int notifier::get_state_history_index() const {
+  return _state_history_index;
+}
+
+void notifier::set_state_history_index(unsigned int state_history_index) {
+  _state_history_index = state_history_index;
 }
 
 /**

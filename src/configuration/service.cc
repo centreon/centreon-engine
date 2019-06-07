@@ -106,7 +106,7 @@ static unsigned short const default_flap_detection_options(
                               | service::critical);
 static unsigned int const   default_freshness_threshold(0);
 static unsigned int const   default_high_flap_threshold(0);
-static unsigned int const   default_initial_state(STATE_OK);
+static unsigned int const   default_initial_state(engine::service::state_ok);
 static bool const           default_is_volatile(false);
 static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(3);
@@ -1389,13 +1389,13 @@ bool service::_set_initial_state(std::string const& value) {
   std::string data(value);
   string::trim(data);
   if (data == "o" || data == "ok")
-    _initial_state = STATE_OK;
+    _initial_state = engine::service::state_ok;
   else if (data == "w" || data == "warning")
-    _initial_state = STATE_WARNING;
+    _initial_state = engine::service::state_warning;
   else if (data == "u" || data == "unknown")
-    _initial_state = STATE_UNKNOWN;
+    _initial_state = engine::service::state_unknown;
   else if (data == "c" || data == "critical")
-    _initial_state = STATE_CRITICAL;
+    _initial_state = engine::service::state_critical;
   else
     return false;
   return true;

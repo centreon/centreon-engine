@@ -29,6 +29,7 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/logging.hh"
 #  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/notifier.hh"
@@ -67,13 +68,20 @@ class                           service : public notifier {
  public:
   static std::array<std::pair<uint32_t, std::string>, 3> const tab_service_states;
 
+  enum                          service_state {
+    state_ok,
+    state_warning,
+    state_critical,
+    state_unknown
+  };
+
                                 service(std::string const& hostname,
                                         std::string const& description,
                                         std::string const& display_name,
                                         std::string const& check_command,
                                         bool checks_enabled,
                                         bool accept_passive_checks,
-                                        int initial_state,
+                                        enum service::service_state initial_state,
                                         double check_interval,
                                         double retry_interval,
                                         int max_attempts,
@@ -108,6 +116,16 @@ class                           service : public notifier {
   void                          set_last_time_unknown(time_t last_time);
   time_t                        get_last_time_critical() const;
   void                          set_last_time_critical(time_t last_time);
+  enum service_state            get_current_state() const;
+  void                          set_current_state(enum service_state current_state);
+  enum service_state            get_last_state() const;
+  void                          set_last_state(enum service_state last_state);
+  enum service_state            get_last_hard_state() const;
+  void                          set_last_hard_state(enum service_state last_hard_state);
+  enum service_state            get_initial_state() const;
+  void                          set_initial_state(enum service_state current_state);
+  bool                          recovered() const override ;
+  int                           get_current_state_int() const override ;
 
   int                           handle_async_check_result(
                                   check_result* queued_check_result);
@@ -174,10 +192,6 @@ class                           service : public notifier {
   int                           obsess_over_service;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;
-  int                           current_state;
-  int                           last_state;
-  int                           last_hard_state;
-  int                           state_type;
   time_t                        next_check;
   int                           should_be_scheduled;
   time_t                        last_check;
@@ -190,10 +204,7 @@ class                           service : public notifier {
   int                           is_executing;
   int                           check_options;
   int                           pending_flex_downtime;
-  int                           state_history[MAX_STATE_HISTORY_ENTRIES];
-  unsigned int                  state_history_index;
   uint64_t                      flapping_comment_id;
-  double                        percent_state_change;
 
   std::unordered_map<std::string, customvariable>
     custom_variables;
@@ -218,6 +229,10 @@ class                           service : public notifier {
   time_t                        _last_time_unknown;
   time_t                        _last_time_critical;
   int                           _is_volatile;
+  enum service_state            _last_state;
+  enum service_state            _last_hard_state;
+  enum service_state            _current_state;
+  enum service_state            _initial_state;
 };
 CCE_END()
 
@@ -238,7 +253,7 @@ com::centreon::engine::service* add_service(
            std::string const& description,
            std::string const& display_name,
            std::string const& check_period,
-           int initial_state,
+           enum com::centreon::engine::service::service_state  initial_state,
            int max_attempts,
            double check_interval,
            double retry_interval,

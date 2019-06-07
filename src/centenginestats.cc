@@ -29,6 +29,8 @@
 #include <unistd.h>
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/notifier.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/exceptions/basic.hh"
@@ -594,7 +596,7 @@ int read_status_file() {
   double execution_time = 0.0;
   double latency = 0.0;
   int check_type = check_active;
-  int current_state = STATE_OK;
+  int current_state = service::state_ok;
   double state_change = 0.0;
   int is_flapping = false;
   int downtime_depth = 0;
@@ -738,13 +740,13 @@ int read_status_file() {
             passive_hosts_checked_last_1min++;
         }
         switch (current_state) {
-        case HOST_UP:
+        case host::state_up:
           hosts_up++;
           break;
-        case HOST_DOWN:
+        case host::state_down:
           hosts_down++;
           break;
-        case HOST_UNREACHABLE:
+        case host::state_unreachable:
           hosts_unreachable++;
           break;
         default:
@@ -864,19 +866,19 @@ int read_status_file() {
             passive_services_checked_last_1min++;
         }
         switch (current_state) {
-        case STATE_OK:
+        case service::state_ok:
           services_ok++;
           break;
 
-	case STATE_WARNING:
+	      case service::state_warning:
           services_warning++;
           break;
 
-        case STATE_UNKNOWN:
+        case service::state_unknown:
           services_unknown++;
           break;
 
-        case STATE_CRITICAL:
+        case service::state_critical:
           services_critical++;
           break;
 

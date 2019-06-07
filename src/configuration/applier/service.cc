@@ -122,7 +122,7 @@ void applier::service::add_object(
     obj.service_description(),
     obj.display_name(),
     obj.check_period(),
-    obj.initial_state(),
+    static_cast<engine::service::service_state>(obj.initial_state()),
     obj.max_check_attempts(),
     obj.check_interval(),
     obj.retry_interval(),
@@ -364,7 +364,7 @@ void applier::service::modify_object(
   s->set_check_command(obj.check_command());
   s->set_event_handler(obj.event_handler());
   s->set_event_handler_enabled(obj.event_handler_enabled());
-  s->set_initial_state(obj.initial_state());
+  s->set_initial_state(static_cast<engine::service::service_state>(obj.initial_state()));
   s->set_check_interval(obj.check_interval());
   s->set_retry_interval(obj.retry_interval());
   s->set_max_attempts(obj.max_check_attempts());

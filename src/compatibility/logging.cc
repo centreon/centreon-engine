@@ -206,10 +206,10 @@ int log_host_states(unsigned int type, time_t* timestamp) {
 void log_service_state(unsigned int type, com::centreon::engine::service* svc) {
   char const* type_str(tab_initial_state[type]);
   char const* state("UNKNOWN");
-  if (svc->current_state >= 0
-      && (unsigned int)svc->current_state < service::tab_service_states.size())
-    state = service::tab_service_states[svc->current_state].second.c_str();
-  std::string const& state_type(service::tab_state_type[svc->state_type]);
+  if (svc->get_current_state() >= 0
+      && (unsigned int)svc->get_current_state() < service::tab_service_states.size())
+    state = service::tab_service_states[svc->get_current_state()].second.c_str();
+  std::string const& state_type(service::tab_state_type[svc->get_state_type()]);
   std::string const& output{svc->get_plugin_output()};
   logger(log_info_message, basic)
     << type_str << " SERVICE STATE: " << svc->get_hostname() << ";"

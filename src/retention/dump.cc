@@ -408,7 +408,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "current_notification_id=" << obj.current_notification_id << "\n"
     "current_notification_number=" << obj.current_notification_number << "\n"
     "current_problem_id=" << obj.get_current_problem_id() << "\n"
-    "current_state=" << obj.current_state << "\n"
+    "current_state=" << obj.get_current_state() << "\n"
     "event_handler=" << obj.get_event_handler() << "\n"
     "event_handler_enabled=" << obj.get_event_handler_enabled() << "\n"
     "flap_detection_enabled=" << obj.get_flap_detection_enabled() << "\n"
@@ -417,11 +417,11 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "last_acknowledgement=" << obj.get_last_acknowledgement() << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.get_last_event_id() << "\n"
-    "last_hard_state=" << obj.last_hard_state << "\n"
+    "last_hard_state=" << obj.get_last_hard_state() << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.get_last_hard_state_change()) << "\n"
     "last_notification=" << static_cast<unsigned long>(obj.get_last_notification()) << "\n"
     "last_problem_id=" << obj.get_last_problem_id() << "\n"
-    "last_state=" << obj.last_state << "\n"
+    "last_state=" << obj.get_last_state() << "\n"
     "last_state_change=" << static_cast<unsigned long>(obj.get_last_state_change()) << "\n"
     "last_time_critical=" << static_cast<unsigned long>(obj.get_last_time_critical()) << "\n"
     "last_time_ok=" << static_cast<unsigned long>(obj.get_last_time_ok()) << "\n"
@@ -439,18 +439,19 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "notified_on_warning=" << obj.get_notified_on(notifier::warning) << "\n"
     "obsess_over_service=" << obj.obsess_over_service << "\n"
     "passive_checks_enabled=" << obj.accept_passive_service_checks << "\n"
-    "percent_state_change=" << std::setprecision(2) << std::fixed << obj.percent_state_change << "\n"
+    "percent_state_change=" << std::setprecision(2) << std::fixed
+                            << obj.get_percent_state_change() << "\n"
     "performance_data=" << obj.get_perf_data() << "\n"
     "plugin_output=" << obj.get_plugin_output() << "\n"
     "problem_has_been_acknowledged=" << obj.get_problem_has_been_acknowledged() << "\n"
     "process_performance_data=" << obj.process_performance_data << "\n"
     "retry_check_interval=" << obj.get_retry_interval() << "\n"
-    "state_type=" << obj.state_type << "\n"
+    "state_type=" << obj.get_state_type() << "\n"
     "recovery_been_sent=" << obj.get_recovery_been_sent() << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
-    os << (x > 0 ? "," : "") << obj.state_history[(x + obj.state_history_index) % MAX_STATE_HISTORY_ENTRIES];
+    os << (x > 0 ? "," : "") << obj.state_history[(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
   os << "\n";
 
   dump::customvariables(os, obj.custom_variables);

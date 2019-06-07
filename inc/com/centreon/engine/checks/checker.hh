@@ -68,7 +68,7 @@ namespace                checks {
                            time_t* preferred_time = NULL);
     void                 run_sync(
                            host* hst,
-                           int* check_result_code,
+                           host::host_state * check_result_code,
                            int check_options,
                            int use_cached_result,
                            unsigned long check_timestamp_horizon);
@@ -80,7 +80,7 @@ namespace                checks {
                          ~checker() throw () override;
     checker&             operator=(checker const& right);
     void                 finished(commands::result const& res) throw () override;
-    int                  _execute_sync(host* hst);
+    host::host_state     _execute_sync(host* hst);
 
     umap<unsigned long, check_result>
                          _list_id;

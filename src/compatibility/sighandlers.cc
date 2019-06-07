@@ -21,9 +21,13 @@
 #include <unistd.h>
 #include "common.h"
 #include "sighandlers.h"
+#include <com/centreon/engine/objects.hh>
+#include <com/centreon/engine/notifier.hh>
 
 #define HOST_TIMEOUT_OUTPUT "(Host Check Timed Out)\n"
 #define SERVICE_TIMEOUT_OUTPUT "(Service Check Timed Out)\n"
+
+using namespace com::centreon::engine;
 
 /**
  *  Helper signal handler function.
@@ -60,7 +64,7 @@ extern "C" {
     sighandler_helper(
       HOST_TIMEOUT_OUTPUT,
       sizeof(HOST_TIMEOUT_OUTPUT) - 1,
-      STATE_UNKNOWN);
+      service::state_unknown);
     return;
   }
 
@@ -71,7 +75,7 @@ extern "C" {
    */
   void my_system_sighandler(int sig) {
     (void)sig;
-    sighandler_helper(NULL, 0, STATE_UNKNOWN);
+    sighandler_helper(NULL, 0, service::state_unknown);
     return;
   }
 
@@ -85,7 +89,7 @@ extern "C" {
     sighandler_helper(
       SERVICE_TIMEOUT_OUTPUT,
       sizeof(SERVICE_TIMEOUT_OUTPUT) - 1,
-      STATE_UNKNOWN);
+      service::state_unknown);
     return;
   }
 }

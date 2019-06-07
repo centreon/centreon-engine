@@ -93,15 +93,16 @@ static char* get_service_group_names(com::centreon::engine::service& svc, nagios
  *
  *  @return Newly allocated string with host state as plain text.
  */
-template <int (com::centreon::engine::service::* member)>
+template <service::service_state ((com::centreon::engine::service::* member)() const)>
 static char* get_service_state(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
   char const* state;
-  if (STATE_OK == svc.*member)
+
+  if (service::state_ok == (svc.*member)())
     state = "OK";
-  else if (STATE_WARNING == svc.*member)
+  else if (service::state_warning == (svc.*member)())
     state = "WARNING";
-  else if (STATE_CRITICAL == svc.*member)
+  else if (service::state_critical == (svc.*member)())
     state = "CRITICAL";
   else
     state = "UNKNOWN";
@@ -181,17 +182,17 @@ struct grab_service_redirection {
        {&get_state_type_old<service>, true}},
       // State.
       {MACRO_SERVICESTATE,
-       {&get_service_state<&service::current_state>, true}},
-      // State ID.
+       {&get_service_state<&service::get_current_state>, true}},
+      // State ID.*/
       {MACRO_SERVICESTATEID,
-       {&get_member_as_string<service, int, &service::current_state>,
+       {&get_member_as_string<service, service::service_state, &service::get_current_state>,
         true}},
       // Last state.
       {MACRO_LASTSERVICESTATE,
-       {&get_service_state<&service::last_state>, true}},
-      // Last state ID.
+       {&get_service_state<&service::get_last_state>, true}},
+      // Last state ID.*/
       {MACRO_LASTSERVICESTATEID,
-       {&get_member_as_string<service, int, &service::last_state>,
+       {&get_member_as_string<service, service::service_state, &service::get_last_state>,
         true}},
       // Is volatile.
       {MACRO_SERVICEISVOLATILE,
@@ -249,7 +250,7 @@ struct grab_service_redirection {
         true}},
       // Percent state change.
       {MACRO_SERVICEPERCENTCHANGE,
-       {&get_double<service, &service::percent_state_change, 2>,
+       {&get_double<service, notifier, &notifier::get_percent_state_change, 2>,
         true}},
       // Duration.
       {MACRO_SERVICEDURATION,

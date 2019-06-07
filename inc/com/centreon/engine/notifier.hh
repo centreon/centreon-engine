@@ -22,7 +22,11 @@
 
 # include <array>
 # include <string>
+# include <list>
+# include "com/centreon/engine/contact.hh"
+# include "com/centreon/engine/contactgroup.hh"
 # include "com/centreon/engine/namespace.hh"
+# include "common.hh"
 
 // Forward declarations
 struct nagios_macros;
@@ -48,6 +52,12 @@ class                notifier {
     flapping =    1 << 8,
     downtime =    1 << 9,
   };
+
+  enum               state_type {
+    soft,
+    hard
+  };
+
   static std::array<std::string, 8> const tab_notification_str;
   static std::array<std::string, 2> const tab_state_type;
 
@@ -58,7 +68,6 @@ class                notifier {
                               std::string const& check_command,
                               bool checks_enabled,
                               bool accept_passive_checks,
-                              int initial_state,
                               double check_interval,
                               double retry_interval,
                               int max_attempts,
@@ -123,8 +132,6 @@ class                notifier {
   std::string const& get_check_command() const;
   void               set_check_command(
                        std::string const& check_command);
-  int                get_initial_state() const;
-  void               set_initial_state(int initial_state);
   double             get_check_interval() const;
   void               set_check_interval(double check_interval);
   double             get_retry_interval() const;
@@ -155,8 +162,6 @@ class                notifier {
   time_t             get_last_notification() const;
   void               set_last_notification(time_t last_notification);
   virtual void       update_notification_flags() = 0;
-  int                get_current_state() const;
-  void               set_current_state(int current_state);
   virtual time_t     get_next_notification_time(time_t offset) = 0;
   void               set_initial_notif_time(time_t notif_time);
   time_t             get_initial_notif_time() const;
@@ -246,9 +251,19 @@ class                notifier {
   void               set_freshness_threshold(int freshness_threshold);
   bool               get_is_flapping() const;
   void               set_is_flapping(bool is_flapping);
+  enum state_type    get_state_type() const;
+  void               set_state_type(enum state_type state_type);
+  double             get_percent_state_change() const;
+  void               set_percent_state_change(double percent_state_change);
+  unsigned int       get_state_history_index() const;
+  void               set_state_history_index(unsigned int state_history_index);
+  virtual bool       recovered() const = 0;
+  virtual int        get_current_state_int() const = 0;
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
+  int                state_history[MAX_STATE_HISTORY_ENTRIES];
+
  protected:
   int                _notifier_type;
   int                _stalk_type;
@@ -262,7 +277,6 @@ class                notifier {
 
   std::string        _display_name;
   std::string        _check_command;
-  int                _initial_state;
   double             _check_interval;
   double             _retry_interval;
   int                _current_notification_number;
@@ -270,7 +284,7 @@ class                notifier {
   uint64_t           _current_notification_id;
   time_t             _next_notification;
   time_t             _last_notification;
-  int                _current_state;
+  enum state_type    _state_type;
 
   time_t             _initial_notif_time;
   int                _acknowledgement_timeout;
@@ -282,6 +296,8 @@ class                notifier {
   uint32_t           _out_notification_type;
   uint32_t           _in_notification_type;
   uint32_t           _modified_attributes;
+  unsigned int       _state_history_index;
+  double             _percent_state_change;
 
  private:
   static uint64_t    _next_notification_id;

@@ -89,7 +89,7 @@ void applier::host::add_object(
         obj.alias(),
         obj.address(),
         obj.check_period(),
-        obj.initial_state(),
+        static_cast<engine::host::host_state>(obj.initial_state()),
         obj.check_interval(),
         obj.retry_interval(),
         obj.max_check_attempts(),
@@ -309,7 +309,7 @@ void applier::host::modify_object(
   h->set_address(obj.address());
   if (obj.check_period().empty())
   h->set_check_period(obj.check_period());
-  h->set_initial_state(static_cast<int>(obj.initial_state()));
+  h->set_initial_state(static_cast<engine::host::host_state>(obj.initial_state()));
   h->set_check_interval(static_cast<double>(obj.check_interval()));
   h->set_retry_interval(static_cast<double>(obj.retry_interval()));
   h->set_max_attempts(static_cast<int>(obj.max_check_attempts()));

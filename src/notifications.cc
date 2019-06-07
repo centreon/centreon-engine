@@ -133,7 +133,7 @@ int check_contact_service_notification_viability(
   /*************************************/
 
   /* see if we should notify about problems with this service */
-  if (svc->current_state == STATE_UNKNOWN
+  if (svc->get_current_state() == service::state_unknown
       && !cntct->notify_on_service_unknown()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNKNOWN "
@@ -141,7 +141,7 @@ int check_contact_service_notification_viability(
     return ERROR;
   }
 
-  if (svc->current_state == STATE_WARNING
+  if (svc->get_current_state() == service::state_warning
       && !cntct->notify_on_service_warning()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about WARNING "
@@ -149,7 +149,7 @@ int check_contact_service_notification_viability(
     return ERROR;
   }
 
-  if (svc->current_state == STATE_CRITICAL
+  if (svc->get_current_state() == service::state_critical
       && !cntct->notify_on_service_critical()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about CRITICAL "
@@ -157,7 +157,7 @@ int check_contact_service_notification_viability(
     return ERROR;
   }
 
-  if (svc->current_state == STATE_OK) {
+  if (svc->get_current_state() == service::state_ok) {
 
     if (!cntct->notify_on_service_recovery()) {
       logger(dbg_notifications, most)
@@ -278,21 +278,21 @@ int check_contact_host_notification_viability(
   /*************************************/
 
   /* see if we should notify about problems with this host */
-  if (hst->get_current_state() == HOST_DOWN
+  if (hst->get_current_state() == host::state_down
       && !cntct->notify_on_host_down()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about DOWN states.";
     return ERROR;
   }
 
-  if (hst->get_current_state() == HOST_UNREACHABLE
+  if (hst->get_current_state() == host::state_unreachable
       && !cntct->notify_on_host_unreachable()) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNREACHABLE states,";
     return ERROR;
   }
 
-  if (hst->get_current_state() == HOST_UP) {
+  if (hst->get_current_state() == host::state_up) {
 
     if (!cntct->notify_on_host_recovery()) {
       logger(dbg_notifications, most)

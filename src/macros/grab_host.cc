@@ -66,17 +66,17 @@ static void generate_host_total_services(
       service* temp_service(it->second.get());
       if (temp_service) {
         total_host_services++;
-        switch (temp_service->current_state) {
-         case STATE_OK:
+        switch (temp_service->get_current_state()) {
+         case service::state_ok:
           total_host_services_ok++;
           break;
-         case STATE_WARNING:
+         case service::state_warning:
           total_host_services_warning++;
           break;
-         case STATE_UNKNOWN:
+         case service::state_unknown:
           total_host_services_unknown++;
           break;
-         case STATE_CRITICAL:
+         case service::state_critical:
           total_host_services_critical++;
           break;
         }
@@ -146,11 +146,10 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
  *
  *  @return Newly allocated string with host state in plain text.
  */
-template <typename T, typename V, int (V::* member)() const>
+template <typename T, host::host_state (T::* member)() const>
 static char* get_host_state(T& t, nagios_macros* mac) {
   (void)mac;
-  V* v{&t};
-  int current{(v->*member)()};
+  uint32_t current = static_cast<host::host_state>((t.*member)());
   return string::dup(com::centreon::engine::host::tab_host_states[current].second);
 }
 
@@ -267,12 +266,12 @@ struct grab_host_redirection {
       {MACRO_HOSTADDRESS,
        {&get_member_as_string<host, std::string const&, &host::get_address>,
         true}},
-      {MACRO_HOSTSTATE, {&get_host_state<host, notifier, &notifier::get_current_state>, true}},
+      {MACRO_HOSTSTATE, {&get_host_state<host, &host::get_current_state>, true}},
       {MACRO_HOSTSTATEID,
-       {&get_member_as_string<host, int, notifier, &notifier::get_current_state>, true}},
-      {MACRO_LASTHOSTSTATE, {&get_host_state<host, host, &host::get_last_state>, true}},
+       {&get_member_as_string<host, host::host_state , &host::get_current_state>, true}},
+      {MACRO_LASTHOSTSTATE, {&get_host_state<host, &host::get_last_state>, true}},
       {MACRO_LASTHOSTSTATEID,
-       {&get_member_as_string<host, int, &host::get_last_state>, true}},
+       {&get_member_as_string<host, host::host_state, &host::get_last_state>, true}},
       {MACRO_HOSTCHECKTYPE, {&get_host_check_type, true}},
       {MACRO_HOSTSTATETYPE, {&get_state_type<host>, true}},
       {MACRO_HOSTOUTPUT,
@@ -306,7 +305,7 @@ struct grab_host_redirection {
        {&get_member_as_string<host, int, notifier, &notifier::get_scheduled_downtime_depth>,
         true}},
       {MACRO_HOSTPERCENTCHANGE,
-       {&get_double<host, &host::get_percent_state_change, 2>, true}},
+       {&get_double<host, notifier, &notifier::get_percent_state_change, 2>, true}},
       {MACRO_HOSTDURATION, {&get_duration<host>, true}},
       {MACRO_HOSTDURATIONSEC, {&get_duration_sec<host>, true}},
       {MACRO_HOSTEXECUTIONTIME,

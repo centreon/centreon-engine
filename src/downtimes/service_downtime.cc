@@ -327,7 +327,7 @@ int service_downtime::handle() {
     if (!_start_flex_downtime) {
 
       /* host is up or service is ok, so we don't really do anything right now */
-      if (svc->current_state == STATE_OK) {
+      if (svc->get_current_state() == service::state_ok) {
 
         /* increment pending flex downtime counter */
         svc->pending_flex_downtime++;

@@ -204,13 +204,13 @@ void raw::run(
   res.exit_status = p.exit_status();
 
   if (res.exit_status == process::timeout) {
-    res.exit_code = STATE_UNKNOWN;
+    res.exit_code = service::state_unknown;
     res.output = "(Process Timeout)";
   }
   else if ((res.exit_status == process::crash)
            || (res.exit_code < -1)
            || (res.exit_code > 3))
-    res.exit_code = STATE_UNKNOWN;
+    res.exit_code = service::state_unknown;
 
   logger(dbg_commands, basic)
     << "raw::run: end process: "
@@ -301,13 +301,13 @@ void raw::finished(process& p) throw () {
     res.exit_status = p.exit_status();
 
     if (res.exit_status == process::timeout) {
-      res.exit_code = STATE_UNKNOWN;
+      res.exit_code = service::state_unknown;
       res.output = "(Process Timeout)";
     }
     else if ((res.exit_status == process::crash)
              || (res.exit_code < -1)
              || (res.exit_code > 3))
-      res.exit_code = STATE_UNKNOWN;
+      res.exit_code = service::state_unknown;
 
     logger(dbg_commands, basic)
       << "raw::finished: "

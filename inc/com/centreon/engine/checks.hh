@@ -24,6 +24,7 @@
 #  include <cstdio>
 #  include <sys/time.h>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/notifier.hh"
 
 // Service dependency values
 #  define DEPENDENCIES_OK     0
@@ -94,39 +95,12 @@ void check_host_result_freshness();
 // determines if a host's check results are fresh
 
 // Route/Host Check Functions
-int perform_on_demand_host_check(
-      com::centreon::engine::host* hst,
-      int* check_return_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
 int perform_scheduled_host_check(
       com::centreon::engine::host* hst,
       int check_options,
       double latency);
-int perform_on_demand_host_check_3x(
-      com::centreon::engine::host* hst,
-      int* check_result_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
-int run_sync_host_check_3x(
-      com::centreon::engine::host* hst,
-      int* check_result_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
-int process_host_check_result_3x(
-      com::centreon::engine::host* hst,
-      int new_state,
-      char* old_plugin_output,
-      int check_options,
-      int reschedule_check,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
 int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
                                  int is_active);
-int determine_host_reachability(com::centreon::engine::host* hst);
 
 #  ifdef __cplusplus
 }

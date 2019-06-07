@@ -32,7 +32,6 @@
 #  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/notifier.hh"
-#  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/service.hh"
 
 
@@ -54,17 +53,25 @@ typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::host>> host_map;
 
 CCE_BEGIN()
-class                 host : public notifier {
+class                host : public notifier {
  public:
   static std::array<std::pair<uint32_t, std::string>, 3> const tab_host_states;
 
-                      host(uint64_t host_id,
+
+
+  enum               host_state {
+    state_up,
+    state_down,
+    state_unreachable
+  };
+
+                     host(uint64_t host_id,
                            std::string const& name,
                            std::string const& display_name,
                            std::string const& alias,
                            std::string const& address,
                            std::string const& check_period,
-                           int initial_state,
+                           enum host::host_state initial_state,
                            double check_interval,
                            double retry_interval,
                            int max_attempts,
@@ -153,6 +160,29 @@ class                 host : public notifier {
   int                is_escalated_contact(contact* cntct);
   bool               is_result_fresh(time_t current_time, int log_this);
 
+  int                run_sync_check_3x(enum host::host_state* check_result_code,
+                                            int check_options,
+                                            int use_cached_result,
+                                            unsigned long check_timestamp_horizon);
+  int                perform_on_demand_check_3x( enum host::host_state* check_result_code,
+                                            int check_options,
+                                            int use_cached_result,
+                                            unsigned long check_timestamp_horizon);
+
+  int                perform_on_demand_check(enum host::host_state* check_return_code,
+                                                 int check_options,
+                                                 int use_cached_result,
+                                                 unsigned long check_timestamp_horizon);
+  int                process_check_result_3x(enum host::host_state new_state,
+                                                 char* old_plugin_output,
+                                                 int check_options,
+                                                 int reschedule_check,
+                                                 int use_cached_result,
+                                                 unsigned long check_timestamp_horizon);
+  enum host_state    determine_host_reachability();
+  bool               recovered() const override ;
+  int                get_current_state_int() const override ;
+
   // setters / getters
   std::string const& get_name() const;
   void               set_name(std::string const& name);
@@ -192,12 +222,6 @@ class                 host : public notifier {
   void               set_should_be_drawn(int should_be_drawn);
   int                get_acknowledgement_type() const;
   void               set_acknowledgement_type(int acknowledgement_type);
-  int                get_last_state() const;
-  void               set_last_state(int last_state);
-  int                get_last_hard_state() const;
-  void               set_last_hard_state(int last_hard_state);
-  int                get_state_type() const;
-  void               set_state_type(int state_type);
   double             get_latency() const;
   void               set_latency(double latency);
   bool               get_is_executing() const;
@@ -226,16 +250,12 @@ class                 host : public notifier {
   void               set_check_flapping_recovery_notification(int check_flapping_recovery_notification);
   int                get_pending_flex_downtime() const;
   void               set_pending_flex_downtime(int pending_flex_downtime);
-  unsigned int       get_state_history_index() const;
-  void               set_state_history_index(unsigned int state_history_index);
   time_t             get_last_state_history_update() const;
   void               set_last_state_history_update(time_t last_state_history_update);
   unsigned long      get_flapping_comment_id() const;
   void               set_flapping_comment_id(unsigned long flapping_comment_id);
   void               disable_flap_detection();
   void               enable_flap_detection();
-  double             get_percent_state_change() const;
-  void               set_percent_state_change(double percent_state_change);
   int                get_total_services() const;
   void               set_total_services(int total_services);
   unsigned long      get_total_service_check_interval() const;
@@ -244,6 +264,14 @@ class                 host : public notifier {
   void               set_circular_path_checked(int check_level);
   bool               get_contains_circular_path() const;
   void               set_contains_circular_path(bool contains_circular_path);
+  enum host_state    get_current_state() const;
+  void               set_current_state(enum host_state current_state);
+  enum host_state    get_last_state() const;
+  void               set_last_state(enum host_state last_state);
+  enum host_state    get_last_hard_state() const;
+  void               set_last_hard_state(enum host_state last_hard_state);
+  enum host_state    get_initial_state() const;
+  void               set_initial_state(enum host_state current_state);
   int                notify_contact(nagios_macros* mac,
                                     contact* cntct,
                                     int type,
@@ -269,7 +297,6 @@ class                 host : public notifier {
   commands::command*  event_handler_ptr;
   commands::command*  check_command_ptr;
 
-  int                 state_history[MAX_STATE_HISTORY_ENTRIES];
   service_map         services;
   timeperiod          *check_period_ptr;
   timeperiod          *notification_period_ptr;
@@ -295,9 +322,6 @@ private:
   int                 _z_3d;
   int                 _should_be_drawn;
   int                 _acknowledgement_type;
-  int                 _last_state;
-  int                 _last_hard_state;
-  int                 _state_type;
   double              _latency;
   bool                _is_executing;
   int                 _check_options;
@@ -314,11 +338,15 @@ private:
   unsigned int        _state_history_index;
   time_t              _last_state_history_update;
   unsigned long       _flapping_comment_id;
-  double              _percent_state_change;
   int                 _total_services;
   unsigned long       _total_service_check_interval;
   int                 _circular_path_checked;
   bool                _contains_circular_path;
+
+  enum host_state    _last_state;
+  enum host_state    _last_hard_state;
+  enum host_state    _current_state;
+  enum host_state    _initial_state;
 };
 
 CCE_END()

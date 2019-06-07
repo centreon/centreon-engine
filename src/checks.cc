@@ -41,6 +41,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/notifier.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/sehandlers.hh"
@@ -84,8 +85,8 @@ int reap_check_results() {
 unsigned int check_service_dependencies(
                com::centreon::engine::service* svc,
                int dependency_type) {
-  com::centreon::engine::service* temp_service = NULL;
-  int state = STATE_OK;
+  service* temp_service = NULL;
+  int state =  service::state_ok;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic)
@@ -117,25 +118,25 @@ unsigned int check_service_dependencies(
       return DEPENDENCIES_OK;
 
     /* get the status to use (use last hard state if its currently in a soft state) */
-    if (temp_service->state_type == SOFT_STATE
+    if (temp_service->get_state_type() == notifier::soft
         && !config->soft_state_dependencies())
-      state = temp_service->last_hard_state;
+      state = temp_service->get_last_hard_state();
     else
-      state = temp_service->current_state;
+      state = temp_service->get_current_state();
 
     /* is the service we depend on in state that fails the dependency tests? */
-    if (state == STATE_OK && temp_dependency->get_fail_on_ok())
+    if (state ==  service::state_ok && temp_dependency->get_fail_on_ok())
       return DEPENDENCIES_FAILED;
-    if (state == STATE_WARNING
+    if (state ==  service::state_warning
         && temp_dependency->get_fail_on_warning())
       return DEPENDENCIES_FAILED;
-    if (state == STATE_UNKNOWN
+    if (state ==  service::state_unknown
         && temp_dependency->get_fail_on_unknown())
       return DEPENDENCIES_FAILED;
-    if (state == STATE_CRITICAL
+    if (state ==  service::state_critical
         && temp_dependency->get_fail_on_critical())
       return DEPENDENCIES_FAILED;
-    if ((state == STATE_OK && !temp_service->get_has_been_checked())
+    if ((state ==  service::state_ok && !temp_service->get_has_been_checked())
         && temp_dependency->get_fail_on_pending())
       return DEPENDENCIES_FAILED;
 
@@ -283,24 +284,7 @@ void check_service_result_freshness() {
 /*************** COMMON ROUTE/HOST CHECK FUNCTIONS ****************/
 /******************************************************************/
 
-/* execute an on-demand check  */
-int perform_on_demand_host_check(
-      com::centreon::engine::host* hst,
-      int* check_return_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon) {
-  logger(dbg_functions, basic)
-    << "perform_on_demand_host_check()";
 
-  perform_on_demand_host_check_3x(
-    hst,
-    check_return_code,
-    check_options,
-    use_cached_result,
-    check_timestamp_horizon);
-  return OK;
-}
 
 /* execute a scheduled host check using either the 2.x or 3.x logic */
 int perform_scheduled_host_check(
@@ -316,7 +300,7 @@ int perform_scheduled_host_check(
 /* checks host dependencies */
 unsigned int check_host_dependencies(com::centreon::engine::host* hst, int dependency_type) {
   host* temp_host = NULL;
-  int state = HOST_UP;
+  enum host::host_state state = host::state_up;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic)
@@ -350,21 +334,21 @@ unsigned int check_host_dependencies(com::centreon::engine::host* hst, int depen
       return DEPENDENCIES_OK;
 
     /* get the status to use (use last hard state if its currently in a soft state) */
-    if (temp_host->get_state_type() == SOFT_STATE
+    if (temp_host->get_state_type() == notifier::soft
         && !config->soft_state_dependencies())
       state = temp_host->get_last_hard_state();
     else
       state = temp_host->get_current_state();
 
     /* is the host we depend on in state that fails the dependency tests? */
-    if (state == HOST_UP && temp_dependency->get_fail_on_up())
+    if (state == host::state_up && temp_dependency->get_fail_on_up())
       return DEPENDENCIES_FAILED;
-    if (state == HOST_DOWN && temp_dependency->get_fail_on_down())
+    if (state == host::state_down && temp_dependency->get_fail_on_down())
       return DEPENDENCIES_FAILED;
-    if (state == HOST_UNREACHABLE
+    if (state == host::state_unreachable
         && temp_dependency->get_fail_on_unreachable())
       return DEPENDENCIES_FAILED;
-    if ((state == HOST_UP && !temp_host->get_has_been_checked())
+    if ((state == host::state_up && !temp_host->get_has_been_checked())
         && temp_dependency->get_fail_on_pending())
       return DEPENDENCIES_FAILED;
 
@@ -510,606 +494,6 @@ void check_host_result_freshness() {
 /******************************************************************/
 
 /*** ON-DEMAND HOST CHECKS USE THIS FUNCTION ***/
-/* check to see if we can reach the host */
-int perform_on_demand_host_check_3x(
-      com::centreon::engine::host* hst,
-      int* check_result_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon) {
-  int result = OK;
-
-  logger(dbg_functions, basic)
-    << "perform_on_demand_host_check_3x()";
-
-  /* make sure we have a host */
-  if (hst == NULL)
-    return ERROR;
-
-  logger(dbg_checks, basic)
-    << "** On-demand check for host '" << hst->get_name() << "'...";
-
-  /* check the status of the host */
-  result = run_sync_host_check_3x(
-             hst,
-             check_result_code,
-             check_options,
-             use_cached_result,
-             check_timestamp_horizon);
-  return result;
-}
-
-/* perform a synchronous check of a host *//* on-demand host checks will use this... */
-int run_sync_host_check_3x(
-      com::centreon::engine::host* hst,
-      int* check_result_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon) {
-  logger(dbg_functions, basic)
-    << "run_sync_host_check_3x: hst=" << hst
-    << ", check_options=" << check_options
-    << ", use_cached_result=" << use_cached_result
-    << ", check_timestamp_horizon=" << check_timestamp_horizon;
-
-  try {
-    checks::checker::instance().run_sync(
-                                  hst,
-                                  check_result_code,
-                                  check_options,
-                                  use_cached_result,
-                                  check_timestamp_horizon);
-  }
-  catch (checks::viability_failure const& e) {
-    // Do not log viability failures.
-    (void)e;
-    return ERROR;
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
-      << "Error: " << e.what();
-    return ERROR;
-  }
-  return OK;
-}
-
-/* processes the result of a synchronous or asynchronous host check */
-int process_host_check_result_3x(com::centreon::engine::host* hst,
-                                 int new_state,
-                                 char* old_plugin_output,
-                                 int check_options,
-                                 int reschedule_check,
-                                 int use_cached_result,
-                                 unsigned long check_timestamp_horizon) {
-  com::centreon::engine::host* master_host = NULL;
-  com::centreon::engine::host* temp_host = NULL;
-  objectlist* check_hostlist = NULL;
-  objectlist* hostlist_item = NULL;
-  int parent_state = HOST_UP;
-  time_t current_time = 0L;
-  time_t next_check = 0L;
-  time_t preferred_time = 0L;
-  time_t next_valid_time = 0L;
-  int run_async_check = true;
-  bool has_parent;
-
-  logger(dbg_functions, basic) << "process_host_check_result_3x()";
-
-  logger(dbg_checks, more)
-      << "HOST: " << hst->get_name()
-      << ", ATTEMPT=" << hst->get_current_attempt() << "/"
-      << hst->get_max_attempts() << ", CHECK TYPE="
-      << (hst->get_check_type() == check_active ? "ACTIVE" : "PASSIVE")
-      << ", STATE TYPE="
-      << (hst->get_state_type() == HARD_STATE ? "HARD" : "SOFT")
-      << ", OLD STATE=" << hst->get_current_state()
-      << ", NEW STATE=" << new_state;
-
-  /* get the current time */
-  time(&current_time);
-
-  /* default next check time */
-  next_check = (unsigned long)(current_time + (hst->get_check_interval() *
-                                               config->interval_length()));
-
-  /* we have to adjust current attempt # for passive checks, as it isn't done
-   * elsewhere */
-  if (hst->get_check_type() == check_passive &&
-      config->passive_host_checks_are_soft())
-    adjust_host_check_attempt_3x(hst, false);
-
-  /* log passive checks - we need to do this here, as some my bypass external
-   * commands by getting dropped in checkresults dir */
-  if (hst->get_check_type() == check_passive) {
-    if (config->log_passive_checks())
-      logger(log_passive_check, basic)
-          << "PASSIVE HOST CHECK: " << hst->get_name() << ";" << new_state
-          << ";" << hst->get_plugin_output();
-  }
-  /******* HOST WAS DOWN/UNREACHABLE INITIALLY *******/
-  if (hst->get_current_state() != HOST_UP) {
-    logger(dbg_checks, more) << "Host was DOWN/UNREACHABLE.";
-
-    /***** HOST IS NOW UP *****/
-    /* the host just recovered! */
-    if (new_state == HOST_UP) {
-      /* set the current state */
-      hst->set_current_state(HOST_UP);
-
-      /* set the state type */
-      /* set state type to HARD for passive checks and active checks that were
-       * previously in a HARD STATE */
-      if (hst->get_state_type() == HARD_STATE ||
-          (hst->get_check_type() == check_passive &&
-           !config->passive_host_checks_are_soft()))
-        hst->set_state_type(HARD_STATE);
-      else
-        hst->set_state_type(SOFT_STATE);
-
-      logger(dbg_checks, more)
-          << "Host experienced a "
-          << (hst->get_state_type() == HARD_STATE ? "HARD" : "SOFT")
-          << " recovery (it's now UP).";
-
-      /* reschedule the next check of the host at the normal interval */
-      reschedule_check = true;
-      next_check = (unsigned long)(current_time + (hst->get_check_interval() *
-                                                   config->interval_length()));
-
-      /* propagate checks to immediate parents if they are not already UP */
-      /* we do this because a parent host (or grandparent) may have recovered
-       * somewhere and we should catch the recovery as soon as possible */
-      logger(dbg_checks, more) << "Propagating checks to parent host(s)...";
-
-      for (host_map::iterator it(hst->parent_hosts.begin()),
-           end(hst->parent_hosts.end());
-           it != end; it++) {
-        if (it->second == nullptr)
-          continue;
-        if (it->second->get_current_state() != HOST_UP) {
-          logger(dbg_checks, more)
-              << "Check of parent host '" << it->first << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
-        }
-      }
-
-      /* propagate checks to immediate children if they are not already UP */
-      /* we do this because children may currently be UNREACHABLE, but may (as a
-       * result of this recovery) switch to UP or DOWN states */
-      logger(dbg_checks, more) << "Propagating checks to child host(s)...";
-
-      for (host_map::iterator it(hst->child_hosts.begin()),
-           end(hst->child_hosts.end());
-           it != end; it++) {
-        if (it->second == nullptr)
-          continue;
-        if (it->second->get_current_state() != HOST_UP) {
-          logger(dbg_checks, more)
-              << "Check of child host '" << it->first << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
-        }
-      }
-    }
-
-    /***** HOST IS STILL DOWN/UNREACHABLE *****/
-    /* we're still in a problem state... */
-    else {
-      logger(dbg_checks, more) << "Host is still DOWN/UNREACHABLE.";
-
-      /* passive checks are treated as HARD states by default... */
-      if (hst->get_check_type() == check_passive &&
-          !config->passive_host_checks_are_soft()) {
-        /* set the state type */
-        hst->set_state_type(HARD_STATE);
-
-        /* reset the current attempt */
-        hst->set_current_attempt(1);
-      }
-
-      /* active checks and passive checks (treated as SOFT states) */
-      else {
-        /* set the state type */
-        /* we've maxed out on the retries */
-        if (hst->get_current_attempt() == hst->get_max_attempts())
-          hst->set_state_type(HARD_STATE);
-        /* the host was in a hard problem state before, so it still is now */
-        else if (hst->get_current_attempt() == 1)
-          hst->set_state_type(HARD_STATE);
-        /* the host is in a soft state and the check will be retried */
-        else
-          hst->set_state_type(SOFT_STATE);
-      }
-
-      /* make a determination of the host's state */
-      /* translate host state between DOWN/UNREACHABLE (only for passive checks
-       * if enabled) */
-      hst->set_current_state(new_state);
-      if (hst->get_check_type() == check_active ||
-          config->translate_passive_host_checks())
-        hst->set_current_state(determine_host_reachability(hst));
-
-      /* reschedule the next check if the host state changed */
-      if (hst->get_last_state() != hst->get_current_state() ||
-          hst->get_last_hard_state() != hst->get_current_state()) {
-        reschedule_check = true;
-
-        /* schedule a re-check of the host at the retry interval because we
-         * can't determine its final state yet... */
-        if (hst->get_state_type() == SOFT_STATE)
-          next_check =
-              (unsigned long)(current_time + (hst->get_retry_interval() *
-                                              config->interval_length()));
-
-        /* host has maxed out on retries (or was previously in a hard problem
-         * state), so reschedule the next check at the normal interval */
-        else
-          next_check =
-              (unsigned long)(current_time + (hst->get_check_interval() *
-                                              config->interval_length()));
-      }
-    }
-  }
-
-  /******* HOST WAS UP INITIALLY *******/
-  else {
-    logger(dbg_checks, more) << "Host was UP.";
-
-    /***** HOST IS STILL UP *****/
-    /* either the host never went down since last check */
-    if (new_state == HOST_UP) {
-      logger(dbg_checks, more) << "Host is still UP.";
-
-      /* set the current state */
-      hst->set_current_state(HOST_UP);
-
-      /* set the state type */
-      hst->set_state_type(HARD_STATE);
-
-      /* reschedule the next check at the normal interval */
-      if (reschedule_check)
-        next_check =
-            (unsigned long)(current_time + (hst->get_check_interval() *
-                                            config->interval_length()));
-    }
-    /***** HOST IS NOW DOWN/UNREACHABLE *****/
-    else {
-      logger(dbg_checks, more) << "Host is now DOWN/UNREACHABLE.";
-
-      /***** SPECIAL CASE FOR HOSTS WITH MAX_ATTEMPTS==1 *****/
-      if (hst->get_max_attempts() == 1) {
-        logger(dbg_checks, more) << "Max attempts = 1!.";
-
-        /* set the state type */
-        hst->set_state_type(HARD_STATE);
-
-        /* host has maxed out on retries, so reschedule the next check at the
-         * normal interval */
-        reschedule_check = true;
-        next_check =
-            (unsigned long)(current_time + (hst->get_check_interval() *
-                                            config->interval_length()));
-
-        /* we need to run SYNCHRONOUS checks of all parent hosts to accurately
-         * determine the state of this host */
-        /* this is extremely inefficient (reminiscent of Nagios 2.x logic), but
-         * there's no other good way around it */
-        /* check all parent hosts to see if we're DOWN or UNREACHABLE */
-        /* only do this for ACTIVE checks, as PASSIVE checks contain a
-         * pre-determined state */
-        if (hst->get_check_type() == check_active) {
-          has_parent = false;
-
-          logger(dbg_checks, more)
-              << "** WARNING: Max attempts = 1, so we have to run serial "
-                 "checks of all parent hosts!";
-
-          for (host_map::iterator it(hst->parent_hosts.begin()),
-               end(hst->parent_hosts.end());
-               it != end; it++) {
-            if (it->second == nullptr)
-              continue;
-
-            has_parent = true;
-
-            logger(dbg_checks, more)
-                << "Running serial check parent host '" << it->first << "'...";
-
-            /* run an immediate check of the parent host */
-            run_sync_host_check_3x(it->second.get(), &parent_state,
-                                   check_options, use_cached_result,
-                                   check_timestamp_horizon);
-
-            /* bail out as soon as we find one parent host that is UP */
-            if (parent_state == HOST_UP) {
-              logger(dbg_checks, more)
-                  << "Parent host is UP, so this one is DOWN.";
-
-              /* set the current state */
-              hst->set_current_state(HOST_DOWN);
-              break;
-            }
-          }
-
-          if (!has_parent) {
-            /* host has no parents, so its up */
-            if (hst->parent_hosts.size() == 0) {
-              logger(dbg_checks, more) << "Host has no parents, so it's DOWN.";
-              hst->set_current_state(HOST_DOWN);
-            } else {
-              /* no parents were up, so this host is UNREACHABLE */
-              logger(dbg_checks, more)
-                  << "No parents were UP, so this host is UNREACHABLE.";
-              hst->set_current_state(HOST_UNREACHABLE);
-            }
-          }
-        }
-
-        /* set the host state for passive checks */
-        else {
-          /* set the state */
-          hst->set_current_state(new_state);
-
-          /* translate host state between DOWN/UNREACHABLE for passive checks
-           * (if enabled) */
-          /* make a determination of the host's state */
-          if (config->translate_passive_host_checks())
-            hst->set_current_state(determine_host_reachability(hst));
-        }
-
-        /* propagate checks to immediate children if they are not UNREACHABLE */
-        /* we do this because we may now be blocking the route to child hosts */
-        logger(dbg_checks, more)
-            << "Propagating check to immediate non-UNREACHABLE child hosts...";
-
-        for (host_map::iterator it(hst->child_hosts.begin()),
-             end(hst->child_hosts.end());
-             it != end; it++) {
-          if (it->second == nullptr)
-            continue;
-          if (it->second->get_current_state() != HOST_UNREACHABLE) {
-            logger(dbg_checks, more)
-                << "Check of child host '" << it->first << "' queued.";
-            add_object_to_objectlist(&check_hostlist, it->second.get());
-          }
-        }
-      }
-
-      /***** MAX ATTEMPTS > 1 *****/
-      else {
-        /* active and (in some cases) passive check results are treated as SOFT
-         * states */
-        if (hst->get_check_type() == check_active ||
-            config->passive_host_checks_are_soft()) {
-          /* set the state type */
-          hst->set_state_type(SOFT_STATE);
-        }
-
-        /* by default, passive check results are treated as HARD states */
-        else {
-          /* set the state type */
-          hst->set_state_type(HARD_STATE);
-
-          /* reset the current attempt */
-          hst->set_current_attempt(1);
-        }
-
-        /* make a (in some cases) preliminary determination of the host's state
-         */
-        /* translate host state between DOWN/UNREACHABLE (for passive checks
-         * only if enabled) */
-        hst->set_current_state(new_state);
-        if (hst->get_check_type() == check_active ||
-            config->translate_passive_host_checks())
-          hst->set_current_state(determine_host_reachability(hst));
-
-        /* reschedule a check of the host */
-        reschedule_check = true;
-
-        /* schedule a re-check of the host at the retry interval because we
-         * can't determine its final state yet... */
-        if (hst->get_check_type() == check_active ||
-            config->passive_host_checks_are_soft())
-          next_check =
-              (unsigned long)(current_time + (hst->get_retry_interval() *
-                                              config->interval_length()));
-
-        /* schedule a re-check of the host at the normal interval */
-        else
-          next_check =
-              (unsigned long)(current_time + (hst->get_check_interval() *
-                                              config->interval_length()));
-
-        /* propagate checks to immediate parents if they are UP */
-        /* we do this because a parent host (or grandparent) may have gone down
-         * and blocked our route */
-        /* checking the parents ASAP will allow us to better determine the final
-         * state (DOWN/UNREACHABLE) of this host later */
-        logger(dbg_checks, more)
-            << "Propagating checks to immediate parent hosts that "
-               "are UP...";
-
-        for (host_map::iterator it(hst->parent_hosts.begin()),
-             end(hst->parent_hosts.end());
-             it != end; it++) {
-          if (it->second == nullptr)
-            continue;
-          if (it->second->get_current_state() == HOST_UP) {
-            add_object_to_objectlist(&check_hostlist, it->second.get());
-            logger(dbg_checks, more)
-                << "Check of host '" << it->first << "' queued.";
-          }
-        }
-
-        /* propagate checks to immediate children if they are not UNREACHABLE */
-        /* we do this because we may now be blocking the route to child hosts */
-        logger(dbg_checks, more)
-            << "Propagating checks to immediate non-UNREACHABLE "
-               "child hosts...";
-
-        for (host_map::iterator it(hst->child_hosts.begin()),
-             end(hst->child_hosts.end());
-             it != end; it++) {
-          if (it->second == nullptr)
-            continue;
-          if (it->second->get_current_state() != HOST_UNREACHABLE) {
-            logger(dbg_checks, more)
-                << "Check of child host '" << it->first << "' queued.";
-            add_object_to_objectlist(&check_hostlist, it->second.get());
-          }
-        }
-
-        /* check dependencies on second to last host check */
-        if (config->enable_predictive_host_dependency_checks() &&
-            hst->get_current_attempt() == (hst->get_max_attempts() - 1)) {
-          /* propagate checks to hosts that THIS ONE depends on for
-           * notifications AND execution */
-          /* we do to help ensure that the dependency checks are accurate before
-           * it comes time to notify */
-          logger(dbg_checks, more)
-              << "Propagating predictive dependency checks to hosts this "
-                 "one depends on...";
-
-          std::string id(hst->get_name());
-          umultimap<std::string, std::shared_ptr<hostdependency> > const&
-              dependencies(state::instance().hostdependencies());
-          for (umultimap<std::string,
-                         std::shared_ptr<hostdependency> >::const_iterator
-                   it(dependencies.find(id)),
-               end(dependencies.end());
-               it != end && it->first == id; ++it) {
-            hostdependency* temp_dependency(&*it->second);
-            if (temp_dependency->dependent_host_ptr == hst &&
-                temp_dependency->master_host_ptr != NULL) {
-              master_host = (com::centreon::engine::host*)
-                                temp_dependency->master_host_ptr;
-              logger(dbg_checks, more)
-                  << "Check of host '" << master_host->get_name()
-                  << "' queued.";
-              add_object_to_objectlist(&check_hostlist, (void*)master_host);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  logger(dbg_checks, more) << "Pre-handle_host_state() Host: "
-                           << hst->get_name()
-                           << ", Attempt=" << hst->get_current_attempt() << "/"
-                           << hst->get_max_attempts() << ", Type="
-                           << (hst->get_state_type() == HARD_STATE ? "HARD"
-                                                                   : "SOFT")
-                           << ", Final State=" << hst->get_current_state();
-
-  /* handle the host state */
-  hst->handle_state();
-
-  logger(dbg_checks, more) << "Post-handle_host_state() Host: "
-                           << hst->get_name()
-                           << ", Attempt=" << hst->get_current_attempt() << "/"
-                           << hst->get_max_attempts() << ", Type="
-                           << (hst->get_state_type() == HARD_STATE ? "HARD"
-                                                                   : "SOFT")
-                           << ", Final State=" << hst->get_current_state();
-
-  /******************** POST-PROCESSING STUFF *********************/
-
-  /* if the plugin output differs from previous check and no state change, log
-   * the current state/output if state stalking is enabled */
-  if (hst->get_last_state() == hst->get_current_state() &&
-      compare_strings(old_plugin_output,
-                      const_cast<char*>(hst->get_plugin_output().c_str()))) {
-    if (hst->get_current_state() == HOST_UP && hst->get_stalk_on(notifier::up))
-      hst->log_event();
-
-    else if (hst->get_current_state() == HOST_DOWN && hst->get_stalk_on(notifier::down))
-      hst->log_event();
-
-    else if (hst->get_current_state() == HOST_UNREACHABLE &&
-             hst->get_stalk_on(notifier::unreachable))
-      hst->log_event();
-  }
-
-  /* check to see if the associated host is flapping */
-  hst->check_for_flapping(true, true, true);
-
-  /* reschedule the next check of the host (usually ONLY for scheduled, active
-   * checks, unless overridden above) */
-  if (reschedule_check) {
-    logger(dbg_checks, more)
-        << "Rescheduling next check of host at " << my_ctime(&next_check);
-
-    /* default is to reschedule host check unless a test below fails... */
-    hst->set_should_be_scheduled(true);
-
-    /* get the new current time */
-    time(&current_time);
-
-    /* make sure we don't get ourselves into too much trouble... */
-    if (current_time > next_check)
-      hst->set_next_check(current_time);
-    else
-      hst->set_next_check(next_check);
-
-    // Make sure we rescheduled the next host check at a valid time.
-    {
-      timezone_locker lock{hst->get_timezone()};
-      preferred_time = hst->get_next_check();
-      get_next_valid_time(preferred_time, &next_valid_time,
-                          hst->check_period_ptr);
-      hst->set_next_check(next_valid_time);
-    }
-
-    /* hosts with non-recurring intervals do not get rescheduled if we're in a
-     * HARD or UP state */
-    if (hst->get_check_interval() == 0 &&
-        (hst->get_state_type() == HARD_STATE ||
-         hst->get_current_state() == HOST_UP))
-      hst->set_should_be_scheduled(false);
-
-    /* host with active checks disabled do not get rescheduled */
-    if (!hst->get_checks_enabled())
-      hst->set_should_be_scheduled(false);
-
-    /* schedule a non-forced check if we can */
-    if (hst->get_should_be_scheduled()) {
-      hst->schedule_check(hst->get_next_check(), CHECK_OPTION_NONE);
-    }
-  }
-
-  /* update host status - for both active (scheduled) and passive
-   * (non-scheduled) hosts */
-  hst->update_status(false);
-
-  /* run async checks of all hosts we added above */
-  /* don't run a check if one is already executing or we can get by with a
-   * cached state */
-  for (hostlist_item = check_hostlist; hostlist_item != NULL;
-       hostlist_item = hostlist_item->next) {
-    run_async_check = true;
-    temp_host = (com::centreon::engine::host*)hostlist_item->object_ptr;
-
-    logger(dbg_checks, most)
-        << "ASYNC CHECK OF HOST: " << temp_host->get_name()
-        << ", CURRENTTIME: " << current_time
-        << ", LASTHOSTCHECK: " << temp_host->get_last_check()
-        << ", CACHEDTIMEHORIZON: " << check_timestamp_horizon
-        << ", USECACHEDRESULT: " << use_cached_result
-        << ", ISEXECUTING: " << temp_host->get_is_executing();
-
-    if (use_cached_result && (static_cast<unsigned long>(
-                                  current_time - temp_host->get_last_check()) <=
-                              check_timestamp_horizon))
-      run_async_check = false;
-    if (temp_host->get_is_executing())
-      run_async_check = false;
-    if (run_async_check)
-      temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false,
-                                 false, NULL, NULL);
-  }
-  free_objectlist(&check_hostlist);
-  return OK;
-}
 
 /* adjusts current host check attempt before a new check is performed */
 int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
@@ -1127,12 +511,12 @@ int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
     << ", state type=" << hst->get_state_type();
 
   /* if host is in a hard state, reset current attempt number */
-  if (hst->get_state_type() == HARD_STATE)
+  if (hst->get_state_type() == notifier::hard)
     hst->set_current_attempt(1);
 
   /* if host is in a soft UP state, reset current attempt number (active checks only) */
-  else if (is_active && hst->get_state_type() == SOFT_STATE
-           && hst->get_current_state() == HOST_UP)
+  else if (is_active && hst->get_state_type() == notifier::soft
+           && hst->get_current_state() ==  host::state_up)
     hst->set_current_attempt(1);
 
   /* increment current attempt number */
@@ -1146,29 +530,29 @@ int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
 
 /* determination of the host's state based on route availability*//* used only to determine difference between DOWN and UNREACHABLE states */
 int determine_host_reachability(com::centreon::engine::host* hst) {
-  int state = HOST_DOWN;
+  enum host::host_state state = host::state_down;
   bool is_host_present = false;
 
   logger(dbg_functions, basic)
     << "determine_host_reachability()";
 
   if (hst == NULL)
-    return HOST_DOWN;
+    return  host::state_down;
 
   logger(dbg_checks, most)
     << "Determining state of host '" << hst->get_name()
     << "': current state=" << hst->get_current_state();
 
   /* host is UP - no translation needed */
-  if (hst->get_current_state() == HOST_UP) {
-    state = HOST_UP;
+  if (hst->get_current_state() ==  host::state_up) {
+    state =  host::state_up;
     logger(dbg_checks, most)
       << "Host is UP, no state translation needed.";
   }
 
   /* host has no parents, so it is DOWN */
   else if (hst->parent_hosts.size() == 0) {
-    state = HOST_DOWN;
+    state =  host::state_down;
     logger(dbg_checks, most)
       << "Host has no parents, so it is DOWN.";
   }
@@ -1187,9 +571,9 @@ int determine_host_reachability(com::centreon::engine::host* hst) {
 
       is_host_present = true;
       /* bail out as soon as we find one parent host that is UP */
-      if (it->second->get_current_state() == HOST_UP) {
+      if (it->second->get_current_state() ==  host::state_up) {
         /* set the current state */
-        state = HOST_DOWN;
+        state =  host::state_down;
         logger(dbg_checks, most)
           << "At least one parent (" << it->first
           << ") is up, so host is DOWN.";
@@ -1198,7 +582,7 @@ int determine_host_reachability(com::centreon::engine::host* hst) {
     }
     /* no parents were up, so this host is UNREACHABLE */
     if (!is_host_present) {
-      state = HOST_UNREACHABLE;
+      state =  host::state_unreachable;
       logger(dbg_checks, most)
         << "No parents were up, so host is UNREACHABLE.";
     }

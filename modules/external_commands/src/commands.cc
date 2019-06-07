@@ -639,7 +639,7 @@ int process_passive_service_check(
 
   /* make sure the return code is within bounds */
   if (result.return_code < 0 || result.return_code > 3) {
-    result.return_code = STATE_UNKNOWN;
+    result.return_code = service::state_unknown;
   }
 
   if (result.latency < 0.0) {
@@ -778,7 +778,7 @@ int process_passive_host_check(
 
   /* make sure the return code is within bounds */
   if (result.return_code < 0 || result.return_code > 3) {
-    result.return_code = STATE_UNKNOWN;
+    result.return_code = service::state_unknown;
   }
 
   if (result.latency < 0.0) {
@@ -1688,8 +1688,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
     attr = MODATTR_MAX_CHECK_ATTEMPTS;
 
     /* adjust current attempt number if in a hard state */
-    if (temp_host->get_state_type() == HARD_STATE
-        && temp_host->get_current_state() != HOST_UP
+    if (temp_host->get_state_type() == notifier::hard
+        && temp_host->get_current_state() != host::state_up
         && temp_host->get_current_attempt() > 1)
       temp_host->set_current_attempt(temp_host->get_max_attempts());
     break;
@@ -1739,8 +1739,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
     attr = MODATTR_MAX_CHECK_ATTEMPTS;
 
     /* adjust current attempt number if in a hard state */
-    if (temp_service->state_type == HARD_STATE
-        && temp_service->current_state != STATE_OK
+    if (temp_service->get_state_type() == notifier::hard
+        && temp_service->get_current_state() != service::state_ok
         && temp_service->get_current_attempt() > 1)
       temp_service->set_current_attempt(temp_service->get_max_attempts());
     break;
@@ -2921,7 +2921,7 @@ void acknowledge_host_problem(
        int notify,
        int persistent) {
   /* cannot acknowledge a non-existent problem */
-  if (hst->get_current_state() == HOST_UP)
+  if (hst->get_current_state() == host::state_up)
     return;
 
   /* set the acknowledgement flag */
@@ -2988,7 +2988,7 @@ void acknowledge_service_problem(
        int notify,
        int persistent) {
   /* cannot acknowledge a non-existent problem */
-  if (svc->current_state == STATE_OK)
+  if (svc->get_current_state() == service::state_ok)
     return;
 
   /* set the acknowledgement flag */

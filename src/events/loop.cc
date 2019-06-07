@@ -313,8 +313,8 @@ void loop::_dispatching() {
           // Otherwise reschedule (TODO: This should be smarter as it
           // doesn't consider its timeperiod).
           else {
-            if (SOFT_STATE == temp_service->state_type &&
-                temp_service->current_state != STATE_OK)
+            if (notifier::soft == temp_service->get_state_type() &&
+                temp_service->get_current_state() != service::state_ok)
               temp_service->next_check =
                   (time_t)(temp_service->next_check +
                            temp_service->get_retry_interval() *
@@ -362,8 +362,8 @@ void loop::_dispatching() {
             &event_list_low_tail);
 
           // Reschedule.
-          if ((SOFT_STATE == temp_host->get_state_type())
-              && (temp_host->get_current_state() != STATE_OK))
+          if ((notifier::soft == temp_host->get_state_type())
+              && (temp_host->get_current_state() != host::state_up))
             temp_host->set_next_check(
               (time_t)(temp_host->get_next_check()
                          + (temp_host->get_retry_interval()

@@ -132,7 +132,7 @@ int downtime_manager::check_pending_flex_host_downtime(host* hst) {
   time(&current_time);
 
   /* if host is currently up, nothing to do */
-  if (hst->get_current_state() == HOST_UP)
+  if (hst->get_current_state() == host::state_up)
     return OK;
 
   /* check all downtime entries */
@@ -179,7 +179,7 @@ int downtime_manager::check_pending_flex_service_downtime(service* svc) {
   time(&current_time);
 
   /* if service is currently ok, nothing to do */
-  if (svc->current_state == STATE_OK)
+  if (svc->get_current_state() == service::state_ok)
     return OK;
 
   /* check all downtime entries */
