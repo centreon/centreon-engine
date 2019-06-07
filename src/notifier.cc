@@ -73,6 +73,7 @@ notifier::notifier(int notifier_type,
                    double low_flap_threshold,
                    double high_flap_threshold,
                    bool check_freshness,
+                   int freshness_threshold,
                    std::string const& timezone)
     : _notifier_type{notifier_type},
       _display_name{display_name},
@@ -99,6 +100,7 @@ notifier::notifier(int notifier_type,
       _checks_enabled{checks_enabled},
       _accept_passive_checks{accept_passive_checks},
       _check_freshness{check_freshness},
+      _freshness_threshold{freshness_threshold},
       _check_type{check_active},
       _current_attempt{0},
       _problem_has_been_acknowledged{false},
@@ -135,6 +137,12 @@ notifier::notifier(int notifier_type,
         << display_name << "'";
     throw engine_error() << "Could not register notifier '" << display_name
                          << "'";
+  }
+
+  if (freshness_threshold < 0) {
+    logger(log_config_error, basic)
+        << "Error: Invalid freshness_threshold value for notifier '" << display_name << "'";
+    throw engine_error() << "Could not register notifier '" << display_name << "'";
   }
 }
 
@@ -1117,3 +1125,10 @@ void notifier::set_execution_time(double execution_time) {
   _execution_time = execution_time;
 }
 
+int notifier::get_freshness_threshold() const {
+  return _freshness_threshold;
+}
+
+void notifier::set_freshness_threshold(int freshness_threshold) {
+  _freshness_threshold = freshness_threshold;
+}

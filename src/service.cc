@@ -87,6 +87,7 @@ service::service(std::string const& hostname,
                  double low_flap_threshold,
                  double high_flap_threshold,
                  bool check_freshness,
+                 int freshness_threshold,
                  std::string const& timezone)
     : notifier{SERVICE_NOTIFICATION,
                display_name,
@@ -112,6 +113,7 @@ service::service(std::string const& hostname,
                low_flap_threshold,
                high_flap_threshold,
                check_freshness,
+               freshness_threshold,
                timezone},
       _hostname{hostname},
       _description{description} {
@@ -198,7 +200,7 @@ bool service::operator==(service const& other) throw() {
          _flap_type == other.get_flap_detection_on() &&
          this->process_performance_data == other.process_performance_data &&
          get_check_freshness() == other.get_check_freshness() &&
-         this->freshness_threshold == other.freshness_threshold &&
+         get_freshness_threshold() == other.get_freshness_threshold() &&
          get_accept_passive_checks() ==
              other.get_accept_passive_checks() &&
          get_event_handler_enabled() == other.get_event_handler_enabled() &&
@@ -447,7 +449,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_check_freshness()
      << "\n"
         "  freshness_threshold:                  "
-     << obj.freshness_threshold
+     << obj.get_freshness_threshold()
      << "\n"
         "  accept_passive_service_checks:        "
      << obj.get_accept_passive_checks()
@@ -748,7 +750,7 @@ com::centreon::engine::service* add_service(
       notification_period, notifications_enabled, check_period, event_handler, event_handler_enabled,
       notes, notes_url, action_url, icon_image, icon_image_alt,
       flap_detection_enabled, low_flap_threshold, high_flap_threshold,
-      check_freshness, timezone)};
+      check_freshness, freshness_threshold, timezone)};
 
   try {
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
@@ -761,7 +763,6 @@ com::centreon::engine::service* add_service(
     flap_detection_on |= (flap_detection_on_unknown > 0 ? notifier::unknown : 0);
     flap_detection_on |= (flap_detection_on_warning > 0 ? notifier::warning : 0);
     obj->set_flap_detection_on(flap_detection_on);
-    obj->freshness_threshold = freshness_threshold;
     obj->is_volatile = (is_volatile > 0);
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;
@@ -1063,7 +1064,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   ** result.
   */
   if ((queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK) &&
-      is_service_result_fresh(this, current_time, false)) {
+      is_result_fresh(current_time, false)) {
     logger(dbg_checks, basic)
         << "Discarding service freshness check result because the service "
            "is currently fresh (race condition avoided).";
@@ -3415,3 +3416,113 @@ bool service::is_valid_escalation_for_notification(
 
   return true;
 }
+
+/* tests whether or not a service's check results are fresh */
+bool service::is_result_fresh(
+      time_t current_time,
+      int log_this) {
+  int freshness_threshold;
+  time_t expiration_time = 0L;
+  int days = 0;
+  int hours = 0;
+  int minutes = 0;
+  int seconds = 0;
+  int tdays = 0;
+  int thours = 0;
+  int tminutes = 0;
+  int tseconds = 0;
+
+  logger(dbg_checks, most)
+    << "Checking freshness of service '" << this->get_description()
+    << "' on host '" << this->get_hostname() << "'...";
+
+  /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
+  if (this->get_freshness_threshold() == 0) {
+    if (this->state_type == HARD_STATE ||
+        this->current_state == STATE_OK)
+      freshness_threshold = static_cast<int>(
+          (this->get_check_interval() * config->interval_length()) +
+          this->latency + config->additional_freshness_latency());
+    else
+      freshness_threshold = static_cast<int>(
+          this->get_retry_interval() * config->interval_length() +
+          this->latency + config->additional_freshness_latency());
+  } else
+    freshness_threshold = this->get_freshness_threshold();
+
+  logger(dbg_checks, most)
+    << "Freshness thresholds: service="
+    << this->get_freshness_threshold()
+    << ", use=" << freshness_threshold;
+
+  /* calculate expiration time */
+  /* CHANGED 11/10/05 EG - program start is only used in expiration time calculation if > last check AND active checks are enabled, so active checks can become stale immediately upon program startup */
+  /* CHANGED 02/25/06 SG - passive checks also become stale, so remove dependence on active check logic */
+  if (!this->get_has_been_checked())
+    expiration_time = (time_t)(event_start + freshness_threshold);
+  /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (services never go stale). */
+  /* CHANGED 10/07/07 EG - Only match next condition for services that have active checks enabled... */
+  /* CHANGED 10/07/07 EG - Added max_service_check_spread to expiration time as suggested by Altinity */
+  else if (this->get_checks_enabled()
+           && event_start > this->last_check
+           && this->get_freshness_threshold() == 0)
+    expiration_time
+      = (time_t)(event_start + freshness_threshold
+                 + (config->max_service_check_spread()
+                    * config->interval_length()));
+  else
+    expiration_time
+      = (time_t)(this->last_check + freshness_threshold);
+
+  logger(dbg_checks, most)
+    << "HBC: " << this->get_has_been_checked()
+    << ", PS: " << program_start
+    << ", ES: " << event_start
+    << ", LC: " << this->last_check
+    << ", CT: " << current_time
+    << ", ET: " << expiration_time;
+
+  /* the results for the last check of this service are stale */
+  if (expiration_time < current_time) {
+
+    get_time_breakdown(
+      (current_time - expiration_time),
+      &days,
+      &hours,
+      &minutes,
+      &seconds);
+    get_time_breakdown(
+      freshness_threshold,
+      &tdays,
+      &thours,
+      &tminutes,
+      &tseconds);
+
+    /* log a warning */
+    if (log_this)
+      logger(log_runtime_warning, basic)
+        << "Warning: The results of service '" << this->get_description()
+        << "' on host '" << this->get_hostname() << "' are stale by "
+        << days << "d " << hours << "h " << minutes << "m " << seconds
+        << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
+        << "m " << tseconds << "s).  I'm forcing an immediate check "
+        "of the service.";
+
+    logger(dbg_checks, more)
+      << "Check results for service '" << this->get_description()
+      << "' on host '" << this->get_hostname() << "' are stale by "
+      << days << "d " << hours << "h " << minutes << "m " << seconds
+      << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
+      << "m " << tseconds << "s).  Forcing an immediate check of "
+      "the service...";
+
+    return false;
+  }
+
+  logger(dbg_checks, more)
+    << "Check results for service '" << this->get_description()
+    << "' on host '" << this->get_hostname() << "' are fresh.";
+
+  return true;
+}
+

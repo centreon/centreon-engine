@@ -77,6 +77,7 @@ class                notifier {
                               double low_flap_threshold,
                               double high_flap_threshold,
                               bool check_freshness,
+                              int freshness_threshold,
                               std::string const& timezone);
   virtual            ~notifier() {}
 
@@ -241,6 +242,8 @@ class                notifier {
   void               inc_scheduled_downtime_depth();
   double             get_execution_time() const;
   void               set_execution_time(double execution_time);
+  int                get_freshness_threshold() const;
+  void               set_freshness_threshold(int freshness_threshold);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -301,13 +304,14 @@ class                notifier {
   bool               _checks_enabled;
   bool               _accept_passive_checks;
   bool               _check_freshness;
+  int                _freshness_threshold;
   int                _check_type;
   int                _current_attempt;
   bool               _problem_has_been_acknowledged;
   bool               _has_been_checked;
   bool               _event_handler_enabled;
-  int                 _scheduled_downtime_depth;
-  double              _execution_time;
+  int                _scheduled_downtime_depth;
+  double             _execution_time;
 };
 
 CCE_END()

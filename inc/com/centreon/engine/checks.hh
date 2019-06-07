@@ -83,11 +83,6 @@ unsigned int check_service_dependencies(
 void check_for_orphaned_services();
 // checks the "freshness" of service check results
 void check_service_result_freshness();
-// determines if a service's check results are fresh
-int is_service_result_fresh(
-      com::centreon::engine::service* temp_service,
-      time_t current_time,
-      int log_this);
 // checks host dependencie
 unsigned int check_host_dependencies(
                com::centreon::engine::host* hst,
@@ -97,10 +92,6 @@ void check_for_orphaned_hosts();
 // checks the "freshness" of host check results
 void check_host_result_freshness();
 // determines if a host's check results are fresh
-int is_host_result_fresh(
-      com::centreon::engine::host* temp_host,
-      time_t current_time,
-      int log_this);
 
 // Route/Host Check Functions
 int perform_on_demand_host_check(

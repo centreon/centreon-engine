@@ -261,13 +261,11 @@ void check_service_result_freshness() {
     /* EXCEPTION */
     /* don't check freshness of services without regular check intervals if we're using auto-freshness threshold */
     if (it->second->get_check_interval() == 0 &&
-      it->second->freshness_threshold == 0)
+      it->second->get_freshness_threshold() == 0)
       continue;
 
     /* the results for the last check of this service are stale! */
-    if (!is_service_result_fresh(
-      it->second.get(), current_time,
-          true)) {
+    if (!it->second->is_result_fresh(current_time, true)) {
 
       /* set the freshen flag */
       it->second->is_being_freshened = true;
@@ -279,116 +277,6 @@ void check_service_result_freshness() {
     }
   }
   return;
-}
-
-/* tests whether or not a service's check results are fresh */
-int is_service_result_fresh(
-      com::centreon::engine::service* temp_service,
-      time_t current_time,
-      int log_this) {
-  int freshness_threshold = 0;
-  time_t expiration_time = 0L;
-  int days = 0;
-  int hours = 0;
-  int minutes = 0;
-  int seconds = 0;
-  int tdays = 0;
-  int thours = 0;
-  int tminutes = 0;
-  int tseconds = 0;
-
-  logger(dbg_checks, most)
-    << "Checking freshness of service '" << temp_service->get_description()
-    << "' on host '" << temp_service->get_hostname() << "'...";
-
-  /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
-  if (temp_service->freshness_threshold == 0) {
-    if (temp_service->state_type == HARD_STATE ||
-        temp_service->current_state == STATE_OK)
-      freshness_threshold = static_cast<int>(
-          (temp_service->get_check_interval() * config->interval_length()) +
-          temp_service->latency + config->additional_freshness_latency());
-    else
-      freshness_threshold = static_cast<int>(
-          temp_service->get_retry_interval() * config->interval_length() +
-          temp_service->latency + config->additional_freshness_latency());
-  } else
-    freshness_threshold = temp_service->freshness_threshold;
-
-  logger(dbg_checks, most)
-    << "Freshness thresholds: service="
-    << temp_service->freshness_threshold
-    << ", use=" << freshness_threshold;
-
-  /* calculate expiration time */
-  /* CHANGED 11/10/05 EG - program start is only used in expiration time calculation if > last check AND active checks are enabled, so active checks can become stale immediately upon program startup */
-  /* CHANGED 02/25/06 SG - passive checks also become stale, so remove dependence on active check logic */
-  if (!temp_service->get_has_been_checked())
-    expiration_time = (time_t)(event_start + freshness_threshold);
-  /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (services never go stale). */
-  /* CHANGED 10/07/07 EG - Only match next condition for services that have active checks enabled... */
-  /* CHANGED 10/07/07 EG - Added max_service_check_spread to expiration time as suggested by Altinity */
-  else if (temp_service->get_checks_enabled()
-           && event_start > temp_service->last_check
-           && temp_service->freshness_threshold == 0)
-    expiration_time
-      = (time_t)(event_start + freshness_threshold
-                 + (config->max_service_check_spread()
-                    * config->interval_length()));
-  else
-    expiration_time
-      = (time_t)(temp_service->last_check + freshness_threshold);
-
-  logger(dbg_checks, most)
-    << "HBC: " << temp_service->get_has_been_checked()
-    << ", PS: " << program_start
-    << ", ES: " << event_start
-    << ", LC: " << temp_service->last_check
-    << ", CT: " << current_time
-    << ", ET: " << expiration_time;
-
-  /* the results for the last check of this service are stale */
-  if (expiration_time < current_time) {
-
-    get_time_breakdown(
-      (current_time - expiration_time),
-      &days,
-      &hours,
-      &minutes,
-      &seconds);
-    get_time_breakdown(
-      freshness_threshold,
-      &tdays,
-      &thours,
-      &tminutes,
-      &tseconds);
-
-    /* log a warning */
-    if (log_this)
-      logger(log_runtime_warning, basic)
-        << "Warning: The results of service '" << temp_service->get_description()
-        << "' on host '" << temp_service->get_hostname() << "' are stale by "
-        << days << "d " << hours << "h " << minutes << "m " << seconds
-        << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
-        << "m " << tseconds << "s).  I'm forcing an immediate check "
-        "of the service.";
-
-    logger(dbg_checks, more)
-      << "Check results for service '" << temp_service->get_description()
-      << "' on host '" << temp_service->get_hostname() << "' are stale by "
-      << days << "d " << hours << "h " << minutes << "m " << seconds
-      << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
-      << "m " << tseconds << "s).  Forcing an immediate check of "
-      "the service...";
-
-    return false;
-  }
-
-  logger(dbg_checks, more)
-    << "Check results for service '" << temp_service->get_description()
-    << "' on host '" << temp_service->get_hostname() << "' are fresh.";
-
-  return true;
 }
 
 /******************************************************************/
@@ -603,7 +491,7 @@ void check_host_result_freshness() {
     }
 
     /* the results for the last check of this host are stale */
-    if (!is_host_result_fresh(it->second.get(), current_time, true)) {
+    if (!it->second->is_result_fresh(current_time, true)) {
 
       /* set the freshen flag */
       it->second->set_is_being_freshened(true);
@@ -615,112 +503,6 @@ void check_host_result_freshness() {
     }
   }
   return;
-}
-
-/* checks to see if a hosts's check results are fresh */
-int is_host_result_fresh(
-      com::centreon::engine::host* temp_host,
-      time_t current_time,
-      int log_this) {
-  time_t expiration_time = 0L;
-  int freshness_threshold = 0;
-  int days = 0;
-  int hours = 0;
-  int minutes = 0;
-  int seconds = 0;
-  int tdays = 0;
-  int thours = 0;
-  int tminutes = 0;
-  int tseconds = 0;
-
-  logger(dbg_checks, most)
-    << "Checking freshness of host '" << temp_host->get_name() << "'...";
-
-  /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
-  if (temp_host->get_freshness_threshold() == 0) {
-    double interval;
-    if ((HARD_STATE == temp_host->get_state_type())
-        || (STATE_OK == temp_host->get_current_state()))
-      interval = temp_host->get_check_interval();
-    else
-      interval = temp_host->get_retry_interval();
-    freshness_threshold
-      = static_cast<int>((interval * config->interval_length())
-                         + temp_host->get_latency()
-                         + config->additional_freshness_latency());
-  }
-  else
-    freshness_threshold = temp_host->get_freshness_threshold();
-
-  logger(dbg_checks, most)
-    << "Freshness thresholds: host=" << temp_host->get_freshness_threshold()
-    << ", use=" << freshness_threshold;
-
-  /* calculate expiration time */
-  /* CHANGED 11/10/05 EG - program start is only used in expiration time calculation if > last check AND active checks are enabled, so active checks can become stale immediately upon program startup */
-  if (!temp_host->get_has_been_checked())
-    expiration_time = (time_t)(event_start + freshness_threshold);
-  /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (hosts never go stale). */
-  /* CHANGED 10/07/07 EG - Added max_host_check_spread to expiration time as suggested by Altinity */
-  else if (temp_host->get_checks_enabled()
-           && event_start > temp_host->get_last_check()
-           && temp_host->get_freshness_threshold() == 0)
-    expiration_time
-      = (time_t)(event_start + freshness_threshold
-                 + (config->max_host_check_spread()
-                    * config->interval_length()));
-  else
-    expiration_time
-      = (time_t)(temp_host->get_last_check() + freshness_threshold);
-
-  logger(dbg_checks, most)
-    << "HBC: " << temp_host->get_has_been_checked()
-    << ", PS: " << program_start
-    << ", ES: " << event_start
-    << ", LC: " << temp_host->get_last_check()
-    << ", CT: " << current_time
-    << ", ET: " << expiration_time;
-
-  /* the results for the last check of this host are stale */
-  if (expiration_time < current_time) {
-    get_time_breakdown(
-      (current_time - expiration_time),
-      &days,
-      &hours,
-      &minutes,
-      &seconds);
-    get_time_breakdown(
-      freshness_threshold,
-      &tdays,
-      &thours,
-      &tminutes,
-      &tseconds);
-
-    /* log a warning */
-    if (log_this)
-      logger(log_runtime_warning, basic)
-        << "Warning: The results of host '" << temp_host->get_name()
-        << "' are stale by " << days << "d " << hours << "h "
-        << minutes << "m " << seconds << "s (threshold="
-        << tdays << "d " << thours << "h " << tminutes << "m "
-        << tseconds << "s).  I'm forcing an immediate check of"
-        " the host.";
-
-    logger(dbg_checks, more)
-      << "Check results for host '" << temp_host->get_name()
-      << "' are stale by " << days << "d " << hours << "h " << minutes
-      << "m " << seconds << "s (threshold=" << tdays << "d " << thours
-      << "h " << tminutes << "m " << tseconds << "s).  "
-      "Forcing an immediate check of the host...";
-
-    return false;
-  }
-  else
-    logger(dbg_checks, more)
-      << "Check results for host '" << temp_host->get_name()
-      << "' are fresh.";
-
-  return true;
 }
 
 /******************************************************************/

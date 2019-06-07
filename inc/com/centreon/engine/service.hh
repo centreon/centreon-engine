@@ -92,6 +92,7 @@ class                           service : public notifier {
                                         double low_flap_threshold,
                                         double high_flap_threshold,
                                         bool check_freshness,
+                                        int freshness_threshold,
                                         std::string const& timezone);
                                 ~service();
   void                          set_hostname(std::string const& name);
@@ -159,11 +160,11 @@ class                           service : public notifier {
   bool                          is_valid_escalation_for_notification(
                                   std::shared_ptr<escalation> e,
                                   int options) const override;
+  bool                          is_result_fresh(time_t current_time, int log_this);
 
   double                        notification_interval;
   int                           is_volatile;
   int                           process_performance_data;
-  int                           freshness_threshold;
   int                           accept_passive_service_checks;
   int                           retain_status_information;
   int                           retain_nonstatus_information;

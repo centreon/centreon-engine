@@ -212,6 +212,7 @@ host::host(uint64_t host_id,
                low_flap_threshold,
                high_flap_threshold,
                check_freshness,
+               freshness_threshold,
                timezone} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
@@ -227,11 +228,6 @@ host::host(uint64_t host_id,
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for host '" << name
         << "'";
-    throw(engine_error() << "Could not register host '" << name << "'");
-  }
-  if (freshness_threshold < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid freshness_threshold value for host '" << name << "'";
     throw(engine_error() << "Could not register host '" << name << "'");
   }
 
@@ -262,7 +258,6 @@ host::host(uint64_t host_id,
   _flap_type |= (flap_detection_on_down > 0 ? notifier::down : 0);
   _flap_type |= (flap_detection_on_unreachable > 0 ? notifier::unreachable : 0);
   _flap_type |= (flap_detection_on_up > 0 ? notifier::up : 0);
-  _freshness_threshold = freshness_threshold;
   _have_2d_coords = (have_2d_coords > 0);
   _have_3d_coords = (have_3d_coords > 0);
   _last_hard_state = initial_state;
@@ -345,14 +340,6 @@ std::string const& host::get_address() const {
 
 void host::set_address(std::string const& address) {
   _address = address;
-}
-
-int host::get_freshness_threshold() const {
-  return _freshness_threshold;
-}
-
-void host::set_freshness_threshold(int freshness_threshold) {
-  _freshness_threshold = freshness_threshold;
 }
 
 bool host::get_process_performance_data() const {
@@ -1576,7 +1563,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   ** host is still stale before we accept the check result.
   */
   if ((queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK) &&
-      is_host_result_fresh(this, current_time, false)) {
+      is_result_fresh(current_time, false)) {
     logger(dbg_checks, basic)
         << "Discarding host freshness check result because the host is "
            "currently fresh (race condition avoided).";
@@ -3200,3 +3187,109 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
 
   return true;
 }
+
+/* checks to see if a hosts's check results are fresh */
+bool host::is_result_fresh(
+      time_t current_time,
+      int log_this) {
+  time_t expiration_time = 0L;
+  int freshness_threshold = 0;
+  int days = 0;
+  int hours = 0;
+  int minutes = 0;
+  int seconds = 0;
+  int tdays = 0;
+  int thours = 0;
+  int tminutes = 0;
+  int tseconds = 0;
+
+  logger(dbg_checks, most)
+    << "Checking freshness of host '" << this->get_name() << "'...";
+
+  /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
+  if (this->get_freshness_threshold() == 0) {
+    double interval;
+    if ((HARD_STATE == this->get_state_type())
+        || (STATE_OK == this->get_current_state()))
+      interval = this->get_check_interval();
+    else
+      interval = this->get_retry_interval();
+    freshness_threshold
+      = static_cast<int>((interval * config->interval_length())
+                         + this->get_latency()
+                         + config->additional_freshness_latency());
+  }
+  else
+    freshness_threshold = this->get_freshness_threshold();
+
+  logger(dbg_checks, most)
+    << "Freshness thresholds: host=" << this->get_freshness_threshold()
+    << ", use=" << freshness_threshold;
+
+  /* calculate expiration time */
+  /* CHANGED 11/10/05 EG - program start is only used in expiration time calculation if > last check AND active checks are enabled, so active checks can become stale immediately upon program startup */
+  if (!this->get_has_been_checked())
+    expiration_time = (time_t)(event_start + freshness_threshold);
+  /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (hosts never go stale). */
+  /* CHANGED 10/07/07 EG - Added max_host_check_spread to expiration time as suggested by Altinity */
+  else if (this->get_checks_enabled()
+           && event_start > this->get_last_check()
+           && this->get_freshness_threshold() == 0)
+    expiration_time
+      = (time_t)(event_start + freshness_threshold
+                 + (config->max_host_check_spread()
+                    * config->interval_length()));
+  else
+    expiration_time
+      = (time_t)(this->get_last_check() + freshness_threshold);
+
+  logger(dbg_checks, most)
+    << "HBC: " << this->get_has_been_checked()
+    << ", PS: " << program_start
+    << ", ES: " << event_start
+    << ", LC: " << this->get_last_check()
+    << ", CT: " << current_time
+    << ", ET: " << expiration_time;
+
+  /* the results for the last check of this host are stale */
+  if (expiration_time < current_time) {
+    get_time_breakdown(
+      (current_time - expiration_time),
+      &days,
+      &hours,
+      &minutes,
+      &seconds);
+    get_time_breakdown(
+      freshness_threshold,
+      &tdays,
+      &thours,
+      &tminutes,
+      &tseconds);
+
+    /* log a warning */
+    if (log_this)
+      logger(log_runtime_warning, basic)
+        << "Warning: The results of host '" << this->get_name()
+        << "' are stale by " << days << "d " << hours << "h "
+        << minutes << "m " << seconds << "s (threshold="
+        << tdays << "d " << thours << "h " << tminutes << "m "
+        << tseconds << "s).  I'm forcing an immediate check of"
+        " the host.";
+
+    logger(dbg_checks, more)
+      << "Check results for host '" << this->get_name()
+      << "' are stale by " << days << "d " << hours << "h " << minutes
+      << "m " << seconds << "s (threshold=" << tdays << "d " << thours
+      << "h " << tminutes << "m " << tseconds << "s).  "
+      "Forcing an immediate check of the host...";
+
+    return false;
+  }
+  else
+    logger(dbg_checks, more)
+      << "Check results for host '" << this->get_name()
+      << "' are fresh.";
+
+  return true;
+}
+

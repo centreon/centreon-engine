@@ -399,9 +399,7 @@ void applier::service::modify_object(
     s->process_performance_data,
     static_cast<int>(obj.process_perf_data()));
   s->set_check_freshness(obj.check_freshness());
-  modify_if_different(
-    s->freshness_threshold,
-    static_cast<int>(obj.freshness_threshold()));
+  s->set_freshness_threshold(obj.freshness_threshold());
   modify_if_different(
     s->accept_passive_service_checks,
     static_cast<int>(obj.checks_passive()));

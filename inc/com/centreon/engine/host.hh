@@ -151,6 +151,7 @@ class                 host : public notifier {
   bool               operator==(host const& other) throw ();
   bool               operator!=(host const& other) throw ();
   int                is_escalated_contact(contact* cntct);
+  bool               is_result_fresh(time_t current_time, int log_this);
 
   // setters / getters
   std::string const& get_name() const;
@@ -159,8 +160,6 @@ class                 host : public notifier {
   void               set_alias(std::string const& alias);
   std::string const& get_address() const;
   void               set_address(std::string const& address);
-  int                get_freshness_threshold() const;
-  void               set_freshness_threshold(int freshness_threshold);
   bool               get_process_performance_data() const;
   void               set_process_performance_data(bool process_performance_data);
   int                get_retain_status_information() const;
@@ -281,7 +280,6 @@ private:
   std::string         _name;
   std::string         _alias;
   std::string         _address;
-  int                 _freshness_threshold;
   bool                _process_performance_data;
   int                 _retain_status_information;
   int                 _retain_nonstatus_information;
