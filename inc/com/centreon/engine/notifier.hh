@@ -261,6 +261,8 @@ class                notifier {
   virtual int        get_current_state_int() const = 0;
   time_t             get_last_check() const;
   void               set_last_check(time_t last_check);
+  double             get_latency() const;
+  void               set_latency(double latency);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -334,6 +336,7 @@ class                notifier {
   double             _execution_time;
   bool               _is_flapping;
   time_t             _last_check;
+  double             _latency;
 };
 
 CCE_END()

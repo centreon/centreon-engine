@@ -175,7 +175,7 @@ void check_for_orphaned_services() {
 
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
     expected_time
-      = (time_t)(it->second->next_check + it->second->latency
+      = (time_t)(it->second->next_check + it->second->get_latency()
                  + config->service_check_timeout()
                  + config->check_reaper_interval() + 600);
 

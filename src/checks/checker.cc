@@ -560,7 +560,7 @@ void checker::run(
             start_time,
             end_time,
             svc->get_check_command().c_str(),
-            svc->latency,
+            svc->get_latency(),
             0.0,
             0,
             false,
@@ -597,8 +597,8 @@ void checker::run(
     svc->check_options = CHECK_OPTION_NONE;
 
   // Update latency for event broker and macros.
-  double old_latency(svc->latency);
-  svc->latency = latency;
+  double old_latency(svc->get_latency());
+  svc->set_latency(latency);
 
   // Get current host and service macros.
   nagios_macros macros;
@@ -659,7 +659,7 @@ void checker::run(
           start_time,
           end_time,
           svc->get_check_command().c_str(),
-          svc->latency,
+          svc->get_latency(),
           0.0,
           config->service_check_timeout(),
           false,
@@ -669,7 +669,7 @@ void checker::run(
   delete[] processed_cmd_ptr;
 
   // Restore latency.
-  svc->latency = old_latency;
+  svc->set_latency(old_latency);
 
   // Service check was override by neb_module.
   if (NEBERROR_CALLBACKOVERRIDE == res) {

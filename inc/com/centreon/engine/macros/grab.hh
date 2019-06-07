@@ -67,7 +67,6 @@ namespace  macros {
    *
    *  @return Newly allocated string with value as a fixed point string.
    */
-
   //TODO SGA to remove after service rework
   template <typename T, double (T::* member), unsigned int precision>
   char*    get_double(T& t, nagios_macros* mac) {

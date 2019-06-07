@@ -214,7 +214,7 @@ struct grab_service_redirection {
         true}},
       // Latency.
       {MACRO_SERVICELATENCY,
-       {&get_double<service, &service::latency, 3>,
+       {&get_double<service, notifier, &notifier::get_latency, 3>,
         true}},
       // Last check.
       {MACRO_LASTSERVICECHECK,

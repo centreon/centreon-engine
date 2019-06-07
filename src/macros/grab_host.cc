@@ -310,7 +310,7 @@ struct grab_host_redirection {
       {MACRO_HOSTDURATIONSEC, {&get_duration_sec<host>, true}},
       {MACRO_HOSTEXECUTIONTIME,
        {&get_double<host, notifier, &notifier::get_execution_time, 3>, true}},
-      {MACRO_HOSTLATENCY, {&get_double<host, &host::get_latency, 3>, true}},
+      {MACRO_HOSTLATENCY, {&get_double<host, notifier, &notifier::get_latency, 3>, true}},
       {MACRO_LASTHOSTCHECK,
        {&get_member_as_string<host, time_t, notifier, &notifier::get_last_check>, true}},
       {MACRO_LASTHOSTSTATECHANGE,

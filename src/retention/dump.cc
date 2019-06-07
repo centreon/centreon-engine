@@ -399,7 +399,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "check_command=" << obj.get_check_command() << "\n"
     "check_execution_time=" << std::setprecision(3) << std::fixed << obj.get_execution_time() << "\n"
     "check_flapping_recovery_notification=" << obj.check_flapping_recovery_notification << "\n"
-    "check_latency=" << std::setprecision(3) << std::fixed << obj.latency << "\n"
+    "check_latency=" << std::setprecision(3) << std::fixed << obj.get_latency() << "\n"
     "check_options=" << obj.check_options << "\n"
     "check_period=" << obj.get_check_period() << "\n"
     "check_type=" << obj.get_check_type() << "\n"

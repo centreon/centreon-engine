@@ -330,7 +330,7 @@ int xsddefault_save_status_data() {
          "\thas_been_checked=" << it->second->get_has_been_checked() << "\n"
          "\tshould_be_scheduled=" << it->second->should_be_scheduled << "\n"
          "\tcheck_execution_time=" << std::setprecision(3) << std::fixed << it->second->get_execution_time() << "\n"
-         "\tcheck_latency=" << std::setprecision(3) << std::fixed << it->second->latency << "\n"
+         "\tcheck_latency=" << std::setprecision(3) << std::fixed << it->second->get_latency() << "\n"
          "\tcheck_type=" << it->second->get_check_type() << "\n"
          "\tcurrent_state=" << it->second->get_current_state() << "\n"
          "\tlast_hard_state=" << it->second->get_last_hard_state() << "\n"

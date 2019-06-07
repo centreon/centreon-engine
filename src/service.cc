@@ -295,7 +295,7 @@ bool service::operator==(service const& other) throw() {
          this->current_notification_number ==
              other.current_notification_number &&
          this->current_notification_id == other.current_notification_id &&
-         this->latency == other.latency &&
+         get_latency() == other.get_latency() &&
          get_execution_time() == other.get_execution_time() &&
          this->is_executing == other.is_executing &&
          this->check_options == other.check_options &&
@@ -567,7 +567,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.current_notification_number
      << "\n  current_notification_id:              "
      << obj.current_notification_id
-     << "\n  latency:                              " << obj.latency
+     << "\n  latency:                              " << obj.get_latency()
      << "\n  execution_time:                       " << obj.get_execution_time()
      << "\n  is_executing:                         " << obj.is_executing
      << "\n  check_options:                        " << obj.check_options
@@ -1113,7 +1113,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   }
 
   /* check latency is passed to us */
-  this->latency = queued_check_result->latency;
+  set_latency(queued_check_result->latency);
 
   /* update the execution time for this check (millisecond resolution) */
   set_execution_time(
@@ -1931,7 +1931,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED, NEBFLAG_NONE,
                        NEBATTR_NONE, this, get_check_type(),
                        queued_check_result->start_time,
-                       queued_check_result->finish_time, nullptr, this->latency,
+                       queued_check_result->finish_time, nullptr, get_latency(),
                        get_execution_time(), config->service_check_timeout(),
                        queued_check_result->early_timeout,
                        queued_check_result->return_code, nullptr, nullptr);
@@ -3483,11 +3483,11 @@ bool service::is_result_fresh(
         this->_current_state == service::state_ok)
       freshness_threshold = static_cast<int>(
           (this->get_check_interval() * config->interval_length()) +
-          this->latency + config->additional_freshness_latency());
+          get_latency() + config->additional_freshness_latency());
     else
       freshness_threshold = static_cast<int>(
           this->get_retry_interval() * config->interval_length() +
-          this->latency + config->additional_freshness_latency());
+          get_latency() + config->additional_freshness_latency());
   } else
     freshness_threshold = this->get_freshness_threshold();
 

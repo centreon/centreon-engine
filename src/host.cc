@@ -471,14 +471,6 @@ void host::set_acknowledgement_type(int acknowledgement_type) {
   _acknowledgement_type = acknowledgement_type;
 }
 
-double host::get_latency() const {
-  return _latency;
-}
-
-void host::set_latency(double latency) {
-  _latency = latency;
-}
-
 bool host::get_is_executing() const {
   return _is_executing;
 }

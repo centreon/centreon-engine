@@ -222,8 +222,6 @@ class                host : public notifier {
   void               set_should_be_drawn(int should_be_drawn);
   int                get_acknowledgement_type() const;
   void               set_acknowledgement_type(int acknowledgement_type);
-  double             get_latency() const;
-  void               set_latency(double latency);
   bool               get_is_executing() const;
   void               set_is_executing(bool is_executing);
   int                get_check_options() const;
@@ -320,7 +318,6 @@ private:
   int                 _z_3d;
   int                 _should_be_drawn;
   int                 _acknowledgement_type;
-  double              _latency;
   bool                _is_executing;
   int                 _check_options;
   time_t              _next_check;

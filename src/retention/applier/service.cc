@@ -86,7 +86,7 @@ void applier::service::_update(
     if (state.check_execution_time().is_set())
       obj.set_execution_time(*state.check_execution_time());
     if (state.check_latency().is_set())
-      obj.latency = *state.check_latency();
+      obj.set_latency(*state.check_latency());
     if (state.check_type().is_set())
       obj.set_check_type(*state.check_type());
     if (state.current_state().is_set())
