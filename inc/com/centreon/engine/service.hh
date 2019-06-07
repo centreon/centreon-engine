@@ -202,9 +202,6 @@ class                           service : public notifier {
   int                           pending_flex_downtime;
   uint64_t                      flapping_comment_id;
 
-  std::unordered_map<std::string, customvariable>
-    custom_variables;
-
   host*                         host_ptr;
   commands::command*            event_handler_ptr;
   char*                         event_handler_args;

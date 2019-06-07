@@ -281,9 +281,6 @@ class                host : public notifier {
   host_map            child_hosts;
   static host_map     hosts;
 
-  std::unordered_map<std::string, customvariable>
-                      custom_variables;
-
   commands::command*  event_handler_ptr;
   commands::command*  check_command_ptr;
 

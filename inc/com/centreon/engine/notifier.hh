@@ -275,6 +275,9 @@ class                notifier {
   contactgroup_map   contact_groups;
   int                state_history[MAX_STATE_HISTORY_ENTRIES];
 
+  std::unordered_map<std::string, customvariable>
+    custom_variables;
+
  protected:
   int                _notifier_type;
   int                _stalk_type;
