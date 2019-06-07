@@ -412,9 +412,7 @@ void applier::service::modify_object(
     s->retain_nonstatus_information,
     static_cast<int>(obj.retain_nonstatus_information()));
   s->set_notifications_enabled(obj.notifications_enabled());
-  modify_if_different(
-    s->obsess_over_service,
-    static_cast<int>(obj.obsess_over_service()));
+  s->set_obsess_over(obj.obsess_over_service());
   s->set_notes(obj.notes());
   s->set_notes_url(obj.notes_url());
   s->set_action_url(obj.action_url());

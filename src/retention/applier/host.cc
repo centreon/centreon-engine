@@ -191,7 +191,7 @@ void applier::host::_update(
 
     if (state.obsess_over_host().is_set()
         && (obj.get_modified_attributes() & MODATTR_OBSESSIVE_HANDLER_ENABLED))
-      obj.set_obsess_over_host(*state.obsess_over_host());
+      obj.set_obsess_over(*state.obsess_over_host());
 
     if (state.check_command().is_set()
         && (obj.get_modified_attributes() & MODATTR_CHECK_COMMAND)) {

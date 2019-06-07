@@ -355,7 +355,7 @@ void applier::host::modify_object(
   h->set_have_3d_coords(static_cast<int>(obj.have_coords_3d()));
   h->set_retain_status_information(static_cast<int>(obj.retain_status_information()));
   h->set_retain_nonstatus_information(static_cast<int>(obj.retain_nonstatus_information()));
-  h->set_obsess_over_host(static_cast<int>(obj.obsess_over_host()));
+  h->set_obsess_over(obj.obsess_over_host());
   h->set_timezone(obj.timezone());
   host_other_props[obj.host_name()].host_id = obj.host_id();
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *

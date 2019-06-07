@@ -189,7 +189,7 @@ void adjust_check_scheduling() {
     }
     else {
       tmp->run_time = new_run_time;
-      svc->next_check = new_run_time;
+      svc->set_next_check(new_run_time);
       svc->update_status(false);
     }
 

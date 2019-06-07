@@ -308,24 +308,24 @@ void loop::_dispatching() {
           // We nudge the next check time when it is
           // due to too many concurrent service checks.
           if (nudge_seconds)
-            temp_service->next_check
-              = (time_t)(temp_service->next_check + nudge_seconds);
+            temp_service->set_next_check(
+              (time_t)(temp_service->get_next_check() + nudge_seconds));
           // Otherwise reschedule (TODO: This should be smarter as it
           // doesn't consider its timeperiod).
           else {
             if (notifier::soft == temp_service->get_state_type() &&
                 temp_service->get_current_state() != service::state_ok)
-              temp_service->next_check =
-                  (time_t)(temp_service->next_check +
+              temp_service->set_next_check(
+                  (time_t)(temp_service->get_next_check() +
                            temp_service->get_retry_interval() *
-                               config->interval_length());
+                               config->interval_length()));
             else
-              temp_service->next_check =
-                  (time_t)(temp_service->next_check +
+              temp_service->set_next_check(
+                  (time_t)(temp_service->get_next_check() +
                            (temp_service->get_check_interval() *
-                            config->interval_length()));
+                            config->interval_length())));
           }
-          temp_event->run_time = temp_service->next_check;
+          temp_event->run_time = temp_service->get_next_check();
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
           temp_service->update_status(false);
           run_event = false;

@@ -118,7 +118,7 @@ class                host : public notifier {
                            int should_be_drawn,
                            int retain_status_information,
                            int retain_nonstatus_information,
-                           int obsess_over_host,
+                           bool obsess_over_host,
                            std::string const& timezone);
                      ~host() {}
   void               add_child_link(host* child);
@@ -198,8 +198,6 @@ class                host : public notifier {
   void               set_retain_nonstatus_information(int retain_nonstatus_information);
   bool               get_failure_prediction_enabled() const;
   void               set_failure_prediction_enabled(bool failure_prediction_enabled);
-  int                get_obsess_over_host() const;
-  void               set_obsess_over_host(int obsess_over_host);
   std::string const& get_vrml_image() const;
   void               set_vrml_image(std::string const& image);
   std::string const& get_statusmap_image() const;
@@ -226,8 +224,6 @@ class                host : public notifier {
   void               set_is_executing(bool is_executing);
   int                get_check_options() const;
   void               set_check_options(int check_options);
-  time_t             get_next_check() const;
-  void               set_next_check(time_t next_check);
   int                get_should_be_scheduled() const;
   void               set_should_be_scheduled(int should_be_scheduled);
   time_t             get_last_time_down() const;
@@ -240,8 +236,6 @@ class                host : public notifier {
   void               set_is_being_freshened(bool is_being_freshened);
   int                get_current_notification_number() const;
   void               set_current_notification_number(int current_notification_number);
-  int                get_no_more_notifications() const;
-  void               set_no_more_notifications(int no_more_notifications);
   int                get_check_flapping_recovery_notification() const;
   void               set_check_flapping_recovery_notification(int check_flapping_recovery_notification);
   int                get_pending_flex_downtime() const;
@@ -306,7 +300,6 @@ private:
   int                 _retain_status_information;
   int                 _retain_nonstatus_information;
   bool                _failure_prediction_enabled;
-  int                 _obsess_over_host;
   std::string         _vrml_image;
   std::string         _statusmap_image;
   bool                _have_2d_coords;
@@ -320,13 +313,11 @@ private:
   int                 _acknowledgement_type;
   bool                _is_executing;
   int                 _check_options;
-  time_t              _next_check;
   int                 _should_be_scheduled;
   time_t              _last_time_down;
   time_t              _last_time_unreachable;
   time_t              _last_time_up;
   bool                _is_being_freshened;
-  int                 _no_more_notifications;
   int                 _check_flapping_recovery_notification;
   int                 _pending_flex_downtime;
   unsigned int        _state_history_index;

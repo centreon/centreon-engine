@@ -568,11 +568,11 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       it->second->get_last_check()));
-    it->second->next_check = adjust_timestamp_for_time_change(
+    it->second->set_next_check(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      it->second->next_check);
+      it->second->get_next_check()));
     it->second->set_last_state_change(adjust_timestamp_for_time_change(
       last_time,
       current_time,

@@ -73,6 +73,7 @@ notifier::notifier(int notifier_type,
                    double high_flap_threshold,
                    bool check_freshness,
                    int freshness_threshold,
+                   bool obsess_over,
                    std::string const& timezone)
     : _notifier_type{notifier_type},
       _display_name{display_name},
@@ -94,6 +95,7 @@ notifier::notifier(int notifier_type,
       _high_flap_threshold{high_flap_threshold},
       _first_notification_delay{first_notification_delay},
       _notifications_enabled{notifications_enabled},
+      _obsess_over{obsess_over},
       _timezone{timezone},
       _checks_enabled{checks_enabled},
       _accept_passive_checks{accept_passive_checks},
@@ -107,7 +109,9 @@ notifier::notifier(int notifier_type,
       _execution_time{0.0},
       _is_flapping{false},
       _last_check{0},
-      _latency{0.0} {
+      _latency{0.0},
+      _next_check{0L},
+      _no_more_notifications{false} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -1160,4 +1164,28 @@ double notifier::get_latency() const {
 
 void notifier::set_latency(double latency) {
   _latency = latency;
+}
+
+time_t notifier::get_next_check() const {
+  return _next_check;
+}
+
+void notifier::set_next_check(time_t next_check) {
+  _next_check = next_check;
+}
+
+bool notifier::get_no_more_notifications() const {
+  return _no_more_notifications;
+}
+
+void notifier::set_no_more_notifications(bool no_more_notifications) {
+  _no_more_notifications = no_more_notifications;
+}
+
+bool notifier::get_obsess_over() const {
+  return _obsess_over;
+}
+
+void notifier::set_obsess_over(bool obsess_over) {
+  _obsess_over = obsess_over;
 }

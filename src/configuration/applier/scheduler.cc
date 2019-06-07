@@ -1049,30 +1049,30 @@ void applier::scheduler::_schedule_service_events(
             + ++interleave_block_index * total_interleave_blocks);
 
       // set the preferred next check time for the service.
-      svc.next_check
-        = (time_t)(now
-             + mult_factor * scheduling_info.service_inter_check_delay);
+      svc.set_next_check(
+        (time_t)(now
+             + mult_factor * scheduling_info.service_inter_check_delay));
 
       // Make sure the service can actually be scheduled when we want.
       {
         timezone_locker lock(svc.get_timezone());
         if (check_time_against_period(
-              svc.next_check,
+              svc.get_next_check(),
               svc.check_period_ptr) == ERROR) {
           time_t next_valid_time(0);
           get_next_valid_time(
-            svc.next_check,
+            svc.get_next_check(),
             &next_valid_time,
             svc.check_period_ptr);
-          svc.next_check = next_valid_time;
+          svc.set_next_check(next_valid_time);
         }
       }
 
       if (!scheduling_info.first_service_check
-          || svc.next_check < scheduling_info.first_service_check)
-        scheduling_info.first_service_check = svc.next_check;
-      if (svc.next_check > scheduling_info.last_service_check)
-        scheduling_info.last_service_check = svc.next_check;
+          || svc.get_next_check() < scheduling_info.first_service_check)
+        scheduling_info.first_service_check = svc.get_next_check();
+      if (svc.get_next_check() > scheduling_info.last_service_check)
+        scheduling_info.last_service_check = svc.get_next_check();
     }
   }
 
@@ -1091,11 +1091,11 @@ void applier::scheduler::_schedule_service_events(
       // passive checks are an exception if a forced check was
       // scheduled before Centreon Engine was restarted.
       if (!(!svc.get_checks_enabled()
-            && svc.next_check
+            && svc.get_next_check()
             && (svc.check_options & CHECK_OPTION_FORCE_EXECUTION)))
         continue;
     }
-    services_to_schedule.insert(std::make_pair(svc.next_check, &svc));
+    services_to_schedule.insert(std::make_pair(svc.get_next_check(), &svc));
   }
 
   // Schedule events list.
@@ -1109,7 +1109,7 @@ void applier::scheduler::_schedule_service_events(
     events::schedule(
               EVENT_SERVICE_CHECK,
               false,
-              svc.next_check,
+              svc.get_next_check(),
               false,
               0,
               NULL,

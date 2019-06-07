@@ -1718,14 +1718,14 @@ int cmd_change_object_int_var(int cmd, char* args) {
           preferred_time,
           &next_valid_time,
           temp_service->check_period_ptr);
-        temp_service->next_check = next_valid_time;
+        temp_service->set_next_check(next_valid_time);
       }
       else
-        temp_service->next_check = preferred_time;
+        temp_service->set_next_check(preferred_time);
 
       /* schedule a check if we should */
       if (temp_service->should_be_scheduled)
-        temp_service->schedule_check(temp_service->next_check, CHECK_OPTION_NONE);
+        temp_service->schedule_check(temp_service->get_next_check(), CHECK_OPTION_NONE);
     }
     break;
 
@@ -2417,14 +2417,14 @@ void enable_service_checks(com::centreon::engine::service* svc) {
       preferred_time,
       &next_valid_time,
       svc->check_period_ptr);
-    svc->next_check = next_valid_time;
+    svc->set_next_check(next_valid_time);
   }
   else
-    svc->next_check = preferred_time;
+    svc->set_next_check(preferred_time);
 
   /* schedule a check if we should */
   if (svc->should_be_scheduled)
-    svc->schedule_check(svc->next_check, CHECK_OPTION_NONE);
+    svc->schedule_check(svc->get_next_check(), CHECK_OPTION_NONE);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -3985,14 +3985,14 @@ void start_obsessing_over_service(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
-  if (svc->obsess_over_service)
+  if (svc->get_obsess_over())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* set the obsess over service flag */
-  svc->obsess_over_service = true;
+  svc->set_obsess_over(true);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -4014,14 +4014,14 @@ void stop_obsessing_over_service(com::centreon::engine::service* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
-  if (svc->obsess_over_service == false)
+  if (!svc->get_obsess_over())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* set the obsess over service flag */
-  svc->obsess_over_service = false;
+  svc->set_obsess_over(false);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -4043,14 +4043,14 @@ void start_obsessing_over_host(com::centreon::engine::host* hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
-  if (hst->get_obsess_over_host())
+  if (hst->get_obsess_over())
     return;
 
   /* set the attribute modified flag */
   hst->add_modified_attributes(attr);
 
   /* set the obsess over host flag */
-  hst->set_obsess_over_host(true);
+  hst->set_obsess_over(true);
 
   /* send data to event broker */
   broker_adaptive_host_data(
@@ -4072,14 +4072,14 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
-  if (!hst->get_obsess_over_host())
+  if (!hst->get_obsess_over())
     return;
 
   /* set the attribute modified flag */
   hst->add_modified_attributes(attr);
 
   /* set the obsess over host flag */
-  hst->set_obsess_over_host(false);
+  hst->set_obsess_over(false);
 
   /* send data to event broker */
   broker_adaptive_host_data(

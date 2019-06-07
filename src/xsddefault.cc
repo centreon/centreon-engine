@@ -291,7 +291,7 @@ int xsddefault_save_status_data() {
            it->second->get_flap_detection_enabled() << "\n"
          "\tprocess_performance_data=" <<
            it->second->get_process_performance_data() << "\n"
-         "\tobsess_over_host=" << it->second->get_obsess_over_host() << "\n"
+         "\tobsess_over_host=" << it->second->get_obsess_over() << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << it->second->get_is_flapping() << "\n"
          "\tpercent_state_change=" << std::setprecision(2) << std::fixed
@@ -351,13 +351,13 @@ int xsddefault_save_status_data() {
          "\tlong_plugin_output=" << it->second->get_long_plugin_output() << "\n"
          "\tperformance_data=" << it->second->get_perf_data() << "\n"
          "\tlast_check=" << static_cast<unsigned long>(it->second->get_last_check()) << "\n"
-         "\tnext_check=" << static_cast<unsigned long>(it->second->next_check) << "\n"
+         "\tnext_check=" << static_cast<unsigned long>(it->second->get_next_check()) << "\n"
          "\tcheck_options=" << it->second->check_options << "\n"
          "\tcurrent_notification_number=" << it->second->current_notification_number << "\n"
          "\tcurrent_notification_id=" << it->second->current_notification_id << "\n"
          "\tlast_notification=" << static_cast<unsigned long>(it->second->get_last_notification()) << "\n"
          "\tnext_notification=" << static_cast<unsigned long>(it->second->get_next_notification()) << "\n"
-         "\tno_more_notifications=" << it->second->no_more_notifications << "\n"
+         "\tno_more_notifications=" << it->second->get_no_more_notifications() << "\n"
          "\tnotifications_enabled=" << it->second->get_notifications_enabled() << "\n"
          "\tactive_checks_enabled=" << it->second->get_checks_enabled() << "\n"
          "\tpassive_checks_enabled=" << it->second->accept_passive_service_checks << "\n"
@@ -366,7 +366,7 @@ int xsddefault_save_status_data() {
          "\tacknowledgement_type=" << it->second->acknowledgement_type << "\n"
          "\tflap_detection_enabled=" << it->second->get_flap_detection_enabled() << "\n"
          "\tprocess_performance_data=" << it->second->process_performance_data << "\n"
-         "\tobsess_over_service=" << it->second->obsess_over_service << "\n"
+         "\tobsess_over_service=" << it->second->get_obsess_over() << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << it->second->get_is_flapping() << "\n"
          "\tpercent_state_change=" << std::setprecision(2)

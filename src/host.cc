@@ -186,7 +186,7 @@ host::host(uint64_t host_id,
            int should_be_drawn,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_host,
+           bool obsess_over_host,
            std::string const& timezone)
     : notifier{HOST_NOTIFICATION,
                !display_name.empty() ? display_name : name,
@@ -212,6 +212,7 @@ host::host(uint64_t host_id,
                high_flap_threshold,
                check_freshness,
                freshness_threshold,
+               obsess_over_host,
                timezone} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
@@ -271,7 +272,6 @@ host::host(uint64_t host_id,
   _out_notification_type |= (notify_up > 0 ? notifier::recovery : 0);
   _out_notification_type |=
       (notify_unreachable > 0 ? notifier::unreachable : 0);
-  _obsess_over_host = (obsess_over_host > 0);
   _process_performance_data = (process_perfdata > 0);
   _retain_nonstatus_information = (retain_nonstatus_information > 0);
   _retain_status_information = (retain_status_information > 0);
@@ -373,14 +373,6 @@ bool host::get_failure_prediction_enabled() const {
 
 void host::set_failure_prediction_enabled(bool failure_prediction_enabled) {
   _failure_prediction_enabled = failure_prediction_enabled;
-}
-
-int host::get_obsess_over_host() const {
-  return _obsess_over_host;
-}
-
-void host::set_obsess_over_host(int obsess_over_host) {
-  _obsess_over_host = obsess_over_host;
 }
 
 std::string const& host::get_vrml_image() const {
@@ -487,14 +479,6 @@ void host::set_check_options(int check_options) {
   _check_options = check_options;
 }
 
-time_t host::get_next_check() const {
-  return _next_check;
-}
-
-void host::set_next_check(time_t next_check) {
-  _next_check = next_check;
-}
-
 int host::get_should_be_scheduled() const {
   return _should_be_scheduled;
 }
@@ -541,14 +525,6 @@ int host::get_current_notification_number() const {
 
 void host::set_current_notification_number(int current_notification_number) {
   _current_notification_number = current_notification_number;
-}
-
-int host::get_no_more_notifications() const {
-  return _no_more_notifications;
-}
-
-void host::set_no_more_notifications(int no_more_notifications) {
-  _no_more_notifications = no_more_notifications;
 }
 
 //
@@ -718,7 +694,7 @@ bool host::operator==(host const& other) throw() {
              other.get_retain_status_information() &&
          get_retain_nonstatus_information() ==
              other.get_retain_nonstatus_information() &&
-         get_obsess_over_host() == other.get_obsess_over_host() &&
+         get_obsess_over() == other.get_obsess_over() &&
          get_notes() == other.get_notes() &&
          get_notes_url() == other.get_notes_url() &&
          get_action_url() == other.get_action_url() &&
@@ -1001,7 +977,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << obj.get_retain_nonstatus_information()
      << "\n"
         "  obsess_over_host:                     "
-     << obj.get_obsess_over_host()
+     << obj.get_obsess_over()
      << "\n"
         "  notes:                                "
      << obj.get_notes()

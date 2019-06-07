@@ -102,6 +102,7 @@ class                           service : public notifier {
                                         double high_flap_threshold,
                                         bool check_freshness,
                                         int freshness_threshold,
+                                        bool obsess_over,
                                         std::string const& timezone);
                                 ~service();
   void                          set_hostname(std::string const& name);
@@ -189,12 +190,9 @@ class                           service : public notifier {
   int                           accept_passive_service_checks;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
-  int                           obsess_over_service;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;
-  time_t                        next_check;
   int                           should_be_scheduled;
-  int                           no_more_notifications;
   int                           check_flapping_recovery_notification;
   int                           is_being_freshened;
   int                           current_notification_number;
@@ -292,7 +290,7 @@ com::centreon::engine::service* add_service(
            std::string const& icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_service,
+           bool obsess_over,
            std::string const& timezone);
 int      get_service_count();
 int      is_contact_for_service(

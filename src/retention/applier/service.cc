@@ -132,7 +132,7 @@ void applier::service::_update(
     if (state.next_check().is_set()
         && config.use_retained_scheduling_info()
         && scheduling_info_is_ok)
-      obj.next_check = *state.next_check();
+      obj.set_next_check(*state.next_check());
     if (state.check_options().is_set()
         && config.use_retained_scheduling_info()
         && scheduling_info_is_ok)
@@ -199,7 +199,7 @@ void applier::service::_update(
 
     if (state.obsess_over_service().is_set()
         && (obj.get_modified_attributes() & MODATTR_OBSESSIVE_HANDLER_ENABLED))
-      obj.obsess_over_service = *state.obsess_over_service();
+      obj.set_obsess_over(*state.obsess_over_service());
 
     if (state.check_command().is_set()
         && (obj.get_modified_attributes() & MODATTR_CHECK_COMMAND)) {

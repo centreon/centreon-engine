@@ -87,6 +87,7 @@ class                notifier {
                               double high_flap_threshold,
                               bool check_freshness,
                               int freshness_threshold,
+                              bool obsess_over,
                               std::string const& timezone);
   virtual            ~notifier() {}
 
@@ -263,6 +264,12 @@ class                notifier {
   void               set_last_check(time_t last_check);
   double             get_latency() const;
   void               set_latency(double latency);
+  time_t             get_next_check() const;
+  void               set_next_check(time_t next_check);
+  bool               get_no_more_notifications() const;
+  void               set_no_more_notifications(bool no_more_notifications);
+  bool               get_obsess_over() const;
+  void               set_obsess_over(bool obsess_over_host);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
@@ -320,6 +327,7 @@ class                notifier {
   double             _high_flap_threshold;
   double             _first_notification_delay;
   bool               _notifications_enabled;
+  bool               _obsess_over;
   std::string        _timezone;
   std::list<std::shared_ptr<escalation>>
                      _escalations;
@@ -337,6 +345,8 @@ class                notifier {
   bool               _is_flapping;
   time_t             _last_check;
   double             _latency;
+  time_t             _next_check;
+  bool               _no_more_notifications;
 };
 
 CCE_END()

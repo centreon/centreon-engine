@@ -58,7 +58,7 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
   /* bail out if we shouldn't be obsessing */
   if (!config->obsess_over_hosts())
     return OK;
-  if (!hst->get_obsess_over_host())
+  if (!hst->get_obsess_over())
     return OK;
 
   /* if there is no valid command, exit */

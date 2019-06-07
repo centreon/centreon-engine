@@ -89,6 +89,7 @@ service::service(std::string const& hostname,
                  double high_flap_threshold,
                  bool check_freshness,
                  int freshness_threshold,
+                 bool obsess_over,
                  std::string const& timezone)
     : notifier{SERVICE_NOTIFICATION,
                display_name,
@@ -114,6 +115,7 @@ service::service(std::string const& hostname,
                high_flap_threshold,
                check_freshness,
                freshness_threshold,
+               obsess_over,
                timezone},
       _hostname{hostname},
       _description{description},
@@ -251,7 +253,7 @@ bool service::operator==(service const& other) throw() {
          this->retain_nonstatus_information ==
              other.retain_nonstatus_information &&
          get_notifications_enabled() == other.get_notifications_enabled() &&
-         this->obsess_over_service == other.obsess_over_service &&
+         get_obsess_over() == other.get_obsess_over() &&
          get_notes() == other.get_notes() &&
          get_notes_url() == other.get_notes_url() &&
          get_action_url() == other.get_action_url() &&
@@ -270,7 +272,7 @@ bool service::operator==(service const& other) throw() {
          get_long_plugin_output() == other.get_long_plugin_output() &&
          get_perf_data() == other.get_perf_data() &&
          _state_type == other.get_state_type() &&
-         this->next_check == other.next_check &&
+         get_next_check() == other.get_next_check() &&
          this->should_be_scheduled == other.should_be_scheduled &&
          get_last_check() == other.get_last_check() &&
          get_current_attempt() == other.get_current_attempt() &&
@@ -280,7 +282,7 @@ bool service::operator==(service const& other) throw() {
          _last_problem_id == other.get_last_problem_id() &&
          get_last_notification() == other.get_last_notification() &&
          get_next_notification() == other.get_next_notification() &&
-         this->no_more_notifications == other.no_more_notifications &&
+         get_no_more_notifications() == other.get_no_more_notifications() &&
          this->check_flapping_recovery_notification ==
              other.check_flapping_recovery_notification &&
          _last_state_change == other.get_last_state_change() &&
@@ -504,7 +506,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.retain_nonstatus_information
      << "\n  notifications_enabled:                "
      << obj.get_notifications_enabled()
-     << "\n  obsess_over_service:                  " << obj.obsess_over_service
+     << "\n  obsess_over_service:                  " << obj.get_obsess_over()
      << "\n  notes:                                " << obj.get_notes()
      << "\n  notes_url:                            " << obj.get_notes_url()
      << "\n  action_url:                           " << obj.get_action_url()
@@ -525,7 +527,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  perf_data:                            " << obj.get_perf_data()
      << "\n  state_type:                           " << obj.get_state_type()
      << "\n  next_check:                           "
-     << string::ctime(obj.next_check)
+     << string::ctime(obj.get_next_check())
      << "\n  should_be_scheduled:                  " << obj.should_be_scheduled
      << "\n  last_check:                           "
      << string::ctime(obj.get_last_check())
@@ -540,7 +542,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  next_notification:                    "
      << string::ctime(obj.get_next_notification())
      << "\n  no_more_notifications:                "
-     << obj.no_more_notifications
+     << obj.get_no_more_notifications()
      << "\n  check_flapping_recovery_notification: "
      << obj.check_flapping_recovery_notification
      << "\n  last_state_change:                    "
@@ -728,7 +730,7 @@ com::centreon::engine::service* add_service(
     std::string const& icon_image_alt,
     int retain_status_information,
     int retain_nonstatus_information,
-    int obsess_over_service,
+    bool obsess_over_service,
     std::string const& timezone) {
   // Make sure we have everything we need.
   if (!service_id) {
@@ -792,8 +794,7 @@ com::centreon::engine::service* add_service(
       notification_period, notifications_enabled, is_volatile, check_period, event_handler, event_handler_enabled,
       notes, notes_url, action_url, icon_image, icon_image_alt,
       flap_detection_enabled, low_flap_threshold, high_flap_threshold,
-      check_freshness, freshness_threshold, timezone)};
-
+      check_freshness, freshness_threshold, obsess_over_service, timezone)};
   try {
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_options = CHECK_OPTION_NONE;
@@ -818,7 +819,6 @@ com::centreon::engine::service* add_service(
     notify_on |= (notify_unknown > 0 ? notifier::unknown : 0);
     notify_on |= (notify_warning > 0 ? notifier::warning : 0);
     obj->set_notify_on(notify_on);
-    obj->obsess_over_service = (obsess_over_service > 0);
     obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
@@ -1359,7 +1359,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_next_notification(static_cast<time_t>(0));
 
     /* reset notification suppression option */
-    this->no_more_notifications = false;
+    set_no_more_notifications(false);
 
     if (ACKNOWLEDGEMENT_NORMAL == this->acknowledgement_type &&
         (state_change || !hard_state_change)) {
@@ -1548,7 +1548,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     }
     set_problem_has_been_acknowledged(false);
     this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    this->no_more_notifications = false;
+    set_no_more_notifications(false);
 
     if (reschedule_check)
       next_service_check =
@@ -1882,19 +1882,19 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     this->should_be_scheduled = true;
 
     /* next check time was calculated above */
-    this->next_check = next_service_check;
+    set_next_check(next_service_check);
 
     /* make sure we don't get ourselves into too much trouble... */
-    if (current_time > this->next_check)
-      this->next_check = current_time;
+    if (current_time > get_next_check())
+      set_next_check(current_time);
 
     // Make sure we rescheduled the next service check at a valid time.
     {
       timezone_locker lock(get_timezone());
-      preferred_time = this->next_check;
+      preferred_time = get_next_check();
       get_next_valid_time(preferred_time, &next_valid_time,
                           this->check_period_ptr);
-      this->next_check = next_valid_time;
+      set_next_check(next_valid_time);
     }
 
     /* services with non-recurring intervals do not get rescheduled */
@@ -1907,7 +1907,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* schedule a non-forced check if we can */
     if (this->should_be_scheduled)
-      schedule_check(this->next_check, CHECK_OPTION_NONE);
+      schedule_check(get_next_check(), CHECK_OPTION_NONE);
   }
 
   /* if we're stalking this state type and state was not already logged AND the
@@ -2212,7 +2212,7 @@ int service::obsessive_compulsive_service_check_processor() {
   /* bail out if we shouldn't be obsessing */
   if (config->obsess_over_services() == false)
     return OK;
-  if (this->obsess_over_service == false)
+  if (!get_obsess_over())
     return OK;
 
   /* if there is no valid command, exit */
@@ -2344,7 +2344,7 @@ int service::run_scheduled_check(int check_options, double latency) {
         if (!time_is_valid &&
             check_time_against_period(next_valid_time,
                                       this->check_period_ptr) == ERROR) {
-          this->next_check = (time_t)(next_valid_time + (60 * 60 * 24 * 7));
+          set_next_check((time_t)(next_valid_time + 60 * 60 * 24 * 7));
           logger(log_runtime_warning, basic)
               << "Warning: Check of service '" << _description
               << "' on host '" << _hostname
@@ -2356,7 +2356,7 @@ int service::run_scheduled_check(int check_options, double latency) {
         }
         // This service could be rescheduled...
         else {
-          this->next_check = next_valid_time;
+          set_next_check(next_valid_time);
           this->should_be_scheduled = true;
           logger(dbg_checks, more) << "Rescheduled next service check for "
                                    << my_ctime(&next_valid_time);
@@ -2370,7 +2370,7 @@ int service::run_scheduled_check(int check_options, double latency) {
      * 10/19/07 EG - keep original check options
      */
     if (this->should_be_scheduled)
-      schedule_check(this->next_check, check_options);
+      schedule_check(get_next_check(), check_options);
 
     /* update the status log */
     this->update_status(false);
@@ -2500,14 +2500,14 @@ void service::schedule_check(time_t check_time, int options) {
       timed_event* new_event(new timed_event);
 
       // Set the next service check time.
-      this->next_check = check_time;
+      set_next_check(check_time);
 
       // Place the new event in the event queue.
       new_event->event_type = EVENT_SERVICE_CHECK;
       new_event->event_data = (void*)this;
       new_event->event_args = (void*)nullptr;
       new_event->event_options = options;
-      new_event->run_time = this->next_check;
+      new_event->run_time = get_next_check();
       new_event->recurring = false;
       new_event->event_interval = 0L;
       new_event->timing_func = nullptr;
@@ -2521,7 +2521,7 @@ void service::schedule_check(time_t check_time, int options) {
   } else {
     // Reset the next check time (it may be out of sync).
     if (temp_event)
-      this->next_check = temp_event->run_time;
+      set_next_check(temp_event->run_time);
 
     logger(dbg_checks, most)
         << "Keeping original service check event (ignoring the new one).";
@@ -3030,7 +3030,7 @@ int service::check_notification_viability(unsigned int type, int options) {
    * don't notify contacts about this service problem again if the notification
    * interval is set to 0
    */
-  if (this->no_more_notifications == true) {
+  if (get_no_more_notifications()) {
     logger(dbg_notifications, more)
         << "We shouldn't re-notify contacts about this service problem.";
     return ERROR;
@@ -3373,9 +3373,9 @@ time_t service::get_next_notification_time(time_t offset) {
    * notifications (unless service is volatile)
    */
   if (interval_to_use == 0.0 && !get_is_volatile())
-    this->no_more_notifications = true;
+    set_no_more_notifications(true);
   else
-    this->no_more_notifications = false;
+    set_no_more_notifications(false);
 
   logger(dbg_notifications, most) << "Interval used for calculating next valid "
                                      "notification time: "
