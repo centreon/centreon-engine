@@ -120,7 +120,7 @@ void applier::host::_update(
     if (state.last_problem_id().is_set())
       obj.set_last_problem_id(*state.last_problem_id());
     if (state.state_type().is_set())
-      obj.set_state_type(*state.state_type());
+      obj.set_state_type(static_cast<enum notifier::state_type>(*state.state_type()));
     if (state.last_state_change().is_set())
       obj.set_last_state_change(*state.last_state_change());
     if (state.last_hard_state_change().is_set())
@@ -248,8 +248,8 @@ void applier::host::_update(
       obj.set_max_attempts(*state.max_attempts());
 
       // adjust current attempt number if in a hard state.
-      if (obj.get_state_type() == HARD_STATE
-          && obj.get_current_state() != HOST_UP
+      if (obj.get_state_type() == notifier::hard
+          && obj.get_current_state() != notifier::state_up
           && obj.get_current_attempt() > 1)
         obj.set_current_attempt(obj.get_max_attempts());
     }
@@ -285,7 +285,7 @@ void applier::host::_update(
   }
 
   // calculate next possible notification time.
-  if (obj.get_current_state() != HOST_UP && obj.get_last_notification())
+  if (obj.get_current_state() != notifier::state_up && obj.get_last_notification())
     obj.set_next_notification(
       obj.get_next_notification_time(
         obj.get_last_notification()));
@@ -293,7 +293,7 @@ void applier::host::_update(
   // ADDED 01/23/2009 adjust current check attempts if host in hard
   // problem state (max attempts may have changed in config
   // since restart).
-  if (obj.get_current_state() != HOST_UP && obj.get_state_type() == HARD_STATE)
+  if (obj.get_current_state() != notifier::state_up && obj.get_state_type() == notifier::hard)
     obj.set_current_attempt(obj.get_max_attempts());
 
   // ADDED 02/20/08 assume same flapping state if large install

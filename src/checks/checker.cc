@@ -398,7 +398,7 @@ void checker::run(
   check_result_info.finish_time = start_time;
   check_result_info.early_timeout = false;
   check_result_info.exited_ok = true;
-  check_result_info.return_code = STATE_OK;
+  check_result_info.return_code = notifier::ok;
   check_result_info.output = nullptr;
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = nullptr;
@@ -476,7 +476,7 @@ void checker::run(
       check_result_info.finish_time.tv_usec = now.to_useconds()
         - check_result_info.finish_time.tv_sec * 1000000ull;
       check_result_info.early_timeout = false;
-      check_result_info.return_code = STATE_UNKNOWN;
+      check_result_info.return_code = notifier::unknown;
       check_result_info.exited_ok = true;
       check_result_info.output = string::dup("(Execute command failed)");
 
@@ -632,7 +632,7 @@ void checker::run(
   check_result_info.finish_time = start_time;
   check_result_info.early_timeout = false;
   check_result_info.exited_ok = true;
-  check_result_info.return_code = STATE_OK;
+  check_result_info.return_code = notifier::ok;
   check_result_info.output = nullptr;
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = nullptr;
@@ -708,7 +708,7 @@ void checker::run(
       check_result_info.finish_time.tv_usec = now.to_useconds()
         - check_result_info.finish_time.tv_sec * 1000000ull;
       check_result_info.early_timeout = false;
-      check_result_info.return_code = STATE_UNKNOWN;
+      check_result_info.return_code = notifier::unknown;
       check_result_info.exited_ok = true;
       check_result_info.output = string::dup("(Execute command failed)");
 
@@ -815,7 +815,7 @@ void checker::run_sync(
 
   // Update host state.
   hst->set_last_state(hst->get_current_state());
-  if (HARD_STATE == hst->get_state_type())
+  if (notifier::hard == hst->get_state_type())
     hst->set_last_hard_state(hst->get_current_state());
 
   // Save old plugin output for state stalking.
@@ -981,7 +981,7 @@ void checker::finished(commands::result const& res) throw () {
  *
  *  @param[in] hst The host to check.
  *
- *  @result Return if the host is up (HOST_UP) or host down (HOST_DOWN).
+ *  @result Return if the host is up ( notifier::state_up) or host down ( notifier::state_down).
  */
 int checker::_execute_sync(host* hst) {
   logger(dbg_functions, basic)
@@ -1062,7 +1062,7 @@ int checker::_execute_sync(host* hst) {
     NEBATTR_NONE,
     hst,
     check_active,
-    HOST_UP,
+     notifier::state_up,
     hst->get_state_type(),
     start_time,
     end_time,
@@ -1071,7 +1071,7 @@ int checker::_execute_sync(host* hst) {
     0.0,
     config->host_check_timeout(),
     false,
-    STATE_OK,
+    notifier::ok,
     tmp_processed_cmd,
     const_cast<char*>(hst->get_plugin_output().c_str()),
     const_cast<char*>(hst->get_long_plugin_output().c_str()),
@@ -1121,7 +1121,7 @@ int checker::_execute_sync(host* hst) {
     // Update check result.
     res.command_id = 0;
     res.end_time = timestamp::now();
-    res.exit_code = STATE_UNKNOWN;
+    res.exit_code = notifier::unknown;
     res.exit_status = process::normal;
     res.output = "(Execute command failed)";
     res.start_time = res.end_time;
@@ -1204,7 +1204,7 @@ int checker::_execute_sync(host* hst) {
   // A nullptr host check command means we should assume the host is UP.
   if (hst->get_check_command().empty()) {
     hst->set_plugin_output("(Host assumed to be UP)");
-    res.exit_code = STATE_OK;
+    res.exit_code = notifier::ok;
   }
 
   // Make sure we have some data.
@@ -1216,16 +1216,16 @@ int checker::_execute_sync(host* hst) {
   hst->set_plugin_output(ploutput);
 
   // If we're not doing aggressive host checking, let WARNING
-  // states indicate the host is up (fake the result to be STATE_OK).
+  // states indicate the host is up (fake the result to be notifier::ok).
   if (!config->use_aggressive_host_checking()
-      && (res.exit_code == STATE_WARNING))
-    res.exit_code = STATE_OK;
+      && (res.exit_code == notifier::warning))
+    res.exit_code = notifier::ok;
 
   // Get host state from plugin exit code.
   int return_result(
-        (res.exit_code == STATE_OK)
-        ? HOST_UP
-        : HOST_DOWN);
+        (res.exit_code == notifier::ok)
+        ?  notifier::state_up
+        :  notifier::state_down);
 
   // Get the end time of command.
   gettimeofday(&end_time, nullptr);

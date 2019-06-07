@@ -21,6 +21,7 @@
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/notifier.hh"
 #include "com/centreon/engine/string.hh"
 
 extern int config_warnings;
@@ -103,7 +104,7 @@ static bool const           default_flap_detection_enabled(true);
 static unsigned short const default_flap_detection_options(host::up | host::down | host::unreachable);
 static unsigned int const   default_freshness_threshold(0);
 static unsigned int const   default_high_flap_threshold(0);
-static unsigned short const default_initial_state(HOST_UP);
+static unsigned short const default_initial_state( notifier::state_up);
 static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(3);
 static bool const           default_notifications_enabled(true);
@@ -1398,11 +1399,11 @@ bool host::_set_initial_state(std::string const& value) {
   std::string data(value);
   string::trim(data);
   if (data == "o" || data == "up")
-    _initial_state = HOST_UP;
+    _initial_state =  notifier::state_up;
   else if (data == "d" || data == "down")
-    _initial_state = HOST_DOWN;
+    _initial_state =  notifier::state_down;
   else if (data == "u" || data == "unreachable")
-    _initial_state = HOST_UNREACHABLE;
+    _initial_state =  notifier::state_unreachable;
   else
     return false;
   return true;

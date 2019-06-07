@@ -41,6 +41,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/notifier.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/sehandlers.hh"
@@ -84,8 +85,8 @@ int reap_check_results() {
 unsigned int check_service_dependencies(
                com::centreon::engine::service* svc,
                int dependency_type) {
-  com::centreon::engine::service* temp_service = NULL;
-  int state = STATE_OK;
+  service* temp_service = NULL;
+  int state =  notifier::state_ok;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic)
@@ -117,25 +118,25 @@ unsigned int check_service_dependencies(
       return DEPENDENCIES_OK;
 
     /* get the status to use (use last hard state if its currently in a soft state) */
-    if (temp_service->state_type == SOFT_STATE
+    if (temp_service->get_state_type() == notifier::soft
         && !config->soft_state_dependencies())
-      state = temp_service->last_hard_state;
+      state = temp_service->get_last_hard_state();
     else
-      state = temp_service->current_state;
+      state = temp_service->get_current_state();
 
     /* is the service we depend on in state that fails the dependency tests? */
-    if (state == STATE_OK && temp_dependency->get_fail_on_ok())
+    if (state ==  notifier::state_ok && temp_dependency->get_fail_on_ok())
       return DEPENDENCIES_FAILED;
-    if (state == STATE_WARNING
+    if (state ==  notifier::state_warning
         && temp_dependency->get_fail_on_warning())
       return DEPENDENCIES_FAILED;
-    if (state == STATE_UNKNOWN
+    if (state ==  notifier::state_unknown
         && temp_dependency->get_fail_on_unknown())
       return DEPENDENCIES_FAILED;
-    if (state == STATE_CRITICAL
+    if (state ==  notifier::state_critical
         && temp_dependency->get_fail_on_critical())
       return DEPENDENCIES_FAILED;
-    if ((state == STATE_OK && !temp_service->get_has_been_checked())
+    if ((state ==  notifier::state_ok && !temp_service->get_has_been_checked())
         && temp_dependency->get_fail_on_pending())
       return DEPENDENCIES_FAILED;
 
@@ -303,8 +304,8 @@ int is_service_result_fresh(
 
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
   if (temp_service->freshness_threshold == 0) {
-    if (temp_service->state_type == HARD_STATE ||
-        temp_service->current_state == STATE_OK)
+    if (temp_service->get_state_type() == notifier::hard ||
+        temp_service->get_current_state() ==  notifier::state_ok)
       freshness_threshold = static_cast<int>(
           (temp_service->get_check_interval() * config->interval_length()) +
           temp_service->latency + config->additional_freshness_latency());
@@ -428,7 +429,7 @@ int perform_scheduled_host_check(
 /* checks host dependencies */
 unsigned int check_host_dependencies(com::centreon::engine::host* hst, int dependency_type) {
   host* temp_host = NULL;
-  int state = HOST_UP;
+  int state =  notifier::state_up;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic)
@@ -462,21 +463,21 @@ unsigned int check_host_dependencies(com::centreon::engine::host* hst, int depen
       return DEPENDENCIES_OK;
 
     /* get the status to use (use last hard state if its currently in a soft state) */
-    if (temp_host->get_state_type() == SOFT_STATE
+    if (temp_host->get_state_type() == notifier::soft
         && !config->soft_state_dependencies())
       state = temp_host->get_last_hard_state();
     else
       state = temp_host->get_current_state();
 
     /* is the host we depend on in state that fails the dependency tests? */
-    if (state == HOST_UP && temp_dependency->get_fail_on_up())
+    if (state ==  notifier::state_up && temp_dependency->get_fail_on_up())
       return DEPENDENCIES_FAILED;
-    if (state == HOST_DOWN && temp_dependency->get_fail_on_down())
+    if (state ==  notifier::state_down && temp_dependency->get_fail_on_down())
       return DEPENDENCIES_FAILED;
-    if (state == HOST_UNREACHABLE
+    if (state ==  notifier::state_unreachable
         && temp_dependency->get_fail_on_unreachable())
       return DEPENDENCIES_FAILED;
-    if ((state == HOST_UP && !temp_host->get_has_been_checked())
+    if ((state ==  notifier::state_up && !temp_host->get_has_been_checked())
         && temp_dependency->get_fail_on_pending())
       return DEPENDENCIES_FAILED;
 
@@ -639,8 +640,8 @@ int is_host_result_fresh(
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
   if (temp_host->get_freshness_threshold() == 0) {
     double interval;
-    if ((HARD_STATE == temp_host->get_state_type())
-        || (STATE_OK == temp_host->get_current_state()))
+    if ((notifier::hard == temp_host->get_state_type())
+        || ( notifier::state_ok == temp_host->get_current_state()))
       interval = temp_host->get_check_interval();
     else
       interval = temp_host->get_retry_interval();
@@ -803,7 +804,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
   com::centreon::engine::host* temp_host = NULL;
   objectlist* check_hostlist = NULL;
   objectlist* hostlist_item = NULL;
-  int parent_state = HOST_UP;
+  int parent_state =  notifier::state_up;
   time_t current_time = 0L;
   time_t next_check = 0L;
   time_t preferred_time = 0L;
@@ -819,7 +820,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
       << hst->get_max_attempts() << ", CHECK TYPE="
       << (hst->get_check_type() == check_active ? "ACTIVE" : "PASSIVE")
       << ", STATE TYPE="
-      << (hst->get_state_type() == HARD_STATE ? "HARD" : "SOFT")
+      << (hst->get_state_type() == notifier::hard ? "HARD" : "SOFT")
       << ", OLD STATE=" << hst->get_current_state()
       << ", NEW STATE=" << new_state;
 
@@ -845,28 +846,28 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
           << ";" << hst->get_plugin_output();
   }
   /******* HOST WAS DOWN/UNREACHABLE INITIALLY *******/
-  if (hst->get_current_state() != HOST_UP) {
+  if (hst->get_current_state() !=  notifier::state_up) {
     logger(dbg_checks, more) << "Host was DOWN/UNREACHABLE.";
 
     /***** HOST IS NOW UP *****/
     /* the host just recovered! */
-    if (new_state == HOST_UP) {
+    if (new_state ==  notifier::state_up) {
       /* set the current state */
-      hst->set_current_state(HOST_UP);
+      hst->set_current_state( notifier::state_up);
 
       /* set the state type */
       /* set state type to HARD for passive checks and active checks that were
        * previously in a HARD STATE */
-      if (hst->get_state_type() == HARD_STATE ||
+      if (hst->get_state_type() == notifier::hard ||
           (hst->get_check_type() == check_passive &&
            !config->passive_host_checks_are_soft()))
-        hst->set_state_type(HARD_STATE);
+        hst->set_state_type(notifier::hard);
       else
-        hst->set_state_type(SOFT_STATE);
+        hst->set_state_type(notifier::soft);
 
       logger(dbg_checks, more)
           << "Host experienced a "
-          << (hst->get_state_type() == HARD_STATE ? "HARD" : "SOFT")
+          << (hst->get_state_type() == notifier::hard ? "HARD" : "SOFT")
           << " recovery (it's now UP).";
 
       /* reschedule the next check of the host at the normal interval */
@@ -884,7 +885,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
            it != end; it++) {
         if (it->second == nullptr)
           continue;
-        if (it->second->get_current_state() != HOST_UP) {
+        if (it->second->get_current_state() !=  notifier::state_up) {
           logger(dbg_checks, more)
               << "Check of parent host '" << it->first << "' queued.";
           add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
@@ -901,7 +902,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
            it != end; it++) {
         if (it->second == nullptr)
           continue;
-        if (it->second->get_current_state() != HOST_UP) {
+        if (it->second->get_current_state() !=  notifier::state_up) {
           logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
           add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
@@ -918,7 +919,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
       if (hst->get_check_type() == check_passive &&
           !config->passive_host_checks_are_soft()) {
         /* set the state type */
-        hst->set_state_type(HARD_STATE);
+        hst->set_state_type(notifier::hard);
 
         /* reset the current attempt */
         hst->set_current_attempt(1);
@@ -929,13 +930,13 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
         /* set the state type */
         /* we've maxed out on the retries */
         if (hst->get_current_attempt() == hst->get_max_attempts())
-          hst->set_state_type(HARD_STATE);
+          hst->set_state_type(notifier::hard);
         /* the host was in a hard problem state before, so it still is now */
         else if (hst->get_current_attempt() == 1)
-          hst->set_state_type(HARD_STATE);
+          hst->set_state_type(notifier::hard);
         /* the host is in a soft state and the check will be retried */
         else
-          hst->set_state_type(SOFT_STATE);
+          hst->set_state_type(notifier::soft);
       }
 
       /* make a determination of the host's state */
@@ -953,7 +954,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
 
         /* schedule a re-check of the host at the retry interval because we
          * can't determine its final state yet... */
-        if (hst->get_state_type() == SOFT_STATE)
+        if (hst->get_state_type() == notifier::soft)
           next_check =
               (unsigned long)(current_time + (hst->get_retry_interval() *
                                               config->interval_length()));
@@ -974,14 +975,14 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
 
     /***** HOST IS STILL UP *****/
     /* either the host never went down since last check */
-    if (new_state == HOST_UP) {
+    if (new_state ==  notifier::state_up) {
       logger(dbg_checks, more) << "Host is still UP.";
 
       /* set the current state */
-      hst->set_current_state(HOST_UP);
+      hst->set_current_state( notifier::state_up);
 
       /* set the state type */
-      hst->set_state_type(HARD_STATE);
+      hst->set_state_type(notifier::hard);
 
       /* reschedule the next check at the normal interval */
       if (reschedule_check)
@@ -998,7 +999,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
         logger(dbg_checks, more) << "Max attempts = 1!.";
 
         /* set the state type */
-        hst->set_state_type(HARD_STATE);
+        hst->set_state_type(notifier::hard);
 
         /* host has maxed out on retries, so reschedule the next check at the
          * normal interval */
@@ -1038,12 +1039,12 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
                                    check_timestamp_horizon);
 
             /* bail out as soon as we find one parent host that is UP */
-            if (parent_state == HOST_UP) {
+            if (parent_state ==  notifier::state_up) {
               logger(dbg_checks, more)
                   << "Parent host is UP, so this one is DOWN.";
 
               /* set the current state */
-              hst->set_current_state(HOST_DOWN);
+              hst->set_current_state( notifier::state_down);
               break;
             }
           }
@@ -1052,12 +1053,12 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
             /* host has no parents, so its up */
             if (hst->parent_hosts.size() == 0) {
               logger(dbg_checks, more) << "Host has no parents, so it's DOWN.";
-              hst->set_current_state(HOST_DOWN);
+              hst->set_current_state( notifier::state_down);
             } else {
               /* no parents were up, so this host is UNREACHABLE */
               logger(dbg_checks, more)
                   << "No parents were UP, so this host is UNREACHABLE.";
-              hst->set_current_state(HOST_UNREACHABLE);
+              hst->set_current_state( notifier::state_unreachable);
             }
           }
         }
@@ -1084,7 +1085,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
              it != end; it++) {
           if (it->second == nullptr)
             continue;
-          if (it->second->get_current_state() != HOST_UNREACHABLE) {
+          if (it->second->get_current_state() !=  notifier::state_unreachable) {
             logger(dbg_checks, more)
                 << "Check of child host '" << it->first << "' queued.";
             add_object_to_objectlist(&check_hostlist, it->second.get());
@@ -1099,13 +1100,13 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
         if (hst->get_check_type() == check_active ||
             config->passive_host_checks_are_soft()) {
           /* set the state type */
-          hst->set_state_type(SOFT_STATE);
+          hst->set_state_type(notifier::soft);
         }
 
         /* by default, passive check results are treated as HARD states */
         else {
           /* set the state type */
-          hst->set_state_type(HARD_STATE);
+          hst->set_state_type(notifier::hard);
 
           /* reset the current attempt */
           hst->set_current_attempt(1);
@@ -1151,7 +1152,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
              it != end; it++) {
           if (it->second == nullptr)
             continue;
-          if (it->second->get_current_state() == HOST_UP) {
+          if (it->second->get_current_state() ==  notifier::state_up) {
             add_object_to_objectlist(&check_hostlist, it->second.get());
             logger(dbg_checks, more)
                 << "Check of host '" << it->first << "' queued.";
@@ -1169,7 +1170,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
              it != end; it++) {
           if (it->second == nullptr)
             continue;
-          if (it->second->get_current_state() != HOST_UNREACHABLE) {
+          if (it->second->get_current_state() !=  notifier::state_unreachable) {
             logger(dbg_checks, more)
                 << "Check of child host '" << it->first << "' queued.";
             add_object_to_objectlist(&check_hostlist, it->second.get());
@@ -1215,7 +1216,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
                            << hst->get_name()
                            << ", Attempt=" << hst->get_current_attempt() << "/"
                            << hst->get_max_attempts() << ", Type="
-                           << (hst->get_state_type() == HARD_STATE ? "HARD"
+                           << (hst->get_state_type() == notifier::hard ? "HARD"
                                                                    : "SOFT")
                            << ", Final State=" << hst->get_current_state();
 
@@ -1226,7 +1227,7 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
                            << hst->get_name()
                            << ", Attempt=" << hst->get_current_attempt() << "/"
                            << hst->get_max_attempts() << ", Type="
-                           << (hst->get_state_type() == HARD_STATE ? "HARD"
+                           << (hst->get_state_type() == notifier::hard ? "HARD"
                                                                    : "SOFT")
                            << ", Final State=" << hst->get_current_state();
 
@@ -1237,13 +1238,13 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
   if (hst->get_last_state() == hst->get_current_state() &&
       compare_strings(old_plugin_output,
                       const_cast<char*>(hst->get_plugin_output().c_str()))) {
-    if (hst->get_current_state() == HOST_UP && hst->get_stalk_on(notifier::up))
+    if (hst->get_current_state() ==  notifier::state_up && hst->get_stalk_on(notifier::up))
       hst->log_event();
 
-    else if (hst->get_current_state() == HOST_DOWN && hst->get_stalk_on(notifier::down))
+    else if (hst->get_current_state() ==  notifier::state_down && hst->get_stalk_on(notifier::down))
       hst->log_event();
 
-    else if (hst->get_current_state() == HOST_UNREACHABLE &&
+    else if (hst->get_current_state() ==  notifier::state_unreachable &&
              hst->get_stalk_on(notifier::unreachable))
       hst->log_event();
   }
@@ -1281,8 +1282,8 @@ int process_host_check_result_3x(com::centreon::engine::host* hst,
     /* hosts with non-recurring intervals do not get rescheduled if we're in a
      * HARD or UP state */
     if (hst->get_check_interval() == 0 &&
-        (hst->get_state_type() == HARD_STATE ||
-         hst->get_current_state() == HOST_UP))
+        (hst->get_state_type() == notifier::hard ||
+         hst->get_current_state() ==  notifier::state_up))
       hst->set_should_be_scheduled(false);
 
     /* host with active checks disabled do not get rescheduled */
@@ -1345,12 +1346,12 @@ int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
     << ", state type=" << hst->get_state_type();
 
   /* if host is in a hard state, reset current attempt number */
-  if (hst->get_state_type() == HARD_STATE)
+  if (hst->get_state_type() == notifier::hard)
     hst->set_current_attempt(1);
 
   /* if host is in a soft UP state, reset current attempt number (active checks only) */
-  else if (is_active && hst->get_state_type() == SOFT_STATE
-           && hst->get_current_state() == HOST_UP)
+  else if (is_active && hst->get_state_type() == notifier::soft
+           && hst->get_current_state() ==  notifier::state_up)
     hst->set_current_attempt(1);
 
   /* increment current attempt number */
@@ -1364,29 +1365,29 @@ int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
 
 /* determination of the host's state based on route availability*//* used only to determine difference between DOWN and UNREACHABLE states */
 int determine_host_reachability(com::centreon::engine::host* hst) {
-  int state = HOST_DOWN;
+  int state =  notifier::state_down;
   bool is_host_present = false;
 
   logger(dbg_functions, basic)
     << "determine_host_reachability()";
 
   if (hst == NULL)
-    return HOST_DOWN;
+    return  notifier::state_down;
 
   logger(dbg_checks, most)
     << "Determining state of host '" << hst->get_name()
     << "': current state=" << hst->get_current_state();
 
   /* host is UP - no translation needed */
-  if (hst->get_current_state() == HOST_UP) {
-    state = HOST_UP;
+  if (hst->get_current_state() ==  notifier::state_up) {
+    state =  notifier::state_up;
     logger(dbg_checks, most)
       << "Host is UP, no state translation needed.";
   }
 
   /* host has no parents, so it is DOWN */
   else if (hst->parent_hosts.size() == 0) {
-    state = HOST_DOWN;
+    state =  notifier::state_down;
     logger(dbg_checks, most)
       << "Host has no parents, so it is DOWN.";
   }
@@ -1405,9 +1406,9 @@ int determine_host_reachability(com::centreon::engine::host* hst) {
 
       is_host_present = true;
       /* bail out as soon as we find one parent host that is UP */
-      if (it->second->get_current_state() == HOST_UP) {
+      if (it->second->get_current_state() ==  notifier::state_up) {
         /* set the current state */
-        state = HOST_DOWN;
+        state =  notifier::state_down;
         logger(dbg_checks, most)
           << "At least one parent (" << it->first
           << ") is up, so host is DOWN.";
@@ -1416,7 +1417,7 @@ int determine_host_reachability(com::centreon::engine::host* hst) {
     }
     /* no parents were up, so this host is UNREACHABLE */
     if (!is_host_present) {
-      state = HOST_UNREACHABLE;
+      state =  notifier::state_unreachable;
       logger(dbg_checks, most)
         << "No parents were up, so host is UNREACHABLE.";
     }

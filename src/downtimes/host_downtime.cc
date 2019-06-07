@@ -316,7 +316,7 @@ int host_downtime::handle() {
     if (!_start_flex_downtime) {
 
       /* host is up, so we don't really do anything right now */
-      if (hst->get_current_state() == HOST_UP) {
+      if (hst->get_current_state() == notifier::state_up) {
 
         /* increment pending flex downtime counter */
         hst->set_pending_flex_downtime(hst->get_pending_flex_downtime() + 1);

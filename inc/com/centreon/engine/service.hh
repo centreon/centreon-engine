@@ -170,10 +170,6 @@ class                           service : public notifier {
   int                           obsess_over_service;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;
-  int                           current_state;
-  int                           last_state;
-  int                           last_hard_state;
-  int                           state_type;
   time_t                        next_check;
   int                           should_be_scheduled;
   time_t                        last_check;
@@ -188,11 +184,8 @@ class                           service : public notifier {
   int                           check_options;
   int                           scheduled_downtime_depth;
   int                           pending_flex_downtime;
-  int                           state_history[MAX_STATE_HISTORY_ENTRIES];
-  unsigned int                  state_history_index;
   int                           is_flapping;
   uint64_t                      flapping_comment_id;
-  double                        percent_state_change;
 
   std::unordered_map<std::string, customvariable>
     custom_variables;

@@ -623,10 +623,10 @@ static int handle_summary_macro(
              : true);
       if (authorized) {
         bool problem(true);
-        if ((it->second->get_current_state() == HOST_UP)
+        if ((it->second->get_current_state() == notifier::state_up)
             && it->second->get_has_been_checked())
           hosts_up++;
-        else if (it->second->get_current_state() == HOST_DOWN) {
+        else if (it->second->get_current_state() == notifier::state_down) {
           if (it->second->get_scheduled_downtime_depth() > 0)
             problem = false;
           if (it->second->get_problem_has_been_acknowledged())
@@ -637,7 +637,7 @@ static int handle_summary_macro(
             hosts_down_unhandled++;
           hosts_down++;
         }
-        else if (it->second->get_current_state() == HOST_UNREACHABLE) {
+        else if (it->second->get_current_state() == notifier::state_unreachable) {
           if (it->second->get_scheduled_downtime_depth() > 0)
             problem = false;
           if (it->second->get_problem_has_been_acknowledged())
@@ -679,10 +679,10 @@ static int handle_summary_macro(
              : true);
       if (authorized) {
         bool problem(true);
-        if (it->second->current_state == STATE_OK
+        if (it->second->get_current_state() == notifier::state_ok
             && it->second->get_has_been_checked())
           services_ok++;
-        else if (it->second->current_state == STATE_WARNING) {
+        else if (it->second->get_current_state() == notifier::state_warning) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
             found(state::instance().hosts().find(get_host_id(it->second->get_hostname())));
@@ -690,8 +690,8 @@ static int handle_summary_macro(
               temp_host = found->second.get();
 
           if (temp_host != nullptr
-              && (temp_host->get_current_state() == HOST_DOWN
-                  || temp_host->get_current_state() == HOST_UNREACHABLE))
+              && (temp_host->get_current_state() == notifier::state_down
+                  || temp_host->get_current_state() == notifier::state_unreachable))
             problem = false;
           if (it->second->scheduled_downtime_depth > 0)
             problem = false;
@@ -703,7 +703,7 @@ static int handle_summary_macro(
             services_warning_unhandled++;
           services_warning++;
         }
-        else if (it->second->current_state == STATE_UNKNOWN) {
+        else if (it->second->get_current_state() == notifier::state_unknown) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
             found(state::instance().hosts().find(get_host_id(it->second->get_hostname())));
@@ -711,8 +711,8 @@ static int handle_summary_macro(
             temp_host = found->second.get();
 
           if (temp_host != nullptr
-              && (temp_host->get_current_state() == HOST_DOWN
-                  || temp_host->get_current_state() == HOST_UNREACHABLE))
+              && (temp_host->get_current_state() == notifier::state_down
+                  || temp_host->get_current_state() == notifier::state_unreachable))
             problem = false;
           if (it->second->scheduled_downtime_depth > 0)
             problem = false;
@@ -724,7 +724,7 @@ static int handle_summary_macro(
             services_unknown_unhandled++;
           services_unknown++;
         }
-        else if (it->second->current_state == STATE_CRITICAL) {
+        else if (it->second->get_current_state() == notifier::state_critical) {
           host* temp_host{nullptr};
           umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
             found(state::instance().hosts().find(get_host_id(it->second->get_hostname())));
@@ -732,8 +732,8 @@ static int handle_summary_macro(
             temp_host = found->second.get();
 
           if (temp_host != nullptr
-              && (temp_host->get_current_state() == HOST_DOWN
-                  || temp_host->get_current_state() == HOST_UNREACHABLE))
+              && (temp_host->get_current_state() == notifier::state_down
+                  || temp_host->get_current_state() == notifier::state_unreachable))
             problem = false;
           if (it->second->scheduled_downtime_depth > 0)
             problem = false;

@@ -48,14 +48,24 @@ namespace  macros {
     return string::dup(oss.str());
   }
 
-  /**
-   *  Extract double.
-   *
-   *  @param[in] t   Host object.
-   *  @param[in] mac Unused.
-   *
-   *  @return Newly allocated string with value as a fixed point string.
-   */
+template <typename T, typename U, double (U::* member)() const, unsigned int precision>
+char*    get_double(T& t, nagios_macros* mac) {
+  (void)mac;
+  std::ostringstream oss;
+  U *u = &t;
+  oss << std::fixed << std::setprecision(precision)
+      << (u->*member)();
+  return string::dup(oss.str());
+}
+
+/**
+ *  Extract double.
+ *
+ *  @param[in] t   Host object.
+ *  @param[in] mac Unused.
+ *
+ *  @return Newly allocated string with value as a fixed point string.
+ */
   //TODO SGA to remove after service rework
   template <typename T, double (T::* member), unsigned int precision>
   char*    get_double(T& t, nagios_macros* mac) {
@@ -79,7 +89,7 @@ namespace  macros {
     (void)mac;
 
     // Get duration.
-    time_t now(time(NULL));
+    time_t now(time(nullptr));
     unsigned long duration(now - t.get_last_state_change());
 
     // Break down duration.
@@ -113,7 +123,7 @@ namespace  macros {
     (void)mac;
 
     // Get duration.
-    time_t now(time(NULL));
+    time_t now(time(nullptr));
     unsigned long duration(now - t.get_last_state_change());
 
     // Break down duration.
@@ -146,7 +156,7 @@ namespace  macros {
     (void)mac;
 
     // Get duration.
-    time_t now(time(NULL));
+    time_t now(time(nullptr));
     unsigned long duration(now - t.get_last_state_change());
     return string::dup(duration);
   }
@@ -165,7 +175,7 @@ namespace  macros {
     (void)mac;
 
     // Get duration.
-    time_t now(time(NULL));
+    time_t now(time(nullptr));
     unsigned long duration(now - t.get_last_state_change());
     return string::dup(duration);
   }
@@ -241,7 +251,7 @@ namespace  macros {
     (void)mac;
 
     // Get copy of string with macros processed.
-    char* buffer(NULL);
+    char* buffer(nullptr);
     process_macros_r(mac, (t.*member)().c_str(), &buffer, options);
     return buffer;
   }
@@ -258,7 +268,7 @@ namespace  macros {
     (void)mac;
 
     // Get copy of string with macros processed.
-    char* buffer(NULL);
+    char* buffer(nullptr);
     V* v{&t};
     process_macros_r(mac, (v->*member)().c_str(), &buffer, options);
     return buffer;
@@ -278,7 +288,7 @@ namespace  macros {
     (void)mac;
 
     // Get copy of string with macros processed.
-    char* buffer(NULL);
+    char* buffer(nullptr);
     process_macros_r(mac, t.*member, &buffer, options);
     return buffer;
   }
@@ -293,7 +303,7 @@ namespace  macros {
   template <typename T>
   char* get_state_type(T& t, nagios_macros* mac) {
     (void)mac;
-    return (string::dup((t.get_state_type() == HARD_STATE)
+    return (string::dup((t.get_state_type() == notifier::hard)
                       ? "HARD"
                       : "SOFT"));
   }
@@ -309,7 +319,7 @@ namespace  macros {
   template <typename T>
   char* get_state_type_old(T& t, nagios_macros* mac) {
     (void)mac;
-    return (string::dup((t.state_type == HARD_STATE)
+    return (string::dup((t.get_state_type() == notifier::hard)
                       ? "HARD"
                       : "SOFT"));
   }

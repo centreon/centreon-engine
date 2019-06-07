@@ -332,15 +332,15 @@ int xsddefault_save_status_data() {
          "\tcheck_execution_time=" << std::setprecision(3) << std::fixed << it->second->execution_time << "\n"
          "\tcheck_latency=" << std::setprecision(3) << std::fixed << it->second->latency << "\n"
          "\tcheck_type=" << it->second->get_check_type() << "\n"
-         "\tcurrent_state=" << it->second->current_state << "\n"
-         "\tlast_hard_state=" << it->second->last_hard_state << "\n"
+         "\tcurrent_state=" << it->second->get_current_state() << "\n"
+         "\tlast_hard_state=" << it->second->get_last_hard_state() << "\n"
          "\tlast_event_id=" << it->second->get_last_event_id() << "\n"
          "\tcurrent_event_id=" << it->second->get_current_event_id() << "\n"
          "\tcurrent_problem_id=" << it->second->get_current_problem_id() << "\n"
          "\tlast_problem_id=" << it->second->get_last_problem_id() << "\n"
          "\tcurrent_attempt=" << it->second->get_current_attempt() << "\n"
          "\tmax_attempts=" << it->second->get_max_attempts() << "\n"
-         "\tstate_type=" << it->second->state_type << "\n"
+         "\tstate_type=" << it->second->get_state_type() << "\n"
          "\tlast_state_change=" << static_cast<unsigned long>(it->second->get_last_state_change()) << "\n"
          "\tlast_hard_state_change=" << static_cast<unsigned long>(it->second->get_last_hard_state_change()) << "\n"
          "\tlast_time_ok=" << static_cast<unsigned long>(it->second->get_last_time_ok()) << "\n"
@@ -369,7 +369,10 @@ int xsddefault_save_status_data() {
          "\tobsess_over_service=" << it->second->obsess_over_service << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << it->second->is_flapping << "\n"
-         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << it->second->percent_state_change << "\n"
+         "\tpercent_state_change=" << std::setprecision(2)
+                                   << std::fixed
+                                   << it->second->get_percent_state_change()
+                                   << "\n"
          "\tscheduled_downtime_depth=" << it->second->scheduled_downtime_depth << "\n";
 
     // custom variables

@@ -22,7 +22,11 @@
 
 # include <array>
 # include <string>
+# include <list>
+# include "com/centreon/engine/contact.hh"
+# include "com/centreon/engine/contactgroup.hh"
 # include "com/centreon/engine/namespace.hh"
+# include "common.hh"
 
 // Forward declarations
 struct nagios_macros;
@@ -48,6 +52,25 @@ class                notifier {
     flapping =    1 << 8,
     downtime =    1 << 9,
   };
+
+  enum               state_type {
+    soft,
+    hard
+  };
+
+  enum               service_state {
+    state_ok,
+    state_warning,
+    state_critical,
+    state_unknown
+  };
+
+  enum               host_state {
+    state_up,
+    state_down,
+    state_unreachable
+  };
+
   static std::array<std::string, 8> const tab_notification_str;
   static std::array<std::string, 2> const tab_state_type;
 
@@ -235,9 +258,21 @@ class                notifier {
   void               set_accept_passive_checks(bool accept_passive_checks);
   bool               get_problem_has_been_acknowledged() const;
   void               set_problem_has_been_acknowledged(bool problem_has_been_acknowledged);
+  int                get_last_state() const;
+  void               set_last_state(int last_state);
+  int                get_last_hard_state() const;
+  void               set_last_hard_state(int last_hard_state);
+  enum state_type    get_state_type() const;
+  void               set_state_type(enum state_type state_type);
+  double             get_percent_state_change() const;
+  void               set_percent_state_change(double percent_state_change);
+  unsigned int       get_state_history_index() const;
+  void               set_state_history_index(unsigned int state_history_index);
 
   contact_map        contacts;
   contactgroup_map   contact_groups;
+  int                state_history[MAX_STATE_HISTORY_ENTRIES];
+
  protected:
   int                _notifier_type;
   int                _stalk_type;
@@ -259,6 +294,9 @@ class                notifier {
   uint64_t           _current_notification_id;
   time_t             _next_notification;
   time_t             _last_notification;
+  int                _last_state;
+  int                _last_hard_state;
+  enum state_type    _state_type;
   int                _current_state;
 
   time_t             _initial_notif_time;
@@ -271,6 +309,8 @@ class                notifier {
   uint32_t           _out_notification_type;
   uint32_t           _in_notification_type;
   uint32_t           _modified_attributes;
+  unsigned int       _state_history_index;
+  double             _percent_state_change;
 
  private:
   static uint64_t    _next_notification_id;

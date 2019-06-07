@@ -212,10 +212,6 @@
 #  define CMD_CUSTOM_COMMAND                                 999
 
 
-/* Service state types. */
-#  define SOFT_STATE 0
-#  define HARD_STATE 1
-
 /* Scheduled downtime types. */
 #  define SERVICE_DOWNTIME 1 /* Service downtime. */
 #  define HOST_DOWNTIME    2 /* Host downtime. */
@@ -322,17 +318,6 @@
 
 /* Default values. */
 #  define DEFAULT_ORPHAN_CHECK_INTERVAL 60 /* Seconds between checks for orphaned hosts and services. */
-
-/* Host status. */
-#  define HOST_UP          0
-#  define HOST_DOWN        1
-#  define HOST_UNREACHABLE 2
-
-/* Service state. */
-#  define STATE_OK       0
-#  define STATE_WARNING  1
-#  define STATE_CRITICAL 2
-#  define STATE_UNKNOWN  3
 
 /* State change types. */
 #  define HOST_STATECHANGE    0

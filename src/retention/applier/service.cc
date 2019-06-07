@@ -90,11 +90,11 @@ void applier::service::_update(
     if (state.check_type().is_set())
       obj.set_check_type(*state.check_type());
     if (state.current_state().is_set())
-      obj.current_state = *state.current_state();
+      obj.set_current_state(*state.current_state());
     if (state.last_state().is_set())
-      obj.last_state = *state.last_state();
+      obj.set_last_state(*state.last_state());
     if (state.last_hard_state().is_set())
-      obj.last_hard_state = *state.last_hard_state();
+      obj.set_last_hard_state(*state.last_hard_state());
     if (state.current_attempt().is_set())
       obj.set_current_attempt(*state.current_attempt());
     if (state.current_event_id().is_set())
@@ -106,7 +106,7 @@ void applier::service::_update(
     if (state.last_problem_id().is_set())
       obj.set_last_problem_id(*state.last_problem_id());
     if (state.state_type().is_set())
-      obj.state_type = *state.state_type();
+      obj.set_state_type(static_cast<enum notifier::state_type>(*state.state_type()));
     if (state.last_state_change().is_set())
       obj.set_last_state_change(*state.last_state_change());
     if (state.last_hard_state_change().is_set())
@@ -155,14 +155,14 @@ void applier::service::_update(
     if (state.last_notification().is_set())
       obj.set_last_notification(*state.last_notification());
     if (state.percent_state_change().is_set())
-      obj.percent_state_change = *state.percent_state_change();
+      obj.set_percent_state_change(*state.percent_state_change());
     if (state.check_flapping_recovery_notification().is_set())
       obj.check_flapping_recovery_notification = *state.check_flapping_recovery_notification();
     if (state.state_history().is_set()) {
       utils::set_state_history(
         *state.state_history(),
         obj.state_history);
-      obj.state_history_index = 0;
+      obj.set_state_history_index(0);
     }
   }
 
@@ -250,8 +250,8 @@ void applier::service::_update(
       obj.set_max_attempts(*state.max_attempts());
 
       // adjust current attempt number if in a hard state.
-      if (obj.state_type == HARD_STATE
-          && obj.current_state != STATE_OK
+      if (obj.get_state_type() == notifier::hard
+          && obj.get_current_state() != notifier::state_ok
           && obj.get_current_attempt() > 1)
         obj.set_current_attempt(obj.get_max_attempts());
     }
@@ -285,18 +285,18 @@ void applier::service::_update(
   }
 
   // calculate next possible notification time.
-  if (obj.current_state != STATE_OK && obj.get_last_notification())
+  if (obj.get_current_state() != notifier::state_ok && obj.get_last_notification())
     obj.set_next_notification(
         obj.get_next_notification_time(obj.get_last_notification()));
 
   // fix old vars.
-  if (!obj.get_has_been_checked() && obj.state_type == SOFT_STATE)
-    obj.state_type = HARD_STATE;
+  if (!obj.get_has_been_checked() && obj.get_state_type() == notifier::soft)
+    obj.set_state_type(notifier::hard);
 
   // ADDED 01/23/2009 adjust current check attempt if service is
   // in hard problem state (max attempts may have changed in config
   // since restart).
-  if (obj.current_state != STATE_OK && obj.state_type == HARD_STATE)
+  if (obj.get_current_state() != notifier::state_ok && obj.get_state_type() == notifier::hard)
     obj.set_current_attempt(obj.get_max_attempts());
 
 

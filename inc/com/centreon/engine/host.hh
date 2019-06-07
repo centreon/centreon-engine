@@ -193,12 +193,6 @@ class                 host : public notifier {
   void               set_should_be_drawn(int should_be_drawn);
   int                get_acknowledgement_type() const;
   void               set_acknowledgement_type(int acknowledgement_type);
-  int                get_last_state() const;
-  void               set_last_state(int last_state);
-  int                get_last_hard_state() const;
-  void               set_last_hard_state(int last_hard_state);
-  int                get_state_type() const;
-  void               set_state_type(int state_type);
   double             get_latency() const;
   void               set_latency(double latency);
   double             get_execution_time() const;
@@ -231,8 +225,6 @@ class                 host : public notifier {
   void               set_scheduled_downtime_depth(int scheduled_downtime_depth);
   int                get_pending_flex_downtime() const;
   void               set_pending_flex_downtime(int pending_flex_downtime);
-  unsigned int       get_state_history_index() const;
-  void               set_state_history_index(unsigned int state_history_index);
   time_t             get_last_state_history_update() const;
   void               set_last_state_history_update(time_t last_state_history_update);
   bool               get_is_flapping() const;
@@ -241,8 +233,6 @@ class                 host : public notifier {
   void               set_flapping_comment_id(unsigned long flapping_comment_id);
   void               disable_flap_detection();
   void               enable_flap_detection();
-  double             get_percent_state_change() const;
-  void               set_percent_state_change(double percent_state_change);
   int                get_total_services() const;
   void               set_total_services(int total_services);
   unsigned long      get_total_service_check_interval() const;
@@ -275,7 +265,6 @@ class                 host : public notifier {
   commands::command*  event_handler_ptr;
   commands::command*  check_command_ptr;
 
-  int                 state_history[MAX_STATE_HISTORY_ENTRIES];
   service_map         services;
   timeperiod          *check_period_ptr;
   timeperiod          *notification_period_ptr;
@@ -302,9 +291,6 @@ private:
   int                 _z_3d;
   int                 _should_be_drawn;
   int                 _acknowledgement_type;
-  int                 _last_state;
-  int                 _last_hard_state;
-  int                 _state_type;
   double              _latency;
   double              _execution_time;
   bool                _is_executing;
@@ -324,7 +310,6 @@ private:
   time_t              _last_state_history_update;
   bool                _is_flapping;
   unsigned long       _flapping_comment_id;
-  double              _percent_state_change;
   int                 _total_services;
   unsigned long       _total_service_check_interval;
   int                 _circular_path_checked;

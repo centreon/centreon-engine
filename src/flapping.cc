@@ -173,7 +173,7 @@ void handle_host_flap_detection_disabled(com::centreon::engine::host* hst) {
 
     /* should we send a recovery notification? */
     if (hst->get_check_flapping_recovery_notification()
-        && hst->get_current_state() == HOST_UP)
+        && hst->get_current_state() ==  notifier::state_up)
       hst->notify(
         NOTIFICATION_NORMAL,
         NULL,
@@ -218,7 +218,7 @@ void handle_service_flap_detection_disabled(com::centreon::engine::service* svc)
       NEBATTR_FLAPPING_STOP_DISABLED,
       SERVICE_FLAPPING,
       svc,
-      svc->percent_state_change,
+      svc->get_percent_state_change(),
       0.0,
       0.0,
       NULL);
@@ -232,7 +232,7 @@ void handle_service_flap_detection_disabled(com::centreon::engine::service* svc)
 
     /* should we send a recovery notification? */
     if (svc->check_flapping_recovery_notification
-        && svc->current_state == STATE_OK)
+        && svc->get_current_state() ==  notifier::state_ok)
       svc->notify(
         NOTIFICATION_NORMAL,
         NULL,

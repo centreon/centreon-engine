@@ -638,7 +638,7 @@ void connector::_recv_query_execute(char const* data) {
     result res;
     res.command_id = command_id;
     res.end_time = timestamp::now();
-    res.exit_code = STATE_UNKNOWN;
+    res.exit_code = notifier::state_unknown;
     res.exit_status = process::normal;
     res.start_time = info->start_time;
 
@@ -653,7 +653,7 @@ void connector::_recv_query_execute(char const* data) {
     // The check result was properly returned.
     else {
       if (exit_code < 0 || exit_code > 3)
-        res.exit_code = STATE_UNKNOWN;
+        res.exit_code = notifier::state_unknown;
       else
         res.exit_code = exit_code;
       res.output = (is_executed ? std_out : std_err);
@@ -848,7 +848,7 @@ void connector::restart::_run() {
       result res;
       res.command_id = command_id;
       res.end_time = timestamp::now();
-      res.exit_code = STATE_UNKNOWN;
+      res.exit_code = notifier::state_unknown;
       res.exit_status = process::normal;
       res.start_time = info->start_time;
       res.output = "(Failed to execute command with connector '"

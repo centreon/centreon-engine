@@ -331,12 +331,12 @@ int notifier::notify(unsigned int type,
     contact* temp_contact{nullptr};
     if (!not_author.empty()) {
       /* see if we can find the contact - first by name, then by alias */
-      if ((temp_contact = state::instance().find_contact(not_author)) ==
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) ==
           nullptr) {
         for (std::unordered_map<std::string,
                                 std::shared_ptr<contact>>::const_iterator
-                 it{state::instance().contacts().begin()},
-             end{state::instance().contacts().end()};
+                 it{configuration::applier::state::instance().contacts().begin()},
+             end{configuration::applier::state::instance().contacts().end()};
              it != end; ++it) {
           if (it->second->get_alias() == not_author) {
             temp_contact = it->second.get();
@@ -401,9 +401,9 @@ int notifier::notify(unsigned int type,
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
     else if ((_notifier_type == HOST_NOTIFICATION &&
-              get_current_state() == HOST_UP) ||
+              get_current_state() ==   notifier::state_up) ||
              (_notifier_type == SERVICE_NOTIFICATION &&
-              get_current_state() == STATE_OK))
+              get_current_state() ==  notifier::state_ok))
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
@@ -530,9 +530,9 @@ int notifier::notify(unsigned int type,
   clear_volatile_macros_r(&mac);
 
   /* Update recovery been sent parameter */
-  if ((_notifier_type == HOST_NOTIFICATION && get_current_state() == HOST_UP) ||
+  if ((_notifier_type == HOST_NOTIFICATION && get_current_state() ==   notifier::state_up) ||
       (_notifier_type == SERVICE_NOTIFICATION &&
-       get_current_state() == STATE_OK))
+       get_current_state() ==  notifier::state_ok))
     _recovery_been_sent = true;
 
   return OK;
@@ -850,6 +850,46 @@ std::list<std::shared_ptr<escalation>> const& notifier::get_escalations()
 
 void notifier::add_escalation(std::shared_ptr<escalation> e) {
   _escalations.push_back(e);
+}
+
+int notifier::get_last_state() const {
+  return _last_state;
+}
+
+void notifier::set_last_state(int last_state) {
+  _last_state = last_state;
+}
+
+int notifier::get_last_hard_state() const {
+  return _last_hard_state;
+}
+
+void notifier::set_last_hard_state(int last_hard_state) {
+  _last_hard_state = last_hard_state;
+}
+
+enum notifier::state_type notifier::get_state_type() const {
+  return _state_type;
+}
+
+void notifier::set_state_type(enum notifier::state_type state_type) {
+  _state_type = state_type;
+}
+
+double notifier::get_percent_state_change() const {
+  return _percent_state_change;
+}
+
+void notifier::set_percent_state_change(double percent_state_change) {
+  _percent_state_change = percent_state_change;
+}
+
+unsigned int notifier::get_state_history_index() const {
+  return _state_history_index;
+}
+
+void notifier::set_state_history_index(unsigned int state_history_index) {
+  _state_history_index = state_history_index;
 }
 
 /**

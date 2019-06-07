@@ -251,7 +251,7 @@ TEST_F(ApplierService, ServicesFlapOptionsAll) {
 TEST_F(ApplierService, ServicesInitialState) {
   configuration::service csvc;
   ASSERT_TRUE(csvc.parse("initial_state", "u"));
-  ASSERT_EQ(csvc.initial_state(), STATE_UNKNOWN);
+  ASSERT_EQ(csvc.initial_state(), notifier::state_unknown);
   ASSERT_FALSE(csvc.parse("initial_state", "g"));
 }
 

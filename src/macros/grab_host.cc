@@ -66,17 +66,17 @@ static void generate_host_total_services(
       service* temp_service(it->second.get());
       if (temp_service) {
         total_host_services++;
-        switch (temp_service->current_state) {
-         case STATE_OK:
+        switch (temp_service->get_current_state()) {
+         case notifier::state_ok:
           total_host_services_ok++;
           break;
-         case STATE_WARNING:
+         case notifier::state_warning:
           total_host_services_warning++;
           break;
-         case STATE_UNKNOWN:
+         case notifier::state_unknown:
           total_host_services_unknown++;
           break;
-         case STATE_CRITICAL:
+         case notifier::state_critical:
           total_host_services_critical++;
           break;
         }
@@ -270,9 +270,9 @@ struct grab_host_redirection {
       {MACRO_HOSTSTATE, {&get_host_state<host, notifier, &notifier::get_current_state>, true}},
       {MACRO_HOSTSTATEID,
        {&get_member_as_string<host, int, notifier, &notifier::get_current_state>, true}},
-      {MACRO_LASTHOSTSTATE, {&get_host_state<host, host, &host::get_last_state>, true}},
+      {MACRO_LASTHOSTSTATE, {&get_host_state<host, notifier, &notifier::get_last_state>, true}},
       {MACRO_LASTHOSTSTATEID,
-       {&get_member_as_string<host, int, &host::get_last_state>, true}},
+       {&get_member_as_string<host, int, notifier, &notifier::get_last_state>, true}},
       {MACRO_HOSTCHECKTYPE, {&get_host_check_type, true}},
       {MACRO_HOSTSTATETYPE, {&get_state_type<host>, true}},
       {MACRO_HOSTOUTPUT,
@@ -306,7 +306,7 @@ struct grab_host_redirection {
        {&get_member_as_string<host, int, &host::get_scheduled_downtime_depth>,
         true}},
       {MACRO_HOSTPERCENTCHANGE,
-       {&get_double<host, &host::get_percent_state_change, 2>, true}},
+       {&get_double<host, notifier, &notifier::get_percent_state_change, 2>, true}},
       {MACRO_HOSTDURATION, {&get_duration<host>, true}},
       {MACRO_HOSTDURATIONSEC, {&get_duration_sec<host>, true}},
       {MACRO_HOSTEXECUTIONTIME,

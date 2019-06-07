@@ -83,7 +83,7 @@ int my_system_r(
 
   // if no command was passed, return with no error.
   if (cmd == NULL) {
-    return STATE_OK;
+    return notifier::ok;
   }
 
   logger(dbg_commands, more)
@@ -105,7 +105,7 @@ int my_system_r(
     *exectime,
     timeout,
     *early_timeout,
-    STATE_OK,
+    notifier::ok,
     cmd,
     NULL,
     NULL);

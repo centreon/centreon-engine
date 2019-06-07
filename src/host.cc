@@ -247,7 +247,7 @@ host::host(uint64_t host_id,
   _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
   _check_options = CHECK_OPTION_NONE;
   _modified_attributes = MODATTR_NONE;
-  _state_type = HARD_STATE;
+  _state_type = notifier::hard;
 
   // Duplicate string vars.
   _name = name;
@@ -256,7 +256,7 @@ host::host(uint64_t host_id,
   _statusmap_image = statusmap_image;
   _vrml_image = vrml_image;
 
-  set_current_attempt(initial_state == HOST_UP ? 1 : max_attempts);
+  set_current_attempt(initial_state ==  notifier::state_up ? 1 : max_attempts);
   _current_state = initial_state;
   _flap_type = notifier::none;
   _flap_type |= (flap_detection_on_down > 0 ? notifier::down : 0);
@@ -483,30 +483,6 @@ void host::set_acknowledgement_type(int acknowledgement_type) {
   _acknowledgement_type = acknowledgement_type;
 }
 
-int host::get_last_state() const {
-  return _last_state;
-}
-
-void host::set_last_state(int last_state) {
-  _last_state = last_state;
-}
-
-int host::get_last_hard_state() const {
-  return _last_hard_state;
-}
-
-void host::set_last_hard_state(int last_hard_state) {
-  _last_hard_state = last_hard_state;
-}
-
-int host::get_state_type() const {
-  return _state_type;
-}
-
-void host::set_state_type(int state_type) {
-  _state_type = state_type;
-}
-
 double host::get_latency() const {
   return _latency;
 }
@@ -642,14 +618,6 @@ void host::set_pending_flex_downtime(int pending_flex_downtime) {
   _pending_flex_downtime = pending_flex_downtime;
 }
 
-unsigned int host::get_state_history_index() const {
-  return _state_history_index;
-}
-
-void host::set_state_history_index(unsigned int state_history_index) {
-  _state_history_index = state_history_index;
-}
-
 time_t host::get_last_state_history_update() const {
   return _last_state_history_update;
 }
@@ -672,14 +640,6 @@ unsigned long host::get_flapping_comment_id() const {
 
 void host::set_flapping_comment_id(unsigned long flapping_comment_id) {
   _flapping_comment_id = flapping_comment_id;
-}
-
-double host::get_percent_state_change() const {
-  return _percent_state_change;
-}
-
-void host::set_percent_state_change(double percent_state_change) {
-  _percent_state_change = percent_state_change;
 }
 
 int host::get_total_services() const {
@@ -1509,7 +1469,7 @@ int host::log_event() {
 /* process results of an asynchronous host check */
 int host::handle_async_check_result_3x(check_result* queued_check_result) {
   time_t current_time;
-  int result = STATE_OK;
+  int result =  notifier::state_ok;
   int reschedule_check = false;
   std::string old_plugin_output;
   struct timeval start_time_hires;
@@ -1648,7 +1608,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   /* save the old host state */
   set_last_state(get_current_state());
-  if (get_state_type() == HARD_STATE)
+  if (get_state_type() == notifier::hard)
     set_last_hard_state(get_current_state());
 
   /* save old plugin output */
@@ -1706,7 +1666,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       set_long_plugin_output("");
       set_perf_data("");
 
-      result = STATE_UNKNOWN;
+      result =  notifier::state_unknown;
     }
 
     /* make sure the return code is within bounds */
@@ -1734,13 +1694,13 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       set_long_plugin_output("");
       set_perf_data("");
 
-      result = STATE_UNKNOWN;
+      result =  notifier::state_unknown;
     }
 
     /* a NULL host check command means we should assume the host is UP */
     if (get_check_command().empty()) {
       set_plugin_output("(Host assumed to be UP)");
-      result = STATE_OK;
+      result =  notifier::state_ok;
     }
   }
 
@@ -1750,17 +1710,17 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
    * the final state */
   if (queued_check_result->check_type == check_active) {
     /* if we're not doing aggressive host checking, let WARNING states indicate
-     * the host is up (fake the result to be STATE_OK) */
-    if (!config->use_aggressive_host_checking() && result == STATE_WARNING)
-      result = STATE_OK;
+     * the host is up (fake the result to be notifier::state_ok) */
+    if (!config->use_aggressive_host_checking() && result ==  notifier::state_warning)
+      result =  notifier::state_ok;
 
     /* OK states means the host is UP */
-    if (result == STATE_OK)
-      result = HOST_UP;
+    if (result ==  notifier::state_ok)
+      result =  notifier::state_up;
 
     /* any problem state indicates the host is not UP */
     else
-      result = HOST_DOWN;
+      result =  notifier::state_down;
   }
 
   /******************* PROCESS THE CHECK RESULTS ******************/
@@ -2047,7 +2007,7 @@ void host::check_for_flapping(int update,
   int is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
-  int last_state_history_value = HOST_UP;
+  int last_state_history_value =  notifier::state_up;
   unsigned long wait_threshold = 0L;
   double curved_changes = 0.0;
   double curved_percent_change = 0.0;
@@ -2078,11 +2038,11 @@ void host::check_for_flapping(int update,
 
   /* should we update state history for this state? */
   if (update_history) {
-    if (get_current_state() == HOST_UP && !get_flap_detection_on(notifier::up))
+    if (get_current_state() ==  notifier::state_up && !get_flap_detection_on(notifier::up))
       update_history = false;
-    if (get_current_state() == HOST_DOWN && !get_flap_detection_on(notifier::down))
+    if (get_current_state() ==  notifier::state_down && !get_flap_detection_on(notifier::down))
       update_history = false;
-    if (get_current_state() == HOST_UNREACHABLE &&
+    if (get_current_state() ==  notifier::state_unreachable &&
         !get_flap_detection_on(notifier::unreachable))
       update_history = false;
   }
@@ -2238,7 +2198,7 @@ void host::set_flap(double percent_change,
 
   /* see if we should check to send a recovery notification out when flapping
    * stops */
-  if (get_current_state() != HOST_UP && get_current_notification_number() > 0)
+  if (get_current_state() !=  notifier::state_up && get_current_notification_number() > 0)
     set_check_flapping_recovery_notification(true);
   else
     set_check_flapping_recovery_notification(false);
@@ -2282,7 +2242,7 @@ void host::clear_flap(double percent_change,
 
   /* should we send a recovery notification? */
   if (get_check_flapping_recovery_notification() &&
-      get_current_state() == HOST_UP)
+      get_current_state() ==  notifier::state_up)
     notify(NOTIFICATION_NORMAL, NULL, NULL, NOTIFICATION_OPTION_NONE);
 
   /* clear the recovery notification flag */
@@ -2405,7 +2365,7 @@ int host::check_notification_viability(unsigned int type, int options) {
    */
   if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
     /* don't send an acknowledgement if there isn't a problem... */
-    if (get_current_state() == HOST_UP) {
+    if (get_current_state() ==  notifier::state_up) {
       logger(dbg_notifications, more)
           << "The host is currently UP, so we won't send "
              "an acknowledgement.";
@@ -2476,7 +2436,7 @@ int host::check_notification_viability(unsigned int type, int options) {
   /****************************************/
 
   /* is this a hard problem/recovery? */
-  if (get_state_type() == SOFT_STATE) {
+  if (get_state_type() == notifier::soft) {
     logger(dbg_notifications, more)
         << "This host is in a soft state, so we won't send "
            "a notification out.";
@@ -2501,18 +2461,18 @@ int host::check_notification_viability(unsigned int type, int options) {
   }
 
   /* see if we should notify about problems with this host */
-  if (get_current_state() == HOST_UNREACHABLE &&
+  if (get_current_state() ==  notifier::state_unreachable &&
       !get_notify_on(notifier::unreachable)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about UNREACHABLE status for this host.";
     return ERROR;
   }
-  if (get_current_state() == HOST_DOWN && !get_notify_on(notifier::down)) {
+  if (get_current_state() ==  notifier::state_down && !get_notify_on(notifier::down)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about DOWN states for this host.";
     return ERROR;
   }
-  if (get_current_state() == HOST_UP) {
+  if (get_current_state() ==  notifier::state_up) {
     if (!get_notify_on(notifier::recovery)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about RECOVERY states for this host.";
@@ -2529,7 +2489,7 @@ int host::check_notification_viability(unsigned int type, int options) {
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL &&
       (get_current_notification_number() == 0 ||
-       (get_current_state() == HOST_UP && !_recovery_been_sent))) {
+       (get_current_state() ==  notifier::state_up && !_recovery_been_sent))) {
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time{_initial_notif_time};
 
@@ -2538,13 +2498,13 @@ int host::check_notification_viability(unsigned int type, int options) {
       initial_notif_time = time(nullptr);
 
     double notification_delay =
-        (get_current_state() != HOST_UP ? get_first_notification_delay()
+        (get_current_state() !=  notifier::state_up ? get_first_notification_delay()
                                         : _recovery_notification_delay) *
         config->interval_length();
 
     if (current_time <
         (time_t)(initial_notif_time + (time_t)(notification_delay))) {
-      if (get_current_state() == HOST_UP)
+      if (get_current_state() ==  notifier::state_up)
         logger(dbg_notifications, more)
             << "Not enough time has elapsed since the host changed to an "
                "UP state (or since program start), so we shouldn't notify "
@@ -2578,7 +2538,7 @@ int host::check_notification_viability(unsigned int type, int options) {
   }
 
   /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
-  if (get_current_state() == HOST_UP)
+  if (get_current_state() ==  notifier::state_up)
     return OK;
 
   /* check if we shouldn't renotify contacts about the host problem */
@@ -2621,15 +2581,15 @@ int host::handle_state() {
 
   /* record latest time for current state */
   switch (get_current_state()) {
-    case HOST_UP:
+    case  notifier::state_up:
       set_last_time_up(current_time);
       break;
 
-    case HOST_DOWN:
+    case  notifier::state_down:
       set_last_time_down(current_time);
       break;
 
-    case HOST_UNREACHABLE:
+    case  notifier::state_unreachable:
       set_last_time_unreachable(current_time);
       break;
 
@@ -2640,16 +2600,16 @@ int host::handle_state() {
   /* has the host state changed? */
   if (get_last_state() != get_current_state() ||
       get_last_hard_state() != get_current_state() ||
-      (get_current_state() == HOST_UP && get_state_type() == SOFT_STATE))
+      (get_current_state() ==  notifier::state_up && get_state_type() == notifier::soft))
     state_change = true;
 
   /* if the host state has changed... */
   if (state_change == true) {
     /* update last state change times */
-    if (get_state_type() == SOFT_STATE ||
+    if (get_state_type() == notifier::soft ||
         get_last_state() != get_current_state())
       set_last_state_change(current_time);
-    if (get_state_type() == HARD_STATE)
+    if (get_state_type() == notifier::hard)
       set_last_hard_state_change(current_time);
 
     /* update the event id */
@@ -2658,7 +2618,7 @@ int host::handle_state() {
     next_event_id++;
 
     /* update the problem id when transitioning to a problem state */
-    if (get_last_state() == HOST_UP) {
+    if (get_last_state() ==  notifier::state_up) {
       /* don't reset last problem id, or it will be zero the next time a problem
        * is encountered */
       /*this->get_last_problem_id=this->get_current_problem_id; */
@@ -2668,7 +2628,7 @@ int host::handle_state() {
 
     /* clear the problem id when transitioning from a problem state to an UP
      * state */
-    if (get_current_state() == HOST_UP) {
+    if (get_current_state() ==  notifier::state_up) {
       set_last_problem_id(get_current_problem_id());
       set_current_problem_id(0L);
     }
@@ -2681,7 +2641,7 @@ int host::handle_state() {
       /* remove any non-persistant comments associated with the ack */
       comment::delete_host_acknowledgement_comments(this);
     } else if (get_acknowledgement_type() == ACKNOWLEDGEMENT_STICKY &&
-               get_current_state() == HOST_UP) {
+               get_current_state() ==  notifier::state_up) {
       set_problem_has_been_acknowledged(false);
       set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
@@ -2697,34 +2657,34 @@ int host::handle_state() {
     set_no_more_notifications(false);
 
     /* write the host state change to the main log file */
-    if (get_state_type() == HARD_STATE ||
-        (get_state_type() == SOFT_STATE && config->log_host_retries() == true))
+    if (get_state_type() == notifier::hard ||
+        (get_state_type() == notifier::soft && config->log_host_retries() == true))
       log_event();
 
     /* check for start of flexible (non-fixed) scheduled downtime */
     /* CHANGED 08-05-2010 EG flex downtime can now start on soft states */
-    /*if(this->state_type==HARD_STATE) */
+    /*if(this->state_type==notifier::hard) */
     downtime_manager::instance().check_pending_flex_host_downtime(this);
 
-    if (get_current_state() == HOST_UP) {
+    if (get_current_state() ==  notifier::state_up) {
       _recovery_been_sent = false;
       _initial_notif_time = 0;
     }
 
     /* notify contacts about the recovery or problem if its a "hard" state */
-    if (get_state_type() == HARD_STATE)
+    if (get_state_type() == notifier::hard)
       notify(NOTIFICATION_NORMAL, NULL, NULL, NOTIFICATION_OPTION_NONE);
 
     /* handle the host state change */
     handle_host_event(this);
 
     /* the host just recovered, so reset the current host attempt */
-    if (get_current_state() == HOST_UP)
+    if (get_current_state() ==  notifier::state_up)
       set_current_attempt(1);
 
     /* the host recovered, so reset the current notification number and state
      * flags (after the recovery notification has gone out) */
-    if (get_current_state() == HOST_UP && _recovery_been_sent) {
+    if (get_current_state() ==  notifier::state_up && _recovery_been_sent) {
       _current_notification_number = 0;
       set_notified_on(notifier::none);
     }
@@ -2735,21 +2695,21 @@ int host::handle_state() {
     bool old_recovery_been_sent{_recovery_been_sent};
 
     /* notify contacts if needed */
-    if ((get_current_state() != HOST_UP ||
-         (get_current_state() == HOST_UP && !_recovery_been_sent)) &&
-        get_state_type() == HARD_STATE)
+    if ((get_current_state() !=  notifier::state_up ||
+         (get_current_state() ==  notifier::state_up && !_recovery_been_sent)) &&
+        get_state_type() == notifier::hard)
       notify(NOTIFICATION_NORMAL, NULL, NULL, NOTIFICATION_OPTION_NONE);
 
     /* the host recovered, so reset the current notification number and state
      * flags (after the recovery notification has gone out) */
     if (!old_recovery_been_sent && _recovery_been_sent &&
-        get_current_state() == HOST_UP) {
+        get_current_state() ==  notifier::state_up) {
       _current_notification_number = 0;
       set_notified_on(notifier::none);
     }
 
     /* if we're in a soft state and we should log host retries, do so now... */
-    if (get_state_type() == SOFT_STATE && config->log_host_retries() == true)
+    if (get_state_type() == notifier::soft && config->log_host_retries() == true)
       log_event();
   }
 
@@ -2783,8 +2743,8 @@ int host::verify_check_viability(int check_options,
   logger(dbg_functions, basic) << "check_host_check_viability_3x()";
 
   /* get the check interval to use if we need to reschedule the check */
-  if (this->get_state_type() == SOFT_STATE &&
-      this->get_current_state() != HOST_UP)
+  if (this->get_state_type() == notifier::soft &&
+      this->get_current_state() !=  notifier::state_up)
     check_interval = static_cast<int>(this->get_retry_interval() *
                                       config->interval_length());
   else
@@ -3025,9 +2985,9 @@ int host::notify_contact(nagios_macros* mac,
 
 void host::update_notification_flags() {
   /* update notifications flags */
-  if (get_current_state() == HOST_DOWN)
+  if (get_current_state() ==  notifier::state_down)
     add_notified_on(notifier::down);
-  else if (get_current_state() == HOST_UNREACHABLE)
+  else if (get_current_state() ==  notifier::state_unreachable)
     add_notified_on(notifier::unreachable);
 }
 
@@ -3172,7 +3132,7 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
    * if this is a recovery, really we check for who got notified about a
    * previous problem
    */
-  if (get_current_state() == HOST_UP)
+  if (get_current_state() ==  notifier::state_up)
     notification_number = get_current_notification_number() - 1;
   else
     notification_number = get_current_notification_number();
@@ -3205,12 +3165,12 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
     return false;
 
   /* skip this escalation if the state options don't match */
-  if (get_current_state() == HOST_UP && !e->get_escalate_on(notifier::recovery))
+  if (get_current_state() ==  notifier::state_up && !e->get_escalate_on(notifier::recovery))
     return false;
-  else if (get_current_state() == HOST_DOWN &&
+  else if (get_current_state() ==  notifier::state_down &&
            !e->get_escalate_on(notifier::down))
     return false;
-  else if (get_current_state() == HOST_UNREACHABLE &&
+  else if (get_current_state() ==  notifier::state_unreachable &&
            !e->get_escalate_on(notifier::unreachable))
     return false;
 
