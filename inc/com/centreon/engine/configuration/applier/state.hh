@@ -120,6 +120,10 @@ namespace           configuration {
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
+      hostgroup_map::const_iterator
+                    hostgroups_find(configuration::hostgroup::key_type const& k) const;
+      hostgroup_map::iterator
+                    hostgroups_find(configuration::hostgroup::key_type const& k);
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>> const&
                     services() const throw ();
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>&
