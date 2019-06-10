@@ -30,6 +30,7 @@ if (WITH_TESTING)
   # Unit test executable.
   add_executable("ut"
     # Sources.
+    "${TESTS_DIR}/parse-check-output.cc"
     "${TESTS_DIR}/commands/simple-command.cc"
     "${TESTS_DIR}/configuration/applier/applier-command.cc"
     "${TESTS_DIR}/configuration/applier/applier-connector.cc"

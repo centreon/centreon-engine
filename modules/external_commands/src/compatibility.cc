@@ -998,9 +998,7 @@ int process_hostgroup_command(int cmd,
                               char* args) {
   char* hostgroup_name = nullptr;
   hostgroup* temp_hostgroup = nullptr;
-  host* temp_host = nullptr;
   com::centreon::engine::service* temp_service = nullptr;
-  servicesmember* temp_servicesmember = nullptr;
 
   (void)entry_time;
 
@@ -1056,10 +1054,12 @@ int process_hostgroup_command(int cmd,
     default:
 
       /* loop through all services on the host */
-      for (temp_servicesmember = it->second->services;
-           temp_servicesmember != nullptr;
-           temp_servicesmember = temp_servicesmember->next) {
-        if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+      for (service_map::iterator
+             it2(it->second->services.begin()),
+             end2(it->second->services.end());
+           it2 != end2;
+           ++it2) {
+        if ((temp_service = it2->second.get()) == nullptr)
           continue;
 
         switch (cmd) {
@@ -1104,7 +1104,6 @@ int process_host_command(int cmd,
   char* host_name = nullptr;
   host* temp_host = nullptr;
   com::centreon::engine::service* temp_service = nullptr;
-  servicesmember* temp_servicesmember = nullptr;
   char* str = nullptr;
   char* buf[2] = { nullptr, nullptr };
   int intval = 0;
@@ -1151,10 +1150,12 @@ int process_host_command(int cmd,
 
   case CMD_ENABLE_HOST_SVC_NOTIFICATIONS:
   case CMD_DISABLE_HOST_SVC_NOTIFICATIONS:
-    for (temp_servicesmember = temp_host->services;
-         temp_servicesmember != nullptr;
-         temp_servicesmember = temp_servicesmember->next) {
-      if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+    for (service_map::iterator
+           it(temp_host->services.begin()),
+           end(temp_host->services.end());
+         it != end;
+         ++it) {
+      if ((temp_service = it->second.get()) == nullptr)
         continue;
       if (cmd == CMD_ENABLE_HOST_SVC_NOTIFICATIONS)
         enable_service_notifications(temp_service);
@@ -1165,10 +1166,12 @@ int process_host_command(int cmd,
 
   case CMD_ENABLE_HOST_SVC_CHECKS:
   case CMD_DISABLE_HOST_SVC_CHECKS:
-    for (temp_servicesmember = temp_host->services;
-         temp_servicesmember != nullptr;
-         temp_servicesmember = temp_servicesmember->next) {
-      if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+    for (service_map::iterator
+           it(temp_host->services.begin()),
+           end(temp_host->services.end());
+         it != end;
+         ++it) {
+      if ((temp_service = it->second.get()) == nullptr)
         continue;
       if (cmd == CMD_ENABLE_HOST_SVC_CHECKS)
         enable_service_checks(temp_service);
@@ -1355,7 +1358,6 @@ int process_servicegroup_command(int cmd,
 
   char* servicegroup_name{nullptr};
   servicegroup* temp_servicegroup{nullptr};
-  servicesmember* temp_member{nullptr};
   host* temp_host{nullptr};
   host* last_host{nullptr};
   com::centreon::engine::service* temp_service{nullptr};
@@ -1378,11 +1380,14 @@ int process_servicegroup_command(int cmd,
   case CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
 
     /* loop through all servicegroup members */
-    for (temp_member = temp_servicegroup->members;
-         temp_member != nullptr;
-         temp_member = temp_member->next) {
+    for (service_map::iterator
+           it(temp_servicegroup->members.begin()),
+           end(temp_servicegroup->members.end());
+         it != end;
+         ++it) {
 
-      temp_service = find_service(temp_member->host_name, temp_member->service_description);
+      temp_service = find_service(it->first.first.c_str(),
+        it->first.second.c_str());
       if (temp_service == nullptr)
         continue;
 
@@ -1426,15 +1431,18 @@ int process_servicegroup_command(int cmd,
   case CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
     /* loop through all hosts that have services belonging to the servicegroup */
     last_host = nullptr;
-    for (temp_member = temp_servicegroup->members; temp_member != nullptr;
-         temp_member = temp_member->next) {
+    for (service_map::iterator
+           it(temp_servicegroup->members.begin()),
+           end(temp_servicegroup->members.end());
+         it != end;
+         ++it) {
       temp_host = nullptr;
       umap<uint64_t,
-           std::shared_ptr<com::centreon::engine::host>>::const_iterator it =
+           std::shared_ptr<com::centreon::engine::host>>::const_iterator found =
           configuration::applier::state::instance().hosts().find(
-              get_host_id(temp_member->host_name));
-      if (it != configuration::applier::state::instance().hosts().end())
-        temp_host = it->second.get();
+              get_host_id(it->first.first));
+      if (found != configuration::applier::state::instance().hosts().end())
+        temp_host = found->second.get();
       if (temp_host == nullptr)
         continue;
 
@@ -1525,7 +1533,6 @@ int process_contactgroup_command(int cmd,
                                  char* args) {
   char* contactgroup_name = nullptr;
   contactgroup* temp_contactgroup = nullptr;
-  contact* temp_contact = nullptr;
 
   (void)entry_time;
 

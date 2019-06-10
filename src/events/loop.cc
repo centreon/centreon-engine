@@ -308,24 +308,24 @@ void loop::_dispatching() {
           // We nudge the next check time when it is
           // due to too many concurrent service checks.
           if (nudge_seconds)
-            temp_service->next_check
-              = (time_t)(temp_service->next_check + nudge_seconds);
+            temp_service->set_next_check(
+              (time_t)(temp_service->get_next_check() + nudge_seconds));
           // Otherwise reschedule (TODO: This should be smarter as it
           // doesn't consider its timeperiod).
           else {
-            if (SOFT_STATE == temp_service->state_type &&
-                temp_service->current_state != STATE_OK)
-              temp_service->next_check =
-                  (time_t)(temp_service->next_check +
+            if (notifier::soft == temp_service->get_state_type() &&
+                temp_service->get_current_state() != service::state_ok)
+              temp_service->set_next_check(
+                  (time_t)(temp_service->get_next_check() +
                            temp_service->get_retry_interval() *
-                               config->interval_length());
+                               config->interval_length()));
             else
-              temp_service->next_check =
-                  (time_t)(temp_service->next_check +
+              temp_service->set_next_check(
+                  (time_t)(temp_service->get_next_check() +
                            (temp_service->get_check_interval() *
-                            config->interval_length()));
+                            config->interval_length())));
           }
-          temp_event->run_time = temp_service->next_check;
+          temp_event->run_time = temp_service->get_next_check();
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
           temp_service->update_status(false);
           run_event = false;
@@ -362,8 +362,8 @@ void loop::_dispatching() {
             &event_list_low_tail);
 
           // Reschedule.
-          if ((SOFT_STATE == temp_host->get_state_type())
-              && (temp_host->get_current_state() != STATE_OK))
+          if ((notifier::soft == temp_host->get_state_type())
+              && (temp_host->get_current_state() != host::state_up))
             temp_host->set_next_check(
               (time_t)(temp_host->get_next_check()
                          + (temp_host->get_retry_interval()

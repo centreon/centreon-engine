@@ -102,14 +102,9 @@ extern time_t                    event_start;
 extern int                       embedded_perl_initialized;
 
 extern std::map<std::string, host_other_properties> host_other_props;
-extern com::centreon::engine::service*                  service_list;
-extern com::centreon::engine::service*                  service_list_tail;
 extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-extern servicegroup*             servicegroup_list;
-extern servicegroup*             servicegroup_list_tail;
-extern std::map<std::string, servicegroup_other_properties> servicegroup_other_props;
-extern serviceescalation*        serviceescalation_list;
-extern serviceescalation*        serviceescalation_list_tail;
+extern com::centreon::engine::serviceescalation*        serviceescalation_list;
+extern com::centreon::engine::serviceescalation*        serviceescalation_list_tail;
 
 extern int                       __nagios_object_structure_version;
 

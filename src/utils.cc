@@ -83,7 +83,7 @@ int my_system_r(
 
   // if no command was passed, return with no error.
   if (cmd == NULL) {
-    return STATE_OK;
+    return notifier::ok;
   }
 
   logger(dbg_commands, more)
@@ -105,7 +105,7 @@ int my_system_r(
     *exectime,
     timeout,
     *early_timeout,
-    STATE_OK,
+    notifier::ok,
     cmd,
     NULL,
     NULL);
@@ -381,203 +381,108 @@ int free_check_result(check_result* info) {
   return OK;
 }
 
-/* parse raw plugin output and return: short and long output, perf data */
-int parse_check_output(
-      char* buf,
-      char** short_output,
-      char** long_output,
-      char** perf_data,
-      int escape_newlines_please,
-      int newlines_are_escaped) {
-  int current_line = 0;
-  bool found_newline = false;
-  bool eof = false;
-  int used_buf = 0;
-  int dbuf_chunk = 1024;
-  dbuf db1;
-  dbuf db2;
-  char* ptr = NULL;
-  bool in_perf_data = false;
-  char* tempbuf = NULL;
-  int x = 0;
-  int y = 0;
+/**
+ * @brief Parse buffer and fill the three strings given as references:
+ *    * short_output
+ *    * long_output
+ *    * perf_data
+ *
+ * @param[in] buffer
+ * @param[out] short_output
+ * @param[out] long_output
+ * @param[out] perf_data
+ * @param[in] escape_newlines_please To escape new lines in the returned strings
+ * @param[in] newlines_are_escaped To consider input newlines as escaped.
+ *
+ */
+void parse_check_output(
+      std::string const& buffer,
+      std::string& short_buffer,
+      std::string& long_buffer,
+      std::string& pd_buffer,
+      bool escape_newlines_please,
+      bool newlines_are_escaped) {
+  bool long_pipe{false};
+  bool perfdata_already_filled{false};
 
-  /* initialize values */
-  if (short_output)
-    *short_output = NULL;
-  if (long_output)
-    *long_output = NULL;
-  if (perf_data)
-    *perf_data = NULL;
-
-  /* nothing to do */
-  if (buf == NULL || *buf == 0)
-    return OK;
-
-  used_buf = strlen(buf) + 1;
-
-  /* initialize dynamic buffers (1KB chunk size) */
-  dbuf_init(&db1, dbuf_chunk);
-  dbuf_init(&db2, dbuf_chunk);
-
-  /* unescape newlines and escaped backslashes first */
-  if (newlines_are_escaped) {
-    for (x = 0, y = 0; buf[x] != '\x0'; x++) {
-      if (buf[x] == '\\' && buf[x + 1] == '\\') {
-        x++;
-        buf[y++] = buf[x];
-      }
-      else if (buf[x] == '\\' && buf[x + 1] == 'n') {
-        x++;
-        buf[y++] = '\n';
-      }
-      else
-        buf[y++] = buf[x];
+  bool eof{false};
+  std::string line;
+  /* pos_line is used to cut a line
+   * start_line is the position of the line begin
+   * end_line is the position of the line end. */
+  size_t start_line{0}, end_line, pos_line;
+  int line_number{1};
+  while (!eof) {
+    if (newlines_are_escaped && (pos_line = buffer.find("\\n", start_line)) != std::string::npos) {
+      end_line = pos_line;
+      pos_line += 2;
     }
-    buf[y] = '\x0';
-  }
-
-  /* process each line of input */
-  for (x = 0; !eof; x++) {
-
-    /* we found the end of a line */
-    if (buf[x] == '\n')
-      found_newline = true;
-    else if (buf[x] == '\\' && buf[x + 1] == 'n'
-             && newlines_are_escaped == true) {
-      found_newline = true;
-      buf[x] = '\x0';
-      x++;
+    else if ((pos_line = buffer.find("\n", start_line)) != std::string::npos) {
+      end_line = pos_line;
+      pos_line++;
     }
-    else if (buf[x] == '\x0') {
-      found_newline = true;
+    else {
+      end_line = buffer.size();
       eof = true;
     }
+    line = buffer.substr(start_line, end_line - start_line);
+    size_t pipe;
+    if (!long_pipe)
+      pipe = line.find_last_of('|');
     else
-      found_newline = false;
+      pipe = std::string::npos;
 
-    if (found_newline == true) {
+    if (pipe != std::string::npos) {
+      end_line = pipe;
+      /* Let's trim the output */
+      while (end_line > 1 && std::isspace(line[end_line - 1]))
+        end_line--;
 
-      current_line++;
+      /* Let's trim the output */
+      pipe++;
+      while (pipe < line.size() - 1 && std::isspace(line[pipe]))
+        pipe++;
 
-      /* handle this line of input */
-      buf[x] = '\x0';
-      tempbuf = string::dup(buf);
-
-      /* first line contains short plugin output and optional perf data */
-      if (current_line == 1) {
-
-        /* get the short plugin output */
-        if ((ptr = strtok(tempbuf, "|"))) {
-          if (short_output)
-            *short_output = string::dup(ptr);
-
-          /* get the optional perf data */
-          if ((ptr = strtok(NULL, "\n")))
-            dbuf_strcat(&db2, ptr);
-        }
+      if (line_number == 1) {
+        short_buffer.append(line.substr(0, end_line));
+        pd_buffer.append(line.substr(pipe));
+        perfdata_already_filled = true;
       }
-
-      /* additional lines contain long plugin output and optional perf data */
       else {
-
-        /* rest of the output is perf data */
-        if (in_perf_data) {
-          dbuf_strcat(&db2, tempbuf);
-          dbuf_strcat(&db2, " ");
-        }
-
-        /* we're still in long output */
-        else {
-
-          /* perf data separator has been found */
-          if (strstr(tempbuf, "|")) {
-
-            /* NOTE: strtok() causes problems if first character of tempbuf='|', so use my_strtok() instead */
-            /* get the remaining long plugin output */
-            if ((ptr = my_strtok(tempbuf, "|"))) {
-
-              if (current_line > 2)
-                dbuf_strcat(&db1, "\n");
-              dbuf_strcat(&db1, ptr);
-
-              /* get the perf data */
-              if ((ptr = my_strtok(NULL, "\n"))) {
-                dbuf_strcat(&db2, ptr);
-                dbuf_strcat(&db2, " ");
-              }
-            }
-
-            /* set the perf data flag */
-            in_perf_data = true;
-          }
-
-          /* just long output */
-          else {
-            if (current_line > 2)
-              dbuf_strcat(&db1, "\n");
-            dbuf_strcat(&db1, tempbuf);
-          }
-        }
+        if (line_number > 2)
+          long_buffer.append(escape_newlines_please ? "\\n" : "\n");
+        long_buffer.append(line.substr(0, end_line));
+        if (perfdata_already_filled)
+          pd_buffer.append(" ");
+        pd_buffer.append(line.substr(pipe));
+        // Now, all new lines contain perfdata.
+        long_pipe = true;
       }
-
-      delete[] tempbuf;
-      tempbuf = NULL;
-
-      /* shift data back to front of buffer and adjust counters */
-      memmove(
-        (void*)&buf[0],
-        (void*)&buf[x + 1],
-        (size_t)((int)used_buf - x - 1));
-      used_buf -= (x + 1);
-      buf[used_buf] = '\x0';
-      x = -1;
     }
-  }
-
-  /* save long output */
-  if (long_output && (db1.buf && strcmp(db1.buf, ""))) {
-    if (escape_newlines_please == false)
-      *long_output = string::dup(db1.buf);
     else {
-      /* escape newlines (and backslashes) in long output */
-      tempbuf = new char[strlen(db1.buf) * 2 + 1];
-
-      for (x = 0, y = 0; db1.buf[x] != '\x0'; x++) {
-
-        if (db1.buf[x] == '\n') {
-          tempbuf[y++] = '\\';
-          tempbuf[y++] = 'n';
+      /* Let's trim the output */
+      end_line = line.size();
+      while (end_line > 1 && std::isspace(line[end_line - 1]))
+        end_line--;
+      line.erase(end_line);
+      if (line_number == 1)
+        short_buffer.append(line);
+      else {
+        if (!long_pipe) {
+          if (line_number > 2)
+            long_buffer.append(escape_newlines_please ? "\\n" : "\n");
+          long_buffer.append(line);
         }
-        else if (db1.buf[x] == '\\') {
-          tempbuf[y++] = '\\';
-          tempbuf[y++] = '\\';
+        else {
+          if (perfdata_already_filled)
+            pd_buffer.append(" ");
+          pd_buffer.append(line);
         }
-        else
-          tempbuf[y++] = db1.buf[x];
       }
-
-      tempbuf[y] = '\x0';
-      *long_output = string::dup(tempbuf);
-      delete[] tempbuf;
     }
+    start_line = pos_line;
+    line_number++;
   }
-
-  /* save perf data */
-  if (perf_data && (db2.buf && strcmp(db2.buf, "")))
-    *perf_data = string::dup(db2.buf);
-
-  /* strip short output and perf data */
-  if (short_output)
-    strip(*short_output);
-  if (perf_data)
-    strip(*perf_data);
-
-  /* free dynamic buffers */
-  dbuf_free(&db1);
-  dbuf_free(&db2);
-
-  return OK;
 }
 
 /******************************************************************/

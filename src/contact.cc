@@ -129,7 +129,7 @@ void contact::set_email(std::string const& email) {
  *
  *  @return A bitmask, representing modified attributes.
  */
-unsigned long contact::get_modified_attributes() const {
+uint32_t contact::get_modified_attributes() const {
   return _modified_attributes;
 }
 
@@ -138,8 +138,17 @@ unsigned long contact::get_modified_attributes() const {
  *
  *  @param[in] attr  Modified attributes.
  */
-void contact::set_modified_attributes(unsigned long attr) {
+void contact::set_modified_attributes(uint32_t attr) {
   _modified_attributes = attr;
+}
+
+/**
+ *  Modify the contact's modified attributes with an OR operator.
+ *
+ *  @param[in] attr  Modified attributes to accumulate.
+ */
+void contact::add_modified_attributes(uint32_t attr) {
+  _modified_attributes |= attr;
 }
 
 /**

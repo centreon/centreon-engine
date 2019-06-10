@@ -86,11 +86,11 @@ void applier::host::_update(
     if (state.check_type().is_set())
       obj.set_check_type(*state.check_type());
     if (state.current_state().is_set())
-      obj.set_current_state(*state.current_state());
+      obj.set_current_state(static_cast<engine::host::host_state>(*state.current_state()));
     if (state.last_state().is_set())
-      obj.set_last_state(*state.last_state());
+      obj.set_last_state(static_cast<engine::host::host_state>(*state.last_state()));
     if (state.last_hard_state().is_set())
-      obj.set_last_hard_state(*state.last_hard_state());
+      obj.set_last_hard_state(static_cast<engine::host::host_state>(*state.last_hard_state()));
     if (state.plugin_output().is_set())
       obj.set_plugin_output(*state.plugin_output());
     if (state.long_plugin_output().is_set())
@@ -120,7 +120,7 @@ void applier::host::_update(
     if (state.last_problem_id().is_set())
       obj.set_last_problem_id(*state.last_problem_id());
     if (state.state_type().is_set())
-      obj.set_state_type(*state.state_type());
+      obj.set_state_type(static_cast<enum notifier::state_type>(*state.state_type()));
     if (state.last_state_change().is_set())
       obj.set_last_state_change(*state.last_state_change());
     if (state.last_hard_state_change().is_set())
@@ -131,10 +131,14 @@ void applier::host::_update(
       obj.set_last_time_down(*state.last_time_down());
     if (state.last_time_unreachable().is_set())
       obj.set_last_time_unreachable(*state.last_time_unreachable());
-    if (state.notified_on_down().is_set())
-      obj.set_notified_on_down(*state.notified_on_down());
-    if (state.notified_on_unreachable().is_set())
-      obj.set_notified_on_unreachable(*state.notified_on_unreachable());
+    obj.set_notified_on(
+        (state.notified_on_down().is_set() && *state.notified_on_down()
+             ? notifier::down
+             : notifier::none) |
+        (state.notified_on_unreachable().is_set() &&
+                 *state.notified_on_unreachable()
+             ? notifier::unreachable
+             : notifier::none));
     if (state.last_notification().is_set())
       obj.set_last_notification(*state.last_notification());
     if (state.current_notification_number().is_set())
@@ -171,7 +175,7 @@ void applier::host::_update(
 
     if (state.passive_checks_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_PASSIVE_CHECKS_ENABLED))
-      obj.set_accept_passive_host_checks(*state.passive_checks_enabled());
+      obj.set_accept_passive_checks(*state.passive_checks_enabled());
 
     if (state.event_handler_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_EVENT_HANDLER_ENABLED))
@@ -187,7 +191,7 @@ void applier::host::_update(
 
     if (state.obsess_over_host().is_set()
         && (obj.get_modified_attributes() & MODATTR_OBSESSIVE_HANDLER_ENABLED))
-      obj.set_obsess_over_host(*state.obsess_over_host());
+      obj.set_obsess_over(*state.obsess_over_host());
 
     if (state.check_command().is_set()
         && (obj.get_modified_attributes() & MODATTR_CHECK_COMMAND)) {
@@ -244,8 +248,8 @@ void applier::host::_update(
       obj.set_max_attempts(*state.max_attempts());
 
       // adjust current attempt number if in a hard state.
-      if (obj.get_state_type() == HARD_STATE
-          && obj.get_current_state() != HOST_UP
+      if (obj.get_state_type() == notifier::hard
+          && obj.get_current_state() != engine::host::state_up
           && obj.get_current_attempt() > 1)
         obj.set_current_attempt(obj.get_max_attempts());
     }
@@ -281,7 +285,7 @@ void applier::host::_update(
   }
 
   // calculate next possible notification time.
-  if (obj.get_current_state() != HOST_UP && obj.get_last_notification())
+  if (obj.get_current_state() != engine::host::state_up && obj.get_last_notification())
     obj.set_next_notification(
       obj.get_next_notification_time(
         obj.get_last_notification()));
@@ -289,7 +293,7 @@ void applier::host::_update(
   // ADDED 01/23/2009 adjust current check attempts if host in hard
   // problem state (max attempts may have changed in config
   // since restart).
-  if (obj.get_current_state() != HOST_UP && obj.get_state_type() == HARD_STATE)
+  if (obj.get_current_state() != engine::host::state_up && obj.get_state_type() == notifier::hard)
     obj.set_current_attempt(obj.get_max_attempts());
 
   // ADDED 02/20/08 assume same flapping state if large install

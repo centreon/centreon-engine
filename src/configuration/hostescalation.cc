@@ -166,7 +166,6 @@ void hostescalation::check_validity() const {
     throw (engine_error() << "Host escalation is not attached to any "
            << "host or host group (properties 'host_name' or "
            << "'hostgroup_name', respectively)");
-  return ;
 }
 
 /**
@@ -175,7 +174,7 @@ void hostescalation::check_validity() const {
  *  @return This object.
  */
 hostescalation::key_type const& hostescalation::key() const throw () {
-  return (*this);
+  return *this;
 }
 
 /**

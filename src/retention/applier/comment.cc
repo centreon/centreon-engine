@@ -127,7 +127,7 @@ void applier::comment::_add_service_comment(
   // acknowledgement comments get deleted if they're not persistent
   // and the original problem is no longer acknowledged.
   if (obj.entry_type() == com::centreon::engine::comment::acknowledgment) {
-    if (!svc->problem_has_been_acknowledged && !obj.persistent())
+    if (!svc->get_problem_has_been_acknowledged() && !obj.persistent())
       engine::comment::delete_comment(obj.comment_id());
   }
   // non-persistent comments don't last past restarts UNLESS

@@ -21,13 +21,13 @@
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/string.hh"
 
 extern int config_warnings;
 extern int config_errors;
 
 using namespace com::centreon;
-using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
@@ -51,7 +51,6 @@ host::setters const host::_setters[] = {
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
   { "event_handler",                SETTER(std::string const&, _set_event_handler) },
-  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "notes",                        SETTER(std::string const&, _set_notes) },
   { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
   { "action_url",                   SETTER(std::string const&, _set_action_url) },
@@ -83,7 +82,6 @@ host::setters const host::_setters[] = {
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
-  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
   { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
@@ -93,7 +91,6 @@ host::setters const host::_setters[] = {
 };
 
 // Default values.
-static int const            default_acknowledgement_timeout(0);
 static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);
@@ -106,7 +103,7 @@ static bool const           default_flap_detection_enabled(true);
 static unsigned short const default_flap_detection_options(host::up | host::down | host::unreachable);
 static unsigned int const   default_freshness_threshold(0);
 static unsigned int const   default_high_flap_threshold(0);
-static unsigned short const default_initial_state(HOST_UP);
+static unsigned short const default_initial_state(engine::host::state_up);
 static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(3);
 static bool const           default_notifications_enabled(true);
@@ -662,7 +659,7 @@ point_3d const& host::coords_3d() const throw () {
  *
  *  @return The customvariables.
  */
-map_customvar const& host::customvariables() const throw () {
+engine::map_customvar const& host::customvariables() const throw () {
   return _customvariables;
 }
 
@@ -1248,37 +1245,6 @@ bool host::_set_event_handler_enabled(bool value) {
 }
 
 /**
- *  Set failure_prediction_enabled value.
- *
- *  @param[in] value The new failure_prediction_enabled value.
- *
- *  @return True on success, otherwise false.
- */
-bool host::_set_failure_prediction_enabled(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: host failure_prediction_enabled was ignored";
-  ++config_warnings;
-  return true;
-}
-
-/**
- *  Set failure_prediction_options value.
- *
- *  @param[in] value The new failure_prediction_options value.
- *
- *  @return True on success, otherwise false.
- */
-bool host::_set_failure_prediction_options(
-       std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: service failure_prediction_options was ignored";
-  ++config_warnings;
-  return true;
-}
-
-/**
  *  Set first_notification_delay value.
  *
  *  @param[in] value The new first_notification_delay value.
@@ -1432,11 +1398,11 @@ bool host::_set_initial_state(std::string const& value) {
   std::string data(value);
   string::trim(data);
   if (data == "o" || data == "up")
-    _initial_state = HOST_UP;
+    _initial_state =  engine::host::state_up;
   else if (data == "d" || data == "down")
-    _initial_state = HOST_DOWN;
+    _initial_state =  engine::host::state_down;
   else if (data == "u" || data == "unreachable")
-    _initial_state = HOST_UNREACHABLE;
+    _initial_state =  engine::host::state_unreachable;
   else
     return false;
   return true;

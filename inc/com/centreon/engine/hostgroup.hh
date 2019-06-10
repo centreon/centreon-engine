@@ -37,14 +37,15 @@ typedef std::unordered_map<std::string,
 CCE_BEGIN()
 class                     hostgroup {
  public:
-                          hostgroup(std::string const& name,
+                          hostgroup(uint64_t id,
+                                    std::string const& name,
                                     std::string const& alias,
                                     std::string const& notes,
                                     std::string const& notes_url,
                                     std::string const& action_url);
 
-  unsigned int             get_id() const;
-  void                     set_id(unsigned int id);
+  uint64_t                 get_id() const;
+  void                     set_id(uint64_t id);
   std::string const&       get_group_name() const;
   void                     set_group_name(std::string const& group_name);
   std::string const&       get_alias() const;
@@ -63,7 +64,7 @@ class                     hostgroup {
   static hostgroup_map     hostgroups;
 
  private:
-  unsigned                 _id;
+  uint64_t                 _id;
   std::string              _group_name;
   std::string              _alias;
   std::string              _notes;

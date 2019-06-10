@@ -42,11 +42,19 @@ hostgroup_map com::centreon::engine::hostgroup::hostgroups;
  *  @param[in] notes_url  URL.
  *  @param[in] action_url Action URL.
  */
-hostgroup::hostgroup(std::string const& name,
+hostgroup::hostgroup(uint64_t id,
+                     std::string const& name,
                      std::string const& alias,
                      std::string const& notes,
                      std::string const& notes_url,
-                     std::string const& action_url) {
+                     std::string const& action_url)
+  : _id{id},
+    _group_name{name},
+    _alias{alias},
+    _notes{notes},
+    _notes_url{notes_url},
+    _action_url{action_url} {
+
 // Make sure we have the data we need.
   if (name.empty()) {
     logger(log_config_error, basic)
@@ -63,18 +71,13 @@ hostgroup::hostgroup(std::string const& name,
     throw (engine_error() << "Could not register host group '"
                           << name << "'");
   }
-  _group_name = name;
-  _alias = alias;
-  _action_url = action_url;
-  _notes = notes;
-  _notes_url = notes_url;
 }
 
-unsigned int hostgroup::get_id() const {
+uint64_t hostgroup::get_id() const {
   return _id;
 }
 
-void hostgroup::set_id(unsigned int id)
+void hostgroup::set_id(uint64_t id)
 {
   _id = id;
 }

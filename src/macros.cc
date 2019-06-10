@@ -110,7 +110,6 @@ int grab_custom_macro_value_r(
       char const* arg2,
       char** output) {
   servicegroup* temp_servicegroup = nullptr;
-  servicesmember* temp_servicesmember = nullptr;
   contactgroup* temp_contactgroup = nullptr;
   int delimiter_len = 0;
   char* temp_buffer = nullptr;
@@ -230,11 +229,13 @@ int grab_custom_macro_value_r(
         delimiter_len = strlen(arg2);
 
         /* concatenate macro values for all servicegroup members */
-        for (temp_servicesmember = temp_servicegroup->members;
-             temp_servicesmember != nullptr;
-             temp_servicesmember = temp_servicesmember->next) {
+          for (service_map::iterator
+                 it(temp_servicegroup->members.begin()),
+                 end(temp_servicegroup->members.end());
+               it != end;
+               ++it) {
 
-          if ((temp_service = temp_servicesmember->service_ptr) == nullptr)
+          if ((temp_service = it->second.get()) == nullptr)
             continue;
 
           /* get the macro value for this service */
@@ -601,7 +602,6 @@ int grab_standard_servicegroup_macro_r(
       int macro_type,
       servicegroup* temp_servicegroup,
       char** output) {
-  servicesmember* temp_servicesmember = nullptr;
   char* temp_buffer = nullptr;
   unsigned int temp_len = 0;
   unsigned int init_len = 0;
@@ -612,32 +612,27 @@ int grab_standard_servicegroup_macro_r(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_SERVICEGROUPNAME:
-    *output = string::dup(temp_servicegroup->group_name);
+    *output = string::dup(temp_servicegroup->get_group_name().c_str());
     break;
 
   case MACRO_SERVICEGROUPALIAS:
-    if (temp_servicegroup->alias)
-      *output = string::dup(temp_servicegroup->alias);
+    if (!temp_servicegroup->get_alias().empty())
+      *output = string::dup(temp_servicegroup->get_alias().c_str());
     break;
 
   case MACRO_SERVICEGROUPMEMBERS:
     /* make the calculations for total string length */
-    for (temp_servicesmember = temp_servicegroup->members;
-         temp_servicesmember != nullptr;
-         temp_servicesmember = temp_servicesmember->next) {
-      if (temp_servicesmember->host_name == nullptr
-          || temp_servicesmember->service_description == nullptr)
+    for (service_map::iterator
+           it(temp_servicegroup->members.begin()),
+           end(temp_servicegroup->members.end());
+         it != end;
+         ++it) {
+      if (it->first.first.empty() || it->first.second.empty())
         continue;
-      if (temp_len == 0) {
-        temp_len +=
-          strlen(temp_servicesmember->host_name) +
-          strlen(temp_servicesmember->service_description) + 2;
-      }
-      else {
-        temp_len +=
-          strlen(temp_servicesmember->host_name) +
-          strlen(temp_servicesmember->service_description) + 3;
-      }
+      if (temp_len == 0)
+        temp_len += it->first.first.length() + it->first.second.length() + 2;
+      else
+        temp_len += it->first.first.length() + it->first.second.length() + 3;
     }
     /* allocate or reallocate the memory buffer */
     if (*output == nullptr)
@@ -648,40 +643,41 @@ int grab_standard_servicegroup_macro_r(
       *output = resize_string(*output, temp_len);
     }
     /* now fill in the string with the group members */
-    for (temp_servicesmember = temp_servicegroup->members;
-         temp_servicesmember != nullptr;
-         temp_servicesmember = temp_servicesmember->next) {
-      if (temp_servicesmember->host_name == nullptr
-          || temp_servicesmember->service_description == nullptr)
+    for (service_map::iterator
+           it(temp_servicegroup->members.begin()),
+           end(temp_servicegroup->members.end());
+         it != end;
+         ++it) {
+      if (it->first.first.empty() || it->first.second.empty())
         continue;
       temp_buffer = *output + init_len;
       if (init_len == 0)      /* If our buffer didn't contain anything, we just need to write "%s,%s" */
         init_len += sprintf(
                       temp_buffer,
                       "%s,%s",
-                      temp_servicesmember->host_name,
-                      temp_servicesmember->service_description);
+                      it->first.first.c_str(),
+                      it->first.second.c_str());
       else                    /* Now we need to write ",%s,%s" */
         init_len += sprintf(
                       temp_buffer,
                       ",%s,%s",
-                      temp_servicesmember->host_name,
-                      temp_servicesmember->service_description);
+                      it->first.first.c_str(),
+                      it->first.second.c_str());
     }
     break;
   case MACRO_SERVICEGROUPACTIONURL:
-    if (temp_servicegroup->action_url)
-      *output = string::dup(temp_servicegroup->action_url);
+    if (!temp_servicegroup->get_action_url().empty())
+      *output = string::dup(temp_servicegroup->get_action_url());
     break;
 
   case MACRO_SERVICEGROUPNOTESURL:
-    if (temp_servicegroup->notes_url)
-      *output = string::dup(temp_servicegroup->notes_url);
+    if (!temp_servicegroup->get_notes_url().empty())
+      *output = string::dup(temp_servicegroup->get_notes_url());
     break;
 
   case MACRO_SERVICEGROUPNOTES:
-    if (temp_servicegroup->notes)
-      *output = string::dup(temp_servicegroup->notes);
+    if (!temp_servicegroup->get_notes().empty())
+      *output = string::dup(temp_servicegroup->get_notes());
     break;
 
   default:

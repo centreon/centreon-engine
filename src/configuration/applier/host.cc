@@ -27,7 +27,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
-#include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -90,7 +89,7 @@ void applier::host::add_object(
         obj.alias(),
         obj.address(),
         obj.check_period(),
-        obj.initial_state(),
+        static_cast<engine::host::host_state>(obj.initial_state()),
         obj.check_interval(),
         obj.retry_interval(),
         obj.max_check_attempts(),
@@ -148,7 +147,8 @@ void applier::host::add_object(
         true, // should_be_drawn, enabled by Nagios
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
-        obj.obsess_over_host())};
+        obj.obsess_over_host(),
+        obj.timezone())};
 
 
   state::instance().hosts()[obj.host_id()] = h;
@@ -156,7 +156,6 @@ void applier::host::add_object(
 
   h->set_initial_notif_time(0);
   host_other_props[obj.host_name()].should_reschedule_current_check = false;
-  host_other_props[obj.host_name()].timezone = obj.timezone();
   host_other_props[obj.host_name()].host_id = obj.host_id();
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());
@@ -310,44 +309,33 @@ void applier::host::modify_object(
   h->set_address(obj.address());
   if (obj.check_period().empty())
   h->set_check_period(obj.check_period());
-  h->set_initial_state(static_cast<int>(obj.initial_state()));
+  h->set_initial_state(static_cast<engine::host::host_state>(obj.initial_state()));
   h->set_check_interval(static_cast<double>(obj.check_interval()));
   h->set_retry_interval(static_cast<double>(obj.retry_interval()));
   h->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
-  h->set_notify_on_recovery(static_cast<int>(static_cast<bool>(
-    obj.notification_options() & configuration::host::up)));
-  h->set_notify_on_down(static_cast<int>(static_cast<bool>(
-    obj.notification_options() & configuration::host::down)));
-  h->set_notify_on_unreachable(static_cast<int>(static_cast<bool>(
-    obj.notification_options() & configuration::host::unreachable)));
-  h->set_notify_on_flapping(static_cast<int>(static_cast<bool>(
-    obj.notification_options() & configuration::host::flapping)));
-  h->set_notify_on_downtime(static_cast<int>(static_cast<bool>(
-    obj.notification_options() & configuration::host::downtime)));
+  h->add_notify_on(obj.notification_options() & configuration::host::up ? notifier::recovery : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::down ? notifier::down : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::flapping ? notifier::flapping : notifier::none);
+  h->add_notify_on(obj.notification_options() & configuration::host::downtime ? notifier::downtime : notifier::none);
   h->set_notification_interval(static_cast<double>(obj.notification_interval()));
   h->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
   h->set_notification_period(obj.notification_period());
   h->set_notifications_enabled(static_cast<int>(obj.notifications_enabled()));
   h->set_check_command(obj.check_command());
   h->set_checks_enabled(static_cast<int>(obj.checks_active()));
-  h->set_accept_passive_host_checks(static_cast<int>(obj.checks_passive()));
+  h->set_accept_passive_checks(static_cast<int>(obj.checks_passive()));
   h->set_event_handler(obj.event_handler());
   h->set_event_handler_enabled(static_cast<int>(obj.event_handler_enabled()));
-  h->set_flap_detection_enabled(static_cast<int>(obj.flap_detection_enabled()));
-  h->set_low_flap_threshold(static_cast<double>(obj.low_flap_threshold()));
-  h->set_high_flap_threshold(static_cast<double>(obj.high_flap_threshold()));
-  h->set_flap_detection_on_up(static_cast<int>(static_cast<bool>(
-    obj.flap_detection_options() & configuration::host::up)));
-  h->set_flap_detection_on_down(static_cast<int>(static_cast<bool>(
-    obj.flap_detection_options() & configuration::host::down)));
-  h->set_flap_detection_on_unreachable(static_cast<int>(static_cast<bool>(
-    obj.flap_detection_options() & configuration::host::unreachable)));
-  h->set_stalk_on_up(static_cast<int>(static_cast<bool>(
-    obj.stalking_options() & configuration::host::up)));
-  h->set_stalk_on_down(static_cast<int>(static_cast<bool>(
-    obj.stalking_options() & configuration::host::down)));
-  h->set_stalk_on_unreachable(static_cast<int>(static_cast<bool>(
-    obj.stalking_options() & configuration::host::unreachable)));
+  h->set_flap_detection_enabled(obj.flap_detection_enabled());
+  h->set_low_flap_threshold(obj.low_flap_threshold());
+  h->set_high_flap_threshold(obj.high_flap_threshold());
+  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::up ? notifier::recovery : notifier::none);
+  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::down ? notifier::down : notifier::none);
+  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  h->add_stalk_on(obj.stalking_options() & configuration::host::up ? notifier::up : notifier::none);
+  h->add_stalk_on(obj.stalking_options() & configuration::host::down ? notifier::down : notifier::none);
+  h->add_stalk_on(obj.stalking_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
   h->set_process_performance_data(static_cast<int>(obj.process_perf_data()));
   h->set_check_freshness(static_cast<int>(obj.check_freshness()));
   h->set_freshness_threshold(static_cast<int>(obj.freshness_threshold()));
@@ -367,8 +355,8 @@ void applier::host::modify_object(
   h->set_have_3d_coords(static_cast<int>(obj.have_coords_3d()));
   h->set_retain_status_information(static_cast<int>(obj.retain_status_information()));
   h->set_retain_nonstatus_information(static_cast<int>(obj.retain_nonstatus_information()));
-  h->set_obsess_over_host(static_cast<int>(obj.obsess_over_host()));
-  host_other_props[obj.host_name()].timezone = obj.timezone();
+  h->set_obsess_over(obj.obsess_over_host());
+  h->set_timezone(obj.timezone());
   host_other_props[obj.host_name()].host_id = obj.host_id();
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());
@@ -539,7 +527,7 @@ void applier::host::resolve_object(
            << obj.host_name() << "'");
 
   // Remove service backlinks.
-  deleter::listmember(it->second->services, &deleter::servicesmember);
+  it->second->services.clear();
 
   // Remove host group links.
   deleter::listmember(it->second->hostgroups_ptr, &deleter::objectlist);

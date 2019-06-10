@@ -42,14 +42,10 @@ void disable_flap_detection_routines();
 void enable_host_flap_detection(com::centreon::engine::host* hst);
 // disables flap detection for a particular host
 void disable_host_flap_detection(com::centreon::engine::host* hst);
-// handles the details when flap detection is disabled globally or on a per-host basis
-void handle_host_flap_detection_disabled(com::centreon::engine::host* hst);
 // enables flap detection for a particular service
 void enable_service_flap_detection(com::centreon::engine::service* svc);
 // disables flap detection for a particular service
 void disable_service_flap_detection(com::centreon::engine::service* svc);
-// handles the details when flap detection is disabled globally or on a per-service basis
-void handle_service_flap_detection_disabled(com::centreon::engine::service* svc);
 
 #  ifdef __cplusplus
 }

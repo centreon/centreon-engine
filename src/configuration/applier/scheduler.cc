@@ -555,7 +555,7 @@ void applier::scheduler::_calculate_host_scheduling_params() {
     if (!hst.get_check_interval() || !hst.get_checks_enabled())
       schedule_check = false;
     else {
-      timezone_locker lock(get_host_timezone(hst.get_name()));
+      timezone_locker lock(hst.get_timezone());
       if (check_time_against_period(
             now,
             hst.check_period_ptr) == ERROR) {
@@ -709,12 +709,11 @@ void applier::scheduler::_calculate_service_scheduling_params() {
     engine::service& svc(*it->second);
 
     bool schedule_check(true);
-    if (!svc.get_check_interval() || !svc.checks_enabled)
+    if (!svc.get_check_interval() || !svc.get_checks_enabled())
       schedule_check = false;
 
     {
-      timezone_locker
-        lock(get_service_timezone(svc.get_hostname(), svc.get_description()));
+      timezone_locker lock(svc.get_timezone());
       if (check_time_against_period(now, svc.check_period_ptr)
           == ERROR) {
         time_t next_valid_time(0);
@@ -728,13 +727,13 @@ void applier::scheduler::_calculate_service_scheduling_params() {
     }
 
     if (schedule_check) {
-      svc.should_be_scheduled = true;
+      svc.set_should_be_scheduled(true);
       ++scheduling_info.total_scheduled_services;
       scheduling_info.service_check_interval_total
         += static_cast<unsigned long>(svc.get_check_interval());
     }
     else {
-      svc.should_be_scheduled = false;
+      svc.set_should_be_scheduled(false);
       logger(dbg_events, more)
         << "Service " << svc.get_description() << " on host " << svc.get_hostname()
         << " should not be scheduled.";
@@ -928,7 +927,7 @@ void applier::scheduler::_schedule_host_events(
 
     // Make sure the host can actually be scheduled at this time.
     {
-      timezone_locker lock(get_host_timezone(hst.get_name()));
+      timezone_locker lock(hst.get_timezone());
       if (check_time_against_period(
             hst.get_next_check(),
             hst.check_period_ptr) == ERROR) {
@@ -1042,7 +1041,7 @@ void applier::scheduler::_schedule_service_events(
       }
 
       // skip this service if it shouldn't be scheduled.
-      if (!svc.should_be_scheduled)
+      if (!svc.get_should_be_scheduled())
         continue;
 
       int const mult_factor(
@@ -1050,31 +1049,30 @@ void applier::scheduler::_schedule_service_events(
             + ++interleave_block_index * total_interleave_blocks);
 
       // set the preferred next check time for the service.
-      svc.next_check
-        = (time_t)(now
-             + mult_factor * scheduling_info.service_inter_check_delay);
+      svc.set_next_check(
+        (time_t)(now
+             + mult_factor * scheduling_info.service_inter_check_delay));
 
       // Make sure the service can actually be scheduled when we want.
       {
-        timezone_locker
-          lock(get_service_timezone(svc.get_hostname(), svc.get_description()));
+        timezone_locker lock(svc.get_timezone());
         if (check_time_against_period(
-              svc.next_check,
+              svc.get_next_check(),
               svc.check_period_ptr) == ERROR) {
           time_t next_valid_time(0);
           get_next_valid_time(
-            svc.next_check,
+            svc.get_next_check(),
             &next_valid_time,
             svc.check_period_ptr);
-          svc.next_check = next_valid_time;
+          svc.set_next_check(next_valid_time);
         }
       }
 
       if (!scheduling_info.first_service_check
-          || svc.next_check < scheduling_info.first_service_check)
-        scheduling_info.first_service_check = svc.next_check;
-      if (svc.next_check > scheduling_info.last_service_check)
-        scheduling_info.last_service_check = svc.next_check;
+          || svc.get_next_check() < scheduling_info.first_service_check)
+        scheduling_info.first_service_check = svc.get_next_check();
+      if (svc.get_next_check() > scheduling_info.last_service_check)
+        scheduling_info.last_service_check = svc.get_next_check();
     }
   }
 
@@ -1089,15 +1087,15 @@ void applier::scheduler::_schedule_service_events(
     svc.update_status(false);
 
     // skip most services that shouldn't be scheduled.
-    if (!svc.should_be_scheduled) {
+    if (!svc.get_should_be_scheduled()) {
       // passive checks are an exception if a forced check was
       // scheduled before Centreon Engine was restarted.
-      if (!(svc.checks_enabled == false
-            && svc.next_check
+      if (!(!svc.get_checks_enabled()
+            && svc.get_next_check()
             && (svc.check_options & CHECK_OPTION_FORCE_EXECUTION)))
         continue;
     }
-    services_to_schedule.insert(std::make_pair(svc.next_check, &svc));
+    services_to_schedule.insert(std::make_pair(svc.get_next_check(), &svc));
   }
 
   // Schedule events list.
@@ -1111,7 +1109,7 @@ void applier::scheduler::_schedule_service_events(
     events::schedule(
               EVENT_SERVICE_CHECK,
               false,
-              svc.next_check,
+              svc.get_next_check(),
               false,
               0,
               NULL,
@@ -1125,7 +1123,7 @@ void applier::scheduler::_schedule_service_events(
   logger(dbg_events, most)
     << "Scheduling service acknowledgement expirations...";
   for (int i(0), end(services.size()); i < end; ++i)
-    if (services[i]->problem_has_been_acknowledged)
+    if (services[i]->get_problem_has_been_acknowledged())
       services[i]->schedule_acknowledgement_expiration();
 
   return ;

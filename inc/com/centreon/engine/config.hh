@@ -22,7 +22,7 @@
 #  define CCE_CONFIG_HH
 
 #  include "com/centreon/engine/objects.hh"
-#  include "com/centreon/engine/objects/servicegroup.hh"
+#  include "com/centreon/engine/servicegroup.hh"
 #  include "com/centreon/engine/timeperiod.hh"
 
 #  ifdef __cplusplus
@@ -39,13 +39,13 @@ int pre_flight_circular_check(int* w, int* e);
 int check_service(com::centreon::engine::service* svc, int* w, int* e);
 int check_host(com::centreon::engine::host* hst, int* w, int* e);
 int check_contact(com::centreon::engine::contact* cntct, int* w, int* e);
-int check_servicegroup(servicegroup* sg, int* w, int* e);
+int check_servicegroup(com::centreon::engine::servicegroup* sg, int* w, int* e);
 int check_hostgroup(com::centreon::engine::hostgroup* hg, int* w, int* e);
 int check_contactgroup(com::centreon::engine::contactgroup* cg, int* w,
   int* e);
 int check_servicedependency(com::centreon::engine::servicedependency* sd, int* w, int* e);
 int check_hostdependency(com::centreon::engine::hostdependency* hd, int* w, int* e);
-int check_serviceescalation(serviceescalation* se, int* w, int* e);
+int check_serviceescalation(com::centreon::engine::serviceescalation* se, int* w, int* e);
 int check_hostescalation(com::centreon::engine::hostescalation* he, int* w, int* e);
 int check_timeperiod(com::centreon::engine::timeperiod* tp, int* w, int* e);
 

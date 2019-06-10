@@ -20,6 +20,7 @@
 #ifndef CCE_TIMEZONE_LOCKER_HH
 #  define CCE_TIMEZONE_LOCKER_HH
 
+#  include <string>
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -33,7 +34,7 @@ CCE_BEGIN()
  */
 class                 timezone_locker {
 public:
-                      timezone_locker(char const* tz);
+                      timezone_locker(std::string const& tz);
                       ~timezone_locker();
 
 private:

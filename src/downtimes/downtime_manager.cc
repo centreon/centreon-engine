@@ -58,11 +58,7 @@ void downtime_manager::delete_downtime(int type, uint64_t downtime_id) {
 
 /* unschedules a host or service downtime */
 int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
-  downtime* next_downtime(nullptr);
-  host* hst(nullptr);
-  service* svc(nullptr);
   timed_event* temp_event(nullptr);
-  int attr(0);
   std::shared_ptr<downtime> temp_downtime{find_downtime(type, downtime_id)};
 
   logger(dbg_functions, basic) << "unschedule_downtime()";
@@ -136,7 +132,7 @@ int downtime_manager::check_pending_flex_host_downtime(host* hst) {
   time(&current_time);
 
   /* if host is currently up, nothing to do */
-  if (hst->get_current_state() == HOST_UP)
+  if (hst->get_current_state() == host::state_up)
     return OK;
 
   /* check all downtime entries */
@@ -183,7 +179,7 @@ int downtime_manager::check_pending_flex_service_downtime(service* svc) {
   time(&current_time);
 
   /* if service is currently ok, nothing to do */
-  if (svc->current_state == STATE_OK)
+  if (svc->get_current_state() == service::state_ok)
     return OK;
 
   /* check all downtime entries */
@@ -195,8 +191,8 @@ int downtime_manager::check_pending_flex_service_downtime(service* svc) {
         it->second->is_in_effect() || it->second->get_triggered_by() != 0)
       continue;
 
-    service_downtime& dt{
-        *std::static_pointer_cast<service_downtime>(it->second)};
+    service_downtime& dt(
+        *std::static_pointer_cast<service_downtime>(it->second));
 
     /* this entry matches our service! */
     if (::find_service(dt.get_hostname().c_str(),
@@ -250,7 +246,7 @@ int downtime_manager::check_for_expired_downtime() {
            it{_scheduled_downtimes.begin()},
        end{_scheduled_downtimes.end()};
        it != end; it = next_it) {
-    downtime& dt{*it->second};
+    downtime& dt(*it->second);
     ++next_it;
 
     /* this entry should be removed */
@@ -386,7 +382,7 @@ int downtime_manager::xdddefault_validate_downtime_data() {
        end{_scheduled_downtimes.end()};
        it != end;) {
     save = true;
-    com::centreon::engine::downtimes::downtime& temp_downtime{*it->second};
+    downtimes::downtime& temp_downtime(*it->second);
 
     if (!temp_downtime.get_triggered_by())
       continue;

@@ -317,7 +317,7 @@ void checker::run(
             NEBFLAG_NONE,
             NEBATTR_NONE,
             hst,
-            HOST_CHECK_ACTIVE,
+            check_active,
             hst->get_current_state(),
             hst->get_state_type(),
             start_time,
@@ -390,7 +390,7 @@ void checker::run(
   // Init check result info.
   check_result check_result_info;
   check_result_info.object_check_type = HOST_CHECK;
-  check_result_info.check_type = HOST_CHECK_ACTIVE;
+  check_result_info.check_type = check_active;
   check_result_info.check_options = check_options;
   check_result_info.scheduled_check = scheduled_check;
   check_result_info.reschedule_check = reschedule_check;
@@ -398,7 +398,7 @@ void checker::run(
   check_result_info.finish_time = start_time;
   check_result_info.early_timeout = false;
   check_result_info.exited_ok = true;
-  check_result_info.return_code = STATE_OK;
+  check_result_info.return_code = notifier::ok;
   check_result_info.output = nullptr;
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = nullptr;
@@ -421,7 +421,7 @@ void checker::run(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     hst->get_current_state(),
     hst->get_state_type(),
     start_time,
@@ -476,7 +476,7 @@ void checker::run(
       check_result_info.finish_time.tv_usec = now.to_useconds()
         - check_result_info.finish_time.tv_sec * 1000000ull;
       check_result_info.early_timeout = false;
-      check_result_info.return_code = STATE_UNKNOWN;
+      check_result_info.return_code = notifier::unknown;
       check_result_info.exited_ok = true;
       check_result_info.output = string::dup("(Execute command failed)");
 
@@ -556,11 +556,11 @@ void checker::run(
             NEBFLAG_NONE,
             NEBATTR_NONE,
             svc,
-            SERVICE_CHECK_ACTIVE,
+            check_active,
             start_time,
             end_time,
             svc->get_check_command().c_str(),
-            svc->latency,
+            svc->get_latency(),
             0.0,
             0,
             false,
@@ -597,8 +597,8 @@ void checker::run(
     svc->check_options = CHECK_OPTION_NONE;
 
   // Update latency for event broker and macros.
-  double old_latency(svc->latency);
-  svc->latency = latency;
+  double old_latency(svc->get_latency());
+  svc->set_latency(latency);
 
   // Get current host and service macros.
   nagios_macros macros;
@@ -624,7 +624,7 @@ void checker::run(
   // Init check result info.
   check_result check_result_info;
   check_result_info.object_check_type = SERVICE_CHECK;
-  check_result_info.check_type = SERVICE_CHECK_ACTIVE;
+  check_result_info.check_type = check_active;
   check_result_info.check_options = check_options;
   check_result_info.scheduled_check = scheduled_check;
   check_result_info.reschedule_check = reschedule_check;
@@ -632,7 +632,7 @@ void checker::run(
   check_result_info.finish_time = start_time;
   check_result_info.early_timeout = false;
   check_result_info.exited_ok = true;
-  check_result_info.return_code = STATE_OK;
+  check_result_info.return_code = notifier::ok;
   check_result_info.output = nullptr;
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = nullptr;
@@ -655,11 +655,11 @@ void checker::run(
           NEBFLAG_NONE,
           NEBATTR_NONE,
           svc,
-          SERVICE_CHECK_ACTIVE,
+          check_active,
           start_time,
           end_time,
           svc->get_check_command().c_str(),
-          svc->latency,
+          svc->get_latency(),
           0.0,
           config->service_check_timeout(),
           false,
@@ -669,7 +669,7 @@ void checker::run(
   delete[] processed_cmd_ptr;
 
   // Restore latency.
-  svc->latency = old_latency;
+  svc->set_latency(old_latency);
 
   // Service check was override by neb_module.
   if (NEBERROR_CALLBACKOVERRIDE == res) {
@@ -708,7 +708,7 @@ void checker::run(
       check_result_info.finish_time.tv_usec = now.to_useconds()
         - check_result_info.finish_time.tv_sec * 1000000ull;
       check_result_info.early_timeout = false;
-      check_result_info.return_code = STATE_UNKNOWN;
+      check_result_info.return_code = notifier::unknown;
       check_result_info.exited_ok = true;
       check_result_info.output = string::dup("(Execute command failed)");
 
@@ -737,7 +737,7 @@ void checker::run(
  */
 void checker::run_sync(
                 host* hst,
-                int* check_result_code,
+                host::host_state * check_result_code,
                 int check_options,
                 int use_cached_result,
                 unsigned long check_timestamp_horizon) {
@@ -815,7 +815,7 @@ void checker::run_sync(
 
   // Update host state.
   hst->set_last_state(hst->get_current_state());
-  if (HARD_STATE == hst->get_state_type())
+  if (notifier::hard == hst->get_state_type())
     hst->set_last_hard_state(hst->get_current_state());
 
   // Save old plugin output for state stalking.
@@ -831,7 +831,7 @@ void checker::run_sync(
   hst->set_check_options(CHECK_OPTION_NONE);
 
   // Set the check type.
-  hst->set_check_type(HOST_CHECK_ACTIVE);
+  hst->set_check_type(check_active);
 
   // Send broker event.
   timeval end_time;
@@ -841,7 +841,7 @@ void checker::run_sync(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     hst->get_current_state(),
     hst->get_state_type(),
     start_time,
@@ -859,11 +859,10 @@ void checker::run_sync(
     nullptr);
 
   // Execute command synchronously.
-  int host_result(_execute_sync(hst));
+  host::host_state host_result(_execute_sync(hst));
 
   // Process result.
-  process_host_check_result_3x(
-    hst,
+  hst->process_check_result_3x(
     host_result,
     old_plugin_output,
     check_options,
@@ -889,7 +888,7 @@ void checker::run_sync(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     hst->get_current_state(),
     hst->get_state_type(),
     start_time,
@@ -981,9 +980,9 @@ void checker::finished(commands::result const& res) throw () {
  *
  *  @param[in] hst The host to check.
  *
- *  @result Return if the host is up (HOST_UP) or host down (HOST_DOWN).
+ *  @result Return if the host is up ( notifier::state_up) or host down ( notifier::state_down).
  */
-int checker::_execute_sync(host* hst) {
+com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   logger(dbg_functions, basic)
     << "checker::_execute_sync: hst=" << hst;
 
@@ -1009,7 +1008,7 @@ int checker::_execute_sync(host* hst) {
             NEBFLAG_NONE,
             NEBATTR_NONE,
             hst,
-            HOST_CHECK_ACTIVE,
+            check_active,
             hst->get_current_state(),
             hst->get_state_type(),
             start_time,
@@ -1061,8 +1060,8 @@ int checker::_execute_sync(host* hst) {
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
-    HOST_UP,
+    check_active,
+    host::state_up,
     hst->get_state_type(),
     start_time,
     end_time,
@@ -1071,7 +1070,7 @@ int checker::_execute_sync(host* hst) {
     0.0,
     config->host_check_timeout(),
     false,
-    STATE_OK,
+    notifier::ok,
     tmp_processed_cmd,
     const_cast<char*>(hst->get_plugin_output().c_str()),
     const_cast<char*>(hst->get_long_plugin_output().c_str()),
@@ -1121,7 +1120,7 @@ int checker::_execute_sync(host* hst) {
     // Update check result.
     res.command_id = 0;
     res.end_time = timestamp::now();
-    res.exit_code = STATE_UNKNOWN;
+    res.exit_code = notifier::unknown;
     res.exit_status = process::normal;
     res.output = "(Execute command failed)";
     res.start_time = res.end_time;
@@ -1181,37 +1180,30 @@ int checker::_execute_sync(host* hst) {
 
   // Update values.
   hst->set_execution_time(execution_time);
-  hst->set_check_type(HOST_CHECK_ACTIVE);
+  hst->set_check_type(check_active);
 
   // Get plugin output.
-  char* tmp_plugin_output(string::dup(res.output));
-
-  char *pl_output_str = ::strdup(hst->get_plugin_output().c_str());
-  char *lpl_output_str = ::strdup(hst->get_long_plugin_output().c_str());
-  char *perfdata_output_str = ::strdup(hst->get_perf_data().c_str());
+  std::string pl_output;
+  std::string lpl_output;
+  std::string perfdata_output;
 
   // Parse the output: short and long output, and perf data.
   parse_check_output(
-    tmp_plugin_output,
-    &pl_output_str,
-    &lpl_output_str,
-    &perfdata_output_str,
+    res.output,
+    pl_output,
+    lpl_output,
+    perfdata_output,
     true,
     true);
-  delete[] tmp_plugin_output;
 
-  hst->set_plugin_output(pl_output_str);
-  hst->set_long_plugin_output(lpl_output_str);
-  hst->set_perf_data(perfdata_output_str);
-
-  delete pl_output_str;
-  delete lpl_output_str;
-  delete perfdata_output_str;
+  hst->set_plugin_output(pl_output);
+  hst->set_long_plugin_output(lpl_output);
+  hst->set_perf_data(perfdata_output);
 
   // A nullptr host check command means we should assume the host is UP.
   if (hst->get_check_command().empty()) {
     hst->set_plugin_output("(Host assumed to be UP)");
-    res.exit_code = STATE_OK;
+    res.exit_code = notifier::ok;
   }
 
   // Make sure we have some data.
@@ -1223,16 +1215,16 @@ int checker::_execute_sync(host* hst) {
   hst->set_plugin_output(ploutput);
 
   // If we're not doing aggressive host checking, let WARNING
-  // states indicate the host is up (fake the result to be STATE_OK).
+  // states indicate the host is up (fake the result to be notifier::ok).
   if (!config->use_aggressive_host_checking()
-      && (res.exit_code == STATE_WARNING))
-    res.exit_code = STATE_OK;
+      && (res.exit_code == notifier::warning))
+    res.exit_code = notifier::ok;
 
   // Get host state from plugin exit code.
-  int return_result(
-        (res.exit_code == STATE_OK)
-        ? HOST_UP
-        : HOST_DOWN);
+  host::host_state return_result(
+        (res.exit_code == notifier::ok)
+        ?  host::state_up
+        :  host::state_down);
 
   // Get the end time of command.
   gettimeofday(&end_time, nullptr);
@@ -1243,7 +1235,7 @@ int checker::_execute_sync(host* hst) {
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    HOST_CHECK_ACTIVE,
+    check_active,
     return_result,
     hst->get_state_type(),
     start_time,

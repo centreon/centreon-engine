@@ -440,7 +440,7 @@ contactgroup_map::iterator applier::state::contactgroups_find(configuration::con
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
+std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
   return _hosts;
 }
 
@@ -449,7 +449,7 @@ std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>> 
  *
  *  @return The current hosts.
  */
-std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
+std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
   return _hosts;
 }
 
@@ -557,97 +557,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
     ++p.first;
   }
   return (p.first == p.second) ? _hostdependencies.end() : p.first;
-}
-
-/**
- *  Get the current hostescalations.
- *
- *  @return The current hostescalations.
- */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> > const& applier::state::hostescalations() const throw () {
-  return _hostescalations;
-}
-
-/**
- *  Get the current hostescalations.
- *
- *  @return The current hostescalations.
- */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >& applier::state::hostescalations() throw () {
-  return _hostescalations;
-}
-
-/**
- *  Find a host escalation by its key.
- *
- *  @param[in] k Host escalation configuration.
- *
- *  @return Iterator to the element if found, hostescalations().end()
- *          otherwise.
- */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
-  return const_cast<state*>(this)->hostescalations_find(k);
-}
-
-/**
- *  Find a host escalation by its key.
- *
- *  @param[in] k Host escalation configuration.
- *
- *  @return Iterator to the element if found, hostescalations().end()
- *          otherwise.
- */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
-  // Copy host escalation configuration to sort some
-  // members (used for comparison below).
-  configuration::hostescalation hesc(k);
-
-  // Browse escalations matching target host.
-  typedef umultimap<std::string, std::shared_ptr<com::centreon::engine::hostescalation> > collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = _hostescalations.equal_range(*k.hosts().begin());
-  while (p.first != p.second) {
-    // Create host escalation configuration from object.
-    configuration::hostescalation current;
-    current.configuration::object::operator=(k);
-    current.hosts().insert(p.first->second->get_host_name());
-    current.first_notification(p.first->second->get_first_notification());
-    current.last_notification(p.first->second->get_last_notification());
-    current.notification_interval(
-              static_cast<unsigned int>(p.first->second->get_notification_interval()));
-    current.escalation_period(p.first->second->get_escalation_period());
-    unsigned int options(
-                   (p.first->second->get_escalate_on_recovery()
-                    ? configuration::hostescalation::recovery
-                    : 0)
-                   | (p.first->second->get_escalate_on_down()
-                      ? configuration::hostescalation::down
-                      : 0)
-                   | (p.first->second->get_escalate_on_unreachable()
-                      ? configuration::hostescalation::unreachable
-                      : 0));
-    current.escalation_options(options);
-    for (contact_map::iterator
-           it(p.first->second->contacts.begin()),
-           end(p.first->second->contacts.end());
-         it != end;
-         ++it)
-      current.contacts().insert(it->first);
-    for (contactgroup_map::iterator
-           it(p.first->second->contact_groups.begin()),
-           end(p.first->second->contact_groups.begin());
-         it != end;
-         ++it)
-      current.contactgroups().insert(it->second->get_name());
-
-    // Found !
-    if (current == hesc)
-      break ;
-
-    // Keep going.
-    ++p.first;
-  }
-  return (p.first == p.second) ? _hostescalations.end() : p.first;
 }
 
 /**
@@ -828,108 +737,11 @@ servicedependency_mmap ::iterator applier::state::servicedependencies_find(confi
 }
 
 /**
- *  Get the current serviceescalations.
- *
- *  @return The current serviceescalations.
- */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> > const& applier::state::serviceescalations() const throw () {
-  return _serviceescalations;
-}
-
-/**
- *  Get the current serviceescalations.
- *
- *  @return The current serviceescalations.
- */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >& applier::state::serviceescalations() throw () {
-  return _serviceescalations;
-}
-
-/**
- *  Find a service escalation by its key.
- *
- *  @param[in] k Service escalation configuration object.
- *
- *  @return Iterator to the element if found, serviceescalations().end()
- *          otherwise.
- */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
-  return const_cast<state*>(this)->serviceescalations_find(k);
-}
-
-/**
- *  Find a service escalation by its key.
- *
- *  @param[in] k Service escalation configuration object.
- *
- *  @return Iterator to the element if found, serviceescalations().end()
- *          otherwise.
- */
-umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> >::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
-  // Copy service escalation configuration to sort some
-  // members (used for comparison below).
-  configuration::serviceescalation sesc(k);
-
-  // Browse escalations matching target service.
-  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<serviceescalation_struct> > collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
-  while (p.first != p.second) {
-    // Create service escalation configuration from object.
-    configuration::serviceescalation current;
-    current.configuration::object::operator=(k);
-    current.hosts().push_back(p.first->second->host_name);
-    current.service_description().push_back(
-                                    p.first->second->description);
-    current.first_notification(p.first->second->first_notification);
-    current.last_notification(p.first->second->last_notification);
-    current.notification_interval(
-              static_cast<unsigned int>(p.first->second->notification_interval));
-    current.escalation_period(p.first->second->escalation_period
-                              ? p.first->second->escalation_period
-                              : "");
-    unsigned int options((p.first->second->escalate_on_recovery
-                          ? configuration::serviceescalation::recovery
-                          : 0)
-                         | (p.first->second->escalate_on_warning
-                            ? configuration::serviceescalation::warning
-                            : 0)
-                         | (p.first->second->escalate_on_unknown
-                            ? configuration::serviceescalation::unknown
-                            : 0)
-                         | (p.first->second->escalate_on_critical
-                            ? configuration::serviceescalation::critical
-                            : 0));
-    current.escalation_options(options);
-    for (contact_map::iterator
-           it(p.first->second->contacts.begin()),
-           end(p.first->second->contacts.end());
-         it != end;
-         ++it)
-      current.contacts().insert(it->first);
-    for (contactgroup_map::iterator
-           it(p.first->second->contact_groups.begin()),
-           end(p.first->second->contact_groups.end());
-         it != end;
-         ++it)
-      current.contactgroups().insert(it->first);
-
-    // Found !
-    if (current == sesc)
-      break ;
-
-    // Keep going.
-    ++p.first;
-  }
-  return (p.first == p.second) ? _serviceescalations.end() : p.first;
-}
-
-/**
  *  Get the current servicegroups.
  *
  *  @return The current servicegroups.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> > const& applier::state::servicegroups() const throw () {
+servicegroup_map const& applier::state::servicegroups() const throw () {
   return _servicegroups;
 }
 
@@ -938,7 +750,7 @@ std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> > const& ap
  *
  *  @return The current servicegroups.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >& applier::state::servicegroups() throw () {
+servicegroup_map& applier::state::servicegroups() throw () {
   return _servicegroups;
 }
 
@@ -950,7 +762,7 @@ std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >& applier:
  *  @return Iterator to the element if found, servicegroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
+servicegroup_map::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
   return _servicegroups.find(k);
 }
 
@@ -962,7 +774,7 @@ std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::const_it
  *  @return Iterator to the element if found, servicegroups().end()
  *          otherwise.
  */
-std::unordered_map<std::string, std::shared_ptr<servicegroup_struct> >::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
+servicegroup_map::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
   return _servicegroups.find(k);
 }
 

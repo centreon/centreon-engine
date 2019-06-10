@@ -52,51 +52,26 @@ hostescalation::hostescalation(std::string const& host_name,
                                int last_notification,
                                double notification_interval,
                                std::string const& escalation_period,
-                               bool escalate_on_down,
-                               bool escalate_on_unreachable,
-                               bool escalate_on_recovery) {
+                               uint32_t escalate_on)
+    : escalation{first_notification, last_notification, notification_interval,
+                 escalation_period, escalate_on},
+      _hostname{host_name} {
   if (host_name.empty())
-    throw (engine_error() << "Could not create escalation "
-                          << "on host '" << host_name << "'");
-  _escalation_period = escalation_period;
-  _escalate_on_down = (escalate_on_down > 0);
-  _escalate_on_recovery = (escalate_on_recovery > 0);
-  _escalate_on_unreachable = (escalate_on_unreachable > 0);
-  _first_notification = first_notification;
-  _last_notification = last_notification;
-  _notification_interval = (notification_interval <= 0) ? 0 : notification_interval;
+    throw engine_error() << "Could not create escalation "
+                         << "on host '" << host_name << "'";
 }
 
-std::string const& hostescalation::get_host_name() const {
-  return _host_name;
+hostescalation::~hostescalation() {
+  logger(logging::dbg_config, logging::more)
+    << "Removing a host escalation (destructor).";
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(nullptr));
+  broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE, NEBFLAG_NONE,
+                                  NEBATTR_NONE, this, &tv);
 }
 
-void hostescalation::set_host_name(std::string const& host_name) {
-  _host_name = host_name;
-}
-
-int hostescalation::get_first_notification() const {
-  return _first_notification;
-}
-
-void hostescalation::set_first_notification(int first_notification) {
-  _first_notification = first_notification;
-}
-
-int hostescalation::get_last_notification() const {
-  return _last_notification;
-}
-
-void hostescalation::set_last_notification(int last_notification) {
-  _last_notification = last_notification;
-}
-
-double hostescalation::get_notification_interval() const {
-  return _notification_interval;
-}
-
-void hostescalation::set_notification_interval(double notification_interval) {
-  _notification_interval = notification_interval;
+std::string const& hostescalation::get_hostname() const {
+  return _hostname;
 }
 
 std::string const& hostescalation::get_escalation_period() const {
@@ -106,30 +81,6 @@ std::string const& hostescalation::get_escalation_period() const {
 void hostescalation::set_escalation_period(
   std::string const& escalation_period) {
   _escalation_period = escalation_period;
-}
-
-bool hostescalation::get_escalate_on_recovery() const {
-  return _escalate_on_recovery;
-}
-
-void hostescalation::set_escalate_on_recovery(bool escalate_on_recovery) {
-  _escalate_on_recovery = escalate_on_recovery;
-}
-
-bool hostescalation::get_escalate_on_down() const {
-  return _escalate_on_down;
-}
-
-void hostescalation::set_escalate_on_down(bool escalate_on_down) {
-  _escalate_on_down = escalate_on_down;
-}
-
-bool hostescalation::get_escalate_on_unreachable() const {
-  return _escalate_on_unreachable;
-}
-
-void hostescalation::set_escalate_on_unreachable(bool escalate_on_unreachable) {
-  _escalate_on_unreachable = escalate_on_unreachable;
 }
 
 /**
@@ -142,22 +93,20 @@ void hostescalation::set_escalate_on_unreachable(bool escalate_on_unreachable) {
  */
 bool hostescalation::operator==(
        hostescalation const& obj) throw () {
-  return (_host_name == obj.get_host_name()
-          && _first_notification == obj.get_first_notification()
-          && _last_notification == obj.get_last_notification()
-          && _notification_interval == obj.get_notification_interval()
+  return _hostname == obj.get_hostname()
+          && get_first_notification() == obj.get_first_notification()
+          && get_last_notification() == obj.get_last_notification()
+          && get_notification_interval() == obj.get_notification_interval()
           && _escalation_period == obj.get_escalation_period()
-          && _escalate_on_recovery == obj.get_escalate_on_recovery()
-          && _escalate_on_down == obj.get_escalate_on_down()
-          && _escalate_on_unreachable == obj.get_escalate_on_unreachable()
+          && get_escalate_on() == obj.get_escalate_on()
           && ((contact_groups.size() == obj.contact_groups.size()) &&
                std::equal(contact_groups.begin(),
                           contact_groups.end(),
                           obj.contact_groups.begin()))
-          && ((contacts.size() == obj.contacts.size()) &&
-               std::equal(contacts.begin(),
-                          contacts.end(),
-                          obj.contacts.begin())));
+          && (contacts().size() == obj.contacts().size() &&
+               std::equal(contacts().begin(),
+                          contacts().end(),
+                          obj.contacts().begin()));
 }
 
 /**
@@ -181,45 +130,41 @@ bool hostescalation::operator!=(hostescalation const& obj) throw () {
  *  @return True if the first object is less than the second.
  */
 bool hostescalation::operator<(hostescalation const& obj) {
-  if (_host_name != obj.get_host_name())
-    return _host_name != obj.get_host_name();
+  if (_hostname != obj.get_hostname())
+    return _hostname != obj.get_hostname();
   else if (_escalation_period !=  obj.get_escalation_period())
     return _escalation_period != obj.get_escalation_period();
-  else if (_first_notification != obj.get_first_notification())
-    return (_first_notification < obj.get_first_notification());
-  else if (_last_notification != obj.get_last_notification())
-    return (_last_notification < obj.get_last_notification());
-  else if (_notification_interval != obj.get_notification_interval())
-    return (_notification_interval < obj.get_notification_interval());
-  else if (_escalate_on_recovery != obj.get_escalate_on_recovery())
-    return (_escalate_on_recovery < obj.get_escalate_on_recovery());
-  else if (_escalate_on_down != obj.get_escalate_on_down())
-    return (_escalate_on_down < obj.get_escalate_on_down());
-  else if (_escalate_on_unreachable != obj.get_escalate_on_unreachable())
-    return (_escalate_on_unreachable < obj.get_escalate_on_unreachable());
+  else if (get_first_notification() != obj.get_first_notification())
+    return (get_first_notification() < obj.get_first_notification());
+  else if (get_last_notification() != obj.get_last_notification())
+    return (get_last_notification() < obj.get_last_notification());
+  else if (get_notification_interval() != obj.get_notification_interval())
+    return get_notification_interval() < obj.get_notification_interval();
+  else if (get_escalate_on() != obj.get_escalate_on())
+    return (get_escalate_on() < obj.get_escalate_on());
   for (contactgroup_map::const_iterator
-         it1(contact_groups.begin()),
-         it2(obj.contact_groups.begin()),
-         end1(contact_groups.end()),
-         end2(obj.contact_groups.end());
+         it1{contact_groups.begin()},
+         it2{obj.contact_groups.begin()},
+         end1{contact_groups.end()},
+         end2{obj.contact_groups.end()};
        (it1 != end1) || (it2 != end2);
        ++it1, ++it2) {
-    if (it1->second == nullptr || it2->second == nullptr)
-      return (!!it1->second < !!it2->second);
+    if (!it1->second || !it2->second)
+      return !!it1->second < !!it2->second;
     else if (it1->second != it2->second)
-      return (it1->second < it2->second);
+      return it1->second < it2->second;
   }
   for (contact_map::const_iterator
-         it1(contacts.begin()),
-         it2(obj.contacts.begin()),
-         end1(contacts.end()),
-         end2(obj.contacts.end());
-       (it1 != end1) || (it2 != end2);
+         it1{contacts().begin()},
+         it2{obj.contacts().begin()},
+         end1{contacts().end()},
+         end2{obj.contacts().end()};
+       it1 != end1 || it2 != end2;
        ++it1, ++it2) {
-    if (it1->second == nullptr || it2->second == nullptr)
-      return (!!it1->second < !!it2->second);
+    if (!it1->second || !it2->second)
+      return !!it1->second < !!it2->second;
     else if (it1->second != it2->second)
-      return (it1->second < it2->second);
+      return it1->second < it2->second;
   }
   return false;
 }
@@ -233,7 +178,6 @@ bool hostescalation::operator<(hostescalation const& obj) {
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
-  char const* hst_str(nullptr);
   std::string escalation_period_str;
   if (obj.escalation_period_ptr)
     escalation_period_str = obj.escalation_period_ptr->get_name();
@@ -248,28 +192,28 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     oss << obj.contact_groups;
     cg_oss = oss.str();
   }
-  if (obj.contacts.empty())
+  if (obj.contacts().empty())
     c_oss = "\"nullptr\"";
   else {
     std::ostringstream oss;
-    oss << obj.contacts;
+    oss << obj.contacts();
     c_oss = oss.str();
   }
 
   os << "hostescalation {\n"
-    "  host_name:               " << obj.get_host_name() << "\n"
+    "  host_name:               " << obj.get_hostname() << "\n"
     "  first_notification:      " << obj.get_first_notification() << "\n"
     "  last_notification:       " << obj.get_last_notification() << "\n"
     "  notification_interval:   " << obj.get_notification_interval() << "\n"
     "  escalation_period:       " << obj.get_escalation_period() << "\n"
-    "  escalate_on_recovery:    " << obj.get_escalate_on_recovery() << "\n"
-    "  escalate_on_down:        " << obj.get_escalate_on_down() << "\n"
-    "  escalate_on_unreachable: " << obj.get_escalate_on_unreachable() << "\n"
+    "  escalate_on_recovery:    " << obj.get_escalate_on(notifier::recovery) << "\n"
+    "  escalate_on_down:        " << obj.get_escalate_on(notifier::down) << "\n"
+    "  escalate_on_unreachable: " << obj.get_escalate_on(notifier::unreachable) << "\n"
     "  contact_groups:          " << cg_oss << "\n"
     "  contacts:                " << c_oss << "\n"
-    "  host_ptr:                " << (obj.host_ptr ?
-                                        obj.host_ptr->get_name() :
-                                        "\"nullptr\"") << "\n"
+    "  notifier_ptr:            " << (obj.notifier_ptr ?
+                                      obj.notifier_ptr->get_display_name() :
+                                      "\"nullptr\"") << "\n"
     "  escalation_period_ptr:   " << escalation_period_str << "\n"
     "}\n";
   return os;

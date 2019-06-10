@@ -27,7 +27,7 @@ using namespace com::centreon::engine;
  *
  *  @param[in] tz  Timezone to set during object lifetime.
  */
-timezone_locker::timezone_locker(char const* tz) {
+timezone_locker::timezone_locker(std::string const& tz) {
   timezone_manager::instance().push_timezone(tz);
 }
 

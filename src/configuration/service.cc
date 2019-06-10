@@ -56,7 +56,6 @@ service::setters const service::_setters[] = {
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
-  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "notes",                        SETTER(std::string const&, _set_notes) },
   { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
   { "action_url",                   SETTER(std::string const&, _set_action_url) },
@@ -71,7 +70,6 @@ service::setters const service::_setters[] = {
   { "recovery_notification_delay",  SETTER(unsigned int, _set_recovery_notification_delay) },
   { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
   { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
-  { "parallelize_check",            SETTER(bool, _set_parallelize_check) },
   { "is_volatile",                  SETTER(bool, _set_is_volatile) },
   { "obsess_over_service",          SETTER(bool, _set_obsess_over_service) },
   { "event_handler_enabled",        SETTER(bool, _set_event_handler_enabled) },
@@ -87,7 +85,6 @@ service::setters const service::_setters[] = {
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
-  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
   { "timezone",                     SETTER(std::string const&, _set_timezone) }
@@ -109,7 +106,7 @@ static unsigned short const default_flap_detection_options(
                               | service::critical);
 static unsigned int const   default_freshness_threshold(0);
 static unsigned int const   default_high_flap_threshold(0);
-static unsigned int const   default_initial_state(STATE_OK);
+static unsigned int const   default_initial_state(engine::service::state_ok);
 static bool const           default_is_volatile(false);
 static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(3);
@@ -1251,36 +1248,6 @@ bool service::_set_event_handler_enabled(bool value) {
 }
 
 /**
- *  Set failure_prediction_enabled value.
- *
- *  @param[in] value The new failure_prediction_enabled value.
- *
- *  @return True on success, otherwise false.
- */
-bool service::_set_failure_prediction_enabled(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: service failure_prediction_enabled was ignored";
-  ++config_warnings;
-  return true;
-}
-
-/**
- *  Set failure_prediction_options value.
- *
- *  @param[in] value The new failure_prediction_options value.
- *
- *  @return True on success, otherwise false.
- */
-bool service::_set_failure_prediction_options(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: service failure_prediction_options was ignored";
-  ++config_warnings;
-  return true;
-}
-
-/**
  *  Set first_notification_delay value.
  *
  *  @param[in] value The new first_notification_delay value.
@@ -1422,13 +1389,13 @@ bool service::_set_initial_state(std::string const& value) {
   std::string data(value);
   string::trim(data);
   if (data == "o" || data == "ok")
-    _initial_state = STATE_OK;
+    _initial_state = engine::service::state_ok;
   else if (data == "w" || data == "warning")
-    _initial_state = STATE_WARNING;
+    _initial_state = engine::service::state_warning;
   else if (data == "u" || data == "unknown")
-    _initial_state = STATE_UNKNOWN;
+    _initial_state = engine::service::state_unknown;
   else if (data == "c" || data == "critical")
-    _initial_state = STATE_CRITICAL;
+    _initial_state = engine::service::state_critical;
   else
     return false;
   return true;
@@ -1580,21 +1547,6 @@ bool service::_set_notification_period(std::string const& value) {
  */
 bool service::_set_obsess_over_service(bool value) {
   _obsess_over_service = value;
-  return true;
-}
-
-/**
- *  Set parallelize_check value.
- *
- *  @param[in] value The new parallelize_check value.
- *
- *  @return True on success, otherwise false.
- */
-bool service::_set_parallelize_check(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "Warning: service parallelize_check was ignored";
-  ++config_warnings;
   return true;
 }
 

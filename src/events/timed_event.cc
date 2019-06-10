@@ -553,47 +553,51 @@ void compensate_for_system_time_change(
   resort_event_list(&event_list_low, &event_list_low_tail);
 
   // adjust service timestamps.
-  for (com::centreon::engine::service* svc(service_list); svc; svc = svc->next) {
-    svc->set_last_notification(adjust_timestamp_for_time_change(
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it) {
+    it->second->set_last_notification(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      svc->get_last_notification()));
-    svc->last_check = adjust_timestamp_for_time_change(
+      it->second->get_last_notification()));
+    it->second->set_last_check(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      svc->last_check);
-    svc->next_check = adjust_timestamp_for_time_change(
+      it->second->get_last_check()));
+    it->second->set_next_check(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      svc->next_check);
-    svc->last_state_change = adjust_timestamp_for_time_change(
+      it->second->get_next_check()));
+    it->second->set_last_state_change(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      svc->last_state_change);
-    svc->last_hard_state_change = adjust_timestamp_for_time_change(
+      it->second->get_last_state_change()));
+    it->second->set_last_hard_state_change(adjust_timestamp_for_time_change(
       last_time,
       current_time,
       time_difference,
-      svc->last_hard_state_change);
+      it->second->get_last_hard_state_change()));
 
-    svc->set_initial_notif_time(adjust_timestamp_for_time_change(
+    it->second->set_initial_notif_time(adjust_timestamp_for_time_change(
         last_time, current_time, time_difference,
-        svc->get_initial_notif_time()));
-    svc->set_last_acknowledgement(adjust_timestamp_for_time_change(
+        it->second->get_initial_notif_time()));
+    it->second->set_last_acknowledgement(adjust_timestamp_for_time_change(
         last_time, current_time, time_difference,
-        svc->get_last_acknowledgement()));
+        it->second->get_last_acknowledgement()));
 
     // recalculate next re-notification time.
-    svc->set_next_notification(
-      svc->get_next_notification_time(
-          svc->get_last_notification()));
+    it->second->set_next_notification(
+      it->second->get_next_notification_time(
+        it->second->get_last_notification()));
 
     // update the status data.
-    svc->update_status(false);
+    it->second->update_status(false);
   }
 
   // adjust host timestamps.
@@ -632,16 +636,6 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       it->second->get_last_state_history_update())};
-    time_t init_notif{adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      it->second->get_initial_notif_time())};
-    time_t last_ack{adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      it->second->get_last_acknowledgement())};
 
     it->second->set_last_notification(last_host_notif);
     it->second->set_last_check(last_check);

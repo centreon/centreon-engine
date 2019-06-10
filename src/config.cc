@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
@@ -40,9 +41,7 @@ using namespace com::centreon::engine::logging;
 
 /* do a pre-flight check to make sure object relationships, etc. make sense */
 int pre_flight_check() {
-  host* temp_host(nullptr);
   char* buf(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   commands::command* temp_command(nullptr);
   char* temp_command_name(nullptr);
   int warnings(0);
@@ -170,17 +169,18 @@ int pre_flight_check() {
   }
 
   /* count number of services associated with each host (we need this for flap detection)... */
-  for (temp_service = service_list;
-       temp_service != nullptr;
-       temp_service = temp_service->next) {
-
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it) {
     umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it(state::instance().hosts().find(get_host_id(temp_service->get_hostname())));
-    if (it != state::instance().hosts().end() && it->second != nullptr) {
-      it->second->set_total_services(it->second->get_total_services() + 1);
-      it->second->set_total_service_check_interval(
-        it->second->get_total_service_check_interval()
-        + static_cast<unsigned long>(temp_service->get_check_interval()));
+      found(state::instance().hosts().find(get_host_id(it->first.first)));
+    if (found != state::instance().hosts().end() && it->second != nullptr) {
+      found->second->set_total_services(found->second->get_total_services() + 1);
+      found->second->set_total_service_check_interval(
+        found->second->get_total_service_check_interval()
+        + static_cast<unsigned long>(it->second->get_check_interval()));
     }
   }
 
@@ -245,10 +245,12 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking services...";
   int total_objects(0);
-  for (com::centreon::engine::service* temp_service(service_list);
-       temp_service;
-       temp_service = temp_service->next, ++total_objects)
-    check_service(temp_service, &warnings, &errors);
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it, ++total_objects)
+    check_service(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " services.";
@@ -285,10 +287,12 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking service groups...";
   total_objects = 0;
-  for (servicegroup* temp_servicegroup(servicegroup_list);
-       temp_servicegroup;
-       temp_servicegroup = temp_servicegroup->next, ++total_objects)
-    check_servicegroup(temp_servicegroup, &warnings, &errors);
+  for (servicegroup_map::iterator
+         it(servicegroup::servicegroups.begin()),
+         end(servicegroup::servicegroups.end());
+       it != end;
+       ++it)
+    check_servicegroup(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service groups.";
@@ -329,10 +333,12 @@ int pre_flight_object_check(int* w, int* e) {
     logger(log_info_message, basic)
       << "Checking service escalations...";
   total_objects = 0;
-  for (serviceescalation* temp_se(serviceescalation_list);
-       temp_se;
-       temp_se = temp_se->next, ++total_objects)
-    check_serviceescalation(temp_se, &warnings, &errors);
+  for (serviceescalation_mmap::iterator
+       it{serviceescalation::serviceescalations.begin()},
+       end{serviceescalation::serviceescalations.end()};
+       it != end;
+       ++it, ++total_objects)
+    check_serviceescalation(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service escalations.";
@@ -360,7 +366,7 @@ int pre_flight_object_check(int* w, int* e) {
          it(hostescalation::hostescalations.begin()),
          end(hostescalation::hostescalations.end());
        it != end;
-       ++it)
+       ++it, ++total_objects)
     check_hostescalation(it->second.get(), &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
@@ -492,10 +498,7 @@ static int dfs_host_path(host* root) {
 
 /* check for circular paths and dependencies */
 int pre_flight_circular_check(int* w, int* e) {
-  servicedependency* temp_sd(nullptr);
-  servicedependency* temp_sd2(nullptr);
   hostdependency* temp_hd(nullptr);
-  hostdependency* temp_hd2(nullptr);
   int found(false);
   int warnings(0);
   int errors(0);
@@ -555,7 +558,7 @@ int pre_flight_circular_check(int* w, int* e) {
     for (servicedependency_mmap::iterator
            it2(servicedependency::servicedependencies.begin()),
            end2(servicedependency::servicedependencies.end());
-         it2 != end;
+         it2 != end2;
          ++it2)
       it2->second->set_circular_path_checked(false);
 
@@ -583,7 +586,7 @@ int pre_flight_circular_check(int* w, int* e) {
     for (servicedependency_mmap::iterator
            it2(servicedependency::servicedependencies.begin()),
            end2(servicedependency::servicedependencies.end());
-         it2 != end;
+         it2 != end2;
          ++it2)
       it2->second->set_circular_path_checked(false);
 
@@ -701,13 +704,26 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
     svc->host_ptr = it->second.get();
 
   /* add a reverse link from the host to the service for faster lookups later */
-  add_service_link_to_host(svc->host_ptr, svc);
+  svc->host_ptr->services[{svc->get_hostname(), svc->get_description()}] =
+    std::shared_ptr<com::centreon::engine::service>(svc);
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_relation_data(
+    NEBTYPE_PARENT_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    svc->host_ptr,
+    NULL,
+    NULL,
+    svc,
+    &tv);
 
   /* check the event handler command */
-  if (svc->event_handler != nullptr) {
+  if (!svc->get_event_handler().empty()) {
 
     /* check the event handler command */
-    char* buf = string::dup(svc->event_handler);
+    char* buf = string::dup(svc->get_event_handler());
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -749,10 +765,10 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   svc->check_command_ptr = temp_command;
 
   // Check for sane recovery options.
-  if (svc->notifications_enabled
-      && svc->notify_on_recovery
-      && !svc->notify_on_warning
-      && !svc->notify_on_critical) {
+  if (svc->get_notifications_enabled()
+      && svc->get_notify_on(notifier::recovery)
+      && !svc->get_notify_on(notifier::warning)
+      && !svc->get_notify_on(notifier::critical)) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in service '"
       << svc->get_description() << "' for host '" << svc->get_hostname()
@@ -848,7 +864,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
     // Save the pointer to the notification timeperiod for later.
     svc->notification_period_ptr = temp_timeperiod;
   }
-  else if (svc->notifications_enabled) {
+  else if (svc->get_notifications_enabled()) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->get_description() << "' on host "
       "'" << svc->get_hostname() << "' has no notification time period "
@@ -857,7 +873,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   }
 
   // See if the notification interval is less than the check interval.
-  if (svc->notifications_enabled
+  if (svc->get_notifications_enabled()
       && svc->notification_interval
       && (svc->notification_interval < svc->get_check_interval())) {
     logger(log_verification_error, basic)
@@ -898,10 +914,12 @@ int check_host(host* hst, int* w, int* e) {
   // modified.
   if (!use_large_installation_tweaks) {
     bool found(false);
-    for (com::centreon::engine::service* temp_service(service_list);
-	       temp_service;
-	       temp_service = temp_service->next)
-      if (hst->get_name() != temp_service->get_hostname()) {
+    for (service_map::iterator
+           it(service::services.begin()),
+           end(service::services.end());
+         it != end;
+         ++it)
+      if (hst->get_name() != it->first.first) {
         found = true;
         break ;
       }
@@ -1050,7 +1068,6 @@ int check_host(host* hst, int* w, int* e) {
        it != end;
        it++) {
 
-    host* hst2 = nullptr;
     umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first)));
 
@@ -1066,9 +1083,9 @@ int check_host(host* hst, int* w, int* e) {
 
   // Check for sane recovery options.
   if (hst->get_notifications_enabled()
-      && hst->get_notify_on_recovery()
-      && !hst->get_notify_on_down()
-      && !hst->get_notify_on_unreachable()) {
+      && hst->get_notify_on(notifier::recovery)
+      && !hst->get_notify_on(notifier::down)
+      && !hst->get_notify_on(notifier::unreachable)) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in host '" << hst->get_name()
       << "' definition doesn't make any sense - specify down and/or "
@@ -1220,18 +1237,20 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
   int errors(0);
 
   // Check all group members.
-  for (servicesmember* temp_servicesmember(sg->members);
-       temp_servicesmember;
-       temp_servicesmember = temp_servicesmember->next) {
-    com::centreon::engine::service* temp_service(find_service(
-                            temp_servicesmember->host_name,
-                            temp_servicesmember->service_description));
+  for (service_map::iterator
+         it(sg->members.begin()),
+         end(sg->members.end());
+       it != end;
+       ++it) {
+    service* temp_service(find_service(
+                            it->first.first.c_str(),
+                            it->first.second.c_str()));
     if (!temp_service) {
       logger(log_verification_error, basic)
         << "Error: Service '"
-        << temp_servicesmember->service_description
-        << "' on host '" << temp_servicesmember->host_name
-        << "' specified in service group '" << sg->group_name
+        << it->first.second
+        << "' on host '" << it->first.first
+        << "' specified in service group '" << sg->get_group_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1242,13 +1261,13 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
       add_object_to_objectlist(&temp_service->servicegroups_ptr, sg);
 
     // Save service pointer for later.
-    temp_servicesmember->service_ptr = temp_service;
+    sg->members[it->first] = std::shared_ptr<service>(temp_service);
   }
 
   // Check for illegal characters in servicegroup name.
-  if (contains_illegal_object_chars(sg->group_name)) {
+  if (contains_illegal_object_chars(sg->get_group_name().c_str())) {
     logger(log_verification_error, basic)
-      << "Error: The name of servicegroup '" << sg->group_name
+      << "Error: The name of servicegroup '" << sg->get_group_name()
       << "' contains one or more illegal characters.";
     errors++;
   }
@@ -1547,32 +1566,32 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   int errors(0);
 
   // Find the service.
-  com::centreon::engine::service* temp_service(find_service(se->host_name, se->description));
+  com::centreon::engine::service* temp_service(find_service(se->get_hostname().c_str(), se->get_description().c_str()));
   if (!temp_service) {
     logger(log_verification_error, basic) << "Error: Service '"
-        << se->description << "' on host '" << se->host_name
+        << se->get_description() << "' on host '" << se->get_hostname()
         << "' specified in service escalation is not defined anywhere!";
     errors++;
   }
 
   // Save the service pointer for later.
-  se->service_ptr = temp_service;
+  se->notifier_ptr = temp_service;
 
   // Find the timeperiod.
-  if (se->escalation_period) {
+  if (!se->get_escalation_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(se->escalation_period));
+      it(state::instance().timeperiods().find(se->get_escalation_period()));
 
     if (it != state::instance().timeperiods().end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
       logger(log_verification_error, basic)
-        << "Error: Escalation period '" << se->escalation_period
+        << "Error: Escalation period '" << se->get_escalation_period()
         << "' specified in service escalation for service '"
-        << se->description << "' on host '"
-        << se->host_name << "' is not defined anywhere!";
+        << se->get_description() << "' on host '"
+        << se->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1581,20 +1600,15 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   }
 
   // Check all contacts.
-  for (contact_map::iterator
-         it(se->contacts.begin()),
-         end(se->contacts.end());
-       it != end;
-       ++it) {
-    // Find the contact.
-    contact* cntct(configuration::applier::state::instance().find_contact(
-      it->first));
-    if (cntct == nullptr) {
+  for (std::pair<std::string, std::shared_ptr<contact>> const& p : se->contacts()) {
+    contact* cntct{configuration::applier::state::instance().find_contact(
+      p.first)};
+    if (!cntct) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << it->first
+        << "Error: Contact '" << p.first
         << "' specified in service escalation for service '"
-        << se->description << "' on host '"
-        << se->host_name << "' is not defined anywhere!";
+        << se->get_description() << "' on host '"
+        << se->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }
@@ -1615,7 +1629,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
         << "Error: Contact group '"
         << it->first
         << "' specified in service escalation for service '"
-        << se->description << "' on host '" << se->host_name
+        << se->get_description() << "' on host '" << se->get_hostname()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1643,19 +1657,19 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
 
   // Find the host.
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(he->get_host_name())));
+    it(state::instance().hosts().find(get_host_id(he->get_hostname())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
-      << "Error: Host '" << he->get_host_name()
+      << "Error: Host '" << he->get_hostname()
       << "' specified in host escalation is not defined anywhere!";
     errors++;
   }
 
   // Save the host pointer for later.
   if (it == state::instance().hosts().end())
-    he->host_ptr = nullptr;
+    he->notifier_ptr = nullptr;
   else
-    he->host_ptr = it->second.get();
+    he->notifier_ptr = it->second.get();
 
   // Find the timeperiod.
   if (!he->get_escalation_period().empty()) {
@@ -1670,7 +1684,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: Escalation period '" << he->get_escalation_period()
         << "' specified in host escalation for host '"
-        << he->get_host_name() << "' is not defined anywhere!";
+        << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1679,19 +1693,15 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   }
 
   // Check all contacts.
-  for (contact_map::iterator
-         it(he->contacts.begin()),
-         end(he->contacts.end());
-       it != end;
-       ++it) {
+  for (std::pair<std::string, std::shared_ptr<contact>> const& p : he->contacts()) {
     // Find the contact.
-    contact* cntct(configuration::applier::state::instance().find_contact(
-                            it->first));
+    contact* cntct{configuration::applier::state::instance().find_contact(
+                            p.first)};
     if (!cntct) {
       logger(log_verification_error, basic)
-        << "Error: Contact '" << it->first
+        << "Error: Contact '" << p.first
         << "' specified in host escalation for host '"
-        << he->get_host_name() << "' is not defined anywhere!";
+        << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }
@@ -1712,7 +1722,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
         << "Error: Contact group '"
         << it->first
         << "' specified in host escalation for host '"
-        << he->get_host_name() << "' is not defined anywhere!";
+        << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
   }
@@ -1750,7 +1760,6 @@ int check_timeperiod(timeperiod* tp, int* w, int* e) {
          end(tp->exclusions.end());
        it != end;
        ++it) {
-    timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
       found(state::instance().timeperiods().find(it->first));
 

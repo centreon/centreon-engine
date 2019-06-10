@@ -24,6 +24,7 @@
 #  include <cstdio>
 #  include <sys/time.h>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/notifier.hh"
 
 // Service dependency values
 #  define DEPENDENCIES_OK     0
@@ -37,6 +38,11 @@ CCE_BEGIN()
   class host;
   class service;
 CCE_END()
+
+enum check_type {
+  check_active,        /* 0: Engine performed the check. */
+  check_passive,       /* 1: Check result submitted by an external source. */
+};
 
 // CHECK_RESULT structure
 typedef struct                check_result_struct {
@@ -78,11 +84,6 @@ unsigned int check_service_dependencies(
 void check_for_orphaned_services();
 // checks the "freshness" of service check results
 void check_service_result_freshness();
-// determines if a service's check results are fresh
-int is_service_result_fresh(
-      com::centreon::engine::service* temp_service,
-      time_t current_time,
-      int log_this);
 // checks host dependencie
 unsigned int check_host_dependencies(
                com::centreon::engine::host* hst,
@@ -92,45 +93,14 @@ void check_for_orphaned_hosts();
 // checks the "freshness" of host check results
 void check_host_result_freshness();
 // determines if a host's check results are fresh
-int is_host_result_fresh(
-      com::centreon::engine::host* temp_host,
-      time_t current_time,
-      int log_this);
 
 // Route/Host Check Functions
-int perform_on_demand_host_check(
-      com::centreon::engine::host* hst,
-      int* check_return_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
 int perform_scheduled_host_check(
       com::centreon::engine::host* hst,
       int check_options,
       double latency);
-int perform_on_demand_host_check_3x(
-      com::centreon::engine::host* hst,
-      int* check_result_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
-int run_sync_host_check_3x(
-      com::centreon::engine::host* hst,
-      int* check_result_code,
-      int check_options,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
-int process_host_check_result_3x(
-      com::centreon::engine::host* hst,
-      int new_state,
-      char* old_plugin_output,
-      int check_options,
-      int reschedule_check,
-      int use_cached_result,
-      unsigned long check_timestamp_horizon);
 int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
                                  int is_active);
-int determine_host_reachability(com::centreon::engine::host* hst);
 
 #  ifdef __cplusplus
 }

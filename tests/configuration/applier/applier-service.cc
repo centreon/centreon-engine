@@ -28,6 +28,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon;
@@ -251,7 +252,7 @@ TEST_F(ApplierService, ServicesFlapOptionsAll) {
 TEST_F(ApplierService, ServicesInitialState) {
   configuration::service csvc;
   ASSERT_TRUE(csvc.parse("initial_state", "u"));
-  ASSERT_EQ(csvc.initial_state(), STATE_UNKNOWN);
+  ASSERT_EQ(csvc.initial_state(), engine::service::state_unknown);
   ASSERT_FALSE(csvc.parse("initial_state", "g"));
 }
 

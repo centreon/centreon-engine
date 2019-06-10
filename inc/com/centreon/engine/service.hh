@@ -24,9 +24,12 @@
 #  include <memory>
 #  include <string>
 #  include <time.h>
+#  include <unordered_map>
+#  include <utility>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/contactgroup.hh"
+#  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/logging.hh"
 #  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/notifier.hh"
@@ -42,30 +45,89 @@ CCE_BEGIN()
     class command;
   }
   class host;
-class timeperiod;
+  class service;
+  class serviceescalation;
+  class timeperiod;
+CCE_END()
+
+//Needed by service to use pair<string, string> as umap key.
+//TODO SGA : check why servicedependency does not need it...
+struct pair_hash {
+  template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2> & pair) const {
+      return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
+    }
+};
+
+typedef std::unordered_map<std::pair<std::string, std::string>,
+  std::shared_ptr<com::centreon::engine::service>, pair_hash> service_map;
+
+CCE_BEGIN()
 
 class                           service : public notifier {
  public:
   static std::array<std::pair<uint32_t, std::string>, 3> const tab_service_states;
 
+  enum                          service_state {
+    state_ok,
+    state_warning,
+    state_critical,
+    state_unknown
+  };
+
                                 service(std::string const& hostname,
                                         std::string const& description,
                                         std::string const& display_name,
                                         std::string const& check_command,
-                                        int initial_state,
+                                        bool checks_enabled,
+                                        bool accept_passive_checks,
+                                        enum service::service_state initial_state,
                                         double check_interval,
                                         double retry_interval,
                                         int max_attempts,
+                                        double first_notification_delay,
                                         std::string const& notification_period,
+                                        bool notifications_enabled,
+                                        bool is_volatile,
                                         std::string const& check_period,
+                                        std::string const& event_handler,
+                                        bool event_handler_enabled,
+                                        std::string const& notes,
+                                        std::string const& notes_url,
                                         std::string const& action_url,
                                         std::string const& icon_image,
-                                        std::string const& icon_image_alt);
+                                        std::string const& icon_image_alt,
+                                        bool flap_detection_enabled,
+                                        double low_flap_threshold,
+                                        double high_flap_threshold,
+                                        bool check_freshness,
+                                        int freshness_threshold,
+                                        bool obsess_over,
+                                        std::string const& timezone);
                                 ~service();
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
   std::string const&            get_description() const;
+  time_t                        get_last_time_ok() const;
+  void                          set_last_time_ok(time_t last_time);
+  time_t                        get_last_time_warning() const;
+  void                          set_last_time_warning(time_t last_time);
+  time_t                        get_last_time_unknown() const;
+  void                          set_last_time_unknown(time_t last_time);
+  time_t                        get_last_time_critical() const;
+  void                          set_last_time_critical(time_t last_time);
+  enum service_state            get_current_state() const;
+  void                          set_current_state(enum service_state current_state);
+  enum service_state            get_last_state() const;
+  void                          set_last_state(enum service_state last_state);
+  enum service_state            get_last_hard_state() const;
+  void                          set_last_hard_state(enum service_state last_hard_state);
+  enum service_state            get_initial_state() const;
+  void                          set_initial_state(enum service_state current_state);
+  bool                          recovered() const override ;
+  int                           get_current_state_int() const override ;
+
   int                           handle_async_check_result(
                                   check_result* queued_check_result);
   int                           log_event();
@@ -101,9 +163,6 @@ class                           service : public notifier {
   int                           verify_check_viability(int check_options,
                                                        int* time_is_valid,
                                                        time_t* new_time);
-  int                           create_notification_list(nagios_macros* mac,
-                                                         int options,
-                                                         bool* escalated) override;
   void                          grab_macros_r(nagios_macros* mac) override;
   int                           notify_contact(nagios_macros* mac,
                                                contact* cntct,
@@ -116,116 +175,61 @@ class                           service : public notifier {
   time_t                        get_next_notification_time(time_t offset) override;
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
+  bool                          operator==(service const& other) throw();
+  bool                          operator!=(service const& other) throw();
+  bool                          is_valid_escalation_for_notification(
+                                  std::shared_ptr<escalation> e,
+                                  int options) const override;
+  bool                          is_result_fresh(time_t current_time, int log_this);
+  void                          handle_flap_detection_disabled();
+  bool                          get_is_volatile() const;
+  void                          set_is_volatile(bool vol);
 
-  char*                         event_handler;
-  int                           parallelize;
-  contactgroup_map              contact_groups;
-  contact_map                   contacts;
   double                        notification_interval;
-  double                        first_notification_delay;
-  int                           notify_on_unknown;
-  int                           notify_on_warning;
-  int                           notify_on_critical;
-  int                           notify_on_recovery;
-  int                           notify_on_flapping;
-  int                           notify_on_downtime;
-  int                           stalk_on_ok;
-  int                           stalk_on_warning;
-  int                           stalk_on_unknown;
-  int                           stalk_on_critical;
-  int                           is_volatile;
-  int                           flap_detection_enabled;
-  double                        low_flap_threshold;
-  double                        high_flap_threshold;
-  int                           flap_detection_on_ok;
-  int                           flap_detection_on_warning;
-  int                           flap_detection_on_unknown;
-  int                           flap_detection_on_critical;
   int                           process_performance_data;
-  int                           check_freshness;
-  int                           freshness_threshold;
   int                           accept_passive_service_checks;
-  int                           event_handler_enabled;
-  int                           checks_enabled;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
-  int                           notifications_enabled;
-  int                           obsess_over_service;
-  int                           failure_prediction_enabled;
-  char*                         failure_prediction_options;
-  char*                         notes;
-  char*                         notes_url;
-  std::unordered_map<std::string, com::centreon::engine::customvariable>
-                                custom_variables;
-  int                           problem_has_been_acknowledged;
   int                           acknowledgement_type;
   int                           host_problem_at_last_check;
-  int                           check_type;
-  int                           current_state;
-  int                           last_state;
-  int                           last_hard_state;
-  char*                         plugin_output;
-  char*                         long_plugin_output;
-  char*                         perf_data;
-  int                           state_type;
-  time_t                        next_check;
-  int                           should_be_scheduled;
-  time_t                        last_check;
-  int                           current_attempt;
-  uint64_t                      current_event_id;
-  uint64_t                      last_event_id;
-  uint64_t                      current_problem_id;
-  uint64_t                      last_problem_id;
-  int                           no_more_notifications;
   int                           check_flapping_recovery_notification;
-  time_t                        last_state_change;
-  time_t                        last_hard_state_change;
-  time_t                        last_time_ok;
-  time_t                        last_time_warning;
-  time_t                        last_time_unknown;
-  time_t                        last_time_critical;
-  int                           has_been_checked;
   int                           is_being_freshened;
-  int                           notified_on_unknown;
-  int                           notified_on_warning;
-  int                           notified_on_critical;
   int                           current_notification_number;
   uint64_t                      current_notification_id;
-  double                        latency;
-  double                        execution_time;
   int                           is_executing;
   int                           check_options;
-  int                           scheduled_downtime_depth;
   int                           pending_flex_downtime;
-  int                           state_history[MAX_STATE_HISTORY_ENTRIES];
-  unsigned int                  state_history_index;
-  int                           is_flapping;
   uint64_t                      flapping_comment_id;
-  double                        percent_state_change;
-  unsigned long                 modified_attributes;
 
-  com::centreon::engine::host*  host_ptr;
-  com::centreon::engine::commands::command*
-                                event_handler_ptr;
+  host*                         host_ptr;
+  commands::command*            event_handler_ptr;
   char*                         event_handler_args;
-  com::centreon::engine::commands::command*
-                                check_command_ptr;
+  commands::command*            check_command_ptr;
   char*                         check_command_args;
   timeperiod*                   check_period_ptr;
   timeperiod*                   notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
-  service*                      next;
-  service*                      nexthash;
+
+  static service_map            services;
+
  private:
   std::string                   _hostname;
   std::string                   _description;
 
+  time_t                        _last_time_ok;
+  time_t                        _last_time_warning;
+  time_t                        _last_time_unknown;
+  time_t                        _last_time_critical;
+  int                           _is_volatile;
+  enum service_state            _last_state;
+  enum service_state            _last_hard_state;
+  enum service_state            _current_state;
+  enum service_state            _initial_state;
 };
 CCE_END()
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
-  std::string                   timezone;
   uint64_t                      host_id;
   uint64_t                      service_id;
 };
@@ -241,51 +245,49 @@ com::centreon::engine::service* add_service(
            std::string const& description,
            std::string const& display_name,
            std::string const& check_period,
-           int initial_state,
+           enum com::centreon::engine::service::service_state  initial_state,
            int max_attempts,
-           int parallelize,
-           int accept_passive_checks,
            double check_interval,
            double retry_interval,
            double notification_interval,
            double first_notification_delay,
            std::string const& notification_period,
-           int notify_recovery,
-           int notify_unknown,
-           int notify_warning,
-           int notify_critical,
-           int notify_flapping,
-           int notify_downtime,
-           int notifications_enabled,
-           int is_volatile,
-           char const* event_handler,
-           int event_handler_enabled,
-           char const* check_command,
-           int checks_enabled,
-           int flap_detection_enabled,
+           bool notify_recovery,
+           bool notify_unknown,
+           bool notify_warning,
+           bool notify_critical,
+           bool notify_flapping,
+           bool notify_downtime,
+           bool notifications_enabled,
+           bool is_volatile,
+           std::string const& event_handler,
+           bool event_handler_enabled,
+           std::string const& check_command,
+           bool checks_enabled,
+           bool accept_passive_checks,
+           bool flap_detection_enabled,
            double low_flap_threshold,
            double high_flap_threshold,
-           int flap_detection_on_ok,
-           int flap_detection_on_warning,
-           int flap_detection_on_unknown,
-           int flap_detection_on_critical,
-           int stalk_on_ok,
-           int stalk_on_warning,
-           int stalk_on_unknown,
-           int stalk_on_critical,
+           bool flap_detection_on_ok,
+           bool flap_detection_on_warning,
+           bool flap_detection_on_unknown,
+           bool flap_detection_on_critical,
+           bool stalk_on_ok,
+           bool stalk_on_warning,
+           bool stalk_on_unknown,
+           bool stalk_on_critical,
            int process_perfdata,
-           int failure_prediction_enabled,
-           char const* failure_prediction_options,
-           int check_freshness,
+           bool check_freshness,
            int freshness_threshold,
-           char const* notes,
-           char const* notes_url,
+           std::string const& notes,
+           std::string const& notes_url,
            std::string const& action_url,
            std::string const& icon_image,
            std::string const& icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_service);
+           bool obsess_over,
+           std::string const& timezone);
 int      get_service_count();
 int      is_contact_for_service(
            com::centreon::engine::service* svc,
@@ -300,20 +302,14 @@ int      is_escalated_contact_for_service(
 #    include <ostream>
 #    include <string>
 
-bool          operator==(
-                com::centreon::engine::service const& obj1,
-                com::centreon::engine::service const& obj2) throw ();
-bool          operator!=(
-                com::centreon::engine::service const& obj1,
-                com::centreon::engine::service const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
+std::ostream& operator<<(std::ostream& os, service_map const& obj);
 
 CCE_BEGIN()
 
 com::centreon::engine::service&      find_service(
                 uint64_t host_id,
                 uint64_t service_id);
-char const*   get_service_timezone(std::string const& hst, std::string const& svc);
 bool          is_service_exist(
                 std::pair<uint64_t, uint64_t> const& id);
 std::pair<uint64_t, uint64_t>

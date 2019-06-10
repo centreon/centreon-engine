@@ -177,11 +177,11 @@ int service_downtime::unschedule() {
       get_downtime_id(),
       nullptr);
 
-    svc->scheduled_downtime_depth--;
+    svc->dec_scheduled_downtime_depth();
     svc->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
-    if (svc->scheduled_downtime_depth == 0) {
+    if (svc->get_scheduled_downtime_depth() == 0) {
       logger(log_info_message, basic)
         << "SERVICE DOWNTIME ALERT: " << svc->get_hostname() << ";"
         << svc->get_description()
@@ -327,7 +327,7 @@ int service_downtime::handle() {
     if (!_start_flex_downtime) {
 
       /* host is up or service is ok, so we don't really do anything right now */
-      if (svc->current_state == STATE_OK) {
+      if (svc->get_current_state() == service::state_ok) {
 
         /* increment pending flex downtime counter */
         svc->pending_flex_downtime++;
@@ -375,9 +375,9 @@ int service_downtime::handle() {
       nullptr);
 
     /* decrement the downtime depth variable */
-    svc->scheduled_downtime_depth--;
+    svc->dec_scheduled_downtime_depth();
 
-    if (svc->scheduled_downtime_depth == 0) {
+    if (svc->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
         << "Service '" << svc->get_description() << "' on host '"
@@ -461,7 +461,7 @@ int service_downtime::handle() {
       get_duration(),
       get_downtime_id(), nullptr);
 
-    if (svc->scheduled_downtime_depth == 0) {
+    if (svc->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
         << "Service '" << svc->get_description() << "' on host '"
@@ -484,7 +484,7 @@ int service_downtime::handle() {
     }
 
     /* increment the downtime depth variable */
-    svc->scheduled_downtime_depth++;
+    svc->inc_scheduled_downtime_depth();
 
     /* set the in effect flag */
     _set_in_effect(true);

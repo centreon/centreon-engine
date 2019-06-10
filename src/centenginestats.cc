@@ -27,7 +27,10 @@
 #endif // HAVE_GETOPT_H
 #include <iostream>
 #include <unistd.h>
+#include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/notifier.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/exceptions/basic.hh"
@@ -592,8 +595,8 @@ int read_status_file() {
 
   double execution_time = 0.0;
   double latency = 0.0;
-  int check_type = SERVICE_CHECK_ACTIVE;
-  int current_state = STATE_OK;
+  int check_type = check_active;
+  int current_state = service::state_ok;
   double state_change = 0.0;
   int is_flapping = false;
   int downtime_depth = 0;
@@ -659,7 +662,7 @@ int read_status_file() {
           have_max_host_state_change = true;
           max_host_state_change = state_change;
         }
-        if (check_type == HOST_CHECK_ACTIVE) {
+        if (check_type == check_active) {
           active_host_checks++;
           average_active_host_latency = (((average_active_host_latency * ((double)active_host_checks - 1.0)) + latency) / (double)active_host_checks);
           if (have_min_active_host_latency == false
@@ -737,13 +740,13 @@ int read_status_file() {
             passive_hosts_checked_last_1min++;
         }
         switch (current_state) {
-        case HOST_UP:
+        case host::state_up:
           hosts_up++;
           break;
-        case HOST_DOWN:
+        case host::state_down:
           hosts_down++;
           break;
-        case HOST_UNREACHABLE:
+        case host::state_unreachable:
           hosts_unreachable++;
           break;
         default:
@@ -773,7 +776,7 @@ int read_status_file() {
           have_max_service_state_change = true;
           max_service_state_change = state_change;
         }
-        if (check_type == SERVICE_CHECK_ACTIVE) {
+        if (check_type == check_active) {
           active_service_checks++;
           average_active_service_latency = (((average_active_service_latency
 					      * ((double)active_service_checks - 1.0))
@@ -863,19 +866,19 @@ int read_status_file() {
             passive_services_checked_last_1min++;
         }
         switch (current_state) {
-        case STATE_OK:
+        case service::state_ok:
           services_ok++;
           break;
 
-	case STATE_WARNING:
+	      case service::state_warning:
           services_warning++;
           break;
 
-        case STATE_UNKNOWN:
+        case service::state_unknown:
           services_unknown++;
           break;
 
-        case STATE_CRITICAL:
+        case service::state_critical:
           services_critical++;
           break;
 

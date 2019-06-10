@@ -53,17 +53,17 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
     << "obsessive_compulsive_host_check_processor()";
 
   if (hst == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* bail out if we shouldn't be obsessing */
   if (!config->obsess_over_hosts())
-    return (OK);
-  if (!hst->get_obsess_over_host())
-    return (OK);
+    return OK;
+  if (!hst->get_obsess_over())
+    return OK;
 
   /* if there is no valid command, exit */
   if (config->ochp_command().empty())
-    return (ERROR);
+    return ERROR;
 
   /* update macros */
   memset(&mac, 0, sizeof(mac));
@@ -77,7 +77,7 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
     &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_checks, most)
@@ -92,7 +92,7 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
     macro_options);
   if (processed_command == NULL) {
     clear_volatile_macros_r(&mac);
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_checks, most)
@@ -127,7 +127,7 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
   delete[] raw_command;
   delete[] processed_command;
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -152,15 +152,15 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     << "run_global_service_event_handler()";
 
   if (svc == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* bail out if we shouldn't be running event handlers */
   if (config->enable_event_handlers() == false)
-    return (OK);
+    return OK;
 
   /* a global service event handler command has not been defined */
   if (config->global_service_event_handler().empty())
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, more)
     << "Running global event handler for service '"
@@ -177,7 +177,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     &raw_command,
     macro_options);
   if (raw_command == NULL) {
-    return (ERROR);
+    return ERROR;
   }
 
   logger(dbg_eventhandlers, most)
@@ -186,7 +186,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command, &processed_command, macro_options);
   if (processed_command == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, most)
     << "Processed global service event handler "
@@ -216,8 +216,8 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     NEBATTR_NONE,
     GLOBAL_SERVICE_EVENTHANDLER,
     (void*)svc,
-    svc->current_state,
-    svc->state_type,
+    svc->get_current_state(),
+    svc->get_state_type(),
     start_time,
     end_time,
     exectime,
@@ -235,7 +235,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     delete[] processed_command;
     delete[] raw_command;
     delete[] processed_logentry;
-    return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
+    return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
   /* run the command */
@@ -272,8 +272,8 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     NEBATTR_NONE,
     GLOBAL_SERVICE_EVENTHANDLER,
     (void*)svc,
-    svc->current_state,
-    svc->state_type,
+    svc->get_current_state(),
+    svc->get_state_type(),
     start_time,
     end_time,
     exectime,
@@ -291,7 +291,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
   delete[] processed_command;
   delete[] processed_logentry;
 
-  return (OK);
+  return OK;
 }
 
 /* runs a service event handler command */
@@ -313,11 +313,11 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     << "run_service_event_handler()";
 
   if (svc == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* bail if there's no command */
-  if (svc->event_handler == NULL)
-    return (ERROR);
+  if (svc->get_event_handler().empty())
+    return ERROR;
 
   logger(dbg_eventhandlers, more)
     << "Running event handler for service '" << svc->get_description()
@@ -330,11 +330,11 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
   get_raw_command_line_r(
     mac,
     svc->event_handler_ptr,
-    svc->event_handler,
+    svc->get_event_handler().c_str(),
     &raw_command,
     macro_options);
   if (raw_command == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, most)
     << "Raw service event handler command line: " << raw_command;
@@ -346,7 +346,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     &processed_command,
     macro_options);
   if (processed_command == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, most)
     << "Processed service event handler command line: "
@@ -357,7 +357,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     oss << "SERVICE EVENT HANDLER: " << svc->get_hostname() << ';'
 	<< svc->get_description()
 	<< ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-	<< svc->event_handler;
+	<< svc->get_event_handler();
     process_macros_r(
       mac,
       oss.str().c_str(),
@@ -376,15 +376,15 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
                  NEBATTR_NONE,
                  SERVICE_EVENTHANDLER,
                  (void*)svc,
-                 svc->current_state,
-                 svc->state_type,
+                 svc->get_current_state(),
+                 svc->get_state_type(),
                  start_time,
                  end_time,
                  exectime,
                  config->event_handler_timeout(),
                  early_timeout,
                  result,
-                 svc->event_handler,
+                 svc->get_event_handler().c_str(),
                  processed_command,
                  NULL,
                  NULL);
@@ -395,7 +395,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     delete[] processed_command;
     delete[] raw_command;
     delete[] processed_logentry;
-    return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
+    return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
   /* run the command */
@@ -431,15 +431,15 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     NEBATTR_NONE,
     SERVICE_EVENTHANDLER,
     (void*)svc,
-    svc->current_state,
-    svc->state_type,
+    svc->get_current_state(),
+    svc->get_state_type(),
     start_time,
     end_time,
     exectime,
     config->event_handler_timeout(),
     early_timeout,
     result,
-    svc->event_handler,
+    svc->get_event_handler().c_str(),
     processed_command,
     command_output,
     NULL);
@@ -450,7 +450,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
   delete[] processed_command;
   delete[] processed_logentry;
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/
@@ -465,7 +465,7 @@ int handle_host_event(com::centreon::engine::host* hst) {
     << "handle_host_event()";
 
   if (hst == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* send event data to broker */
   broker_statechange_data(
@@ -482,9 +482,9 @@ int handle_host_event(com::centreon::engine::host* hst) {
 
   /* bail out if we shouldn't be running event handlers */
   if (!config->enable_event_handlers())
-    return (OK);
+    return OK;
   if (!hst->get_event_handler_enabled())
-    return (OK);
+    return OK;
 
   /* update host macros */
   memset(&mac, 0, sizeof(mac));
@@ -508,7 +508,7 @@ int handle_host_event(com::centreon::engine::host* hst) {
     NULL,
     NULL);
 
-  return (OK);
+  return OK;
 }
 
 /* runs the global host event handler */
@@ -530,15 +530,15 @@ int run_global_host_event_handler(nagios_macros* mac,
     << "run_global_host_event_handler()";
 
   if (hst == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* bail out if we shouldn't be running event handlers */
   if (config->enable_event_handlers() == false)
-    return (OK);
+    return OK;
 
   /* no global host event handler command is defined */
   if (config->global_host_event_handler() == "")
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, more)
     << "Running global event handler for host '" << hst->get_name() << "'...";
@@ -554,7 +554,7 @@ int run_global_host_event_handler(nagios_macros* mac,
     &raw_command,
     macro_options);
   if (raw_command == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, most)
     << "Raw global host event handler command line: " << raw_command;
@@ -566,7 +566,7 @@ int run_global_host_event_handler(nagios_macros* mac,
     &processed_command,
     macro_options);
   if (processed_command == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, most)
     << "Processed global host event handler "
@@ -613,7 +613,7 @@ int run_global_host_event_handler(nagios_macros* mac,
     delete[] processed_command;
     delete[] raw_command;
     delete[] processed_logentry;
-    return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
+    return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
   /* run the command */
@@ -668,7 +668,7 @@ int run_global_host_event_handler(nagios_macros* mac,
   delete[] processed_command;
   delete[] processed_logentry;
 
-  return (OK);
+  return OK;
 }
 
 /* runs a host event handler command */
@@ -690,11 +690,11 @@ int run_host_event_handler(nagios_macros* mac,
     << "run_host_event_handler()";
 
   if (hst == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* bail if there's no command */
   if (hst->get_event_handler().empty())
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, more)
     << "Running event handler for host '" << hst->get_name() << "'...";
@@ -710,7 +710,7 @@ int run_host_event_handler(nagios_macros* mac,
     &raw_command,
     macro_options);
   if (raw_command == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, most)
     << "Raw host event handler command line: " << raw_command;
@@ -722,7 +722,7 @@ int run_host_event_handler(nagios_macros* mac,
     &processed_command,
     macro_options);
   if (processed_command == NULL)
-    return (ERROR);
+    return ERROR;
 
   logger(dbg_eventhandlers, most)
     << "Processed host event handler command line: "
@@ -770,7 +770,7 @@ int run_host_event_handler(nagios_macros* mac,
     delete[] processed_command;
     delete[] raw_command;
     delete[] processed_logentry;
-    return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
+    return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
   /* run the command */
@@ -825,7 +825,7 @@ int run_host_event_handler(nagios_macros* mac,
   delete[] processed_command;
   delete[] processed_logentry;
 
-  return (OK);
+  return OK;
 }
 
 /******************************************************************/

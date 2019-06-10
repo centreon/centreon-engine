@@ -40,7 +40,7 @@ extern "C" {
 #  endif // C++
 
 int grab_hostgroup_macros(com::centreon::engine::hostgroup* hg);
-int grab_servicegroup_macros(servicegroup* sg);
+int grab_servicegroup_macros(com::centreon::engine::servicegroup* sg);
 int grab_contact_macros(com::centreon::engine::contact* cntct);
 
 int grab_custom_macro_value(
@@ -64,7 +64,7 @@ int grab_standard_service_macro(
       int* free_macro);
 int grab_standard_servicegroup_macro(
       int macro_type,
-      servicegroup* temp_servicegroup,
+      com::centreon::engine::servicegroup* temp_servicegroup,
       char** output);
 int grab_standard_contact_macro(
       int macro_type,
@@ -89,7 +89,7 @@ int grab_hostgroup_macros_r(
       com::centreon::engine::hostgroup* hg);
 int grab_servicegroup_macros_r(
       nagios_macros* mac,
-      servicegroup* sg);
+      com::centreon::engine::servicegroup* sg);
 int grab_contact_macros_r(
       nagios_macros* mac,
       com::centreon::engine::contact* cntct);
@@ -114,7 +114,7 @@ int grab_standard_hostgroup_macro_r(
 int grab_standard_servicegroup_macro_r(
       nagios_macros* mac,
       int macro_type,
-      servicegroup* temp_servicegroup,
+      com::centreon::engine::servicegroup* temp_servicegroup,
       char** output);
 int grab_standard_contact_macro_r(
       nagios_macros* mac,

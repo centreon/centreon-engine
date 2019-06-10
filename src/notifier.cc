@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -33,47 +34,85 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;
 
-std::array<std::string, 8> const notifier::tab_notification_str {{
-  "NORMAL",
-  "ACKNOWLEDGEMENT",
-  "FLAPPINGSTART",
-  "FLAPPINGSTOP",
-  "FLAPPINGDISABLED",
-  "DOWNTIMESTART",
-  "DOWNTIMEEND",
-  "DOWNTIMECANCELLED",
+std::array<std::string, 8> const notifier::tab_notification_str{{
+    "NORMAL",
+    "ACKNOWLEDGEMENT",
+    "FLAPPINGSTART",
+    "FLAPPINGSTOP",
+    "FLAPPINGDISABLED",
+    "DOWNTIMESTART",
+    "DOWNTIMEEND",
+    "DOWNTIMECANCELLED",
 }};
 
-std::array<std::string, 2> const notifier::tab_state_type {{
-  "SOFT",
-  "HARD"
-}};
+std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
 uint64_t notifier::_next_notification_id{0};
 
-notifier::notifier(int notification_type,
+notifier::notifier(int notifier_type,
                    std::string const& display_name,
                    std::string const& check_command,
-                   int initial_state,
+                   bool checks_enabled,
+                   bool accept_passive_checks,
                    double check_interval,
                    double retry_interval,
                    int max_attempts,
+                   double first_notification_delay,
                    std::string const& notification_period,
+                   bool notifications_enabled,
                    std::string const& check_period,
+                   std::string const& event_handler,
+                   bool event_handler_enabled,
+                   std::string const& notes,
+                   std::string const& notes_url,
                    std::string const& action_url,
                    std::string const& icon_image,
-                   std::string const& icon_image_alt)
-    : _notification_type{notification_type},
+                   std::string const& icon_image_alt,
+                   bool flap_detection_enabled,
+                   double low_flap_threshold,
+                   double high_flap_threshold,
+                   bool check_freshness,
+                   int freshness_threshold,
+                   bool obsess_over,
+                   std::string const& timezone)
+    : _notifier_type{notifier_type},
       _display_name{display_name},
       _check_command{check_command},
-      _initial_state{initial_state},
       _check_interval{check_interval},
       _retry_interval{retry_interval},
       _max_attempts{max_attempts},
       _notification_period{notification_period},
       _check_period{check_period},
+      _event_handler{event_handler},
+      _event_handler_enabled{event_handler_enabled},
+      _action_url{action_url},
       _icon_image{icon_image},
-      _icon_image_alt{icon_image_alt} {
+      _icon_image_alt{icon_image_alt},
+      _notes{notes},
+      _notes_url{notes_url},
+      _flap_detection_enabled{flap_detection_enabled},
+      _low_flap_threshold{low_flap_threshold},
+      _high_flap_threshold{high_flap_threshold},
+      _first_notification_delay{first_notification_delay},
+      _notifications_enabled{notifications_enabled},
+      _obsess_over{obsess_over},
+      _timezone{timezone},
+      _checks_enabled{checks_enabled},
+      _accept_passive_checks{accept_passive_checks},
+      _check_freshness{check_freshness},
+      _freshness_threshold{freshness_threshold},
+      _check_type{check_active},
+      _current_attempt{0},
+      _problem_has_been_acknowledged{false},
+      _has_been_checked{false},
+      _scheduled_downtime_depth{0},
+      _execution_time{0.0},
+      _is_flapping{false},
+      _last_check{0},
+      _latency{0.0},
+      _next_check{0L},
+      _no_more_notifications{false},
+      _should_be_scheduled{true} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
@@ -91,12 +130,25 @@ notifier::notifier(int notification_type,
                          << "'";
   }
 
+  if (first_notification_delay < 0) {
+    logger(log_config_error, basic)
+        << "Error: Invalid first_notification_delay value for host '"
+        << display_name << "'";
+    throw engine_error() << "Could not register host '" << display_name << "'";
+  }
+
   if (max_attempts <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid max_check_attempts value for notifier '"
         << display_name << "'";
     throw engine_error() << "Could not register notifier '" << display_name
                          << "'";
+  }
+
+  if (freshness_threshold < 0) {
+    logger(log_config_error, basic)
+        << "Error: Invalid freshness_threshold value for notifier '" << display_name << "'";
+    throw engine_error() << "Could not register notifier '" << display_name << "'";
   }
 }
 
@@ -116,14 +168,6 @@ void notifier::set_check_command(std::string const& check_command) {
   _check_command = check_command;
 }
 
-int notifier::get_initial_state() const {
-  return _initial_state;
-}
-
-void notifier::set_initial_state(int initial_state) {
-  _initial_state = initial_state;
-}
-
 double notifier::get_check_interval() const {
   return _check_interval;
 }
@@ -138,6 +182,54 @@ double notifier::get_retry_interval() const {
 
 void notifier::set_retry_interval(double retry_interval) {
   _retry_interval = retry_interval;
+}
+
+time_t notifier::get_last_state_change() const {
+  return _last_state_change;
+}
+
+void notifier::set_last_state_change(time_t last_state_change) {
+  _last_state_change = last_state_change;
+}
+
+time_t notifier::get_last_hard_state_change() const {
+  return _last_hard_state_change;
+}
+
+void notifier::set_last_hard_state_change(time_t last_hard_state_change) {
+  _last_hard_state_change = last_hard_state_change;
+}
+
+unsigned long notifier::get_current_event_id() const {
+  return _current_event_id;
+}
+
+void notifier::set_current_event_id(unsigned long current_event_id) {
+  _current_event_id = current_event_id;
+}
+
+unsigned long notifier::get_last_event_id() const {
+  return _last_event_id;
+}
+
+void notifier::set_last_event_id(unsigned long last_event_id) {
+  _last_event_id = last_event_id;
+}
+
+unsigned long notifier::get_current_problem_id() const {
+  return _current_notification_id;
+}
+
+void notifier::set_current_problem_id(unsigned long current_problem_id) {
+  _current_problem_id = current_problem_id;
+}
+
+unsigned long notifier::get_last_problem_id() const {
+  return _last_problem_id;
+}
+
+void notifier::set_last_problem_id(unsigned long last_problem_id) {
+  _last_problem_id = last_problem_id;
 }
 
 /**
@@ -162,9 +254,9 @@ void notifier::set_max_attempts(int max_attempts) {
 }
 
 int notifier::notify(unsigned int type,
-    std::string const& not_author,
-    std::string const& not_data,
-    int options) {
+                     std::string const& not_author,
+                     std::string const& not_data,
+                     int options) {
   bool increment_notification_number{false};
   time_t current_time;
   struct timeval start_time;
@@ -181,9 +273,9 @@ int notifier::notify(unsigned int type,
   time_t last_notif{get_last_notification()};
   logger(dbg_notifications, basic)
       << "** Notifier Notification Attempt ** Notifier: '" << get_display_name()
-      << "', Notification Type: " << _notification_type
-      << ", Type: " << type
-      << ", Options: " << options << ", Current State: " << this->get_current_state()
+      << "', Notification Type: " << _notifier_type << ", Type: " << type
+      << ", Options: " << options
+      << ", Current State: " << get_current_state_int()
       << ", Last Notification: " << my_ctime(&last_notif);
 
   nagios_macros mac;
@@ -205,8 +297,7 @@ int notifier::notify(unsigned int type,
   }
 
   logger(dbg_notifications, more)
-      << "Current notification number: "
-      << _current_notification_number << " ("
+      << "Current notification number: " << _current_notification_number << " ("
       << (increment_notification_number == true ? "incremented" : "unchanged")
       << ")";
 
@@ -224,9 +315,9 @@ int notifier::notify(unsigned int type,
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
   int neb_result{broker_notification_data(
-      NEBTYPE_NOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE,
-      _notification_type, type, start_time, end_time, (void*)this, not_author.c_str(), not_data.c_str(), escalated,
-      0, nullptr)};
+      NEBTYPE_NOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE, _notifier_type,
+      type, start_time, end_time, (void*)this, not_author.c_str(),
+      not_data.c_str(), escalated, 0, nullptr)};
 
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
     free_notification_list();
@@ -248,12 +339,12 @@ int notifier::notify(unsigned int type,
     contact* temp_contact{nullptr};
     if (!not_author.empty()) {
       /* see if we can find the contact - first by name, then by alias */
-      if ((temp_contact = state::instance().find_contact(not_author)) ==
+      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) ==
           nullptr) {
         for (std::unordered_map<std::string,
                                 std::shared_ptr<contact>>::const_iterator
-                 it{state::instance().contacts().begin()},
-                 end{state::instance().contacts().end()};
+                 it{configuration::applier::state::instance().contacts().begin()},
+             end{configuration::applier::state::instance().contacts().end()};
              it != end; ++it) {
           if (it->second->get_alias() == not_author) {
             temp_contact = it->second.get();
@@ -282,11 +373,10 @@ int notifier::notify(unsigned int type,
      * if this is an acknowledgement, get author and comment macros
      */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-      if (_notification_type == HOST_NOTIFICATION) {
+      if (_notifier_type == HOST_NOTIFICATION) {
         string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
         string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
-      }
-      else {
+      } else {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
         string::setstr(mac.x[MACRO_SERVICEACKCOMMENT], not_data);
       }
@@ -318,14 +408,13 @@ int notifier::notify(unsigned int type,
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
-    else if ((_notification_type == HOST_NOTIFICATION && get_current_state() == HOST_UP)
-             || (_notification_type == SERVICE_NOTIFICATION && get_current_state() == STATE_OK))
+    else if (recovered())
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
 
     /* set the notification number macro */
-    if (_notification_type == HOST_NOTIFICATION)
+    if (_notifier_type == HOST_NOTIFICATION)
       string::setstr(mac.x[MACRO_HOSTNOTIFICATIONNUMBER],
                      _current_notification_number);
     else
@@ -335,16 +424,17 @@ int notifier::notify(unsigned int type,
     /*
      * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
      */
-    char const* notificationnumber{_notification_type == HOST_NOTIFICATION ?
-      mac.x[MACRO_HOSTNOTIFICATIONNUMBER] : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]};
+    char const* notificationnumber{
+        _notifier_type == HOST_NOTIFICATION
+            ? mac.x[MACRO_HOSTNOTIFICATIONNUMBER]
+            : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]};
 
     string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER],
                    notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
-    if (_notification_type == HOST_NOTIFICATION)
-      string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID],
-                     _current_notification_id);
+    if (_notifier_type == HOST_NOTIFICATION)
+      string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID], _current_notification_id);
     else
       string::setstr(mac.x[MACRO_SERVICENOTIFICATIONID],
                      _current_notification_id);
@@ -385,8 +475,7 @@ int notifier::notify(unsigned int type,
        */
       if (contacts_notified > 0) {
         /* calculate the next acceptable re-notification time */
-        set_next_notification(
-            get_next_notification_time(current_time));
+        set_next_notification(get_next_notification_time(current_time));
 
         /*
          * update the last notification time for this host (this is needed for
@@ -397,9 +486,9 @@ int notifier::notify(unsigned int type,
 
         time_t time{get_next_notification()};
         logger(dbg_notifications, basic) << contacts_notified
-          << " contacts were notified. "
-             "Next possibile notification time: "
-          << my_ctime(&time);
+                                         << " contacts were notified. "
+                                            "Next possibile notification time: "
+                                         << my_ctime(&time);
       }
 
       /* we didn't end up notifying anyone */
@@ -416,7 +505,7 @@ int notifier::notify(unsigned int type,
     }
 
     logger(dbg_notifications, basic)
-      << contacts_notified << " contacts were notified.";
+        << contacts_notified << " contacts were notified.";
   }
 
   /* there were no contacts, so no notification really occurred... */
@@ -435,9 +524,9 @@ int notifier::notify(unsigned int type,
 
   /* send data to event broker */
   broker_notification_data(NEBTYPE_NOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
-                           _notification_type, type, start_time, end_time,
-                           (void*)this, not_author.c_str(), not_data.c_str(), escalated,
-                           contacts_notified, nullptr);
+                           _notifier_type, type, start_time, end_time,
+                           (void*)this, not_author.c_str(), not_data.c_str(),
+                           escalated, contacts_notified, nullptr);
 
   /* update the status log with the host info */
   update_status(false);
@@ -446,10 +535,7 @@ int notifier::notify(unsigned int type,
   clear_volatile_macros_r(&mac);
 
   /* Update recovery been sent parameter */
-  if ((_notification_type == HOST_NOTIFICATION &&
-       get_current_state() == HOST_UP) ||
-      (_notification_type == SERVICE_NOTIFICATION &&
-       get_current_state() == STATE_OK))
+  if(recovered())
     _recovery_been_sent = true;
 
   return OK;
@@ -481,14 +567,6 @@ time_t notifier::get_last_notification() const {
 
 void notifier::set_last_notification(time_t last_notification) {
   _last_notification = last_notification;
-}
-
-int notifier::get_current_state() const {
-  return _current_state;
-}
-
-void notifier::set_current_state(int current_state) {
-  _current_state = current_state;
 }
 
 void notifier::set_initial_notif_time(time_t notif_time) {
@@ -535,8 +613,7 @@ std::string const& notifier::get_notification_period() const {
   return _notification_period;
 }
 
-void  notifier::set_notification_period(std::string const& notification_period)
-{
+void notifier::set_notification_period(std::string const& notification_period) {
   _notification_period = notification_period;
 }
 
@@ -570,4 +647,554 @@ std::string const& notifier::get_icon_image_alt() const {
 
 void notifier::set_icon_image_alt(std::string const& icon_image_alt) {
   _icon_image_alt = icon_image_alt;
+}
+
+std::string const& notifier::get_event_handler() const {
+  return _event_handler;
+}
+
+void notifier::set_event_handler(std::string const& event_handler) {
+  _event_handler = event_handler;
+}
+
+std::string const& notifier::get_notes() const {
+  return _notes;
+}
+
+void notifier::set_notes(std::string const& notes) {
+  _notes = notes;
+}
+
+std::string const& notifier::get_notes_url() const {
+  return _notes_url;
+}
+
+void notifier::set_notes_url(std::string const& notes_url) {
+  _notes_url = notes_url;
+}
+
+std::string const& notifier::get_plugin_output() const {
+  return _plugin_output;
+}
+
+void notifier::set_plugin_output(std::string const& plugin_output) {
+  _plugin_output = plugin_output;
+}
+
+std::string const& notifier::get_long_plugin_output() const {
+  return _long_plugin_output;
+}
+
+void notifier::set_long_plugin_output(std::string const& long_plugin_output) {
+  _long_plugin_output = long_plugin_output;
+}
+
+std::string const& notifier::get_perf_data() const {
+  return _perf_data;
+}
+
+void notifier::set_perf_data(std::string const& perf_data) {
+  _perf_data = perf_data;
+}
+
+bool notifier::get_flap_detection_enabled(void) const {
+  return _flap_detection_enabled;
+}
+
+void notifier::set_flap_detection_enabled(bool flap_detection_enabled) {
+  _flap_detection_enabled = flap_detection_enabled;
+}
+
+double notifier::get_low_flap_threshold() const {
+  return _low_flap_threshold;
+}
+
+void notifier::set_low_flap_threshold(double low_flap_threshold) {
+  _low_flap_threshold = low_flap_threshold;
+}
+
+double notifier::get_high_flap_threshold() const {
+  return _high_flap_threshold;
+}
+
+void notifier::set_high_flap_threshold(double high_flap_threshold) {
+  _high_flap_threshold = high_flap_threshold;
+}
+
+bool notifier::get_notify_on(notification_type type) const {
+  return _out_notification_type & type;
+}
+
+uint32_t notifier::get_notify_on() const {
+  return _out_notification_type;
+}
+
+void notifier::add_notify_on(notification_type type) {
+  _out_notification_type |= type;
+}
+
+void notifier::set_notify_on(uint32_t type) {
+  _out_notification_type = type;
+}
+
+void notifier::remove_notify_on(notification_type type) {
+  _out_notification_type &= ~type;
+}
+
+double notifier::get_first_notification_delay(void) const {
+  return _first_notification_delay;
+}
+
+void notifier::set_first_notification_delay(double first_notification_delay) {
+  _first_notification_delay = first_notification_delay;
+}
+
+bool notifier::get_notifications_enabled() const {
+  return _notifications_enabled;
+}
+
+void notifier::set_notifications_enabled(bool notifications_enabled) {
+  _notifications_enabled = notifications_enabled;
+}
+
+bool notifier::get_notified_on(notification_type type) const {
+  return _in_notification_type & type;
+}
+
+uint32_t notifier::get_notified_on() const {
+  return _in_notification_type;
+}
+
+void notifier::add_notified_on(notification_type type) {
+  _in_notification_type |= type;
+}
+
+void notifier::set_notified_on(uint32_t type) {
+  _in_notification_type = type;
+}
+
+void notifier::remove_notified_on(notification_type type) {
+  _in_notification_type &= ~type;
+}
+
+bool notifier::get_flap_detection_on(notification_type type) const {
+  return _stalk_type & type;
+}
+
+uint32_t notifier::get_flap_detection_on() const {
+  return _stalk_type;
+}
+
+void notifier::set_flap_detection_on(uint32_t type) {
+  _stalk_type = type;
+}
+
+void notifier::add_flap_detection_on(notification_type type) {
+  _stalk_type |= type;
+}
+
+bool notifier::get_stalk_on(notification_type type) const {
+  return _stalk_type & type;
+}
+
+uint32_t notifier::get_stalk_on() const {
+  return _stalk_type;
+}
+
+void notifier::set_stalk_on(uint32_t type) {
+  _stalk_type = type;
+}
+
+void notifier::add_stalk_on(notification_type type) {
+  _stalk_type |= type;
+}
+
+/**
+ *  Get host timezone.
+ *
+ *  @return a reference to the notifier timezone.
+ */
+std::string const& notifier::get_timezone() const {
+  return _timezone;
+}
+
+void notifier::set_timezone(std::string const& timezone) {
+  _timezone = timezone;
+}
+
+uint32_t notifier::get_modified_attributes() const {
+  return _modified_attributes;
+}
+
+void notifier::set_modified_attributes(uint32_t modified_attributes) {
+  _modified_attributes = modified_attributes;
+}
+
+void notifier::add_modified_attributes(uint32_t attr) {
+  _modified_attributes |= attr;
+}
+
+std::list<std::shared_ptr<escalation>>& notifier::get_escalations() {
+  return _escalations;
+}
+
+std::list<std::shared_ptr<escalation>> const& notifier::get_escalations()
+    const {
+  return _escalations;
+}
+
+void notifier::add_escalation(std::shared_ptr<escalation> e) {
+  _escalations.push_back(e);
+}
+
+enum notifier::state_type notifier::get_state_type() const {
+  return _state_type;
+}
+
+void notifier::set_state_type(enum notifier::state_type state_type) {
+  _state_type = state_type;
+}
+
+double notifier::get_percent_state_change() const {
+  return _percent_state_change;
+}
+
+void notifier::set_percent_state_change(double percent_state_change) {
+  _percent_state_change = percent_state_change;
+}
+
+
+unsigned int notifier::get_state_history_index() const {
+  return _state_history_index;
+}
+
+void notifier::set_state_history_index(unsigned int state_history_index) {
+  _state_history_index = state_history_index;
+}
+
+/**
+ *  Tests whether or not a contact is an escalated contact for a
+ *  particular host.
+ *
+ *  @param[in] hst   Target host.
+ *  @param[in] cntct Target contact.
+ *
+ *  @return true or false.
+ */
+bool notifier::is_escalated_contact(contact* cntct) const {
+  if (!cntct)
+    return false;
+
+  for (std::shared_ptr<escalation> const& e : get_escalations()) {
+    // Search all contacts of this host escalation.
+    contact_map::const_iterator itt{e->contacts().find(cntct->get_name())};
+    if (itt != e->contacts().end()) {
+      assert(itt->second.get() == cntct);
+      return true;
+    }
+
+    // Search all contactgroups of this host escalation.
+    for (contactgroup_map::iterator itt(e->contact_groups.begin()),
+         end(e->contact_groups.begin());
+         itt != end; ++itt)
+      if (itt->second->get_members().find(cntct->get_name()) !=
+          itt->second->get_members().end())
+        return true;
+  }
+  return false;
+}
+
+/**
+ * @brief Create a list of contacts to be notified for this notifier.
+ * Remove also duplicates.
+ *
+ * @param mac
+ * @param options
+ * @param escalated
+ *
+ */
+void notifier::create_notification_list(nagios_macros* mac,
+                                        int options,
+                                        bool* escalated) {
+  logger(dbg_functions, basic) << "notifier::create_notification_list()";
+
+  /* see if this notification should be escalated */
+  bool escalate_notification{should_notification_be_escalated()};
+
+  /* set the escalation flag */
+  *escalated = escalate_notification;
+
+  /* make sure there aren't any leftover contacts */
+  free_notification_list();
+
+  /* set the escalation macro */
+  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
+
+  if (options & NOTIFICATION_OPTION_BROADCAST)
+    logger(dbg_notifications, more)
+        << "This notification will be BROADCAST to all (escalated and "
+           "normal) contacts...";
+
+  /* use escalated contacts for this notification */
+  if (escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
+    logger(dbg_notifications, more)
+        << "Adding contacts from notifier escalation(s) to "
+           "notification list.";
+
+    for (std::shared_ptr<escalation> const& e : get_escalations()) {
+      /* see if this escalation if valid for this notification */
+      if (!is_valid_escalation_for_notification(e, options))
+        continue;
+
+      logger(dbg_notifications, most)
+          << "Adding individual contacts from notifier escalation(s) "
+             "to notification list.";
+
+      /* add all individual contacts for this escalation entry */
+      for (contact_map::const_iterator itt{e->contacts().begin()},
+           end{e->contacts().end()};
+           itt != end; ++itt)
+        add_notification(mac, itt->second.get());
+
+      logger(dbg_notifications, most)
+          << "Adding members of contact groups from notifier escalation(s) "
+             "to notification list.";
+
+      /* add all contacts that belong to contactgroups for this escalation */
+      for (contactgroup_map::iterator itt(e->contact_groups.begin()),
+           end(e->contact_groups.end());
+           itt != end; ++itt) {
+        logger(dbg_notifications, most)
+            << "Adding members of contact group '" << itt->first
+            << "' for notifier escalation to notification list.";
+
+        if (!itt->second)
+          continue;
+        for (std::unordered_map<std::string, contact*>::const_iterator
+                 itm(itt->second->get_members().begin()),
+             endm(itt->second->get_members().end());
+             itm != endm; ++itm) {
+          if (!itm->second)
+            continue;
+          add_notification(mac, itm->second);
+        }
+      }
+    }
+  }
+
+  /* use normal, non-escalated contacts for this notification */
+  if (!escalate_notification || (options & NOTIFICATION_OPTION_BROADCAST)) {
+    logger(dbg_notifications, more)
+        << "Adding normal contacts for notifier to notification list.";
+
+    /* add all individual contacts for this notifier */
+    for (contact_map::iterator it(this->contacts.begin()),
+         end(this->contacts.end());
+         it != end; ++it)
+      add_notification(mac, it->second.get());
+
+    /* add all contacts that belong to contactgroups for this notifier */
+    for (contactgroup_map::iterator it{this->contact_groups.begin()},
+         end{this->contact_groups.end()};
+         it != end; ++it) {
+      logger(dbg_notifications, most)
+          << "Adding members of contact group '" << it->first
+          << "' for notifier to notification list.";
+
+      if (!it->second)
+        continue;
+      for (std::unordered_map<std::string, contact*>::const_iterator
+               itm(it->second->get_members().begin()),
+           endm(it->second->get_members().end());
+           itm != endm; ++itm) {
+        if (!itm->second)
+          continue;
+        add_notification(mac, itm->second);
+      }
+    }
+  }
+}
+
+/**
+ *  Checks to see whether a service notification should be escalated.
+ *
+ *  @param[in] svc Service.
+ *
+ *  @return true if service notification should be escalated, false if
+ *          it should not.
+ */
+bool notifier::should_notification_be_escalated() const {
+  // Debug.
+  logger(dbg_functions, basic)
+      << "notifier::should_notification_be_escalated()";
+
+  for (std::shared_ptr<escalation> const& e : get_escalations()) {
+    // We found a matching entry, so escalate this notification!
+    if (is_valid_escalation_for_notification(e, NOTIFICATION_OPTION_NONE)) {
+      logger(dbg_notifications, more)
+          << "Notifier notification WILL be escalated.";
+      return true;
+    }
+  }
+
+  logger(dbg_notifications, more)
+      << "Notifier notification will NOT be escalated.";
+  return false;
+}
+
+bool notifier::get_checks_enabled() const {
+  return _checks_enabled;
+}
+
+void notifier::set_checks_enabled(bool checks_enabled) {
+  _checks_enabled = checks_enabled;
+}
+
+bool notifier::get_check_freshness() const {
+  return _check_freshness;
+}
+
+void notifier::set_check_freshness(bool check_freshness) {
+  _check_freshness = check_freshness;
+}
+
+int notifier::get_check_type() const {
+  return _check_type;
+}
+
+void notifier::set_check_type(int check_type) {
+  _check_type = check_type;
+}
+
+void notifier::set_current_attempt(int attempt) {
+  _current_attempt = attempt;
+}
+
+int notifier::get_current_attempt() const {
+  return _current_attempt;
+}
+
+void notifier::add_current_attempt(int num) {
+  _current_attempt += num;
+}
+
+bool notifier::get_problem_has_been_acknowledged() const {
+  return _problem_has_been_acknowledged;
+}
+
+void notifier::set_problem_has_been_acknowledged(
+    bool problem_has_been_acknowledged) {
+  _problem_has_been_acknowledged = problem_has_been_acknowledged;
+}
+
+bool notifier::get_has_been_checked() const {
+  return _has_been_checked;
+}
+
+void notifier::set_has_been_checked(bool has_been_checked) {
+  _has_been_checked = has_been_checked;
+}
+
+bool notifier::get_event_handler_enabled() const {
+  return _event_handler_enabled;
+}
+
+void notifier::set_event_handler_enabled(bool event_handler_enabled) {
+  _event_handler_enabled = event_handler_enabled;
+}
+
+bool notifier::get_accept_passive_checks() const {
+  return _accept_passive_checks;
+}
+
+void notifier::set_accept_passive_checks(bool accept_passive_checks) {
+  _accept_passive_checks = accept_passive_checks;
+}
+
+int notifier::get_scheduled_downtime_depth() const {
+  return _scheduled_downtime_depth;
+}
+
+void notifier::set_scheduled_downtime_depth(int scheduled_downtime_depth) {
+  _scheduled_downtime_depth = scheduled_downtime_depth;
+}
+
+void notifier::inc_scheduled_downtime_depth() {
+  ++_scheduled_downtime_depth;
+}
+
+void notifier::dec_scheduled_downtime_depth() {
+  --_scheduled_downtime_depth;
+}
+
+double notifier::get_execution_time() const {
+  return _execution_time;
+}
+
+void notifier::set_execution_time(double execution_time) {
+  _execution_time = execution_time;
+}
+
+int notifier::get_freshness_threshold() const {
+  return _freshness_threshold;
+}
+
+void notifier::set_freshness_threshold(int freshness_threshold) {
+  _freshness_threshold = freshness_threshold;
+}
+
+bool notifier::get_is_flapping() const {
+  return _is_flapping;
+}
+
+void notifier::set_is_flapping(bool is_flapping) {
+  _is_flapping = is_flapping;
+}
+
+time_t notifier::get_last_check() const {
+  return _last_check;
+}
+
+void notifier::set_last_check(time_t last_check) {
+  _last_check = last_check;
+}
+
+double notifier::get_latency() const {
+  return _latency;
+}
+
+void notifier::set_latency(double latency) {
+  _latency = latency;
+}
+
+time_t notifier::get_next_check() const {
+  return _next_check;
+}
+
+void notifier::set_next_check(time_t next_check) {
+  _next_check = next_check;
+}
+
+bool notifier::get_no_more_notifications() const {
+  return _no_more_notifications;
+}
+
+void notifier::set_no_more_notifications(bool no_more_notifications) {
+  _no_more_notifications = no_more_notifications;
+}
+
+bool notifier::get_obsess_over() const {
+  return _obsess_over;
+}
+
+void notifier::set_obsess_over(bool obsess_over) {
+  _obsess_over = obsess_over;
+}
+
+bool notifier::get_should_be_scheduled() const {
+  return _should_be_scheduled;
+}
+
+void notifier::set_should_be_scheduled(bool should_be_scheduled) {
+  _should_be_scheduled = should_be_scheduled;
 }

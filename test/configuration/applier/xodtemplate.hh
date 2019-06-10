@@ -269,7 +269,6 @@ typedef struct xodtemplate_host_struct{
   int          stalk_on_unreachable;
   int          process_perf_data;
   int          failure_prediction_enabled;
-  char*        failure_prediction_options;
   char*        notes;
   char*        notes_url;
   char*        action_url;
@@ -295,7 +294,6 @@ typedef struct xodtemplate_host_struct{
   int          have_contact_groups;
   int          have_contacts;
   int          have_notification_period;
-  int          have_failure_prediction_options;
   int          have_notes;
   int          have_notes_url;
   int          have_action_url;
@@ -415,7 +413,6 @@ typedef struct xodtemplate_service_struct{
   int          stalk_on_critical;
   int          process_perf_data;
   int          failure_prediction_enabled;
-  char*        failure_prediction_options;
   char*        notes;
   char*        notes_url;
   char*        action_url;
@@ -437,7 +434,6 @@ typedef struct xodtemplate_service_struct{
   int          have_notification_period;
   int          have_contact_groups;
   int          have_contacts;
-  int          have_failure_prediction_options;
   int          have_notes;
   int          have_notes_url;
   int          have_action_url;

@@ -46,7 +46,7 @@ public:
   }
 
   bool        operator()(std::shared_ptr<configuration::servicegroup> sg) {
-    return (_servicegroup_name == sg->servicegroup_name());
+    return _servicegroup_name == sg->servicegroup_name();
   }
 
 private:
@@ -82,7 +82,7 @@ applier::service::~service() throw () {}
 applier::service& applier::service::operator=(
                                       applier::service const& right) {
   (void)right;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -116,15 +116,14 @@ void applier::service::add_object(
 
   // Create service.
   engine::service* svc{add_service(
-    obj.host_id(), obj.service_id(),
+    obj.host_id(),
+    obj.service_id(),
     *obj.hosts().begin(),
     obj.service_description(),
     obj.display_name(),
     obj.check_period(),
-    obj.initial_state(),
+    static_cast<engine::service::service_state>(obj.initial_state()),
     obj.max_check_attempts(),
-    true, // parallelize, enabled by default in Nagios
-    obj.checks_passive(),
     obj.check_interval(),
     obj.retry_interval(),
     obj.notification_interval(),
@@ -144,10 +143,11 @@ void applier::service::add_object(
                       & configuration::service::downtime),
     obj.notifications_enabled(),
     obj.is_volatile(),
-    NULL_IF_EMPTY(obj.event_handler()),
+    obj.event_handler(),
     obj.event_handler_enabled(),
-    NULL_IF_EMPTY(obj.check_command()),
+    obj.check_command(),
     obj.checks_active(),
+    obj.checks_passive(),
     obj.flap_detection_enabled(),
     obj.low_flap_threshold(),
     obj.high_flap_threshold(),
@@ -168,26 +168,22 @@ void applier::service::add_object(
     static_cast<bool>(obj.stalking_options()
                       &configuration::service::critical),
     obj.process_perf_data(),
-    false, // failure_prediction_enabled
-    NULL, // failure_prediction_options
     obj.check_freshness(),
     obj.freshness_threshold(),
-    NULL_IF_EMPTY(obj.notes()),
-    NULL_IF_EMPTY(obj.notes_url()),
+    obj.notes(),
+    obj.notes_url(),
     obj.action_url(),
     obj.icon_image(),
     obj.icon_image_alt(),
     obj.retain_status_information(),
     obj.retain_nonstatus_information(),
-    obj.obsess_over_service())};
+    obj.obsess_over_service(),
+    obj.timezone())};
   if (!svc)
-      throw (engine_error() << "Could not register service '"
+      throw engine_error() << "Could not register service '"
              << obj.service_description()
-             << "' of host '" << *obj.hosts().begin() << "'");
+             << "' of host '" << *obj.hosts().begin() << "'";
   svc->set_initial_notif_time(0);
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].timezone = obj.timezone();
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].host_id = obj.host_id();
@@ -235,8 +231,6 @@ void applier::service::add_object(
     MODATTR_ALL,
     MODATTR_ALL,
     &tv);
-
-  return ;
 }
 
 /**
@@ -368,130 +362,64 @@ void applier::service::modify_object(
   s->set_description(obj.service_description());
   s->set_display_name(obj.display_name()),
   s->set_check_command(obj.check_command());
-  modify_if_different(
-    s->event_handler,
-    NULL_IF_EMPTY(obj.event_handler()));
-  modify_if_different(
-    s->event_handler_enabled,
-    static_cast<int>(obj.event_handler_enabled()));
-  s->set_initial_state(obj.initial_state());
+  s->set_event_handler(obj.event_handler());
+  s->set_event_handler_enabled(obj.event_handler_enabled());
+  s->set_initial_state(static_cast<engine::service::service_state>(obj.initial_state()));
   s->set_check_interval(obj.check_interval());
   s->set_retry_interval(obj.retry_interval());
   s->set_max_attempts(obj.max_check_attempts());
-  modify_if_different(
-    s->notification_interval,
-    static_cast<double>(obj.notification_interval()));
-  modify_if_different(
-    s->first_notification_delay,
-    static_cast<double>(obj.first_notification_delay()));
-  modify_if_different(
-    s->notify_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->notify_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::warning)));
-  modify_if_different(
-    s->notify_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::critical)));
-  modify_if_different(
-    s->notify_on_recovery,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::ok)));
-  modify_if_different(
-    s->notify_on_flapping,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::flapping)));
-  modify_if_different(
-    s->notify_on_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::service::downtime)));
-  modify_if_different(
-    s->stalk_on_ok,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::ok)));
-  modify_if_different(
-    s->stalk_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::warning)));
-  modify_if_different(
-    s->stalk_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->stalk_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::service::critical)));
+
+  s->add_notify_on(obj.notification_options() & configuration::service::unknown? notifier::unknown : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::warning ? notifier::warning : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::critical ? notifier::critical : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::ok ? notifier::recovery : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::flapping ? notifier::flapping : notifier::none);
+  s->add_notify_on(obj.notification_options() & configuration::service::downtime ? notifier::downtime : notifier::none);
+
+  s->set_notification_interval(static_cast<double>(obj.notification_interval()));
+  s->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
+
+  s->add_stalk_on(obj.notification_options() & configuration::service::ok ? notifier::ok : notifier::none);
+  s->add_stalk_on(obj.notification_options() & configuration::service::warning ? notifier::warning : notifier::none);
+  s->add_stalk_on(obj.notification_options() & configuration::service::unknown ? notifier::unknown : notifier::none);
+  s->add_stalk_on(obj.notification_options() & configuration::service::critical ? notifier::critical : notifier::none);
+
   s->set_notification_period(obj.notification_period());
   s->set_check_period(obj.check_period());
-  modify_if_different(
-    s->flap_detection_enabled,
-    static_cast<int>(obj.flap_detection_enabled()));
-  modify_if_different(
-    s->low_flap_threshold,
-    static_cast<double>(obj.low_flap_threshold()));
-  modify_if_different(
-    s->high_flap_threshold,
-    static_cast<double>(obj.high_flap_threshold()));
-  modify_if_different(
-    s->flap_detection_on_ok,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::ok)));
-  modify_if_different(
-    s->flap_detection_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::warning)));
-  modify_if_different(
-    s->flap_detection_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->flap_detection_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::service::critical)));
+  s->set_flap_detection_enabled(obj.flap_detection_enabled());
+  s->set_low_flap_threshold(obj.low_flap_threshold());
+  s->set_high_flap_threshold(obj.high_flap_threshold());
+
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::ok ? notifier::ok : notifier::none);
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::warning ? notifier::warning : notifier::none);
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::unknown ? notifier::unknown : notifier::none);
+  s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::critical ? notifier::critical : notifier::none);
+
   modify_if_different(
     s->process_performance_data,
     static_cast<int>(obj.process_perf_data()));
-  modify_if_different(
-    s->check_freshness,
-    static_cast<int>(obj.check_freshness()));
-  modify_if_different(
-    s->freshness_threshold,
-    static_cast<int>(obj.freshness_threshold()));
+  s->set_check_freshness(obj.check_freshness());
+  s->set_freshness_threshold(obj.freshness_threshold());
   modify_if_different(
     s->accept_passive_service_checks,
     static_cast<int>(obj.checks_passive()));
-  modify_if_different(
-    s->event_handler,
-    NULL_IF_EMPTY(obj.event_handler()));
-  modify_if_different(
-    s->checks_enabled,
-    static_cast<int>(obj.checks_active()));
+  s->set_event_handler(obj.event_handler());
+  s->set_checks_enabled(obj.checks_active());
   modify_if_different(
     s->retain_status_information,
     static_cast<int>(obj.retain_status_information()));
   modify_if_different(
     s->retain_nonstatus_information,
     static_cast<int>(obj.retain_nonstatus_information()));
-  modify_if_different(
-    s->notifications_enabled,
-    static_cast<int>(obj.notifications_enabled()));
-  modify_if_different(
-    s->obsess_over_service,
-    static_cast<int>(obj.obsess_over_service()));
-  modify_if_different(s->notes, NULL_IF_EMPTY(obj.notes()));
-  modify_if_different(s->notes_url, NULL_IF_EMPTY(obj.notes_url()));
+  s->set_notifications_enabled(obj.notifications_enabled());
+  s->set_obsess_over(obj.obsess_over_service());
+  s->set_notes(obj.notes());
+  s->set_notes_url(obj.notes_url());
   s->set_action_url(obj.action_url());
   s->set_icon_image(obj.icon_image());
   s->set_icon_image_alt(obj.icon_image_alt());
-  modify_if_different(
-    s->is_volatile,
-    static_cast<int>(obj.is_volatile()));
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].timezone = obj.timezone();
+  s->set_is_volatile(obj.is_volatile());
+  s->set_timezone(obj.timezone());
   service_other_props[std::make_pair(
                              *obj.hosts().begin(),
                              obj.service_description())].host_id = obj.host_id();
@@ -587,12 +515,7 @@ void applier::service::remove_object(
     applier::scheduler::instance().remove_service(obj);
 
     // Unregister service.
-    for (engine::service** s(&service_list); *s; s = &(*s)->next)
-      if ((*s)->get_hostname() == host_name
-          && (*s)->get_description() == service_description) {
-        *s = (*s)->next;
-        break ;
-      }
+    engine::service::services.erase({host_name, service_description});
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -646,7 +569,6 @@ void applier::service::resolve_object(
     &deleter::objectlist);
 
   // Find host and adjust its counters.
-  unsigned long host_id(it->first.first);
   umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::iterator
     hst(applier::state::instance().hosts_find(it->first.first));
   if (hst != applier::state::instance().hosts().end()) {

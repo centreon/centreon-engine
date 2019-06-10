@@ -122,13 +122,12 @@ void free_notification_list();
 
 // frees memory associated with a host/service check result
 int free_check_result(check_result* info);
-int parse_check_output(
-      char* buf,
-      char** short_output,
-      char** long_output,
-      char** perf_data,
-      int escape_newlines_please,
-      int newlines_are_escaped);
+void parse_check_output(std::string const& buffer,
+                       std::string& short_output,
+                       std::string& long_output,
+                       std::string& perf_data,
+                       bool escape_newlines_please,
+                       bool newlines_are_escaped);
 
 #  ifdef __cplusplus
 }
