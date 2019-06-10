@@ -507,32 +507,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
 }
 
 /**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-hostgroup_map::const_iterator applier::state::hostgroups_find(
-  configuration::hostgroup::key_type const& k) const {
-  return _hostgroups.find(k);
-}
-
-/**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-hostgroup_map::iterator applier::state::hostgroups_find(
-  configuration::hostgroup::key_type const& k) {
-  return _hostgroups.find(k);
-}
-
-/**
  *  Get the current services.
  *
  *  @return The current services.
