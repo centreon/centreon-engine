@@ -248,8 +248,8 @@ class                host : public notifier {
   void               set_total_services(int total_services);
   unsigned long      get_total_service_check_interval() const;
   void               set_total_service_check_interval(unsigned long total_service_check_interval);
-  bool               get_circular_path_checked() const;
-  void               set_circular_path_checked(bool check_level);
+  int                get_circular_path_checked() const;
+  void               set_circular_path_checked(int check_level);
   bool               get_contains_circular_path() const;
   void               set_contains_circular_path(bool contains_circular_path);
   enum host_state    get_current_state() const;
@@ -319,7 +319,7 @@ private:
   unsigned long       _flapping_comment_id;
   int                 _total_services;
   unsigned long       _total_service_check_interval;
-  bool                 _circular_path_checked;
+  int                 _circular_path_checked;
   bool                _contains_circular_path;
 
   enum host_state    _last_state;

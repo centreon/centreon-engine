@@ -3572,9 +3572,6 @@ void service::handle_flap_detection_disabled() {
   logger(dbg_functions, basic)
     << "handle_service_flap_detection_disabled()";
 
-  if (this == NULL)
-    return;
-
   /* if the service was flapping, remove the flapping indicator */
   if (get_is_flapping()) {
     set_is_flapping(false);

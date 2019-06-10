@@ -1313,6 +1313,9 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
     // membership lookups later.
     else
       add_object_to_objectlist(&it_host->second->hostgroups_ptr, hg);
+
+    // Save host pointer for later.
+    hg->members[it->first] = it_host->second;
   }
 
   // Check for illegal characters in hostgroup name.
@@ -1365,6 +1368,7 @@ int check_contactgroup(contactgroup* cg, int* w, int* e) {
       add_object_to_objectlist(&temp_contact->contactgroups_ptr, cg);
 
     // Save the contact pointer for later.
+    cg->add_member(temp_contact);
   }
 
   // Check for illegal characters in contact group name.
@@ -1542,7 +1546,10 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
     }
 
     // Save the timeperiod pointer for later.
-    hd->dependency_period_ptr = temp_timeperiod;
+    if (it == state::instance().timeperiods().end())
+      hd->dependency_period_ptr = nullptr;
+    else
+      hd->dependency_period_ptr = temp_timeperiod;
   }
 
   // Add errors.
@@ -1620,7 +1627,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
        it != end;
        ++it) {
     // Find the contact group.
-    com::centreon::engine::contactgroup* temp_contactgroup(
+    contactgroup* temp_contactgroup(
       configuration::applier::state::instance().find_contactgroup(
         it->first));
 
@@ -1633,6 +1640,9 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
         << "' is not defined anywhere!";
       errors++;
     }
+
+    // Save the contactgroup pointer for later.
+    se->contact_groups[it->first] = std::shared_ptr<contactgroup>(temp_contactgroup);
   }
 
   // Add errors.
@@ -1704,6 +1714,9 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
         << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
+
+    // Save the contact pointer for later.
+    he->contacts().insert({p.first, std::shared_ptr<contact>(cntct)});
   }
 
   // Check all contact groups.
@@ -1713,7 +1726,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
        it != end;
        ++it) {
     // Find the contact group.
-    com::centreon::engine::contactgroup* temp_contactgroup(
+    contactgroup* temp_contactgroup(
       configuration::applier::state::instance().find_contactgroup(
         it->first));
 
@@ -1725,6 +1738,9 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
         << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
+
+    // Save the contactgroup pointer for later.
+    he->contact_groups[it->first] = std::shared_ptr<contactgroup>(temp_contactgroup);
   }
 
   // Add errors.
@@ -1772,6 +1788,7 @@ int check_timeperiod(timeperiod* tp, int* w, int* e) {
       errors++;
     }
 
+    // Save the timeperiod pointer for later.
     it->second = found->second;
   }
 

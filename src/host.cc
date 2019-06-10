@@ -568,11 +568,11 @@ void host::set_total_service_check_interval(
   _total_service_check_interval = total_service_check_interval;
 }
 
-bool host::get_circular_path_checked() const {
+int host::get_circular_path_checked() const {
   return _circular_path_checked;
 }
 
-void host::set_circular_path_checked(bool check_level) {
+void host::set_circular_path_checked(int check_level) {
   _circular_path_checked = check_level;
 }
 
@@ -3236,9 +3236,6 @@ bool host::is_result_fresh(
 void host::handle_flap_detection_disabled() {
   logger(dbg_functions, basic)
     << "handle_host_flap_detection_disabled()";
-
-  if (this == NULL)
-    return;
 
   /* if the host was flapping, remove the flapping indicator */
   if (this->get_is_flapping()) {
