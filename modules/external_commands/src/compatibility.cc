@@ -1009,8 +1009,8 @@ int process_hostgroup_command(int cmd,
   /* find the hostgroup */
   temp_hostgroup = nullptr;
   hostgroup_map::const_iterator
-    it(state::instance().hostgroups().find(hostgroup_name));
-  if (it != state::instance().hostgroups().end())
+    it(hostgroup::hostgroups.find(hostgroup_name));
+  if (it != hostgroup::hostgroups.end())
     temp_hostgroup = it->second.get();
   if (temp_hostgroup == nullptr)
     return ERROR;

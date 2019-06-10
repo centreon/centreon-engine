@@ -148,8 +148,8 @@ int grab_custom_macro_value_r(
     /* a host macro with a hostgroup name and delimiter */
     else {
       hostgroup_map::const_iterator
-        it_hg(state::instance().hostgroups().find(arg1));
-      if (it_hg == state::instance().hostgroups().end() || it_hg->second == nullptr)
+        it_hg(hostgroup::hostgroups.find(arg1));
+      if (it_hg == hostgroup::hostgroups.end() || it_hg->second == nullptr)
         return ERROR;
 
       delimiter_len = strlen(arg2);

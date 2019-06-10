@@ -39,7 +39,8 @@ typedef std::unordered_map<std::string,
 CCE_BEGIN()
 class                     servicegroup {
  public:
-                          servicegroup(std::string const& group_name,
+                          servicegroup(uint64_t id,
+                                       std::string const& group_name,
                                        std::string const& alias,
                                        std::string const& notes,
                                        std::string const& notes_url,

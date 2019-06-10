@@ -124,10 +124,6 @@ namespace           configuration {
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      hostgroup_map const&
-                    hostgroups() const throw ();
-      hostgroup_map&
-                    hostgroups() throw ();
       hostgroup_map::const_iterator
                     hostgroups_find(configuration::hostgroup::key_type const& k) const;
       hostgroup_map::iterator

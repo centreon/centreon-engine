@@ -192,8 +192,8 @@ namespace         modules {
 
         hostgroup* group(nullptr);
         hostgroup_map::const_iterator
-          it(configuration::applier::state::instance().hostgroups().find(group_name));
-        if (it != configuration::applier::state::instance().hostgroups().end())
+          it{hostgroup::hostgroups.find(group_name)};
+        if (it != hostgroup::hostgroups.end())
           group = it->second.get();
         if (!group)
           return ;

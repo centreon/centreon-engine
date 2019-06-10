@@ -260,7 +260,7 @@ int main(int argc, char* argv[]) {
           << "Checked " << applier.contacts().size() << " contacts.\n"
           << "Checked " << applier.hostdependencies().size() << " host dependencies.\n"
           << "Checked " << com::centreon::engine::hostescalation::hostescalations.size() << " host escalations.\n"
-          << "Checked " << applier.hostgroups().size() << " host groups.\n"
+          << "Checked " << hostgroup::hostgroups.size() << " host groups.\n"
           << "Checked " << applier.hosts().size() << " hosts.\n"
           << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
           << "Checked " << com::centreon::engine::serviceescalation::serviceescalations.size() << " service escalations.\n"

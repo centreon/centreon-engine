@@ -954,8 +954,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
     temp_hostgroup = nullptr;
     hostgroup_map::const_iterator
-      it(state::instance().hostgroups().find(hostgroup_name));
-    if (it != state::instance().hostgroups().end())
+      it(hostgroup::hostgroups.find(hostgroup_name));
+    if (it != hostgroup::hostgroups.end())
       temp_hostgroup = it->second.get();
     /* verify that the hostgroup is valid */
     if (temp_hostgroup == nullptr)
@@ -1445,8 +1445,8 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
 
   temp_hostgroup = nullptr;
   hostgroup_map::const_iterator
-    it(state::instance().hostgroups().find(temp_ptr));
-  if (it != state::instance().hostgroups().end())
+    it{hostgroup::hostgroups.find(temp_ptr)};
+  if (it != hostgroup::hostgroups.end())
     temp_hostgroup = it->second.get();
   if (temp_hostgroup == nullptr)
     return ERROR;

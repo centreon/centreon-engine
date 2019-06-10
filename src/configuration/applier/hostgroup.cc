@@ -87,8 +87,7 @@ void applier::hostgroup::add_object(
       obj.action_url())};
 
   // Add new items to the configuration state.
-  state::instance().hostgroups()[obj.hostgroup_name()] = hg;
-  com::centreon::engine::hostgroup::hostgroups.insert({hg->get_group_name(),  hg});
+  engine::hostgroup::hostgroups.insert({hg->get_group_name(),  hg});
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -106,8 +105,6 @@ void applier::hostgroup::add_object(
        it != end;
        ++it)
     hg->members.insert({*it, nullptr});
-
-  return ;
 }
 
 /**
@@ -133,8 +130,6 @@ void applier::hostgroup::expand_objects(configuration::state& s) {
        it != end;
        ++it)
     s.hostgroups().insert(it->second);
-
-  return ;
 }
 
 /**
@@ -158,8 +153,8 @@ void applier::hostgroup::modify_object(
 
   // Find host group object.
   hostgroup_map::iterator
-    it_obj(applier::state::instance().hostgroups_find(obj.key()));
-  if (it_obj == applier::state::instance().hostgroups().end())
+    it_obj(engine::hostgroup::hostgroups.find(obj.key()));
+  if (it_obj == engine::hostgroup::hostgroups.end())
     throw (engine_error() << "Could not modify non-existing "
            << "host group object '" << obj.hostgroup_name() << "'");
   com::centreon::engine::hostgroup* hg(it_obj->second.get());
@@ -211,8 +206,6 @@ void applier::hostgroup::modify_object(
     NEBATTR_NONE,
     hg,
     &tv);
-
-  return ;
 }
 
 /**
@@ -229,11 +222,11 @@ void applier::hostgroup::remove_object(
 
   // Find host group.
   hostgroup_map::iterator
-    it(applier::state::instance().hostgroups_find(obj.key()));
-  if (it != applier::state::instance().hostgroups().end()) {
-    com::centreon::engine::hostgroup* grp(it->second.get());
+    it{engine::hostgroup::hostgroups.find(obj.key())};
+  if (it != engine::hostgroup::hostgroups.end()) {
+    engine::hostgroup* grp(it->second.get());
 
-   com::centreon::engine::hostgroup::hostgroups.erase(grp->get_group_name());
+    engine::hostgroup::hostgroups.erase(grp->get_group_name());
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -245,14 +238,11 @@ void applier::hostgroup::remove_object(
       &tv);
 
     // Erase host group object (will effectively delete the object).
-    engine::hostgroup::hostgroups.erase(obj.hostgroup_name());
-    applier::state::instance().hostgroups().erase(it);
+    engine::hostgroup::hostgroups.erase(it);
   }
 
   // Remove host group from the global configuration set.
   config->hostgroups().erase(obj);
-
-  return ;
 }
 
 /**
@@ -268,17 +258,15 @@ void applier::hostgroup::resolve_object(
 
   // Find host group.
   hostgroup_map::iterator
-    it(applier::state::instance().hostgroups_find(obj.key()));
-  if (applier::state::instance().hostgroups().end() == it)
-    throw (engine_error() << "Cannot resolve non-existing "
-           << "host group '" << obj.hostgroup_name() << "'");
+    it{engine::hostgroup::hostgroups.find(obj.key())};
+  if (it == engine::hostgroup::hostgroups.end())
+    throw engine_error() << "Cannot resolve non-existing "
+           << "host group '" << obj.hostgroup_name() << "'";
 
   // Resolve host group.
   if (!check_hostgroup(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve host group '"
            << obj.hostgroup_name() << "'");
-
-  return ;
 }
 
 /**
@@ -328,6 +316,4 @@ void applier::hostgroup::_resolve_members(
                                resolved_group.members().end());
     }
   }
-
-  return ;
 }

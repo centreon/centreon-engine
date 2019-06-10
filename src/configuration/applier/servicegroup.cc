@@ -78,6 +78,7 @@ void applier::servicegroup::add_object(
 
   // Create servicegroup.
   std::shared_ptr<engine::servicegroup> sg{new engine::servicegroup(
+                            obj.servicegroup_id(),
                             obj.servicegroup_name(),
                             obj.alias(),
                             obj.notes(),
@@ -93,7 +94,7 @@ void applier::servicegroup::add_object(
   engine::servicegroup::servicegroups[obj.servicegroup_name()]->set_id(obj.servicegroup_id());
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv(get_broker_timestamp(nullptr));
   broker_group(
     NEBTYPE_SERVICEGROUP_ADD,
     NEBFLAG_NONE,

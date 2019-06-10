@@ -560,24 +560,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
 }
 
 /**
- *  Get the current hostgroups.
- *
- *  @return The current hostgroups.
- */
-hostgroup_map const& applier::state::hostgroups() const throw () {
-  return _hostgroups;
-}
-
-/**
- *  Get the current hostgroups.
- *
- *  @return The current hostgroups.
- */
-hostgroup_map& applier::state::hostgroups() throw () {
-  return _hostgroups;
-}
-
-/**
  *  Find a host group from its key.
  *
  *  @param[in] k Host group name.
