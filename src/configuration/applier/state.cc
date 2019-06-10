@@ -560,32 +560,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
 }
 
 /**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-hostgroup_map::const_iterator applier::state::hostgroups_find(
-  configuration::hostgroup::key_type const& k) const {
-  return _hostgroups.find(k);
-}
-
-/**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-hostgroup_map::iterator applier::state::hostgroups_find(
-  configuration::hostgroup::key_type const& k) {
-  return _hostgroups.find(k);
-}
-
-/**
  *  Get the current services.
  *
  *  @return The current services.
@@ -716,48 +690,6 @@ servicedependency_mmap ::iterator applier::state::servicedependencies_find(confi
     ++p.first;
   }
   return (p.first == p.second) ? _servicedependencies.end() : p.first;
-}
-
-/**
- *  Get the current servicegroups.
- *
- *  @return The current servicegroups.
- */
-servicegroup_map const& applier::state::servicegroups() const throw () {
-  return _servicegroups;
-}
-
-/**
- *  Get the current servicegroups.
- *
- *  @return The current servicegroups.
- */
-servicegroup_map& applier::state::servicegroups() throw () {
-  return _servicegroups;
-}
-
-/**
- *  Find a service group from its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-servicegroup_map::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
-  return _servicegroups.find(k);
-}
-
-/**
- *  Find a service group from its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-servicegroup_map::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
-  return _servicegroups.find(k);
 }
 
 /**
@@ -1297,7 +1229,7 @@ void applier::state::_processing(
   _expand<configuration::host, applier::host>(
     new_cfg);
 
-  // Expand hostgroups.
+  // Expand hlostgroups.
   _expand<configuration::hostgroup, applier::hostgroup>(
     new_cfg);
 

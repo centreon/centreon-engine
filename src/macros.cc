@@ -109,7 +109,6 @@ int grab_custom_macro_value_r(
       char const* arg1,
       char const* arg2,
       char** output) {
-  servicegroup* temp_servicegroup = nullptr;
   contactgroup* temp_contactgroup = nullptr;
   int delimiter_len = 0;
   char* temp_buffer = nullptr;
@@ -223,15 +222,17 @@ int grab_custom_macro_value_r(
       }
       /* else we have a service macro with a servicegroup name and a delimiter... */
       else {
-        if ((temp_servicegroup = ::find_servicegroup(arg1)) == nullptr)
+        servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(arg1)};
+        if (sg_it == servicegroup::servicegroups.end())
           return ERROR;
 
+        std::shared_ptr<servicegroup> const& temp_servicegroup{sg_it->second};
         delimiter_len = strlen(arg2);
 
         /* concatenate macro values for all servicegroup members */
           for (service_map::iterator
-                 it(temp_servicegroup->members.begin()),
-                 end(temp_servicegroup->members.end());
+                 it{temp_servicegroup->members.begin()},
+                 end{temp_servicegroup->members.end()};
                it != end;
                ++it) {
 

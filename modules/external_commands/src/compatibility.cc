@@ -1357,7 +1357,7 @@ int process_servicegroup_command(int cmd,
   (void)entry_time;
 
   char* servicegroup_name{nullptr};
-  servicegroup* temp_servicegroup{nullptr};
+  std::shared_ptr<servicegroup> temp_servicegroup;
   host* temp_host{nullptr};
   host* last_host{nullptr};
   com::centreon::engine::service* temp_service{nullptr};
@@ -1367,8 +1367,10 @@ int process_servicegroup_command(int cmd,
     return ERROR;
 
   /* find the servicegroup */
-  if ((temp_servicegroup = ::find_servicegroup(servicegroup_name)) == nullptr)
+  servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(servicegroup_name)};
+  if (sg_it == servicegroup::servicegroups.end())
     return ERROR;
+  temp_servicegroup = sg_it->second;
 
   switch (cmd) {
 

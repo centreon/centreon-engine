@@ -930,7 +930,6 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   com::centreon::engine::host* temp_host(nullptr);
   com::centreon::engine::host* last_host(nullptr);
   hostgroup* temp_hostgroup(nullptr);
-  servicegroup* temp_servicegroup(nullptr);
   char* host_name(nullptr);
   char* hostgroup_name(nullptr);
   char* servicegroup_name(nullptr);
@@ -944,6 +943,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   char* author(nullptr);
   char* comment_data(nullptr);
   uint64_t downtime_id{0};
+  std::shared_ptr<servicegroup> temp_servicegroup;
 
   if (cmd == CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME
       || cmd == CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME) {
@@ -970,10 +970,11 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       return ERROR;
 
     /* verify that the servicegroup is valid */
-    if ((temp_servicegroup = ::find_servicegroup(servicegroup_name)) == nullptr)
+    servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(servicegroup_name)};
+    if (sg_it == servicegroup::servicegroups.end())
       return ERROR;
+    temp_servicegroup = sg_it->second;
   }
-
   else {
 
     /* get the host name */

@@ -248,9 +248,10 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        servicegroup* group(::find_servicegroup(group_name));
-        if (!group)
+        servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(group_name)};
+        if (sg_it == servicegroup::servicegroups.end())
           return ;
+        servicegroup* group{sg_it->second.get()};
 
         for (service_map::iterator
                it(group->members.begin()),
@@ -270,11 +271,12 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        servicegroup* group(::find_servicegroup(group_name));
-        if (!group)
+        servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(group_name)};
+        if (sg_it == servicegroup::servicegroups.end())
           return ;
+        servicegroup* group{sg_it->second.get()};
 
-        host* last_host(NULL);
+        host* last_host{nullptr};
         for (service_map::iterator
                it(group->members.begin()),
                end(group->members.end());

@@ -59,21 +59,6 @@ com::centreon::engine::service* find_service(char const* host_name, char const* 
 }
 
 /**
- *  Find a servicegroup from the list in memory.
- *
- *  @param[in] name Service group name.
- *
- *  @return Service group object if found, nullptr otherwise.
- */
-servicegroup* find_servicegroup(std::string const& name) {
-  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
-    it(state::instance().servicegroups().find(name));
-  if (it != state::instance().servicegroups().end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
  *  Deprecated function.
  *
  *  @param[in]  host_name Unused.

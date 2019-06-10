@@ -178,10 +178,10 @@ std::ostream& operator<<(std::ostream& os, servicegroup const& obj) {
  */
 servicegroup& engine::find_servicegroup(std::string const& name) {
   umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
-    it(state::instance().servicegroups().find(name));
-  if (it == state::instance().servicegroups().end())
-    throw (engine_error() << "Service group "
-           << name << "' was not found");
+    it{servicegroup::servicegroups.find(name)};
+  if (it == servicegroup::servicegroups.end())
+    throw engine_error() << "Service group "
+           << name << "' was not found";
   return *it->second;
 }
 
@@ -193,7 +193,7 @@ servicegroup& engine::find_servicegroup(std::string const& name) {
  *  @return True if the servicegroup is found, otherwise false.
  */
 bool engine::is_servicegroup_exist(std::string const& name) throw () {
-  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
-    it(state::instance().servicegroups().find(name));
-  return it != state::instance().servicegroups().end();
+  umap<std::string, std::shared_ptr<servicegroup> >::const_iterator
+    it{servicegroup::servicegroups.find(name)};
+  return it != servicegroup::servicegroups.end();
 }

@@ -258,10 +258,11 @@ static int handle_service_macro(
       // Else we have a service macro with a
       // servicegroup name and a delimiter...
       else {
-        servicegroup* sg(::find_servicegroup(arg1));
-        if (!sg)
+        servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(arg1)};
+        if (sg_it == servicegroup::servicegroups.end())
           retval = ERROR;
         else {
+          servicegroup* sg{sg_it->second.get()};
           size_t delimiter_len(strlen(arg2));
 
           // Concatenate macro values for all servicegroup members.
@@ -340,10 +341,12 @@ static int handle_servicegroup_macro(
 
   // Use the saved servicegroup pointer
   // or find the servicegroup for on-demand macros.
-  servicegroup* sg(arg1 ? ::find_servicegroup(arg1) : mac->servicegroup_ptr);
-  if (!sg)
+  servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(arg1)};
+  if (sg_it == servicegroup::servicegroups.end())
     retval = ERROR;
   else {
+    servicegroup* sg{sg_it->second.get()};
+    retval = ERROR;
     // Get the servicegroup macro value.
     retval = grab_standard_servicegroup_macro_r(
                mac,

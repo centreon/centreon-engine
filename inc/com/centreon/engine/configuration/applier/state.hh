@@ -124,10 +124,6 @@ namespace           configuration {
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      hostgroup_map::const_iterator
-                    hostgroups_find(configuration::hostgroup::key_type const& k) const;
-      hostgroup_map::iterator
-                    hostgroups_find(configuration::hostgroup::key_type const& k);
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>> const&
                     services() const throw ();
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>&
@@ -144,14 +140,6 @@ namespace           configuration {
                     servicedependencies_find(configuration::servicedependency::key_type const& k) const;
       servicedependency_mmap::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      servicegroup_map const&
-                    servicegroups() const throw ();
-      servicegroup_map&
-                    servicegroups() throw ();
-      servicegroup_map::const_iterator
-                    servicegroups_find(configuration::servicegroup::key_type const& k) const;
-      servicegroup_map::iterator
-                    servicegroups_find(configuration::servicegroup::key_type const& k);
       timeperiod_map const&
                     timeperiods() const throw ();
       timeperiod_map &
