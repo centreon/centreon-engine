@@ -76,21 +76,21 @@ void applier::servicegroup::add_object(
   // Add service group to the global configuration set.
   config->servicegroups().insert(obj);
 
-  // Add servicegroup id to the other props.
-  engine::servicegroup::servicegroups[obj.servicegroup_name()]->set_id(obj.servicegroup_id());
-
   // Create servicegroup.
   std::shared_ptr<engine::servicegroup> sg{new engine::servicegroup(
-                            obj.servicegroup_name().c_str(),
-                            NULL_IF_EMPTY(obj.alias()),
-                            NULL_IF_EMPTY(obj.notes()),
-                            NULL_IF_EMPTY(obj.notes_url()),
-                            NULL_IF_EMPTY(obj.action_url()))};
+                            obj.servicegroup_name(),
+                            obj.alias(),
+                            obj.notes(),
+                            obj.notes_url(),
+                            obj.action_url())};
 
   // Add new items to the configuration state.
   state::instance().servicegroups().insert({sg->get_group_name(), sg});
   // Add  new items to the list.
   engine::servicegroup::servicegroups.insert({sg->get_group_name(), sg});
+
+  // Add servicegroup id to the other props.
+  engine::servicegroup::servicegroups[obj.servicegroup_name()]->set_id(obj.servicegroup_id());
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -253,13 +253,9 @@ void applier::servicegroup::remove_object(
     << "Removing servicegroup '" << obj.servicegroup_name() << "'";
 
   // Find service group.
-  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::iterator
+  servicegroup_map::iterator
     it(applier::state::instance().servicegroups_find(obj.key()));
   if (it != applier::state::instance().servicegroups().end()) {
-    com::centreon::engine::servicegroup* grp(it->second.get());
-
-    // Remove service dependency from its list.
-    engine::servicegroup::servicegroups.erase(it);
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
@@ -267,11 +263,12 @@ void applier::servicegroup::remove_object(
       NEBTYPE_SERVICEGROUP_DELETE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      grp,
+      it->second.get(),
       &tv);
 
-    // Erase service group object (will effectively delete the object).
+    // Remove service dependency from its list.
     engine::servicegroup::servicegroups.erase(obj.servicegroup_name());
+    // Erase service group object (will effectively delete the object).
     applier::state::instance().servicegroups().erase(it);
   }
 

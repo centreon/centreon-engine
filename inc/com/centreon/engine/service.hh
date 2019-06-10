@@ -109,6 +109,10 @@ class                           service : public notifier {
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
   std::string const&            get_description() const;
+  void                          set_event_handler_args(std::string const& event_hdl_args);
+  std::string const&            get_event_handler_args() const;
+  void                          set_check_command_args(std::string const& cmd_args);
+  std::string const&            get_check_command_args() const;
   time_t                        get_last_time_ok() const;
   void                          set_last_time_ok(time_t last_time);
   time_t                        get_last_time_warning() const;
@@ -203,9 +207,7 @@ class                           service : public notifier {
 
   host*                         host_ptr;
   commands::command*            event_handler_ptr;
-  char*                         event_handler_args;
   commands::command*            check_command_ptr;
-  char*                         check_command_args;
   timeperiod*                   check_period_ptr;
   timeperiod*                   notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
@@ -215,6 +217,8 @@ class                           service : public notifier {
  private:
   std::string                   _hostname;
   std::string                   _description;
+  std::string                   _event_handler_args;
+  std::string                   _check_command_args;
 
   time_t                        _last_time_ok;
   time_t                        _last_time_warning;

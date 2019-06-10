@@ -52,7 +52,7 @@ servicegroup::servicegroup(std::string const& group_name,
                            std::string const& notes_url,
                            std::string const& action_url)
     : _group_name{group_name},
-      _alias{alias.empty() ? alias : group_name},
+      _alias{alias.empty() ? group_name : alias},
       _notes{notes},
       _notes_url{notes_url},
       _action_url{action_url} {

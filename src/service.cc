@@ -127,11 +127,6 @@ service::service(std::string const& hostname,
 service::~service() {
   this->contact_groups.clear();
   deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
-
-  delete[] this->event_handler_args;
-  this->event_handler_args = nullptr;
-  delete[] this->check_command_args;
-  this->check_command_args = nullptr;
 }
 
 time_t service::get_last_time_ok() const {
@@ -309,9 +304,9 @@ bool service::operator==(service const& other) throw() {
          get_is_flapping() == other.get_is_flapping() &&
          this->flapping_comment_id == other.flapping_comment_id &&
          _percent_state_change == other.get_percent_state_change() &&
-         this->_modified_attributes == other._modified_attributes &&
-         is_equal(this->event_handler_args, other.event_handler_args) &&
-         is_equal(this->check_command_args, other.check_command_args);
+         _modified_attributes == other._modified_attributes &&
+         _event_handler_args == other.get_event_handler_args() &&
+         _check_command_args == other.get_check_command_args();
 }
 
 /**
@@ -594,10 +589,10 @@ std::ostream& operator<<(std::ostream& os,
      << (obj.host_ptr ? obj.host_ptr->get_name() : "\"nullptr\"")
      << "\n  event_handler_ptr:                    " << evt_str
      << "\n  event_handler_args:                   "
-     << chkstr(obj.event_handler_args)
+     << obj.get_event_handler_args()
      << "\n  check_command_ptr:                    " << cmd_str
      << "\n  check_command_args:                   "
-     << chkstr(obj.check_command_args)
+     << obj.get_check_command_args()
      << "\n  check_period_ptr:                     " << chk_period_str
      << "\n  notification_period_ptr:              " << notif_period_str
      << "\n  servicegroups_ptr:                    " << svcgrp_str << "\n";
@@ -1012,6 +1007,42 @@ void service::set_description(std::string const& desc) {
  */
 std::string const& service::get_description() const {
   return _description;
+}
+
+/**
+ * @brief set the event handler arguments
+ *
+ *  @param[in] event_hdl_args the event handler arguments
+ */
+void service::set_event_handler_args(std::string const& event_hdl_args) {
+  _event_handler_args = event_hdl_args;
+}
+
+/**
+ * @brief Get the event handler arguments of the service.
+ *
+ * @return A string reference to the event handler arguments.
+ */
+std::string const& service::get_event_handler_args() const {
+  return _event_handler_args;
+}
+
+/**
+ * @brief set the command arguments
+ *
+ *  @param[in] cmd_args the command arguments
+ */
+void service::set_check_command_args(std::string const& cmd_args) {
+  _check_command_args = cmd_args;
+}
+
+/**
+ * @brief Get the event command arguments of the service.
+ *
+ * @return A string reference to the command arguments.
+ */
+std::string const& service::get_check_command_args() const {
+  return _check_command_args;
 }
 
 int service::handle_async_check_result(check_result* queued_check_result) {
