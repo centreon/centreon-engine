@@ -1358,6 +1358,7 @@ int process_servicegroup_command(int cmd,
                                  char* args) {
   (void)entry_time;
   char* servicegroup_name{nullptr};
+  std::shared_ptr<servicegroup> temp_servicegroup;
   host* temp_host{nullptr};
   host* last_host{nullptr};
 
@@ -1370,6 +1371,7 @@ int process_servicegroup_command(int cmd,
     sg_it{servicegroup::servicegroups.find(servicegroup_name)};
   if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
     return ERROR;
+  temp_servicegroup = sg_it->second;
 
   switch (cmd) {
 

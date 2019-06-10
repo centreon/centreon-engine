@@ -978,7 +978,6 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   char* author(nullptr);
   char* comment_data(nullptr);
   uint64_t downtime_id{0};
-  servicegroup_map::const_iterator sg_it;
 
   if (cmd == CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME
       || cmd == CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME) {
@@ -1005,7 +1004,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       return ERROR;
 
     /* verify that the servicegroup is valid */
-    sg_it = servicegroup::servicegroups.find(servicegroup_name);
+    servicegroup_map sg_it{servicegroup::servicegroups.find(servicegroup_name)};
     if (sg_it == servicegroup::servicegroups.end() ||
       !sg_it->second)
       return ERROR;
