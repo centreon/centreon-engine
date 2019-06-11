@@ -383,18 +383,18 @@ static int handle_contact_macro(
   // Return value.
   int retval;
 
-  if (arg2 == nullptr) {
+  if (!arg2) {
     // Find the contact for on-demand macros
     // or use saved contact pointer.
-    contact* cntct(arg1 ? configuration::applier::state::instance().find_contact(arg1) : mac->contact_ptr);
-    if (!cntct)
+    contact_map::const_iterator ct_it{contact::contacts.find(arg1)};
+    if (ct_it == contact::contacts.end())
       retval = ERROR;
     else {
       // Get the contact macro value.
       retval = grab_standard_contact_macro_r(
                  mac,
                  macro_type,
-                 cntct,
+                 ct_it->second.get(),
                  output);
       if (OK == retval)
         *free_macro = true;
@@ -409,12 +409,11 @@ static int handle_contact_macro(
       size_t delimiter_len(strlen(arg2));
 
       // Concatenate macro values for all contactgroup members.
-      for(std::unordered_map<std::string, contact *>::const_iterator
-            it(cg->get_members().begin()),
-            end(cg->get_members().end());
-            it != end;
-            ++it) {
-        contact* cntct(it->second);
+      for(contact_map::const_iterator
+            it{cg->get_members().begin()},
+            end{cg->get_members().end()};
+            it != end; ++it) {
+        contact* cntct(it->second.get());
         if (cntct) {
           // Get the macro value for this contact.
           char* buffer(nullptr);
@@ -1201,20 +1200,17 @@ int grab_macro_value_r(
         delimiter_len = strlen(arg[1]);
 
         /* concatenate macro values for all contactgroup members */
-      for(std::unordered_map<std::string, contact *>::const_iterator
-            it(temp_contactgroup->get_members().begin()),
-            end(temp_contactgroup->get_members().end());
-            it != end;
-            ++it) {
-          if (it->second == nullptr)
-            continue;
-          if ((temp_contact = configuration::applier::state::instance().find_contact(it->second->get_name())) == nullptr)
+      for(contact_map::const_iterator
+            it{temp_contactgroup->get_members().begin()},
+            end{temp_contactgroup->get_members().end()};
+            it != end; ++it) {
+          if (!it->second)
             continue;
 
           /* get the macro value for this contact */
-          grab_contact_address_macro(x, temp_contact, &temp_buffer);
+          grab_contact_address_macro(x, it->second.get(), &temp_buffer);
 
-          if (temp_buffer == nullptr)
+          if (!temp_buffer)
             continue;
 
           /* add macro value to already running macro */
@@ -1237,13 +1233,15 @@ int grab_macro_value_r(
       /* else on-demand contact macro */
       else {
         /* find the contact */
-        if ((temp_contact = configuration::applier::state::instance().find_contact(arg[0])) == nullptr) {
+        contact_map::const_iterator
+          it{contact::contacts.find(arg[0])};
+        if (it == contact::contacts.end()) {
           delete[] buf;
           return ERROR;
         }
 
         /* get the macro value */
-        result = grab_contact_address_macro(x, temp_contact, output);
+        result = grab_contact_address_macro(x, it->second.get(), output);
       }
     }
   }

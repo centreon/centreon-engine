@@ -134,7 +134,7 @@ TEST_F(ApplierContact, RemoveContactFromConfig) {
   aply.add_object(ctct);
   aply.expand_objects(*config);
   aply.remove_object(ctct);
-  ASSERT_TRUE(configuration::applier::state::instance().contacts().empty());
+  ASSERT_TRUE(engine::contact::contacts.empty());
 }
 
 TEST_F(ApplierContact, ModifyContactFromConfig) {
@@ -169,12 +169,13 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   ASSERT_TRUE(ctct.customvariables().size() == 2);
   ASSERT_TRUE(ctct.parse("service_notification_options", "n"));
   aply.modify_object(ctct);
-  engine::contact* c(configuration::applier::state::instance().find_contact("test"));
-  ASSERT_TRUE(c->custom_variables.size() == 2);
-  ASSERT_TRUE(c->custom_variables["superVar"].get_value() == "Super");
-  ASSERT_TRUE(c->custom_variables["superVar1"].get_value() == "Super1");
-  ASSERT_TRUE(c->get_alias() == "newAlias");
-  ASSERT_FALSE(c->notify_on_service_unknown());
+  contact_map::const_iterator ct_it{engine::contact::contacts.find("test")};
+  ASSERT_TRUE(ct_it != engine::contact::contacts.end());
+  ASSERT_EQ(ct_it->second->custom_variables.size(), 2);
+  ASSERT_TRUE(ct_it->second->custom_variables["superVar"].get_value() == "Super");
+  ASSERT_TRUE(ct_it->second->custom_variables["superVar1"].get_value() == "Super1");
+  ASSERT_TRUE(ct_it->second->get_alias() == "newAlias");
+  ASSERT_FALSE(ct_it->second->notify_on_service(notifier::unknown));
 
   std::set<configuration::command>::iterator it{config->commands_find("cmd")};
   ASSERT_TRUE(it != config->commands().end());

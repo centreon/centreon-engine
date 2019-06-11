@@ -3195,7 +3195,7 @@ int service::notify_contact(nagios_macros* mac,
    * acknowledgements are no longer excluded from this test -
    * added 8/19/02 Tom Bertelson
    */
-  if (check_contact_service_notification_viability(cntct, this, type,
+  if (cntct->check_service_notification_viability(this, type,
                                                    options) == ERROR)
     return ERROR;
 

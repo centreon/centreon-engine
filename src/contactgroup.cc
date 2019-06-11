@@ -79,7 +79,7 @@ contactgroup& contactgroup::operator=(contactgroup const& other) {
   _alias = other._alias;
   _members = other._members;
   _name = other._name;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -91,8 +91,8 @@ std::string const& contactgroup::get_name() const {
   return _name;
 }
 
-void contactgroup::add_member(contact* cntct) {
-  _members[cntct->get_name()] = cntct;
+void contactgroup::add_member(std::shared_ptr<contact> cntct) {
+  _members.insert({cntct->get_name(), cntct});
 
   timeval tv(get_broker_timestamp(NULL));
   broker_group(
@@ -101,22 +101,20 @@ void contactgroup::add_member(contact* cntct) {
     NEBATTR_NONE,
     this,
     &tv);
-  return ;
 }
 
 void contactgroup::clear_members() {
   _members.clear();
-  return ;
 }
 
-std::unordered_map<std::string, contact*> const& contactgroup::get_members() const {
-  return (_members);
+contact_map const& contactgroup::get_members() const {
+  return _members;
 }
 
 bool contactgroup::contains_illegal_object_chars() const {
   if (_name.empty() || !illegal_object_chars)
     return false;
-  return (_name.find(illegal_object_chars) != std::string::npos);
+  return _name.find(illegal_object_chars) != std::string::npos;
 }
 
 std::string const& contactgroup::get_alias() const {
@@ -125,11 +123,10 @@ std::string const& contactgroup::get_alias() const {
 
 void contactgroup::set_alias(std::string const& alias) {
   _alias = alias;
-  return ;
 }
 
 bool contactgroup::has_member(std::string const& name) const {
-  return (_members.find(name) != _members.end());
+  return _members.find(name) != _members.end();
 }
 
 std::ostream& operator<<(
@@ -146,5 +143,5 @@ std::ostream& operator<<(
     else
       os << "";
   }
-  return (os);
+  return os;
 }

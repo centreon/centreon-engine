@@ -1554,31 +1554,30 @@ int process_contactgroup_command(int cmd,
   case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
 
     /* loop through all contactgroup members */
-    for (std::unordered_map<std::string, contact *>::const_iterator
-           it(temp_contactgroup->get_members().begin()),
-           end(temp_contactgroup->get_members().end());
-         it != end;
-         ++it) {
+    for (contact_map::const_iterator
+           it{temp_contactgroup->get_members().begin()},
+           end{temp_contactgroup->get_members().end()};
+         it != end; ++it) {
 
-      if (it->second == nullptr)
+      if (!it->second)
         continue;
 
       switch (cmd) {
 
       case CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        enable_contact_host_notifications(it->second);
+        enable_contact_host_notifications(it->second.get());
         break;
 
       case CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        disable_contact_host_notifications(it->second);
+        disable_contact_host_notifications(it->second.get());
         break;
 
       case CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        enable_contact_service_notifications(it->second);
+        enable_contact_service_notifications(it->second.get());
         break;
 
       case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        disable_contact_service_notifications(it->second);
+        disable_contact_service_notifications(it->second.get());
         break;
 
       default:

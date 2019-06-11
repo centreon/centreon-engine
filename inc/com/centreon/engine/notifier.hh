@@ -23,8 +23,8 @@
 # include <array>
 # include <string>
 # include <list>
-# include "com/centreon/engine/contact.hh"
 # include "com/centreon/engine/contactgroup.hh"
+# include "com/centreon/engine/customvariable.hh"
 # include "com/centreon/engine/namespace.hh"
 # include "common.hh"
 
@@ -273,7 +273,8 @@ class                notifier {
   bool               get_should_be_scheduled() const;
   void               set_should_be_scheduled(bool should_be_scheduled);
 
-  contact_map        contacts;
+  std::unordered_map<std::string, std::shared_ptr<contact>>
+                     contacts;
   contactgroup_map   contact_groups;
   int                state_history[MAX_STATE_HISTORY_ENTRIES];
 

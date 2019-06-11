@@ -88,9 +88,9 @@ int grab_contact_macros_r(nagios_macros* mac, contact* cntct) {
     return ERROR;
 
   /* save pointer to first/primary contactgroup for later */
-  if (cntct->contactgroups_ptr)
+  if (!cntct->get_parent_groups().empty())
     mac->contactgroup_ptr
-      = (contactgroup*)cntct->contactgroups_ptr->object_ptr;
+      = cntct->get_parent_groups().front().get();
   return OK;
 }
 
@@ -274,8 +274,11 @@ int grab_custom_macro_value_r(
     if (arg2 == nullptr) {
       /* find the contact for on-demand macros */
       if (arg1) {
-        if ((temp_contact = configuration::applier::state::instance().find_contact(arg1)) == nullptr)
+        contact_map::const_iterator it{contact::contacts.find(arg1)};
+        if (it == contact::contacts.end())
           return ERROR;
+        else
+          temp_contact = it->second.get();
       }
       /* else use saved contact pointer */
       else if ((temp_contact = mac->contact_ptr) == nullptr)
@@ -296,13 +299,13 @@ int grab_custom_macro_value_r(
       delimiter_len = strlen(arg2);
 
       /* concatenate macro values for all contactgroup members */
-      for (std::unordered_map<std::string, contact *>::const_iterator
-             it(temp_contactgroup->get_members().begin()),
-             end(temp_contactgroup->get_members().end());
+      for (contact_map::const_iterator
+             it{temp_contactgroup->get_members().begin()},
+             end{temp_contactgroup->get_members().end()};
            it != end;
            ++it) {
 
-        if (it->second == nullptr)
+        if (!it->second)
           continue;
 
         /* get the macro value for this contact */
@@ -763,15 +766,16 @@ int grab_standard_contact_macro_r(
     std::string buf;
     /* get the contactgroup names */
     /* find all contactgroups this contact is a member of */
-    for (temp_objectlist = temp_contact->contactgroups_ptr;
-         temp_objectlist != nullptr;
-         temp_objectlist = temp_objectlist->next) {
-      if ((temp_contactgroup = (contactgroup*)temp_objectlist->object_ptr) == nullptr)
+    for (std::list<std::shared_ptr<contactgroup>>::const_iterator
+           it(temp_contact->get_parent_groups().begin()),
+           end(temp_contact->get_parent_groups().end());
+         it != end; ++it) {
+      if (!*it)
         continue;
 
       if (!buf.empty())
         buf.append(",");
-      buf.append(temp_contactgroup->get_name());
+      buf.append((*it)->get_name());
     }
     if (!buf.empty())
       *output = string::dup(buf);
@@ -842,9 +846,9 @@ int grab_standard_contactgroup_macro(
 
   case MACRO_CONTACTGROUPMEMBERS:
     /* get the member list */
-    for (std::unordered_map<std::string, contact *>::const_iterator
-           it(temp_contactgroup->get_members().begin()),
-           end(temp_contactgroup->get_members().end());
+    for (contact_map::const_iterator
+           it{temp_contactgroup->get_members().begin()},
+           end{temp_contactgroup->get_members().end()};
          it != end;
          ++it) {
       if (it->second->get_name().empty())

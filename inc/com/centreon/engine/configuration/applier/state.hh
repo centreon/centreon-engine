@@ -92,10 +92,6 @@ namespace           configuration {
                     find_connector(configuration::connector::key_type const& k) const;
       commands::connector*
                     find_connector(configuration::connector::key_type const& k);
-      contact_map const&
-                    contacts() const throw ();
-      contact_map&
-                    contacts() throw ();
       contact_map::const_iterator
                     contacts_find(configuration::contact::key_type const& k) const;
       contact_map::iterator
@@ -192,8 +188,6 @@ namespace           configuration {
                     _commands;
       std::unordered_map<std::string, std::shared_ptr<commands::connector>>
                     _connectors;
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>
-                    _contacts;
       std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>
                     _contactgroups;
       concurrency::condvar

@@ -301,10 +301,9 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking contacts...";
   total_objects = 0;
-  for (std::unordered_map<std::string,
-            std::shared_ptr<com::centreon::engine::contact> >::iterator
-         it(configuration::applier::state::instance().contacts().begin()),
-         end(configuration::applier::state::instance().contacts().end());
+  for (contact_map::iterator
+         it{contact::contacts.begin()},
+         end{contact::contacts.end()};
        it != end;
        ++it) {
     check_contact(it->second.get(), &warnings, &errors);
@@ -323,7 +322,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(configuration::applier::state::instance().contactgroups().end());
        it != end;
        ++it) {
-    check_contactgroup(it->second.get(), &warnings, &errors);
+    check_contactgroup(it->second, &warnings, &errors);
     if (verify_config)
       logger(log_info_message, basic)
         << "\tChecked " << total_objects << " contact groups.";
@@ -783,10 +782,8 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
          end(svc->contacts.end());
        it != end;
        ++it) {
-    com::centreon::engine::contact* temp_contact
-      = configuration::applier::state::instance().find_contact(it->first);
-
-    if (temp_contact == nullptr) {
+    contact_map::const_iterator ct_it{contact::contacts.find(it->first)};
+    if (ct_it == contact::contacts.end()) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in service '" << svc->get_description() << "' for "
@@ -1007,10 +1004,8 @@ int check_host(host* hst, int* w, int* e) {
          end(hst->contacts.end());
        it != end;
        ++it) {
-    com::centreon::engine::contact* temp_contact
-      = configuration::applier::state::instance().find_contact(it->first);
-
-    if (temp_contact == nullptr) {
+    contact_map::const_iterator ct_it{contact::contacts.find(it->first)};
+    if (ct_it == contact::contacts.end()) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in host '" << hst->get_name()
@@ -1187,9 +1182,9 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
   }
 
   /* check for sane host recovery options */
-  if (cntct->notify_on_host_recovery()
-      && !cntct->notify_on_host_down()
-      && !cntct->notify_on_host_unreachable()) {
+  if (cntct->notify_on_host(notifier::recovery)
+      && !cntct->notify_on_host(notifier::down)
+      && !cntct->notify_on_host(notifier::unreachable)) {
     logger(log_verification_error, basic)
       << "Warning: Host recovery notification option for contact '"
       << cntct->get_name() << "' doesn't make any sense - specify down "
@@ -1198,9 +1193,9 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
   }
 
   /* check for sane service recovery options */
-  if (cntct->notify_on_service_recovery()
-      && !cntct->notify_on_service_critical()
-      && !cntct->notify_on_service_warning()) {
+  if (cntct->notify_on_service(notifier::recovery)
+      && !cntct->notify_on_service(notifier::critical)
+      && !cntct->notify_on_service(notifier::warning)) {
     logger(log_verification_error, basic)
       << "Warning: Service recovery notification option for contact '"
       << cntct->get_name() << "' doesn't make any sense - specify critical "
@@ -1342,32 +1337,31 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_contactgroup(contactgroup* cg, int* w, int* e) {
+int check_contactgroup(std::shared_ptr<contactgroup> cg, int* w, int* e) {
   (void)w;
   int errors(0);
 
-  for (std::unordered_map<std::string, contact *>::const_iterator
-         it(cg->get_members().begin()),
-         end(cg->get_members().end());
+  for (contact_map::const_iterator
+         it{cg->get_members().begin()},
+         end{cg->get_members().end()};
        it != end;
        ++it) {
-    contact *temp_contact(
-      configuration::applier::state::instance().find_contact(
-        it->first));
-    if (temp_contact == nullptr) {
+    std::shared_ptr<contact> temp_contact{it->second};
+    if (!temp_contact) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in contact group '" << cg->get_name()
         << "' is not defined anywhere!";
       errors++;
     }
-
     // Save a pointer to this contact group for faster contact/group
     // membership lookups later.
     else
-      add_object_to_objectlist(&temp_contact->contactgroups_ptr, cg);
+      temp_contact->get_parent_groups().push_back(cg);
 
     // Save the contact pointer for later.
+    // FIXME DBR: something strange here, we add again temp_contact to cg. But
+    // we get it from cg.
     cg->add_member(temp_contact);
   }
 
@@ -1608,9 +1602,8 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
 
   // Check all contacts.
   for (std::pair<std::string, std::shared_ptr<contact>> const& p : se->contacts()) {
-    contact* cntct{configuration::applier::state::instance().find_contact(
-      p.first)};
-    if (!cntct) {
+    contact_map::const_iterator ct_it{contact::contacts.find(p.first)};
+    if (ct_it == contact::contacts.end()) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << p.first
         << "' specified in service escalation for service '"
@@ -1705,18 +1698,14 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   // Check all contacts.
   for (std::pair<std::string, std::shared_ptr<contact>> const& p : he->contacts()) {
     // Find the contact.
-    contact* cntct{configuration::applier::state::instance().find_contact(
-                            p.first)};
-    if (!cntct) {
+    contact_map::const_iterator ct_it{contact::contacts.find(p.first)};
+    if (ct_it == contact::contacts.end()) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << p.first
         << "' specified in host escalation for host '"
         << he->get_hostname() << "' is not defined anywhere!";
       errors++;
     }
-
-    // Save the contact pointer for later.
-    he->contacts().insert({p.first, std::shared_ptr<contact>(cntct)});
   }
 
   // Check all contact groups.

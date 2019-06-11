@@ -116,13 +116,11 @@ std::ostream& dump::contact(std::ostream& os, com::centreon::engine::contact con
  */
 std::ostream& dump::contacts(std::ostream& os) {
   configuration::applier::state const& config(configuration::applier::state::instance());
-  for (std::unordered_map<std::string,
-            std::shared_ptr<com::centreon::engine::contact> >::const_iterator
-         it(config.contacts().begin()),
-         end(config.contacts().end());
-       it != end;
-       ++it)
-    dump::contact(os, *it->second);
+  for (contact_map::const_iterator
+         it{contact::contacts.begin()},
+         end{contact::contacts.end()};
+       it != end; ++it)
+    dump::contact(os, *it->second.get());
 
   return os;
 }

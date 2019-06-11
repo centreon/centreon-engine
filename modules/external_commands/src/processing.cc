@@ -38,462 +38,190 @@ using namespace com::centreon::engine::modules::external_commands;
 // Dummy command.
 void dummy_command() {}
 
-processing::processing() {
-  // process commands.
-  _lst_command["ENTER_STANDBY_MODE"] = command_info(
-      CMD_DISABLE_NOTIFICATIONS, &_redirector<&disable_all_notifications>);
-  _lst_command["DISABLE_NOTIFICATIONS"] = command_info(
-      CMD_DISABLE_NOTIFICATIONS, &_redirector<&disable_all_notifications>);
-  _lst_command["ENTER_ACTIVE_MODE"] = command_info(
-      CMD_ENABLE_NOTIFICATIONS, &_redirector<&enable_all_notifications>);
-  _lst_command["ENABLE_NOTIFICATIONS"] = command_info(
-      CMD_ENABLE_NOTIFICATIONS, &_redirector<&enable_all_notifications>);
-  _lst_command["SHUTDOWN_PROGRAM"] =
-      command_info(CMD_SHUTDOWN_PROCESS, &_redirector<&cmd_signal_process>);
-  _lst_command["SHUTDOWN_PROCESS"] =
-      command_info(CMD_SHUTDOWN_PROCESS, &_redirector<&cmd_signal_process>);
-  _lst_command["RESTART_PROGRAM"] =
-      command_info(CMD_RESTART_PROCESS, &_redirector<&cmd_signal_process>);
-  _lst_command["RESTART_PROCESS"] =
-      command_info(CMD_RESTART_PROCESS, &_redirector<&cmd_signal_process>);
-  _lst_command["SAVE_STATE_INFORMATION"] =
-      command_info(CMD_SAVE_STATE_INFORMATION,
-                   &_redirector<&_wrapper_save_state_information>);
-  _lst_command["READ_STATE_INFORMATION"] =
-      command_info(CMD_READ_STATE_INFORMATION,
-                   &_redirector<&_wrapper_read_state_information>);
-  _lst_command["ENABLE_EVENT_HANDLERS"] = command_info(
-      CMD_ENABLE_EVENT_HANDLERS, &_redirector<&start_using_event_handlers>);
-  _lst_command["DISABLE_EVENT_HANDLERS"] = command_info(
-      CMD_DISABLE_EVENT_HANDLERS, &_redirector<&stop_using_event_handlers>);
+processing::processing()
+ : _lst_command {
+   { "ENTER_STANDBY_MODE", command_info(
+      CMD_DISABLE_NOTIFICATIONS, &_redirector<&disable_all_notifications>) },
+   { "DISABLE_NOTIFICATIONS", command_info(
+      CMD_DISABLE_NOTIFICATIONS, &_redirector<&disable_all_notifications>) },
+   // process commands.
+   { "ENTER_ACTIVE_MODE", command_info(
+      CMD_ENABLE_NOTIFICATIONS, &_redirector<&enable_all_notifications>) },
+   { "ENABLE_NOTIFICATIONS", command_info(
+      CMD_ENABLE_NOTIFICATIONS, &_redirector<&enable_all_notifications>) },
+   { "SHUTDOWN_PROGRAM", command_info(CMD_SHUTDOWN_PROCESS, &_redirector<&cmd_signal_process>) },
+   { "SHUTDOWN_PROCESS", command_info(CMD_SHUTDOWN_PROCESS, &_redirector<&cmd_signal_process>) },
+   { "RESTART_PROGRAM", command_info(CMD_RESTART_PROCESS, &_redirector<&cmd_signal_process>) },
+   { "RESTART_PROCESS", command_info(CMD_RESTART_PROCESS, &_redirector<&cmd_signal_process>) },
+   { "SAVE_STATE_INFORMATION", command_info(CMD_SAVE_STATE_INFORMATION, &_redirector<&_wrapper_save_state_information>) },
+   { "READ_STATE_INFORMATION", command_info(CMD_READ_STATE_INFORMATION, &_redirector<&_wrapper_read_state_information>) },
+   { "ENABLE_EVENT_HANDLERS", command_info(CMD_ENABLE_EVENT_HANDLERS, &_redirector<&start_using_event_handlers>) },
+   { "DISABLE_EVENT_HANDLERS", command_info(CMD_DISABLE_EVENT_HANDLERS, &_redirector<&stop_using_event_handlers>) },
   // _lst_command["FLUSH_PENDING_COMMANDS"] =
   //   command_info(CMD_FLUSH_PENDING_COMMANDS,
   //                &_redirector<&>);
-  _lst_command["ENABLE_FAILURE_PREDICTION"] =
-      command_info(CMD_ENABLE_FAILURE_PREDICTION, &_redirector<&dummy_command>);
-  _lst_command["DISABLE_FAILURE_PREDICTION"] = command_info(
-      CMD_DISABLE_FAILURE_PREDICTION, &_redirector<&dummy_command>);
-  _lst_command["ENABLE_PERFORMANCE_DATA"] = command_info(
-      CMD_ENABLE_PERFORMANCE_DATA, &_redirector<&enable_performance_data>);
-  _lst_command["DISABLE_PERFORMANCE_DATA"] = command_info(
-      CMD_DISABLE_PERFORMANCE_DATA, &_redirector<&disable_performance_data>);
-  _lst_command["START_EXECUTING_HOST_CHECKS"] =
-      command_info(CMD_START_EXECUTING_HOST_CHECKS,
-                   &_redirector<&start_executing_host_checks>);
-  _lst_command["STOP_EXECUTING_HOST_CHECKS"] =
-      command_info(CMD_STOP_EXECUTING_HOST_CHECKS,
-                   &_redirector<&stop_executing_host_checks>);
-  _lst_command["START_EXECUTING_SVC_CHECKS"] =
-      command_info(CMD_START_EXECUTING_SVC_CHECKS,
-                   &_redirector<&start_executing_service_checks>);
-  _lst_command["STOP_EXECUTING_SVC_CHECKS"] =
-      command_info(CMD_STOP_EXECUTING_SVC_CHECKS,
-                   &_redirector<&stop_executing_service_checks>);
-  _lst_command["START_ACCEPTING_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_START_ACCEPTING_PASSIVE_HOST_CHECKS,
-                   &_redirector<&start_accepting_passive_host_checks>);
-  _lst_command["STOP_ACCEPTING_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_STOP_ACCEPTING_PASSIVE_HOST_CHECKS,
-                   &_redirector<&stop_accepting_passive_host_checks>);
-  _lst_command["START_ACCEPTING_PASSIVE_SVC_CHECKS"] =
-      command_info(CMD_START_ACCEPTING_PASSIVE_SVC_CHECKS,
-                   &_redirector<&start_accepting_passive_service_checks>);
-  _lst_command["STOP_ACCEPTING_PASSIVE_SVC_CHECKS"] =
-      command_info(CMD_STOP_ACCEPTING_PASSIVE_SVC_CHECKS,
-                   &_redirector<&stop_accepting_passive_service_checks>);
-  _lst_command["START_OBSESSING_OVER_HOST_CHECKS"] =
-      command_info(CMD_START_OBSESSING_OVER_HOST_CHECKS,
-                   &_redirector<&start_obsessing_over_host_checks>);
-  _lst_command["STOP_OBSESSING_OVER_HOST_CHECKS"] =
-      command_info(CMD_STOP_OBSESSING_OVER_HOST_CHECKS,
-                   &_redirector<&stop_obsessing_over_host_checks>);
-  _lst_command["START_OBSESSING_OVER_SVC_CHECKS"] =
-      command_info(CMD_START_OBSESSING_OVER_SVC_CHECKS,
-                   &_redirector<&start_obsessing_over_service_checks>);
-  _lst_command["STOP_OBSESSING_OVER_SVC_CHECKS"] =
-      command_info(CMD_STOP_OBSESSING_OVER_SVC_CHECKS,
-                   &_redirector<&stop_obsessing_over_service_checks>);
-  _lst_command["ENABLE_FLAP_DETECTION"] = command_info(
-      CMD_ENABLE_FLAP_DETECTION, &_redirector<&enable_flap_detection_routines>);
-  _lst_command["DISABLE_FLAP_DETECTION"] =
-      command_info(CMD_DISABLE_FLAP_DETECTION,
-                   &_redirector<&disable_flap_detection_routines>);
-  _lst_command["CHANGE_GLOBAL_HOST_EVENT_HANDLER"] =
-      command_info(CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_GLOBAL_SVC_EVENT_HANDLER"] =
-      command_info(CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["ENABLE_SERVICE_FRESHNESS_CHECKS"] =
-      command_info(CMD_ENABLE_SERVICE_FRESHNESS_CHECKS,
-                   &_redirector<&enable_service_freshness_checks>);
-  _lst_command["DISABLE_SERVICE_FRESHNESS_CHECKS"] =
-      command_info(CMD_DISABLE_SERVICE_FRESHNESS_CHECKS,
-                   &_redirector<&disable_service_freshness_checks>);
-  _lst_command["ENABLE_HOST_FRESHNESS_CHECKS"] =
-      command_info(CMD_ENABLE_HOST_FRESHNESS_CHECKS,
-                   &_redirector<&enable_host_freshness_checks>);
-  _lst_command["DISABLE_HOST_FRESHNESS_CHECKS"] =
-      command_info(CMD_DISABLE_HOST_FRESHNESS_CHECKS,
-                   &_redirector<&disable_host_freshness_checks>);
+   { "ENABLE_FAILURE_PREDICTION", command_info(CMD_ENABLE_FAILURE_PREDICTION, &_redirector<&dummy_command>) },
+   { "DISABLE_FAILURE_PREDICTION", command_info(CMD_DISABLE_FAILURE_PREDICTION, &_redirector<&dummy_command>) },
+   { "ENABLE_PERFORMANCE_DATA", command_info(CMD_ENABLE_PERFORMANCE_DATA, &_redirector<&enable_performance_data>) },
+   { "DISABLE_PERFORMANCE_DATA", command_info(CMD_DISABLE_PERFORMANCE_DATA, &_redirector<&disable_performance_data>) },
+   { "START_EXECUTING_HOST_CHECKS", command_info(CMD_START_EXECUTING_HOST_CHECKS, &_redirector<&start_executing_host_checks>) },
+   { "STOP_EXECUTING_HOST_CHECKS", command_info(CMD_STOP_EXECUTING_HOST_CHECKS, &_redirector<&stop_executing_host_checks>) },
+   { "START_EXECUTING_SVC_CHECKS", command_info(CMD_START_EXECUTING_SVC_CHECKS, &_redirector<&start_executing_service_checks>) },
+   { "STOP_EXECUTING_SVC_CHECKS", command_info(CMD_STOP_EXECUTING_SVC_CHECKS, &_redirector<&stop_executing_service_checks>) },
+   { "START_ACCEPTING_PASSIVE_HOST_CHECKS", command_info(CMD_START_ACCEPTING_PASSIVE_HOST_CHECKS, &_redirector<&start_accepting_passive_host_checks>) },
+   { "STOP_ACCEPTING_PASSIVE_HOST_CHECKS", command_info(CMD_STOP_ACCEPTING_PASSIVE_HOST_CHECKS, &_redirector<&stop_accepting_passive_host_checks>) },
+   { "START_ACCEPTING_PASSIVE_SVC_CHECKS", command_info(CMD_START_ACCEPTING_PASSIVE_SVC_CHECKS, &_redirector<&start_accepting_passive_service_checks>) },
+   { "STOP_ACCEPTING_PASSIVE_SVC_CHECKS", command_info(CMD_STOP_ACCEPTING_PASSIVE_SVC_CHECKS, &_redirector<&stop_accepting_passive_service_checks>) },
+   { "START_OBSESSING_OVER_HOST_CHECKS", command_info(CMD_START_OBSESSING_OVER_HOST_CHECKS, &_redirector<&start_obsessing_over_host_checks>) },
+   { "STOP_OBSESSING_OVER_HOST_CHECKS", command_info(CMD_STOP_OBSESSING_OVER_HOST_CHECKS, &_redirector<&stop_obsessing_over_host_checks>) },
+   { "START_OBSESSING_OVER_SVC_CHECKS", command_info(CMD_START_OBSESSING_OVER_SVC_CHECKS, &_redirector<&start_obsessing_over_service_checks>) },
+   { "STOP_OBSESSING_OVER_SVC_CHECKS", command_info(CMD_STOP_OBSESSING_OVER_SVC_CHECKS, &_redirector<&stop_obsessing_over_service_checks>) },
+   { "ENABLE_FLAP_DETECTION", command_info(CMD_ENABLE_FLAP_DETECTION, &_redirector<&enable_flap_detection_routines>) },
+   { "DISABLE_FLAP_DETECTION", command_info(CMD_DISABLE_FLAP_DETECTION, &_redirector<&disable_flap_detection_routines>) },
+   { "CHANGE_GLOBAL_HOST_EVENT_HANDLER", command_info(CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_GLOBAL_SVC_EVENT_HANDLER", command_info(CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER, &_redirector<&cmd_change_object_char_var>) },
+   { "ENABLE_SERVICE_FRESHNESS_CHECKS", command_info(CMD_ENABLE_SERVICE_FRESHNESS_CHECKS, &_redirector<&enable_service_freshness_checks>) },
+   { "DISABLE_SERVICE_FRESHNESS_CHECKS", command_info(CMD_DISABLE_SERVICE_FRESHNESS_CHECKS, &_redirector<&disable_service_freshness_checks>) },
+   { "ENABLE_HOST_FRESHNESS_CHECKS", command_info(CMD_ENABLE_HOST_FRESHNESS_CHECKS, &_redirector<&enable_host_freshness_checks>) },
+   { "DISABLE_HOST_FRESHNESS_CHECKS", command_info(CMD_DISABLE_HOST_FRESHNESS_CHECKS, &_redirector<&disable_host_freshness_checks>) },
+   // host-related commands.
+   { "ADD_HOST_COMMENT", command_info(CMD_ADD_HOST_COMMENT, &_redirector<&cmd_add_comment>) },
+   { "DEL_HOST_COMMENT", command_info(CMD_DEL_HOST_COMMENT, &_redirector<&cmd_delete_comment>) },
+   { "DEL_ALL_HOST_COMMENTS", command_info(CMD_DEL_ALL_HOST_COMMENTS, &_redirector<&cmd_delete_all_comments>) },
+   { "DELAY_HOST_NOTIFICATION", command_info(CMD_DELAY_HOST_NOTIFICATION, &_redirector<&cmd_delay_notification>) },
+   { "ENABLE_HOST_NOTIFICATIONS", command_info(CMD_ENABLE_HOST_NOTIFICATIONS, &_redirector_host<&enable_host_notifications>) },
+   { "DISABLE_HOST_NOTIFICATIONS", command_info(CMD_DISABLE_HOST_NOTIFICATIONS, &_redirector_host<&disable_host_notifications>) },
+   { "ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST", command_info(CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST, &_redirector_host<&_wrapper_enable_all_notifications_beyond_host>) },
+   { "DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST", command_info(CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST, &_redirector_host<&_wrapper_disable_all_notifications_beyond_host>) },
+   { "ENABLE_HOST_AND_CHILD_NOTIFICATIONS", command_info(CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS, &_redirector_host<&_wrapper_enable_host_and_child_notifications>) },
+   { "DISABLE_HOST_AND_CHILD_NOTIFICATIONS", command_info(CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS, &_redirector_host<&_wrapper_disable_host_and_child_notifications>) },
+   { "ENABLE_HOST_SVC_NOTIFICATIONS", command_info(CMD_ENABLE_HOST_SVC_NOTIFICATIONS, &_redirector_host<&_wrapper_enable_host_svc_notifications>) },
+   { "DISABLE_HOST_SVC_NOTIFICATIONS", command_info(CMD_DISABLE_HOST_SVC_NOTIFICATIONS, &_redirector_host<&_wrapper_disable_host_svc_notifications>) },
+   { "ENABLE_HOST_SVC_CHECKS", command_info(CMD_ENABLE_HOST_SVC_CHECKS, &_redirector_host<&_wrapper_enable_host_svc_checks>) },
+   { "DISABLE_HOST_SVC_CHECKS", command_info(CMD_DISABLE_HOST_SVC_CHECKS, &_redirector_host<&_wrapper_disable_host_svc_checks>) },
+   { "ENABLE_PASSIVE_HOST_CHECKS", command_info(CMD_ENABLE_PASSIVE_HOST_CHECKS, &_redirector_host<&enable_passive_host_checks>) },
+   { "DISABLE_PASSIVE_HOST_CHECKS", command_info(CMD_DISABLE_PASSIVE_HOST_CHECKS, &_redirector_host<&disable_passive_host_checks>) },
+   { "SCHEDULE_HOST_SVC_CHECKS", command_info(CMD_SCHEDULE_HOST_SVC_CHECKS, &_redirector<&cmd_schedule_check>) },
+   { "SCHEDULE_FORCED_HOST_SVC_CHECKS", command_info(CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS, &_redirector<&cmd_schedule_check>) },
+   { "ACKNOWLEDGE_HOST_PROBLEM", command_info(CMD_ACKNOWLEDGE_HOST_PROBLEM, &_redirector<&cmd_acknowledge_problem>) },
+   { "REMOVE_HOST_ACKNOWLEDGEMENT", command_info(CMD_REMOVE_HOST_ACKNOWLEDGEMENT, &_redirector<&cmd_remove_acknowledgement>) },
+   { "ENABLE_HOST_EVENT_HANDLER", command_info(CMD_ENABLE_HOST_EVENT_HANDLER, &_redirector_host<&enable_host_event_handler>) },
+   { "DISABLE_HOST_EVENT_HANDLER", command_info(CMD_DISABLE_HOST_EVENT_HANDLER, &_redirector_host<&disable_host_event_handler>) },
+   { "ENABLE_HOST_CHECK", command_info(CMD_ENABLE_HOST_CHECK, &_redirector_host<&enable_host_checks>) },
+   { "DISABLE_HOST_CHECK", command_info(CMD_DISABLE_HOST_CHECK, &_redirector_host<&disable_host_checks>) },
+   { "SCHEDULE_HOST_CHECK", command_info(CMD_SCHEDULE_HOST_CHECK, &_redirector<&cmd_schedule_check>) },
+   { "SCHEDULE_FORCED_HOST_CHECK", command_info(CMD_SCHEDULE_FORCED_HOST_CHECK, &_redirector<&cmd_schedule_check>) },
+   { "SCHEDULE_HOST_DOWNTIME", command_info(CMD_SCHEDULE_HOST_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   { "SCHEDULE_HOST_SVC_DOWNTIME", command_info(CMD_SCHEDULE_HOST_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   { "DEL_HOST_DOWNTIME", command_info(CMD_DEL_HOST_DOWNTIME, &_redirector<&cmd_delete_downtime>) },
+   { "DEL_HOST_DOWNTIME_FULL", command_info(CMD_DEL_HOST_DOWNTIME_FULL, &_redirector<&cmd_delete_downtime_full>) },
+   { "DEL_DOWNTIME_BY_HOST_NAME", command_info(CMD_DEL_DOWNTIME_BY_HOST_NAME, &_redirector<&cmd_delete_downtime_by_host_name>) },
+   { "DEL_DOWNTIME_BY_HOSTGROUP_NAME", command_info(CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME, &_redirector<&cmd_delete_downtime_by_hostgroup_name>) },
+   { "DEL_DOWNTIME_BY_START_TIME_COMMENT", command_info(CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT, &_redirector<&cmd_delete_downtime_by_start_time_comment>) },
+   { "ENABLE_HOST_FLAP_DETECTION", command_info(CMD_ENABLE_HOST_FLAP_DETECTION, &_redirector_host<&enable_host_flap_detection>) },
+   { "DISABLE_HOST_FLAP_DETECTION", command_info(CMD_DISABLE_HOST_FLAP_DETECTION, &_redirector_host<&disable_host_flap_detection>) },
+   { "START_OBSESSING_OVER_HOST", command_info(CMD_START_OBSESSING_OVER_HOST, &_redirector_host<&start_obsessing_over_host>) },
+   { "STOP_OBSESSING_OVER_HOST", command_info(CMD_STOP_OBSESSING_OVER_HOST, &_redirector_host<&stop_obsessing_over_host>) },
+   { "CHANGE_HOST_EVENT_HANDLER", command_info(CMD_CHANGE_HOST_EVENT_HANDLER, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_HOST_CHECK_COMMAND", command_info(CMD_CHANGE_HOST_CHECK_COMMAND, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_NORMAL_HOST_CHECK_INTERVAL", command_info(CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL, &_redirector<&cmd_change_object_int_var>) },
+   { "CHANGE_RETRY_HOST_CHECK_INTERVAL", command_info(CMD_CHANGE_RETRY_HOST_CHECK_INTERVAL, &_redirector<&cmd_change_object_int_var>) },
+   { "CHANGE_MAX_HOST_CHECK_ATTEMPTS", command_info(CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS, &_redirector<&cmd_change_object_int_var>) },
+   { "SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME", command_info(CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   { "SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME", command_info(CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   { "SET_HOST_NOTIFICATION_NUMBER", command_info(CMD_SET_HOST_NOTIFICATION_NUMBER, &_redirector_host<&_wrapper_set_host_notification_number>) },
+   { "CHANGE_HOST_CHECK_TIMEPERIOD", command_info(CMD_CHANGE_HOST_CHECK_TIMEPERIOD, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_CUSTOM_HOST_VAR", command_info(CMD_CHANGE_CUSTOM_HOST_VAR, &_redirector<&cmd_change_object_custom_var>) },
+   { "SEND_CUSTOM_HOST_NOTIFICATION", command_info(CMD_SEND_CUSTOM_HOST_NOTIFICATION, &_redirector_host<&_wrapper_send_custom_host_notification>) },
+   { "CHANGE_HOST_NOTIFICATION_TIMEPERIOD", command_info(CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_HOST_MODATTR", command_info(CMD_CHANGE_HOST_MODATTR, &_redirector<&cmd_change_object_int_var>) },
+   // hostgroup-related commands.
+   { "ENABLE_HOSTGROUP_HOST_NOTIFICATIONS", command_info(CMD_ENABLE_HOSTGROUP_HOST_NOTIFICATIONS, &_redirector_hostgroup<&enable_host_notifications>) },
+   { "DISABLE_HOSTGROUP_HOST_NOTIFICATIONS", command_info(CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS, &_redirector_hostgroup<&disable_host_notifications>) },
+   { "ENABLE_HOSTGROUP_SVC_NOTIFICATIONS", command_info(CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS, &_redirector_hostgroup<&_wrapper_enable_service_notifications>) },
+   { "DISABLE_HOSTGROUP_SVC_NOTIFICATIONS", command_info(CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS, &_redirector_hostgroup<&_wrapper_disable_service_notifications>) },
+   { "ENABLE_HOSTGROUP_HOST_CHECKS", command_info(CMD_ENABLE_HOSTGROUP_HOST_CHECKS, &_redirector_hostgroup<&enable_host_checks>) },
+   { "DISABLE_HOSTGROUP_HOST_CHECKS", command_info(CMD_DISABLE_HOSTGROUP_HOST_CHECKS, &_redirector_hostgroup<&disable_host_checks>) },
+   { "ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS", command_info(CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS, &_redirector_hostgroup<&enable_passive_host_checks>) },
+   { "DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS", command_info(CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS, &_redirector_hostgroup<&disable_passive_host_checks>) },
+   { "ENABLE_HOSTGROUP_SVC_CHECKS", command_info(CMD_ENABLE_HOSTGROUP_SVC_CHECKS, &_redirector_hostgroup<&_wrapper_enable_service_checks>) },
+   { "DISABLE_HOSTGROUP_SVC_CHECKS", command_info(CMD_DISABLE_HOSTGROUP_SVC_CHECKS, &_redirector_hostgroup<&_wrapper_disable_service_checks>) },
+   { "ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS",  command_info( CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS, &_redirector_hostgroup<&_wrapper_enable_passive_service_checks>) },
+   { "DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS",  command_info( CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS, &_redirector_hostgroup<&_wrapper_disable_passive_service_checks>) },
+   { "SCHEDULE_HOSTGROUP_HOST_DOWNTIME", command_info(CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   { "SCHEDULE_HOSTGROUP_SVC_DOWNTIME", command_info(CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   // service-related commands.
+   { "ADD_SVC_COMMENT", command_info(CMD_ADD_SVC_COMMENT, &_redirector<&cmd_add_comment>) },
+   { "DEL_SVC_COMMENT", command_info(CMD_DEL_SVC_COMMENT, &_redirector<&cmd_delete_comment>) },
+   { "DEL_ALL_SVC_COMMENTS",  command_info( CMD_DEL_ALL_SVC_COMMENTS, &_redirector<&cmd_delete_all_comments>) },
+   { "SCHEDULE_SVC_CHECK", command_info(CMD_SCHEDULE_SVC_CHECK, &_redirector<&cmd_schedule_check>) },
+   { "SCHEDULE_FORCED_SVC_CHECK",  command_info( CMD_SCHEDULE_FORCED_SVC_CHECK, &_redirector<&cmd_schedule_check>) },
+   { "ENABLE_SVC_CHECK",  command_info( CMD_ENABLE_SVC_CHECK, &_redirector_service<&enable_service_checks>) },
+   { "DISABLE_SVC_CHECK",  command_info( CMD_DISABLE_SVC_CHECK, &_redirector_service<&disable_service_checks>) },
+   { "ENABLE_PASSIVE_SVC_CHECKS", command_info(CMD_ENABLE_PASSIVE_SVC_CHECKS, &_redirector_service<&enable_passive_service_checks>) },
+   { "DISABLE_PASSIVE_SVC_CHECKS", command_info(CMD_DISABLE_PASSIVE_SVC_CHECKS, &_redirector_service<&disable_passive_service_checks>) },
+   { "DELAY_SVC_NOTIFICATION",  command_info( CMD_DELAY_SVC_NOTIFICATION, &_redirector<&cmd_delay_notification>) },
+   { "ENABLE_SVC_NOTIFICATIONS", command_info(CMD_ENABLE_SVC_NOTIFICATIONS, &_redirector_service<&enable_service_notifications>) },
+   { "DISABLE_SVC_NOTIFICATIONS", command_info(CMD_DISABLE_SVC_NOTIFICATIONS, &_redirector_service<&disable_service_notifications>) },
+   { "PROCESS_SERVICE_CHECK_RESULT", command_info(CMD_PROCESS_SERVICE_CHECK_RESULT, &_redirector<&cmd_process_service_check_result>, true) },
+   { "PROCESS_HOST_CHECK_RESULT", command_info(CMD_PROCESS_HOST_CHECK_RESULT, &_redirector<&cmd_process_host_check_result>, true) },
+   { "ENABLE_SVC_EVENT_HANDLER", command_info(CMD_ENABLE_SVC_EVENT_HANDLER, &_redirector_service<&enable_service_event_handler>) },
+   { "DISABLE_SVC_EVENT_HANDLER", command_info(CMD_DISABLE_SVC_EVENT_HANDLER, &_redirector_service<&disable_service_event_handler>) },
+   { "ENABLE_SVC_FLAP_DETECTION", command_info(CMD_ENABLE_SVC_FLAP_DETECTION, &_redirector_service<&enable_service_flap_detection>) },
+   { "DISABLE_SVC_FLAP_DETECTION", command_info(CMD_DISABLE_SVC_FLAP_DETECTION, &_redirector_service<&disable_service_flap_detection>) },
+   { "SCHEDULE_SVC_DOWNTIME",  command_info( CMD_SCHEDULE_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   { "DEL_SVC_DOWNTIME", command_info(CMD_DEL_SVC_DOWNTIME, &_redirector<&cmd_delete_downtime>) },
+   { "DEL_SVC_DOWNTIME_FULL",  command_info( CMD_DEL_SVC_DOWNTIME_FULL, &_redirector<&cmd_delete_downtime_full>) },
+   { "ACKNOWLEDGE_SVC_PROBLEM",  command_info( CMD_ACKNOWLEDGE_SVC_PROBLEM, &_redirector<&cmd_acknowledge_problem>) },
+   { "REMOVE_SVC_ACKNOWLEDGEMENT", command_info(CMD_REMOVE_SVC_ACKNOWLEDGEMENT, &_redirector<&cmd_remove_acknowledgement>) },
+   { "START_OBSESSING_OVER_SVC", command_info(CMD_START_OBSESSING_OVER_SVC, &_redirector_service<&start_obsessing_over_service>) },
+   { "STOP_OBSESSING_OVER_SVC", command_info(CMD_STOP_OBSESSING_OVER_SVC, &_redirector_service<&stop_obsessing_over_service>) },
+   { "CHANGE_SVC_EVENT_HANDLER",  command_info( CMD_CHANGE_SVC_EVENT_HANDLER, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_SVC_CHECK_COMMAND",  command_info( CMD_CHANGE_SVC_CHECK_COMMAND, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_NORMAL_SVC_CHECK_INTERVAL", command_info(CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL, &_redirector<&cmd_change_object_int_var>) },
+   { "CHANGE_RETRY_SVC_CHECK_INTERVAL", command_info(CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL, &_redirector<&cmd_change_object_int_var>) },
+   { "CHANGE_MAX_SVC_CHECK_ATTEMPTS", command_info(CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS, &_redirector<&cmd_change_object_int_var>) },
+   { "SET_SVC_NOTIFICATION_NUMBER",  command_info( CMD_SET_SVC_NOTIFICATION_NUMBER, &_redirector_service<&_wrapper_set_service_notification_number>) },
+   { "CHANGE_SVC_CHECK_TIMEPERIOD", command_info(CMD_CHANGE_SVC_CHECK_TIMEPERIOD, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_CUSTOM_SVC_VAR",  command_info( CMD_CHANGE_CUSTOM_SVC_VAR, &_redirector<&cmd_change_object_custom_var>) },
+   { "CHANGE_CUSTOM_CONTACT_VAR", command_info(CMD_CHANGE_CUSTOM_CONTACT_VAR, &_redirector<&cmd_change_object_custom_var>) },
+   { "SEND_CUSTOM_SVC_NOTIFICATION",  command_info( CMD_SEND_CUSTOM_SVC_NOTIFICATION, &_redirector_service<&_wrapper_send_custom_service_notification>) },
+   { "CHANGE_SVC_NOTIFICATION_TIMEPERIOD", command_info(CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_SVC_MODATTR",  command_info( CMD_CHANGE_SVC_MODATTR, &_redirector<&cmd_change_object_int_var>) },
+   // servicegroup-related commands.
+   { "ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS",  command_info(CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS, &_redirector_servicegroup<&enable_host_notifications>) },
+   { "DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS",  command_info(CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS, &_redirector_servicegroup<&disable_host_notifications>) },
+   { "ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS",  command_info(CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS, &_redirector_servicegroup<&enable_service_notifications>) },
+   { "DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS",  command_info(CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS, &_redirector_servicegroup<&disable_service_notifications>) },
+   { "ENABLE_SERVICEGROUP_HOST_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_HOST_CHECKS, &_redirector_servicegroup<&enable_host_checks>) },
+   { "DISABLE_SERVICEGROUP_HOST_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_HOST_CHECKS, &_redirector_servicegroup<&disable_host_checks>) },
+   { "ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS, &_redirector_servicegroup<&enable_passive_host_checks>) },
+   { "DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS, &_redirector_servicegroup<&disable_passive_host_checks>) },
+   { "ENABLE_SERVICEGROUP_SVC_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_SVC_CHECKS, &_redirector_servicegroup<&enable_service_checks>) },
+   { "DISABLE_SERVICEGROUP_SVC_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_SVC_CHECKS, &_redirector_servicegroup<&disable_service_checks>) },
+   { "ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS, &_redirector_servicegroup<&enable_passive_service_checks>) },
+   { "DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS, &_redirector_servicegroup<&disable_passive_service_checks>) },
+   { "SCHEDULE_SERVICEGROUP_HOST_DOWNTIME",  command_info(CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   { "SCHEDULE_SERVICEGROUP_SVC_DOWNTIME",  command_info(CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
+   // contact-related commands.
+   { "ENABLE_CONTACT_HOST_NOTIFICATIONS",  command_info(CMD_ENABLE_CONTACT_HOST_NOTIFICATIONS, &_redirector_contact<&enable_contact_host_notifications>) },
+   { "DISABLE_CONTACT_HOST_NOTIFICATIONS",  command_info(CMD_DISABLE_CONTACT_HOST_NOTIFICATIONS, &_redirector_contact<&disable_contact_host_notifications>) },
+   { "ENABLE_CONTACT_SVC_NOTIFICATIONS",  command_info(CMD_ENABLE_CONTACT_SVC_NOTIFICATIONS, &_redirector_contact<&enable_contact_service_notifications>) },
+   { "DISABLE_CONTACT_SVC_NOTIFICATIONS",  command_info( CMD_DISABLE_CONTACT_SVC_NOTIFICATIONS, &_redirector_contact<&disable_contact_service_notifications>) },
+   { "CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD",  command_info(CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD",  command_info(CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD, &_redirector<&cmd_change_object_char_var>) },
+   { "CHANGE_CONTACT_MODATTR",  command_info( CMD_CHANGE_CONTACT_MODATTR, &_redirector<&cmd_change_object_int_var>) },
+   { "CHANGE_CONTACT_MODHATTR",  command_info( CMD_CHANGE_CONTACT_MODHATTR, &_redirector<&cmd_change_object_int_var>) },
+   { "CHANGE_CONTACT_MODSATTR",  command_info( CMD_CHANGE_CONTACT_MODSATTR, &_redirector<&cmd_change_object_int_var>) },
+   // contactgroup-related commands.
+   { "ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS",  command_info( CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS, &_redirector_contactgroup<&enable_contact_host_notifications>) },
+   { "DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS",  command_info( CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS, &_redirector_contactgroup<&disable_contact_host_notifications>) },
+   { "ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS",  command_info( CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS, &_redirector_contactgroup<&enable_contact_service_notifications>) },
+   { "DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS",  command_info( CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS, &_redirector_contactgroup<&disable_contact_service_notifications>) },
+ }
 
-  // host-related commands.
-  _lst_command["ADD_HOST_COMMENT"] =
-      command_info(CMD_ADD_HOST_COMMENT, &_redirector<&cmd_add_comment>);
-  _lst_command["DEL_HOST_COMMENT"] =
-      command_info(CMD_DEL_HOST_COMMENT, &_redirector<&cmd_delete_comment>);
-  _lst_command["DEL_ALL_HOST_COMMENTS"] = command_info(
-      CMD_DEL_ALL_HOST_COMMENTS, &_redirector<&cmd_delete_all_comments>);
-  _lst_command["DELAY_HOST_NOTIFICATION"] = command_info(
-      CMD_DELAY_HOST_NOTIFICATION, &_redirector<&cmd_delay_notification>);
-  _lst_command["ENABLE_HOST_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_HOST_NOTIFICATIONS,
-                   &_redirector_host<&enable_host_notifications>);
-  _lst_command["DISABLE_HOST_NOTIFICATIONS"] =
-      command_info(CMD_DISABLE_HOST_NOTIFICATIONS,
-                   &_redirector_host<&disable_host_notifications>);
-  _lst_command["ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST"] = command_info(
-      CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST,
-      &_redirector_host<&_wrapper_enable_all_notifications_beyond_host>);
-  _lst_command["DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST"] = command_info(
-      CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST,
-      &_redirector_host<&_wrapper_disable_all_notifications_beyond_host>);
-  _lst_command["ENABLE_HOST_AND_CHILD_NOTIFICATIONS"] = command_info(
-      CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS,
-      &_redirector_host<&_wrapper_enable_host_and_child_notifications>);
-  _lst_command["DISABLE_HOST_AND_CHILD_NOTIFICATIONS"] = command_info(
-      CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS,
-      &_redirector_host<&_wrapper_disable_host_and_child_notifications>);
-  _lst_command["ENABLE_HOST_SVC_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_HOST_SVC_NOTIFICATIONS,
-                   &_redirector_host<&_wrapper_enable_host_svc_notifications>);
-  _lst_command["DISABLE_HOST_SVC_NOTIFICATIONS"] =
-      command_info(CMD_DISABLE_HOST_SVC_NOTIFICATIONS,
-                   &_redirector_host<&_wrapper_disable_host_svc_notifications>);
-  _lst_command["ENABLE_HOST_SVC_CHECKS"] =
-      command_info(CMD_ENABLE_HOST_SVC_CHECKS,
-                   &_redirector_host<&_wrapper_enable_host_svc_checks>);
-  _lst_command["DISABLE_HOST_SVC_CHECKS"] =
-      command_info(CMD_DISABLE_HOST_SVC_CHECKS,
-                   &_redirector_host<&_wrapper_disable_host_svc_checks>);
-  _lst_command["ENABLE_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_ENABLE_PASSIVE_HOST_CHECKS,
-                   &_redirector_host<&enable_passive_host_checks>);
-  _lst_command["DISABLE_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_DISABLE_PASSIVE_HOST_CHECKS,
-                   &_redirector_host<&disable_passive_host_checks>);
-  _lst_command["SCHEDULE_HOST_SVC_CHECKS"] = command_info(
-      CMD_SCHEDULE_HOST_SVC_CHECKS, &_redirector<&cmd_schedule_check>);
-  _lst_command["SCHEDULE_FORCED_HOST_SVC_CHECKS"] = command_info(
-      CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS, &_redirector<&cmd_schedule_check>);
-  _lst_command["ACKNOWLEDGE_HOST_PROBLEM"] = command_info(
-      CMD_ACKNOWLEDGE_HOST_PROBLEM, &_redirector<&cmd_acknowledge_problem>);
-  _lst_command["REMOVE_HOST_ACKNOWLEDGEMENT"] =
-      command_info(CMD_REMOVE_HOST_ACKNOWLEDGEMENT,
-                   &_redirector<&cmd_remove_acknowledgement>);
-  _lst_command["ENABLE_HOST_EVENT_HANDLER"] =
-      command_info(CMD_ENABLE_HOST_EVENT_HANDLER,
-                   &_redirector_host<&enable_host_event_handler>);
-  _lst_command["DISABLE_HOST_EVENT_HANDLER"] =
-      command_info(CMD_DISABLE_HOST_EVENT_HANDLER,
-                   &_redirector_host<&disable_host_event_handler>);
-  _lst_command["ENABLE_HOST_CHECK"] = command_info(
-      CMD_ENABLE_HOST_CHECK, &_redirector_host<&enable_host_checks>);
-  _lst_command["DISABLE_HOST_CHECK"] = command_info(
-      CMD_DISABLE_HOST_CHECK, &_redirector_host<&disable_host_checks>);
-  _lst_command["SCHEDULE_HOST_CHECK"] =
-      command_info(CMD_SCHEDULE_HOST_CHECK, &_redirector<&cmd_schedule_check>);
-  _lst_command["SCHEDULE_FORCED_HOST_CHECK"] = command_info(
-      CMD_SCHEDULE_FORCED_HOST_CHECK, &_redirector<&cmd_schedule_check>);
-  _lst_command["SCHEDULE_HOST_DOWNTIME"] = command_info(
-      CMD_SCHEDULE_HOST_DOWNTIME, &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_HOST_SVC_DOWNTIME"] = command_info(
-      CMD_SCHEDULE_HOST_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>);
-  _lst_command["DEL_HOST_DOWNTIME"] =
-      command_info(CMD_DEL_HOST_DOWNTIME, &_redirector<&cmd_delete_downtime>);
-  _lst_command["DEL_HOST_DOWNTIME_FULL"] = command_info(
-      CMD_DEL_HOST_DOWNTIME_FULL, &_redirector<&cmd_delete_downtime_full>);
-  _lst_command["DEL_DOWNTIME_BY_HOST_NAME"] =
-      command_info(CMD_DEL_DOWNTIME_BY_HOST_NAME,
-                   &_redirector<&cmd_delete_downtime_by_host_name>);
-  _lst_command["DEL_DOWNTIME_BY_HOSTGROUP_NAME"] =
-      command_info(CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME,
-                   &_redirector<&cmd_delete_downtime_by_hostgroup_name>);
-  _lst_command["DEL_DOWNTIME_BY_START_TIME_COMMENT"] =
-      command_info(CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT,
-                   &_redirector<&cmd_delete_downtime_by_start_time_comment>);
-  _lst_command["ENABLE_HOST_FLAP_DETECTION"] =
-      command_info(CMD_ENABLE_HOST_FLAP_DETECTION,
-                   &_redirector_host<&enable_host_flap_detection>);
-  _lst_command["DISABLE_HOST_FLAP_DETECTION"] =
-      command_info(CMD_DISABLE_HOST_FLAP_DETECTION,
-                   &_redirector_host<&disable_host_flap_detection>);
-  _lst_command["START_OBSESSING_OVER_HOST"] =
-      command_info(CMD_START_OBSESSING_OVER_HOST,
-                   &_redirector_host<&start_obsessing_over_host>);
-  _lst_command["STOP_OBSESSING_OVER_HOST"] =
-      command_info(CMD_STOP_OBSESSING_OVER_HOST,
-                   &_redirector_host<&stop_obsessing_over_host>);
-  _lst_command["CHANGE_HOST_EVENT_HANDLER"] = command_info(
-      CMD_CHANGE_HOST_EVENT_HANDLER, &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_HOST_CHECK_COMMAND"] = command_info(
-      CMD_CHANGE_HOST_CHECK_COMMAND, &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_NORMAL_HOST_CHECK_INTERVAL"] =
-      command_info(CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL,
-                   &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_RETRY_HOST_CHECK_INTERVAL"] =
-      command_info(CMD_CHANGE_RETRY_HOST_CHECK_INTERVAL,
-                   &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_MAX_HOST_CHECK_ATTEMPTS"] =
-      command_info(CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS,
-                   &_redirector<&cmd_change_object_int_var>);
-  _lst_command["SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME"] =
-      command_info(CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME,
-                   &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME"] =
-      command_info(CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME,
-                   &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SET_HOST_NOTIFICATION_NUMBER"] =
-      command_info(CMD_SET_HOST_NOTIFICATION_NUMBER,
-                   &_redirector_host<&_wrapper_set_host_notification_number>);
-  _lst_command["CHANGE_HOST_CHECK_TIMEPERIOD"] =
-      command_info(CMD_CHANGE_HOST_CHECK_TIMEPERIOD,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_CUSTOM_HOST_VAR"] = command_info(
-      CMD_CHANGE_CUSTOM_HOST_VAR, &_redirector<&cmd_change_object_custom_var>);
-  _lst_command["SEND_CUSTOM_HOST_NOTIFICATION"] =
-      command_info(CMD_SEND_CUSTOM_HOST_NOTIFICATION,
-                   &_redirector_host<&_wrapper_send_custom_host_notification>);
-  _lst_command["CHANGE_HOST_NOTIFICATION_TIMEPERIOD"] =
-      command_info(CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_HOST_MODATTR"] = command_info(
-      CMD_CHANGE_HOST_MODATTR, &_redirector<&cmd_change_object_int_var>);
+{
 
-  // hostgroup-related commands.
-  _lst_command["ENABLE_HOSTGROUP_HOST_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_HOSTGROUP_HOST_NOTIFICATIONS,
-                   &_redirector_hostgroup<&enable_host_notifications>);
-  _lst_command["DISABLE_HOSTGROUP_HOST_NOTIFICATIONS"] =
-      command_info(CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS,
-                   &_redirector_hostgroup<&disable_host_notifications>);
-  _lst_command["ENABLE_HOSTGROUP_SVC_NOTIFICATIONS"] = command_info(
-      CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS,
-      &_redirector_hostgroup<&_wrapper_enable_service_notifications>);
-  _lst_command["DISABLE_HOSTGROUP_SVC_NOTIFICATIONS"] = command_info(
-      CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS,
-      &_redirector_hostgroup<&_wrapper_disable_service_notifications>);
-  _lst_command["ENABLE_HOSTGROUP_HOST_CHECKS"] =
-      command_info(CMD_ENABLE_HOSTGROUP_HOST_CHECKS,
-                   &_redirector_hostgroup<&enable_host_checks>);
-  _lst_command["DISABLE_HOSTGROUP_HOST_CHECKS"] =
-      command_info(CMD_DISABLE_HOSTGROUP_HOST_CHECKS,
-                   &_redirector_hostgroup<&disable_host_checks>);
-  _lst_command["ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS,
-                   &_redirector_hostgroup<&enable_passive_host_checks>);
-  _lst_command["DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS,
-                   &_redirector_hostgroup<&disable_passive_host_checks>);
-  _lst_command["ENABLE_HOSTGROUP_SVC_CHECKS"] =
-      command_info(CMD_ENABLE_HOSTGROUP_SVC_CHECKS,
-                   &_redirector_hostgroup<&_wrapper_enable_service_checks>);
-  _lst_command["DISABLE_HOSTGROUP_SVC_CHECKS"] =
-      command_info(CMD_DISABLE_HOSTGROUP_SVC_CHECKS,
-                   &_redirector_hostgroup<&_wrapper_disable_service_checks>);
-  _lst_command["ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"] = command_info(
-      CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS,
-      &_redirector_hostgroup<&_wrapper_enable_passive_service_checks>);
-  _lst_command["DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"] = command_info(
-      CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS,
-      &_redirector_hostgroup<&_wrapper_disable_passive_service_checks>);
-  _lst_command["SCHEDULE_HOSTGROUP_HOST_DOWNTIME"] =
-      command_info(CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME,
-                   &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_HOSTGROUP_SVC_DOWNTIME"] =
-      command_info(CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME,
-                   &_redirector<&cmd_schedule_downtime>);
-
-  // service-related commands.
-  _lst_command["ADD_SVC_COMMENT"] =
-      command_info(CMD_ADD_SVC_COMMENT, &_redirector<&cmd_add_comment>);
-  _lst_command["DEL_SVC_COMMENT"] =
-      command_info(CMD_DEL_SVC_COMMENT, &_redirector<&cmd_delete_comment>);
-  _lst_command["DEL_ALL_SVC_COMMENTS"] = command_info(
-      CMD_DEL_ALL_SVC_COMMENTS, &_redirector<&cmd_delete_all_comments>);
-  _lst_command["SCHEDULE_SVC_CHECK"] =
-      command_info(CMD_SCHEDULE_SVC_CHECK, &_redirector<&cmd_schedule_check>);
-  _lst_command["SCHEDULE_FORCED_SVC_CHECK"] = command_info(
-      CMD_SCHEDULE_FORCED_SVC_CHECK, &_redirector<&cmd_schedule_check>);
-  _lst_command["ENABLE_SVC_CHECK"] = command_info(
-      CMD_ENABLE_SVC_CHECK, &_redirector_service<&enable_service_checks>);
-  _lst_command["DISABLE_SVC_CHECK"] = command_info(
-      CMD_DISABLE_SVC_CHECK, &_redirector_service<&disable_service_checks>);
-  _lst_command["ENABLE_PASSIVE_SVC_CHECKS"] =
-      command_info(CMD_ENABLE_PASSIVE_SVC_CHECKS,
-                   &_redirector_service<&enable_passive_service_checks>);
-  _lst_command["DISABLE_PASSIVE_SVC_CHECKS"] =
-      command_info(CMD_DISABLE_PASSIVE_SVC_CHECKS,
-                   &_redirector_service<&disable_passive_service_checks>);
-  _lst_command["DELAY_SVC_NOTIFICATION"] = command_info(
-      CMD_DELAY_SVC_NOTIFICATION, &_redirector<&cmd_delay_notification>);
-  _lst_command["ENABLE_SVC_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_SVC_NOTIFICATIONS,
-                   &_redirector_service<&enable_service_notifications>);
-  _lst_command["DISABLE_SVC_NOTIFICATIONS"] =
-      command_info(CMD_DISABLE_SVC_NOTIFICATIONS,
-                   &_redirector_service<&disable_service_notifications>);
-  _lst_command["PROCESS_SERVICE_CHECK_RESULT"] =
-      command_info(CMD_PROCESS_SERVICE_CHECK_RESULT,
-                   &_redirector<&cmd_process_service_check_result>, true);
-  _lst_command["PROCESS_HOST_CHECK_RESULT"] =
-      command_info(CMD_PROCESS_HOST_CHECK_RESULT,
-                   &_redirector<&cmd_process_host_check_result>, true);
-  _lst_command["ENABLE_SVC_EVENT_HANDLER"] =
-      command_info(CMD_ENABLE_SVC_EVENT_HANDLER,
-                   &_redirector_service<&enable_service_event_handler>);
-  _lst_command["DISABLE_SVC_EVENT_HANDLER"] =
-      command_info(CMD_DISABLE_SVC_EVENT_HANDLER,
-                   &_redirector_service<&disable_service_event_handler>);
-  _lst_command["ENABLE_SVC_FLAP_DETECTION"] =
-      command_info(CMD_ENABLE_SVC_FLAP_DETECTION,
-                   &_redirector_service<&enable_service_flap_detection>);
-  _lst_command["DISABLE_SVC_FLAP_DETECTION"] =
-      command_info(CMD_DISABLE_SVC_FLAP_DETECTION,
-                   &_redirector_service<&disable_service_flap_detection>);
-  _lst_command["SCHEDULE_SVC_DOWNTIME"] = command_info(
-      CMD_SCHEDULE_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>);
-  _lst_command["DEL_SVC_DOWNTIME"] =
-      command_info(CMD_DEL_SVC_DOWNTIME, &_redirector<&cmd_delete_downtime>);
-  _lst_command["DEL_SVC_DOWNTIME_FULL"] = command_info(
-      CMD_DEL_SVC_DOWNTIME_FULL, &_redirector<&cmd_delete_downtime_full>);
-  _lst_command["ACKNOWLEDGE_SVC_PROBLEM"] = command_info(
-      CMD_ACKNOWLEDGE_SVC_PROBLEM, &_redirector<&cmd_acknowledge_problem>);
-  _lst_command["REMOVE_SVC_ACKNOWLEDGEMENT"] =
-      command_info(CMD_REMOVE_SVC_ACKNOWLEDGEMENT,
-                   &_redirector<&cmd_remove_acknowledgement>);
-  _lst_command["START_OBSESSING_OVER_SVC"] =
-      command_info(CMD_START_OBSESSING_OVER_SVC,
-                   &_redirector_service<&start_obsessing_over_service>);
-  _lst_command["STOP_OBSESSING_OVER_SVC"] =
-      command_info(CMD_STOP_OBSESSING_OVER_SVC,
-                   &_redirector_service<&stop_obsessing_over_service>);
-  _lst_command["CHANGE_SVC_EVENT_HANDLER"] = command_info(
-      CMD_CHANGE_SVC_EVENT_HANDLER, &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_SVC_CHECK_COMMAND"] = command_info(
-      CMD_CHANGE_SVC_CHECK_COMMAND, &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_NORMAL_SVC_CHECK_INTERVAL"] =
-      command_info(CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL,
-                   &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_RETRY_SVC_CHECK_INTERVAL"] =
-      command_info(CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL,
-                   &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_MAX_SVC_CHECK_ATTEMPTS"] =
-      command_info(CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS,
-                   &_redirector<&cmd_change_object_int_var>);
-  _lst_command["SET_SVC_NOTIFICATION_NUMBER"] = command_info(
-      CMD_SET_SVC_NOTIFICATION_NUMBER,
-      &_redirector_service<&_wrapper_set_service_notification_number>);
-  _lst_command["CHANGE_SVC_CHECK_TIMEPERIOD"] =
-      command_info(CMD_CHANGE_SVC_CHECK_TIMEPERIOD,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_CUSTOM_SVC_VAR"] = command_info(
-      CMD_CHANGE_CUSTOM_SVC_VAR, &_redirector<&cmd_change_object_custom_var>);
-  _lst_command["CHANGE_CUSTOM_CONTACT_VAR"] =
-      command_info(CMD_CHANGE_CUSTOM_CONTACT_VAR,
-                   &_redirector<&cmd_change_object_custom_var>);
-  _lst_command["SEND_CUSTOM_SVC_NOTIFICATION"] = command_info(
-      CMD_SEND_CUSTOM_SVC_NOTIFICATION,
-      &_redirector_service<&_wrapper_send_custom_service_notification>);
-  _lst_command["CHANGE_SVC_NOTIFICATION_TIMEPERIOD"] =
-      command_info(CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_SVC_MODATTR"] = command_info(
-      CMD_CHANGE_SVC_MODATTR, &_redirector<&cmd_change_object_int_var>);
-
-  // servicegroup-related commands.
-  _lst_command["ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS,
-                   &_redirector_servicegroup<&enable_host_notifications>);
-  _lst_command["DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS"] =
-      command_info(CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS,
-                   &_redirector_servicegroup<&disable_host_notifications>);
-  _lst_command["ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
-                   &_redirector_servicegroup<&enable_service_notifications>);
-  _lst_command["DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS"] =
-      command_info(CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
-                   &_redirector_servicegroup<&disable_service_notifications>);
-  _lst_command["ENABLE_SERVICEGROUP_HOST_CHECKS"] =
-      command_info(CMD_ENABLE_SERVICEGROUP_HOST_CHECKS,
-                   &_redirector_servicegroup<&enable_host_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_HOST_CHECKS"] =
-      command_info(CMD_DISABLE_SERVICEGROUP_HOST_CHECKS,
-                   &_redirector_servicegroup<&disable_host_checks>);
-  _lst_command["ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS,
-                   &_redirector_servicegroup<&enable_passive_host_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS"] =
-      command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS,
-                   &_redirector_servicegroup<&disable_passive_host_checks>);
-  _lst_command["ENABLE_SERVICEGROUP_SVC_CHECKS"] =
-      command_info(CMD_ENABLE_SERVICEGROUP_SVC_CHECKS,
-                   &_redirector_servicegroup<&enable_service_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_SVC_CHECKS"] =
-      command_info(CMD_DISABLE_SERVICEGROUP_SVC_CHECKS,
-                   &_redirector_servicegroup<&disable_service_checks>);
-  _lst_command["ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"] =
-      command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
-                   &_redirector_servicegroup<&enable_passive_service_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"] =
-      command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
-                   &_redirector_servicegroup<&disable_passive_service_checks>);
-  _lst_command["SCHEDULE_SERVICEGROUP_HOST_DOWNTIME"] =
-      command_info(CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME,
-                   &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_SERVICEGROUP_SVC_DOWNTIME"] =
-      command_info(CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME,
-                   &_redirector<&cmd_schedule_downtime>);
-
-  // contact-related commands.
-  _lst_command["ENABLE_CONTACT_HOST_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_CONTACT_HOST_NOTIFICATIONS,
-                   &_redirector_contact<&enable_contact_host_notifications>);
-  _lst_command["DISABLE_CONTACT_HOST_NOTIFICATIONS"] =
-      command_info(CMD_DISABLE_CONTACT_HOST_NOTIFICATIONS,
-                   &_redirector_contact<&disable_contact_host_notifications>);
-  _lst_command["ENABLE_CONTACT_SVC_NOTIFICATIONS"] =
-      command_info(CMD_ENABLE_CONTACT_SVC_NOTIFICATIONS,
-                   &_redirector_contact<&enable_contact_service_notifications>);
-  _lst_command["DISABLE_CONTACT_SVC_NOTIFICATIONS"] = command_info(
-      CMD_DISABLE_CONTACT_SVC_NOTIFICATIONS,
-      &_redirector_contact<&disable_contact_service_notifications>);
-  _lst_command["CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD"] =
-      command_info(CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD"] =
-      command_info(CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD,
-                   &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_CONTACT_MODATTR"] = command_info(
-      CMD_CHANGE_CONTACT_MODATTR, &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_CONTACT_MODHATTR"] = command_info(
-      CMD_CHANGE_CONTACT_MODHATTR, &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_CONTACT_MODSATTR"] = command_info(
-      CMD_CHANGE_CONTACT_MODSATTR, &_redirector<&cmd_change_object_int_var>);
-
-  // contactgroup-related commands.
-  _lst_command["ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS"] = command_info(
-      CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS,
-      &_redirector_contactgroup<&enable_contact_host_notifications>);
-  _lst_command["DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS"] = command_info(
-      CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS,
-      &_redirector_contactgroup<&disable_contact_host_notifications>);
-  _lst_command["ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS"] = command_info(
-      CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS,
-      &_redirector_contactgroup<&enable_contact_service_notifications>);
-  _lst_command["DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS"] = command_info(
-      CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS,
-      &_redirector_contactgroup<&disable_contact_service_notifications>);
 
   // misc commands.
   _lst_command["PROCESS_FILE"] = command_info(

@@ -385,9 +385,9 @@ int xsddefault_save_status_data() {
   }
 
   // save contact status data
-  for (umap<std::string, std::shared_ptr<contact> >::const_iterator
-         it(state::instance().contacts().begin()),
-         end(state::instance().contacts().end());
+  for (contact_map::const_iterator
+         it{contact::contacts.begin()},
+         end{contact::contacts.end()};
        it != end;
        ++it) {
     contact *cntct(it->second.get());

@@ -43,9 +43,9 @@ class contactgroup {
    std::string const& get_name() const;
    std::string const& get_alias() const;
    void               set_alias(std::string const &alias);
-   void               add_member(contact *cntct);
+   void               add_member(std::shared_ptr<contact> cntct);
    void               clear_members();
-   std::unordered_map<std::string, contact *> const&
+   std::unordered_map<std::string, std::shared_ptr<contact>> const&
                       get_members() const;
    bool               has_member(std::string const &name) const;
    bool               contains_illegal_object_chars() const;
@@ -56,7 +56,7 @@ class contactgroup {
 
  private:
    std::string        _alias;
-   std::unordered_map<std::string, contact *>
+   std::unordered_map<std::string, std::shared_ptr<contact>>
                       _members;
    std::string        _name;
 };

@@ -185,6 +185,7 @@ applier::state::state()
  *  Destructor.
  */
 applier::state::~state() throw() {
+  engine::contact::contacts.clear();
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();
@@ -244,42 +245,6 @@ commands::command* applier::state::find_command(configuration::command::key_type
     it(_commands.find(k));
 
   if (it != _commands.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a contact name, find a contact from the list in memory.
- *
- *  @param[in] k Contact name.
- *
- *  @return Contact object if found, nullptr otherwise.
- */
-engine::contact const* applier::state::find_contact(configuration::contact::key_type const& k) const {
-  if (k.empty())
-    return nullptr;
-
-  contact_map::const_iterator it(_contacts.find(k));
-
-  if (it != _contacts.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a contact name, find a contact from the list in memory.
- *
- *  @param[in] k Contact name.
- *
- *  @return Contact object if found, nullptr otherwise.
- */
-engine::contact* applier::state::find_contact(configuration::contact::key_type const& k) {
-  if (k.empty())
-    return nullptr;
-
-  contact_map::const_iterator it(_contacts.find(k));
-
-  if (it != _contacts.end())
     return it->second.get();
   return nullptr;
 }
@@ -373,24 +338,6 @@ commands::connector* applier::state::find_connector(configuration::connector::ke
   if (it != _connectors.end())
     return it->second.get();
   return nullptr;
-}
-
-/**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-contact_map const& applier::state::contacts() const throw () {
-  return _contacts;
-}
-
-/**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-contact_map& applier::state::contacts() throw () {
-  return _contacts;
 }
 
 /**

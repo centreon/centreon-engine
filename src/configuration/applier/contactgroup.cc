@@ -84,29 +84,26 @@ void applier::contactgroup::add_object(
   config->contactgroups().insert(obj);
 
   // Create contact group.
-  std::shared_ptr<engine::contactgroup> cg(new engine::contactgroup(obj));
+  std::shared_ptr<engine::contactgroup> cg{new engine::contactgroup(obj)};
 
   for (set_string::const_iterator
          it(obj.members().begin()),
          end(obj.members().end());
        it != end;
        ++it) {
-    engine::contact* cntct(
-      configuration::applier::state::instance().find_contact(*it));
-    if (cntct == nullptr) {
+    contact_map::iterator ct_it{engine::contact::contacts.find(*it)};
+    if (ct_it == engine::contact::contacts.end()) {
      logger(log_verification_error, basic)
         << "Error: Contact '" << *it
         << "' specified in contact group '" << cg->get_name()
         << "' is not defined anywhere!";
-      throw (engine_error() << "Error: Cannot resolve contact group "
-         << obj.contactgroup_name() << "'");
+      throw engine_error() << "Error: Cannot resolve contact group "
+         << obj.contactgroup_name() << "'";
     } else
-      cg->add_member(cntct);
+      cg->add_member(ct_it->second);
   }
 
   applier::state::instance().contactgroups().insert({name, cg});
-
-  return ;
 }
 
 /**
@@ -182,17 +179,18 @@ void applier::contactgroup::modify_object(
          end(obj.members().end());
        it != end;
        ++it) {
-      engine::contact* cntct(
-        configuration::applier::state::instance().find_contact(*it));
-      if (cntct == nullptr) {
-       logger(log_verification_error, basic)
+      contact_map::const_iterator
+        ct_it{engine::contact::contacts.find(*it)};
+      if (ct_it == engine::contact::contacts.end()) {
+        logger(log_verification_error, basic)
           << "Error: Contact '" << *it
           << "' specified in contact group '" << cg->get_name()
           << "' is not defined anywhere!";
-        throw (engine_error() << "Error: Cannot resolve contact group "
-           << obj.contactgroup_name() << "'");
-      } else
-        cg->add_member(cntct);
+        throw engine_error() << "Error: Cannot resolve contact group "
+           << obj.contactgroup_name() << "'";
+      }
+      else
+        cg->add_member(ct_it->second);
     }
   }
 
@@ -266,7 +264,7 @@ void applier::contactgroup::resolve_object(
            << "contact group '" << obj.contactgroup_name() << "'");
 
   // Resolve contact group.
-  if (!check_contactgroup(it->second.get(), &config_warnings, &config_errors))
+  if (!check_contactgroup(it->second, &config_warnings, &config_errors))
     throw (engine_error() << "Error: Cannot resolve contact group "
            << obj.contactgroup_name() << "'");
 

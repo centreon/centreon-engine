@@ -306,10 +306,10 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        contact* cntc(configuration::applier::state::instance().find_contact(name));
-        if (!cntc)
+        contact_map::const_iterator ct_it{contact::contacts.find(name)};
+        if (ct_it == contact::contacts.end())
           return ;
-        (*fptr)(cntc);
+        (*fptr)(ct_it->second.get());
       }
 
       template <void (*fptr)(contact*)>
@@ -325,13 +325,12 @@ namespace         modules {
         if (!group)
           return ;
 
-        for (std::unordered_map<std::string, contact *>::const_iterator
+        for (contact_map::const_iterator
                it(group->get_members().begin()),
                end(group->get_members().end());
-             it != end;
-             ++it)
+             it != end; ++it)
           if (it->second)
-            (*fptr)(it->second);
+            (*fptr)(it->second.get());
       }
 
       std::unordered_map<std::string, command_info> _lst_command;
