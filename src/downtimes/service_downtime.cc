@@ -27,7 +27,6 @@
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -197,7 +196,7 @@ int service_downtime::unschedule() {
 
       /* send a notification */
       found->second->notify(
-        NOTIFICATION_DOWNTIMECANCELLED,
+        notifier::notification_downtimecancelled,
         nullptr,
         nullptr,
         NOTIFICATION_OPTION_NONE);
@@ -408,7 +407,7 @@ int service_downtime::handle() {
 
       /* send a notification */
       found->second->notify(
-        NOTIFICATION_DOWNTIMEEND,
+        notifier::notification_downtimeend,
         get_author().c_str(),
         get_comment().c_str(),
         NOTIFICATION_OPTION_NONE);
@@ -492,7 +491,7 @@ int service_downtime::handle() {
 
       /* send a notification */
       found->second->notify(
-        NOTIFICATION_DOWNTIMESTART,
+        notifier::notification_downtimestart,
         get_author().c_str(),
         get_comment().c_str(),
         NOTIFICATION_OPTION_NONE);

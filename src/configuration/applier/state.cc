@@ -1176,7 +1176,7 @@ void applier::state::_processing(
   _expand<configuration::host, applier::host>(
     new_cfg);
 
-  // Expand hlostgroups.
+  // Expand hostgroups.
   _expand<configuration::hostgroup, applier::hostgroup>(
     new_cfg);
 

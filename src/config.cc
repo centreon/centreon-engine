@@ -28,7 +28,6 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;

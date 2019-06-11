@@ -33,6 +33,7 @@ struct nagios_macros;
 
 CCE_BEGIN()
 class escalation;
+class contact;
 
 class                notifier {
  public:
@@ -56,6 +57,23 @@ class                notifier {
   enum               state_type {
     soft,
     hard
+  };
+
+  enum               notifier_type {
+    host_notification,
+    service_notification,
+  };
+
+  enum               reason_type {
+    notification_normal,
+    notification_acknowledgement,
+    notification_flappingstart,
+    notification_flappingstop,
+    notification_flappingdisabled,
+    notification_downtimestart,
+    notification_downtimeend,
+    notification_downtimecancelled,
+    notification_custom = 99,
   };
 
   static std::array<std::string, 8> const tab_notification_str;
@@ -280,6 +298,10 @@ class                notifier {
 
   std::unordered_map<std::string, customvariable>
     custom_variables;
+
+  static int         add_notification(nagios_macros* mac, std::shared_ptr<contact> cntct);
+
+  static std::unordered_map<std::string, std::shared_ptr<contact>> current_notifications;
 
  protected:
   int                _notifier_type;

@@ -25,7 +25,6 @@
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/statusdata.hh"
 
 using namespace com::centreon::engine;

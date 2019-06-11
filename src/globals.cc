@@ -93,7 +93,6 @@ int                 test_scheduling(false);
 int                 verify_circular_paths(true);
 int                 verify_config(false);
 nebcallback*        neb_callback_list[NEBCALLBACK_NUMITEMS];
-notification*       notification_list(NULL);
 pthread_t           worker_threads[TOTAL_WORKER_THREADS];
 sched_info          scheduling_info;
 serviceescalation*  serviceescalation_list(NULL);

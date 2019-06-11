@@ -1235,7 +1235,7 @@ int process_host_command(int cmd,
     if (str)
       buf[1] = string::dup(str);
     if (buf[0] && buf[1])
-      host_notification(temp_host, NOTIFICATION_CUSTOM, buf[0], buf[1], intval);
+      temp_host->notify(notifier::notification_custom, buf[0], buf[1], intval);
     break;
 
   default:
@@ -1340,7 +1340,7 @@ int process_service_command(int cmd,
       buf[1] = string::dup(str);
     if (buf[0] && buf[1])
       found->second->notify(
-                           NOTIFICATION_CUSTOM,
+                           notifier::notification_custom,
                            buf[0],
                            buf[1],
                            intval);

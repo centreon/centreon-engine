@@ -26,13 +26,14 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/notifier.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;
+
+std::unordered_map<std::string, std::shared_ptr<contact>> notifier::current_notifications;
 
 std::array<std::string, 8> const notifier::tab_notification_str{{
     "NORMAL",
@@ -290,7 +291,7 @@ int notifier::notify(unsigned int type,
   logger(dbg_notifications, basic) << "Notification viability test passed.";
 
   /* should the notification number be increased? */
-  if (type == NOTIFICATION_NORMAL ||
+  if (type == notification_normal ||
       (options & NOTIFICATION_OPTION_INCREMENT)) {
     _current_notification_number++;
     increment_notification_number = true;
@@ -320,15 +321,15 @@ int notifier::notify(unsigned int type,
       not_data.c_str(), escalated, 0, nullptr)};
 
   if (NEBERROR_CALLBACKCANCEL == neb_result) {
-    free_notification_list();
+    notifier::current_notifications.clear();
     return ERROR;
   } else if (NEBERROR_CALLBACKOVERRIDE == neb_result) {
-    free_notification_list();
+    notifier::current_notifications.clear();
     return OK;
   }
 
   /* we have contacts to notify... */
-  if (notification_list) {
+  if (!notifier::current_notifications.empty()) {
     /* grab the macro variables */
     grab_macros_r(&mac);
 
@@ -373,8 +374,8 @@ int notifier::notify(unsigned int type,
      * major release
      * if this is an acknowledgement, get author and comment macros
      */
-    if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-      if (_notifier_type == HOST_NOTIFICATION) {
+    if (type == notification_acknowledgement) {
+      if (_notifier_type == host_notification) {
         string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
         string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
       } else {
@@ -393,21 +394,21 @@ int notifier::notify(unsigned int type,
     }
 
     /* set the notification type macro */
-    if (type == NOTIFICATION_ACKNOWLEDGEMENT)
+    if (type == notification_acknowledgement)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "ACKNOWLEDGEMENT");
-    else if (type == NOTIFICATION_FLAPPINGSTART)
+    else if (type == notification_flappingstart)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTART");
-    else if (type == NOTIFICATION_FLAPPINGSTOP)
+    else if (type == notification_flappingstop)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
-    else if (type == NOTIFICATION_FLAPPINGDISABLED)
+    else if (type == notification_flappingdisabled)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGDISABLED");
-    else if (type == NOTIFICATION_DOWNTIMESTART)
+    else if (type == notification_downtimestart)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMESTART");
-    else if (type == NOTIFICATION_DOWNTIMEEND)
+    else if (type == notification_downtimeend)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMEEND");
-    else if (type == NOTIFICATION_DOWNTIMECANCELLED)
+    else if (type == notification_downtimecancelled)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
-    else if (type == NOTIFICATION_CUSTOM)
+    else if (type == notification_custom)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
     else if (recovered())
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
@@ -415,7 +416,7 @@ int notifier::notify(unsigned int type,
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
 
     /* set the notification number macro */
-    if (_notifier_type == HOST_NOTIFICATION)
+    if (_notifier_type == host_notification)
       string::setstr(mac.x[MACRO_HOSTNOTIFICATIONNUMBER],
                      _current_notification_number);
     else
@@ -426,7 +427,7 @@ int notifier::notify(unsigned int type,
      * the $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
      */
     char const* notificationnumber{
-        _notifier_type == HOST_NOTIFICATION
+        _notifier_type == host_notification
             ? mac.x[MACRO_HOSTNOTIFICATIONNUMBER]
             : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]};
 
@@ -434,24 +435,26 @@ int notifier::notify(unsigned int type,
                    notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
-    if (_notifier_type == HOST_NOTIFICATION)
+    if (_notifier_type == host_notification)
       string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID], _current_notification_id);
     else
       string::setstr(mac.x[MACRO_SERVICENOTIFICATIONID],
                      _current_notification_id);
 
-    notification* temp_notification{nullptr};
     /* notify each contact (duplicates have been removed) */
-    for (temp_notification = notification_list; temp_notification != nullptr;
-         temp_notification = temp_notification->next) {
+    for (contact_map::const_iterator
+           it{notifier::current_notifications.begin()},
+           end{notifier::current_notifications.end()};
+         it != end;
+         ++it) {
       /* grab the macro variables for this contact */
-      grab_contact_macros_r(&mac, temp_notification->cntct);
+      grab_contact_macros_r(&mac, it->second.get());
 
       /* clear summary macros (they are customized for each contact) */
       clear_summary_macros_r(&mac);
 
       /* notify this contact */
-      int result = notify_contact(&mac, temp_notification->cntct, type,
+      int result = notify_contact(&mac, it->second.get(), type,
                                   not_author.c_str(), not_data.c_str(), options,
                                   escalated);
 
@@ -461,7 +464,8 @@ int notifier::notify(unsigned int type,
     }
 
     /* free memory allocated to the notification list */
-    free_notification_list();
+    notifier::current_notifications.clear();
+    notifier::current_notifications.clear();
 
     /*
      * clear summary macros so they will be regenerated without contact
@@ -469,7 +473,7 @@ int notifier::notify(unsigned int type,
      */
     clear_summary_macros_r(&mac);
 
-    if (type == NOTIFICATION_NORMAL) {
+    if (type == notification_normal) {
       /*
        * adjust last/next notification time and notification flags if we
        * notified someone
@@ -926,7 +930,7 @@ void notifier::create_notification_list(nagios_macros* mac,
   *escalated = escalate_notification;
 
   /* make sure there aren't any leftover contacts */
-  free_notification_list();
+  current_notifications.clear();
 
   /* set the escalation macro */
   string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
@@ -955,7 +959,7 @@ void notifier::create_notification_list(nagios_macros* mac,
       for (contact_map::const_iterator itt{e->contacts().begin()},
            end{e->contacts().end()};
            itt != end; ++itt)
-        add_notification(mac, itt->second.get());
+        add_notification(mac, itt->second);
 
       logger(dbg_notifications, most)
           << "Adding members of contact groups from notifier escalation(s) "
@@ -977,7 +981,7 @@ void notifier::create_notification_list(nagios_macros* mac,
              itm != endm; ++itm) {
           if (!itm->second)
             continue;
-          add_notification(mac, itm->second.get());
+          add_notification(mac, itm->second);
         }
       }
     }
@@ -992,7 +996,7 @@ void notifier::create_notification_list(nagios_macros* mac,
     for (contact_map::iterator it(this->contacts.begin()),
          end(this->contacts.end());
          it != end; ++it)
-      add_notification(mac, it->second.get());
+      add_notification(mac, it->second);
 
     /* add all contacts that belong to contactgroups for this notifier */
     for (contactgroup_map::iterator it{this->contact_groups.begin()},
@@ -1010,7 +1014,7 @@ void notifier::create_notification_list(nagios_macros* mac,
            itm != endm; ++itm) {
         if (!itm->second)
           continue;
-        add_notification(mac, itm->second.get());
+        add_notification(mac, itm->second);
       }
     }
   }
@@ -1198,4 +1202,35 @@ bool notifier::get_should_be_scheduled() const {
 
 void notifier::set_should_be_scheduled(bool should_be_scheduled) {
   _should_be_scheduled = should_be_scheduled;
+}
+
+/* add a new notification to the list in memory */
+int notifier::add_notification(nagios_macros* mac, std::shared_ptr<contact> cntct) {
+  logger(dbg_functions, basic)
+    << "add_notification()";
+
+  if (!cntct)
+    return ERROR;
+
+  logger(dbg_notifications, most)
+    << "Adding contact '" << cntct->get_name() << "' to notification list.";
+
+  /* don't add anything if this contact is already on the notification list */
+  if (notifier::current_notifications.find(cntct->get_name()) != notifier::current_notifications.end())
+    return OK;
+
+  /* Add contact to notification list */
+  current_notifications.insert({cntct->get_name(), cntct});
+
+  /* add contact to notification recipients macro */
+  if (!mac->x[MACRO_NOTIFICATIONRECIPIENTS])
+    string::setstr(mac->x[MACRO_NOTIFICATIONRECIPIENTS], cntct->get_name());
+  else {
+    std::string buffer(mac->x[MACRO_NOTIFICATIONRECIPIENTS]);
+    buffer += ",";
+    buffer += cntct->get_name();
+    string::setstr(mac->x[MACRO_NOTIFICATIONRECIPIENTS], buffer);
+  }
+
+  return OK;
 }

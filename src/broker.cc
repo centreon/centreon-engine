@@ -26,7 +26,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -549,7 +548,7 @@ int broker_contact_notification_data(
   ds.end_time = end_time;
   ds.reason_type = reason_type;
   ds.contact_name = const_cast<char*>(cntct->get_name().c_str());
-  if (notification_type == SERVICE_NOTIFICATION) {
+  if (notification_type == notifier::service_notification) {
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
@@ -639,8 +638,8 @@ int broker_contact_notification_method_data(
   ds.contact_name = const_cast<char*>(cntct->get_name().c_str());
   ds.command_name = command_name;
   ds.command_args = command_args;
-  if (notification_type == SERVICE_NOTIFICATION) {
-    temp_service = (com::centreon::engine::service*)data;
+  if (notification_type == notifier::service_notification) {
+    temp_service = static_cast<service*>(data);
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->get_current_state();
@@ -1336,7 +1335,7 @@ int broker_notification_data(
   ds.start_time = start_time;
   ds.end_time = end_time;
   ds.reason_type = reason_type;
-  if (notification_type == SERVICE_NOTIFICATION) {
+  if (notification_type == notifier::service_notification) {
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());

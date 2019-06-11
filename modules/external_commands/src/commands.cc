@@ -36,7 +36,6 @@
 #include "com/centreon/engine/modules/external_commands/internal.hh"
 #include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -3011,9 +3010,8 @@ void acknowledge_host_problem(
 
   /* send out an acknowledgement notification */
   if (notify)
-    host_notification(
-      hst,
-      NOTIFICATION_ACKNOWLEDGEMENT,
+    hst->notify(
+      notifier::notification_acknowledgement,
       ack_author,
       ack_data,
       NOTIFICATION_OPTION_NONE);
@@ -3079,7 +3077,7 @@ void acknowledge_service_problem(
   /* send out an acknowledgement notification */
   if (notify)
     svc->notify(
-      NOTIFICATION_ACKNOWLEDGEMENT,
+      notifier::notification_acknowledgement,
       ack_author,
       ack_data,
       NOTIFICATION_OPTION_NONE);

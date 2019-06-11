@@ -802,16 +802,16 @@ int contact::check_service_notification_viability(
   /*********************************************/
 
   /* custom notifications are good to go at this point... */
-  if (type == NOTIFICATION_CUSTOM)
+  if (type == notifier::notification_custom)
     return OK;
 
   /****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
   /****************************************/
 
-  if (type == NOTIFICATION_FLAPPINGSTART
-      || type == NOTIFICATION_FLAPPINGSTOP
-      || type == NOTIFICATION_FLAPPINGDISABLED) {
+  if (type == notifier::notification_flappingstart
+      || type == notifier::notification_flappingstop
+      || type == notifier::notification_flappingdisabled) {
 
     if (!notify_on_service(notifier::flapping)) {
       logger(dbg_notifications, most)
@@ -827,9 +827,9 @@ int contact::check_service_notification_viability(
   /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
   /****************************************/
 
-  if (type == NOTIFICATION_DOWNTIMESTART
-      || type == NOTIFICATION_DOWNTIMEEND
-      || type == NOTIFICATION_DOWNTIMECANCELLED) {
+  if (type == notifier::notification_downtimestart
+      || type == notifier::notification_downtimeend
+      || type == notifier::notification_downtimecancelled) {
 
     if (!notify_on_service(notifier::downtime)) {
       logger(dbg_notifications, most)
@@ -940,16 +940,16 @@ int contact::check_host_notification_viability(host* hst,
   /*********************************************/
 
   /* custom notifications are good to go at this point... */
-  if (type == NOTIFICATION_CUSTOM)
+  if (type == notifier::notification_custom)
     return OK;
 
   /****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
   /****************************************/
 
-  if (type == NOTIFICATION_FLAPPINGSTART
-      || type == NOTIFICATION_FLAPPINGSTOP
-      || type == NOTIFICATION_FLAPPINGDISABLED) {
+  if (type == notifier::notification_flappingstart
+      || type == notifier::notification_flappingstop
+      || type == notifier::notification_flappingdisabled) {
 
     if (!notify_on_host(notifier::flapping)) {
       logger(dbg_notifications, most)
@@ -965,9 +965,9 @@ int contact::check_host_notification_viability(host* hst,
   /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
   /****************************************/
 
-  if (type == NOTIFICATION_DOWNTIMESTART
-      || type == NOTIFICATION_DOWNTIMEEND
-      || type == NOTIFICATION_DOWNTIMECANCELLED) {
+  if (type == notifier::notification_downtimestart
+      || type == notifier::notification_downtimeend
+      || type == notifier::notification_downtimecancelled) {
 
     if (!notify_on_host(notifier::downtime)) {
       logger(dbg_notifications, most)
@@ -1023,23 +1023,3 @@ int contact::check_host_notification_viability(host* hst,
 
   return OK;
 }
-
-/*
- * given a contact name, find the notification entry for them for the list in
- * memory
- */
-notification* contact::find_notification() {
-  logger(dbg_functions, basic)
-    << "find_notification()";
-
-  for (notification* temp_notification = notification_list;
-       temp_notification != nullptr;
-       temp_notification = temp_notification->next) {
-    if (temp_notification->cntct == this)
-      return temp_notification;
-  }
-
-  /* we couldn't find the contact in the notification list */
-  return nullptr;
-}
-
