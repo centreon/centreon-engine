@@ -3338,7 +3338,6 @@ int host::process_check_result_3x(enum host::host_state new_state,
   com::centreon::engine::host* master_host = NULL;
   host* temp_host;
   std::list<host*> check_hostlist;
-  objectlist* hostlist_item = NULL;
   host::host_state parent_state =  host::state_up;
   time_t current_time = 0L;
   time_t next_check = 0L;
