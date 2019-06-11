@@ -36,6 +36,9 @@ using namespace com::centreon::engine::string;
 hostgroup_map com::centreon::engine::hostgroup::hostgroups;
 
 /*
+ *  Constructor
+ *
+ *  @param[in] id         Host group id.
  *  @param[in] name       Host group name.
  *  @param[in] alias      Host group alias.
  *  @param[in] notes      Notes.

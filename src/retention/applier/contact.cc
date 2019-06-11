@@ -36,12 +36,11 @@ using namespace com::centreon::engine::retention;
 void applier::contact::apply(
        configuration::state const& config,
        list_contact const& lst) {
-  for (list_contact::const_iterator it(lst.begin()), end(lst.end());
-       it != end;
-       ++it) {
-    engine::contact* cntct(configuration::applier::state::instance().find_contact((*it)->contact_name()));
-    if (cntct)
-      _update(config, **it, cntct);
+  for (list_contact::const_iterator it{lst.begin()}, end{lst.end()};
+       it != end; ++it) {
+    contact_map::const_iterator ct_it{engine::contact::contacts.find((*it)->contact_name())};
+    if (ct_it != engine::contact::contacts.end())
+      _update(config, **it, ct_it->second.get());
   }
 }
 

@@ -336,22 +336,23 @@ int notifier::notify(unsigned int type,
      * if this notification has an author, attempt to lookup the
      * associated contact
      */
-    contact* temp_contact{nullptr};
+    std::shared_ptr<contact> temp_contact;
     if (!not_author.empty()) {
       /* see if we can find the contact - first by name, then by alias */
-      if ((temp_contact = configuration::applier::state::instance().find_contact(not_author)) ==
-          nullptr) {
-        for (std::unordered_map<std::string,
-                                std::shared_ptr<contact>>::const_iterator
-                 it{configuration::applier::state::instance().contacts().begin()},
-             end{configuration::applier::state::instance().contacts().end()};
+      contact_map::const_iterator ct_it{contact::contacts.find(not_author)};
+      if (ct_it == contact::contacts.end()) {
+        for (contact_map::const_iterator
+               it{contact::contacts.begin()},
+               end{contact::contacts.end()};
              it != end; ++it) {
           if (it->second->get_alias() == not_author) {
-            temp_contact = it->second.get();
+            temp_contact = it->second;
             break;
           }
         }
       }
+      else
+        temp_contact = ct_it->second;
     }
 
     /* get author and comment macros */
@@ -970,13 +971,13 @@ void notifier::create_notification_list(nagios_macros* mac,
 
         if (!itt->second)
           continue;
-        for (std::unordered_map<std::string, contact*>::const_iterator
-                 itm(itt->second->get_members().begin()),
-             endm(itt->second->get_members().end());
+        for (contact_map::const_iterator
+               itm{itt->second->get_members().begin()},
+               endm{itt->second->get_members().end()};
              itm != endm; ++itm) {
           if (!itm->second)
             continue;
-          add_notification(mac, itm->second);
+          add_notification(mac, itm->second.get());
         }
       }
     }
@@ -1003,13 +1004,13 @@ void notifier::create_notification_list(nagios_macros* mac,
 
       if (!it->second)
         continue;
-      for (std::unordered_map<std::string, contact*>::const_iterator
-               itm(it->second->get_members().begin()),
-           endm(it->second->get_members().end());
+      for (contact_map::const_iterator
+             itm{it->second->get_members().begin()},
+             endm{it->second->get_members().end()};
            itm != endm; ++itm) {
         if (!itm->second)
           continue;
-        add_notification(mac, itm->second);
+        add_notification(mac, itm->second.get());
       }
     }
   }

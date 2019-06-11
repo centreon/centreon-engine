@@ -2781,7 +2781,7 @@ int host::notify_contact(nagios_macros* mac,
    * acknowledgements are no longer excluded from this test -
    * added 8/19/02 Tom Bertelson
    */
-  if (check_contact_host_notification_viability(cntct, this, type, options) ==
+  if (cntct->check_host_notification_viability(this, type, options) ==
       ERROR)
     return ERROR;
 

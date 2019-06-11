@@ -185,6 +185,7 @@ applier::state::state()
  *  Destructor.
  */
 applier::state::~state() throw() {
+  engine::contact::contacts.clear();
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();
@@ -244,42 +245,6 @@ commands::command* applier::state::find_command(configuration::command::key_type
     it(_commands.find(k));
 
   if (it != _commands.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a contact name, find a contact from the list in memory.
- *
- *  @param[in] k Contact name.
- *
- *  @return Contact object if found, nullptr otherwise.
- */
-engine::contact const* applier::state::find_contact(configuration::contact::key_type const& k) const {
-  if (k.empty())
-    return nullptr;
-
-  contact_map::const_iterator it(_contacts.find(k));
-
-  if (it != _contacts.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a contact name, find a contact from the list in memory.
- *
- *  @param[in] k Contact name.
- *
- *  @return Contact object if found, nullptr otherwise.
- */
-engine::contact* applier::state::find_contact(configuration::contact::key_type const& k) {
-  if (k.empty())
-    return nullptr;
-
-  contact_map::const_iterator it(_contacts.find(k));
-
-  if (it != _contacts.end())
     return it->second.get();
   return nullptr;
 }
@@ -373,24 +338,6 @@ commands::connector* applier::state::find_connector(configuration::connector::ke
   if (it != _connectors.end())
     return it->second.get();
   return nullptr;
-}
-
-/**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-contact_map const& applier::state::contacts() const throw () {
-  return _contacts;
-}
-
-/**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-contact_map& applier::state::contacts() throw () {
-  return _contacts;
 }
 
 /**
@@ -560,50 +507,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
 }
 
 /**
- *  Get the current hostgroups.
- *
- *  @return The current hostgroups.
- */
-hostgroup_map const& applier::state::hostgroups() const throw () {
-  return _hostgroups;
-}
-
-/**
- *  Get the current hostgroups.
- *
- *  @return The current hostgroups.
- */
-hostgroup_map& applier::state::hostgroups() throw () {
-  return _hostgroups;
-}
-
-/**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-hostgroup_map::const_iterator applier::state::hostgroups_find(
-  configuration::hostgroup::key_type const& k) const {
-  return _hostgroups.find(k);
-}
-
-/**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-hostgroup_map::iterator applier::state::hostgroups_find(
-  configuration::hostgroup::key_type const& k) {
-  return _hostgroups.find(k);
-}
-
-/**
  *  Get the current services.
  *
  *  @return The current services.
@@ -734,48 +637,6 @@ servicedependency_mmap ::iterator applier::state::servicedependencies_find(confi
     ++p.first;
   }
   return (p.first == p.second) ? _servicedependencies.end() : p.first;
-}
-
-/**
- *  Get the current servicegroups.
- *
- *  @return The current servicegroups.
- */
-servicegroup_map const& applier::state::servicegroups() const throw () {
-  return _servicegroups;
-}
-
-/**
- *  Get the current servicegroups.
- *
- *  @return The current servicegroups.
- */
-servicegroup_map& applier::state::servicegroups() throw () {
-  return _servicegroups;
-}
-
-/**
- *  Find a service group from its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-servicegroup_map::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
-  return _servicegroups.find(k);
-}
-
-/**
- *  Find a service group from its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-servicegroup_map::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
-  return _servicegroups.find(k);
 }
 
 /**
@@ -1315,7 +1176,7 @@ void applier::state::_processing(
   _expand<configuration::host, applier::host>(
     new_cfg);
 
-  // Expand hostgroups.
+  // Expand hlostgroups.
   _expand<configuration::hostgroup, applier::hostgroup>(
     new_cfg);
 

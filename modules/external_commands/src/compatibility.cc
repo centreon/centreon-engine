@@ -1009,8 +1009,8 @@ int process_hostgroup_command(int cmd,
   /* find the hostgroup */
   temp_hostgroup = nullptr;
   hostgroup_map::const_iterator
-    it(state::instance().hostgroups().find(hostgroup_name));
-  if (it != state::instance().hostgroups().end())
+    it(hostgroup::hostgroups.find(hostgroup_name));
+  if (it != hostgroup::hostgroups.end())
     temp_hostgroup = it->second.get();
   if (temp_hostgroup == nullptr)
     return ERROR;
@@ -1357,7 +1357,7 @@ int process_servicegroup_command(int cmd,
   (void)entry_time;
 
   char* servicegroup_name{nullptr};
-  servicegroup* temp_servicegroup{nullptr};
+  std::shared_ptr<servicegroup> temp_servicegroup;
   host* temp_host{nullptr};
   host* last_host{nullptr};
   com::centreon::engine::service* temp_service{nullptr};
@@ -1367,8 +1367,10 @@ int process_servicegroup_command(int cmd,
     return ERROR;
 
   /* find the servicegroup */
-  if ((temp_servicegroup = ::find_servicegroup(servicegroup_name)) == nullptr)
+  servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(servicegroup_name)};
+  if (sg_it == servicegroup::servicegroups.end())
     return ERROR;
+  temp_servicegroup = sg_it->second;
 
   switch (cmd) {
 
@@ -1552,31 +1554,30 @@ int process_contactgroup_command(int cmd,
   case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
 
     /* loop through all contactgroup members */
-    for (std::unordered_map<std::string, contact *>::const_iterator
-           it(temp_contactgroup->get_members().begin()),
-           end(temp_contactgroup->get_members().end());
-         it != end;
-         ++it) {
+    for (contact_map::const_iterator
+           it{temp_contactgroup->get_members().begin()},
+           end{temp_contactgroup->get_members().end()};
+         it != end; ++it) {
 
-      if (it->second == nullptr)
+      if (!it->second)
         continue;
 
       switch (cmd) {
 
       case CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        enable_contact_host_notifications(it->second);
+        enable_contact_host_notifications(it->second.get());
         break;
 
       case CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        disable_contact_host_notifications(it->second);
+        disable_contact_host_notifications(it->second.get());
         break;
 
       case CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        enable_contact_service_notifications(it->second);
+        enable_contact_service_notifications(it->second.get());
         break;
 
       case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        disable_contact_service_notifications(it->second);
+        disable_contact_service_notifications(it->second.get());
         break;
 
       default:

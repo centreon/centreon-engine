@@ -121,8 +121,8 @@ TEST_F(SimpleCommand, NewCommandAsync) {
   memset(&mac, 0, sizeof(mac));
   std::string cc(cmd->process_cmd(&mac));
   ASSERT_EQ(cc, "/bin/echo bonjour");
-  unsigned long id(cmd->run(cc, mac, 2));
-  int timeout(0);
+  uint64_t id{cmd->run(cc, mac, 2)};
+  int timeout{0};
   while (timeout < 20 && lstnr->get_result().output == "") {
     usleep(100000);
     ++timeout;

@@ -41,7 +41,7 @@ int check_host(com::centreon::engine::host* hst, int* w, int* e);
 int check_contact(com::centreon::engine::contact* cntct, int* w, int* e);
 int check_servicegroup(com::centreon::engine::servicegroup* sg, int* w, int* e);
 int check_hostgroup(com::centreon::engine::hostgroup* hg, int* w, int* e);
-int check_contactgroup(com::centreon::engine::contactgroup* cg, int* w,
+int check_contactgroup(std::shared_ptr<com::centreon::engine::contactgroup> cg, int* w,
   int* e);
 int check_servicedependency(com::centreon::engine::servicedependency* sd, int* w, int* e);
 int check_hostdependency(com::centreon::engine::hostdependency* hd, int* w, int* e);

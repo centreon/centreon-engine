@@ -92,12 +92,12 @@ TEST_F(ApplierServicegroup, ModifyServicegroupFromConfig) {
   ASSERT_TRUE(sg.parse("members", "host1,service1"));
   aply.add_object(sg);
   umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
-    it(configuration::applier::state::instance().servicegroups_find("test"));
+    it{engine::servicegroup::servicegroups.find("test")};
   ASSERT_TRUE(it->second->get_alias() == "test");
 
   ASSERT_TRUE(sg.parse("alias", "test_renamed"));
   aply.modify_object(sg);
-  it = configuration::applier::state::instance().servicegroups().find("test");
+  it = engine::servicegroup::servicegroups.find("test");
   ASSERT_TRUE(it->second->get_alias() == "test_renamed");
 }
 
@@ -238,9 +238,7 @@ TEST_F(ApplierServicegroup, RemoveServicegroupFromConfig) {
   grp1 = *config->servicegroups_find("big_group");
   ASSERT_TRUE(grp1.members().size() == 1);
 
-  ASSERT_TRUE(
-    configuration::applier::state::instance().servicegroups().size() == 2);
+  ASSERT_EQ(engine::servicegroup::servicegroups.size(), 2);
   aply_grp.remove_object(grp);
-  ASSERT_TRUE(
-    configuration::applier::state::instance().servicegroups().size() == 1);
+  ASSERT_EQ(engine::servicegroup::servicegroups.size(), 1);
 }

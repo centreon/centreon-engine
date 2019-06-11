@@ -39,8 +39,6 @@ struct serviceescalation_struct;
 com::centreon::engine::service*           find_service(
                             char const* host_name,
                             char const* svc_desc);
-com::centreon::engine::servicegroup*
-                          find_servicegroup(std::string const& name);
 hostdependency_struct*    get_first_host_dependency_by_dependent_host(
                             char const* host_name,
                             void** ptr);

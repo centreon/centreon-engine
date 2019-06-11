@@ -39,6 +39,7 @@ servicegroup_map servicegroup::servicegroups;
 /**
  *  Create a new service group
  *
+ *  @param[in] id         Group id.
  *  @param[in] name       Group name.
  *  @param[in] alias      Group alias.
  *  @param[in] notes      Notes.
@@ -46,7 +47,8 @@ servicegroup_map servicegroup::servicegroups;
  *  @param[in] action_url Action URL.
  *
  */
-servicegroup::servicegroup(std::string const& group_name,
+servicegroup::servicegroup(uint64_t id,
+                           std::string const& group_name,
                            std::string const& alias,
                            std::string const& notes,
                            std::string const& notes_url,
@@ -61,9 +63,9 @@ servicegroup::servicegroup(std::string const& group_name,
   if (is_servicegroup_exist(group_name)) {
     logger(log_config_error, basic)
       << "Error: Servicegroup '" << group_name << "' has already been defined";
-    throw (engine_error() << "Could not register service group '"
-                          << group_name << "'");
- }
+    throw engine_error() << "Could not register service group '"
+                         << group_name << "'";
+  }
 }
 
 uint64_t servicegroup::get_id() const {
@@ -176,10 +178,10 @@ std::ostream& operator<<(std::ostream& os, servicegroup const& obj) {
  */
 servicegroup& engine::find_servicegroup(std::string const& name) {
   umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
-    it(state::instance().servicegroups().find(name));
-  if (it == state::instance().servicegroups().end())
-    throw (engine_error() << "Service group "
-           << name << "' was not found");
+    it{servicegroup::servicegroups.find(name)};
+  if (it == servicegroup::servicegroups.end())
+    throw engine_error() << "Service group "
+           << name << "' was not found";
   return *it->second;
 }
 
@@ -191,7 +193,7 @@ servicegroup& engine::find_servicegroup(std::string const& name) {
  *  @return True if the servicegroup is found, otherwise false.
  */
 bool engine::is_servicegroup_exist(std::string const& name) throw () {
-  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
-    it(state::instance().servicegroups().find(name));
-  return it != state::instance().servicegroups().end();
+  umap<std::string, std::shared_ptr<servicegroup> >::const_iterator
+    it{servicegroup::servicegroups.find(name)};
+  return it != servicegroup::servicegroups.end();
 }

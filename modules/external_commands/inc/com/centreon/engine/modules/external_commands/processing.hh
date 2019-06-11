@@ -192,8 +192,8 @@ namespace         modules {
 
         hostgroup* group(nullptr);
         hostgroup_map::const_iterator
-          it(configuration::applier::state::instance().hostgroups().find(group_name));
-        if (it != configuration::applier::state::instance().hostgroups().end())
+          it{hostgroup::hostgroups.find(group_name)};
+        if (it != hostgroup::hostgroups.end())
           group = it->second.get();
         if (!group)
           return ;
@@ -248,9 +248,10 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        servicegroup* group(::find_servicegroup(group_name));
-        if (!group)
+        servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(group_name)};
+        if (sg_it == servicegroup::servicegroups.end())
           return ;
+        servicegroup* group{sg_it->second.get()};
 
         for (service_map::iterator
                it(group->members.begin()),
@@ -270,11 +271,12 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        servicegroup* group(::find_servicegroup(group_name));
-        if (!group)
+        servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(group_name)};
+        if (sg_it == servicegroup::servicegroups.end())
           return ;
+        servicegroup* group{sg_it->second.get()};
 
-        host* last_host(NULL);
+        host* last_host{nullptr};
         for (service_map::iterator
                it(group->members.begin()),
                end(group->members.end());
@@ -304,10 +306,10 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        contact* cntc(configuration::applier::state::instance().find_contact(name));
-        if (!cntc)
+        contact_map::const_iterator ct_it{contact::contacts.find(name)};
+        if (ct_it == contact::contacts.end())
           return ;
-        (*fptr)(cntc);
+        (*fptr)(ct_it->second.get());
       }
 
       template <void (*fptr)(contact*)>
@@ -323,13 +325,12 @@ namespace         modules {
         if (!group)
           return ;
 
-        for (std::unordered_map<std::string, contact *>::const_iterator
+        for (contact_map::const_iterator
                it(group->get_members().begin()),
                end(group->get_members().end());
-             it != end;
-             ++it)
+             it != end; ++it)
           if (it->second)
-            (*fptr)(it->second);
+            (*fptr)(it->second.get());
       }
 
       std::unordered_map<std::string, command_info> _lst_command;

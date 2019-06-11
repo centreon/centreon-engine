@@ -92,10 +92,6 @@ namespace           configuration {
                     find_connector(configuration::connector::key_type const& k) const;
       commands::connector*
                     find_connector(configuration::connector::key_type const& k);
-      contact_map const&
-                    contacts() const throw ();
-      contact_map&
-                    contacts() throw ();
       contact_map::const_iterator
                     contacts_find(configuration::contact::key_type const& k) const;
       contact_map::iterator
@@ -124,14 +120,6 @@ namespace           configuration {
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      hostgroup_map const&
-                    hostgroups() const throw ();
-      hostgroup_map&
-                    hostgroups() throw ();
-      hostgroup_map::const_iterator
-                    hostgroups_find(configuration::hostgroup::key_type const& k) const;
-      hostgroup_map::iterator
-                    hostgroups_find(configuration::hostgroup::key_type const& k);
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>> const&
                     services() const throw ();
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>&
@@ -148,14 +136,6 @@ namespace           configuration {
                     servicedependencies_find(configuration::servicedependency::key_type const& k) const;
       servicedependency_mmap::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      servicegroup_map const&
-                    servicegroups() const throw ();
-      servicegroup_map&
-                    servicegroups() throw ();
-      servicegroup_map::const_iterator
-                    servicegroups_find(configuration::servicegroup::key_type const& k) const;
-      servicegroup_map::iterator
-                    servicegroups_find(configuration::servicegroup::key_type const& k);
       timeperiod_map const&
                     timeperiods() const throw ();
       timeperiod_map &
@@ -208,8 +188,6 @@ namespace           configuration {
                     _commands;
       std::unordered_map<std::string, std::shared_ptr<commands::connector>>
                     _connectors;
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contact>>
-                    _contacts;
       std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>
                     _contactgroups;
       concurrency::condvar

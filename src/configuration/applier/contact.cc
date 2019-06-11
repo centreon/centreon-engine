@@ -227,8 +227,8 @@ void applier::contact::modify_object(
 
   // Find contact object.
   umap<std::string, std::shared_ptr<com::centreon::engine::contact> >::iterator
-    it_obj(applier::state::instance().contacts().find(obj.key()));
-  if (it_obj == applier::state::instance().contacts().end())
+    it_obj(engine::contact::contacts.find(obj.key()));
+  if (it_obj == engine::contact::contacts.end())
     throw (engine_error() << "Could not modify non-existing "
            << "contact object '" << obj.contact_name() << "'");
   engine::contact* c(it_obj->second.get());
@@ -248,61 +248,19 @@ void applier::contact::modify_object(
     c->set_pager(obj.pager());
   if (c->get_addresses() != obj.address())
     c->set_addresses(obj.address());
-  if (static_cast<bool>(
-        obj.service_notification_options() & service::unknown)
-      != c->notify_on_service_unknown())
-    c->set_notify_on_service_unknown(static_cast<bool>(
-      obj.service_notification_options() & service::unknown));
-  if (static_cast<bool>(
-        obj.service_notification_options() & service::warning)
-      != c->notify_on_service_warning())
-    c->set_notify_on_service_warning(static_cast<bool>(
-      obj.service_notification_options() & service::warning));
-  if (static_cast<bool>(
-        obj.service_notification_options() & service::critical)
-      != c->notify_on_service_critical())
-    c->set_notify_on_service_critical(static_cast<bool>(
-      obj.service_notification_options() & service::critical));
-  if (static_cast<bool>(
-        obj.service_notification_options() & service::ok)
-      != c->notify_on_service_recovery())
-    c->set_notify_on_service_recovery(static_cast<bool>(
-      obj.service_notification_options() & service::ok));
-  if (static_cast<bool>(
-        obj.service_notification_options() & service::flapping)
-      != c->notify_on_service_flapping())
-    c->set_notify_on_service_flapping(static_cast<bool>(
-      obj.service_notification_options() & service::flapping));
-  if (static_cast<bool>(
-        obj.service_notification_options() & service::downtime)
-      != c->notify_on_service_downtime())
-    c->set_notify_on_service_downtime(static_cast<bool>(
-      obj.service_notification_options() & service::downtime));
-  if (static_cast<bool>(
-        obj.host_notification_options() & host::down)
-      != c->notify_on_host_down())
-    c->set_notify_on_host_down(static_cast<bool>(
-      obj.host_notification_options() & host::down));
-  if (static_cast<bool>(
-        obj.host_notification_options() & host::unreachable)
-      != c->notify_on_host_unreachable())
-    c->set_notify_on_host_unreachable(static_cast<bool>(
-      obj.host_notification_options() & host::unreachable));
-  if (static_cast<bool>(
-        obj.host_notification_options() & host::up)
-      != c->notify_on_host_recovery())
-    c->set_notify_on_host_recovery(static_cast<bool>(
-      obj.host_notification_options() & host::up));
-  if (static_cast<bool>(
-        obj.host_notification_options() & host::flapping)
-      != c->notify_on_host_flapping())
-    c->set_notify_on_host_flapping(static_cast<bool>(
-      obj.host_notification_options() & host::flapping));
-  if (static_cast<bool>(
-        obj.host_notification_options() & host::downtime)
-      != c->notify_on_host_downtime())
-    c->set_notify_on_host_downtime(static_cast<bool>(
-      obj.host_notification_options() & host::downtime));
+  c->set_notify_on_service(
+      (obj.service_notification_options() & service::unknown ? notifier::unknown : notifier::none) |
+      (obj.service_notification_options() & service::warning ? notifier::warning : notifier::none) |
+      (obj.service_notification_options() & service::critical ? notifier::critical : notifier::none) |
+      (obj.service_notification_options() & service::ok ? notifier::recovery : notifier::none) |
+      (obj.service_notification_options() & service::flapping ? notifier::flapping : notifier::none) |
+      (obj.service_notification_options() & service::downtime ? notifier::downtime : notifier::none));
+  c->set_notify_on_host(
+      (obj.host_notification_options() & host::down ? notifier::down : notifier::none) |
+      (obj.host_notification_options() & host::unreachable ? notifier::unreachable : notifier::none) |
+      (obj.host_notification_options() & host::up ? notifier::recovery : notifier::none) |
+      (obj.host_notification_options() & host::flapping ? notifier::flapping : notifier::none) |
+      (obj.host_notification_options() & host::downtime ? notifier::downtime : notifier::none));
   if (c->get_host_notification_period() != obj.host_notification_period())
     c->set_host_notification_period(obj.host_notification_period());
   if (c->get_service_notification_period() != obj.service_notification_period())
@@ -394,9 +352,8 @@ void applier::contact::remove_object(
     << "Removing contact '" << obj.contact_name() << "'.";
 
   // Find contact.
-  umap<std::string, std::shared_ptr<engine::contact> >::iterator
-    it(applier::state::instance().contacts().find(obj.key()));
-  if (it != applier::state::instance().contacts().end()) {
+  contact_map::iterator it{engine::contact::contacts.find(obj.key())};
+  if (it != engine::contact::contacts.end()) {
     engine::contact* cntct(it->second.get());
 
     // Notify event broker.
@@ -416,7 +373,7 @@ void applier::contact::remove_object(
       &tv);
 
     // Erase contact object (this will effectively delete the object).
-    applier::state::instance().contacts().erase(it);
+    engine::contact::contacts.erase(it);
   }
 
   // Remove contact from the global configuration set.
@@ -435,12 +392,12 @@ void applier::contact::resolve_object(
     << "Resolving contact '" << obj.contact_name() << "'.";
 
   // Find contact.
-  com::centreon::engine::contact* c(
-    applier::state::instance().find_contact(obj.contact_name()));
-  if (c == nullptr)
+  contact_map::const_iterator ct_it{engine::contact::contacts.find(obj.contact_name())};
+  if (ct_it == engine::contact::contacts.end())
     throw (engine_error()
            << "Cannot resolve non-existing contact '"
            << obj.contact_name() << "'");
+  engine::contact* c{ct_it->second.get()};
 
   // Add all the host notification commands.
   for (list_string::const_iterator
@@ -479,9 +436,7 @@ void applier::contact::resolve_object(
   }
 
   // Remove contact group links.
-  deleter::listmember(
-    c->contactgroups_ptr,
-    &deleter::objectlist);
+  c->get_parent_groups().clear();
 
   // Resolve contact.
   if (!check_contact(c, &config_warnings, &config_errors))
