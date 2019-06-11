@@ -98,7 +98,6 @@ class                           contact {
   void                          set_host_notifications_enabled(bool enabled);
   bool                          get_service_notifications_enabled() const;
   void                          set_service_notifications_enabled(bool enabled);
-  notification*                 find_notification();
 
   // Host notification properties.
   time_t                        get_last_host_notification() const;

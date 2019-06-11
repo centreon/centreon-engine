@@ -47,7 +47,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/nebmods.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
@@ -333,7 +332,6 @@ void setup_sighandler() {
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sighandler);
   signal(SIGHUP, sighandler);
-  return;
 }
 
 /* reset signal handling... */
@@ -342,7 +340,6 @@ void reset_sighandler() {
   signal(SIGTERM, SIG_DFL);
   signal(SIGHUP, SIG_DFL);
   signal(SIGPIPE, SIG_DFL);
-  return;
 }
 
 /* handle signals */
@@ -361,7 +358,6 @@ void sighandler(int sig) {
   /* else begin shutting down... */
   else
     sigshutdown = true;
-  return;
 }
 
 /******************************************************************/
@@ -857,7 +853,6 @@ void cleanup() {
 
   // Free all allocated memory - including macros.
   free_memory(get_global_macros());
-  return;
 }
 
 /**
@@ -899,7 +894,7 @@ void free_memory(nagios_macros* mac) {
   quick_timed_event.clear(hash_timed_event::low);
 
   // Free any notification list that may have been overlooked.
-  free_notification_list();
+  notifier::current_notifications.clear();
 
   /*
   ** Free memory associated with macros. It's ok to only free the
@@ -910,22 +905,4 @@ void free_memory(nagios_macros* mac) {
   */
   clear_volatile_macros_r(mac);
   free_macrox_names();
-  return;
-}
-
-/* free a notification list that was created */
-void free_notification_list() {
-  notification* temp_notification = NULL;
-  notification* next_notification = NULL;
-
-  temp_notification = notification_list;
-  while (temp_notification != NULL) {
-    next_notification = temp_notification->next;
-    delete temp_notification;
-    temp_notification = next_notification;
-  }
-
-  /* reset notification list pointer */
-  notification_list = NULL;
-  return;
 }

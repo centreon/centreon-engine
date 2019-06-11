@@ -32,7 +32,6 @@
 #  include "com/centreon/engine/events/sched_info.hh"
 #  include "com/centreon/engine/events/timed_event.hh"
 #  include "com/centreon/engine/nebmods.hh"
-#  include "com/centreon/engine/notifications.hh"
 #  include "com/centreon/engine/objects.hh"
 #  include "com/centreon/engine/downtimes/downtime.hh"
 #  include "com/centreon/engine/utils.hh"
@@ -107,8 +106,6 @@ extern com::centreon::engine::serviceescalation*        serviceescalation_list;
 extern com::centreon::engine::serviceescalation*        serviceescalation_list_tail;
 
 extern int                       __nagios_object_structure_version;
-
-extern notification*             notification_list;
 
 extern check_result              check_result_info;
 extern check_result*             check_result_list;

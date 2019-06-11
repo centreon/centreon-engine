@@ -1235,7 +1235,7 @@ int process_host_command(int cmd,
     if (str)
       buf[1] = string::dup(str);
     if (buf[0] && buf[1])
-      host_notification(temp_host, NOTIFICATION_CUSTOM, buf[0], buf[1], intval);
+      temp_host->notify(notifier::notification_custom, buf[0], buf[1], intval);
     break;
 
   default:
@@ -1340,7 +1340,7 @@ int process_service_command(int cmd,
       buf[1] = string::dup(str);
     if (buf[0] && buf[1])
       found->second->notify(
-                           NOTIFICATION_CUSTOM,
+                           notifier::notification_custom,
                            buf[0],
                            buf[1],
                            intval);
@@ -1358,6 +1358,7 @@ int process_servicegroup_command(int cmd,
                                  char* args) {
   (void)entry_time;
   char* servicegroup_name{nullptr};
+  std::shared_ptr<servicegroup> temp_servicegroup;
   host* temp_host{nullptr};
   host* last_host{nullptr};
 
@@ -1370,6 +1371,7 @@ int process_servicegroup_command(int cmd,
     sg_it{servicegroup::servicegroups.find(servicegroup_name)};
   if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
     return ERROR;
+  temp_servicegroup = sg_it->second;
 
   switch (cmd) {
 
