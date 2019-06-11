@@ -34,6 +34,7 @@ struct nagios_macros;
 CCE_BEGIN()
 class escalation;
 class contact;
+class timeperiod;
 
 class                notifier {
  public:
@@ -159,7 +160,7 @@ class                notifier {
   virtual void       update_status(bool aggregated_dump) = 0;
   int                get_max_attempts() const;
   void               set_max_attempts(int max_attempts);
-  virtual int        check_notification_viability(reason_type type,
+  virtual bool       check_notification_viability(reason_type type,
                                                   int options) = 0;
   int                notify(reason_type type,
                             std::string const& not_author,
@@ -290,6 +291,8 @@ class                notifier {
   void               set_obsess_over(bool obsess_over_host);
   bool               get_should_be_scheduled() const;
   void               set_should_be_scheduled(bool should_be_scheduled);
+  virtual timeperiod* get_notification_period_ptr() const = 0;
+  bool               notifications_available(int options) const;
 
   std::unordered_map<std::string, std::shared_ptr<contact>>
                      contacts;

@@ -43,7 +43,6 @@ namespace commands {
 class host;
 class hostgroup;
 class hostescalation;
-class timeperiod;
 CCE_END()
 
 typedef std::unordered_map<std::string,
@@ -144,7 +143,7 @@ class                host : public notifier {
                                 double low_threshold);
   void               update_status(bool aggregated_dump) override;
   void               check_for_expired_acknowledgement();
-  int                check_notification_viability(reason_type type,
+  bool               check_notification_viability(reason_type type,
                                                   int options) override;
   int                handle_state();
   void               update_performance_data();
@@ -271,6 +270,7 @@ class                host : public notifier {
                        std::shared_ptr<escalation> e,
                        int options) const override;
   void               handle_flap_detection_disabled();
+  timeperiod*        get_notification_period_ptr() const override;
 
   host_map            parent_hosts;
   host_map            child_hosts;

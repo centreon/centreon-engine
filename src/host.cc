@@ -2225,35 +2225,22 @@ void host::check_for_expired_acknowledgement() {
 }
 
 /* checks viability of sending a host notification */
-int host::check_notification_viability(reason_type type, int options) {
+bool host::check_notification_viability(reason_type type, int options) {
   time_t current_time;
   time_t timeperiod_start;
 
-  logger(dbg_functions, basic) << "check_host_notification_viability()";
-
-  /* forced notifications bust through everything */
-  if (options & NOTIFICATION_OPTION_FORCED) {
-    logger(dbg_notifications, more)
-        << "This is a forced host notification, so we'll send it out.";
-    return OK;
-  }
+  logger(dbg_functions, basic) << "host::check_notification_viability()";
 
   /* get current time */
   time(&current_time);
 
-  /* are notifications enabled? */
-  if (!config->enable_notifications()) {
-    logger(dbg_notifications, more)
-        << "Notifications are disabled, so host notifications will not "
-           "be sent out.";
-    return ERROR;
-  }
+  timeperiod* temp_period{notification_period_ptr};
 
   // See if the host can have notifications sent out at this time.
   {
     timezone_locker lock(get_timezone());
     if (check_time_against_period(current_time,
-                                  this->notification_period_ptr) == ERROR) {
+                                  temp_period) == false) {
       logger(dbg_notifications, more)
           << "This host shouldn't have notifications sent out at "
              "this time.";
@@ -2262,7 +2249,7 @@ int host::check_notification_viability(reason_type type, int options) {
       // notification time, once the next valid time range arrives...
       if (type == notification_normal) {
         get_next_valid_time(current_time, &timeperiod_start,
-                            this->notification_period_ptr);
+                            temp_period);
 
         // It looks like there is no notification time defined, so
         // schedule next one far into the future (one year)...
@@ -2276,16 +2263,8 @@ int host::check_notification_viability(reason_type type, int options) {
         logger(dbg_notifications, more)
             << "Next possible notification time: " << my_ctime(&time);
       }
-      return ERROR;
+      return false;
     }
-  }
-
-  /* are notifications temporarily disabled for this host? */
-  if (!get_notifications_enabled()) {
-    logger(dbg_notifications, more)
-        << "Notifications are temporarily disabled for this host, "
-           "so we won't send one out.";
-    return ERROR;
   }
 
   /*********************************************/
@@ -2298,9 +2277,9 @@ int host::check_notification_viability(reason_type type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't send custom notification during "
              "scheduled downtime.";
-      return ERROR;
+      return false;
     }
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2317,14 +2296,14 @@ int host::check_notification_viability(reason_type type, int options) {
       logger(dbg_notifications, more)
           << "The host is currently UP, so we won't send "
              "an acknowledgement.";
-      return ERROR;
+      return false;
     }
 
     /*
      * acknowledgement viability test passed, so the notification can be sent
      * out
      */
-    return OK;
+    return true;
   }
 
   /*****************************************/
@@ -2338,7 +2317,7 @@ int host::check_notification_viability(reason_type type, int options) {
     if (!get_notify_on(flapping)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events for this host.";
-      return ERROR;
+      return false;
     }
 
     /* don't send notifications during scheduled downtime */
@@ -2346,11 +2325,11 @@ int host::check_notification_viability(reason_type type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events during "
              "scheduled downtime.";
-      return ERROR;
+      return false;
     }
 
     /* flapping viability test passed, so the notification can be sent out */
-    return OK;
+    return true;
   }
 
   /*****************************************/
@@ -2364,7 +2343,7 @@ int host::check_notification_viability(reason_type type, int options) {
     if (!get_notify_on(downtime)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events for this host.";
-      return ERROR;
+      return false;
     }
 
     /* don't send notifications during scheduled downtime */
@@ -2372,11 +2351,11 @@ int host::check_notification_viability(reason_type type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events during "
              "scheduled downtime!";
-      return ERROR;
+      return false;
     }
 
     /* downtime viability test passed, so the notification can be sent out */
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2388,7 +2367,7 @@ int host::check_notification_viability(reason_type type, int options) {
     logger(dbg_notifications, more)
         << "This host is in a soft state, so we won't send "
            "a notification out.";
-    return ERROR;
+    return false;
   }
 
   /* has this problem already been acknowledged? */
@@ -2396,7 +2375,7 @@ int host::check_notification_viability(reason_type type, int options) {
     logger(dbg_notifications, more)
         << "This host problem has already been acknowledged, "
            "so we won't send a notification out!";
-    return ERROR;
+    return false;
   }
 
   /* check notification dependencies */
@@ -2405,7 +2384,7 @@ int host::check_notification_viability(reason_type type, int options) {
     logger(dbg_notifications, more)
         << "Notification dependencies for this host have failed, "
            "so we won't sent a notification out!";
-    return ERROR;
+    return false;
   }
 
   /* see if we should notify about problems with this host */
@@ -2413,24 +2392,24 @@ int host::check_notification_viability(reason_type type, int options) {
       !get_notify_on(unreachable)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about UNREACHABLE status for this host.";
-    return ERROR;
+    return false;
   }
   if (get_current_state() ==  host::state_down && !get_notify_on(down)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about DOWN states for this host.";
-    return ERROR;
+    return false;
   }
   if (get_current_state() ==  host::state_up) {
     if (!get_notify_on(recovery)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about RECOVERY states for this host.";
-      return ERROR;
+      return false;
     }
     /* No notification received */
     if (get_notified_on() == 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about this recovery.";
-      return ERROR;
+      return false;
     }
   }
 
@@ -2462,7 +2441,7 @@ int host::check_notification_viability(reason_type type, int options) {
             << "Not enough time has elapsed since the host changed to a "
                "non-UP state (or since program start), so we shouldn't notify "
                "about this problem yet.";
-      return ERROR;
+      return false;
     }
   }
 
@@ -2471,7 +2450,7 @@ int host::check_notification_viability(reason_type type, int options) {
     logger(dbg_notifications, more)
         << "This host is currently flapping, so we won't "
            "send notifications.";
-    return ERROR;
+    return false;
   }
 
   /*
@@ -2482,18 +2461,18 @@ int host::check_notification_viability(reason_type type, int options) {
     logger(dbg_notifications, more)
         << "This host is currently in a scheduled downtime, "
            "so we won't send notifications.";
-    return ERROR;
+    return false;
   }
 
   /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
   if (get_current_state() ==  host::state_up)
-    return OK;
+    return true;
 
   /* check if we shouldn't renotify contacts about the host problem */
   if (get_no_more_notifications()) {
     logger(dbg_notifications, more)
         << "We shouldn't re-notify contacts about this host problem.";
-    return ERROR;
+    return false;
   }
 
   /* check if its time to re-notify the contacts about the host... */
@@ -2504,10 +2483,10 @@ int host::check_notification_viability(reason_type type, int options) {
     time_t time = get_next_notification();
     logger(dbg_notifications, more)
         << "Next acceptable notification time: " << my_ctime(&time);
-    return ERROR;
+    return false;
   }
 
-  return OK;
+  return true;
 }
 
 /* top level host state handler - occurs after every host check (soft/hard and
@@ -3953,4 +3932,8 @@ std::list<std::shared_ptr<hostgroup>> const& host::get_parent_groups() const {
 
 std::list<std::shared_ptr<hostgroup>>& host::get_parent_groups() {
   return _hostgroups;
+}
+
+timeperiod* host::get_notification_period_ptr() const {
+  return notification_period_ptr;
 }
