@@ -36,16 +36,13 @@
 #  include "com/centreon/engine/checks.hh"
 
 /* Forward declaration. */
-extern "C" {
-struct objectlist_struct;
-};
-
 CCE_BEGIN()
   namespace commands {
     class command;
   }
   class host;
   class service;
+  class servicegroup;
   class serviceescalation;
   class timeperiod;
 CCE_END()
@@ -210,7 +207,10 @@ class                           service : public notifier {
   commands::command*            check_command_ptr;
   timeperiod*                   check_period_ptr;
   timeperiod*                   notification_period_ptr;
-  objectlist_struct*            servicegroups_ptr;
+  std::list<std::shared_ptr<servicegroup>> const&
+                                get_parent_groups() const;
+  std::list<std::shared_ptr<servicegroup>>&
+                                get_parent_groups();
 
   static service_map            services;
 
@@ -229,6 +229,8 @@ class                           service : public notifier {
   enum service_state            _last_hard_state;
   enum service_state            _current_state;
   enum service_state            _initial_state;
+  std::list<std::shared_ptr<servicegroup>>
+                                _servicegroups;
 };
 CCE_END()
 

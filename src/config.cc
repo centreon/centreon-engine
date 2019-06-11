@@ -1256,7 +1256,7 @@ int check_servicegroup(std::shared_ptr<servicegroup> sg, int* w, int* e) {
     // Save a pointer to this servicegroup for faster service/group
     // membership lookups later.
     else {
-      add_object_to_objectlist(&found->second->servicegroups_ptr, sg.get());
+      found->second->get_parent_groups().push_back(sg);
 
       // Save service pointer for later.
       sg->members[it->first] = found->second;

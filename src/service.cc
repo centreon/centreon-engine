@@ -358,10 +358,8 @@ std::ostream& operator<<(std::ostream& os,
   if (obj.notification_period_ptr)
     notif_period_str = obj.notification_period_ptr->get_name();
   std::string svcgrp_str;
-  if (obj.servicegroups_ptr)
-    svcgrp_str =
-        static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)
-            ->get_group_name();
+  if (!obj.get_parent_groups().empty())
+    svcgrp_str = obj.get_parent_groups().front()->get_group_name();
 
   std::string cg_oss;
   std::string c_oss;
@@ -3660,4 +3658,12 @@ bool service::get_is_volatile() const {
 
 void service::set_is_volatile(bool vol) {
   _is_volatile = vol;
+}
+
+std::list<std::shared_ptr<servicegroup>> const& service::get_parent_groups() const {
+  return _servicegroups;
+}
+
+std::list<std::shared_ptr<servicegroup>>& service::get_parent_groups() {
+  return _servicegroups;
 }
