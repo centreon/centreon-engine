@@ -785,8 +785,7 @@ std::ostream& operator<<(std::ostream& os, host_map const& obj) {
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, host const& obj) {
-  com::centreon::engine::hostgroup const* hg =
-      static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr);
+  std::shared_ptr<hostgroup> hg{obj.get_parent_groups().front()};
 
   std::string evt_str;
   if (obj.event_handler_ptr)
@@ -3945,4 +3944,12 @@ enum host::host_state host::determine_host_reachability() {
   }
 
   return state;
+}
+
+std::list<std::shared_ptr<hostgroup>> const& host::get_parent_groups() const {
+  return _hostgroups;
+}
+
+std::list<std::shared_ptr<hostgroup>>& host::get_parent_groups() {
+  return _hostgroups;
 }

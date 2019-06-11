@@ -36,17 +36,14 @@
 
 
 /* Forward declaration. */
-extern "C" {
-struct objectlist_struct;
-};
-
 CCE_BEGIN()
-class host;
-class hostescalation;
-class timeperiod;
 namespace commands {
   class command;
 }
+class host;
+class hostgroup;
+class hostescalation;
+class timeperiod;
 CCE_END()
 
 typedef std::unordered_map<std::string,
@@ -285,7 +282,10 @@ class                host : public notifier {
   service_map         services;
   timeperiod          *check_period_ptr;
   timeperiod          *notification_period_ptr;
-  objectlist_struct*  hostgroups_ptr;
+  std::list<std::shared_ptr<hostgroup>> const&
+                                get_parent_groups() const;
+  std::list<std::shared_ptr<hostgroup>>&
+                                get_parent_groups();
 
 private:
   std::string         _name;
@@ -326,6 +326,8 @@ private:
   enum host_state    _last_hard_state;
   enum host_state    _current_state;
   enum host_state    _initial_state;
+  std::list<std::shared_ptr<hostgroup>>
+                                _hostgroups;
 };
 
 CCE_END()

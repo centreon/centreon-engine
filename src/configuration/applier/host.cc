@@ -530,7 +530,7 @@ void applier::host::resolve_object(
   it->second->services.clear();
 
   // Remove host group links.
-  deleter::listmember(it->second->hostgroups_ptr, &deleter::objectlist);
+  it->second->get_parent_groups().clear();
 
   // Reset host counters.
   it->second->set_total_services(0);
