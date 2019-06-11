@@ -250,7 +250,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(service::services.end());
        it != end;
        ++it, ++total_objects)
-    check_service(it->second.get(), &warnings, &errors);
+    check_service(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " services.";
@@ -264,7 +264,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(host::hosts.end());
        it != end;
        ++it, ++total_objects) {
-    check_host(it->second.get(), &warnings, &errors);
+    check_host(it->second, &warnings, &errors);
     if (verify_config)
       logger(log_info_message, basic)
         << "\tChecked " << total_objects << " hosts.";
@@ -278,7 +278,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(hostgroup::hostgroups.end());
        it != end;
        ++it, ++total_objects)
-    check_hostgroup(it->second.get(), &warnings, &errors);
+    check_hostgroup(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host groups.";
@@ -292,7 +292,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(servicegroup::servicegroups.end());
        it != end;
        ++it)
-    check_servicegroup(it->second.get(), &warnings, &errors);
+    check_servicegroup(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service groups.";
@@ -306,7 +306,7 @@ int pre_flight_object_check(int* w, int* e) {
          end{contact::contacts.end()};
        it != end;
        ++it) {
-    check_contact(it->second.get(), &warnings, &errors);
+    check_contact(it->second, &warnings, &errors);
   }
   if (verify_config)
     logger(log_info_message, basic)
@@ -337,7 +337,7 @@ int pre_flight_object_check(int* w, int* e) {
        end{serviceescalation::serviceescalations.end()};
        it != end;
        ++it, ++total_objects)
-    check_serviceescalation(it->second.get(), &warnings, &errors);
+    check_serviceescalation(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service escalations.";
@@ -352,7 +352,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(servicedependency::servicedependencies.end());
        it != end;
        ++it)
-    check_servicedependency(it->second.get(), &warnings, &errors);
+    check_servicedependency(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service dependencies.";
@@ -366,7 +366,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(hostescalation::hostescalations.end());
        it != end;
        ++it, ++total_objects)
-    check_hostescalation(it->second.get(), &warnings, &errors);
+    check_hostescalation(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host escalations.";
@@ -380,7 +380,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(hostdependency::hostdependencies.end());
        it != end;
        ++it)
-    check_hostdependency(it->second.get(), &warnings, &errors);
+    check_hostdependency(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host dependencies.";
@@ -417,7 +417,7 @@ int pre_flight_object_check(int* w, int* e) {
          end(timeperiod::timeperiods.end());
        it != end;
        ++it)
-    check_timeperiod(it->second.get(), &warnings, &errors);
+    check_timeperiod(it->second, &warnings, &errors);
   if (verify_config)
     logger(log_verification_error, basic)
       << "\tChecked " << total_objects << " time periods.";
@@ -679,7 +679,7 @@ int pre_flight_circular_check(int* w, int* e) {
   return ((errors > 0) ? ERROR : OK);
 }
 
-int check_service(com::centreon::engine::service* svc, int* w, int* e) {
+int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   int errors(0);
   int warnings(0);
 
@@ -703,8 +703,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
     svc->host_ptr = it->second.get();
 
   /* add a reverse link from the host to the service for faster lookups later */
-  svc->host_ptr->services[{svc->get_hostname(), svc->get_description()}] =
-    std::shared_ptr<com::centreon::engine::service>(svc);
+  svc->host_ptr->services[{svc->get_hostname(), svc->get_description()}] = svc;
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -715,7 +714,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
     svc->host_ptr,
     NULL,
     NULL,
-    svc,
+    svc.get(),
     &tv);
 
   /* check the event handler command */
@@ -898,7 +897,7 @@ int check_service(com::centreon::engine::service* svc, int* w, int* e) {
   return (errors == 0);
 }
 
-int check_host(host* hst, int* w, int* e) {
+int check_host(std::shared_ptr<host> hst, int* w, int* e) {
   int warnings(0);
   int errors(0);
 
@@ -1063,7 +1062,7 @@ int check_host(host* hst, int* w, int* e) {
        it != end;
        it++) {
 
-    umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<unsigned long, std::shared_ptr<host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first)));
 
     if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
@@ -1103,7 +1102,7 @@ int check_host(host* hst, int* w, int* e) {
   return (errors == 0);
 }
 
-int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
+int check_contact(std::shared_ptr<contact> cntct, int* w, int* e) {
   int warnings(0);
   int errors(0);
 
@@ -1227,7 +1226,7 @@ int check_contact(com::centreon::engine::contact* cntct, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_servicegroup(servicegroup* sg, int* w, int* e) {
+int check_servicegroup(std::shared_ptr<servicegroup> sg, int* w, int* e) {
   (void)w;
   int errors(0);
 
@@ -1237,10 +1236,15 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
          end(sg->members.end());
        it != end;
        ++it) {
-    service* temp_service(find_service(
-                            it->first.first.c_str(),
-                            it->first.second.c_str()));
-    if (!temp_service) {
+
+    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+      it->first.first, it->first.second));
+    std::unordered_map<std::pair<uint64_t, uint64_t>,
+      std::shared_ptr<service> >::const_iterator
+        found(state::instance().services().find(id));
+
+    if (found == state::instance().services().end() ||
+      !found->second) {
       logger(log_verification_error, basic)
         << "Error: Service '"
         << it->first.second
@@ -1252,11 +1256,12 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
 
     // Save a pointer to this servicegroup for faster service/group
     // membership lookups later.
-    else
-      add_object_to_objectlist(&temp_service->servicegroups_ptr, sg);
+    else {
+      add_object_to_objectlist(&found->second->servicegroups_ptr, sg.get());
 
-    // Save service pointer for later.
-    sg->members[it->first] = std::shared_ptr<service>(temp_service);
+      // Save service pointer for later.
+      sg->members[it->first] = found->second;
+    }
   }
 
   // Check for illegal characters in servicegroup name.
@@ -1283,7 +1288,7 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_hostgroup(hostgroup* hg, int* w, int* e) {
+int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
   (void)w;
   int errors(0);
 
@@ -1294,7 +1299,7 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
        it != end;
        ++it) {
 
-    umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    umap<unsigned long, std::shared_ptr<host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first.c_str())));
     if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
       logger(log_verification_error, basic)
@@ -1306,11 +1311,12 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
 
     // Save a pointer to this hostgroup for faster host/group
     // membership lookups later.
-    else
-      add_object_to_objectlist(&it_host->second->hostgroups_ptr, hg);
+    else {
+      add_object_to_objectlist(&it_host->second->hostgroups_ptr, hg.get());
 
-    // Save host pointer for later.
-    hg->members[it->first] = it_host->second;
+      // Save host pointer for later.
+      hg->members[it->first] = it_host->second;
+    }
   }
 
   // Check for illegal characters in hostgroup name.
@@ -1356,13 +1362,14 @@ int check_contactgroup(std::shared_ptr<contactgroup> cg, int* w, int* e) {
     }
     // Save a pointer to this contact group for faster contact/group
     // membership lookups later.
-    else
+    else {
       temp_contact->get_parent_groups().push_back(cg);
 
-    // Save the contact pointer for later.
-    // FIXME DBR: something strange here, we add again temp_contact to cg. But
-    // we get it from cg.
-    cg->add_member(temp_contact);
+      // Save the contact pointer for later.
+      // FIXME DBR: something strange here, we add again temp_contact to cg. But
+      // we get it from cg.
+      cg->add_member(temp_contact);
+    }
   }
 
   // Check for illegal characters in contact group name.
@@ -1389,15 +1396,19 @@ int check_contactgroup(std::shared_ptr<contactgroup> cg, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_servicedependency(servicedependency* sd, int* w, int* e) {
+int check_servicedependency(std::shared_ptr<servicedependency> sd, int* w, int* e) {
   (void)w;
   int errors(0);
 
   // Find the dependent service.
-  com::centreon::engine::service* temp_service(find_service(
-                          sd->get_dependent_hostname().c_str(),
-                          sd->get_dependent_service_description().c_str()));
-  if (!temp_service) {
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    sd->get_dependent_hostname(), sd->get_dependent_service_description()));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
+
+  if (found == state::instance().services().end() ||
+    found->second.get() == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Dependent service '"
       << sd->get_dependent_service_description() << "' on host '"
@@ -1408,14 +1419,15 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
     errors++;
   }
 
+  sd->dependent_service_ptr = found->second.get();
+
   // Save pointer for later.
-  sd->dependent_service_ptr = temp_service;
+  id = get_host_and_service_id(sd->get_hostname(), sd->get_service_description());
+  found = state::instance().services().find(id);
 
   // Find the service we're depending on.
-  temp_service = find_service(
-                   sd->get_hostname().c_str(),
-                   sd->get_service_description().c_str());
-  if (!temp_service) {
+  if (found == state::instance().services().end() ||
+    found->second.get() == nullptr) {
     logger(log_verification_error, basic)
       << "Error: Service '" << sd->get_service_description() << "' on host '"
       << sd->get_hostname()
@@ -1426,7 +1438,8 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
   }
 
   // Save pointer for later.
-  sd->master_service_ptr = temp_service;
+  else
+    sd->master_service_ptr = found->second.get();
 
   // Make sure they're not the same service.
   if (sd->dependent_service_ptr == sd->master_service_ptr) {
@@ -1476,7 +1489,7 @@ int check_servicedependency(servicedependency* sd, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_hostdependency(hostdependency* hd, int* w, int* e) {
+int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
   (void)w;
   int errors(0);
 
@@ -1562,13 +1575,19 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_serviceescalation(serviceescalation* se, int* w, int* e) {
+int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* e) {
   (void)w;
   int errors(0);
 
   // Find the service.
-  com::centreon::engine::service* temp_service(find_service(se->get_hostname().c_str(), se->get_description().c_str()));
-  if (!temp_service) {
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    se->get_hostname(), se->get_description()));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
+
+  if (found == state::instance().services().end() ||
+    found->second.get() == nullptr) {
     logger(log_verification_error, basic) << "Error: Service '"
         << se->get_description() << "' on host '" << se->get_hostname()
         << "' specified in service escalation is not defined anywhere!";
@@ -1576,7 +1595,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
   }
 
   // Save the service pointer for later.
-  se->notifier_ptr = temp_service;
+  se->notifier_ptr = found->second.get();
 
   // Find the timeperiod.
   if (!se->get_escalation_period().empty()) {
@@ -1654,7 +1673,7 @@ int check_serviceescalation(serviceescalation* se, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_hostescalation(hostescalation* he, int* w, int* e) {
+int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   (void)w;
   int errors(0);
 
@@ -1747,7 +1766,7 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
  *
  *  @return Non-zero on success.
  */
-int check_timeperiod(timeperiod* tp, int* w, int* e) {
+int check_timeperiod(std::shared_ptr<timeperiod> tp, int* w, int* e) {
   (void)w;
   int errors(0);
 

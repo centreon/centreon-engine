@@ -408,7 +408,7 @@ std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>& appl
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
+std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
   return _hosts.find(k);
 }
 
@@ -420,7 +420,7 @@ std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>:
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-std::unordered_map<unsigned long, std::shared_ptr<com::centreon::engine::host>>::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
+std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
   return _hosts.find(k);
 }
 

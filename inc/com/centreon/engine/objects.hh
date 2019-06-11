@@ -30,7 +30,6 @@
 #  include "com/centreon/engine/servicedependency.hh"
 #  include "com/centreon/engine/serviceescalation.hh"
 #  include "com/centreon/engine/timerange.hh"
-#  include "find.hh"
 
 /*
 ** Current object revision, Increment when changes are made to data

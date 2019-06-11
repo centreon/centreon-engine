@@ -34,7 +34,6 @@
 #include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/xpddefault.hh"
-#include "find.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;

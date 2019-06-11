@@ -998,7 +998,6 @@ int process_hostgroup_command(int cmd,
                               char* args) {
   char* hostgroup_name = nullptr;
   hostgroup* temp_hostgroup = nullptr;
-  com::centreon::engine::service* temp_service = nullptr;
 
   (void)entry_time;
 
@@ -1059,33 +1058,33 @@ int process_hostgroup_command(int cmd,
              end2(it->second->services.end());
            it2 != end2;
            ++it2) {
-        if ((temp_service = it2->second.get()) == nullptr)
+        if (!it2->second)
           continue;
 
         switch (cmd) {
 
         case CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS:
-          enable_service_notifications(temp_service);
+          enable_service_notifications(it2->second);
           break;
 
         case CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS:
-          disable_service_notifications(temp_service);
+          disable_service_notifications(it2->second);
           break;
 
         case CMD_ENABLE_HOSTGROUP_SVC_CHECKS:
-          enable_service_checks(temp_service);
+          enable_service_checks(it2->second);
           break;
 
         case CMD_DISABLE_HOSTGROUP_SVC_CHECKS:
-          disable_service_checks(temp_service);
+          disable_service_checks(it2->second);
           break;
 
         case CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS:
-          enable_passive_service_checks(temp_service);
+          enable_passive_service_checks(it2->second);
           break;
 
         case CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS:
-          disable_passive_service_checks(temp_service);
+          disable_passive_service_checks(it2->second);
           break;
 
         default:
@@ -1103,7 +1102,6 @@ int process_host_command(int cmd,
                          char* args) {
   char* host_name = nullptr;
   host* temp_host = nullptr;
-  com::centreon::engine::service* temp_service = nullptr;
   char* str = nullptr;
   char* buf[2] = { nullptr, nullptr };
   int intval = 0;
@@ -1155,12 +1153,12 @@ int process_host_command(int cmd,
            end(temp_host->services.end());
          it != end;
          ++it) {
-      if ((temp_service = it->second.get()) == nullptr)
+      if (!it->second)
         continue;
       if (cmd == CMD_ENABLE_HOST_SVC_NOTIFICATIONS)
-        enable_service_notifications(temp_service);
+        enable_service_notifications(it->second);
       else
-        disable_service_notifications(temp_service);
+        disable_service_notifications(it->second);
     }
     break;
 
@@ -1171,12 +1169,12 @@ int process_host_command(int cmd,
            end(temp_host->services.end());
          it != end;
          ++it) {
-      if ((temp_service = it->second.get()) == nullptr)
+      if (!it->second)
         continue;
       if (cmd == CMD_ENABLE_HOST_SVC_CHECKS)
-        enable_service_checks(temp_service);
+        enable_service_checks(it->second);
       else
-        disable_service_checks(temp_service);
+        disable_service_checks(it->second);
     }
     break;
 
@@ -1252,7 +1250,6 @@ int process_service_command(int cmd,
                             char* args) {
   char* host_name = nullptr;
   char* svc_description = nullptr;
-  com::centreon::engine::service* temp_service = nullptr;
   char* str = nullptr;
   char* buf[2] = { nullptr, nullptr };
   int intval = 0;
@@ -1268,62 +1265,67 @@ int process_service_command(int cmd,
     return ERROR;
 
   /* find the service */
-  if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    host_name, svc_description));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
+  if (found == state::instance().services().end() || !found->second.get())
     return ERROR;
 
   switch (cmd) {
   case CMD_ENABLE_SVC_NOTIFICATIONS:
-    enable_service_notifications(temp_service);
+    enable_service_notifications(found->second);
     break;
 
   case CMD_DISABLE_SVC_NOTIFICATIONS:
-    disable_service_notifications(temp_service);
+    disable_service_notifications(found->second);
     break;
 
   case CMD_ENABLE_SVC_CHECK:
-    enable_service_checks(temp_service);
+    enable_service_checks(found->second);
     break;
 
   case CMD_DISABLE_SVC_CHECK:
-    disable_service_checks(temp_service);
+    disable_service_checks(found->second);
     break;
 
   case CMD_ENABLE_SVC_EVENT_HANDLER:
-    enable_service_event_handler(temp_service);
+    enable_service_event_handler(found->second);
     break;
 
   case CMD_DISABLE_SVC_EVENT_HANDLER:
-    disable_service_event_handler(temp_service);
+    disable_service_event_handler(found->second);
     break;
 
   case CMD_ENABLE_SVC_FLAP_DETECTION:
-    enable_service_flap_detection(temp_service);
+    enable_service_flap_detection(found->second.get());
     break;
 
   case CMD_DISABLE_SVC_FLAP_DETECTION:
-    disable_service_flap_detection(temp_service);
+    disable_service_flap_detection(found->second.get());
     break;
 
   case CMD_ENABLE_PASSIVE_SVC_CHECKS:
-    enable_passive_service_checks(temp_service);
+    enable_passive_service_checks(found->second);
     break;
 
   case CMD_DISABLE_PASSIVE_SVC_CHECKS:
-    disable_passive_service_checks(temp_service);
+    disable_passive_service_checks(found->second);
     break;
 
   case CMD_START_OBSESSING_OVER_SVC:
-    start_obsessing_over_service(temp_service);
+    start_obsessing_over_service(found->second);
     break;
 
   case CMD_STOP_OBSESSING_OVER_SVC:
-    stop_obsessing_over_service(temp_service);
+    stop_obsessing_over_service(found->second);
     break;
 
   case CMD_SET_SVC_NOTIFICATION_NUMBER:
     if ((str = my_strtok(nullptr, ";"))) {
       intval = atoi(str);
-      set_service_notification_number(temp_service, intval);
+      set_service_notification_number(found->second, intval);
     }
     break;
 
@@ -1337,7 +1339,7 @@ int process_service_command(int cmd,
     if (str)
       buf[1] = string::dup(str);
     if (buf[0] && buf[1])
-      temp_service->notify(
+      found->second->notify(
                            NOTIFICATION_CUSTOM,
                            buf[0],
                            buf[1],
@@ -1355,22 +1357,19 @@ int process_servicegroup_command(int cmd,
                                  time_t entry_time,
                                  char* args) {
   (void)entry_time;
-
   char* servicegroup_name{nullptr};
-  std::shared_ptr<servicegroup> temp_servicegroup;
   host* temp_host{nullptr};
   host* last_host{nullptr};
-  com::centreon::engine::service* temp_service{nullptr};
 
   /* get the servicegroup name */
   if ((servicegroup_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
   /* find the servicegroup */
-  servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(servicegroup_name)};
-  if (sg_it == servicegroup::servicegroups.end())
+  servicegroup_map::const_iterator
+    sg_it{servicegroup::servicegroups.find(servicegroup_name)};
+  if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
     return ERROR;
-  temp_servicegroup = sg_it->second;
 
   switch (cmd) {
 
@@ -1383,40 +1382,43 @@ int process_servicegroup_command(int cmd,
 
     /* loop through all servicegroup members */
     for (service_map::iterator
-           it(temp_servicegroup->members.begin()),
-           end(temp_servicegroup->members.end());
+           it(sg_it->second->members.begin()),
+           end(sg_it->second->members.end());
          it != end;
          ++it) {
 
-      temp_service = find_service(it->first.first.c_str(),
-        it->first.second.c_str());
-      if (temp_service == nullptr)
+      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+        it->first.first, it->first.second));
+      std::unordered_map<std::pair<uint64_t, uint64_t>,
+                         std::shared_ptr<service> >::const_iterator
+        found(state::instance().services().find(id));
+      if (found == state::instance().services().end() || !found->second)
         continue;
 
       switch (cmd) {
 
       case CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
-        enable_service_notifications(temp_service);
+        enable_service_notifications(found->second);
         break;
 
       case CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
-        disable_service_notifications(temp_service);
+        disable_service_notifications(found->second);
         break;
 
       case CMD_ENABLE_SERVICEGROUP_SVC_CHECKS:
-        enable_service_checks(temp_service);
+        enable_service_checks(found->second);
         break;
 
       case CMD_DISABLE_SERVICEGROUP_SVC_CHECKS:
-        disable_service_checks(temp_service);
+        disable_service_checks(found->second);
         break;
 
       case CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
-        enable_passive_service_checks(temp_service);
+        enable_passive_service_checks(found->second);
         break;
 
       case CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
-        disable_passive_service_checks(temp_service);
+        disable_passive_service_checks(found->second);
         break;
 
       default:
@@ -1434,8 +1436,8 @@ int process_servicegroup_command(int cmd,
     /* loop through all hosts that have services belonging to the servicegroup */
     last_host = nullptr;
     for (service_map::iterator
-           it(temp_servicegroup->members.begin()),
-           end(temp_servicegroup->members.end());
+           it(sg_it->second->members.begin()),
+           end(sg_it->second->members.end());
          it != end;
          ++it) {
       temp_host = nullptr;

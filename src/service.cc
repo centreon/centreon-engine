@@ -126,7 +126,7 @@ service::service(std::string const& hostname,
 
 service::~service() {
   this->contact_groups.clear();
-  deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
+  //deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
 }
 
 time_t service::get_last_time_ok() const {

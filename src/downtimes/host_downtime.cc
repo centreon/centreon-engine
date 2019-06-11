@@ -28,7 +28,6 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "compatibility/find.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;

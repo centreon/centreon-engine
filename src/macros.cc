@@ -210,20 +210,27 @@ int grab_custom_macro_value_r(
       /* if first arg is blank, it means use the current host name */
       if (mac->host_ptr == nullptr)
         return ERROR;
-      if ((temp_service = find_service(
-                            mac->host_ptr ? mac->host_ptr->get_name().c_str() : nullptr,
-                            arg2))) {
+
+      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+        mac->host_ptr ? mac->host_ptr->get_name(): "", arg2));
+      std::unordered_map<std::pair<uint64_t, uint64_t>,
+                         std::shared_ptr<service> >::const_iterator
+        found(state::instance().services().find(id));
+
+      if (found != state::instance().services().end() &&
+        found->second) {
+
         /* get the service macro value */
         result = grab_custom_object_macro_r(
                    mac,
                    macro_name + 8,
-                   temp_service->custom_variables,
+                   found->second->custom_variables,
                    output);
       }
       /* else we have a service macro with a servicegroup name and a delimiter... */
       else {
         servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(arg1)};
-        if (sg_it == servicegroup::servicegroups.end())
+        if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
           return ERROR;
 
         std::shared_ptr<servicegroup> const& temp_servicegroup{sg_it->second};

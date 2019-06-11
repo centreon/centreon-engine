@@ -286,7 +286,7 @@ void applier::hostdependency::resolve_object(
 
   // Resolve host dependency.
   if (!check_hostdependency(
-        it->second.get(),
+        it->second,
         &config_warnings,
         &config_errors))
     throw (engine_error() << "Cannot resolve host dependency");

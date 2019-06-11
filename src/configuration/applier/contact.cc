@@ -393,11 +393,10 @@ void applier::contact::resolve_object(
 
   // Find contact.
   contact_map::const_iterator ct_it{engine::contact::contacts.find(obj.contact_name())};
-  if (ct_it == engine::contact::contacts.end())
+  if (ct_it == engine::contact::contacts.end() || !ct_it->second)
     throw (engine_error()
            << "Cannot resolve non-existing contact '"
            << obj.contact_name() << "'");
-  engine::contact* c{ct_it->second.get()};
 
   // Add all the host notification commands.
   for (list_string::const_iterator
@@ -407,7 +406,7 @@ void applier::contact::resolve_object(
        ++it) {
     std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator itt(configuration::applier::state::instance().commands().find(*it));
     if (itt != configuration::applier::state::instance().commands().end())
-      c->get_host_notification_commands().push_back(itt->second);
+      ct_it->second->get_host_notification_commands().push_back(itt->second);
     else {
       ++config_errors;
       throw (engine_error()
@@ -425,7 +424,7 @@ void applier::contact::resolve_object(
        ++it) {
     std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator itt(configuration::applier::state::instance().commands().find(*it));
     if (itt != configuration::applier::state::instance().commands().end())
-      c->get_service_notification_commands().push_back(itt->second);
+      ct_it->second->get_service_notification_commands().push_back(itt->second);
     else {
       ++config_errors;
       throw(
@@ -436,10 +435,10 @@ void applier::contact::resolve_object(
   }
 
   // Remove contact group links.
-  c->get_parent_groups().clear();
+  ct_it->second->get_parent_groups().clear();
 
   // Resolve contact.
-  if (!check_contact(c, &config_warnings, &config_errors))
+  if (!check_contact(ct_it->second, &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve contact '"
            << obj.contact_name() << "'");
 }

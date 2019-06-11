@@ -121,7 +121,7 @@ class                host : public notifier {
                            bool obsess_over_host,
                            std::string const& timezone);
                      ~host() {}
-  void               add_child_link(host* child);
+  void               add_child_link(std::shared_ptr<host> child);
   void               add_parent_host(std::string const& host_name);
   int                log_event();
   int                handle_async_check_result_3x(

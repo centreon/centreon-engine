@@ -351,7 +351,7 @@ void applier::service::modify_object(
     throw (engine_error() << "Could not modify non-existing "
            << "service object '" << service_description
            << "' of host '" << host_name << "'");
-  engine::service* s(it_obj->second.get());
+  std::shared_ptr<engine::service> s(it_obj->second);
 
   // Update the global configuration set.
   configuration::service obj_old(*it_cfg);
@@ -468,7 +468,7 @@ void applier::service::modify_object(
     NEBTYPE_SERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    s,
+    s.get(),
     CMD_NONE,
     MODATTR_ALL,
     MODATTR_ALL,
@@ -499,7 +499,7 @@ void applier::service::remove_object(
        std::shared_ptr<engine::service> >::iterator
     it(applier::state::instance().services_find(obj.key()));
   if (it != applier::state::instance().services().end()) {
-    engine::service* svc(it->second.get());
+    std::shared_ptr<engine::service> svc(it->second);
 
     // Remove service comments.
     comment::delete_service_comments(host_name, service_description);
@@ -523,7 +523,7 @@ void applier::service::remove_object(
       NEBTYPE_SERVICE_DELETE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      svc,
+      svc.get(),
       CMD_NONE,
       MODATTR_ALL,
       MODATTR_ALL,
@@ -569,17 +569,17 @@ void applier::service::resolve_object(
     &deleter::objectlist);
 
   // Find host and adjust its counters.
-  umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::iterator
+  std::unordered_map<uint64_t, std::shared_ptr<engine::host>>::iterator
     hst(applier::state::instance().hosts_find(it->first.first));
   if (hst != applier::state::instance().hosts().end()) {
     hst->second->set_total_services(hst->second->get_total_services() + 1);
     hst->second->set_total_service_check_interval(
       hst->second->get_total_service_check_interval() +
-      static_cast<unsigned long>(it->second->get_check_interval()));
+      static_cast<uint64_t>(it->second->get_check_interval()));
   }
 
   // Resolve service.
-  if (!check_service(it->second.get(), &config_warnings, &config_errors))
+  if (!check_service(it->second, &config_warnings, &config_errors))
       throw (engine_error() << "Cannot resolve service '"
              << obj.service_description() << "' of host '"
              << *obj.hosts().begin() << "'");

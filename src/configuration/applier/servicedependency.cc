@@ -351,7 +351,7 @@ void applier::servicedependency::resolve_object(
 
   // Resolve service dependency.
   if (!check_servicedependency(
-        it->second.get(),
+        it->second,
         &config_warnings,
         &config_errors))
     throw (engine_error() << "Cannot resolve service dependency");

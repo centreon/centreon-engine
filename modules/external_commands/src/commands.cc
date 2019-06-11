@@ -175,7 +175,6 @@ int process_external_command(char const* cmd) {
 int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   char* user(nullptr);
@@ -194,7 +193,12 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+      host_name, svc_description));
+    std::unordered_map<std::pair<uint64_t, uint64_t>,
+                       std::shared_ptr<service> >::const_iterator
+      found(state::instance().services().find(id));
+    if (found == state::instance().services().end() || !found->second)
       return ERROR;
   }
 
@@ -259,7 +263,6 @@ int cmd_delete_comment(int cmd, char* args) {
 
 /* removes all comments associated with a host or service from the status log */
 int cmd_delete_all_comments(int cmd, char* args) {
-  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -276,7 +279,12 @@ int cmd_delete_all_comments(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+      host_name, svc_description));
+    std::unordered_map<std::pair<uint64_t, uint64_t>,
+                       std::shared_ptr<service> >::const_iterator
+      found(state::instance().services().find(id));
+    if (found == state::instance().services().end() || !found->second)
       return ERROR;
   }
 
@@ -302,10 +310,11 @@ int cmd_delete_all_comments(int cmd, char* args) {
 int cmd_delay_notification(int cmd, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+    std::shared_ptr<service> >::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -319,7 +328,12 @@ int cmd_delay_notification(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+      host_name, svc_description));
+    found = state::instance().services().find(id);
+
+    if (found == state::instance().services().end() ||
+      !found->second)
       return ERROR;
   }
 
@@ -343,7 +357,7 @@ int cmd_delay_notification(int cmd, char* args) {
   if (cmd == CMD_DELAY_HOST_NOTIFICATION)
     temp_host->set_next_notification(delay_time);
   else
-    temp_service->set_next_notification(delay_time);
+    found->second->set_next_notification(delay_time);
 
   return OK;
 }
@@ -352,10 +366,11 @@ int cmd_delay_notification(int cmd, char* args) {
 int cmd_schedule_check(int cmd, char* args) {
   char* temp_ptr(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+    std::shared_ptr<service> >::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -383,7 +398,12 @@ int cmd_schedule_check(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+      host_name, svc_description));
+    found = state::instance().services().find(id);
+
+    if (found == state::instance().services().end() ||
+      !found->second)
       return ERROR;
   }
 
@@ -408,16 +428,16 @@ int cmd_schedule_check(int cmd, char* args) {
            end(temp_host->services.end());
          it != end;
          ++it) {
-      if ((temp_service = it->second.get()) == nullptr)
+      if (!it->second)
         continue;
-      temp_service->schedule_check(
+      it->second->schedule_check(
         delay_time,
         (cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS)
         ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
     }
   }
   else
-    temp_service->schedule_check(
+    found->second->schedule_check(
       delay_time,
       (cmd == CMD_SCHEDULE_FORCED_SVC_CHECK)
       ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
@@ -556,7 +576,6 @@ int process_passive_service_check(
       int return_code,
       char const* output) {
   com::centreon::engine::host* temp_host(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   char const* real_host_name(nullptr);
 
   /* skip this service check result if we aren't accepting passive service checks */
@@ -598,7 +617,12 @@ int process_passive_service_check(
   }
 
   /* make sure the service exists */
-  if ((temp_service = find_service(real_host_name, svc_description)) == nullptr) {
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    real_host_name, svc_description));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
+  if (found == state::instance().services().end() || !found->second) {
     logger(log_runtime_warning, basic)
       << "Warning:  Passive check result was received for service '"
       << svc_description << "' on host '" << host_name
@@ -607,7 +631,7 @@ int process_passive_service_check(
   }
 
   /* skip this is we aren't accepting passive checks for this service */
-  if (temp_service->accept_passive_service_checks == false)
+  if (found->second->accept_passive_service_checks == false)
     return ERROR;
 
   timeval tv;
@@ -792,7 +816,6 @@ int process_passive_host_check(
 
 /* acknowledges a host or service problem */
 int cmd_acknowledge_problem(int cmd, char* args) {
-  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -802,6 +825,8 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   int type(ACKNOWLEDGEMENT_NORMAL);
   int notify(true);
   int persistent(true);
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -824,7 +849,12 @@ int cmd_acknowledge_problem(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(temp_host->get_name().c_str(), svc_description)) == nullptr)
+    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+      temp_host->get_name(), svc_description));
+    found = state::instance().services().find(id);
+
+    if (found == state::instance().services().end() ||
+      !found->second)
       return ERROR;
   }
 
@@ -867,7 +897,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   /* acknowledge the service problem */
   else
     acknowledge_service_problem(
-      temp_service,
+      found->second,
       ack_author,
       ack_data,
       type,
@@ -883,10 +913,11 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
 /* removes a host or service acknowledgement */
 int cmd_remove_acknowledgement(int cmd, char* args) {
-  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+    std::shared_ptr<service> >::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -909,7 +940,12 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    if (!(temp_service = find_service(temp_host->get_name().c_str(), svc_description)))
+    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+      temp_host->get_name(), svc_description));
+    found = state::instance().services().find(id);
+
+    if (found == state::instance().services().end() ||
+      !found->second)
       return ERROR;
   }
 
@@ -919,14 +955,13 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
   /* acknowledge the service problem */
   else
-    remove_service_acknowledgement(temp_service);
+    remove_service_acknowledgement(found->second);
 
   return OK;
 }
 
 /* schedules downtime for a specific host or service */
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
-  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   com::centreon::engine::host* last_host(nullptr);
   hostgroup* temp_hostgroup(nullptr);
@@ -943,7 +978,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   char* author(nullptr);
   char* comment_data(nullptr);
   uint64_t downtime_id{0};
-  std::shared_ptr<servicegroup> temp_servicegroup;
+  servicegroup_map::const_iterator sg_it;
 
   if (cmd == CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME
       || cmd == CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME) {
@@ -970,10 +1005,10 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       return ERROR;
 
     /* verify that the servicegroup is valid */
-    servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(servicegroup_name)};
-    if (sg_it == servicegroup::servicegroups.end())
+    sg_it = servicegroup::servicegroups.find(servicegroup_name);
+    if (sg_it == servicegroup::servicegroups.end() ||
+      !sg_it->second)
       return ERROR;
-    temp_servicegroup = sg_it->second;
   }
   else {
 
@@ -998,7 +1033,14 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         return ERROR;
 
       /* verify that the service is valid */
-      if ((temp_service = find_service(temp_host->get_name().c_str(), svc_description)) == nullptr)
+      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+        temp_host->get_name(), svc_description));
+      std::unordered_map<std::pair<uint64_t, uint64_t>,
+                         std::shared_ptr<service> >::const_iterator
+        found(state::instance().services().find(id));
+
+      if (found == state::instance().services().end() ||
+        !found->second)
         return ERROR;
     }
   }
@@ -1090,12 +1132,12 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
            end(temp_host->services.end());
          it != end;
          ++it) {
-      if ((temp_service = it->second.get()) == nullptr)
+      if (!it->second)
         continue;
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
         host_name,
-        temp_service->get_description(),
+        it->second->get_description(),
         entry_time,
         author,
         comment_data,
@@ -1142,12 +1184,12 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
              end2(it->second->services.end());
            it2 != end2;
            ++it2) {
-        if ((temp_service = it2->second.get()) == nullptr)
+        if (!it2->second)
           continue;
         downtime_manager::instance().schedule_downtime(
           SERVICE_DOWNTIME,
-          temp_service->get_hostname(),
-          temp_service->get_description(),
+          it2->second->get_hostname(),
+          it2->second->get_description(),
           entry_time, author,
           comment_data,
           start_time,
@@ -1163,8 +1205,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   case CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME:
     last_host = nullptr;
       for (service_map::iterator
-             it(temp_servicegroup->members.begin()),
-             end(temp_servicegroup->members.end());
+             it(sg_it->second->members.begin()),
+             end(sg_it->second->members.end());
            it != end;
            ++it) {
       temp_host = nullptr;
@@ -1196,8 +1238,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME:
     for (service_map::iterator
-           it(temp_servicegroup->members.begin()),
-           end(temp_servicegroup->members.end());
+           it(sg_it->second->members.begin()),
+           end(sg_it->second->members.end());
          it != end;
          ++it)
       downtime_manager::instance().schedule_downtime(
@@ -1560,7 +1602,6 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd, char* args) {
-  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   contact* temp_contact(nullptr);
   char* host_name(nullptr);
@@ -1577,6 +1618,9 @@ int cmd_change_object_int_var(int cmd, char* args) {
   unsigned long sattr(MODATTR_NONE);
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it;
+  std::pair<uint64_t, uint64_t> id;
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service>>::const_iterator found_svc;
 
   switch (cmd) {
     case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
@@ -1593,7 +1637,11 @@ int cmd_change_object_int_var(int cmd, char* args) {
         return ERROR;
 
       /* verify that the service is valid */
-      if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+      id = get_host_and_service_id(host_name, svc_description);
+      found_svc = state::instance().services().find(id);
+
+      if (found_svc == state::instance().services().end() ||
+        !found_svc->second)
         return ERROR;
       break;
 
@@ -1697,53 +1745,53 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
   case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
     /* save the old check interval */
-    old_dval = temp_service->get_check_interval();
+    old_dval = found_svc->second->get_check_interval();
 
     /* modify the check interval */
-    temp_service->set_check_interval(dval);
+    found_svc->second->set_check_interval(dval);
     attr = MODATTR_NORMAL_CHECK_INTERVAL;
 
     /* schedule a service check if previous interval was 0 (checks were not regularly scheduled) */
-    if (old_dval == 0 && temp_service->get_checks_enabled()
-        && temp_service->get_check_interval() != 0) {
+    if (old_dval == 0 && found_svc->second->get_checks_enabled()
+        && found_svc->second->get_check_interval() != 0) {
 
       /* set the service check flag */
-      temp_service->set_should_be_scheduled(true);
+      found_svc->second->set_should_be_scheduled(true);
 
       /* schedule a check for right now (or as soon as possible) */
       time(&preferred_time);
       if (check_time_against_period(
             preferred_time,
-            temp_service->check_period_ptr) == ERROR) {
+            found_svc->second->check_period_ptr) == ERROR) {
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
-          temp_service->check_period_ptr);
-        temp_service->set_next_check(next_valid_time);
+          found_svc->second->check_period_ptr);
+        found_svc->second->set_next_check(next_valid_time);
       }
       else
-        temp_service->set_next_check(preferred_time);
+        found_svc->second->set_next_check(preferred_time);
 
       /* schedule a check if we should */
-      if (temp_service->get_should_be_scheduled())
-        temp_service->schedule_check(temp_service->get_next_check(), CHECK_OPTION_NONE);
+      if (found_svc->second->get_should_be_scheduled())
+        found_svc->second->schedule_check(found_svc->second->get_next_check(), CHECK_OPTION_NONE);
     }
     break;
 
   case CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL:
-    temp_service->set_retry_interval(dval);
+    found_svc->second->set_retry_interval(dval);
     attr = MODATTR_RETRY_CHECK_INTERVAL;
     break;
 
   case CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS:
-    temp_service->set_max_attempts(intval);
+    found_svc->second->set_max_attempts(intval);
     attr = MODATTR_MAX_CHECK_ATTEMPTS;
 
     /* adjust current attempt number if in a hard state */
-    if (temp_service->get_state_type() == notifier::hard
-        && temp_service->get_current_state() != service::state_ok
-        && temp_service->get_current_attempt() > 1)
-      temp_service->set_current_attempt(temp_service->get_max_attempts());
+    if (found_svc->second->get_state_type() == notifier::hard
+        && found_svc->second->get_current_state() != service::state_ok
+        && found_svc->second->get_current_attempt() > 1)
+      found_svc->second->set_current_attempt(found_svc->second->get_max_attempts());
     break;
 
   case CMD_CHANGE_HOST_MODATTR:
@@ -1774,22 +1822,22 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
     /* set the modified service attribute */
     if (cmd == CMD_CHANGE_SVC_MODATTR)
-      temp_service->set_modified_attributes(attr);
+      found_svc->second->set_modified_attributes(attr);
     else
-      temp_service->set_modified_attributes(temp_service->get_modified_attributes() | attr);
+      found_svc->second->set_modified_attributes(found_svc->second->get_modified_attributes() | attr);
 
     /* send data to event broker */
     broker_adaptive_service_data(
       NEBTYPE_ADAPTIVESERVICE_UPDATE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      temp_service,
+      found_svc->second.get(),
       cmd, attr,
-      temp_service->get_modified_attributes(),
+      found_svc->second->get_modified_attributes(),
       nullptr);
 
     /* update the status log with the service info */
-    temp_service->update_status(false);
+      found_svc->second->update_status(false);
     break;
 
   case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
@@ -1866,7 +1914,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd, char* args) {
-  com::centreon::engine::service* temp_service{nullptr};
   com::centreon::engine::host* temp_host{nullptr};
   contact* temp_contact{nullptr};
   timeperiod* temp_timeperiod{nullptr};
@@ -1880,8 +1927,10 @@ int cmd_change_object_char_var(int cmd, char* args) {
   unsigned long attr{MODATTR_NONE};
   unsigned long hattr{MODATTR_NONE};
   unsigned long sattr{MODATTR_NONE};
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it;
+  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator it;
+  std::pair<uint64_t, uint64_t> id;
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+    std::shared_ptr<service>>::const_iterator found_svc;
 
   /* SECURITY PATCH - disable these for the time being */
   switch (cmd) {
@@ -1936,7 +1985,11 @@ int cmd_change_object_char_var(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == nullptr)
+    id = get_host_and_service_id(host_name, svc_description);
+    found_svc = state::instance().services().find(id);
+
+    if (found_svc == state::instance().services().end() ||
+      !found_svc->second)
       return ERROR;
 
     if ((charval = my_strtok(nullptr, "\n")) == nullptr)
@@ -2053,27 +2106,27 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_SVC_EVENT_HANDLER:
-    temp_service->set_event_handler(temp_ptr);
-    temp_service->event_handler_ptr = temp_command;
+    found_svc->second->set_event_handler(temp_ptr);
+    found_svc->second->event_handler_ptr = temp_command;
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_SVC_CHECK_COMMAND:
-    temp_service->set_check_command(temp_ptr);
+    found_svc->second->set_check_command(temp_ptr);
     delete[] temp_ptr;
-    temp_service->check_command_ptr = temp_command;
+    found_svc->second->check_command_ptr = temp_command;
     attr = MODATTR_CHECK_COMMAND;
     break;
 
   case CMD_CHANGE_SVC_CHECK_TIMEPERIOD:
-    temp_service->set_check_period(temp_ptr);
-    temp_service->check_period_ptr = temp_timeperiod;
+    found_svc->second->set_check_period(temp_ptr);
+    found_svc->second->check_period_ptr = temp_timeperiod;
     attr = MODATTR_CHECK_TIMEPERIOD;
     break;
 
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
-    temp_service->set_notification_period(temp_ptr);
-    temp_service->notification_period_ptr = temp_timeperiod;
+    found_svc->second->set_notification_period(temp_ptr);
+    found_svc->second->notification_period_ptr = temp_timeperiod;
     attr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
@@ -2141,21 +2194,21 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
 
     /* set the modified service attribute */
-    temp_service->add_modified_attributes(attr);
+    found_svc->second->add_modified_attributes(attr);
 
     /* send data to event broker */
     broker_adaptive_service_data(
       NEBTYPE_ADAPTIVESERVICE_UPDATE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      temp_service,
+      found_svc->second.get(),
       cmd,
       attr,
-      temp_service->get_modified_attributes(),
+      found_svc->second->get_modified_attributes(),
       nullptr);
 
     /* update the status log with the service info */
-    temp_service->update_status(false);
+    found_svc->second->update_status(false);
     break;
 
   case CMD_CHANGE_HOST_EVENT_HANDLER:
@@ -2219,7 +2272,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
 /* changes a custom host or service variable */
 int cmd_change_object_custom_var(int cmd, char* args) {
   com::centreon::engine::host* temp_host(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   contact* temp_contact(nullptr);
 
   /* get the host or contact name */
@@ -2283,19 +2335,26 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     break;
   case CMD_CHANGE_CUSTOM_SVC_VAR:
     {
-      if ((temp_service = find_service(name1.c_str(), name2.c_str())) == nullptr)
+      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+        name1, name2));
+      std::unordered_map<std::pair<uint64_t, uint64_t>,
+                         std::shared_ptr<service> >::const_iterator
+        found(state::instance().services().find(id));
+
+      if (found == state::instance().services().end() ||
+        !found->second)
         return ERROR;
-      std::unordered_map<std::string, customvariable>::iterator it(temp_service->custom_variables.find(varname));
-      if (it == temp_service->custom_variables.end())
-        temp_service->custom_variables.insert({std::move(varname), customvariable(std::move(varvalue))});
+      std::unordered_map<std::string, customvariable>::iterator it(found->second->custom_variables.find(varname));
+      if (it == found->second->custom_variables.end())
+        found->second->custom_variables.insert({std::move(varname), customvariable(std::move(varvalue))});
       else
         it->second.update(std::move(varvalue));
 
       /* set the modified attributes and update the status of the object */
-      temp_service->custom_variables.insert(
-          {std::move(varname), customvariable(std::move(varvalue))});
-      temp_service->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
-      temp_service->update_status(false);
+      found->second->custom_variables.insert(
+        {std::move(varname), customvariable(std::move(varvalue))});
+      found->second->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
+      found->second->update_status(false);
     }
     break;
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
@@ -2359,7 +2418,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
 /******************************************************************/
 
 /* temporarily disables a service check */
-void disable_service_checks(com::centreon::engine::service* svc) {
+void disable_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -2378,7 +2437,7 @@ void disable_service_checks(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2389,7 +2448,7 @@ void disable_service_checks(com::centreon::engine::service* svc) {
 }
 
 /* enables a service check */
-void enable_service_checks(com::centreon::engine::service* svc) {
+void enable_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -2432,7 +2491,7 @@ void enable_service_checks(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2505,7 +2564,7 @@ void disable_all_notifications(void) {
 }
 
 /* enables notifications for a service */
-void enable_service_notifications(com::centreon::engine::service* svc) {
+void enable_service_notifications(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2523,7 +2582,7 @@ void enable_service_notifications(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2534,7 +2593,7 @@ void enable_service_notifications(com::centreon::engine::service* svc) {
 }
 
 /* disables notifications for a service */
-void disable_service_notifications(com::centreon::engine::service* svc) {
+void disable_service_notifications(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2552,7 +2611,7 @@ void disable_service_notifications(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2627,7 +2686,7 @@ void enable_and_propagate_notifications(
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  com::centreon::engine::service* temp_service(nullptr);
+  std::shared_ptr<com::centreon::engine::service> temp_service(nullptr);
 
   /* enable notification for top level host */
   if (affect_top_host && level == 0)
@@ -2662,9 +2721,9 @@ void enable_and_propagate_notifications(
              end2(it->second->services.end());
            it2 != end2;
            ++it2) {
-        if ((temp_service = it2->second.get()) == nullptr)
+        if (!it2->second)
           continue;
-        enable_service_notifications(temp_service);
+        enable_service_notifications(it2->second);
       }
     }
   }
@@ -2677,7 +2736,7 @@ void disable_and_propagate_notifications(
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  com::centreon::engine::service* temp_service(nullptr);
+  std::shared_ptr<com::centreon::engine::service> temp_service(nullptr);
 
   if (hst == nullptr)
     return;
@@ -2715,9 +2774,9 @@ void disable_and_propagate_notifications(
              end2(it->second->services.end());
            it2 != end2;
            ++it2) {
-        if ((temp_service = it2->second.get()) == nullptr)
+        if (!it2->second)
           continue;
-        disable_service_notifications(temp_service);
+        disable_service_notifications(it2->second);
       }
     }
   }
@@ -2982,7 +3041,7 @@ void acknowledge_host_problem(
 
 /* acknowledges a service problem */
 void acknowledge_service_problem(
-       com::centreon::engine::service* svc,
+       std::shared_ptr<com::centreon::engine::service> svc,
        char* ack_author,
        char* ack_data,
        int type,
@@ -3010,7 +3069,7 @@ void acknowledge_service_problem(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     SERVICE_ACKNOWLEDGEMENT,
-    (void*)svc,
+    (void*)svc.get(),
     ack_author,
     ack_data,
     type,
@@ -3059,7 +3118,7 @@ void remove_host_acknowledgement(com::centreon::engine::host* hst) {
 }
 
 /* removes a service acknowledgement */
-void remove_service_acknowledgement(com::centreon::engine::service* svc) {
+void remove_service_acknowledgement(std::shared_ptr<com::centreon::engine::service> svc) {
   /* set the acknowledgement flag */
   svc->set_problem_has_been_acknowledged(false);
 
@@ -3067,7 +3126,7 @@ void remove_service_acknowledgement(com::centreon::engine::service* svc) {
   svc->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
-  comment::delete_service_acknowledgement_comments(svc);
+  comment::delete_service_acknowledgement_comments(svc.get());
 }
 
 /* starts executing service checks */
@@ -3191,7 +3250,7 @@ void stop_accepting_passive_service_checks(void) {
 }
 
 /* enables passive service checks for a particular service */
-void enable_passive_service_checks(com::centreon::engine::service* svc) {
+void enable_passive_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3209,7 +3268,7 @@ void enable_passive_service_checks(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3220,7 +3279,7 @@ void enable_passive_service_checks(com::centreon::engine::service* svc) {
 }
 
 /* disables passive service checks for a particular service */
-void disable_passive_service_checks(com::centreon::engine::service* svc) {
+void disable_passive_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3238,7 +3297,7 @@ void disable_passive_service_checks(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3488,7 +3547,7 @@ void stop_using_event_handlers(void) {
 }
 
 /* enables the event handler for a particular service */
-void enable_service_event_handler(com::centreon::engine::service* svc) {
+void enable_service_event_handler(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3506,7 +3565,7 @@ void enable_service_event_handler(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3517,7 +3576,7 @@ void enable_service_event_handler(com::centreon::engine::service* svc) {
 }
 
 /* disables the event handler for a particular service */
-void disable_service_event_handler(com::centreon::engine::service* svc) {
+void disable_service_event_handler(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3535,7 +3594,7 @@ void disable_service_event_handler(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3982,7 +4041,7 @@ void disable_performance_data(void) {
 }
 
 /* start obsessing over a particular service */
-void start_obsessing_over_service(com::centreon::engine::service* svc) {
+void start_obsessing_over_service(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4000,7 +4059,7 @@ void start_obsessing_over_service(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -4011,7 +4070,7 @@ void start_obsessing_over_service(com::centreon::engine::service* svc) {
 }
 
 /* stop obsessing over a particular service */
-void stop_obsessing_over_service(com::centreon::engine::service* svc) {
+void stop_obsessing_over_service(std::shared_ptr<com::centreon::engine::service> svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4029,7 +4088,7 @@ void stop_obsessing_over_service(com::centreon::engine::service* svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc,
+    svc.get(),
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),

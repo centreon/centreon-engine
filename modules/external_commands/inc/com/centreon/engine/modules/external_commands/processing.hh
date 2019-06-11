@@ -33,7 +33,6 @@
 #  include "com/centreon/engine/hostgroup.hh"
 #  include "com/centreon/engine/service.hh"
 #  include "com/centreon/engine/servicegroup.hh"
-#  include "find.hh"
 
 CCE_BEGIN()
 
@@ -84,7 +83,7 @@ namespace         modules {
       static void _wrapper_enable_passive_service_checks(host* hst);
       static void _wrapper_disable_passive_service_checks(host* hst);
       static void _wrapper_set_service_notification_number(
-                    service* svc,
+                    std::shared_ptr<service> svc,
                     char* args);
       static void _wrapper_send_custom_service_notification(
                     service* svc,
@@ -207,8 +206,8 @@ namespace         modules {
             (*fptr)(it->second.get());
       }
 
-      template <void (*fptr)(service*)>
-      static void _redirector_service(
+      template <void (*fptr)(std::shared_ptr<service>)>
+      static void _redirector_service_shared(
                     int id,
                     time_t entry_time,
                     char* args) {
@@ -217,10 +216,40 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
-        service* svc(::find_service(name, description));
-        if (!svc)
+
+        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
+          name, description));
+        std::unordered_map<std::pair<uint64_t, uint64_t>,
+                           std::shared_ptr<service> >::const_iterator
+          found(configuration::applier::state::instance().services().find(found_id));
+
+        if (found == configuration::applier::state::instance().services().end() ||
+          !found->second)
           return ;
-        (*fptr)(svc);
+        (*fptr)(found->second);
+      }
+
+      template <void (*fptr)(service*)>
+      static void _redirector_service(
+        int id,
+        time_t entry_time,
+        char* args) {
+        (void)id;
+        (void)entry_time;
+
+        char* name(my_strtok(args, ";"));
+        char* description(my_strtok(NULL, ";"));
+
+        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
+          name, description));
+        std::unordered_map<std::pair<uint64_t, uint64_t>,
+                           std::shared_ptr<service> >::const_iterator
+          found(configuration::applier::state::instance().services().find(found_id));
+
+        if (found == configuration::applier::state::instance().services().end() ||
+          !found->second)
+          return ;
+        (*fptr)(found->second.get());
       }
 
       template <void (*fptr)(service*, char*)>
@@ -233,11 +262,40 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
-        service* svc(::find_service(name, description));
-        if (!svc)
+        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
+          name, description));
+        std::unordered_map<std::pair<uint64_t, uint64_t>,
+                           std::shared_ptr<service> >::const_iterator
+          found(configuration::applier::state::instance().services().find(found_id));
+
+        if (found == configuration::applier::state::instance().services().end() ||
+          !found->second)
           return ;
-        (*fptr)(svc, args + strlen(name) + strlen(description) + 2);
+        (*fptr)(found->second.get(), args + strlen(name) + strlen(description) + 2);
       }
+
+      template <void (*fptr)(std::shared_ptr<service>, char*)>
+      static void _redirector_service_shared(
+        int id,
+        time_t entry_time,
+        char* args) {
+        (void)id;
+        (void)entry_time;
+
+        char* name(my_strtok(args, ";"));
+        char* description(my_strtok(NULL, ";"));
+        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
+          name, description));
+        std::unordered_map<std::pair<uint64_t, uint64_t>,
+                           std::shared_ptr<service> >::const_iterator
+          found(configuration::applier::state::instance().services().find(found_id));
+
+        if (found == configuration::applier::state::instance().services().end() ||
+          !found->second)
+          return ;
+        (*fptr)(found->second, args + strlen(name) + strlen(description) + 2);
+      }
+
 
       template <void (*fptr)(service*)>
       static void _redirector_servicegroup(
@@ -249,17 +307,18 @@ namespace         modules {
 
         char* group_name(my_strtok(args, ";"));
         servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(group_name)};
-        if (sg_it == servicegroup::servicegroups.end())
+        if (sg_it == servicegroup::servicegroups.end() ||
+          !sg_it->second)
           return ;
         servicegroup* group{sg_it->second.get()};
 
         for (service_map::iterator
-               it(group->members.begin()),
-               end(group->members.end());
-             it != end;
-             ++it)
-          if (it->second.get())
-            (*fptr)(it->second.get());
+               it2(sg_it->second->members.begin()),
+               end2(sg_it->second->members.end());
+             it2 != end2;
+             ++it2)
+          if (it2->second)
+            (*fptr)(it2->second.get());
       }
 
       template <void (*fptr)(host*)>
@@ -272,21 +331,21 @@ namespace         modules {
 
         char* group_name(my_strtok(args, ";"));
         servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(group_name)};
-        if (sg_it == servicegroup::servicegroups.end())
+        if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
           return ;
         servicegroup* group{sg_it->second.get()};
 
         host* last_host{nullptr};
         for (service_map::iterator
-               it(group->members.begin()),
-               end(group->members.end());
-             it != end;
-             ++it) {
+               it2(sg_it->second->members.begin()),
+               end2(sg_it->second->members.end());
+             it2 != end2;
+             ++it2) {
           host* hst(nullptr);
           umap<uint64_t,
                std::shared_ptr<com::centreon::engine::host>>::const_iterator
               found(configuration::applier::state::instance().hosts().find(
-                  get_host_id(it->first.first)));
+                  get_host_id(it2->first.first)));
           if (found != configuration::applier::state::instance().hosts().end())
             hst = found->second.get();
 

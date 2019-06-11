@@ -36,18 +36,17 @@ int pre_flight_object_check(int* w, int* e);
 // Detects circular dependencies and paths.
 int pre_flight_circular_check(int* w, int* e);
 
-int check_service(com::centreon::engine::service* svc, int* w, int* e);
-int check_host(com::centreon::engine::host* hst, int* w, int* e);
-int check_contact(com::centreon::engine::contact* cntct, int* w, int* e);
-int check_servicegroup(com::centreon::engine::servicegroup* sg, int* w, int* e);
-int check_hostgroup(com::centreon::engine::hostgroup* hg, int* w, int* e);
-int check_contactgroup(std::shared_ptr<com::centreon::engine::contactgroup> cg, int* w,
-  int* e);
-int check_servicedependency(com::centreon::engine::servicedependency* sd, int* w, int* e);
-int check_hostdependency(com::centreon::engine::hostdependency* hd, int* w, int* e);
-int check_serviceescalation(com::centreon::engine::serviceescalation* se, int* w, int* e);
-int check_hostescalation(com::centreon::engine::hostescalation* he, int* w, int* e);
-int check_timeperiod(com::centreon::engine::timeperiod* tp, int* w, int* e);
+int check_service(std::shared_ptr<com::centreon::engine::service> svc, int* w, int* e);
+int check_host(std::shared_ptr<com::centreon::engine::host> hst, int* w, int* e);
+int check_contact(std::shared_ptr<com::centreon::engine::contact> cntct, int* w, int* e);
+int check_servicegroup(std::shared_ptr<com::centreon::engine::servicegroup> sg, int* w, int* e);
+int check_hostgroup(std::shared_ptr<com::centreon::engine::hostgroup> hg, int* w, int* e);
+int check_contactgroup(std::shared_ptr<com::centreon::engine::contactgroup> cg, int* w, int* e);
+int check_servicedependency(std::shared_ptr<com::centreon::engine::servicedependency> sd, int* w, int* e);
+int check_hostdependency(std::shared_ptr<com::centreon::engine::hostdependency> hd, int* w, int* e);
+int check_serviceescalation(std::shared_ptr<com::centreon::engine::serviceescalation> se, int* w, int* e);
+int check_hostescalation(std::shared_ptr<com::centreon::engine::hostescalation> he, int* w, int* e);
+int check_timeperiod(std::shared_ptr<com::centreon::engine::timeperiod> tp, int* w, int* e);
 
 #  ifdef __cplusplus
 }

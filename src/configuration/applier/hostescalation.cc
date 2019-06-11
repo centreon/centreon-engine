@@ -282,7 +282,7 @@ void applier::hostescalation::resolve_object(
              configuration::hostescalation::recovery)) {
       // Resolve host escalation.
       if (!check_hostescalation(
-               static_cast<engine::hostescalation*>((*itt).get()),
+               std::static_pointer_cast<engine::hostescalation>(*itt),
                &config_warnings,
                &config_errors))
         throw engine_error() << "Cannot resolve host escalation";

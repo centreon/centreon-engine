@@ -30,7 +30,6 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "compatibility/find.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
@@ -77,16 +76,20 @@ service_downtime::~service_downtime() {
  */
 bool service_downtime::is_stale() const {
   bool retval{false};
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
+
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    get_hostname(), get_service_description()));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
 
   /* delete downtimes with invalid host names */
   if (it == state::instance().hosts().end() || it->second == nullptr)
     retval = true;
   /* delete downtimes with invalid service descriptions */
-  else if (::find_service(
-           get_hostname().c_str(),
-           get_service_description().c_str()) == nullptr)
+  else if (found == state::instance().services().end() || found->second.get() == nullptr)
     retval = true;
   /* delete downtimes that have expired */
   else if (get_end_time() < time(nullptr))
@@ -144,15 +147,19 @@ void service_downtime::print(std::ostream& os) const {
 }
 
 int service_downtime::unschedule() {
-  service* svc;
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    get_hostname(), get_service_description()));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
 
   /* find the host or service associated with this downtime */
-  if ((svc = ::find_service(get_hostname().c_str(), get_service_description().c_str())) == nullptr)
+  if (found == state::instance().services().end() || !found->second.get())
     return ERROR;
 
   /* decrement pending flex downtime if necessary ... */
   if (!is_fixed() && _incremented_pending_downtime)
-    svc->pending_flex_downtime--;
+    found->second->pending_flex_downtime--;
 
   /* decrement the downtime depth variable and update status data if necessary
    */
@@ -177,19 +184,19 @@ int service_downtime::unschedule() {
       get_downtime_id(),
       nullptr);
 
-    svc->dec_scheduled_downtime_depth();
-    svc->update_status(false);
+    found->second->dec_scheduled_downtime_depth();
+    found->second->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
-    if (svc->get_scheduled_downtime_depth() == 0) {
+    if (found->second->get_scheduled_downtime_depth() == 0) {
       logger(log_info_message, basic)
-        << "SERVICE DOWNTIME ALERT: " << svc->get_hostname() << ";"
-        << svc->get_description()
+        << "SERVICE DOWNTIME ALERT: " << found->second->get_hostname() << ";"
+        << found->second->get_description()
         << ";CANCELLED; Scheduled downtime "
            "for service has been cancelled.";
 
       /* send a notification */
-      svc->notify(
+      found->second->notify(
         NOTIFICATION_DOWNTIMECANCELLED,
         nullptr,
         nullptr,
@@ -203,11 +210,14 @@ int service_downtime::subscribe() {
   logger(dbg_functions, basic)
     << "service_downtime::subscribe()";
 
-  service* svc{
-    ::find_service(get_hostname().c_str(), get_service_description().c_str())};
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    get_hostname(), get_service_description()));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
 
   /* find the host or service associated with this downtime */
-  if (!svc)
+  if (found == state::instance().services().end() || found->second.get() == nullptr)
     return ERROR;
 
   /* create the comment */
@@ -245,10 +255,10 @@ int service_downtime::subscribe() {
   logger(dbg_downtime, basic) << "Scheduled Downtime Details:";
   logger(dbg_downtime, basic) << " Type:        Service Downtime\n"
                                  " Host:        "
-                              << svc->get_hostname()
+                              << found->second->get_hostname()
                               << "\n"
                                  " Service:     "
-                              << svc->get_description();
+                              << found->second->get_description();
   logger(dbg_downtime, basic)
     << " Fixed/Flex:  " << (is_fixed() ? "Fixed\n" : "Flexible\n")
     << " Start:       " << start_time_string << "\n"
@@ -263,8 +273,8 @@ int service_downtime::subscribe() {
     new comment(
       comment::service,
       comment::downtime,
-      svc->get_hostname(),
-      svc->get_description(),
+      found->second->get_hostname(),
+      found->second->get_description(),
       time(nullptr),
       "(Centreon Engine Process)",
       oss.str(),
@@ -308,15 +318,20 @@ int service_downtime::subscribe() {
 }
 
 int service_downtime::handle() {
-  service* svc(nullptr);
   time_t event_time(0L);
   int attr(0);
 
   logger(dbg_functions, basic)
     << "handle_downtime()";
 
+  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+    get_hostname(), get_service_description()));
+  std::unordered_map<std::pair<uint64_t, uint64_t>,
+                     std::shared_ptr<service> >::const_iterator
+    found(state::instance().services().find(id));
+
   /* find the host or service associated with this downtime */
-  if ((svc = ::find_service(get_hostname().c_str(), get_service_description().c_str())) == nullptr)
+  if (found == state::instance().services().end() || !found->second)
       return ERROR;
 
   /* if downtime if flexible and host/svc is in an ok state, don't do anything right now (wait for event handler to kick it off) */
@@ -327,10 +342,10 @@ int service_downtime::handle() {
     if (!_start_flex_downtime) {
 
       /* host is up or service is ok, so we don't really do anything right now */
-      if (svc->get_current_state() == service::state_ok) {
+      if (found->second->get_current_state() == service::state_ok) {
 
         /* increment pending flex downtime counter */
-        svc->pending_flex_downtime++;
+        found->second->pending_flex_downtime++;
         _incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
@@ -375,24 +390,24 @@ int service_downtime::handle() {
       nullptr);
 
     /* decrement the downtime depth variable */
-    svc->dec_scheduled_downtime_depth();
+    found->second->dec_scheduled_downtime_depth();
 
-    if (svc->get_scheduled_downtime_depth() == 0) {
+    if (found->second->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
-        << "Service '" << svc->get_description() << "' on host '"
-        << svc->get_hostname() << "' has exited from a period of "
+        << "Service '" << found->second->get_description() << "' on host '"
+        << found->second->get_hostname() << "' has exited from a period of "
         "scheduled downtime (id=" << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "SERVICE DOWNTIME ALERT: " << svc->get_hostname()
-        << ";" << svc->get_description()
+        << "SERVICE DOWNTIME ALERT: " << found->second->get_hostname()
+        << ";" << found->second->get_description()
         << ";STOPPED; Service has exited from a period of scheduled "
         "downtime";
 
       /* send a notification */
-      svc->notify(
+      found->second->notify(
         NOTIFICATION_DOWNTIMEEND,
         get_author().c_str(),
         get_comment().c_str(),
@@ -400,13 +415,13 @@ int service_downtime::handle() {
     }
 
     /* update the status data */
-    svc->update_status(false);
+    found->second->update_status(false);
 
     /* decrement pending flex downtime if necessary */
     if (!is_fixed()
         && _incremented_pending_downtime) {
-      if (svc->pending_flex_downtime > 0)
-        svc->pending_flex_downtime--;
+      if (found->second->pending_flex_downtime > 0)
+        found->second->pending_flex_downtime--;
     }
 
     /* handle (stop) downtime that is triggered by this one */
@@ -461,22 +476,22 @@ int service_downtime::handle() {
       get_duration(),
       get_downtime_id(), nullptr);
 
-    if (svc->get_scheduled_downtime_depth() == 0) {
+    if (found->second->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
-        << "Service '" << svc->get_description() << "' on host '"
-        << svc->get_hostname() << "' has entered a period of scheduled "
+        << "Service '" << found->second->get_description() << "' on host '"
+        << found->second->get_hostname() << "' has entered a period of scheduled "
         "downtime (id=" << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "SERVICE DOWNTIME ALERT: " << svc->get_hostname()
-        << ";" << svc->get_description()
+        << "SERVICE DOWNTIME ALERT: " << found->second->get_hostname()
+        << ";" << found->second->get_description()
         << ";STARTED; Service has entered a period of scheduled "
         "downtime";
 
       /* send a notification */
-      svc->notify(
+      found->second->notify(
         NOTIFICATION_DOWNTIMESTART,
         get_author().c_str(),
         get_comment().c_str(),
@@ -484,13 +499,13 @@ int service_downtime::handle() {
     }
 
     /* increment the downtime depth variable */
-    svc->inc_scheduled_downtime_depth();
+    found->second->inc_scheduled_downtime_depth();
 
     /* set the in effect flag */
     _set_in_effect(true);
 
     /* update the status data */
-    svc->update_status(false);
+    found->second->update_status(false);
 
     /* schedule an event */
     if (!is_fixed())

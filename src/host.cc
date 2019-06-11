@@ -286,18 +286,17 @@ host::host(uint64_t host_id,
   _z_3d = z_3d;
 }
 
-void host::add_child_link(host* child) {
+void host::add_child_link(std::shared_ptr<host> child) {
   // Make sure we have the data we need.
   if (!child)
     throw(engine_error() << "add child link called with nullptr ptr");
 
-  child_hosts.insert({child->get_name(),
-                      std::make_shared<com::centreon::engine::host>(*child)});
+  child_hosts.insert({child->get_name(), child});
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(nullptr));
   broker_relation_data(NEBTYPE_PARENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, this,
-                       nullptr, child, nullptr, &tv);
+                       nullptr, child.get(), nullptr, &tv);
 }
 
 void host::add_parent_host(std::string const& host_name) {

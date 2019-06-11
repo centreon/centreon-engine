@@ -229,15 +229,20 @@ static int handle_service_macro(
       if (!mac->host_ptr)
         retval = ERROR;
       else if (arg2) {
-        com::centreon::engine::service* svc(find_service(mac->host_ptr->get_name().c_str(), arg2));
-        if (!svc)
+        std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+          mac->host_ptr->get_name(), arg2));
+        std::unordered_map<std::pair<uint64_t, uint64_t>,
+                           std::shared_ptr<service> >::const_iterator
+          found(state::instance().services().find(id));
+
+        if (found == state::instance().services().end() || !found->second)
           retval = ERROR;
         else
           // Get the service macro value.
           retval = grab_standard_service_macro_r(
                      mac,
                      macro_type,
-                     svc,
+                     found->second.get(),
                      output,
                      free_macro);
       }
@@ -246,20 +251,25 @@ static int handle_service_macro(
     }
     else if (arg1 && arg2) {
       // On-demand macro with both host and service name.
-      com::centreon::engine::service* svc(find_service(arg1, arg2));
-      if (svc)
+      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
+        arg1, arg2));
+      std::unordered_map<std::pair<uint64_t, uint64_t>,
+                         std::shared_ptr<service> >::const_iterator
+        found(state::instance().services().find(id));
+
+      if (found == state::instance().services().end() || !found->second)
         // Get the service macro value.
         retval = grab_standard_service_macro_r(
                    mac,
                    macro_type,
-                   svc,
+                   found->second.get(),
                    output,
                    free_macro);
       // Else we have a service macro with a
       // servicegroup name and a delimiter...
       else {
         servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(arg1)};
-        if (sg_it == servicegroup::servicegroups.end())
+        if (sg_it == servicegroup::servicegroups.end() || !found->second)
           retval = ERROR;
         else {
           servicegroup* sg{sg_it->second.get()};
@@ -267,19 +277,18 @@ static int handle_service_macro(
 
           // Concatenate macro values for all servicegroup members.
           for (service_map::iterator
-                 it(sg->members.begin()),
-                 end(sg->members.end());
+                 it(sg_it->second->members.begin()),
+                 end(sg_it->second->members.end());
                it != end;
                ++it) {
-            svc = it->second.get();
-            if (svc) {
+            if (it->second.get() != nullptr) {
               // Get the macro value for this service.
               char* buffer(nullptr);
               int free_sub_macro(false);
               grab_standard_service_macro_r(
                 mac,
                 macro_type,
-                svc,
+                it->second.get(),
                 &buffer,
                 &free_sub_macro);
               if (buffer) {
@@ -342,7 +351,7 @@ static int handle_servicegroup_macro(
   // Use the saved servicegroup pointer
   // or find the servicegroup for on-demand macros.
   servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(arg1)};
-  if (sg_it == servicegroup::servicegroups.end())
+  if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
     retval = ERROR;
   else {
     servicegroup* sg{sg_it->second.get()};
@@ -351,7 +360,7 @@ static int handle_servicegroup_macro(
     retval = grab_standard_servicegroup_macro_r(
                mac,
                macro_type,
-               sg,
+               sg_it->second.get(),
                output);
     if (OK == retval)
       *free_macro = true;

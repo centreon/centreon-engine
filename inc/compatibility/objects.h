@@ -40,6 +40,5 @@
 #  include "com/centreon/engine/timerange.hh"
 #  include "common.h"
 #  include "config.h"
-#  include "find.hh"
 
 #endif // !CCE_COMPATIBILITY_OBJECTS_H
