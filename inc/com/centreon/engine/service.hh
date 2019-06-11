@@ -159,7 +159,7 @@ class                           service : public notifier {
   void                          disable_flap_detection();
   void                          update_status(bool aggregated_dump) override;
   void                          set_notification_number(int num);
-  int                           check_notification_viability(unsigned int type,
+  int                           check_notification_viability(reason_type type,
                                                              int options) override;
   int                           verify_check_viability(int check_options,
                                                        int* time_is_valid,

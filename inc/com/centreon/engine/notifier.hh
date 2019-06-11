@@ -159,9 +159,9 @@ class                notifier {
   virtual void       update_status(bool aggregated_dump) = 0;
   int                get_max_attempts() const;
   void               set_max_attempts(int max_attempts);
-  virtual int        check_notification_viability(unsigned int type,
+  virtual int        check_notification_viability(reason_type type,
                                                   int options) = 0;
-  int                notify(unsigned int type,
+  int                notify(reason_type type,
                             std::string const& not_author,
                             std::string const& not_data,
                             int options);

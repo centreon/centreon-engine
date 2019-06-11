@@ -2153,7 +2153,7 @@ void host::set_flap(double percent_change,
 
   /* send a notification */
   if (allow_flapstart_notification)
-    notify(notification_flappingstart, NULL, NULL, NOTIFICATION_OPTION_NONE);
+    notify(notification_flappingstart, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 }
 
 /* handles a host that has stopped flapping */
@@ -2225,7 +2225,7 @@ void host::check_for_expired_acknowledgement() {
 }
 
 /* checks viability of sending a host notification */
-int host::check_notification_viability(unsigned int type, int options) {
+int host::check_notification_viability(reason_type type, int options) {
   time_t current_time;
   time_t timeperiod_start;
 
@@ -2621,7 +2621,7 @@ int host::handle_state() {
 
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (get_state_type() == hard)
-      notify(notification_normal, NULL, NULL, NOTIFICATION_OPTION_NONE);
+      notify(notification_normal, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 
     /* handle the host state change */
     handle_host_event(this);
@@ -3262,7 +3262,7 @@ void host::handle_flap_detection_disabled() {
       NULL);
 
     /* send a notification */
-    this->notify(
+    notify(
       notification_flappingdisabled,
       NULL,
       NULL,
@@ -3271,7 +3271,7 @@ void host::handle_flap_detection_disabled() {
     /* should we send a recovery notification? */
     if (this->get_check_flapping_recovery_notification()
         && this->get_current_state() == host::state_up)
-      this->notify(
+      notify(
         notification_normal,
         NULL,
         NULL,

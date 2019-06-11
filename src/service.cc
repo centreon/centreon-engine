@@ -2740,7 +2740,7 @@ void service::set_notification_number(int num) {
 }
 
 /* checks the viability of sending out a service alert (top level filters) */
-int service::check_notification_viability(unsigned int type, int options) {
+int service::check_notification_viability(reason_type type, int options) {
   host* temp_host;
   timeperiod* temp_period;
   time_t current_time;

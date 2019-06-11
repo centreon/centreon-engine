@@ -254,7 +254,7 @@ void notifier::set_max_attempts(int max_attempts) {
   _max_attempts = max_attempts;
 }
 
-int notifier::notify(unsigned int type,
+int notifier::notify(notifier::reason_type type,
                      std::string const& not_author,
                      std::string const& not_data,
                      int options) {

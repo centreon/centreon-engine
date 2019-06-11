@@ -144,7 +144,7 @@ class                host : public notifier {
                                 double low_threshold);
   void               update_status(bool aggregated_dump) override;
   void               check_for_expired_acknowledgement();
-  int                check_notification_viability(unsigned int type,
+  int                check_notification_viability(reason_type type,
                                                   int options) override;
   int                handle_state();
   void               update_performance_data();
