@@ -3357,8 +3357,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
                                  int use_cached_result,
                                  unsigned long check_timestamp_horizon) {
   com::centreon::engine::host* master_host = NULL;
-  com::centreon::engine::host* temp_host = NULL;
-  objectlist* check_hostlist = NULL;
+  host* temp_host;
+  std::list<host*> check_hostlist;
   objectlist* hostlist_item = NULL;
   host::host_state parent_state =  host::state_up;
   time_t current_time = 0L;
@@ -3444,7 +3444,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         if (it->second->get_current_state() !=  host::state_up) {
           logger(dbg_checks, more)
             << "Check of parent host '" << it->first << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
+          check_hostlist.push_back(it->second.get());
         }
       }
 
@@ -3461,7 +3461,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         if (it->second->get_current_state() !=  host::state_up) {
           logger(dbg_checks, more)
             << "Check of child host '" << it->first << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
+          check_hostlist.push_back(it->second.get());
         }
       }
     }
@@ -3644,7 +3644,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second->get_current_state() !=  host::state_unreachable) {
             logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
-            add_object_to_objectlist(&check_hostlist, it->second.get());
+            check_hostlist.push_back(it->second.get());
           }
         }
       }
@@ -3709,7 +3709,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second == nullptr)
             continue;
           if (it->second->get_current_state() ==  host::state_up) {
-            add_object_to_objectlist(&check_hostlist, it->second.get());
+            check_hostlist.push_back(it->second.get());
             logger(dbg_checks, more)
               << "Check of host '" << it->first << "' queued.";
           }
@@ -3729,7 +3729,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second->get_current_state() !=  host::state_unreachable) {
             logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
-            add_object_to_objectlist(&check_hostlist, it->second.get());
+            check_hostlist.push_back(it->second.get());
           }
         }
 
@@ -3755,12 +3755,11 @@ int host::process_check_result_3x(enum host::host_state new_state,
             hostdependency* temp_dependency(&*it->second);
             if (temp_dependency->dependent_host_ptr == this &&
               temp_dependency->master_host_ptr != NULL) {
-              master_host = (com::centreon::engine::host*)
-                temp_dependency->master_host_ptr;
+              master_host = (host*) temp_dependency->master_host_ptr;
               logger(dbg_checks, more)
                 << "Check of host '" << master_host->get_name()
                 << "' queued.";
-              add_object_to_objectlist(&check_hostlist, (void*)master_host);
+              check_hostlist.push_back(master_host);
             }
           }
         }
@@ -3859,10 +3858,13 @@ int host::process_check_result_3x(enum host::host_state new_state,
   /* run async checks of all hosts we added above */
   /* don't run a check if one is already executing or we can get by with a
    * cached state */
-  for (hostlist_item = check_hostlist; hostlist_item != NULL;
-       hostlist_item = hostlist_item->next) {
+  for (std::list<host*>::iterator
+         it{check_hostlist.begin()},
+         end{check_hostlist.end()};
+       it != end;
+       ++it) {
     run_async_check = true;
-    temp_host = (com::centreon::engine::host*)hostlist_item->object_ptr;
+    temp_host = *it;
 
     logger(dbg_checks, most)
       << "ASYNC CHECK OF HOST: " << temp_host->get_name()
@@ -3882,7 +3884,6 @@ int host::process_check_result_3x(enum host::host_state new_state,
       temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false,
                                  false, NULL, NULL);
   }
-  free_objectlist(&check_hostlist);
   return OK;
 }
 

@@ -24,7 +24,6 @@
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
@@ -37,7 +36,6 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/service.hh"
@@ -126,7 +124,6 @@ service::service(std::string const& hostname,
 
 service::~service() {
   this->contact_groups.clear();
-  //deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
 }
 
 time_t service::get_last_time_ok() const {
@@ -1056,8 +1053,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   time_t current_time = 0L;
   int state_was_logged = false;
   std::string old_plugin_output;
-  objectlist* check_servicelist = nullptr;
-  objectlist* servicelist_item = nullptr;
+  std::list<service*> check_servicelist;
   com::centreon::engine::service* master_service = nullptr;
   int run_async_check = true;
   /* TODO - 09/23/07 move this to a global variable */
@@ -1831,7 +1827,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                 << "Predictive check of service '"
                 << master_service->get_description() << "' on host '"
                 << master_service->get_hostname() << "' queued.";
-            add_object_to_objectlist(&check_servicelist, (void*)master_service);
+            check_servicelist.push_back(master_service);
           }
         }
       }
@@ -1986,10 +1982,13 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* run async checks of all services we added above */
   /* don't run a check if one is already executing or we can get by with a
    * cached state */
-  for (servicelist_item = check_servicelist; servicelist_item != nullptr;
-       servicelist_item = servicelist_item->next) {
+  for (std::list<service*>::iterator
+         it{check_servicelist.begin()},
+         end{check_servicelist.end()};
+       it != end;
+       ++it) {
     run_async_check = true;
-    service* svc = static_cast<service*>(servicelist_item->object_ptr);
+    service* svc{*it};
 
     /* we can get by with a cached state, so don't check the service */
     if (static_cast<unsigned long>(current_time - svc->get_last_check()) <=
@@ -2007,7 +2006,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       svc->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
                            nullptr);
   }
-  free_objectlist(&check_servicelist);
   return OK;
 }
 
