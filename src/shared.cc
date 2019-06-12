@@ -70,46 +70,6 @@ char* my_strtok(char const* buffer, char const* tokens) {
   return (sequence_head);
 }
 
-/* fixes compiler problems under Solaris, since strsep() isn't included */
-/* this code is taken from the glibc source */
-char* my_strsep(char** stringp, char const* delim) {
-  char* begin;
-  char* end;
-
-  if ((begin = *stringp) == NULL)
-    return (NULL);
-
-  /* A frequent case is when the delimiter string contains only one
-   * character.  Here we don't need to call the expensive `strpbrk'
-   * function and instead work using `strchr'.  */
-  if (delim[0] == '\0' || delim[1] == '\0') {
-    char ch = delim[0];
-
-    if (ch == '\0' || begin[0] == '\0')
-      end = NULL;
-    else {
-      if (*begin == ch)
-        end = begin;
-      else
-        end = strchr(begin + 1, ch);
-    }
-  }
-  else {
-    /* find the end of the token.  */
-    end = strpbrk(begin, delim);
-  }
-
-  if (end) {
-    /* terminate the token and set *STRINGP past NUL character.  */
-    *end++ = '\0';
-    *stringp = end;
-  }
-  else
-    /* no more delimiters; this is the last token.  */
-    *stringp = NULL;
-  return (begin);
-}
-
 /* strip newline, carriage return, and tab characters from beginning and end of a string */
 void strip(char* buffer) {
   int x, z;
@@ -167,22 +127,6 @@ void strip(char* buffer) {
 /**************************************************
  *************** HASH FUNCTIONS *******************
  **************************************************/
-
-/* dual hash function */
-int hashfunc(char const* name1, char const* name2, int hashslots) {
-  unsigned int result(0);
-
-  if (name1)
-    for (unsigned int i(0), end(strlen(name1)); i < end; ++i)
-      result += name1[i];
-
-  if (name2)
-    for (unsigned int i(0), end(strlen(name2)); i < end; ++i)
-      result += name2[i];
-
-  return (result % hashslots);
-}
-
 /* dual hash data comparison */
 int compare_hashdata(
       char const* val1a,

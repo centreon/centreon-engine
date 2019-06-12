@@ -48,9 +48,7 @@ namespace                      logging {
                                  unsigned int size) throw () override;
     void                        open() override;
     void                        reopen() override;
-    void                        show_pid(bool enable) override;
-    void                        show_timestamp(com::centreon::logging::time_precision val) override;
-    void                        show_thread_id(bool enable) override;
+
 
   private:
     bool                       _enable;

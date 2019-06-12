@@ -22,7 +22,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/servicegroup.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
@@ -166,23 +165,6 @@ std::ostream& operator<<(std::ostream& os, servicegroup const& obj) {
     "  action_url: " << obj.get_action_url() << "\n"
     "}\n";
   return os;
-}
-
-/**
- *  Get servicegroup by name.
- *
- *  @param[in] name The servicegroup name.
- *
- *  @return The struct servicegroup or throw exception if the
- *          servicegroup is not found.
- */
-servicegroup& engine::find_servicegroup(std::string const& name) {
-  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
-    it{servicegroup::servicegroups.find(name)};
-  if (it == servicegroup::servicegroups.end())
-    throw engine_error() << "Service group "
-           << name << "' was not found";
-  return *it->second;
 }
 
 /**

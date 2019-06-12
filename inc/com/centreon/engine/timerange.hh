@@ -36,9 +36,7 @@ class                   timerange {
  public:
                         timerange(uint64_t start, uint64_t end);
   uint64_t              get_range_start() const;
-  void                  set_range_start(uint64_t range_start);
   uint64_t              get_range_end() const;
-  void                  set_range_end(uint64_t range_end);
   //static timerange_list timeranges;
 
   bool                  operator==(timerange const& obj) throw ();

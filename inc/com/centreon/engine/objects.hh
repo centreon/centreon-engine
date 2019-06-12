@@ -30,25 +30,4 @@
 #  include "com/centreon/engine/serviceescalation.hh"
 #  include "com/centreon/engine/timerange.hh"
 
-/*
-** Current object revision, Increment when changes are made to data
-** structures...
-*/
-#  define CURRENT_OBJECT_STRUCTURE_VERSION 307
-
-/* Skip lists. */
-#  define HOST_SKIPLIST                    0
-#  define SERVICE_SKIPLIST                 1
-#  define COMMAND_SKIPLIST                 2
-#  define TIMEPERIOD_SKIPLIST              3
-#  define CONTACT_SKIPLIST                 4
-#  define CONTACTGROUP_SKIPLIST            5
-#  define HOSTGROUP_SKIPLIST               6
-#  define SERVICEGROUP_SKIPLIST            7
-#  define HOSTDEPENDENCY_SKIPLIST          8
-#  define SERVICEDEPENDENCY_SKIPLIST       9
-#  define HOSTESCALATION_SKIPLIST          10
-#  define SERVICEESCALATION_SKIPLIST       11
-#  define NUM_OBJECT_SKIPLISTS             12
-
 #endif /* !CCE_OBJECTS_HH */

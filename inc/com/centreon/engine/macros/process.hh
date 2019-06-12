@@ -32,10 +32,6 @@ int process_macros_r(
       char const* input_buffer,
       char** output_buffer,
       int options);
-int process_macros(
-      char const* input_buffer,
-      char** output_buffer,
-      int options);
 
 #  ifdef __cplusplus
 }

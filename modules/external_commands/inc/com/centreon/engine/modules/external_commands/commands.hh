@@ -22,7 +22,6 @@
 #  define CCE_MOD_EXTCMD_COMMANDS_HH
 
 #  include <time.h>
-#  include "com/centreon/engine/modules/external_commands/compatibility.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -40,7 +39,6 @@ int cmd_delete_comment(int cmd,char* args);                                 // d
 int cmd_delete_all_comments(int cmd,char* args);                            // delete all comments associated with a host or service
 int cmd_delay_notification(int cmd,char* args);                             // delay a service or host notification
 int cmd_schedule_check(int cmd,char* args);                                 // schedule an immediate or delayed host check
-int cmd_schedule_host_service_checks(int cmd,char* args, int force);        // schedule an immediate or delayed checks of all services on a host
 void cmd_signal_process(int cmd, char* args);                               // schedules a program shutdown or restart
 int cmd_process_service_check_result(int cmd,time_t check_time,char* args); // processes a passive service check
 int process_passive_service_check(time_t check_time, char const* host_name, char const* svc_description, int return_code, char const* output);

@@ -47,8 +47,6 @@ class contactgroup {
    void               clear_members();
    std::unordered_map<std::string, std::shared_ptr<contact>> const&
                       get_members() const;
-   bool               has_member(std::string const &name) const;
-   bool               contains_illegal_object_chars() const;
 
    contactgroup*      next;
 

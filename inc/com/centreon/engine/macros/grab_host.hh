@@ -34,13 +34,7 @@ int grab_standard_host_macro_r(
       com::centreon::engine::host* hst,
       char** output,
       int* free_macro);
-int grab_standard_host_macro(
-      int macro_type,
-      com::centreon::engine::host* hst,
-      char** output,
-      int* free_macro);
 int grab_host_macros_r(nagios_macros* mac, com::centreon::engine::host* hst);
-int grab_host_macros(com::centreon::engine::host* hst);
 
 #  ifdef __cplusplus
 }

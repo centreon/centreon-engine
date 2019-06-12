@@ -35,7 +35,7 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -57,6 +57,13 @@ std::array<std::pair<uint32_t, std::string>, 3> const host::tab_host_states{
      {NSLOG_HOST_UNREACHABLE, "UNREACHABLE"}}};
 
 host_map com::centreon::engine::host::hosts;
+
+static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
+  for (unsigned int i(0); i < size; ++i)
+    if (tab1[i] != tab2[i])
+      return (false);
+  return (true);
+}
 
 /*
  *  @param[in] name                          Host name.
@@ -363,14 +370,6 @@ bool host::get_retain_nonstatus_information() const {
 
 void host::set_retain_nonstatus_information(bool retain_nonstatus_information) {
   _retain_nonstatus_information = retain_nonstatus_information;
-}
-
-bool host::get_failure_prediction_enabled() const {
-  return _failure_prediction_enabled;
-}
-
-void host::set_failure_prediction_enabled(bool failure_prediction_enabled) {
-  _failure_prediction_enabled = failure_prediction_enabled;
 }
 
 std::string const& host::get_vrml_image() const {

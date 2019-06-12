@@ -23,7 +23,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/hostgroup.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 

@@ -47,19 +47,6 @@ debug_file::debug_file(
 debug_file::~debug_file() throw () {}
 
 /**
- *  Called when max size is reached.
- */
-void debug_file::_max_size_reached() {
-  close();
-  std::string old_filename(filename());
-  old_filename.append(".old");
-  remove(old_filename.c_str());
-  rename(filename().c_str(), old_filename.c_str());
-  open();
-  return ;
-}
-
-/**
  *  Copy constructor.
  */
 debug_file::debug_file(debug_file const& other)

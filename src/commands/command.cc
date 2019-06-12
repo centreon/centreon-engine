@@ -109,15 +109,6 @@ std::string const& commands::command::get_command_line() const throw() {
 }
 
 /**
- *  Get the command listener.
- *
- *  @return The listener who catch events.
- */
-commands::command_listener* commands::command::get_listener() const throw() {
-  return (_listener);
-}
-
-/**
  *  Get the command name.
  *
  *  @return The command name.

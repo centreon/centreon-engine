@@ -151,28 +151,6 @@ int my_system_r(
   return result;
 }
 
-/*
- * For API compatibility, we must include a my_system() whose
- * signature doesn't include the Centreon Engine_macros variable.
- * NDOUtils uses this. Possibly other modules as well.
- */
-int my_system(
-      char* cmd,
-      int timeout,
-      int* early_timeout,
-      double* exectime,
-      char** output,
-      int max_output_length) {
-  return (my_system_r(
-            get_global_macros(),
-            cmd,
-            timeout,
-            early_timeout,
-            exectime,
-            output,
-            max_output_length));
-}
-
 // same like unix ctime without the '\n' at the end of the string.
 char const* my_ctime(time_t const* t) {
   char* buf(ctime(t));
@@ -270,53 +248,6 @@ int get_raw_command_line_r(
   return OK;
 }
 
-/*
- * This function modifies the global macro struct and is thus not
- * threadsafe
- */
-int get_raw_command_line(
-      commands::command* cmd_ptr,
-      char* cmd,
-      char** full_command,
-      int macro_options) {
-  nagios_macros* mac = get_global_macros();
-  return (get_raw_command_line_r(
-            mac,
-            cmd_ptr,
-            cmd,
-            full_command,
-            macro_options));
-}
-
-/******************************************************************/
-/******************** ENVIRONMENT FUNCTIONS ***********************/
-/******************************************************************/
-
-/* sets or unsets an environment variable */
-int set_environment_var(char const* name, char const* value, int set) {
-  /* we won't mess with null variable names */
-  if (name == NULL)
-    return ERROR;
-
-  /* set the environment variable */
-  if (set) {
-    setenv(name, (value ? value : ""), 1);
-
-    /* needed for Solaris and systems that don't have setenv() */
-    /* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
-    std::string val(name);
-    val.append("=").append(value ? value : "");
-    char* env_string(engine::string::dup(val));
-    putenv(env_string);
-  }
-  /* clear the variable */
-  else {
-    unsetenv(name);
-  }
-
-  return OK;
-}
-
 /******************************************************************/
 /******************** SIGNAL HANDLER FUNCTIONS ********************/
 /******************************************************************/
@@ -334,18 +265,9 @@ void setup_sighandler() {
   signal(SIGHUP, sighandler);
 }
 
-/* reset signal handling... */
-void reset_sighandler() {
-  /* set signal handling to default actions */
-  signal(SIGTERM, SIG_DFL);
-  signal(SIGHUP, SIG_DFL);
-  signal(SIGPIPE, SIG_DFL);
-}
 
 /* handle signals */
 void sighandler(int sig) {
-  caught_signal = true;
-
   if (sig < 0)
     sig = -sig;
 
@@ -472,36 +394,6 @@ void parse_check_output(
 /************************ STRING FUNCTIONS ************************/
 /******************************************************************/
 
-/* gets the next string from a buffer in memory - strings are terminated by newlines, which are removed */
-char* get_next_string_from_buf(
-        char* buf,
-        int* start_index,
-        int bufsize) {
-  char* sptr = NULL;
-  char const* nl = "\n";
-  int x;
-
-  if (buf == NULL || start_index == NULL)
-    return NULL;
-  if (bufsize < 0)
-    return NULL;
-  if (*start_index >= (bufsize - 1))
-    return NULL;
-
-  sptr = buf + *start_index;
-
-  /* end of buffer */
-  if (sptr[0] == '\x0')
-    return NULL;
-
-  x = strcspn(sptr, nl);
-  sptr[x] = '\x0';
-
-  *start_index += x + 1;
-
-  return sptr;
-}
-
 /**
  *  @brief Determines whether or not an object name (host, service, etc)
  *  contains illegal characters.
@@ -523,39 +415,6 @@ bool contains_illegal_object_chars(char const* name) {
   return strpbrk(name, illegal_object_chars) ? true : false;
 }
 
-/* escapes newlines in a string */
-char* escape_newlines(char* rawbuf) {
-  char* newbuf = NULL;
-  int x, y;
-
-  if (rawbuf == NULL)
-    return NULL;
-
-  /* allocate enough memory to escape all chars if necessary */
-  newbuf = new char[strlen(rawbuf) * 2 + 1];
-
-  for (x = 0, y = 0; rawbuf[x] != (char)'\x0'; x++) {
-
-    /* escape backslashes */
-    if (rawbuf[x] == '\\') {
-      newbuf[y++] = '\\';
-      newbuf[y++] = '\\';
-    }
-
-    /* escape newlines */
-    else if (rawbuf[x] == '\n') {
-      newbuf[y++] = '\\';
-      newbuf[y++] = 'n';
-    }
-
-    else
-      newbuf[y++] = rawbuf[x];
-  }
-  newbuf[y] = '\x0';
-
-  return newbuf;
-}
-
 /* compares strings */
 int compare_strings(char* val1a, char* val2a) {
   /* use the compare_hashdata() function */
@@ -566,237 +425,6 @@ int compare_strings(char* val1a, char* val2a) {
 /************************* FILE FUNCTIONS *************************/
 /******************************************************************/
 
-/* renames a file - works across filesystems (Mike Wiacek) */
-int my_rename(char const* source, char const* dest) {
-  int rename_result = 0;
-
-  /* make sure we have something */
-  if (source == NULL || dest == NULL)
-    return -1;
-
-  /* first see if we can rename file with standard function */
-  rename_result = rename(source, dest);
-
-  /* handle any errors... */
-  if (rename_result == -1) {
-
-    /* an error occurred because the source and dest files are on different filesystems */
-    if (errno == EXDEV) {
-
-      /* try copying the file */
-      if (my_fcopy(source, dest) == ERROR) {
-        logger(log_runtime_error, basic)
-          << "Error: Unable to rename file '" << source
-          << "' to '" << dest << "': " << strerror(errno);
-        return -1;
-      }
-
-      /* delete the original file */
-      unlink(source);
-
-      /* reset result since we successfully copied file */
-      rename_result = 0;
-    }
-    /* some other error occurred */
-    else {
-      logger(log_runtime_error, basic)
-        << "Error: Unable to rename file '" << source
-        << "' to '" << dest << "': " << strerror(errno);
-      return rename_result;
-    }
-  }
-
-  return rename_result;
-}
-
-/*
- * copy a file from the path at source to the already opened
- * destination file dest.
- * This is handy when creating tempfiles with mkstemp()
- */
-int my_fdcopy(char const* source, char const* dest, int dest_fd) {
-  int source_fd, rd_result = 0, wr_result = 0;
-  long tot_written = 0, buf_size = 0;
-  struct stat st;
-  char* buf;
-
-  /* open source file for reading */
-  if ((source_fd = open(source, O_RDONLY, 0644)) < 0) {
-    logger(log_runtime_error, basic)
-      << "Error: Unable to open file '" << source
-      << "' for reading: " << strerror(errno);
-    return ERROR;
-  }
-
-  /*
-   * find out how large the source-file is so we can be sure
-   * we've written all of it
-   */
-  if (fstat(source_fd, &st) < 0) {
-    logger(log_runtime_error, basic)
-      << "Error: Unable to stat source file '" << source
-      << "' for my_fcopy(): " << strerror(errno);
-    close(source_fd);
-    return ERROR;
-  }
-
-  /*
-   * If the file is huge, read it and write it in chunks.
-   * This value (128K) is the result of "pick-one-at-random"
-   * with some minimal testing and may not be optimal for all
-   * hardware setups, but it should work ok for most. It's
-   * faster than 1K buffers and 1M buffers, so change at your
-   * own peril. Note that it's useful to make it fit in the L2
-   * cache, so larger isn't necessarily better.
-   */
-  buf_size = st.st_size > 128 << 10 ? 128 << 10 : st.st_size;
-  try {
-    buf = new char[buf_size];
-  }
-  catch (...) {
-    close(source_fd);
-    throw;
-  }
-  /* most of the times, this loop will be gone through once */
-  while (tot_written < st.st_size) {
-    int loop_wr = 0;
-
-    rd_result = read(source_fd, buf, buf_size);
-    if (rd_result < 0) {
-      if (errno == EAGAIN || errno == EINTR)
-        continue;
-      logger(log_runtime_error, basic)
-        << "Error: my_fcopy() failed to read from '" << source
-        << "': " << strerror(errno);
-      break;
-    }
-
-    while (loop_wr < rd_result) {
-      wr_result = write(dest_fd, buf + loop_wr, rd_result - loop_wr);
-
-      if (wr_result < 0) {
-        if (errno == EAGAIN || errno == EINTR)
-          continue;
-        logger(log_runtime_error, basic)
-          << "Error: my_fcopy() failed to write to '" << dest
-          << "': " << strerror(errno);
-        break;
-      }
-      loop_wr += wr_result;
-    }
-    if (wr_result < 0)
-      break;
-    tot_written += loop_wr;
-  }
-
-  /*
-   * clean up irregardless of how things went. dest_fd comes from
-   * our caller, so we mustn't close it.
-   */
-  close(source_fd);
-  delete[] buf;
-
-  if (rd_result < 0 || wr_result < 0) {
-    /* don't leave half-written files around */
-    unlink(dest);
-    return ERROR;
-  }
-
-  return OK;
-}
-
-/* copies a file */
-int my_fcopy(char const* source, char const* dest) {
-  int dest_fd, result;
-
-  /* make sure we have something */
-  if (source == NULL || dest == NULL)
-    return ERROR;
-
-  /* unlink destination file first (not doing so can cause problems on network file systems like CIFS) */
-  unlink(dest);
-
-  /* open destination file for writing */
-  if ((dest_fd = open(
-                   dest,
-                   O_WRONLY | O_TRUNC | O_CREAT | O_APPEND,
-                   0644)) < 0) {
-    logger(log_runtime_error, basic)
-      << "Error: Unable to open file '" << dest
-      << "' for writing: " << strerror(errno);
-    return ERROR;
-  }
-
-  result = my_fdcopy(source, dest, dest_fd);
-  close(dest_fd);
-  return result;
-}
-
-/******************************************************************/
-/******************** DYNAMIC BUFFER FUNCTIONS ********************/
-/******************************************************************/
-
-/* initializes a dynamic buffer */
-int dbuf_init(dbuf* db, int chunk_size) {
-  if (db == NULL)
-    return ERROR;
-
-  db->buf = NULL;
-  db->used_size = 0L;
-  db->allocated_size = 0L;
-  db->chunk_size = chunk_size;
-
-  return OK;
-}
-
-/* frees a dynamic buffer */
-int dbuf_free(dbuf* db) {
-  if (db == NULL)
-    return ERROR;
-
-  if (db->buf != NULL)
-    delete[] db->buf;
-  db->buf = NULL;
-  db->used_size = 0L;
-  db->allocated_size = 0L;
-
-  return OK;
-}
-
-/* dynamically expands a string */
-int dbuf_strcat(dbuf* db, char const* buf) {
-  if (db == NULL || buf == NULL)
-    return ERROR;
-
-  /* how much memory should we allocate (if any)? */
-  unsigned long buflen(strlen(buf));
-  unsigned long new_size(db->used_size + buflen + 1);
-
-  /* we need more memory */
-  if (db->allocated_size < new_size) {
-
-    unsigned long memory_needed
-      = static_cast<unsigned long>((ceil(new_size / db->chunk_size) + 1)
-                                   * db->chunk_size);
-
-    /* allocate memory to store old and new string */
-    db->buf = resize_string(db->buf, memory_needed);
-
-    /* update allocated size */
-    db->allocated_size = memory_needed;
-
-    /* terminate buffer */
-    db->buf[db->used_size] = '\x0';
-  }
-
-  /* append the new string */
-  strcat(db->buf, buf);
-
-  /* update size allocated */
-  db->used_size += buflen;
-
-  return OK;
-}
 
 /**
  *  Set the close-on-exec flag on the file descriptor.

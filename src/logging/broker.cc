@@ -146,35 +146,3 @@ void broker::reopen() {
   _enable = true;
 }
 
-/**
- *  Set show pid.
- *
- *  @param[in] enable  Unused.
- */
-void broker::show_pid(bool enable) {
-  (void)enable;
-  throw (basic_error()
-         << "unable to set show pid for broker backend");
-}
-
-/**
- *  Set show timestamp.
- *
- *  @param[in] val  Unused.
- */
-void broker::show_timestamp(com::centreon::logging::time_precision val) {
-  (void)val;
-  throw (basic_error()
-         << "unable to set show timestamp for broker backend");
-}
-
-/**
- *  Set show thread id.
- *
- *  @param[in] enable  Unused.
- */
-void broker::show_thread_id(bool enable) {
-  (void)enable;
-  throw (basic_error()
-         << "unable to set show thread id for broker backend");
-}

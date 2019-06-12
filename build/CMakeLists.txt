@@ -737,6 +737,7 @@ set(
   "${INC_DIR}/com/centreon/engine/nebmodules.hh"
   "${INC_DIR}/com/centreon/engine/nebstructs.hh"
   "${INC_DIR}/com/centreon/engine/notifier.hh"
+  "${INC_DIR}/com/centreon/engine/objects.hh"
   "${INC_DIR}/com/centreon/engine/opt.hh"
   "${INC_DIR}/com/centreon/engine/sehandlers.hh"
   "${INC_DIR}/com/centreon/engine/service.hh"
@@ -769,7 +770,6 @@ add_subdirectory("events")
 add_subdirectory("logging")
 add_subdirectory("macros")
 add_subdirectory("modules")
-add_subdirectory("objects")
 add_subdirectory("retention")
 
 # Library engine target.

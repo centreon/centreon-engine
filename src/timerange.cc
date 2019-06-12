@@ -57,16 +57,8 @@ uint64_t timerange::get_range_start() const {
   return _range_start;
 }
 
-void timerange::set_range_start(uint64_t range_start) {
-  _range_start = range_start;
-}
-
 uint64_t timerange::get_range_end() const {
   return _range_end;
-}
-
-void timerange::set_range_end(uint64_t range_end) {
-  _range_end = range_end;
 }
 
 /**

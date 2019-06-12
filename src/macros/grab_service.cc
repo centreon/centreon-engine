@@ -381,32 +381,6 @@ int grab_standard_service_macro_r(
 }
 
 /**
- *  Grab a standard service macro for global macros.
- *
- *  @param[in]  macro_type Macro to dump.
- *  @param[in]  svc        Target service.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer should be free
- *                         by caller.
- *
- *  @return OK on success.
- *
- *  @see grab_standard_service_macro_r
- */
-int grab_standard_service_macro(
-      int macro_type,
-      com::centreon::engine::service* svc,
-      char** output,
-      int* free_macro) {
-  return grab_standard_service_macro_r(
-            get_global_macros(),
-            macro_type,
-            svc,
-            output,
-            free_macro);
-}
-
-/**
  *  Grab macros that are specific to a service.
  *
  *  @param[in] mac Macros object.
@@ -432,19 +406,6 @@ int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* sv
       = svc->get_parent_groups().front().get();
 
   return OK;
-}
-
-/**
- *  Grab macros that are specific to a service.
- *
- *  @param[in] svc Service pointer.
- *
- *  @return OK on success.
- *
- *  @see grab_service_macros_r
- */
-int grab_service_macros(com::centreon::engine::service* svc) {
-  return grab_service_macros_r(get_global_macros(), svc);
 }
 
 }

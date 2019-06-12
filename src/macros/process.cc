@@ -249,14 +249,3 @@ int process_macros_r(
     "**** END MACRO PROCESSING *************";
   return OK;
 }
-
-int process_macros(
-      char const* input_buffer,
-      char** output_buffer,
-      int options) {
-  return (process_macros_r(
-            get_global_macros(),
-            input_buffer,
-            output_buffer,
-            options));
-}

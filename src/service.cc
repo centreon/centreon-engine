@@ -37,7 +37,7 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/shared.hh"
@@ -53,6 +53,13 @@ using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
+
+static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
+  for (unsigned int i(0); i < size; ++i)
+    if (tab1[i] != tab2[i])
+      return (false);
+  return (true);
+}
 
 std::array<std::pair<uint32_t, std::string>, 3> const
     service::tab_service_states{{{NSLOG_SERVICE_OK, "OK"},

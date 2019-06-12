@@ -1285,19 +1285,6 @@ int grab_macro_value_r(
   return result;
 }
 
-int grab_macro_value(
-      char* macro_buffer,
-      char** output,
-      int* clean_options,
-      int* free_macro) {
-  return (grab_macro_value_r(
-            get_global_macros(),
-            macro_buffer,
-            output,
-            clean_options,
-            free_macro));
-}
-
 /**
  *  Grab a macro value.
  *
@@ -1339,35 +1326,6 @@ int grab_macrox_value_r(
                  free_macro);
   }
   return retval;
-}
-
-/**
- *  Grab a global macro value.
- *
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer must be freed by
- *                         caller.
- *
- *  @return OK on success.
- *
- *  @see grab_macrox_value_r
- */
-int grab_macrox_value(
-      int macro_type,
-      char const* arg1,
-      char const* arg2,
-      char** output,
-      int* free_macro) {
-  return (grab_macrox_value_r(
-            get_global_macros(),
-            macro_type,
-            arg1,
-            arg2,
-            output,
-            free_macro));
 }
 
 }

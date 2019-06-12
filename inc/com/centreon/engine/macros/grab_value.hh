@@ -33,19 +33,8 @@ int grab_macro_value_r(
       char** output,
       int* clean_options,
       int* free_macro);
-int grab_macro_value(
-      char* macro_buffer,
-      char** output,
-      int* clean_options,
-      int* free_macro);
 int grab_macrox_value_r(
       nagios_macros* mac,
-      int macro_type,
-      char const* arg1,
-      char const* arg2,
-      char** output,
-      int* free_macro);
-int grab_macrox_value(
       int macro_type,
       char const* arg1,
       char const* arg2,

@@ -30,7 +30,6 @@
 #  include "com/centreon/engine/hostdependency.hh"
 #  include "com/centreon/engine/hostescalation.hh"
 #  include "com/centreon/engine/hostgroup.hh"
-#  include "com/centreon/engine/objects/defines.hh"
 #  include "com/centreon/engine/servicegroup.hh"
 #  include "com/centreon/engine/service.hh"
 #  include "com/centreon/engine/servicedependency.hh"

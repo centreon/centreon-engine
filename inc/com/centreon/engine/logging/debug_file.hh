@@ -39,9 +39,6 @@ namespace        logging {
                    long long max_size = 0);
                  ~debug_file() throw () override;
 
-  protected:
-    void _max_size_reached() override;
-
   private:
                  debug_file(debug_file const& other);
     debug_file&  operator=(debug_file const& other);

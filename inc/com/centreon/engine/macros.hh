@@ -39,37 +39,6 @@ std::string clean_macro_chars(std::string const& macro, int options);
 extern "C" {
 #  endif // C++
 
-int grab_hostgroup_macros(com::centreon::engine::hostgroup* hg);
-int grab_servicegroup_macros(com::centreon::engine::servicegroup* sg);
-int grab_contact_macros(com::centreon::engine::contact* cntct);
-
-int grab_custom_macro_value(
-      char* macro_name,
-      std::string const& arg1,
-      char const* arg2,
-      char** output);
-int grab_datetime_macro(
-      int macro_type,
-      char const* arg1,
-      char const* arg2,
-      char** output);
-int grab_standard_hostgroup_macro(
-      int macro_type,
-      com::centreon::engine::hostgroup* temp_hostgroup,
-      char** output);
-int grab_standard_service_macro(
-      int macro_type,
-      com::centreon::engine::service* temp_service,
-      char** output,
-      int* free_macro);
-int grab_standard_servicegroup_macro(
-      int macro_type,
-      com::centreon::engine::servicegroup* temp_servicegroup,
-      char** output);
-int grab_standard_contact_macro(
-      int macro_type,
-      com::centreon::engine::contact* temp_contact,
-      char** output);
 int grab_contact_address_macro(
       unsigned int macro_num,
       com::centreon::engine::contact* temp_contact,
@@ -78,18 +47,7 @@ int grab_standard_contactgroup_macro(
       int macro_type,
       com::centreon::engine::contactgroup* temp_contactgroup,
       char** output);
-int grab_custom_object_macro(
-      char* macro_name,
-      std::list<com::centreon::engine::customvariable> const& vars,
-      char** output);
 
-// Thread-safe version of the above.
-int grab_hostgroup_macros_r(
-      nagios_macros* mac,
-      com::centreon::engine::hostgroup* hg);
-int grab_servicegroup_macros_r(
-      nagios_macros* mac,
-      com::centreon::engine::servicegroup* sg);
 int grab_contact_macros_r(
       nagios_macros* mac,
       com::centreon::engine::contact* cntct);
@@ -134,38 +92,12 @@ int init_macros();
 int init_macrox_names();
 int free_macrox_names();
 
-void copy_constant_macros(char** dest);
-
-/* clear macros */
-int clear_argv_macros();
-int clear_volatile_macros();
-int clear_contact_macros();
-int clear_contactgroup_macros();
-int clear_summary_macros();
-
 /* thread-safe version of the above */
 int clear_argv_macros_r(nagios_macros* mac);
 int clear_volatile_macros_r(nagios_macros* mac);
 int clear_contact_macros_r(nagios_macros* mac);
 int clear_contactgroup_macros_r(nagios_macros* mac);
 int clear_summary_macros_r(nagios_macros* mac);
-
-int set_all_macro_environment_vars(bool set);
-int set_macrox_environment_vars(bool set);
-int set_argv_macro_environment_vars(bool set);
-int set_custom_macro_environment_vars(bool set);
-int set_contact_address_environment_vars(bool set);
-int set_macro_environment_var(
-      std::string const& name,
-      std::string const& value,
-      bool set);
-
-/* thread-safe version of the above */
-int set_all_macro_environment_vars_r(nagios_macros* mac, bool set);
-int set_macrox_environment_vars_r(nagios_macros* mac, bool set);
-int set_argv_macro_environment_vars_r(nagios_macros* mac, bool set);
-int set_custom_macro_environment_vars_r(nagios_macros* mac, bool set);
-int set_contact_address_environment_vars_r(nagios_macros* mac, bool set);
 
 #  ifdef __cplusplus
 }

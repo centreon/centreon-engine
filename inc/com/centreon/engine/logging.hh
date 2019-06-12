@@ -26,22 +26,6 @@
 
 // State Logging Types
 #  define INITIAL_STATES             1
-#  define CURRENT_STATES             2
-
-// Logging Types
-#  define NSLOG_RUNTIME_ERROR        1
-#  define NSLOG_RUNTIME_WARNING      2
-
-#  define NSLOG_VERIFICATION_ERROR   4
-#  define NSLOG_VERIFICATION_WARNING 8
-
-#  define NSLOG_CONFIG_ERROR         16
-#  define NSLOG_CONFIG_WARNING       32
-
-#  define NSLOG_PROCESS_INFO         64
-#  define NSLOG_EVENT_HANDLER        128
-// #  define NSLOG_NOTIFICATION       256 //NOT USED ANYMORE - CAN BE REUSED
-#  define NSLOG_EXTERNAL_COMMAND     512
 
 #  define NSLOG_HOST_UP              1024
 #  define NSLOG_HOST_DOWN            2048
@@ -52,39 +36,6 @@
 #  define NSLOG_SERVICE_WARNING      32768
 #  define NSLOG_SERVICE_CRITICAL     65536
 
-#  define NSLOG_PASSIVE_CHECK        131072
-
-#  define NSLOG_INFO_MESSAGE         262144
-
-#  define NSLOG_HOST_NOTIFICATION    524288
-#  define NSLOG_SERVICE_NOTIFICATION 1048576
-
-// Debugging Levels
-#  define DEBUGL_ALL                 (unsigned int)-1
-#  define DEBUGL_NONE                0
-#  define DEBUGL_FUNCTIONS           1
-#  define DEBUGL_CONFIG              2
-#  define DEBUGL_PROCESS             4
-#  define DEBUGL_STATUSDATA          4
-#  define DEBUGL_RETENTIONDATA       4
-#  define DEBUGL_EVENTS              8
-#  define DEBUGL_CHECKS              16
-#  define DEBUGL_IPC                 16
-#  define DEBUGL_FLAPPING            16
-#  define DEBUGL_EVENTHANDLERS       16
-#  define DEBUGL_PERFDATA            16
-#  define DEBUGL_NOTIFICATIONS       32
-#  define DEBUGL_EVENTBROKER         64
-#  define DEBUGL_EXTERNALCOMMANDS    128
-#  define DEBUGL_COMMANDS            256
-#  define DEBUGL_DOWNTIME            512
-#  define DEBUGL_COMMENTS            1024
-#  define DEBUGL_MACROS              2048
-
-#  define DEBUGV_BASIC               0
-#  define DEBUGV_MORE                1
-#  define DEBUGV_MOST                2
-
 CCE_BEGIN()
   class host;
   class service;
@@ -94,37 +45,9 @@ CCE_END()
 extern "C" {
 #  endif // C++
 
-// Logging Functions
-void logit(int data_type, int display, char const* fmt, ...);
-int log_debug_info(
-      int level,
-      unsigned int verbosity,
-      char const* fmt,
-      ...);
-
-// writes a string to main log file and syslog facility
-int write_to_all_logs(char const* buffer, unsigned long data_type);
-// write a string to the main log file
-int write_to_log(
-      char const* buffer,
-      unsigned long data_type,
-      time_t* timestamp);
-// write a string to the syslog facility
-int write_to_syslog(char const* buffer, unsigned long data_type);
-// logs a service event
-int log_service_event(com::centreon::engine::service const* svc);
-// logs initial/current host states
 void log_host_state(unsigned int type, com::centreon::engine::host* hst);
-int log_host_states(unsigned int type, time_t* timestamp);
 // logs initial/current service states
 void log_service_state(unsigned int type, com::centreon::engine::service* svc);
-int log_service_states(unsigned int type, time_t* timestamp);
-// rotates the main log file
-int rotate_log_file(time_t rotation_time);
-// records log file/version info
-int write_log_file_info(time_t* timestamp);
-int open_debug_log();
-int close_debug_log();
 
 #  ifdef __cplusplus
 }

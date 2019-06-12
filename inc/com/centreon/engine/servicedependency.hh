@@ -87,9 +87,6 @@ class                 servicedependency : public dependency {
 };
 
 CCE_END();
-/*
-com::centreon::engine::servicedependency*/
-
 
 std::ostream& operator<<(std::ostream& os,
   com::centreon::engine::servicedependency const& obj);

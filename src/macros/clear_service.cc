@@ -88,15 +88,4 @@ int clear_service_macros_r(nagios_macros* mac) {
   return OK;
 }
 
-/**
- *  Clear global service macros.
- *
- *  @return OK on success.
- *
- *  @see clear_service_macros_r
- */
-int clear_service_macros() {
-  return clear_service_macros_r(get_global_macros());
-}
-
 }

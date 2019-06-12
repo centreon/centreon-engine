@@ -49,7 +49,6 @@ namespace                      commands {
                                  command const& right) const throw ();
     virtual command*           clone() const = 0;
     virtual std::string const& get_command_line() const throw ();
-    command_listener*          get_listener() const throw ();
     virtual std::string const& get_name() const throw ();
     virtual std::string        process_cmd(nagios_macros* macros) const;
     virtual unsigned long      run(

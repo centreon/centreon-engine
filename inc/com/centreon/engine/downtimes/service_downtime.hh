@@ -42,7 +42,6 @@ class                               service_downtime : public downtime {
                                     service_downtime(downtime const& other);
                                     service_downtime(downtime&& other);
   virtual                           ~service_downtime();
-  void                              set_service_description(std::string const& descr);
   std::string const&                get_service_description() const;
   virtual bool                      is_stale() const override;
   virtual void                      schedule() override;

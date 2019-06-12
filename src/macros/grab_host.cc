@@ -398,11 +398,11 @@ extern "C" {
  *  @return OK on success.
  */
 int grab_standard_host_macro_r(
-      nagios_macros* mac,
-      int macro_type,
-      host* hst,
-      char** output,
-      int* free_macro) {
+  nagios_macros *mac,
+  int macro_type,
+  host *hst,
+  char **output,
+  int *free_macro) {
   // Check that function was called with valid arguments.
   int retval;
   if (hst && output && free_macro) {
@@ -419,43 +419,16 @@ int grab_standard_host_macro_r(
       // Successful execution.
       retval = OK;
     }
-    // Non-existent macro.
+      // Non-existent macro.
     else {
       logger(dbg_macros, basic)
         << "UNHANDLED HOST MACRO #" << macro_type << "! THIS IS A BUG!";
       retval = ERROR;
     }
-  }
-  else
+  } else
     retval = ERROR;
 
   return retval;
-}
-
-/**
- *  Grab a standard host macro for global macros.
- *
- *  @param[in]  macro_type Macro to dump.
- *  @param[in]  hst        Target host.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer should be free
- *                         by caller.
- *
- *  @return OK on success.
- *
- *  @see grab_standard_host_macro_r
- */
-int grab_standard_host_macro(
-      int macro_type,
-      host* hst,
-      char** output,
-      int* free_macro) {
-  return (grab_standard_host_macro_r(
-            get_global_macros(),
-            macro_type,
-            hst,
-            output,
-            free_macro));
 }
 
 /**
@@ -466,7 +439,7 @@ int grab_standard_host_macro(
  *
  *  @return OK on success.
  */
-int grab_host_macros_r(nagios_macros* mac, host* hst) {
+int grab_host_macros_r(nagios_macros *mac, host *hst) {
   // Clear host-related macros.
   clear_host_macros_r(mac);
   clear_hostgroup_macros_r(mac);
@@ -483,19 +456,6 @@ int grab_host_macros_r(nagios_macros* mac, host* hst) {
     mac->hostgroup_ptr = hst->get_parent_groups().front().get();
 
   return OK;
-}
-
-/**
- *  Grab macros that are specific to a host.
- *
- *  @param[in] hst Host pointer.
- *
- *  @return OK on success.
- *
- *  @see grab_host_macros_r
- */
-int grab_host_macros(host* hst) {
-  return grab_host_macros_r(get_global_macros(), hst);
 }
 
 }

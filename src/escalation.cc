@@ -41,16 +41,8 @@ int escalation::get_first_notification() const {
   return _first_notification;
 }
 
-void escalation::set_first_notification(int first_notification) {
-  _first_notification = first_notification;
-}
-
 int escalation::get_last_notification() const {
   return _last_notification;
-}
-
-void escalation::set_last_notification(int last_notification) {
-  _last_notification = last_notification;
 }
 
 double escalation::get_notification_interval() const {

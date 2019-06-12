@@ -28,7 +28,6 @@ extern "C" {
 #  endif // C++
 
 int clear_host_macros_r(nagios_macros* mac);
-int clear_host_macros();
 
 #  ifdef __cplusplus
 }

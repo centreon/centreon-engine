@@ -73,8 +73,6 @@ class                     servicegroup {
   std::string             _action_url;
 };
 
-com::centreon::engine::servicegroup&
-                          find_servicegroup(std::string const& name);
 bool                      is_servicegroup_exist(std::string const& name) throw ();
 
 CCE_END()

@@ -277,132 +277,52 @@ void comment::remove_if_expired_comment(uint64_t comment_id) {
     delete_comment(comment_id);
 }
 
-/* get the number of comments associated with a particular host */
-int comment::number_of_host_comments(std::string const& host_name) {
-  int total_comments{0};
-
-  for (comment_map::iterator
-         it(comments.begin()),
-         end(comments.end());
-       it != end;
-       ++it)
-    if (it->second->get_comment_type() == com::centreon::engine::comment::host
-        && it->second->get_host_name() == host_name)
-      total_comments++;
-
-  return (total_comments);
-}
-
-int comment::number_of_service_comments(std::string const& host_name,
-    std::string const& svc_description) {
-  int total_comments{0};
-  for (comment_map::iterator
-         it(comments.begin()),
-         end(comments.end());
-       it != end;
-       ++it)
-    if (it->second->get_comment_type() == com::centreon::engine::comment::service
-        && it->second->get_host_name() == host_name
-        && it->second->get_service_description() == svc_description)
-      total_comments++;
-
-  return (total_comments);
-}
-
 comment::type comment::get_comment_type() const {
   return _comment_type;
-}
-
-void comment::set_comment_type(comment::type comment_type) {
-  _comment_type = comment_type;
 }
 
 comment::e_type comment::get_entry_type() const {
   return _entry_type;
 }
 
-void comment::set_entry_type(comment::e_type entry_type) {
-  _entry_type = entry_type;
-}
-
 unsigned long comment::get_comment_id() const {
   return _comment_id;
-}
-
-void comment::set_comment_id(unsigned long  comment_id) {
-  _comment_id = comment_id;
 }
 
 comment::src comment::get_source() const {
   return _source;
 }
 
-void comment::set_source(comment::src source) {
-  _source = source;
-}
-
 bool comment::get_persistent() const {
   return _persistent;
-}
-
-void comment::set_persistent(bool persistent) {
-  _persistent = persistent;
 }
 
 time_t comment::get_entry_time() const {
   return _entry_time;
 }
 
-void comment::set_entry_time(time_t entry_time) {
-  _entry_time = entry_time;
-}
-
 bool comment::get_expires() const {
   return _expires;
-}
-
-void comment::set_expires(bool expires) {
-  _expires = expires;
 }
 
 time_t comment::get_expire_time() const {
   return _expire_time;
 }
 
-void comment::set_expire_time(time_t expire_time) {
-  _expire_time = expire_time;
-}
-
 std::string const& comment::get_host_name() const {
   return _host_name;
-}
-
-void comment::set_host_name(std::string const& host_name) {
-  _host_name = host_name;
 }
 
 std::string const& comment::get_service_description() const {
   return _service_description;
 }
 
-void comment::set_service_description(std::string const& service_description) {
-  _service_description = service_description;
-}
-
 std::string const& comment::get_author() const {
   return _author;
 }
 
-void comment::set_author(std::string const& author) {
-  _author = author;
-}
-
 std::string const& comment::get_comment_data() const {
   return _comment_data;
-}
-
-void comment::set_comment_data(std::string const& comment_data) {
-  _comment_data = comment_data;
 }
 
 /**

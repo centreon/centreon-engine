@@ -110,22 +110,12 @@ contact_map const& contactgroup::get_members() const {
   return _members;
 }
 
-bool contactgroup::contains_illegal_object_chars() const {
-  if (_name.empty() || !illegal_object_chars)
-    return false;
-  return _name.find(illegal_object_chars) != std::string::npos;
-}
-
 std::string const& contactgroup::get_alias() const {
   return _alias;
 }
 
 void contactgroup::set_alias(std::string const& alias) {
   _alias = alias;
-}
-
-bool contactgroup::has_member(std::string const& name) const {
-  return _members.find(name) != _members.end();
 }
 
 std::ostream& operator<<(

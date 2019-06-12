@@ -92,15 +92,4 @@ int clear_host_macros_r(nagios_macros* mac) {
   return OK;
 }
 
-/**
- *  Clear global host macros.
- *
- *  @return OK on success.
- *
- *  @see clear_host_macros_r
- */
-int clear_host_macros() {
-  return clear_host_macros_r(get_global_macros());
-}
-
 }

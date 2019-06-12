@@ -201,8 +201,6 @@ class                host : public notifier {
   void               set_retain_status_information(bool retain_status_information);
   bool               get_retain_nonstatus_information() const;
   void               set_retain_nonstatus_information(bool retain_nonstatus_information);
-  bool               get_failure_prediction_enabled() const;
-  void               set_failure_prediction_enabled(bool failure_prediction_enabled);
   std::string const& get_vrml_image() const;
   void               set_vrml_image(std::string const& image);
   std::string const& get_statusmap_image() const;
@@ -303,7 +301,6 @@ private:
   bool                _process_performance_data;
   int                 _retain_status_information;
   int                 _retain_nonstatus_information;
-  bool                _failure_prediction_enabled;
   std::string         _vrml_image;
   std::string         _statusmap_image;
   bool                _have_2d_coords;
@@ -323,7 +320,6 @@ private:
   bool                _is_being_freshened;
   int                 _check_flapping_recovery_notification;
   int                 _pending_flex_downtime;
-  unsigned int        _state_history_index;
   time_t              _last_state_history_update;
   unsigned long       _flapping_comment_id;
   int                 _total_services;

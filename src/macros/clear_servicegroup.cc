@@ -53,15 +53,4 @@ int clear_servicegroup_macros_r(nagios_macros* mac) {
   return (OK);
 }
 
-/**
- *  Clear global servicegroup macros.
- *
- *  @return OK on success.
- *
- *  @see clear_servicegroup_macros_r
- */
-int clear_servicegroup_macros() {
-  return (clear_servicegroup_macros_r(get_global_macros()));
-}
-
 }
