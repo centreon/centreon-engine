@@ -186,6 +186,9 @@ applier::state::state()
  */
 applier::state::~state() throw() {
   engine::contact::contacts.clear();
+  engine::servicegroup::servicegroups.clear();
+  engine::hostgroup::hostgroups.clear();
+
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();

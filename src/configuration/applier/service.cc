@@ -24,8 +24,6 @@
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -564,9 +562,7 @@ void applier::service::resolve_object(
            << *obj.hosts().begin() << "'");
 
   // Remove service group links.
-  deleter::listmember(
-    it->second->servicegroups_ptr,
-    &deleter::objectlist);
+  it->second->get_parent_groups().clear();
 
   // Find host and adjust its counters.
   std::unordered_map<uint64_t, std::shared_ptr<engine::host>>::iterator

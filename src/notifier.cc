@@ -254,7 +254,35 @@ void notifier::set_max_attempts(int max_attempts) {
   _max_attempts = max_attempts;
 }
 
-int notifier::notify(unsigned int type,
+bool notifier::notifications_available(int options) const {
+  logger(dbg_functions, basic) << "notifier::notifications_available()";
+
+  /* forced notifications bust through everything */
+  if (options & NOTIFICATION_OPTION_FORCED) {
+    logger(dbg_notifications, more)
+        << "This is a forced notification, so we'll send it out.";
+    return true;
+  }
+
+  /* are notifications enabled? */
+  if (!config->enable_notifications()) {
+    logger(dbg_notifications, more)
+        << "Notifications are disabled, so service notifications will "
+           "not be sent out.";
+    return false;
+  }
+
+  /* are notifications temporarily disabled for this notifier? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for "
+           "this notifier, so we won't send one out.";
+    return false;
+  }
+  return true;
+}
+
+int notifier::notify(notifier::reason_type type,
                      std::string const& not_author,
                      std::string const& not_data,
                      int options) {
@@ -280,8 +308,12 @@ int notifier::notify(unsigned int type,
       << ", Last Notification: " << my_ctime(&last_notif);
 
   nagios_macros mac;
+  /* Are notifications available for this notifier? */
+  if (!notifications_available(options))
+    return OK;
+
   /* check viability of sending out a host notification */
-  if (check_notification_viability(type, options) == ERROR) {
+  if (!check_notification_viability(type, options)) {
     logger(dbg_notifications, basic)
         << "Notification viability test failed.  No notification will "
            "be sent out.";

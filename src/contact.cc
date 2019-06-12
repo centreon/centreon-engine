@@ -21,7 +21,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"

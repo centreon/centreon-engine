@@ -224,7 +224,7 @@ int pre_flight_check() {
     printf("\n\n");
   }
 
-  return ((errors > 0) ? ERROR : OK);
+  return (errors > 0) ? ERROR : OK;
 }
 
 /**
@@ -425,7 +425,7 @@ int pre_flight_object_check(int* w, int* e) {
   *w += warnings;
   *e += errors;
 
-  return ((errors > 0) ? ERROR : OK);
+  return (errors > 0) ? ERROR : OK;
 }
 
 /* dfs status values */
@@ -446,10 +446,10 @@ int pre_flight_object_check(int* w, int* e) {
  */
 static int dfs_host_path(host* root) {
   if (!root)
-    return (DFS_NEAR_LOOP);
+    return DFS_NEAR_LOOP;
 
   if (dfs_get_status(root) != DFS_UNCHECKED)
-    return (dfs_get_status(root));
+    return dfs_get_status(root);
 
   /* Mark the root temporary checked */
   dfs_set_status(root, DFS_TEMP_CHECKED);
@@ -491,7 +491,7 @@ static int dfs_host_path(host* root) {
    */
   if (dfs_get_status(root) == DFS_TEMP_CHECKED)
     dfs_set_status(root, DFS_OK);
-  return (dfs_get_status(root));
+  return dfs_get_status(root);
 }
 
 /* check for circular paths and dependencies */
@@ -503,7 +503,7 @@ int pre_flight_circular_check(int* w, int* e) {
 
   /* bail out if we aren't supposed to verify circular paths */
   if (!verify_circular_paths)
-    return (OK);
+    return OK;
 
   /********************************************/
   /* check for circular paths between hosts   */
@@ -675,7 +675,7 @@ int pre_flight_circular_check(int* w, int* e) {
   if (e != nullptr)
     *e += errors;
 
-  return ((errors > 0) ? ERROR : OK);
+  return (errors > 0) ? ERROR : OK;
 }
 
 int check_service(std::shared_ptr<service> svc, int* w, int* e) {
@@ -893,7 +893,7 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
     *w += warnings;
   if (e != nullptr)
     *e += errors;
-  return (errors == 0);
+  return errors == 0;
 }
 
 int check_host(std::shared_ptr<host> hst, int* w, int* e) {
@@ -1098,7 +1098,7 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
     *w += warnings;
   if (e != nullptr)
     *e += errors;
-  return (errors == 0);
+  return errors == 0;
 }
 
 int check_contact(std::shared_ptr<contact> cntct, int* w, int* e) {
@@ -1213,7 +1213,7 @@ int check_contact(std::shared_ptr<contact> cntct, int* w, int* e) {
     *w += warnings;
   if (e != nullptr)
     *e += errors;
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1256,7 +1256,7 @@ int check_servicegroup(std::shared_ptr<servicegroup> sg, int* w, int* e) {
     // Save a pointer to this servicegroup for faster service/group
     // membership lookups later.
     else {
-      add_object_to_objectlist(&found->second->servicegroups_ptr, sg.get());
+      found->second->get_parent_groups().push_back(sg);
 
       // Save service pointer for later.
       sg->members[it->first] = found->second;
@@ -1275,7 +1275,7 @@ int check_servicegroup(std::shared_ptr<servicegroup> sg, int* w, int* e) {
   if (e)
     *e += errors;
 
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1298,9 +1298,9 @@ int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
        it != end;
        ++it) {
 
-    umap<unsigned long, std::shared_ptr<host>>::const_iterator
+    umap<uint64_t, std::shared_ptr<host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first.c_str())));
-    if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
+    if (it_host == state::instance().hosts().end() || !it_host->second) {
       logger(log_verification_error, basic)
         << "Error: Host '" << it->first
         << "' specified in host group '" << hg->get_group_name()
@@ -1311,7 +1311,7 @@ int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
     // Save a pointer to this hostgroup for faster host/group
     // membership lookups later.
     else {
-      add_object_to_objectlist(&it_host->second->hostgroups_ptr, hg.get());
+      it_host->second->get_parent_groups().push_back(hg);
 
       // Save host pointer for later.
       hg->members[it->first] = it_host->second;
@@ -1330,7 +1330,7 @@ int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
   if (e)
     *e += errors;
 
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1383,7 +1383,7 @@ int check_contactgroup(std::shared_ptr<contactgroup> cg, int* w, int* e) {
   if (e)
     *e += errors;
 
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1476,7 +1476,7 @@ int check_servicedependency(std::shared_ptr<servicedependency> sd, int* w, int* 
   if (e)
     *e += errors;
 
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1562,7 +1562,7 @@ int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
   if (e)
     *e += errors;
 
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1660,7 +1660,7 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
   if (e)
     *e += errors;
 
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1753,7 +1753,7 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   // Add errors.
   if (e)
     *e += errors;
-  return (errors == 0);
+  return errors == 0;
 }
 
 /**
@@ -1803,5 +1803,5 @@ int check_timeperiod(std::shared_ptr<timeperiod> tp, int* w, int* e) {
   if (e)
     *e += errors;
 
-  return (errors == 0);
+  return errors == 0;
 }

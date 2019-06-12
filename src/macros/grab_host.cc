@@ -27,7 +27,6 @@
 #include "com/centreon/engine/macros/grab.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/misc.hh"
-#include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
@@ -124,18 +123,18 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
 
   std::string buf;
   // Find all hostgroups this host is associated with.
-  for (objectlist* temp_objectlist = hst.hostgroups_ptr;
-       temp_objectlist != NULL;
-       temp_objectlist = temp_objectlist->next) {
-    hostgroup* temp_hostgroup(
-      static_cast<hostgroup*>(temp_objectlist->object_ptr));
-    if (temp_hostgroup) {
+  for (std::list<std::shared_ptr<hostgroup>>::const_iterator
+         it{hst.get_parent_groups().begin()},
+         end{hst.get_parent_groups().end()};
+       it != end;
+       ++it) {
+    if (*it) {
       if (!buf.empty())
         buf.append(",");
-      buf.append(temp_hostgroup->get_group_name());
+      buf.append((*it)->get_group_name());
     }
   }
-  return (string::dup(buf));
+  return string::dup(buf);
 }
 
 /**
@@ -164,7 +163,7 @@ static char* get_host_state(T& t, nagios_macros* mac) {
 template <unsigned int macro_id>
 static char* get_host_total_services(host& hst, nagios_macros* mac) {
   generate_host_total_services(hst, mac);
-  return (mac->x[macro_id]);
+  return mac->x[macro_id];
 }
 
 /**
@@ -187,7 +186,7 @@ static char* get_host_parents(host& hst, nagios_macros* mac) {
       retval.append(it->first);
     retval.append(",");
   }
-  return (string::dup(retval.c_str()));
+  return string::dup(retval.c_str());
 }
 
 /**
@@ -210,7 +209,7 @@ static char* get_host_children(host& hst, nagios_macros* mac) {
       retval.append(it->first);
     retval.append(",");
   }
-  return (string::dup(retval.c_str()));
+  return string::dup(retval.c_str());
 }
 
 /**
@@ -430,7 +429,7 @@ int grab_standard_host_macro_r(
   else
     retval = ERROR;
 
-  return (retval);
+  return retval;
 }
 
 /**
@@ -477,14 +476,13 @@ int grab_host_macros_r(nagios_macros* mac, host* hst) {
   mac->hostgroup_ptr = NULL;
 
   if (hst == NULL)
-    return (ERROR);
+    return ERROR;
 
   // Save pointer to host's first/primary hostgroup.
-  if (hst->hostgroups_ptr)
-    mac->hostgroup_ptr
-      = static_cast<hostgroup*>(hst->hostgroups_ptr->object_ptr);
+  if (!hst->get_parent_groups().empty())
+    mac->hostgroup_ptr = hst->get_parent_groups().front().get();
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -497,7 +495,7 @@ int grab_host_macros_r(nagios_macros* mac, host* hst) {
  *  @see grab_host_macros_r
  */
 int grab_host_macros(host* hst) {
-  return (grab_host_macros_r(get_global_macros(), hst));
+  return grab_host_macros_r(get_global_macros(), hst);
 }
 
 }

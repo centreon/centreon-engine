@@ -36,17 +36,13 @@
 
 
 /* Forward declaration. */
-extern "C" {
-struct objectlist_struct;
-};
-
 CCE_BEGIN()
-class host;
-class hostescalation;
-class timeperiod;
 namespace commands {
   class command;
 }
+class host;
+class hostgroup;
+class hostescalation;
 CCE_END()
 
 typedef std::unordered_map<std::string,
@@ -147,7 +143,7 @@ class                host : public notifier {
                                 double low_threshold);
   void               update_status(bool aggregated_dump) override;
   void               check_for_expired_acknowledgement();
-  int                check_notification_viability(unsigned int type,
+  bool               check_notification_viability(reason_type type,
                                                   int options) override;
   int                handle_state();
   void               update_performance_data();
@@ -274,6 +270,7 @@ class                host : public notifier {
                        std::shared_ptr<escalation> e,
                        int options) const override;
   void               handle_flap_detection_disabled();
+  timeperiod*        get_notification_period_ptr() const override;
 
   host_map            parent_hosts;
   host_map            child_hosts;
@@ -285,7 +282,10 @@ class                host : public notifier {
   service_map         services;
   timeperiod          *check_period_ptr;
   timeperiod          *notification_period_ptr;
-  objectlist_struct*  hostgroups_ptr;
+  std::list<std::shared_ptr<hostgroup>> const&
+                                get_parent_groups() const;
+  std::list<std::shared_ptr<hostgroup>>&
+                                get_parent_groups();
 
 private:
   std::string         _name;
@@ -326,6 +326,8 @@ private:
   enum host_state    _last_hard_state;
   enum host_state    _current_state;
   enum host_state    _initial_state;
+  std::list<std::shared_ptr<hostgroup>>
+                                _hostgroups;
 };
 
 CCE_END()

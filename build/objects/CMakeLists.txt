@@ -27,11 +27,9 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/objectlist.cc"
 
   # Headers.
   "${INC_DIR}/defines.hh"
-  "${INC_DIR}/objectlist.hh"
   "${INC_DIR}/tool.hh"
 
   PARENT_SCOPE

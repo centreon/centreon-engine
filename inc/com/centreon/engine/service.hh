@@ -36,18 +36,14 @@
 #  include "com/centreon/engine/checks.hh"
 
 /* Forward declaration. */
-extern "C" {
-struct objectlist_struct;
-};
-
 CCE_BEGIN()
   namespace commands {
     class command;
   }
   class host;
   class service;
+  class servicegroup;
   class serviceescalation;
-  class timeperiod;
 CCE_END()
 
 //Needed by service to use pair<string, string> as umap key.
@@ -162,7 +158,7 @@ class                           service : public notifier {
   void                          disable_flap_detection();
   void                          update_status(bool aggregated_dump) override;
   void                          set_notification_number(int num);
-  int                           check_notification_viability(unsigned int type,
+  bool                          check_notification_viability(reason_type type,
                                                              int options) override;
   int                           verify_check_viability(int check_options,
                                                        int* time_is_valid,
@@ -188,6 +184,7 @@ class                           service : public notifier {
   void                          handle_flap_detection_disabled();
   bool                          get_is_volatile() const;
   void                          set_is_volatile(bool vol);
+  timeperiod*                   get_notification_period_ptr() const override;
 
   double                        notification_interval;
   int                           process_performance_data;
@@ -210,7 +207,10 @@ class                           service : public notifier {
   commands::command*            check_command_ptr;
   timeperiod*                   check_period_ptr;
   timeperiod*                   notification_period_ptr;
-  objectlist_struct*            servicegroups_ptr;
+  std::list<std::shared_ptr<servicegroup>> const&
+                                get_parent_groups() const;
+  std::list<std::shared_ptr<servicegroup>>&
+                                get_parent_groups();
 
   static service_map            services;
 
@@ -229,6 +229,8 @@ class                           service : public notifier {
   enum service_state            _last_hard_state;
   enum service_state            _current_state;
   enum service_state            _initial_state;
+  std::list<std::shared_ptr<servicegroup>>
+                                _servicegroups;
 };
 CCE_END()
 

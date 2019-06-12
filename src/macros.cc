@@ -742,7 +742,6 @@ int grab_standard_contact_macro_r(
       contact* temp_contact,
       char** output) {
   contactgroup* temp_contactgroup = nullptr;
-  objectlist* temp_objectlist = nullptr;
 
   (void)mac;
 

@@ -785,8 +785,7 @@ std::ostream& operator<<(std::ostream& os, host_map const& obj) {
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, host const& obj) {
-  com::centreon::engine::hostgroup const* hg =
-      static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr);
+  std::shared_ptr<hostgroup> hg{obj.get_parent_groups().front()};
 
   std::string evt_str;
   if (obj.event_handler_ptr)
@@ -2154,7 +2153,7 @@ void host::set_flap(double percent_change,
 
   /* send a notification */
   if (allow_flapstart_notification)
-    notify(notification_flappingstart, NULL, NULL, NOTIFICATION_OPTION_NONE);
+    notify(notification_flappingstart, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 }
 
 /* handles a host that has stopped flapping */
@@ -2226,35 +2225,22 @@ void host::check_for_expired_acknowledgement() {
 }
 
 /* checks viability of sending a host notification */
-int host::check_notification_viability(unsigned int type, int options) {
+bool host::check_notification_viability(reason_type type, int options) {
   time_t current_time;
   time_t timeperiod_start;
 
-  logger(dbg_functions, basic) << "check_host_notification_viability()";
-
-  /* forced notifications bust through everything */
-  if (options & NOTIFICATION_OPTION_FORCED) {
-    logger(dbg_notifications, more)
-        << "This is a forced host notification, so we'll send it out.";
-    return OK;
-  }
+  logger(dbg_functions, basic) << "host::check_notification_viability()";
 
   /* get current time */
   time(&current_time);
 
-  /* are notifications enabled? */
-  if (!config->enable_notifications()) {
-    logger(dbg_notifications, more)
-        << "Notifications are disabled, so host notifications will not "
-           "be sent out.";
-    return ERROR;
-  }
+  timeperiod* temp_period{notification_period_ptr};
 
   // See if the host can have notifications sent out at this time.
   {
     timezone_locker lock(get_timezone());
     if (check_time_against_period(current_time,
-                                  this->notification_period_ptr) == ERROR) {
+                                  temp_period) == false) {
       logger(dbg_notifications, more)
           << "This host shouldn't have notifications sent out at "
              "this time.";
@@ -2263,7 +2249,7 @@ int host::check_notification_viability(unsigned int type, int options) {
       // notification time, once the next valid time range arrives...
       if (type == notification_normal) {
         get_next_valid_time(current_time, &timeperiod_start,
-                            this->notification_period_ptr);
+                            temp_period);
 
         // It looks like there is no notification time defined, so
         // schedule next one far into the future (one year)...
@@ -2277,16 +2263,8 @@ int host::check_notification_viability(unsigned int type, int options) {
         logger(dbg_notifications, more)
             << "Next possible notification time: " << my_ctime(&time);
       }
-      return ERROR;
+      return false;
     }
-  }
-
-  /* are notifications temporarily disabled for this host? */
-  if (!get_notifications_enabled()) {
-    logger(dbg_notifications, more)
-        << "Notifications are temporarily disabled for this host, "
-           "so we won't send one out.";
-    return ERROR;
   }
 
   /*********************************************/
@@ -2299,9 +2277,9 @@ int host::check_notification_viability(unsigned int type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't send custom notification during "
              "scheduled downtime.";
-      return ERROR;
+      return false;
     }
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2318,14 +2296,14 @@ int host::check_notification_viability(unsigned int type, int options) {
       logger(dbg_notifications, more)
           << "The host is currently UP, so we won't send "
              "an acknowledgement.";
-      return ERROR;
+      return false;
     }
 
     /*
      * acknowledgement viability test passed, so the notification can be sent
      * out
      */
-    return OK;
+    return true;
   }
 
   /*****************************************/
@@ -2339,7 +2317,7 @@ int host::check_notification_viability(unsigned int type, int options) {
     if (!get_notify_on(flapping)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events for this host.";
-      return ERROR;
+      return false;
     }
 
     /* don't send notifications during scheduled downtime */
@@ -2347,11 +2325,11 @@ int host::check_notification_viability(unsigned int type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events during "
              "scheduled downtime.";
-      return ERROR;
+      return false;
     }
 
     /* flapping viability test passed, so the notification can be sent out */
-    return OK;
+    return true;
   }
 
   /*****************************************/
@@ -2365,7 +2343,7 @@ int host::check_notification_viability(unsigned int type, int options) {
     if (!get_notify_on(downtime)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events for this host.";
-      return ERROR;
+      return false;
     }
 
     /* don't send notifications during scheduled downtime */
@@ -2373,11 +2351,11 @@ int host::check_notification_viability(unsigned int type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events during "
              "scheduled downtime!";
-      return ERROR;
+      return false;
     }
 
     /* downtime viability test passed, so the notification can be sent out */
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2389,7 +2367,7 @@ int host::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This host is in a soft state, so we won't send "
            "a notification out.";
-    return ERROR;
+    return false;
   }
 
   /* has this problem already been acknowledged? */
@@ -2397,7 +2375,7 @@ int host::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This host problem has already been acknowledged, "
            "so we won't send a notification out!";
-    return ERROR;
+    return false;
   }
 
   /* check notification dependencies */
@@ -2406,7 +2384,7 @@ int host::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "Notification dependencies for this host have failed, "
            "so we won't sent a notification out!";
-    return ERROR;
+    return false;
   }
 
   /* see if we should notify about problems with this host */
@@ -2414,24 +2392,24 @@ int host::check_notification_viability(unsigned int type, int options) {
       !get_notify_on(unreachable)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about UNREACHABLE status for this host.";
-    return ERROR;
+    return false;
   }
   if (get_current_state() ==  host::state_down && !get_notify_on(down)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about DOWN states for this host.";
-    return ERROR;
+    return false;
   }
   if (get_current_state() ==  host::state_up) {
     if (!get_notify_on(recovery)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about RECOVERY states for this host.";
-      return ERROR;
+      return false;
     }
     /* No notification received */
     if (get_notified_on() == 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about this recovery.";
-      return ERROR;
+      return false;
     }
   }
 
@@ -2463,7 +2441,7 @@ int host::check_notification_viability(unsigned int type, int options) {
             << "Not enough time has elapsed since the host changed to a "
                "non-UP state (or since program start), so we shouldn't notify "
                "about this problem yet.";
-      return ERROR;
+      return false;
     }
   }
 
@@ -2472,7 +2450,7 @@ int host::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This host is currently flapping, so we won't "
            "send notifications.";
-    return ERROR;
+    return false;
   }
 
   /*
@@ -2483,18 +2461,18 @@ int host::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This host is currently in a scheduled downtime, "
            "so we won't send notifications.";
-    return ERROR;
+    return false;
   }
 
   /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
   if (get_current_state() ==  host::state_up)
-    return OK;
+    return true;
 
   /* check if we shouldn't renotify contacts about the host problem */
   if (get_no_more_notifications()) {
     logger(dbg_notifications, more)
         << "We shouldn't re-notify contacts about this host problem.";
-    return ERROR;
+    return false;
   }
 
   /* check if its time to re-notify the contacts about the host... */
@@ -2505,10 +2483,10 @@ int host::check_notification_viability(unsigned int type, int options) {
     time_t time = get_next_notification();
     logger(dbg_notifications, more)
         << "Next acceptable notification time: " << my_ctime(&time);
-    return ERROR;
+    return false;
   }
 
-  return OK;
+  return true;
 }
 
 /* top level host state handler - occurs after every host check (soft/hard and
@@ -2622,7 +2600,7 @@ int host::handle_state() {
 
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (get_state_type() == hard)
-      notify(notification_normal, NULL, NULL, NOTIFICATION_OPTION_NONE);
+      notify(notification_normal, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
 
     /* handle the host state change */
     handle_host_event(this);
@@ -3263,7 +3241,7 @@ void host::handle_flap_detection_disabled() {
       NULL);
 
     /* send a notification */
-    this->notify(
+    notify(
       notification_flappingdisabled,
       NULL,
       NULL,
@@ -3272,7 +3250,7 @@ void host::handle_flap_detection_disabled() {
     /* should we send a recovery notification? */
     if (this->get_check_flapping_recovery_notification()
         && this->get_current_state() == host::state_up)
-      this->notify(
+      notify(
         notification_normal,
         NULL,
         NULL,
@@ -3358,9 +3336,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
                                  int use_cached_result,
                                  unsigned long check_timestamp_horizon) {
   com::centreon::engine::host* master_host = NULL;
-  com::centreon::engine::host* temp_host = NULL;
-  objectlist* check_hostlist = NULL;
-  objectlist* hostlist_item = NULL;
+  host* temp_host;
+  std::list<host*> check_hostlist;
   host::host_state parent_state =  host::state_up;
   time_t current_time = 0L;
   time_t next_check = 0L;
@@ -3445,7 +3422,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         if (it->second->get_current_state() !=  host::state_up) {
           logger(dbg_checks, more)
             << "Check of parent host '" << it->first << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
+          check_hostlist.push_back(it->second.get());
         }
       }
 
@@ -3462,7 +3439,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         if (it->second->get_current_state() !=  host::state_up) {
           logger(dbg_checks, more)
             << "Check of child host '" << it->first << "' queued.";
-          add_object_to_objectlist(&check_hostlist, (void*)it->second.get());
+          check_hostlist.push_back(it->second.get());
         }
       }
     }
@@ -3645,7 +3622,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second->get_current_state() !=  host::state_unreachable) {
             logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
-            add_object_to_objectlist(&check_hostlist, it->second.get());
+            check_hostlist.push_back(it->second.get());
           }
         }
       }
@@ -3710,7 +3687,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second == nullptr)
             continue;
           if (it->second->get_current_state() ==  host::state_up) {
-            add_object_to_objectlist(&check_hostlist, it->second.get());
+            check_hostlist.push_back(it->second.get());
             logger(dbg_checks, more)
               << "Check of host '" << it->first << "' queued.";
           }
@@ -3730,7 +3707,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second->get_current_state() !=  host::state_unreachable) {
             logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
-            add_object_to_objectlist(&check_hostlist, it->second.get());
+            check_hostlist.push_back(it->second.get());
           }
         }
 
@@ -3756,12 +3733,11 @@ int host::process_check_result_3x(enum host::host_state new_state,
             hostdependency* temp_dependency(&*it->second);
             if (temp_dependency->dependent_host_ptr == this &&
               temp_dependency->master_host_ptr != NULL) {
-              master_host = (com::centreon::engine::host*)
-                temp_dependency->master_host_ptr;
+              master_host = (host*) temp_dependency->master_host_ptr;
               logger(dbg_checks, more)
                 << "Check of host '" << master_host->get_name()
                 << "' queued.";
-              add_object_to_objectlist(&check_hostlist, (void*)master_host);
+              check_hostlist.push_back(master_host);
             }
           }
         }
@@ -3860,10 +3836,13 @@ int host::process_check_result_3x(enum host::host_state new_state,
   /* run async checks of all hosts we added above */
   /* don't run a check if one is already executing or we can get by with a
    * cached state */
-  for (hostlist_item = check_hostlist; hostlist_item != NULL;
-       hostlist_item = hostlist_item->next) {
+  for (std::list<host*>::iterator
+         it{check_hostlist.begin()},
+         end{check_hostlist.end()};
+       it != end;
+       ++it) {
     run_async_check = true;
-    temp_host = (com::centreon::engine::host*)hostlist_item->object_ptr;
+    temp_host = *it;
 
     logger(dbg_checks, most)
       << "ASYNC CHECK OF HOST: " << temp_host->get_name()
@@ -3883,7 +3862,6 @@ int host::process_check_result_3x(enum host::host_state new_state,
       temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false,
                                  false, NULL, NULL);
   }
-  free_objectlist(&check_hostlist);
   return OK;
 }
 
@@ -3945,4 +3923,16 @@ enum host::host_state host::determine_host_reachability() {
   }
 
   return state;
+}
+
+std::list<std::shared_ptr<hostgroup>> const& host::get_parent_groups() const {
+  return _hostgroups;
+}
+
+std::list<std::shared_ptr<hostgroup>>& host::get_parent_groups() {
+  return _hostgroups;
+}
+
+timeperiod* host::get_notification_period_ptr() const {
+  return notification_period_ptr;
 }

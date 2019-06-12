@@ -24,7 +24,6 @@
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
@@ -37,7 +36,6 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/service.hh"
@@ -126,7 +124,6 @@ service::service(std::string const& hostname,
 
 service::~service() {
   this->contact_groups.clear();
-  //deleter::listmember(this->servicegroups_ptr, &deleter::objectlist);
 }
 
 time_t service::get_last_time_ok() const {
@@ -358,10 +355,8 @@ std::ostream& operator<<(std::ostream& os,
   if (obj.notification_period_ptr)
     notif_period_str = obj.notification_period_ptr->get_name();
   std::string svcgrp_str;
-  if (obj.servicegroups_ptr)
-    svcgrp_str =
-        static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)
-            ->get_group_name();
+  if (!obj.get_parent_groups().empty())
+    svcgrp_str = obj.get_parent_groups().front()->get_group_name();
 
   std::string cg_oss;
   std::string c_oss;
@@ -1058,8 +1053,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   time_t current_time = 0L;
   int state_was_logged = false;
   std::string old_plugin_output;
-  objectlist* check_servicelist = nullptr;
-  objectlist* servicelist_item = nullptr;
+  std::list<service*> check_servicelist;
   com::centreon::engine::service* master_service = nullptr;
   int run_async_check = true;
   /* TODO - 09/23/07 move this to a global variable */
@@ -1833,7 +1827,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                 << "Predictive check of service '"
                 << master_service->get_description() << "' on host '"
                 << master_service->get_hostname() << "' queued.";
-            add_object_to_objectlist(&check_servicelist, (void*)master_service);
+            check_servicelist.push_back(master_service);
           }
         }
       }
@@ -1988,10 +1982,13 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* run async checks of all services we added above */
   /* don't run a check if one is already executing or we can get by with a
    * cached state */
-  for (servicelist_item = check_servicelist; servicelist_item != nullptr;
-       servicelist_item = servicelist_item->next) {
+  for (std::list<service*>::iterator
+         it{check_servicelist.begin()},
+         end{check_servicelist.end()};
+       it != end;
+       ++it) {
     run_async_check = true;
-    service* svc = static_cast<service*>(servicelist_item->object_ptr);
+    service* svc{*it};
 
     /* we can get by with a cached state, so don't check the service */
     if (static_cast<unsigned long>(current_time - svc->get_last_check()) <=
@@ -2009,7 +2006,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       svc->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
                            nullptr);
   }
-  free_objectlist(&check_servicelist);
   return OK;
 }
 
@@ -2743,50 +2739,29 @@ void service::set_notification_number(int num) {
   update_status(false);
 }
 
-/* checks the viability of sending out a service alert (top level filters) */
-int service::check_notification_viability(unsigned int type, int options) {
-  host* temp_host;
-  timeperiod* temp_period;
+/**
+ * @brief Checks the viability of sending out a service alert (top level
+ * filters)
+ *
+ * @param type A reason type notification
+ * @param options Options for the notification.
+ *
+ * @return true if the check is good, false otherwise.
+ */
+bool service::check_notification_viability(reason_type type, int options) {
   time_t current_time;
-  time_t timeperiod_start;
-
-  logger(dbg_functions, basic) << "check_service_notification_viability()";
-
-  /* forced notifications bust through everything */
-  if (options & NOTIFICATION_OPTION_FORCED) {
-    logger(dbg_notifications, more)
-        << "This is a forced service notification, so we'll send it out.";
-    return OK;
-  }
-
   /* get current time */
   time(&current_time);
 
-  /* are notifications enabled? */
-  if (!config->enable_notifications()) {
-    logger(dbg_notifications, more)
-        << "Notifications are disabled, so service notifications will "
-           "not be sent out.";
-    return ERROR;
-  }
+  logger(dbg_functions, basic) << "service::check_notification_viability()";
 
-  /* find the host this service is associated with */
-  if ((temp_host = (host*)this->host_ptr) == nullptr) {
-    logger(dbg_notifications, more)
-        << "Couldn't find the host associated with this service, "
-           "so we won't send a notification.";
-    return ERROR;
-  }
-
-  /* if the service has no notification period, inherit one from the host */
-  temp_period = this->notification_period_ptr;
-  if (temp_period == nullptr)
-    temp_period = this->host_ptr->notification_period_ptr;
+  timeperiod* temp_period{get_notification_period_ptr()};
 
   // See if the service can have notifications sent out at this time.
   {
     timezone_locker lock(get_timezone());
-    if (check_time_against_period(current_time, temp_period) == ERROR) {
+    if (check_time_against_period(current_time,
+                                  temp_period) == ERROR) {
       logger(dbg_notifications, more)
           << "This service shouldn't have notifications sent out "
              "at this time.";
@@ -2794,8 +2769,9 @@ int service::check_notification_viability(unsigned int type, int options) {
       // Calculate the next acceptable notification time,
       // once the next valid time range arrives...
       if (type == notification_normal) {
+        time_t timeperiod_start;
         get_next_valid_time(current_time, &timeperiod_start,
-                            this->notification_period_ptr);
+                            temp_period);
 
         // Looks like there are no valid notification times defined, so
         // schedule the next one far into the future (one year)...
@@ -2809,16 +2785,8 @@ int service::check_notification_viability(unsigned int type, int options) {
                                         << my_ctime(&_next_notification);
       }
 
-      return ERROR;
+      return false;
     }
-  }
-
-  /* are notifications temporarily disabled for this service? */
-  if (!get_notifications_enabled()) {
-    logger(dbg_notifications, more)
-        << "Notifications are temporarily disabled for "
-           "this service, so we won't send one out.";
-    return ERROR;
   }
 
   /*********************************************/
@@ -2828,13 +2796,13 @@ int service::check_notification_viability(unsigned int type, int options) {
   /* custom notifications are good to go at this point... */
   if (type == notification_custom) {
     if (get_scheduled_downtime_depth() > 0 ||
-        temp_host->get_scheduled_downtime_depth() > 0) {
+        host_ptr->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
           << "We shouldn't send custom notification during "
              "scheduled downtime.";
-      return ERROR;
+      return false;
     }
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2849,16 +2817,16 @@ int service::check_notification_viability(unsigned int type, int options) {
     /* don't send an acknowledgement if there isn't a problem... */
     if (_current_state == service::state_ok) {
       logger(dbg_notifications, more)
-          << "The service is currently OK, so we won't send an "
+          << "The service is currently true, so we won't send an "
              "acknowledgement.";
-      return ERROR;
+      return false;
     }
 
     /*
      * acknowledgement viability test passed, so the notification can be sent
      * out
      */
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2873,20 +2841,20 @@ int service::check_notification_viability(unsigned int type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events for this "
              "service.";
-      return ERROR;
+      return false;
     }
 
     /* don't send notifications during scheduled downtime */
     if (get_scheduled_downtime_depth() > 0 ||
-        temp_host->get_scheduled_downtime_depth() > 0) {
+        host_ptr->get_scheduled_downtime_depth() > 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about FLAPPING events during "
              "scheduled downtime.";
-      return ERROR;
+      return false;
     }
 
     /* flapping viability test passed, so the notification can be sent out */
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2901,7 +2869,7 @@ int service::check_notification_viability(unsigned int type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events for "
              "this service.";
-      return ERROR;
+      return false;
     }
 
     /*
@@ -2912,11 +2880,11 @@ int service::check_notification_viability(unsigned int type, int options) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about DOWNTIME events during "
              "scheduled downtime.";
-      return ERROR;
+      return false;
     }
 
     /* downtime viability test passed, so the notification can be sent out */
-    return OK;
+    return true;
   }
 
   /****************************************/
@@ -2928,7 +2896,7 @@ int service::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This service is in a soft state, so we won't send a "
            "notification out.";
-    return ERROR;
+    return false;
   }
 
   /* has this problem already been acknowledged? */
@@ -2936,7 +2904,7 @@ int service::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This service problem has already been acknowledged, "
            "so we won't send a notification out.";
-    return ERROR;
+    return false;
   }
 
   /* check service notification dependencies */
@@ -2945,16 +2913,16 @@ int service::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "Service notification dependencies for this service "
            "have failed, so we won't sent a notification out.";
-    return ERROR;
+    return false;
   }
 
   /* check host notification dependencies */
-  if (check_host_dependencies(temp_host, hostdependency::notification) ==
+  if (check_host_dependencies(host_ptr, hostdependency::notification) ==
       DEPENDENCIES_FAILED) {
     logger(dbg_notifications, more)
         << "Host notification dependencies for this service have failed, "
            "so we won't sent a notification out.";
-    return ERROR;
+    return false;
   }
 
   /* see if we should notify about problems with this service */
@@ -2962,31 +2930,31 @@ int service::check_notification_viability(unsigned int type, int options) {
     !get_notify_on(unknown)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about UNKNOWN states for this service.";
-    return ERROR;
+    return false;
   }
   if (_current_state == service::state_warning &&
     !get_notify_on(warning)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about WARNING states for this service.";
-    return ERROR;
+    return false;
   }
   if (_current_state == service::state_critical &&
     !get_notify_on(critical)) {
     logger(dbg_notifications, more)
         << "We shouldn't notify about CRITICAL states for this service.";
-    return ERROR;
+    return false;
   }
   if (_current_state == service::state_ok) {
     if (!get_notify_on(recovery)) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about RECOVERY states for this service.";
-      return ERROR;
+      return false;
     }
     /* No notification in input */
     if (get_notified_on() == 0) {
       logger(dbg_notifications, more)
           << "We shouldn't notify about this recovery.";
-      return ERROR;
+      return false;
     }
   }
 
@@ -3011,12 +2979,12 @@ int service::check_notification_viability(unsigned int type, int options) {
       if (_current_state == service::state_ok)
         logger(dbg_notifications, more)
             << "Not enough time has elapsed since the service changed to a "
-               "OK state, so we should not notify about this problem yet";
+               "true state, so we should not notify about this problem yet";
       else
         logger(dbg_notifications, more)
             << "Not enough time has elapsed since the service changed to a "
-               "non-OK state, so we should not notify about this problem yet";
-      return ERROR;
+               "non-true state, so we should not notify about this problem yet";
+      return false;
     }
   }
 
@@ -3025,7 +2993,7 @@ int service::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This service is currently flapping, so we won't send "
            "notifications.";
-    return ERROR;
+    return false;
   }
 
   /*
@@ -3036,18 +3004,18 @@ int service::check_notification_viability(unsigned int type, int options) {
     logger(dbg_notifications, more)
         << "This service is currently in a scheduled downtime, so "
            "we won't send notifications.";
-    return ERROR;
+    return false;
   }
 
   /*
    * if this host is currently in a scheduled downtime period, don't send the
    * notification
    * */
-  if (temp_host->get_scheduled_downtime_depth() > 0) {
+  if (host_ptr->get_scheduled_downtime_depth() > 0) {
     logger(dbg_notifications, more)
         << "The host this service is associated with is currently in "
            "a scheduled downtime, so we won't send notifications.";
-    return ERROR;
+    return false;
   }
 
   /*
@@ -3055,7 +3023,7 @@ int service::check_notification_viability(unsigned int type, int options) {
    ***** NOTIFICATION WAS SENT                                            *****
    */
   if (_current_state == service::state_ok)
-    return (this->current_notification_number > 0) ? OK : ERROR;
+    return (this->current_notification_number > 0) ? true : false;
 
   /*
    * don't notify contacts about this service problem again if the notification
@@ -3064,18 +3032,18 @@ int service::check_notification_viability(unsigned int type, int options) {
   if (get_no_more_notifications()) {
     logger(dbg_notifications, more)
         << "We shouldn't re-notify contacts about this service problem.";
-    return ERROR;
+    return false;
   }
 
   /*
    * if the host is down or unreachable, don't notify contacts about service
    * failures
    */
-  if (temp_host->get_current_state() !=  host::state_up) {
+  if (host_ptr->get_current_state() !=  host::state_up) {
     logger(dbg_notifications, more)
         << "The host is either down or unreachable, so we won't "
            "notify contacts about this service.";
-    return ERROR;
+    return false;
   }
 
   /*
@@ -3088,10 +3056,10 @@ int service::check_notification_viability(unsigned int type, int options) {
            "about this service.";
     logger(dbg_notifications, more)
         << "Next valid notification time: " << my_ctime(&_next_notification);
-    return ERROR;
+    return false;
   }
 
-  return OK;
+  return true;
 }
 
 /* checks viability of performing a service check */
@@ -3660,4 +3628,17 @@ bool service::get_is_volatile() const {
 
 void service::set_is_volatile(bool vol) {
   _is_volatile = vol;
+}
+
+std::list<std::shared_ptr<servicegroup>> const& service::get_parent_groups() const {
+  return _servicegroups;
+}
+
+std::list<std::shared_ptr<servicegroup>>& service::get_parent_groups() {
+  return _servicegroups;
+}
+
+timeperiod* service::get_notification_period_ptr() const {
+  /* if the service has no notification period, inherit one from the host */
+  return notification_period_ptr ? notification_period_ptr : host_ptr->notification_period_ptr;
 }

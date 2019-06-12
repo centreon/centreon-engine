@@ -27,7 +27,6 @@
 #include "com/centreon/engine/macros/grab.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/macros/misc.hh"
-#include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
@@ -66,23 +65,23 @@ static char* get_service_check_type(com::centreon::engine::service& svc, nagios_
  *
  *  @return List of names of groups associated with this service.
  */
-static char* get_service_group_names(com::centreon::engine::service& svc, nagios_macros* mac) {
+static char* get_service_group_names(service& svc, nagios_macros* mac) {
   (void)mac;
 
   // Find all servicegroups this service is associated with.
   std::string buf;
-  for (objectlist* temp_objectlist = svc.servicegroups_ptr;
-       temp_objectlist != NULL;
-       temp_objectlist = temp_objectlist->next) {
-    servicegroup* temp_servicegroup(
-      static_cast<servicegroup*>(temp_objectlist->object_ptr));
-    if (temp_servicegroup) {
+  for (std::list<std::shared_ptr<servicegroup>>::const_iterator
+         it{svc.get_parent_groups().begin()},
+         end{svc.get_parent_groups().end()};
+       it != end;
+       ++it) {
+    if (*it) {
       if (!buf.empty())
         buf.append(",");
-      buf.append(temp_servicegroup->get_group_name());
+      buf.append((*it)->get_group_name());
     }
   }
-  return (string::dup(buf));
+  return string::dup(buf);
 }
 
 /**
@@ -106,7 +105,7 @@ static char* get_service_state(com::centreon::engine::service& svc, nagios_macro
     state = "CRITICAL";
   else
     state = "UNKNOWN";
-  return (string::dup(state));
+  return string::dup(state);
 }
 
 /**
@@ -378,7 +377,7 @@ int grab_standard_service_macro_r(
   else
     retval = ERROR;
 
-  return (retval);
+  return retval;
 }
 
 /**
@@ -399,12 +398,12 @@ int grab_standard_service_macro(
       com::centreon::engine::service* svc,
       char** output,
       int* free_macro) {
-  return (grab_standard_service_macro_r(
+  return grab_standard_service_macro_r(
             get_global_macros(),
             macro_type,
             svc,
             output,
-            free_macro));
+            free_macro);
 }
 
 /**
@@ -425,14 +424,14 @@ int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* sv
   mac->servicegroup_ptr = NULL;
 
   if (svc == NULL)
-    return (ERROR);
+    return ERROR;
 
   // Save first/primary servicegroup pointer for later.
-  if (svc->servicegroups_ptr)
+  if (!svc->get_parent_groups().empty())
     mac->servicegroup_ptr
-      = static_cast<servicegroup*>(svc->servicegroups_ptr->object_ptr);
+      = svc->get_parent_groups().front().get();
 
-  return (OK);
+  return OK;
 }
 
 /**
@@ -445,7 +444,7 @@ int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* sv
  *  @see grab_service_macros_r
  */
 int grab_service_macros(com::centreon::engine::service* svc) {
-  return (grab_service_macros_r(get_global_macros(), svc));
+  return grab_service_macros_r(get_global_macros(), svc);
 }
 
 }
