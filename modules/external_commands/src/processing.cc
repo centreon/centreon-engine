@@ -156,17 +156,17 @@ processing::processing()
    { "DEL_ALL_SVC_COMMENTS",  command_info( CMD_DEL_ALL_SVC_COMMENTS, &_redirector<&cmd_delete_all_comments>) },
    { "SCHEDULE_SVC_CHECK", command_info(CMD_SCHEDULE_SVC_CHECK, &_redirector<&cmd_schedule_check>) },
    { "SCHEDULE_FORCED_SVC_CHECK",  command_info( CMD_SCHEDULE_FORCED_SVC_CHECK, &_redirector<&cmd_schedule_check>) },
-   { "ENABLE_SVC_CHECK",  command_info( CMD_ENABLE_SVC_CHECK, &_redirector_service_shared<&enable_service_checks>) },
-   { "DISABLE_SVC_CHECK",  command_info( CMD_DISABLE_SVC_CHECK, &_redirector_service_shared<&disable_service_checks>) },
-   { "ENABLE_PASSIVE_SVC_CHECKS", command_info(CMD_ENABLE_PASSIVE_SVC_CHECKS, &_redirector_service_shared<&enable_passive_service_checks>) },
-   { "DISABLE_PASSIVE_SVC_CHECKS", command_info(CMD_DISABLE_PASSIVE_SVC_CHECKS, &_redirector_service_shared<&disable_passive_service_checks>) },
+   { "ENABLE_SVC_CHECK",  command_info( CMD_ENABLE_SVC_CHECK, &_redirector_service<&enable_service_checks>) },
+   { "DISABLE_SVC_CHECK",  command_info( CMD_DISABLE_SVC_CHECK, &_redirector_service<&disable_service_checks>) },
+   { "ENABLE_PASSIVE_SVC_CHECKS", command_info(CMD_ENABLE_PASSIVE_SVC_CHECKS, &_redirector_service<&enable_passive_service_checks>) },
+   { "DISABLE_PASSIVE_SVC_CHECKS", command_info(CMD_DISABLE_PASSIVE_SVC_CHECKS, &_redirector_service<&disable_passive_service_checks>) },
    { "DELAY_SVC_NOTIFICATION",  command_info( CMD_DELAY_SVC_NOTIFICATION, &_redirector<&cmd_delay_notification>) },
-   { "ENABLE_SVC_NOTIFICATIONS", command_info(CMD_ENABLE_SVC_NOTIFICATIONS, &_redirector_service_shared<&enable_service_notifications>) },
-   { "DISABLE_SVC_NOTIFICATIONS", command_info(CMD_DISABLE_SVC_NOTIFICATIONS, &_redirector_service_shared<&disable_service_notifications>) },
+   { "ENABLE_SVC_NOTIFICATIONS", command_info(CMD_ENABLE_SVC_NOTIFICATIONS, &_redirector_service<&enable_service_notifications>) },
+   { "DISABLE_SVC_NOTIFICATIONS", command_info(CMD_DISABLE_SVC_NOTIFICATIONS, &_redirector_service<&disable_service_notifications>) },
    { "PROCESS_SERVICE_CHECK_RESULT", command_info(CMD_PROCESS_SERVICE_CHECK_RESULT, &_redirector<&cmd_process_service_check_result>, true) },
    { "PROCESS_HOST_CHECK_RESULT", command_info(CMD_PROCESS_HOST_CHECK_RESULT, &_redirector<&cmd_process_host_check_result>, true) },
-   { "ENABLE_SVC_EVENT_HANDLER", command_info(CMD_ENABLE_SVC_EVENT_HANDLER, &_redirector_service_shared<&enable_service_event_handler>) },
-   { "DISABLE_SVC_EVENT_HANDLER", command_info(CMD_DISABLE_SVC_EVENT_HANDLER, &_redirector_service_shared<&disable_service_event_handler>) },
+   { "ENABLE_SVC_EVENT_HANDLER", command_info(CMD_ENABLE_SVC_EVENT_HANDLER, &_redirector_service<&enable_service_event_handler>) },
+   { "DISABLE_SVC_EVENT_HANDLER", command_info(CMD_DISABLE_SVC_EVENT_HANDLER, &_redirector_service<&disable_service_event_handler>) },
    { "ENABLE_SVC_FLAP_DETECTION", command_info(CMD_ENABLE_SVC_FLAP_DETECTION, &_redirector_service<&enable_service_flap_detection>) },
    { "DISABLE_SVC_FLAP_DETECTION", command_info(CMD_DISABLE_SVC_FLAP_DETECTION, &_redirector_service<&disable_service_flap_detection>) },
    { "SCHEDULE_SVC_DOWNTIME",  command_info( CMD_SCHEDULE_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
@@ -174,14 +174,14 @@ processing::processing()
    { "DEL_SVC_DOWNTIME_FULL",  command_info( CMD_DEL_SVC_DOWNTIME_FULL, &_redirector<&cmd_delete_downtime_full>) },
    { "ACKNOWLEDGE_SVC_PROBLEM",  command_info( CMD_ACKNOWLEDGE_SVC_PROBLEM, &_redirector<&cmd_acknowledge_problem>) },
    { "REMOVE_SVC_ACKNOWLEDGEMENT", command_info(CMD_REMOVE_SVC_ACKNOWLEDGEMENT, &_redirector<&cmd_remove_acknowledgement>) },
-   { "START_OBSESSING_OVER_SVC", command_info(CMD_START_OBSESSING_OVER_SVC, &_redirector_service_shared<&start_obsessing_over_service>) },
-   { "STOP_OBSESSING_OVER_SVC", command_info(CMD_STOP_OBSESSING_OVER_SVC, &_redirector_service_shared<&stop_obsessing_over_service>) },
+   { "START_OBSESSING_OVER_SVC", command_info(CMD_START_OBSESSING_OVER_SVC, &_redirector_service<&start_obsessing_over_service>) },
+   { "STOP_OBSESSING_OVER_SVC", command_info(CMD_STOP_OBSESSING_OVER_SVC, &_redirector_service<&stop_obsessing_over_service>) },
    { "CHANGE_SVC_EVENT_HANDLER",  command_info( CMD_CHANGE_SVC_EVENT_HANDLER, &_redirector<&cmd_change_object_char_var>) },
    { "CHANGE_SVC_CHECK_COMMAND",  command_info( CMD_CHANGE_SVC_CHECK_COMMAND, &_redirector<&cmd_change_object_char_var>) },
    { "CHANGE_NORMAL_SVC_CHECK_INTERVAL", command_info(CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL, &_redirector<&cmd_change_object_int_var>) },
    { "CHANGE_RETRY_SVC_CHECK_INTERVAL", command_info(CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL, &_redirector<&cmd_change_object_int_var>) },
    { "CHANGE_MAX_SVC_CHECK_ATTEMPTS", command_info(CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS, &_redirector<&cmd_change_object_int_var>) },
-   { "SET_SVC_NOTIFICATION_NUMBER",  command_info( CMD_SET_SVC_NOTIFICATION_NUMBER, &_redirector_service_shared<&_wrapper_set_service_notification_number>) },
+   { "SET_SVC_NOTIFICATION_NUMBER",  command_info( CMD_SET_SVC_NOTIFICATION_NUMBER, &_redirector_service<&_wrapper_set_service_notification_number>) },
    { "CHANGE_SVC_CHECK_TIMEPERIOD", command_info(CMD_CHANGE_SVC_CHECK_TIMEPERIOD, &_redirector<&cmd_change_object_char_var>) },
    { "CHANGE_CUSTOM_SVC_VAR",  command_info( CMD_CHANGE_CUSTOM_SVC_VAR, &_redirector<&cmd_change_object_custom_var>) },
    { "CHANGE_CUSTOM_CONTACT_VAR", command_info(CMD_CHANGE_CUSTOM_CONTACT_VAR, &_redirector<&cmd_change_object_custom_var>) },
@@ -191,16 +191,16 @@ processing::processing()
    // servicegroup-related commands.
    { "ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS",  command_info(CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS, &_redirector_servicegroup<&enable_host_notifications>) },
    { "DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS",  command_info(CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS, &_redirector_servicegroup<&disable_host_notifications>) },
-   { "ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS",  command_info(CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS, &_redirector_service_shared<&enable_service_notifications>) },
-   { "DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS",  command_info(CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS, &_redirector_service_shared<&disable_service_notifications>) },
+   { "ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS",  command_info(CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS, &_redirector_service<&enable_service_notifications>) },
+   { "DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS",  command_info(CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS, &_redirector_service<&disable_service_notifications>) },
    { "ENABLE_SERVICEGROUP_HOST_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_HOST_CHECKS, &_redirector_servicegroup<&enable_host_checks>) },
    { "DISABLE_SERVICEGROUP_HOST_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_HOST_CHECKS, &_redirector_servicegroup<&disable_host_checks>) },
    { "ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS, &_redirector_servicegroup<&enable_passive_host_checks>) },
    { "DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS, &_redirector_servicegroup<&disable_passive_host_checks>) },
-   { "ENABLE_SERVICEGROUP_SVC_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_SVC_CHECKS, &_redirector_service_shared<&enable_service_checks>) },
-   { "DISABLE_SERVICEGROUP_SVC_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_SVC_CHECKS, &_redirector_service_shared<&disable_service_checks>) },
-   { "ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS, &_redirector_service_shared<&enable_passive_service_checks>) },
-   { "DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS, &_redirector_service_shared<&disable_passive_service_checks>) },
+   { "ENABLE_SERVICEGROUP_SVC_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_SVC_CHECKS, &_redirector_service<&enable_service_checks>) },
+   { "DISABLE_SERVICEGROUP_SVC_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_SVC_CHECKS, &_redirector_service<&disable_service_checks>) },
+   { "ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",  command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS, &_redirector_service<&enable_passive_service_checks>) },
+   { "DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",  command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS, &_redirector_service<&disable_passive_service_checks>) },
    { "SCHEDULE_SERVICEGROUP_HOST_DOWNTIME",  command_info(CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
    { "SCHEDULE_SERVICEGROUP_SVC_DOWNTIME",  command_info(CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME, &_redirector<&cmd_schedule_downtime>) },
    // contact-related commands.
@@ -354,23 +354,23 @@ void processing::_wrapper_save_state_information() {
   retention::dump::save(config->state_retention_file());
 }
 
-void processing::_wrapper_enable_host_and_child_notifications(host* hst) {
+void processing::_wrapper_enable_host_and_child_notifications(std::shared_ptr<host> hst) {
   enable_and_propagate_notifications(hst, 0, true, true, false);
 }
 
-void processing::_wrapper_disable_host_and_child_notifications(host* hst) {
+void processing::_wrapper_disable_host_and_child_notifications(std::shared_ptr<host> hst) {
   disable_and_propagate_notifications(hst, 0, true, true, false);
 }
 
-void processing::_wrapper_enable_all_notifications_beyond_host(host* hst) {
+void processing::_wrapper_enable_all_notifications_beyond_host(std::shared_ptr<host> hst) {
   enable_and_propagate_notifications(hst, 0, false, true, true);
 }
 
-void processing::_wrapper_disable_all_notifications_beyond_host(host* hst) {
+void processing::_wrapper_disable_all_notifications_beyond_host(std::shared_ptr<host> hst) {
   disable_and_propagate_notifications(hst, 0, false, true, true);
 }
 
-void processing::_wrapper_enable_host_svc_notifications(host* hst) {
+void processing::_wrapper_enable_host_svc_notifications(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -380,7 +380,7 @@ void processing::_wrapper_enable_host_svc_notifications(host* hst) {
       enable_service_notifications(it->second);
 }
 
-void processing::_wrapper_disable_host_svc_notifications(host* hst) {
+void processing::_wrapper_disable_host_svc_notifications(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -390,7 +390,7 @@ void processing::_wrapper_disable_host_svc_notifications(host* hst) {
       disable_service_notifications(it->second);
 }
 
-void processing::_wrapper_disable_host_svc_checks(host* hst) {
+void processing::_wrapper_disable_host_svc_checks(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -400,7 +400,7 @@ void processing::_wrapper_disable_host_svc_checks(host* hst) {
       disable_service_checks(it->second);
 }
 
-void processing::_wrapper_enable_host_svc_checks(host* hst) {
+void processing::_wrapper_enable_host_svc_checks(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -410,12 +410,12 @@ void processing::_wrapper_enable_host_svc_checks(host* hst) {
       enable_service_checks(it->second);
 }
 
-void processing::_wrapper_set_host_notification_number(host* hst, char* args) {
+void processing::_wrapper_set_host_notification_number(std::shared_ptr<host> hst, char* args) {
   if (args)
     set_host_notification_number(hst, atoi(args));
 }
 
-void processing::_wrapper_send_custom_host_notification(host* hst, char* args) {
+void processing::_wrapper_send_custom_host_notification(std::shared_ptr<host> hst, char* args) {
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&
       (buf[2] = my_strtok(NULL, ";"))) {
@@ -423,7 +423,7 @@ void processing::_wrapper_send_custom_host_notification(host* hst, char* args) {
   }
 }
 
-void processing::_wrapper_enable_service_notifications(host* hst) {
+void processing::_wrapper_enable_service_notifications(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -433,7 +433,7 @@ void processing::_wrapper_enable_service_notifications(host* hst) {
       enable_service_notifications(it->second);
 }
 
-void processing::_wrapper_disable_service_notifications(host* hst) {
+void processing::_wrapper_disable_service_notifications(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -443,7 +443,7 @@ void processing::_wrapper_disable_service_notifications(host* hst) {
       disable_service_notifications(it->second);
 }
 
-void processing::_wrapper_enable_service_checks(host* hst) {
+void processing::_wrapper_enable_service_checks(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -453,7 +453,7 @@ void processing::_wrapper_enable_service_checks(host* hst) {
       enable_service_checks(it->second);
 }
 
-void processing::_wrapper_disable_service_checks(host* hst) {
+void processing::_wrapper_disable_service_checks(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -463,7 +463,7 @@ void processing::_wrapper_disable_service_checks(host* hst) {
       disable_service_checks(it->second);
 }
 
-void processing::_wrapper_enable_passive_service_checks(host* hst) {
+void processing::_wrapper_enable_passive_service_checks(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -473,7 +473,7 @@ void processing::_wrapper_enable_passive_service_checks(host* hst) {
       enable_passive_service_checks(it->second);
 }
 
-void processing::_wrapper_disable_passive_service_checks(host* hst) {
+void processing::_wrapper_disable_passive_service_checks(std::shared_ptr<host> hst) {
   for (service_map::iterator
          it(hst->services.begin()),
          end(hst->services.end());
@@ -490,7 +490,7 @@ void processing::_wrapper_set_service_notification_number(std::shared_ptr<servic
     set_service_notification_number(svc, atoi(str));
 }
 
-void processing::_wrapper_send_custom_service_notification(service* svc,
+void processing::_wrapper_send_custom_service_notification(std::shared_ptr<service> svc,
                                                            char* args) {
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&

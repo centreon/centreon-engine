@@ -31,7 +31,6 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/check_result.cc"
   "${SRC_DIR}/common.cc"
   "${SRC_DIR}/embedded_perl.cc"
   "${SRC_DIR}/globals.cc"
@@ -42,7 +41,6 @@ set(
 
   # Headers.
   "${INC_DIR}/broker.h"
-  "${INC_DIR}/check_result.h"
   "${INC_DIR}/comments.h"
   "${INC_DIR}/common.h"
   "${INC_DIR}/config.h"

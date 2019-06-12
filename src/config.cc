@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include <unordered_map>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -173,7 +174,7 @@ int pre_flight_check() {
          end(service::services.end());
        it != end;
        ++it) {
-    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+    std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       found(state::instance().hosts().find(get_host_id(it->first.first)));
     if (found != state::instance().hosts().end() && it->second != nullptr) {
       found->second->set_total_services(found->second->get_total_services() + 1);
@@ -315,8 +316,7 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config)
     logger(log_info_message, basic) << "Checking contact groups...";
   total_objects = 0;
-  for (std::unordered_map<std::string,
-            std::shared_ptr<com::centreon::engine::contactgroup> >::iterator
+  for (contactgroup_map::iterator
          it(configuration::applier::state::instance().contactgroups().begin()),
          end(configuration::applier::state::instance().contactgroups().end());
        it != end;
@@ -1061,7 +1061,7 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
        it != end;
        it++) {
 
-    umap<unsigned long, std::shared_ptr<host>>::const_iterator
+    std::unordered_map<uint64_t, std::shared_ptr<host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first)));
 
     if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
@@ -1298,7 +1298,7 @@ int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
        it != end;
        ++it) {
 
-    umap<uint64_t, std::shared_ptr<host>>::const_iterator
+    std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it_host(state::instance().hosts().find(get_host_id(it->first.c_str())));
     if (it_host == state::instance().hosts().end() || !it_host->second) {
       logger(log_verification_error, basic)
@@ -1493,7 +1493,7 @@ int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
   int errors(0);
 
   // Find the dependent host.
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(hd->get_dependent_hostname())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
@@ -1677,7 +1677,7 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   int errors(0);
 
   // Find the host.
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(he->get_hostname())));
   if (it == state::instance().hosts().end() || it->second == nullptr) {
     logger(log_verification_error, basic)
@@ -1733,21 +1733,19 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
        it != end;
        ++it) {
     // Find the contact group.
-    contactgroup* temp_contactgroup(
-      configuration::applier::state::instance().find_contactgroup(
-        it->first));
+    contactgroup_map::iterator it_cg(configuration::applier::state::instance().contactgroups().find(it->first));
 
-    if (!temp_contactgroup) {
+    if (it_cg == configuration::applier::state::instance().contactgroups().end() || !it_cg->second) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
         << it->first
         << "' specified in host escalation for host '"
         << he->get_hostname() << "' is not defined anywhere!";
       errors++;
+    } else {
+      // Save the contactgroup pointer for later.
+      he->contact_groups[it->first] = it_cg->second;
     }
-
-    // Save the contactgroup pointer for later.
-    he->contact_groups[it->first] = std::shared_ptr<contactgroup>(temp_contactgroup);
   }
 
   // Add errors.

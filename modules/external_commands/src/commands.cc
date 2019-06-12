@@ -447,7 +447,6 @@ int cmd_schedule_check(int cmd, char* args) {
 /* schedules all service checks on a host for a particular time */
 int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   char* temp_ptr(nullptr);
-  com::centreon::engine::service* temp_service(nullptr);
   com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   time_t delay_time(0);
@@ -478,9 +477,9 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
          end(temp_host->services.end());
        it != end;
        ++it) {
-    if ((temp_service = it->second.get()) == nullptr)
+    if (!it->second)
       continue;
-    temp_service->schedule_check(
+    it->second->schedule_check(
       delay_time,
       (force) ? CHECK_OPTION_FORCE_EXECUTION : CHECK_OPTION_NONE);
   }
@@ -574,7 +573,6 @@ int process_passive_service_check(
       char const* svc_description,
       int return_code,
       char const* output) {
-  com::centreon::engine::host* temp_host(nullptr);
   char const* real_host_name(nullptr);
 
   /* skip this service check result if we aren't accepting passive service checks */
@@ -586,12 +584,9 @@ int process_passive_service_check(
     return ERROR;
 
   /* find the host by its name or address */
-  temp_host = nullptr;
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end())
-    temp_host = it->second.get();
-  if (temp_host != nullptr)
+  if (it != configuration::applier::state::instance().hosts().end() && it->second)
     real_host_name = host_name;
   else {
     for (host_map::iterator
@@ -636,37 +631,32 @@ int process_passive_service_check(
   timeval tv;
   gettimeofday(&tv, nullptr);
 
-  check_result result;
-  result.object_check_type = SERVICE_CHECK;
-  result.host_name = string::dup(real_host_name);
-  result.service_description = string::dup(svc_description);
-  result.check_type = check_passive;
-  result.check_options = CHECK_OPTION_NONE;
-  result.scheduled_check = false;
-  result.reschedule_check = false;
-  result.output_file = nullptr;
-  result.output_file_fp = nullptr;
-  result.output_file_fd = -1;
-  result.latency = (double)((double)(tv.tv_sec - check_time)
-			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
-  result.start_time.tv_sec = check_time;
-  result.start_time.tv_usec = 0;
-  result.finish_time.tv_sec = check_time;
-  result.finish_time.tv_usec = 0;
-  result.early_timeout = false;
-  result.exited_ok = true;
-  result.return_code = return_code;
-  result.output = string::dup(output);
-  result.next = nullptr;
-  // result.check_time = check_time;
+  timeval set_tv;
+  set_tv.tv_sec = check_time;
+  set_tv.tv_usec = 0;
+
+  check_result result(service_check,
+                      real_host_name,
+                      svc_description,
+                      check_passive,
+                      CHECK_OPTION_NONE,
+                      false,
+                      (double)((double)(tv.tv_sec - check_time)
+			                  + (double)(tv.tv_usec / 1000.0) / 1000.0),
+                      set_tv,
+                      set_tv,
+                      false,
+                      true,
+                      return_code,
+                      output);
 
   /* make sure the return code is within bounds */
-  if (result.return_code < 0 || result.return_code > 3) {
-    result.return_code = service::state_unknown;
+  if (result.get_return_code() < 0 || result.get_return_code() > 3) {
+    result.set_return_code(service::state_unknown);
   }
 
-  if (result.latency < 0.0) {
-    result.latency = 0.0;
+  if (result.get_latency() < 0.0) {
+    result.set_latency(0.0);
   }
 
   checks::checker::instance().push_check_result(result);
@@ -724,8 +714,8 @@ int process_passive_host_check(
       char const* host_name,
       int return_code,
       char const* output) {
-  host const* temp_host(nullptr);
   char const* real_host_name(nullptr);
+  std::shared_ptr<host> hst;
 
   /* skip this host check result if we aren't accepting passive host checks */
   if (config->accept_passive_service_checks() == false)
@@ -740,12 +730,9 @@ int process_passive_host_check(
     return ERROR;
 
   /* find the host by its name or address */
-  temp_host = nullptr;
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end())
-    temp_host = it->second.get();
-  if (temp_host != nullptr)
+  if (it != configuration::applier::state::instance().hosts().end() && it->second)
     real_host_name = host_name;
   else {
     for (host_map::iterator
@@ -761,7 +748,7 @@ int process_passive_host_check(
   }
 
   /* we couldn't find the host */
-  if (temp_host == nullptr) {
+  if (real_host_name == nullptr) {
     logger(log_runtime_warning, basic)
       << "Warning:  Passive check result was received for host '"
       << host_name << "', but the host could not be found!";
@@ -769,43 +756,37 @@ int process_passive_host_check(
   }
 
   /* skip this is we aren't accepting passive checks for this host */
-  if (!temp_host->get_accept_passive_checks())
+  if (!it->second->get_accept_passive_checks())
     return ERROR;
 
   timeval tv;
   gettimeofday(&tv, nullptr);
+  timeval tv_start;
+  tv_start.tv_sec = check_time;
+  tv_start.tv_usec = 0;
 
-  check_result result;
-  result.object_check_type = HOST_CHECK;
-  result.host_name = string::dup(real_host_name);
-  result.service_description = nullptr;
-  result.check_type = check_passive;
-  result.check_options = CHECK_OPTION_NONE;
-  result.scheduled_check = false;
-  result.reschedule_check = false;
-  result.output_file = nullptr;
-  result.output_file_fp = nullptr;
-  result.output_file_fd = -1;
-  result.latency = (double)((double)(tv.tv_sec - check_time)
-			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
-  result.start_time.tv_sec = check_time;
-  result.start_time.tv_usec = 0;
-  result.finish_time.tv_sec = check_time;
-  result.finish_time.tv_usec = 0;
-  result.early_timeout = false;
-  result.exited_ok = true;
-  result.return_code = return_code;
-  result.output = string::dup(output);
-  result.next = nullptr;
-  // result.check_time = check_time;
+  check_result result(host_check,
+                      real_host_name,
+                      "",
+                      check_passive,
+                      CHECK_OPTION_NONE,
+                      false,
+                      (double)((double)(tv.tv_sec - check_time)
+			                  + (double)(tv.tv_usec / 1000.0) / 1000.0),
+                      tv_start,
+                      tv_start,
+                      false,
+                      true,
+                      return_code,
+                      output);
 
   /* make sure the return code is within bounds */
-  if (result.return_code < 0 || result.return_code > 3) {
-    result.return_code = service::state_unknown;
+  if (result.get_return_code() < 0 || result.get_return_code() > 3) {
+    result.set_return_code(service::state_unknown);
   }
 
-  if (result.latency < 0.0) {
-    result.latency = 0.0;
+  if (result.get_latency() < 0.0) {
+    result.set_latency(0.0);
   }
 
   checks::checker::instance().push_check_result(result);
@@ -815,7 +796,6 @@ int process_passive_host_check(
 
 /* acknowledges a host or service problem */
 int cmd_acknowledge_problem(int cmd, char* args) {
-  com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   char* ack_author(nullptr);
@@ -832,12 +812,9 @@ int cmd_acknowledge_problem(int cmd, char* args) {
     return ERROR;
 
   /* verify that the host is valid */
-  temp_host = nullptr;
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end())
-    temp_host = it->second.get();
-  if (temp_host  == nullptr)
+  if (it == configuration::applier::state::instance().hosts().end() || !it->second)
     return ERROR;
 
   /* this is a service acknowledgement */
@@ -849,7 +826,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
     /* verify that the service is valid */
     std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      temp_host->get_name(), svc_description));
+      it->second->get_name(), svc_description));
     found = state::instance().services().find(id);
 
     if (found == state::instance().services().end() ||
@@ -887,7 +864,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   /* acknowledge the host problem */
   if (cmd == CMD_ACKNOWLEDGE_HOST_PROBLEM)
     acknowledge_host_problem(
-      temp_host,
+      it->second,
       ack_author,
       ack_data,
       type,
@@ -912,7 +889,6 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
 /* removes a host or service acknowledgement */
 int cmd_remove_acknowledgement(int cmd, char* args) {
-  com::centreon::engine::host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   std::unordered_map<std::pair<uint64_t, uint64_t>,
@@ -923,12 +899,9 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
     return ERROR;
 
   /* verify that the host is valid */
-  temp_host = nullptr;
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end())
-    temp_host = it->second.get();
-  if (temp_host  == nullptr)
+  if (it == configuration::applier::state::instance().hosts().end() || !it->second)
     return ERROR;
 
   /* we are removing a service acknowledgement */
@@ -940,7 +913,7 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
     /* verify that the service is valid */
     std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      temp_host->get_name(), svc_description));
+      it->second->get_name(), svc_description));
     found = state::instance().services().find(id);
 
     if (found == state::instance().services().end() ||
@@ -950,7 +923,7 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
   /* acknowledge the host problem */
   if (cmd == CMD_REMOVE_HOST_ACKNOWLEDGEMENT)
-    remove_host_acknowledgement(temp_host);
+    remove_host_acknowledgement(it->second);
 
   /* acknowledge the service problem */
   else
@@ -961,21 +934,21 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
 /* schedules downtime for a specific host or service */
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
-  com::centreon::engine::host* temp_host(nullptr);
-  com::centreon::engine::host* last_host(nullptr);
-  hostgroup* temp_hostgroup(nullptr);
-  char* host_name(nullptr);
-  char* hostgroup_name(nullptr);
-  char* servicegroup_name(nullptr);
-  char* svc_description(nullptr);
-  char* temp_ptr(nullptr);
-  time_t start_time(0);
-  time_t end_time(0);
-  int fixed(0);
-  uint64_t triggered_by(0);
-  unsigned long duration(0);
-  char* author(nullptr);
-  char* comment_data(nullptr);
+  std::shared_ptr<host> temp_host{nullptr};
+  std::shared_ptr<host> last_host{nullptr};
+  std::shared_ptr<hostgroup> hg{nullptr};
+  char* host_name{nullptr};
+  char* hostgroup_name{nullptr};
+  char* servicegroup_name{nullptr};
+  char* svc_description{nullptr};
+  char* temp_ptr{nullptr};
+  time_t start_time{0};
+  time_t end_time{0};
+  int fixed{0};
+  uint64_t triggered_by{0};
+  unsigned long duration{0};
+  char* author{nullptr};
+  char* comment_data{nullptr};
   uint64_t downtime_id{0};
   servicegroup_map::const_iterator sg_it;
 
@@ -986,14 +959,11 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     if ((hostgroup_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
 
-    temp_hostgroup = nullptr;
     hostgroup_map::const_iterator
       it(hostgroup::hostgroups.find(hostgroup_name));
-    if (it != hostgroup::hostgroups.end())
-      temp_hostgroup = it->second.get();
-    /* verify that the hostgroup is valid */
-    if (temp_hostgroup == nullptr)
+    if (it == hostgroup::hostgroups.end() || !it->second)
       return ERROR;
+    hg = it->second;
   }
 
   else if (cmd == CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME
@@ -1019,10 +989,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     temp_host = nullptr;
     umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-    if (it != configuration::applier::state::instance().hosts().end())
-      temp_host = it->second.get();
-    if (temp_host  == nullptr)
+    if (it == configuration::applier::state::instance().hosts().end() || !it->second)
       return ERROR;
+    temp_host = it->second;
 
     /* this is a service downtime */
     if (cmd == CMD_SCHEDULE_SVC_DOWNTIME) {
@@ -1151,8 +1120,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME:
     for (host_map::iterator
-           it(temp_hostgroup->members.begin()),
-           end(temp_hostgroup->members.end());
+           it(hg->members.begin()),
+           end(hg->members.end());
          it != end;
          ++it)
       downtime_manager::instance().schedule_downtime(
@@ -1172,8 +1141,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME:
     for (host_map::iterator
-           it(temp_hostgroup->members.begin()),
-           end(temp_hostgroup->members.end());
+           it(hg->members.begin()),
+           end(hg->members.end());
          it != end;
          ++it) {
       if (it->second == nullptr)
@@ -1212,10 +1181,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
         found(configuration::applier::state::instance().hosts().find(
           get_host_id(it->first.first)));
-      if (found != configuration::applier::state::instance().hosts().end())
-        temp_host = found->second.get();
-      if (temp_host  == nullptr)
+      if (found == configuration::applier::state::instance().hosts().end() || !found->second)
         continue;
+      temp_host = found->second;
       if (last_host == temp_host)
         continue;
       downtime_manager::instance().schedule_downtime(
@@ -1471,7 +1439,6 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
 int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
   char *temp_ptr(nullptr);
   char *end_ptr(nullptr);
-  hostgroup *temp_hostgroup(nullptr);
   char *service_description(nullptr);
   char *downtime_comment(nullptr);
   char *host_name(nullptr);
@@ -1485,12 +1452,9 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
   if (nullptr == temp_ptr)
     return ERROR;
 
-  temp_hostgroup = nullptr;
   hostgroup_map::const_iterator
     it{hostgroup::hostgroups.find(temp_ptr)};
-  if (it != hostgroup::hostgroups.end())
-    temp_hostgroup = it->second.get();
-  if (temp_hostgroup == nullptr)
+  if (it == hostgroup::hostgroups.end() || !it->second)
     return ERROR;
 
   /* Get the optional host name. */
@@ -1541,16 +1505,16 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
   }
 
   for (host_map::iterator
-         it(temp_hostgroup->members.begin()),
-         end(temp_hostgroup->members.end());
-       it != end;
-       ++it) {
-    if (it->second == nullptr)
+         it_h(it->second->members.begin()),
+         end_h(it->second->members.end());
+       it_h != end_h;
+       ++it_h) {
+    if (!it_h->second)
       continue ;
     if (host_name != nullptr && it->first != host_name)
       continue ;
     deleted = downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
-                it->first.c_str(),
+                it->first,
                 service_description,
                 downtime_start_time,
                 downtime_comment);
@@ -2621,7 +2585,7 @@ void disable_service_notifications(std::shared_ptr<com::centreon::engine::servic
 }
 
 /* enables notifications for a host */
-void enable_host_notifications(com::centreon::engine::host* hst) {
+void enable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2639,7 +2603,7 @@ void enable_host_notifications(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -2650,7 +2614,7 @@ void enable_host_notifications(com::centreon::engine::host* hst) {
 }
 
 /* disables notifications for a host */
-void disable_host_notifications(com::centreon::engine::host* hst) {
+void disable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2668,7 +2632,7 @@ void disable_host_notifications(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -2680,12 +2644,11 @@ void disable_host_notifications(com::centreon::engine::host* hst) {
 
 /* enables notifications for all hosts and services "beyond" a given host */
 void enable_and_propagate_notifications(
-       com::centreon::engine::host* hst,
+       std::shared_ptr<com::centreon::engine::host> hst,
        int level,
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  std::shared_ptr<com::centreon::engine::service> temp_service(nullptr);
 
   /* enable notification for top level host */
   if (affect_top_host && level == 0)
@@ -2703,7 +2666,7 @@ void enable_and_propagate_notifications(
 
     /* recurse... */
     enable_and_propagate_notifications(
-      it->second.get(),
+      it->second,
       level + 1,
       affect_top_host,
       affect_hosts,
@@ -2711,7 +2674,7 @@ void enable_and_propagate_notifications(
 
     /* enable notifications for this host */
     if (affect_hosts)
-      enable_host_notifications(it->second.get());
+      enable_host_notifications(it->second);
 
     /* enable notifications for all services on this host... */
     if (affect_services) {
@@ -2730,7 +2693,7 @@ void enable_and_propagate_notifications(
 
 /* disables notifications for all hosts and services "beyond" a given host */
 void disable_and_propagate_notifications(
-       com::centreon::engine::host* hst,
+       std::shared_ptr<com::centreon::engine::host> hst,
        int level,
        int affect_top_host,
        int affect_hosts,
@@ -2756,7 +2719,7 @@ void disable_and_propagate_notifications(
 
     /* recurse... */
     disable_and_propagate_notifications(
-      it->second.get(),
+      it->second,
       level + 1,
       affect_top_host,
       affect_hosts,
@@ -2764,7 +2727,7 @@ void disable_and_propagate_notifications(
 
     /* disable notifications for this host */
     if (affect_hosts)
-      disable_host_notifications(it->second.get());
+      disable_host_notifications(it->second);
 
     /* disable notifications for all services on this host... */
     if (affect_services) {
@@ -2973,7 +2936,7 @@ void schedule_and_propagate_downtime(
 
 /* acknowledges a host problem */
 void acknowledge_host_problem(
-       com::centreon::engine::host* hst,
+       std::shared_ptr<com::centreon::engine::host> hst,
        char* ack_author,
        char* ack_data,
        int type,
@@ -3001,7 +2964,7 @@ void acknowledge_host_problem(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     HOST_ACKNOWLEDGEMENT,
-    (void*)hst,
+    (void*)hst.get(),
     ack_author,
     ack_data,
     type,
@@ -3104,7 +3067,7 @@ void acknowledge_service_problem(
 }
 
 /* removes a host acknowledgement */
-void remove_host_acknowledgement(com::centreon::engine::host* hst) {
+void remove_host_acknowledgement(std::shared_ptr<com::centreon::engine::host> hst) {
   /* set the acknowledgement flag */
   hst->set_problem_has_been_acknowledged(false);
 
@@ -3112,7 +3075,7 @@ void remove_host_acknowledgement(com::centreon::engine::host* hst) {
   hst->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
-  comment::delete_host_acknowledgement_comments(hst);
+  comment::delete_host_acknowledgement_comments(hst.get());
 }
 
 /* removes a service acknowledgement */
@@ -3425,7 +3388,7 @@ void stop_accepting_passive_host_checks(void) {
 }
 
 /* enables passive host checks for a particular host */
-void enable_passive_host_checks(com::centreon::engine::host* hst) {
+void enable_passive_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3443,7 +3406,7 @@ void enable_passive_host_checks(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3454,7 +3417,7 @@ void enable_passive_host_checks(com::centreon::engine::host* hst) {
 }
 
 /* disables passive host checks for a particular host */
-void disable_passive_host_checks(com::centreon::engine::host* hst) {
+void disable_passive_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3472,7 +3435,7 @@ void disable_passive_host_checks(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3603,7 +3566,7 @@ void disable_service_event_handler(std::shared_ptr<com::centreon::engine::servic
 }
 
 /* enables the event handler for a particular host */
-void enable_host_event_handler(com::centreon::engine::host* hst) {
+void enable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3621,7 +3584,7 @@ void enable_host_event_handler(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3632,7 +3595,7 @@ void enable_host_event_handler(com::centreon::engine::host* hst) {
 }
 
 /* disables the event handler for a particular host */
-void disable_host_event_handler(com::centreon::engine::host* hst) {
+void disable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3650,7 +3613,7 @@ void disable_host_event_handler(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3661,7 +3624,7 @@ void disable_host_event_handler(com::centreon::engine::host* hst) {
 }
 
 /* disables checks of a particular host */
-void disable_host_checks(com::centreon::engine::host* hst) {
+void disable_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -3680,7 +3643,7 @@ void disable_host_checks(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3691,7 +3654,7 @@ void disable_host_checks(com::centreon::engine::host* hst) {
 }
 
 /* enables checks of a particular host */
-void enable_host_checks(com::centreon::engine::host* hst) {
+void enable_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -3729,7 +3692,7 @@ void enable_host_checks(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -4097,7 +4060,7 @@ void stop_obsessing_over_service(std::shared_ptr<com::centreon::engine::service>
 }
 
 /* start obsessing over a particular host */
-void start_obsessing_over_host(com::centreon::engine::host* hst) {
+void start_obsessing_over_host(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4115,7 +4078,7 @@ void start_obsessing_over_host(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -4126,7 +4089,7 @@ void start_obsessing_over_host(com::centreon::engine::host* hst) {
 }
 
 /* stop obsessing over a particular host */
-void stop_obsessing_over_host(com::centreon::engine::host* hst) {
+void stop_obsessing_over_host(std::shared_ptr<com::centreon::engine::host> hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4144,7 +4107,7 @@ void stop_obsessing_over_host(com::centreon::engine::host* hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    hst.get(),
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),

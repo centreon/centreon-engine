@@ -30,6 +30,7 @@
 #include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/hostdependency.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
@@ -1075,18 +1076,17 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   logger(dbg_checks, more)
       << "HOST: " << _hostname
       << ", SERVICE: " << _description << ", CHECK TYPE: "
-      << (queued_check_result->check_type == check_active ? "Active"
+      << (queued_check_result->get_check_type() == check_active ? "Active"
                                                           : "Passive")
-      << ", OPTIONS: " << queued_check_result->check_options << ", SCHEDULED: "
-      << (queued_check_result->scheduled_check ? "Yes" : "No")
+      << ", OPTIONS: " << queued_check_result->get_check_options()
       << ", RESCHEDULE: "
-      << (queued_check_result->reschedule_check ? "Yes" : "No")
-      << ", EXITED OK: " << (queued_check_result->exited_ok ? "Yes" : "No")
-      << ", return CODE: " << queued_check_result->return_code
-      << ", OUTPUT: " << queued_check_result->output;
+      << (queued_check_result->get_reschedule_check() ? "Yes" : "No")
+      << ", EXITED OK: " << (queued_check_result->get_exited_ok() ? "Yes" : "No")
+      << ", return CODE: " << queued_check_result->get_return_code()
+      << ", OUTPUT: " << queued_check_result->get_output();
 
   /* decrement the number of service checks still out there... */
-  if (queued_check_result->check_type == check_active &&
+  if (queued_check_result->get_check_type() == check_active &&
       currently_running_service_checks > 0)
     currently_running_service_checks--;
 
@@ -1094,7 +1094,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * skip this service check results if its passive and we aren't accepting
    * passive check results
    */
-  if (queued_check_result->check_type == check_passive) {
+  if (queued_check_result->get_check_type() == check_passive) {
     if (!config->accept_passive_service_checks()) {
       logger(dbg_checks, basic)
           << "Discarding passive service check result because passive "
@@ -1113,11 +1113,11 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * clear the freshening flag (it would have been set if this service was
    * determined to be stale)
    */
-  if (queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK)
+  if (queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK)
     this->is_being_freshened = false;
 
   /* clear the execution flag if this was an active check */
-  if (queued_check_result->check_type == check_active)
+  if (queued_check_result->get_check_type() == check_active)
     this->is_executing = false;
 
   /* DISCARD INVALID FRESHNESS CHECK RESULTS */
@@ -1129,7 +1129,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   ** make sure the service is still stale before we accept the check
   ** result.
   */
-  if ((queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK) &&
+  if ((queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK) &&
       is_result_fresh(current_time, false)) {
     logger(dbg_checks, basic)
         << "Discarding service freshness check result because the service "
@@ -1138,37 +1138,37 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   }
 
   /* check latency is passed to us */
-  set_latency(queued_check_result->latency);
+  set_latency(queued_check_result->get_latency());
 
   /* update the execution time for this check (millisecond resolution) */
   set_execution_time(
-      (double)((double)(queued_check_result->finish_time.tv_sec -
-                        queued_check_result->start_time.tv_sec) +
-               (double)((queued_check_result->finish_time.tv_usec -
-                         queued_check_result->start_time.tv_usec) /
+      (double)((double)(queued_check_result->get_finish_time().tv_sec -
+                        queued_check_result->get_start_time().tv_sec) +
+               (double)((queued_check_result->get_finish_time().tv_usec -
+                         queued_check_result->get_start_time().tv_usec) /
                         1000.0) /
                    1000.0));
   if (get_execution_time() < 0.0)
     set_execution_time(0.0);
 
   /* get the last check time */
-  set_last_check(queued_check_result->start_time.tv_sec);
+  set_last_check(queued_check_result->get_start_time().tv_sec);
 
   /* was this check passive or active? */
-  set_check_type((queued_check_result->check_type == check_active)
+  set_check_type((queued_check_result->get_check_type() == check_active)
                      ? check_active
                      : check_passive);
 
   /* update check statistics for passive checks */
-  if (queued_check_result->check_type == check_passive)
+  if (queued_check_result->get_check_type() == check_passive)
     update_check_stats(PASSIVE_SERVICE_CHECK_STATS,
-                       queued_check_result->start_time.tv_sec);
+                       queued_check_result->get_start_time().tv_sec);
 
   /*
    * should we reschedule the next service check? NOTE: This may be overridden
    * later...
    */
-  reschedule_check = queued_check_result->reschedule_check;
+  reschedule_check = queued_check_result->get_reschedule_check();
 
   /* save the old service status info */
   _last_state = _current_state;
@@ -1180,7 +1180,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * if there was some error running the command, just skip it (this
    * shouldn't be happening)
    */
-  if (!queued_check_result->exited_ok) {
+  if (!queued_check_result->get_exited_ok()) {
     logger(log_runtime_warning, basic)
         << "Warning:  Check of service '" << _description
         << "' on host '" << _hostname << "' did not exit properly!";
@@ -1190,25 +1190,25 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   }
 
   /* make sure the return code is within bounds */
-  else if (queued_check_result->return_code < 0 ||
-           queued_check_result->return_code > 3) {
+  else if (queued_check_result->get_return_code() < 0 ||
+           queued_check_result->get_return_code() > 3) {
     logger(log_runtime_warning, basic)
-        << "Warning: return (code of " << queued_check_result->return_code
+        << "Warning: return (code of " << queued_check_result->get_return_code()
         << " for check of service '" << _description << "' on host '"
         << _hostname << "' was out of bounds."
-        << (queued_check_result->return_code == 126
+        << (queued_check_result->get_return_code() == 126
                 ? "Make sure the plugin you're trying to run is executable."
-                : (queued_check_result->return_code == 127
+                : (queued_check_result->get_return_code() == 127
                        ? " Make sure the plugin you're trying to run actually "
                          "exists."
                        : ""));
 
     std::ostringstream oss;
-    oss << "(Return code of " << queued_check_result->return_code
+    oss << "(Return code of " << queued_check_result->get_return_code()
         << " is out of bounds"
-        << (queued_check_result->return_code == 126
+        << (queued_check_result->get_return_code() == 126
                 ? " - plugin may not be executable"
-                : (queued_check_result->return_code == 127
+                : (queued_check_result->get_return_code() == 127
                        ? " - plugin may be missing"
                        : ""))
         << ')';
@@ -1223,7 +1223,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
      * parse check output to get: (1) short output, (2) long output,
      * (3) perf data
      */
-    std::string output{queued_check_result->output};
+    std::string output{queued_check_result->get_output()};
     std::string plugin_output;
     std::string long_plugin_output;
     std::string perf_data;
@@ -1258,7 +1258,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         << (get_perf_data().empty() ? "NULL" : get_perf_data());
 
     /* grab the return code */
-    _current_state = static_cast<service::service_state>(queued_check_result->return_code);
+    _current_state = static_cast<service::service_state>(queued_check_result->get_return_code());
   }
 
   /* record the last state time */
@@ -1955,11 +1955,11 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* send data to event broker */
   broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED, NEBFLAG_NONE,
                        NEBATTR_NONE, this, get_check_type(),
-                       queued_check_result->start_time,
-                       queued_check_result->finish_time, nullptr, get_latency(),
+                       queued_check_result->get_start_time(),
+                       queued_check_result->get_finish_time(), nullptr, get_latency(),
                        get_execution_time(), config->service_check_timeout(),
-                       queued_check_result->early_timeout,
-                       queued_check_result->return_code, nullptr, nullptr);
+                       queued_check_result->get_early_timeout(),
+                       queued_check_result->get_return_code(), nullptr, nullptr);
 
   if (!(reschedule_check && get_should_be_scheduled() &&
         get_has_been_checked()) ||
@@ -2908,7 +2908,7 @@ bool service::check_notification_viability(reason_type type, int options) {
   }
 
   /* check service notification dependencies */
-  if (check_service_dependencies(this, hostdependency::notification) ==
+  if (check_dependencies(hostdependency::notification) ==
       DEPENDENCIES_FAILED) {
     logger(dbg_notifications, more)
         << "Service notification dependencies for this service "
@@ -2917,7 +2917,7 @@ bool service::check_notification_viability(reason_type type, int options) {
   }
 
   /* check host notification dependencies */
-  if (check_host_dependencies(host_ptr, hostdependency::notification) ==
+  if (host_ptr->check_dependencies(hostdependency::notification) ==
       DEPENDENCIES_FAILED) {
     logger(dbg_notifications, more)
         << "Host notification dependencies for this service have failed, "
@@ -3114,7 +3114,7 @@ int service::verify_check_viability(int check_options,
     }
 
     /* check service dependencies for execution */
-    if (check_service_dependencies(this, hostdependency::execution) ==
+    if (check_dependencies(hostdependency::execution) ==
         DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
@@ -3640,5 +3640,204 @@ std::list<std::shared_ptr<servicegroup>>& service::get_parent_groups() {
 
 timeperiod* service::get_notification_period_ptr() const {
   /* if the service has no notification period, inherit one from the host */
-  return notification_period_ptr ? notification_period_ptr : host_ptr->notification_period_ptr;
+  return notification_period_ptr ? notification_period_ptr
+                                 : host_ptr->notification_period_ptr;
+}
+
+/* handles asynchronous service check results */
+/* checks service dependencies */
+uint64_t service::check_dependencies(
+  int dependency_type) {
+  service* temp_service = NULL;
+  int state =  service::state_ok;
+  time_t current_time = 0L;
+
+  logger(dbg_functions, basic)
+    << "check_service_dependencies()";
+
+  std::pair<std::string, std::string>
+    id(_hostname, _description);
+  servicedependency_mmap const& dependencies(
+    state::instance().servicedependencies());
+  for (servicedependency_mmap::const_iterator
+         it(dependencies.find(id)), end(dependencies.end());
+       it != end && it->first == id;
+       ++it) {
+    servicedependency* temp_dependency(&*it->second);
+
+    /* only check dependencies of the desired type (notification or execution) */
+    if (temp_dependency->get_dependency_type() != dependency_type)
+      continue;
+
+    /* find the service we depend on... */
+    if ((temp_service = temp_dependency->master_service_ptr) == NULL)
+      continue;
+
+    /* skip this dependency if it has a timeperiod and the current time isn't valid */
+    time(&current_time);
+    if (check_time_against_period(
+      current_time,
+      temp_dependency->dependency_period_ptr) == ERROR)
+      return DEPENDENCIES_OK;
+
+    /* get the status to use (use last hard state if its currently in a soft state) */
+    if (temp_service->get_state_type() == notifier::soft
+      && !config->soft_state_dependencies())
+      state = temp_service->get_last_hard_state();
+    else
+      state = temp_service->get_current_state();
+
+    /* is the service we depend on in state that fails the dependency tests? */
+    if (state ==  service::state_ok && temp_dependency->get_fail_on_ok())
+      return DEPENDENCIES_FAILED;
+    if (state ==  service::state_warning
+      && temp_dependency->get_fail_on_warning())
+      return DEPENDENCIES_FAILED;
+    if (state ==  service::state_unknown
+      && temp_dependency->get_fail_on_unknown())
+      return DEPENDENCIES_FAILED;
+    if (state ==  service::state_critical
+      && temp_dependency->get_fail_on_critical())
+      return DEPENDENCIES_FAILED;
+    if ((state ==  service::state_ok && !temp_service->get_has_been_checked())
+      && temp_dependency->get_fail_on_pending())
+      return DEPENDENCIES_FAILED;
+
+    /* immediate dependencies ok at this point - check parent dependencies if necessary */
+    if (temp_dependency->get_inherits_parent()) {
+      if (temp_service->check_dependencies(
+        dependency_type) != DEPENDENCIES_OK)
+        return DEPENDENCIES_FAILED;
+    }
+  }
+  return DEPENDENCIES_OK;
+}
+
+/* check for services that never returned from a check... */
+void service::check_for_orphaned() {
+  time_t current_time{0L};
+  time_t expected_time{0L};
+
+  logger(dbg_functions, basic)
+    << "check_for_orphaned_services()";
+
+  /* get the current time */
+  time(&current_time);
+
+  /* check all services... */
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it) {
+
+    /* skip services that are not currently executing */
+    if (!it->second->is_executing)
+      continue;
+
+    /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
+    expected_time
+      = (time_t)(it->second->get_next_check() + it->second->get_latency()
+      + config->service_check_timeout()
+      + config->check_reaper_interval() + 600);
+
+    /* this service was supposed to have executed a while ago, but for some reason the results haven't come back in... */
+    if (expected_time < current_time) {
+
+      /* log a warning */
+      logger(log_runtime_warning, basic)
+        << "Warning: The check of service '"
+        << it->first.second << "' on host '"
+        << it->first.first << "' looks like it was orphaned "
+                              "(results never came back).  I'm scheduling an immediate check "
+                              "of the service...";
+
+      logger(dbg_checks, more)
+        << "Service '" << it->first.second
+        << "' on host '" << it->first.first
+        << "' was orphaned, so we're scheduling an immediate check...";
+
+      /* decrement the number of running service checks */
+      if (currently_running_service_checks > 0)
+        currently_running_service_checks--;
+
+      /* disable the executing flag */
+      it->second->is_executing = false;
+
+      /* schedule an immediate check of the service */
+      it->second->schedule_check(current_time, CHECK_OPTION_ORPHAN_CHECK);
+    }
+  }
+}
+
+/* check freshness of service results */
+void service::check_result_freshness() {
+  time_t current_time{0L};
+
+  logger(dbg_functions, basic)
+    << "check_service_result_freshness()";
+  logger(dbg_checks, more)
+    << "Checking the freshness of service check results...";
+
+  /* bail out if we're not supposed to be checking freshness */
+  if (!config->check_service_freshness()) {
+    logger(dbg_checks, more)
+      << "Service freshness checking is disabled.";
+    return;
+  }
+  /* get the current time */
+  time(&current_time);
+
+  /* check all services... */
+  for (service_map::iterator
+         it(service::services.begin()),
+         end(service::services.end());
+       it != end;
+       ++it) {
+
+    /* skip services we shouldn't be checking for freshness */
+    if (!it->second->get_check_freshness())
+      continue;
+
+    /* skip services that are currently executing (problems here will be caught by orphaned service check) */
+    if (it->second->is_executing)
+      continue;
+
+    /* skip services that have both active and passive checks disabled */
+    if (!it->second->get_checks_enabled()
+      && !it->second->accept_passive_service_checks)
+      continue;
+
+    /* skip services that are already being freshened */
+    if (it->second->is_being_freshened)
+      continue;
+
+    // See if the time is right...
+    {
+      timezone_locker lock(it->second->get_timezone());
+      if (check_time_against_period(
+        current_time,
+        it->second->check_period_ptr) == ERROR)
+        continue ;
+    }
+
+    /* EXCEPTION */
+    /* don't check freshness of services without regular check intervals if we're using auto-freshness threshold */
+    if (it->second->get_check_interval() == 0 &&
+      it->second->get_freshness_threshold() == 0)
+      continue;
+
+    /* the results for the last check of this service are stale! */
+    if (!it->second->is_result_fresh(current_time, true)) {
+
+      /* set the freshen flag */
+      it->second->is_being_freshened = true;
+
+      /* schedule an immediate forced check of the service */
+      it->second->schedule_check(
+        current_time,
+        CHECK_OPTION_FORCE_EXECUTION | CHECK_OPTION_FRESHNESS_CHECK);
+    }
+  }
+  return;
 }

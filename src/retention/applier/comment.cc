@@ -53,9 +53,8 @@ void applier::comment::_add_host_comment(
   umap<unsigned long,
        std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(configuration::applier::state::instance().hosts().find(get_host_id(obj.host_name().c_str())));
-  if (it == configuration::applier::state::instance().hosts().end())
+  if (it == configuration::applier::state::instance().hosts().end() || !it->second)
     return;
-  com::centreon::engine::host* hst(it->second.get());
 
   // add the comment.
   std::shared_ptr<engine::comment> com{
@@ -78,7 +77,7 @@ void applier::comment::_add_host_comment(
   // acknowledgement comments get deleted if they're not persistent
   // and the original problem is no longer acknowledged.
   if (obj.entry_type() == com::centreon::engine::comment::acknowledgment) {
-    if (!hst->get_problem_has_been_acknowledged() && !obj.persistent())
+    if (!it->second->get_problem_has_been_acknowledged() && !obj.persistent())
       engine::comment::delete_comment(obj.comment_id());
   }
   // non-persistent comments don't last past restarts UNLESS
@@ -102,9 +101,8 @@ void applier::comment::_add_service_comment(
   umap<std::pair<unsigned long, unsigned long>,
        std::shared_ptr<engine::service> >::const_iterator
     it_svc(configuration::applier::state::instance().services().find(id));
-  if (it_svc == configuration::applier::state::instance().services().end())
+  if (it_svc == configuration::applier::state::instance().services().end() || !it_svc->second)
     return;
-  engine::service* svc(&*it_svc->second);
 
   // add the comment.
   std::shared_ptr<engine::comment> com{
@@ -127,7 +125,7 @@ void applier::comment::_add_service_comment(
   // acknowledgement comments get deleted if they're not persistent
   // and the original problem is no longer acknowledged.
   if (obj.entry_type() == com::centreon::engine::comment::acknowledgment) {
-    if (!svc->get_problem_has_been_acknowledged() && !obj.persistent())
+    if (!it_svc->second->get_problem_has_been_acknowledged() && !obj.persistent())
       engine::comment::delete_comment(obj.comment_id());
   }
   // non-persistent comments don't last past restarts UNLESS

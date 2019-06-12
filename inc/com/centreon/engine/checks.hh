@@ -30,80 +30,86 @@
 #  define DEPENDENCIES_OK     0
 #  define DEPENDENCIES_FAILED 1
 
-// Object check types
-#  define SERVICE_CHECK       0
-#  define HOST_CHECK          1
-
-CCE_BEGIN()
-  class host;
-  class service;
-CCE_END()
-
 enum check_type {
   check_active,        /* 0: Engine performed the check. */
   check_passive,       /* 1: Check result submitted by an external source. */
 };
 
+enum check_source {
+  service_check,
+  host_check
+};
+CCE_BEGIN()
+class check_result;
+CCE_END()
+
+typedef std::list<com::centreon::engine::check_result> check_result_list;
+
 // CHECK_RESULT structure
-typedef struct                check_result_struct {
-  unsigned int                object_check_type;    // is this a service or a host check?
-  char*                       host_name;            // host name
-  char*                       service_description;  // service description
-  int                         check_type;           // was this an active or passive service check?
-  int                         check_options;
-  int                         scheduled_check;      // was this a scheduled or an on-demand check?
-  int                         reschedule_check;     // should we reschedule the next check
-  char*                       output_file;          // what file is the output stored in?
-  FILE*                       output_file_fp;
-  int                         output_file_fd;
-  double                      latency;
-  struct timeval              start_time;           // time the service check was initiated
-  struct timeval              finish_time;          // time the service check was completed
-  int                         early_timeout;        // did the service check timeout?
-  int                         exited_ok;            // did the plugin check return okay?
-  int                         return_code;          // plugin return code
-  char*                       output;               // plugin output
-  struct check_result_struct* next;
-}                             check_result;
+CCE_BEGIN()
+class                        check_result{
+ public:
+                             check_result();
+                             check_result(enum check_source object_check_type,
+                                          std::string _host_name,
+                                          std::string service_description,
+                                          enum check_type check_type,
+                                          int check_options,
+                                          int reschedule_check,
+                                          double latency,
+                                          struct timeval start_time,
+                                          struct timeval finish_time,
+                                          bool early_timeout,
+                                          bool exited_ok,
+                                          int return_code,
+                                          std::string output);
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif // C++
+  enum check_source          get_object_check_type() const;
+  void                       set_object_check_type(enum check_source object_check_type);
+  std::string const&         get_hostname() const;
+  void                       set_hostname(std::string const& hostname);
+  std::string const&         get_service_description() const;
+  void                       set_service_description(std::string const& service_description);
+  struct timeval             get_finish_time() const;
+  void                       set_finish_time(struct timeval finish_time);
+  struct timeval             get_start_time() const;
+  void                       set_start_time(struct timeval start_time);
+  int                        get_return_code() const;
+  void                       set_return_code(int return_code);
+  bool                       get_early_timeout() const;
+  void                       set_early_timeout(bool early_timeout);
+  std::string const&         get_output() const;
+  void                       set_output(std::string const& output);
+  bool                       get_exited_ok() const;
+  void                       set_exited_ok(bool exited_ok);
+  bool                       get_reschedule_check() const;
+  void                       set_reschedule_check(bool reschedule_check);
+  enum check_type            get_check_type() const;
+  void                       set_check_type(enum check_type check_type);
+  double                     get_latency() const;
+  void                       set_latency(double latency);
+  int                        get_check_options() const;
+  void                       set_check_options(int check_options);
 
-// Common Check Fucntions
+  static bool                process_check_result_queue(std::string const& dirname);
+  static bool                process_check_result_file(std::string const& fname);
+  static check_result_list   results;
 
-int reap_check_results();
-
-// Monitoring/Event Handler Functions
-
-// checks service dependencies
-unsigned int check_service_dependencies(
-               com::centreon::engine::service* svc,
-               int dependency_type);
-// checks for orphaned services
-void check_for_orphaned_services();
-// checks the "freshness" of service check results
-void check_service_result_freshness();
-// checks host dependencie
-unsigned int check_host_dependencies(
-               com::centreon::engine::host* hst,
-               int dependency_type);
-// checks for orphaned hosts
-void check_for_orphaned_hosts();
-// checks the "freshness" of host check results
-void check_host_result_freshness();
-// determines if a host's check results are fresh
-
-// Route/Host Check Functions
-int perform_scheduled_host_check(
-      com::centreon::engine::host* hst,
-      int check_options,
-      double latency);
-int adjust_host_check_attempt_3x(com::centreon::engine::host* hst,
-                                 int is_active);
-
-#  ifdef __cplusplus
-}
-#  endif // C++
+ private:
+  enum check_source          _object_check_type;    // is this a service or a host check?
+  std::string                _host_name;            // host name
+  std::string                _service_description;  // service description
+  enum check_type             _check_type;           // was this an active or passive service check?
+  int                         _check_options;
+  int                         _reschedule_check;     // should we reschedule the next check
+  double                      _latency;
+  struct timeval              _start_time;           // time the service check was initiated
+  struct timeval              _finish_time;          // time the service check was completed
+  bool                        _early_timeout;        // did the service check timeout?
+  bool                        _exited_ok;            // did the plugin check return okay?
+  int                         _return_code;          // plugin return code
+  std::string                 _output;               // plugin output
+};
+CCE_END()
 
 #endif // !CCE_CHECKS_HH

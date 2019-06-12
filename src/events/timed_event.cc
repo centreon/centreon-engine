@@ -21,6 +21,7 @@
 */
 
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
@@ -126,6 +127,18 @@ static void _exec_event_program_restart(timed_event* event) {
     << "PROGRAM_RESTART event encountered, restarting...";
 }
 
+static int reap_check_results() {
+  try {
+    checks::checker::instance().reap();
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: " << e.what();
+    return ERROR;
+  }
+  return OK;
+}
+
 /**
  *  Execute check reaper.
  *
@@ -152,9 +165,9 @@ static void _exec_event_orphan_check(timed_event* event) {
 
   // check for orphaned hosts and services.
   if (config->check_orphaned_hosts())
-    check_for_orphaned_hosts();
+    host::check_for_orphaned();
   if (config->check_orphaned_services())
-    check_for_orphaned_services();
+    service::check_for_orphaned();
 }
 
 /**
@@ -213,7 +226,7 @@ static void _exec_event_sfreshness_check(timed_event* event) {
     << "** Service Result Freshness Check Event";
 
   // check service result freshness.
-  check_service_result_freshness();
+  service::check_result_freshness();
 }
 
 /**
@@ -250,7 +263,7 @@ static void _exec_event_host_check(timed_event* event) {
     << ", Latency: " << latency << " sec";
 
   // run the host check.
-  perform_scheduled_host_check(hst, event->event_options, latency);
+  hst->perform_scheduled_check(event->event_options, latency);
 }
 
 /**
@@ -264,7 +277,7 @@ static void _exec_event_hfreshness_check(timed_event* event) {
     << "** Host Result Freshness Check Event";
 
   // check host result freshness.
-  check_host_result_freshness();
+  host::check_result_freshness();
 }
 
 /**

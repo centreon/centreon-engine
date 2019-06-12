@@ -102,13 +102,8 @@ extern int                       embedded_perl_initialized;
 
 extern std::map<std::string, host_other_properties> host_other_props;
 extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-extern com::centreon::engine::serviceescalation*        serviceescalation_list;
-extern com::centreon::engine::serviceescalation*        serviceescalation_list_tail;
 
 extern int                       __nagios_object_structure_version;
-
-extern check_result              check_result_info;
-extern check_result*             check_result_list;
 
 extern dbuf                      check_result_dbuf;
 

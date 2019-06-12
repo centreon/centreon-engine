@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -38,7 +38,6 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/string.hh"
-#include "compatibility/check_result.h"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::logging;
@@ -97,15 +96,19 @@ void checker::reap() {
 
   if (config->use_check_result_path()) {
     std::string const& path(config->check_result_path());
-    process_check_result_queue(path.c_str());
+    check_result::process_check_result_queue(path);
   }
 
   // Keep compatibility with old check result list.
-  if (check_result_list) {
+  if (!check_result::results.empty()) {
     concurrency::locker lock(&_mut_reap);
     check_result* cr(nullptr);
-    while ((cr = read_check_result())) {
-      _to_reap.push(*cr);
+    for (check_result_list::iterator
+           it(check_result::results.begin()),
+           end(check_result::results.end());
+         it != end;
+         ++it) {
+      _to_reap.push(*it);
       delete cr;
     }
   }
@@ -135,12 +138,11 @@ void checker::reap() {
         _list_id.erase(it_id);
 
         // Merge check result.
-        result.finish_time.tv_sec = it_partial->second.finish_time.tv_sec;
-        result.finish_time.tv_usec = it_partial->second.finish_time.tv_usec;
-        result.early_timeout = it_partial->second.early_timeout;
-        result.return_code = it_partial->second.return_code;
-        result.exited_ok = it_partial->second.exited_ok;
-        result.output = it_partial->second.output;
+        result.set_finish_time(it_partial->second.get_finish_time());
+        result.set_early_timeout(it_partial->second.get_early_timeout());
+        result.set_return_code(it_partial->second.get_return_code());
+        result.set_exited_ok(it_partial->second.get_exited_ok());
+        result.set_output(it_partial->second.get_output());
 
         // Push back in reap list.
         _to_reap.push(result);
@@ -159,26 +161,26 @@ void checker::reap() {
       lock.unlock();
 
       // Service check result.
-      if (SERVICE_CHECK == result.object_check_type) {
+      if (service_check == result.get_object_check_type()) {
         try {
           // Check if the service exists.
-          unsigned int host_id(get_host_id(result.host_name));
+          unsigned int host_id(get_host_id(result.get_hostname()));
           unsigned int service_id(get_service_id(
-                                    result.host_name,
-                                    result.service_description));
+                                    result.get_hostname(),
+                                    result.get_service_description()));
           service& svc(find_service(host_id, service_id));
           // Process the check result.
           logger(dbg_checks, more)
             << "Handling check result for service '"
-            << result.service_description << "' on host '"
-            << result.host_name << "'...";
+            << result.get_service_description() << "' on host '"
+            << result.get_hostname() << "'...";
           svc.handle_async_check_result(&result);
         }
         catch (std::exception const& e) {
           logger(log_runtime_warning, basic)
             << "Warning: Check result queue contained results for "
-            << "service '" << result.service_description << "' on "
-            << "host '" << result.host_name << "', but the service "
+            << "service '" << result.get_service_description() << "' on "
+            << "host '" << result.get_hostname() << "', but the service "
             << "could not be found! Perhaps you forgot to define the "
             << "service in your config files ?";
         }
@@ -186,25 +188,22 @@ void checker::reap() {
       // Host check result.
       else {
         try {
-          host& hst(find_host(get_host_id(result.host_name)));
+          host& hst(find_host(get_host_id(result.get_hostname())));
           // Process the check result.
           logger(dbg_checks, more)
             << "Handling check result for host '"
-            << result.host_name << "'...";
+            << result.get_hostname() << "'...";
           hst.handle_async_check_result_3x(&result);
         }
         catch (std::exception const& e) {
           // Check if the host exists.
           logger(log_runtime_warning, basic)
             << "Warning: Check result queue contained results for "
-            << "host '" << result.host_name << "', but the host could "
+            << "host '" << result.get_hostname() << "', but the host could "
             << "not be found! Perhaps you forgot to define the host in "
             << "your config files ?";
         }
       }
-
-      // Cleanup.
-      free_check_result(&result);
 
       // Check if reaping has timed out.
       time_t current_time;
@@ -356,7 +355,7 @@ void checker::run(
     hst->set_check_options(CHECK_OPTION_NONE);
 
   // Adjust check attempts.
-  adjust_host_check_attempt_3x(hst, true);
+  hst->adjust_check_attempt(true);
 
   // Update latency for event broker and macros.
   double old_latency(hst->get_latency());
@@ -388,25 +387,19 @@ void checker::run(
   hst->set_is_executing(true);
 
   // Init check result info.
-  check_result check_result_info;
-  check_result_info.object_check_type = HOST_CHECK;
-  check_result_info.check_type = check_active;
-  check_result_info.check_options = check_options;
-  check_result_info.scheduled_check = scheduled_check;
-  check_result_info.reschedule_check = reschedule_check;
-  check_result_info.start_time = start_time;
-  check_result_info.finish_time = start_time;
-  check_result_info.early_timeout = false;
-  check_result_info.exited_ok = true;
-  check_result_info.return_code = notifier::ok;
-  check_result_info.output = nullptr;
-  check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = nullptr;
-  check_result_info.output_file = nullptr;
-  check_result_info.host_name = string::dup(hst->get_name());
-  check_result_info.service_description = nullptr;
-  check_result_info.latency = latency;
-  check_result_info.next = nullptr;
+  check_result check_result_info(host_check,
+                                 hst->get_name(),
+                                 "",
+                                 check_active,
+                                 check_options,
+                                 reschedule_check,
+                                 latency,
+                                 start_time,
+                                 start_time,
+                                 false,
+                                 true,
+                                 notifier::ok,
+                                 "");
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
@@ -472,13 +465,14 @@ void checker::run(
       timestamp now(timestamp::now());
 
       // Update check result.
-      check_result_info.finish_time.tv_sec = now.to_seconds();
-      check_result_info.finish_time.tv_usec = now.to_useconds()
-        - check_result_info.finish_time.tv_sec * 1000000ull;
-      check_result_info.early_timeout = false;
-      check_result_info.return_code = notifier::unknown;
-      check_result_info.exited_ok = true;
-      check_result_info.output = string::dup("(Execute command failed)");
+      struct timeval tv;
+      tv.tv_sec = now.to_seconds();
+      tv.tv_usec = now.to_useconds() - check_result_info.get_finish_time().tv_sec * 1000000ull;
+      check_result_info.set_finish_time(tv);
+      check_result_info.set_early_timeout(false);
+      check_result_info.set_return_code(notifier::unknown);
+      check_result_info.set_exited_ok(true);
+      check_result_info.set_output("(Execute command failed)");
 
       // Queue check result.
       concurrency::locker lock(&_mut_reap);
@@ -622,25 +616,19 @@ void checker::run(
   svc->is_executing = true;
 
   // Init check result info.
-  check_result check_result_info;
-  check_result_info.object_check_type = SERVICE_CHECK;
-  check_result_info.check_type = check_active;
-  check_result_info.check_options = check_options;
-  check_result_info.scheduled_check = scheduled_check;
-  check_result_info.reschedule_check = reschedule_check;
-  check_result_info.start_time = start_time;
-  check_result_info.finish_time = start_time;
-  check_result_info.early_timeout = false;
-  check_result_info.exited_ok = true;
-  check_result_info.return_code = notifier::ok;
-  check_result_info.output = nullptr;
-  check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = nullptr;
-  check_result_info.output_file = nullptr;
-  check_result_info.host_name = string::dup(svc->get_hostname());
-  check_result_info.service_description = string::dup(svc->get_description());
-  check_result_info.latency = latency;
-  check_result_info.next = nullptr;
+  check_result check_result_info(service_check,
+                                 svc->get_hostname(),
+                                 svc->get_description(),
+                                 check_active,
+                                 check_options,
+                                 reschedule_check,
+                                 latency,
+                                 start_time,
+                                 start_time,
+                                 false,
+                                 true,
+                                 notifier::ok,
+                                 "");
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
@@ -704,13 +692,16 @@ void checker::run(
       timestamp now(timestamp::now());
 
       // Update check result.
-      check_result_info.finish_time.tv_sec = now.to_seconds();
-      check_result_info.finish_time.tv_usec = now.to_useconds()
-        - check_result_info.finish_time.tv_sec * 1000000ull;
-      check_result_info.early_timeout = false;
-      check_result_info.return_code = notifier::unknown;
-      check_result_info.exited_ok = true;
-      check_result_info.output = string::dup("(Execute command failed)");
+      timeval tv;
+      tv.tv_sec = now.to_seconds();
+      tv.tv_usec = now.to_useconds()
+        - check_result_info.get_finish_time().tv_sec * 1000000ull;
+      check_result_info.set_finish_time(tv);
+
+      check_result_info.set_early_timeout(false);
+      check_result_info.set_return_code(notifier::unknown);
+      check_result_info.set_exited_ok(true);
+      check_result_info.set_output("(Execute command failed)");
 
       // Queue check result.
       concurrency::locker lock(&_mut_reap);
@@ -811,7 +802,7 @@ void checker::run_sync(
   hst->set_latency(0.0);
 
   // Adjust check attempts.
-  adjust_host_check_attempt_3x(hst, true);
+  hst->adjust_check_attempt(true);
 
   // Update host state.
   hst->set_last_state(hst->get_current_state());
@@ -939,7 +930,6 @@ checker::~checker() throw () {
   try {
     concurrency::locker lock(&_mut_reap);
     while (!_to_reap.empty()) {
-      free_check_result(&_to_reap.front());
       _to_reap.pop();
     }
   }
@@ -959,15 +949,16 @@ void checker::finished(commands::result const& res) throw () {
   // Find check result.
   check_result result;
 
+  struct timeval tv;
   // Update check result.
-  result.finish_time.tv_sec = res.end_time.to_seconds();
-  result.finish_time.tv_usec = res.end_time.to_useconds()
-                               - result.finish_time.tv_sec * 1000000ull;
-  result.early_timeout = (res.exit_status == process::timeout);
-  result.return_code = res.exit_code;
-  result.exited_ok = ((res.exit_status == process::normal)
+  tv.tv_sec = res.end_time.to_seconds();
+  tv.tv_usec = res.end_time.to_useconds()- result.get_finish_time().tv_sec * 1000000ull;
+  result.set_finish_time(tv);
+  result.set_early_timeout(res.exit_status == process::timeout);
+  result.set_return_code(res.exit_code);
+  result.set_exited_ok((res.exit_status == process::normal)
                       || (res.exit_status == process::timeout));
-  result.output = string::dup(res.output);
+  result.set_output(res.output);
 
   // Queue check result.
   concurrency::locker lock(&_mut_reap);

@@ -1432,10 +1432,10 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   time(&current_time);
 
-  execution_time = (double)((double)(queued_check_result->finish_time.tv_sec -
-                                     queued_check_result->start_time.tv_sec) +
-                            (double)((queued_check_result->finish_time.tv_usec -
-                                      queued_check_result->start_time.tv_usec) /
+  execution_time = (double)((double)(queued_check_result->get_finish_time().tv_sec -
+                                     queued_check_result->get_start_time().tv_sec) +
+                            (double)((queued_check_result->get_finish_time().tv_usec -
+                                      queued_check_result->get_start_time().tv_usec) /
                                      1000.0) /
                                 1000.0);
   if (execution_time < 0.0)
@@ -1446,32 +1446,30 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   logger(dbg_checks, most)
       << "\tCheck Type:         "
-      << (queued_check_result->check_type == check_active ? "Active"
+      << (queued_check_result->get_check_type() == check_active ? "Active"
                                                           : "Passive")
       << "\n"
-      << "\tCheck Options:      " << queued_check_result->check_options << "\n"
-      << "\tScheduled Check?:   "
-      << (queued_check_result->scheduled_check ? "Yes" : "No") << "\n"
+      << "\tCheck Options:      " << queued_check_result->get_check_options() << "\n"
       << "\tReschedule Check?:  "
-      << (queued_check_result->reschedule_check ? "Yes" : "No") << "\n"
+      << (queued_check_result->get_reschedule_check() ? "Yes" : "No") << "\n"
       << "\tShould Reschedule Current Host Check?:"
       << host_other_props[get_name()].should_reschedule_current_check
       << "\tExited OK?:         "
-      << (queued_check_result->exited_ok ? "Yes" : "No") << "\n"
+      << (queued_check_result->get_exited_ok() ? "Yes" : "No") << "\n"
       << com::centreon::logging::setprecision(3)
       << "\tExec Time:          " << execution_time << "\n"
-      << "\tLatency:            " << queued_check_result->latency << "\n"
-      << "\treturn Status:      " << queued_check_result->return_code << "\n"
-      << "\tOutput:             " << queued_check_result->output;
+      << "\tLatency:            " << queued_check_result->get_latency() << "\n"
+      << "\treturn Status:      " << queued_check_result->get_return_code() << "\n"
+      << "\tOutput:             " << queued_check_result->get_output();
 
   /* decrement the number of host checks still out there... */
-  if (queued_check_result->check_type == check_active &&
+  if (queued_check_result->get_check_type() == check_active &&
       currently_running_host_checks > 0)
     currently_running_host_checks--;
 
   /* skip this host check results if its passive and we aren't accepting passive
    * check results */
-  if (queued_check_result->check_type == check_passive) {
+  if (queued_check_result->get_check_type() == check_passive) {
     if (!config->accept_passive_host_checks()) {
       logger(dbg_checks, basic)
           << "Discarding passive host check result because passive host "
@@ -1488,7 +1486,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   /* clear the freshening flag (it would have been set if this host was
    * determined to be stale) */
-  if (queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK)
+  if (queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK)
     set_is_being_freshened(false);
 
   /* DISCARD INVALID FRESHNESS CHECK RESULTS */
@@ -1499,7 +1497,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   ** make the host fresh again, so we do a quick check to make sure the
   ** host is still stale before we accept the check result.
   */
-  if ((queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK) &&
+  if ((queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK) &&
       is_result_fresh(current_time, false)) {
     logger(dbg_checks, basic)
         << "Discarding host freshness check result because the host is "
@@ -1508,18 +1506,18 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   }
 
   /* was this check passive or active? */
-  set_check_type((queued_check_result->check_type == check_active)
+  set_check_type((queued_check_result->get_check_type() == check_active)
                      ? check_active
                      : check_passive);
 
   /* update check statistics for passive results */
-  if (queued_check_result->check_type == check_passive)
+  if (queued_check_result->get_check_type() == check_passive)
     update_check_stats(PASSIVE_HOST_CHECK_STATS,
-                       queued_check_result->start_time.tv_sec);
+                       queued_check_result->get_start_time().tv_sec);
 
   /* should we reschedule the next check of the host? NOTE: this might be
    * overridden later... */
-  reschedule_check = queued_check_result->reschedule_check;
+  reschedule_check = queued_check_result->get_reschedule_check();
 
   // Inherit the should reschedule flag from the host. It is used when
   // rescheduled checks were discarded because only one check can be executed
@@ -1527,14 +1525,14 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   // and this check should be rescheduled regardless of what it was meant
   // to initially.
   if (host_other_props[get_name()].should_reschedule_current_check &&
-      !queued_check_result->reschedule_check)
+      !queued_check_result->get_reschedule_check())
     reschedule_check = true;
 
   // Clear the should reschedule flag.
   host_other_props[get_name()].should_reschedule_current_check = false;
 
   /* check latency is passed to us for both active and passive checks */
-  set_latency(queued_check_result->latency);
+  set_latency(queued_check_result->get_latency());
 
   /* update the execution time for this check (millisecond resolution) */
   set_execution_time(execution_time);
@@ -1543,14 +1541,14 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   set_has_been_checked(true);
 
   /* clear the execution flag if this was an active check */
-  if (queued_check_result->check_type == check_active)
+  if (queued_check_result->get_check_type() == check_active)
     set_is_executing(false);
 
   /* get the last check time */
-  set_last_check(queued_check_result->start_time.tv_sec);
+  set_last_check(queued_check_result->get_start_time().tv_sec);
 
   /* was this check passive or active? */
-  set_check_type((queued_check_result->check_type == check_active)
+  set_check_type((queued_check_result->get_check_type() == check_active)
                      ? check_active
                      : check_passive);
 
@@ -1566,7 +1564,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   /* parse check output to get: (1) short output, (2) long output, (3) perf data
    */
 
-  std::string output{queued_check_result->output};
+  std::string output{queued_check_result->get_output()};
   std::string plugin_output;
   std::string long_plugin_output;
   std::string perf_data;
@@ -1599,13 +1597,13 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   /* get the unprocessed return code */
   /* NOTE: for passive checks, this is the final/processed state */
-  svc_res = static_cast<enum service::service_state>(queued_check_result->return_code);
+  svc_res = static_cast<enum service::service_state>(queued_check_result->get_return_code());
 
   /* adjust return code (active checks only) */
-  if (queued_check_result->check_type == check_active) {
+  if (queued_check_result->get_check_type() == check_active) {
     /* if there was some error running the command, just skip it (this shouldn't
      * be happening) */
-    if (!queued_check_result->exited_ok) {
+    if (!queued_check_result->get_exited_ok()) {
       logger(log_runtime_warning, basic)
           << "Warning:  Check of host '" << get_name()
           << "' did not exit properly!";
@@ -1618,22 +1616,22 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
     }
 
     /* make sure the return code is within bounds */
-    else if (queued_check_result->return_code < 0 ||
-             queued_check_result->return_code > 3) {
+    else if (queued_check_result->get_return_code() < 0 ||
+             queued_check_result->get_return_code() > 3) {
       logger(log_runtime_warning, basic)
-          << "Warning: return (code of " << queued_check_result->return_code
+          << "Warning: return (code of " << queued_check_result->get_return_code()
           << " for check of host '" << get_name() << "' was out of bounds."
-          << ((queued_check_result->return_code == 126 ||
-               queued_check_result->return_code == 127)
+          << ((queued_check_result->get_return_code() == 126 ||
+               queued_check_result->get_return_code() == 127)
                   ? " Make sure the plugin you're trying to run actually "
                     "exists."
                   : "");
 
       std::ostringstream oss;
-      oss << "(Return code of " << queued_check_result->return_code
+      oss << "(Return code of " << queued_check_result->get_return_code()
           << " is out of bounds"
-          << ((queued_check_result->return_code == 126 ||
-               queued_check_result->return_code == 127)
+          << ((queued_check_result->get_return_code() == 126 ||
+               queued_check_result->get_return_code() == 127)
                   ? " - plugin may be missing"
                   : "")
           << ")";
@@ -1656,7 +1654,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
    * determination is made later */
   /* NOTE: only do this for active checks - passive check results already have
    * the final state */
-  if (queued_check_result->check_type == check_active) {
+  if (queued_check_result->get_check_type() == check_active) {
     /* if we're not doing aggressive host checking, let WARNING states indicate
      * the host is up (fake the result to be state_ok) */
     if (!config->use_aggressive_host_checking() && svc_res ==  service::state_warning)
@@ -1683,7 +1681,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
                            << "' handled: new state=" << get_current_state();
 
   /* high resolution start time for event broker */
-  start_time_hires = queued_check_result->start_time;
+  start_time_hires = queued_check_result->get_start_time();
 
   /* high resolution end time for event broker */
   gettimeofday(&end_time_hires, NULL);
@@ -1694,7 +1692,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       get_check_type(), get_current_state(), get_state_type(), start_time_hires,
       end_time_hires, get_check_command().c_str(), get_latency(),
       get_execution_time(), config->host_check_timeout(),
-      queued_check_result->early_timeout, queued_check_result->return_code,
+      queued_check_result->get_early_timeout(), queued_check_result->get_return_code(),
       NULL, const_cast<char*>(get_plugin_output().c_str()),
       const_cast<char*>(get_long_plugin_output().c_str()),
       const_cast<char*>(get_perf_data().c_str()), NULL);
@@ -2379,7 +2377,7 @@ bool host::check_notification_viability(reason_type type, int options) {
   }
 
   /* check notification dependencies */
-  if (check_host_dependencies(this, hostdependency::notification) ==
+  if (check_dependencies(hostdependency::notification) ==
       DEPENDENCIES_FAILED) {
     logger(dbg_notifications, more)
         << "Notification dependencies for this host have failed, "
@@ -2710,7 +2708,7 @@ int host::verify_check_viability(int check_options,
     }
 
     /* check host dependencies for execution */
-    if (check_host_dependencies(this, hostdependency::execution) ==
+    if (check_dependencies(hostdependency::execution) ==
         DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
@@ -3369,7 +3367,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
    * elsewhere */
   if (get_check_type() == check_passive &&
     config->passive_host_checks_are_soft())
-    adjust_host_check_attempt_3x(this, false);
+    adjust_check_attempt(false);
 
   /* log passive checks - we need to do this here, as some my bypass external
    * commands by getting dropped in checkresults dir */
@@ -3935,4 +3933,235 @@ std::list<std::shared_ptr<hostgroup>>& host::get_parent_groups() {
 
 timeperiod* host::get_notification_period_ptr() const {
   return notification_period_ptr;
+}
+
+/* execute a scheduled host check using either the 2.x or 3.x logic */
+int host::perform_scheduled_check(
+  int check_options,
+  double latency) {
+  logger(dbg_functions, basic)
+    << "perform_scheduled_host_check()";
+  run_scheduled_check(check_options, latency);
+  return OK;
+}
+
+/* checks host dependencies */
+uint64_t host::check_dependencies(int dependency_type) {
+  host* temp_host = NULL;
+  enum host::host_state state = host::state_up;
+  time_t current_time = 0L;
+
+  logger(dbg_functions, basic)
+    << "check_host_dependencies()";
+
+  std::string id(_name);
+  hostdependency_mmap const&
+    dependencies(state::instance().hostdependencies());
+
+  /* check all dependencies... */
+  for (hostdependency_mmap::const_iterator
+         it(dependencies.find(id)), end(dependencies.end());
+       it != end && it->first == id;
+       ++it) {
+    hostdependency* temp_dependency(&*it->second);
+
+    /* only check dependencies of the desired type (notification or execution) */
+    if (temp_dependency->get_dependency_type() != dependency_type)
+      continue;
+
+    /* find the host we depend on... */
+    if ((temp_host = temp_dependency->master_host_ptr) == NULL)
+      continue;
+
+    /* skip this dependency if it has a timeperiod and the current time isn't valid */
+    time(&current_time);
+    if (!temp_dependency->get_dependency_period().empty()
+      && check_time_against_period(
+        current_time,
+        temp_dependency->dependency_period_ptr) == ERROR)
+      return DEPENDENCIES_OK;
+
+    /* get the status to use (use last hard state if its currently in a soft state) */
+    if (temp_host->get_state_type() == notifier::soft
+      && !config->soft_state_dependencies())
+      state = temp_host->get_last_hard_state();
+    else
+      state = temp_host->get_current_state();
+
+    /* is the host we depend on in state that fails the dependency tests? */
+    if (state == host::state_up && temp_dependency->get_fail_on_up())
+      return DEPENDENCIES_FAILED;
+    if (state == host::state_down && temp_dependency->get_fail_on_down())
+      return DEPENDENCIES_FAILED;
+    if (state == host::state_unreachable
+      && temp_dependency->get_fail_on_unreachable())
+      return DEPENDENCIES_FAILED;
+    if ((state == host::state_up && !temp_host->get_has_been_checked())
+      && temp_dependency->get_fail_on_pending())
+      return DEPENDENCIES_FAILED;
+
+    /* immediate dependencies ok at this point - check parent dependencies if necessary */
+    if (temp_dependency->get_inherits_parent()) {
+      if (check_dependencies(dependency_type) != DEPENDENCIES_OK)
+        return DEPENDENCIES_FAILED;
+    }
+  }
+  return DEPENDENCIES_OK;
+}
+
+
+
+/* check freshness of host results */
+void host::check_result_freshness() {
+  time_t current_time = 0L;
+
+  logger(dbg_functions, basic)
+    << "check_host_result_freshness()";
+  logger(dbg_checks, most)
+    << "Attempting to check the freshness of host check results...";
+
+  /* bail out if we're not supposed to be checking freshness */
+  if (!config->check_host_freshness()) {
+    logger(dbg_checks, most)
+      << "Host freshness checking is disabled.";
+    return;
+  }
+
+  /* get the current time */
+  time(&current_time);
+
+  /* check all hosts... */
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it) {
+
+    /* skip hosts we shouldn't be checking for freshness */
+    if (!it->second->get_check_freshness())
+      continue;
+
+    /* skip hosts that have both active and passive checks disabled */
+    if (!it->second->get_checks_enabled()
+      && !it->second->get_accept_passive_checks())
+      continue;
+
+    /* skip hosts that are currently executing (problems here will be caught by orphaned host check) */
+    if (it->second->get_is_executing())
+      continue;
+
+    /* skip hosts that are already being freshened */
+    if (it->second->get_is_being_freshened())
+      continue;
+
+    // See if the time is right...
+    {
+      timezone_locker lock(it->second->get_timezone());
+      if (check_time_against_period(
+        current_time,
+        it->second->check_period_ptr) == ERROR)
+        continue ;
+    }
+
+    /* the results for the last check of this host are stale */
+    if (!it->second->is_result_fresh(current_time, true)) {
+
+      /* set the freshen flag */
+      it->second->set_is_being_freshened(true);
+
+      /* schedule an immediate forced check of the host */
+      it->second->schedule_check(
+        current_time,
+        CHECK_OPTION_FORCE_EXECUTION | CHECK_OPTION_FRESHNESS_CHECK);
+    }
+  }
+  return;
+}
+
+/* adjusts current host check attempt before a new check is performed */
+int host::adjust_check_attempt(bool is_active) {
+  logger(dbg_functions, basic)
+    << "adjust_host_check_attempt_3x()";
+
+  logger(dbg_checks, most)
+    << "Adjusting check attempt number for host '" << _name
+    << "': current attempt=" << get_current_attempt() << "/"
+    << get_max_attempts() << ", state=" << _current_state
+    << ", state type=" << _state_type;
+
+  /* if host is in a hard state, reset current attempt number */
+  if (_state_type == notifier::hard)
+    set_current_attempt(1);
+
+    /* if host is in a soft UP state, reset current attempt number (active checks only) */
+  else if (is_active && _state_type == notifier::soft
+    && _current_state ==  host::state_up)
+    set_current_attempt(1);
+
+    /* increment current attempt number */
+  else if (get_current_attempt() < get_max_attempts())
+    set_current_attempt(get_current_attempt() + 1);
+
+  logger(dbg_checks, most)
+    << "New check attempt number = " << get_current_attempt();
+  return OK;
+}
+
+/* check for hosts that never returned from a check... */
+void host::check_for_orphaned() {
+  time_t current_time = 0L;
+  time_t expected_time = 0L;
+
+  logger(dbg_functions, basic)
+    << "check_for_orphaned_hosts()";
+
+  /* get the current time */
+  time(&current_time);
+
+  /* check all hosts... */
+  for (host_map::iterator
+         it(host::hosts.begin()),
+         end(host::hosts.end());
+       it != end;
+       ++it) {
+
+    /* skip hosts that don't have a set check interval (on-demand checks are missed by the orphan logic) */
+    if (it->second->get_next_check() == (time_t)0L)
+      continue;
+
+    /* skip hosts that are not currently executing */
+    if (!it->second->get_is_executing())
+      continue;
+
+    /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
+    expected_time
+      = (time_t)(it->second->get_next_check() + it->second->get_latency()
+      + config->host_check_timeout()
+      + config->check_reaper_interval() + 600);
+
+    /* this host was supposed to have executed a while ago, but for some reason the results haven't come back in... */
+    if (expected_time < current_time) {
+
+      /* log a warning */
+      logger(log_runtime_warning, basic)
+        << "Warning: The check of host '" << it->second->get_name()
+        << "' looks like it was orphaned (results never came back).  "
+           "I'm scheduling an immediate check of the host...";
+
+      logger(dbg_checks, more)
+        << "Host '" << it->second->get_name()
+        << "' was orphaned, so we're scheduling an immediate check...";
+
+      /* decrement the number of running host checks */
+      if (currently_running_host_checks > 0)
+        currently_running_host_checks--;
+
+      /* disable the executing flag */
+      it->second->set_is_executing(false);
+
+      /* schedule an immediate check of the host */
+      it->second->schedule_check(current_time, CHECK_OPTION_ORPHAN_CHECK);
+    }
+  }
+  return;
 }

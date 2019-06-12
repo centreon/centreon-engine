@@ -64,18 +64,18 @@ void enable_all_notifications(void);                                        // e
 void disable_all_notifications(void);                                       // disables notifications on a program-wide basis
 void enable_service_notifications(std::shared_ptr<com::centreon::engine::service> svc);                            // enables service notifications
 void disable_service_notifications(std::shared_ptr<com::centreon::engine::service> svc);                           // disables service notifications
-void enable_host_notifications(com::centreon::engine::host* hst);           // enables host notifications
-void disable_host_notifications(com::centreon::engine::host* hst);          // disables host notifications
-void enable_and_propagate_notifications(com::centreon::engine::host* hst, int level, int affect_top_host, int affect_hosts, int affect_services);  // enables notifications for all hosts and services beyond a given host
-void disable_and_propagate_notifications(com::centreon::engine::host* hst, int level, int affect_top_host, int affect_hosts, int affect_services); // disables notifications for all hosts and services beyond a given host
-void enable_contact_host_notifications(com::centreon::engine::contact* cntct);                     // enables host notifications for a specific contact
-void disable_contact_host_notifications(com::centreon::engine::contact* cntct);                    // disables host notifications for a specific contact
-void enable_contact_service_notifications(com::centreon::engine::contact* cntct);                  // enables service notifications for a specific contact
-void disable_contact_service_notifications(com::centreon::engine::contact* cntct);                 // disables service notifications for a specific contact
-void schedule_and_propagate_downtime(com::centreon::engine::host* temp_host, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration); // schedules downtime for all hosts beyond a given host
-void acknowledge_host_problem(com::centreon::engine::host* hst, char* ack_author, char* ack_data, int type, int notify, int persistent);       // acknowledges a host problem
+void enable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst);           // enables host notifications
+void disable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst);          // disables host notifications
+void enable_and_propagate_notifications(std::shared_ptr<com::centreon::engine::host> hst, int level, int affect_top_host, int affect_hosts, int affect_services);  // enables notifications for all hosts and services beyond a given host
+void disable_and_propagate_notifications(std::shared_ptr<com::centreon::engine::host> hst, int level, int affect_top_host, int affect_hosts, int affect_services); // disables notifications for all hosts and services beyond a given host
+void enable_contact_host_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                     // enables host notifications for a specific contact
+void disable_contact_host_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                    // disables host notifications for a specific contact
+void enable_contact_service_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                  // enables service notifications for a specific contact
+void disable_contact_service_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                 // disables service notifications for a specific contact
+void schedule_and_propagate_downtime(std::shared_ptr<com::centreon::engine::host> temp_host, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration); // schedules downtime for all hosts beyond a given host
+void acknowledge_host_problem(std::shared_ptr<com::centreon::engine::host> hst, char* ack_author, char* ack_data, int type, int notify, int persistent);       // acknowledges a host problem
 void acknowledge_service_problem(std::shared_ptr<com::centreon::engine::service> svc, char* ack_author, char* ack_data, int type, int notify, int persistent); // acknowledges a service problem
-void remove_host_acknowledgement(com::centreon::engine::host* hst);        // removes a host acknowledgement
+void remove_host_acknowledgement(std::shared_ptr<com::centreon::engine::host> hst);        // removes a host acknowledgement
 void remove_service_acknowledgement(std::shared_ptr<com::centreon::engine::service> svc);                         // removes a service acknowledgement
 void start_executing_service_checks(void);                                 // starts executing service checks
 void stop_executing_service_checks(void);                                  // stops executing service checks
@@ -87,16 +87,16 @@ void start_executing_host_checks(void);                                    // st
 void stop_executing_host_checks(void);                                     // stops executing host checks
 void start_accepting_passive_host_checks(void);                            // starts accepting passive host check results
 void stop_accepting_passive_host_checks(void);                             // stops accepting passive host check results
-void enable_passive_host_checks(com::centreon::engine::host* hst);         // enables passive host checks for a particular host
-void disable_passive_host_checks(com::centreon::engine::host* hst);        // disables passive host checks for a particular host
+void enable_passive_host_checks(std::shared_ptr<com::centreon::engine::host> hst);         // enables passive host checks for a particular host
+void disable_passive_host_checks(std::shared_ptr<com::centreon::engine::host> hst);        // disables passive host checks for a particular host
 void start_using_event_handlers(void);                                     // enables event handlers on a program-wide basis
 void stop_using_event_handlers(void);                                      // disables event handlers on a program-wide basis
 void enable_service_event_handler(std::shared_ptr<com::centreon::engine::service> svc);                           // enables the event handler for a particular service
 void disable_service_event_handler(std::shared_ptr<com::centreon::engine::service> svc);                          // disables the event handler for a particular service
-void enable_host_event_handler(com::centreon::engine::host* hst);          // enables the event handler for a particular host
-void disable_host_event_handler(com::centreon::engine::host* hst);         // disables the event handler for a particular host
-void disable_host_checks(com::centreon::engine::host* hst);                // disables checks of a particular host
-void enable_host_checks(com::centreon::engine::host* hst);                 // enables checks of a particular host
+void enable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst);          // enables the event handler for a particular host
+void disable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst);         // disables the event handler for a particular host
+void disable_host_checks(std::shared_ptr<com::centreon::engine::host> hst);                // disables checks of a particular host
+void enable_host_checks(std::shared_ptr<com::centreon::engine::host> hst);                 // enables checks of a particular host
 void start_obsessing_over_service_checks(void);                            // start obsessing about service check results
 void stop_obsessing_over_service_checks(void);                             // stop obsessing about service check results
 void start_obsessing_over_host_checks(void);                               // start obsessing about host check results
@@ -109,9 +109,9 @@ void enable_performance_data(void);                                        // en
 void disable_performance_data(void);                                       // disables processing of performance data on a program-wide basis
 void start_obsessing_over_service(std::shared_ptr<com::centreon::engine::service> svc);                           // start obsessing about specific service check results
 void stop_obsessing_over_service(std::shared_ptr<com::centreon::engine::service> svc);                            // stop obsessing about specific service check results
-void start_obsessing_over_host(com::centreon::engine::host* hst);             // start obsessing about specific host check results
-void stop_obsessing_over_host(com::centreon::engine::host* hst);              // stop obsessing about specific host check results
-void set_host_notification_number(com::centreon::engine::host* hst, int num); // sets current notification number for a specific host
+void start_obsessing_over_host(std::shared_ptr<com::centreon::engine::host> hst);             // start obsessing about specific host check results
+void stop_obsessing_over_host(std::shared_ptr<com::centreon::engine::host> hst);              // stop obsessing about specific host check results
+void set_host_notification_number(std::shared_ptr<com::centreon::engine::host> hst, int num); // sets current notification number for a specific host
 void set_service_notification_number(std::shared_ptr<com::centreon::engine::service> svc, int num);               // sets current notification number for a specific service
 
 #  ifdef __cplusplus

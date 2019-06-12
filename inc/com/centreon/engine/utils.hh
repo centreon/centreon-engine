@@ -119,7 +119,6 @@ void cleanup();
 void free_memory(nagios_macros* mac);
 
 // frees memory associated with a host/service check result
-int free_check_result(check_result* info);
 void parse_check_output(std::string const& buffer,
                        std::string& short_output,
                        std::string& long_output,

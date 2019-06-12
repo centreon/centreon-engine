@@ -294,6 +294,8 @@ class                notifier {
   virtual timeperiod* get_notification_period_ptr() const = 0;
   bool               notifications_available(int options) const;
 
+  virtual uint64_t   check_dependencies(int dependency_type) = 0;
+
   std::unordered_map<std::string, std::shared_ptr<contact>>
                      contacts;
   contactgroup_map   contact_groups;

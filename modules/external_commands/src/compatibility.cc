@@ -1027,27 +1027,27 @@ int process_hostgroup_command(int cmd,
     switch (cmd) {
 
     case CMD_ENABLE_HOSTGROUP_HOST_NOTIFICATIONS:
-      enable_host_notifications(it->second.get());
+      enable_host_notifications(it->second);
       break;
 
     case CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS:
-      disable_host_notifications(it->second.get());
+      disable_host_notifications(it->second);
       break;
 
     case CMD_ENABLE_HOSTGROUP_HOST_CHECKS:
-      enable_host_checks(it->second.get());
+      enable_host_checks(it->second);
       break;
 
     case CMD_DISABLE_HOSTGROUP_HOST_CHECKS:
-      disable_host_checks(it->second.get());
+      disable_host_checks(it->second);
       break;
 
     case CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS:
-      enable_passive_host_checks(it->second.get());
+      enable_passive_host_checks(it->second);
       break;
 
     case CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS:
-      disable_passive_host_checks(it->second.get());
+      disable_passive_host_checks(it->second);
       break;
 
     default:
@@ -1101,7 +1101,7 @@ int process_host_command(int cmd,
                          time_t entry_time,
                          char* args) {
   char* host_name = nullptr;
-  host* temp_host = nullptr;
+  std::shared_ptr<host> temp_host = nullptr;
   char* str = nullptr;
   char* buf[2] = { nullptr, nullptr };
   int intval = 0;
@@ -1114,12 +1114,11 @@ int process_host_command(int cmd,
 
   /* find the host */
   temp_host = nullptr;
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  umap<uint64_t, std::shared_ptr<host>>::const_iterator
     it = configuration::applier::state::instance().hosts().find(get_host_id(host_name));
-  if (it != configuration::applier::state::instance().hosts().end())
-    temp_host = it->second.get();
-  if (temp_host == nullptr)
+  if (it == configuration::applier::state::instance().hosts().end() || !it->second)
     return ERROR;
+  temp_host = it->second;
 
   switch (cmd) {
   case CMD_ENABLE_HOST_NOTIFICATIONS:
@@ -1270,7 +1269,7 @@ int process_service_command(int cmd,
   std::unordered_map<std::pair<uint64_t, uint64_t>,
                      std::shared_ptr<service> >::const_iterator
     found(state::instance().services().find(id));
-  if (found == state::instance().services().end() || !found->second.get())
+  if (found == state::instance().services().end() || !found->second)
     return ERROR;
 
   switch (cmd) {
@@ -1299,11 +1298,11 @@ int process_service_command(int cmd,
     break;
 
   case CMD_ENABLE_SVC_FLAP_DETECTION:
-    enable_service_flap_detection(found->second.get());
+    enable_service_flap_detection(found->second);
     break;
 
   case CMD_DISABLE_SVC_FLAP_DETECTION:
-    disable_service_flap_detection(found->second.get());
+    disable_service_flap_detection(found->second);
     break;
 
   case CMD_ENABLE_PASSIVE_SVC_CHECKS:
@@ -1358,9 +1357,8 @@ int process_servicegroup_command(int cmd,
                                  char* args) {
   (void)entry_time;
   char* servicegroup_name{nullptr};
-  std::shared_ptr<servicegroup> temp_servicegroup;
-  host* temp_host{nullptr};
-  host* last_host{nullptr};
+  std::shared_ptr<host> temp_host{nullptr};
+  std::shared_ptr<host> last_host{nullptr};
 
   /* get the servicegroup name */
   if ((servicegroup_name = my_strtok(args, ";")) == nullptr)
@@ -1371,7 +1369,6 @@ int process_servicegroup_command(int cmd,
     sg_it{servicegroup::servicegroups.find(servicegroup_name)};
   if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
     return ERROR;
-  temp_servicegroup = sg_it->second;
 
   switch (cmd) {
 
@@ -1444,13 +1441,12 @@ int process_servicegroup_command(int cmd,
          ++it) {
       temp_host = nullptr;
       umap<uint64_t,
-           std::shared_ptr<com::centreon::engine::host>>::const_iterator found =
+           std::shared_ptr<host>>::const_iterator found =
           configuration::applier::state::instance().hosts().find(
               get_host_id(it->first.first));
-      if (found != configuration::applier::state::instance().hosts().end())
-        temp_host = found->second.get();
-      if (temp_host == nullptr)
+      if (found == configuration::applier::state::instance().hosts().end() || !found->second)
         continue;
+      temp_host = found->second;
 
       if (temp_host == last_host)
         continue;
@@ -1498,34 +1494,34 @@ int process_contact_command(int cmd,
                             time_t entry_time,
                             char* args) {
   char* contact_name = nullptr;
-  contact* temp_contact = nullptr;
-
   (void)entry_time;
 
   /* get the contact name */
   if ((contact_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
+  contact_map::iterator it_ct{contact::contacts.find(contact_name)};
+
   /* find the contact */
-  if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == nullptr)
+  if (it_ct == contact::contacts.end() || !it_ct->second)
     return ERROR;
 
   switch (cmd) {
 
   case CMD_ENABLE_CONTACT_HOST_NOTIFICATIONS:
-    enable_contact_host_notifications(temp_contact);
+    enable_contact_host_notifications(it_ct->second);
     break;
 
   case CMD_DISABLE_CONTACT_HOST_NOTIFICATIONS:
-    disable_contact_host_notifications(temp_contact);
+    disable_contact_host_notifications(it_ct->second);
     break;
 
   case CMD_ENABLE_CONTACT_SVC_NOTIFICATIONS:
-    enable_contact_service_notifications(temp_contact);
+    enable_contact_service_notifications(it_ct->second);
     break;
 
   case CMD_DISABLE_CONTACT_SVC_NOTIFICATIONS:
-    disable_contact_service_notifications(temp_contact);
+    disable_contact_service_notifications(it_ct->second);
     break;
 
   default:
@@ -1569,19 +1565,19 @@ int process_contactgroup_command(int cmd,
       switch (cmd) {
 
       case CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        enable_contact_host_notifications(it->second.get());
+        enable_contact_host_notifications(it->second);
         break;
 
       case CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        disable_contact_host_notifications(it->second.get());
+        disable_contact_host_notifications(it->second);
         break;
 
       case CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        enable_contact_service_notifications(it->second.get());
+        enable_contact_service_notifications(it->second);
         break;
 
       case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        disable_contact_service_notifications(it->second.get());
+        disable_contact_service_notifications(it->second);
         break;
 
       default:

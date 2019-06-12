@@ -62,32 +62,30 @@ namespace         modules {
 
       static void _wrapper_read_state_information();
       static void _wrapper_save_state_information();
-      static void _wrapper_enable_host_and_child_notifications(host* hst);
-      static void _wrapper_disable_host_and_child_notifications(host* hst);
-      static void _wrapper_enable_all_notifications_beyond_host(host* hst);
-      static void _wrapper_disable_all_notifications_beyond_host(host* hst);
-      static void _wrapper_enable_host_svc_notifications(host* hst);
-      static void _wrapper_disable_host_svc_notifications(host* hst);
-      static void _wrapper_enable_host_svc_checks(host* hst);
-      static void _wrapper_disable_host_svc_checks(host* hst);
+      static void _wrapper_enable_host_and_child_notifications(std::shared_ptr<host> hst);
+      static void _wrapper_disable_host_and_child_notifications(std::shared_ptr<host> hst);
+      static void _wrapper_enable_all_notifications_beyond_host(std::shared_ptr<host> hst);
+      static void _wrapper_disable_all_notifications_beyond_host(std::shared_ptr<host> hst);
+      static void _wrapper_enable_host_svc_notifications(std::shared_ptr<host> hst);
+      static void _wrapper_disable_host_svc_notifications(std::shared_ptr<host> hst);
+      static void _wrapper_enable_host_svc_checks(std::shared_ptr<host> hst);
+      static void _wrapper_disable_host_svc_checks(std::shared_ptr<host> hst);
       static void _wrapper_set_host_notification_number(
-                    host* hst,
+        std::shared_ptr<host> hst,
                     char* args);
       static void _wrapper_send_custom_host_notification(
-                    host* hst,
+        std::shared_ptr<host> hst,
                     char* args);
-      static void _wrapper_enable_service_notifications(host* hst);
-      static void _wrapper_disable_service_notifications(host* hst);
-      static void _wrapper_enable_service_checks(host* hst);
-      static void _wrapper_disable_service_checks(host* hst);
-      static void _wrapper_enable_passive_service_checks(host* hst);
-      static void _wrapper_disable_passive_service_checks(host* hst);
+      static void _wrapper_enable_service_notifications(std::shared_ptr<host> hst);
+      static void _wrapper_disable_service_notifications(std::shared_ptr<host> hst);
+      static void _wrapper_enable_service_checks(std::shared_ptr<host> hst);
+      static void _wrapper_disable_service_checks(std::shared_ptr<host> hst);
+      static void _wrapper_enable_passive_service_checks(std::shared_ptr<host> hst);
+      static void _wrapper_disable_passive_service_checks(std::shared_ptr<host> hst);
       static void _wrapper_set_service_notification_number(
-                    std::shared_ptr<service> svc,
-                    char* args);
+        std::shared_ptr<service> svc, char* args);
       static void _wrapper_send_custom_service_notification(
-                    service* svc,
-                    char* args);
+        std::shared_ptr<service> svc, char* args);
 
       template <void (*fptr)()>
       static void _redirector(
@@ -137,7 +135,7 @@ namespace         modules {
         (*fptr)(id, entry_time, args);
       }
 
-      template <void (*fptr)(host*)>
+      template <void (*fptr)(std::shared_ptr<host>)>
       static void _redirector_host(
                     int id,
                     time_t entry_time,
@@ -147,18 +145,18 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
 
-        host* hst(nullptr);
+        std::shared_ptr<host> hst(nullptr);
         umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
           it(configuration::applier::state::instance().hosts().find(get_host_id(name)));
         if (it != configuration::applier::state::instance().hosts().end())
-          hst = it->second.get();
+          hst = it->second;
 
         if (!hst)
           return ;
         (*fptr)(hst);
       }
 
-      template <void (*fptr)(host*, char*)>
+      template <void (*fptr)(std::shared_ptr<host>, char*)>
       static void _redirector_host(
                     int id,
                     time_t entry_time,
@@ -168,18 +166,18 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
 
-        host* hst(nullptr);
+        std::shared_ptr<host> hst(nullptr);
         umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
           it(configuration::applier::state::instance().hosts().find(get_host_id(name)));
         if (it != configuration::applier::state::instance().hosts().end())
-          hst = it->second.get();
+          hst = it->second;
 
         if (!hst)
           return ;
         (*fptr)(hst, args + strlen(name) + 1);
       }
 
-      template <void (*fptr)(host*)>
+      template <void (*fptr)(std::shared_ptr<host>)>
       static void _redirector_hostgroup(
                     int id,
                     time_t entry_time,
@@ -203,14 +201,14 @@ namespace         modules {
              it != end;
              ++it)
           if (it->second)
-            (*fptr)(it->second.get());
+            (*fptr)(it->second);
       }
 
       template <void (*fptr)(std::shared_ptr<service>)>
-      static void _redirector_service_shared(
-                    int id,
-                    time_t entry_time,
-                    char* args) {
+      static void _redirector_service(
+        int id,
+        time_t entry_time,
+        char* args) {
         (void)id;
         (void)entry_time;
 
@@ -229,56 +227,11 @@ namespace         modules {
         (*fptr)(found->second);
       }
 
-      template <void (*fptr)(service*)>
-      static void _redirector_service(
-        int id,
-        time_t entry_time,
-        char* args) {
-        (void)id;
-        (void)entry_time;
-
-        char* name(my_strtok(args, ";"));
-        char* description(my_strtok(NULL, ";"));
-
-        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
-          name, description));
-        std::unordered_map<std::pair<uint64_t, uint64_t>,
-                           std::shared_ptr<service> >::const_iterator
-          found(configuration::applier::state::instance().services().find(found_id));
-
-        if (found == configuration::applier::state::instance().services().end() ||
-          !found->second)
-          return ;
-        (*fptr)(found->second.get());
-      }
-
-      template <void (*fptr)(service*, char*)>
+      template <void (*fptr)(std::shared_ptr<service>, char*)>
       static void _redirector_service(
                     int id,
                     time_t entry_time,
                     char* args) {
-        (void)id;
-        (void)entry_time;
-
-        char* name(my_strtok(args, ";"));
-        char* description(my_strtok(NULL, ";"));
-        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
-          name, description));
-        std::unordered_map<std::pair<uint64_t, uint64_t>,
-                           std::shared_ptr<service> >::const_iterator
-          found(configuration::applier::state::instance().services().find(found_id));
-
-        if (found == configuration::applier::state::instance().services().end() ||
-          !found->second)
-          return ;
-        (*fptr)(found->second.get(), args + strlen(name) + strlen(description) + 2);
-      }
-
-      template <void (*fptr)(std::shared_ptr<service>, char*)>
-      static void _redirector_service_shared(
-        int id,
-        time_t entry_time,
-        char* args) {
         (void)id;
         (void)entry_time;
 
@@ -296,8 +249,7 @@ namespace         modules {
         (*fptr)(found->second, args + strlen(name) + strlen(description) + 2);
       }
 
-
-      template <void (*fptr)(service*)>
+      template <void (*fptr)(std::shared_ptr<service>)>
       static void _redirector_servicegroup(
                     int id,
                     time_t entry_time,
@@ -310,7 +262,6 @@ namespace         modules {
         if (sg_it == servicegroup::servicegroups.end() ||
           !sg_it->second)
           return ;
-        servicegroup* group{sg_it->second.get()};
 
         for (service_map::iterator
                it2(sg_it->second->members.begin()),
@@ -318,10 +269,10 @@ namespace         modules {
              it2 != end2;
              ++it2)
           if (it2->second)
-            (*fptr)(it2->second.get());
+            (*fptr)(it2->second);
       }
 
-      template <void (*fptr)(host*)>
+      template <void (*fptr)(std::shared_ptr<host>)>
       static void _redirector_servicegroup(
                     int id,
                     time_t entry_time,
@@ -333,21 +284,20 @@ namespace         modules {
         servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(group_name)};
         if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
           return ;
-        servicegroup* group{sg_it->second.get()};
 
-        host* last_host{nullptr};
+        std::shared_ptr<host> last_host{nullptr};
         for (service_map::iterator
                it2(sg_it->second->members.begin()),
                end2(sg_it->second->members.end());
              it2 != end2;
              ++it2) {
-          host* hst(nullptr);
+          std::shared_ptr<host> hst(nullptr);
           umap<uint64_t,
                std::shared_ptr<com::centreon::engine::host>>::const_iterator
               found(configuration::applier::state::instance().hosts().find(
                   get_host_id(it2->first.first)));
           if (found != configuration::applier::state::instance().hosts().end())
-            hst = found->second.get();
+            hst = found->second;
 
           if (!hst || hst == last_host)
             continue;
@@ -356,7 +306,7 @@ namespace         modules {
         }
       }
 
-      template <void (*fptr)(contact*)>
+      template <void (*fptr)(std::shared_ptr<contact>)>
       static void _redirector_contact(
                     int id,
                     time_t entry_time,
@@ -368,10 +318,10 @@ namespace         modules {
         contact_map::const_iterator ct_it{contact::contacts.find(name)};
         if (ct_it == contact::contacts.end())
           return ;
-        (*fptr)(ct_it->second.get());
+        (*fptr)(ct_it->second);
       }
 
-      template <void (*fptr)(contact*)>
+      template <void (*fptr)(std::shared_ptr<contact>)>
       static void _redirector_contactgroup(
                     int id,
                     time_t entry_time,
@@ -389,7 +339,7 @@ namespace         modules {
                end(group->get_members().end());
              it != end; ++it)
           if (it->second)
-            (*fptr)(it->second.get());
+            (*fptr)(it->second);
       }
 
       std::unordered_map<std::string, command_info> _lst_command;

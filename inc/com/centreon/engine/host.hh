@@ -175,6 +175,15 @@ class                host : public notifier {
                                                  int reschedule_check,
                                                  int use_cached_result,
                                                  unsigned long check_timestamp_horizon);
+  int                perform_scheduled_check(int check_options,
+                                                 double latency);
+  int                adjust_check_attempt(bool is_active);
+  uint64_t           check_dependencies(int dependency_type) override;
+  static void        check_for_orphaned();
+  static void        check_result_freshness();
+
+
+
   enum host_state    determine_host_reachability();
   bool               recovered() const override ;
   int                get_current_state_int() const override ;

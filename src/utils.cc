@@ -364,19 +364,6 @@ void sighandler(int sig) {
 /************************* IPC FUNCTIONS **************************/
 /******************************************************************/
 
-/* frees memory associated with a host/service check result */
-int free_check_result(check_result* info) {
-  if (info == NULL)
-    return OK;
-
-  delete[] info->host_name;
-  delete[] info->service_description;
-  delete[] info->output_file;
-  delete[] info->output;
-
-  return OK;
-}
-
 /**
  * @brief Parse buffer and fill the three strings given as references:
  *    * short_output
