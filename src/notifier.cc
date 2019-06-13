@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"

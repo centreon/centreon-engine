@@ -344,7 +344,9 @@ void checkable::set_latency(double latency) { _latency = latency; }
 
 std::time_t checkable::get_next_check() const { return _next_check; }
 
-void checkable::set_next_check(std::time_t next_check) { _next_check = next_check; }
+void checkable::set_next_check(std::time_t next_check) {
+  _next_check = next_check;
+}
 
 enum checkable::state_type checkable::get_state_type() const {
   return _state_type;
@@ -364,11 +366,12 @@ void checkable::set_percent_state_change(double percent_state_change) {
 
 bool checkable::get_obsess_over() const { return _obsess_over; }
 
-void checkable::set_obsess_over(bool obsess_over) { _obsess_over = obsess_over; }
+void checkable::set_obsess_over(bool obsess_over) {
+  _obsess_over = obsess_over;
+}
 
 bool checkable::get_should_be_scheduled() const { return _should_be_scheduled; }
 
 void checkable::set_should_be_scheduled(bool should_be_scheduled) {
   _should_be_scheduled = should_be_scheduled;
 }
-
