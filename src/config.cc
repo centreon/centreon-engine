@@ -645,7 +645,7 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
   }
 
   // Check notification timeperiod.
-  if (hst->get_notification_period().empty()) {
+  if (!hst->get_notification_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
       it(state::instance().timeperiods().find(hst->get_notification_period()));
