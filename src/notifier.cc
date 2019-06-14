@@ -221,7 +221,7 @@ bool notifier::is_notification_viable(reason_type type,
 
   if (!check_time_against_period(now, tp)) {
     logger(dbg_notifications, more)
-        << "This service shouldn't have notifications sent out "
+        << "This notifier shouldn't have notifications sent out "
            "at this time.";
     return false;
   }
