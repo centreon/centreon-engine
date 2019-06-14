@@ -54,14 +54,6 @@ std::array<notifier::is_viable, 6> const notifier::_is_notification_viable{{
   &notifier::_is_notification_viable_downtime,
   &notifier::_is_notification_viable_custom,
 }};
-//bool (notifier::* const _is_notification_viable[])(notifier::notification_option) {
-//  &notifier::_is_notification_viable_normal,
-//  &notifier::_is_notification_viable_recovery,
-//  &notifier::_is_notification_viable_acknowledgement,
-//  &notifier::_is_notification_viable_flapping,
-//  &notifier::_is_notification_viable_downtime,
-//  &notifier::_is_notification_viable_custom,
-//};
 
 uint64_t notifier::_next_notification_id{1L};
 
@@ -208,7 +200,7 @@ bool notifier::notifications_available(int options) const {
 }
 
 bool notifier::_is_notification_viable_normal(notification_option options) const {
-  logger(dbg_functions, basic) << "notifier::is_notification_viable()";
+  logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
@@ -235,6 +227,41 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
         << "This notifier shouldn't have notifications sent out "
            "at this time.";
     return false;
+  }
+
+  /* if this notifier is currently in a scheduled downtime period, don't send the notification */
+  if (get_scheduled_downtime_depth() > 0) {
+    logger(dbg_notifications, more)
+      << "This notifier is currently in a scheduled downtime, so "
+      "we won't send notifications.";
+    return false;
+  }
+
+  /* if this notifier is flapping, don't send the notification */
+  if (get_is_flapping()) {
+    logger(dbg_notifications, more)
+      << "This notifier is flapping, so we won't send notifications.";
+    return false;
+  }
+
+  if (get_state_type() != hard) {
+    logger(dbg_notifications, more)
+      << "This notifier is in soft state, so we won't send notifications.";
+    return false;
+  }
+
+  if (get_problem_has_been_acknowledged()) {
+    logger(dbg_notifications, more)
+      << "This notifier problem has been acknowledged, so we won't send notifications.";
+    return false;
+  }
+
+  if (_last_notification + _notification_interval * config->interval_length()
+      < now) {
+    logger(dbg_notifications, more)
+      << "This notifier problem has been sent at " << _last_notification
+      << " so it won't be sent until "
+      << (_notification_interval * config->interval_length());
   }
 
   return true;
