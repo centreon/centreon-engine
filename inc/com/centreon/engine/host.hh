@@ -77,7 +77,8 @@ class                host : public notifier {
                            int notify_flapping,
                            int notify_downtime,
                            double notification_interval,
-                           double first_notification_delay,
+                           uint32_t first_notification_delay,
+                           uint32_t recovery_notification_delay,
                            std::string const& notification_period,
                            bool notifications_enabled,
                            std::string const& check_command,
@@ -143,8 +144,8 @@ class                host : public notifier {
                                 double low_threshold);
   void               update_status(bool aggregated_dump) override;
   void               check_for_expired_acknowledgement();
-  bool               check_notification_viability(reason_type type,
-                                                  int options) override;
+//  bool               check_notification_viability(reason_type type,
+//                                                  int options) override;
   int                handle_state();
   void               update_performance_data();
   int                verify_check_viability(int check_options,
@@ -235,8 +236,6 @@ class                host : public notifier {
   void               set_last_time_up(time_t last_time);
   bool               get_is_being_freshened() const;
   void               set_is_being_freshened(bool is_being_freshened);
-  int                get_current_notification_number() const;
-  void               set_current_notification_number(int current_notification_number);
   int                get_check_flapping_recovery_notification() const;
   void               set_check_flapping_recovery_notification(int check_flapping_recovery_notification);
   int                get_pending_flex_downtime() const;
@@ -277,7 +276,7 @@ class                host : public notifier {
                        std::shared_ptr<escalation> e,
                        int options) const override;
   void               handle_flap_detection_disabled();
-  timeperiod*        get_notification_period_ptr() const override;
+  timeperiod*        get_notification_timeperiod() const override;
 
   host_map            parent_hosts;
   host_map            child_hosts;

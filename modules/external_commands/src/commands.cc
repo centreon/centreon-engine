@@ -638,7 +638,7 @@ int process_passive_service_check(
   check_result result(service_check,
                       real_host_name,
                       svc_description,
-                      check_passive,
+                      checkable::check_passive,
                       CHECK_OPTION_NONE,
                       false,
                       (double)((double)(tv.tv_sec - check_time)
@@ -768,7 +768,7 @@ int process_passive_host_check(
   check_result result(host_check,
                       real_host_name,
                       "",
-                      check_passive,
+                      checkable::check_passive,
                       CHECK_OPTION_NONE,
                       false,
                       (double)((double)(tv.tv_sec - check_time)
@@ -2979,7 +2979,7 @@ void acknowledge_host_problem(
       notifier::notification_acknowledgement,
       ack_author,
       ack_data,
-      NOTIFICATION_OPTION_NONE);
+      notifier::notification_option_none);
 
   /* update the status log with the host info */
   hst->update_status(false);
@@ -3045,7 +3045,7 @@ void acknowledge_service_problem(
       notifier::notification_acknowledgement,
       ack_author,
       ack_data,
-      NOTIFICATION_OPTION_NONE);
+      notifier::notification_option_none);
 
   /* update the status log with the service info */
   svc->update_status(false);

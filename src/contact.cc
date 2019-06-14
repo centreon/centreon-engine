@@ -769,7 +769,7 @@ int contact::check_service_notification_viability(
     "for contact '" << get_name() << "'...";
 
   /* forced notifications bust through everything */
-  if (options & NOTIFICATION_OPTION_FORCED) {
+  if (options & notifier::notification_option_forced) {
     logger(dbg_notifications, more)
       << "This is a forced service notification, so we'll "
       "send it out to this contact.";
@@ -907,7 +907,7 @@ int contact::check_host_notification_viability(host* hst,
     << get_name() << "'...";
 
   /* forced notifications bust through everything */
-  if (options & NOTIFICATION_OPTION_FORCED) {
+  if (options & notifier::notification_option_forced) {
     logger(dbg_notifications, most)
       << "This is a forced host notification, so we'll "
       "send it out for this contact.";

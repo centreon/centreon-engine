@@ -80,8 +80,10 @@ class                           service : public notifier {
                                         enum service::service_state initial_state,
                                         double check_interval,
                                         double retry_interval,
+                                        double notification_interval,
                                         int max_attempts,
-                                        double first_notification_delay,
+                                        uint32_t first_notification_delay,
+                                        uint32_t recovery_notification_delay,
                                         std::string const& notification_period,
                                         bool notifications_enabled,
                                         bool is_volatile,
@@ -158,8 +160,8 @@ class                           service : public notifier {
   void                          disable_flap_detection();
   void                          update_status(bool aggregated_dump) override;
   void                          set_notification_number(int num);
-  bool                          check_notification_viability(reason_type type,
-                                                             int options) override;
+//  bool                          check_notification_viability(reason_type type,
+//                                                             int options) override;
   int                           verify_check_viability(int check_options,
                                                        int* time_is_valid,
                                                        time_t* new_time);
@@ -175,7 +177,7 @@ class                           service : public notifier {
   time_t                        get_next_notification_time(time_t offset) override;
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
-  bool                          operator==(service const& other) throw();
+  bool                          operator==(service const& other);
   bool                          operator!=(service const& other) throw();
   bool                          is_valid_escalation_for_notification(
                                   std::shared_ptr<escalation> e,
@@ -184,13 +186,12 @@ class                           service : public notifier {
   void                          handle_flap_detection_disabled();
   bool                          get_is_volatile() const;
   void                          set_is_volatile(bool vol);
-  timeperiod*                   get_notification_period_ptr() const override;
+  timeperiod*                   get_notification_timeperiod() const override;
 
   uint64_t                      check_dependencies(int dependency_type) override;
   static void                   check_for_orphaned();
   static void                   check_result_freshness();
 
-  double                        notification_interval;
   int                           process_performance_data;
   int                           accept_passive_service_checks;
   int                           retain_status_information;
@@ -260,7 +261,8 @@ com::centreon::engine::service* add_service(
            double check_interval,
            double retry_interval,
            double notification_interval,
-           double first_notification_delay,
+           uint32_t first_notification_delay,
+           uint32_t recovery_notification_delay,
            std::string const& notification_period,
            bool notify_recovery,
            bool notify_unknown,

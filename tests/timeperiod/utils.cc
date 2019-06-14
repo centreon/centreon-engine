@@ -304,7 +304,6 @@ void timeperiod_creator::new_timerange(
       hmtos(end_hour, end_minute))};
 
   target->times.push_back(tr);
-  return ;
 }
 
 /**
@@ -333,8 +332,6 @@ void timeperiod_creator::new_timerange(
       hmtos(end_hour, end_minute))};
 
   target->days[day].push_back(tr);
-
-  return ;
 }
 
 /**
@@ -346,7 +343,7 @@ void timeperiod_creator::new_timerange(
  *  @return The number of seconds.
  */
 int hmtos(int h, int m) {
-  return (h * 60 * 60 + m * 60);
+  return h * 60 * 60 + m * 60;
 }
 
 /**
@@ -359,7 +356,6 @@ int hmtos(int h, int m) {
  */
 void set_time(time_t now) {
   gl_now = now;
-  return ;
 }
 
 /**

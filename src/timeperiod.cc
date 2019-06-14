@@ -839,9 +839,9 @@ static bool _timerange_to_time_t(
  *  @param[in] test_time  Time to test.
  *  @param[in] tperiod    Target time period.
  *
- *  @return OK on success, ERROR on failure.
+ *  @return true on success, false on failure.
  */
-int check_time_against_period(
+bool check_time_against_period(
   time_t test_time,
   timeperiod* tperiod) {
   logger(dbg_functions, basic)
@@ -849,7 +849,7 @@ int check_time_against_period(
 
   // If no period was specified, assume the time is good.
   if (!tperiod)
-    return (OK);
+    return true;
 
   // Faked next valid time must be tested time.
   time_t next_valid_time((time_t)-1);
@@ -857,7 +857,7 @@ int check_time_against_period(
     test_time,
     &next_valid_time,
     tperiod);
-  return ((next_valid_time == test_time) ? OK : ERROR);
+  return next_valid_time == test_time;
 }
 
 /**

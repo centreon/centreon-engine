@@ -77,8 +77,10 @@ service::service(std::string const& hostname,
                  enum service::service_state initial_state,
                  double check_interval,
                  double retry_interval,
+                 double notification_interval,
                  int max_attempts,
-                 double first_notification_delay,
+                 uint32_t first_notification_delay,
+                 uint32_t recovery_notification_delay,
                  std::string const& notification_period,
                  bool notifications_enabled,
                  bool is_volatile,
@@ -104,8 +106,10 @@ service::service(std::string const& hostname,
                accept_passive_checks,
                check_interval,
                retry_interval,
+               notification_interval,
                max_attempts,
                first_notification_delay,
+               recovery_notification_delay,
                notification_period,
                notifications_enabled,
                check_period,
@@ -125,8 +129,8 @@ service::service(std::string const& hostname,
                timezone},
       _hostname{hostname},
       _description{description},
-      _initial_state{initial_state},
-      _is_volatile{is_volatile} {
+      _is_volatile{is_volatile},
+      _initial_state{initial_state} {
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
 
@@ -214,7 +218,7 @@ int service::get_current_state_int() const {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool service::operator==(service const& other) throw() {
+bool service::operator==(service const& other) {
   return get_hostname() == other.get_hostname() &&
          get_description() == other.get_description() &&
          get_display_name() == other.get_display_name() &&
@@ -230,8 +234,9 @@ bool service::operator==(service const& other) throw() {
          ((this->contacts.size() == other.contacts.size()) &&
           std::equal(this->contacts.begin(), this->contacts.end(),
                      other.contacts.begin())) &&
-         this->notification_interval == other.notification_interval &&
+         this->get_notification_interval() == other.get_notification_interval() &&
          get_first_notification_delay() == get_first_notification_delay() &&
+         get_recovery_notification_delay() == get_recovery_notification_delay() &&
          get_notify_on() == other.get_notify_on() &&
          get_stalk_on() == other.get_stalk_on() &&
          get_is_volatile() == other.get_is_volatile() &&
@@ -271,7 +276,7 @@ bool service::operator==(service const& other) throw() {
          get_plugin_output() == other.get_plugin_output() &&
          get_long_plugin_output() == other.get_long_plugin_output() &&
          get_perf_data() == other.get_perf_data() &&
-         _state_type == other.get_state_type() &&
+         get_state_type() == other.get_state_type() &&
          get_next_check() == other.get_next_check() &&
          get_should_be_scheduled() == other.get_should_be_scheduled() &&
          get_last_check() == other.get_last_check() &&
@@ -285,8 +290,8 @@ bool service::operator==(service const& other) throw() {
          get_no_more_notifications() == other.get_no_more_notifications() &&
          this->check_flapping_recovery_notification ==
              other.check_flapping_recovery_notification &&
-         _last_state_change == other.get_last_state_change() &&
-         _last_hard_state_change == other.get_last_hard_state_change() &&
+         get_last_state_change() == other.get_last_state_change() &&
+         get_last_hard_state_change() == other.get_last_hard_state_change() &&
          _last_time_ok == other.get_last_time_ok() &&
          _last_time_warning == other.get_last_time_warning() &&
          _last_time_unknown == other.get_last_time_unknown() &&
@@ -305,10 +310,10 @@ bool service::operator==(service const& other) throw() {
          this->pending_flex_downtime == other.pending_flex_downtime &&
          is_equal(state_history, other.state_history,
                   MAX_STATE_HISTORY_ENTRIES) &&
-         _state_history_index == other.get_state_history_index() &&
+         get_state_history_index() == other.get_state_history_index() &&
          get_is_flapping() == other.get_is_flapping() &&
          this->flapping_comment_id == other.flapping_comment_id &&
-         _percent_state_change == other.get_percent_state_change() &&
+         get_percent_state_change() == other.get_percent_state_change() &&
          _modified_attributes == other._modified_attributes &&
          _event_handler_args == other.get_event_handler_args() &&
          _check_command_args == other.get_check_command_args();
@@ -419,10 +424,13 @@ std::ostream& operator<<(std::ostream& os,
      << c_oss
      << "\n"
         "  notification_interval:                "
-     << obj.notification_interval
+     << obj.get_notification_interval()
      << "\n"
         "  first_notification_delay:             "
      << obj.get_first_notification_delay()
+     << "\n"
+        "  recovery_notification_delay:          "
+     << obj.get_recovery_notification_delay()
      << "\n"
         "  notify_on_unknown:                    "
      << obj.get_notify_on(notifier::unknown)
@@ -623,6 +631,7 @@ std::ostream& operator<<(std::ostream& os,
  *  @param[in] retry_interval               Retry check interval.
  *  @param[in] notification_interval        Notification interval.
  *  @param[in] first_notification_delay     First notification delay.
+ *  @param[in] recovery_notification_delay  Recovery notification delay.
  *  @param[in] notification_period          Notification timeperiod
  *                                          name.
  *  @param[in] notify_recovery              Does this service notify
@@ -692,7 +701,8 @@ com::centreon::engine::service* add_service(
     double check_interval,
     double retry_interval,
     double notification_interval,
-    double first_notification_delay,
+    uint32_t first_notification_delay,
+    uint32_t recovery_notification_delay,
     std::string const& notification_period,
     bool notify_recovery,
     bool notify_unknown,
@@ -768,13 +778,6 @@ com::centreon::engine::service* add_service(
         << description << "' on host '" << host_name << "'";
     return nullptr;
   }
-  if (first_notification_delay < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid first_notification_delay value for service '"
-        << description << "' on host '" << host_name << "'";
-    return nullptr;
-  }
-
   // Check if the service is already exist.
   std::pair<uint64_t, uint64_t> id(std::make_pair(host_id, service_id));
   if (is_service_exist(id)) {
@@ -788,7 +791,7 @@ com::centreon::engine::service* add_service(
   std::shared_ptr<service> obj{new service(
       host_name, description, display_name.empty() ? description : display_name,
       check_command, checks_enabled, accept_passive_checks, initial_state, check_interval,
-      retry_interval, max_attempts, first_notification_delay,
+      retry_interval, notification_interval, max_attempts, first_notification_delay, recovery_notification_delay,
       notification_period, notifications_enabled, is_volatile, check_period, event_handler, event_handler_enabled,
       notes, notes_url, action_url, icon_image, icon_image_alt,
       flap_detection_enabled, low_flap_threshold, high_flap_threshold,
@@ -807,7 +810,6 @@ com::centreon::engine::service* add_service(
     obj->set_last_hard_state(initial_state);
     obj->set_last_state(initial_state);
     obj->set_modified_attributes(MODATTR_NONE);
-    obj->notification_interval = notification_interval;
     uint32_t notify_on;
     notify_on = none;
     notify_on |= (notify_critical > 0 ? notifier::critical : 0);
@@ -1339,12 +1341,12 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * increment the current attempt number if this is a soft state
    * (service was rechecked)
    */
-  if (_state_type == soft &&
+  if (get_state_type() == soft &&
       get_current_attempt() < get_max_attempts())
     add_current_attempt(1);
 
   logger(dbg_checks, most) << "ST: "
-                           << (_state_type == soft ? "SOFT" : "HARD")
+                           << (get_state_type() == soft ? "SOFT" : "HARD")
                            << "  CA: " << get_current_attempt()
                            << "  MA: " << get_max_attempts()
                            << "  CS: " << _current_state
@@ -1514,7 +1516,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       logger(dbg_checks, more) << "Service experienced a HARD RECOVERY.";
 
       /* set the state type macro */
-      _state_type = hard;
+      set_state_type(hard);
 
       /* log the service recovery */
       log_event();
@@ -1533,7 +1535,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
-      notify(notification_normal, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
+      notify(notification_normal, nullptr, nullptr, notification_option_none);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event();
@@ -1544,7 +1546,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       logger(dbg_checks, more) << "Service experienced a SOFT RECOVERY.";
 
       /* this is a soft recovery */
-      _state_type = soft;
+      set_state_type(soft);
 
       /* log the soft recovery */
       log_event();
@@ -1560,7 +1562,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* Check if we need to send a recovery notification */
     if (!_recovery_been_sent && !hard_state_change)
-      notify(notification_normal, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
+      notify(notification_normal, nullptr, nullptr, notification_option_none);
 
     /* should we obsessive over service checks? */
     if (config->obsess_over_services())
@@ -1569,7 +1571,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /* reset all service variables because its okay now... */
     this->host_problem_at_last_check = false;
     set_current_attempt(1);
-    _state_type = hard;
+    set_state_type(hard);
     _last_hard_state = service::state_ok;
     _last_notification = static_cast<time_t>(0);
     _next_notification = static_cast<time_t>(0);
@@ -1700,7 +1702,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
         /* possibly re-send host notifications... */
         temp_host->notify(notification_normal, nullptr, nullptr,
-                          NOTIFICATION_OPTION_NONE);
+                          notification_option_none);
       }
     }
 
@@ -1722,7 +1724,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         set_last_state_change(get_last_check());
       if (hard_state_change) {
         set_last_hard_state_change(get_last_check());
-        _state_type = hard ;
+        set_state_type(hard );
         _last_hard_state = _current_state;
       }
 
@@ -1748,7 +1750,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * sometimes come back as soft problem states after */
       /* the hosts recovered.  This caused problems, so hopefully this will fix
        * it */
-      if (_state_type == soft)
+      if (get_state_type() == soft)
         set_current_attempt(1);
     }
 
@@ -1848,7 +1850,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
              "handle the error...";
 
       /* this is a hard state */
-      _state_type = hard;
+      set_state_type(hard);
 
       /* if we've hard a hard state change... */
       if (hard_state_change) {
@@ -1883,7 +1885,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* (re)send notifications out about this service problem if the host is up
        * (and was at last check also) and the dependencies were okay... */
-      notify(notification_normal, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
+      notify(notification_normal, nullptr, nullptr, notification_option_none);
 
       /* run the service event handler if we changed state from the last hard
        * state or if this service is flagged as being volatile */
@@ -1930,7 +1932,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     }
 
     /* services with non-recurring intervals do not get rescheduled */
-    if (_check_interval == 0)
+    if (get_check_interval() == 0)
       set_should_be_scheduled(false);
 
     /* services with active checks disabled do not get rescheduled */
@@ -1944,7 +1946,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /* if we're stalking this state type and state was not already logged AND the
    * plugin output changed since last check, log it now.. */
-  if (_state_type == hard && !state_change && !state_was_logged &&
+  if (get_state_type() == hard && !state_change && !state_was_logged &&
       old_plugin_output == get_plugin_output()) {
     if ((_current_state == service::state_ok && get_stalk_on(ok)))
       log_event();
@@ -2025,7 +2027,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
  *  @return Return true on success.
  */
 int service::log_event() {
-  if (_state_type == soft && !config->log_service_retries())
+  if (get_state_type() == soft && !config->log_service_retries())
     return OK;
 
   if (!this->host_ptr)
@@ -2038,7 +2040,7 @@ int service::log_event() {
     log_options = tab_service_states[_current_state].first;
     state = tab_service_states[_current_state].second.c_str();
   }
-  std::string const& state_type{tab_state_type[_state_type]};
+  std::string const& state_type{tab_state_type[get_state_type()]};
 
   logger(log_options, basic)
       << "SERVICE ALERT: " << _hostname << ";" << _description << ";"
@@ -2074,7 +2076,7 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
   /* if this is a soft service state and not a soft recovery, don't record this
    * in the history */
   /* only hard states and soft recoveries get recorded for flap detection */
-  if (_state_type == soft && _current_state != service::state_ok)
+  if (get_state_type() == soft && _current_state != service::state_ok)
     return;
 
   /* what threshold values should we use (global or service-specific)? */
@@ -2105,16 +2107,16 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
   /* record current service state */
   if (update_history) {
     /* record the current state in the state history */
-    state_history[_state_history_index] = _current_state;
+    state_history[get_state_history_index()] = _current_state;
 
     /* increment state history index to next available slot */
-    _state_history_index++;
-    if (_state_history_index >= MAX_STATE_HISTORY_ENTRIES)
-      _state_history_index = 0;
+    set_state_history_index(get_state_history_index() + 1);
+    if (get_state_history_index() >= MAX_STATE_HISTORY_ENTRIES)
+      set_state_history_index(0);
   }
 
   /* calculate overall and curved percent state changes */
-  for (x = 0, y = _state_history_index; x < MAX_STATE_HISTORY_ENTRIES;
+  for (x = 0, y = get_state_history_index(); x < MAX_STATE_HISTORY_ENTRIES;
        x++) {
     if (x == 0) {
       last_state_history_value = state_history[y];
@@ -2141,7 +2143,7 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
   curved_percent_change = (double)(((double)curved_changes * 100.0) /
                                    (double)(MAX_STATE_HISTORY_ENTRIES - 1));
 
-  _percent_state_change = curved_percent_change;
+  set_percent_state_change(curved_percent_change);
 
   logger(dbg_flapping, most)
       << com::centreon::logging::setprecision(2) << "LFT=" << low_threshold
@@ -2196,7 +2198,7 @@ int service::handle_service_event() {
   /* send event data to broker */
   broker_statechange_data(NEBTYPE_STATECHANGE_END, NEBFLAG_NONE, NEBATTR_NONE,
                           SERVICE_STATECHANGE, (void*)this, _current_state,
-                          _state_type, get_current_attempt(),
+                          get_state_type(), get_current_attempt(),
                           get_max_attempts(), nullptr);
 
   /* bail out if we shouldn't be running event handlers */
@@ -2362,9 +2364,9 @@ int service::run_scheduled_check(int check_options, double latency) {
       if (current_time >= preferred_time)
         preferred_time =
             current_time +
-            static_cast<time_t>(_check_interval <= 0
+            static_cast<time_t>(get_check_interval() <= 0
                                     ? 300
-                                    : _check_interval *
+                                    : get_check_interval() *
                                           config->interval_length());
 
       // Make sure we rescheduled the next service check at a valid time.
@@ -2622,7 +2624,7 @@ void service::set_flap(double percent_change,
   /* send a notification */
   if (allow_flapstart_notification)
     notify(notification_flappingstart, nullptr, nullptr,
-           NOTIFICATION_OPTION_NONE);
+           notification_option_none);
 }
 
 /* handles a service that has stopped flapping */
@@ -2657,12 +2659,12 @@ void service::clear_flap(double percent_change,
                        percent_change, high_threshold, low_threshold, nullptr);
 
   /* send a notification */
-  notify(notification_flappingstop, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
+  notify(notification_flappingstop, nullptr, nullptr, notification_option_none);
 
   /* should we send a recovery notification? */
   if (this->check_flapping_recovery_notification &&
       _current_state == service::state_ok)
-    notify(notification_normal, nullptr, nullptr, NOTIFICATION_OPTION_NONE);
+    notify(notification_normal, nullptr, nullptr, notification_option_none);
 
   /* clear the recovery notification flag */
   this->check_flapping_recovery_notification = false;
@@ -2755,319 +2757,319 @@ void service::set_notification_number(int num) {
  *
  * @return true if the check is good, false otherwise.
  */
-bool service::check_notification_viability(reason_type type, int options) {
-  time_t current_time;
-  /* get current time */
-  time(&current_time);
-
-  logger(dbg_functions, basic) << "service::check_notification_viability()";
-
-  timeperiod* temp_period{get_notification_period_ptr()};
-
-  // See if the service can have notifications sent out at this time.
-  {
-    timezone_locker lock(get_timezone());
-    if (check_time_against_period(current_time,
-                                  temp_period) == ERROR) {
-      logger(dbg_notifications, more)
-          << "This service shouldn't have notifications sent out "
-             "at this time.";
-
-      // Calculate the next acceptable notification time,
-      // once the next valid time range arrives...
-      if (type == notification_normal) {
-        time_t timeperiod_start;
-        get_next_valid_time(current_time, &timeperiod_start,
-                            temp_period);
-
-        // Looks like there are no valid notification times defined, so
-        // schedule the next one far into the future (one year)...
-        if (timeperiod_start == (time_t)0)
-          _next_notification =
-              static_cast<time_t>(current_time + 60 * 60 * 24 * 365);
-        // Else use the next valid notification time.
-        else
-          _next_notification = timeperiod_start;
-        logger(dbg_notifications, more) << "Next possible notification time: "
-                                        << my_ctime(&_next_notification);
-      }
-
-      return false;
-    }
-  }
-
-  /*********************************************/
-  /*** SPECIAL CASE FOR CUSTOM NOTIFICATIONS ***/
-  /*********************************************/
-
-  /* custom notifications are good to go at this point... */
-  if (type == notification_custom) {
-    if (get_scheduled_downtime_depth() > 0 ||
-        host_ptr->get_scheduled_downtime_depth() > 0) {
-      logger(dbg_notifications, more)
-          << "We shouldn't send custom notification during "
-             "scheduled downtime.";
-      return false;
-    }
-    return true;
-  }
-
-  /****************************************/
-  /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
-  /****************************************/
-
-  /*
-   * acknowledgements only have to pass three general filters, although they
-   * have another test of their own...
-   */
-  if (type == notification_acknowledgement) {
-    /* don't send an acknowledgement if there isn't a problem... */
-    if (_current_state == service::state_ok) {
-      logger(dbg_notifications, more)
-          << "The service is currently true, so we won't send an "
-             "acknowledgement.";
-      return false;
-    }
-
-    /*
-     * acknowledgement viability test passed, so the notification can be sent
-     * out
-     */
-    return true;
-  }
-
-  /****************************************/
-  /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
-  /****************************************/
-
-  /* flapping notifications only have to pass three general filters */
-  if (type == notification_flappingstart || type == notification_flappingstop ||
-      type == notification_flappingdisabled) {
-    /* don't send a notification if we're not supposed to... */
-    if (!get_notify_on(flapping)) {
-      logger(dbg_notifications, more)
-          << "We shouldn't notify about FLAPPING events for this "
-             "service.";
-      return false;
-    }
-
-    /* don't send notifications during scheduled downtime */
-    if (get_scheduled_downtime_depth() > 0 ||
-        host_ptr->get_scheduled_downtime_depth() > 0) {
-      logger(dbg_notifications, more)
-          << "We shouldn't notify about FLAPPING events during "
-             "scheduled downtime.";
-      return false;
-    }
-
-    /* flapping viability test passed, so the notification can be sent out */
-    return true;
-  }
-
-  /****************************************/
-  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
-  /****************************************/
-
-  /* downtime notifications only have to pass three general filters */
-  if (type == notification_downtimestart || type == notification_downtimeend ||
-      type == notification_downtimecancelled) {
-    /* don't send a notification if we're not supposed to... */
-    if (!get_notify_on(downtime)) {
-      logger(dbg_notifications, more)
-          << "We shouldn't notify about DOWNTIME events for "
-             "this service.";
-      return false;
-    }
-
-    /*
-     * don't send notifications during scheduled downtime (for service only,
-     * not host)
-     */
-    if (get_scheduled_downtime_depth() > 0) {
-      logger(dbg_notifications, more)
-          << "We shouldn't notify about DOWNTIME events during "
-             "scheduled downtime.";
-      return false;
-    }
-
-    /* downtime viability test passed, so the notification can be sent out */
-    return true;
-  }
-
-  /****************************************/
-  /*** NORMAL NOTIFICATIONS ***************/
-  /****************************************/
-
-  /* is this a hard problem/recovery? */
-  if (_state_type == soft) {
-    logger(dbg_notifications, more)
-        << "This service is in a soft state, so we won't send a "
-           "notification out.";
-    return false;
-  }
-
-  /* has this problem already been acknowledged? */
-  if (get_problem_has_been_acknowledged()) {
-    logger(dbg_notifications, more)
-        << "This service problem has already been acknowledged, "
-           "so we won't send a notification out.";
-    return false;
-  }
-
-  /* check service notification dependencies */
-  if (check_dependencies(hostdependency::notification) ==
-      DEPENDENCIES_FAILED) {
-    logger(dbg_notifications, more)
-        << "Service notification dependencies for this service "
-           "have failed, so we won't sent a notification out.";
-    return false;
-  }
-
-  /* check host notification dependencies */
-  if (host_ptr->check_dependencies(hostdependency::notification) ==
-      DEPENDENCIES_FAILED) {
-    logger(dbg_notifications, more)
-        << "Host notification dependencies for this service have failed, "
-           "so we won't sent a notification out.";
-    return false;
-  }
-
-  /* see if we should notify about problems with this service */
-  if (_current_state == service::state_unknown &&
-    !get_notify_on(unknown)) {
-    logger(dbg_notifications, more)
-        << "We shouldn't notify about UNKNOWN states for this service.";
-    return false;
-  }
-  if (_current_state == service::state_warning &&
-    !get_notify_on(warning)) {
-    logger(dbg_notifications, more)
-        << "We shouldn't notify about WARNING states for this service.";
-    return false;
-  }
-  if (_current_state == service::state_critical &&
-    !get_notify_on(critical)) {
-    logger(dbg_notifications, more)
-        << "We shouldn't notify about CRITICAL states for this service.";
-    return false;
-  }
-  if (_current_state == service::state_ok) {
-    if (!get_notify_on(recovery)) {
-      logger(dbg_notifications, more)
-          << "We shouldn't notify about RECOVERY states for this service.";
-      return false;
-    }
-    /* No notification in input */
-    if (get_notified_on() == 0) {
-      logger(dbg_notifications, more)
-          << "We shouldn't notify about this recovery.";
-      return false;
-    }
-  }
-
-  /* see if enough time has elapsed for first notification */
-  if (type == notification_normal &&
-      (this->current_notification_number == 0 ||
-       (_current_state == service::state_ok && !_recovery_been_sent))) {
-    /* get the time at which a notification should have been sent */
-    time_t& initial_notif_time(_initial_notif_time);
-
-    /* if not set, set it to now */
-    if (!initial_notif_time)
-      initial_notif_time = time(nullptr);
-
-    double notification_delay =
-        (_current_state != service::state_ok ? get_first_notification_delay()
-                                         : _recovery_notification_delay) *
-        config->interval_length();
-
-    if (current_time <
-        (time_t)(initial_notif_time + (time_t)(notification_delay))) {
-      if (_current_state == service::state_ok)
-        logger(dbg_notifications, more)
-            << "Not enough time has elapsed since the service changed to a "
-               "true state, so we should not notify about this problem yet";
-      else
-        logger(dbg_notifications, more)
-            << "Not enough time has elapsed since the service changed to a "
-               "non-true state, so we should not notify about this problem yet";
-      return false;
-    }
-  }
-
-  /* if this service is currently flapping, don't send the notification */
-  if (get_is_flapping()) {
-    logger(dbg_notifications, more)
-        << "This service is currently flapping, so we won't send "
-           "notifications.";
-    return false;
-  }
-
-  /*
-   * if this service is currently in a scheduled downtime period, don't send
-   * the notification
-   */
-  if (get_scheduled_downtime_depth() > 0) {
-    logger(dbg_notifications, more)
-        << "This service is currently in a scheduled downtime, so "
-           "we won't send notifications.";
-    return false;
-  }
-
-  /*
-   * if this host is currently in a scheduled downtime period, don't send the
-   * notification
-   * */
-  if (host_ptr->get_scheduled_downtime_depth() > 0) {
-    logger(dbg_notifications, more)
-        << "The host this service is associated with is currently in "
-           "a scheduled downtime, so we won't send notifications.";
-    return false;
-  }
-
-  /*
-   ***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT IF ANY OTHER *****
-   ***** NOTIFICATION WAS SENT                                            *****
-   */
-  if (_current_state == service::state_ok)
-    return (this->current_notification_number > 0) ? true : false;
-
-  /*
-   * don't notify contacts about this service problem again if the notification
-   * interval is set to 0
-   */
-  if (get_no_more_notifications()) {
-    logger(dbg_notifications, more)
-        << "We shouldn't re-notify contacts about this service problem.";
-    return false;
-  }
-
-  /*
-   * if the host is down or unreachable, don't notify contacts about service
-   * failures
-   */
-  if (host_ptr->get_current_state() !=  host::state_up) {
-    logger(dbg_notifications, more)
-        << "The host is either down or unreachable, so we won't "
-           "notify contacts about this service.";
-    return false;
-  }
-
-  /*
-   * don't notify if we haven't waited long enough since the last time (and
-   * the service is not marked as being volatile)
-   */
-  if (current_time < _next_notification && !get_is_volatile()) {
-    logger(dbg_notifications, more)
-        << "We haven't waited long enough to re-notify contacts "
-           "about this service.";
-    logger(dbg_notifications, more)
-        << "Next valid notification time: " << my_ctime(&_next_notification);
-    return false;
-  }
-
-  return true;
-}
+//bool service::check_notification_viability(reason_type type, int options) {
+//  time_t current_time;
+//  /* get current time */
+//  time(&current_time);
+//
+//  logger(dbg_functions, basic) << "service::check_notification_viability()";
+//
+//  timeperiod* temp_period{get_notification_timeperiod()};
+//
+//  // See if the service can have notifications sent out at this time.
+//  {
+//    timezone_locker lock(get_timezone());
+//    if (check_time_against_period(current_time,
+//                                  temp_period) == ERROR) {
+//      logger(dbg_notifications, more)
+//          << "This service shouldn't have notifications sent out "
+//             "at this time.";
+//
+//      // Calculate the next acceptable notification time,
+//      // once the next valid time range arrives...
+//      if (type == notification_normal) {
+//        time_t timeperiod_start;
+//        get_next_valid_time(current_time, &timeperiod_start,
+//                            temp_period);
+//
+//        // Looks like there are no valid notification times defined, so
+//        // schedule the next one far into the future (one year)...
+//        if (timeperiod_start == (time_t)0)
+//          _next_notification =
+//              static_cast<time_t>(current_time + 60 * 60 * 24 * 365);
+//        // Else use the next valid notification time.
+//        else
+//          _next_notification = timeperiod_start;
+//        logger(dbg_notifications, more) << "Next possible notification time: "
+//                                        << my_ctime(&_next_notification);
+//      }
+//
+//      return false;
+//    }
+//  }
+//
+//  /*********************************************/
+//  /*** SPECIAL CASE FOR CUSTOM NOTIFICATIONS ***/
+//  /*********************************************/
+//
+//  /* custom notifications are good to go at this point... */
+//  if (type == notification_custom) {
+//    if (get_scheduled_downtime_depth() > 0 ||
+//        host_ptr->get_scheduled_downtime_depth() > 0) {
+//      logger(dbg_notifications, more)
+//          << "We shouldn't send custom notification during "
+//             "scheduled downtime.";
+//      return false;
+//    }
+//    return true;
+//  }
+//
+//  /****************************************/
+//  /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
+//  /****************************************/
+//
+//  /*
+//   * acknowledgements only have to pass three general filters, although they
+//   * have another test of their own...
+//   */
+//  if (type == notification_acknowledgement) {
+//    /* don't send an acknowledgement if there isn't a problem... */
+//    if (_current_state == service::state_ok) {
+//      logger(dbg_notifications, more)
+//          << "The service is currently true, so we won't send an "
+//             "acknowledgement.";
+//      return false;
+//    }
+//
+//    /*
+//     * acknowledgement viability test passed, so the notification can be sent
+//     * out
+//     */
+//    return true;
+//  }
+//
+//  /****************************************/
+//  /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
+//  /****************************************/
+//
+//  /* flapping notifications only have to pass three general filters */
+//  if (type == notification_flappingstart || type == notification_flappingstop ||
+//      type == notification_flappingdisabled) {
+//    /* don't send a notification if we're not supposed to... */
+//    if (!get_notify_on(flapping)) {
+//      logger(dbg_notifications, more)
+//          << "We shouldn't notify about FLAPPING events for this "
+//             "service.";
+//      return false;
+//    }
+//
+//    /* don't send notifications during scheduled downtime */
+//    if (get_scheduled_downtime_depth() > 0 ||
+//        host_ptr->get_scheduled_downtime_depth() > 0) {
+//      logger(dbg_notifications, more)
+//          << "We shouldn't notify about FLAPPING events during "
+//             "scheduled downtime.";
+//      return false;
+//    }
+//
+//    /* flapping viability test passed, so the notification can be sent out */
+//    return true;
+//  }
+//
+//  /****************************************/
+//  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
+//  /****************************************/
+//
+//  /* downtime notifications only have to pass three general filters */
+//  if (type == notification_downtimestart || type == notification_downtimeend ||
+//      type == notification_downtimecancelled) {
+//    /* don't send a notification if we're not supposed to... */
+//    if (!get_notify_on(downtime)) {
+//      logger(dbg_notifications, more)
+//          << "We shouldn't notify about DOWNTIME events for "
+//             "this service.";
+//      return false;
+//    }
+//
+//    /*
+//     * don't send notifications during scheduled downtime (for service only,
+//     * not host)
+//     */
+//    if (get_scheduled_downtime_depth() > 0) {
+//      logger(dbg_notifications, more)
+//          << "We shouldn't notify about DOWNTIME events during "
+//             "scheduled downtime.";
+//      return false;
+//    }
+//
+//    /* downtime viability test passed, so the notification can be sent out */
+//    return true;
+//  }
+//
+//  /****************************************/
+//  /*** NORMAL NOTIFICATIONS ***************/
+//  /****************************************/
+//
+//  /* is this a hard problem/recovery? */
+//  if (get_state_type() == soft) {
+//    logger(dbg_notifications, more)
+//        << "This service is in a soft state, so we won't send a "
+//           "notification out.";
+//    return false;
+//  }
+//
+//  /* has this problem already been acknowledged? */
+//  if (get_problem_has_been_acknowledged()) {
+//    logger(dbg_notifications, more)
+//        << "This service problem has already been acknowledged, "
+//           "so we won't send a notification out.";
+//    return false;
+//  }
+//
+//  /* check service notification dependencies */
+//  if (check_dependencies(hostdependency::notification) ==
+//      DEPENDENCIES_FAILED) {
+//    logger(dbg_notifications, more)
+//        << "Service notification dependencies for this service "
+//           "have failed, so we won't sent a notification out.";
+//    return false;
+//  }
+//
+//  /* check host notification dependencies */
+//  if (host_ptr->check_dependencies(hostdependency::notification) ==
+//      DEPENDENCIES_FAILED) {
+//    logger(dbg_notifications, more)
+//        << "Host notification dependencies for this service have failed, "
+//           "so we won't sent a notification out.";
+//    return false;
+//  }
+//
+//  /* see if we should notify about problems with this service */
+//  if (_current_state == service::state_unknown &&
+//    !get_notify_on(unknown)) {
+//    logger(dbg_notifications, more)
+//        << "We shouldn't notify about UNKNOWN states for this service.";
+//    return false;
+//  }
+//  if (_current_state == service::state_warning &&
+//    !get_notify_on(warning)) {
+//    logger(dbg_notifications, more)
+//        << "We shouldn't notify about WARNING states for this service.";
+//    return false;
+//  }
+//  if (_current_state == service::state_critical &&
+//    !get_notify_on(critical)) {
+//    logger(dbg_notifications, more)
+//        << "We shouldn't notify about CRITICAL states for this service.";
+//    return false;
+//  }
+//  if (_current_state == service::state_ok) {
+//    if (!get_notify_on(recovery)) {
+//      logger(dbg_notifications, more)
+//          << "We shouldn't notify about RECOVERY states for this service.";
+//      return false;
+//    }
+//    /* No notification in input */
+//    if (get_notified_on() == 0) {
+//      logger(dbg_notifications, more)
+//          << "We shouldn't notify about this recovery.";
+//      return false;
+//    }
+//  }
+//
+//  /* see if enough time has elapsed for first notification */
+//  if (type == notification_normal &&
+//      (this->current_notification_number == 0 ||
+//       (_current_state == service::state_ok && !_recovery_been_sent))) {
+//    /* get the time at which a notification should have been sent */
+//    time_t& initial_notif_time(_initial_notif_time);
+//
+//    /* if not set, set it to now */
+//    if (!initial_notif_time)
+//      initial_notif_time = time(nullptr);
+//
+//    double notification_delay =
+//        (_current_state != service::state_ok ? get_first_notification_delay()
+//                                         : _recovery_notification_delay) *
+//        config->interval_length();
+//
+//    if (current_time <
+//        (time_t)(initial_notif_time + (time_t)(notification_delay))) {
+//      if (_current_state == service::state_ok)
+//        logger(dbg_notifications, more)
+//            << "Not enough time has elapsed since the service changed to a "
+//               "true state, so we should not notify about this problem yet";
+//      else
+//        logger(dbg_notifications, more)
+//            << "Not enough time has elapsed since the service changed to a "
+//               "non-true state, so we should not notify about this problem yet";
+//      return false;
+//    }
+//  }
+//
+//  /* if this service is currently flapping, don't send the notification */
+//  if (get_is_flapping()) {
+//    logger(dbg_notifications, more)
+//        << "This service is currently flapping, so we won't send "
+//           "notifications.";
+//    return false;
+//  }
+//
+//  /*
+//   * if this service is currently in a scheduled downtime period, don't send
+//   * the notification
+//   */
+//  if (get_scheduled_downtime_depth() > 0) {
+//    logger(dbg_notifications, more)
+//        << "This service is currently in a scheduled downtime, so "
+//           "we won't send notifications.";
+//    return false;
+//  }
+//
+//  /*
+//   * if this host is currently in a scheduled downtime period, don't send the
+//   * notification
+//   * */
+//  if (host_ptr->get_scheduled_downtime_depth() > 0) {
+//    logger(dbg_notifications, more)
+//        << "The host this service is associated with is currently in "
+//           "a scheduled downtime, so we won't send notifications.";
+//    return false;
+//  }
+//
+//  /*
+//   ***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT IF ANY OTHER *****
+//   ***** NOTIFICATION WAS SENT                                            *****
+//   */
+//  if (_current_state == service::state_ok)
+//    return (this->current_notification_number > 0) ? true : false;
+//
+//  /*
+//   * don't notify contacts about this service problem again if the notification
+//   * interval is set to 0
+//   */
+//  if (get_no_more_notifications()) {
+//    logger(dbg_notifications, more)
+//        << "We shouldn't re-notify contacts about this service problem.";
+//    return false;
+//  }
+//
+//  /*
+//   * if the host is down or unreachable, don't notify contacts about service
+//   * failures
+//   */
+//  if (host_ptr->get_current_state() !=  host::state_up) {
+//    logger(dbg_notifications, more)
+//        << "The host is either down or unreachable, so we won't "
+//           "notify contacts about this service.";
+//    return false;
+//  }
+//
+//  /*
+//   * don't notify if we haven't waited long enough since the last time (and
+//   * the service is not marked as being volatile)
+//   */
+//  if (current_time < _next_notification && !get_is_volatile()) {
+//    logger(dbg_notifications, more)
+//        << "We haven't waited long enough to re-notify contacts "
+//           "about this service.";
+//    logger(dbg_notifications, more)
+//        << "Next valid notification time: " << my_ctime(&_next_notification);
+//    return false;
+//  }
+//
+//  return true;
+//}
 
 /* checks viability of performing a service check */
 int service::verify_check_viability(int check_options,
@@ -3081,11 +3083,11 @@ int service::verify_check_viability(int check_options,
   logger(dbg_functions, basic) << "check_service_check_viability()";
 
   /* get the check interval to use if we need to reschedule the check */
-  if (_state_type == soft && _current_state != service::state_ok)
-    check_interval = static_cast<int>(_retry_interval *
+  if (get_state_type() == soft && _current_state != service::state_ok)
+    check_interval = static_cast<int>(get_retry_interval() *
                                       config->interval_length());
   else
-    check_interval = static_cast<int>(_check_interval *
+    check_interval = static_cast<int>(get_check_interval() *
                                       config->interval_length());
 
   /* get the current time */
@@ -3351,7 +3353,7 @@ time_t service::get_next_notification_time(time_t offset) {
       continue;
 
     /* skip this entry if it isn't appropriate */
-    if (!is_valid_escalation_for_notification(e, NOTIFICATION_OPTION_NONE))
+    if (!is_valid_escalation_for_notification(e, notification_option_none))
       continue;
 
     logger(dbg_notifications, most)
@@ -3426,7 +3428,7 @@ bool service::is_valid_escalation_for_notification(
 
   /*** EXCEPTION ***/
   /* broadcast options go to everyone, so this escalation is valid */
-  if (options & NOTIFICATION_OPTION_BROADCAST)
+  if (options & notification_option_broadcast)
     return true;
 
   /* skip this escalation if it happens later */
@@ -3484,11 +3486,11 @@ bool service::is_result_fresh(
     << "' on host '" << this->get_hostname() << "'...";
 
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
-  if (this->get_freshness_threshold() == 0) {
-    if (this->_state_type == hard ||
+  if (get_freshness_threshold() == 0) {
+    if (get_state_type() == hard ||
         this->_current_state == service::state_ok)
       freshness_threshold = static_cast<int>(
-          (this->get_check_interval() * config->interval_length()) +
+          (get_check_interval() * config->interval_length()) +
           get_latency() + config->additional_freshness_latency());
     else
       freshness_threshold = static_cast<int>(
@@ -3600,7 +3602,7 @@ void service::handle_flap_detection_disabled() {
       NEBATTR_FLAPPING_STOP_DISABLED,
       SERVICE_FLAPPING,
       this,
-      this->_percent_state_change,
+      get_percent_state_change(),
       0.0,
       0.0,
       NULL);
@@ -3610,7 +3612,7 @@ void service::handle_flap_detection_disabled() {
       notification_flappingdisabled,
       NULL,
       NULL,
-      NOTIFICATION_OPTION_NONE);
+      notification_option_none);
 
     /* should we send a recovery notification? */
     if (this->check_flapping_recovery_notification
@@ -3619,7 +3621,7 @@ void service::handle_flap_detection_disabled() {
         notification_normal,
         NULL,
         NULL,
-        NOTIFICATION_OPTION_NONE);
+        notification_option_none);
 
     /* clear the recovery notification flag */
     this->check_flapping_recovery_notification = false;
@@ -3645,7 +3647,7 @@ std::list<std::shared_ptr<servicegroup>>& service::get_parent_groups() {
   return _servicegroups;
 }
 
-timeperiod* service::get_notification_period_ptr() const {
+timeperiod* service::get_notification_timeperiod() const {
   /* if the service has no notification period, inherit one from the host */
   return notification_period_ptr ? notification_period_ptr
                                  : host_ptr->notification_period_ptr;

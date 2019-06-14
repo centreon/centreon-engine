@@ -35,8 +35,6 @@
 typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::contact>> contact_map;
 
-typedef struct notify_list_struct notification;
-
 CCE_BEGIN()
 class host;
 class service;

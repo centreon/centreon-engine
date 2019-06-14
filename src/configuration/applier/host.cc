@@ -103,6 +103,7 @@ void applier::host::add_object(
                           & configuration::host::downtime),
         obj.notification_interval(),
         obj.first_notification_delay(),
+        obj.recovery_notification_delay(),
         obj.notification_period(),
         obj.notifications_enabled(),
         obj.check_command(),
@@ -158,7 +159,6 @@ void applier::host::add_object(
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());
   h->set_last_acknowledgement(0);
-  h->set_recovery_notification_delay(obj.recovery_notification_delay());
   h->set_recovery_been_sent(true);
 
   // Contacts

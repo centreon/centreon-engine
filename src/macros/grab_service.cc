@@ -52,7 +52,7 @@ using namespace com::centreon::engine::logging;
 static char* get_service_check_type(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
   return (string::dup(
-            (check_passive == svc.get_check_type()
+            (checkable::check_passive == svc.get_check_type()
              ? "PASSIVE"
              : "ACTIVE")));
 }
@@ -156,23 +156,23 @@ struct grab_service_redirection {
         true}},
       // Display name.
       {MACRO_SERVICEDISPLAYNAME,
-       {&get_member_as_string<service, std::string const&, notifier, &notifier::get_display_name>,
+       {&get_member_as_string<service, std::string const&, checkable, &checkable::get_display_name>,
         true}},
       // Output.
       {MACRO_SERVICEOUTPUT,
-       {&get_member_as_string<service, std::string const&, notifier, &notifier::get_plugin_output>,
+       {&get_member_as_string<service, std::string const&, checkable, &checkable::get_plugin_output>,
         true}},
       // Long output.
       {MACRO_LONGSERVICEOUTPUT,
-       {&get_member_as_string< service, std::string const&, notifier, &notifier::get_long_plugin_output>,
+       {&get_member_as_string< service, std::string const&, checkable, &checkable::get_long_plugin_output>,
         true}},
       // Perfdata.
       {MACRO_SERVICEPERFDATA,
-       {&get_member_as_string<service, std::string const&, notifier, &notifier::get_perf_data>,
+       {&get_member_as_string<service, std::string const&, checkable, &checkable::get_perf_data>,
         true}},
       // Check command.
       {MACRO_SERVICECHECKCOMMAND,
-       {&get_member_as_string<service, std::string const&, notifier, &notifier::get_check_command>,
+       {&get_member_as_string<service, std::string const&, checkable, &checkable::get_check_command>,
         true}},
       // Check type.
       {MACRO_SERVICECHECKTYPE, {&get_service_check_type, true}},
@@ -199,29 +199,29 @@ struct grab_service_redirection {
         true}},
       // Attempt.
       {MACRO_SERVICEATTEMPT,
-       {&get_member_as_string<service, int, notifier, &notifier::get_current_attempt>,
+       {&get_member_as_string<service, int, checkable, &checkable::get_current_attempt>,
         true}},
       // Max attempts.
       {MACRO_MAXSERVICEATTEMPTS,
-       {&get_member_as_string<service, int, notifier, &notifier::get_max_attempts>,
+       {&get_member_as_string<service, int, checkable, &checkable::get_max_attempts>,
         true}},
       // Execution time.
       {MACRO_SERVICEEXECUTIONTIME,
-       {&get_double<com::centreon::engine::service, com::centreon::engine::notifier,
-                    &com::centreon::engine::notifier::get_execution_time,
+       {&get_double<service, checkable,
+                    &checkable::get_execution_time,
                     3>,
         true}},
       // Latency.
       {MACRO_SERVICELATENCY,
-       {&get_double<service, notifier, &notifier::get_latency, 3>,
+       {&get_double<service, checkable, &checkable::get_latency, 3>,
         true}},
       // Last check.
       {MACRO_LASTSERVICECHECK,
-       {&get_member_as_string<service, time_t, notifier, &notifier::get_last_check>,
+       {&get_member_as_string<service, time_t, checkable, &checkable::get_last_check>,
         true}},
       // Last state change.
       {MACRO_LASTSERVICESTATECHANGE,
-       {&get_member_as_string<service, time_t, notifier, &notifier::get_last_state_change>,
+       {&get_member_as_string<service, time_t, checkable, &checkable::get_last_state_change>,
         true}},
       // Last time ok.
       {MACRO_LASTSERVICEOK,
@@ -242,14 +242,14 @@ struct grab_service_redirection {
       // Downtime.
       {MACRO_SERVICEDOWNTIME,
        {&get_member_as_string<
-            com::centreon::engine::service,
+            service,
             int,
-            com::centreon::engine::notifier,
-            &com::centreon::engine::notifier::get_scheduled_downtime_depth>,
+            checkable,
+            &checkable::get_scheduled_downtime_depth>,
         true}},
       // Percent state change.
       {MACRO_SERVICEPERCENTCHANGE,
-       {&get_double<service, notifier, &notifier::get_percent_state_change, 2>,
+       {&get_double<service, checkable, &checkable::get_percent_state_change, 2>,
         true}},
       // Duration.
       {MACRO_SERVICEDURATION,
@@ -287,15 +287,15 @@ struct grab_service_redirection {
         true}},
       // Action URL.
       {MACRO_SERVICEACTIONURL,
-       {&get_recursive<service, notifier, &notifier::get_action_url, URL_ENCODE_MACRO_CHARS>,
+       {&get_recursive<service, checkable, &checkable::get_action_url, URL_ENCODE_MACRO_CHARS>,
         true}},
       // Notes URL.
       {MACRO_SERVICENOTESURL,
-       {&get_recursive<service, notifier, &notifier::get_notes_url, URL_ENCODE_MACRO_CHARS>,
+       {&get_recursive<service, checkable, &checkable::get_notes_url, URL_ENCODE_MACRO_CHARS>,
         true}},
       // Notes.
       {MACRO_SERVICENOTES,
-       {&get_recursive<service, notifier, &notifier::get_notes,0>,
+       {&get_recursive<service, checkable, &checkable::get_notes,0>,
         true}},
       // Group names.
       {MACRO_SERVICEGROUPNAMES, {&get_service_group_names, true}},
