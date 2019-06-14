@@ -72,7 +72,7 @@ class HostEscalation : public ::testing::Test {
   std::shared_ptr<engine::host> _host;
 };
 
-TEST_F(HostEscalation, SimpleHostEscalation) {
+TEST_F(HostEscalation, SimpleNormalHostNotification) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
    */
@@ -94,7 +94,7 @@ TEST_F(HostEscalation, SimpleHostEscalation) {
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleHostEscalationOutsideTimeperiod) {
+TEST_F(HostEscalation, SimpleNormalHostNotificationOutsideTimeperiod) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   time_t t{time(nullptr)};  // get time now
@@ -116,7 +116,7 @@ TEST_F(HostEscalation, SimpleHostEscalationOutsideTimeperiod) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleHostEscalationForcedNotification) {
+TEST_F(HostEscalation, SimpleNormalHostNotificationForcedNotification) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   time_t t{time(nullptr)};  // get time now

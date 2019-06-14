@@ -46,9 +46,14 @@ std::array<std::string, 8> const notifier::tab_notification_str{
 
 std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
-bool (notifier::*_is_notification_viable[])(notifier::reason_type,
-                                            notifier::notification_option)
-    const = {&notifier::is_notification_viable, };
+//bool (notifier::* const _is_notification_viable[])(notifier::notification_option) const = {
+//  &notifier::_is_notification_viable_normal,
+//  &notifier::_is_notification_viable_recovery,
+//  &notifier::_is_notification_viable_acknowledgement,
+//  &notifier::_is_notification_viable_flapping,
+//  &notifier::_is_notification_viable_downtime,
+//  &notifier::_is_notification_viable_custom,
+//};
 
 uint64_t notifier::_next_notification_id{1L};
 
@@ -194,9 +199,12 @@ bool notifier::notifications_available(int options) const {
   return true;
 }
 
-bool notifier::is_notification_viable(reason_type type,
+bool notifier::is_notification_viable(notification_category cat,
                                       notification_option options) const {
+  return (this->*(_is_notification_viable[0]))(options);
+}
 
+bool notifier::_is_notification_viable_normal(notification_option options) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable()";
 
   /* forced notifications bust through everything */
@@ -229,9 +237,31 @@ bool notifier::is_notification_viable(reason_type type,
   return true;
 }
 
+bool notifier::_is_notification_viable_recovery(notification_option options) const {
+}
+
+bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
+}
+
+bool notifier::_is_notification_viable_flapping(notification_option options) const {
+}
+
+bool notifier::_is_notification_viable_downtime(notification_option options) const {
+}
+
+bool notifier::_is_notification_viable_custom(notification_option options) const {
+}
+
 std::list<std::shared_ptr<contact> > notifier::get_contacts_to_notify() const {
   std::list<std::shared_ptr<contact> > retval;
   return retval;
+}
+
+notifier::notification_category notifier::get_category(reason_type type) const {
+  if (type == 99)
+    return cat_custom;
+  notification_category cat[] = {cat_normal, cat_acknowledgement, cat_flapping, cat_flapping, cat_flapping, cat_downtime, cat_downtime, cat_downtime, cat_custom};
+  return cat[static_cast<size_t>(type)];
 }
 
 int notifier::notify(notifier::reason_type type,
@@ -242,7 +272,7 @@ int notifier::notify(notifier::reason_type type,
   logger(dbg_functions, basic) << "notifier::notify()";
 
   /* Has this notification got sense? */
-  if (!is_notification_viable(type, options))
+  if (!is_notification_viable(get_category(type), options))
     return OK;
 
   /* For a first notification, we store what type of notification we try to
@@ -666,7 +696,8 @@ uint32_t notifier::get_recovery_notification_delay(void) const {
   return _recovery_notification_delay;
 }
 
-void notifier::set_recovery_notification_delay(uint32_t recovery_notification_delay) {
+void notifier::set_recovery_notification_delay(
+    uint32_t recovery_notification_delay) {
   _recovery_notification_delay = recovery_notification_delay;
 }
 

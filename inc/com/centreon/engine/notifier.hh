@@ -92,8 +92,6 @@ class                notifier : public checkable {
   static std::array<std::string, 8> const tab_notification_str;
   static std::array<std::string, 2> const tab_state_type;
 
-  static bool (notifier::* _is_notification_viable[])(reason_type, notification_option) const&;
-
   //static void        inc_next_notification_id();
 
                      notifier(int notification_type,
@@ -220,27 +218,23 @@ class                notifier : public checkable {
   void               set_modified_attributes(uint32_t modified_attributes);
   bool               get_problem_has_been_acknowledged() const;
   void               set_problem_has_been_acknowledged(bool problem_has_been_acknowledged);
-//  unsigned int       get_state_history_index() const;
-//  void               set_state_history_index(unsigned int state_history_index);
   virtual bool       recovered() const = 0;
   virtual int        get_current_state_int() const = 0;
-//  time_t             get_last_check() const;
-//  void               set_last_check(time_t last_check);
   bool               get_no_more_notifications() const;
   void               set_no_more_notifications(bool no_more_notifications);
-//  bool               get_should_be_scheduled() const;
-//  void               set_should_be_scheduled(bool should_be_scheduled);
   bool               notifications_available(int options) const;
   int                get_current_notification_number() const;
   void               set_current_notification_number(int number);
 
   virtual uint64_t   check_dependencies(int dependency_type) = 0;
-  bool               is_notification_viable(reason_type type,
-                                            notification_option options) const;
   std::list<std::shared_ptr<contact>>
                      get_contacts_to_notify() const;
   uint64_t           get_next_notification_id() const;
   virtual timeperiod* get_notification_timeperiod() const = 0;
+  notification_category
+                     get_category(reason_type type) const;
+  bool               is_notification_viable(notification_category cat,
+                                      notification_option options) const;
 
   std::unordered_map<std::string, std::shared_ptr<contact>>
                      contacts;
@@ -278,6 +272,21 @@ class                notifier : public checkable {
   uint32_t           _modified_attributes;
 
  private:
+
+  static bool (notifier::* const _is_notification_viable[])(notification_option) const;
+
+  bool               _is_notification_viable_normal(
+                                            notification_option options) const;
+  bool               _is_notification_viable_recovery(
+                                            notification_option options) const;
+  bool               _is_notification_viable_acknowledgement(
+                                            notification_option options) const;
+  bool               _is_notification_viable_flapping(
+                                            notification_option options) const;
+  bool               _is_notification_viable_downtime(
+                                            notification_option options) const;
+  bool               _is_notification_viable_custom(
+                                            notification_option options) const;
   static uint64_t    _next_notification_id;
   uint32_t           _first_notification_delay;
   uint32_t           _recovery_notification_delay;
