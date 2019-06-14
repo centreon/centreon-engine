@@ -113,7 +113,8 @@ notifier::notifier(int notifier_type,
       _latency{0.0},
       _next_check{0L},
       _no_more_notifications{false},
-      _should_be_scheduled{true} {
+      _should_be_scheduled{true},
+      _state_history_index{0} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for notifier '" << display_name
