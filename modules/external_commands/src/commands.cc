@@ -1880,7 +1880,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
   com::centreon::engine::host* temp_host{nullptr};
   contact* temp_contact{nullptr};
   timeperiod* temp_timeperiod{nullptr};
-  commands::command* temp_command{nullptr};
   char* host_name{nullptr};
   char* svc_description{nullptr};
   char* contact_name{nullptr};
@@ -1982,6 +1981,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   temp_ptr = string::dup(charval);
 
   timeperiod_map::const_iterator found;
+  command_map::iterator cmd_found;
 
   /* do some validation */
   switch (cmd) {
@@ -2015,7 +2015,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_SVC_CHECK_COMMAND:
     /* make sure the command exists */
     temp_ptr2 = my_strtok(temp_ptr, "!");
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_ptr2)) == nullptr) {
+    cmd_found = commands::command::commands.find(temp_ptr2);
+    if(cmd_found == commands::command::commands.end() || !cmd_found->second) {
       delete[] temp_ptr;
       return ERROR;
     }
@@ -2033,25 +2034,25 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER:
     config->global_host_event_handler(temp_ptr);
-    global_host_event_handler_ptr = temp_command;
+    global_host_event_handler_ptr = cmd_found->second.get();
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER:
     config->global_service_event_handler(temp_ptr);
-    global_service_event_handler_ptr = temp_command;
+    global_service_event_handler_ptr = cmd_found->second.get();
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_HOST_EVENT_HANDLER:
     temp_host->set_event_handler(temp_ptr);
-    temp_host->event_handler_ptr = temp_command;
+    temp_host->event_handler_ptr = cmd_found->second.get();
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_HOST_CHECK_COMMAND:
     temp_host->set_check_command(temp_ptr);
-    temp_host->check_command_ptr = temp_command;
+    temp_host->check_command_ptr = cmd_found->second.get();
     attr = MODATTR_CHECK_COMMAND;
     break;
 
@@ -2070,14 +2071,14 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_SVC_EVENT_HANDLER:
     found_svc->second->set_event_handler(temp_ptr);
-    found_svc->second->event_handler_ptr = temp_command;
+    found_svc->second->event_handler_ptr = cmd_found->second.get();
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_SVC_CHECK_COMMAND:
     found_svc->second->set_check_command(temp_ptr);
     delete[] temp_ptr;
-    found_svc->second->check_command_ptr = temp_command;
+    found_svc->second->check_command_ptr = cmd_found->second.get();
     attr = MODATTR_CHECK_COMMAND;
     break;
 

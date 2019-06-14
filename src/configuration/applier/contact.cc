@@ -286,8 +286,8 @@ void applier::contact::modify_object(
            end(obj.host_notification_commands().end());
          it != end;
          ++it) {
-      std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator itt(configuration::applier::state::instance().commands().find(*it));
-      if (itt != configuration::applier::state::instance().commands().end())
+      command_map::const_iterator itt(commands::command::commands.find(*it));
+      if (itt != commands::command::commands.end())
         c->get_host_notification_commands().push_back(itt->second);
       else
         throw (engine_error()
@@ -307,8 +307,8 @@ void applier::contact::modify_object(
            end(obj.service_notification_commands().end());
          it != end;
          ++it) {
-      std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator itt(configuration::applier::state::instance().commands().find(*it));
-      if (itt != configuration::applier::state::instance().commands().end())
+      command_map::const_iterator itt(commands::command::commands.find(*it));
+      if (itt != commands::command::commands.end())
         c->get_service_notification_commands().push_back(itt->second);
       else
         throw (engine_error()
@@ -404,8 +404,8 @@ void applier::contact::resolve_object(
          end(obj.host_notification_commands().end());
        it != end;
        ++it) {
-    std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator itt(configuration::applier::state::instance().commands().find(*it));
-    if (itt != configuration::applier::state::instance().commands().end())
+    command_map::const_iterator itt(commands::command::commands.find(*it));
+    if (itt != commands::command::commands.end())
       ct_it->second->get_host_notification_commands().push_back(itt->second);
     else {
       ++config_errors;
@@ -422,8 +422,8 @@ void applier::contact::resolve_object(
 	 end(obj.service_notification_commands().end());
        it != end;
        ++it) {
-    std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator itt(configuration::applier::state::instance().commands().find(*it));
-    if (itt != configuration::applier::state::instance().commands().end())
+    command_map::const_iterator itt(commands::command::commands.find(*it));
+    if (itt != commands::command::commands.end())
       ct_it->second->get_service_notification_commands().push_back(itt->second);
     else {
       ++config_errors;

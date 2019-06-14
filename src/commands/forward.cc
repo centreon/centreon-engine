@@ -48,6 +48,13 @@ forward::forward(
              command& cmd)
   : command(command_name, command_line, NULL),
     _command(&cmd) {
+  if (_name.empty())
+    throw (engine_error()
+      << "Could not create a command with an empty name");
+  if (_command_line.empty())
+    throw (engine_error()
+      << "Could not create '"
+      << _name << "' command: command line is empty");
 }
 
 /**

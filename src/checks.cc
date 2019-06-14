@@ -401,7 +401,7 @@ bool check_result::process_check_result_queue(std::string const& dirname) {
   while ((dirfile = readdir(dirp)) != nullptr) {
     // Create /path/to/file.
     char file[MAX_FILENAME_LENGTH];
-    snprintf(file, sizeof(file), "%s/%s", dirname, dirfile->d_name);
+    snprintf(file, sizeof(file), "%s/%s", dirname.c_str(), dirfile->d_name);
     file[sizeof(file) - 1] = '\x0';
 
     // Process this if it's a check result file...
@@ -432,9 +432,10 @@ bool check_result::process_check_result_queue(std::string const& dirname) {
       // Can we find the associated ok-to-go file ?
       std::string temp_buffer(file);
       temp_buffer.append(".ok");
-      result = stat(temp_buffer.c_str(), &ok_stat_buf);
-      if (result == -1)
+      if (stat(temp_buffer.c_str(), &ok_stat_buf) == -1) {
+        result = false;
         continue;
+      }
 
       // Process the file.
       result = process_check_result_file(file);

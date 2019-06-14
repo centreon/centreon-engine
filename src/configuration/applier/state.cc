@@ -188,86 +188,14 @@ applier::state::~state() throw() {
   engine::contact::contacts.clear();
   engine::servicegroup::servicegroups.clear();
   engine::hostgroup::hostgroups.clear();
+  engine::commands::command::commands.clear();
+  engine::commands::connector::connectors.clear();
 
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();
   applier::globals::unload();
   applier::logging::unload();
-}
-
-/**
- *  Get the current commands.
- *
- *  @return The current commands.
- */
-std::unordered_map<std::string, std::shared_ptr<commands::command>> const& applier::state::commands() const throw () {
-  return _commands;
-}
-
-/**
- *  Get the current commands.
- *
- *  @return The current commands.
- */
-std::unordered_map<std::string, std::shared_ptr<commands::command>>& applier::state::commands() throw () {
-  return _commands;
-}
-
-/**
- *  Given a command name, find a command from the list in memory.
- *
- *  @param[in] k Command name.
- *
- *  @return Command object if found, nullptr otherwise.
- */
-commands::command const* applier::state::find_command(configuration::command::key_type const& k) const {
-  if (k.empty())
-    return nullptr;
-
-  std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
-    it(_commands.find(k));
-
-  if (it != _commands.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a command name, find a command from the list in memory.
- *
- *  @param[in] k Command name.
- *
- *  @return Command object if found, nullptr otherwise.
- */
-commands::command* applier::state::find_command(configuration::command::key_type const& k) {
-  if (k.empty())
-    return nullptr;
-
-  std::unordered_map<std::string, std::shared_ptr<commands::command>>::const_iterator
-    it(_commands.find(k));
-
-  if (it != _commands.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a contact name, find a contact from the list in memory.
- *
- *  @param[in] name Contact name.
- *
- *  @return Contact object if found, nullptr otherwise.
- */
-engine::contactgroup const* applier::state::find_contactgroup(configuration::contact::key_type const& k) const {
-  if (k.empty())
-    return nullptr;
-
-  contactgroup_map::const_iterator it(_contactgroups.find(k));
-
-  if (it != _contactgroups.end())
-    return it->second.get();
-  return nullptr;
 }
 
 /**
@@ -284,61 +212,6 @@ engine::contactgroup* applier::state::find_contactgroup(configuration::contact::
   contactgroup_map::const_iterator it(_contactgroups.find(k));
 
   if (it != _contactgroups.end())
-    return it->second.get();
-  return nullptr;
-}
-/**
- *  Get the current connectors.
- *
- *  @return The current connectors.
- */
-std::unordered_map<std::string, std::shared_ptr<commands::connector> > const& applier::state::connectors() const throw () {
-  return _connectors;
-}
-
-/**
- *  Get the current connectors.
- *
- *  @return The current connectors.
- */
-std::unordered_map<std::string, std::shared_ptr<commands::connector> >& applier::state::connectors() throw () {
-  return _connectors;
-}
-
-/**
- *  Given a connector name, find a connector from the list in memory.
- *
- *  @param[in] k Command name.
- *
- *  @return Command object if found, nullptr otherwise.
- */
-commands::connector const* applier::state::find_connector(configuration::connector::key_type const& k) const {
-  if (k.empty())
-    return nullptr;
-
-  std::unordered_map<std::string, std::shared_ptr<commands::connector>>::const_iterator
-    it(_connectors.find(k));
-
-  if (it != _connectors.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Given a connector name, find a connector from the list in memory.
- *
- *  @param[in] k Command name.
- *
- *  @return Command object if found, nullptr otherwise.
- */
-commands::connector* applier::state::find_connector(configuration::connector::key_type const& k) {
-  if (k.empty())
-    return nullptr;
-
-  std::unordered_map<std::string, std::shared_ptr<commands::connector>>::const_iterator
-    it(_connectors.find(k));
-
-  if (it != _connectors.end())
     return it->second.get();
   return nullptr;
 }
@@ -359,18 +232,6 @@ contactgroup_map const& applier::state::contactgroups() const throw () {
  */
 contactgroup_map& applier::state::contactgroups() throw () {
   return _contactgroups;
-}
-
-/**
- *  Find a contact group from its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-contactgroup_map::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
-  return _contactgroups.find(k);
 }
 
 /**
@@ -411,18 +272,6 @@ std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>& appl
  *  @return Iterator to the host object if found, hosts().end() if it
  *          was not.
  */
-std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
-  return _hosts.find(k);
-}
-
-/**
- *  Find a host from its key.
- *
- *  @param[in] k Host key (host name).
- *
- *  @return Iterator to the host object if found, hosts().end() if it
- *          was not.
- */
 std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
   return _hosts.find(k);
 }
@@ -443,18 +292,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> > 
  */
 umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >& applier::state::hostdependencies() throw () {
   return _hostdependencies;
-}
-
-/**
- *  Get a host dependency from its key.
- *
- *  @param[in] k Host dependency key.
- *
- *  @return Iterator to the element if found, hostdependencies().end()
- *          otherwise.
- */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >::const_iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) const {
-  return const_cast<state*>(this)->hostdependencies_find(k);
 }
 
 /**
@@ -529,18 +366,6 @@ std::unordered_map<std::pair<unsigned long, unsigned long>,
   return _services;
 }
 
-/**
- *  Find a service by its key.
- *
- *  @param[in] k Pair of host name / service description.
- *
- *  @return Iterator to the element if found, services().end()
- *          otherwise.
- */
-std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<engine::service> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
-  return _services.find(k);
-}
 
 /**
  *  Find a service by its key.
@@ -571,18 +396,6 @@ servicedependency_mmap const& applier::state::servicedependencies() const throw 
  */
 servicedependency_mmap& applier::state::servicedependencies() throw () {
   return _servicedependencies;
-}
-
-/**
- *  Find a service dependency from its key.
- *
- *  @param[in] k The service dependency configuration.
- *
- *  @return Iterator to the element if found,
- *          servicedependencies().end() otherwise.
- */
-servicedependency_mmap ::const_iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) const {
-  return const_cast<state*>(this)->servicedependencies_find(k);
 }
 
 /**
@@ -668,18 +481,6 @@ timeperiod_map& applier::state::timeperiods() throw () {
  *  @return Iterator to the element if found, timeperiods().end()
  *          otherwise.
  */
-timeperiod_map::const_iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) const {
-  return _timeperiods.find(k);
-}
-
-/**
- *  Find a time period from its key.
- *
- *  @param[in] k Time period name.
- *
- *  @return Iterator to the element if found, timeperiods().end()
- *          otherwise.
- */
 timeperiod_map::iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) {
   return _timeperiods.find(k);
 }
@@ -690,15 +491,6 @@ timeperiod_map::iterator applier::state::timeperiods_find(configuration::timeper
  *  @return  The user macros.
  */
 std::unordered_map<std::string, std::string>& applier::state::user_macros() {
-  return _user_macros;
-}
-
-/**
- *  Return the user macros, immutable.
- *
- *  @return  The user macros, immutable.
- */
-std::unordered_map<std::string, std::string> const& applier::state::user_macros() const {
   return _user_macros;
 }
 
@@ -930,32 +722,32 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     std::string temp_command_name(config->global_host_event_handler().substr(
                                     0,
                                     config->global_host_event_handler().find_first_of('!')));
-    commands::command* temp_command(instance().find_command(temp_command_name));
-    if (!temp_command) {
+    command_map::iterator found{
+      commands::command::commands.find(temp_command_name)};
+    if(found == commands::command::commands.end() || !found->second)  {
       logger(log_verification_error, basic)
         << "Error: Global host event handler command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
     }
-
-    // Save the pointer to the command for later.
-    global_host_event_handler_ptr = temp_command;
+    else
+      global_host_event_handler_ptr = found->second.get();
   }
   if (!config->global_service_event_handler().empty()) {
     // Check the event handler command.
     std::string temp_command_name(config->global_service_event_handler().substr(
                                     0,
                                     config->global_service_event_handler().find_first_of('!')));
-    commands::command* temp_command(instance().find_command(temp_command_name));
-    if (!temp_command) {
-      logger(log_verification_error, basic)
-        << "Error: Global service event handler command '"
-        << temp_command_name << "' is not defined anywhere!";
+    command_map::iterator found{
+      commands::command::commands.find(temp_command_name)};
+    if(found == commands::command::commands.end() || !found->second)  {
+       logger(log_verification_error, basic)
+      << "Error: Global service event handler command '"
+      << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
     }
-
-    // Save the pointer to the command for later.
-    global_service_event_handler_ptr = temp_command;
+    else
+      global_service_event_handler_ptr = found->second.get();
   }
 
   // Check obsessive processor commands...
@@ -966,31 +758,31 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     std::string temp_command_name(config->ocsp_command().substr(
                                     0,
                                     config->ocsp_command().find_first_of('!')));
-    commands::command* temp_command(instance().find_command(temp_command_name));
-    if (!temp_command) {
+    command_map::iterator found{
+      commands::command::commands.find(temp_command_name)};
+    if(found == commands::command::commands.end() || !found->second)  {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive service processor command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
     }
-
-    // Save the pointer to the command for later.
-    ocsp_command_ptr = temp_command;
+    else
+      ocsp_command_ptr = found->second.get();
   }
   if (!config->ochp_command().empty()) {
     std::string temp_command_name(config->ochp_command().substr(
                                     0,
                                     config->ochp_command().find_first_of('!')));
-    commands::command* temp_command(instance().find_command(temp_command_name));
-    if (!temp_command) {
+    command_map::iterator found{
+      commands::command::commands.find(temp_command_name)};
+    if(found == commands::command::commands.end() || !found->second)  {
       logger(log_verification_error, basic)
         << "Error: Obsessive compulsive host processor command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
     }
-
-    // Save the pointer to the command for later.
-    ochp_command_ptr = temp_command;
+    else
+      ochp_command_ptr = found->second.get();
   }
 }
 

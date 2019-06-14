@@ -20,7 +20,6 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include "../../timeperiod/utils.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
@@ -44,7 +43,6 @@ class ApplierService : public ::testing::Test {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load(); // Needed to create a contact
-    commands::set::load();
   }
 
   void TearDown() override {

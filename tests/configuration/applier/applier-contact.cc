@@ -30,7 +30,6 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
@@ -50,12 +49,10 @@ class ApplierContact : public ::testing::Test {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
-    com::centreon::engine::commands::set::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
-    com::centreon::engine::commands::set::unload();
     delete config;
     config = NULL;
   }
@@ -187,8 +184,11 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   aplyr.add_object(cmd);
   ASSERT_TRUE(ctct.parse("host_notification_commands", "cmd"));
   aply.modify_object(ctct);
-  engine::commands::command* cc{configuration::applier::state::instance().find_command("cmd")};
-  ASSERT_TRUE(cc->get_command_line() == "bar");
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
+  ASSERT_TRUE(found != commands::command::commands.end());
+  ASSERT_TRUE(found->second);
+  ASSERT_TRUE(found->second->get_command_line() == "bar");
 }
 
 // Given contactgroup / contact appliers

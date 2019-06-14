@@ -336,20 +336,21 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
 
-    commands::command* temp_command(
-      configuration::applier::state::instance().find_command(temp_command_name));
-    if (temp_command == nullptr) {
+    command_map::iterator cmd_found = commands::command::commands.find(
+      temp_command_name);
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
       logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
         << "' specified in service '" << svc->get_description()
         << "' for host '" << svc->get_hostname() << "' not defined anywhere";
       errors++;
     }
+    else
+      svc->event_handler_ptr = cmd_found->second.get();
 
     delete[] buf;
-
     /* save the pointer to the event handler for later */
-    svc->event_handler_ptr = temp_command;
   }
 
   /* check the service check_command */
@@ -358,19 +359,21 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   /* get the command name, leave any arguments behind */
   char* temp_command_name = my_strtok(buf, "!");
 
-  commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
-  if (temp_command == nullptr) {
-    logger(log_verification_error, basic)
+  command_map::iterator cmd_found = commands::command::commands.find(
+    temp_command_name);
+
+  if (cmd_found == commands::command::commands.end() || !cmd_found->second) {    logger(log_verification_error, basic)
       << "Error: Service check command '" << temp_command_name
       << "' specified in service '" << svc->get_description()
       << "' for host '" << svc->get_hostname() << "' not defined anywhere!";
     errors++;
   }
+  else
+    svc->check_command_ptr = cmd_found->second.get();
 
   delete[] buf;
 
   /* save the pointer to the check command for later */
-  svc->check_command_ptr = temp_command;
 
   // Check for sane recovery options.
   if (svc->get_notifications_enabled()
@@ -548,19 +551,22 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
 
-    commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
-    if (temp_command == nullptr) {
-      logger(log_verification_error, basic)
+    command_map::iterator cmd_found = commands::command::commands.find(
+      temp_command_name);
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
+        logger(log_verification_error, basic)
         << "Error: Event handler command '" << temp_command_name
         << "' specified for host '" << hst->get_name()
         << "' not defined anywhere";
-      errors++;
+        errors++;
     }
+    else
+      hst->event_handler_ptr = cmd_found->second.get();
 
     delete[] buf;
 
     /* save the pointer to the event handler command for later */
-    hst->event_handler_ptr = temp_command;
   }
 
   /* hosts that don't have check commands defined shouldn't ever be checked... */
@@ -572,17 +578,18 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
 
-    commands::command* temp_command = configuration::applier::state::instance().find_command(temp_command_name);
-    if (temp_command == nullptr) {
+    command_map::iterator cmd_found = commands::command::commands.find(
+      temp_command_name);
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
       logger(log_verification_error, basic)
         << "Error: Host check command '" << temp_command_name
         << "' specified for host '" << hst->get_name()
         << "' is not defined anywhere!",
       errors++;
     }
-
-    /* save the pointer to the check command for later */
-    hst->check_command_ptr = temp_command;
+    else
+      hst->check_command_ptr = cmd_found->second.get(); /* save the pointer to the check command for later */
 
     delete[] buf;
   }

@@ -19,7 +19,6 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -41,14 +40,12 @@ class ApplierConnector : public ::testing::Test {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
-    commands::set::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
     delete config;
     config = NULL;
-    commands::set::unload();
   }
 
 };
@@ -63,7 +60,7 @@ TEST_F(ApplierConnector, UnusableConnectorFromConfig) {
   aply.add_object(cnn);
   set_connector s(config->connectors());
   ASSERT_EQ(s.size(), 1);
-  ASSERT_EQ(configuration::applier::state::instance().connectors().size(), 1);
+  ASSERT_EQ(commands::connector::connectors.size(), 1);
 
 }
 
@@ -80,9 +77,13 @@ TEST_F(ApplierConnector, ModifyConnector) {
   cnn.parse("connector_line", "date");
   aply.modify_object(cnn);
 
-  commands::connector* cc(applier::state::instance().find_connector("connector"));
-  ASSERT_EQ(cc->get_name(), "connector");
-  ASSERT_EQ(cc->get_command_line(), "date");
+  connector_map::iterator found_con{
+    commands::connector::connectors.find("connector")};
+  ASSERT_FALSE(found_con == commands::connector::connectors.end());
+  ASSERT_FALSE(!found_con->second);
+
+  ASSERT_EQ(found_con->second->get_name(), "connector");
+  ASSERT_EQ(found_con->second->get_command_line(), "date");
 }
 
 // When a non existing connector is modified
@@ -103,7 +104,7 @@ TEST_F(ApplierConnector, RemoveNonExistingConnector) {
   cnn.parse("connector_line", "echo 1");
 
   ASSERT_TRUE(config->connectors().size() == 0);
-  ASSERT_TRUE(configuration::applier::state::instance().connectors().size() == 0);
+  ASSERT_TRUE(commands::connector::connectors.size() == 0);
 }
 
 // Given simple connector applier already applied
@@ -117,5 +118,5 @@ TEST_F(ApplierConnector, RemoveConnector) {
   aply.add_object(cnn);
   aply.remove_object(cnn);
   ASSERT_TRUE(config->connectors().size() == 0);
-  ASSERT_TRUE(configuration::applier::state::instance().connectors().size() == 0);
+  ASSERT_TRUE(commands::connector::connectors.size() == 0);
 }

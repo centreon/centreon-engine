@@ -29,7 +29,6 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/commands/command.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -402,10 +401,12 @@ void checker::run(
                                  "");
 
   // Get command object.
-  commands::set& cmd_set(commands::set::instance());
-  std::shared_ptr<commands::command>
-    cmd(cmd_set.get_command(hst->check_command_ptr->get_name()));
-  std::string processed_cmd(cmd->process_cmd(&macros));
+  command_map::iterator found{
+    commands::command::commands.find(hst->check_command_ptr->get_name())};
+   if(found == commands::command::commands.end() || !found->second)
+     throw (engine_error() << "unknow command " << hst->check_command_ptr->get_name());
+
+  std::string processed_cmd(found->second->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
 
   // Send event broker.
@@ -450,7 +451,7 @@ void checker::run(
     retry = false;
     try {
       // Run command.
-      uint64_t id(cmd->run(
+      uint64_t id(found->second->run(
                               processed_cmd,
                               macros,
                               config->host_check_timeout()));
@@ -631,10 +632,12 @@ void checker::run(
                                  "");
 
   // Get command object.
-  commands::set& cmd_set(commands::set::instance());
-  std::shared_ptr<commands::command>
-    cmd(cmd_set.get_command(svc->check_command_ptr->get_name()));
-  std::string processed_cmd(cmd->process_cmd(&macros));
+  command_map::iterator found{
+    commands::command::commands.find(svc->check_command_ptr->get_name())};
+  if(found == commands::command::commands.end() || !found->second)
+    throw (engine_error() << "unknow command " << svc->check_command_ptr->get_name());
+
+  std::string processed_cmd(found->second->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
 
   // Send event broker.
@@ -677,7 +680,7 @@ void checker::run(
     retry = false;
     try {
       // Run command.
-      uint64_t id(cmd->run(
+      uint64_t id(found->second->run(
                               processed_cmd,
                               macros,
                               config->service_check_timeout()));
@@ -1039,10 +1042,12 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   hst->set_last_check(start_time.tv_sec);
 
   // Get command object.
-  commands::set& cmd_set(commands::set::instance());
-  std::shared_ptr<commands::command>
-    cmd(cmd_set.get_command(hst->check_command_ptr->get_name()));
-  std::string processed_cmd(cmd->process_cmd(&macros));
+  command_map::iterator found{
+    commands::command::commands.find(hst->check_command_ptr->get_name())};
+  if(found == commands::command::commands.end() || !found->second)
+    throw (engine_error() << "unknow command " << hst->check_command_ptr->get_name());
+
+  std::string processed_cmd(found->second->process_cmd(&macros));
   char* tmp_processed_cmd(string::dup(processed_cmd));
 
   // Send broker event.
@@ -1101,7 +1106,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   // Run command.
   commands::result res;
   try {
-    cmd->run(
+    found->second->run(
            processed_cmd,
            macros,
            config->host_check_timeout(),

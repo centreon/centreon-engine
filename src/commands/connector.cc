@@ -35,6 +35,8 @@ using namespace com::centreon::engine::commands;
 *                                     *
 **************************************/
 
+connector_map connector::connectors;
+
 /**
  *  Constructor.
  *

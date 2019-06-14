@@ -90,16 +90,19 @@ int xpddefault_initialize_performance_data() {
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
 
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
+    command_map::iterator cmd_found = commands::command::commands.find(
+      temp_command_name);
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
       logger(log_runtime_warning, basic)
         << "Warning: Host performance command '" << temp_command_name
         << "' was not found - host performance data will not "
         "be processed!";
     }
-    delete[] temp_buffer;
+    else
+      xpddefault_host_perfdata_command_ptr = cmd_found->second.get(); // save the command pointer for later.
 
-    // save the command pointer for later.
-    xpddefault_host_perfdata_command_ptr = temp_command;
+    delete[] temp_buffer;
   }
 
   if (!config->service_perfdata_command().empty()) {
@@ -108,18 +111,20 @@ int xpddefault_initialize_performance_data() {
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
 
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
+    command_map::iterator cmd_found = commands::command::commands.find(
+      temp_command_name);
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
       logger(log_runtime_warning, basic)
         << "Warning: Service performance command '" << temp_command_name
         << "' was not found - service performance data will not "
         "be processed!";
     }
+    else
+      xpddefault_service_perfdata_command_ptr = cmd_found->second.get();
 
     // free memory.
     delete[] temp_buffer;
-
-    // save the command pointer for later.
-    xpddefault_service_perfdata_command_ptr = temp_command;
   }
 
   if (!config->host_perfdata_file_processing_command().empty()) {
@@ -128,18 +133,20 @@ int xpddefault_initialize_performance_data() {
 
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
+    command_map::iterator cmd_found = commands::command::commands.find(
+      temp_command_name);
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
       logger(log_runtime_warning, basic)
         << "Warning: Host performance file processing command '"
         << temp_command_name << "' was not found - host performance "
         "data file will not be processed!";
     }
+    else
+      xpddefault_host_perfdata_file_processing_command_ptr = cmd_found->second.get();
 
     // free memory.
     delete[] temp_buffer;
-
-    // save the command pointer for later.
-    xpddefault_host_perfdata_file_processing_command_ptr = temp_command;
   }
 
   if (!config->service_perfdata_file_processing_command().empty()) {
@@ -148,19 +155,19 @@ int xpddefault_initialize_performance_data() {
 
     // get the command name, leave any arguments behind.
     temp_command_name = my_strtok(temp_buffer, "!");
-    if ((temp_command = configuration::applier::state::instance().find_command(temp_command_name)) == nullptr) {
+    command_map::iterator cmd_found = commands::command::commands.find(
+      temp_command_name);
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
       logger(log_runtime_warning, basic)
         << "Warning: Service performance file processing command '"
         << temp_command_name << "' was not found - service performance "
         "data file will not be processed!";
     }
-
+    else
+      xpddefault_service_perfdata_file_processing_command_ptr = cmd_found->second.get();
     // free memory.
     delete[] temp_buffer;
-
-    // save the command pointer for later.
-    xpddefault_service_perfdata_file_processing_command_ptr
-      = temp_command;
   }
 
   return OK;

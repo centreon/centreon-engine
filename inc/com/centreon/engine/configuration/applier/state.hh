@@ -68,86 +68,48 @@ namespace           configuration {
       static void   load();
       static void   unload();
 
-      std::unordered_map<std::string, std::shared_ptr<commands::command>> const&
-                    commands() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<commands::command>>&
-                    commands() throw ();
-      commands::command const*
-                    find_command(configuration::command::key_type const& k) const;
-      commands::command*
-                    find_command(configuration::command::key_type const& k);
-      engine::contact const*
-                    find_contact(configuration::contact::key_type const& k) const;
       engine::contact*
                     find_contact(configuration::contact::key_type const& k);
-      engine::contactgroup const*
-                    find_contactgroup(configuration::contactgroup::key_type const& k) const;
       engine::contactgroup*
                     find_contactgroup(configuration::contactgroup::key_type const& k);
-      std::unordered_map<std::string, std::shared_ptr<commands::connector>> const&
-                    connectors() const throw ();
-      std::unordered_map<std::string, std::shared_ptr<commands::connector>>&
-                    connectors() throw ();
-      commands::connector const*
-                    find_connector(configuration::connector::key_type const& k) const;
-      commands::connector*
-                    find_connector(configuration::connector::key_type const& k);
-      contact_map::const_iterator
-                    contacts_find(configuration::contact::key_type const& k) const;
-      contact_map::iterator
-                    contacts_find(configuration::contact::key_type const& k);
       contactgroup_map const&
                     contactgroups() const throw ();
       contactgroup_map&
                     contactgroups() throw ();
-      contactgroup_map::const_iterator
-                    contactgroups_find(configuration::contactgroup::key_type const& k) const;
       contactgroup_map::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
       std::unordered_map<uint64_t, std::shared_ptr<engine::host>> const&
                     hosts() const throw ();
       std::unordered_map<uint64_t, std::shared_ptr<engine::host>>&
                     hosts() throw ();
-      std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-                    hosts_find(configuration::host::key_type const& k) const;
       std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::iterator
                     hosts_find(configuration::host::key_type const& k);
       hostdependency_mmap const&
                     hostdependencies() const throw ();
       hostdependency_mmap&
                     hostdependencies() throw ();
-      hostdependency_mmap::const_iterator
-                    hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>> const&
                     services() const throw ();
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>&
                     services() throw ();
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::const_iterator
-                    services_find(configuration::service::key_type const& k) const;
       std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator
                     services_find(configuration::service::key_type const& k);
       servicedependency_mmap const&
                     servicedependencies() const throw ();
       servicedependency_mmap&
                     servicedependencies() throw ();
-      servicedependency_mmap::const_iterator
-                    servicedependencies_find(configuration::servicedependency::key_type const& k) const;
       servicedependency_mmap::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
       timeperiod_map const&
                     timeperiods() const throw ();
       timeperiod_map &
                     timeperiods() throw ();
-      timeperiod_map::const_iterator
-                    timeperiods_find(configuration::timeperiod::key_type const& k) const;
       timeperiod_map::iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k);
       std::unordered_map<std::string, std::string>&
                     user_macros();
-      std::unordered_map<std::string, std::string> const&
-                    user_macros() const;
       std::unordered_map<std::string, std::string>::const_iterator
                     user_macros_find(std::string const& key) const;
       void          try_lock();
@@ -184,10 +146,6 @@ namespace           configuration {
 
       state*        _config;
 
-      std::unordered_map<std::string, std::shared_ptr<commands::command>>
-                    _commands;
-      std::unordered_map<std::string, std::shared_ptr<commands::connector>>
-                    _connectors;
       std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>
                     _contactgroups;
       concurrency::condvar
@@ -196,8 +154,6 @@ namespace           configuration {
                     _hosts;
       hostdependency_mmap
                     _hostdependencies;
-      hostescalation_mmap
-                    _hostescalations;
       hostgroup_map _hostgroups;
       concurrency::mutex
                     _lock;

@@ -22,7 +22,6 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
@@ -47,7 +46,6 @@ class ApplierHost : public ::testing::Test {
     configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
-    commands::set::load();
   }
 
   void TearDown() override {

@@ -47,7 +47,15 @@ raw::raw(
        std::string const& name,
        std::string const& command_line,
        command_listener* listener)
-  : command(name, command_line, listener), process_listener() {}
+  : command(name, command_line, listener), process_listener() {
+  if (_name.empty())
+    throw (engine_error()
+      << "Could not create a command with an empty name");
+  if (_command_line.empty())
+    throw (engine_error()
+      << "Could not create '"
+      << _name << "' command: command line is empty");
+}
 
 /**
  *  Copy constructor

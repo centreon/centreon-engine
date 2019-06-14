@@ -32,6 +32,15 @@
 #  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
+namespace commands {
+  class connector;
+}
+CCE_END()
+
+typedef std::unordered_map<std::string,
+  std::shared_ptr<com::centreon::engine::commands::connector>> connector_map;
+
+CCE_BEGIN()
 
 namespace                commands {
   /**
@@ -64,6 +73,8 @@ namespace                commands {
                            result& res) override;
     void                 set_command_line(
                            std::string const& command_line) override;
+
+    static connector_map connectors;
 
   private:
     class                restart : public concurrency::thread {

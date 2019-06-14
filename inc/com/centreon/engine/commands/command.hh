@@ -26,6 +26,15 @@
 #  include "com/centreon/engine/macros/defines.hh"
 
 CCE_BEGIN()
+namespace commands {
+  class command;
+}
+CCE_END()
+
+typedef std::unordered_map<std::string,
+  std::shared_ptr<com::centreon::engine::commands::command>> command_map;
+
+CCE_BEGIN()
 
 namespace                      commands {
   /**
@@ -37,7 +46,6 @@ namespace                      commands {
    */
   class                        command {
   public:
-    static command*            add_command(commands::command* obj);
                                command(
                                  std::string const& name,
                                  std::string const& command_line,
@@ -64,6 +72,7 @@ namespace                      commands {
                                  std::string const& command_line);
     void                       set_listener(
                                  command_listener* listener) throw ();
+    static command_map         commands;
 
   protected:
                                command(command const& right);

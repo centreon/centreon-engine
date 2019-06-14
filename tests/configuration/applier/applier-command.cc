@@ -21,7 +21,6 @@
 #include <string>
 #include <unordered_map>
 #include "../../timeperiod/utils.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -44,14 +43,12 @@ class ApplierCommand : public ::testing::Test {
     if (config == nullptr)
       config = new configuration::state;
     applier::state::load();  // Needed to create a contact
-    commands::set::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
     delete config;
     config = nullptr;
-    commands::set::unload();
   }
 
 };
@@ -67,7 +64,7 @@ TEST_F(ApplierCommand, UnusableCommandFromConfig) {
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1);
   std::unordered_map<std::string, std::shared_ptr<commands::command>> cm(
-    configuration::applier::state::instance().commands());
+    commands::command::commands);
   ASSERT_EQ(cm.size(), 0);
 }
 
@@ -82,9 +79,12 @@ TEST_F(ApplierCommand, NewCommandFromConfig) {
   aply.add_object(cmd);
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1);
-  commands::command const* cc(applier::state::instance().find_command("cmd"));
-  ASSERT_EQ(cc->get_name(), "cmd");
-  ASSERT_EQ(cc->get_command_line(), "echo 1");
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
+  ASSERT_FALSE(found == commands::command::commands.end());
+  ASSERT_FALSE(!found->second);
+  ASSERT_EQ(found->second->get_name(), "cmd");
+  ASSERT_EQ(found->second->get_command_line(), "echo 1");
 }
 
 // Given a command applier
@@ -99,8 +99,9 @@ TEST_F(ApplierCommand, NewCommandWithEmptyConnectorFromConfig) {
   ASSERT_THROW(aply.add_object(cmd), std::exception);
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1);
-  commands::command const* cc(applier::state::instance().find_command("cmd"));
-  ASSERT_TRUE(cc == nullptr);
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
+  ASSERT_TRUE(found == commands::command::commands.end());
 }
 
 // Given a command applier
@@ -117,8 +118,8 @@ TEST_F(ApplierCommand, NewCommandWithConnectorFromConfig) {
   configuration::connector cnn("perl");
 
   cnn_aply.add_object(cnn);
-//  aply.add_object(cmd);
-//
+  aply.add_object(cmd);
+
 //  set_command s(config->commands());
 //  ASSERT_EQ(s.size(), 1);
 //  commands::command const* cc(applier::state::instance().find_command("cmd"));
@@ -145,14 +146,22 @@ TEST_F(ApplierCommand, NewCommandAndConnectorWithSameName) {
 
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1);
-  commands::command const* cc(applier::state::instance().find_command("cmd"));
-  ASSERT_EQ(cc->get_name(), "cmd");
-  ASSERT_EQ(cc->get_command_line(), "echo 1");
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
+  ASSERT_FALSE(found == commands::command::commands.end());
+  ASSERT_FALSE(!found->second);
+
+  ASSERT_EQ(found->second->get_name(), "cmd");
+  ASSERT_EQ(found->second->get_command_line(), "echo 1");
+
   aply.resolve_object(cmd);
-  commands::connector* mycnn(applier::state::instance().find_connector("cmd"));
-  ASSERT_FALSE(!mycnn);
-  commands::command const* mycmd(applier::state::instance().find_command("cmd"));
-  ASSERT_FALSE(!mycmd);
+  connector_map::iterator found_con{
+    commands::connector::connectors.find("cmd")};
+  ASSERT_TRUE(found_con != commands::connector::connectors.end());
+  ASSERT_TRUE(found_con->second);
+
+  found = commands::command::commands.find("cmd");
+  ASSERT_TRUE(found != commands::command::commands.end());
 }
 
 // Given some command and connector appliers already applied with
@@ -199,7 +208,9 @@ TEST_F(ApplierCommand, RemoveCommand) {
   aply.add_object(cmd);
 
   aply.remove_object(cmd);
-  ASSERT_TRUE(applier::state::instance().find_command("cmd") == nullptr);
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
+  ASSERT_EQ(found, commands::command::commands.end());
   ASSERT_TRUE(config->commands().size() == 0);
 }
 
@@ -219,6 +230,8 @@ TEST_F(ApplierCommand, RemoveCommandWithConnector) {
   aply.add_object(cmd);
 
   aply.remove_object(cmd);
-  ASSERT_TRUE(applier::state::instance().find_command("cmd") == nullptr);
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
+  ASSERT_EQ(found, commands::command::commands.end());
   ASSERT_TRUE(config->commands().size() == 0);
 }

@@ -21,7 +21,6 @@
 #include <gtest/gtest.h>
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/process_manager.hh"
 
@@ -39,7 +38,6 @@ class SimpleCommand : public ::testing::Test {
       config = new configuration::state;
     process_manager::load();
     configuration::applier::state::load();  // Needed to store commands
-    set::load();
   }
 
   void TearDown() override {
@@ -68,26 +66,22 @@ class my_listener : public commands::command_listener {
 // When the add_command method is called with it as argument,
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, NewCommandWithNoName) {
-  ASSERT_THROW(commands::command::add_command(
-        new commands::raw("", "bar")), std::exception);
+  ASSERT_THROW(new commands::raw("", "bar"), std::exception);
 }
 
 // Given a command to store,
 // When the add_command method is called with an empty value,
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, NewCommandWithNoValue) {
-  ASSERT_THROW(commands::command::add_command(
-        new commands::raw("foo", "")), std::exception);
+  ASSERT_THROW(new commands::raw("foo", ""), std::exception);
 }
 
 // Given an already existing command
 // When the add_command method is called with the same name
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, CommandAlreadyExisting) {
-  commands::command::add_command(
-        new commands::raw("toto", "/bin/ls"));
-  ASSERT_NO_THROW(commands::command::add_command(
-        new commands::raw("toto", "/bin/ls")));
+  new commands::raw("toto", "/bin/ls");
+  ASSERT_NO_THROW(new commands::raw("toto", "/bin/ls"));
 }
 
 // Given a name and a command line
@@ -96,8 +90,7 @@ TEST_F(SimpleCommand, CommandAlreadyExisting) {
 // When sync executed
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandSync) {
-  commands::command* cmd(commands::command::add_command(
-        new commands::raw("test", "/bin/echo bonjour")));
+  commands::command* cmd(new commands::raw("test", "/bin/echo bonjour"));
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
   commands::result res;
@@ -114,8 +107,7 @@ TEST_F(SimpleCommand, NewCommandSync) {
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandAsync) {
   std::unique_ptr<my_listener> lstnr(new my_listener);
-  commands::command* cmd(commands::command::add_command(
-    new commands::raw("test", "/bin/echo bonjour")));
+  commands::command* cmd(new commands::raw("test", "/bin/echo bonjour"));
   cmd->set_listener(lstnr.get());
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));

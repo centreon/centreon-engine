@@ -52,8 +52,6 @@ namespace             configuration {
      private:
                       command(command const& right);
       command&        operator=(command const& right);
-      commands::command const*
-                      _create_command(configuration::command const& obj);
     };
   }
 }

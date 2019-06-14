@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/connector.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
@@ -70,8 +69,7 @@ void applier::connector::add_object(
                         obj.connector_name(),
                         processed_cmd,
                         &checks::checker::instance()));
-  state::instance().connectors()[obj.connector_name()] = cmd;
-  commands::set::instance().add_command(cmd);
+  commands::connector::connectors[obj.connector_name()] = cmd;
 }
 
 /**
@@ -104,9 +102,8 @@ void applier::connector::modify_object(
            << obj.connector_name() << "'");
 
   // Find connector object.
-  umap<std::string, std::shared_ptr<commands::connector> >::iterator
-    it_obj(applier::state::instance().connectors().find(obj.key()));
-  if (it_obj == applier::state::instance().connectors().end())
+  connector_map::iterator it_obj(commands::connector::connectors.find(obj.key()));
+  if (it_obj == commands::connector::connectors.end())
     throw (engine_error() << "Could not modify non-existing "
            << "connector object '" << obj.connector_name() << "'");
   commands::connector* c(it_obj->second.get());
@@ -143,12 +140,10 @@ void applier::connector::remove_object(
     << "Removing connector '" << obj.connector_name() << "'.";
 
   // Find connector.
-  umap<std::string, std::shared_ptr<commands::connector> >::iterator
-    it(applier::state::instance().connectors().find(obj.key()));
-  if (it != applier::state::instance().connectors().end()) {
+  connector_map::iterator it(commands::connector::connectors.find(obj.key()));
+  if (it != commands::connector::connectors.end()) {
     // Remove connector object.
-    commands::set::instance().remove_command(obj.connector_name());
-    state::instance().connectors().erase(it);
+    commands::connector::connectors.erase(it);
   }
 
   // Remove connector from the global configuration set.
