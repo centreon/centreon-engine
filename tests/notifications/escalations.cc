@@ -76,9 +76,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotification) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
    */
-  time_t now{-1};
-  localtime(&now);
-  set_time(now);
+  set_time(43200);
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   for (int i = 0; i < 7; ++i)
@@ -97,15 +95,11 @@ TEST_F(HostEscalation, SimpleNormalHostNotification) {
 TEST_F(HostEscalation, SimpleNormalHostNotificationOutsideTimeperiod) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
-  time_t t{time(nullptr)};  // get time now
-  /* One hour before... */
-  t -= 3600;
-  std::tm* now = std::localtime(&t);
-  int end{now->tm_sec + now->tm_min * 60 + now->tm_hour * 3600};
+  set_time(20000);
 
   uint64_t id{_host->get_next_notification_id()};
   for (int i = 0; i < 7; ++i)
-    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, end));
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
@@ -119,15 +113,11 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationOutsideTimeperiod) {
 TEST_F(HostEscalation, SimpleNormalHostNotificationForcedNotification) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
-  time_t t{time(nullptr)};  // get time now
-  /* One hour before... */
-  t -= 3600;
-  std::tm* now = std::localtime(&t);
-  int end{now->tm_sec + now->tm_min * 60 + now->tm_hour * 3600};
+  set_time(20000);
 
   uint64_t id{_host->get_next_notification_id()};
   for (int i = 0; i < 7; ++i)
-    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, end));
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
