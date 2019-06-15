@@ -236,7 +236,6 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
       "we won't send notifications.";
     return false;
   }
-  std::cout << "COUCOU 5" << std::endl;
 
   /* if this notifier is flapping, don't send the notification */
   if (get_is_flapping()) {
@@ -244,21 +243,18 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
       << "This notifier is flapping, so we won't send notifications.";
     return false;
   }
-  std::cout << "COUCOU 4" << std::endl;
 
   if (get_state_type() != hard) {
     logger(dbg_notifications, more)
       << "This notifier is in soft state, so we won't send notifications.";
     return false;
   }
-  std::cout << "COUCOU 3" << std::endl;
 
   if (get_problem_has_been_acknowledged()) {
     logger(dbg_notifications, more)
       << "This notifier problem has been acknowledged, so we won't send notifications.";
     return false;
   }
-  std::cout << "COUCOU 2" << std::endl;
 
   if (!get_notify_on_current_state()) {
     logger(dbg_notifications, more)
@@ -266,7 +262,13 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
     return false;
   }
 
-  std::cout << "COUCOU 0" << std::endl;
+  if (_notification_interval > 0 && _notification_number == 0 && get_last_hard_state_change() + _first_notification_delay * config->interval_length() < now) {
+    logger(dbg_notifications, more)
+      << "This notifier is configured with a first notification delay, we won't send notification until "
+      << "timestamp " << (_first_notification_delay * config->interval_length());
+    return false;
+  }
+
   if (_notification_number >= 1 && _notification_interval > 0) {
     if (_last_notification + _notification_interval * config->interval_length()
         < now) {
@@ -286,7 +288,27 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
 }
 
 bool notifier::_is_notification_viable_recovery(notification_option options) const {
-  return true;
+  bool retval;
+  /* Recovery is sent on state OK or UP */
+  if (get_current_state_int() == 0) {
+    /* Filtering conditions are similar to normal notifications */
+    retval = _is_notification_viable_normal(options);
+    if (retval) {
+      timeperiod* tp{get_notification_timeperiod()};
+      timezone_locker lock{get_timezone()};
+      time_t now;
+      time(&now);
+      retval = (get_last_hard_state_change() + _recovery_notification_delay <= now);
+      if (!retval)
+        logger(dbg_notifications, more)
+          << "This notifier is configured with a recovery notification delay. "
+          << "It won't send any recovery notification until timestamp "
+          << " so it won't be sent until "
+          << (get_last_hard_state_change() + _recovery_notification_delay);
+    }
+  }
+  else
+    retval = false;
 }
 
 bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
@@ -727,8 +749,6 @@ void notifier::set_notification_period(std::string const& notification_period) {
 }
 
 bool notifier::get_notify_on(notification_type type) const {
-  std::cout << "type=" << type << std::endl;
-  std::cout << "out_notif=" << _out_notification_type << std::endl;
   return _out_notification_type & type;
 }
 
