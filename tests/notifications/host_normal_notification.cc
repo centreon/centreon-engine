@@ -40,7 +40,7 @@ using namespace com::centreon::engine::configuration::applier;
 
 extern configuration::state* config;
 
-class HostEscalation : public ::testing::Test {
+class HostNotification : public ::testing::Test {
  public:
   void SetUp() override {
     if (config == NULL)
@@ -76,7 +76,7 @@ class HostEscalation : public ::testing::Test {
   std::shared_ptr<engine::host> _host;
 };
 
-TEST_F(HostEscalation, SimpleNormalHostNotification) {
+TEST_F(HostNotification, SimpleNormalHostNotification) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
    */
@@ -96,7 +96,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotification) {
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationOutsideTimeperiod) {
+TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -114,7 +114,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationOutsideTimeperiod) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationForcedNotification) {
+TEST_F(HostNotification, SimpleNormalHostNotificationForcedNotification) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -134,7 +134,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationForcedNotification) {
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationWithDowntime) {
+TEST_F(HostNotification, SimpleNormalHostNotificationWithDowntime) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -155,7 +155,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationWithDowntime) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationWithFlapping) {
+TEST_F(HostNotification, SimpleNormalHostNotificationWithFlapping) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -176,7 +176,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationWithFlapping) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationWithSoftState) {
+TEST_F(HostNotification, SimpleNormalHostNotificationWithSoftState) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -197,7 +197,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationWithSoftState) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationWithHardStateAcknowledged) {
+TEST_F(HostNotification, SimpleNormalHostNotificationWithHardStateAcknowledged) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -218,7 +218,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationWithHardStateAcknowledged) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationAfterPreviousTooSoon) {
+TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousTooSoon) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -240,7 +240,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationAfterPreviousTooSoon) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationAfterPreviousWithNullInterval) {
+TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousWithNullInterval) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);
@@ -264,7 +264,7 @@ TEST_F(HostEscalation, SimpleNormalHostNotificationAfterPreviousWithNullInterval
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostEscalation, SimpleNormalHostNotificationOnStateNotNotified) {
+TEST_F(HostNotification, SimpleNormalHostNotificationOnStateNotNotified) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   set_time(20000);

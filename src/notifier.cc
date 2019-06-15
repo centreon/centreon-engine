@@ -262,7 +262,7 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
     return false;
   }
 
-  if (_notification_interval > 0 && _notification_number == 0 && get_last_hard_state_change() + _first_notification_delay * config->interval_length() < now) {
+  if (_first_notification_delay > 0 && _notification_number == 0 && get_last_hard_state_change() + _first_notification_delay * config->interval_length() < now) {
     logger(dbg_notifications, more)
       << "This notifier is configured with a first notification delay, we won't send notification until "
       << "timestamp " << (_first_notification_delay * config->interval_length());
@@ -276,12 +276,8 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
         << "This notifier problem has been sent at " << _last_notification
         << " so it won't be sent until "
         << (_notification_interval * config->interval_length());
+      return false;
     }
-  }
-  else {
-    logger(dbg_notifications, more)
-      << "This notifier problem has already been sent at " << _last_notification
-      << " and won't be sent again since the notification_interval is zero.";
   }
 
   return true;
@@ -335,7 +331,7 @@ std::list<std::shared_ptr<contact> > notifier::get_contacts_to_notify() const {
 notifier::notification_category notifier::get_category(reason_type type) const {
   if (type == 99)
     return cat_custom;
-  notification_category cat[] = {cat_normal, cat_acknowledgement, cat_flapping, cat_flapping, cat_flapping, cat_downtime, cat_downtime, cat_downtime, cat_custom};
+  notification_category cat[] = {cat_normal, cat_recovery, cat_acknowledgement, cat_flapping, cat_flapping, cat_flapping, cat_downtime, cat_downtime, cat_downtime, cat_custom};
   return cat[static_cast<size_t>(type)];
 }
 

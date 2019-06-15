@@ -72,6 +72,7 @@ class                notifier : public checkable {
 
   enum               reason_type {
     notification_normal,
+    notification_recovery,
     notification_acknowledgement,
     notification_flappingstart,
     notification_flappingstop,
