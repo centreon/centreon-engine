@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <cassert>
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
@@ -4081,7 +4082,6 @@ void host::check_result_freshness() {
         CHECK_OPTION_FORCE_EXECUTION | CHECK_OPTION_FRESHNESS_CHECK);
     }
   }
-  return;
 }
 
 /* adjusts current host check attempt before a new check is performed */
@@ -4169,5 +4169,17 @@ void host::check_for_orphaned() {
       it->second->schedule_check(current_time, CHECK_OPTION_ORPHAN_CHECK);
     }
   }
-  return;
+}
+
+std::string const& host::get_current_state_as_string() const {
+  return tab_host_states[get_current_state()].second;
+}
+
+bool host::get_notify_on_current_state() const {
+  notification_type type[]{up, down, unreachable};
+  std::cout << "TITI 1 " << get_current_state() << std::endl;
+  bool retval = get_notify_on(type[get_current_state()]);
+  std::cout << "TITI 2 " << type[get_current_state()] << std::endl;
+  std::cout << "TITI 3 " << retval << std::endl;
+  return retval;
 }

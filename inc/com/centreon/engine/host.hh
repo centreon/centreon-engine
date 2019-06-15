@@ -53,8 +53,6 @@ class                host : public notifier {
  public:
   static std::array<std::pair<uint32_t, std::string>, 3> const tab_host_states;
 
-
-
   enum               host_state {
     state_up,
     state_down,
@@ -183,11 +181,10 @@ class                host : public notifier {
   static void        check_for_orphaned();
   static void        check_result_freshness();
 
-
-
   enum host_state    determine_host_reachability();
   bool               recovered() const override ;
   int                get_current_state_int() const override ;
+  std::string const& get_current_state_as_string() const override;
 
   // setters / getters
   std::string const& get_name() const;
@@ -277,6 +274,7 @@ class                host : public notifier {
                        int options) const override;
   void               handle_flap_detection_disabled();
   timeperiod*        get_notification_timeperiod() const override;
+  bool               get_notify_on_current_state() const override;
 
   host_map            parent_hosts;
   host_map            child_hosts;

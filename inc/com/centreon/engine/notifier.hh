@@ -51,8 +51,8 @@ class                notifier : public checkable {
   enum               notification_type {
     none =        0,
     // Host
-    down =        1 << 0,
-    up   =        1 << 1,
+    up   =        1 << 0,
+    down =        1 << 1,
     unreachable = 1 << 2,
     // Service
     ok =          1 << 3,
@@ -132,6 +132,7 @@ class                notifier : public checkable {
   void               set_notify_on(uint32_t type);
   void               add_notify_on(notification_type type);
   void               remove_notify_on(notification_type type);
+  virtual bool       get_notify_on_current_state() const = 0;
 
   bool               get_notified_on(notification_type type) const;
   uint32_t           get_notified_on() const;

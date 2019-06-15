@@ -1143,8 +1143,8 @@ static void _get_next_valid_time_per_timeperiod(
       // Browse all date ranges of a given type. The earliest valid
       // time found in any date range will be valid.
       for (daterange_list::iterator
-             it(tperiod->exceptions[daterange_type].begin()),
-             end(tperiod->exceptions[daterange_type].end());
+             it{tperiod->exceptions[daterange_type].begin()},
+             end{tperiod->exceptions[daterange_type].end()};
            it != end;
            ++it) {
         // Get next range limits and check that we are within bounds.

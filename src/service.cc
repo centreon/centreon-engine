@@ -61,10 +61,11 @@ static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
   return (true);
 }
 
-std::array<std::pair<uint32_t, std::string>, 3> const
+std::array<std::pair<uint32_t, std::string>, 4> const
     service::tab_service_states{{{NSLOG_SERVICE_OK, "OK"},
                                  {NSLOG_SERVICE_WARNING, "WARNING"},
-                                 {NSLOG_SERVICE_CRITICAL, "CRITICAL"}}};
+                                 {NSLOG_SERVICE_CRITICAL, "CRITICAL"},
+                                 {NSLOG_SERVICE_CRITICAL, "UNKNOWN"}}};
 
 service_map service::services;
 
@@ -3848,4 +3849,13 @@ void service::check_result_freshness() {
     }
   }
   return;
+}
+
+std::string const& service::get_current_state_as_string() const {
+  return tab_service_states[get_current_state()].second;
+}
+
+bool service::get_notify_on_current_state() const {
+  notification_type type[]{ok, warning, critical, unknown};
+  return get_notify_on(type[get_current_state()]);
 }

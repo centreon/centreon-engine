@@ -145,6 +145,7 @@ class checkable {
   void set_next_check(std::time_t next_check);
   bool get_should_be_scheduled() const;
   void set_should_be_scheduled(bool should_be_scheduled);
+  virtual std::string const& get_current_state_as_string() const = 0;
 
  private:
   std::string _display_name;

@@ -236,6 +236,7 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
       "we won't send notifications.";
     return false;
   }
+  std::cout << "COUCOU 5" << std::endl;
 
   /* if this notifier is flapping, don't send the notification */
   if (get_is_flapping()) {
@@ -243,25 +244,42 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
       << "This notifier is flapping, so we won't send notifications.";
     return false;
   }
+  std::cout << "COUCOU 4" << std::endl;
 
   if (get_state_type() != hard) {
     logger(dbg_notifications, more)
       << "This notifier is in soft state, so we won't send notifications.";
     return false;
   }
+  std::cout << "COUCOU 3" << std::endl;
 
   if (get_problem_has_been_acknowledged()) {
     logger(dbg_notifications, more)
       << "This notifier problem has been acknowledged, so we won't send notifications.";
     return false;
   }
+  std::cout << "COUCOU 2" << std::endl;
 
-  if (_last_notification + _notification_interval * config->interval_length()
-      < now) {
+  if (!get_notify_on_current_state()) {
     logger(dbg_notifications, more)
-      << "This notifier problem has been sent at " << _last_notification
-      << " so it won't be sent until "
-      << (_notification_interval * config->interval_length());
+      << "This notifier is not configured to notify the state " << get_current_state_as_string();
+    return false;
+  }
+
+  std::cout << "COUCOU 0" << std::endl;
+  if (_notification_number >= 1 && _notification_interval > 0) {
+    if (_last_notification + _notification_interval * config->interval_length()
+        < now) {
+      logger(dbg_notifications, more)
+        << "This notifier problem has been sent at " << _last_notification
+        << " so it won't be sent until "
+        << (_notification_interval * config->interval_length());
+    }
+  }
+  else {
+    logger(dbg_notifications, more)
+      << "This notifier problem has already been sent at " << _last_notification
+      << " and won't be sent again since the notification_interval is zero.";
   }
 
   return true;
@@ -709,6 +727,8 @@ void notifier::set_notification_period(std::string const& notification_period) {
 }
 
 bool notifier::get_notify_on(notification_type type) const {
+  std::cout << "type=" << type << std::endl;
+  std::cout << "out_notif=" << _out_notification_type << std::endl;
   return _out_notification_type & type;
 }
 

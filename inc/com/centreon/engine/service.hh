@@ -62,7 +62,7 @@ CCE_BEGIN()
 
 class                           service : public notifier {
  public:
-  static std::array<std::pair<uint32_t, std::string>, 3> const tab_service_states;
+  static std::array<std::pair<uint32_t, std::string>, 4> const tab_service_states;
 
   enum                          service_state {
     state_ok,
@@ -127,8 +127,9 @@ class                           service : public notifier {
   void                          set_last_hard_state(enum service_state last_hard_state);
   enum service_state            get_initial_state() const;
   void                          set_initial_state(enum service_state current_state);
-  bool                          recovered() const override ;
-  int                           get_current_state_int() const override ;
+  bool                          recovered() const override;
+  int                           get_current_state_int() const override;
+  std::string const&            get_current_state_as_string() const override;
 
   int                           handle_async_check_result(
                                   check_result* queued_check_result);
@@ -187,6 +188,7 @@ class                           service : public notifier {
   bool                          get_is_volatile() const;
   void                          set_is_volatile(bool vol);
   timeperiod*                   get_notification_timeperiod() const override;
+  bool                          get_notify_on_current_state() const override;
 
   uint64_t                      check_dependencies(int dependency_type) override;
   static void                   check_for_orphaned();
