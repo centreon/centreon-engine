@@ -305,6 +305,7 @@ bool notifier::_is_notification_viable_recovery(notification_option options) con
   }
   else
     retval = false;
+  return retval;
 }
 
 bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
