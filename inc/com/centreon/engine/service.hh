@@ -193,6 +193,7 @@ class                           service : public notifier {
   uint64_t                      check_dependencies(int dependency_type) override;
   static void                   check_for_orphaned();
   static void                   check_result_freshness();
+  bool                          is_in_downtime() const override;
 
   int                           process_performance_data;
   int                           accept_passive_service_checks;

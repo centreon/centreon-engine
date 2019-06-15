@@ -77,7 +77,10 @@ class HostRecovery : public ::testing::Test {
     uint64_t id{_host->get_next_notification_id()};
     _host->notification_period_ptr = tperiod.release();
     /* Sending a notification */
-    _host->notify(notifier::notification_normal, "", "", notifier::notification_option_none);
+    _host->notify(notifier::notification_normal,
+                  "",
+                  "",
+                  notifier::notification_option_none);
   }
 
   void TearDown() override {
@@ -102,7 +105,11 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithDownState) {
   set_time(_current_time + 300);
 
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+                          "",
+                          "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -119,7 +126,11 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithHardUpState) {
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::hard);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+                          "",
+                          "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
@@ -136,16 +147,23 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithSoftUpState) {
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::soft);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+                          "",
+                          "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
 // Given a host in hard state down
-// When the host is reset to hard up state, and a recovery notification delay > 0
-// is given to it, and a call to notify is done before the recovery_notification_delay
+// When the host is reset to hard up state, and a recovery notification delay >
+// 0
+// is given to it, and a call to notify is done before the
+// recovery_notification_delay
 // end,
 // Then no notification is sent.
-TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithSoftUpStateRecoveryDelay) {
+TEST_F(HostRecovery,
+       SimpleRecoveryHostNotificationWithSoftUpStateRecoveryDelay) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
    */
@@ -157,6 +175,10 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithSoftUpStateRecoveryDelay)
   _host->set_last_hard_state_change(_current_time);
   set_time(_current_time + 300);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+                          "",
+                          "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }

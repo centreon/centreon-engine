@@ -230,7 +230,7 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
   }
 
   /* if this notifier is currently in a scheduled downtime period, don't send the notification */
-  if (get_scheduled_downtime_depth() > 0) {
+  if (is_in_downtime()) {
     logger(dbg_notifications, more)
       << "This notifier is currently in a scheduled downtime, so "
       "we won't send notifications.";
@@ -309,18 +309,81 @@ bool notifier::_is_notification_viable_recovery(notification_option options) con
 }
 
 bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
+  if (!config->enable_notifications()) {
+    logger(dbg_notifications, more)
+      << "Notifications are disabled, so notifications won't be sent out.";
+    return false;
+  }
+
+  if (get_current_state_int() == 0) {
+    logger(dbg_notifications, more)
+      << "The notifier is currently OK/UP, so we won't send an acknowledgement.";
+    return false;
+  }
   return true;
 }
 
 bool notifier::_is_notification_viable_flapping(notification_option options) const {
+  if (!config->enable_notifications()) {
+    logger(dbg_notifications, more)
+      << "Notifications are disabled, so notifications won't be sent out.";
+    return false;
+  }
+
+  /* Don't send a notification if we are not supposed to */
+  if (!get_notify_on(flapping)) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about FLAPPING events for this notifier.";
+    return false;
+  }
+
+  /* Don't send notifications during scheduled downtime */
+  if (is_in_downtime()) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about FLAPPING events during scheduled downtime.";
+    return false;
+  }
   return true;
 }
 
 bool notifier::_is_notification_viable_downtime(notification_option options) const {
+  if (!config->enable_notifications()) {
+    logger(dbg_notifications, more)
+      << "Notifications are disabled, so notifications won't be sent out.";
+    return false;
+  }
+
+  /* Don't send a notification if we are not supposed to */
+  if (!get_notify_on(downtime)) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about DOWNTIME events for this notifier.";
+    return false;
+  }
+
+  /* Don't send notifications during scheduled downtime (in the case of a
+   * service, we don't care of the host, so the use of
+   * get_scheduled_downtime_depth()) */
+  if (get_scheduled_downtime_depth() > 0) {
+    logger(dbg_notifications, more)
+      << "We shouldn't notify about DOWNTIME events during scheduled downtime.";
+    return false;
+  }
   return true;
 }
 
 bool notifier::_is_notification_viable_custom(notification_option options) const {
+  if (!config->enable_notifications()) {
+    logger(dbg_notifications, more)
+      << "Notifications are disabled, so notifications won't be sent out.";
+    return false;
+  }
+
+  /* Don't send notifications during scheduled downtime */
+  if (is_in_downtime()) {
+    logger(dbg_notifications, more)
+      << "We shouldn't send a CUSTOM notification during scheduled downtime.";
+    return false;
+  }
   return true;
 }
 

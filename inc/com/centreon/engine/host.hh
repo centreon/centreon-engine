@@ -275,6 +275,7 @@ class                host : public notifier {
   void               handle_flap_detection_disabled();
   timeperiod*        get_notification_timeperiod() const override;
   bool               get_notify_on_current_state() const override;
+  bool               is_in_downtime() const override;
 
   host_map            parent_hosts;
   host_map            child_hosts;

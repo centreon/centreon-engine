@@ -49,20 +49,20 @@ class                notifier : public checkable {
   };
 
   enum               notification_type {
-    none =        0,
+    none =            0,
     // Host
-    up   =        1 << 0,
-    down =        1 << 1,
-    unreachable = 1 << 2,
+    up   =            1 << 0,
+    down =            1 << 1,
+    unreachable =     1 << 2,
     // Service
-    ok =          1 << 3,
-    warning =     1 << 4,
-    critical =    1 << 5,
-    unknown =     1 << 6,
+    ok =              1 << 3,
+    warning =         1 << 4,
+    critical =        1 << 5,
+    unknown =         1 << 6,
     // Common
-    recovery =    1 << 7,
-    flapping =    1 << 8,
-    downtime =    1 << 9,
+    recovery =        1 << 7,
+    flapping =        1 << 8,
+    downtime =        1 << 9,
   };
 
   enum               notifier_type {

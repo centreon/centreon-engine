@@ -3859,3 +3859,7 @@ bool service::get_notify_on_current_state() const {
   notification_type type[]{ok, warning, critical, unknown};
   return get_notify_on(type[get_current_state()]);
 }
+
+bool service::is_in_downtime() const {
+  return get_scheduled_downtime_depth() > 0 || host_ptr->get_scheduled_downtime_depth() > 0;
+}

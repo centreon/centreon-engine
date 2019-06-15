@@ -146,6 +146,7 @@ class checkable {
   bool get_should_be_scheduled() const;
   void set_should_be_scheduled(bool should_be_scheduled);
   virtual std::string const& get_current_state_as_string() const = 0;
+  virtual bool is_in_downtime() const = 0;
 
  private:
   std::string _display_name;

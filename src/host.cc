@@ -4183,3 +4183,7 @@ bool host::get_notify_on_current_state() const {
   std::cout << "TITI 3 " << retval << std::endl;
   return retval;
 }
+
+bool host::is_in_downtime() const {
+  return get_scheduled_downtime_depth() > 0;
+}
