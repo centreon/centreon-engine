@@ -2378,8 +2378,8 @@ int service::run_scheduled_check(int check_options, double latency) {
         // The service could not be rescheduled properly.
         // Set the next check time for next week.
         if (!time_is_valid &&
-            check_time_against_period(next_valid_time,
-                                      this->check_period_ptr) == ERROR) {
+            !check_time_against_period(next_valid_time,
+                                      this->check_period_ptr)) {
           set_next_check((time_t)(next_valid_time + 60 * 60 * 24 * 7));
           logger(log_runtime_warning, basic)
               << "Warning: Check of service '" << _description
@@ -3110,8 +3110,8 @@ int service::verify_check_viability(int check_options,
     // Make sure this is a valid time to check the service.
     {
       timezone_locker lock(get_timezone());
-      if (check_time_against_period((unsigned long)current_time,
-                                    this->check_period_ptr) == ERROR) {
+      if (!check_time_against_period((unsigned long)current_time,
+                                    this->check_period_ptr)) {
         preferred_time = current_time;
         if (time_is_valid)
           *time_is_valid = false;
@@ -3445,8 +3445,7 @@ bool service::is_valid_escalation_for_notification(
    * valid
    */
   if (!e->get_escalation_period().empty() &&
-      check_time_against_period(current_time, e->escalation_period_ptr) ==
-          ERROR)
+      !check_time_against_period(current_time, e->escalation_period_ptr))
     return false;
 
   /* skip this escalation if the state options don't match */
@@ -3684,9 +3683,9 @@ uint64_t service::check_dependencies(
 
     /* skip this dependency if it has a timeperiod and the current time isn't valid */
     time(&current_time);
-    if (check_time_against_period(
+    if (!check_time_against_period(
       current_time,
-      temp_dependency->dependency_period_ptr) == ERROR)
+      temp_dependency->dependency_period_ptr))
       return DEPENDENCIES_OK;
 
     /* get the status to use (use last hard state if its currently in a soft state) */
@@ -3824,9 +3823,9 @@ void service::check_result_freshness() {
     // See if the time is right...
     {
       timezone_locker lock(it->second->get_timezone());
-      if (check_time_against_period(
+      if (!check_time_against_period(
         current_time,
-        it->second->check_period_ptr) == ERROR)
+        it->second->check_period_ptr))
         continue ;
     }
 
