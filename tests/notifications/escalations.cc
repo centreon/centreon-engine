@@ -22,7 +22,6 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <time.h>
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
@@ -49,7 +48,6 @@ class HostEscalation : public ::testing::Test {
     configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
-    commands::set::load();
     timezone_manager::load();
 
     configuration::applier::host hst_aply;
@@ -78,7 +76,7 @@ TEST_F(HostEscalation, SimpleHostEscalation) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
    */
-  time_t now;
+  time_t now{-1};
   localtime(&now);
   set_time(now);
   std::unique_ptr<engine::timeperiod> tperiod{

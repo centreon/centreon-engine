@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
@@ -216,13 +215,10 @@ bool notifier::is_notification_viable(reason_type type,
 
   timeperiod* tp{get_notification_timeperiod()};
   timezone_locker lock{get_timezone()};
-  time_t my_now;
-  ::time(&my_now);
-  printf("%d\n", my_now);
-  std::cout << strerror(errno) << std::endl;
-  std::cout << my_now << std::endl;
+  time_t now;
+  time(&now);
 
-  if (!check_time_against_period(my_now, tp)) {
+  if (!check_time_against_period(now, tp)) {
     logger(dbg_notifications, more)
         << "This service shouldn't have notifications sent out "
            "at this time.";

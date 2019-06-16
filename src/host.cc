@@ -2705,8 +2705,8 @@ int host::verify_check_viability(int check_options,
     // Make sure this is a valid time to check the host.
     {
       timezone_locker lock(get_timezone());
-      if (check_time_against_period(static_cast<unsigned long>(current_time),
-                                    this->check_period_ptr) == ERROR) {
+      if (!check_time_against_period(static_cast<unsigned long>(current_time),
+                                    this->check_period_ptr)) {
         preferred_time = current_time;
         if (time_is_valid)
           *time_is_valid = false;
@@ -3092,8 +3092,7 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
    * isn't valid
    */
   if (!e->get_escalation_period().empty() &&
-      check_time_against_period(current_time, e->escalation_period_ptr) ==
-          ERROR)
+      !check_time_against_period(current_time, e->escalation_period_ptr))
     return false;
 
   /* skip this escalation if the state options don't match */
@@ -3983,9 +3982,9 @@ uint64_t host::check_dependencies(int dependency_type) {
     /* skip this dependency if it has a timeperiod and the current time isn't valid */
     time(&current_time);
     if (!temp_dependency->get_dependency_period().empty()
-      && check_time_against_period(
+      && !check_time_against_period(
         current_time,
-        temp_dependency->dependency_period_ptr) == ERROR)
+        temp_dependency->dependency_period_ptr))
       return DEPENDENCIES_OK;
 
     /* get the status to use (use last hard state if its currently in a soft state) */
@@ -4064,9 +4063,9 @@ void host::check_result_freshness() {
     // See if the time is right...
     {
       timezone_locker lock(it->second->get_timezone());
-      if (check_time_against_period(
+      if (!check_time_against_period(
         current_time,
-        it->second->check_period_ptr) == ERROR)
+        it->second->check_period_ptr))
         continue ;
     }
 
