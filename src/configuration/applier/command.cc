@@ -200,9 +200,9 @@ void applier::command::remove_object(
 void applier::command::resolve_object(
                          configuration::command const& obj) {
   if (!obj.connector().empty()) {
-    command_map::iterator found{
-      commands::command::commands.find(obj.connector())};
-    if(found == commands::command::commands.end() || !found->second)
+    connector_map::iterator found{
+      commands::connector::connectors.find(obj.connector())};
+    if(found == commands::connector::connectors.end() || !found->second)
       throw (engine_error() << "unknow command " << obj.connector());
   }
 }
