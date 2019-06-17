@@ -92,6 +92,8 @@ class                notifier : public checkable {
   static std::array<std::string, 8> const tab_notification_str;
   static std::array<std::string, 2> const tab_state_type;
 
+  typedef bool (notifier::* is_viable)(notification_option) const;
+
   //static void        inc_next_notification_id();
 
                      notifier(int notification_type,
@@ -234,7 +236,7 @@ class                notifier : public checkable {
   notification_category
                      get_category(reason_type type) const;
   bool               is_notification_viable(notification_category cat,
-                                      notification_option options) const;
+                                      notification_option options);
 
   std::unordered_map<std::string, std::shared_ptr<contact>>
                      contacts;
@@ -272,8 +274,7 @@ class                notifier : public checkable {
   uint32_t           _modified_attributes;
 
  private:
-
-  static bool (notifier::* const _is_notification_viable[])(notification_option) const;
+  static std::array<is_viable, 6> const _is_notification_viable;
 
   bool               _is_notification_viable_normal(
                                             notification_option options) const;
@@ -287,6 +288,7 @@ class                notifier : public checkable {
                                             notification_option options) const;
   bool               _is_notification_viable_custom(
                                             notification_option options) const;
+
   static uint64_t    _next_notification_id;
   uint32_t           _first_notification_delay;
   uint32_t           _recovery_notification_delay;

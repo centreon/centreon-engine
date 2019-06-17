@@ -68,7 +68,7 @@ applier::service::service(applier::service const& right) {
 /**
  *  Destructor.
  */
-applier::service::~service() throw () {}
+applier::service::~service() {}
 
 /**
  *  Assignment operator.

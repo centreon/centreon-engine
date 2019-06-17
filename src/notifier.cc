@@ -46,7 +46,15 @@ std::array<std::string, 8> const notifier::tab_notification_str{
 
 std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
-//bool (notifier::* const _is_notification_viable[])(notifier::notification_option) const = {
+std::array<notifier::is_viable, 6> const notifier::_is_notification_viable{{
+  &notifier::_is_notification_viable_normal,
+  &notifier::_is_notification_viable_recovery,
+  &notifier::_is_notification_viable_acknowledgement,
+  &notifier::_is_notification_viable_flapping,
+  &notifier::_is_notification_viable_downtime,
+  &notifier::_is_notification_viable_custom,
+}};
+//bool (notifier::* const _is_notification_viable[])(notifier::notification_option) {
 //  &notifier::_is_notification_viable_normal,
 //  &notifier::_is_notification_viable_recovery,
 //  &notifier::_is_notification_viable_acknowledgement,
@@ -199,11 +207,6 @@ bool notifier::notifications_available(int options) const {
   return true;
 }
 
-bool notifier::is_notification_viable(notification_category cat,
-                                      notification_option options) const {
-  return (this->*(_is_notification_viable[0]))(options);
-}
-
 bool notifier::_is_notification_viable_normal(notification_option options) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable()";
 
@@ -238,18 +241,23 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
 }
 
 bool notifier::_is_notification_viable_recovery(notification_option options) const {
+  return true;
 }
 
 bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
+  return true;
 }
 
 bool notifier::_is_notification_viable_flapping(notification_option options) const {
+  return true;
 }
 
 bool notifier::_is_notification_viable_downtime(notification_option options) const {
+  return true;
 }
 
 bool notifier::_is_notification_viable_custom(notification_option options) const {
+  return true;
 }
 
 std::list<std::shared_ptr<contact> > notifier::get_contacts_to_notify() const {
@@ -262,6 +270,11 @@ notifier::notification_category notifier::get_category(reason_type type) const {
     return cat_custom;
   notification_category cat[] = {cat_normal, cat_acknowledgement, cat_flapping, cat_flapping, cat_flapping, cat_downtime, cat_downtime, cat_downtime, cat_custom};
   return cat[static_cast<size_t>(type)];
+}
+
+bool notifier::is_notification_viable(notification_category cat,
+                                      notification_option options) {
+  return (this->*(_is_notification_viable[cat]))(options);
 }
 
 int notifier::notify(notifier::reason_type type,
