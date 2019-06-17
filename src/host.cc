@@ -1416,7 +1416,7 @@ int host::log_event() {
 int host::handle_async_check_result_3x(check_result* queued_check_result) {
   time_t current_time;
   enum service::service_state svc_res =  service::state_ok;
-  enum host::host_state hst_res;
+  enum host::host_state hst_res = host::state_up;
   int reschedule_check = false;
   std::string old_plugin_output;
   struct timeval start_time_hires;
