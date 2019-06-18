@@ -23,17 +23,13 @@
 
 #  include <cstdio>
 #  include <sys/time.h>
+#  include "com/centreon/engine/checkable.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/notifier.hh"
 
 // Service dependency values
 #  define DEPENDENCIES_OK     0
 #  define DEPENDENCIES_FAILED 1
-
-enum check_type {
-  check_active,        /* 0: Engine performed the check. */
-  check_passive,       /* 1: Check result submitted by an external source. */
-};
 
 enum check_source {
   service_check,
@@ -51,18 +47,18 @@ class                        check_result{
  public:
                              check_result();
                              check_result(enum check_source object_check_type,
-                                          std::string _host_name,
-                                          std::string service_description,
-                                          enum check_type check_type,
+                                          std::string const& _host_name,
+                                          std::string const& service_description,
+                                          enum checkable::check_type check_type,
                                           int check_options,
-                                          int reschedule_check,
+                                          bool reschedule_check,
                                           double latency,
                                           struct timeval start_time,
                                           struct timeval finish_time,
                                           bool early_timeout,
                                           bool exited_ok,
                                           int return_code,
-                                          std::string output);
+                                          std::string const& output);
 
   enum check_source          get_object_check_type() const;
   void                       set_object_check_type(enum check_source object_check_type);
@@ -84,8 +80,8 @@ class                        check_result{
   void                       set_exited_ok(bool exited_ok);
   bool                       get_reschedule_check() const;
   void                       set_reschedule_check(bool reschedule_check);
-  enum check_type            get_check_type() const;
-  void                       set_check_type(enum check_type check_type);
+  enum checkable::check_type get_check_type() const;
+  void                       set_check_type(enum checkable::check_type check_type);
   double                     get_latency() const;
   void                       set_latency(double latency);
   int                        get_check_options() const;
@@ -99,9 +95,9 @@ class                        check_result{
   enum check_source          _object_check_type;    // is this a service or a host check?
   std::string                _host_name;            // host name
   std::string                _service_description;  // service description
-  enum check_type             _check_type;           // was this an active or passive service check?
+  enum checkable::check_type _check_type;           // was this an active or passive service check?
   int                         _check_options;
-  int                         _reschedule_check;     // should we reschedule the next check
+  bool                        _reschedule_check;     // should we reschedule the next check
   double                      _latency;
   struct timeval              _start_time;           // time the service check was initiated
   struct timeval              _finish_time;          // time the service check was completed

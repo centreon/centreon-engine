@@ -217,12 +217,6 @@
 #  define HOST_DOWNTIME    2 /* Host downtime. */
 #  define ANY_DOWNTIME     3 /* Host or service downtime. */
 
-/* Notification options. */
-#  define NOTIFICATION_OPTION_NONE      0
-#  define NOTIFICATION_OPTION_BROADCAST 1
-#  define NOTIFICATION_OPTION_FORCED    2
-#  define NOTIFICATION_OPTION_INCREMENT 4
-
 /* Acknowledgement types. */
 #  define HOST_ACKNOWLEDGEMENT    0
 #  define SERVICE_ACKNOWLEDGEMENT 1

@@ -419,7 +419,7 @@ void processing::_wrapper_send_custom_host_notification(std::shared_ptr<host> hs
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&
       (buf[2] = my_strtok(NULL, ";"))) {
-    hst->notify(notifier::notification_custom, buf[1], buf[2], atoi(buf[0]));
+    hst->notify(notifier::notification_custom, buf[1], buf[2], static_cast<notifier::notification_option>(atoi(buf[0])));
   }
 }
 
@@ -495,6 +495,6 @@ void processing::_wrapper_send_custom_service_notification(std::shared_ptr<servi
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&
       (buf[2] = my_strtok(NULL, ";"))) {
-    svc->notify(notifier::notification_custom, buf[1], buf[2], atoi(buf[0]));
+    svc->notify(notifier::notification_custom, buf[1], buf[2], static_cast<notifier::notification_option>(atoi(buf[0])));
   }
 }

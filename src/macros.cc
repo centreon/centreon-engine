@@ -408,9 +408,9 @@ int grab_datetime_macro_r(
   case MACRO_NEXTVALIDTIME:
     get_next_valid_time(test_time, &next_valid_time, temp_timeperiod);
     if (next_valid_time == test_time
-        && check_time_against_period(
+        && !check_time_against_period(
              test_time,
-             temp_timeperiod) == ERROR)
+             temp_timeperiod))
       next_valid_time = (time_t)0L;
     string::setstr(*output, next_valid_time);
     break;
@@ -654,8 +654,6 @@ int grab_standard_contact_macro_r(
       int macro_type,
       contact* temp_contact,
       char** output) {
-  contactgroup* temp_contactgroup = nullptr;
-
   (void)mac;
 
   if (temp_contact == nullptr || output == nullptr)

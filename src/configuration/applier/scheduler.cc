@@ -556,9 +556,9 @@ void applier::scheduler::_calculate_host_scheduling_params() {
       schedule_check = false;
     else {
       timezone_locker lock(hst.get_timezone());
-      if (check_time_against_period(
+      if (!check_time_against_period(
             now,
-            hst.check_period_ptr) == ERROR) {
+            hst.check_period_ptr)) {
         time_t next_valid_time(0);
         get_next_valid_time(
           now,
@@ -714,8 +714,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
 
     {
       timezone_locker lock(svc.get_timezone());
-      if (check_time_against_period(now, svc.check_period_ptr)
-          == ERROR) {
+      if (!check_time_against_period(now, svc.check_period_ptr)) {
         time_t next_valid_time(0);
         get_next_valid_time(
           now,
@@ -928,9 +927,9 @@ void applier::scheduler::_schedule_host_events(
     // Make sure the host can actually be scheduled at this time.
     {
       timezone_locker lock(hst.get_timezone());
-      if (check_time_against_period(
+      if (!check_time_against_period(
             hst.get_next_check(),
-            hst.check_period_ptr) == ERROR) {
+            hst.check_period_ptr)) {
         time_t next_valid_time(0);
         get_next_valid_time(
           hst.get_next_check(),
@@ -1056,9 +1055,9 @@ void applier::scheduler::_schedule_service_events(
       // Make sure the service can actually be scheduled when we want.
       {
         timezone_locker lock(svc.get_timezone());
-        if (check_time_against_period(
+        if (!check_time_against_period(
               svc.get_next_check(),
-              svc.check_period_ptr) == ERROR) {
+              svc.check_period_ptr)) {
           time_t next_valid_time(0);
           get_next_valid_time(
             svc.get_next_check(),

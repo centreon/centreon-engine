@@ -638,7 +638,7 @@ int process_passive_service_check(
   check_result result(service_check,
                       real_host_name,
                       svc_description,
-                      check_passive,
+                      checkable::check_passive,
                       CHECK_OPTION_NONE,
                       false,
                       (double)((double)(tv.tv_sec - check_time)
@@ -768,7 +768,7 @@ int process_passive_host_check(
   check_result result(host_check,
                       real_host_name,
                       "",
-                      check_passive,
+                      checkable::check_passive,
                       CHECK_OPTION_NONE,
                       false,
                       (double)((double)(tv.tv_sec - check_time)
@@ -1672,9 +1672,9 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* schedule a check for right now (or as soon as possible) */
       time(&preferred_time);
-      if (check_time_against_period(
+      if (!check_time_against_period(
             preferred_time,
-            temp_host->check_period_ptr) == ERROR) {
+            temp_host->check_period_ptr)) {
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
@@ -1723,9 +1723,9 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* schedule a check for right now (or as soon as possible) */
       time(&preferred_time);
-      if (check_time_against_period(
+      if (!check_time_against_period(
             preferred_time,
-            found_svc->second->check_period_ptr) == ERROR) {
+            found_svc->second->check_period_ptr)) {
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
@@ -2434,9 +2434,9 @@ void enable_service_checks(std::shared_ptr<com::centreon::engine::service> svc) 
 
   /* schedule a check for right now (or as soon as possible) */
   time(&preferred_time);
-  if (check_time_against_period(
+  if (!check_time_against_period(
         preferred_time,
-        svc->check_period_ptr) == ERROR) {
+        svc->check_period_ptr)) {
     get_next_valid_time(
       preferred_time,
       &next_valid_time,
@@ -2979,7 +2979,7 @@ void acknowledge_host_problem(
       notifier::notification_acknowledgement,
       ack_author,
       ack_data,
-      NOTIFICATION_OPTION_NONE);
+      notifier::notification_option_none);
 
   /* update the status log with the host info */
   hst->update_status(false);
@@ -3045,7 +3045,7 @@ void acknowledge_service_problem(
       notifier::notification_acknowledgement,
       ack_author,
       ack_data,
-      NOTIFICATION_OPTION_NONE);
+      notifier::notification_option_none);
 
   /* update the status log with the service info */
   svc->update_status(false);
@@ -3677,7 +3677,7 @@ void enable_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
 
   /* schedule a check for right now (or as soon as possible) */
   time(&preferred_time);
-  if (check_time_against_period(preferred_time, hst->check_period_ptr) == ERROR) {
+  if (!check_time_against_period(preferred_time, hst->check_period_ptr)) {
     get_next_valid_time(preferred_time, &next_valid_time, hst->check_period_ptr);
     hst->set_next_check(next_valid_time);
   }

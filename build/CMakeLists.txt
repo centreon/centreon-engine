@@ -672,6 +672,7 @@ set(
 
   # Sources.
   "${SRC_DIR}/broker.cc"
+  "${SRC_DIR}/checkable.cc"
   "${SRC_DIR}/checks.cc"
   "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/config.cc"
@@ -691,6 +692,7 @@ set(
   "${SRC_DIR}/hostgroup.cc"
   "${SRC_DIR}/macros.cc"
   "${SRC_DIR}/nebmods.cc"
+  "${SRC_DIR}/notification.cc"
   "${SRC_DIR}/notifier.cc"
   "${SRC_DIR}/sehandlers.cc"
   "${SRC_DIR}/service.cc"
@@ -710,6 +712,7 @@ set(
 
   # Headers.
   "${INC_DIR}/com/centreon/engine/broker.hh"
+  "${INC_DIR}/com/centreon/engine/checkable.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
   "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
   "${INC_DIR}/com/centreon/engine/comment.hh"
@@ -736,6 +739,7 @@ set(
   "${INC_DIR}/com/centreon/engine/nebmods.hh"
   "${INC_DIR}/com/centreon/engine/nebmodules.hh"
   "${INC_DIR}/com/centreon/engine/nebstructs.hh"
+  "${INC_DIR}/com/centreon/engine/notification.hh"
   "${INC_DIR}/com/centreon/engine/notifier.hh"
   "${INC_DIR}/com/centreon/engine/objects.hh"
   "${INC_DIR}/com/centreon/engine/opt.hh"

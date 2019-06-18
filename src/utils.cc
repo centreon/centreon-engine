@@ -508,7 +508,8 @@ void free_memory(nagios_macros* mac) {
   quick_timed_event.clear(hash_timed_event::low);
 
   // Free any notification list that may have been overlooked.
-  notifier::current_notifications.clear();
+  //FIXME DBR
+  //notifier::current_notifications.clear();
 
   /*
   ** Free memory associated with macros. It's ok to only free the

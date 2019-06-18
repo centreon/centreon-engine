@@ -595,7 +595,7 @@ int read_status_file() {
 
   double execution_time = 0.0;
   double latency = 0.0;
-  int check_type = check_active;
+  int check_type = checkable::check_active;
   int current_state = service::state_ok;
   double state_change = 0.0;
   int is_flapping = false;
@@ -662,7 +662,7 @@ int read_status_file() {
           have_max_host_state_change = true;
           max_host_state_change = state_change;
         }
-        if (check_type == check_active) {
+        if (check_type == checkable::check_active) {
           active_host_checks++;
           average_active_host_latency = (((average_active_host_latency * ((double)active_host_checks - 1.0)) + latency) / (double)active_host_checks);
           if (have_min_active_host_latency == false
@@ -776,7 +776,7 @@ int read_status_file() {
           have_max_service_state_change = true;
           max_service_state_change = state_change;
         }
-        if (check_type == check_active) {
+        if (check_type == checkable::check_active) {
           active_service_checks++;
           average_active_service_latency = (((average_active_service_latency
 					      * ((double)active_service_checks - 1.0))

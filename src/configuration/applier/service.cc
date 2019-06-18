@@ -68,7 +68,7 @@ applier::service::service(applier::service const& right) {
 /**
  *  Destructor.
  */
-applier::service::~service() throw () {}
+applier::service::~service() {}
 
 /**
  *  Assignment operator.
@@ -126,6 +126,7 @@ void applier::service::add_object(
     obj.retry_interval(),
     obj.notification_interval(),
     obj.first_notification_delay(),
+    obj.recovery_notification_delay(),
     obj.notification_period(),
     static_cast<bool>(obj.notification_options()
                       & configuration::service::ok),
@@ -191,7 +192,6 @@ void applier::service::add_object(
   svc->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                    config->interval_length());
   svc->set_last_acknowledgement(0);
-  svc->set_recovery_notification_delay(obj.recovery_notification_delay());
   svc->set_recovery_been_sent(true);
 
   // Add contacts.

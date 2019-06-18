@@ -1,5 +1,5 @@
 /*
-** Copyright 2014 Merethis
+** Copyright 2014-2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -36,10 +36,8 @@ class                 timezone_locker {
 public:
                       timezone_locker(std::string const& tz);
                       ~timezone_locker();
-
-private:
-                      timezone_locker(timezone_locker const& other);
-  timezone_locker&    operator=(timezone_locker const& other);
+                      timezone_locker(timezone_locker const& other) = delete;
+  timezone_locker&    operator=(timezone_locker const& other) = delete;
 };
 
 CCE_END()

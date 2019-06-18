@@ -483,8 +483,8 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
 
   // See if the notification interval is less than the check interval.
   if (svc->get_notifications_enabled()
-      && svc->notification_interval
-      && (svc->notification_interval < svc->get_check_interval())) {
+      && svc->get_notification_interval()
+      && (svc->get_notification_interval() < svc->get_check_interval())) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->get_description() << "' on host '"
       << svc->get_hostname() << "'  has a notification interval less than "

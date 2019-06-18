@@ -36,7 +36,7 @@ check_result_list check_result::results;
 
 check_result::check_result()
   : _object_check_type{host_check},
-    _check_type(check_active),
+    _check_type(checkable::check_active),
     _check_options{CHECK_OPTION_NONE},
     _reschedule_check{false},
     _host_name{""},
@@ -55,18 +55,18 @@ check_result::check_result()
 }
 
 check_result::check_result(enum check_source object_check_type,
-                           std::string hostname,
-                           std::string service_description,
-                           enum check_type check_type,
+                           std::string const& hostname,
+                           std::string const& service_description,
+                           enum checkable::check_type check_type,
                            int check_options,
-                           int reschedule_check,
+                           bool reschedule_check,
                            double latency,
                            struct timeval start_time,
                            struct timeval finish_time,
                            bool early_timeout,
                            bool exited_ok,
                            int return_code,
-                           std::string output)
+                           std::string const& output)
   : _object_check_type{object_check_type},
     _host_name{hostname},
     _service_description{service_description},
@@ -74,8 +74,8 @@ check_result::check_result(enum check_source object_check_type,
     _check_options{check_options},
     _reschedule_check{reschedule_check},
     _latency{latency},
-    _start_time{start_time},
-    _finish_time{finish_time},
+    _start_time(start_time),
+    _finish_time(finish_time),
     _early_timeout{early_timeout},
     _exited_ok{exited_ok},
     _return_code{return_code},
@@ -161,11 +161,11 @@ void check_result::set_reschedule_check(bool reschedule_check) {
   _reschedule_check = reschedule_check;
 }
 
-enum check_type check_result::get_check_type() const {
+enum checkable::check_type check_result::get_check_type() const {
   return _check_type;
 }
 
-void check_result::set_check_type(enum check_type check_type) {
+void check_result::set_check_type(enum checkable::check_type check_type) {
   _check_type = check_type;
 }
 
@@ -252,7 +252,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
           new_cr->set_object_check_type(host_check);
           new_cr->set_hostname("");
           new_cr->set_service_description("");
-          new_cr->set_check_type(check_active);
+          new_cr->set_check_type(checkable::check_active);
           new_cr->set_check_options(CHECK_OPTION_NONE);
           new_cr->set_reschedule_check(false);
           new_cr->set_latency(0.0);
@@ -294,7 +294,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
       new_cr->set_object_check_type(service_check);
     }
     else if (!strcmp(var, "check_type"))
-      new_cr->set_check_type(static_cast<enum check_type>(strtol(val, nullptr, 0)));
+      new_cr->set_check_type(static_cast<enum checkable::check_type>(strtol(val, nullptr, 0)));
     else if (!strcmp(var, "check_options"))
       new_cr->set_check_options(strtol(val, nullptr, 0));
     else if (!strcmp(var, "scheduled_check"))

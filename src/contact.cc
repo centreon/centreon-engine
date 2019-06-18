@@ -769,7 +769,7 @@ int contact::check_service_notification_viability(
     "for contact '" << get_name() << "'...";
 
   /* forced notifications bust through everything */
-  if (options & NOTIFICATION_OPTION_FORCED) {
+  if (options & notifier::notification_option_forced) {
     logger(dbg_notifications, more)
       << "This is a forced service notification, so we'll "
       "send it out to this contact.";
@@ -786,9 +786,9 @@ int contact::check_service_notification_viability(
   // See if the contact can be notified at this time.
   {
     timezone_locker lock(get_timezone().c_str());
-    if (check_time_against_period(
+    if (!check_time_against_period(
           time(nullptr),
-          this->service_notification_period_ptr) == ERROR) {
+          this->service_notification_period_ptr)) {
       logger(dbg_notifications, most)
         << "This contact shouldn't be notified at this time.";
       return ERROR;
@@ -907,7 +907,7 @@ int contact::check_host_notification_viability(host* hst,
     << get_name() << "'...";
 
   /* forced notifications bust through everything */
-  if (options & NOTIFICATION_OPTION_FORCED) {
+  if (options & notifier::notification_option_forced) {
     logger(dbg_notifications, most)
       << "This is a forced host notification, so we'll "
       "send it out for this contact.";
@@ -924,9 +924,9 @@ int contact::check_host_notification_viability(host* hst,
   // See if the contact can be notified at this time.
   {
     timezone_locker lock(get_timezone().c_str());
-    if (check_time_against_period(
+    if (!check_time_against_period(
           time(nullptr),
-          this->host_notification_period_ptr) == ERROR) {
+          this->host_notification_period_ptr)) {
       logger(dbg_notifications, most)
         << "This contact shouldn't be notified at this time.";
       return ERROR;

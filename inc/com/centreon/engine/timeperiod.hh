@@ -69,7 +69,7 @@ class                timeperiod {
 
 CCE_END()
 
-int  check_time_against_period(
+bool check_time_against_period(
   time_t test_time,
   com::centreon::engine::timeperiod* tperiod);
 void get_next_valid_time(

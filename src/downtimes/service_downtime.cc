@@ -199,7 +199,7 @@ int service_downtime::unschedule() {
         notifier::notification_downtimecancelled,
         nullptr,
         nullptr,
-        NOTIFICATION_OPTION_NONE);
+        notifier::notification_option_none);
     }
   }
   return OK;
@@ -410,7 +410,7 @@ int service_downtime::handle() {
         notifier::notification_downtimeend,
         get_author().c_str(),
         get_comment().c_str(),
-        NOTIFICATION_OPTION_NONE);
+        notifier::notification_option_none);
     }
 
     /* update the status data */
@@ -494,7 +494,7 @@ int service_downtime::handle() {
         notifier::notification_downtimestart,
         get_author().c_str(),
         get_comment().c_str(),
-        NOTIFICATION_OPTION_NONE);
+        notifier::notification_option_none);
     }
 
     /* increment the downtime depth variable */
