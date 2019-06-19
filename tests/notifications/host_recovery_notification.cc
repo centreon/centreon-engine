@@ -66,16 +66,15 @@ class HostRecovery : public ::testing::Test {
     _host->set_notify_on(static_cast<uint32_t>(-1));
     _current_time = 43200;
     set_time(_current_time);
-    std::unique_ptr<engine::timeperiod> tperiod{
-        new engine::timeperiod("tperiod", "alias")};
+    _tperiod.reset(new engine::timeperiod("tperiod", "alias"));
     for (int i = 0; i < 7; ++i)
-      tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+      _tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
     std::unique_ptr<engine::hostescalation> host_escalation{
         new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
 
     uint64_t id{_host->get_next_notification_id()};
-    _host->notification_period_ptr = tperiod.release();
+    _host->notification_period_ptr = _tperiod.get();
     /* Sending a notification */
     _host->notify(notifier::notification_normal,
                   "",
@@ -91,6 +90,7 @@ class HostRecovery : public ::testing::Test {
   }
 
  protected:
+  std::unique_ptr<engine::timeperiod> _tperiod;
   std::shared_ptr<engine::host> _host;
   std::time_t _current_time;
 };

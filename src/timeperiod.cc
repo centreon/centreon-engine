@@ -44,26 +44,22 @@ timeperiod_map timeperiod::timeperiods;
  *
  */
 
-timeperiod::timeperiod(std::string const& name, std::string const& alias) {
+timeperiod::timeperiod(std::string const& name, std::string const& alias)
+    : _name{name}, _alias{alias} {
   if (name.empty() || alias.empty()) {
     logger(log_config_error, basic)
-      << "Error: Name or alias for timeperiod is NULL";
-    throw (engine_error() << "Could not register time period '"
-                          << name << "'");
+        << "Error: Name or alias for timeperiod is NULL";
+    throw(engine_error() << "Could not register time period '" << name << "'");
   }
 
   // Check if the timeperiod already exist.
-  timeperiod_map::const_iterator
-    it(configuration::applier::state::instance().timeperiods().find(name));
+  timeperiod_map::const_iterator it{
+      configuration::applier::state::instance().timeperiods().find(name)};
   if (it != configuration::applier::state::instance().timeperiods().end()) {
     logger(log_config_error, basic)
-      << "Error: Timeperiod '" << name << "' has already been defined";
-    throw (engine_error() << "Could not register time period '"
-                          << name << "'");
+        << "Error: Timeperiod '" << name << "' has already been defined";
+    throw engine_error() << "Could not register time period '" << name << "'";
   }
-
-  _name = name;
-  _alias = alias;
 }
 
 std::string const& timeperiod::timeperiod::get_name() const {

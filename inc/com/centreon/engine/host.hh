@@ -285,8 +285,6 @@ class                host : public notifier {
   commands::command*  check_command_ptr;
 
   service_map         services;
-  timeperiod          *check_period_ptr;
-  timeperiod          *notification_period_ptr;
   std::list<std::shared_ptr<hostgroup>> const&
                                 get_parent_groups() const;
   std::list<std::shared_ptr<hostgroup>>&

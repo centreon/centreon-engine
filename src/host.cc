@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <cassert>
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
@@ -4177,10 +4176,7 @@ std::string const& host::get_current_state_as_string() const {
 
 bool host::get_notify_on_current_state() const {
   notification_type type[]{up, down, unreachable};
-  std::cout << "TITI 1 " << get_current_state() << std::endl;
   bool retval = get_notify_on(type[get_current_state()]);
-  std::cout << "TITI 2 " << type[get_current_state()] << std::endl;
-  std::cout << "TITI 3 " << retval << std::endl;
   return retval;
 }
 
