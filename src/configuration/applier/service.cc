@@ -183,12 +183,12 @@ void applier::service::add_object(
              << obj.service_description()
              << "' of host '" << *obj.hosts().begin() << "'";
   svc->set_initial_notif_time(0);
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].host_id = obj.host_id();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].service_id = obj.service_id();
+  engine::service::services[
+    {*obj.hosts().begin(),obj.service_description()}]->set_host_id(
+      obj.host_id());
+  engine::service::services[
+    {*obj.hosts().begin(), obj.service_description()}]->set_service_id(
+      obj.service_id());
   svc->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                    config->interval_length());
   svc->set_last_acknowledgement(0);
@@ -342,10 +342,9 @@ void applier::service::modify_object(
            << host_name << "'");
 
   // Find service object.
-  umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<engine::service> >::iterator
-    it_obj(applier::state::instance().services_find(obj.key()));
-  if (it_obj == applier::state::instance().services().end())
+  service_id_map::iterator it_obj(engine::service::services_by_id.find(
+    obj.key()));
+  if (it_obj == engine::service::services_by_id.end())
     throw (engine_error() << "Could not modify non-existing "
            << "service object '" << service_description
            << "' of host '" << host_name << "'");
@@ -418,12 +417,12 @@ void applier::service::modify_object(
   s->set_icon_image_alt(obj.icon_image_alt());
   s->set_is_volatile(obj.is_volatile());
   s->set_timezone(obj.timezone());
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].host_id = obj.host_id();
-  service_other_props[std::make_pair(
-                             *obj.hosts().begin(),
-                             obj.service_description())].service_id = obj.service_id();
+  engine::service::services[
+    {*obj.hosts().begin(),obj.service_description()}]->set_host_id(
+      obj.host_id());
+  engine::service::services[
+    {*obj.hosts().begin(),obj.service_description()}]->set_service_id(
+      obj.service_id());
   s->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                    config->interval_length());
   s->set_recovery_notification_delay(obj.recovery_notification_delay());
@@ -491,12 +490,9 @@ void applier::service::remove_object(
     << "' of host '" << host_name << "'.";
 
   // Find service.
-  std::pair<std::string, std::string>
-    id(std::make_pair(host_name, service_description));
-  umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<engine::service> >::iterator
-    it(applier::state::instance().services_find(obj.key()));
-  if (it != applier::state::instance().services().end()) {
+  service_id_map::iterator
+    it(engine::service::services_by_id.find(obj.key()));
+  if (it != engine::service::services_by_id.end()) {
     std::shared_ptr<engine::service> svc(it->second);
 
     // Remove service comments.
@@ -512,9 +508,6 @@ void applier::service::remove_object(
     // Remove events related to this service.
     applier::scheduler::instance().remove_service(obj);
 
-    // Unregister service.
-    engine::service::services.erase({host_name, service_description});
-
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
     broker_adaptive_service_data(
@@ -527,11 +520,9 @@ void applier::service::remove_object(
       MODATTR_ALL,
       &tv);
 
-    // Remove service object (will effectively delete the object).
-    service_other_props.erase(std::make_pair(
-                                     *obj.hosts().begin(),
-                                     obj.service_description()));
-    applier::state::instance().services().erase(it);
+    // Unregister service.
+    engine::service::services.erase({host_name, service_description});
+    engine::service::services_by_id.erase(it);
   }
 
   // Remove service from the global configuration set.
@@ -553,10 +544,8 @@ void applier::service::resolve_object(
     << "' of host '" << *obj.hosts().begin() << "'.";
 
   // Find service.
-  umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<engine::service> >::iterator
-    it(applier::state::instance().services_find(obj.key()));
-  if (applier::state::instance().services().end() == it)
+  service_id_map::iterator it(engine::service::services_by_id.find(obj.key()));
+  if (engine::service::services_by_id.end() == it)
     throw (engine_error() << "Cannot resolve non-existing service '"
            << obj.service_description() << "' of host '"
            << *obj.hosts().begin() << "'");

@@ -854,14 +854,10 @@ int check_servicegroup(std::shared_ptr<servicegroup> sg, int* w, int* e) {
        it != end;
        ++it) {
 
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      it->first.first, it->first.second));
-    std::unordered_map<std::pair<uint64_t, uint64_t>,
-      std::shared_ptr<service> >::const_iterator
-        found(state::instance().services().find(id));
+   service_map::const_iterator found(service::services.find(
+     {it->first.first, it->first.second}));
 
-    if (found == state::instance().services().end() ||
-      !found->second) {
+    if (found == service::services.end() || !found->second) {
       logger(log_verification_error, basic)
         << "Error: Service '"
         << it->first.second
@@ -1018,14 +1014,10 @@ int check_servicedependency(std::shared_ptr<servicedependency> sd, int* w, int* 
   int errors(0);
 
   // Find the dependent service.
-  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-    sd->get_dependent_hostname(), sd->get_dependent_service_description()));
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator
-    found(state::instance().services().find(id));
+  service_map::const_iterator found(service::services.find(
+    {sd->get_dependent_hostname(), sd->get_dependent_service_description()}));
 
-  if (found == state::instance().services().end() ||
-    found->second.get() == nullptr) {
+  if (found == service::services.end() || !found->second) {
     logger(log_verification_error, basic)
       << "Error: Dependent service '"
       << sd->get_dependent_service_description() << "' on host '"
@@ -1039,12 +1031,10 @@ int check_servicedependency(std::shared_ptr<servicedependency> sd, int* w, int* 
   sd->dependent_service_ptr = found->second.get();
 
   // Save pointer for later.
-  id = get_host_and_service_id(sd->get_hostname(), sd->get_service_description());
-  found = state::instance().services().find(id);
+  found = service::services.find({sd->get_hostname(), sd->get_service_description()});
 
   // Find the service we're depending on.
-  if (found == state::instance().services().end() ||
-    found->second.get() == nullptr) {
+  if (found == service::services.end() || !found->second) {
     logger(log_verification_error, basic)
       << "Error: Service '" << sd->get_service_description() << "' on host '"
       << sd->get_hostname()
@@ -1197,14 +1187,10 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
   int errors(0);
 
   // Find the service.
-  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-    se->get_hostname(), se->get_description()));
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator
-    found(state::instance().services().find(id));
+  service_map::const_iterator found = service::services.find(
+    {se->get_hostname(), se->get_description()});
 
-  if (found == state::instance().services().end() ||
-    found->second.get() == nullptr) {
+  if (found == service::services.end() || !found->second) {
     logger(log_verification_error, basic) << "Error: Service '"
         << se->get_description() << "' on host '" << se->get_hostname()
         << "' specified in service escalation is not defined anywhere!";

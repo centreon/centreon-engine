@@ -96,12 +96,9 @@ void applier::comment::_add_service_comment(
   if (!is_host_exist(get_host_id(obj.host_name().c_str())))
     return;
 
-  std::pair<unsigned int, unsigned int>
-    id(get_host_and_service_id(obj.host_name().c_str(), obj.service_description().c_str()));
-  umap<std::pair<unsigned long, unsigned long>,
-       std::shared_ptr<engine::service> >::const_iterator
-    it_svc(configuration::applier::state::instance().services().find(id));
-  if (it_svc == configuration::applier::state::instance().services().end() || !it_svc->second)
+  service_map::const_iterator it_svc(service::services.find(
+    {obj.host_name().c_str(), obj.service_description().c_str()}));
+  if (it_svc == service::services.end() || !it_svc->second)
     return;
 
   // add the comment.

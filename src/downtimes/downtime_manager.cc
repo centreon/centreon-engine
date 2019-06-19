@@ -193,14 +193,11 @@ int downtime_manager::check_pending_flex_service_downtime(service* svc) {
     service_downtime& dt(
         *std::static_pointer_cast<service_downtime>(it->second));
 
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      dt.get_hostname(), dt.get_service_description()));
-    std::unordered_map<std::pair<uint64_t, uint64_t>,
-                       std::shared_ptr<service> >::const_iterator
-      found(state::instance().services().find(id));
+    service_map::const_iterator
+      found(service::services.find({dt.get_hostname(), dt.get_service_description()}));
 
       /* this entry matches our service! */
-    if (found != state::instance().services().end() && found->second.get() == svc) {
+    if (found != service::services.end() && found->second.get() == svc) {
       /* if the time boundaries are okay, start this scheduled downtime */
       if (dt.get_start_time() <= current_time && current_time <= dt.get_end_time()) {
         logger(dbg_downtime, basic)

@@ -207,11 +207,9 @@ void applier::serviceescalation::remove_object(
   // Find service escalation.
   std::string const& host_name{*obj.hosts().begin()};
   std::string const& description{obj.service_description().front()};
-  std::pair<uint64_t, uint64_t> id{engine::get_host_and_service_id(host_name, description)};
   std::pair<serviceescalation_mmap::iterator, serviceescalation_mmap::iterator>
       range{engine::serviceescalation::serviceescalations.equal_range({host_name, description})};
-  std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator sit{
-    state::instance().services().find(id)};
+  service_map::iterator sit{engine::service::services.find({host_name, description})};
 
   for (serviceescalation_mmap::iterator
        it{range.first}, end{range.second};
@@ -270,9 +268,8 @@ void applier::serviceescalation::resolve_object(
   logger(logging::dbg_config, logging::more)
       << "Resolving a service escalation.";
 
-  std::pair<uint64_t, uint64_t> svc_id{get_host_and_service_id(*obj.hosts().begin(), obj.service_description().front())};
-  std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator it{
-    state::instance().services().find(svc_id)};
+  service_map::iterator it{engine::service::services.find(
+    {*obj.hosts().begin(), obj.service_description().front()})};
   for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
       itt{it->second->get_escalations().begin()},
       end{it->second->get_escalations().end()};

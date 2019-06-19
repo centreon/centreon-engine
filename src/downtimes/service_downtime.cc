@@ -78,17 +78,14 @@ bool service_downtime::is_stale() const {
   std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
     it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
 
-  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-    get_hostname(), get_service_description()));
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator
-    found(state::instance().services().find(id));
+  service_map::const_iterator
+    found(service::services.find({get_hostname(), get_service_description()}));
 
   /* delete downtimes with invalid host names */
   if (it == state::instance().hosts().end() || it->second == nullptr)
     retval = true;
   /* delete downtimes with invalid service descriptions */
-  else if (found == state::instance().services().end() || found->second.get() == nullptr)
+  else if (found == service::services.end() || !found->second)
     retval = true;
   /* delete downtimes that have expired */
   else if (get_end_time() < time(nullptr))
@@ -146,14 +143,11 @@ void service_downtime::print(std::ostream& os) const {
 }
 
 int service_downtime::unschedule() {
-  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-    get_hostname(), get_service_description()));
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator
-    found(state::instance().services().find(id));
+  service_map::const_iterator found(
+    service::services.find({get_hostname(), get_service_description()}));
 
   /* find the host or service associated with this downtime */
-  if (found == state::instance().services().end() || !found->second.get())
+  if (found == service::services.end() || !found->second.get())
     return ERROR;
 
   /* decrement pending flex downtime if necessary ... */
@@ -209,14 +203,11 @@ int service_downtime::subscribe() {
   logger(dbg_functions, basic)
     << "service_downtime::subscribe()";
 
-  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-    get_hostname(), get_service_description()));
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator
-    found(state::instance().services().find(id));
+  service_map::const_iterator found(service::services.find(
+    {get_hostname(), get_service_description()}));
 
   /* find the host or service associated with this downtime */
-  if (found == state::instance().services().end() || found->second.get() == nullptr)
+  if (found == service::services.end() || !found->second)
     return ERROR;
 
   /* create the comment */
@@ -323,14 +314,11 @@ int service_downtime::handle() {
   logger(dbg_functions, basic)
     << "handle_downtime()";
 
-  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-    get_hostname(), get_service_description()));
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator
-    found(state::instance().services().find(id));
+  service_map::const_iterator
+    found(service::services.find({get_hostname(), get_service_description()}));
 
   /* find the host or service associated with this downtime */
-  if (found == state::instance().services().end() || !found->second)
+  if (found == service::services.end() || !found->second)
       return ERROR;
 
   /* if downtime if flexible and host/svc is in an ok state, don't do anything right now (wait for event handler to kick it off) */

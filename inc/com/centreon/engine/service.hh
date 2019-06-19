@@ -22,6 +22,7 @@
 
 #  include <array>
 #  include <memory>
+#  include <ostream>
 #  include <string>
 #  include <time.h>
 #  include <unordered_map>
@@ -57,6 +58,8 @@ struct pair_hash {
 
 typedef std::unordered_map<std::pair<std::string, std::string>,
   std::shared_ptr<com::centreon::engine::service>, pair_hash> service_map;
+typedef std::unordered_map<std::pair<uint64_t, uint64_t>,
+  std::shared_ptr<com::centreon::engine::service>, pair_hash> service_id_map;
 
 CCE_BEGIN()
 
@@ -103,6 +106,10 @@ class                           service : public notifier {
                                         bool obsess_over,
                                         std::string const& timezone);
                                 ~service();
+  void                          set_host_id(uint64_t host_id);
+  uint64_t                      get_host_id() const;
+  void                          set_service_id(uint64_t service_id);
+  uint64_t                      get_service_id() const;
   void                          set_hostname(std::string const& name);
   std::string const&            get_hostname() const;
   void                          set_description(std::string const& desc);
@@ -219,8 +226,11 @@ class                           service : public notifier {
                                 get_parent_groups();
 
   static service_map            services;
+  static service_id_map         services_by_id;
 
  private:
+  uint64_t                      _host_id;
+  uint64_t                      _service_id;
   std::string                   _hostname;
   std::string                   _description;
   std::string                   _event_handler_args;
@@ -239,12 +249,6 @@ class                           service : public notifier {
                                 _servicegroups;
 };
 CCE_END()
-
-/* Other SERVICE structure. */
-struct                          service_other_properties {
-  uint64_t                      host_id;
-  uint64_t                      service_id;
-};
 
 #  ifdef __cplusplus
 extern "C" {
@@ -301,7 +305,6 @@ com::centreon::engine::service* add_service(
            int retain_nonstatus_information,
            bool obsess_over,
            std::string const& timezone);
-int      get_service_count();
 int      is_contact_for_service(
            com::centreon::engine::service* svc,
            com::centreon::engine::contact* cntct);
@@ -311,9 +314,6 @@ int      is_escalated_contact_for_service(
 
 #  ifdef __cplusplus
 }
-
-#    include <ostream>
-#    include <string>
 
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
 std::ostream& operator<<(std::ostream& os, service_map const& obj);

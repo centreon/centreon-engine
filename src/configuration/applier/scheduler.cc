@@ -103,12 +103,10 @@ void applier::scheduler::apply(
          end(diff_services.modified().end());
        it != end;
        ++it) {
-    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> > const&
-      services(applier::state::instance().services());
-    umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> >::const_iterator
-      svc(services.find(std::make_pair(
-                               it->host_id(),   //*it->hosts().begin(),
-                               it->service_id())));
+    service_id_map const& services(engine::service::services_by_id);
+    service_id_map::const_iterator
+      svc(engine::service::services_by_id.find({
+        it->host_id(), it->service_id()}));
     if (svc != services.end()) {
       bool has_event(quick_timed_event.find(
                                          events::hash_timed_event::low,
@@ -226,12 +224,8 @@ void applier::scheduler::remove_host(configuration::host const& h) {
  */
 void applier::scheduler::remove_service(
                            configuration::service const& s) {
-  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> > const&
-    services(applier::state::instance().services());
-  umap<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service> >::const_iterator
-    svc(services.find(std::make_pair(
-                             s.host_id(),
-                             s.service_id())));
+  service_id_map const& services(engine::service::services_by_id);
+  service_id_map::const_iterator svc(services.find({s.host_id(), s.service_id()}));
   if (svc != services.end()) {
     std::vector<engine::service*> svec;
     svec.push_back(svc->second.get());
@@ -700,10 +694,9 @@ void applier::scheduler::_calculate_service_scheduling_params() {
   time_t const now(time(NULL));
 
   // get total services and total scheduled services.
-  for (umap<std::pair<uint64_t, uint64_t>,
-            std::shared_ptr<engine::service> >::const_iterator
-         it(applier::state::instance().services().begin()),
-         end(applier::state::instance().services().end());
+  for (service_id_map::const_iterator
+         it(engine::service::services_by_id.begin()),
+         end(engine::service::services_by_id.end());
        it != end;
        ++it) {
     engine::service& svc(*it->second);
@@ -845,9 +838,7 @@ void applier::scheduler::_get_services(
        set_service const& svc_cfg,
        std::vector<engine::service*>& svc_obj,
        bool throw_if_not_found) {
-  umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<engine::service> > const&
-    services(applier::state::instance().services());
+  service_id_map const& services(engine::service::services_by_id);
   for (set_service::const_reverse_iterator
          it(svc_cfg.rbegin()), end(svc_cfg.rend());
        it != end;
@@ -856,9 +847,7 @@ void applier::scheduler::_get_services(
     uint64_t service_id(it->service_id());
     std::string const& host_name(*it->hosts().begin());
     std::string const& service_description(it->service_description());
-    umap<std::pair<uint64_t, uint64_t>,
-         std::shared_ptr<engine::service> >::const_iterator
-      svc(services.find(std::make_pair(host_id, service_id)));
+    service_id_map::const_iterator svc(services.find({host_id, service_id}));
     if (svc == services.end()) {
       if (throw_if_not_found)
         throw (engine_error() << "Cannot schedule non-existing service '"

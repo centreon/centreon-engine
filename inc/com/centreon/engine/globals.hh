@@ -92,7 +92,6 @@ extern time_t                    program_start;
 extern time_t                    event_start;
 
 extern std::map<std::string, host_other_properties> host_other_props;
-extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
 
 extern circular_buffer           external_command_buffer;
 extern pthread_t                 worker_threads[];

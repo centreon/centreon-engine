@@ -229,13 +229,10 @@ static int handle_service_macro(
       if (!mac->host_ptr)
         retval = ERROR;
       else if (arg2) {
-        std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-          mac->host_ptr->get_name(), arg2));
-        std::unordered_map<std::pair<uint64_t, uint64_t>,
-                           std::shared_ptr<service> >::const_iterator
-          found(state::instance().services().find(id));
+        service_map::const_iterator
+          found(service::services.find({mac->host_ptr->get_name(), arg2}));
 
-        if (found == state::instance().services().end() || !found->second)
+        if (found == service::services.end() || !found->second)
           retval = ERROR;
         else
           // Get the service macro value.
@@ -251,13 +248,10 @@ static int handle_service_macro(
     }
     else if (arg1 && arg2) {
       // On-demand macro with both host and service name.
-      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-        arg1, arg2));
-      std::unordered_map<std::pair<uint64_t, uint64_t>,
-                         std::shared_ptr<service> >::const_iterator
-        found(state::instance().services().find(id));
+      service_map::const_iterator
+        found(service::services.find({arg1, arg2}));
 
-      if (found == state::instance().services().end() || !found->second)
+      if (found == service::services.end() || !found->second)
         // Get the service macro value.
         retval = grab_standard_service_macro_r(
                    mac,

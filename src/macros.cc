@@ -172,14 +172,10 @@ int grab_custom_macro_value_r(
       if (mac->host_ptr == nullptr)
         return ERROR;
 
-      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-        mac->host_ptr ? mac->host_ptr->get_name(): "", arg2));
-      std::unordered_map<std::pair<uint64_t, uint64_t>,
-                         std::shared_ptr<service> >::const_iterator
-        found(state::instance().services().find(id));
+      service_map::const_iterator found = service::services.find(
+        {mac->host_ptr ? mac->host_ptr->get_name(): "", arg2});
 
-      if (found != state::instance().services().end() &&
-        found->second) {
+      if (found != service::services.end() && found->second) {
 
         /* get the service macro value */
         result = grab_custom_object_macro_r(

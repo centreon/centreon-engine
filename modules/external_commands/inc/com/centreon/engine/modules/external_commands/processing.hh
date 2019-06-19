@@ -215,14 +215,10 @@ namespace         modules {
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
 
-        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
-          name, description));
-        std::unordered_map<std::pair<uint64_t, uint64_t>,
-                           std::shared_ptr<service> >::const_iterator
-          found(configuration::applier::state::instance().services().find(found_id));
+        service_map::const_iterator found(service::services.find(
+          {name, description}));
 
-        if (found == configuration::applier::state::instance().services().end() ||
-          !found->second)
+        if (found == service::services.end() || !found->second)
           return ;
         (*fptr)(found->second);
       }
@@ -237,14 +233,10 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
-        std::pair<uint64_t, uint64_t> found_id(get_host_and_service_id(
-          name, description));
-        std::unordered_map<std::pair<uint64_t, uint64_t>,
-                           std::shared_ptr<service> >::const_iterator
-          found(configuration::applier::state::instance().services().find(found_id));
+        service_map::const_iterator
+          found(service::services.find({name, description}));
 
-        if (found == configuration::applier::state::instance().services().end() ||
-          !found->second)
+        if (found == service::services.end() || !found->second)
           return ;
         (*fptr)(found->second, args + strlen(name) + strlen(description) + 2);
       }

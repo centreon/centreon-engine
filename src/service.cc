@@ -68,6 +68,7 @@ std::array<std::pair<uint32_t, std::string>, 4> const
                                  {NSLOG_SERVICE_CRITICAL, "UNKNOWN"}}};
 
 service_map service::services;
+service_id_map service::services_by_id;
 
 service::service(std::string const& hostname,
                  std::string const& description,
@@ -838,25 +839,14 @@ com::centreon::engine::service* add_service(
     // for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
     //   obj->state_history[x] = state_ok;
 
-    // Add new items to the configuration state.
-    state::instance().services()[id] = obj;
-
     // Add new items to the list.
     service::services[{obj->get_hostname(), obj->get_description()}] = obj;
+    service::services_by_id[{host_id, service_id}] = obj;
   } catch (...) {
     obj.reset();
   }
 
   return obj.get();
-}
-
-/**
- *  Get number of registered services.
- *
- *  @return Number of registered services.
- */
-int get_service_count() {
-  return state::instance().services().size();
 }
 
 /**
@@ -921,11 +911,9 @@ void service::check_for_expired_acknowledgement() {
  */
 com::centreon::engine::service& engine::find_service(uint64_t host_id,
                                                      uint64_t service_id) {
-  std::pair<uint64_t, uint64_t> id(std::make_pair(host_id, service_id));
-  umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<com::centreon::engine::service>>::const_iterator
-      it(state::instance().services().find(id));
-  if (it == state::instance().services().end())
+  service_id_map::const_iterator it(service::services_by_id.find(
+    {host_id, service_id}));
+  if (it == service::services_by_id.end())
     throw(engine_error() << "Service '" << service_id << "' on host '"
                          << host_id << "' was not found");
   return *it->second;
@@ -939,10 +927,8 @@ com::centreon::engine::service& engine::find_service(uint64_t host_id,
  *  @return True if the service is found, otherwise false.
  */
 bool engine::is_service_exist(std::pair<uint64_t, uint64_t> const& id) {
-  umap<std::pair<uint64_t, uint64_t>,
-       std::shared_ptr<com::centreon::engine::service>>::const_iterator
-      it(state::instance().services().find(id));
-  return it != state::instance().services().end();
+  service_id_map::const_iterator it(service::services_by_id.find(id));
+  return it != service::services_by_id.end();
 }
 
 /**
@@ -956,12 +942,10 @@ bool engine::is_service_exist(std::pair<uint64_t, uint64_t> const& id) {
 std::pair<uint64_t, uint64_t> engine::get_host_and_service_id(
     std::string const& host,
     std::string const& svc) {
-  std::map<std::pair<std::string, std::string>,
-           service_other_properties>::const_iterator found =
-      service_other_props.find({host, std::string(svc)});
-  return found != service_other_props.end()
-             ? std::pair<uint64_t, uint64_t>{found->second.host_id,
-                                             found->second.service_id}
+  service_map::const_iterator found = service::services.find({host, svc});
+  return found != service::services.end()
+             ? std::pair<uint64_t, uint64_t>{found->second->get_host_id(),
+                                             found->second->get_service_id()}
              : std::pair<uint64_t, uint64_t>{0u, 0u};
 }
 
@@ -987,6 +971,22 @@ void service::schedule_acknowledgement_expiration() {
     schedule_new_event(EVENT_EXPIRE_SERVICE_ACK, false,
                        _last_acknowledgement + _acknowledgement_timeout, false,
                        0, nullptr, true, this, nullptr, 0);
+}
+
+void service::set_host_id(uint64_t host_id) {
+  _host_id = host_id;
+}
+
+uint64_t service::get_host_id() const {
+  return _host_id;
+}
+
+void service::set_service_id(uint64_t service_id) {
+  _service_id = service_id;
+}
+
+uint64_t service::get_service_id() const {
+  return _service_id;
 }
 
 void service::set_hostname(std::string const& name) {

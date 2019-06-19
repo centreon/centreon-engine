@@ -90,12 +90,6 @@ namespace           configuration {
                     hostdependencies() throw ();
       hostdependency_mmap::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>> const&
-                    services() const throw ();
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>&
-                    services() throw ();
-      std::unordered_map<std::pair<uint64_t, uint64_t>, std::shared_ptr<engine::service>>::iterator
-                    services_find(configuration::service::key_type const& k);
       servicedependency_mmap const&
                     servicedependencies() const throw ();
       servicedependency_mmap&
@@ -159,9 +153,7 @@ namespace           configuration {
                     _lock;
       processing_state
                     _processing_state;
-      std::unordered_map<std::pair<uint64_t, uint64_t>,
-                         std::shared_ptr<engine::service>>
-                    _services;
+
       servicedependency_mmap
                     _servicedependencies;
       servicegroup_map

@@ -261,7 +261,7 @@ int main(int argc, char* argv[]) {
           << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
           << "Checked " << com::centreon::engine::serviceescalation::serviceescalations.size() << " service escalations.\n"
           << "Checked " << servicegroup::servicegroups.size() << " service groups.\n"
-          << "Checked " << applier.services().size() << " services.\n"
+          << "Checked " << service::services.size() << " services.\n"
           << "Checked " << applier.timeperiods().size() << " time periods.\n"
           << "\n"
           << "Total Warnings: " << config_warnings << "\n"

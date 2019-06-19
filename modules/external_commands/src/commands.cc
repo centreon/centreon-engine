@@ -192,12 +192,9 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      host_name, svc_description));
-    std::unordered_map<std::pair<uint64_t, uint64_t>,
-                       std::shared_ptr<service> >::const_iterator
-      found(state::instance().services().find(id));
-    if (found == state::instance().services().end() || !found->second)
+    service_map::const_iterator found(service::services.find(
+      {host_name, svc_description}));
+    if (found == service::services.end() || !found->second)
       return ERROR;
   }
 
@@ -278,12 +275,9 @@ int cmd_delete_all_comments(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      host_name, svc_description));
-    std::unordered_map<std::pair<uint64_t, uint64_t>,
-                       std::shared_ptr<service> >::const_iterator
-      found(state::instance().services().find(id));
-    if (found == state::instance().services().end() || !found->second)
+    service_map::const_iterator found(service::services.find(
+      {host_name, svc_description}));
+    if (found == service::services.end() || !found->second)
       return ERROR;
   }
 
@@ -312,8 +306,7 @@ int cmd_delay_notification(int cmd, char* args) {
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-    std::shared_ptr<service> >::const_iterator found;
+  service_map::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -327,11 +320,9 @@ int cmd_delay_notification(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      host_name, svc_description));
-    found = state::instance().services().find(id);
+    found = service::services.find({host_name, svc_description});
 
-    if (found == state::instance().services().end() ||
+    if (found == service::services.end() ||
       !found->second)
       return ERROR;
   }
@@ -368,8 +359,7 @@ int cmd_schedule_check(int cmd, char* args) {
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-    std::shared_ptr<service> >::const_iterator found;
+  service_map::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -397,11 +387,9 @@ int cmd_schedule_check(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      host_name, svc_description));
-    found = state::instance().services().find(id);
+    found = service::services.find({host_name, svc_description});
 
-    if (found == state::instance().services().end() ||
+    if (found == service::services.end() ||
       !found->second)
       return ERROR;
   }
@@ -611,12 +599,9 @@ int process_passive_service_check(
   }
 
   /* make sure the service exists */
-  std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-    real_host_name, svc_description));
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator
-    found(state::instance().services().find(id));
-  if (found == state::instance().services().end() || !found->second) {
+  service_map::const_iterator
+    found(service::services.find({real_host_name, svc_description}));
+  if (found == service::services.end() || !found->second) {
     logger(log_runtime_warning, basic)
       << "Warning:  Passive check result was received for service '"
       << svc_description << "' on host '" << host_name
@@ -804,8 +789,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   int type(ACKNOWLEDGEMENT_NORMAL);
   int notify(true);
   int persistent(true);
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service> >::const_iterator found;
+  service_map::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -825,11 +809,9 @@ int cmd_acknowledge_problem(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      it->second->get_name(), svc_description));
-    found = state::instance().services().find(id);
+    found = service::services.find({it->second->get_name(), svc_description});
 
-    if (found == state::instance().services().end() ||
+    if (found == service::services.end() ||
       !found->second)
       return ERROR;
   }
@@ -891,8 +873,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 int cmd_remove_acknowledgement(int cmd, char* args) {
   char* host_name(nullptr);
   char* svc_description(nullptr);
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-    std::shared_ptr<service> >::const_iterator found;
+  service_map::const_iterator found;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -912,11 +893,9 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-      it->second->get_name(), svc_description));
-    found = state::instance().services().find(id);
+    found = service::services.find({it->second->get_name(), svc_description});
 
-    if (found == state::instance().services().end() ||
+    if (found == service::services.end() ||
       !found->second)
       return ERROR;
   }
@@ -1001,13 +980,10 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         return ERROR;
 
       /* verify that the service is valid */
-      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-        temp_host->get_name(), svc_description));
-      std::unordered_map<std::pair<uint64_t, uint64_t>,
-                         std::shared_ptr<service> >::const_iterator
-        found(state::instance().services().find(id));
+      service_map::const_iterator
+        found(service::services.find({temp_host->get_name(), svc_description}));
 
-      if (found == state::instance().services().end() ||
+      if (found == service::services.end() ||
         !found->second)
         return ERROR;
     }
@@ -1582,8 +1558,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
       it;
   std::pair<uint64_t, uint64_t> id;
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-                     std::shared_ptr<service>>::const_iterator found_svc;
+  service_map::const_iterator found_svc;
 
   switch (cmd) {
     case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
@@ -1600,10 +1575,9 @@ int cmd_change_object_int_var(int cmd, char* args) {
         return ERROR;
 
       /* verify that the service is valid */
-      id = get_host_and_service_id(host_name, svc_description);
-      found_svc = state::instance().services().find(id);
+      found_svc = service::services.find({host_name, svc_description});
 
-      if (found_svc == state::instance().services().end() ||
+      if (found_svc == service::services.end() ||
         !found_svc->second)
         return ERROR;
       break;
@@ -1891,8 +1865,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   unsigned long sattr{MODATTR_NONE};
   umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator it;
   std::pair<uint64_t, uint64_t> id;
-  std::unordered_map<std::pair<uint64_t, uint64_t>,
-    std::shared_ptr<service>>::const_iterator found_svc;
+  service_map::const_iterator found_svc;
 
   /* SECURITY PATCH - disable these for the time being */
   switch (cmd) {
@@ -1947,10 +1920,9 @@ int cmd_change_object_char_var(int cmd, char* args) {
       return ERROR;
 
     /* verify that the service is valid */
-    id = get_host_and_service_id(host_name, svc_description);
-    found_svc = state::instance().services().find(id);
+    found_svc = service::services.find({host_name, svc_description});
 
-    if (found_svc == state::instance().services().end() ||
+    if (found_svc == service::services.end() ||
       !found_svc->second)
       return ERROR;
 
@@ -2299,13 +2271,10 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     break;
   case CMD_CHANGE_CUSTOM_SVC_VAR:
     {
-      std::pair<uint64_t, uint64_t> id(get_host_and_service_id(
-        name1, name2));
-      std::unordered_map<std::pair<uint64_t, uint64_t>,
-                         std::shared_ptr<service> >::const_iterator
-        found(state::instance().services().find(id));
+      service_map::const_iterator
+        found(service::services.find({name1, name2}));
 
-      if (found == state::instance().services().end() ||
+      if (found == service::services.end() ||
         !found->second)
         return ERROR;
       std::unordered_map<std::string, customvariable>::iterator it(found->second->custom_variables.find(varname));

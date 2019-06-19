@@ -190,6 +190,8 @@ applier::state::~state() throw() {
   engine::hostgroup::hostgroups.clear();
   engine::commands::command::commands.clear();
   engine::commands::connector::connectors.clear();
+  engine::service::services.clear();
+  engine::service::services_by_id.clear();
 
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
@@ -344,40 +346,6 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >:
     ++p.first;
   }
   return (p.first == p.second) ? _hostdependencies.end() : p.first;
-}
-
-/**
- *  Get the current services.
- *
- *  @return The current services.
- */
-std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<engine::service> > const& applier::state::services() const throw () {
-  return _services;
-}
-
-/**
- *  Get the current services.
- *
- *  @return The current services.
- */
-std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<engine::service> >& applier::state::services() throw () {
-  return _services;
-}
-
-
-/**
- *  Find a service by its key.
- *
- *  @param[in] k Pair of host name / service description.
- *
- *  @return Iterator to the element if found, services().end()
- *          otherwise.
- */
-std::unordered_map<std::pair<unsigned long, unsigned long>,
-     std::shared_ptr<engine::service> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
-  return _services.find(k);
 }
 
 /**
@@ -1261,12 +1229,11 @@ void applier::state::_processing(
              end(diff_services.added().end());
            it != end;
            ++it) {
-        std::unordered_map<std::pair<unsigned long, unsigned long>,
-             std::shared_ptr<engine::service> >::const_iterator
-          svc(services().find(std::make_pair(
+        service_id_map::const_iterator
+          svc(engine::service::services_by_id.find({
                                      it->host_id(),
-                                     it->service_id())));
-        if (svc != services().end())
+                                     it->service_id()}));
+        if (svc != engine::service::services_by_id.end())
           log_service_state(INITIAL_STATES, svc->second.get());
       }
     }
