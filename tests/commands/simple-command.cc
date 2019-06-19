@@ -73,15 +73,16 @@ TEST_F(SimpleCommand, NewCommandWithNoName) {
 // When the add_command method is called with an empty value,
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, NewCommandWithNoValue) {
-  ASSERT_THROW(new commands::raw("foo", ""), std::exception);
+  std::unique_ptr<commands::raw> cmd;
+  ASSERT_THROW(cmd.reset(new commands::raw("foo", "")), std::exception);
 }
 
 // Given an already existing command
 // When the add_command method is called with the same name
 // Then it returns a NULL pointer.
 TEST_F(SimpleCommand, CommandAlreadyExisting) {
-  new commands::raw("toto", "/bin/ls");
-  ASSERT_NO_THROW(new commands::raw("toto", "/bin/ls"));
+  std::unique_ptr<commands::raw> cmd;
+  ASSERT_NO_THROW(cmd.reset(new commands::raw("toto", "/bin/ls")));
 }
 
 // Given a name and a command line
@@ -90,7 +91,7 @@ TEST_F(SimpleCommand, CommandAlreadyExisting) {
 // When sync executed
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandSync) {
-  commands::command* cmd(new commands::raw("test", "/bin/echo bonjour"));
+  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
   commands::result res;

@@ -131,7 +131,10 @@ service::service(std::string const& hostname,
       _hostname{hostname},
       _description{description},
       _is_volatile{is_volatile},
-      _initial_state{initial_state} {
+      _initial_state{initial_state},
+      _current_state{initial_state},
+      _last_hard_state{initial_state},
+      _last_state{initial_state} {
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
 
@@ -800,7 +803,6 @@ com::centreon::engine::service* add_service(
   try {
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_options = CHECK_OPTION_NONE;
-    obj->set_current_state(initial_state);
     uint32_t flap_detection_on;
     flap_detection_on = none;
     flap_detection_on |= (flap_detection_on_critical > 0 ? notifier::critical : 0);
@@ -808,8 +810,6 @@ com::centreon::engine::service* add_service(
     flap_detection_on |= (flap_detection_on_unknown > 0 ? notifier::unknown : 0);
     flap_detection_on |= (flap_detection_on_warning > 0 ? notifier::warning : 0);
     obj->set_flap_detection_on(flap_detection_on);
-    obj->set_last_hard_state(initial_state);
-    obj->set_last_state(initial_state);
     obj->set_modified_attributes(MODATTR_NONE);
     uint32_t notify_on;
     notify_on = none;

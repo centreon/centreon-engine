@@ -252,6 +252,8 @@ class                notifier : public checkable {
 
   static std::unordered_map<std::string, std::shared_ptr<contact>> current_notifications;
 
+  timeperiod          *notification_period_ptr;
+
  protected:
   int                _notifier_type;
   int                _stalk_type;

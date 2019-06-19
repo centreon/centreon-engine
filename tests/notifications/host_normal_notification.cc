@@ -125,6 +125,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationForcedNotification) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(
@@ -146,6 +147,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithDowntime) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(
@@ -167,6 +169,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithFlapping) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(
@@ -188,6 +191,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithSoftState) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(
@@ -208,6 +212,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithHardStateAcknowledged) 
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
@@ -229,6 +234,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousTooSoon) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
@@ -251,6 +257,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousWithNullInterv
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
@@ -275,6 +282,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateNotNotified) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);

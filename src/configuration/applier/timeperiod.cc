@@ -153,7 +153,7 @@ void applier::timeperiod::modify_object(
   if (obj.timeranges() != old_cfg.timeranges()) {
     // Delete old time ranges.
     for (unsigned int i(0);
-         i < sizeof(tp->days) / sizeof(*tp->days);
+         i < tp->days.size();
          ++i)
       tp->days[i].clear();
     // Create new time ranges.
@@ -164,7 +164,7 @@ void applier::timeperiod::modify_object(
   if (obj.exceptions() != old_cfg.exceptions()) {
     // Delete old exceptions.
     for (unsigned int i(0);
-         i < sizeof(tp->exceptions) / sizeof(*tp->exceptions);
+         i < tp->exceptions.size();
          ++i)
       tp->exceptions[i].clear();
 
@@ -361,5 +361,4 @@ void applier::timeperiod::_add_time_ranges(
           it2->end())};
       tp->days[day].push_back(tr);
     }
-  return ;
 }

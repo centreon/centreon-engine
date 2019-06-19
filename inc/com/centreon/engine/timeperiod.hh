@@ -54,8 +54,8 @@ class                timeperiod {
   bool                operator==(timeperiod const& obj) throw ();
   bool                operator!=(timeperiod const& obj) throw ();
 
-  timerange_list      days[7];
-  daterange_list      exceptions[DATERANGE_TYPES];
+  std::array<timerange_list, 7> days;
+  std::array<daterange_list, DATERANGE_TYPES> exceptions;
   timeperiodexclusion exclusions;
 
   static timeperiod_map
@@ -64,7 +64,6 @@ class                timeperiod {
  private:
   std::string         _name;
   std::string         _alias;
-
 };
 
 CCE_END()

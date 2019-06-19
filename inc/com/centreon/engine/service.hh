@@ -213,8 +213,6 @@ class                           service : public notifier {
   host*                         host_ptr;
   commands::command*            event_handler_ptr;
   commands::command*            check_command_ptr;
-  timeperiod*                   check_period_ptr;
-  timeperiod*                   notification_period_ptr;
   std::list<std::shared_ptr<servicegroup>> const&
                                 get_parent_groups() const;
   std::list<std::shared_ptr<servicegroup>>&
