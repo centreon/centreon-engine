@@ -56,7 +56,8 @@ std::array<std::pair<uint32_t, std::string>, 3> const host::tab_host_states{
      {NSLOG_HOST_DOWN, "DOWN"},
      {NSLOG_HOST_UNREACHABLE, "UNREACHABLE"}}};
 
-host_map com::centreon::engine::host::hosts;
+host_map host::hosts;
+host_id_map host::hosts_by_id;
 
 static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
   for (unsigned int i(0); i < size; ++i)
@@ -256,6 +257,9 @@ host::host(uint64_t host_id,
 
   _initial_state = initial_state;
 
+  _id = host_id;
+  _should_reschedule_current_check = false;
+
   // Duplicate string vars.
   _name = name;
   _address = address;
@@ -294,6 +298,14 @@ host::host(uint64_t host_id,
   _y_2d = y_2d;
   _y_3d = y_3d;
   _z_3d = z_3d;
+}
+
+uint64_t host::get_host_id(void) const {
+  return _id;
+}
+
+void host::set_host_id(uint64_t id) {
+  _id = id;
 }
 
 void host::add_child_link(std::shared_ptr<host> child) {
@@ -509,6 +521,14 @@ bool host::get_is_being_freshened() const {
 
 void host::set_is_being_freshened(bool is_being_freshened) {
   _is_being_freshened = is_being_freshened;
+}
+
+bool host::get_should_reschedule_current_check() const {
+  return _should_reschedule_current_check;
+}
+
+void host::set_should_reschedule_current_check(bool should_reschedule) {
+  _should_reschedule_current_check = should_reschedule;
 }
 
 //int host::get_current_notification_number() const {
@@ -1350,9 +1370,8 @@ int number_of_total_parent_hosts(com::centreon::engine::host* hst) {
  *          host is not found.
  */
 host& engine::find_host(uint64_t host_id) {
-  std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it{state::instance().hosts().find(host_id)};
-  if (it == state::instance().hosts().end())
+  host_id_map::const_iterator it{host::hosts_by_id.find(host_id)};
+  if (it == host::hosts_by_id.end())
     throw engine_error() << "Host '" << host_id << "' was not found";
   return *it->second;
 }
@@ -1365,9 +1384,8 @@ host& engine::find_host(uint64_t host_id) {
  *  @return True if the host is found, otherwise false.
  */
 bool engine::is_host_exist(uint64_t host_id) throw() {
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it(state::instance().hosts().find(host_id));
-  return it != state::instance().hosts().end();
+  host_id_map::const_iterator it(host::hosts_by_id.find(host_id));
+  return it != host::hosts_by_id.end();
 }
 
 /**
@@ -1378,9 +1396,8 @@ bool engine::is_host_exist(uint64_t host_id) throw() {
  *  @return  The host id or 0.
  */
 uint64_t engine::get_host_id(std::string const& name) {
-  std::map<std::string, host_other_properties>::const_iterator found =
-      host_other_props.find(name);
-  return found != host_other_props.end() ? found->second.host_id : 0;
+  host_map::const_iterator found{host::hosts.find(name)};
+  return found != host::hosts.end() ? found->second->get_host_id() : 0;
 }
 
 /**
@@ -1460,7 +1477,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       << "\tReschedule Check?:  "
       << (queued_check_result->get_reschedule_check() ? "Yes" : "No") << "\n"
       << "\tShould Reschedule Current Host Check?:"
-      << host_other_props[get_name()].should_reschedule_current_check
+      << host::hosts[get_name()]->get_should_reschedule_current_check()
       << "\tExited OK?:         "
       << (queued_check_result->get_exited_ok() ? "Yes" : "No") << "\n"
       << com::centreon::logging::setprecision(3)
@@ -1531,12 +1548,12 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   // on the same host at the same time. The flag is then set in the host
   // and this check should be rescheduled regardless of what it was meant
   // to initially.
-  if (host_other_props[get_name()].should_reschedule_current_check &&
+  if (host::hosts[get_name()]->get_should_reschedule_current_check() &&
       !queued_check_result->get_reschedule_check())
     reschedule_check = true;
 
   // Clear the should reschedule flag.
-  host_other_props[get_name()].should_reschedule_current_check = false;
+  host::hosts[get_name()]->set_should_reschedule_current_check(false);
 
   /* check latency is passed to us for both active and passive checks */
   set_latency(queued_check_result->get_latency());

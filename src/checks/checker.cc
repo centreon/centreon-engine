@@ -186,21 +186,26 @@ void checker::reap() {
       }
       // Host check result.
       else {
-        try {
-          host& hst(find_host(get_host_id(result.get_hostname())));
-          // Process the check result.
-          logger(dbg_checks, more)
-            << "Handling check result for host '"
-            << result.get_hostname() << "'...";
-          hst.handle_async_check_result_3x(&result);
-        }
-        catch (std::exception const& e) {
-          // Check if the host exists.
+        host_map::iterator it = host::hosts.find(result.get_hostname());
+        if (it == host::hosts.end())
           logger(log_runtime_warning, basic)
             << "Warning: Check result queue contained results for "
             << "host '" << result.get_hostname() << "', but the host could "
             << "not be found! Perhaps you forgot to define the host in "
             << "your config files ?";
+        else {
+          try {
+            // Process the check result.
+            logger(dbg_checks, more)
+              << "Handling check result for host '"
+              << result.get_hostname() << "'...";
+            it->second->handle_async_check_result_3x(&result);
+          }
+          catch (std::exception const &e) {
+            logger(log_runtime_warning, basic)
+              << "Check result queue errors for "
+              << "host '" << result.get_hostname();
+          }
         }
       }
 
@@ -294,7 +299,7 @@ void checker::run(
   // bound to be rescheduled but would be discarded because a host check
   // is already running.
   if (reschedule_check)
-    host_other_props[hst->get_name()].should_reschedule_current_check = true;
+    host::hosts[hst->get_name()]->set_should_reschedule_current_check(true);
 
   // Don't execute a new host check if one is already running.
   if (hst->get_is_executing()

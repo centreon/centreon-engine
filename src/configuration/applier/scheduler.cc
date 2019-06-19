@@ -75,11 +75,8 @@ void applier::scheduler::apply(
          end(diff_hosts.modified().end());
        it != end;
        ++it) {
-    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>> const&
-      hosts{applier::state::instance().hosts()};
-    umap<uint64_t,
-         std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      hst(hosts.find(get_host_id(it->host_name().c_str())));
+    host_map const& hosts{engine::host::hosts};
+    host_map::const_iterator hst(hosts.find(it->host_name().c_str()));
     if (hst != hosts.end()) {
       bool has_event(quick_timed_event.find(
                                          events::hash_timed_event::low,
@@ -204,11 +201,8 @@ void applier::scheduler::load() {
  *  @param[in] h  Host configuration.
  */
 void applier::scheduler::remove_host(configuration::host const& h) {
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host> > const&
-    hosts(applier::state::instance().hosts());
-  umap<uint64_t,
-       std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    hst(hosts.find(get_host_id(h.host_name().c_str())));
+  host_map const& hosts(engine::host::hosts);
+  host_map::const_iterator hst(hosts.find(h.host_name()));
   if (hst != hosts.end()) {
     std::vector<com::centreon::engine::host*> hvec;
     hvec.push_back(hst->second.get());
@@ -537,10 +531,9 @@ void applier::scheduler::_calculate_host_scheduling_params() {
   time_t const now(time(NULL));
 
   // get total hosts and total scheduled hosts.
-  for (umap<uint64_t,
-            std::shared_ptr<com::centreon::engine::host>>::const_iterator
-         it(applier::state::instance().hosts().begin()),
-         end(applier::state::instance().hosts().end());
+  for (host_map::const_iterator
+         it(engine::host::hosts.begin()),
+         end(engine::host::hosts.end());
          it != end;
          ++it) {
     com::centreon::engine::host& hst(*it->second);
@@ -804,8 +797,7 @@ void applier::scheduler::_get_hosts(
        set_host const& hst_cfg,
        std::vector<com::centreon::engine::host*>& hst_obj,
        bool throw_if_not_found) {
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host> > const&
-    hosts{applier::state::instance().hosts()};
+  host_id_map const& hosts{engine::host::hosts_by_id};
   for (set_host::const_reverse_iterator
          it(hst_cfg.rbegin()),
          end(hst_cfg.rend());
@@ -813,8 +805,7 @@ void applier::scheduler::_get_hosts(
        ++it) {
     uint64_t host_id(it->host_id());
     std::string const& host_name(it->host_name());
-    umap<uint64_t, std::shared_ptr<com::centreon::engine::host> >::const_iterator
-      hst(hosts.find(host_id));
+    host_id_map::const_iterator hst(hosts.find(host_id));
     if (hst == hosts.end()) {
       if (throw_if_not_found)
         throw (engine_error() << "Could not schedule non-existing host '"

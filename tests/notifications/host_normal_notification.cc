@@ -56,8 +56,7 @@ class HostNotification : public ::testing::Test {
     hst.parse("address", "127.0.0.1");
     hst.parse("_HOST_ID", "12");
     hst_aply.add_object(hst);
-    umap<uint64_t, std::shared_ptr<engine::host> > const& hm{
-        configuration::applier::state::instance().hosts()};
+    host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
     _host->set_current_state(engine::host::state_up);
     _host->set_state_type(checkable::hard);

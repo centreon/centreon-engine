@@ -47,7 +47,7 @@ namespace                  configuration {
       flapping = (1 << 3),
       downtime = (1 << 4)
     };
-    typedef unsigned int   key_type;
+    typedef uint64_t       key_type;
 
                            host(key_type const& key = 0);
                            host(host const& other);

@@ -47,6 +47,8 @@ CCE_END()
 
 typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::host>> host_map;
+typedef std::unordered_map<uint64_t,
+  std::shared_ptr<com::centreon::engine::host>> host_id_map;
 
 CCE_BEGIN()
 class                host : public notifier {
@@ -116,6 +118,8 @@ class                host : public notifier {
                            bool obsess_over_host,
                            std::string const& timezone);
                      ~host() {}
+  uint64_t           get_host_id(void) const;
+  void               set_host_id(uint64_t id);
   void               add_child_link(std::shared_ptr<host> child);
   void               add_parent_host(std::string const& host_name);
   int                log_event();
@@ -199,6 +203,8 @@ class                host : public notifier {
   void               set_retain_status_information(bool retain_status_information);
   bool               get_retain_nonstatus_information() const;
   void               set_retain_nonstatus_information(bool retain_nonstatus_information);
+  bool               get_should_reschedule_current_check() const;
+  void               set_should_reschedule_current_check(bool should_reschedule);
   std::string const& get_vrml_image() const;
   void               set_vrml_image(std::string const& image);
   std::string const& get_statusmap_image() const;
@@ -280,6 +286,7 @@ class                host : public notifier {
   host_map            parent_hosts;
   host_map            child_hosts;
   static host_map     hosts;
+  static host_id_map  hosts_by_id;
 
   commands::command*  event_handler_ptr;
   commands::command*  check_command_ptr;
@@ -291,6 +298,7 @@ class                host : public notifier {
                                 get_parent_groups();
 
 private:
+  uint64_t            _id;
   std::string         _name;
   std::string         _alias;
   std::string         _address;
@@ -309,6 +317,7 @@ private:
   int                 _should_be_drawn;
   int                 _acknowledgement_type;
   bool                _is_executing;
+  bool                _should_reschedule_current_check;
   int                 _check_options;
   time_t              _last_time_down;
   time_t              _last_time_unreachable;
@@ -332,19 +341,6 @@ private:
 };
 
 CCE_END()
-
-/* Other HOST structure. */
-struct                host_other_properties {
-  bool                should_reschedule_current_check;
-  uint64_t            host_id;
-};
-
-/* Hash structures. */
-typedef struct        host_cursor_struct {
-  int                 host_hashchain_iterator;
-  com::centreon::engine::host*
-                      current_host_pointer;
-}                     host_cursor;
 
 int                   is_contact_for_host(com::centreon::engine::host* hst,
                           com::centreon::engine::contact* cntct);

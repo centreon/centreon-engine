@@ -150,12 +150,13 @@ void applier::host::add_object(
         obj.timezone())};
 
 
-  state::instance().hosts()[obj.host_id()] = h;
-  com::centreon::engine::host::hosts.insert({h->get_name(), h});
+  engine::host::hosts.insert({h->get_name(), h});
+  engine::host::hosts_by_id.insert({obj.host_id(), h});
+
 
   h->set_initial_notif_time(0);
-  host_other_props[obj.host_name()].should_reschedule_current_check = false;
-  host_other_props[obj.host_name()].host_id = obj.host_id();
+  h->set_should_reschedule_current_check(false);
+  h->set_host_id(obj.host_id());
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());
   h->set_last_acknowledgement(0);
@@ -284,13 +285,10 @@ void applier::host::modify_object(
            << obj.host_name() << "'");
 
   // Find host object.
-  umap<unsigned long,
-       std::shared_ptr<com::centreon::engine::host>>::iterator
-    it_obj(applier::state::instance().hosts_find(obj.key()));
-  if (it_obj == applier::state::instance().hosts().end())
+  host_id_map::iterator it_obj(engine::host::hosts_by_id.find(obj.key()));
+  if (it_obj == engine::host::hosts_by_id.end())
     throw (engine_error() << "Could not modify non-existing "
            << "host object '" << obj.host_name() << "'");
-  com::centreon::engine::host* h(it_obj->second.get());
 
   // Update the global configuration set.
   configuration::host obj_old(*it_cfg);
@@ -298,72 +296,77 @@ void applier::host::modify_object(
   config->hosts().insert(obj);
 
   // Modify properties.
-  h->set_name(obj.host_name());
-  h->set_display_name(obj.display_name());
+  if(it_obj->second->get_name() != obj.host_name()) {
+    engine::host::hosts.erase(it_obj->second->get_name());
+    engine::host::hosts.insert({obj.host_name(), it_obj->second});
+  }
+
+  it_obj->second->set_name(obj.host_name());
+  it_obj->second->set_display_name(obj.display_name());
   if (!obj.alias().empty())
-    h->set_alias(obj.alias());
+    it_obj->second->set_alias(obj.alias());
   else
-    h->set_alias(obj.host_name());
-  h->set_address(obj.address());
+    it_obj->second->set_alias(obj.host_name());
+  it_obj->second->set_address(obj.address());
   if (obj.check_period().empty())
-  h->set_check_period(obj.check_period());
-  h->set_initial_state(static_cast<engine::host::host_state>(obj.initial_state()));
-  h->set_check_interval(static_cast<double>(obj.check_interval()));
-  h->set_retry_interval(static_cast<double>(obj.retry_interval()));
-  h->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
-  h->add_notify_on(obj.notification_options() & configuration::host::up ? notifier::recovery : notifier::none);
-  h->add_notify_on(obj.notification_options() & configuration::host::down ? notifier::down : notifier::none);
-  h->add_notify_on(obj.notification_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
-  h->add_notify_on(obj.notification_options() & configuration::host::flapping ? notifier::flapping : notifier::none);
-  h->add_notify_on(obj.notification_options() & configuration::host::downtime ? notifier::downtime : notifier::none);
-  h->set_notification_interval(static_cast<double>(obj.notification_interval()));
-  h->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
-  h->set_notification_period(obj.notification_period());
-  h->set_notifications_enabled(static_cast<int>(obj.notifications_enabled()));
-  h->set_check_command(obj.check_command());
-  h->set_checks_enabled(static_cast<int>(obj.checks_active()));
-  h->set_accept_passive_checks(static_cast<int>(obj.checks_passive()));
-  h->set_event_handler(obj.event_handler());
-  h->set_event_handler_enabled(static_cast<int>(obj.event_handler_enabled()));
-  h->set_flap_detection_enabled(obj.flap_detection_enabled());
-  h->set_low_flap_threshold(obj.low_flap_threshold());
-  h->set_high_flap_threshold(obj.high_flap_threshold());
-  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::up ? notifier::recovery : notifier::none);
-  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::down ? notifier::down : notifier::none);
-  h->set_flap_detection_on(obj.flap_detection_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
-  h->add_stalk_on(obj.stalking_options() & configuration::host::up ? notifier::up : notifier::none);
-  h->add_stalk_on(obj.stalking_options() & configuration::host::down ? notifier::down : notifier::none);
-  h->add_stalk_on(obj.stalking_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
-  h->set_process_performance_data(static_cast<int>(obj.process_perf_data()));
-  h->set_check_freshness(static_cast<int>(obj.check_freshness()));
-  h->set_freshness_threshold(static_cast<int>(obj.freshness_threshold()));
-  h->set_notes(obj.notes());
-  h->set_notes_url(obj.notes_url());
-  h->set_action_url(obj.action_url());
-  h->set_icon_image(obj.icon_image());
-  h->set_icon_image_alt(obj.icon_image_alt());
-  h->set_vrml_image(obj.vrml_image());
-  h->set_statusmap_image(obj.statusmap_image());
-  h->set_x_2d(obj.coords_2d().x());
-  h->set_y_2d(obj.coords_2d().y());
-  h->set_have_2d_coords(static_cast<int>(obj.have_coords_2d()));
-  h->set_x_3d(obj.coords_3d().x());
-  h->set_y_3d(obj.coords_3d().y());
-  h->set_z_3d(obj.coords_3d().z());
-  h->set_have_3d_coords(static_cast<int>(obj.have_coords_3d()));
-  h->set_retain_status_information(static_cast<int>(obj.retain_status_information()));
-  h->set_retain_nonstatus_information(static_cast<int>(obj.retain_nonstatus_information()));
-  h->set_obsess_over(obj.obsess_over_host());
-  h->set_timezone(obj.timezone());
-  host_other_props[obj.host_name()].host_id = obj.host_id();
-  h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
+    it_obj->second->set_check_period(obj.check_period());
+  it_obj->second->set_initial_state(static_cast<engine::host::host_state>(obj.initial_state()));
+  it_obj->second->set_check_interval(static_cast<double>(obj.check_interval()));
+  it_obj->second->set_retry_interval(static_cast<double>(obj.retry_interval()));
+  it_obj->second->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
+  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::up ? notifier::recovery : notifier::none);
+  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::down ? notifier::down : notifier::none);
+  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::flapping ? notifier::flapping : notifier::none);
+  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::downtime ? notifier::downtime : notifier::none);
+  it_obj->second->set_notification_interval(static_cast<double>(obj.notification_interval()));
+  it_obj->second->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
+  it_obj->second->set_notification_period(obj.notification_period());
+  it_obj->second->set_notifications_enabled(static_cast<int>(obj.notifications_enabled()));
+  it_obj->second->set_check_command(obj.check_command());
+  it_obj->second->set_checks_enabled(static_cast<int>(obj.checks_active()));
+  it_obj->second->set_accept_passive_checks(static_cast<int>(obj.checks_passive()));
+  it_obj->second->set_event_handler(obj.event_handler());
+  it_obj->second->set_event_handler_enabled(static_cast<int>(obj.event_handler_enabled()));
+  it_obj->second->set_flap_detection_enabled(obj.flap_detection_enabled());
+  it_obj->second->set_low_flap_threshold(obj.low_flap_threshold());
+  it_obj->second->set_high_flap_threshold(obj.high_flap_threshold());
+  it_obj->second->set_flap_detection_on(obj.flap_detection_options() & configuration::host::up ? notifier::recovery : notifier::none);
+  it_obj->second->set_flap_detection_on(obj.flap_detection_options() & configuration::host::down ? notifier::down : notifier::none);
+  it_obj->second->set_flap_detection_on(obj.flap_detection_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  it_obj->second->add_stalk_on(obj.stalking_options() & configuration::host::up ? notifier::up : notifier::none);
+  it_obj->second->add_stalk_on(obj.stalking_options() & configuration::host::down ? notifier::down : notifier::none);
+  it_obj->second->add_stalk_on(obj.stalking_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  it_obj->second->set_process_performance_data(static_cast<int>(obj.process_perf_data()));
+  it_obj->second->set_check_freshness(static_cast<int>(obj.check_freshness()));
+  it_obj->second->set_freshness_threshold(static_cast<int>(obj.freshness_threshold()));
+  it_obj->second->set_notes(obj.notes());
+  it_obj->second->set_notes_url(obj.notes_url());
+  it_obj->second->set_action_url(obj.action_url());
+  it_obj->second->set_icon_image(obj.icon_image());
+  it_obj->second->set_icon_image_alt(obj.icon_image_alt());
+  it_obj->second->set_vrml_image(obj.vrml_image());
+  it_obj->second->set_statusmap_image(obj.statusmap_image());
+  it_obj->second->set_x_2d(obj.coords_2d().x());
+  it_obj->second->set_y_2d(obj.coords_2d().y());
+  it_obj->second->set_have_2d_coords(static_cast<int>(obj.have_coords_2d()));
+  it_obj->second->set_x_3d(obj.coords_3d().x());
+  it_obj->second->set_y_3d(obj.coords_3d().y());
+  it_obj->second->set_z_3d(obj.coords_3d().z());
+  it_obj->second->set_have_3d_coords(static_cast<int>(obj.have_coords_3d()));
+  it_obj->second->set_retain_status_information(static_cast<int>(obj.retain_status_information()));
+  it_obj->second->set_retain_nonstatus_information(static_cast<int>(obj.retain_nonstatus_information()));
+  it_obj->second->set_obsess_over(obj.obsess_over_host());
+  it_obj->second->set_timezone(obj.timezone());
+  it_obj->second->set_host_id(obj.host_id());
+  it_obj->second->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());
-  h->set_recovery_notification_delay(obj.recovery_notification_delay());
+  it_obj->second->set_recovery_notification_delay(obj.recovery_notification_delay());
 
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
     // Delete old contacts.
-    h->contacts.clear();
+    it_obj->second->contacts.clear();
 
     // Add contacts to host.
     for (set_string::const_iterator
@@ -371,13 +374,13 @@ void applier::host::modify_object(
            end(obj.contacts().end());
          it != end;
          ++it)
-      h->contacts.insert({*it, nullptr});
+      it_obj->second->contacts.insert({*it, nullptr});
   }
 
   // Contact groups.
   if (obj.contactgroups() != obj_old.contactgroups()) {
     // Delete old contact groups.
-    h->contact_groups.clear();
+    it_obj->second->contact_groups.clear();
 
     // Add contact groups to host.
     for (set_string::const_iterator
@@ -385,12 +388,12 @@ void applier::host::modify_object(
            end(obj.contactgroups().end());
          it != end;
          ++it)
-      h->contact_groups.insert({*it, nullptr});
+      it_obj->second->contact_groups.insert({*it, nullptr});
   }
 
   // Custom variables.
   if (obj.customvariables() != obj_old.customvariables())
-    h->custom_variables = obj.customvariables();
+    it_obj->second->custom_variables = obj.customvariables();
 
   // Parents.
   if (obj.parents() != obj_old.parents()) {
@@ -398,8 +401,8 @@ void applier::host::modify_object(
     {
       timeval tv(get_broker_timestamp(nullptr));
       for (host_map::iterator
-             it(h->parent_hosts.begin()),
-             end(h->parent_hosts.end());
+             it(it_obj->second->parent_hosts.begin()),
+             end(it_obj->second->parent_hosts.end());
            it != end;
            it++)
         broker_relation_data(
@@ -408,11 +411,11 @@ void applier::host::modify_object(
           NEBATTR_NONE,
           it->second.get(),
           nullptr,
-          h,
+          it_obj->second.get(),
           nullptr,
           &tv);
     }
-    h->parent_hosts.clear();
+    it_obj->second->parent_hosts.clear();
 
     // Create parents.
     for (set_string::const_iterator
@@ -420,7 +423,7 @@ void applier::host::modify_object(
            end(obj.parents().end());
          it != end;
          ++it)
-      h->add_parent_host(*it);
+      it_obj->second->add_parent_host(*it);
   }
 
   // Notify event broker.
@@ -429,7 +432,7 @@ void applier::host::modify_object(
     NEBTYPE_HOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    h,
+    it_obj->second.get(),
     CMD_NONE,
     MODATTR_ALL,
     MODATTR_ALL,
@@ -450,10 +453,8 @@ void applier::host::remove_object(
     << "Removing host '" << obj.host_name() << "'.";
 
   // Find host.
-  umap<unsigned long, std::shared_ptr<com::centreon::engine::host> >::iterator
-    it(applier::state::instance().hosts_find(obj.key()));
-  if (it != applier::state::instance().hosts().end()) {
-    com::centreon::engine::host* hst(it->second.get());
+  host_id_map::iterator it(engine::host::hosts_by_id.find(obj.key()));
+  if (it != engine::host::hosts_by_id.end()) {
 
     // Remove host comments.
     comment::delete_host_comments(obj.host_name());
@@ -469,7 +470,7 @@ void applier::host::remove_object(
     applier::scheduler::instance().remove_host(obj);
 
     // Remove host from its list.
-    com::centreon::engine::host::hosts.erase(hst->get_name());
+    com::centreon::engine::host::hosts.erase(it->second->get_name());
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
@@ -477,15 +478,15 @@ void applier::host::remove_object(
       NEBTYPE_HOST_DELETE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      hst,
+      it->second.get(),
       CMD_NONE,
       MODATTR_ALL,
       MODATTR_ALL,
       &tv);
 
     // Erase host object (will effectively delete the object).
-    host_other_props.erase(obj.host_name());
-    applier::state::instance().hosts().erase(it);
+    engine::host::hosts.erase(obj.host_name());
+    engine::host::hosts_by_id.erase(it);
   }
 
   // Remove host from the global configuration set.
@@ -510,17 +511,16 @@ void applier::host::resolve_object(
   // It is necessary to do it only once to prevent the removal
   // of valid child backlinks.
   if (obj == *config->hosts().begin()) {
-    for (umap<unsigned long,
-              std::shared_ptr<com::centreon::engine::host> >::iterator
-         it(applier::state::instance().hosts().begin()),
-         end(applier::state::instance().hosts().end()); it != end; ++it)
+    for (host_map::iterator
+         it(engine::host::hosts.begin()),
+         end(engine::host::hosts.end()); it != end; ++it)
       it->second->child_hosts.clear();
   }
 
   // Find host.
-  umap<unsigned long, std::shared_ptr<com::centreon::engine::host> >::iterator
-    it(applier::state::instance().hosts_find(obj.key()));
-  if (applier::state::instance().hosts().end() == it)
+  host_id_map::iterator
+    it(engine::host::hosts_by_id.find(obj.key()));
+  if (engine::host::hosts_by_id.end() == it)
     throw (engine_error() << "Cannot resolve non-existing host '"
            << obj.host_name() << "'");
 

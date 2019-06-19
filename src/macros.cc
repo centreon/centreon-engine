@@ -86,9 +86,8 @@ int grab_custom_macro_value_r(
     if (arg2 == nullptr) {
       /* find the host for on-demand macros */
       if (arg1) {
-        umap<unsigned long,std::shared_ptr<com::centreon::engine::host>>::const_iterator
-          it = state::instance().hosts().find(get_host_id(arg1));
-        if (it != state::instance().hosts().end())
+        host_map::const_iterator it = host::hosts.find(arg1);
+        if (it != host::hosts.end())
           temp_host = it->second.get();
 
         if(temp_host == nullptr)

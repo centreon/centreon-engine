@@ -554,9 +554,8 @@ void applier::service::resolve_object(
   it->second->get_parent_groups().clear();
 
   // Find host and adjust its counters.
-  std::unordered_map<uint64_t, std::shared_ptr<engine::host>>::iterator
-    hst(applier::state::instance().hosts_find(it->first.first));
-  if (hst != applier::state::instance().hosts().end()) {
+  host_id_map::iterator hst(engine::host::hosts_by_id.find(it->first.first));
+  if (hst != engine::host::hosts_by_id.end()) {
     hst->second->set_total_services(hst->second->get_total_services() + 1);
     hst->second->set_total_service_check_interval(
       hst->second->get_total_service_check_interval() +

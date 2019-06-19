@@ -99,9 +99,8 @@ void applier::hostescalation::add_object(
 
   // Add new items to the configuration state.
   uint64_t host_id{get_host_id(he->get_hostname())};
-  std::unordered_map<uint64_t, std::shared_ptr<engine::host> >::iterator it{
-      state::instance().hosts().find(host_id)};
-  if (it != state::instance().hosts().end())
+  host_id_map::iterator it{engine::host::hosts_by_id.find(host_id)};
+  if (it != engine::host::hosts_by_id.end())
     it->second->add_escalation(he);
 
   // Add new items to the list.
@@ -198,8 +197,7 @@ void applier::hostescalation::remove_object(
   uint64_t host_id{get_host_id(host_name)};
   std::pair<hostescalation_mmap::iterator, hostescalation_mmap::iterator> range{
       engine::hostescalation::hostescalations.equal_range(host_name)};
-  std::unordered_map<uint64_t, std::shared_ptr<engine::host> >::iterator hit{
-      state::instance().hosts().find(host_id)};
+  host_id_map::iterator hit{engine::host::hosts_by_id.find(host_id)};
 
   for (hostescalation_mmap::iterator it{range.first}, end{range.second};
        it != end;
@@ -259,8 +257,7 @@ void applier::hostescalation::resolve_object(
   logger(logging::dbg_config, logging::more) << "Resolving a host escalation.";
 
   uint64_t host_id{get_host_id(*obj.hosts().begin())};
-  std::unordered_map<uint64_t, std::shared_ptr<engine::host> >::iterator it{
-      state::instance().hosts().find(host_id)};
+  host_id_map::iterator it{engine::host::hosts_by_id.find(host_id)};
   for (std::list<std::shared_ptr<engine::escalation> >::const_iterator
            itt{it->second->get_escalations().begin()},
        end{it->second->get_escalations().end()};

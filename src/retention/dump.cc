@@ -196,7 +196,7 @@ std::ostream& dump::header(std::ostream& os) {
 std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& obj) {
   os << "host {\n"
     "host_name=" << obj.get_name() << "\n"
-    "host_id=" << host_other_props[obj.get_name()].host_id << "\n"
+    "host_id=" << obj.get_host_id() << "\n"
     "acknowledgement_type=" << obj.get_acknowledgement_type() << "\n"
     "active_checks_enabled=" << obj.get_checks_enabled() << "\n"
     "check_command=" << obj.get_check_command() << "\n"

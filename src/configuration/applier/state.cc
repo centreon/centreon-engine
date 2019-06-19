@@ -192,6 +192,8 @@ applier::state::~state() throw() {
   engine::commands::connector::connectors.clear();
   engine::service::services.clear();
   engine::service::services_by_id.clear();
+  engine::host::hosts.clear();
+  engine::host::hosts_by_id.clear();
 
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
@@ -246,36 +248,6 @@ contactgroup_map& applier::state::contactgroups() throw () {
  */
 contactgroup_map::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
   return _contactgroups.find(k);
-}
-
-/**
- *  Get the current hosts.
- *
- *  @return The current hosts.
- */
-std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>> const& applier::state::hosts() const throw () {
-  return _hosts;
-}
-
-/**
- *  Get the current hosts.
- *
- *  @return The current hosts.
- */
-std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>& applier::state::hosts() throw () {
-  return _hosts;
-}
-
-/**
- *  Find a host from its key.
- *
- *  @param[in] k Host key (host name).
- *
- *  @return Iterator to the host object if found, hosts().end() if it
- *          was not.
- */
-std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
-  return _hosts.find(k);
 }
 
 /**
@@ -1218,10 +1190,9 @@ void applier::state::_processing(
              end(diff_hosts.added().end());
            it != end;
            ++it) {
-        std::unordered_map<unsigned long,
-                           std::shared_ptr<com::centreon::engine::host>>::const_iterator
-          hst(hosts().find(it->host_id()));
-        if (hst != hosts().end())
+        host_id_map::const_iterator
+          hst(engine::host::hosts_by_id.find(it->host_id()));
+        if (hst != engine::host::hosts_by_id.end())
           log_host_state(INITIAL_STATES, hst->second.get());
       }
       for (set_service::iterator

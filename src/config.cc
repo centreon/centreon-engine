@@ -294,12 +294,11 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   int warnings(0);
 
   /* check for a valid host */
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(svc->get_hostname())));
+  host_map::const_iterator it(host::hosts.find(svc->get_hostname()));
 
   /* we couldn't find an associated host! */
 
-  if (it == state::instance().hosts().end() || it->second == nullptr) {
+  if (it == host::hosts.end() || !it->second) {
     logger(log_verification_error, basic)
       << "Error: Host '" << svc->get_hostname() << "' specified in service "
       "'" << svc->get_description() << "' not defined anywhere!";
@@ -307,7 +306,7 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   }
 
   /* save the host pointer for later */
-  if (it == state::instance().hosts().end())
+  if (it == host::hosts.end())
     svc->host_ptr = nullptr;
   else
     svc->host_ptr = it->second.get();
@@ -679,10 +678,9 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
        it != end;
        it++) {
 
-    std::unordered_map<uint64_t, std::shared_ptr<host>>::const_iterator
-      it_host(state::instance().hosts().find(get_host_id(it->first)));
+    host_map::const_iterator it_host(host::hosts.find(it->first));
 
-    if (it_host == state::instance().hosts().end() || it_host->second == nullptr) {
+    if (it_host == host::hosts.end() || !it_host->second) {
       logger(log_verification_error, basic)
         << "Error: '" << it->first << "' is not a "
         "valid parent for host '" << hst->get_name() << "'!";
@@ -912,9 +910,8 @@ int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
        it != end;
        ++it) {
 
-    std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it_host(state::instance().hosts().find(get_host_id(it->first.c_str())));
-    if (it_host == state::instance().hosts().end() || !it_host->second) {
+    host_map::const_iterator it_host(host::hosts.find(it->first.c_str()));
+    if (it_host == host::hosts.end() || !it_host->second) {
       logger(log_verification_error, basic)
         << "Error: Host '" << it->first
         << "' specified in host group '" << hg->get_group_name()
@@ -1101,9 +1098,8 @@ int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
   int errors(0);
 
   // Find the dependent host.
-  std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(hd->get_dependent_hostname())));
-  if (it == state::instance().hosts().end() || it->second == nullptr) {
+  host_map::const_iterator it(host::hosts.find(hd->get_dependent_hostname()));
+  if (it == host::hosts.end() || !it->second) {
     logger(log_verification_error, basic)
       << "Error: Dependent host specified in host dependency for "
          "host '" << hd->get_dependent_hostname()
@@ -1112,14 +1108,14 @@ int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
   }
 
   // Save pointer for later.
-  if (it == state::instance().hosts().end())
+  if (it == host::hosts.end())
     hd->dependent_host_ptr = nullptr;
   else
     hd->dependent_host_ptr = it->second.get();
 
   // Find the host we're depending on.
-  it = state::instance().hosts().find(get_host_id(hd->get_hostname()));
-  if (it == state::instance().hosts().end() || it->second == nullptr) {
+  it = host::hosts.find(hd->get_hostname());
+  if (it == host::hosts.end() || !it->second) {
     logger(log_verification_error, basic)
       << "Error: Host specified in host dependency for host '"
       << hd->get_dependent_hostname() << "' is not defined anywhere!";
@@ -1127,7 +1123,7 @@ int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
   }
 
   // Save pointer for later.
-  if (it == state::instance().hosts().end())
+  if (it == host::hosts.end())
     hd->master_host_ptr = nullptr;
   else
     hd->master_host_ptr = it->second.get();
@@ -1281,9 +1277,8 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   int errors(0);
 
   // Find the host.
-  std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(he->get_hostname())));
-  if (it == state::instance().hosts().end() || it->second == nullptr) {
+  host_map::const_iterator it(host::hosts.find(he->get_hostname()));
+  if (it == host::hosts.end() || !it->second) {
     logger(log_verification_error, basic)
       << "Error: Host '" << he->get_hostname()
       << "' specified in host escalation is not defined anywhere!";
@@ -1291,7 +1286,7 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   }
 
   // Save the host pointer for later.
-  if (it == state::instance().hosts().end())
+  if (it == host::hosts.end())
     he->notifier_ptr = nullptr;
   else
     he->notifier_ptr = it->second.get();

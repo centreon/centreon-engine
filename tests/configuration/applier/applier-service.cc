@@ -206,8 +206,7 @@ TEST_F(ApplierService, ServicesCheckValidity) {
     sm(engine::service::services);
   ASSERT_EQ(sm.size(), 1);
 
-  umap<unsigned long, std::shared_ptr<com::centreon::engine::host>> const& hm(
-    configuration::applier::state::instance().hosts());
+  host_map const& hm(engine::host::hosts);
   ASSERT_EQ(sm.begin()->second->host_ptr, hm.begin()->second.get());
 }
 

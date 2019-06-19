@@ -173,7 +173,7 @@ int process_external_command(char const* cmd) {
 /* adds a host or service comment to the status log */
 int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   char* temp_ptr(nullptr);
-  com::centreon::engine::host* temp_host(nullptr);
+  host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   char* user(nullptr);
@@ -200,9 +200,8 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
 
   /* else verify that the host is valid */
   temp_host = nullptr;
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end())
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it != host::hosts.end())
     temp_host = it->second.get();
   if (temp_host  == nullptr)
     return ERROR;
@@ -259,7 +258,7 @@ int cmd_delete_comment(int cmd, char* args) {
 
 /* removes all comments associated with a host or service from the status log */
 int cmd_delete_all_comments(int cmd, char* args) {
-  com::centreon::engine::host* temp_host(nullptr);
+  host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
 
@@ -283,9 +282,8 @@ int cmd_delete_all_comments(int cmd, char* args) {
 
   /* else verify that the host is valid */
   temp_host = nullptr;
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end())
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it != host::hosts.end())
     temp_host = it->second.get();
   if (temp_host  == nullptr)
     return ERROR;
@@ -302,7 +300,7 @@ int cmd_delete_all_comments(int cmd, char* args) {
 /* delays a host or service notification for given number of minutes */
 int cmd_delay_notification(int cmd, char* args) {
   char* temp_ptr(nullptr);
-  com::centreon::engine::host* temp_host(nullptr);
+  host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
@@ -330,9 +328,8 @@ int cmd_delay_notification(int cmd, char* args) {
   /* else verify that the host is valid */
   else {
     temp_host = nullptr;
-    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-    if (it != configuration::applier::state::instance().hosts().end())
+    host_map::const_iterator it(host::hosts.find(host_name));
+    if (it != host::hosts.end())
       temp_host = it->second.get();
     if (temp_host  == nullptr)
       return ERROR;
@@ -355,7 +352,7 @@ int cmd_delay_notification(int cmd, char* args) {
 /* schedules a host check at a particular time */
 int cmd_schedule_check(int cmd, char* args) {
   char* temp_ptr(nullptr);
-  com::centreon::engine::host* temp_host(nullptr);
+  host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   time_t delay_time(0);
@@ -372,9 +369,8 @@ int cmd_schedule_check(int cmd, char* args) {
 
     /* verify that the host is valid */
     temp_host = nullptr;
-    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-     it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-    if (it != configuration::applier::state::instance().hosts().end())
+    host_map::const_iterator it(host::hosts.find(host_name));
+    if (it != host::hosts.end())
       temp_host = it->second.get();
     if (temp_host  == nullptr)
       return ERROR;
@@ -435,7 +431,7 @@ int cmd_schedule_check(int cmd, char* args) {
 /* schedules all service checks on a host for a particular time */
 int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   char* temp_ptr(nullptr);
-  com::centreon::engine::host* temp_host(nullptr);
+  host* temp_host(nullptr);
   char* host_name(nullptr);
   time_t delay_time(0);
 
@@ -447,9 +443,8 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
 
   /* verify that the host is valid */
   temp_host = nullptr;
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-   it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end())
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it != host::hosts.end())
     temp_host = it->second.get();
   if (temp_host  == nullptr)
     return ERROR;
@@ -572,14 +567,13 @@ int process_passive_service_check(
     return ERROR;
 
   /* find the host by its name or address */
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end() && it->second)
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it != host::hosts.end() && it->second)
     real_host_name = host_name;
   else {
     for (host_map::iterator
-           it(com::centreon::engine::host::hosts.begin()),
-           end(com::centreon::engine::host::hosts.end());
+           it(host::hosts.begin()),
+           end(host::hosts.end());
          it != end;
          ++it) {
       if (it->second->get_address() == host_name) {
@@ -715,14 +709,13 @@ int process_passive_host_check(
     return ERROR;
 
   /* find the host by its name or address */
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it != configuration::applier::state::instance().hosts().end() && it->second)
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it != host::hosts.end() && it->second)
     real_host_name = host_name;
   else {
     for (host_map::iterator
-           it(com::centreon::engine::host::hosts.begin()),
-           end(com::centreon::engine::host::hosts.end());
+           it(host::hosts.begin()),
+           end(host::hosts.end());
          it != end;
          ++it) {
       if (it->second->get_address() == host_name) {
@@ -796,9 +789,8 @@ int cmd_acknowledge_problem(int cmd, char* args) {
     return ERROR;
 
   /* verify that the host is valid */
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it == configuration::applier::state::instance().hosts().end() || !it->second)
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it == host::hosts.end() || !it->second)
     return ERROR;
 
   /* this is a service acknowledgement */
@@ -880,9 +872,8 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
     return ERROR;
 
   /* verify that the host is valid */
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-  if (it == configuration::applier::state::instance().hosts().end() || !it->second)
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it == host::hosts.end() || !it->second)
     return ERROR;
 
   /* we are removing a service acknowledgement */
@@ -966,9 +957,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
     /* verify that the host is valid */
     temp_host = nullptr;
-    umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it(configuration::applier::state::instance().hosts().find(get_host_id(host_name)));
-    if (it == configuration::applier::state::instance().hosts().end() || !it->second)
+    host_map::const_iterator it(host::hosts.find(host_name));
+    if (it == host::hosts.end() || !it->second)
       return ERROR;
     temp_host = it->second;
 
@@ -1154,10 +1144,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
            it != end;
            ++it) {
       temp_host = nullptr;
-      umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-        found(configuration::applier::state::instance().hosts().find(
-          get_host_id(it->first.first)));
-      if (found == configuration::applier::state::instance().hosts().end() || !found->second)
+      host_map::const_iterator found(host::hosts.find(it->first.first));
+      if (found == host::hosts.end() || !found->second)
         continue;
       temp_host = found->second;
       if (last_host == temp_host)
@@ -1541,7 +1529,7 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd, char* args) {
-  com::centreon::engine::host* temp_host(nullptr);
+  host* temp_host(nullptr);
   contact* temp_contact(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
@@ -1555,7 +1543,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
   unsigned long attr(MODATTR_NONE);
   unsigned long hattr(MODATTR_NONE);
   unsigned long sattr(MODATTR_NONE);
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
+  host_map::const_iterator
       it;
   std::pair<uint64_t, uint64_t> id;
   service_map::const_iterator found_svc;
@@ -1592,9 +1580,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* verify that the host is valid */
       temp_host = nullptr;
-      it = configuration::applier::state::instance().hosts().find(
-          get_host_id(host_name));
-      if (it != configuration::applier::state::instance().hosts().end())
+      it = host::hosts.find(host_name);
+      if (it != host::hosts.end())
         temp_host = it->second.get();
       if (temp_host == nullptr)
         return ERROR;
@@ -1851,7 +1838,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd, char* args) {
-  com::centreon::engine::host* temp_host{nullptr};
+  host* temp_host{nullptr};
   contact* temp_contact{nullptr};
   timeperiod* temp_timeperiod{nullptr};
   char* host_name{nullptr};
@@ -1863,7 +1850,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   unsigned long attr{MODATTR_NONE};
   unsigned long hattr{MODATTR_NONE};
   unsigned long sattr{MODATTR_NONE};
-  umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator it;
+  host_map::const_iterator it;
   std::pair<uint64_t, uint64_t> id;
   service_map::const_iterator found_svc;
 
@@ -1897,8 +1884,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
     /* verify that the host is valid */
     temp_host = nullptr;
-    it = configuration::applier::state::instance().hosts().find(get_host_id(host_name));
-    if (it != configuration::applier::state::instance().hosts().end())
+    it = host::hosts.find(host_name);
+    if (it != host::hosts.end())
       temp_host = it->second.get();
     if (temp_host  == nullptr)
       return ERROR;
@@ -2207,7 +2194,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
 /* changes a custom host or service variable */
 int cmd_change_object_custom_var(int cmd, char* args) {
-  com::centreon::engine::host* temp_host(nullptr);
+  host* temp_host(nullptr);
   contact* temp_contact(nullptr);
 
   /* get the host or contact name */
@@ -2252,9 +2239,9 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   case CMD_CHANGE_CUSTOM_HOST_VAR:
     {
       temp_host = nullptr;
-      umap<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it_h(configuration::applier::state::instance().hosts().find(get_host_id(name1.c_str())));
-      if (it_h != configuration::applier::state::instance().hosts().end())
+      host_map::const_iterator
+      it_h(host::hosts.find(name1));
+      if (it_h != host::hosts.end())
         temp_host = it_h->second.get();
       if (temp_host  == nullptr)
         return ERROR;
@@ -2351,7 +2338,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
 /******************************************************************/
 
 /* temporarily disables a service check */
-void disable_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
+void disable_service_checks(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -2381,7 +2368,7 @@ void disable_service_checks(std::shared_ptr<com::centreon::engine::service> svc)
 }
 
 /* enables a service check */
-void enable_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
+void enable_service_checks(std::shared_ptr<service> svc) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -2497,7 +2484,7 @@ void disable_all_notifications(void) {
 }
 
 /* enables notifications for a service */
-void enable_service_notifications(std::shared_ptr<com::centreon::engine::service> svc) {
+void enable_service_notifications(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2526,7 +2513,7 @@ void enable_service_notifications(std::shared_ptr<com::centreon::engine::service
 }
 
 /* disables notifications for a service */
-void disable_service_notifications(std::shared_ptr<com::centreon::engine::service> svc) {
+void disable_service_notifications(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2555,7 +2542,7 @@ void disable_service_notifications(std::shared_ptr<com::centreon::engine::servic
 }
 
 /* enables notifications for a host */
-void enable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst) {
+void enable_host_notifications(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2584,7 +2571,7 @@ void enable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst)
 }
 
 /* disables notifications for a host */
-void disable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst) {
+void disable_host_notifications(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2614,7 +2601,7 @@ void disable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst
 
 /* enables notifications for all hosts and services "beyond" a given host */
 void enable_and_propagate_notifications(
-       std::shared_ptr<com::centreon::engine::host> hst,
+       std::shared_ptr<host> hst,
        int level,
        int affect_top_host,
        int affect_hosts,
@@ -2663,12 +2650,12 @@ void enable_and_propagate_notifications(
 
 /* disables notifications for all hosts and services "beyond" a given host */
 void disable_and_propagate_notifications(
-       std::shared_ptr<com::centreon::engine::host> hst,
+       std::shared_ptr<host> hst,
        int level,
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  std::shared_ptr<com::centreon::engine::service> temp_service(nullptr);
+  std::shared_ptr<service> temp_service(nullptr);
 
   if (hst == nullptr)
     return;
@@ -2855,7 +2842,7 @@ void disable_contact_service_notifications(contact* cntct) {
 
 /* schedules downtime for all hosts "beyond" a given host */
 void schedule_and_propagate_downtime(
-       com::centreon::engine::host* temp_host,
+       host* temp_host,
        time_t entry_time,
        char const* author,
        char const* comment_data,
@@ -2906,7 +2893,7 @@ void schedule_and_propagate_downtime(
 
 /* acknowledges a host problem */
 void acknowledge_host_problem(
-       std::shared_ptr<com::centreon::engine::host> hst,
+       std::shared_ptr<host> hst,
        char* ack_author,
        char* ack_data,
        int type,
@@ -2972,7 +2959,7 @@ void acknowledge_host_problem(
 
 /* acknowledges a service problem */
 void acknowledge_service_problem(
-       std::shared_ptr<com::centreon::engine::service> svc,
+       std::shared_ptr<service> svc,
        char* ack_author,
        char* ack_data,
        int type,
@@ -3037,7 +3024,7 @@ void acknowledge_service_problem(
 }
 
 /* removes a host acknowledgement */
-void remove_host_acknowledgement(std::shared_ptr<com::centreon::engine::host> hst) {
+void remove_host_acknowledgement(std::shared_ptr<host> hst) {
   /* set the acknowledgement flag */
   hst->set_problem_has_been_acknowledged(false);
 
@@ -3049,7 +3036,7 @@ void remove_host_acknowledgement(std::shared_ptr<com::centreon::engine::host> hs
 }
 
 /* removes a service acknowledgement */
-void remove_service_acknowledgement(std::shared_ptr<com::centreon::engine::service> svc) {
+void remove_service_acknowledgement(std::shared_ptr<service> svc) {
   /* set the acknowledgement flag */
   svc->set_problem_has_been_acknowledged(false);
 
@@ -3181,7 +3168,7 @@ void stop_accepting_passive_service_checks(void) {
 }
 
 /* enables passive service checks for a particular service */
-void enable_passive_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
+void enable_passive_service_checks(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3210,7 +3197,7 @@ void enable_passive_service_checks(std::shared_ptr<com::centreon::engine::servic
 }
 
 /* disables passive service checks for a particular service */
-void disable_passive_service_checks(std::shared_ptr<com::centreon::engine::service> svc) {
+void disable_passive_service_checks(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3358,7 +3345,7 @@ void stop_accepting_passive_host_checks(void) {
 }
 
 /* enables passive host checks for a particular host */
-void enable_passive_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
+void enable_passive_host_checks(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3387,7 +3374,7 @@ void enable_passive_host_checks(std::shared_ptr<com::centreon::engine::host> hst
 }
 
 /* disables passive host checks for a particular host */
-void disable_passive_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
+void disable_passive_host_checks(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3478,7 +3465,7 @@ void stop_using_event_handlers(void) {
 }
 
 /* enables the event handler for a particular service */
-void enable_service_event_handler(std::shared_ptr<com::centreon::engine::service> svc) {
+void enable_service_event_handler(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3507,7 +3494,7 @@ void enable_service_event_handler(std::shared_ptr<com::centreon::engine::service
 }
 
 /* disables the event handler for a particular service */
-void disable_service_event_handler(std::shared_ptr<com::centreon::engine::service> svc) {
+void disable_service_event_handler(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3536,7 +3523,7 @@ void disable_service_event_handler(std::shared_ptr<com::centreon::engine::servic
 }
 
 /* enables the event handler for a particular host */
-void enable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst) {
+void enable_host_event_handler(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3565,7 +3552,7 @@ void enable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst)
 }
 
 /* disables the event handler for a particular host */
-void disable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst) {
+void disable_host_event_handler(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3594,7 +3581,7 @@ void disable_host_event_handler(std::shared_ptr<com::centreon::engine::host> hst
 }
 
 /* disables checks of a particular host */
-void disable_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
+void disable_host_checks(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -3624,7 +3611,7 @@ void disable_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
 }
 
 /* enables checks of a particular host */
-void enable_host_checks(std::shared_ptr<com::centreon::engine::host> hst) {
+void enable_host_checks(std::shared_ptr<host> hst) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -3972,7 +3959,7 @@ void disable_performance_data(void) {
 }
 
 /* start obsessing over a particular service */
-void start_obsessing_over_service(std::shared_ptr<com::centreon::engine::service> svc) {
+void start_obsessing_over_service(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4001,7 +3988,7 @@ void start_obsessing_over_service(std::shared_ptr<com::centreon::engine::service
 }
 
 /* stop obsessing over a particular service */
-void stop_obsessing_over_service(std::shared_ptr<com::centreon::engine::service> svc) {
+void stop_obsessing_over_service(std::shared_ptr<service> svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4030,7 +4017,7 @@ void stop_obsessing_over_service(std::shared_ptr<com::centreon::engine::service>
 }
 
 /* start obsessing over a particular host */
-void start_obsessing_over_host(std::shared_ptr<com::centreon::engine::host> hst) {
+void start_obsessing_over_host(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4059,7 +4046,7 @@ void start_obsessing_over_host(std::shared_ptr<com::centreon::engine::host> hst)
 }
 
 /* stop obsessing over a particular host */
-void stop_obsessing_over_host(std::shared_ptr<com::centreon::engine::host> hst) {
+void stop_obsessing_over_host(std::shared_ptr<host> hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */

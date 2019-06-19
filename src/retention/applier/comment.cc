@@ -50,10 +50,8 @@ void applier::comment::apply(list_comment const& lst) {
  */
 void applier::comment::_add_host_comment(
        retention::comment const& obj) throw () {
-  umap<unsigned long,
-       std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(configuration::applier::state::instance().hosts().find(get_host_id(obj.host_name().c_str())));
-  if (it == configuration::applier::state::instance().hosts().end() || !it->second)
+  host_map::const_iterator it(host::hosts.find(obj.host_name()));
+  if (it == host::hosts.end() || !it->second)
     return;
 
   // add the comment.

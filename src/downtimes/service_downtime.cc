@@ -75,14 +75,13 @@ service_downtime::~service_downtime() {
  */
 bool service_downtime::is_stale() const {
   bool retval{false};
-  std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-    it(state::instance().hosts().find(get_host_id(get_hostname().c_str())));
+  host_map::const_iterator it(host::hosts.find(get_hostname()));
 
   service_map::const_iterator
     found(service::services.find({get_hostname(), get_service_description()}));
 
   /* delete downtimes with invalid host names */
-  if (it == state::instance().hosts().end() || it->second == nullptr)
+  if (it == host::hosts.end() || !it->second)
     retval = true;
   /* delete downtimes with invalid service descriptions */
   else if (found == service::services.end() || !found->second)

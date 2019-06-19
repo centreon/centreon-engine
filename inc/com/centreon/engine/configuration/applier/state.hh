@@ -78,12 +78,6 @@ namespace           configuration {
                     contactgroups() throw ();
       contactgroup_map::iterator
                     contactgroups_find(configuration::contactgroup::key_type const& k);
-      std::unordered_map<uint64_t, std::shared_ptr<engine::host>> const&
-                    hosts() const throw ();
-      std::unordered_map<uint64_t, std::shared_ptr<engine::host>>&
-                    hosts() throw ();
-      std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>::iterator
-                    hosts_find(configuration::host::key_type const& k);
       hostdependency_mmap const&
                     hostdependencies() const throw ();
       hostdependency_mmap&
@@ -144,8 +138,6 @@ namespace           configuration {
                     _contactgroups;
       concurrency::condvar
                     _cv_lock;
-      std::unordered_map<uint64_t, std::shared_ptr<com::centreon::engine::host>>
-                    _hosts;
       hostdependency_mmap
                     _hostdependencies;
       hostgroup_map _hostgroups;

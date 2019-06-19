@@ -91,8 +91,6 @@ extern unsigned int              currently_running_host_checks;
 extern time_t                    program_start;
 extern time_t                    event_start;
 
-extern std::map<std::string, host_other_properties> host_other_props;
-
 extern circular_buffer           external_command_buffer;
 extern pthread_t                 worker_threads[];
 

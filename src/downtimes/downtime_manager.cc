@@ -145,9 +145,8 @@ int downtime_manager::check_pending_flex_host_downtime(host* hst) {
 
     /* this entry matches our host! */
     host *temp_host(nullptr);
-    umap<unsigned long, std::shared_ptr<com::centreon::engine::host>>::const_iterator
-      it_hg(state::instance().hosts().find(get_host_id(it->second->get_hostname().c_str())));
-    if (it_hg != state::instance().hosts().end())
+    host_map::const_iterator it_hg(host::hosts.find(it->second->get_hostname()));
+    if (it_hg != host::hosts.end())
       temp_host = it_hg->second.get();
 
     if (temp_host == hst) {
