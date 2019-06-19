@@ -135,7 +135,8 @@ service::service(std::string const& hostname,
       _initial_state{initial_state},
       _current_state{initial_state},
       _last_hard_state{initial_state},
-      _last_state{initial_state} {
+      _last_state{initial_state},
+      _host_ptr{nullptr} {
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
 
@@ -602,7 +603,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  modified_attributes:                  "
      << obj.get_modified_attributes()
      << "\n  host_ptr:                             "
-     << (obj.host_ptr ? obj.host_ptr->get_name() : "\"nullptr\"")
+     << (obj.get_host_ptr() ? obj.get_host_ptr()->get_name() : "\"nullptr\"")
      << "\n  event_handler_ptr:                    " << evt_str
      << "\n  event_handler_args:                   "
      << obj.get_event_handler_args()
@@ -891,7 +892,7 @@ void service::check_for_expired_acknowledgement() {
       if (_last_acknowledgement + _acknowledgement_timeout >= now) {
         logger(log_info_message, basic)
             << "Acknowledgement of service '" << get_description()
-            << "' on host '" << this->host_ptr->get_name() << "' just expired";
+            << "' on host '" << this->get_host_ptr()->get_name() << "' just expired";
         set_problem_has_been_acknowledged(false);
         this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
         update_status(false);
@@ -1052,7 +1053,6 @@ std::string const& service::get_check_command_args() const {
 }
 
 int service::handle_async_check_result(check_result* queued_check_result) {
-  com::centreon::engine::host* temp_host = nullptr;
   time_t next_service_check = 0L;
   time_t preferred_time = 0L;
   time_t next_valid_time = 0L;
@@ -1305,19 +1305,17 @@ int service::handle_async_check_result(check_result* queued_check_result) {
           << get_plugin_output();
   }
 
-  /* get the host that this service runs on */
-  temp_host = (host*)this->host_ptr;
-
+  host* hst{get_host_ptr().get()};
   /* if the service check was okay... */
   if (_current_state == service::state_ok) {
     /* if the host has never been checked before, verify its status
      * only do this if 1) the initial state was set to non-UP or 2) the host
      * is not scheduled to be checked soon (next 5 minutes)
      */
-    if (!temp_host->get_has_been_checked() &&
-        (temp_host->get_initial_state() !=  host::state_up ||
-         (unsigned long)temp_host->get_next_check() == 0L ||
-         (unsigned long)(temp_host->get_next_check() - current_time) > 300)) {
+    if (!hst->get_has_been_checked() &&
+        (hst->get_initial_state() !=  host::state_up ||
+         (unsigned long)hst->get_next_check() == 0L ||
+         (unsigned long)(hst->get_next_check() - current_time) > 300)) {
       /* set a flag to remember that we launched a check */
       first_host_check_initiated = true;
 
@@ -1328,10 +1326,10 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * to be checked for real...
        * */
       if (config->use_aggressive_host_checking())
-        temp_host->perform_on_demand_check(nullptr, CHECK_OPTION_NONE,
+        hst->perform_on_demand_check(nullptr, CHECK_OPTION_NONE,
                                      false, 0L);
       else
-        temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
                                    nullptr, nullptr);
     }
   }
@@ -1425,10 +1423,10 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_last_state_change(get_last_check());
   if (get_last_hard_state_change() == (time_t)0)
     set_last_hard_state_change(get_last_check());
-  if (temp_host->get_last_state_change() == (time_t)0)
-    temp_host->set_last_state_change(get_last_check());
-  if (temp_host->get_last_hard_state_change() == (time_t)0)
-    temp_host->set_last_hard_state_change(get_last_check());
+  if (hst->get_last_state_change() == (time_t)0)
+    hst->set_last_state_change(get_last_check());
+  if (hst->get_last_hard_state_change() == (time_t)0)
+    hst->set_last_hard_state_change(get_last_check());
 
   /* update last service state change times */
   if (state_change)
@@ -1474,7 +1472,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
     /* verify the route to the host and send out host recovery notifications */
-    if (temp_host->get_current_state() !=  host::state_up) {
+    if (hst->get_current_state() !=  host::state_up) {
       logger(dbg_checks, more)
           << "Host is NOT UP, so we'll check it to see if it recovered...";
 
@@ -1482,7 +1480,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
       if (config->use_aggressive_host_checking())
-        temp_host->perform_on_demand_check(nullptr, CHECK_OPTION_NONE,
+        hst->perform_on_demand_check(nullptr, CHECK_OPTION_NONE,
                                      true, config->cached_host_check_horizon());
       /* 09/23/07 EG don't launch a new host check if we already did so earlier
        */
@@ -1495,19 +1493,19 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* usually only use cached host state if no service state change has
          * occurred */
         if ((!state_change || state_changes_use_cached_state) &&
-            temp_host->get_has_been_checked() &&
+            hst->get_has_been_checked() &&
             (static_cast<unsigned long>(current_time -
-                                        temp_host->get_last_check()) <=
+                                        hst->get_last_check()) <=
              config->cached_host_check_horizon())) {
           logger(dbg_checks, more) << "* Using cached host state: "
-                                   << temp_host->get_current_state();
+                                   << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
 
         /* else launch an async (parallel) check of the host */
         else
-          temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
                                      nullptr, nullptr);
       }
     }
@@ -1532,7 +1530,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* this should be done before a notification is sent out to ensure the
        * host didn't just start flapping */
       check_for_flapping(true, true);
-      temp_host->check_for_flapping(true, false, true);
+      hst->check_for_flapping(true, false, true);
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
@@ -1600,7 +1598,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     logger(dbg_checks, more) << "Service is in a non-OK state!";
 
     /* check the route to the host if its up right now... */
-    if (temp_host->get_current_state() ==  host::state_up) {
+    if (hst->get_current_state() ==  host::state_up) {
       logger(dbg_checks, more)
           << "Host is currently UP, so we'll recheck its state to "
              "make sure...";
@@ -1609,21 +1607,21 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
       if (config->use_aggressive_host_checking())
-        temp_host->perform_on_demand_check(&route_result,
+        hst->perform_on_demand_check(&route_result,
                                      CHECK_OPTION_NONE, true,
                                      config->cached_host_check_horizon());
       else {
         /* can we use the last cached host state? */
         /* only use cached host state if no service state change has occurred */
         if ((!state_change || state_changes_use_cached_state) &&
-            temp_host->get_has_been_checked() &&
+            hst->get_has_been_checked() &&
             (static_cast<unsigned long>(current_time -
-                                        temp_host->get_last_check()) <=
+                                        hst->get_last_check()) <=
              config->cached_host_check_horizon())) {
           /* use current host state as route result */
-          route_result = temp_host->get_current_state();
+          route_result = hst->get_current_state();
           logger(dbg_checks, more) << "* Using cached host state: "
-                                   << temp_host->get_current_state();
+                                   << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
@@ -1633,17 +1631,17 @@ int service::handle_async_check_result(check_result* queued_check_result) {
            checked */
         else if (state_change) {
           /* use current host state as route result */
-          route_result = temp_host->get_current_state();
-          temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+          route_result = hst->get_current_state();
+          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
                                      nullptr, nullptr);
         }
 
         /* ADDED 02/15/08 */
         /* else assume same host state */
         else {
-          route_result = temp_host->get_current_state();
+          route_result = hst->get_current_state();
           logger(dbg_checks, more) << "* Using last known host state: "
-                                   << temp_host->get_current_state();
+                                   << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
@@ -1661,7 +1659,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         logger(dbg_checks, more)
             << "Aggressive host checking is enabled, so we'll recheck the "
                "host state...";
-        temp_host->perform_on_demand_check(&route_result,
+        hst->perform_on_demand_check(&route_result,
                                      CHECK_OPTION_NONE, true,
                                      config->cached_host_check_horizon());
       }
@@ -1676,10 +1674,10 @@ int service::handle_async_check_result(check_result* queued_check_result) {
          * host checking is enabled */
         /* previous logic was to simply run a sync (serial) host check */
         /* use current host state as route result */
-        route_result = temp_host->get_current_state();
-        temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+        route_result = hst->get_current_state();
+        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
                                    nullptr, nullptr);
-        /*perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,true,config->cached_host_check_horizon());
+        /*perform_on_demand_host_check(hst,&route_result,CHECK_OPTION_NONE,true,config->cached_host_check_horizon());
          */
       }
 
@@ -1693,16 +1691,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
          * last check time */
         /* 03/11/06 EG Note: This probably never evaluates to false, present for
          * historical reasons only, can probably be removed in the future */
-        if (!temp_host->get_has_been_checked()) {
-          temp_host->set_has_been_checked(true);
-          temp_host->set_last_check(get_last_check());
+        if (!hst->get_has_been_checked()) {
+          hst->set_has_been_checked(true);
+          hst->set_last_check(get_last_check());
         }
 
         /* fake the route check result */
-        route_result = temp_host->get_current_state();
+        route_result = hst->get_current_state();
 
         /* possibly re-send host notifications... */
-        temp_host->notify(notification_normal, nullptr, nullptr,
+        hst->notify(notification_normal, nullptr, nullptr,
                           notification_option_none);
       }
     }
@@ -1881,7 +1879,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* this should be done before a notification is sent out to ensure the
        * host didn't just start flapping */
       check_for_flapping(true, true);
-      temp_host->check_for_flapping(true, false, true);
+      hst->check_for_flapping(true, false, true);
       flapping_check_done = true;
 
       /* (re)send notifications out about this service problem if the host is up
@@ -1983,7 +1981,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* check to see if the service and/or associate host is flapping */
   if (!flapping_check_done) {
     check_for_flapping(true, true);
-    temp_host->check_for_flapping(true, false, true);
+    hst->check_for_flapping(true, false, true);
   }
 
   /* update service performance info */
@@ -2031,7 +2029,7 @@ int service::log_event() {
   if (get_state_type() == soft && !config->log_service_retries())
     return OK;
 
-  if (!this->host_ptr)
+  if (!_host_ptr)
     return ERROR;
 
   uint32_t log_options{NSLOG_SERVICE_UNKNOWN};
@@ -2191,7 +2189,6 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
 
 /* handles changes in the state of a service */
 int service::handle_service_event() {
-  com::centreon::engine::host* temp_host = nullptr;
   nagios_macros mac;
 
   logger(dbg_functions, basic) << "handle_service_event()";
@@ -2209,12 +2206,12 @@ int service::handle_service_event() {
     return OK;
 
   /* find the host */
-  if ((temp_host = (com::centreon::engine::host*)this->host_ptr) == nullptr)
+  if (!get_host_ptr())
     return ERROR;
 
   /* update service macros */
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, temp_host);
+  grab_host_macros_r(&mac, get_host_ptr().get());
   grab_service_macros_r(&mac, this);
 
   /* run the global service event handler */
@@ -2237,7 +2234,7 @@ int service::handle_service_event() {
 int service::obsessive_compulsive_service_check_processor() {
   char* raw_command = nullptr;
   char* processed_command = nullptr;
-  com::centreon::engine::host* temp_host = nullptr;
+  host* temp_host{get_host_ptr().get()};
   int early_timeout = false;
   double exectime = 0.0;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
@@ -2257,7 +2254,7 @@ int service::obsessive_compulsive_service_check_processor() {
     return ERROR;
 
   /* find the associated host */
-  if ((temp_host = (com::centreon::engine::host*)this->host_ptr) == nullptr)
+  if (temp_host == nullptr)
     return ERROR;
 
   /* update service macros */
@@ -3143,7 +3140,7 @@ int service::verify_check_viability(int check_options,
 }
 
 void service::grab_macros_r(nagios_macros* mac) {
-  grab_host_macros_r(mac, this->host_ptr);
+  grab_host_macros_r(mac, _host_ptr.get());
   grab_service_macros_r(mac, this);
 }
 
@@ -3650,7 +3647,7 @@ std::list<std::shared_ptr<servicegroup>>& service::get_parent_groups() {
 timeperiod* service::get_notification_timeperiod() const {
   /* if the service has no notification period, inherit one from the host */
   return notification_period_ptr ? notification_period_ptr
-                                 : host_ptr->notification_period_ptr;
+                                 : _host_ptr->notification_period_ptr;
 }
 
 /* handles asynchronous service check results */
@@ -3861,5 +3858,17 @@ bool service::get_notify_on_current_state() const {
 }
 
 bool service::is_in_downtime() const {
-  return get_scheduled_downtime_depth() > 0 || host_ptr->get_scheduled_downtime_depth() > 0;
+  return get_scheduled_downtime_depth() > 0 || _host_ptr->get_scheduled_downtime_depth() > 0;
+}
+
+void service::set_host_ptr(std::shared_ptr<host> h) {
+  _host_ptr = h;
+}
+
+std::shared_ptr<host> const service::get_host_ptr() const {
+  return _host_ptr;
+}
+
+std::shared_ptr<host> service::get_host_ptr() {
+  return _host_ptr;
 }

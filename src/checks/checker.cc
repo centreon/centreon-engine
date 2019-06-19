@@ -525,13 +525,13 @@ void checker::run(
   // Preamble.
   if (!svc)
     throw (engine_error() << "Attempt to run check on invalid service");
-  if (!svc->host_ptr)
-    throw (engine_error()
-           << "Attempt to run check on service with invalid host");
+  if (!svc->get_host_ptr())
+    throw engine_error()
+           << "Attempt to run check on service with invalid host";
   if (!svc->check_command_ptr)
-    throw (engine_error() << "Attempt to run active check on service '"
-           << svc->get_description() << "' on host '" << svc->host_ptr->get_name()
-           << "' with no check command");
+    throw engine_error() << "Attempt to run active check on service '"
+           << svc->get_description() << "' on host '" << svc->get_host_ptr()->get_name()
+           << "' with no check command";
 
   logger(dbg_checks, basic)
     << "** Running async check of service '" << svc->get_description()
@@ -603,7 +603,7 @@ void checker::run(
   // Get current host and service macros.
   nagios_macros macros;
   memset(&macros, 0, sizeof(macros));
-  grab_host_macros_r(&macros, svc->host_ptr);
+  grab_host_macros_r(&macros, svc->get_host_ptr().get());
   grab_service_macros_r(&macros, svc);
   get_raw_command_line_r(
     &macros,

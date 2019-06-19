@@ -46,7 +46,11 @@ commands::command::command(
                      command_listener* listener)
   : _command_line(command_line),
     _listener(listener),
-    _name(name) {}
+    _name(name) {
+  if (_name.empty())
+    throw (engine_error()
+      << "Could not create a command with an empty name");
+}
 
 /**
  *  Destructor.

@@ -217,13 +217,15 @@ class                           service : public notifier {
   int                           pending_flex_downtime;
   uint64_t                      flapping_comment_id;
 
-  host*                         host_ptr;
   commands::command*            event_handler_ptr;
   commands::command*            check_command_ptr;
   std::list<std::shared_ptr<servicegroup>> const&
                                 get_parent_groups() const;
   std::list<std::shared_ptr<servicegroup>>&
                                 get_parent_groups();
+  void                          set_host_ptr(std::shared_ptr<host> h);
+  std::shared_ptr<host> const   get_host_ptr() const;
+  std::shared_ptr<host>         get_host_ptr();
 
   static service_map            services;
   static service_id_map         services_by_id;
@@ -247,6 +249,7 @@ class                           service : public notifier {
   enum service_state            _initial_state;
   std::list<std::shared_ptr<servicegroup>>
                                 _servicegroups;
+  std::shared_ptr<host>         _host_ptr;
 };
 CCE_END()
 
