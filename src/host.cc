@@ -1451,7 +1451,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   logger(dbg_functions, basic) << "handle_async_host_check_result_3x()";
 
   /* make sure we have what we need */
-  if (queued_check_result == NULL)
+  if (queued_check_result == nullptr)
     return ERROR;
 
   time(&current_time);
@@ -1697,7 +1697,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   /* process the host check result */
   this->process_check_result_3x(hst_res,
-                               const_cast<char*>(old_plugin_output.c_str()),
+                               old_plugin_output,
                                CHECK_OPTION_NONE, reschedule_check, true,
                                config->cached_host_check_horizon());
 
@@ -1708,7 +1708,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   start_time_hires = queued_check_result->get_start_time();
 
   /* high resolution end time for event broker */
-  gettimeofday(&end_time_hires, NULL);
+  gettimeofday(&end_time_hires, nullptr);
 
   /* send data to event broker */
   broker_host_check(
@@ -1717,9 +1717,9 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       end_time_hires, get_check_command().c_str(), get_latency(),
       get_execution_time(), config->host_check_timeout(),
       queued_check_result->get_early_timeout(), queued_check_result->get_return_code(),
-      NULL, const_cast<char*>(get_plugin_output().c_str()),
+      nullptr, const_cast<char*>(get_plugin_output().c_str()),
       const_cast<char*>(get_long_plugin_output().c_str()),
-      const_cast<char*>(get_perf_data().c_str()), NULL);
+      const_cast<char*>(get_perf_data().c_str()), nullptr);
   return OK;
 }
 
@@ -1837,8 +1837,8 @@ int host::run_async_check(int check_options,
 
 /* schedules an immediate or delayed host check */
 void host::schedule_check(time_t check_time, int options) {
-  timed_event* temp_event = NULL;
-  timed_event* new_event = NULL;
+  timed_event* temp_event = nullptr;
+  timed_event* new_event = nullptr;
   int use_original_event = true;
 
   logger(dbg_functions, basic) << "schedule_host_check()";
@@ -1873,7 +1873,7 @@ void host::schedule_check(time_t check_time, int options) {
 
   /* we found another host check event for this host in the queue - what should
    * we do? */
-  if (temp_event != NULL) {
+  if (temp_event != nullptr) {
     logger(dbg_checks, most)
         << "Found another host check event for this host @ "
         << my_ctime(&temp_event->run_time);
@@ -1946,19 +1946,19 @@ void host::schedule_check(time_t check_time, int options) {
     /* place the new event in the event queue */
     new_event->event_type = EVENT_HOST_CHECK;
     new_event->event_data = (void*)this;
-    new_event->event_args = (void*)NULL;
+    new_event->event_args = (void*)nullptr;
     new_event->event_options = options;
     new_event->run_time = get_next_check();
     new_event->recurring = false;
     new_event->event_interval = 0L;
-    new_event->timing_func = NULL;
+    new_event->timing_func = nullptr;
     new_event->compensate_for_time_change = true;
     reschedule_event(new_event, &event_list_low, &event_list_low_tail);
   }
 
   else {
     /* reset the next check time (it may be out of sync) */
-    if (temp_event != NULL)
+    if (temp_event != nullptr)
       set_next_check(temp_event->run_time);
 
     logger(dbg_checks, most)
@@ -2149,7 +2149,7 @@ void host::set_flap(double percent_change,
   unsigned long comment_id;
   comment_id = get_flapping_comment_id();
   std::shared_ptr<comment> com{
-      new comment(comment::host, comment::flapping, get_name(), "", time(NULL),
+      new comment(comment::host, comment::flapping, get_name(), "", time(nullptr),
                   "(Centreon Engine Process)", oss.str(), false,
                   comment::internal, false, (time_t)0)};
 
@@ -2164,7 +2164,7 @@ void host::set_flap(double percent_change,
   /* send data to event broker */
   broker_flapping_data(NEBTYPE_FLAPPING_START, NEBFLAG_NONE, NEBATTR_NONE,
                        HOST_FLAPPING, this, percent_change, high_threshold,
-                       low_threshold, NULL);
+                       low_threshold, nullptr);
 
   /* see if we should check to send a recovery notification out when flapping
    * stops */
@@ -2205,15 +2205,15 @@ void host::clear_flap(double percent_change,
   /* send data to event broker */
   broker_flapping_data(NEBTYPE_FLAPPING_STOP, NEBFLAG_NONE,
                        NEBATTR_FLAPPING_STOP_NORMAL, HOST_FLAPPING, this,
-                       percent_change, high_threshold, low_threshold, NULL);
+                       percent_change, high_threshold, low_threshold, nullptr);
 
   /* send a notification */
-  notify(notification_flappingstop, NULL, NULL, notifier::notification_option_none);
+  notify(notification_flappingstop, "", "", notifier::notification_option_none);
 
   /* should we send a recovery notification? */
   if (get_check_flapping_recovery_notification() &&
       get_current_state() ==  host::state_up)
-    notify(notification_normal, NULL, NULL, notifier::notification_option_none);
+    notify(notification_normal, "", "", notifier::notification_option_none);
 
   /* clear the recovery notification flag */
   set_check_flapping_recovery_notification(false);
@@ -2646,8 +2646,12 @@ int host::handle_state() {
     /* notify contacts if needed */
     if ((get_current_state() !=  host::state_up ||
          (get_current_state() ==  host::state_up && !_recovery_been_sent)) &&
-        get_state_type() == hard)
-      notify(notification_normal, NULL, NULL, notifier::notification_option_none);
+        get_state_type() == hard) {
+      notify(notification_normal,
+             "",
+             "",
+             notifier::notification_option_none);
+    }
 
     /* the host recovered, so reset the current notification number and state
      * flags (after the recovery notification has gone out) */
@@ -3025,7 +3029,7 @@ void host::disable_flap_detection() {
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
                             NEBATTR_NONE, this, CMD_NONE, attr,
-                            get_modified_attributes(), NULL);
+                            get_modified_attributes(), nullptr);
 
   /* handle the details... */
   handle_flap_detection_disabled();
@@ -3259,7 +3263,7 @@ void host::handle_flap_detection_disabled() {
       this->get_percent_state_change(),
       0.0,
       0.0,
-      NULL);
+      nullptr);
 
     /* send a notification */
     notify(
@@ -3351,12 +3355,12 @@ int host::run_sync_check_3x(enum host::host_state* check_result_code,
 
 /* processes the result of a synchronous or asynchronous host check */
 int host::process_check_result_3x(enum host::host_state new_state,
-                                 char* old_plugin_output,
+                                 std::string const& old_plugin_output,
                                  int check_options,
                                  int reschedule_check,
                                  int use_cached_result,
                                  unsigned long check_timestamp_horizon) {
-  com::centreon::engine::host* master_host = NULL;
+  com::centreon::engine::host* master_host = nullptr;
   host* temp_host;
   std::list<host*> check_hostlist;
   host::host_state parent_state =  host::state_up;
@@ -3753,7 +3757,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
                it != end && it->first == id; ++it) {
             hostdependency* temp_dependency(&*it->second);
             if (temp_dependency->dependent_host_ptr == this &&
-              temp_dependency->master_host_ptr != NULL) {
+              temp_dependency->master_host_ptr != nullptr) {
               master_host = (host*) temp_dependency->master_host_ptr;
               logger(dbg_checks, more)
                 << "Check of host '" << master_host->get_name()
@@ -3789,9 +3793,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
 
   /* if the plugin output differs from previous check and no state change, log
    * the current state/output if state stalking is enabled */
-  if (_last_state == _current_state &&
-    compare_strings(old_plugin_output,
-                    const_cast<char*>(get_plugin_output().c_str()))) {
+  if (_last_state == _current_state && old_plugin_output == get_plugin_output()) {
     if (_current_state ==  host::state_up && get_stalk_on(up))
       log_event();
 
@@ -3881,7 +3883,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
       run_async_check = false;
     if (run_async_check)
       temp_host->run_async_check(CHECK_OPTION_NONE, 0.0, false,
-                                 false, NULL, NULL);
+                                 false, nullptr, nullptr);
   }
   return OK;
 }
@@ -3970,7 +3972,7 @@ int host::perform_scheduled_check(
 
 /* checks host dependencies */
 uint64_t host::check_dependencies(int dependency_type) {
-  host* temp_host = NULL;
+  host* temp_host = nullptr;
   enum host::host_state state = host::state_up;
   time_t current_time = 0L;
 
@@ -3993,7 +3995,7 @@ uint64_t host::check_dependencies(int dependency_type) {
       continue;
 
     /* find the host we depend on... */
-    if ((temp_host = temp_dependency->master_host_ptr) == NULL)
+    if ((temp_host = temp_dependency->master_host_ptr) == nullptr)
       continue;
 
     /* skip this dependency if it has a timeperiod and the current time isn't valid */

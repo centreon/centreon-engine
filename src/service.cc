@@ -1534,7 +1534,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
-      notify(notification_normal, nullptr, nullptr, notification_option_none);
+      notify(notification_normal, "", "", notification_option_none);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event();
@@ -1561,7 +1561,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* Check if we need to send a recovery notification */
     if (!_recovery_been_sent && !hard_state_change)
-      notify(notification_normal, nullptr, nullptr, notification_option_none);
+      notify(notification_normal, "", "", notification_option_none);
 
     /* should we obsessive over service checks? */
     if (config->obsess_over_services())
@@ -1700,8 +1700,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         route_result = hst->get_current_state();
 
         /* possibly re-send host notifications... */
-        hst->notify(notification_normal, nullptr, nullptr,
-                          notification_option_none);
+        hst->notify(notification_normal, "", "", notification_option_none);
       }
     }
 
@@ -1884,7 +1883,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* (re)send notifications out about this service problem if the host is up
        * (and was at last check also) and the dependencies were okay... */
-      notify(notification_normal, nullptr, nullptr, notification_option_none);
+      notify(notification_normal, "", "", notification_option_none);
 
       /* run the service event handler if we changed state from the last hard
        * state or if this service is flagged as being volatile */
@@ -2621,7 +2620,7 @@ void service::set_flap(double percent_change,
 
   /* send a notification */
   if (allow_flapstart_notification)
-    notify(notification_flappingstart, nullptr, nullptr,
+    notify(notification_flappingstart, "", "",
            notification_option_none);
 }
 
@@ -2657,12 +2656,12 @@ void service::clear_flap(double percent_change,
                        percent_change, high_threshold, low_threshold, nullptr);
 
   /* send a notification */
-  notify(notification_flappingstop, nullptr, nullptr, notification_option_none);
+  notify(notification_flappingstop, "", "", notification_option_none);
 
   /* should we send a recovery notification? */
   if (this->check_flapping_recovery_notification &&
       _current_state == service::state_ok)
-    notify(notification_normal, nullptr, nullptr, notification_option_none);
+    notify(notification_normal, "", "", notification_option_none);
 
   /* clear the recovery notification flag */
   this->check_flapping_recovery_notification = false;
@@ -3602,13 +3601,13 @@ void service::handle_flap_detection_disabled() {
       get_percent_state_change(),
       0.0,
       0.0,
-      NULL);
+      nullptr);
 
     /* send a notification */
     this->notify(
       notification_flappingdisabled,
-      NULL,
-      NULL,
+      "",
+      "",
       notification_option_none);
 
     /* should we send a recovery notification? */
@@ -3616,8 +3615,8 @@ void service::handle_flap_detection_disabled() {
         && this->_current_state == service::state_ok)
       this->notify(
         notification_normal,
-        NULL,
-        NULL,
+        "",
+        "",
         notification_option_none);
 
     /* clear the recovery notification flag */
@@ -3654,7 +3653,7 @@ timeperiod* service::get_notification_timeperiod() const {
 /* checks service dependencies */
 uint64_t service::check_dependencies(
   int dependency_type) {
-  service* temp_service = NULL;
+  service* temp_service = nullptr;
   int state =  service::state_ok;
   time_t current_time = 0L;
 
@@ -3676,7 +3675,7 @@ uint64_t service::check_dependencies(
       continue;
 
     /* find the service we depend on... */
-    if ((temp_service = temp_dependency->master_service_ptr) == NULL)
+    if ((temp_service = temp_dependency->master_service_ptr) == nullptr)
       continue;
 
     /* skip this dependency if it has a timeperiod and the current time isn't valid */

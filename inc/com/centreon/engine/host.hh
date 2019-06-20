@@ -173,7 +173,7 @@ class                host : public notifier {
                                                  int use_cached_result,
                                                  unsigned long check_timestamp_horizon);
   int                process_check_result_3x(enum host::host_state new_state,
-                                                 char* old_plugin_output,
+                                                 std::string const& old_plugin_output,
                                                  int check_options,
                                                  int reschedule_check,
                                                  int use_cached_result,
