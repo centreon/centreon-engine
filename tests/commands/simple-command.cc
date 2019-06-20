@@ -108,7 +108,7 @@ TEST_F(SimpleCommand, NewCommandSync) {
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandAsync) {
   std::unique_ptr<my_listener> lstnr(new my_listener);
-  commands::command* cmd(new commands::raw("test", "/bin/echo bonjour"));
+  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
   cmd->set_listener(lstnr.get());
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
@@ -116,10 +116,10 @@ TEST_F(SimpleCommand, NewCommandAsync) {
   ASSERT_EQ(cc, "/bin/echo bonjour");
   uint64_t id{cmd->run(cc, mac, 2)};
   int timeout{0};
-  while (timeout < 20 && lstnr->get_result().output == "") {
+  while (timeout < 50 && lstnr->get_result().output == "") {
     usleep(100000);
     ++timeout;
   }
-  ASSERT_TRUE(timeout < 20);
+  ASSERT_TRUE(timeout < 50);
   ASSERT_EQ(lstnr->get_result().output, "bonjour\n");
 }
