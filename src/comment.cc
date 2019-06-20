@@ -285,7 +285,7 @@ comment::e_type comment::get_entry_type() const {
   return _entry_type;
 }
 
-unsigned long comment::get_comment_id() const {
+uint64_t comment::get_comment_id() const {
   return _comment_id;
 }
 
