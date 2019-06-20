@@ -66,26 +66,23 @@ int grab_contact_macros_r(nagios_macros* mac, contact* cntct) {
 /* calculates the value of a custom macro */
 int grab_custom_macro_value_r(
       nagios_macros* mac,
-      char* macro_name,
-      char const* arg1,
-      char const* arg2,
-      char** output) {
+      std::string const& macro_name,
+      std::string const& arg1,
+      std::string const& arg2,
+      std::string& output) {
   contactgroup* temp_contactgroup = nullptr;
   int delimiter_len = 0;
-  char* temp_buffer = nullptr;
+  std::string temp_buffer;
   int result = OK;
 
-  if (macro_name == nullptr || output == nullptr)
-    return ERROR;
-
   /***** CUSTOM HOST MACRO *****/
-  if (strstr(macro_name, "_HOST") == macro_name) {
+  if (macro_name.rfind("_HOST", 0) == 0) {
 
     host *temp_host(nullptr);
     /* a standard host macro */
-    if (arg2 == nullptr) {
+    if (arg2.empty()) {
       /* find the host for on-demand macros */
-      if (arg1) {
+      if (!arg1.empty()) {
         host_map::const_iterator it = host::hosts.find(arg1);
         if (it != host::hosts.end())
           temp_host = it->second.get();
@@ -100,7 +97,7 @@ int grab_custom_macro_value_r(
       /* get the host macro value */
       result = grab_custom_object_macro_r(
                  mac,
-                 macro_name + 5,
+                 macro_name.substr(5),
                  temp_host->custom_variables,
                  output);
     }
@@ -111,7 +108,7 @@ int grab_custom_macro_value_r(
       if (it_hg == hostgroup::hostgroups.end() || it_hg->second == nullptr)
         return ERROR;
 
-      delimiter_len = strlen(arg2);
+      delimiter_len = arg2.length();
 
       /* concatenate macro values for all hostgroup members */
       for (host_map::iterator
@@ -127,41 +124,37 @@ int grab_custom_macro_value_r(
         grab_custom_macro_value_r(
           mac,
           macro_name,
-          it->first.c_str(),
-          nullptr,
-          &temp_buffer);
+          it->first,
+          "",
+          temp_buffer);
 
-        if (temp_buffer == nullptr)
+        if (temp_buffer.empty())
           continue;
 
         /* add macro value to already running macro */
-        if (*output == nullptr)
-          *output = string::dup(temp_buffer);
+        if (output.empty())
+          output = temp_buffer;
         else {
-          *output = resize_string(
-                      *output,
-                      strlen(*output) + strlen(temp_buffer) + delimiter_len + 1);
-          strcat(*output, arg2);
-          strcat(*output, temp_buffer);
+          output.append(arg2);
+          output.append(temp_buffer);
         }
-        delete[] temp_buffer;
-        temp_buffer = nullptr;
+        temp_buffer = "";
       }
     }
   }
   /***** CUSTOM SERVICE MACRO *****/
-  else if (strstr(macro_name, "_SERVICE") == macro_name) {
+  else if (macro_name.rfind("_SERVICE", 0) == 0) {
     com::centreon::engine::service* temp_service(nullptr);
 
     /* use saved service pointer */
-    if (arg1 == nullptr && arg2 == nullptr) {
+    if (arg1.empty() && arg2.empty()) {
       if ((temp_service = mac->service_ptr) == nullptr)
         return ERROR;
 
       /* get the service macro value */
       result = grab_custom_object_macro_r(
                  mac,
-                 macro_name + 8,
+                 macro_name.substr(8),
                  temp_service->custom_variables,
                  output);
     }
@@ -179,7 +172,7 @@ int grab_custom_macro_value_r(
         /* get the service macro value */
         result = grab_custom_object_macro_r(
                    mac,
-                   macro_name + 8,
+                   macro_name.substr(8),
                    found->second->custom_variables,
                    output);
       }
@@ -190,7 +183,7 @@ int grab_custom_macro_value_r(
           return ERROR;
 
         std::shared_ptr<servicegroup> const& temp_servicegroup{sg_it->second};
-        delimiter_len = strlen(arg2);
+        delimiter_len = arg2.length();
 
         /* concatenate macro values for all servicegroup members */
           for (service_map::iterator
@@ -206,37 +199,33 @@ int grab_custom_macro_value_r(
           grab_custom_macro_value_r(
             mac,
             macro_name,
-            temp_service->get_hostname().c_str(),
-            temp_service->get_description().c_str(),
-            &temp_buffer);
+            temp_service->get_hostname(),
+            temp_service->get_description(),
+            temp_buffer);
 
-          if (temp_buffer == nullptr)
+          if (temp_buffer.empty())
             continue;
 
           /* add macro value to already running macro */
-          if (*output == nullptr)
-            *output = string::dup(temp_buffer);
+          if (output.empty())
+            output = temp_buffer;
           else {
-            *output = resize_string(
-                        *output,
-                        strlen(*output) + strlen(temp_buffer) + delimiter_len + 1);
-            strcat(*output, arg2);
-            strcat(*output, temp_buffer);
+            output.append(arg2);
+            output.append(temp_buffer);
           }
-          delete[] temp_buffer;
-          temp_buffer = nullptr;
+          temp_buffer = "";
         }
       }
     }
   }
   /***** CUSTOM CONTACT VARIABLE *****/
-  else if (strstr(macro_name, "_CONTACT") == macro_name) {
+  else if (macro_name.rfind("_CONTACT", 0) == 0) {
     contact* temp_contact(nullptr);
 
     /* a standard contact macro */
-    if (arg2 == nullptr) {
+    if (arg2.empty()) {
       /* find the contact for on-demand macros */
-      if (arg1) {
+      if (!arg1.empty()) {
         contact_map::const_iterator it{contact::contacts.find(arg1)};
         if (it == contact::contacts.end())
           return ERROR;
@@ -250,21 +239,22 @@ int grab_custom_macro_value_r(
       /* get the contact macro value */
       result = grab_custom_object_macro_r(
                  mac,
-                 macro_name + 8,
+                 macro_name.substr(8),
                  temp_contact->custom_variables,
                  output);
     }
     /* a contact macro with a contactgroup name and delimiter */
     else {
-      if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(arg1)) == nullptr)
+      contactgroup_map::iterator cg_it = contactgroup::contactgroups.find(arg1);
+      if (cg_it == contactgroup::contactgroups.end() || !cg_it->second)
         return (ERROR);
 
-      delimiter_len = strlen(arg2);
+      delimiter_len = arg2.length();
 
       /* concatenate macro values for all contactgroup members */
       for (contact_map::const_iterator
-             it{temp_contactgroup->get_members().begin()},
-             end{temp_contactgroup->get_members().end()};
+             it{cg_it->second->get_members().begin()},
+             end{cg_it->second->get_members().end()};
            it != end;
            ++it) {
 
@@ -277,23 +267,19 @@ int grab_custom_macro_value_r(
           macro_name,
           it->second->get_name().c_str(),
           nullptr,
-          &temp_buffer);
+          temp_buffer);
 
-        if (temp_buffer == nullptr)
+        if (temp_buffer.empty())
           continue;
 
         /* add macro value to already running macro */
-        if (*output == nullptr)
-          *output = string::dup(temp_buffer);
+        if (output.empty())
+          output = temp_buffer;
         else {
-          *output = resize_string(
-                      *output,
-                      strlen(*output) + strlen(temp_buffer) + delimiter_len + 1);
-          strcat(*output, arg2);
-          strcat(*output, temp_buffer);
+          output.append(arg2);
+          output.append(temp_buffer);
         }
-        delete[] temp_buffer;
-        temp_buffer = nullptr;
+        temp_buffer = "";
       }
     }
   }
@@ -306,19 +292,17 @@ int grab_custom_macro_value_r(
 int grab_datetime_macro_r(
       nagios_macros* mac,
       int macro_type,
-      char const* arg1,
-      char const* arg2,
-      char** output) {
+      std::string const& arg1,
+      std::string const& arg2,
+      std::string & output) {
   time_t current_time = 0L;
   timeperiod* temp_timeperiod = nullptr;
   time_t test_time = 0L;
   time_t next_valid_time = 0L;
   timeperiod_map::const_iterator it;
+  char tmp_date[MAX_DATETIME_LENGTH];
 
   (void)mac;
-
-  if (output == nullptr)
-    return ERROR;
 
   /* get the current time */
   time(&current_time);
@@ -329,17 +313,17 @@ int grab_datetime_macro_r(
   case MACRO_NEXTVALIDTIME:
     /* find the timeperiod */
     temp_timeperiod = nullptr;
-    it = state::instance().timeperiods().find(arg1);
+    it = timeperiod::timeperiods.find(arg1);
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (temp_timeperiod == nullptr)
       return ERROR;
 
     /* what timestamp should we use? */
-    if (arg2)
-      test_time = (time_t)strtoul(arg2, nullptr, 0);
+    if (!arg2.empty())
+      test_time = (time_t)strtoul(arg2.c_str(), nullptr, 0);
     else
       test_time = current_time;
     break;
@@ -351,53 +335,47 @@ int grab_datetime_macro_r(
   /* calculate the value */
   switch (macro_type) {
   case MACRO_LONGDATETIME:
-    if (*output == nullptr)
-      *output = new char[MAX_DATETIME_LENGTH];
     get_datetime_string(
       &current_time,
-      *output,
+      tmp_date,
       MAX_DATETIME_LENGTH,
       LONG_DATE_TIME);
+    output = tmp_date;
     break;
 
   case MACRO_SHORTDATETIME:
-    if (*output == nullptr)
-      *output = new char[MAX_DATETIME_LENGTH];
     get_datetime_string(
       &current_time,
-      *output,
+      tmp_date,
       MAX_DATETIME_LENGTH,
       SHORT_DATE_TIME);
+      output = tmp_date;
     break;
 
   case MACRO_DATE:
-    if (*output == nullptr)
-      *output = new char[MAX_DATETIME_LENGTH];
     get_datetime_string(
       &current_time,
-      *output,
+      tmp_date,
       MAX_DATETIME_LENGTH,
       SHORT_DATE);
+      output = tmp_date;
     break;
 
   case MACRO_TIME:
-    if (*output == nullptr)
-      *output = new char[MAX_DATETIME_LENGTH];
     get_datetime_string(
       &current_time,
-      *output,
+      tmp_date,
       MAX_DATETIME_LENGTH,
       SHORT_TIME);
+      output = tmp_date;
     break;
 
   case MACRO_TIMET:
-    string::setstr(*output, current_time);
+    output = current_time;
     break;
 
   case MACRO_ISVALIDTIME:
-    string::setstr(
-      *output,
-      !check_time_against_period(test_time, temp_timeperiod));
+      output = !check_time_against_period(test_time, temp_timeperiod);
     break;
 
   case MACRO_NEXTVALIDTIME:
@@ -407,7 +385,7 @@ int grab_datetime_macro_r(
              test_time,
              temp_timeperiod))
       next_valid_time = (time_t)0L;
-    string::setstr(*output, next_valid_time);
+    output = next_valid_time;
     break;
 
   default:
@@ -421,47 +399,26 @@ int grab_standard_hostgroup_macro_r(
       nagios_macros* mac,
       int macro_type,
       hostgroup* temp_hostgroup,
-      char** output) {
-  char* temp_buffer = nullptr;
+      std::string & output) {
+  std::string temp_buffer;
   unsigned int temp_len = 0;
   unsigned int init_len = 0;
 
-  if (temp_hostgroup == nullptr || output == nullptr)
+  if (temp_hostgroup == nullptr)
     return ERROR;
 
   /* get the macro value */
   switch (macro_type) {
   case MACRO_HOSTGROUPNAME:
-    *output = string::dup(temp_hostgroup->get_group_name());
+    output = temp_hostgroup->get_group_name();
     break;
 
   case MACRO_HOSTGROUPALIAS:
     if (!temp_hostgroup->get_alias().empty())
-      *output = string::dup(temp_hostgroup->get_alias());
+      output = temp_hostgroup->get_alias();
     break;
 
   case MACRO_HOSTGROUPMEMBERS:
-    /* make the calculations for total string length */
-    for (host_map::iterator
-           it(temp_hostgroup->members.begin()),
-           end(temp_hostgroup->members.begin());
-         it != end;
-         ++it) {
-      if (it->first.empty())
-        continue;
-      if (temp_len == 0)
-        temp_len += strlen(it->first.c_str()) + 1;
-      else
-        temp_len += strlen(it->first.c_str()) + 2;
-    }
-    /* allocate or reallocate the memory buffer */
-    if (*output == nullptr)
-      *output = new char[temp_len];
-    else {
-      init_len = strlen(*output);
-      temp_len += init_len;
-      *output = resize_string(*output, temp_len);
-    }
     /* now fill in the string with the member names */
       for (host_map::iterator
              it(temp_hostgroup->members.begin()),
@@ -470,27 +427,26 @@ int grab_standard_hostgroup_macro_r(
            ++it) {
         if (it->first.empty())
         continue;
-      temp_buffer = *output + init_len;
-      if (init_len == 0)      /* If our buffer didn't contain anything, we just need to write "%s,%s" */
-        init_len += sprintf(temp_buffer, "%s", it->first.c_str());
+      if (temp_buffer.empty())      /* If our buffer didn't contain anything, we just need to write "%s,%s" */
+        temp_buffer.append(it->first);
       else
-        init_len += sprintf(temp_buffer, ",%s", it->first.c_str());
+        temp_buffer += "," + it->first;
     }
     break;
 
   case MACRO_HOSTGROUPACTIONURL:
     if (!temp_hostgroup->get_action_url().empty())
-      *output = string::dup(temp_hostgroup->get_action_url());
+      output = temp_hostgroup->get_action_url();
     break;
 
   case MACRO_HOSTGROUPNOTESURL:
     if (!temp_hostgroup->get_notes_url().empty())
-      *output = string::dup(temp_hostgroup->get_notes_url());
+      output = temp_hostgroup->get_notes_url();
     break;
 
   case MACRO_HOSTGROUPNOTES:
     if (!temp_hostgroup->get_notes().empty())
-      *output = string::dup(temp_hostgroup->get_notes());
+      output = temp_hostgroup->get_notes();
     break;
 
   default:
@@ -506,17 +462,15 @@ int grab_standard_hostgroup_macro_r(
   case MACRO_HOSTGROUPNOTESURL:
     process_macros_r(
       mac,
-      *output,
-      &temp_buffer,
+      output,
+      temp_buffer,
       URL_ENCODE_MACRO_CHARS);
-    delete[] *output;
-    *output = temp_buffer;
+    output = temp_buffer;
     break;
 
   case MACRO_HOSTGROUPNOTES:
-    process_macros_r(mac, *output, &temp_buffer, 0);
-    delete[] *output;
-    *output = temp_buffer;
+    process_macros_r(mac, output, temp_buffer, 0);
+    output = temp_buffer;
     break;
 
   default:
@@ -531,27 +485,27 @@ int grab_standard_servicegroup_macro_r(
       nagios_macros* mac,
       int macro_type,
       servicegroup* temp_servicegroup,
-      char** output) {
-  char* temp_buffer = nullptr;
+      std::string & output) {
+  std::string temp_buffer;
   unsigned int temp_len = 0;
   unsigned int init_len = 0;
 
-  if (temp_servicegroup == nullptr || output == nullptr)
+  if (temp_servicegroup == nullptr)
     return ERROR;
 
   /* get the macro value */
   switch (macro_type) {
   case MACRO_SERVICEGROUPNAME:
-    *output = string::dup(temp_servicegroup->get_group_name().c_str());
+    output = temp_servicegroup->get_group_name();
     break;
 
   case MACRO_SERVICEGROUPALIAS:
     if (!temp_servicegroup->get_alias().empty())
-      *output = string::dup(temp_servicegroup->get_alias().c_str());
+      output = temp_servicegroup->get_alias();
     break;
 
   case MACRO_SERVICEGROUPMEMBERS:
-    /* make the calculations for total string length */
+    /* fill the string with the group members */
     for (service_map::iterator
            it(temp_servicegroup->members.begin()),
            end(temp_servicegroup->members.end());
@@ -559,55 +513,25 @@ int grab_standard_servicegroup_macro_r(
          ++it) {
       if (it->first.first.empty() || it->first.second.empty())
         continue;
-      if (temp_len == 0)
-        temp_len += it->first.first.length() + it->first.second.length() + 2;
-      else
-        temp_len += it->first.first.length() + it->first.second.length() + 3;
-    }
-    /* allocate or reallocate the memory buffer */
-    if (*output == nullptr)
-      *output = new char[temp_len];
-    else {
-      init_len = strlen(*output);
-      temp_len += init_len;
-      *output = resize_string(*output, temp_len);
-    }
-    /* now fill in the string with the group members */
-    for (service_map::iterator
-           it(temp_servicegroup->members.begin()),
-           end(temp_servicegroup->members.end());
-         it != end;
-         ++it) {
-      if (it->first.first.empty() || it->first.second.empty())
-        continue;
-      temp_buffer = *output + init_len;
-      if (init_len == 0)      /* If our buffer didn't contain anything, we just need to write "%s,%s" */
-        init_len += sprintf(
-                      temp_buffer,
-                      "%s,%s",
-                      it->first.first.c_str(),
-                      it->first.second.c_str());
+      if (temp_buffer.empty())      /* If our buffer didn't contain anything, we just need to write "%s,%s" */
+        temp_buffer = it->first.first + "," + it->first.second;
       else                    /* Now we need to write ",%s,%s" */
-        init_len += sprintf(
-                      temp_buffer,
-                      ",%s,%s",
-                      it->first.first.c_str(),
-                      it->first.second.c_str());
+        temp_buffer = "," + it->first.first + "," + it->first.second;
     }
     break;
   case MACRO_SERVICEGROUPACTIONURL:
     if (!temp_servicegroup->get_action_url().empty())
-      *output = string::dup(temp_servicegroup->get_action_url());
+      output = temp_servicegroup->get_action_url();
     break;
 
   case MACRO_SERVICEGROUPNOTESURL:
     if (!temp_servicegroup->get_notes_url().empty())
-      *output = string::dup(temp_servicegroup->get_notes_url());
+      output = temp_servicegroup->get_notes_url();
     break;
 
   case MACRO_SERVICEGROUPNOTES:
     if (!temp_servicegroup->get_notes().empty())
-      *output = string::dup(temp_servicegroup->get_notes());
+      output = temp_servicegroup->get_notes();
     break;
 
   default:
@@ -624,17 +548,15 @@ int grab_standard_servicegroup_macro_r(
   case MACRO_SERVICEGROUPNOTESURL:
     process_macros_r(
       mac,
-      *output,
-      &temp_buffer,
+      output,
+      temp_buffer,
       URL_ENCODE_MACRO_CHARS);
-    delete[] *output;
-    *output = temp_buffer;
+    output = temp_buffer;
     break;
 
   case MACRO_SERVICEGROUPNOTES:
-    process_macros_r(mac, *output, &temp_buffer, 0);
-    delete[] *output;
-    *output = temp_buffer;
+    process_macros_r(mac, output, output, 0);
+    output = temp_buffer;
     break;
 
   default:
@@ -648,30 +570,30 @@ int grab_standard_contact_macro_r(
       nagios_macros* mac,
       int macro_type,
       contact* temp_contact,
-      char** output) {
+      std::string& output) {
   (void)mac;
 
-  if (temp_contact == nullptr || output == nullptr)
+  if (temp_contact == nullptr)
     return ERROR;
 
   /* get the macro value */
   switch (macro_type) {
   case MACRO_CONTACTNAME:
-    *output = string::dup(temp_contact->get_name());
+    output = temp_contact->get_name();
     break;
 
   case MACRO_CONTACTALIAS:
-    *output = string::dup(temp_contact->get_alias());
+    output = temp_contact->get_alias();
     break;
 
   case MACRO_CONTACTEMAIL:
     if (!temp_contact->get_email().empty())
-      *output = string::dup(temp_contact->get_email());
+      output = temp_contact->get_email();
     break;
 
   case MACRO_CONTACTPAGER:
     if (!temp_contact->get_pager().empty())
-      *output = string::dup(temp_contact->get_pager());
+      output = temp_contact->get_pager();
     break;
 
   case MACRO_CONTACTGROUPNAMES: {
@@ -690,12 +612,12 @@ int grab_standard_contact_macro_r(
       buf.append((*it)->get_name());
     }
     if (!buf.empty())
-      *output = string::dup(buf);
+      output = buf;
   }
     break;
 
   case MACRO_CONTACTTIMEZONE: {
-    *output = string::dup(temp_contact->get_timezone());
+    output = temp_contact->get_timezone();
   }
     break ;
 
@@ -712,16 +634,16 @@ int grab_standard_contact_macro_r(
 int grab_contact_address_macro(
       unsigned int macro_num,
       contact* temp_contact,
-      char** output) {
+      std::string& output) {
   if (macro_num >= MAX_CONTACT_ADDRESSES)
     return ERROR;
 
-  if (temp_contact == nullptr || output == nullptr)
+  if (temp_contact == nullptr)
     return ERROR;
 
   /* get the macro */
   if (!temp_contact->get_address(macro_num).empty())
-    *output = string::dup(temp_contact->get_address(macro_num));
+    output = temp_contact->get_address(macro_num);
   return OK;
 }
 
@@ -729,20 +651,20 @@ int grab_contact_address_macro(
 int grab_standard_contactgroup_macro(
       int macro_type,
       contactgroup* temp_contactgroup,
-      char** output) {
+      std::string& output) {
 
-  if (temp_contactgroup == nullptr || output == nullptr)
+  if (temp_contactgroup == nullptr)
     return ERROR;
 
   /* get the macro value */
   switch (macro_type) {
   case MACRO_CONTACTGROUPNAME:
-    *output = string::dup(temp_contactgroup->get_name());
+    output = temp_contactgroup->get_name();
     break;
 
   case MACRO_CONTACTGROUPALIAS:
     if (!temp_contactgroup->get_alias().empty())
-      *output = string::dup(temp_contactgroup->get_alias());
+      output = temp_contactgroup->get_alias();
     break;
 
   case MACRO_CONTACTGROUPMEMBERS:
@@ -754,14 +676,11 @@ int grab_standard_contactgroup_macro(
          ++it) {
       if (it->second->get_name().empty())
         continue;
-      if (*output == nullptr)
-        *output = string::dup(it->first);
+      if (output.empty())
+        output = it->first;
       else {
-        *output = resize_string(
-                    *output,
-                    strlen(*output) + strlen(it->first.c_str()) + 2);
-        strcat(*output, ",");
-        strcat(*output, it->first.c_str());
+        output.append(",");
+        output.append(it->first);
       }
     }
     break;
@@ -778,21 +697,21 @@ int grab_standard_contactgroup_macro(
 /* computes a custom object macro */
 int grab_custom_object_macro_r(
       nagios_macros* mac,
-      char* macro_name,
+      std::string const& macro_name,
       std::unordered_map<std::string, customvariable> const& vars,
-      char** output) {
+      std::string & output) {
   int result = ERROR;
 
   (void)mac;
 
-  if (macro_name == nullptr || vars.empty() || output == nullptr)
+  if (macro_name.empty() || vars.empty())
     return ERROR;
 
   /* get the custom variable */
   for (std::pair<std::string, customvariable> const& cv : vars) {
 
-    if (!strcmp(macro_name, cv.first.c_str())) {
-      *output = string::dup(cv.second.get_value());
+    if (macro_name == cv.first) {
+      output = cv.second.get_value();
       result = OK;
       break;
     }
@@ -832,18 +751,18 @@ std::string clean_macro_chars(std::string const& macro, int options) {
 }
 
 /* encodes a string in proper URL format */
-char* get_url_encoded_string(char* input) {
+char* get_url_encoded_string(std::string const& input) {
   int x = 0;
   int y = 0;
   char* encoded_url_string = nullptr;
   char temp_expansion[6] = "";
 
   /* bail if no input */
-  if (input == nullptr)
+  if (input.empty())
     return nullptr;
 
   /* allocate enough memory to escape all characters if necessary */
-  encoded_url_string = new char[strlen(input) * 3 + 1];
+  encoded_url_string = new char[input.length() * 3 + 1];
 
   /* check/encode all characters */
   for (x = 0, y = 0; input[x] != (char)'\x0'; x++) {
@@ -1093,8 +1012,7 @@ int clear_argv_macros_r(nagios_macros* mac) {
 
   /* command argument macros */
   for (x = 0; x < MAX_COMMAND_ARGUMENTS; x++) {
-    delete[] mac->argv[x];
-    mac->argv[x] = nullptr;
+    mac->argv[x] = "";
   }
   return OK;
 }
@@ -1125,16 +1043,14 @@ int clear_volatile_macros_r(nagios_macros* mac) {
       break;
 
     default:
-      delete[] mac->x[x];
-      mac->x[x] = nullptr;
+      mac->x[x] = "";
       break;
     }
   }
 
   /* contact address macros */
   for (x = 0; x < MAX_CONTACT_ADDRESSES; x++) {
-    delete[] mac->contactaddress[x];
-    mac->contactaddress[x] = nullptr;
+    mac->contactaddress[x] = "";
   }
 
   /* clear macro pointers */
@@ -1146,8 +1062,7 @@ int clear_volatile_macros_r(nagios_macros* mac) {
   mac->contactgroup_ptr = nullptr;
 
   /* clear on-demand macro */
-  delete[] mac->ondemand;
-  mac->ondemand = nullptr;
+  mac->ondemand = "";
 
   /* clear ARGx macros */
   clear_argv_macros_r(mac);
@@ -1175,8 +1090,7 @@ int clear_contact_macros_r(nagios_macros* mac) {
     case MACRO_CONTACTEMAIL:
     case MACRO_CONTACTPAGER:
     case MACRO_CONTACTGROUPNAMES:
-      delete[] mac->x[x];
-      mac->x[x] = nullptr;
+      mac->x[x] = "";
       break;
 
     default:
@@ -1186,8 +1100,7 @@ int clear_contact_macros_r(nagios_macros* mac) {
 
   /* clear contact addresses */
   for (x = 0; x < MAX_CONTACT_ADDRESSES; x++) {
-    delete[] mac->contactaddress[x];
-    mac->contactaddress[x] = nullptr;
+    mac->contactaddress[x] = "";
   }
 
   /* clear custom contact variables */
@@ -1208,8 +1121,7 @@ int clear_contactgroup_macros_r(nagios_macros* mac) {
     case MACRO_CONTACTGROUPNAME:
     case MACRO_CONTACTGROUPALIAS:
     case MACRO_CONTACTGROUPMEMBERS:
-      delete[] mac->x[x];
-      mac->x[x] = nullptr;
+      mac->x[x] = "";
       break;
 
     default:
@@ -1230,8 +1142,7 @@ int clear_summary_macros_r(nagios_macros* mac) {
   for (x = MACRO_TOTALHOSTSUP;
        x <= MACRO_TOTALSERVICEPROBLEMSUNHANDLED;
        x++) {
-    delete[] mac->x[x];
-    mac->x[x] = nullptr;
+    mac->x[x] = "";
   }
 
   return OK;

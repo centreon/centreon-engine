@@ -152,11 +152,9 @@ commands::command& commands::command::operator=(commands::command const& right) 
  *  @return The processed command line.
  */
 std::string commands::command::process_cmd(nagios_macros* macros) const {
-  char* command_line = NULL;
-  process_macros_r(macros, _command_line.c_str(), &command_line, 0);
-  std::string processed_cmd(command_line);
-  delete[] command_line;
-  return (processed_cmd);
+  std::string command_line;
+  process_macros_r(macros, _command_line, command_line, 0);
+  return (command_line);
 }
 
 /**

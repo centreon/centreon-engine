@@ -35,11 +35,11 @@ extern "C" {
 // thread-safe version of the above
 int my_system_r(
       nagios_macros* mac,
-      char* cmd,
+      std::string const& cmd,
       int timeout,
       int* early_timeout,
       double* exectime,
-      char** output,
+      std::string & output,
       unsigned int max_output_length);
 // same like unix ctime without the '\n' at the end of the string.
 char const* my_ctime(time_t const* t);
@@ -51,7 +51,7 @@ int get_raw_command_line_r(
       nagios_macros* mac,
       com::centreon::engine::commands::command* cmd_ptr,
       char const* cmd,
-      char** full_command,
+      std::string& full_command,
       int macro_options);
 // trap signals
 void setup_sighandler();

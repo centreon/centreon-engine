@@ -1530,7 +1530,6 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd, char* args) {
   host* temp_host(nullptr);
-  contact* temp_contact(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
   char* contact_name(nullptr);
@@ -1547,6 +1546,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
       it;
   std::pair<uint64_t, uint64_t> id;
   service_map::const_iterator found_svc;
+  contact_map::iterator cnct;
 
   switch (cmd) {
     case CMD_CHANGE_NORMAL_SVC_CHECK_INTERVAL:
@@ -1594,10 +1594,9 @@ int cmd_change_object_int_var(int cmd, char* args) {
       if ((contact_name = my_strtok(args, ";")) == nullptr)
         return ERROR;
 
+      cnct = contact::contacts.find(contact_name);
       /* verify that the contact is valid */
-      if ((temp_contact =
-               configuration::applier::state::instance().find_contact(
-                   contact_name)) == nullptr)
+      if (cnct == contact::contacts.end() || !cnct->second)
         return ERROR;
       break;
 
@@ -1796,15 +1795,15 @@ int cmd_change_object_int_var(int cmd, char* args) {
     /* set the modified attribute */
     switch (cmd) {
     case CMD_CHANGE_CONTACT_MODATTR:
-      temp_contact->set_modified_attributes(attr);
+      cnct->second->set_modified_attributes(attr);
       break;
 
     case CMD_CHANGE_CONTACT_MODHATTR:
-      temp_contact->set_modified_host_attributes(hattr);
+      cnct->second->set_modified_host_attributes(hattr);
       break;
 
     case CMD_CHANGE_CONTACT_MODSATTR:
-      temp_contact->set_modified_service_attributes(sattr);
+      cnct->second->set_modified_service_attributes(sattr);
       break;
 
     default:
@@ -1816,17 +1815,17 @@ int cmd_change_object_int_var(int cmd, char* args) {
       NEBTYPE_ADAPTIVECONTACT_UPDATE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      temp_contact,
+      cnct->second.get(),
       cmd, attr,
-      temp_contact->get_modified_attributes(),
+      cnct->second->get_modified_attributes(),
       hattr,
-      temp_contact->get_modified_host_attributes(),
+      cnct->second->get_modified_host_attributes(),
       sattr,
-      temp_contact->get_modified_service_attributes(),
+      cnct->second->get_modified_service_attributes(),
       nullptr);
 
     /* update the status log with the contact info */
-    temp_contact->update_status_info(false);
+    cnct->second->update_status_info(false);
     break;
 
   default:
@@ -1839,7 +1838,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd, char* args) {
   host* temp_host{nullptr};
-  contact* temp_contact{nullptr};
   timeperiod* temp_timeperiod{nullptr};
   char* host_name{nullptr};
   char* svc_description{nullptr};
@@ -1853,6 +1851,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   host_map::const_iterator it;
   std::pair<uint64_t, uint64_t> id;
   service_map::const_iterator found_svc;
+  contact_map::iterator cnct;
 
   /* SECURITY PATCH - disable these for the time being */
   switch (cmd) {
@@ -1924,7 +1923,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
       return ERROR;
 
     /* verify that the contact is valid */
-    if ((temp_contact = configuration::applier::state::instance().find_contact(contact_name)) == nullptr)
+    cnct = contact::contacts.find(contact_name);
+    if (cnct == contact::contacts.end() || !cnct->second)
       return ERROR;
 
     if ((charval = my_strtok(nullptr, "\n")) == nullptr)
@@ -1954,10 +1954,10 @@ int cmd_change_object_char_var(int cmd, char* args) {
     /* make sure the timeperiod is valid */
 
     temp_timeperiod = nullptr;
-    found = configuration::applier::state::instance().timeperiods().find(
+    found = timeperiod::timeperiods.find(
       temp_ptr);
 
-    if (found != configuration::applier::state::instance().timeperiods().end())
+    if (found != timeperiod::timeperiods.end())
       temp_timeperiod = found->second.get();
 
     if (temp_timeperiod == nullptr) {
@@ -2054,14 +2054,14 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
-    temp_contact->set_host_notification_period(temp_ptr);
-    temp_contact->host_notification_period_ptr = temp_timeperiod;
+    cnct->second->set_host_notification_period(temp_ptr);
+    cnct->second->host_notification_period_ptr = temp_timeperiod;
     hattr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
-    temp_contact->set_service_notification_period(temp_ptr);
-    temp_contact->service_notification_period_ptr = temp_timeperiod;
+    cnct->second->set_service_notification_period(temp_ptr);
+    cnct->second->service_notification_period_ptr = temp_timeperiod;
     sattr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
@@ -2159,30 +2159,28 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     /* set the modified attributes */
-    temp_contact->set_modified_host_attributes(
-                    temp_contact->get_modified_host_attributes()
-                    | hattr);
-    temp_contact->set_modified_service_attributes(
-                    temp_contact->get_modified_service_attributes()
-                    | sattr);
+    cnct->second->set_modified_host_attributes(
+      cnct->second->get_modified_host_attributes() | hattr);
+    cnct->second->set_modified_service_attributes(
+      cnct->second->get_modified_service_attributes() | sattr);
 
     /* send data to event broker */
     broker_adaptive_contact_data(
       NEBTYPE_ADAPTIVECONTACT_UPDATE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      temp_contact,
+      cnct->second.get(),
       cmd,
       attr,
-      temp_contact->get_modified_attributes(),
+      cnct->second->get_modified_attributes(),
       hattr,
-      temp_contact->get_modified_host_attributes(),
+      cnct->second->get_modified_host_attributes(),
       sattr,
-      temp_contact->get_modified_service_attributes(),
+      cnct->second->get_modified_service_attributes(),
       nullptr);
 
     /* update the status log with the contact info */
-    temp_contact->update_status_info(false);
+      cnct->second->update_status_info(false);
     break;
 
   default:
@@ -2279,10 +2277,11 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     break;
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
     {
-      if ((temp_contact = configuration::applier::state::instance().find_contact(name1)) == nullptr)
+      contact_map::iterator cnct_it = contact::contacts.find(name1);
+      if (cnct_it == contact::contacts.end() || !cnct_it->second)
         return ERROR;
-      std::unordered_map<std::string, customvariable>::iterator it(temp_contact->custom_variables.find(varname));
-      if (it == temp_contact->custom_variables.end())
+      std::unordered_map<std::string, customvariable>::iterator it(cnct_it->second->custom_variables.find(varname));
+      if (it == cnct_it->second->custom_variables.end())
         temp_contact->custom_variables.insert({std::move(varname), customvariable(std::move(varvalue))});
       else
         it->second.update(std::move(varvalue));

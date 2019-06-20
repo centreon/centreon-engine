@@ -41,8 +41,8 @@ using namespace com::centreon::engine::logging;
 
 /* handles host check results in an obsessive compulsive manner... */
 int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) {
-  char* raw_command = NULL;
-  char* processed_command = NULL;
+  std::string raw_command;
+  std::string processed_command;
   int early_timeout = false;
   double exectime = 0.0;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
@@ -73,8 +73,8 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
     &mac,
     ochp_command_ptr,
     config->ochp_command().c_str(),
-    &raw_command, macro_options);
-  if (raw_command == NULL) {
+    raw_command, macro_options);
+  if (raw_command.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -87,9 +87,9 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
   process_macros_r(
     &mac,
     raw_command,
-    &processed_command,
+    processed_command,
     macro_options);
-  if (processed_command == NULL) {
+  if (processed_command.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -100,13 +100,14 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
 
   /* run the command */
   try {
+    std::string tmp;
     my_system_r(
       &mac,
       processed_command,
       config->ochp_timeout(),
       &early_timeout,
       &exectime,
-      NULL,
+      tmp,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -122,10 +123,6 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
       << "' for host '" << hst->get_name() << "' timed out after "
       << config->ochp_timeout() << " seconds";
 
-  /* free memory */
-  delete[] raw_command;
-  delete[] processed_command;
-
   return OK;
 }
 
@@ -135,10 +132,10 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
 
 /* runs the global service event handler */
 int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc) {
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  char* processed_logentry = NULL;
-  char* command_output = NULL;
+  std::string raw_command = NULL;
+  std::string processed_command = NULL;
+  std::string processed_logentry = NULL;
+  std::string command_output = NULL;
   int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
@@ -173,9 +170,9 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     mac,
     global_service_event_handler_ptr,
     config->global_service_event_handler().c_str(),
-    &raw_command,
+    raw_command,
     macro_options);
-  if (raw_command == NULL) {
+  if (raw_command.empty()) {
     return ERROR;
   }
 
@@ -183,8 +180,8 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     << "Raw global service event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(mac, raw_command, &processed_command, macro_options);
-  if (processed_command == NULL)
+  process_macros_r(mac, raw_command, processed_command, macro_options);
+  if (processed_command.empty())
     return ERROR;
 
   logger(dbg_eventhandlers, most)
@@ -199,8 +196,8 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
         << config->global_service_event_handler();
     process_macros_r(
       mac,
-      oss.str().c_str(),
-      &processed_logentry,
+      oss.str(),
+      processed_logentry,
       macro_options);
     logger(log_event_handler, basic)
       << processed_logentry;
@@ -224,16 +221,13 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     early_timeout,
     result,
     config->global_service_event_handler().c_str(),
-    processed_command,
+    const_cast<char*>(processed_command.c_str()),
     NULL,
     NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
-    delete[] processed_command;
-    delete[] raw_command;
-    delete[] processed_logentry;
     return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
@@ -245,7 +239,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
                config->event_handler_timeout(),
                &early_timeout,
                &exectime,
-               &command_output,
+               command_output,
                0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -280,25 +274,19 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     early_timeout,
     result,
     config->global_service_event_handler().c_str(),
-    processed_command,
-    command_output,
+    const_cast<char *>(processed_command.c_str()),
+    const_cast<char *>(command_output.c_str()),
     NULL);
-
-  /* free memory */
-  delete[] command_output;
-  delete[] raw_command;
-  delete[] processed_command;
-  delete[] processed_logentry;
 
   return OK;
 }
 
 /* runs a service event handler command */
 int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc) {
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  char* processed_logentry = NULL;
-  char* command_output = NULL;
+  std::string raw_command = NULL;
+  std::string processed_command = NULL;
+  std::string processed_logentry = NULL;
+  std::string command_output = NULL;
   int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
@@ -330,9 +318,9 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     mac,
     svc->event_handler_ptr,
     svc->get_event_handler().c_str(),
-    &raw_command,
+    raw_command,
     macro_options);
-  if (raw_command == NULL)
+  if (raw_command.empty())
     return ERROR;
 
   logger(dbg_eventhandlers, most)
@@ -342,9 +330,9 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
   process_macros_r(
     mac,
     raw_command,
-    &processed_command,
+    processed_command,
     macro_options);
-  if (processed_command == NULL)
+  if (processed_command.empty())
     return ERROR;
 
   logger(dbg_eventhandlers, most)
@@ -359,8 +347,8 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
 	<< svc->get_event_handler();
     process_macros_r(
       mac,
-      oss.str().c_str(),
-      &processed_logentry,
+      oss.str(),
+      processed_logentry,
       macro_options);
     logger(log_event_handler, basic)
       << processed_logentry;
@@ -384,16 +372,13 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
                  early_timeout,
                  result,
                  svc->get_event_handler().c_str(),
-                 processed_command,
+                 const_cast<char *>(processed_command.c_str()),
                  NULL,
                  NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
-    delete[] processed_command;
-    delete[] raw_command;
-    delete[] processed_logentry;
     return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
@@ -405,7 +390,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
                config->event_handler_timeout(),
                &early_timeout,
                &exectime,
-               &command_output,
+               command_output,
                0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -439,15 +424,9 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     early_timeout,
     result,
     svc->get_event_handler().c_str(),
-    processed_command,
-    command_output,
+    const_cast<char *>(processed_command.c_str()),
+    const_cast<char *>(command_output.c_str()),
     NULL);
-
-  /* free memory */
-  delete[] command_output;
-  delete[] raw_command;
-  delete[] processed_command;
-  delete[] processed_logentry;
 
   return OK;
 }
@@ -513,10 +492,10 @@ int handle_host_event(com::centreon::engine::host* hst) {
 /* runs the global host event handler */
 int run_global_host_event_handler(nagios_macros* mac,
                                   com::centreon::engine::host* hst) {
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  char* processed_logentry = NULL;
-  char* command_output = NULL;
+  std::string raw_command;
+  std::string processed_command;
+  std::string processed_logentry;
+  std::string command_output;
   int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
@@ -550,9 +529,9 @@ int run_global_host_event_handler(nagios_macros* mac,
     mac,
     global_host_event_handler_ptr,
     config->global_host_event_handler().c_str(),
-    &raw_command,
+    raw_command,
     macro_options);
-  if (raw_command == NULL)
+  if (raw_command.empty())
     return ERROR;
 
   logger(dbg_eventhandlers, most)
@@ -562,9 +541,9 @@ int run_global_host_event_handler(nagios_macros* mac,
   process_macros_r(
     mac,
     raw_command,
-    &processed_command,
+    processed_command,
     macro_options);
-  if (processed_command == NULL)
+  if (processed_command.empty())
     return ERROR;
 
   logger(dbg_eventhandlers, most)
@@ -578,8 +557,8 @@ int run_global_host_event_handler(nagios_macros* mac,
 	<< config->global_host_event_handler();
     process_macros_r(
       mac,
-      oss.str().c_str(),
-      &processed_logentry,
+      oss.str(),
+      processed_logentry,
       macro_options);
     logger(log_event_handler, basic)
       << processed_logentry;
@@ -602,16 +581,13 @@ int run_global_host_event_handler(nagios_macros* mac,
                  config->event_handler_timeout(),
                  early_timeout, result,
                  config->global_host_event_handler().c_str(),
-                 processed_command,
+                 const_cast<char *>(processed_command.c_str()),
                  NULL,
                  NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
-    delete[] processed_command;
-    delete[] raw_command;
-    delete[] processed_logentry;
     return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
@@ -623,7 +599,7 @@ int run_global_host_event_handler(nagios_macros* mac,
                config->event_handler_timeout(),
                &early_timeout,
                &exectime,
-               &command_output,
+               command_output,
                0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -657,15 +633,9 @@ int run_global_host_event_handler(nagios_macros* mac,
     early_timeout,
     result,
     config->global_host_event_handler().c_str(),
-    processed_command,
-    command_output,
+    const_cast<char *>(processed_command.c_str()),
+    const_cast<char *>(command_output.c_str()),
     NULL);
-
-  /* free memory */
-  delete[] command_output;
-  delete[] raw_command;
-  delete[] processed_command;
-  delete[] processed_logentry;
 
   return OK;
 }
@@ -673,10 +643,10 @@ int run_global_host_event_handler(nagios_macros* mac,
 /* runs a host event handler command */
 int run_host_event_handler(nagios_macros* mac,
                            com::centreon::engine::host* hst) {
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  char* processed_logentry = NULL;
-  char* command_output = NULL;
+  std::string raw_command;
+  std::string processed_command;
+  std::string processed_logentry;
+  std::string command_output;
   int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
@@ -706,9 +676,9 @@ int run_host_event_handler(nagios_macros* mac,
     mac,
     hst->event_handler_ptr,
     hst->get_event_handler().c_str(),
-    &raw_command,
+    raw_command,
     macro_options);
-  if (raw_command == NULL)
+  if (raw_command.empty())
     return ERROR;
 
   logger(dbg_eventhandlers, most)
@@ -718,9 +688,9 @@ int run_host_event_handler(nagios_macros* mac,
   process_macros_r(
     mac,
     raw_command,
-    &processed_command,
+    processed_command,
     macro_options);
-  if (processed_command == NULL)
+  if (processed_command.empty())
     return ERROR;
 
   logger(dbg_eventhandlers, most)
@@ -734,8 +704,8 @@ int run_host_event_handler(nagios_macros* mac,
 	<< hst->get_event_handler();
     process_macros_r(
       mac,
-      oss.str().c_str(),
-      &processed_logentry,
+      oss.str(),
+      processed_logentry,
       macro_options);
     logger(log_event_handler, basic)
       << processed_logentry;
@@ -759,16 +729,13 @@ int run_host_event_handler(nagios_macros* mac,
                  early_timeout,
                  result,
                  hst->get_event_handler().c_str(),
-                 processed_command,
+                 const_cast<char *>(processed_command.c_str()),
                  NULL,
                  NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
-    delete[] processed_command;
-    delete[] raw_command;
-    delete[] processed_logentry;
     return (neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK;
   }
 
@@ -780,7 +747,7 @@ int run_host_event_handler(nagios_macros* mac,
                config->event_handler_timeout(),
                &early_timeout,
                &exectime,
-               &command_output,
+               command_output,
                0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -814,15 +781,9 @@ int run_host_event_handler(nagios_macros* mac,
     early_timeout,
     result,
     hst->get_event_handler().c_str(),
-    processed_command,
-    command_output,
+    const_cast<char *>(processed_command.c_str()),
+    const_cast<char *>(command_output.c_str()),
     NULL);
-
-  /* free memory */
-  delete[] command_output;
-  delete[] raw_command;
-  delete[] processed_command;
-  delete[] processed_logentry;
 
   return OK;
 }

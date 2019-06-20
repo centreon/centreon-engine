@@ -51,7 +51,7 @@ static void generate_host_total_services(
               nagios_macros* mac) {
   // Generate host service summary macros
   // (if they haven't already been computed).
-  if (!mac->x[MACRO_TOTALHOSTSERVICES]) {
+  if (mac->x[MACRO_TOTALHOSTSERVICES].empty()) {
     unsigned long total_host_services(0);
     unsigned long total_host_services_ok(0);
     unsigned long total_host_services_warning(0);
@@ -84,11 +84,11 @@ static void generate_host_total_services(
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
-    string::setstr(mac->x[MACRO_TOTALHOSTSERVICES], total_host_services);
-    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESOK], total_host_services_ok);
-    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESWARNING], total_host_services_warning);
-    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN], total_host_services_unknown);
-    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESCRITICAL], total_host_services_critical);
+    mac->x[MACRO_TOTALHOSTSERVICES] = total_host_services;
+    mac->x[MACRO_TOTALHOSTSERVICESOK] = total_host_services_ok;
+    mac->x[MACRO_TOTALHOSTSERVICESWARNING] = total_host_services_warning;
+    mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN] = total_host_services_unknown;
+    mac->x[MACRO_TOTALHOSTSERVICESCRITICAL] = total_host_services_critical;
   }
   return;
 }
@@ -102,12 +102,11 @@ static void generate_host_total_services(
  *  @return Newly allocated string containing either "PASSIVE" or
  *          "ACTIVE".
  */
-static char* get_host_check_type(host& hst, nagios_macros* mac) {
+static std::string get_host_check_type(host& hst, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(
-           (checkable::check_passive == hst.get_check_type()
+  return (checkable::check_passive == hst.get_check_type())
             ? "PASSIVE"
-            : "ACTIVE")));
+            : "ACTIVE";
 }
 
 /**
@@ -118,7 +117,7 @@ static char* get_host_check_type(host& hst, nagios_macros* mac) {
  *
  *  @return Newly allocated string with group names.
  */
-static char* get_host_group_names(host& hst, nagios_macros* mac) {
+static std::string get_host_group_names(host& hst, nagios_macros* mac) {
   (void)mac;
 
   std::string buf;
@@ -134,7 +133,7 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
       buf.append((*it)->get_group_name());
     }
   }
-  return string::dup(buf);
+  return buf;
 }
 
 /**
@@ -146,10 +145,10 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
  *  @return Newly allocated string with host state in plain text.
  */
 template <typename T, host::host_state (T::* member)() const>
-static char* get_host_state(T& t, nagios_macros* mac) {
+std::string get_host_state(T& t, nagios_macros* mac) {
   (void)mac;
   uint32_t current = static_cast<host::host_state>((t.*member)());
-  return string::dup(com::centreon::engine::host::tab_host_states[current].second);
+  return com::centreon::engine::host::tab_host_states[current].second;
 }
 
 /**
@@ -161,7 +160,7 @@ static char* get_host_state(T& t, nagios_macros* mac) {
  *  @return Newly allocated string with requested value in plain text.
  */
 template <unsigned int macro_id>
-static char* get_host_total_services(host& hst, nagios_macros* mac) {
+std::string get_host_total_services(host& hst, nagios_macros* mac) {
   generate_host_total_services(hst, mac);
   return mac->x[macro_id];
 }
@@ -174,7 +173,7 @@ static char* get_host_total_services(host& hst, nagios_macros* mac) {
  *
  *  @return Newly allocated string with requested value in plain text.
  */
-static char* get_host_parents(host& hst, nagios_macros* mac) {
+static std::string get_host_parents(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
   for (host_map::iterator
@@ -186,7 +185,7 @@ static char* get_host_parents(host& hst, nagios_macros* mac) {
       retval.append(it->first);
     retval.append(",");
   }
-  return string::dup(retval.c_str());
+  return retval;
 }
 
 /**
@@ -197,7 +196,7 @@ static char* get_host_parents(host& hst, nagios_macros* mac) {
  *
  *  @return Newly allocated string with requested value in plain text.
  */
-static char* get_host_children(host& hst, nagios_macros* mac) {
+static std::string get_host_children(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
   for (host_map::iterator
@@ -209,7 +208,7 @@ static char* get_host_children(host& hst, nagios_macros* mac) {
       retval.append(it->first);
     retval.append(",");
   }
-  return string::dup(retval.c_str());
+  return retval;
 }
 
 /**
@@ -220,10 +219,10 @@ static char* get_host_children(host& hst, nagios_macros* mac) {
  *
  *  @return  Newly allocated string with the host id.
  */
-static char* get_host_id(host& hst, nagios_macros* mac) {
+static std::string get_host_id(host& hst, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(string::from(
-            com::centreon::engine::get_host_id(hst.get_name())).c_str()));
+  return (string::from(
+            com::centreon::engine::get_host_id(hst.get_name())).c_str());
 }
 
 /**
@@ -234,9 +233,9 @@ static char* get_host_id(host& hst, nagios_macros* mac) {
  *
  *  @return Newly allocated string with requested value in plain text.
  */
-static char* get_host_macro_timezone(host& hst, nagios_macros* mac) {
+static std::string get_host_macro_timezone(host& hst, nagios_macros* mac) {
   (void)mac;
-  return string::dup(hst.get_timezone());
+  return hst.get_timezone();
 }
 
 /**************************************
@@ -247,7 +246,7 @@ static char* get_host_macro_timezone(host& hst, nagios_macros* mac) {
 
 // Redirection object.
 struct grab_host_redirection {
-  typedef umap<unsigned int, std::pair<char* (*)(host&, nagios_macros*), bool>>
+  typedef umap<unsigned int, std::pair<std::string (*)(host&, nagios_macros*), bool>>
       entry;
   entry routines{
       {MACRO_HOSTNAME,
@@ -292,91 +291,91 @@ struct grab_host_redirection {
                               checkable,
                               &checkable::get_check_command>,
         true}},
-      {MACRO_HOSTATTEMPT,
-       {&get_member_as_string<host,
-                              int,
-                              checkable,
-                              &checkable::get_current_attempt>,
-        true}},
-      {MACRO_MAXHOSTATTEMPTS,
-       {&get_member_as_string<host, int, checkable, &checkable::get_max_attempts>, true}},
-      {MACRO_HOSTDOWNTIME,
-       {&get_member_as_string<host, int, checkable, &checkable::get_scheduled_downtime_depth>,
-        true}},
-      {MACRO_HOSTPERCENTCHANGE,
-       {&get_double<host, checkable, &checkable::get_percent_state_change, 2>, true}},
-      {MACRO_HOSTDURATION, {&get_duration<host>, true}},
-      {MACRO_HOSTDURATIONSEC, {&get_duration_sec<host>, true}},
-      {MACRO_HOSTEXECUTIONTIME,
-       {&get_double<host, checkable, &checkable::get_execution_time, 3>, true}},
-      {MACRO_HOSTLATENCY, {&get_double<host, checkable, &checkable::get_latency, 3>, true}},
-      {MACRO_LASTHOSTCHECK,
-       {&get_member_as_string<host, time_t, checkable, &checkable::get_last_check>, true}},
-      {MACRO_LASTHOSTSTATECHANGE,
-       {&get_member_as_string<host, time_t, checkable, &checkable::get_last_state_change>,
-        true}},
-      {MACRO_LASTHOSTUP,
-       {&get_member_as_string<host, time_t, &host::get_last_time_up>, true}},
-      {MACRO_LASTHOSTDOWN,
-       {&get_member_as_string<host, time_t, &host::get_last_time_down>, true}},
-      {MACRO_LASTHOSTUNREACHABLE,
-       {&get_member_as_string<host, time_t, &host::get_last_time_unreachable>,
-        true}},
-      {MACRO_HOSTNOTIFICATIONNUMBER,
-       {&get_member_as_string<host,
-                              int,
-                              notifier,
-                              &notifier::get_current_notification_number>,
-        true}},
-      {MACRO_HOSTNOTIFICATIONID,
-       {&get_member_as_string<host,
-                              uint64_t, notifier,
-                              &notifier::get_current_notification_id>,
-        true}},
-      {MACRO_HOSTEVENTID,
-       {&get_member_as_string<host, unsigned long, notifier, &notifier::get_current_event_id>,
-        true}},
-      {MACRO_LASTHOSTEVENTID,
-       {&get_member_as_string<host, unsigned long, notifier, &notifier::get_last_event_id>,
-        true}},
-      {MACRO_HOSTPROBLEMID,
-       {&get_member_as_string<host,
-                              unsigned long,
-                              notifier,
-                              &notifier::get_current_problem_id>,
-        true}},
-      {MACRO_LASTHOSTPROBLEMID,
-       {&get_member_as_string<host, unsigned long, notifier, &notifier::get_last_problem_id>,
-        true}},
-      {MACRO_HOSTACTIONURL,
-       {&get_recursive<host, checkable, &checkable::get_action_url, URL_ENCODE_MACRO_CHARS>,
-        true}},
-      {MACRO_HOSTNOTESURL,
-       {&get_recursive<host, checkable, &checkable::get_notes_url, URL_ENCODE_MACRO_CHARS>,
-        true}},
-      {MACRO_HOSTNOTES, {&get_recursive<host, checkable, &checkable::get_notes, 0>, true}},
-      {MACRO_HOSTGROUPNAMES, {&get_host_group_names, true}},
-      {MACRO_TOTALHOSTSERVICES,
-       {&get_host_total_services<MACRO_TOTALHOSTSERVICES>, true}},
-      {MACRO_TOTALHOSTSERVICESOK,
-       {&get_host_total_services<MACRO_TOTALHOSTSERVICESOK>, true}},
-      {MACRO_TOTALHOSTSERVICESWARNING,
-       {&get_host_total_services<MACRO_TOTALHOSTSERVICESWARNING>, true}},
-      {MACRO_TOTALHOSTSERVICESUNKNOWN,
-       {&get_host_total_services<MACRO_TOTALHOSTSERVICESUNKNOWN>, true}},
-      {MACRO_TOTALHOSTSERVICESCRITICAL,
-       {&get_host_total_services<MACRO_TOTALHOSTSERVICESCRITICAL>, true}},
-      {MACRO_HOSTACKAUTHOR, {&get_macro_copy<host, MACRO_HOSTACKAUTHOR>, true}},
-      {MACRO_HOSTACKAUTHORNAME,
-       {&get_macro_copy<host, MACRO_HOSTACKAUTHORNAME>, true}},
-      {MACRO_HOSTACKAUTHORALIAS,
-       {&get_macro_copy<host, MACRO_HOSTACKAUTHORALIAS>, true}},
-      {MACRO_HOSTACKCOMMENT,
-       {&get_macro_copy<host, MACRO_HOSTACKCOMMENT>, true}},
-      {MACRO_HOSTPARENTS, {&get_host_parents, true}},
-      {MACRO_HOSTCHILDREN, {&get_host_children, true}},
-      {MACRO_HOSTID, {&get_host_id, true}},
-      {MACRO_HOSTTIMEZONE, {&get_host_macro_timezone, true}}};
+    {MACRO_HOSTATTEMPT,
+     {&get_member_as_string<host,
+                            int,
+                            checkable,
+                            &checkable::get_current_attempt>,
+      true}},
+    {MACRO_MAXHOSTATTEMPTS,
+     {&get_member_as_string<host, int, checkable, &checkable::get_max_attempts>, true}},
+    {MACRO_HOSTDOWNTIME,
+     {&get_member_as_string<host, int, checkable, &checkable::get_scheduled_downtime_depth>,
+      true}},
+    {MACRO_HOSTPERCENTCHANGE,
+     {&get_double<host, checkable, &checkable::get_percent_state_change, 2>, true}},
+    {MACRO_HOSTDURATION, {&get_duration<host>, true}},
+    {MACRO_HOSTDURATIONSEC, {&get_duration_sec<host>, true}},
+    {MACRO_HOSTEXECUTIONTIME,
+     {&get_double<host, checkable, &checkable::get_execution_time, 3>, true}},
+    {MACRO_HOSTLATENCY, {&get_double<host, checkable, &checkable::get_latency, 3>, true}},
+    {MACRO_LASTHOSTCHECK,
+     {&get_member_as_string<host, time_t, checkable, &checkable::get_last_check>, true}},
+    {MACRO_LASTHOSTSTATECHANGE,
+     {&get_member_as_string<host, time_t, checkable, &checkable::get_last_state_change>,
+      true}},
+    {MACRO_LASTHOSTUP,
+     {&get_member_as_string<host, time_t, &host::get_last_time_up>, true}},
+    {MACRO_LASTHOSTDOWN,
+     {&get_member_as_string<host, time_t, &host::get_last_time_down>, true}},
+    {MACRO_LASTHOSTUNREACHABLE,
+     {&get_member_as_string<host, time_t, &host::get_last_time_unreachable>,
+      true}},
+    {MACRO_HOSTNOTIFICATIONNUMBER,
+     {&get_member_as_string<host,
+                            int,
+                            notifier,
+                            &notifier::get_current_notification_number>,
+      true}},
+    {MACRO_HOSTNOTIFICATIONID,
+     {&get_member_as_string<host,
+                            uint64_t, notifier,
+                            &notifier::get_current_notification_id>,
+      true}},
+    {MACRO_HOSTEVENTID,
+     {&get_member_as_string<host, unsigned long, notifier, &notifier::get_current_event_id>,
+      true}},
+    {MACRO_LASTHOSTEVENTID,
+     {&get_member_as_string<host, unsigned long, notifier, &notifier::get_last_event_id>,
+      true}},
+    {MACRO_HOSTPROBLEMID,
+     {&get_member_as_string<host,
+                            unsigned long,
+                            notifier,
+                            &notifier::get_current_problem_id>,
+      true}},
+    {MACRO_LASTHOSTPROBLEMID,
+     {&get_member_as_string<host, unsigned long, notifier, &notifier::get_last_problem_id>,
+      true}},
+    {MACRO_HOSTACTIONURL,
+     {&get_recursive<host, checkable, &checkable::get_action_url, URL_ENCODE_MACRO_CHARS>,
+      true}},
+     {MACRO_HOSTNOTESURL,
+     {&get_recursive<host, checkable, &checkable::get_notes_url, URL_ENCODE_MACRO_CHARS>,
+       true}},
+     {MACRO_HOSTNOTES, {&get_recursive<host, checkable, &checkable::get_notes, 0>, true}},
+     {MACRO_HOSTGROUPNAMES, {&get_host_group_names, true}},
+     {MACRO_TOTALHOSTSERVICES,
+      {&get_host_total_services<MACRO_TOTALHOSTSERVICES>, true}},
+     {MACRO_TOTALHOSTSERVICESOK,
+      {&get_host_total_services<MACRO_TOTALHOSTSERVICESOK>, true}},
+     {MACRO_TOTALHOSTSERVICESWARNING,
+      {&get_host_total_services<MACRO_TOTALHOSTSERVICESWARNING>, true}},
+     {MACRO_TOTALHOSTSERVICESUNKNOWN,
+      {&get_host_total_services<MACRO_TOTALHOSTSERVICESUNKNOWN>, true}},
+     {MACRO_TOTALHOSTSERVICESCRITICAL,
+      {&get_host_total_services<MACRO_TOTALHOSTSERVICESCRITICAL>, true}},
+     {MACRO_HOSTACKAUTHOR, {&get_macro_copy<host, MACRO_HOSTACKAUTHOR>, true}},
+     {MACRO_HOSTACKAUTHORNAME,
+      {&get_macro_copy<host, MACRO_HOSTACKAUTHORNAME>, true}},
+     {MACRO_HOSTACKAUTHORALIAS,
+      {&get_macro_copy<host, MACRO_HOSTACKAUTHORALIAS>, true}},
+     {MACRO_HOSTACKCOMMENT,
+      {&get_macro_copy<host, MACRO_HOSTACKCOMMENT>, true}},
+     {MACRO_HOSTPARENTS, {&get_host_parents, true}},
+     {MACRO_HOSTCHILDREN, {&get_host_children, true}},
+     {MACRO_HOSTID, {&get_host_id, true}},
+     {MACRO_HOSTTIMEZONE, {&get_host_macro_timezone, true}}};
 } static const redirector;
 
 /**************************************
@@ -402,17 +401,17 @@ int grab_standard_host_macro_r(
   nagios_macros *mac,
   int macro_type,
   host *hst,
-  char **output,
+  std::string& output,
   int *free_macro) {
   // Check that function was called with valid arguments.
   int retval;
-  if (hst && output && free_macro) {
+  if (hst && free_macro) {
     grab_host_redirection::entry::const_iterator it(
       redirector.routines.find(macro_type));
     // Found matching routine.
     if (it != redirector.routines.end()) {
       // Call routine.
-      *output = (*it->second.first)(*hst, mac);
+      output = (*it->second.first)(*hst, mac);
 
       // Set the free macro flag.
       *free_macro = it->second.second;

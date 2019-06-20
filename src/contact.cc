@@ -414,7 +414,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
  *
  *  @return New contact object.
  */
-contact* add_contact(
+std::shared_ptr<contact> add_contact(
            std::string const& name,
            char const* alias,
            char const* email,
@@ -499,9 +499,6 @@ contact* add_contact(
     obj->set_retain_status_information(retain_status_information > 0);
     obj->set_service_notifications_enabled(service_notifications_enabled > 0);
 
-    // Add new items to the configuration state.
-    contact::contacts.insert({id, obj});
-
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_contact_data(
@@ -522,7 +519,7 @@ contact* add_contact(
     obj.reset();
   }
 
-  return obj.get();
+  return obj;
 }
 
 contact::contact()

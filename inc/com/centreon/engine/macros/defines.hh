@@ -204,10 +204,10 @@
 
 // NAGIOS_MACROS structure
 struct                                  nagios_macros {
-  char*                                 x[MACRO_X_COUNT];
-  char*                                 argv[MAX_COMMAND_ARGUMENTS];
-  char*                                 contactaddress[MAX_CONTACT_ADDRESSES];
-  char*                                 ondemand;
+  std::string                           x[MACRO_X_COUNT];
+  std::string                           argv[MAX_COMMAND_ARGUMENTS];
+  std::string                           contactaddress[MAX_CONTACT_ADDRESSES];
+  std::string                           ondemand;
   com::centreon::engine::host*          host_ptr;
   com::centreon::engine::hostgroup*     hostgroup_ptr;
   com::centreon::engine::service*       service_ptr;

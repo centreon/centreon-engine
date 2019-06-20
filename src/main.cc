@@ -262,7 +262,7 @@ int main(int argc, char* argv[]) {
           << "Checked " << serviceescalation::serviceescalations.size() << " service escalations.\n"
           << "Checked " << servicegroup::servicegroups.size() << " service groups.\n"
           << "Checked " << service::services.size() << " services.\n"
-          << "Checked " << applier.timeperiods().size() << " time periods.\n"
+          << "Checked " << timeperiod::timeperiods.size() << " time periods.\n"
           << "\n"
           << "Total Warnings: " << config_warnings << "\n"
           << "Total Errors:   " << config_errors;
@@ -343,7 +343,7 @@ int main(int argc, char* argv[]) {
         // done after we read config files, as user may have overridden
         // timezone offset.
         program_start = time(NULL);
-        string::setstr(mac->x[MACRO_PROCESSSTARTTIME], program_start);
+        mac->x[MACRO_PROCESSSTARTTIME] = program_start;
 
         // Load broker modules.
         for (std::list<std::string>::const_iterator
@@ -392,7 +392,7 @@ int main(int argc, char* argv[]) {
 
         // Get event start time and save as macro.
         event_start = time(NULL);
-        string::setstr(mac->x[MACRO_EVENTSTARTTIME], event_start);
+        mac->x[MACRO_EVENTSTARTTIME] = event_start;
 
         logger(logging::log_info_message, logging::basic)
           << "Event loop start at " << string::ctime(event_start);

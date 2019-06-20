@@ -30,7 +30,7 @@ extern "C" {
 int grab_macro_value_r(
       nagios_macros* mac,
       char* macro_buffer,
-      char** output,
+      std::string& output,
       int* clean_options,
       int* free_macro);
 int grab_macrox_value_r(
@@ -38,7 +38,7 @@ int grab_macrox_value_r(
       int macro_type,
       char const* arg1,
       char const* arg2,
-      char** output,
+      std::string& output,
       int* free_macro);
 
 #  ifdef __cplusplus

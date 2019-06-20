@@ -55,7 +55,7 @@ static int handle_host_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   int retval;
   if (arg2 == nullptr) {
@@ -101,30 +101,24 @@ static int handle_host_macro(
            ++it) {
         if (it->second) {
           // Get the macro value for this host.
-          char* buffer{nullptr};
+          std::string buffer;
           int free_sub_macro{false};
           grab_standard_host_macro_r(
             mac,
             macro_type,
             it->second.get(),
-            &buffer,
+            buffer,
             &free_sub_macro);
-          if (buffer) {
-            // Add macro value to already running macro.
-            if (*output == nullptr)
-              *output = string::dup(buffer);
-            else {
-              *output
-                = resize_string(
-                    *output,
-                    strlen(*output) + strlen(buffer) + delimiter_len + 1);
-              strcat(*output, arg2);
-              strcat(*output, buffer);
-            }
-            if (free_sub_macro == true)
-              delete[] buffer;
-            *free_macro = true;
+
+          // Add macro value to already running macro.
+          if (output.empty())
+            output = buffer;
+          else {
+            output.append(arg2);
+            output.append(buffer);
           }
+
+          *free_macro = true;
         }
       }
       retval = OK;
@@ -153,7 +147,7 @@ static int handle_hostgroup_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   (void)arg2;
 
@@ -204,7 +198,7 @@ static int handle_service_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   // Return value.
   int retval;
@@ -276,32 +270,19 @@ static int handle_service_macro(
                ++it) {
             if (it->second.get() != nullptr) {
               // Get the macro value for this service.
-              char* buffer(nullptr);
+              std::string buffer;
               int free_sub_macro(false);
               grab_standard_service_macro_r(
                 mac,
                 macro_type,
                 it->second.get(),
-                &buffer,
+                buffer,
                 &free_sub_macro);
-              if (buffer) {
-                // Add macro value to already running macro.
-                if (*output == nullptr)
-                  *output = string::dup(buffer);
-                else {
-                  *output = resize_string(
-                              *output,
-                              strlen(*output)
-                              + strlen(buffer)
-                              + delimiter_len
-                              + 1);
-                  strcat(*output, arg2);
-                  strcat(*output, buffer);
-                }
-                if (free_sub_macro != false) {
-                  delete[] buffer;
-                  buffer = nullptr;
-                }
+              if (output.empty())
+                output = buffer;
+              else {
+                output.append(arg2);
+                output.append(buffer);
               }
             }
           }
@@ -334,7 +315,7 @@ static int handle_servicegroup_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   (void)arg2;
 
@@ -380,7 +361,7 @@ static int handle_contact_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   // Return value.
   int retval;
@@ -404,43 +385,33 @@ static int handle_contact_macro(
   }
   // A contact macro with a contactgroup name and delimiter.
   else if (arg1 && arg2) {
-    contactgroup* cg(configuration::applier::state::instance().find_contactgroup(arg1));
-    if (!cg)
+    contactgroup_map::iterator cg{contactgroup::contactgroups.find(arg1)};
+    if (cg == contactgroup::contactgroups.end() || !cg->second)
       retval = ERROR;
     else {
       size_t delimiter_len(strlen(arg2));
 
       // Concatenate macro values for all contactgroup members.
       for(contact_map::const_iterator
-            it{cg->get_members().begin()},
-            end{cg->get_members().end()};
+            it{cg->second->get_members().begin()},
+            end{cg->second->get_members().end()};
             it != end; ++it) {
-        contact* cntct(it->second.get());
-        if (cntct) {
+        if (it->second) {
           // Get the macro value for this contact.
-          char* buffer(nullptr);
+          std::string buffer;
           grab_standard_contact_macro_r(
             mac,
             macro_type,
-            cntct,
-            &buffer);
-          if (buffer) {
-            // Add macro value to already running macro.
-            if (*output == nullptr)
-              *output = string::dup(buffer);
-            else {
-              *output = resize_string(
-                          *output,
-                          strlen(*output)
-                          + strlen(buffer)
-                          + delimiter_len
-                          + 1);
-              strcat(*output, arg2);
-              strcat(*output, buffer);
-            }
-            delete[] buffer;
-            buffer = nullptr;
+            it->second.get(),
+            buffer);
+          // Add macro value to already running macro.
+          if (output.empty())
+            output = buffer;
+          else {
+            output.append(arg2);
+            output.append(buffer);
           }
+
         }
       }
       *free_macro = true;
@@ -470,7 +441,7 @@ static int handle_contactgroup_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   (void)arg2;
 
@@ -479,7 +450,11 @@ static int handle_contactgroup_macro(
 
   // Use the saved contactgroup pointer.
   // or find the contactgroup for on-demand macros.
-  contactgroup* cg(arg1 ? configuration::applier::state::instance().find_contactgroup(arg1) : mac->contactgroup_ptr);
+  contactgroup* cg{nullptr};
+  contactgroup_map::iterator cg_it{contactgroup::contactgroups.find(arg1)};
+  if (cg_it == contactgroup::contactgroups.end() || !cg_it->second)
+    cg = mac->contactgroup_ptr;
+
   if (!cg)
     retval = ERROR;
   else {
@@ -509,13 +484,13 @@ static int handle_notification_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   (void)arg1;
   (void)arg2;
 
   // Notification macros have already been pre-computed.
-  *output = mac->x[macro_type];
+  output = mac->x[macro_type];
   *free_macro = false;
 
   return OK;
@@ -539,7 +514,7 @@ static int handle_datetime_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   // Calculate macros.
   int retval(grab_datetime_macro_r(
@@ -570,14 +545,14 @@ static int handle_static_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string& output,
              int* free_macro) {
   (void)mac;
   (void)arg1;
   (void)arg2;
 
   // No need to do any more work - these are already precomputed for us.
-  *output = get_global_macros()->x[macro_type];
+  output = get_global_macros()->x[macro_type];
   *free_macro = false;
   return OK;
 }
@@ -600,13 +575,13 @@ static int handle_summary_macro(
              int macro_type,
              char const* arg1,
              char const* arg2,
-             char** output,
+             std::string &output,
              int* free_macro) {
   (void)arg1;
   (void)arg2;
 
   // Generate summary macros if needed.
-  if (!mac->x[MACRO_TOTALHOSTSUP]) {
+  if (mac->x[MACRO_TOTALHOSTSUP].empty()) {
     // Get host totals.
     unsigned int host_problems(0);
     unsigned int host_problems_unhandled(0);
@@ -756,27 +731,27 @@ static int handle_summary_macro(
       + services_unknown_unhandled;
 
     // These macros are time-intensive to compute, and will likely be
-    // used together, so save them all for future use.
-    string::setstr(mac->x[MACRO_TOTALHOSTSUP], hosts_up);
-    string::setstr(mac->x[MACRO_TOTALHOSTSDOWN], hosts_down);
-    string::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLE], hosts_unreachable);
-    string::setstr(mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED], hosts_down_unhandled);
-    string::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED], hosts_unreachable_unhandled);
-    string::setstr(mac->x[MACRO_TOTALHOSTPROBLEMS], host_problems);
-    string::setstr(mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED], host_problems_unhandled);
-    string::setstr(mac->x[MACRO_TOTALSERVICESOK], services_ok);
-    string::setstr(mac->x[MACRO_TOTALSERVICESWARNING], services_warning);
-    string::setstr(mac->x[MACRO_TOTALSERVICESCRITICAL], services_critical);
-    string::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWN], services_unknown);
-    string::setstr(mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED], services_warning_unhandled);
-    string::setstr(mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED], services_critical_unhandled);
-    string::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED], services_unknown_unhandled);
-    string::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMS], service_problems);
-    string::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED], service_problems_unhandled);
+    //r, so save them all for future use.
+    mac->x[MACRO_TOTALHOSTSUP] = hosts_up;
+    mac->x[MACRO_TOTALHOSTSDOWN] = hosts_down;
+    mac->x[MACRO_TOTALHOSTSUNREACHABLE] = hosts_unreachable;
+    mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED] = hosts_down_unhandled;
+    mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED] = hosts_unreachable_unhandled;
+    mac->x[MACRO_TOTALHOSTPROBLEMS] = host_problems;
+    mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED] = host_problems_unhandled;
+    mac->x[MACRO_TOTALSERVICESOK] = services_ok;
+    mac->x[MACRO_TOTALSERVICESWARNING] = services_warning;
+    mac->x[MACRO_TOTALSERVICESCRITICAL] = services_critical;
+    mac->x[MACRO_TOTALSERVICESUNKNOWN] = services_unknown;
+    mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED] = services_warning_unhandled;
+    mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED] = services_critical_unhandled;
+    mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED] = services_unknown_unhandled;
+    mac->x[MACRO_TOTALSERVICEPROBLEMS] = service_problems;
+    mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED] = service_problems_unhandled;
   }
 
   // Return only the macro the user requested.
-  *output = mac->x[macro_type];
+  output = mac->x[macro_type];
 
   // Tell caller to NOT free memory when done.
   *free_macro = false;
@@ -792,7 +767,7 @@ static int handle_summary_macro(
 
 // Redirection object.
 struct grab_value_redirection {
-  typedef std::unordered_map<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, char**, int*)> entry;
+  typedef std::unordered_map<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, std::string&, int*)> entry;
   entry routines;
   grab_value_redirection() {
     // Host macros.
@@ -1049,7 +1024,7 @@ extern "C" {
 int grab_macro_value_r(
       nagios_macros* mac,
       char* macro_buffer,
-      char** output,
+      std::string& output,
       int* clean_options,
       int* free_macro) {
   char* buf = nullptr;
@@ -1058,17 +1033,10 @@ int grab_macro_value_r(
   char* arg[2] = { nullptr, nullptr };
   contact* temp_contact = nullptr;
   contactgroup* temp_contactgroup = nullptr;
-  char* temp_buffer = nullptr;
+  std::string temp_buffer;
   int delimiter_len = 0;
   unsigned int x;
   int result = OK;
-
-  if (output == nullptr)
-    return ERROR;
-
-  /* clear the old macro value */
-  delete[] *output;
-  *output = nullptr;
 
   if (macro_buffer == nullptr || clean_options == nullptr
       || free_macro == nullptr)
@@ -1154,7 +1122,7 @@ int grab_macro_value_r(
     }
 
     /* use a pre-computed macro value */
-    *output = mac->argv[x - 1];
+    output = mac->argv[x - 1];
     *free_macro = false;
   }
   /***** USER MACROS *****/
@@ -1168,7 +1136,7 @@ int grab_macro_value_r(
     }
 
     /* use a pre-computed macro value */
-    *output = macro_user[x - 1];
+    output = macro_user[x - 1];
     *free_macro = false;
   }
 
@@ -1193,40 +1161,34 @@ int grab_macro_value_r(
     else {
       /* on-demand contact macro with a contactgroup and a delimiter */
       if (arg[1] != nullptr) {
-        if ((temp_contactgroup = configuration::applier::state::instance().find_contactgroup(arg[0])) == nullptr)
+        contactgroup_map::iterator cg_it{contactgroup::contactgroups.find(arg[0])};
+        if (cg_it == contactgroup::contactgroups.end() || !cg_it->second)
           return ERROR;
 
         delimiter_len = strlen(arg[1]);
 
         /* concatenate macro values for all contactgroup members */
       for(contact_map::const_iterator
-            it{temp_contactgroup->get_members().begin()},
-            end{temp_contactgroup->get_members().end()};
+            it{cg_it->second->get_members().begin()},
+            end{cg_it->second->get_members().end()};
             it != end; ++it) {
           if (!it->second)
             continue;
 
           /* get the macro value for this contact */
-          grab_contact_address_macro(x, it->second.get(), &temp_buffer);
+          grab_contact_address_macro(x, it->second.get(), temp_buffer);
 
-          if (!temp_buffer)
+          if (temp_buffer.empty())
             continue;
 
           /* add macro value to already running macro */
-          if (*output == nullptr)
-            *output = string::dup(temp_buffer);
+          if (output.empty())
+            output.append(temp_buffer);
           else {
-            *output = resize_string(
-                        *output,
-                        strlen(*output)
-                        + strlen(temp_buffer)
-                        + delimiter_len
-                        + 1);
-            strcat(*output, arg[1]);
-            strcat(*output, temp_buffer);
+            output.append(arg[1]);
+            output.append(temp_buffer);
           }
-          delete[] temp_buffer;
-          temp_buffer = nullptr;
+          temp_buffer = "";
         }
       }
       /* else on-demand contact macro */
@@ -1258,8 +1220,8 @@ int grab_macro_value_r(
     configuration::applier::state::instance().user_macros().find(macro_name)
       != configuration::applier::state::instance().user_macros().end()) {
     /*** New style user macros ***/
-    *output = string::dup(
-      configuration::applier::state::instance().user_macros_find(macro_name)->second.c_str());
+    output =
+      configuration::applier::state::instance().user_macros_find(macro_name)->second;
     result = true;
   }
   /* no macro matched... */
@@ -1293,10 +1255,10 @@ int grab_macrox_value_r(
       int macro_type,
       char const* arg1,
       char const* arg2,
-      char** output,
+      std::string& output,
       int* free_macro) {
   int retval;
-  if (!mac || !output || !free_macro)
+  if (!mac || !free_macro)
     retval = ERROR;
   else {
     grab_value_redirection::entry::const_iterator it(

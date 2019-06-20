@@ -103,7 +103,7 @@ extern timed_event*              event_list_high_tail;
 extern sched_info                scheduling_info;
 
 extern char*                     macro_x_names[];
-extern char*                     macro_user[];
+extern std::string               macro_user[];
 
 extern nebcallback*              neb_callback_list[];
 

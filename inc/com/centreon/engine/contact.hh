@@ -182,7 +182,7 @@ typedef std::unordered_map<std::string,
 extern "C" {
 #  endif /* C++ */
 
-com::centreon::engine::contact* add_contact(
+std::shared_ptr<com::centreon::engine::contact> add_contact(
            std::string const& name,
            char const* alias,
            char const* email,

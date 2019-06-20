@@ -34,6 +34,8 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
+contactgroup_map contactgroup::contactgroups;
+
 /**************************************
 *                                     *
 *           Public Methods            *
@@ -84,7 +86,9 @@ contactgroup& contactgroup::operator=(contactgroup const& other) {
 /**
  * Destructor.
  */
-contactgroup::~contactgroup() {}
+contactgroup::~contactgroup() {
+  _members.clear();
+}
 
 std::string const& contactgroup::get_name() const {
   return _name;

@@ -348,9 +348,8 @@ void raw::_build_argv_macro_environment(
             nagios_macros const& macros,
             environment& env) {
   for (unsigned int i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
-    char const* value(macros.argv[i] ? macros.argv[i] : "");
     std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << value;
+    oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << macros.argv[i];
     env.add(oss.str());
   }
 }
@@ -517,7 +516,7 @@ void raw::_build_macrosx_environment(
     int release_memory(0);
 
     // Need to grab macros?
-    if (!macros.x[i]) {
+    if (macros.x[i].empty()) {
       // Skip summary macro in lage instalation tweaks.
       if ((i < MACRO_TOTALHOSTSUP)
           || (i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
@@ -527,7 +526,7 @@ void raw::_build_macrosx_environment(
           i,
           NULL,
           NULL,
-          &macros.x[i],
+          macros.x[i],
           &release_memory);
       }
     }
@@ -538,14 +537,13 @@ void raw::_build_macrosx_environment(
       line.append(MACRO_ENV_VAR_PREFIX);
       line.append(macro_x_names[i]);
       line.append("=");
-      line.append(macros.x[i] ? macros.x[i] : "");
+      line.append(macros.x[i]);
       env.add(line);
     }
 
     // Release memory if necessary.
     if (release_memory) {
-      delete[] macros.x[i];
-      macros.x[i] = NULL;
+      macros.x[i] = "";
     }
   }
 }

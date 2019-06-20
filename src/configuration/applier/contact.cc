@@ -101,7 +101,7 @@ void applier::contact::add_object(configuration::contact const& obj) {
   }
 
   // Create contact.
-  com::centreon::engine::contact*
+  std::shared_ptr<com::centreon::engine::contact>
     c(add_contact(
         obj.contact_name(),
         NULL_IF_EMPTY(obj.alias()),
@@ -141,6 +141,9 @@ void applier::contact::add_object(configuration::contact const& obj) {
     throw (engine_error() << "Could not register contact '"
            << obj.contact_name() << "'");
   c->set_timezone(obj.timezone());
+
+  // Add new items to the configuration state.
+  engine::contact::contacts.insert({c->get_name(), c});
 
   // Add all custom variables.
   for (map_customvar::const_iterator

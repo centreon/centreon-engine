@@ -51,14 +51,13 @@ void applier::connector::add_object(
 
   // Expand command line.
   nagios_macros* macros(get_global_macros());
-  char* command_line(NULL);
+  std::string command_line;
   process_macros_r(
     macros,
-    obj.connector_line().c_str(),
-    &command_line,
+    obj.connector_line(),
+    command_line,
     0);
   std::string processed_cmd(command_line);
-  delete [] command_line;
 
   // Add connector to the global configuration set.
   config->connectors().insert(obj);
@@ -114,14 +113,13 @@ void applier::connector::modify_object(
 
   // Expand command line.
   nagios_macros* macros(get_global_macros());
-  char* command_line(NULL);
+  std::string command_line;
   process_macros_r(
     macros,
-    obj.connector_line().c_str(),
-    &command_line,
+    obj.connector_line(),
+    command_line,
     0);
   std::string processed_cmd(command_line);
-  delete [] command_line;
 
   // Set the new command line.
   c->set_command_line(processed_cmd);

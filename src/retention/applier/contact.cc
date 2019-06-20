@@ -80,10 +80,10 @@ void applier::contact::_update(
       if (obj->get_modified_host_attributes() & MODATTR_NOTIFICATION_TIMEPERIOD) {
         timeperiod* temp_timeperiod(nullptr);
         timeperiod_map::const_iterator
-          found(configuration::applier::state::instance().timeperiods().find(
+          found(timeperiod::timeperiods.find(
             state.host_notification_period()));
 
-        if (found != configuration::applier::state::instance().timeperiods().end())
+        if (found != timeperiod::timeperiods.end())
           temp_timeperiod = found->second.get();
 
         if (!temp_timeperiod)
@@ -99,10 +99,10 @@ void applier::contact::_update(
           & MODATTR_NOTIFICATION_TIMEPERIOD) {
         timeperiod* temp_timeperiod(nullptr);
         timeperiod_map::const_iterator
-          found(configuration::applier::state::instance().timeperiods().find(
+          found(timeperiod::timeperiods.find(
           state.host_notification_period()));
 
-        if (found != configuration::applier::state::instance().timeperiods().end())
+        if (found != timeperiod::timeperiods.end())
           temp_timeperiod = found->second.get();
 
         if (!temp_timeperiod)

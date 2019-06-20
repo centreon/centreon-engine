@@ -68,16 +68,6 @@ namespace           configuration {
       static void   load();
       static void   unload();
 
-      engine::contact*
-                    find_contact(configuration::contact::key_type const& k);
-      engine::contactgroup*
-                    find_contactgroup(configuration::contactgroup::key_type const& k);
-      contactgroup_map const&
-                    contactgroups() const throw ();
-      contactgroup_map&
-                    contactgroups() throw ();
-      contactgroup_map::iterator
-                    contactgroups_find(configuration::contactgroup::key_type const& k);
       hostdependency_mmap const&
                     hostdependencies() const throw ();
       hostdependency_mmap&
@@ -90,12 +80,6 @@ namespace           configuration {
                     servicedependencies() throw ();
       servicedependency_mmap::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      timeperiod_map const&
-                    timeperiods() const throw ();
-      timeperiod_map &
-                    timeperiods() throw ();
-      timeperiod_map::iterator
-                    timeperiods_find(configuration::timeperiod::key_type const& k);
       std::unordered_map<std::string, std::string>&
                     user_macros();
       std::unordered_map<std::string, std::string>::const_iterator
@@ -134,13 +118,10 @@ namespace           configuration {
 
       state*        _config;
 
-      std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::contactgroup>>
-                    _contactgroups;
       concurrency::condvar
                     _cv_lock;
       hostdependency_mmap
                     _hostdependencies;
-      hostgroup_map _hostgroups;
       concurrency::mutex
                     _lock;
       processing_state
@@ -148,10 +129,6 @@ namespace           configuration {
 
       servicedependency_mmap
                     _servicedependencies;
-      servicegroup_map
-                    _servicegroups;
-      timeperiod_map
-                    _timeperiods;
       std::unordered_map<std::string, std::string>
                     _user_macros;
     };

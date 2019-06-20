@@ -49,12 +49,11 @@ using namespace com::centreon::engine::logging;
  *  @return Newly allocated string containing either "PASSIVE" or
  *          "ACTIVE".
  */
-static char* get_service_check_type(com::centreon::engine::service& svc, nagios_macros* mac) {
+static std::string get_service_check_type(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
-  return (string::dup(
-            (checkable::check_passive == svc.get_check_type()
+  return (checkable::check_passive == svc.get_check_type())
              ? "PASSIVE"
-             : "ACTIVE")));
+             : "ACTIVE";
 }
 
 /**
@@ -65,7 +64,7 @@ static char* get_service_check_type(com::centreon::engine::service& svc, nagios_
  *
  *  @return List of names of groups associated with this service.
  */
-static char* get_service_group_names(service& svc, nagios_macros* mac) {
+static std::string get_service_group_names(service& svc, nagios_macros* mac) {
   (void)mac;
 
   // Find all servicegroups this service is associated with.
@@ -81,7 +80,7 @@ static char* get_service_group_names(service& svc, nagios_macros* mac) {
       buf.append((*it)->get_group_name());
     }
   }
-  return string::dup(buf);
+  return buf;
 }
 
 /**
@@ -93,7 +92,7 @@ static char* get_service_group_names(service& svc, nagios_macros* mac) {
  *  @return Newly allocated string with host state as plain text.
  */
 template <service::service_state ((com::centreon::engine::service::* member)() const)>
-static char* get_service_state(com::centreon::engine::service& svc, nagios_macros* mac) {
+static std::string get_service_state(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
   char const* state;
 
@@ -105,7 +104,7 @@ static char* get_service_state(com::centreon::engine::service& svc, nagios_macro
     state = "CRITICAL";
   else
     state = "UNKNOWN";
-  return string::dup(state);
+  return state;
 }
 
 /**
@@ -116,11 +115,11 @@ static char* get_service_state(com::centreon::engine::service& svc, nagios_macro
  *
  *  @return  Newly allocated string with the service id.
  */
-static char* get_service_id(com::centreon::engine::service& svc, nagios_macros* mac) {
+static std::string get_service_id(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
-  return string::dup(string::from(com::centreon::engine::get_service_id(
+  return string::from(com::centreon::engine::get_service_id(
                                              svc.get_hostname(),
-                                             svc.get_description())).c_str());
+                                             svc.get_description()));
 }
 
 /**
@@ -131,9 +130,9 @@ static char* get_service_id(com::centreon::engine::service& svc, nagios_macros* 
  *
  *  @return Newly allocated string with requested value in plain text.
  */
-static char* get_service_macro_timezone(com::centreon::engine::service& svc, nagios_macros* mac) {
+static std::string get_service_macro_timezone(com::centreon::engine::service& svc, nagios_macros* mac) {
   (void)mac;
-  return string::dup(svc.get_timezone());
+  return svc.get_timezone();
 }
 
 /**************************************
@@ -146,7 +145,7 @@ static char* get_service_macro_timezone(com::centreon::engine::service& svc, nag
 struct grab_service_redirection {
   typedef umap<
       unsigned int,
-      std::pair<char* (*)(com::centreon::engine::service&, nagios_macros* mac),
+      std::pair<std::string (*)(com::centreon::engine::service&, nagios_macros* mac),
                 bool>>
       entry;
   entry routines{
@@ -182,14 +181,14 @@ struct grab_service_redirection {
       // State.
       {MACRO_SERVICESTATE,
        {&get_service_state<&service::get_current_state>, true}},
-      // State ID.*/
+      // State ID.
       {MACRO_SERVICESTATEID,
        {&get_member_as_string<service, service::service_state, &service::get_current_state>,
         true}},
       // Last state.
       {MACRO_LASTSERVICESTATE,
        {&get_service_state<&service::get_last_state>, true}},
-      // Last state ID.*/
+      // Last state ID.
       {MACRO_LASTSERVICESTATEID,
        {&get_member_as_string<service, service::service_state, &service::get_last_state>,
         true}},
@@ -348,17 +347,17 @@ int grab_standard_service_macro_r(
       nagios_macros* mac,
       int macro_type,
       com::centreon::engine::service* svc,
-      char** output,
+      std::string& output,
       int* free_macro) {
   // Check that function was called with valid arguments.
   int retval;
-  if (svc && output && free_macro) {
+  if (svc &&  free_macro) {
     grab_service_redirection::entry::const_iterator it(
       redirector.routines.find(macro_type));
     // Found matching routine.
     if (it != redirector.routines.end()) {
       // Call routine.
-      *output = (*it->second.first)(*svc, mac);
+      output = (*it->second.first)(*svc, mac);
 
       // Set the free macro flag.
       *free_macro = it->second.second;

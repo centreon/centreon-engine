@@ -40,23 +40,23 @@ namespace  macros {
    *  @return Newly allocated string with value as a fixed point string.
    */
   template <typename T, double (T::* member)() const, unsigned int precision>
-  char*    get_double(T& t, nagios_macros* mac) {
+  std::string get_double(T& t, nagios_macros* mac) {
     (void)mac;
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision)
         << (t.*member)();
-    return string::dup(oss.str());
+    return oss.str();
   }
 
   template <typename T, typename V, double (V::* member)() const, unsigned int precision>
-  char*    get_double(T& t, nagios_macros* mac) {
+  std::string get_double(T& t, nagios_macros* mac) {
     (void)mac;
 
     V* v{&t};
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision)
         << (v->*member)();
-    return string::dup(oss.str());
+    return oss.str();
   }
 
   /**
@@ -69,12 +69,12 @@ namespace  macros {
    */
   //TODO SGA to remove after service rework
   template <typename T, double (T::* member), unsigned int precision>
-  char*    get_double(T& t, nagios_macros* mac) {
+  std::string get_double(T& t, nagios_macros* mac) {
     (void)mac;
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision)
         << t.*member;
-    return string::dup(oss.str());
+    return oss.str();
   }
 
   /**
@@ -86,7 +86,7 @@ namespace  macros {
    *  @return Duration in a newly allocated string.
    */
   template <typename T>
-  char*    get_duration(T& t, nagios_macros* mac) {
+  std::string get_duration(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get duration.
@@ -107,7 +107,7 @@ namespace  macros {
         << hours << "h "
         << minutes << "m "
         << duration << "s";
-    return string::dup(oss.str());
+    return oss.str();
   }
 
   /**
@@ -120,7 +120,7 @@ namespace  macros {
    */
   //TODO SGA to remove with service rework
   template <typename T>
-  char*    get_duration_old(T& t, nagios_macros* mac) {
+  std::string get_duration_old(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get duration.
@@ -141,7 +141,7 @@ namespace  macros {
         << hours << "h "
         << minutes << "m "
         << duration << "s";
-    return string::dup(oss.str());
+    return oss.str();
   }
 
   /**
@@ -153,13 +153,13 @@ namespace  macros {
    *  @return Duration in second in a newly allocated string.
    */
   template <typename T>
-  char*    get_duration_sec(T& t, nagios_macros* mac) {
+  std::string get_duration_sec(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get duration.
     time_t now(time(nullptr));
     unsigned long duration(now - t.get_last_state_change());
-    return string::dup(duration);
+    return std::to_string(duration);
   }
 
   /**
@@ -172,13 +172,13 @@ namespace  macros {
    */
   //TODO SGA to remove with service
   template <typename T>
-  char*    get_duration_sec_old(T& t, nagios_macros* mac) {
+  std::string get_duration_sec_old(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get duration.
     time_t now(time(nullptr));
     unsigned long duration(now - t.get_last_state_change());
-    return string::dup(duration);
+    return std::to_string(duration);
   }
 
   /**
@@ -190,9 +190,9 @@ namespace  macros {
    *  @return Copy of the requested macro.
    */
   template <typename T, unsigned int macro_id>
-  char*    get_macro_copy(T& t, nagios_macros* mac) {
+  std::string get_macro_copy(T& t, nagios_macros* mac) {
     (void)t;
-    return string::dup(mac->x[macro_id] ? mac->x[macro_id] : "");
+    return mac->x[macro_id];
   }
 
   /**
@@ -204,9 +204,11 @@ namespace  macros {
    *  @return String copy of object member.
    */
   template <typename T, typename U, U (T::* member)() const>
-  char*    get_member_as_string(T& t, nagios_macros* mac) {
+  std::string get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
-    return string::dup((t.*member)());
+    std::stringstream ss;
+    ss << (t.*member)();
+    return ss.str();
   }
 
   /**
@@ -218,10 +220,12 @@ namespace  macros {
    *  @return String copy of object member.
    */
   template <typename T, typename U, typename V, U (V::* member)() const>
-  char*    get_member_as_string(T& t, nagios_macros* mac) {
+  std::string get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
     V* v{&t};
-    return string::dup((v->*member)());
+    std::stringstream ss;
+    ss << (v->*member)();
+    return ss.str();
   }
 
   /**
@@ -234,9 +238,11 @@ namespace  macros {
    */
 //TODO SGA to remove after service
   template <typename T, typename U, U (T::* member)>
-  char*    get_member_as_string(T& t, nagios_macros* mac) {
+  std::string get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
-    return string::dup(t.*member);
+    std::stringstream ss;
+    ss << t.*member;
+    return ss.str();
   }
 
   /**
@@ -248,12 +254,12 @@ namespace  macros {
    *  @return Newly allocated string with macros processed.
    */
   template <typename T, std::string const& (T::* member)() const, unsigned int options>
-  char* get_recursive(T& t, nagios_macros* mac) {
+  std::string get_recursive(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get copy of string with macros processed.
-    char* buffer(nullptr);
-    process_macros_r(mac, (t.*member)().c_str(), &buffer, options);
+    std::string buffer;
+    process_macros_r(mac, (t.*member)(), buffer, options);
     return buffer;
   }
   /**
@@ -265,13 +271,13 @@ namespace  macros {
    *  @return Newly allocated string with macros processed.
    */
   template <typename T, typename V, std::string const& (V::* member)() const, unsigned int options>
-  char* get_recursive(T& t, nagios_macros* mac) {
+  std::string get_recursive(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get copy of string with macros processed.
-    char* buffer(nullptr);
+    std::string buffer;
     V* v{&t};
-    process_macros_r(mac, (v->*member)().c_str(), &buffer, options);
+    process_macros_r(mac, (v->*member)(), buffer, options);
     return buffer;
   }
 
@@ -284,13 +290,13 @@ namespace  macros {
    *  @return Newly allocated string with macros processed.
    */
   //TODO SGA to remove after service rework
-  template <typename T, char* (T::* member), unsigned int options>
-  char* get_recursive(T& t, nagios_macros* mac) {
+  template <typename T, std::string (T::* member), unsigned int options>
+  std::string get_recursive(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get copy of string with macros processed.
-    char* buffer(nullptr);
-    process_macros_r(mac, t.*member, &buffer, options);
+    std::string buffer;
+    process_macros_r(mac, t.*member, buffer, options);
     return buffer;
   }
   /**
@@ -302,11 +308,11 @@ namespace  macros {
    *  @return Newly allocated state type as a string.
    */
   template <typename T>
-  char* get_state_type(T& t, nagios_macros* mac) {
+  std::string get_state_type(T& t, nagios_macros* mac) {
     (void)mac;
-    return (string::dup((t.get_state_type() == notifier::hard)
+    return (t.get_state_type() == notifier::hard)
                       ? "HARD"
-                      : "SOFT"));
+                      : "SOFT";
   }
   /**
    *  Extract state type.
@@ -318,11 +324,11 @@ namespace  macros {
    */
   //TODO SGA to remove after service rework
   template <typename T>
-  char* get_state_type_old(T& t, nagios_macros* mac) {
+  std::string get_state_type_old(T& t, nagios_macros* mac) {
     (void)mac;
-    return (string::dup((t.get_state_type() == notifier::hard)
+    return (t.get_state_type() == notifier::hard)
                       ? "HARD"
-                      : "SOFT"));
+                      : "SOFT";
   }
 }
 

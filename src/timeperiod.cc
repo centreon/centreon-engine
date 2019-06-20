@@ -53,9 +53,8 @@ timeperiod::timeperiod(std::string const& name, std::string const& alias)
   }
 
   // Check if the timeperiod already exist.
-  timeperiod_map::const_iterator it{
-      configuration::applier::state::instance().timeperiods().find(name)};
-  if (it != configuration::applier::state::instance().timeperiods().end()) {
+  timeperiod_map::const_iterator it{timeperiod::timeperiods.find(name)};
+  if (it != timeperiod::timeperiods.end()) {
     logger(log_config_error, basic)
         << "Error: Timeperiod '" << name << "' has already been defined";
     throw engine_error() << "Could not register time period '" << name << "'";

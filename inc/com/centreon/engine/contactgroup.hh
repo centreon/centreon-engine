@@ -22,6 +22,7 @@
 
 #include <list>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include "com/centreon/engine/namespace.hh"
 
@@ -30,10 +31,19 @@ struct contactsmember_struct;
 
 CCE_BEGIN()
 class contact;
+class contactgroup;
 
 namespace configuration {
   class contactgroup;
 }
+CCE_END()
+
+typedef std::unordered_map<std::string,
+  std::shared_ptr<com::centreon::engine::contactgroup>>
+    contactgroup_map;
+
+
+CCE_BEGIN()
 
 class contactgroup {
  public:
@@ -48,9 +58,10 @@ class contactgroup {
    std::unordered_map<std::string, std::shared_ptr<contact>> const&
                       get_members() const;
 
-   contactgroup*      next;
-
    contactgroup& operator=(contactgroup const& other);
+
+   static contactgroup_map
+                      contactgroups;
 
  private:
    std::string        _alias;
@@ -60,10 +71,6 @@ class contactgroup {
 };
 
 CCE_END()
-
-typedef std::unordered_map<std::string,
-                           std::shared_ptr<com::centreon::engine::contactgroup>>
-                      contactgroup_map;
 
 std::ostream& operator<<(
                 std::ostream& os,

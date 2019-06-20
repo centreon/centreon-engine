@@ -411,11 +411,9 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
        ++it) {
 
     // Find the contact group.
-    com::centreon::engine::contactgroup* temp_contactgroup(
-      configuration::applier::state::instance().find_contactgroup(
-        it->first));
+    contactgroup_map::iterator find_cg{contactgroup::contactgroups.find(it->first)};
 
-    if (temp_contactgroup == nullptr) {
+    if (find_cg == contactgroup::contactgroups.end() || !find_cg->second) {
       logger(log_verification_error, basic)
         << "Error: Contact group '" << it->first
         << "' specified in service '" << svc->get_description() << "' for "
@@ -434,9 +432,9 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   else {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(svc->get_check_period()));
+      it(timeperiod::timeperiods.find(svc->get_check_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (temp_timeperiod == nullptr) {
@@ -456,9 +454,9 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   if (!svc->get_notification_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(svc->get_notification_period()));
+      it(timeperiod::timeperiods.find(svc->get_notification_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
@@ -596,9 +594,9 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
   if (!hst->get_check_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(hst->get_check_period()));
+      it(timeperiod::timeperiods.find(hst->get_check_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (temp_timeperiod == nullptr) {
@@ -636,11 +634,10 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
        it != end;
        ++it) {
     // Find the contact group.
-    com::centreon::engine::contactgroup* temp_contactgroup(
-      configuration::applier::state::instance().find_contactgroup(
-        it->first));
+    contactgroup_map::iterator find_cg{
+      contactgroup::contactgroups.find(it->first)};
 
-    if (temp_contactgroup == nullptr) {
+    if (find_cg == contactgroup::contactgroups.end() || !find_cg->second) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
         << it->first
@@ -654,9 +651,9 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
   if (!hst->get_notification_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(hst->get_notification_period()));
+      it(timeperiod::timeperiods.find(hst->get_notification_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
@@ -748,9 +745,9 @@ int check_contact(std::shared_ptr<contact> cntct, int* w, int* e) {
   else {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(cntct->get_service_notification_period()));
+      it(timeperiod::timeperiods.find(cntct->get_service_notification_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (temp_timeperiod == nullptr) {
@@ -777,9 +774,9 @@ int check_contact(std::shared_ptr<contact> cntct, int* w, int* e) {
   else {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(cntct->get_host_notification_period()));
+      it(timeperiod::timeperiods.find(cntct->get_host_notification_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (temp_timeperiod == nullptr) {
@@ -1059,9 +1056,9 @@ int check_servicedependency(std::shared_ptr<servicedependency> sd, int* w, int* 
   if (!sd->get_dependency_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(sd->get_dependency_period()));
+      it(timeperiod::timeperiods.find(sd->get_dependency_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
@@ -1141,9 +1138,9 @@ int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
   if (!hd->get_dependency_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(hd->get_dependency_period()));
+      it(timeperiod::timeperiods.find(hd->get_dependency_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
@@ -1156,7 +1153,7 @@ int check_hostdependency(std::shared_ptr<hostdependency> hd, int* w, int* e) {
     }
 
     // Save the timeperiod pointer for later.
-    if (it == state::instance().timeperiods().end())
+    if (it == timeperiod::timeperiods.end())
       hd->dependency_period_ptr = nullptr;
     else
       hd->dependency_period_ptr = temp_timeperiod;
@@ -1200,9 +1197,9 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
   if (!se->get_escalation_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(se->get_escalation_period()));
+      it(timeperiod::timeperiods.find(se->get_escalation_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
@@ -1238,11 +1235,10 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
        it != end;
        ++it) {
     // Find the contact group.
-    contactgroup* temp_contactgroup(
-      configuration::applier::state::instance().find_contactgroup(
-        it->first));
+    contactgroup_map::iterator find_cg{
+      contactgroup::contactgroups.find(it->first)};
 
-    if (!temp_contactgroup) {
+    if (find_cg == contactgroup::contactgroups.end() || !find_cg->second) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
         << it->first
@@ -1253,7 +1249,7 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
     }
 
     // Save the contactgroup pointer for later.
-    se->contact_groups[it->first] = std::shared_ptr<contactgroup>(temp_contactgroup);
+    se->contact_groups[it->first] = find_cg->second;
   }
 
   // Add errors.
@@ -1295,9 +1291,9 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   if (!he->get_escalation_period().empty()) {
     timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
-      it(state::instance().timeperiods().find(he->get_escalation_period()));
+      it(timeperiod::timeperiods.find(he->get_escalation_period()));
 
-    if (it != state::instance().timeperiods().end())
+    if (it != timeperiod::timeperiods.end())
       temp_timeperiod = it->second.get();
 
     if (!temp_timeperiod) {
@@ -1332,9 +1328,9 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
        it != end;
        ++it) {
     // Find the contact group.
-    contactgroup_map::iterator it_cg(configuration::applier::state::instance().contactgroups().find(it->first));
+    contactgroup_map::iterator it_cg(contactgroup::contactgroups.find(it->first));
 
-    if (it_cg == configuration::applier::state::instance().contactgroups().end() || !it_cg->second) {
+    if (it_cg == contactgroup::contactgroups.end() || !it_cg->second) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
         << it->first
@@ -1381,9 +1377,9 @@ int check_timeperiod(std::shared_ptr<timeperiod> tp, int* w, int* e) {
        it != end;
        ++it) {
     timeperiod_map::const_iterator
-      found(state::instance().timeperiods().find(it->first));
+      found(timeperiod::timeperiods.find(it->first));
 
-    if (found == state::instance().timeperiods().end()) {
+    if (found == timeperiod::timeperiods.end()) {
       logger(log_verification_error, basic)
         << "Error: Excluded time period '"
         << it->first

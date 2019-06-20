@@ -78,13 +78,11 @@ void applier::timeperiod::add_object(
       obj.timeperiod_name(),
       obj.alias())};
 
-  state::instance().timeperiods().insert(
-    {obj.timeperiod_name(), tp});
   engine::timeperiod::timeperiods.insert(
     {obj.timeperiod_name(), tp});
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv(get_broker_timestamp(nullptr));
   broker_adaptive_timeperiod_data(
     NEBTYPE_TIMEPERIOD_ADD,
     NEBFLAG_NONE,
@@ -134,8 +132,8 @@ void applier::timeperiod::modify_object(
 
   // Find time period object.
   timeperiod_map::iterator
-    it_obj(applier::state::instance().timeperiods_find(obj.key()));
-  if (it_obj == applier::state::instance().timeperiods().end())
+    it_obj(engine::timeperiod::timeperiods.find(obj.key()));
+  if (it_obj == engine::timeperiod::timeperiods.end() || !it_obj->second)
     throw (engine_error() << "Could not modify non-existing "
            << "time period object '" << obj.timeperiod_name() << "'");
   engine::timeperiod* tp(it_obj->second.get());
@@ -181,7 +179,7 @@ void applier::timeperiod::modify_object(
   }
 
   // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
+  timeval tv(get_broker_timestamp(nullptr));
   broker_adaptive_timeperiod_data(
     NEBTYPE_TIMEPERIOD_UPDATE,
     NEBFLAG_NONE,
@@ -206,25 +204,21 @@ void applier::timeperiod::remove_object(
 
   // Find time period.
   timeperiod_map::iterator
-    it(applier::state::instance().timeperiods_find(obj.key()));
-  if (it != applier::state::instance().timeperiods().end()) {
-    engine::timeperiod* tp(it->second.get());
-
-    // Remove timeperiod from its list.
-    engine::timeperiod::timeperiods.erase(tp->get_name());
+    it(engine::timeperiod::timeperiods.find(obj.key()));
+  if (it != engine::timeperiod::timeperiods.end() && it->second) {
 
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
+    timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_timeperiod_data(
       NEBTYPE_TIMEPERIOD_DELETE,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      tp,
+      it->second.get(),
       CMD_NONE,
       &tv);
 
     // Erase time period (will effectively delete the object).
-    applier::state::instance().timeperiods().erase(it);
+    engine::timeperiod::timeperiods.erase(it);
   }
 
   // Remove time period from the global configuration set.
@@ -249,8 +243,8 @@ void applier::timeperiod::resolve_object(
 
   // Find time period.
   timeperiod_map::iterator
-    it(applier::state::instance().timeperiods_find(obj.key()));
-  if (applier::state::instance().timeperiods().end() == it)
+    it(engine::timeperiod::timeperiods.find(obj.key()));
+  if (engine::timeperiod::timeperiods.end() == it || !it->second)
     throw (engine_error() << "Cannot resolve non-existing "
            << "time period '" << obj.timeperiod_name() << "'");
 

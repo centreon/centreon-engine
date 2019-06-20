@@ -20,7 +20,7 @@
 
 #ifndef CCE_MACROS_HH
 #  define CCE_MACROS_HH
-
+#  include <string>
 #  include "com/centreon/engine/macros/clear_host.hh"
 #  include "com/centreon/engine/macros/clear_hostgroup.hh"
 #  include "com/centreon/engine/macros/clear_service.hh"
@@ -42,11 +42,11 @@ extern "C" {
 int grab_contact_address_macro(
       unsigned int macro_num,
       com::centreon::engine::contact* temp_contact,
-      char** output);
+      std::string & output);
 int grab_standard_contactgroup_macro(
       int macro_type,
       com::centreon::engine::contactgroup* temp_contactgroup,
-      char** output);
+      std::string& output);
 
 int grab_contact_macros_r(
       nagios_macros* mac,
@@ -54,39 +54,39 @@ int grab_contact_macros_r(
 
 int grab_custom_macro_value_r(
       nagios_macros* mac,
-      char* macro_name,
-      char const* arg1,
-      char const* arg2,
-      char** output);
+      std::string const& macro_name,
+      std::string const& arg1,
+      std::string const& arg2,
+      std::string& output);
 int grab_datetime_macro_r(
       nagios_macros* mac,
       int macro_type,
-      char const* arg1,
-      char const* arg2,
-      char** output);
+      std::string const& arg1,
+      std::string const& arg2,
+      std::string& output);
 int grab_standard_hostgroup_macro_r(
       nagios_macros* mac,
       int macro_type,
       com::centreon::engine::hostgroup* temp_hostgroup,
-      char** output);
+      std::string& output);
 int grab_standard_servicegroup_macro_r(
       nagios_macros* mac,
       int macro_type,
       com::centreon::engine::servicegroup* temp_servicegroup,
-      char** output);
+      std::string& output);
 int grab_standard_contact_macro_r(
       nagios_macros* mac,
       int macro_type,
       com::centreon::engine::contact* temp_contact,
-      char** output);
+      std::string& output);
 int grab_custom_object_macro_r(
       nagios_macros* mac,
-      char* macro_name,
+      std::string const& macro_name,
       std::unordered_map<std::string, com::centreon::engine::customvariable> const& vars,
-      char** output);
+      std::string& output);
 
 // URL encode a string
-char* get_url_encoded_string(char* input);
+char* get_url_encoded_string(std::string const& input);
 
 int init_macros();
 int init_macrox_names();

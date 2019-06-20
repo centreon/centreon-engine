@@ -2764,8 +2764,8 @@ int host::notify_contact(nagios_macros* mac,
                          int options,
                          int escalated) {
   char* command_name = nullptr;
-  char* raw_command = nullptr;
-  char* processed_command = nullptr;
+  std::string raw_command;
+  std::string processed_command;
   int early_timeout = false;
   double exectime;
   struct timeval start_time;
@@ -2827,16 +2827,16 @@ int host::notify_contact(nagios_macros* mac,
 
     /* get the raw command line */
     get_raw_command_line_r(mac, cmd.get(), cmd->get_command_line().c_str(),
-                           &raw_command, macro_options);
-    if (raw_command == nullptr)
+                           raw_command, macro_options);
+    if (raw_command.empty())
       continue;
 
     logger(dbg_notifications, most)
         << "Raw notification command: " << raw_command;
 
     /* process any macros contained in the argument */
-    process_macros_r(mac, raw_command, &processed_command, macro_options);
-    if (processed_command == nullptr)
+    process_macros_r(mac, raw_command, processed_command, macro_options);
+    if (processed_command.empty())
       continue;
 
     /* get the command name */
@@ -2889,8 +2889,9 @@ int host::notify_contact(nagios_macros* mac,
 
     /* run the notification command */
     try {
+      std::string out;
       my_system_r(mac, processed_command, config->notification_timeout(),
-                  &early_timeout, &exectime, nullptr, 0);
+                  &early_timeout, &exectime, out, 0);
     } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
           << "Error: can't execute host notification '" << cntct->get_name()
@@ -2905,10 +2906,6 @@ int host::notify_contact(nagios_macros* mac,
           << "' timed out after " << config->notification_timeout()
           << " seconds";
     }
-
-    /* free memory */
-    delete[] raw_command;
-    delete[] processed_command;
 
     /* get end time */
     gettimeofday(&method_end_time, nullptr);

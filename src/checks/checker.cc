@@ -369,11 +369,12 @@ void checker::run(
   nagios_macros macros;
   memset(&macros, 0, sizeof(macros));
   grab_host_macros_r(&macros, hst);
+  std::string tmp;
   get_raw_command_line_r(
     &macros,
     hst->check_command_ptr,
     hst->get_check_command().c_str(),
-    nullptr,
+    tmp,
     0);
 
   // Time to start command.
@@ -605,11 +606,12 @@ void checker::run(
   memset(&macros, 0, sizeof(macros));
   grab_host_macros_r(&macros, svc->get_host_ptr().get());
   grab_service_macros_r(&macros, svc);
+  std::string tmp;
   get_raw_command_line_r(
     &macros,
     svc->check_command_ptr,
     svc->get_check_command().c_str(),
-    nullptr,
+    tmp,
     0);
 
   // Time to start command.
@@ -1033,11 +1035,12 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   nagios_macros macros;
   memset(&macros, 0, sizeof(macros));
   grab_host_macros_r(&macros, hst);
+  std::string tmp;
   get_raw_command_line_r(
     &macros,
     hst->check_command_ptr,
     hst->get_check_command().c_str(),
-    nullptr,
+    tmp,
     0);
 
   // Time to start command.

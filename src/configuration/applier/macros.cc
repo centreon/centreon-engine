@@ -115,8 +115,6 @@ void applier::macros::unload() {
  */
 applier::macros::macros()
   : _mac(get_global_macros()) {
-  memset(_mac, 0, sizeof(*_mac));
-  memset(macro_user, 0, sizeof(*macro_user) * MAX_USER_MACROS);
 
   init_macros();
 
@@ -131,25 +129,8 @@ applier::macros::~macros() throw() {
   clear_volatile_macros_r(_mac);
   free_macrox_names();
 
-  delete[] _mac->x[MACRO_ADMINEMAIL];
-  delete[] _mac->x[MACRO_ADMINPAGER];
-  delete[] _mac->x[MACRO_COMMANDFILE];
-  delete[] _mac->x[MACRO_EVENTSTARTTIME];
-  delete[] _mac->x[MACRO_HOSTPERFDATAFILE];
-  delete[] _mac->x[MACRO_LOGFILE];
-  delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  delete[] _mac->x[MACRO_OBJECTCACHEFILE];
-  delete[] _mac->x[MACRO_PROCESSSTARTTIME];
-  delete[] _mac->x[MACRO_RESOURCEFILE];
-  delete[] _mac->x[MACRO_RETENTIONDATAFILE];
-  delete[] _mac->x[MACRO_SERVICEPERFDATAFILE];
-  delete[] _mac->x[MACRO_STATUSDATAFILE];
-  delete[] _mac->x[MACRO_TEMPFILE];
-  delete[] _mac->x[MACRO_TEMPPATH];
-
   for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
-    delete[] macro_user[i];
-    macro_user[i] = NULL;
+    macro_user[i] = "";
   }
 }
 
@@ -164,8 +145,8 @@ void applier::macros::_set_macro(
        std::string const& value) {
   if (type >= MACRO_X_COUNT)
     throw (engine_error() << "Invalid type of global macro: " << type);
-  if (!_mac->x[type] || strcmp(_mac->x[type], value.c_str()))
-    string::setstr(_mac->x[type], value);
+  if (_mac->x[type] != value)
+    _mac->x[type] = value;
 }
 
 /**
@@ -179,6 +160,6 @@ void applier::macros::_set_macros_user(
        std::string const& value) {
   if (idx >= MAX_USER_MACROS)
     throw (engine_error() << "Invalid index of user macro: " << idx);
-  if (!macro_user[idx] || strcmp(macro_user[idx], value.c_str()))
-    string::setstr(macro_user[idx], value);
+  if (macro_user[idx] != value)
+    macro_user[idx] = value;
 }

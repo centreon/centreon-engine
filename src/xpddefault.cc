@@ -280,8 +280,8 @@ int xpddefault_update_host_performance_data(host* hst) {
 int xpddefault_run_service_performance_data_command(
       nagios_macros* mac,
       com::centreon::engine::service* svc) {
-  char* raw_command_line(nullptr);
-  char* processed_command_line(nullptr);
+  std::string raw_command_line;
+  std::string processed_command_line;
   int early_timeout(false);
   double exectime;
   int result(OK);
@@ -302,9 +302,9 @@ int xpddefault_run_service_performance_data_command(
     mac,
     xpddefault_service_perfdata_command_ptr,
     config->service_perfdata_command().c_str(),
-    &raw_command_line,
+    raw_command_line,
     macro_options);
-  if (raw_command_line == nullptr)
+  if (raw_command_line.c_str())
     return ERROR;
 
   logger(dbg_perfdata, most)
@@ -315,9 +315,9 @@ int xpddefault_run_service_performance_data_command(
   process_macros_r(
     mac,
     raw_command_line,
-    &processed_command_line,
+    processed_command_line,
     macro_options);
-  if (processed_command_line == nullptr)
+  if (processed_command_line.empty())
     return ERROR;
 
   logger(dbg_perfdata, most)
@@ -326,13 +326,14 @@ int xpddefault_run_service_performance_data_command(
 
   // run the command.
   try {
+    std::string tmp;
     my_system_r(
       mac,
       processed_command_line,
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      nullptr,
+      tmp,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -349,10 +350,6 @@ int xpddefault_run_service_performance_data_command(
       << svc->get_hostname() << "' timed out after "
       << config->perfdata_timeout() << " seconds";
 
-  // free memory.
-  delete[] raw_command_line;
-  delete[] processed_command_line;
-
   return result;
 }
 
@@ -360,8 +357,8 @@ int xpddefault_run_service_performance_data_command(
 int xpddefault_run_host_performance_data_command(
       nagios_macros* mac,
       host* hst) {
-  char* raw_command_line(nullptr);
-  char* processed_command_line(nullptr);
+  std::string raw_command_line;
+  std::string processed_command_line;
   int early_timeout(false);
   double exectime;
   int result(OK);
@@ -382,9 +379,9 @@ int xpddefault_run_host_performance_data_command(
     mac,
     xpddefault_host_perfdata_command_ptr,
     config->host_perfdata_command().c_str(),
-    &raw_command_line,
+    raw_command_line,
     macro_options);
-  if (raw_command_line == nullptr)
+  if (raw_command_line.empty())
     return ERROR;
 
   logger(dbg_perfdata, most)
@@ -394,7 +391,7 @@ int xpddefault_run_host_performance_data_command(
   process_macros_r(
     mac,
     raw_command_line,
-    &processed_command_line,
+    processed_command_line,
     macro_options);
 
   logger(dbg_perfdata, most)
@@ -403,13 +400,14 @@ int xpddefault_run_host_performance_data_command(
 
   // run the command.
   try {
+    std::string tmp;
     my_system_r(
       mac,
       processed_command_line,
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      nullptr,
+      tmp,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -417,7 +415,7 @@ int xpddefault_run_host_performance_data_command(
       << processed_command_line << "' : " << e.what();
   }
 
-  if (processed_command_line == nullptr)
+  if (processed_command_line.empty())
     return ERROR;
 
   // check to see if the command timed out.
@@ -427,10 +425,6 @@ int xpddefault_run_host_performance_data_command(
       << processed_command_line << "' for host '" << hst->get_name()
       << "' timed out after " << config->perfdata_timeout()
       << " seconds";
-
-  // free memory.
-  delete[] raw_command_line;
-  delete[] processed_command_line;
 
   return result;
 }
@@ -562,8 +556,8 @@ void xpddefault_preprocess_file_templates(char* tmpl) {
 int xpddefault_update_service_performance_data_file(
       nagios_macros* mac,
       com::centreon::engine::service* svc) {
-  char* raw_output(nullptr);
-  char* processed_output(nullptr);
+  std::string raw_output;
+  std::string processed_output;
   int result(OK);
 
   logger(dbg_functions, basic)
@@ -578,14 +572,14 @@ int xpddefault_update_service_performance_data_file(
     return OK;
 
   // get the raw line to write.
-  raw_output = string::dup(xpddefault_service_perfdata_file_template);
+  raw_output = xpddefault_service_perfdata_file_template;
 
   logger(dbg_perfdata, most)
     << "Raw service performance data file output: " << raw_output;
 
   // process any macros in the raw output line.
-  process_macros_r(mac, raw_output, &processed_output, 0);
-  if (processed_output == nullptr)
+  process_macros_r(mac, raw_output, processed_output, 0);
+  if (processed_output.empty())
     return ERROR;
 
   logger(dbg_perfdata, most)
@@ -594,14 +588,10 @@ int xpddefault_update_service_performance_data_file(
 
   // lock, write to and unlock host performance data file.
   pthread_mutex_lock(&xpddefault_service_perfdata_fp_lock);
-  fputs(processed_output, xpddefault_service_perfdata_fp);
+  fputs(processed_output.c_str(), xpddefault_service_perfdata_fp);
   fputc('\n', xpddefault_service_perfdata_fp);
   fflush(xpddefault_service_perfdata_fp);
   pthread_mutex_unlock(&xpddefault_service_perfdata_fp_lock);
-
-  // free memory.
-  delete[] raw_output;
-  delete[] processed_output;
 
   return result;
 }
@@ -610,8 +600,8 @@ int xpddefault_update_service_performance_data_file(
 int xpddefault_update_host_performance_data_file(
       nagios_macros* mac,
       host* hst) {
-  char* raw_output(nullptr);
-  char* processed_output(nullptr);
+  std::string raw_output;
+  std::string processed_output;
   int result(OK);
 
   logger(dbg_functions, basic)
@@ -632,8 +622,8 @@ int xpddefault_update_host_performance_data_file(
     << "Raw host performance file output: " << raw_output;
 
   // process any macros in the raw output.
-  process_macros_r(mac, raw_output, &processed_output, 0);
-  if (processed_output == nullptr)
+  process_macros_r(mac, raw_output, processed_output, 0);
+  if (processed_output.empty())
     return ERROR;
 
   logger(dbg_perfdata, most)
@@ -642,22 +632,18 @@ int xpddefault_update_host_performance_data_file(
 
   // lock, write to and unlock host performance data file.
   pthread_mutex_lock(&xpddefault_host_perfdata_fp_lock);
-  fputs(processed_output, xpddefault_host_perfdata_fp);
+  fputs(processed_output.c_str(), xpddefault_host_perfdata_fp);
   fputc('\n', xpddefault_host_perfdata_fp);
   fflush(xpddefault_host_perfdata_fp);
   pthread_mutex_unlock(&xpddefault_host_perfdata_fp_lock);
-
-  // free memory.
-  delete[] raw_output;
-  delete[] processed_output;
 
   return result;
 }
 
 // periodically process the host perf data file.
 int xpddefault_process_host_perfdata_file() {
-  char* raw_command_line(nullptr);
-  char* processed_command_line(nullptr);
+  std::string raw_command_line;
+  std::string processed_command_line;
   int early_timeout(false);
   double exectime(0.0);
   int result(OK);
@@ -679,9 +665,9 @@ int xpddefault_process_host_perfdata_file() {
     &mac,
     xpddefault_host_perfdata_file_processing_command_ptr,
     config->host_perfdata_file_processing_command().c_str(),
-    &raw_command_line,
+    raw_command_line,
     macro_options);
-  if (raw_command_line == nullptr) {
+  if (raw_command_line.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -694,9 +680,9 @@ int xpddefault_process_host_perfdata_file() {
   process_macros_r(
     &mac,
     raw_command_line,
-    &processed_command_line,
+    processed_command_line,
     macro_options);
-  if (processed_command_line == nullptr) {
+  if (processed_command_line.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -711,13 +697,14 @@ int xpddefault_process_host_perfdata_file() {
 
   // run the command.
   try {
+    std::string tmp;
     my_system_r(
       &mac,
       processed_command_line,
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      nullptr,
+      tmp,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -737,18 +724,13 @@ int xpddefault_process_host_perfdata_file() {
       << "Warning: Host performance data file processing command '"
       << processed_command_line << "' timed out after "
       << config->perfdata_timeout() << " seconds";
-
-  // free memory.
-  delete[] raw_command_line;
-  delete[] processed_command_line;
-
   return result;
 }
 
 // periodically process the service perf data file.
 int xpddefault_process_service_perfdata_file() {
-  char* raw_command_line(nullptr);
-  char* processed_command_line(nullptr);
+  std::string raw_command_line;
+  std::string processed_command_line;
   int early_timeout(false);
   double exectime(0.0);
   int result(OK);
@@ -770,9 +752,9 @@ int xpddefault_process_service_perfdata_file() {
     &mac,
     xpddefault_service_perfdata_file_processing_command_ptr,
     config->service_perfdata_file_processing_command().c_str(),
-    &raw_command_line,
+    raw_command_line,
     macro_options);
-  if (raw_command_line == nullptr) {
+  if (raw_command_line.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -785,9 +767,9 @@ int xpddefault_process_service_perfdata_file() {
   process_macros_r(
     &mac,
     raw_command_line,
-    &processed_command_line,
+    processed_command_line,
     macro_options);
-  if (processed_command_line == nullptr) {
+  if (processed_command_line.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -802,13 +784,14 @@ int xpddefault_process_service_perfdata_file() {
 
   // run the command.
   try {
+    std::string tmp;
     my_system_r(
       &mac,
       processed_command_line,
       config->perfdata_timeout(),
       &early_timeout,
       &exectime,
-      nullptr,
+      tmp,
       0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -831,8 +814,5 @@ int xpddefault_process_service_perfdata_file() {
       << config->perfdata_timeout() << " seconds";
 
   // free memory.
-  delete[] raw_command_line;
-  delete[] processed_command_line;
-
   return result;
 }

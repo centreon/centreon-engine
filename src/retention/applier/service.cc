@@ -211,8 +211,8 @@ void applier::service::_update(
     if (state.check_period().is_set()
         && (obj.get_modified_attributes() & MODATTR_CHECK_TIMEPERIOD)) {
       timeperiod_map::const_iterator
-        it(configuration::applier::state::instance().timeperiods().find(*state.check_period()));
-      if (it != configuration::applier::state::instance().timeperiods().end())
+        it(timeperiod::timeperiods.find(*state.check_period()));
+      if (it != timeperiod::timeperiods.end())
         obj.set_check_period(*state.check_period());
       else
         obj.set_modified_attributes(obj.get_modified_attributes() - MODATTR_CHECK_TIMEPERIOD);
@@ -221,8 +221,8 @@ void applier::service::_update(
     if (state.notification_period().is_set()
         && (obj.get_modified_attributes() & MODATTR_NOTIFICATION_TIMEPERIOD)) {
       timeperiod_map::const_iterator
-        it(configuration::applier::state::instance().timeperiods().find(*state.notification_period()));
-      if (it != configuration::applier::state::instance().timeperiods().end())
+        it(timeperiod::timeperiods.find(*state.notification_period()));
+      if (it != timeperiod::timeperiods.end())
         obj.set_notification_period(*state.notification_period());
       else
         obj.set_modified_attributes(obj.get_modified_attributes() - MODATTR_NOTIFICATION_TIMEPERIOD);

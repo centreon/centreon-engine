@@ -32,7 +32,7 @@ int grab_standard_service_macro_r(
       nagios_macros* mac,
       int macro_type,
       com::centreon::engine::service* svc,
-      char** output,
+      std::string& output,
       int* free_macro);
 
 int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* svc);

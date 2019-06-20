@@ -186,6 +186,7 @@ applier::state::state()
  */
 applier::state::~state() throw() {
   engine::contact::contacts.clear();
+  engine::contactgroup::contactgroups.clear();
   engine::servicegroup::servicegroups.clear();
   engine::hostgroup::hostgroups.clear();
   engine::commands::command::commands.clear();
@@ -194,6 +195,7 @@ applier::state::~state() throw() {
   engine::service::services_by_id.clear();
   engine::host::hosts.clear();
   engine::host::hosts_by_id.clear();
+  engine::timeperiod::timeperiods.clear();
 
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
@@ -202,53 +204,6 @@ applier::state::~state() throw() {
   applier::logging::unload();
 }
 
-/**
- *  Given a contact name, find a contact from the list in memory.
- *
- *  @param[in] name Contact name.
- *
- *  @return Contact object if found, nullptr otherwise.
- */
-engine::contactgroup* applier::state::find_contactgroup(configuration::contact::key_type const& k) {
-  if (k.empty())
-    return nullptr;
-
-  contactgroup_map::const_iterator it(_contactgroups.find(k));
-
-  if (it != _contactgroups.end())
-    return it->second.get();
-  return nullptr;
-}
-
-/**
- *  Get the current contactgroups.
- *
- *  @return The current contactgroups.
- */
-contactgroup_map const& applier::state::contactgroups() const throw () {
-  return _contactgroups;
-}
-
-/**
- *  Get the current contactgroups.
- *
- *  @return The current contactgroups.
- */
-contactgroup_map& applier::state::contactgroups() throw () {
-  return _contactgroups;
-}
-
-/**
- *  Find a contact group from its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-contactgroup_map::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
-  return _contactgroups.find(k);
-}
 
 /**
  *  Get the current hostdependencies.
@@ -393,36 +348,6 @@ servicedependency_mmap ::iterator applier::state::servicedependencies_find(confi
     ++p.first;
   }
   return (p.first == p.second) ? _servicedependencies.end() : p.first;
-}
-
-/**
- *  Get the current timeperiods.
- *
- *  @return The current timeperiods.
- */
-timeperiod_map const& applier::state::timeperiods() const throw () {
-  return _timeperiods;
-}
-
-/**
- *  Get the current timeperiods.
- *
- *  @return The current timeperiods.
- */
-timeperiod_map& applier::state::timeperiods() throw () {
-  return _timeperiods;
-}
-
-/**
- *  Find a time period from its key.
- *
- *  @param[in] k Time period name.
- *
- *  @return Iterator to the element if found, timeperiods().end()
- *          otherwise.
- */
-timeperiod_map::iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) {
-  return _timeperiods.find(k);
 }
 
 /**

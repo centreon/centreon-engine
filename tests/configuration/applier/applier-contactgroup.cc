@@ -113,11 +113,11 @@ TEST_F(ApplierContactgroup, RemoveContactgroupFromConfig) {
   ASSERT_TRUE(cg.parse("members", "contact"));
   aply.add_object(cg);
   ASSERT_FALSE(
-    configuration::applier::state::instance().contactgroups().empty());
+    engine::contactgroup::contactgroups.empty());
 
   aply.remove_object(cg);
   ASSERT_TRUE(
-    configuration::applier::state::instance().contactgroups().empty());
+    engine::contactgroup::contactgroups.empty());
 }
 
 // Given a contactgroup applier and a configuration contactgroup

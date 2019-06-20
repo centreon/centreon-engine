@@ -62,25 +62,22 @@ using namespace com::centreon::engine::logging;
 /* executes a system command - used for notifications, event handlers, etc. */
 int my_system_r(
       nagios_macros* mac,
-      char* cmd,
+      std::string const& cmd,
       int timeout,
       int* early_timeout,
       double* exectime,
-      char** output,
+      std::string& output,
       unsigned int max_output_length) {
 
   logger(dbg_functions, basic)
     << "my_system_r()";
 
   // initialize return variables.
-  if (output != NULL) {
-    *output = NULL;
-  }
   *early_timeout = false;
   *exectime = 0.0;
 
   // if no command was passed, return with no error.
-  if (cmd == NULL) {
+  if (cmd.empty()) {
     return notifier::ok;
   }
 
@@ -104,7 +101,7 @@ int my_system_r(
     timeout,
     *early_timeout,
     notifier::ok,
-    cmd,
+    const_cast<char *>(cmd.c_str()),
     NULL,
     NULL);
 
@@ -117,12 +114,10 @@ int my_system_r(
     = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
   *exectime = (res.end_time - res.start_time).to_seconds();
   *early_timeout = res.exit_status == process::timeout;
-  if (output) {
-    if (max_output_length > 0)
-      *output = engine::string::dup(res.output.substr(0, max_output_length - 1));
-    else
-      *output = engine::string::dup(res.output);
-  }
+  if (max_output_length > 0)
+    output = res.output.substr(0, max_output_length - 1);
+  else
+    output = res.output;
   int result(res.exit_code);
 
   logger(dbg_commands, more)
@@ -130,7 +125,7 @@ int my_system_r(
     << "Execution time=" << *exectime
     << " sec, early timeout=" << *early_timeout
     << ", result=" << result << ", output="
-    << (output == NULL ? "(null)" : *output);
+    << output;
 
   // send event broker.
   broker_system_command(
@@ -143,8 +138,8 @@ int my_system_r(
     timeout,
     *early_timeout,
     result,
-    cmd,
-    (output == NULL ? NULL : *output),
+    const_cast<char *>(cmd.c_str()),
+    const_cast<char *>(output.c_str()),
     NULL);
 
   return result;
@@ -163,10 +158,10 @@ int get_raw_command_line_r(
       nagios_macros* mac,
       commands::command* cmd_ptr,
       char const* cmd,
-      char** full_command,
+      std::string& full_command,
       int macro_options) {
   char temp_arg[MAX_COMMAND_BUFFER] = "";
-  char* arg_buffer = NULL;
+  std::string arg_buffer;
   unsigned int x = 0;
   unsigned int y = 0;
   int arg_index = 0;
@@ -187,10 +182,7 @@ int get_raw_command_line_r(
     << "Raw Command Input: " << cmd_ptr->get_command_line();
 
   /* get the full command line */
-  if (full_command != NULL) {
-    *full_command
-      = string::dup(cmd_ptr->get_command_line());
-  }
+  full_command = cmd_ptr->get_command_line();
 
   /* get the command arguments */
   if (cmd != NULL) {
@@ -233,16 +225,14 @@ int get_raw_command_line_r(
 
       /* ADDED 01/29/04 EG */
       /* process any macros we find in the argument */
-      process_macros_r(mac, temp_arg, &arg_buffer, macro_options);
+      process_macros_r(mac, temp_arg, arg_buffer, macro_options);
 
       mac->argv[x] = arg_buffer;
     }
   }
 
-  if (full_command != NULL) {
-    logger(dbg_commands | dbg_checks | dbg_macros, most)
-      << "Expanded Command Output: " << *full_command;
-  }
+  logger(dbg_commands | dbg_checks | dbg_macros, most)
+      << "Expanded Command Output: " << full_command;
 
   return OK;
 }

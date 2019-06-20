@@ -318,13 +318,13 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        contactgroup* group(configuration::applier::state::instance().find_contactgroup(group_name));
-        if (!group)
+        contactgroup_map::iterator it_cg{contactgroup::contactgroups.find(group_name)};
+        if (it_cg == contactgroup::contactgroups.end() || !it_cg->second)
           return ;
 
         for (contact_map::const_iterator
-               it(group->get_members().begin()),
-               end(group->get_members().end());
+               it(it_cg->second->get_members().begin()),
+               end(it_cg->second->get_members().end());
              it != end; ++it)
           if (it->second)
             (*fptr)(it->second);

@@ -2231,8 +2231,8 @@ int service::handle_service_event() {
 
 /* handles service check results in an obsessive compulsive manner... */
 int service::obsessive_compulsive_service_check_processor() {
-  char* raw_command = nullptr;
-  char* processed_command = nullptr;
+  std::string raw_command;
+  std::string processed_command;
   host* temp_host{get_host_ptr().get()};
   int early_timeout = false;
   double exectime = 0.0;
@@ -2263,8 +2263,8 @@ int service::obsessive_compulsive_service_check_processor() {
 
   /* get the raw command line */
   get_raw_command_line_r(&mac, ocsp_command_ptr, config->ocsp_command().c_str(),
-                         &raw_command, macro_options);
-  if (raw_command == nullptr) {
+                         raw_command, macro_options);
+  if (raw_command.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -2274,8 +2274,8 @@ int service::obsessive_compulsive_service_check_processor() {
                            << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(&mac, raw_command, &processed_command, macro_options);
-  if (processed_command == nullptr) {
+  process_macros_r(&mac, raw_command, processed_command, macro_options);
+  if (processed_command.empty()) {
     clear_volatile_macros_r(&mac);
     return ERROR;
   }
@@ -2286,8 +2286,9 @@ int service::obsessive_compulsive_service_check_processor() {
 
   /* run the command */
   try {
+    std::string tmp;
     my_system_r(&mac, processed_command, config->ocsp_timeout(), &early_timeout,
-                &exectime, nullptr, 0);
+                &exectime, tmp, 0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
         << "Error: can't execute compulsive service processor command line '"
@@ -2302,10 +2303,6 @@ int service::obsessive_compulsive_service_check_processor() {
         << "Warning: OCSP command '" << processed_command << "' for service '"
         << _description << "' on host '" << _hostname
         << "' timed out after " << config->ocsp_timeout() << " seconds";
-
-  /* free memory */
-  delete[] raw_command;
-  delete[] processed_command;
 
   return OK;
 }
@@ -3151,8 +3148,8 @@ int service::notify_contact(nagios_macros* mac,
                             char const* not_data,
                             int options,
                             int escalated) {
-  char* raw_command = nullptr;
-  char* processed_command = nullptr;
+  std::string raw_command;
+  std::string processed_command;
   int early_timeout = false;
   double exectime;
   struct timeval start_time, end_time;
@@ -3212,16 +3209,16 @@ int service::notify_contact(nagios_macros* mac,
 
     /* get the raw command line */
     get_raw_command_line_r(mac, cmd.get(), cmd->get_command_line().c_str(),
-                           &raw_command, macro_options);
-    if (raw_command == nullptr)
+                           raw_command, macro_options);
+    if (raw_command.empty())
       continue;
 
     logger(dbg_notifications, most)
         << "Raw notification command: " << raw_command;
 
     /* process any macros contained in the argument */
-    process_macros_r(mac, raw_command, &processed_command, macro_options);
-    if (processed_command == nullptr)
+    process_macros_r(mac, raw_command, processed_command, macro_options);
+    if (processed_command.empty())
       continue;
 
     /* run the notification command... */
@@ -3271,8 +3268,9 @@ int service::notify_contact(nagios_macros* mac,
 
     /* run the notification command */
     try {
+      std::string tmp;
       my_system_r(mac, processed_command, config->notification_timeout(),
-                  &early_timeout, &exectime, nullptr, 0);
+                  &early_timeout, &exectime, tmp, 0);
     } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
           << "Error: can't execute service notification '" << cntct->get_name()
@@ -3287,10 +3285,6 @@ int service::notify_contact(nagios_macros* mac,
           << "' timed out after " << config->notification_timeout()
           << " seconds";
     }
-
-    /* free memory */
-    delete[] raw_command;
-    delete[] processed_command;
 
     /* get end time */
     gettimeofday(&method_end_time, nullptr);
