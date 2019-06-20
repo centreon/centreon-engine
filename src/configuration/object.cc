@@ -153,7 +153,7 @@ object_ptr object::create(std::string const& type_name) {
     obj = object_ptr(new configuration::serviceextinfo());
   else if (type_name == "hostextinfo")
     obj = object_ptr(new configuration::hostextinfo());
-  return (obj);
+  return obj;
 }
 
 /**

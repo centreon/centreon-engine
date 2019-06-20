@@ -205,8 +205,6 @@ void applier::host::add_object(
     MODATTR_ALL,
     MODATTR_ALL,
     &tv);
-
-  return ;
 }
 
 /**

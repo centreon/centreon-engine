@@ -49,6 +49,8 @@ class ApplierService : public ::testing::Test {
     configuration::applier::state::unload();
     delete config;
     config = NULL;
+    ASSERT_TRUE(engine::host::hosts.empty());
+    ASSERT_TRUE(engine::service::services.empty());
   }
 };
 
@@ -107,7 +109,7 @@ TEST_F(ApplierService, NewServiceFromConfig) {
   ASSERT_EQ(sm.begin()->first.second, 3);
 
   // Service is not resolved, host is null now.
-  ASSERT_TRUE(sm.begin()->second->host_ptr == NULL);
+  ASSERT_TRUE(!sm.begin()->second->get_host_ptr());
   ASSERT_TRUE(sm.begin()->second->get_description() == "test description");
 }
 
@@ -207,7 +209,7 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   ASSERT_EQ(sm.size(), 1);
 
   host_map const& hm(engine::host::hosts);
-  ASSERT_EQ(sm.begin()->second->host_ptr, hm.begin()->second.get());
+  ASSERT_EQ(sm.begin()->second->get_host_ptr(), hm.begin()->second);
 }
 
 // Given a service configuration,

@@ -384,8 +384,8 @@ bool dump::save(std::string const& path) {
  */
 std::ostream& dump::service(std::ostream& os, class service const& obj) {
   std::string hostname;
-  if (obj.host_ptr)
-    hostname = obj.host_ptr->get_name();
+  if (obj.get_host_ptr())
+    hostname = obj.get_host_ptr()->get_name();
 
   os << "service {\n"
     "host_name=" << obj.get_hostname() << "\n"

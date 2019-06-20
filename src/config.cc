@@ -307,12 +307,12 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
 
   /* save the host pointer for later */
   if (it == host::hosts.end())
-    svc->host_ptr = nullptr;
+    svc->get_host_ptr().reset();
   else
-    svc->host_ptr = it->second.get();
+    svc->set_host_ptr(it->second);
 
   /* add a reverse link from the host to the service for faster lookups later */
-  svc->host_ptr->services[{svc->get_hostname(), svc->get_description()}] = svc;
+  svc->get_host_ptr()->services[{svc->get_hostname(), svc->get_description()}] = svc;
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -320,7 +320,7 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
     NEBTYPE_PARENT_ADD,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc->host_ptr,
+    svc->get_host_ptr().get(),
     NULL,
     NULL,
     svc.get(),
