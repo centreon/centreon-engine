@@ -398,7 +398,7 @@ void applier::host::modify_object(
     // Delete old parents.
     {
       timeval tv(get_broker_timestamp(nullptr));
-      for (host_map::iterator
+      for (host_map_unsafe::iterator
              it(it_obj->second->parent_hosts.begin()),
              end(it_obj->second->parent_hosts.end());
            it != end;
@@ -407,7 +407,7 @@ void applier::host::modify_object(
           NEBTYPE_PARENT_DELETE,
           NEBFLAG_NONE,
           NEBATTR_NONE,
-          it->second.get(),
+          it->second,
           nullptr,
           it_obj->second.get(),
           nullptr,

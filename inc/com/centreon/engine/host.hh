@@ -47,6 +47,8 @@ CCE_END()
 
 typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::host>> host_map;
+typedef std::unordered_map<std::string,
+  com::centreon::engine::host*> host_map_unsafe;
 typedef std::unordered_map<uint64_t,
   std::shared_ptr<com::centreon::engine::host>> host_id_map;
 
@@ -120,7 +122,7 @@ class                host : public notifier {
                      ~host() {}
   uint64_t           get_host_id(void) const;
   void               set_host_id(uint64_t id);
-  void               add_child_link(std::shared_ptr<host> child);
+  void               add_child_link(host* child);
   void               add_parent_host(std::string const& host_name);
   int                log_event();
   int                handle_async_check_result_3x(
@@ -283,19 +285,19 @@ class                host : public notifier {
   bool               get_notify_on_current_state() const override;
   bool               is_in_downtime() const override;
 
-  host_map            parent_hosts;
-  host_map            child_hosts;
+  host_map_unsafe     parent_hosts;
+  host_map_unsafe     child_hosts;
   static host_map     hosts;
   static host_id_map  hosts_by_id;
 
   commands::command*  event_handler_ptr;
   commands::command*  check_command_ptr;
 
-  service_map         services;
-  std::list<std::shared_ptr<hostgroup>> const&
-                                get_parent_groups() const;
-  std::list<std::shared_ptr<hostgroup>>&
-                                get_parent_groups();
+  service_map_unsafe  services;
+  std::list<hostgroup*> const&
+                      get_parent_groups() const;
+  std::list<hostgroup*>&
+                      get_parent_groups();
 
 private:
   uint64_t            _id;
@@ -336,8 +338,8 @@ private:
   enum host_state    _last_hard_state;
   enum host_state    _current_state;
   enum host_state    _initial_state;
-  std::list<std::shared_ptr<hostgroup>>
-                                _hostgroups;
+  std::list<hostgroup*>
+                     _hostgroups;
 };
 
 CCE_END()
@@ -362,6 +364,7 @@ int                   number_of_total_parent_hosts(
 std::ostream&         operator<<(std::ostream& os,
                             com::centreon::engine::host const& obj);
 std::ostream&         operator<<(std::ostream& os, host_map const& obj);
+std::ostream&         operator<<(std::ostream& os, host_map_unsafe const& obj);
 
 CCE_BEGIN()
 

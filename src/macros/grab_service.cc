@@ -69,7 +69,7 @@ static std::string get_service_group_names(service& svc, nagios_macros* mac) {
 
   // Find all servicegroups this service is associated with.
   std::string buf;
-  for (std::list<std::shared_ptr<servicegroup>>::const_iterator
+  for (std::list<servicegroup*>::const_iterator
          it{svc.get_parent_groups().begin()},
          end{svc.get_parent_groups().end()};
        it != end;
@@ -402,7 +402,7 @@ int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* sv
   // Save first/primary servicegroup pointer for later.
   if (!svc->get_parent_groups().empty())
     mac->servicegroup_ptr
-      = svc->get_parent_groups().front().get();
+      = svc->get_parent_groups().front();
 
   return OK;
 }

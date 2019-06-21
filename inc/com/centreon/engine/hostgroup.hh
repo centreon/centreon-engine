@@ -59,7 +59,7 @@ class                     hostgroup {
   bool                     operator==(hostgroup const& obj) throw ();
   bool                     operator!=(hostgroup const& obj1) throw ();
 
-  host_map                 members;
+  host_map_unsafe          members;
 
   static hostgroup_map     hostgroups;
 

@@ -39,13 +39,13 @@ void enable_flap_detection_routines();
 // disables flap detection on a program-wide basis
 void disable_flap_detection_routines();
 // enables flap detection for a particular host
-void enable_host_flap_detection(std::shared_ptr<com::centreon::engine::host> hst);
+void enable_host_flap_detection(com::centreon::engine::host* hst);
 // disables flap detection for a particular host
-void disable_host_flap_detection(std::shared_ptr<com::centreon::engine::host> hst);
+void disable_host_flap_detection(com::centreon::engine::host* hst);
 // enables flap detection for a particular service
-void enable_service_flap_detection(std::shared_ptr<com::centreon::engine::service> svc);
+void enable_service_flap_detection(com::centreon::engine::service* svc);
 // disables flap detection for a particular service
-void disable_service_flap_detection(std::shared_ptr<com::centreon::engine::service> svc);
+void disable_service_flap_detection(com::centreon::engine::service* svc);
 
 #  ifdef __cplusplus
 }

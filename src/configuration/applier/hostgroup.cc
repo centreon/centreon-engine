@@ -174,7 +174,7 @@ void applier::hostgroup::modify_object(
   // Were members modified ?
   if (obj.members() != old_cfg.members()) {
     // Delete all old host group members.
-    for(host_map::iterator
+    for(host_map_unsafe::iterator
           it(it_obj->second->members.begin()),
           end(it_obj->second->members.end());
         it != end;
@@ -184,7 +184,7 @@ void applier::hostgroup::modify_object(
         NEBTYPE_HOSTGROUPMEMBER_DELETE,
         NEBFLAG_NONE,
         NEBATTR_NONE,
-        it->second.get(),
+        it->second,
         hg,
         &tv);
     }

@@ -406,7 +406,7 @@ int cmd_schedule_check(int cmd, char* args) {
   /* schedule service checks */
   else if (cmd == CMD_SCHEDULE_HOST_SVC_CHECKS
            || cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS) {
-    for (service_map::iterator
+    for (service_map_unsafe::iterator
            it(temp_host->services.begin()),
            end(temp_host->services.end());
          it != end;
@@ -455,7 +455,7 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   delay_time = strtoul(temp_ptr, nullptr, 10);
 
   /* reschedule all services on the specified host */
-  for (service_map::iterator
+  for (service_map_unsafe::iterator
          it(temp_host->services.begin()),
          end(temp_host->services.end());
        it != end;
@@ -1061,7 +1061,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_HOST_SVC_DOWNTIME:
-    for (service_map::iterator
+    for (service_map_unsafe::iterator
            it(temp_host->services.begin()),
            end(temp_host->services.end());
          it != end;
@@ -1085,7 +1085,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME:
-    for (host_map::iterator
+    for (host_map_unsafe::iterator
            it(hg->members.begin()),
            end(hg->members.end());
          it != end;
@@ -1106,14 +1106,14 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME:
-    for (host_map::iterator
+    for (host_map_unsafe::iterator
            it(hg->members.begin()),
            end(hg->members.end());
          it != end;
          ++it) {
-      if (it->second == nullptr)
+      if (!it->second)
         continue;
-      for (service_map::iterator
+      for (service_map_unsafe::iterator
              it2(it->second->services.begin()),
              end2(it->second->services.end());
            it2 != end2;
@@ -1138,7 +1138,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
   case CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME:
     last_host = nullptr;
-      for (service_map::iterator
+      for (service_map_unsafe::iterator
              it(sg_it->second->members.begin()),
              end(sg_it->second->members.end());
            it != end;
@@ -1168,7 +1168,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     break;
 
   case CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME:
-    for (service_map::iterator
+    for (service_map_unsafe::iterator
            it(sg_it->second->members.begin()),
            end(sg_it->second->members.end());
          it != end;
@@ -1468,7 +1468,7 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
     }
   }
 
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it_h(it->second->members.begin()),
          end_h(it->second->members.end());
        it_h != end_h;
@@ -2337,7 +2337,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
 /******************************************************************/
 
 /* temporarily disables a service check */
-void disable_service_checks(std::shared_ptr<service> svc) {
+void disable_service_checks(service* svc) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -2356,7 +2356,7 @@ void disable_service_checks(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2367,7 +2367,7 @@ void disable_service_checks(std::shared_ptr<service> svc) {
 }
 
 /* enables a service check */
-void enable_service_checks(std::shared_ptr<service> svc) {
+void enable_service_checks(service* svc) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -2410,7 +2410,7 @@ void enable_service_checks(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2483,7 +2483,7 @@ void disable_all_notifications(void) {
 }
 
 /* enables notifications for a service */
-void enable_service_notifications(std::shared_ptr<service> svc) {
+void enable_service_notifications(service *svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2501,7 +2501,7 @@ void enable_service_notifications(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2512,7 +2512,7 @@ void enable_service_notifications(std::shared_ptr<service> svc) {
 }
 
 /* disables notifications for a service */
-void disable_service_notifications(std::shared_ptr<service> svc) {
+void disable_service_notifications(service *svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2530,7 +2530,7 @@ void disable_service_notifications(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -2541,7 +2541,7 @@ void disable_service_notifications(std::shared_ptr<service> svc) {
 }
 
 /* enables notifications for a host */
-void enable_host_notifications(std::shared_ptr<host> hst) {
+void enable_host_notifications(host *hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2559,7 +2559,7 @@ void enable_host_notifications(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -2570,7 +2570,7 @@ void enable_host_notifications(std::shared_ptr<host> hst) {
 }
 
 /* disables notifications for a host */
-void disable_host_notifications(std::shared_ptr<host> hst) {
+void disable_host_notifications(host *hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2588,7 +2588,7 @@ void disable_host_notifications(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -2600,7 +2600,7 @@ void disable_host_notifications(std::shared_ptr<host> hst) {
 
 /* enables notifications for all hosts and services "beyond" a given host */
 void enable_and_propagate_notifications(
-       std::shared_ptr<host> hst,
+       host* hst,
        int level,
        int affect_top_host,
        int affect_hosts,
@@ -2611,7 +2611,7 @@ void enable_and_propagate_notifications(
     enable_host_notifications(hst);
 
   /* check all child hosts... */
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(hst->child_hosts.begin()),
          end(hst->child_hosts.end());
        it != end;
@@ -2634,7 +2634,7 @@ void enable_and_propagate_notifications(
 
     /* enable notifications for all services on this host... */
     if (affect_services) {
-      for (service_map::iterator
+      for (service_map_unsafe::iterator
              it2(it->second->services.begin()),
              end2(it->second->services.end());
            it2 != end2;
@@ -2649,7 +2649,7 @@ void enable_and_propagate_notifications(
 
 /* disables notifications for all hosts and services "beyond" a given host */
 void disable_and_propagate_notifications(
-       std::shared_ptr<host> hst,
+       host* hst,
        int level,
        int affect_top_host,
        int affect_hosts,
@@ -2664,7 +2664,7 @@ void disable_and_propagate_notifications(
     disable_host_notifications(hst);
 
   /* check all child hosts... */
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(hst->child_hosts.begin()),
          end(hst->child_hosts.begin());
        it != end;
@@ -2687,7 +2687,7 @@ void disable_and_propagate_notifications(
 
     /* disable notifications for all services on this host... */
     if (affect_services) {
-      for (service_map::iterator
+      for (service_map_unsafe::iterator
              it2(it->second->services.begin()),
              end2(it->second->services.end());
            it2 != end2;
@@ -2852,7 +2852,7 @@ void schedule_and_propagate_downtime(
        unsigned long duration) {
 
   /* check all child hosts... */
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(temp_host->child_hosts.begin()),
          end(temp_host->child_hosts.end());
        it != end;
@@ -2863,7 +2863,7 @@ void schedule_and_propagate_downtime(
 
     /* recurse... */
     schedule_and_propagate_downtime(
-      it->second.get(),
+      it->second,
       entry_time,
       author,
       comment_data,
@@ -3167,7 +3167,7 @@ void stop_accepting_passive_service_checks(void) {
 }
 
 /* enables passive service checks for a particular service */
-void enable_passive_service_checks(std::shared_ptr<service> svc) {
+void enable_passive_service_checks(service* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3185,7 +3185,7 @@ void enable_passive_service_checks(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3196,7 +3196,7 @@ void enable_passive_service_checks(std::shared_ptr<service> svc) {
 }
 
 /* disables passive service checks for a particular service */
-void disable_passive_service_checks(std::shared_ptr<service> svc) {
+void disable_passive_service_checks(service* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3214,7 +3214,7 @@ void disable_passive_service_checks(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3344,7 +3344,7 @@ void stop_accepting_passive_host_checks(void) {
 }
 
 /* enables passive host checks for a particular host */
-void enable_passive_host_checks(std::shared_ptr<host> hst) {
+void enable_passive_host_checks(host* hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3362,7 +3362,7 @@ void enable_passive_host_checks(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3373,7 +3373,7 @@ void enable_passive_host_checks(std::shared_ptr<host> hst) {
 }
 
 /* disables passive host checks for a particular host */
-void disable_passive_host_checks(std::shared_ptr<host> hst) {
+void disable_passive_host_checks(host* hst) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
@@ -3391,7 +3391,7 @@ void disable_passive_host_checks(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3464,7 +3464,7 @@ void stop_using_event_handlers(void) {
 }
 
 /* enables the event handler for a particular service */
-void enable_service_event_handler(std::shared_ptr<service> svc) {
+void enable_service_event_handler(service* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3482,7 +3482,7 @@ void enable_service_event_handler(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3493,7 +3493,7 @@ void enable_service_event_handler(std::shared_ptr<service> svc) {
 }
 
 /* disables the event handler for a particular service */
-void disable_service_event_handler(std::shared_ptr<service> svc) {
+void disable_service_event_handler(service* svc) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3511,7 +3511,7 @@ void disable_service_event_handler(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3551,7 +3551,7 @@ void enable_host_event_handler(std::shared_ptr<host> hst) {
 }
 
 /* disables the event handler for a particular host */
-void disable_host_event_handler(std::shared_ptr<host> hst) {
+void disable_host_event_handler(host* hst) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3569,7 +3569,7 @@ void disable_host_event_handler(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3580,7 +3580,7 @@ void disable_host_event_handler(std::shared_ptr<host> hst) {
 }
 
 /* disables checks of a particular host */
-void disable_host_checks(std::shared_ptr<host> hst) {
+void disable_host_checks(host* hst) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* checks are already disabled */
@@ -3599,7 +3599,7 @@ void disable_host_checks(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3610,7 +3610,7 @@ void disable_host_checks(std::shared_ptr<host> hst) {
 }
 
 /* enables checks of a particular host */
-void enable_host_checks(std::shared_ptr<host> hst) {
+void enable_host_checks(host* hst) {
   time_t preferred_time(0);
   time_t next_valid_time(0);
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -3648,7 +3648,7 @@ void enable_host_checks(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -3958,7 +3958,7 @@ void disable_performance_data(void) {
 }
 
 /* start obsessing over a particular service */
-void start_obsessing_over_service(std::shared_ptr<service> svc) {
+void start_obsessing_over_service(service* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -3976,7 +3976,7 @@ void start_obsessing_over_service(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -3987,7 +3987,7 @@ void start_obsessing_over_service(std::shared_ptr<service> svc) {
 }
 
 /* stop obsessing over a particular service */
-void stop_obsessing_over_service(std::shared_ptr<service> svc) {
+void stop_obsessing_over_service(service* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4005,7 +4005,7 @@ void stop_obsessing_over_service(std::shared_ptr<service> svc) {
     NEBTYPE_ADAPTIVESERVICE_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc.get(),
+    svc,
     CMD_NONE,
     attr,
     svc->get_modified_attributes(),
@@ -4016,7 +4016,7 @@ void stop_obsessing_over_service(std::shared_ptr<service> svc) {
 }
 
 /* start obsessing over a particular host */
-void start_obsessing_over_host(std::shared_ptr<host> hst) {
+void start_obsessing_over_host(host* hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4034,7 +4034,7 @@ void start_obsessing_over_host(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -4045,7 +4045,7 @@ void start_obsessing_over_host(std::shared_ptr<host> hst) {
 }
 
 /* stop obsessing over a particular host */
-void stop_obsessing_over_host(std::shared_ptr<host> hst) {
+void stop_obsessing_over_host(host* hst) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
@@ -4063,7 +4063,7 @@ void stop_obsessing_over_host(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),

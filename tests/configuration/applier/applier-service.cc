@@ -209,7 +209,7 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   ASSERT_EQ(sm.size(), 1);
 
   host_map const& hm(engine::host::hosts);
-  ASSERT_EQ(sm.begin()->second->get_host_ptr(), hm.begin()->second);
+  ASSERT_EQ(sm.begin()->second->get_host_ptr(), hm.begin()->second.get());
 }
 
 // Given a service configuration,

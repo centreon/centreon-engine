@@ -188,7 +188,7 @@ void applier::servicegroup::modify_object(
   // Were members modified ?
   if (obj.members() != old_cfg.members()) {
     // Delete all old service group members.
-      for (service_map::iterator
+      for (service_map_unsafe::iterator
              it(it_obj->second->members.begin()),
              end(it_obj->second->members.end());
            it != end;
@@ -198,7 +198,7 @@ void applier::servicegroup::modify_object(
         NEBTYPE_SERVICEGROUPMEMBER_DELETE,
         NEBFLAG_NONE,
         NEBATTR_NONE,
-        it->second.get(),
+        it->second,
         sg,
         &tv);
     }

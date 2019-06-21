@@ -111,7 +111,7 @@ int grab_custom_macro_value_r(
       delimiter_len = arg2.length();
 
       /* concatenate macro values for all hostgroup members */
-      for (host_map::iterator
+      for (host_map_unsafe::iterator
              it(it_hg->second->members.begin()),
              end(it_hg->second->members.begin());
            it != end;
@@ -186,13 +186,13 @@ int grab_custom_macro_value_r(
         delimiter_len = arg2.length();
 
         /* concatenate macro values for all servicegroup members */
-          for (service_map::iterator
+          for (service_map_unsafe::iterator
                  it{temp_servicegroup->members.begin()},
                  end{temp_servicegroup->members.end()};
                it != end;
                ++it) {
 
-          if ((temp_service = it->second.get()) == nullptr)
+          if ((temp_service = it->second) == nullptr)
             continue;
 
           /* get the macro value for this service */
@@ -420,7 +420,7 @@ int grab_standard_hostgroup_macro_r(
 
   case MACRO_HOSTGROUPMEMBERS:
     /* now fill in the string with the member names */
-      for (host_map::iterator
+      for (host_map_unsafe::iterator
              it(temp_hostgroup->members.begin()),
              end(temp_hostgroup->members.begin());
            it != end;
@@ -506,7 +506,7 @@ int grab_standard_servicegroup_macro_r(
 
   case MACRO_SERVICEGROUPMEMBERS:
     /* fill the string with the group members */
-    for (service_map::iterator
+    for (service_map_unsafe::iterator
            it(temp_servicegroup->members.begin()),
            end(temp_servicegroup->members.end());
          it != end;

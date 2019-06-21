@@ -94,7 +94,7 @@ static int handle_host_macro(
       size_t delimiter_len{strlen(arg2)};
 
       // Concatenate macro values for all hostgroup members.
-      for (host_map::iterator
+      for (host_map_unsafe::iterator
              it(hg->members.begin()),
              end(hg->members.end());
            it != end;
@@ -106,7 +106,7 @@ static int handle_host_macro(
           grab_standard_host_macro_r(
             mac,
             macro_type,
-            it->second.get(),
+            it->second,
             buffer,
             &free_sub_macro);
 
@@ -263,19 +263,19 @@ static int handle_service_macro(
           size_t delimiter_len(strlen(arg2));
 
           // Concatenate macro values for all servicegroup members.
-          for (service_map::iterator
+          for (service_map_unsafe::iterator
                  it(sg_it->second->members.begin()),
                  end(sg_it->second->members.end());
                it != end;
                ++it) {
-            if (it->second.get() != nullptr) {
+            if (it->second != nullptr) {
               // Get the macro value for this service.
               std::string buffer;
               int free_sub_macro(false);
               grab_standard_service_macro_r(
                 mac,
                 macro_type,
-                it->second.get(),
+                it->second,
                 buffer,
                 &free_sub_macro);
               if (output.empty())
