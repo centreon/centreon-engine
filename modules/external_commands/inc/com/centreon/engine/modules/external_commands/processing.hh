@@ -294,7 +294,7 @@ namespace         modules {
         }
       }
 
-      template <void (*fptr)(std::shared_ptr<contact>)>
+      template <void (*fptr)(contact*)>
       static void _redirector_contact(
                     int id,
                     time_t entry_time,
@@ -306,10 +306,10 @@ namespace         modules {
         contact_map::const_iterator ct_it{contact::contacts.find(name)};
         if (ct_it == contact::contacts.end())
           return ;
-        (*fptr)(ct_it->second);
+        (*fptr)(ct_it->second.get());
       }
 
-      template <void (*fptr)(std::shared_ptr<contact>)>
+      template <void (*fptr)(contact*)>
       static void _redirector_contactgroup(
                     int id,
                     time_t entry_time,
@@ -322,7 +322,7 @@ namespace         modules {
         if (it_cg == contactgroup::contactgroups.end() || !it_cg->second)
           return ;
 
-        for (contact_map::const_iterator
+        for (contact_map_unsafe::const_iterator
                it(it_cg->second->get_members().begin()),
                end(it_cg->second->get_members().end());
              it != end; ++it)

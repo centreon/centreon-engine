@@ -118,9 +118,9 @@ class                           contact {
                                 get_service_notification_commands() const;
   std::list<std::shared_ptr<commands::command>>&
                                 get_service_notification_commands();
-  std::list<std::shared_ptr<contactgroup>> const&
+  std::list<contactgroup *> const&
                                 get_parent_groups() const;
-  std::list<std::shared_ptr<contactgroup>>&
+  std::list<contactgroup *>&
                                 get_parent_groups();
   int                           check_service_notification_viability(
                                   service* svc,
@@ -161,8 +161,7 @@ class                           contact {
                                 _host_notification_commands;
   std::list<std::shared_ptr<commands::command>>
                                 _service_notification_commands;
-  std::list<std::shared_ptr<contactgroup>>
-                                _contactgroups;
+  std::list<contactgroup*>     _contactgroups;
 
  public:
   std::unordered_map<std::string, customvariable>
@@ -173,10 +172,6 @@ class                           contact {
 };
 
 CCE_END()
-
-typedef std::unordered_map<std::string,
-                           std::shared_ptr<com::centreon::engine::contact>>
-                      contact_map;
 
 #  ifdef __cplusplus
 extern "C" {

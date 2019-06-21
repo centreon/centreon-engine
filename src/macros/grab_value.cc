@@ -392,7 +392,7 @@ static int handle_contact_macro(
       size_t delimiter_len(strlen(arg2));
 
       // Concatenate macro values for all contactgroup members.
-      for(contact_map::const_iterator
+      for(contact_map_unsafe::const_iterator
             it{cg->second->get_members().begin()},
             end{cg->second->get_members().end()};
             it != end; ++it) {
@@ -402,7 +402,7 @@ static int handle_contact_macro(
           grab_standard_contact_macro_r(
             mac,
             macro_type,
-            it->second.get(),
+            it->second,
             buffer);
           // Add macro value to already running macro.
           if (output.empty())
@@ -1168,7 +1168,7 @@ int grab_macro_value_r(
         delimiter_len = strlen(arg[1]);
 
         /* concatenate macro values for all contactgroup members */
-      for(contact_map::const_iterator
+      for(contact_map_unsafe::const_iterator
             it{cg_it->second->get_members().begin()},
             end{cg_it->second->get_members().end()};
             it != end; ++it) {
@@ -1176,7 +1176,7 @@ int grab_macro_value_r(
             continue;
 
           /* get the macro value for this contact */
-          grab_contact_address_macro(x, it->second.get(), temp_buffer);
+          grab_contact_address_macro(x, it->second, temp_buffer);
 
           if (temp_buffer.empty())
             continue;

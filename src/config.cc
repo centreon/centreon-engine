@@ -954,12 +954,12 @@ int check_contactgroup(std::shared_ptr<contactgroup> cg, int* w, int* e) {
   (void)w;
   int errors(0);
 
-  for (contact_map::const_iterator
+  for (contact_map_unsafe::const_iterator
          it{cg->get_members().begin()},
          end{cg->get_members().end()};
        it != end;
        ++it) {
-    std::shared_ptr<contact> temp_contact{it->second};
+    contact *temp_contact{it->second};
     if (!temp_contact) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
@@ -970,7 +970,7 @@ int check_contactgroup(std::shared_ptr<contactgroup> cg, int* w, int* e) {
     // Save a pointer to this contact group for faster contact/group
     // membership lookups later.
     else {
-      temp_contact->get_parent_groups().push_back(cg);
+      temp_contact->get_parent_groups().push_back(cg.get());
 
       // Save the contact pointer for later.
       // FIXME DBR: something strange here, we add again temp_contact to cg. But
