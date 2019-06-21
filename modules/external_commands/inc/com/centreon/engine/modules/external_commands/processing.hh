@@ -62,26 +62,26 @@ namespace         modules {
 
       static void _wrapper_read_state_information();
       static void _wrapper_save_state_information();
-      static void _wrapper_enable_host_and_child_notifications(std::shared_ptr<host> hst);
-      static void _wrapper_disable_host_and_child_notifications(std::shared_ptr<host> hst);
-      static void _wrapper_enable_all_notifications_beyond_host(std::shared_ptr<host> hst);
-      static void _wrapper_disable_all_notifications_beyond_host(std::shared_ptr<host> hst);
-      static void _wrapper_enable_host_svc_notifications(std::shared_ptr<host> hst);
-      static void _wrapper_disable_host_svc_notifications(std::shared_ptr<host> hst);
-      static void _wrapper_enable_host_svc_checks(std::shared_ptr<host> hst);
-      static void _wrapper_disable_host_svc_checks(std::shared_ptr<host> hst);
+      static void _wrapper_enable_host_and_child_notifications(host* hst);
+      static void _wrapper_disable_host_and_child_notifications(host* hst);
+      static void _wrapper_enable_all_notifications_beyond_host(host* hst);
+      static void _wrapper_disable_all_notifications_beyond_host(host* hst);
+      static void _wrapper_enable_host_svc_notifications(host* hst);
+      static void _wrapper_disable_host_svc_notifications(host* hst);
+      static void _wrapper_enable_host_svc_checks(host* hst);
+      static void _wrapper_disable_host_svc_checks(host* hst);
       static void _wrapper_set_host_notification_number(
         std::shared_ptr<host> hst,
                     char* args);
       static void _wrapper_send_custom_host_notification(
         std::shared_ptr<host> hst,
                     char* args);
-      static void _wrapper_enable_service_notifications(std::shared_ptr<host> hst);
-      static void _wrapper_disable_service_notifications(std::shared_ptr<host> hst);
-      static void _wrapper_enable_service_checks(std::shared_ptr<host> hst);
-      static void _wrapper_disable_service_checks(std::shared_ptr<host> hst);
-      static void _wrapper_enable_passive_service_checks(std::shared_ptr<host> hst);
-      static void _wrapper_disable_passive_service_checks(std::shared_ptr<host> hst);
+      static void _wrapper_enable_service_notifications(host* hst);
+      static void _wrapper_disable_service_notifications(host* hst);
+      static void _wrapper_enable_service_checks(host* hst);
+      static void _wrapper_disable_service_checks(host* hst);
+      static void _wrapper_enable_passive_service_checks(host* hst);
+      static void _wrapper_disable_passive_service_checks(host* hst);
       static void _wrapper_set_service_notification_number(
         std::shared_ptr<service> svc, char* args);
       static void _wrapper_send_custom_service_notification(
@@ -135,7 +135,7 @@ namespace         modules {
         (*fptr)(id, entry_time, args);
       }
 
-      template <void (*fptr)(std::shared_ptr<host>)>
+      template <void (*fptr)(host*)>
       static void _redirector_host(
                     int id,
                     time_t entry_time,
@@ -152,7 +152,7 @@ namespace         modules {
 
         if (!hst)
           return ;
-        (*fptr)(hst);
+        (*fptr)(hst.get());
       }
 
       template <void (*fptr)(std::shared_ptr<host>, char*)>
@@ -175,7 +175,7 @@ namespace         modules {
         (*fptr)(hst, args + strlen(name) + 1);
       }
 
-      template <void (*fptr)(std::shared_ptr<host>)>
+      template <void (*fptr)(host*)>
       static void _redirector_hostgroup(
                     int id,
                     time_t entry_time,
@@ -193,7 +193,7 @@ namespace         modules {
         if (!group)
           return ;
 
-        for (host_map::iterator
+        for (host_map_unsafe::iterator
                it(group->members.begin()),
                end(group->members.begin());
              it != end;
@@ -202,7 +202,7 @@ namespace         modules {
             (*fptr)(it->second);
       }
 
-      template <void (*fptr)(std::shared_ptr<service>)>
+      template <void (*fptr)(service*)>
       static void _redirector_service(
         int id,
         time_t entry_time,
@@ -218,7 +218,7 @@ namespace         modules {
 
         if (found == service::services.end() || !found->second)
           return ;
-        (*fptr)(found->second);
+        (*fptr)(found->second.get());
       }
 
       template <void (*fptr)(std::shared_ptr<service>, char*)>
@@ -239,7 +239,7 @@ namespace         modules {
         (*fptr)(found->second, args + strlen(name) + strlen(description) + 2);
       }
 
-      template <void (*fptr)(std::shared_ptr<service>)>
+      template <void (*fptr)(service*)>
       static void _redirector_servicegroup(
                     int id,
                     time_t entry_time,
@@ -253,7 +253,7 @@ namespace         modules {
           !sg_it->second)
           return ;
 
-        for (service_map::iterator
+        for (service_map_unsafe::iterator
                it2(sg_it->second->members.begin()),
                end2(sg_it->second->members.end());
              it2 != end2;
@@ -262,7 +262,7 @@ namespace         modules {
             (*fptr)(it2->second);
       }
 
-      template <void (*fptr)(std::shared_ptr<host>)>
+      template <void (*fptr)(host*)>
       static void _redirector_servicegroup(
                     int id,
                     time_t entry_time,
@@ -276,7 +276,7 @@ namespace         modules {
           return ;
 
         std::shared_ptr<host> last_host{nullptr};
-        for (service_map::iterator
+        for (service_map_unsafe::iterator
                it2(sg_it->second->members.begin()),
                end2(sg_it->second->members.end());
              it2 != end2;
@@ -289,7 +289,7 @@ namespace         modules {
 
           if (!hst || hst == last_host)
             continue;
-          (*fptr)(hst);
+          (*fptr)(hst.get());
           last_host = hst;
         }
       }

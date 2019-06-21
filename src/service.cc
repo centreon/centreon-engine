@@ -352,6 +352,21 @@ std::ostream& operator<<(std::ostream& os, service_map const& obj) {
 }
 
 /**
+ *  Dump a service_map_unsafe content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The service_map to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, service_map_unsafe const& obj) {
+  for (service_map_unsafe::const_iterator it(obj.begin()), end(obj.end()); it != end; ++it)
+    os << "(" << it->first.first << ", "
+       << it->first.second << (std::next(it) != obj.end() ? "), " : ")");
+  return os;
+}
+
+/**
  *  Dump service content into the stream.
  *
  *  @param[out] os  The output stream.
@@ -1305,7 +1320,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
           << get_plugin_output();
   }
 
-  host* hst{get_host_ptr().get()};
+  host* hst{get_host_ptr()};
   /* if the service check was okay... */
   if (_current_state == service::state_ok) {
     /* if the host has never been checked before, verify its status
@@ -2210,7 +2225,7 @@ int service::handle_service_event() {
 
   /* update service macros */
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, get_host_ptr().get());
+  grab_host_macros_r(&mac, get_host_ptr());
   grab_service_macros_r(&mac, this);
 
   /* run the global service event handler */
@@ -2233,7 +2248,7 @@ int service::handle_service_event() {
 int service::obsessive_compulsive_service_check_processor() {
   std::string raw_command;
   std::string processed_command;
-  host* temp_host{get_host_ptr().get()};
+  host* temp_host{get_host_ptr()};
   int early_timeout = false;
   double exectime = 0.0;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
@@ -3136,7 +3151,7 @@ int service::verify_check_viability(int check_options,
 }
 
 void service::grab_macros_r(nagios_macros* mac) {
-  grab_host_macros_r(mac, _host_ptr.get());
+  grab_host_macros_r(mac, _host_ptr);
   grab_service_macros_r(mac, this);
 }
 
@@ -3629,11 +3644,11 @@ void service::set_is_volatile(bool vol) {
   _is_volatile = vol;
 }
 
-std::list<std::shared_ptr<servicegroup>> const& service::get_parent_groups() const {
+std::list<servicegroup*> const& service::get_parent_groups() const {
   return _servicegroups;
 }
 
-std::list<std::shared_ptr<servicegroup>>& service::get_parent_groups() {
+std::list<servicegroup*>& service::get_parent_groups() {
   return _servicegroups;
 }
 
@@ -3854,14 +3869,14 @@ bool service::is_in_downtime() const {
   return get_scheduled_downtime_depth() > 0 || _host_ptr->get_scheduled_downtime_depth() > 0;
 }
 
-void service::set_host_ptr(std::shared_ptr<host> h) {
+void service::set_host_ptr(host* h) {
   _host_ptr = h;
 }
 
-std::shared_ptr<host> const service::get_host_ptr() const {
+host const* service::get_host_ptr() const {
   return _host_ptr;
 }
 
-std::shared_ptr<host> service::get_host_ptr() {
+host* service::get_host_ptr() {
   return _host_ptr;
 }

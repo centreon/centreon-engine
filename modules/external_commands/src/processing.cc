@@ -354,24 +354,24 @@ void processing::_wrapper_save_state_information() {
   retention::dump::save(config->state_retention_file());
 }
 
-void processing::_wrapper_enable_host_and_child_notifications(std::shared_ptr<host> hst) {
+void processing::_wrapper_enable_host_and_child_notifications(host* hst) {
   enable_and_propagate_notifications(hst, 0, true, true, false);
 }
 
-void processing::_wrapper_disable_host_and_child_notifications(std::shared_ptr<host> hst) {
+void processing::_wrapper_disable_host_and_child_notifications(host* hst) {
   disable_and_propagate_notifications(hst, 0, true, true, false);
 }
 
-void processing::_wrapper_enable_all_notifications_beyond_host(std::shared_ptr<host> hst) {
+void processing::_wrapper_enable_all_notifications_beyond_host(host* hst) {
   enable_and_propagate_notifications(hst, 0, false, true, true);
 }
 
-void processing::_wrapper_disable_all_notifications_beyond_host(std::shared_ptr<host> hst) {
+void processing::_wrapper_disable_all_notifications_beyond_host(host* hst) {
   disable_and_propagate_notifications(hst, 0, false, true, true);
 }
 
-void processing::_wrapper_enable_host_svc_notifications(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_enable_host_svc_notifications(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -380,8 +380,8 @@ void processing::_wrapper_enable_host_svc_notifications(std::shared_ptr<host> hs
       enable_service_notifications(it->second);
 }
 
-void processing::_wrapper_disable_host_svc_notifications(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_disable_host_svc_notifications(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -390,8 +390,8 @@ void processing::_wrapper_disable_host_svc_notifications(std::shared_ptr<host> h
       disable_service_notifications(it->second);
 }
 
-void processing::_wrapper_disable_host_svc_checks(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_disable_host_svc_checks(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -400,8 +400,8 @@ void processing::_wrapper_disable_host_svc_checks(std::shared_ptr<host> hst) {
       disable_service_checks(it->second);
 }
 
-void processing::_wrapper_enable_host_svc_checks(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_enable_host_svc_checks(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -423,8 +423,8 @@ void processing::_wrapper_send_custom_host_notification(std::shared_ptr<host> hs
   }
 }
 
-void processing::_wrapper_enable_service_notifications(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_enable_service_notifications(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -433,8 +433,8 @@ void processing::_wrapper_enable_service_notifications(std::shared_ptr<host> hst
       enable_service_notifications(it->second);
 }
 
-void processing::_wrapper_disable_service_notifications(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_disable_service_notifications(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -443,8 +443,8 @@ void processing::_wrapper_disable_service_notifications(std::shared_ptr<host> hs
       disable_service_notifications(it->second);
 }
 
-void processing::_wrapper_enable_service_checks(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_enable_service_checks(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -453,8 +453,8 @@ void processing::_wrapper_enable_service_checks(std::shared_ptr<host> hst) {
       enable_service_checks(it->second);
 }
 
-void processing::_wrapper_disable_service_checks(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_disable_service_checks(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -463,8 +463,8 @@ void processing::_wrapper_disable_service_checks(std::shared_ptr<host> hst) {
       disable_service_checks(it->second);
 }
 
-void processing::_wrapper_enable_passive_service_checks(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_enable_passive_service_checks(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;
@@ -473,8 +473,8 @@ void processing::_wrapper_enable_passive_service_checks(std::shared_ptr<host> hs
       enable_passive_service_checks(it->second);
 }
 
-void processing::_wrapper_disable_passive_service_checks(std::shared_ptr<host> hst) {
-  for (service_map::iterator
+void processing::_wrapper_disable_passive_service_checks(host* hst) {
+  for (service_map_unsafe::iterator
          it(hst->services.begin()),
          end(hst->services.end());
        it != end;

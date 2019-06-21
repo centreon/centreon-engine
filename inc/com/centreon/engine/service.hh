@@ -44,7 +44,6 @@ CCE_BEGIN()
   class host;
   class service;
   class servicegroup;
-  class serviceescalation;
 CCE_END()
 
 //Needed by service to use pair<string, string> as umap key.
@@ -58,6 +57,8 @@ struct pair_hash {
 
 typedef std::unordered_map<std::pair<std::string, std::string>,
   std::shared_ptr<com::centreon::engine::service>, pair_hash> service_map;
+typedef std::unordered_map<std::pair<std::string, std::string>,
+  com::centreon::engine::service*, pair_hash> service_map_unsafe;
 typedef std::unordered_map<std::pair<uint64_t, uint64_t>,
   std::shared_ptr<com::centreon::engine::service>, pair_hash> service_id_map;
 
@@ -219,13 +220,13 @@ class                           service : public notifier {
 
   commands::command*            event_handler_ptr;
   commands::command*            check_command_ptr;
-  std::list<std::shared_ptr<servicegroup>> const&
+  std::list<servicegroup *> const&
                                 get_parent_groups() const;
-  std::list<std::shared_ptr<servicegroup>>&
+  std::list<servicegroup *>&
                                 get_parent_groups();
-  void                          set_host_ptr(std::shared_ptr<host> h);
-  std::shared_ptr<host> const   get_host_ptr() const;
-  std::shared_ptr<host>         get_host_ptr();
+  void                          set_host_ptr(host* h);
+  host const*                   get_host_ptr() const;
+  host*                         get_host_ptr();
 
   static service_map            services;
   static service_id_map         services_by_id;
@@ -247,9 +248,8 @@ class                           service : public notifier {
   enum service_state            _last_hard_state;
   enum service_state            _current_state;
   enum service_state            _initial_state;
-  std::list<std::shared_ptr<servicegroup>>
-                                _servicegroups;
-  std::shared_ptr<host>         _host_ptr;
+  std::list<servicegroup *>     _servicegroups;
+  host*                         _host_ptr;
 };
 CCE_END()
 
@@ -320,6 +320,7 @@ int      is_escalated_contact_for_service(
 
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
 std::ostream& operator<<(std::ostream& os, service_map const& obj);
+std::ostream& operator<<(std::ostream& os, service_map_unsafe const& obj);
 
 CCE_BEGIN()
 

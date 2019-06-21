@@ -57,12 +57,12 @@ static void generate_host_total_services(
     unsigned long total_host_services_warning(0);
     unsigned long total_host_services_unknown(0);
     unsigned long total_host_services_critical(0);
-    for (service_map::iterator
+    for (service_map_unsafe::iterator
            it(hst.services.begin()),
            end(hst.services.end());
          it != end;
          ++it) {
-      service* temp_service(it->second.get());
+      service* temp_service(it->second);
       if (temp_service) {
         total_host_services++;
         switch (temp_service->get_current_state()) {
@@ -122,7 +122,7 @@ static std::string get_host_group_names(host& hst, nagios_macros* mac) {
 
   std::string buf;
   // Find all hostgroups this host is associated with.
-  for (std::list<std::shared_ptr<hostgroup>>::const_iterator
+  for (std::list<hostgroup*>::const_iterator
          it{hst.get_parent_groups().begin()},
          end{hst.get_parent_groups().end()};
        it != end;
@@ -176,7 +176,7 @@ std::string get_host_total_services(host& hst, nagios_macros* mac) {
 static std::string get_host_parents(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(hst.parent_hosts.begin()),
          end(hst.parent_hosts.end());
        it != end;
@@ -199,7 +199,7 @@ static std::string get_host_parents(host& hst, nagios_macros* mac) {
 static std::string get_host_children(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(hst.child_hosts.begin()),
          end(hst.child_hosts.end());
        it != end;
@@ -453,7 +453,7 @@ int grab_host_macros_r(nagios_macros *mac, host *hst) {
 
   // Save pointer to host's first/primary hostgroup.
   if (!hst->get_parent_groups().empty())
-    mac->hostgroup_ptr = hst->get_parent_groups().front().get();
+    mac->hostgroup_ptr = hst->get_parent_groups().front();
 
   return OK;
 }

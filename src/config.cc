@@ -66,21 +66,21 @@ static int dfs_host_path(host* root) {
   dfs_set_status(root, DFS_TEMP_CHECKED);
 
   /* We are scanning the children */
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(root->child_hosts.begin()),
          end(root->child_hosts.end());
        it != end;
        it++) {
-    int child_status = dfs_get_status(it->second.get());
+    int child_status = dfs_get_status(it->second);
 
     /* If a child is not checked, check it */
     if (child_status == DFS_UNCHECKED)
-      child_status = dfs_host_path(it->second.get());
+      child_status = dfs_host_path(it->second);
 
     /* If a child already temporary checked, its a problem,
      * loop inside, and its a acked status */
     if (child_status == DFS_TEMP_CHECKED) {
-      dfs_set_status(it->second.get(), DFS_LOOPY);
+      dfs_set_status(it->second, DFS_LOOPY);
       dfs_set_status(root, DFS_LOOPY);
     }
 
@@ -91,7 +91,7 @@ static int dfs_host_path(host* root) {
         dfs_set_status(root, DFS_NEAR_LOOP);
 
       /* we already saw this child, it's a problem */
-      dfs_set_status(it->second.get(), DFS_LOOPY);
+      dfs_set_status(it->second, DFS_LOOPY);
     }
   }
 
@@ -307,12 +307,12 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
 
   /* save the host pointer for later */
   if (it == host::hosts.end())
-    svc->get_host_ptr().reset();
+    svc->set_host_ptr(nullptr);
   else
-    svc->set_host_ptr(it->second);
+    svc->set_host_ptr(it->second.get());
 
   /* add a reverse link from the host to the service for faster lookups later */
-  svc->get_host_ptr()->services[{svc->get_hostname(), svc->get_description()}] = svc;
+  svc->get_host_ptr()->services[{svc->get_hostname(), svc->get_description()}] = svc.get();
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -320,7 +320,7 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
     NEBTYPE_PARENT_ADD,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    svc->get_host_ptr().get(),
+    svc->get_host_ptr(),
     NULL,
     NULL,
     svc.get(),
@@ -669,7 +669,7 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
   }
 
   /* check all parent parent host */
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(hst->parent_hosts.begin()),
          end(hst->parent_hosts.end());
        it != end;
@@ -684,7 +684,7 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
       errors++;
     }
     else
-      it_host->second->add_child_link(hst); //add a reverse (child) link to make searches faster later on
+      it_host->second->add_child_link(hst.get()); //add a reverse (child) link to make searches faster later on
   }
 
   // Check for sane recovery options.
@@ -843,14 +843,14 @@ int check_servicegroup(std::shared_ptr<servicegroup> sg, int* w, int* e) {
   int errors(0);
 
   // Check all group members.
-  for (service_map::iterator
+  for (service_map_unsafe::iterator
          it(sg->members.begin()),
          end(sg->members.end());
        it != end;
        ++it) {
 
    service_map::const_iterator found(service::services.find(
-     {it->first.first, it->first.second}));
+     it->first));
 
     if (found == service::services.end() || !found->second) {
       logger(log_verification_error, basic)
@@ -865,10 +865,10 @@ int check_servicegroup(std::shared_ptr<servicegroup> sg, int* w, int* e) {
     // Save a pointer to this servicegroup for faster service/group
     // membership lookups later.
     else {
-      found->second->get_parent_groups().push_back(sg);
+      found->second->get_parent_groups().push_back(sg.get());
 
       // Save service pointer for later.
-      sg->members[it->first] = found->second;
+      sg->members[it->first] = found->second.get();
     }
   }
 
@@ -901,7 +901,7 @@ int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
   int errors(0);
 
   // Check all group members.
-  for (host_map::iterator
+  for (host_map_unsafe::iterator
          it(hg->members.begin()),
          end(hg->members.end());
        it != end;
@@ -919,10 +919,10 @@ int check_hostgroup(std::shared_ptr<hostgroup> hg, int* w, int* e) {
     // Save a pointer to this hostgroup for faster host/group
     // membership lookups later.
     else {
-      it_host->second->get_parent_groups().push_back(hg);
+      it_host->second->get_parent_groups().push_back(hg.get());
 
       // Save host pointer for later.
-      hg->members[it->first] = it_host->second;
+      hg->members[it->first] = it_host->second.get();
     }
   }
 

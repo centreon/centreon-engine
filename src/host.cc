@@ -308,7 +308,7 @@ void host::set_host_id(uint64_t id) {
   _id = id;
 }
 
-void host::add_child_link(std::shared_ptr<host> child) {
+void host::add_child_link(host* child) {
   // Make sure we have the data we need.
   if (!child)
     throw(engine_error() << "add child link called with nullptr ptr");
@@ -318,7 +318,7 @@ void host::add_child_link(std::shared_ptr<host> child) {
   // Notify event broker.
   timeval tv(get_broker_timestamp(nullptr));
   broker_relation_data(NEBTYPE_PARENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, this,
-                       nullptr, child.get(), nullptr, &tv);
+                       nullptr, child, nullptr, &tv);
 }
 
 void host::add_parent_host(std::string const& host_name) {
@@ -800,6 +800,18 @@ std::ostream& operator<<(std::ostream& os, host_map const& obj) {
   return os;
 }
 
+std::ostream& operator<<(std::ostream& os, host_map_unsafe const& obj) {
+  for (host_map_unsafe::const_iterator it(obj.begin()), end(obj.end()); it != end;
+       ++it) {
+    os << it->first;
+    if (next(it) != end)
+      os << ", ";
+    else
+      os << "";
+  }
+  return os;
+}
+
 /**
  *  Dump host content into the stream.
  *
@@ -1263,10 +1275,10 @@ int is_host_immediate_child_of_host(com::centreon::engine::host* parent_host,
   }
   // Mid-level/bottom hosts.
   else {
-    for (host_map::iterator it(child_host->parent_hosts.begin()),
+    for (host_map_unsafe::iterator it(child_host->parent_hosts.begin()),
          end(child_host->parent_hosts.end());
          it != end; it++)
-      if (it->second.get() == parent_host)
+      if (it->second == parent_host)
         return true;
   }
 
@@ -3436,7 +3448,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
        * somewhere and we should catch the recovery as soon as possible */
       logger(dbg_checks, more) << "Propagating checks to parent host(s)...";
 
-      for (host_map::iterator it(parent_hosts.begin()),
+      for (host_map_unsafe::iterator it(parent_hosts.begin()),
              end(parent_hosts.end());
            it != end; it++) {
         if (it->second == nullptr)
@@ -3444,7 +3456,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         if (it->second->get_current_state() !=  host::state_up) {
           logger(dbg_checks, more)
             << "Check of parent host '" << it->first << "' queued.";
-          check_hostlist.push_back(it->second.get());
+          check_hostlist.push_back(it->second);
         }
       }
 
@@ -3453,7 +3465,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
        * result of this recovery) switch to UP or DOWN states */
       logger(dbg_checks, more) << "Propagating checks to child host(s)...";
 
-      for (host_map::iterator it(child_hosts.begin()),
+      for (host_map_unsafe::iterator it(child_hosts.begin()),
              end(child_hosts.end());
            it != end; it++) {
         if (it->second == nullptr)
@@ -3461,7 +3473,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         if (it->second->get_current_state() !=  host::state_up) {
           logger(dbg_checks, more)
             << "Check of child host '" << it->first << "' queued.";
-          check_hostlist.push_back(it->second.get());
+          check_hostlist.push_back(it->second);
         }
       }
     }
@@ -3578,7 +3590,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
             << "** WARNING: Max attempts = 1, so we have to run serial "
                "checks of all parent hosts!";
 
-          for (host_map::iterator it(parent_hosts.begin()),
+          for (host_map_unsafe::iterator it(parent_hosts.begin()),
                  end(parent_hosts.end());
                it != end; it++) {
             if (it->second == nullptr)
@@ -3590,7 +3602,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
               << "Running serial check parent host '" << it->first << "'...";
 
             /* run an immediate check of the parent host */
-            it->second.get()->run_sync_check_3x( &parent_state,
+            it->second->run_sync_check_3x( &parent_state,
                                                       check_options, use_cached_result,
                                                       check_timestamp_horizon);
 
@@ -3636,7 +3648,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         logger(dbg_checks, more)
           << "Propagating check to immediate non-UNREACHABLE child hosts...";
 
-        for (host_map::iterator it(child_hosts.begin()),
+        for (host_map_unsafe::iterator it(child_hosts.begin()),
                end(child_hosts.end());
              it != end; it++) {
           if (it->second == nullptr)
@@ -3644,7 +3656,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second->get_current_state() !=  host::state_unreachable) {
             logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
-            check_hostlist.push_back(it->second.get());
+            check_hostlist.push_back(it->second);
           }
         }
       }
@@ -3703,13 +3715,13 @@ int host::process_check_result_3x(enum host::host_state new_state,
           << "Propagating checks to immediate parent hosts that "
              "are UP...";
 
-        for (host_map::iterator it(parent_hosts.begin()),
+        for (host_map_unsafe::iterator it(parent_hosts.begin()),
                end(parent_hosts.end());
              it != end; it++) {
           if (it->second == nullptr)
             continue;
           if (it->second->get_current_state() ==  host::state_up) {
-            check_hostlist.push_back(it->second.get());
+            check_hostlist.push_back(it->second);
             logger(dbg_checks, more)
               << "Check of host '" << it->first << "' queued.";
           }
@@ -3721,7 +3733,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           << "Propagating checks to immediate non-UNREACHABLE "
              "child hosts...";
 
-        for (host_map::iterator it(child_hosts.begin()),
+        for (host_map_unsafe::iterator it(child_hosts.begin()),
                end(child_hosts.end());
              it != end; it++) {
           if (it->second == nullptr)
@@ -3729,7 +3741,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           if (it->second->get_current_state() !=  host::state_unreachable) {
             logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
-            check_hostlist.push_back(it->second.get());
+            check_hostlist.push_back(it->second);
           }
         }
 
@@ -3914,7 +3926,7 @@ enum host::host_state host::determine_host_reachability() {
     /* check all parent hosts to see if we're DOWN or UNREACHABLE */
   else {
 
-    for (host_map::iterator
+    for (host_map_unsafe::iterator
            it(parent_hosts.begin()),
            end(parent_hosts.end());
          it != end;
@@ -3945,11 +3957,11 @@ enum host::host_state host::determine_host_reachability() {
   return state;
 }
 
-std::list<std::shared_ptr<hostgroup>> const& host::get_parent_groups() const {
+std::list<hostgroup*> const& host::get_parent_groups() const {
   return _hostgroups;
 }
 
-std::list<std::shared_ptr<hostgroup>>& host::get_parent_groups() {
+std::list<hostgroup*>& host::get_parent_groups() {
   return _hostgroups;
 }
 

@@ -604,7 +604,7 @@ void checker::run(
   // Get current host and service macros.
   nagios_macros macros;
   memset(&macros, 0, sizeof(macros));
-  grab_host_macros_r(&macros, svc->get_host_ptr().get());
+  grab_host_macros_r(&macros, svc->get_host_ptr());
   grab_service_macros_r(&macros, svc);
   std::string tmp;
   get_raw_command_line_r(

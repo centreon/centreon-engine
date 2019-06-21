@@ -62,7 +62,7 @@ class                     servicegroup {
   bool                    operator!=(servicegroup const& obj) throw ();
 
   static servicegroup_map servicegroups;
-  service_map             members;
+  service_map_unsafe      members;
 
  private:
   uint64_t                _id;
