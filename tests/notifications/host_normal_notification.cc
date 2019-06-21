@@ -90,7 +90,7 @@ TEST_F(HostNotification, SimpleNormalHostNotification) {
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.release();
+  _host->notification_period_ptr = tperiod.get();
   ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
