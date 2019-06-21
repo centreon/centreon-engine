@@ -203,7 +203,16 @@
 # define URL_ENCODE_MACRO_CHARS                 4
 
 // NAGIOS_MACROS structure
-struct                                  nagios_macros {
+class nagios_macros {
+ public:
+  nagios_macros()
+    : host_ptr{nullptr},
+      hostgroup_ptr{nullptr},
+      service_ptr{nullptr},
+      servicegroup_ptr{nullptr},
+      contact_ptr{nullptr},
+      contactgroup_ptr{nullptr} {};
+
   std::string                           x[MACRO_X_COUNT];
   std::string                           argv[MAX_COMMAND_ARGUMENTS];
   std::string                           contactaddress[MAX_CONTACT_ADDRESSES];
@@ -221,7 +230,5 @@ struct                                  nagios_macros {
   std::unordered_map<std::string, com::centreon::engine::customvariable>
                                         custom_contact_vars;
 };
-
-typedef struct nagios_macros nagios_macros;
 
 #endif /* !CCE_MACROS_DEFINES_HH_ */

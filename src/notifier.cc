@@ -506,7 +506,6 @@ int notifier::notify(notifier::reason_type type,
 //      << "Creating list of contacts to be notified.";
 //
 //  /* create the contact notification list for this service */
-//  memset(&mac, 0, sizeof(mac));
 //  create_notification_list(&mac, options, &escalated);
 //
 //  /* send data to event broker */

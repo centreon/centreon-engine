@@ -208,12 +208,6 @@ int xpddefault_update_service_performance_data(com::centreon::engine::service* s
       && config->service_perfdata_command().empty())
     return OK;
 
-  /*
-   * we know we've got some work to do, so grab the necessary
-   * macros and get busy
-   */
-  memset(&mac, 0, sizeof(mac));
-
   host* hst{nullptr};
   host_map::const_iterator it(host::hosts.find(svc->get_hostname()));
   if (it != host::hosts.end())
@@ -254,7 +248,6 @@ int xpddefault_update_host_performance_data(host* hst) {
     return OK;
 
   // set up macros and get to work.
-  memset(&mac, 0, sizeof(mac));
   grab_host_macros_r(&mac, hst);
 
   // run the performance data command.
@@ -657,9 +650,6 @@ int xpddefault_process_host_perfdata_file() {
   if (config->host_perfdata_file_processing_command().empty())
     return OK;
 
-  // init macros.
-  memset(&mac, 0, sizeof(mac));
-
   // get the raw command line.
   get_raw_command_line_r(
     &mac,
@@ -743,9 +733,6 @@ int xpddefault_process_service_perfdata_file() {
   // we don't have a command.
   if (config->service_perfdata_file_processing_command().empty())
     return OK;
-
-  // init macros.
-  memset(&mac, 0, sizeof(mac));
 
   // get the raw command line.
   get_raw_command_line_r(

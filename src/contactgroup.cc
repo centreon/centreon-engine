@@ -94,7 +94,7 @@ std::string const& contactgroup::get_name() const {
   return _name;
 }
 
-void contactgroup::add_member(contact* :cntct) {
+void contactgroup::add_member(contact* cntct) {
   _members.insert({cntct->get_name(), cntct});
 
   timeval tv(get_broker_timestamp(NULL));
