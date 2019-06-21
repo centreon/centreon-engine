@@ -741,11 +741,11 @@ std::ostream& operator<<(
   return (os);
 }
 
-std::list<std::shared_ptr<contactgroup>> const& contact::get_parent_groups() const {
+std::list<contactgroup*> const& contact::get_parent_groups() const {
   return _contactgroups;
 }
 
-std::list<std::shared_ptr<contactgroup>>& contact::get_parent_groups() {
+std::list<contactgroup*>& contact::get_parent_groups() {
   return _contactgroups;
 }
 

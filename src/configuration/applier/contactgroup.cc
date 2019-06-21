@@ -101,7 +101,7 @@ void applier::contactgroup::add_object(
       throw engine_error() << "Error: Cannot resolve contact group "
          << obj.contactgroup_name() << "'";
     } else
-      cg->add_member(ct_it->second);
+      cg->add_member(ct_it->second.get());
   }
 
   engine::contactgroup::contactgroups.insert({name, cg});
@@ -189,7 +189,7 @@ void applier::contactgroup::modify_object(
            << obj.contactgroup_name() << "'";
       }
       else
-        it_obj->second->add_member(ct_it->second);
+        it_obj->second->add_member(ct_it->second.get());
     }
   }
 

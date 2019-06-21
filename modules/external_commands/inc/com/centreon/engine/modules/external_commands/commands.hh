@@ -66,10 +66,10 @@ void enable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst)
 void disable_host_notifications(std::shared_ptr<com::centreon::engine::host> hst);          // disables host notifications
 void enable_and_propagate_notifications(std::shared_ptr<com::centreon::engine::host> hst, int level, int affect_top_host, int affect_hosts, int affect_services);  // enables notifications for all hosts and services beyond a given host
 void disable_and_propagate_notifications(std::shared_ptr<com::centreon::engine::host> hst, int level, int affect_top_host, int affect_hosts, int affect_services); // disables notifications for all hosts and services beyond a given host
-void enable_contact_host_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                     // enables host notifications for a specific contact
-void disable_contact_host_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                    // disables host notifications for a specific contact
-void enable_contact_service_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                  // enables service notifications for a specific contact
-void disable_contact_service_notifications(std::shared_ptr<com::centreon::engine::contact> cntct);                 // disables service notifications for a specific contact
+void enable_contact_host_notifications(com::centreon::engine::contact *cntct);                     // enables host notifications for a specific contact
+void disable_contact_host_notifications(com::centreon::engine::contact *cntct);                    // disables host notifications for a specific contact
+void enable_contact_service_notifications(com::centreon::engine::contact *cntct);                  // enables service notifications for a specific contact
+void disable_contact_service_notifications(com::centreon::engine::contact *cntct);                 // disables service notifications for a specific contact
 void schedule_and_propagate_downtime(std::shared_ptr<com::centreon::engine::host> temp_host, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration); // schedules downtime for all hosts beyond a given host
 void acknowledge_host_problem(std::shared_ptr<com::centreon::engine::host> hst, char* ack_author, char* ack_data, int type, int notify, int persistent);       // acknowledges a host problem
 void acknowledge_service_problem(std::shared_ptr<com::centreon::engine::service> svc, char* ack_author, char* ack_data, int type, int notify, int persistent); // acknowledges a service problem

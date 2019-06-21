@@ -27,11 +27,9 @@
 #include "com/centreon/engine/namespace.hh"
 
 /* Forward declaration. */
-struct contactsmember_struct;
-
 CCE_BEGIN()
-class contact;
 class contactgroup;
+class contact;
 
 namespace configuration {
   class contactgroup;
@@ -41,6 +39,8 @@ CCE_END()
 typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::contactgroup>>
     contactgroup_map;
+typedef std::unordered_map<std::string,
+    com::centreon::engine::contact *> contact_map_unsafe;
 
 
 CCE_BEGIN()
@@ -53,9 +53,9 @@ class contactgroup {
    std::string const& get_name() const;
    std::string const& get_alias() const;
    void               set_alias(std::string const &alias);
-   void               add_member(std::shared_ptr<contact> cntct);
+   void               add_member(contact* cntct);
    void               clear_members();
-   std::unordered_map<std::string, std::shared_ptr<contact>> const&
+   contact_map_unsafe const&
                       get_members() const;
 
    contactgroup& operator=(contactgroup const& other);
@@ -65,8 +65,7 @@ class contactgroup {
 
  private:
    std::string        _alias;
-   std::unordered_map<std::string, std::shared_ptr<contact>>
-                      _members;
+   contact_map_unsafe _members;
    std::string        _name;
 };
 

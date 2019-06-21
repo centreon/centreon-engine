@@ -94,7 +94,7 @@ std::string const& contactgroup::get_name() const {
   return _name;
 }
 
-void contactgroup::add_member(std::shared_ptr<contact> cntct) {
+void contactgroup::add_member(contact *cntct) {
   _members.insert({cntct->get_name(), cntct});
 
   timeval tv(get_broker_timestamp(NULL));
@@ -110,7 +110,7 @@ void contactgroup::clear_members() {
   _members.clear();
 }
 
-contact_map const& contactgroup::get_members() const {
+contact_map_unsafe const& contactgroup::get_members() const {
   return _members;
 }
 
