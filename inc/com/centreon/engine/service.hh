@@ -44,6 +44,7 @@ CCE_BEGIN()
   class host;
   class service;
   class servicegroup;
+  class serviceescalation;
 CCE_END()
 
 //Needed by service to use pair<string, string> as umap key.
@@ -220,9 +221,9 @@ class                           service : public notifier {
 
   commands::command*            event_handler_ptr;
   commands::command*            check_command_ptr;
-  std::list<servicegroup *> const&
+  std::list<servicegroup*> const&
                                 get_parent_groups() const;
-  std::list<servicegroup *>&
+  std::list<servicegroup*>&
                                 get_parent_groups();
   void                          set_host_ptr(host* h);
   host const*                   get_host_ptr() const;
@@ -319,7 +320,6 @@ int      is_escalated_contact_for_service(
 }
 
 std::ostream& operator<<(std::ostream& os, com::centreon::engine::service const& obj);
-std::ostream& operator<<(std::ostream& os, service_map const& obj);
 std::ostream& operator<<(std::ostream& os, service_map_unsafe const& obj);
 
 CCE_BEGIN()

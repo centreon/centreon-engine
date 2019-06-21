@@ -73,147 +73,31 @@ std::string const& hostescalation::get_hostname() const {
   return _hostname;
 }
 
-std::string const& hostescalation::get_escalation_period() const {
-  return _escalation_period;
-}
-
-void hostescalation::set_escalation_period(
-  std::string const& escalation_period) {
-  _escalation_period = escalation_period;
-}
-
 /**
- *  Equal operator.
+ *  This method is called by a notifier to know if this escalation is touched
+ *  by the notification to send.
  *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
+ * @param state The notifier state.
+ * @param notification_number The current notifier notification number.
  *
- *  @return True if is the same object, otherwise false.
+ * @return A boolean.
  */
-bool hostescalation::operator==(
-       hostescalation const& obj) throw () {
-  return _hostname == obj.get_hostname()
-          && get_first_notification() == obj.get_first_notification()
-          && get_last_notification() == obj.get_last_notification()
-          && get_notification_interval() == obj.get_notification_interval()
-          && _escalation_period == obj.get_escalation_period()
-          && get_escalate_on() == obj.get_escalate_on()
-          && ((contact_groups.size() == obj.contact_groups.size()) &&
-               std::equal(contact_groups.begin(),
-                          contact_groups.end(),
-                          obj.contact_groups.begin()))
-          && (contacts().size() == obj.contacts().size() &&
-               std::equal(contacts().begin(),
-                          contacts().end(),
-                          obj.contacts().begin()));
-}
+bool hostescalation::is_viable(int state, int notification_number) const {
+  logger(dbg_functions, basic)
+    << "serviceescalation::is_viable()";
 
-/**
- *  Not equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is not the same object, otherwise false.
- */
-bool hostescalation::operator!=(hostescalation const& obj) throw () {
-  return !((*this) == obj);
-}
+  bool retval{escalation::is_viable(state, notification_number)};
+  if (retval) {
+    std::array<notifier::notification_type, 3> nt = {
+      notifier::up,
+      notifier::down,
+      notifier::unreachable,
+    };
 
-/**
- *  Less-than operator.
- *
- *  @param[in] obj1 First object to compare.
- *  @param[in] obj2 Second object to compare.
- *
- *  @return True if the first object is less than the second.
- */
-bool hostescalation::operator<(hostescalation const& obj) {
-  if (_hostname != obj.get_hostname())
-    return _hostname != obj.get_hostname();
-  else if (_escalation_period !=  obj.get_escalation_period())
-    return _escalation_period != obj.get_escalation_period();
-  else if (get_first_notification() != obj.get_first_notification())
-    return (get_first_notification() < obj.get_first_notification());
-  else if (get_last_notification() != obj.get_last_notification())
-    return (get_last_notification() < obj.get_last_notification());
-  else if (get_notification_interval() != obj.get_notification_interval())
-    return get_notification_interval() < obj.get_notification_interval();
-  else if (get_escalate_on() != obj.get_escalate_on())
-    return (get_escalate_on() < obj.get_escalate_on());
-  for (contactgroup_map::const_iterator
-         it1{contact_groups.begin()},
-         it2{obj.contact_groups.begin()},
-         end1{contact_groups.end()},
-         end2{obj.contact_groups.end()};
-       (it1 != end1) || (it2 != end2);
-       ++it1, ++it2) {
-    if (!it1->second || !it2->second)
-      return !!it1->second < !!it2->second;
-    else if (it1->second != it2->second)
-      return it1->second < it2->second;
+    if (!get_escalate_on(nt[state]))
+      return false;
+    return true;
   }
-  for (contact_map::const_iterator
-         it1{contacts().begin()},
-         it2{obj.contacts().begin()},
-         end1{contacts().end()},
-         end2{obj.contacts().end()};
-       it1 != end1 || it2 != end2;
-       ++it1, ++it2) {
-    if (!it1->second || !it2->second)
-      return !!it1->second < !!it2->second;
-    else if (it1->second != it2->second)
-      return it1->second < it2->second;
-  }
-  return false;
-}
-
-/**
- *  Dump hostescalation content into the stream.
- *
- *  @param[out] os  The output stream.
- *  @param[in]  obj The hostescalation to dump.
- *
- *  @return The output stream.
- */
-std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
-  std::string escalation_period_str;
-  if (obj.escalation_period_ptr)
-    escalation_period_str = obj.escalation_period_ptr->get_name();
-
-  std::string cg_oss;
-  std::string c_oss;
-
-  if (obj.contact_groups.empty())
-    cg_oss = "\"nullptr\"";
-  else {
-    std::ostringstream oss;
-    oss << obj.contact_groups;
-    cg_oss = oss.str();
-  }
-  if (obj.contacts().empty())
-    c_oss = "\"nullptr\"";
-  else {
-    std::ostringstream oss;
-    oss << obj.contacts();
-    c_oss = oss.str();
-  }
-
-  os << "hostescalation {\n"
-    "  host_name:               " << obj.get_hostname() << "\n"
-    "  first_notification:      " << obj.get_first_notification() << "\n"
-    "  last_notification:       " << obj.get_last_notification() << "\n"
-    "  notification_interval:   " << obj.get_notification_interval() << "\n"
-    "  escalation_period:       " << obj.get_escalation_period() << "\n"
-    "  escalate_on_recovery:    " << obj.get_escalate_on(notifier::recovery) << "\n"
-    "  escalate_on_down:        " << obj.get_escalate_on(notifier::down) << "\n"
-    "  escalate_on_unreachable: " << obj.get_escalate_on(notifier::unreachable) << "\n"
-    "  contact_groups:          " << cg_oss << "\n"
-    "  contacts:                " << c_oss << "\n"
-    "  notifier_ptr:            " << (obj.notifier_ptr ?
-                                      obj.notifier_ptr->get_display_name() :
-                                      "\"nullptr\"") << "\n"
-    "  escalation_period_ptr:   " << escalation_period_str << "\n"
-    "}\n";
-  return os;
+  else
+    return retval;
 }

@@ -2483,7 +2483,7 @@ void disable_all_notifications(void) {
 }
 
 /* enables notifications for a service */
-void enable_service_notifications(service *svc) {
+void enable_service_notifications(service* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2512,7 +2512,7 @@ void enable_service_notifications(service *svc) {
 }
 
 /* disables notifications for a service */
-void disable_service_notifications(service *svc) {
+void disable_service_notifications(service* svc) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2541,7 +2541,7 @@ void disable_service_notifications(service *svc) {
 }
 
 /* enables notifications for a host */
-void enable_host_notifications(host *hst) {
+void enable_host_notifications(host* hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */
@@ -2570,7 +2570,7 @@ void enable_host_notifications(host *hst) {
 }
 
 /* disables notifications for a host */
-void disable_host_notifications(host *hst) {
+void disable_host_notifications(host* hst) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* no change */

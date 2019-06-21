@@ -48,11 +48,13 @@ class                escalation {
   uint32_t           get_escalate_on() const;
   bool               get_escalate_on(notifier::notification_type type) const;
   void               set_escalate_on(uint32_t escalate_on);
+  virtual bool       is_viable(int state, int notification_number) const;
 
-  contact_map const& contacts() const;
-  contact_map&       contacts();
+  contact_map_unsafe const& contacts() const;
+  contact_map_unsafe& contacts();
+  contactgroup_map_unsafe const& contact_groups() const;
+  contactgroup_map_unsafe&       contact_groups();
 
-  contactgroup_map   contact_groups;
   notifier*          notifier_ptr;
   timeperiod*        escalation_period_ptr;
 
@@ -62,7 +64,8 @@ class                escalation {
   double             _notification_interval;
   std::string        _escalation_period;
   uint32_t           _escalate_on;
-  contact_map        _contacts;
+  contact_map_unsafe        _contacts;
+  contactgroup_map_unsafe _contact_groups;
 };
 CCE_END()
 

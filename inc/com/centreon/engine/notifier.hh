@@ -21,8 +21,9 @@
 #define CCE_NOTIFIER_HH
 
 # include <array>
-# include <string>
 # include <list>
+# include <string>
+# include <unordered_set>
 # include "com/centreon/engine/checkable.hh"
 # include "com/centreon/engine/contactgroup.hh"
 # include "com/centreon/engine/customvariable.hh"
@@ -97,7 +98,7 @@ class                notifier : public checkable {
 
   //static void        inc_next_notification_id();
 
-                     notifier(int notification_type,
+                     notifier(notifier_type notification_type,
                               std::string const& display_name,
                               std::string const& check_command,
                               bool checks_enabled,
@@ -231,14 +232,15 @@ class                notifier : public checkable {
   void               set_current_notification_number(int number);
 
   virtual uint64_t   check_dependencies(int dependency_type) = 0;
-  std::list<std::shared_ptr<contact>>
-                     get_contacts_to_notify() const;
   uint64_t           get_next_notification_id() const;
   virtual timeperiod* get_notification_timeperiod() const = 0;
   notification_category
                      get_category(reason_type type) const;
   bool               is_notification_viable(notification_category cat,
                                       notification_option options);
+  std::unordered_set<contact*>
+                     get_contacts_to_notify(notification_category cat, int state);
+  notifier_type      get_notifier_type() const;
 
   std::unordered_map<std::string, std::shared_ptr<contact>>
                      contacts;
@@ -255,7 +257,7 @@ class                notifier : public checkable {
   timeperiod          *notification_period_ptr;
 
  protected:
-  int                _notifier_type;
+  notifier_type      _notifier_type;
   int                _stalk_type;
   int                _flap_type;
   unsigned long      _current_event_id;

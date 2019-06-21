@@ -250,14 +250,14 @@ void applier::contact::modify_object(
     c->set_pager(obj.pager());
   if (c->get_addresses() != obj.address())
     c->set_addresses(obj.address());
-  c->set_notify_on_service(
+  c->set_notify_on(notifier::service_notification,
       (obj.service_notification_options() & service::unknown ? notifier::unknown : notifier::none) |
       (obj.service_notification_options() & service::warning ? notifier::warning : notifier::none) |
       (obj.service_notification_options() & service::critical ? notifier::critical : notifier::none) |
       (obj.service_notification_options() & service::ok ? notifier::recovery : notifier::none) |
       (obj.service_notification_options() & service::flapping ? notifier::flapping : notifier::none) |
       (obj.service_notification_options() & service::downtime ? notifier::downtime : notifier::none));
-  c->set_notify_on_host(
+  c->set_notify_on(notifier::host_notification,
       (obj.host_notification_options() & host::down ? notifier::down : notifier::none) |
       (obj.host_notification_options() & host::unreachable ? notifier::unreachable : notifier::none) |
       (obj.host_notification_options() & host::up ? notifier::recovery : notifier::none) |

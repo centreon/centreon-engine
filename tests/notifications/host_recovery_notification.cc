@@ -124,6 +124,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithHardUpState) {
 
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::hard);
+  _host->set_last_hard_state_change(_current_time);
   uint64_t id{_host->get_next_notification_id()};
   ASSERT_EQ(_host->notify(notifier::notification_recovery,
                           "",

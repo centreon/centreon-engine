@@ -20,18 +20,11 @@
 #ifndef CCE_SERVICEESCALATION_HH
 #define CCE_SERVICEESCALATION_HH
 
-#include <ostream>
-#include <string>
-
-#include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/escalation.hh"
-#include "com/centreon/engine/namespace.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
-class service;
 class serviceescalation;
-class timeperiod;
 CCE_END()
 
 typedef std::unordered_multimap<
@@ -49,8 +42,10 @@ class serviceescalation : public escalation {
                     double notification_interval,
                     std::string const& escalation_period,
                     uint32_t escalate_on);
+  virtual ~serviceescalation();
   std::string const& get_hostname() const;
   std::string const& get_description() const;
+  bool is_viable(int state, int notification_number) const override;
 
   static serviceescalation_mmap serviceescalations;
 

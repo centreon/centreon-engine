@@ -86,7 +86,7 @@ int clear_host_macros_r(nagios_macros* mac) {
   mac->custom_host_vars.clear();
 
   // Clear pointers.
-  mac->host_ptr = nullptr;
+  mac->host_ptr = NULL;
 
   return OK;
 }

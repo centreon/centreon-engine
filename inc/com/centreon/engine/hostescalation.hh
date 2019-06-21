@@ -30,57 +30,28 @@ CCE_END()
 
 typedef std::unordered_multimap<std::string,
 std::shared_ptr<com::centreon::engine::hostescalation>> hostescalation_mmap;
+typedef std::unordered_multimap<std::string, com::centreon::engine::hostescalation*> hostescalation_mmap_unsafe;
 
 CCE_BEGIN()
-class                 hostescalation : public escalation {
+class hostescalation : public escalation {
  public:
-                      hostescalation(std::string const& host_name,
-                                     int first_notification,
-                                     int last_notification,
-                                     double notification_interval,
-                                     std::string const& escalation_period,
-                                     uint32_t escalate_on);
-                      ~hostescalation();
+  hostescalation(std::string const& host_name,
+                 int first_notification,
+                 int last_notification,
+                 double notification_interval,
+                 std::string const& escalation_period,
+                 uint32_t escalate_on);
+  virtual ~hostescalation();
 
-  std::string const&  get_hostname() const;
-  std::string const&  get_escalation_period() const;
-  void                set_escalation_period(
-    std::string const& escalation_period);
-  bool                get_escalate_on_recovery() const;
-  void                set_escalate_on_recovery(bool escalate_on_recovery);
-  bool                get_escalate_on_down() const;
-  void                set_escalate_on_down(bool escalate_on_down);
-  bool                get_escalate_on_unreachable() const;
-  void                set_escalate_on_unreachable(bool escalate_on_unreachable);
+  std::string const& get_hostname() const;
+  bool is_viable(int state, int notification_number) const override;
 
-  bool                operator==(
-                           hostescalation const& obj) throw ();
-  bool                operator!=(
-                           hostescalation const& obj) throw();
-  bool                operator<(
-                           hostescalation const& obj);
-
-  static hostescalation_mmap
-                      hostescalations;
+  static hostescalation_mmap hostescalations;
 
  private:
-  std::string         _hostname;
-  std::string         _escalation_period;
+  std::string _hostname;
 };
+
 CCE_END()
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* C++ */
-
-#  ifdef __cplusplus
-}
-
-std::ostream& operator<<(std::ostream& os,
-  com::centreon::engine::hostescalation const& obj);
-
-#  endif /* C++ */
-
-#endif // !CCE_HOSTESCALATION_HH
-
-
+#endif  // !CCE_HOSTESCALATION_HH

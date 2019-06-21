@@ -283,7 +283,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateNotNotified) {
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
   _host->notification_period_ptr = tperiod.get();
 
-  _host->set_problem_has_been_acknowledged(true);
+  _host->set_problem_has_been_acknowledged(false);
   ASSERT_TRUE(host_escalation);
   _host->remove_notify_on(notifier::down);
   _host->set_current_state(engine::host::state_down);
@@ -292,4 +292,55 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateNotNotified) {
           notifier::notification_normal, "", "", notifier::notification_option_none),
       OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
+}
+
+TEST_F(HostNotification, SimpleNormalHostNotificationOnStateBeforeFirstNotifDelay) {
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  set_time(20000);
+
+  uint64_t id{_host->get_next_notification_id()};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::hostescalation> host_escalation{
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
+
+  _host->set_problem_has_been_acknowledged(false);
+  ASSERT_TRUE(host_escalation);
+  _host->set_current_state(engine::host::state_down);
+  _host->set_last_hard_state_change(20000 - 200);
+  /* It is multiplicated by config->interval_length(): we set 5 for 5*60 */
+  _host->set_first_notification_delay(5);
+  ASSERT_EQ(
+      _host->notify(
+          notifier::notification_normal, "", "", notifier::notification_option_none),
+      OK);
+  ASSERT_EQ(id, _host->get_next_notification_id());
+}
+
+TEST_F(HostNotification, SimpleNormalHostNotificationOnStateAfterFirstNotifDelay) {
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  set_time(20000);
+
+  uint64_t id{_host->get_next_notification_id()};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::hostescalation> host_escalation{
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
+
+  _host->set_problem_has_been_acknowledged(false);
+  ASSERT_TRUE(host_escalation);
+  _host->set_current_state(engine::host::state_down);
+  _host->set_last_hard_state_change(20000 - 400);
+  _host->set_first_notification_delay(5);
+  ASSERT_EQ(
+      _host->notify(
+          notifier::notification_normal, "", "", notifier::notification_option_none),
+      OK);
+  ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }

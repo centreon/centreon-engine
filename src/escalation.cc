@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/escalation.hh"
+#include "com/centreon/engine/timeperiod.hh"
 
 using namespace com::centreon::engine;
 
@@ -73,10 +74,45 @@ bool escalation::get_escalate_on(notifier::notification_type type) const {
   return _escalate_on & type;
 }
 
-contact_map const& escalation::contacts() const {
+contact_map_unsafe const& escalation::contacts() const {
   return _contacts;
 }
 
-contact_map& escalation::contacts() {
+contact_map_unsafe& escalation::contacts() {
   return _contacts;
+}
+
+contactgroup_map_unsafe const& escalation::contact_groups() const {
+  return _contact_groups;
+}
+
+contactgroup_map_unsafe& escalation::contact_groups() {
+  return _contact_groups;
+}
+
+/**
+ *  This method is called by a notifier to know if this escalation is touched
+ *  by the notification to send.
+ *
+ * @param state The notifier state.
+ * @param notification_number The current notifier notification number.
+ *
+ * @return A boolean.
+ */
+bool escalation::is_viable(int state, int notification_number) const {
+  std::time_t current_time;
+  std::time(&current_time);
+
+  /* In case of a recovery, we are interested by the last notification */
+  int number{state == 0 ?
+    notification_number - 1 : notification_number};
+
+  /* Skip this escalation if current_time is outside its timeperiod */
+  if (!get_escalation_period().empty() &&
+      !check_time_against_period(current_time, escalation_period_ptr))
+    return false;
+
+  if (number < get_first_notification() || number > get_last_notification())
+    return false;
+  return true;
 }

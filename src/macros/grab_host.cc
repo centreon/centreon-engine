@@ -176,7 +176,7 @@ std::string get_host_total_services(host& hst, nagios_macros* mac) {
 static std::string get_host_parents(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
-  for (host_map_unsafe::iterator
+  for (host_map_unsafe::const_iterator
          it(hst.parent_hosts.begin()),
          end(hst.parent_hosts.end());
        it != end;
@@ -199,7 +199,7 @@ static std::string get_host_parents(host& hst, nagios_macros* mac) {
 static std::string get_host_children(host& hst, nagios_macros* mac) {
   (void)mac;
   std::string retval;
-  for (host_map_unsafe::iterator
+  for (host_map_unsafe::const_iterator
          it(hst.child_hosts.begin()),
          end(hst.child_hosts.end());
        it != end;

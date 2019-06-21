@@ -377,4 +377,8 @@ uint64_t              get_host_id(std::string const& name);
 
 CCE_END()
 
+std::ostream& operator<<(
+                std::ostream& os,
+                host_map_unsafe const& obj);
+
 #endif // !CCE_HOST_HH
