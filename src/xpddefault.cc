@@ -510,39 +510,34 @@ int xpddefault_close_service_perfdata_file() {
 
 // processes delimiter characters in templates.
 void xpddefault_preprocess_file_templates(char* tmpl) {
-  char* tempbuf;
-  size_t x(0);
-  size_t y(0);
+  if (!tmpl)
+    return ;
+  char* tmp1{tmpl}, *tmp2{tmpl};
 
-  // allocate temporary buffer.
-  tempbuf = new char[strlen(tmpl) + 1];
-  strcpy(tempbuf, "");
-
-  for (x = 0, y = 0; x < strlen(tmpl); x++, y++) {
-    if (tmpl[x] == '\\') {
-      if (tmpl[x + 1] == 't') {
-        tempbuf[y] = '\t';
-        x++;
+  for (; *tmp1 != 0; tmp1++, tmp2++) {
+    if (*tmp1 == '\\') {
+      switch (tmp1[1]) {
+        case 't':
+          *tmp2 = '\t';
+          tmp1++;
+          break;
+        case 'r':
+          *tmp2 = '\r';
+          tmp1++;
+          break;
+        case 'n':
+          *tmp2 = '\n';
+          tmp1++;
+          break;
+        default:
+          *tmp2 = *tmp1;
+          break;
       }
-      else if (tmpl[x + 1] == 'r') {
-        tempbuf[y] = '\r';
-        x++;
-      }
-      else if (tmpl[x + 1] == 'n') {
-        tempbuf[y] = '\n';
-        x++;
-      }
-      else
-        tempbuf[y] = tmpl[x];
     }
     else
-      tempbuf[y] = tmpl[x];
+      *tmp2 = *tmp1;
   }
-  tempbuf[y] = '\x0';
-
-  strcpy(tmpl, tempbuf);
-  delete[] tempbuf;
-  return;
+  *tmp2 = 0;
 }
 
 // updates service performance data file.

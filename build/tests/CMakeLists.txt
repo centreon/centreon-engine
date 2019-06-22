@@ -49,6 +49,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/main.cc"
     "${TESTS_DIR}/notifications/host_normal_notification.cc"
     "${TESTS_DIR}/notifications/host_recovery_notification.cc"
+    "${TESTS_DIR}/perfdata/perfdata.cc"
     "${TESTS_DIR}/retention/host.cc"
     "${TESTS_DIR}/retention/service.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/between_two_years.cc"

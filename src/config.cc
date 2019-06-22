@@ -107,7 +107,6 @@ static int dfs_host_path(host* root) {
 
 /* check for circular paths and dependencies */
 int pre_flight_circular_check(int* w, int* e) {
-  hostdependency* temp_hd(nullptr);
   int found(false);
   int warnings(0);
   int errors(0);
@@ -120,10 +119,7 @@ int pre_flight_circular_check(int* w, int* e) {
   /* check for circular paths between hosts   */
   /********************************************/
 
-  /* check routes between all hosts */
-  found = false;
-
-  /* We clean the dsf status from previous check */
+/* We clean the dsf status from previous check */
   for (host_map::iterator
          it(host::hosts.begin()),
          end(host::hosts.end());
@@ -241,7 +237,7 @@ int pre_flight_circular_check(int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could "
         "result in a deadlock) exists for host '"
-        << temp_hd->get_hostname() << "'!";
+        << it->second->get_hostname() << "'!";
       errors++;
     }
   }
