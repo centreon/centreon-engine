@@ -127,3 +127,23 @@ void disable_flap_detection_routines() {
        ++it)
     it->second->handle_flap_detection_disabled();
 }
+
+// disables flap detection for a particular host
+void disable_host_flap_detection(host* hst) {
+  hst->disable_flap_detection();
+}
+
+// enables flap detection for a particular host
+void enable_host_flap_detection(host* hst) {
+  hst->enable_flap_detection();
+}
+
+// enables flap detection for a particular service
+void enable_service_flap_detection(com::centreon::engine::service* svc) {
+  svc->enable_flap_detection();
+}
+
+// disables flap detection for a particular service
+void disable_service_flap_detection(service* svc) {
+  svc->disable_flap_detection();
+}

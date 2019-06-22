@@ -71,10 +71,10 @@ namespace         modules {
       static void _wrapper_enable_host_svc_checks(host* hst);
       static void _wrapper_disable_host_svc_checks(host* hst);
       static void _wrapper_set_host_notification_number(
-        std::shared_ptr<host> hst,
+                    host* hst,
                     char* args);
       static void _wrapper_send_custom_host_notification(
-        std::shared_ptr<host> hst,
+                    host* hst,
                     char* args);
       static void _wrapper_enable_service_notifications(host* hst);
       static void _wrapper_disable_service_notifications(host* hst);
@@ -83,9 +83,9 @@ namespace         modules {
       static void _wrapper_enable_passive_service_checks(host* hst);
       static void _wrapper_disable_passive_service_checks(host* hst);
       static void _wrapper_set_service_notification_number(
-        std::shared_ptr<service> svc, char* args);
+                     service* svc, char* args);
       static void _wrapper_send_custom_service_notification(
-        std::shared_ptr<service> svc, char* args);
+                     service* svc, char* args);
 
       template <void (*fptr)()>
       static void _redirector(
@@ -145,17 +145,17 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
 
-        std::shared_ptr<host> hst(nullptr);
+        host* hst{nullptr};
         host_map::const_iterator it(host::hosts.find(name));
         if (it != host::hosts.end())
-          hst = it->second;
+          hst = it->second.get();
 
         if (!hst)
           return ;
-        (*fptr)(hst.get());
+        (*fptr)(hst);
       }
 
-      template <void (*fptr)(std::shared_ptr<host>, char*)>
+      template <void (*fptr)(host*, char*)>
       static void _redirector_host(
                     int id,
                     time_t entry_time,
@@ -165,10 +165,10 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
 
-        std::shared_ptr<host> hst(nullptr);
+        host* hst{nullptr};
         host_map::const_iterator it(host::hosts.find(name));
         if (it != host::hosts.end())
-          hst = it->second;
+          hst = it->second.get();
 
         if (!hst)
           return ;
@@ -221,7 +221,7 @@ namespace         modules {
         (*fptr)(found->second.get());
       }
 
-      template <void (*fptr)(std::shared_ptr<service>, char*)>
+      template <void (*fptr)(service*, char*)>
       static void _redirector_service(
                     int id,
                     time_t entry_time,
@@ -229,14 +229,14 @@ namespace         modules {
         (void)id;
         (void)entry_time;
 
-        char* name(my_strtok(args, ";"));
-        char* description(my_strtok(NULL, ";"));
+        char* name{my_strtok(args, ";")};
+        char* description{my_strtok(NULL, ";")};
         service_map::const_iterator
-          found(service::services.find({name, description}));
+          found{service::services.find({name, description})};
 
         if (found == service::services.end() || !found->second)
           return ;
-        (*fptr)(found->second, args + strlen(name) + strlen(description) + 2);
+        (*fptr)(found->second.get(), args + strlen(name) + strlen(description) + 2);
       }
 
       template <void (*fptr)(service*)>
@@ -275,21 +275,21 @@ namespace         modules {
         if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
           return ;
 
-        std::shared_ptr<host> last_host{nullptr};
+        host* last_host{nullptr};
         for (service_map_unsafe::iterator
                it2(sg_it->second->members.begin()),
                end2(sg_it->second->members.end());
              it2 != end2;
              ++it2) {
-          std::shared_ptr<host> hst(nullptr);
+          host* hst{nullptr};
           host_map::const_iterator
               found(host::hosts.find(it2->first.first));
           if (found != host::hosts.end())
-            hst = found->second;
+            hst = found->second.get();
 
           if (!hst || hst == last_host)
             continue;
-          (*fptr)(hst.get());
+          (*fptr)(hst);
           last_host = hst;
         }
       }

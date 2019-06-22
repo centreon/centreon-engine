@@ -70,11 +70,11 @@ void enable_contact_host_notifications(com::centreon::engine::contact* cntct);  
 void disable_contact_host_notifications(com::centreon::engine::contact* cntct);                    // disables host notifications for a specific contact
 void enable_contact_service_notifications(com::centreon::engine::contact* cntct);                  // enables service notifications for a specific contact
 void disable_contact_service_notifications(com::centreon::engine::contact* cntct);                 // disables service notifications for a specific contact
-void schedule_and_propagate_downtime(std::shared_ptr<com::centreon::engine::host> temp_host, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration); // schedules downtime for all hosts beyond a given host
-void acknowledge_host_problem(std::shared_ptr<com::centreon::engine::host> hst, char* ack_author, char* ack_data, int type, int notify, int persistent);       // acknowledges a host problem
-void acknowledge_service_problem(std::shared_ptr<com::centreon::engine::service> svc, char* ack_author, char* ack_data, int type, int notify, int persistent); // acknowledges a service problem
-void remove_host_acknowledgement(std::shared_ptr<com::centreon::engine::host> hst);        // removes a host acknowledgement
-void remove_service_acknowledgement(std::shared_ptr<com::centreon::engine::service> svc);                         // removes a service acknowledgement
+void schedule_and_propagate_downtime(com::centreon::engine::host* temp_host, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration); // schedules downtime for all hosts beyond a given host
+void acknowledge_host_problem(com::centreon::engine::host* hst, char* ack_author, char* ack_data, int type, int notify, int persistent);       // acknowledges a host problem
+void acknowledge_service_problem(com::centreon::engine::service* svc, char* ack_author, char* ack_data, int type, int notify, int persistent); // acknowledges a service problem
+void remove_host_acknowledgement(com::centreon::engine::host* hst);        // removes a host acknowledgement
+void remove_service_acknowledgement(com::centreon::engine::service* svc);                         // removes a service acknowledgement
 void start_executing_service_checks(void);                                 // starts executing service checks
 void stop_executing_service_checks(void);                                  // stops executing service checks
 void start_accepting_passive_service_checks(void);                         // starts accepting passive service check results
@@ -109,8 +109,8 @@ void start_obsessing_over_service(com::centreon::engine::service* svc);         
 void stop_obsessing_over_service(com::centreon::engine::service* svc);                            // stop obsessing about specific service check results
 void start_obsessing_over_host(com::centreon::engine::host* hst);             // start obsessing about specific host check results
 void stop_obsessing_over_host(com::centreon::engine::host* hst);              // stop obsessing about specific host check results
-void set_host_notification_number(std::shared_ptr<com::centreon::engine::host> hst, int num); // sets current notification number for a specific host
-void set_service_notification_number(std::shared_ptr<com::centreon::engine::service> svc, int num);               // sets current notification number for a specific service
+void set_host_notification_number(com::centreon::engine::host* hst, int num); // sets current notification number for a specific host
+void set_service_notification_number(com::centreon::engine::service* svc, int num);               // sets current notification number for a specific service
 
 #  ifdef __cplusplus
 }

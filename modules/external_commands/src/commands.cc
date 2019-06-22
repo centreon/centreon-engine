@@ -224,8 +224,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
     return ERROR;
 
   /* add the comment */
-  std::shared_ptr<comment> com =
-    std::make_shared<comment>(
+  std::shared_ptr<comment> com{new comment(
              (cmd == CMD_ADD_HOST_COMMENT) ? comment::host : comment::service,
              comment::user,
              host_name,
@@ -236,8 +235,8 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
              persistent,
              comment::external,
              false,
-             (time_t)0);
-  comment::comments.insert({com->get_comment_id(), com});
+             (time_t)0)};
+  comment::comments.insert({com->get_comment_id(), std::move(com)});
 
   return OK;
 }
@@ -362,6 +361,8 @@ int cmd_schedule_check(int cmd, char* args) {
   if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
+  logger(log_runtime_warning, basic) << "Warning: COUCOU 1";
+
   if (cmd == CMD_SCHEDULE_HOST_CHECK
       || cmd == CMD_SCHEDULE_FORCED_HOST_CHECK
       || cmd == CMD_SCHEDULE_HOST_SVC_CHECKS
@@ -372,7 +373,7 @@ int cmd_schedule_check(int cmd, char* args) {
     host_map::const_iterator it(host::hosts.find(host_name));
     if (it != host::hosts.end())
       temp_host = it->second.get();
-    if (temp_host  == nullptr)
+    if (temp_host == nullptr)
       return ERROR;
   }
 
@@ -694,8 +695,6 @@ int process_passive_host_check(
       int return_code,
       char const* output) {
   char const* real_host_name(nullptr);
-  std::shared_ptr<host> hst;
-
   /* skip this host check result if we aren't accepting passive host checks */
   if (config->accept_passive_service_checks() == false)
     return ERROR;
@@ -838,7 +837,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   /* acknowledge the host problem */
   if (cmd == CMD_ACKNOWLEDGE_HOST_PROBLEM)
     acknowledge_host_problem(
-      it->second,
+      it->second.get(),
       ack_author,
       ack_data,
       type,
@@ -847,7 +846,7 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   /* acknowledge the service problem */
   else
     acknowledge_service_problem(
-      found->second,
+      found->second.get(),
       ack_author,
       ack_data,
       type,
@@ -893,20 +892,20 @@ int cmd_remove_acknowledgement(int cmd, char* args) {
 
   /* acknowledge the host problem */
   if (cmd == CMD_REMOVE_HOST_ACKNOWLEDGEMENT)
-    remove_host_acknowledgement(it->second);
+    remove_host_acknowledgement(it->second.get());
 
   /* acknowledge the service problem */
   else
-    remove_service_acknowledgement(found->second);
+    remove_service_acknowledgement(found->second.get());
 
   return OK;
 }
 
 /* schedules downtime for a specific host or service */
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
-  std::shared_ptr<host> temp_host{nullptr};
-  std::shared_ptr<host> last_host{nullptr};
-  std::shared_ptr<hostgroup> hg{nullptr};
+  host* temp_host{nullptr};
+  host* last_host{nullptr};
+  hostgroup* hg{nullptr};
   char* host_name{nullptr};
   char* hostgroup_name{nullptr};
   char* servicegroup_name{nullptr};
@@ -933,7 +932,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       it(hostgroup::hostgroups.find(hostgroup_name));
     if (it == hostgroup::hostgroups.end() || !it->second)
       return ERROR;
-    hg = it->second;
+    hg = it->second.get();
   }
 
   else if (cmd == CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME
@@ -957,10 +956,10 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
 
     /* verify that the host is valid */
     temp_host = nullptr;
-    host_map::const_iterator it(host::hosts.find(host_name));
+    host_map::const_iterator it{host::hosts.find(host_name)};
     if (it == host::hosts.end() || !it->second)
       return ERROR;
-    temp_host = it->second;
+    temp_host = it->second.get();
 
     /* this is a service downtime */
     if (cmd == CMD_SCHEDULE_SVC_DOWNTIME) {
@@ -1147,7 +1146,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       host_map::const_iterator found(host::hosts.find(it->first.first));
       if (found == host::hosts.end() || !found->second)
         continue;
-      temp_host = found->second;
+      temp_host = found->second.get();
       if (last_host == temp_host)
         continue;
       downtime_manager::instance().schedule_downtime(
@@ -2654,9 +2653,7 @@ void disable_and_propagate_notifications(
        int affect_top_host,
        int affect_hosts,
        int affect_services) {
-  std::shared_ptr<service> temp_service(nullptr);
-
-  if (hst == nullptr)
+  if (!hst)
     return;
 
   /* disable notifications for top host */
@@ -2670,7 +2667,7 @@ void disable_and_propagate_notifications(
        it != end;
        ++it) {
 
-    if (it->second == nullptr)
+    if (!it->second)
       continue;
 
     /* recurse... */
@@ -2892,7 +2889,7 @@ void schedule_and_propagate_downtime(
 
 /* acknowledges a host problem */
 void acknowledge_host_problem(
-       std::shared_ptr<host> hst,
+       host* hst,
        char* ack_author,
        char* ack_data,
        int type,
@@ -2920,7 +2917,7 @@ void acknowledge_host_problem(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     HOST_ACKNOWLEDGEMENT,
-    (void*)hst.get(),
+    (void*)hst,
     ack_author,
     ack_data,
     type,
@@ -2940,8 +2937,7 @@ void acknowledge_host_problem(
   hst->update_status(false);
 
   /* add a comment for the acknowledgement */
-  std::shared_ptr<comment> com =
-    std::make_shared<comment>(
+  std::shared_ptr<comment> com{new comment(
       comment::host,
       comment::acknowledgment,
       hst->get_name().c_str(),
@@ -2952,13 +2948,13 @@ void acknowledge_host_problem(
       persistent,
       comment::internal,
       false,
-      (time_t)0);
-  comment::comments.insert({com->get_comment_id(), com});
+      (time_t)0)};
+  comment::comments.insert({com->get_comment_id(), std::move(com)});
 }
 
 /* acknowledges a service problem */
 void acknowledge_service_problem(
-       std::shared_ptr<service> svc,
+       service* svc,
        char* ack_author,
        char* ack_data,
        int type,
@@ -2986,7 +2982,7 @@ void acknowledge_service_problem(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     SERVICE_ACKNOWLEDGEMENT,
-    (void*)svc.get(),
+    (void*)svc,
     ack_author,
     ack_data,
     type,
@@ -3006,8 +3002,7 @@ void acknowledge_service_problem(
   svc->update_status(false);
 
   /* add a comment for the acknowledgement */
-  std::shared_ptr<comment> com =
-    std::make_shared<comment>(
+  std::shared_ptr<comment> com{new comment(
       comment::service,
       comment::acknowledgment,
       svc->get_hostname(),
@@ -3018,12 +3013,12 @@ void acknowledge_service_problem(
       persistent,
       comment::internal,
       false,
-      (time_t)0);
-  comment::comments.insert({com->get_comment_id(), com});
+      (time_t)0)};
+  comment::comments.insert({com->get_comment_id(), std::move(com)});
 }
 
 /* removes a host acknowledgement */
-void remove_host_acknowledgement(std::shared_ptr<host> hst) {
+void remove_host_acknowledgement(host* hst) {
   /* set the acknowledgement flag */
   hst->set_problem_has_been_acknowledged(false);
 
@@ -3031,11 +3026,11 @@ void remove_host_acknowledgement(std::shared_ptr<host> hst) {
   hst->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
-  comment::delete_host_acknowledgement_comments(hst.get());
+  comment::delete_host_acknowledgement_comments(hst);
 }
 
 /* removes a service acknowledgement */
-void remove_service_acknowledgement(std::shared_ptr<service> svc) {
+void remove_service_acknowledgement(service* svc) {
   /* set the acknowledgement flag */
   svc->set_problem_has_been_acknowledged(false);
 
@@ -3043,7 +3038,7 @@ void remove_service_acknowledgement(std::shared_ptr<service> svc) {
   svc->update_status(false);
 
   /* remove any non-persistant comments associated with the ack */
-  comment::delete_service_acknowledgement_comments(svc.get());
+  comment::delete_service_acknowledgement_comments(svc);
 }
 
 /* starts executing service checks */
@@ -3522,7 +3517,7 @@ void disable_service_event_handler(service* svc) {
 }
 
 /* enables the event handler for a particular host */
-void enable_host_event_handler(std::shared_ptr<host> hst) {
+void enable_host_event_handler(host* hst) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
@@ -3540,7 +3535,7 @@ void enable_host_event_handler(std::shared_ptr<host> hst) {
     NEBTYPE_ADAPTIVEHOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst.get(),
+    hst,
     CMD_NONE,
     attr,
     hst->get_modified_attributes(),
@@ -4071,4 +4066,12 @@ void stop_obsessing_over_host(host* hst) {
 
   /* update the status log with the host info */
   hst->update_status(false);
+}
+
+void set_host_notification_number(host* hst, int num) {
+  hst->set_notification_number(num);
+}
+
+void set_service_notification_number(service* svc, int num) {
+  svc->set_notification_number(num);
 }

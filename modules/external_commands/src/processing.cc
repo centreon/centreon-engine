@@ -410,12 +410,12 @@ void processing::_wrapper_enable_host_svc_checks(host* hst) {
       enable_service_checks(it->second);
 }
 
-void processing::_wrapper_set_host_notification_number(std::shared_ptr<host> hst, char* args) {
+void processing::_wrapper_set_host_notification_number(host* hst, char* args) {
   if (args)
     set_host_notification_number(hst, atoi(args));
 }
 
-void processing::_wrapper_send_custom_host_notification(std::shared_ptr<host> hst, char* args) {
+void processing::_wrapper_send_custom_host_notification(host* hst, char* args) {
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&
       (buf[2] = my_strtok(NULL, ";"))) {
@@ -483,18 +483,19 @@ void processing::_wrapper_disable_passive_service_checks(host* hst) {
       disable_passive_service_checks(it->second);
 }
 
-void processing::_wrapper_set_service_notification_number(std::shared_ptr<service> svc,
+void processing::_wrapper_set_service_notification_number(service* svc,
                                                           char* args) {
   char* str(my_strtok(args, ";"));
   if (str)
     set_service_notification_number(svc, atoi(str));
 }
 
-void processing::_wrapper_send_custom_service_notification(std::shared_ptr<service> svc,
+void processing::_wrapper_send_custom_service_notification(service* svc,
                                                            char* args) {
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&
       (buf[2] = my_strtok(NULL, ";"))) {
-    svc->notify(notifier::notification_custom, buf[1], buf[2], static_cast<notifier::notification_option>(atoi(buf[0])));
+    svc->notify(notifier::notification_custom, buf[1], buf[2],
+                static_cast<notifier::notification_option>(atoi(buf[0])));
   }
 }
