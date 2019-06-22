@@ -793,9 +793,9 @@ int check_contact(std::shared_ptr<contact> cntct, int* w, int* e) {
   }
 
   /* check for sane host recovery options */
-  if (cntct->notify_on_host(notifier::recovery)
-      && !cntct->notify_on_host(notifier::down)
-      && !cntct->notify_on_host(notifier::unreachable)) {
+  if (cntct->notify_on(notifier::host_notification, notifier::recovery)
+      && !cntct->notify_on(notifier::host_notification, notifier::down)
+      && !cntct->notify_on(notifier::host_notification, notifier::unreachable)) {
     logger(log_verification_error, basic)
       << "Warning: Host recovery notification option for contact '"
       << cntct->get_name() << "' doesn't make any sense - specify down "
@@ -804,9 +804,9 @@ int check_contact(std::shared_ptr<contact> cntct, int* w, int* e) {
   }
 
   /* check for sane service recovery options */
-  if (cntct->notify_on_service(notifier::recovery)
-      && !cntct->notify_on_service(notifier::critical)
-      && !cntct->notify_on_service(notifier::warning)) {
+  if (cntct->notify_on(notifier::service_notification, notifier::recovery)
+      && !cntct->notify_on(notifier::service_notification, notifier::critical)
+      && !cntct->notify_on(notifier::service_notification, notifier::warning)) {
     logger(log_verification_error, basic)
       << "Warning: Service recovery notification option for contact '"
       << cntct->get_name() << "' doesn't make any sense - specify critical "
@@ -959,7 +959,7 @@ int check_contactgroup(std::shared_ptr<contactgroup> cg, int* w, int* e) {
          end{cg->get_members().end()};
        it != end;
        ++it) {
-    contact *temp_contact{it->second};
+    contact* temp_contact{it->second};
     if (!temp_contact) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
@@ -1216,7 +1216,7 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
   }
 
   // Check all contacts.
-  for (std::pair<std::string, std::shared_ptr<contact>> const& p : se->contacts()) {
+  for (std::pair<std::string, contact*> const& p : se->contacts()) {
     contact_map::const_iterator ct_it{contact::contacts.find(p.first)};
     if (ct_it == contact::contacts.end()) {
       logger(log_verification_error, basic)
@@ -1229,9 +1229,9 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
   }
 
   // Check all contact groups.
-  for (contactgroup_map::iterator
-         it(se->contact_groups.begin()),
-         end(se->contact_groups.end());
+  for (contactgroup_map_unsafe::iterator
+         it(se->contact_groups().begin()),
+         end(se->contact_groups().end());
        it != end;
        ++it) {
     // Find the contact group.
@@ -1249,7 +1249,7 @@ int check_serviceescalation(std::shared_ptr<serviceescalation> se, int* w, int* 
     }
 
     // Save the contactgroup pointer for later.
-    se->contact_groups[it->first] = find_cg->second;
+    se->contact_groups()[it->first] = find_cg->second.get();
   }
 
   // Add errors.
@@ -1309,7 +1309,7 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   }
 
   // Check all contacts.
-  for (std::pair<std::string, std::shared_ptr<contact>> const& p : he->contacts()) {
+  for (std::pair<std::string, contact*> const& p : he->contacts()) {
     // Find the contact.
     contact_map::const_iterator ct_it{contact::contacts.find(p.first)};
     if (ct_it == contact::contacts.end()) {
@@ -1322,9 +1322,9 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   }
 
   // Check all contact groups.
-  for (contactgroup_map::iterator
-         it(he->contact_groups.begin()),
-         end(he->contact_groups.end());
+  for (contactgroup_map_unsafe::iterator
+         it(he->contact_groups().begin()),
+         end(he->contact_groups().end());
        it != end;
        ++it) {
     // Find the contact group.
@@ -1339,7 +1339,7 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
       errors++;
     } else {
       // Save the contactgroup pointer for later.
-      he->contact_groups[it->first] = it_cg->second;
+      he->contact_groups()[it->first] = it_cg->second.get();
     }
   }
 

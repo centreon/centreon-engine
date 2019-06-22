@@ -30,6 +30,9 @@ notification::notification(notifier::reason_type type, std::string const& author
     case notifier::notification_normal:
       _category = notifier::cat_normal;
       break;
+      case notifier::notification_recovery:
+      _category = notifier::cat_recovery;
+      break;
     case notifier::notification_acknowledgement:
       _category = notifier::cat_acknowledgement;
       break;
@@ -49,6 +52,6 @@ notification::notification(notifier::reason_type type, std::string const& author
   }
 }
 
-int notification::execute(std::list<std::shared_ptr<contact>> const& to_notify) {
+int notification::execute(std::unordered_set<contact*> const& to_notify) {
   return OK;
 }

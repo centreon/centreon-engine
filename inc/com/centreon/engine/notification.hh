@@ -30,7 +30,7 @@ class contact;
 class notification {
  public:
   notification(notifier::reason_type type, std::string const& author, std::string const& message, uint32_t options, uint64_t notification_id);
-  int execute(std::list<std::shared_ptr<contact>> const& to_notify);
+  int execute(std::unordered_set<contact*> const& to_notify);
 
  private:
   notifier::reason_type _type;

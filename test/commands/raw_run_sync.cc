@@ -41,7 +41,6 @@ static bool run_without_timeout() {
 
   // Run command.
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   result res;
   cmd.run(cmd.get_command_line(), mac, 0, res);
 
@@ -63,7 +62,6 @@ static bool run_with_timeout() {
 
   // Run command.
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   result res;
   cmd.run(cmd.get_command_line(), mac, 1, res);
 
@@ -85,7 +83,6 @@ static bool run_with_environment_macros() {
 
   // Get environment macros.
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   char const* argv("default_arg");
   mac.argv[0] = new char[strlen(argv) + 1];
   strcpy(mac.argv[0], argv);
@@ -116,7 +113,6 @@ static bool run_with_single_quotes() {
 
   // Run command.
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   result res;
   cmd.run(cmd.get_command_line(), mac, 0, res);
 
@@ -138,7 +134,6 @@ static bool run_with_double_quotes() {
 
   // Run command.
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   result res;
   cmd.run(cmd.get_command_line(), mac, 0, res);
 

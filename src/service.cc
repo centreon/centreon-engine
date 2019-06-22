@@ -344,25 +344,11 @@ bool service::operator!=(service const& other) throw() {
  *
  *  @return The output stream.
  */
-std::ostream& operator<<(std::ostream& os, service_map const& obj) {
-  for (service_map::const_iterator it(obj.begin()), end(obj.end()); it != end; ++it)
-    os << "(" << it->first.first << ", "
-       << it->first.second << (std::next(it) != obj.end() ? "), " : ")");
-  return os;
-}
-
-/**
- *  Dump a service_map_unsafe content into the stream.
- *
- *  @param[out] os  The output stream.
- *  @param[in]  obj The service_map to dump.
- *
- *  @return The output stream.
- */
 std::ostream& operator<<(std::ostream& os, service_map_unsafe const& obj) {
-  for (service_map_unsafe::const_iterator it(obj.begin()), end(obj.end()); it != end; ++it)
-    os << "(" << it->first.first << ", "
-       << it->first.second << (std::next(it) != obj.end() ? "), " : ")");
+  for (service_map_unsafe::const_iterator it(obj.begin()), end(obj.end());
+       it != end; ++it)
+    os << "(" << it->first.first << ", " << it->first.second
+       << (std::next(it) != obj.end() ? "), " : ")");
   return os;
 }
 

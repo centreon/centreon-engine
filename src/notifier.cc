@@ -57,7 +57,7 @@ std::array<notifier::is_viable, 6> const notifier::_is_notification_viable{{
 
 uint64_t notifier::_next_notification_id{1L};
 
-notifier::notifier(int notifier_type,
+notifier::notifier(notifier::notifier_type notifier_type,
                    std::string const& display_name,
                    std::string const& check_command,
                    bool checks_enabled,
@@ -113,22 +113,6 @@ notifier::notifier(int notifier_type,
     throw engine_error() << "Could not register notifier '" << display_name
                          << "'";
   }
-
-  if (first_notification_delay < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid first_notification_delay value for notifier '"
-        << display_name << "'";
-    throw engine_error() << "Could not register notifier '" << display_name
-                         << "'";
-  }
-
-  if (recovery_notification_delay < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid recovery_notification_delay value for notifier '"
-        << display_name << "'";
-    throw engine_error() << "Could not register notifier '" << display_name
-                         << "'";
-  }
 }
 
 unsigned long notifier::get_current_event_id() const {
@@ -172,34 +156,6 @@ void notifier::set_notification_number(int num) {
   update_status(false);
 }
 
-bool notifier::notifications_available(int options) const {
-  logger(dbg_functions, basic) << "notifier::notifications_available()";
-
-  /* forced notifications bust through everything */
-  if (options & notification_option_forced) {
-    logger(dbg_notifications, more)
-        << "This is a forced notification, so we'll send it out.";
-    return true;
-  }
-
-  /* are notifications enabled? */
-  if (!config->enable_notifications()) {
-    logger(dbg_notifications, more)
-        << "Notifications are disabled, so service notifications will "
-           "not be sent out.";
-    return false;
-  }
-
-  /* are notifications temporarily disabled for this notifier? */
-  if (!get_notifications_enabled()) {
-    logger(dbg_notifications, more)
-        << "Notifications are temporarily disabled for "
-           "this notifier, so we won't send one out.";
-    return false;
-  }
-  return true;
-}
-
 bool notifier::_is_notification_viable_normal(notification_option options) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
@@ -213,8 +169,16 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
   /* are notifications enabled? */
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
-        << "Notifications are disabled, so services/hosts notifications will "
+        << "Notifications are disabled, so notifications will "
            "not be sent out.";
+    return false;
+  }
+
+  /* are notifications temporarily disabled for this notifier? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for "
+           "this notifier, so we won't send one out.";
     return false;
   }
 
@@ -263,7 +227,7 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
     return false;
   }
 
-  if (_first_notification_delay > 0 && _notification_number == 0 && get_last_hard_state_change() + _first_notification_delay * config->interval_length() < now) {
+  if (_first_notification_delay > 0 && _notification_number == 0 && get_last_hard_state_change() + _first_notification_delay * config->interval_length() > now) {
     logger(dbg_notifications, more)
       << "This notifier is configured with a first notification delay, we won't send notification until "
       << "timestamp " << (_first_notification_delay * config->interval_length());
@@ -286,6 +250,29 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
 
 bool notifier::_is_notification_viable_recovery(notification_option options) const {
   bool retval;
+  /* forced notifications bust through everything */
+  if (options & notification_option_forced) {
+    logger(dbg_notifications, more)
+        << "This is a forced notification, so we'll send it out.";
+    return true;
+  }
+
+  /* are notifications enabled? */
+  if (!config->enable_notifications()) {
+    logger(dbg_notifications, more)
+        << "Notifications are disabled, so notifications will "
+           "not be sent out.";
+    return false;
+  }
+
+  /* are notifications temporarily disabled for this notifier? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for "
+           "this notifier, so we won't send one out.";
+    return false;
+  }
+
   /* Recovery is sent on state OK or UP */
   if (get_current_state_int() == 0) {
     /* Filtering conditions are similar to normal notifications */
@@ -310,9 +297,26 @@ bool notifier::_is_notification_viable_recovery(notification_option options) con
 }
 
 bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
+  /* forced notifications bust through everything */
+  if (options & notification_option_forced) {
+    logger(dbg_notifications, more)
+        << "This is a forced notification, so we'll send it out.";
+    return true;
+  }
+
+  /* are notifications enabled? */
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
-      << "Notifications are disabled, so notifications won't be sent out.";
+        << "Notifications are disabled, so notifications will "
+           "not be sent out.";
+    return false;
+  }
+
+  /* are notifications temporarily disabled for this notifier? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for "
+           "this notifier, so we won't send one out.";
     return false;
   }
 
@@ -325,9 +329,26 @@ bool notifier::_is_notification_viable_acknowledgement(notification_option optio
 }
 
 bool notifier::_is_notification_viable_flapping(notification_option options) const {
+  /* forced notifications bust through everything */
+  if (options & notification_option_forced) {
+    logger(dbg_notifications, more)
+        << "This is a forced notification, so we'll send it out.";
+    return true;
+  }
+
+  /* are notifications enabled? */
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
-      << "Notifications are disabled, so notifications won't be sent out.";
+        << "Notifications are disabled, so notifications will "
+           "not be sent out.";
+    return false;
+  }
+
+  /* are notifications temporarily disabled for this notifier? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for "
+           "this notifier, so we won't send one out.";
     return false;
   }
 
@@ -348,6 +369,30 @@ bool notifier::_is_notification_viable_flapping(notification_option options) con
 }
 
 bool notifier::_is_notification_viable_downtime(notification_option options) const {
+
+  /* forced notifications bust through everything */
+  if (options & notification_option_forced) {
+    logger(dbg_notifications, more)
+        << "This is a forced notification, so we'll send it out.";
+    return true;
+  }
+
+  /* are notifications enabled? */
+  if (!config->enable_notifications()) {
+    logger(dbg_notifications, more)
+        << "Notifications are disabled, so notifications will "
+           "not be sent out.";
+    return false;
+  }
+
+  /* are notifications temporarily disabled for this notifier? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for "
+           "this notifier, so we won't send one out.";
+    return false;
+  }
+
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
       << "Notifications are disabled, so notifications won't be sent out.";
@@ -373,9 +418,26 @@ bool notifier::_is_notification_viable_downtime(notification_option options) con
 }
 
 bool notifier::_is_notification_viable_custom(notification_option options) const {
+  /* forced notifications bust through everything */
+  if (options & notification_option_forced) {
+    logger(dbg_notifications, more)
+        << "This is a forced notification, so we'll send it out.";
+    return true;
+  }
+
+  /* are notifications enabled? */
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
-      << "Notifications are disabled, so notifications won't be sent out.";
+        << "Notifications are disabled, so notifications will "
+           "not be sent out.";
+    return false;
+  }
+
+  /* are notifications temporarily disabled for this notifier? */
+  if (!get_notifications_enabled()) {
+    logger(dbg_notifications, more)
+        << "Notifications are temporarily disabled for "
+           "this notifier, so we won't send one out.";
     return false;
   }
 
@@ -388,8 +450,54 @@ bool notifier::_is_notification_viable_custom(notification_option options) const
   return true;
 }
 
-std::list<std::shared_ptr<contact> > notifier::get_contacts_to_notify() const {
-  std::list<std::shared_ptr<contact> > retval;
+std::unordered_set<contact*> notifier::get_contacts_to_notify(notification_category cat, int state) {
+  std::unordered_set<contact*> retval;
+
+  /* Let's start looking at escalations */
+  for (std::list<std::shared_ptr<escalation>>::const_iterator
+         it{_escalations.begin()},
+         end{_escalations.end()};
+       it != end;
+       ++it) {
+    if ((*it)->is_viable(get_current_state_int(), _notification_number)) {
+      /* Construction of the set containing contacts to notify. We don't know
+       * for the moment if those contacts accept notification. */
+      for (contact_map_unsafe::const_iterator cit{(*it)->contacts().begin()},
+           cend{(*it)->contacts().end()};
+           cit != cend; ++cit)
+        if (cit->second->should_be_notified(cat, *this))
+          retval.insert(cit->second);
+
+      /* For each contact group, we also add its contacts. */
+      for (contactgroup_map_unsafe::const_iterator cgit{(*it)->contact_groups().begin()}, cgend{(*it)->contact_groups().end()};
+          cgit != cgend; ++cgit) {
+        for (contact_map_unsafe::const_iterator cit{cgit->second->get_members().begin()},
+            cend{cgit->second->get_members().end()};
+            cit != cend;
+            ++cit)
+          if (cit->second->should_be_notified(cat, *this))
+            retval.insert(cit->second);
+      }
+    }
+  }
+
+  if (retval.empty()) {
+    /* Construction of the set containing contacts to notify. We don't know
+     * for the moment if those contacts accept notification. */
+    for (contact_map::const_iterator it{contacts.begin()}, end{contacts.end()};
+        it != end; ++it)
+      retval.insert(it->second.get());
+
+    /* For each contact group, we also add its contacts. */
+    for (contactgroup_map::const_iterator it{contact_groups.begin()}, end{contact_groups.end()};
+        it != end; ++it) {
+      for (contact_map_unsafe::const_iterator cit{it->second->get_members().begin()},
+          cend{it->second->get_members().end()};
+          cit != cend;
+          ++cit)
+        retval.insert(cit->second);
+    }
+  }
   return retval;
 }
 
@@ -411,9 +519,10 @@ int notifier::notify(notifier::reason_type type,
                      notification_option options) {
 
   logger(dbg_functions, basic) << "notifier::notify()";
+  notification_category cat{get_category(type)};
 
   /* Has this notification got sense? */
-  if (!is_notification_viable(get_category(type), options))
+  if (!is_notification_viable(cat, options))
     return OK;
 
   /* For a first notification, we store what type of notification we try to
@@ -430,7 +539,8 @@ int notifier::notify(notifier::reason_type type,
       _type, not_author, not_data, options, _next_notification_id++)};
 
   /* What are the contacts to notify? */
-  std::list<std::shared_ptr<contact> > to_notify{get_contacts_to_notify()};
+  std::unordered_set<contact*> to_notify{
+      get_contacts_to_notify(cat, get_current_state_int())};
 
   /* Let's make the notification. */
   int retval{notif->execute(to_notify)};
@@ -506,6 +616,7 @@ int notifier::notify(notifier::reason_type type,
 //      << "Creating list of contacts to be notified.";
 //
 //  /* create the contact notification list for this service */
+//  memset(&mac, 0, sizeof(mac));
 //  create_notification_list(&mac, options, &escalated);
 //
 //  /* send data to event broker */
@@ -927,15 +1038,15 @@ bool notifier::is_escalated_contact(contact* cntct) const {
 
   for (std::shared_ptr<escalation> const& e : get_escalations()) {
     // Search all contacts of this host escalation.
-    contact_map::const_iterator itt{e->contacts().find(cntct->get_name())};
+    contact_map_unsafe::const_iterator itt{e->contacts().find(cntct->get_name())};
     if (itt != e->contacts().end()) {
-      assert(itt->second.get() == cntct);
+      assert(itt->second == cntct);
       return true;
     }
 
     // Search all contactgroups of this host escalation.
-    for (contactgroup_map::iterator itt(e->contact_groups.begin()),
-         end(e->contact_groups.begin());
+    for (contactgroup_map_unsafe::iterator itt(e->contact_groups().begin()),
+         end(e->contact_groups().begin());
          itt != end;
          ++itt)
       if (itt->second->get_members().find(cntct->get_name()) !=
@@ -1058,11 +1169,11 @@ bool notifier::is_escalated_contact(contact* cntct) const {
 //}
 
 /**
- *  Checks to see whether a service notification should be escalated.
+ *  Checks to see whether a notification should be escalated.
  *
  *  @param[in] svc Service.
  *
- *  @return true if service notification should be escalated, false if
+ *  @return true if the notification should be escalated, false if
  *          it should not.
  */
 bool notifier::should_notification_be_escalated() const {
@@ -1149,4 +1260,8 @@ void notifier::set_current_notification_number(int number) {
  */
 uint64_t notifier::get_next_notification_id() const {
   return _next_notification_id;
+}
+
+notifier::notifier_type notifier::get_notifier_type() const {
+  return _notifier_type;
 }

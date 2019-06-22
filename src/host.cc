@@ -311,7 +311,7 @@ void host::set_host_id(uint64_t id) {
 void host::add_child_link(host* child) {
   // Make sure we have the data we need.
   if (!child)
-    throw(engine_error() << "add child link called with nullptr ptr");
+    throw engine_error() << "add child link called with nullptr ptr";
 
   child_hosts.insert({child->get_name(), child});
 
@@ -800,18 +800,6 @@ std::ostream& operator<<(std::ostream& os, host_map const& obj) {
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, host_map_unsafe const& obj) {
-  for (host_map_unsafe::const_iterator it(obj.begin()), end(obj.end()); it != end;
-       ++it) {
-    os << it->first;
-    if (next(it) != end)
-      os << ", ";
-    else
-      os << "";
-  }
-  return os;
-}
-
 /**
  *  Dump host content into the stream.
  *
@@ -856,11 +844,11 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     c_oss = oss.str();
   }
   if (obj.parent_hosts.empty())
-    c_oss = "\"NULL\"";
+    p_oss = "\"NULL\"";
   else {
     std::ostringstream oss;
     oss << obj.parent_hosts;
-    c_oss = oss.str();
+    p_oss = oss.str();
   }
 
   if (obj.child_hosts.empty())
@@ -1270,16 +1258,13 @@ int is_host_immediate_child_of_host(com::centreon::engine::host* parent_host,
 
   // Root/top-level hosts.
   if (!parent_host) {
-    if (child_host->parent_hosts.size() == 0)
+    if (child_host->parent_hosts.empty())
       return true;
   }
   // Mid-level/bottom hosts.
   else {
-    for (host_map_unsafe::iterator it(child_host->parent_hosts.begin()),
-         end(child_host->parent_hosts.end());
-         it != end; it++)
-      if (it->second == parent_host)
-        return true;
+    host_map_unsafe::const_iterator it{child_host->parent_hosts.find(parent_host->get_name())};
+    return it != child_host->parent_hosts.end();
   }
 
   return false;
@@ -1452,9 +1437,9 @@ int host::log_event() {
 /* process results of an asynchronous host check */
 int host::handle_async_check_result_3x(check_result* queued_check_result) {
   time_t current_time;
-  enum service::service_state svc_res =  service::state_ok;
-  enum host::host_state hst_res = host::state_up;
-  int reschedule_check = false;
+  enum service::service_state svc_res{service::state_ok};
+  enum host::host_state hst_res{host::state_up};
+  int reschedule_check{false};
   std::string old_plugin_output;
   struct timeval start_time_hires;
   struct timeval end_time_hires;
@@ -2796,7 +2781,8 @@ int host::notify_contact(nagios_macros* mac,
    * acknowledgements are no longer excluded from this test -
    * added 8/19/02 Tom Bertelson
    */
-  if (cntct->check_host_notification_viability(this, type, options) ==
+  notification_category cat{get_category(static_cast<notifier::reason_type>(type))};
+  if (cntct->check_host_notification_viability(this, cat, options) ==
       ERROR)
     return ERROR;
 
@@ -3451,9 +3437,9 @@ int host::process_check_result_3x(enum host::host_state new_state,
       for (host_map_unsafe::iterator it(parent_hosts.begin()),
              end(parent_hosts.end());
            it != end; it++) {
-        if (it->second == nullptr)
+        if (!it->second)
           continue;
-        if (it->second->get_current_state() !=  host::state_up) {
+        if (it->second->get_current_state() != host::state_up) {
           logger(dbg_checks, more)
             << "Check of parent host '" << it->first << "' queued.";
           check_hostlist.push_back(it->second);
@@ -3468,9 +3454,9 @@ int host::process_check_result_3x(enum host::host_state new_state,
       for (host_map_unsafe::iterator it(child_hosts.begin()),
              end(child_hosts.end());
            it != end; it++) {
-        if (it->second == nullptr)
+        if (!it->second)
           continue;
-        if (it->second->get_current_state() !=  host::state_up) {
+        if (it->second->get_current_state() != host::state_up) {
           logger(dbg_checks, more)
             << "Check of child host '" << it->first << "' queued.";
           check_hostlist.push_back(it->second);
@@ -3593,7 +3579,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
           for (host_map_unsafe::iterator it(parent_hosts.begin()),
                  end(parent_hosts.end());
                it != end; it++) {
-            if (it->second == nullptr)
+            if (!it->second)
               continue;
 
             has_parent = true;
@@ -3619,7 +3605,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
 
           if (!has_parent) {
             /* host has no parents, so its up */
-            if (parent_hosts.size() == 0) {
+            if (parent_hosts.empty()) {
               logger(dbg_checks, more) << "Host has no parents, so it's DOWN.";
               _current_state = host::state_down;
             } else {
@@ -3630,7 +3616,6 @@ int host::process_check_result_3x(enum host::host_state new_state,
             }
           }
         }
-
           /* set the host state for passive checks */
         else {
           /* set the state */
@@ -3651,7 +3636,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         for (host_map_unsafe::iterator it(child_hosts.begin()),
                end(child_hosts.end());
              it != end; it++) {
-          if (it->second == nullptr)
+          if (!it->second)
             continue;
           if (it->second->get_current_state() !=  host::state_unreachable) {
             logger(dbg_checks, more)
@@ -3660,7 +3645,6 @@ int host::process_check_result_3x(enum host::host_state new_state,
           }
         }
       }
-
         /***** MAX ATTEMPTS > 1 *****/
       else {
         /* active and (in some cases) passive check results are treated as SOFT
@@ -3670,7 +3654,6 @@ int host::process_check_result_3x(enum host::host_state new_state,
           /* set the state type */
           set_state_type(soft);
         }
-
           /* by default, passive check results are treated as HARD states */
         else {
           /* set the state type */
@@ -3733,12 +3716,12 @@ int host::process_check_result_3x(enum host::host_state new_state,
           << "Propagating checks to immediate non-UNREACHABLE "
              "child hosts...";
 
-        for (host_map_unsafe::iterator it(child_hosts.begin()),
-               end(child_hosts.end());
+        for (host_map_unsafe::iterator it{child_hosts.begin()},
+               end{child_hosts.end()};
              it != end; it++) {
-          if (it->second == nullptr)
+          if (!it->second)
             continue;
-          if (it->second->get_current_state() !=  host::state_unreachable) {
+          if (it->second->get_current_state() != host::state_unreachable) {
             logger(dbg_checks, more)
               << "Check of child host '" << it->first << "' queued.";
             check_hostlist.push_back(it->second);
@@ -3932,7 +3915,7 @@ enum host::host_state host::determine_host_reachability() {
          it != end;
          it++) {
 
-      if (it->second == nullptr)
+      if (!it->second)
         continue;
 
       is_host_present = true;
@@ -4211,3 +4194,16 @@ bool host::get_notify_on_current_state() const {
 bool host::is_in_downtime() const {
   return get_scheduled_downtime_depth() > 0;
 }
+
+std::ostream& operator<<(std::ostream& os, host_map_unsafe const& obj) {
+  for (host_map_unsafe::const_iterator it{obj.begin()}, end{obj.end()};
+       it != end; ++it) {
+    os << it->first;
+    if (next(it) != end)
+      os << ", ";
+    else
+      os << "";
+  }
+  return os;
+}
+

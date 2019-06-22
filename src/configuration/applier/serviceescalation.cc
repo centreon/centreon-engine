@@ -71,10 +71,8 @@ void applier::serviceescalation::add_object(
   // Check service escalation.
   if ((obj.hosts().size() != 1) || !obj.hostgroups().empty() ||
       obj.service_description().size() != 1 || !obj.servicegroups().empty())
-    throw(engine_error()
-          << "Could not create service "
-          << "escalation with multiple hosts / host groups / services "
-          << "/ service groups");
+    throw engine_error()
+          << "Could not create service escalation with multiple hosts / host groups / services / service groups";
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -125,7 +123,7 @@ void applier::serviceescalation::add_object(
   for (set_string::const_iterator it(obj.contactgroups().begin()),
        end(obj.contactgroups().end());
        it != end; ++it)
-    se->contact_groups.insert({*it, nullptr});
+    se->contact_groups().insert({*it, nullptr});
 }
 
 /**
@@ -241,17 +239,8 @@ void applier::serviceescalation::remove_object(
         break;
       }
     }
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(nullptr));
-    broker_adaptive_escalation_data(
-      NEBTYPE_SERVICEESCALATION_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      it->second.get(),
-      &tv);
-
     // Remove escalation from the global configuration set.
-    engine::serviceescalation::serviceescalations.erase(it->first);
+    engine::serviceescalation::serviceescalations.erase(it);
   }
 
   config->serviceescalations().erase(obj);

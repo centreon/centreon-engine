@@ -36,11 +36,11 @@ check_result_list check_result::results;
 
 check_result::check_result()
   : _object_check_type{host_check},
+    _host_name{""},
+    _service_description{""},
     _check_type(checkable::check_active),
     _check_options{CHECK_OPTION_NONE},
     _reschedule_check{false},
-    _host_name{""},
-    _service_description{""},
     _latency{0.0},
     _early_timeout{false},
     _exited_ok{false},

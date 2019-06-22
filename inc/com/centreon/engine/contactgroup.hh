@@ -28,8 +28,8 @@
 
 /* Forward declaration. */
 CCE_BEGIN()
-class contactgroup;
 class contact;
+class contactgroup;
 
 namespace configuration {
   class contactgroup;
@@ -40,8 +40,9 @@ typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::contactgroup>>
     contactgroup_map;
 typedef std::unordered_map<std::string,
-    com::centreon::engine::contact *> contact_map_unsafe;
-
+    com::centreon::engine::contact*> contact_map_unsafe;
+typedef std::unordered_map<std::string,
+    com::centreon::engine::contactgroup*> contactgroup_map_unsafe;
 
 CCE_BEGIN()
 

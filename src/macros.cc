@@ -112,12 +112,12 @@ int grab_custom_macro_value_r(
 
       /* concatenate macro values for all hostgroup members */
       for (host_map_unsafe::iterator
-             it(it_hg->second->members.begin()),
-             end(it_hg->second->members.begin());
+             it{it_hg->second->members.begin()},
+             end{it_hg->second->members.begin()};
            it != end;
            ++it) {
 
-        if (it->second == nullptr)
+        if (!it->second)
           continue;
 
         /* get the macro value for this host */
@@ -420,9 +420,9 @@ int grab_standard_hostgroup_macro_r(
 
   case MACRO_HOSTGROUPMEMBERS:
     /* now fill in the string with the member names */
-      for (host_map_unsafe::iterator
-             it(temp_hostgroup->members.begin()),
-             end(temp_hostgroup->members.begin());
+      for (host_map_unsafe::const_iterator
+             it{temp_hostgroup->members.begin()},
+             end{temp_hostgroup->members.begin()};
            it != end;
            ++it) {
         if (it->first.empty())
@@ -507,8 +507,8 @@ int grab_standard_servicegroup_macro_r(
   case MACRO_SERVICEGROUPMEMBERS:
     /* fill the string with the group members */
     for (service_map_unsafe::iterator
-           it(temp_servicegroup->members.begin()),
-           end(temp_servicegroup->members.end());
+           it{temp_servicegroup->members.begin()},
+           end{temp_servicegroup->members.end()};
          it != end;
          ++it) {
       if (it->first.first.empty() || it->first.second.empty())
@@ -601,8 +601,8 @@ int grab_standard_contact_macro_r(
     /* get the contactgroup names */
     /* find all contactgroups this contact is a member of */
     for (std::list<contactgroup*>::const_iterator
-           it(temp_contact->get_parent_groups().begin()),
-           end(temp_contact->get_parent_groups().end());
+           it{temp_contact->get_parent_groups().begin()},
+           end{temp_contact->get_parent_groups().end()};
          it != end; ++it) {
       if (!*it)
         continue;

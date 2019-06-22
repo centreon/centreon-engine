@@ -165,7 +165,6 @@ int main_test(int argc, char** argv) {
 
   // Macro object.
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   mac.x[MACRO_SERVICEACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
   mac.x[MACRO_SERVICEACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
   mac.x[MACRO_SERVICEACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));

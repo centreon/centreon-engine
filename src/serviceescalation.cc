@@ -49,10 +49,49 @@ serviceescalation::serviceescalation(std::string const& hostname,
                          << "on a service without description";
 }
 
+serviceescalation::~serviceescalation() {
+  logger(logging::dbg_config, logging::more)
+    << "Removing a service escalation (destructor).";
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(nullptr));
+  broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE, NEBFLAG_NONE,
+                                  NEBATTR_NONE, this, &tv);
+}
+
 std::string const& serviceescalation::get_hostname() const {
   return _hostname;
 }
 
 std::string const& serviceescalation::get_description() const {
   return _description;
+}
+
+/**
+ *  This method is called by a notifier to know if this escalation is touched
+ *  by the notification to send.
+ *
+ * @param state The notifier state.
+ * @param notification_number The current notifier notification number.
+ *
+ * @return A boolean.
+ */
+bool serviceescalation::is_viable(int state, int notification_number) const {
+  logger(dbg_functions, basic)
+    << "serviceescalation::is_viable()";
+
+  bool retval{escalation::is_viable(state, notification_number)};
+  if (retval) {
+    std::array<notifier::notification_type, 4> nt = {
+      notifier::ok,
+      notifier::warning,
+      notifier::critical,
+      notifier::unknown,
+    };
+
+    if (!get_escalate_on(nt[state]))
+      return false;
+    return true;
+  }
+  else
+    return retval;
 }

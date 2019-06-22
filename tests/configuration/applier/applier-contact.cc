@@ -172,7 +172,7 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   ASSERT_TRUE(ct_it->second->custom_variables["superVar"].get_value() == "Super");
   ASSERT_TRUE(ct_it->second->custom_variables["superVar1"].get_value() == "Super1");
   ASSERT_TRUE(ct_it->second->get_alias() == "newAlias");
-  ASSERT_FALSE(ct_it->second->notify_on_service(notifier::unknown));
+  ASSERT_FALSE(ct_it->second->notify_on(notifier::service_notification, notifier::unknown));
 
   std::set<configuration::command>::iterator it{config->commands_find("cmd")};
   ASSERT_TRUE(it != config->commands().end());

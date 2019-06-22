@@ -93,7 +93,6 @@ TEST_F(SimpleCommand, CommandAlreadyExisting) {
 TEST_F(SimpleCommand, NewCommandSync) {
   std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   commands::result res;
   std::string cc(cmd->process_cmd(&mac));
   ASSERT_EQ(cc, "/bin/echo bonjour");
@@ -111,7 +110,6 @@ TEST_F(SimpleCommand, NewCommandAsync) {
   std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
   cmd->set_listener(lstnr.get());
   nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
   std::string cc(cmd->process_cmd(&mac));
   ASSERT_EQ(cc, "/bin/echo bonjour");
   uint64_t id{cmd->run(cc, mac, 2)};

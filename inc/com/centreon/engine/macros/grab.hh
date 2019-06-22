@@ -282,24 +282,6 @@ namespace  macros {
   }
 
   /**
-   *  Recursively process macros.
-   *
-   *  @param[in] hst Host object.
-   *  @param[in] mac Unused.
-   *
-   *  @return Newly allocated string with macros processed.
-   */
-  //TODO SGA to remove after service rework
-  template <typename T, std::string (T::* member), unsigned int options>
-  std::string get_recursive(T& t, nagios_macros* mac) {
-    (void)mac;
-
-    // Get copy of string with macros processed.
-    std::string buffer;
-    process_macros_r(mac, t.*member, buffer, options);
-    return buffer;
-  }
-  /**
    *  Extract state type.
    *
    *  @param[in] t   Base object.
@@ -309,22 +291,6 @@ namespace  macros {
    */
   template <typename T>
   std::string get_state_type(T& t, nagios_macros* mac) {
-    (void)mac;
-    return (t.get_state_type() == notifier::hard)
-                      ? "HARD"
-                      : "SOFT";
-  }
-  /**
-   *  Extract state type.
-   *
-   *  @param[in] t   Base object.
-   *  @param[in] mac Unused.
-   *
-   *  @return Newly allocated state type as a string.
-   */
-  //TODO SGA to remove after service rework
-  template <typename T>
-  std::string get_state_type_old(T& t, nagios_macros* mac) {
     (void)mac;
     return (t.get_state_type() == notifier::hard)
                       ? "HARD"

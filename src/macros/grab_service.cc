@@ -177,7 +177,7 @@ struct grab_service_redirection {
       {MACRO_SERVICECHECKTYPE, {&get_service_check_type, true}},
       // State type.
       {MACRO_SERVICESTATETYPE,
-       {&get_state_type_old<service>, true}},
+       {&get_state_type<service>, true}},
       // State.
       {MACRO_SERVICESTATE,
        {&get_service_state<&service::get_current_state>, true}},

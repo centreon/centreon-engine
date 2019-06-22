@@ -36,6 +36,16 @@ using namespace com::centreon::engine::string;
 
 contact_map contact::contacts;
 
+std::array<contact::to_notify, 6> const contact::_to_notify{{
+  &contact::_to_notify_normal,
+  &contact::_to_notify_recovery,
+  &contact::_to_notify_acknowledgement,
+  &contact::_to_notify_flapping,
+  &contact::_to_notify_downtime,
+  &contact::_to_notify_custom,
+}};
+
+
 /**************************************
 *                                     *
 *           Base properties           *
@@ -260,17 +270,8 @@ bool operator==(
          && obj1.get_addresses() == obj2.get_addresses()
          && obj1.get_host_notification_commands() == obj2.get_host_notification_commands()
          && obj1.get_service_notification_commands() == obj2.get_service_notification_commands()
-         && obj1.notify_on_service(notifier::unknown) == obj2.notify_on_service(notifier::unknown)
-         && obj1.notify_on_service(notifier::warning) == obj2.notify_on_service(notifier::warning)
-         && obj1.notify_on_service(notifier::critical) == obj2.notify_on_service(notifier::critical)
-         && obj1.notify_on_service(notifier::recovery) == obj2.notify_on_service(notifier::recovery)
-         && obj1.notify_on_service(notifier::flapping) == obj2.notify_on_service(notifier::flapping)
-         && obj1.notify_on_service(notifier::downtime) == obj2.notify_on_service(notifier::downtime)
-         && obj1.notify_on_host(notifier::down) == obj2.notify_on_host(notifier::down)
-         && obj1.notify_on_host(notifier::unreachable) == obj2.notify_on_host(notifier::unreachable)
-         && obj1.notify_on_host(notifier::recovery) == obj2.notify_on_host(notifier::recovery)
-         && obj1.notify_on_host(notifier::flapping) == obj2.notify_on_host(notifier::flapping)
-         && obj1.notify_on_host(notifier::downtime) == obj2.notify_on_host(notifier::downtime)
+         && obj1.notify_on(notifier::service_notification) == obj2.notify_on(notifier::service_notification)
+         && obj1.notify_on(notifier::host_notification) == obj2.notify_on(notifier::host_notification)
          && obj1.get_host_notification_period() == obj2.get_host_notification_period()
          && obj1.get_service_notification_period() == obj2.get_service_notification_period()
          && obj1.get_host_notifications_enabled() == obj2.get_host_notifications_enabled()
@@ -335,17 +336,17 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
   for (std::shared_ptr<commands::command> const& cmd : obj.get_service_notification_commands())
     os << cmd->get_command_line() << " ; ";
   os << "\n"
-    "  notify_on_service_unknown:       " << obj.notify_on_service(notifier::unknown) << "\n"
-    "  notify_on_service_warning:       " << obj.notify_on_service(notifier::warning) << "\n"
-    "  notify_on_service_critical:      " << obj.notify_on_service(notifier::critical) << "\n"
-    "  notify_on_service_recovery:      " << obj.notify_on_service(notifier::recovery) << "\n"
-    "  notify_on_service_flapping:      " << obj.notify_on_service(notifier::flapping) << "\n"
-    "  notify_on_service_downtime:      " << obj.notify_on_service(notifier::downtime) << "\n"
-    "  notify_on_host_down:             " << obj.notify_on_host(notifier::down) << "\n"
-    "  notify_on_host_unreachable:      " << obj.notify_on_host(notifier::unreachable) << "\n"
-    "  notify_on_host_recovery:         " << obj.notify_on_host(notifier::recovery) << "\n"
-    "  notify_on_host_flapping:         " << obj.notify_on_host(notifier::flapping) << "\n"
-    "  notify_on_host_downtime:         " << obj.notify_on_host(notifier::downtime) << "\n"
+    "  notify_on_service_unknown:       " << obj.notify_on(notifier::service_notification, notifier::unknown) << "\n"
+    "  notify_on_service_warning:       " << obj.notify_on(notifier::service_notification, notifier::warning) << "\n"
+    "  notify_on_service_critical:      " << obj.notify_on(notifier::service_notification, notifier::critical) << "\n"
+    "  notify_on_service_recovery:      " << obj.notify_on(notifier::service_notification, notifier::recovery) << "\n"
+    "  notify_on_service_flapping:      " << obj.notify_on(notifier::service_notification, notifier::flapping) << "\n"
+    "  notify_on_service_downtime:      " << obj.notify_on(notifier::service_notification, notifier::downtime) << "\n"
+    "  notify_on_host_down:             " << obj.notify_on(notifier::host_notification, notifier::down) << "\n"
+    "  notify_on_host_unreachable:      " << obj.notify_on(notifier::host_notification, notifier::unreachable) << "\n"
+    "  notify_on_host_recovery:         " << obj.notify_on(notifier::host_notification, notifier::recovery) << "\n"
+    "  notify_on_host_flapping:         " << obj.notify_on(notifier::host_notification, notifier::flapping) << "\n"
+    "  notify_on_host_downtime:         " << obj.notify_on(notifier::host_notification, notifier::downtime) << "\n"
     "  host_notification_period:        " << obj.get_host_notification_period() << "\n"
     "  service_notification_period:     " << obj.get_service_notification_period() << "\n"
     "  host_notifications_enabled:      " << obj.get_host_notifications_enabled() << "\n"
@@ -482,13 +483,13 @@ std::shared_ptr<contact> add_contact(
     obj->set_modified_attributes(MODATTR_NONE);
     obj->set_modified_host_attributes(MODATTR_NONE);
     obj->set_modified_service_attributes(MODATTR_NONE);
-    obj->set_notify_on_host(
+    obj->set_notify_on(notifier::host_notification,
         (notify_host_down > 0 ? notifier::down : notifier::none) |
         (notify_host_downtime > 0 ? notifier::downtime : notifier::none) |
         (notify_host_flapping > 0 ? notifier::flapping : notifier::none) |
         (notify_host_up > 0 ? notifier::recovery : notifier::none) |
         (notify_host_unreachable > 0 ? notifier::unreachable : notifier::none));
-    obj->set_notify_on_service(
+    obj->set_notify_on(notifier::service_notification,
         (notify_service_critical > 0 ? notifier::critical : notifier::none) |
         (notify_service_downtime > 0 ? notifier::downtime : notifier::none) |
         (notify_service_flapping > 0 ? notifier::flapping : notifier::none) |
@@ -524,43 +525,31 @@ std::shared_ptr<contact> add_contact(
 
 contact::contact()
  : _addresses(MAX_CONTACT_ADDRESSES),
-   _notify_on_service{0} {}
+   _notify_on{0, 0} {}
 
 contact::~contact() {
   // host_notification_period_ptr not free.
   // service_notification_period_ptr not free.
 }
 
-bool contact::notify_on_host(notifier::notification_type type) const {
-  return _notify_on_host & type;
+void contact::set_notify_on(notifier::notifier_type type, uint32_t notif) {
+  _notify_on[type] = notif;
 }
 
-void contact::set_notify_on_host(uint32_t notif) {
-  _notify_on_host = notif;
+void contact::add_notify_on(notifier::notifier_type type, notifier::notification_type notif) {
+  _notify_on[type] |= notif;
 }
 
-void contact::add_notify_on_host(notifier::notification_type type) {
-  _notify_on_host |= type;
+void contact::remove_notify_on(notifier::notifier_type type, notifier::notification_type notif) {
+  _notify_on[type] &= ~notif;
 }
 
-void contact::remove_notify_on_host(notifier::notification_type type) {
-  _notify_on_host &= ~type;
+bool contact::notify_on(notifier::notifier_type type, notifier::notification_type notif) const {
+  return _notify_on[type] & notif;
 }
 
-bool contact::notify_on_service(notifier::notification_type type) const {
-  return _notify_on_service & type;
-}
-
-void contact::set_notify_on_service(uint32_t notif) {
-  _notify_on_service = notif;
-}
-
-void contact::add_notify_on_service(notifier::notification_type type) {
-  _notify_on_service |= type;
-}
-
-void contact::remove_notify_on_service(notifier::notification_type type) {
-  _notify_on_service &= ~type;
+uint32_t contact::notify_on(notifier::notifier_type type) const {
+  return _notify_on[type];
 }
 
 /**
@@ -808,7 +797,7 @@ int contact::check_service_notification_viability(
       || type == notifier::notification_flappingstop
       || type == notifier::notification_flappingdisabled) {
 
-    if (!notify_on_service(notifier::flapping)) {
+    if (!notify_on(notifier::service_notification, notifier::flapping)) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
         "service events.";
@@ -826,7 +815,7 @@ int contact::check_service_notification_viability(
       || type == notifier::notification_downtimeend
       || type == notifier::notification_downtimecancelled) {
 
-    if (!notify_on_service(notifier::downtime)) {
+    if (!notify_on(notifier::service_notification, notifier::downtime)) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about DOWNTIME "
         "service events.";
@@ -842,7 +831,7 @@ int contact::check_service_notification_viability(
 
   /* see if we should notify about problems with this service */
   if (svc->get_current_state() == service::state_unknown
-      && !notify_on_service(notifier::unknown)) {
+      && !notify_on(notifier::service_notification, notifier::unknown)) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNKNOWN "
       "service states.";
@@ -850,7 +839,7 @@ int contact::check_service_notification_viability(
   }
 
   if (svc->get_current_state() == service::state_warning
-      && !notify_on_service(notifier::warning)) {
+      && !notify_on(notifier::service_notification, notifier::warning)) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about WARNING "
       "service states.";
@@ -858,7 +847,7 @@ int contact::check_service_notification_viability(
   }
 
   if (svc->get_current_state() == service::state_critical
-      && !notify_on_service(notifier::critical)) {
+      && !notify_on(notifier::service_notification, notifier::critical)) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about CRITICAL "
       "service states.";
@@ -867,7 +856,7 @@ int contact::check_service_notification_viability(
 
   if (svc->get_current_state() == service::state_ok) {
 
-    if (!notify_on_service(notifier::recovery)) {
+    if (!notify_on(notifier::service_notification, notifier::recovery)) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about RECOVERY "
         "service states.";
@@ -875,11 +864,11 @@ int contact::check_service_notification_viability(
     }
 
     if (!((svc->get_notified_on(notifier::unknown)
-           && notify_on_service(notifier::unknown))
+           && notify_on(notifier::service_notification, notifier::unknown))
           || (svc->get_notified_on(notifier::warning)
-              && notify_on_service(notifier::warning))
+              && notify_on(notifier::service_notification, notifier::warning))
           || (svc->get_notified_on(notifier::critical)
-              && notify_on_service(notifier::critical)))) {
+              && notify_on(notifier::service_notification, notifier::critical)))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
       return ERROR;
@@ -893,9 +882,173 @@ int contact::check_service_notification_viability(
   return OK;
 }
 
+/**
+ *  Returns a boolean telling if this contact should be notified by a notifier
+ *  with the given properties.
+ *
+ * @param type A service or a host.
+ * @param cat The notification category
+ * @param state The notifier current state
+ *
+ * @return true if the contact should be notified, false otherwise.
+ */
+bool contact::should_be_notified(notifier::notification_category cat, notifier const& notif) const {
+  logger(dbg_functions, basic)
+    << "contact::should_be_notified()";
+  /* Are notifications enabled? */
+  switch (notif.get_notifier_type()) {
+    case notifier::service_notification:
+      if (!_service_notifications_enabled) {
+        logger(dbg_notifications, most)
+          << "This contact shouldn't be notified from services.";
+        return false;
+      }
+      break;
+    case notifier::host_notification:
+      if (!_host_notifications_enabled) {
+        logger(dbg_notifications, most)
+          << "This contact shouldn't be notified from hosts.";
+        return false;
+      }
+      break;
+  }
+
+  // See if the contact can be notified at this time.
+  {
+    timezone_locker lock(get_timezone());
+    if (!check_time_against_period(
+          std::time(nullptr),
+          this->service_notification_period_ptr)) {
+      logger(dbg_notifications, most)
+        << "This contact shouldn't be notified at this time.";
+      return false;
+    }
+  }
+
+  return (this->*(_to_notify[cat]))(notif);
+}
+
+bool contact::_to_notify_normal(notifier const& notif) const {
+  logger(dbg_functions, basic)
+    << "contact::_to_notify_normal()";
+  notifier::notifier_type type{notif.get_notifier_type()};
+  int state{notif.get_current_state_int()};
+
+  /* Should the contact be notified by the notifier state? */
+  notifier::notification_type t;
+  if (type == notifier::service_notification) {
+    std::array<notifier::notification_type, 4> type{notifier::ok, notifier::warning, notifier::critical, notifier::unknown};
+    t = type[state];
+  }
+  else {
+    std::array<notifier::notification_type, 3> type{notifier::up, notifier::down, notifier::unreachable};
+    t = type[state];
+  }
+  if (!notify_on(type, t)) {
+    logger(dbg_notifications, most)
+      << "We shouldn't notify this contact about state " << state
+      << " since it is not configured for this contact.";
+    return false;
+  }
+
+  return true;
+}
+
+bool contact::_to_notify_recovery(notifier const& notif) const {
+  logger(dbg_functions, basic)
+    << "contact::_to_notify_recovery()";
+  notifier::notifier_type type{notif.get_notifier_type()};
+
+  if (!notify_on(type, notifier::recovery)) {
+    logger(dbg_notifications, most)
+      << "We shouldn't notify this contact about a "
+      << (type == notifier::service_notification ? "service" : "host")
+      << " recovery.";
+    return false;
+  }
+
+  bool retval{false};
+  if (type == notifier::service_notification) {
+    std::array<notifier::notification_type, 4> pb{notifier::warning, notifier::critical, notifier::unknown};
+    for (notifier::notification_type t : pb)
+      if (notif.get_notified_on(t) && notify_on(type, t)) {
+        retval = true;
+        break;
+      }
+  }
+  else {
+    std::array<notifier::notification_type, 3> pb{notifier::down, notifier::unreachable};
+    for (notifier::notification_type t : pb)
+      if (notif.get_notified_on(t) && notify_on(type, t)) {
+        retval = true;
+        break;
+      }
+  }
+  if (!retval)
+    logger(dbg_notifications, most)
+      << "We shouldn't notify the contact about this recovery since it is not "
+      "configured to receive a problem notification.";
+  return retval;
+}
+
+bool contact::_to_notify_acknowledgement(notifier const& notif) const {
+  logger(dbg_functions, basic)
+    << "contact::_to_notify_acknowledgement()";
+  logger(dbg_notifications, most)
+    << "** Checking if contact '"
+    << get_name()
+    << "' should be notified about a acknowledgement notification";
+  return true;
+}
+
+bool contact::_to_notify_flapping(notifier const& notif) const {
+  logger(dbg_functions, basic)
+    << "contact::_to_notify_flapping()";
+  logger(dbg_notifications, most)
+    << "** Checking if contact '"
+    << get_name()
+    << "' should be notified about a flapping notification";
+  notifier::notifier_type type{notif.get_notifier_type()};
+
+  if (!notify_on(type, notifier::flapping)) {
+    logger(dbg_notifications, most)
+      << "We shouldn't notify this contact about FLAPPING "
+      "notifier events.";
+    return false;
+  }
+  return true;
+}
+
+bool contact::_to_notify_downtime(notifier const& notif) const {
+  logger(dbg_functions, basic)
+    << "contact::_to_notify_downtime()";
+  logger(dbg_notifications, most)
+    << "** Checking if contact '"
+    << get_name()
+    << "' should be notified about a downtime notification";
+  notifier::notifier_type type{notif.get_notifier_type()};
+
+  if (!notify_on(type, notifier::downtime)) {
+    logger(dbg_notifications, most)
+      << "We shouldn't notify this contact about DOWNTIME notifier events.";
+    return false;
+  }
+  return true;
+}
+
+bool contact::_to_notify_custom(notifier const& notif) const {
+  logger(dbg_functions, basic)
+    << "contact::_to_notify_custom()";
+  logger(dbg_notifications, most)
+    << "** Checking if contact '"
+    << get_name()
+    << "' should be notified about a custom notification";
+  return true;
+}
+
 /* checks the viability of notifying a specific contact about a host */
 int contact::check_host_notification_viability(host* hst,
-                                               unsigned int type,
+                                               notifier::notification_category type,
                                                int options) {
   logger(dbg_functions, basic)
     << "check_contact_host_notification_viability()";
@@ -935,18 +1088,16 @@ int contact::check_host_notification_viability(host* hst,
   /*********************************************/
 
   /* custom notifications are good to go at this point... */
-  if (type == notifier::notification_custom)
+  if (type == notifier::cat_custom)
     return OK;
 
   /****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
   /****************************************/
 
-  if (type == notifier::notification_flappingstart
-      || type == notifier::notification_flappingstop
-      || type == notifier::notification_flappingdisabled) {
+  if (type == notifier::cat_flapping) {
 
-    if (!notify_on_host(notifier::flapping)) {
+    if (!notify_on(notifier::host_notification, notifier::flapping)) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
         "host events.";
@@ -960,11 +1111,9 @@ int contact::check_host_notification_viability(host* hst,
   /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
   /****************************************/
 
-  if (type == notifier::notification_downtimestart
-      || type == notifier::notification_downtimeend
-      || type == notifier::notification_downtimecancelled) {
+  if (type == notifier::cat_downtime) {
 
-    if (!notify_on_host(notifier::downtime)) {
+    if (!notify_on(notifier::host_notification, notifier::downtime)) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about DOWNTIME "
         "host events.";
@@ -980,14 +1129,14 @@ int contact::check_host_notification_viability(host* hst,
 
   /* see if we should notify about problems with this host */
   if (hst->get_current_state() == host::state_down
-      && !notify_on_host(notifier::down)) {
+      && !notify_on(notifier::host_notification, notifier::down)) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about DOWN states.";
     return ERROR;
   }
 
   if (hst->get_current_state() == host::state_unreachable
-      && !notify_on_host(notifier::unreachable)) {
+      && !notify_on(notifier::host_notification, notifier::unreachable)) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNREACHABLE states,";
     return ERROR;
@@ -995,16 +1144,16 @@ int contact::check_host_notification_viability(host* hst,
 
   if (hst->get_current_state() == host::state_up) {
 
-    if (!notify_on_host(notifier::recovery)) {
+    if (!notify_on(notifier::host_notification, notifier::recovery)) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about RECOVERY states.";
       return ERROR;
     }
 
     if (!((hst->get_notified_on(notifier::down)
-           && notify_on_host(notifier::down))
+           && notify_on(notifier::host_notification, notifier::down))
           || (hst->get_notified_on(notifier::unreachable)
-              && notify_on_host(notifier::unreachable)))) {
+              && notify_on(notifier::host_notification, notifier::unreachable)))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
       return ERROR;
