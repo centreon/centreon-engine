@@ -2210,7 +2210,6 @@ int service::handle_service_event() {
     return ERROR;
 
   /* update service macros */
-  memset(&mac, 0, sizeof(mac));
   grab_host_macros_r(&mac, get_host_ptr());
   grab_service_macros_r(&mac, this);
 
@@ -2258,7 +2257,6 @@ int service::obsessive_compulsive_service_check_processor() {
     return ERROR;
 
   /* update service macros */
-  memset(&mac, 0, sizeof(mac));
   grab_host_macros_r(&mac, temp_host);
   grab_service_macros_r(&mac, this);
 

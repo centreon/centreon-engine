@@ -367,7 +367,6 @@ void checker::run(
 
   // Get current host macros.
   nagios_macros macros;
-  memset(&macros, 0, sizeof(macros));
   grab_host_macros_r(&macros, hst);
   std::string tmp;
   get_raw_command_line_r(
@@ -603,7 +602,6 @@ void checker::run(
 
   // Get current host and service macros.
   nagios_macros macros;
-  memset(&macros, 0, sizeof(macros));
   grab_host_macros_r(&macros, svc->get_host_ptr());
   grab_service_macros_r(&macros, svc);
   std::string tmp;
@@ -1033,7 +1031,6 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
 
   // Get current host macros.
   nagios_macros macros;
-  memset(&macros, 0, sizeof(macros));
   grab_host_macros_r(&macros, hst);
   std::string tmp;
   get_raw_command_line_r(
