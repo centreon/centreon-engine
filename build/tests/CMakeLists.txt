@@ -46,6 +46,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/contacts/contactgroup-config.cc"
     "${TESTS_DIR}/contacts/simple-contactgroup.cc"
     "${TESTS_DIR}/downtime_finder.cc"
+    "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/main.cc"
     "${TESTS_DIR}/notifications/host_normal_notification.cc"
     "${TESTS_DIR}/notifications/host_recovery_notification.cc"

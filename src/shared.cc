@@ -55,19 +55,19 @@ char* my_strtok(char const* buffer, char const* tokens) {
 
   sequence_head = my_strtok_buffer;
 
-  if (sequence_head[0] == '\x0')
-    return (NULL);
+  if (!sequence_head || sequence_head[0] == '\x0')
+    return nullptr;
 
   token_position = strchr(my_strtok_buffer, tokens[0]);
 
   if (token_position == NULL) {
     my_strtok_buffer = strchr(my_strtok_buffer, '\x0');
-    return (sequence_head);
+    return sequence_head;
   }
 
   token_position[0] = '\x0';
   my_strtok_buffer = token_position + 1;
-  return (sequence_head);
+  return sequence_head;
 }
 
 /* strip newline, carriage return, and tab characters from beginning and end of a string */
@@ -338,12 +338,13 @@ void get_time_breakdown(
 char* resize_string(char* str, size_t size) {
   if (size == 0) {
     delete[] str;
-    return (NULL);
+    return nullptr;
   }
-  if (str == NULL)
-    return (new char[size]);
+  if (str == nullptr)
+    return new char[size];
   char* new_str = new char[size];
-  strcpy(new_str, str);
+  strncpy(new_str, str, size - 2);
+  new_str[size - 1] = 0;
   delete[] str;
-  return (new_str);
+  return new_str;
 }

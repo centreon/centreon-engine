@@ -140,7 +140,7 @@ char* mmap_fgets(mmapfile* temp_mmapfile) {
 /* gets one line of input from an mmap()'ed file (may be contained on more than one line in the source file) */
 char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
   if (!temp_mmapfile)
-    return (NULL);
+    return nullptr;
 
   char* buf(NULL);
   char* tempbuf(NULL);

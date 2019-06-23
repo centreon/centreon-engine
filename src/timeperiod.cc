@@ -343,7 +343,7 @@ static time_t calculate_time_from_weekday_of_month(
     midnight = mktime(&t);
   }
 
-  return (midnight);
+  return midnight;
 }
 
 /**
