@@ -71,7 +71,6 @@ int grab_custom_macro_value_r(
       std::string const& arg2,
       std::string& output) {
   contactgroup* temp_contactgroup = nullptr;
-  int delimiter_len = 0;
   std::string temp_buffer;
   int result = OK;
 
@@ -107,8 +106,6 @@ int grab_custom_macro_value_r(
         it_hg(hostgroup::hostgroups.find(arg1));
       if (it_hg == hostgroup::hostgroups.end() || it_hg->second == nullptr)
         return ERROR;
-
-      delimiter_len = arg2.length();
 
       /* concatenate macro values for all hostgroup members */
       for (host_map_unsafe::iterator
@@ -183,7 +180,6 @@ int grab_custom_macro_value_r(
           return ERROR;
 
         std::shared_ptr<servicegroup> const& temp_servicegroup{sg_it->second};
-        delimiter_len = arg2.length();
 
         /* concatenate macro values for all servicegroup members */
           for (service_map_unsafe::iterator
@@ -248,8 +244,6 @@ int grab_custom_macro_value_r(
       contactgroup_map::iterator cg_it = contactgroup::contactgroups.find(arg1);
       if (cg_it == contactgroup::contactgroups.end() || !cg_it->second)
         return (ERROR);
-
-      delimiter_len = arg2.length();
 
       /* concatenate macro values for all contactgroup members */
       for (contact_map_unsafe::const_iterator
@@ -748,6 +742,30 @@ std::string clean_macro_chars(std::string const& macro, int options) {
     retval.resize(y);
   }
   return retval;
+}
+
+std::string url_encode(std::string const& value) {
+  std::ostringstream escaped;
+  escaped.fill('0');
+  escaped << std::hex;
+
+  for (std::string::const_iterator i{value.begin()}, n{value.end()};
+          i != n; ++i) {
+    std::string::value_type c{*i};
+
+    // Keep alphanumeric and other accepted characters intact
+    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+      escaped << c;
+      continue;
+    }
+
+    // Any other characters are percent-encoded
+    escaped << std::uppercase;
+    escaped << '%' << std::setw(2) << int((unsigned char) c);
+    escaped << std::nouppercase;
+  }
+
+  return escaped.str();
 }
 
 /* encodes a string in proper URL format */

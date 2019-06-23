@@ -86,6 +86,7 @@ int grab_custom_object_macro_r(
       std::string& output);
 
 // URL encode a string
+std::string url_encode(std::string const& value);
 char* get_url_encoded_string(std::string const& input);
 
 int init_macros();

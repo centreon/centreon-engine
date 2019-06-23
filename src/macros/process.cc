@@ -161,7 +161,8 @@ int process_macros_r(
 
         /* URL encode the macro if requested - this allocates new memory */
         if (macro_options & URL_ENCODE_MACRO_CHARS) {
-          selected_macro = get_url_encoded_string(selected_macro);
+          selected_macro = url_encode(selected_macro);
+          //selected_macro = get_url_encoded_string(selected_macro);
           free_macro = true;
         }
 

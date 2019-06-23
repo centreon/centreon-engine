@@ -2143,8 +2143,6 @@ void host::set_flap(double percent_change,
       << "% threshold).  When the host state stabilizes and the "
       << "flapping stops, notifications will be re-enabled.";
 
-  unsigned long comment_id;
-  comment_id = get_flapping_comment_id();
   std::shared_ptr<comment> com{
       new comment(comment::host, comment::flapping, get_name(), "", time(nullptr),
                   "(Centreon Engine Process)", oss.str(), false,
@@ -2152,7 +2150,7 @@ void host::set_flap(double percent_change,
 
   comment::comments.insert({com->get_comment_id(), com});
 
-  comment_id = com->get_comment_id();
+  uint64_t comment_id{com->get_comment_id()};
   set_flapping_comment_id(comment_id);
 
   /* set the flapping indicator */
@@ -2760,7 +2758,6 @@ int host::notify_contact(nagios_macros* mac,
                          char const* not_data,
                          int options,
                          int escalated) {
-  char* command_name = nullptr;
   std::string raw_command;
   std::string processed_command;
   int early_timeout = false;
@@ -2836,9 +2833,6 @@ int host::notify_contact(nagios_macros* mac,
     process_macros_r(mac, raw_command, processed_command, macro_options);
     if (processed_command.empty())
       continue;
-
-    /* get the command name */
-    command_name = string::dup(cmd->get_command_line());
 
     /* run the notification command... */
 
