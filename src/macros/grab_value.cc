@@ -1083,8 +1083,8 @@ int grab_macro_value_r(
       result = grab_macrox_value_r(
                  mac,
                  x,
-                 arg[0],
-                 arg[1],
+                 arg[0] ? arg[0] : "",
+                 arg[1] ? arg[1] : "",
                  output,
                  free_macro);
 
