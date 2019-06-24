@@ -52,11 +52,17 @@ class HostNotification : public ::testing::Test {
     // other unload function... :-(
     timezone_manager::load();
 
+    configuration::applier::contact ct_aply;
+    configuration::contact ctct{valid_contact_config()};
+    ct_aply.add_object(ctct);
+    ct_aply.expand_objects(*config);
+
     configuration::applier::host hst_aply;
     configuration::host hst;
     hst.parse("host_name", "test_host");
     hst.parse("address", "127.0.0.1");
     hst.parse("_HOST_ID", "12");
+    hst.parse("contacts", "admin");
     hst_aply.add_object(hst);
     host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
@@ -64,11 +70,6 @@ class HostNotification : public ::testing::Test {
     _host->set_state_type(checkable::hard);
     _host->set_problem_has_been_acknowledged(false);
     _host->set_notify_on(static_cast<uint32_t>(-1));
-
-    configuration::applier::contact ct_aply;
-    configuration::contact ctct{valid_contact_config()};
-    ct_aply.add_object(ctct);
-    ct_aply.expand_objects(*config);
   }
 
   void TearDown() override {

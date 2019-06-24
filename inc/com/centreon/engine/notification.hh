@@ -29,16 +29,25 @@ class contact;
 
 class notification {
  public:
-  notification(notifier::reason_type type, std::string const& author, std::string const& message, uint32_t options, uint64_t notification_id);
+  notification(notifier* parent,
+               notifier::reason_type type,
+               std::string const& author,
+               std::string const& message,
+               uint32_t options,
+               uint64_t notification_id,
+               uint32_t notification_number);
   int execute(std::unordered_set<contact*> const& to_notify);
 
  private:
+  notifier* _parent;
   notifier::reason_type _type;
   notifier::notification_category _category;
   std::string _author;
   std::string _message;
   uint32_t _options;
+  bool _escalated;
   uint64_t _id;
+  uint32_t _number;
 };
 CCE_END()
 

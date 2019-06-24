@@ -537,8 +537,9 @@ int notifier::notify(notifier::reason_type type,
   else {
   }
 
-  std::unique_ptr<notification> notif{new notification(
-      _type, not_author, not_data, options, _next_notification_id++)};
+  std::unique_ptr<notification> notif{
+      new notification(this, _type, not_author, not_data, options,
+                       _next_notification_id++, _notification_number)};
 
   /* What are the contacts to notify? */
   std::unordered_set<contact*> to_notify{

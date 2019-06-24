@@ -213,9 +213,9 @@ class nagios_macros {
       contact_ptr{nullptr},
       contactgroup_ptr{nullptr} {};
 
-  std::string                           x[MACRO_X_COUNT];
-  std::string                           argv[MAX_COMMAND_ARGUMENTS];
-  std::string                           contactaddress[MAX_CONTACT_ADDRESSES];
+  std::array<std::string, MACRO_X_COUNT> x;
+  std::array<std::string, MAX_COMMAND_ARGUMENTS> argv;
+  std::array<std::string, MAX_CONTACT_ADDRESSES> contactaddress;
   std::string                           ondemand;
   com::centreon::engine::host*          host_ptr;
   com::centreon::engine::hostgroup*     hostgroup_ptr;
