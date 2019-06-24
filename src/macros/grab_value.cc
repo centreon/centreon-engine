@@ -1212,8 +1212,8 @@ int grab_macro_value_r(
     result = grab_custom_macro_value_r(
                mac,
                macro_name,
-               arg[0],
-               arg[1],
+               arg[0] ? arg[0] : "",
+               arg[1] ? arg[1] : "",
                output);
   }
   else if (
