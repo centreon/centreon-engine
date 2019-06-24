@@ -140,9 +140,7 @@ service::service(std::string const& hostname,
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
 
-service::~service() {
-  this->contact_groups.clear();
-}
+service::~service() {}
 
 time_t service::get_last_time_ok() const {
   return _last_time_ok;
@@ -234,12 +232,12 @@ bool service::operator==(service const& other) {
          get_check_interval() == other.get_check_interval() &&
          get_retry_interval() == other.get_retry_interval() &&
          get_max_attempts() == other.get_max_attempts() &&
-         ((this->contact_groups.size() == other.contact_groups.size()) &&
-          std::equal(this->contact_groups.begin(), this->contact_groups.end(),
-                     other.contact_groups.begin())) &&
-         ((this->contacts.size() == other.contacts.size()) &&
-          std::equal(this->contacts.begin(), this->contacts.end(),
-                     other.contacts.begin())) &&
+         (get_contactgroups().size() == other.get_contactgroups().size() &&
+          std::equal(get_contactgroups().begin(), get_contactgroups().end(),
+                     other.get_contactgroups().begin())) &&
+         (get_contacts().size() == other.get_contacts().size() &&
+          std::equal(get_contacts().begin(), get_contacts().end(),
+                     other.get_contacts().begin())) &&
          this->get_notification_interval() == other.get_notification_interval() &&
          get_first_notification_delay() == get_first_notification_delay() &&
          get_recovery_notification_delay() == get_recovery_notification_delay() &&
@@ -381,18 +379,18 @@ std::ostream& operator<<(std::ostream& os,
   std::string cg_oss;
   std::string c_oss;
 
-  if (obj.contact_groups.empty())
+  if (obj.get_contactgroups().empty())
     cg_oss = "\"nullptr\"";
   else {
     std::ostringstream oss;
-    oss << obj.contact_groups;
+    oss << obj.get_contactgroups();
     cg_oss = oss.str();
   }
-  if (obj.contacts.empty())
+  if (obj.get_contacts().empty())
     c_oss = "\"nullptr\"";
   else {
     std::ostringstream oss;
-    oss << obj.contacts;
+    oss << obj.get_contacts();
     c_oss = oss.str();
   }
 
@@ -849,37 +847,6 @@ com::centreon::engine::service* add_service(
   }
 
   return obj.get();
-}
-
-/**
- *  Tests whether a contact is a contact for a particular service.
- *
- *  @param[in] svc   Target service.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_contact_for_service(com::centreon::engine::service* svc,
-                           contact* cntct) {
-  if (!svc || !cntct)
-    return false;
-
-  // Search all individual contacts of this service.
-  for (contact_map::iterator it(svc->contacts.begin()),
-       end(svc->contacts.end());
-       it != end; ++it)
-    if (it->second.get() == cntct)
-      return true;
-
-  // Search all contactgroups of this service.
-  for (contactgroup_map::iterator it(svc->contact_groups.begin()),
-       end(svc->contact_groups.end());
-       it != end; ++it)
-    if (it->second->get_members().find(cntct->get_name()) ==
-        it->second->get_members().end())
-      return true;
-
-  return false;
 }
 
 /**

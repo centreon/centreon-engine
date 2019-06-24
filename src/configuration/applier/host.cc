@@ -168,7 +168,7 @@ void applier::host::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    h->contacts.insert({*it, nullptr});
+    h->get_contacts().insert({*it, nullptr});
 
   // Contact groups.
   for (set_string::const_iterator
@@ -176,7 +176,7 @@ void applier::host::add_object(
          end(obj.contactgroups().end());
        it != end;
        ++it)
-    h->contact_groups.insert({*it, nullptr});
+    h->get_contactgroups().insert({*it, nullptr});
 
   // Custom variables.
   for (map_customvar::const_iterator
@@ -364,7 +364,7 @@ void applier::host::modify_object(
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
     // Delete old contacts.
-    it_obj->second->contacts.clear();
+    it_obj->second->get_contacts().clear();
 
     // Add contacts to host.
     for (set_string::const_iterator
@@ -372,13 +372,13 @@ void applier::host::modify_object(
            end(obj.contacts().end());
          it != end;
          ++it)
-      it_obj->second->contacts.insert({*it, nullptr});
+      it_obj->second->get_contacts().insert({*it, nullptr});
   }
 
   // Contact groups.
   if (obj.contactgroups() != obj_old.contactgroups()) {
     // Delete old contact groups.
-    it_obj->second->contact_groups.clear();
+    it_obj->second->get_contactgroups().clear();
 
     // Add contact groups to host.
     for (set_string::const_iterator
@@ -386,7 +386,7 @@ void applier::host::modify_object(
            end(obj.contactgroups().end());
          it != end;
          ++it)
-      it_obj->second->contact_groups.insert({*it, nullptr});
+      it_obj->second->get_contactgroups().insert({*it, nullptr});
   }
 
   // Custom variables.

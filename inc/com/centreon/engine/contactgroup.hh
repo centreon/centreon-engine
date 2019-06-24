@@ -74,6 +74,6 @@ CCE_END()
 
 std::ostream& operator<<(
                 std::ostream& os,
-                contactgroup_map const& obj);
+                contactgroup_map_unsafe const& obj);
 
 #endif // !CCE_OBJECTS_CONTACTGROUP_HH

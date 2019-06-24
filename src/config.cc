@@ -384,13 +384,13 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   }
 
   /* check for valid contacts */
-  for (contact_map::iterator
-         it(svc->contacts.begin()),
-         end(svc->contacts.end());
+  for (contact_map_unsafe::const_iterator
+         it{svc->get_contacts().begin()},
+         end{svc->get_contacts().end()};
        it != end;
        ++it) {
     contact_map::const_iterator ct_it{contact::contacts.find(it->first)};
-    if (ct_it == contact::contacts.end()) {
+    if (ct_it == contact::contacts.end() || ct_it->second.get() != it->second) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in service '" << svc->get_description() << "' for "
@@ -400,16 +400,16 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
   }
 
   /* check all contact groupss */
-  for (contactgroup_map::iterator
-         it(svc->contact_groups.begin()),
-         end(svc->contact_groups.end());
+  for (contactgroup_map_unsafe::const_iterator
+         it{svc->get_contactgroups().begin()},
+         end{svc->get_contactgroups().end()};
        it != end;
        ++it) {
 
     // Find the contact group.
     contactgroup_map::iterator find_cg{contactgroup::contactgroups.find(it->first)};
 
-    if (find_cg == contactgroup::contactgroups.end() || !find_cg->second) {
+    if (find_cg == contactgroup::contactgroups.end() || find_cg->second.get() != it->second) {
       logger(log_verification_error, basic)
         << "Error: Contact group '" << it->first
         << "' specified in service '" << svc->get_description() << "' for "
@@ -608,13 +608,13 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
   }
 
   /* check all contacts */
-  for (contact_map::iterator
-         it(hst->contacts.begin()),
-         end(hst->contacts.end());
+  for (contact_map_unsafe::const_iterator
+         it{hst->get_contacts().begin()},
+         end{hst->get_contacts().end()};
        it != end;
        ++it) {
     contact_map::const_iterator ct_it{contact::contacts.find(it->first)};
-    if (ct_it == contact::contacts.end()) {
+    if (ct_it == contact::contacts.end() || ct_it->second.get() != it->second) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << it->first
         << "' specified in host '" << hst->get_name()
@@ -624,16 +624,16 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
   }
 
   /* check all contact groups */
-  for (contactgroup_map::iterator
-         it(hst->contact_groups.begin()),
-         end(hst->contact_groups.end());
-       it != end;
-       ++it) {
+  for (contactgroup_map_unsafe::const_iterator
+           it{hst->get_contactgroups().begin()},
+       end{hst->get_contactgroups().end()};
+       it != end; ++it) {
     // Find the contact group.
     contactgroup_map::iterator find_cg{
       contactgroup::contactgroups.find(it->first)};
 
-    if (find_cg == contactgroup::contactgroups.end() || !find_cg->second) {
+    if (find_cg == contactgroup::contactgroups.end() ||
+        find_cg->second.get() != it->second) {
       logger(log_verification_error, basic)
         << "Error: Contact group '"
         << it->first

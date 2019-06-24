@@ -124,10 +124,10 @@ void contactgroup::set_alias(std::string const& alias) {
 
 std::ostream& operator<<(
                 std::ostream& os,
-                contactgroup_map const& obj)
+                contactgroup_map_unsafe const& obj)
 {
-  for (contactgroup_map::const_iterator
-         it(obj.begin()), end(obj.end());
+  for (contactgroup_map_unsafe::const_iterator
+         it{obj.begin()}, end{obj.end()};
        it != end;
        ++it) {
     os << it->first;

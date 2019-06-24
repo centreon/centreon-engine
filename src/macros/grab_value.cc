@@ -598,7 +598,7 @@ static int handle_summary_macro(
       // Filter totals based on contact if necessary.
       bool authorized(
              mac->contact_ptr
-             ? is_contact_for_host(it->second.get(), mac->contact_ptr)
+             ? is_contact_for_notifier(it->second.get(), mac->contact_ptr)
              : true);
       if (authorized) {
         bool problem(true);
@@ -652,7 +652,7 @@ static int handle_summary_macro(
       // Filter totals based on contact if necessary.
       bool authorized(
              mac->contact_ptr
-             ? is_contact_for_service(
+             ? is_contact_for_notifier(
                  it->second.get(),
                  mac->contact_ptr)
              : true);

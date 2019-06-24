@@ -278,7 +278,6 @@ bool notifier::_is_notification_viable_recovery(notification_option options) con
     /* Filtering conditions are similar to normal notifications */
     retval = _is_notification_viable_normal(options);
     if (retval) {
-      timeperiod* tp{get_notification_timeperiod()};
       timezone_locker lock{get_timezone()};
       time_t now;
       time(&now);
@@ -484,17 +483,20 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(notification_categ
   if (retval.empty()) {
     /* Construction of the set containing contacts to notify. We don't know
      * for the moment if those contacts accept notification. */
-    for (contact_map::const_iterator it{contacts.begin()}, end{contacts.end()};
-        it != end; ++it)
-      retval.insert(it->second.get());
+    for (contact_map_unsafe::const_iterator it{get_contacts().begin()},
+         end{get_contacts().end()};
+         it != end; ++it)
+      retval.insert(it->second);
 
     /* For each contact group, we also add its contacts. */
-    for (contactgroup_map::const_iterator it{contact_groups.begin()}, end{contact_groups.end()};
-        it != end; ++it) {
-      for (contact_map_unsafe::const_iterator cit{it->second->get_members().begin()},
-          cend{it->second->get_members().end()};
-          cit != cend;
-          ++cit)
+    for (contactgroup_map_unsafe::const_iterator
+             it{get_contactgroups().begin()},
+         end{get_contactgroups().end()};
+         it != end; ++it) {
+      for (contact_map_unsafe::const_iterator
+               cit{it->second->get_members().begin()},
+           cend{it->second->get_members().end()};
+           cit != cend; ++cit)
         retval.insert(cit->second);
     }
   }
@@ -1027,7 +1029,6 @@ void notifier::add_escalation(std::shared_ptr<escalation> e) {
  *  Tests whether or not a contact is an escalated contact for a
  *  particular host.
  *
- *  @param[in] hst   Target host.
  *  @param[in] cntct Target contact.
  *
  *  @return true or false.
@@ -1264,4 +1265,50 @@ uint64_t notifier::get_next_notification_id() const {
 
 notifier::notifier_type notifier::get_notifier_type() const {
   return _notifier_type;
+}
+
+std::unordered_map<std::string, contact*>& notifier::get_contacts() {
+  return _contacts;
+}
+
+std::unordered_map<std::string, contact*> const& notifier::get_contacts() const {
+  return _contacts;
+}
+
+contactgroup_map_unsafe& notifier::get_contactgroups() {
+  return _contact_groups;
+}
+
+contactgroup_map_unsafe const& notifier::get_contactgroups() const {
+  return _contact_groups;
+}
+
+/**
+ *  Tests whether a contact is a contact for a particular notifier.
+ *
+ *  @param[in] notif Target notifier.
+ *  @param[in] cntct Target contact.
+ *
+ *  @return true or false.
+ */
+bool is_contact_for_notifier(com::centreon::engine::notifier* notif, contact* cntct) {
+  if (!notif || !cntct)
+    return false;
+
+  // Search all individual contacts of this host.
+  for (contact_map_unsafe::const_iterator it{notif->get_contacts().begin()},
+       end{notif->get_contacts().end()};
+       it != end; ++it)
+    if (it->second == cntct)
+      return true;
+
+  for (contactgroup_map_unsafe::const_iterator
+           it{notif->get_contactgroups().begin()},
+       end{notif->get_contactgroups().end()};
+       it != end; ++it)
+    if (it->second->get_members().find(cntct->get_name()) ==
+        it->second->get_members().end())
+      return true;
+
+  return false;
 }

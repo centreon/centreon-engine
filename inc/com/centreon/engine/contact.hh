@@ -219,9 +219,8 @@ bool          operator==(
 bool          operator!=(
                 com::centreon::engine::contact const& obj1,
                 com::centreon::engine::contact const& obj2) throw ();
-std::ostream& operator<<(std::ostream& os, com::centreon::engine::contact const& obj);
-std::ostream& operator<<(
-                std::ostream& os,
-                contact_map const& obj);
+std::ostream& operator<<(std::ostream& os,
+                         com::centreon::engine::contact const& obj);
+std::ostream& operator<<(std::ostream& os, contact_map_unsafe const& obj);
 
 #endif // !CCE_CONTACT_HH

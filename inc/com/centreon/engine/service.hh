@@ -309,12 +309,6 @@ com::centreon::engine::service* add_service(
            int retain_nonstatus_information,
            bool obsess_over,
            std::string const& timezone);
-int      is_contact_for_service(
-           com::centreon::engine::service* svc,
-           com::centreon::engine::contact* cntct);
-int      is_escalated_contact_for_service(
-           com::centreon::engine::service* svc,
-           com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
 }

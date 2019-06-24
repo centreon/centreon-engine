@@ -28,8 +28,6 @@
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/logging.hh"
-#  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/notifier.hh"
 #  include "com/centreon/engine/service.hh"
@@ -40,6 +38,7 @@ CCE_BEGIN()
 namespace commands {
   class command;
 }
+class contact;
 class host;
 class hostgroup;
 class hostescalation;
@@ -158,7 +157,6 @@ class                host : public notifier {
   void               grab_macros_r(nagios_macros* mac) override;
   bool               operator==(host const& other) throw ();
   bool               operator!=(host const& other) throw ();
-  int                is_escalated_contact(contact* cntct);
   bool               is_result_fresh(time_t current_time, int log_this);
 
   int                run_sync_check_3x(enum host::host_state* check_result_code,
@@ -344,8 +342,6 @@ private:
 
 CCE_END()
 
-int                   is_contact_for_host(com::centreon::engine::host* hst,
-                          com::centreon::engine::contact* cntct);
 int                   is_host_immediate_child_of_host(
                                     com::centreon::engine::host* parent,
                                     com::centreon::engine::host* child);
@@ -363,7 +359,6 @@ int                   number_of_total_parent_hosts(
 
 std::ostream&         operator<<(std::ostream& os,
                             com::centreon::engine::host const& obj);
-std::ostream&         operator<<(std::ostream& os, host_map const& obj);
 std::ostream&         operator<<(std::ostream& os, host_map_unsafe const& obj);
 
 CCE_BEGIN()
