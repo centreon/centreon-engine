@@ -283,14 +283,14 @@ void connector::set_command_line(std::string const& command_line) {
 void connector::data_is_available(process& p) throw () {
   typedef void (connector::*recv_query)(char const*);
   static recv_query tab_recv_query[] = {
-    NULL,
+    nullptr,
     &connector::_recv_query_version,
-    NULL,
+    nullptr,
     &connector::_recv_query_execute,
-    NULL,
+    nullptr,
     &connector::_recv_query_quit,
     &connector::_recv_query_error,
-    NULL
+    nullptr
   };
 
   try {
@@ -332,7 +332,7 @@ void connector::data_is_available(process& p) throw () {
          it != end;
          ++it) {
       char const* data(it->c_str());
-      char* endptr(NULL);
+      char* endptr(nullptr);
       unsigned int id(strtol(data, &endptr, 10));
       logger(dbg_commands, basic)
         << "connector::data_is_available: request id=" << id;
@@ -553,7 +553,7 @@ void connector::_recv_query_error(char const* data) {
     logger(dbg_commands, basic)
       << "connector::_recv_query_error";
 
-    char* endptr(NULL);
+    char* endptr(nullptr);
     int code(strtol(data, &endptr, 10));
     if (data == endptr)
       throw (engine_error() << "Invalid query for connector '"
@@ -596,7 +596,7 @@ void connector::_recv_query_execute(char const* data) {
       << "connector::_recv_query_execute";
 
     // Get query informations.
-    char* endptr(NULL);
+    char* endptr(nullptr);
     unsigned long command_id(strtol(data, &endptr, 10));
     if (data == endptr)
       throw (engine_error()
@@ -719,7 +719,7 @@ void connector::_recv_query_version(char const* data) {
     // Parse query version response to get major and minor
     // engine version supported by the connector.
     int version[2];
-    char* endptr(NULL);
+    char* endptr(nullptr);
     for (unsigned int i(0); i < 2; ++i) {
       version[i] = strtol(data, &endptr, 10);
       if (data == endptr)

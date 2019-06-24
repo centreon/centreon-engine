@@ -115,23 +115,23 @@ bool downtime_finder::_match_criteria(
     retval = (crit.second == dt.get_hostname());
   }
   else if (crit.first == "start") {
-    time_t expected(strtoll(crit.second.c_str(), NULL, 0));
+    time_t expected(strtoll(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_start_time());
   }
   else if (crit.first == "end") {
-    time_t expected(strtoll(crit.second.c_str(), NULL, 0));
+    time_t expected(strtoll(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_end_time());
   }
   else if (crit.first == "fixed") {
-    bool expected(strtol(crit.second.c_str(), NULL, 0));
+    bool expected(strtol(crit.second.c_str(), nullptr, 0));
     retval = (expected == static_cast<bool>(dt.is_fixed()));
   }
   else if (crit.first == "triggered_by") {
-    unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
+    unsigned long expected(strtoul(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_triggered_by());
   }
   else if (crit.first == "duration") {
-    unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
+    unsigned long expected(strtoul(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_duration());
   }
   else if (crit.first == "author")
@@ -162,23 +162,23 @@ bool downtime_finder::_match_criteria(
     retval = (crit.second == dt.get_service_description());
   }
   else if (crit.first == "start") {
-    time_t expected(strtoll(crit.second.c_str(), NULL, 0));
+    time_t expected(strtoll(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_start_time());
   }
   else if (crit.first == "end") {
-    time_t expected(strtoll(crit.second.c_str(), NULL, 0));
+    time_t expected(strtoll(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_end_time());
   }
   else if (crit.first == "fixed") {
-    bool expected(strtol(crit.second.c_str(), NULL, 0));
+    bool expected(strtol(crit.second.c_str(), nullptr, 0));
     retval = (expected == static_cast<bool>(dt.is_fixed()));
   }
   else if (crit.first == "triggered_by") {
-    unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
+    unsigned long expected(strtoul(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_triggered_by());
   }
   else if (crit.first == "duration") {
-    unsigned long expected(strtoul(crit.second.c_str(), NULL, 0));
+    unsigned long expected(strtoul(crit.second.c_str(), nullptr, 0));
     retval = (expected == dt.get_duration());
   }
   else if (crit.first == "author")

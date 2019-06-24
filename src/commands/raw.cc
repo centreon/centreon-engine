@@ -124,7 +124,7 @@ unsigned long raw::run(
     << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Get process and put into the busy list.
-  process* p(NULL);
+  process* p(nullptr);
   unsigned long command_id(get_uniq_id());
   {
     concurrency::locker lock(&_lock);
@@ -524,8 +524,8 @@ void raw::_build_macrosx_environment(
         grab_macrox_value_r(
           &macros,
           i,
-          NULL,
-          NULL,
+          nullptr,
+          nullptr,
           macros.x[i],
           &release_memory);
       }

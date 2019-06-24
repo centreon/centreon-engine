@@ -446,9 +446,9 @@ int grab_host_macros_r(nagios_macros *mac, host *hst) {
 
   // Save pointer to host.
   mac->host_ptr = hst;
-  mac->hostgroup_ptr = NULL;
+  mac->hostgroup_ptr = nullptr;
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return ERROR;
 
   // Save pointer to host's first/primary hostgroup.

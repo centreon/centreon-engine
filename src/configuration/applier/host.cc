@@ -460,7 +460,7 @@ void applier::host::remove_object(
     // Remove host downtimes.
     downtimes::downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
       obj.host_name(),
-      nullptr,
+      "",
       (time_t)0,
       nullptr);
 

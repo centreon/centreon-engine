@@ -88,7 +88,7 @@ int my_system_r(
   timeval end_time = timeval();
 
   // time to start command.
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   // send event broker.
   broker_system_command(
@@ -102,8 +102,8 @@ int my_system_r(
     *early_timeout,
     notifier::ok,
     const_cast<char *>(cmd.c_str()),
-    NULL,
-    NULL);
+    nullptr,
+    nullptr);
 
   commands::raw raw_cmd("system", cmd);
   commands::result res;
@@ -140,7 +140,7 @@ int my_system_r(
     result,
     const_cast<char *>(cmd.c_str()),
     const_cast<char *>(output.c_str()),
-    NULL);
+    nullptr);
 
   return result;
 }
@@ -148,7 +148,7 @@ int my_system_r(
 // same like unix ctime without the '\n' at the end of the string.
 char const* my_ctime(time_t const* t) {
   char* buf(ctime(t));
-  if (buf != NULL)
+  if (buf != nullptr)
     buf[strlen(buf) - 1] = 0;
   return buf;
 }
@@ -174,7 +174,7 @@ int get_raw_command_line_r(
   clear_argv_macros_r(mac);
 
   /* make sure we've got all the requirements */
-  if (cmd_ptr == NULL) {
+  if (cmd_ptr == nullptr) {
     return ERROR;
   }
 
@@ -185,7 +185,7 @@ int get_raw_command_line_r(
   full_command = cmd_ptr->get_command_line();
 
   /* get the command arguments */
-  if (cmd != NULL) {
+  if (cmd != nullptr) {
     /* skip the command name (we're about to get the arguments)... */
     for (arg_index = 0;; arg_index++) {
       if (cmd[arg_index] == '!' || cmd[arg_index] == '\x0')
@@ -244,9 +244,9 @@ int get_raw_command_line_r(
 /* trap signals so we can exit gracefully */
 void setup_sighandler() {
   /* remove buffering from stderr, stdin, and stdout */
-  setbuf(stdin, (char*)NULL);
-  setbuf(stdout, (char*)NULL);
-  setbuf(stderr, (char*)NULL);
+  setbuf(stdin, (char*)nullptr);
+  setbuf(stdout, (char*)nullptr);
+  setbuf(stderr, (char*)nullptr);
 
   /* initialize signal handling */
   signal(SIGPIPE, SIG_IGN);
@@ -407,7 +407,7 @@ bool contains_illegal_object_chars(char const* name) {
 /* compares strings */
 int compare_strings(char* val1a, char* val2a) {
   /* use the compare_hashdata() function */
-  return compare_hashdata(val1a, NULL, val2a, NULL);
+  return compare_hashdata(val1a, nullptr, val2a, nullptr);
 }
 
 /******************************************************************/
@@ -476,12 +476,12 @@ void free_memory(nagios_macros* mac) {
     timed_event* next_event(this_event->next);
     if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
       delete static_cast<unsigned long*>(this_event->event_data);
-      this_event->event_data = NULL;
+      this_event->event_data = nullptr;
     }
     delete this_event;
     this_event = next_event;
   }
-  event_list_high = NULL;
+  event_list_high = nullptr;
   quick_timed_event.clear(hash_timed_event::high);
 
   // Free memory for the low priority event list.
@@ -489,12 +489,12 @@ void free_memory(nagios_macros* mac) {
     timed_event* next_event(this_event->next);
     if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
       delete static_cast<unsigned long*>(this_event->event_data);
-      this_event->event_data = NULL;
+      this_event->event_data = nullptr;
     }
     delete this_event;
     this_event = next_event;
   }
-  event_list_low = NULL;
+  event_list_low = nullptr;
   quick_timed_event.clear(hash_timed_event::low);
 
   // Free any notification list that may have been overlooked.

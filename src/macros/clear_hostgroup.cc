@@ -47,7 +47,7 @@ int clear_hostgroup_macros_r(nagios_macros* mac) {
   }
 
   // Clear pointers.
-  mac->hostgroup_ptr = NULL;
+  mac->hostgroup_ptr = nullptr;
 
   return (OK);
 }

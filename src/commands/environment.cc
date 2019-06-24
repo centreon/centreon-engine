@@ -32,8 +32,8 @@ static unsigned int const EXTRA_SIZE_BUFFER = 4096;
  *  Constructor.
  */
 environment::environment(char** env)
-  : _buffer(NULL),
-    _env(NULL),
+  : _buffer(nullptr),
+    _env(nullptr),
     _pos_buffer(0),
     _pos_env(0),
     _size_buffer(0),
@@ -116,7 +116,7 @@ void environment::add(char const* line) {
   if (_pos_env + 1 >= _size_env)
     _realoc_env(_size_env + EXTRA_SIZE_ENV);
   _env[_pos_env++] = _buffer + _pos_buffer;
-  _env[_pos_env] = NULL;
+  _env[_pos_env] = nullptr;
   _pos_buffer += size + 1;
   return;
 }
@@ -145,7 +145,7 @@ void environment::add(char const* name, char const* value) {
   if (_pos_env + 1 >= _size_env)
     _realoc_env(_size_env + EXTRA_SIZE_ENV);
   _env[_pos_env++] = _buffer + _pos_buffer;
-  _env[_pos_env] = NULL;
+  _env[_pos_env] = nullptr;
   _pos_buffer += size_name + size_value + 2;
   return;
 }
@@ -169,7 +169,7 @@ void environment::add(std::string const& line) {
   if (_pos_env + 1 >= _size_env)
     _realoc_env(_size_env + EXTRA_SIZE_ENV);
   _env[_pos_env++] = _buffer + _pos_buffer;
-  _env[_pos_env] = NULL;
+  _env[_pos_env] = nullptr;
   _pos_buffer += line.size() + 1;
   return;
 }
@@ -201,7 +201,7 @@ void environment::add(
   if (_pos_env + 1 >= _size_env)
     _realoc_env(_size_env + EXTRA_SIZE_ENV);
   _env[_pos_env++] = _buffer + _pos_buffer;
-  _env[_pos_env] = NULL;
+  _env[_pos_env] = nullptr;
   _pos_buffer += name.size() + value.size() + 2;
   return;
 }
@@ -283,6 +283,6 @@ void environment::_rebuild_env() {
     _env[i] = _buffer + pos;
     pos += strlen(_buffer + pos + 1) + 2;
   }
-  _env[_pos_env] = NULL;
+  _env[_pos_env] = nullptr;
   return;
 }

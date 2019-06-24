@@ -190,8 +190,8 @@ int service_downtime::unschedule() {
       /* send a notification */
       found->second->notify(
         notifier::notification_downtimecancelled,
-        nullptr,
-        nullptr,
+        "",
+        "",
         notifier::notification_option_none);
     }
   }
@@ -395,8 +395,8 @@ int service_downtime::handle() {
       /* send a notification */
       found->second->notify(
         notifier::notification_downtimeend,
-        get_author().c_str(),
-        get_comment().c_str(),
+        get_author(),
+        get_comment(),
         notifier::notification_option_none);
     }
 
@@ -479,8 +479,8 @@ int service_downtime::handle() {
       /* send a notification */
       found->second->notify(
         notifier::notification_downtimestart,
-        get_author().c_str(),
-        get_comment().c_str(),
+        get_author(),
+        get_comment(),
         notifier::notification_option_none);
     }
 

@@ -394,9 +394,9 @@ int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* sv
 
   // Save pointer for later.
   mac->service_ptr = svc;
-  mac->servicegroup_ptr = NULL;
+  mac->servicegroup_ptr = nullptr;
 
-  if (svc == NULL)
+  if (svc == nullptr)
     return ERROR;
 
   // Save first/primary servicegroup pointer for later.

@@ -161,27 +161,31 @@ void checker::reap() {
 
       // Service check result.
       if (service_check == result.get_object_check_type()) {
-        try {
-          // Check if the service exists.
-          unsigned int host_id(get_host_id(result.get_hostname()));
-          unsigned int service_id(get_service_id(
-                                    result.get_hostname(),
-                                    result.get_service_description()));
-          service& svc(find_service(host_id, service_id));
-          // Process the check result.
-          logger(dbg_checks, more)
-            << "Handling check result for service '"
-            << result.get_service_description() << "' on host '"
-            << result.get_hostname() << "'...";
-          svc.handle_async_check_result(&result);
-        }
-        catch (std::exception const& e) {
-          logger(log_runtime_warning, basic)
+        service_map::iterator
+          it = service::services.find({result.get_hostname(),
+                                       result.get_service_description()});
+        if (it == service::services.end()) {
+          logger(log_runtime_error, basic)
             << "Warning: Check result queue contained results for "
             << "service '" << result.get_service_description() << "' on "
             << "host '" << result.get_hostname() << "', but the service "
             << "could not be found! Perhaps you forgot to define the "
             << "service in your config files ?";
+        }
+        try {
+          // Check if the service exists.
+          logger(dbg_checks, more)
+            << "Handling check result for service '"
+            << result.get_service_description() << "' on host '"
+            << result.get_hostname() << "'...";
+          it->second->handle_async_check_result(&result);
+        }
+        catch (std::exception const &e) {
+          logger(log_runtime_warning, basic)
+            << "Check result queue errors for "
+            << "host '" << result.get_hostname()
+            << "' service '"  << result.get_service_description() << "' ex: "
+            << e.what();
         }
       }
       // Host check result.
@@ -202,9 +206,10 @@ void checker::reap() {
             it->second->handle_async_check_result_3x(&result);
           }
           catch (std::exception const &e) {
-            logger(log_runtime_warning, basic)
+            logger(log_runtime_error, basic)
               << "Check result queue errors for "
-              << "host '" << result.get_hostname();
+              << "host '" << result.get_hostname() << "' ex : "
+              << e.what();
           }
         }
       }

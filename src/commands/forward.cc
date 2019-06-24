@@ -46,7 +46,7 @@ forward::forward(
              std::string const& command_name,
              std::string const& command_line,
              command& cmd)
-  : command(command_name, command_line, NULL),
+  : command(command_name, command_line, nullptr),
     _command(&cmd) {
   if (_name.empty())
     throw (engine_error()

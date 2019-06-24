@@ -51,7 +51,7 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
   logger(dbg_functions, basic)
     << "obsessive_compulsive_host_check_processor()";
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return ERROR;
 
   /* bail out if we shouldn't be obsessing */
@@ -131,10 +131,10 @@ int obsessive_compulsive_host_check_processor(com::centreon::engine::host* hst) 
 
 /* runs the global service event handler */
 int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc) {
-  std::string raw_command = NULL;
-  std::string processed_command = NULL;
-  std::string processed_logentry = NULL;
-  std::string command_output = NULL;
+  std::string raw_command;
+  std::string processed_command;
+  std::string processed_logentry;
+  std::string command_output;
   int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
@@ -146,7 +146,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
   logger(dbg_functions, basic)
     << "run_global_service_event_handler()";
 
-  if (svc == NULL)
+  if (svc == nullptr)
     return ERROR;
 
   /* bail out if we shouldn't be running event handlers */
@@ -162,7 +162,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     << svc->get_description() << "' on host '" << svc->get_hostname() << "'...";
 
   /* get start time */
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   /* get the raw command line */
   get_raw_command_line_r(
@@ -221,8 +221,8 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     result,
     config->global_service_event_handler().c_str(),
     const_cast<char*>(processed_command.c_str()),
-    NULL,
-    NULL);
+    nullptr,
+    nullptr);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -255,7 +255,7 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
       << config->event_handler_timeout() << " seconds";
 
   /* get end time */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* send event data to broker */
   broker_event_handler(
@@ -275,17 +275,17 @@ int run_global_service_event_handler(nagios_macros* mac, com::centreon::engine::
     config->global_service_event_handler().c_str(),
     const_cast<char *>(processed_command.c_str()),
     const_cast<char *>(command_output.c_str()),
-    NULL);
+    nullptr);
 
   return OK;
 }
 
 /* runs a service event handler command */
 int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service* svc) {
-  std::string raw_command = NULL;
-  std::string processed_command = NULL;
-  std::string processed_logentry = NULL;
-  std::string command_output = NULL;
+  std::string raw_command;
+  std::string processed_command;
+  std::string processed_logentry;
+  std::string command_output;
   int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
@@ -298,7 +298,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
   logger(dbg_functions, basic)
     << "run_service_event_handler()";
 
-  if (svc == NULL)
+  if (svc == nullptr)
     return ERROR;
 
   /* bail if there's no command */
@@ -310,7 +310,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     << "' on host '" << svc->get_hostname() <<"'...";
 
   /* get start time */
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   /* get the raw command line */
   get_raw_command_line_r(
@@ -372,8 +372,8 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
                  result,
                  svc->get_event_handler().c_str(),
                  const_cast<char *>(processed_command.c_str()),
-                 NULL,
-                 NULL);
+                 nullptr,
+                 nullptr);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -405,7 +405,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
       << " seconds";
 
   /* get end time */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* send event data to broker */
   broker_event_handler(
@@ -425,7 +425,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
     svc->get_event_handler().c_str(),
     const_cast<char *>(processed_command.c_str()),
     const_cast<char *>(command_output.c_str()),
-    NULL);
+    nullptr);
 
   return OK;
 }
@@ -441,7 +441,7 @@ int handle_host_event(com::centreon::engine::host* hst) {
   logger(dbg_functions, basic)
     << "handle_host_event()";
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return ERROR;
 
   /* send event data to broker */
@@ -455,7 +455,7 @@ int handle_host_event(com::centreon::engine::host* hst) {
     hst->get_state_type(),
     hst->get_current_attempt(),
     hst->get_max_attempts(),
-    NULL);
+    nullptr);
 
   /* bail out if we shouldn't be running event handlers */
   if (!config->enable_event_handlers())
@@ -479,10 +479,10 @@ int handle_host_event(com::centreon::engine::host* hst) {
     NEBFLAG_NONE,
     NEBATTR_NONE,
     CMD_NONE,
-    time(NULL),
-    NULL,
-    NULL,
-    NULL);
+    time(nullptr),
+    nullptr,
+    nullptr,
+    nullptr);
 
   return OK;
 }
@@ -505,7 +505,7 @@ int run_global_host_event_handler(nagios_macros* mac,
   logger(dbg_functions, basic)
     << "run_global_host_event_handler()";
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return ERROR;
 
   /* bail out if we shouldn't be running event handlers */
@@ -520,7 +520,7 @@ int run_global_host_event_handler(nagios_macros* mac,
     << "Running global event handler for host '" << hst->get_name() << "'...";
 
   /* get start time */
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   /* get the raw command line */
   get_raw_command_line_r(
@@ -580,8 +580,8 @@ int run_global_host_event_handler(nagios_macros* mac,
                  early_timeout, result,
                  config->global_host_event_handler().c_str(),
                  const_cast<char *>(processed_command.c_str()),
-                 NULL,
-                 NULL);
+                 nullptr,
+                 nullptr);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -613,7 +613,7 @@ int run_global_host_event_handler(nagios_macros* mac,
       << config->event_handler_timeout() << " seconds";
 
   /* get end time */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* send event data to broker */
   broker_event_handler(
@@ -633,7 +633,7 @@ int run_global_host_event_handler(nagios_macros* mac,
     config->global_host_event_handler().c_str(),
     const_cast<char *>(processed_command.c_str()),
     const_cast<char *>(command_output.c_str()),
-    NULL);
+    nullptr);
 
   return OK;
 }
@@ -656,7 +656,7 @@ int run_host_event_handler(nagios_macros* mac,
   logger(dbg_functions, basic)
     << "run_host_event_handler()";
 
-  if (hst == NULL)
+  if (hst == nullptr)
     return ERROR;
 
   /* bail if there's no command */
@@ -667,7 +667,7 @@ int run_host_event_handler(nagios_macros* mac,
     << "Running event handler for host '" << hst->get_name() << "'...";
 
   /* get start time */
-  gettimeofday(&start_time, NULL);
+  gettimeofday(&start_time, nullptr);
 
   /* get the raw command line */
   get_raw_command_line_r(
@@ -728,8 +728,8 @@ int run_host_event_handler(nagios_macros* mac,
                  result,
                  hst->get_event_handler().c_str(),
                  const_cast<char *>(processed_command.c_str()),
-                 NULL,
-                 NULL);
+                 nullptr,
+                 nullptr);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -761,7 +761,7 @@ int run_host_event_handler(nagios_macros* mac,
       << " seconds";
 
   /* get end time */
-  gettimeofday(&end_time, NULL);
+  gettimeofday(&end_time, nullptr);
 
   /* send event data to broker */
   broker_event_handler(
@@ -781,7 +781,7 @@ int run_host_event_handler(nagios_macros* mac,
     hst->get_event_handler().c_str(),
     const_cast<char *>(processed_command.c_str()),
     const_cast<char *>(command_output.c_str()),
-    NULL);
+    nullptr);
 
   return OK;
 }

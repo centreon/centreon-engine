@@ -1031,7 +1031,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
-      nullptr,
+      "",
       entry_time,
       author,
       comment_data,
@@ -1092,7 +1092,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
         it->first,
-        nullptr,
+        "",
         entry_time,
         author,
         comment_data,
@@ -1152,7 +1152,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
         it->first.first.c_str(),
-        nullptr,
+        "",
         entry_time,
         author,
         comment_data,
@@ -1191,7 +1191,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
-      nullptr,
+      "",
       entry_time,
       author,
       comment_data,
@@ -1220,7 +1220,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       host_name,
-      nullptr,
+      "",
       entry_time,
       author,
       comment_data,
@@ -1516,7 +1516,7 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
 
   deleted = downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
               "",
-              nullptr,
+              "",
               downtime_start_time,
               downtime_comment);
 
@@ -2874,7 +2874,7 @@ void schedule_and_propagate_downtime(
     downtime_manager::instance().schedule_downtime(
       HOST_DOWNTIME,
       it->first,
-      nullptr,
+      "",
       entry_time,
       author,
       comment_data,

@@ -47,7 +47,7 @@ int clear_servicegroup_macros_r(nagios_macros* mac) {
   }
 
   // Clear pointers.
-  mac->servicegroup_ptr = NULL;
+  mac->servicegroup_ptr = nullptr;
 
   return (OK);
 }

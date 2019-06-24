@@ -501,7 +501,7 @@ void applier::service::remove_object(
     // Remove service downtimes.
     downtime_manager::instance().delete_downtime_by_hostname_service_description_start_time_comment(
       host_name,
-      service_description.c_str(),
+      service_description,
       (time_t)0,
       NULL);
 

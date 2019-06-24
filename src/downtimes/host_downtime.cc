@@ -173,8 +173,8 @@ int host_downtime::unschedule() {
       /* send a notification */
       hst->notify(
         notifier::notification_downtimecancelled,
-        nullptr,
-        nullptr,
+        "",
+        "",
         notifier::notification_option_none);
     }
   }
@@ -376,8 +376,8 @@ int host_downtime::handle() {
       /* send a notification */
       hst->notify(
         notifier::notification_downtimeend,
-        get_author().c_str(),
-        get_comment().c_str(),
+        get_author(),
+        get_comment(),
         notifier::notification_option_none);
       }
 
@@ -457,8 +457,8 @@ int host_downtime::handle() {
       /* send a notification */
       hst->notify(
         notifier::notification_downtimestart,
-        get_author().c_str(),
-        get_comment().c_str(),
+        get_author(),
+        get_comment(),
         notifier::notification_option_none);
     }
 

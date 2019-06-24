@@ -35,10 +35,10 @@ int process_macros_r(
       std::string const& input_buffer,
       std::string & output_buffer,
       int options) {
-  char* temp_buffer = NULL;
-  char* save_buffer = NULL;
-  char* buf_ptr = NULL;
-  char* delim_ptr = NULL;
+  char* temp_buffer = nullptr;
+  char* save_buffer = nullptr;
+  char* buf_ptr = nullptr;
+  char* delim_ptr = nullptr;
   int in_macro = false;
   std::string selected_macro;
   std::string cleaned_macro;
@@ -76,7 +76,7 @@ int process_macros_r(
     }
     /* no delimiter found - we already have the last of the buffer */
     else
-      buf_ptr = NULL;
+      buf_ptr = nullptr;
 
     logger(dbg_macros, most)
       << "  Processing part: '" << temp_buffer << "'";

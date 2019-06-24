@@ -260,7 +260,7 @@ int grab_custom_macro_value_r(
           mac,
           macro_name,
           it->second->get_name().c_str(),
-          nullptr,
+          "",
           temp_buffer);
 
         if (temp_buffer.empty())
