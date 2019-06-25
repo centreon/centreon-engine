@@ -21,7 +21,9 @@
 option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
   # Add root inclusion direction.
-  include_directories("${PROJECT_SOURCE_DIR}")
+  set(MODULE_DIR "${PROJECT_SOURCE_DIR}/modules/external_commands")
+  set(INC_DIR "${MODULE_DIR}/inc/com/centreon/engine/modules/external_commands")
+  include_directories(${PROJECT_SOURCE_DIR} ${MODULE_DIR}/inc)
 
   # Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
@@ -30,6 +32,9 @@ if (WITH_TESTING)
   # Unit test executable.
   add_executable("ut"
     # Sources.
+    "${PROJECT_SOURCE_DIR}/modules/external_commands/src/commands.cc"
+    "${PROJECT_SOURCE_DIR}/modules/external_commands/src/internal.cc"
+    "${PROJECT_SOURCE_DIR}/modules/external_commands/src/processing.cc"
     "${TESTS_DIR}/parse-check-output.cc"
     "${TESTS_DIR}/commands/simple-command.cc"
     "${TESTS_DIR}/configuration/applier/applier-command.cc"
@@ -45,7 +50,8 @@ if (WITH_TESTING)
     "${TESTS_DIR}/configuration/service.cc"
     "${TESTS_DIR}/contacts/contactgroup-config.cc"
     "${TESTS_DIR}/contacts/simple-contactgroup.cc"
-    "${TESTS_DIR}/downtime_finder.cc"
+    "${TESTS_DIR}/downtimes/downtime.cc"
+    "${TESTS_DIR}/downtimes/downtime_finder.cc"
     "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/main.cc"
     "${TESTS_DIR}/notifications/host_normal_notification.cc"

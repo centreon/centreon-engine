@@ -114,7 +114,7 @@ comment::comment(comment::type comment_type,
 void comment::delete_comment(uint64_t comment_id) {
   comment_map::iterator found = comment::comments.find(comment_id);
 
-  if (found != comment::comments.end()) {
+  if (found != comment::comments.end() && found->second) {
     broker_comment_data(
       NEBTYPE_COMMENT_DELETE,
       NEBFLAG_NONE,

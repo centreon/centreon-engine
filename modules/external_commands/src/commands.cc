@@ -1151,7 +1151,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         continue;
       downtime_manager::instance().schedule_downtime(
         HOST_DOWNTIME,
-        it->first.first.c_str(),
+        it->first.first,
         "",
         entry_time,
         author,
@@ -1174,8 +1174,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
          ++it)
       downtime_manager::instance().schedule_downtime(
         SERVICE_DOWNTIME,
-        it->first.first.c_str(),
-        it->first.second.c_str(),
+        it->first.first,
+        it->first.second,
         entry_time, author,
         comment_data,
         start_time,

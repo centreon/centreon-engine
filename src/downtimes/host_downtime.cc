@@ -131,11 +131,10 @@ int host_downtime::unschedule() {
   /* delete downtimes with invalid host names */
   if (it == host::hosts.end() || !it->second)
     return ERROR;
-  host* hst = it->second.get();
 
   /* decrement pending flex downtime if necessary ... */
   if (!is_fixed() && _incremented_pending_downtime)
-    hst->set_pending_flex_downtime(hst->get_pending_flex_downtime() - 1);
+    it->second->set_pending_flex_downtime(it->second->get_pending_flex_downtime() - 1);
 
   /* decrement the downtime depth variable and update status data if necessary
    */
@@ -160,18 +159,18 @@ int host_downtime::unschedule() {
       get_downtime_id(),
       nullptr);
 
-    hst->set_scheduled_downtime_depth(hst->get_scheduled_downtime_depth() - 1);
-    hst->update_status(false);
+    it->second->set_scheduled_downtime_depth(it->second->get_scheduled_downtime_depth() - 1);
+    it->second->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
-    if (hst->get_scheduled_downtime_depth() == 0) {
+    if (it->second->get_scheduled_downtime_depth() == 0) {
       logger(log_info_message, basic)
-        << "HOST DOWNTIME ALERT: " << hst->get_name()
+        << "HOST DOWNTIME ALERT: " << it->second->get_name()
         << ";CANCELLED; Scheduled downtime for host has been "
            "cancelled.";
 
       /* send a notification */
-      hst->notify(
+      it->second->notify(
         notifier::notification_downtimecancelled,
         "",
         "",
@@ -289,17 +288,16 @@ int host_downtime::subscribe() {
 }
 
 int host_downtime::handle() {
-  host* hst{NULL};
   time_t event_time{0L};
   int attr{0};
 
   logger(dbg_functions, basic)
     << "handle_downtime()";
 
-  host_map::const_iterator it(host::hosts.find(get_hostname()));
+  host_map::const_iterator it_hst(host::hosts.find(get_hostname()));
 
   /* find the host or service associated with this downtime */
-  if (it == host::hosts.end() || it->second == nullptr)
+  if (it_hst == host::hosts.end() || it_hst->second == nullptr)
       return ERROR;
 
   /* if downtime is flexible and host/svc is in an ok state, don't do anything right now (wait for event handler to kick it off) */
@@ -310,10 +308,10 @@ int host_downtime::handle() {
     if (!_start_flex_downtime) {
 
       /* host is up, so we don't really do anything right now */
-      if (hst->get_current_state() == host::state_up) {
+      if (it_hst->second->get_current_state() == host::state_up) {
 
         /* increment pending flex downtime counter */
-        hst->set_pending_flex_downtime(hst->get_pending_flex_downtime() + 1);
+        it_hst->second->set_pending_flex_downtime(it_hst->second->get_pending_flex_downtime() + 1);
         _incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
@@ -358,23 +356,24 @@ int host_downtime::handle() {
       NULL);
 
     /* decrement the downtime depth variable */
-    hst->set_scheduled_downtime_depth(hst->get_scheduled_downtime_depth() - 1);
+    it_hst->second->set_scheduled_downtime_depth(
+      it_hst->second->get_scheduled_downtime_depth() - 1);
 
-      if (hst->get_scheduled_downtime_depth() == 0) {
+      if (it_hst->second->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
-        << "Host '" << hst->get_name() << "' has exited from a period "
-        "of scheduled downtime (id=" << get_downtime_id()
-        << ").";
+        << "Host '" << it_hst->second->get_name()
+        << "' has exited from a period of scheduled downtime (id="
+        << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "HOST DOWNTIME ALERT: " << hst->get_name()
+        << "HOST DOWNTIME ALERT: " << it_hst->second->get_name()
         << ";STOPPED; Host has exited from a period of scheduled "
         "downtime";
 
       /* send a notification */
-      hst->notify(
+      it_hst->second->notify(
         notifier::notification_downtimeend,
         get_author(),
         get_comment(),
@@ -382,21 +381,26 @@ int host_downtime::handle() {
       }
 
     /* update the status data */
-      hst->update_status(false);
+    it_hst->second->update_status(false);
 
     /* decrement pending flex downtime if necessary */
     if (!is_fixed()
         && _incremented_pending_downtime) {
-        if (hst->get_pending_flex_downtime() > 0)
-          hst->set_pending_flex_downtime(hst->get_pending_flex_downtime() - 1);
+        if (it_hst->second->get_pending_flex_downtime() > 0)
+          it_hst->second->set_pending_flex_downtime(
+            it_hst->second->get_pending_flex_downtime() - 1);
     }
 
     /* handle (stop) downtime that is triggered by this one */
     while (true) {
       std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator it;
-      std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator end{downtime_manager::instance().get_scheduled_downtimes().end()};
+      std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator end{
+        downtime_manager::instance().get_scheduled_downtimes().end()};
 
-      /* list contents might change by recursive calls, so we use this inefficient method to prevent segfaults */
+      /*
+       * list contents might change by recursive calls, so we use this
+       * inefficient method to prevent segfaults
+       */
       for (it = downtime_manager::instance().get_scheduled_downtimes().begin();
           it != end;
           ++it) {
@@ -443,19 +447,20 @@ int host_downtime::handle() {
       get_duration(),
       get_downtime_id(), nullptr);
 
-    if (hst->get_scheduled_downtime_depth() == 0) {
+    if (it_hst->second->get_scheduled_downtime_depth() == 0) {
 
       logger(dbg_downtime, basic)
-        << "Host '" << hst->get_name() << "' has entered a period of "
-        "scheduled downtime (id=" << get_downtime_id() << ").";
+        << "Host '" << it_hst->second->get_name()
+        << "' has entered a period of scheduled downtime (id="
+        << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "HOST DOWNTIME ALERT: " << hst->get_name()
+        << "HOST DOWNTIME ALERT: " << it_hst->second->get_name()
         << ";STARTED; Host has entered a period of scheduled downtime";
 
       /* send a notification */
-      hst->notify(
+      it_hst->second->notify(
         notifier::notification_downtimestart,
         get_author(),
         get_comment(),
@@ -463,13 +468,14 @@ int host_downtime::handle() {
     }
 
     /* increment the downtime depth variable */
-    hst->set_scheduled_downtime_depth(hst->get_scheduled_downtime_depth() + 1);
+    it_hst->second->set_scheduled_downtime_depth(
+      it_hst->second->get_scheduled_downtime_depth() + 1);
 
     /* set the in effect flag */
     _set_in_effect(true);
 
     /* update the status data */
-    hst->update_status(false);
+    it_hst->second->update_status(false);
 
     /* schedule an event */
     if (!is_fixed())

@@ -483,7 +483,7 @@ downtime* downtime_manager::add_new_service_downtime(
   retval->schedule();
 
   /* save downtime id */
-  if (downtime_id != nullptr)
+  if (downtime_id)
     *downtime_id = new_downtime_id;
 
   /* send data to event broker */
