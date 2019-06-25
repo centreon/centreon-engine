@@ -32,8 +32,6 @@ extern "C" {
 // Detects circular dependencies and paths.
 int pre_flight_circular_check(int* w, int* e);
 
-int check_service(std::shared_ptr<com::centreon::engine::service> svc, int* w, int* e);
-int check_host(std::shared_ptr<com::centreon::engine::host> hst, int* w, int* e);
 int check_contact(std::shared_ptr<com::centreon::engine::contact> cntct, int* w, int* e);
 int check_servicegroup(std::shared_ptr<com::centreon::engine::servicegroup> sg, int* w, int* e);
 int check_hostgroup(std::shared_ptr<com::centreon::engine::hostgroup> hg, int* w, int* e);

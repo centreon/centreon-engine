@@ -203,6 +203,7 @@ class                           service : public notifier {
   static void                   check_for_orphaned();
   static void                   check_result_freshness();
   bool                          is_in_downtime() const override;
+  void resolve(int& w, int& e);
 
   int                           process_performance_data;
   int                           accept_passive_service_checks;

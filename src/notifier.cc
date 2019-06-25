@@ -1364,7 +1364,13 @@ void notifier::resolve(int& w, int& e) {
       set_check_command_ptr(cmd_found->second.get());
   }
 
-  if (!get_check_period().empty()) {
+  if (get_check_period().empty()) {
+    logger(log_verification_error, basic)
+      << "Warning: Notifier '" << get_display_name()
+      << "' has no check time period defined!";
+    warnings++;
+  }
+  else {
     timeperiod_map::const_iterator
       found_it{timeperiod::timeperiods.find(get_check_period())};
 
@@ -1387,7 +1393,7 @@ void notifier::resolve(int& w, int& e) {
     contact_map::const_iterator found_it{contact::contacts.find(it->first)};
     if (found_it == contact::contacts.end() || !found_it->second.get()) {
       logger(log_verification_error, basic)
-          << "Error: Contact '" << it->first << "' specified in host '"
+          << "Error: Contact '" << it->first << "' specified in notifier '"
           << get_display_name() << "' is not defined anywhere!";
       errors++;
     }
@@ -1423,7 +1429,7 @@ void notifier::resolve(int& w, int& e) {
     if (found_it == timeperiod::timeperiods.end() || !found_it->second.get()) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << get_notification_period()
-        << "' specified for host '" << get_display_name()
+        << "' specified for notifier '" << get_display_name()
         << "' is not defined anywhere!";
       errors++;
     }
@@ -1431,16 +1437,10 @@ void notifier::resolve(int& w, int& e) {
       // Save the pointer to the notification timeperiod for later.
       notification_period_ptr = found_it->second.get();
   }
-
-  // Check for sane recovery options.
-  if (get_notifications_enabled()
-      && get_notify_on(notifier::recovery)
-      && !get_notify_on(notifier::down)
-      && !get_notify_on(notifier::unreachable)) {
+  else if (get_notifications_enabled()) {
     logger(log_verification_error, basic)
-      << "Warning: Recovery notification option in host '" << get_display_name()
-      << "' definition doesn't make any sense - specify down and/or "
-         "unreachable options as well";
+      << "Warning: Notifier '" << get_display_name()
+      << "' has no notification time period defined!";
     warnings++;
   }
 

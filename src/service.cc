@@ -3833,3 +3833,89 @@ host const* service::get_host_ptr() const {
 host* service::get_host_ptr() {
   return _host_ptr;
 }
+
+void service::resolve(int& w, int& e) {
+  int warnings{0}, errors{0};
+
+  try {
+    notifier::resolve(warnings, errors);
+  }
+  catch (std::exception const& e) {
+    logger(log_verification_error, basic)
+      << "Error: Service description '" << _description
+      << "' of host '" << _hostname
+      << "' has problem in its notifier part: " << e.what();
+  }
+
+  {
+    /* check for a valid host */
+    host_map::const_iterator it{host::hosts.find(_hostname)};
+
+    /* we couldn't find an associated host! */
+
+    if (it == host::hosts.end() || !it->second) {
+      logger(log_verification_error, basic)
+          << "Error: Host '" << _hostname
+          << "' specified in service "
+             "'"
+          << _description << "' not defined anywhere!";
+      errors++;
+      set_host_ptr(nullptr);
+    } else {
+      /* save the host pointer for later */
+      set_host_ptr(it->second.get());
+
+      /* add a reverse link from the host to the service for faster lookups
+       * later
+       */
+      it->second->services.insert({{_hostname, _description}, this});
+
+      // Notify event broker.
+      timeval tv(get_broker_timestamp(NULL));
+      broker_relation_data(NEBTYPE_PARENT_ADD, NEBFLAG_NONE, NEBATTR_NONE,
+                           get_host_ptr(), NULL, NULL, this, &tv);
+    }
+  }
+
+  // Check for sane recovery options.
+  if (get_notifications_enabled()
+      && get_notify_on(notifier::recovery)
+      && !get_notify_on(notifier::warning)
+      && !get_notify_on(notifier::critical)) {
+    logger(log_verification_error, basic)
+      << "Warning: Recovery notification option in service '" << _description
+      << "' for host '" << _hostname
+      << "' doesn't make any sense - specify warning and /or critical "
+         "options as well";
+    warnings++;
+  }
+
+  // See if the notification interval is less than the check interval.
+  if (get_notifications_enabled()
+      && get_notification_interval()
+      && get_notification_interval() < get_check_interval()) {
+    logger(log_verification_error, basic)
+      << "Warning: Service '" << _description << "' on host '"
+      << _hostname << "'  has a notification interval less than "
+         "its check interval!  Notifications are only re-sent after "
+         "checks are made, so the effective notification interval will "
+         "be that of the check interval.";
+    warnings++;
+  }
+
+  /* check for illegal characters in service description */
+  if (contains_illegal_object_chars(_description.c_str())) {
+    logger(log_verification_error, basic)
+      << "Error: The description string for service '"
+      << _description << "' on host '" << _hostname
+      << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  w += warnings;
+  e += errors;
+
+  if (errors)
+    throw engine_error() << "Cannot resolve service '" << _description
+                         << "' of host '" << _hostname << "'";
+}

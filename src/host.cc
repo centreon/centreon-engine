@@ -4233,9 +4233,21 @@ void host::resolve(int& w, int& e) {
     errors++;
   }
 
+  // Check for sane recovery options.
+  if (get_notifications_enabled()
+      && get_notify_on(notifier::recovery)
+      && !get_notify_on(notifier::down)
+      && !get_notify_on(notifier::unreachable)) {
+    logger(log_verification_error, basic)
+      << "Warning: Recovery notification option in host '" << get_display_name()
+      << "' definition doesn't make any sense - specify down and/or "
+         "unreachable options as well";
+    warnings++;
+  }
+
   w += warnings;
   e += errors;
 
-  if (e)
+  if (errors)
     throw engine_error() << "Cannot resolve host '" << _name << "'";
 }

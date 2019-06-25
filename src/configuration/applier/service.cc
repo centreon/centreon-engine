@@ -563,12 +563,7 @@ void applier::service::resolve_object(
   }
 
   // Resolve service.
-  if (!check_service(it->second, &config_warnings, &config_errors))
-      throw (engine_error() << "Cannot resolve service '"
-             << obj.service_description() << "' of host '"
-             << *obj.hosts().begin() << "'");
-
-  return ;
+  it->second->resolve(config_warnings, config_errors);
 }
 
 /**
