@@ -61,6 +61,8 @@ TEST_F(DowntimeExternalCommand, AddUnkownHostDowntime) {
             << now << ";1;0;7200;admin;host";
 
   ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now, const_cast<char *>(s.str().c_str())), ERROR);
+
+  ASSERT_EQ(0, downtime_manager::instance().get_scheduled_downtimes().size());
 }
 
 TEST_F(DowntimeExternalCommand, AddHostDowntime) {

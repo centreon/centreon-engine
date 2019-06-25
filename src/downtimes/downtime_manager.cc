@@ -380,7 +380,8 @@ int downtime_manager::xdddefault_validate_downtime_data() {
                 std::shared_ptr<com::centreon::engine::downtimes::downtime>>::
            iterator it{_scheduled_downtimes.begin()},
        end{_scheduled_downtimes.end()};
-       it != end;) {
+       it != end;
+       ++it) {
     save = true;
     downtimes::downtime& temp_downtime(*it->second);
 
