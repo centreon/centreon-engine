@@ -25,6 +25,9 @@
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
+namespace commands {
+  class command;
+}
 class timeperiod;
 
 class checkable {
@@ -148,6 +151,10 @@ class checkable {
   void set_should_be_scheduled(bool should_be_scheduled);
   virtual std::string const& get_current_state_as_string() const = 0;
   virtual bool is_in_downtime() const = 0;
+  void set_event_handler_ptr(commands::command* cmd);
+  commands::command* get_event_handler_ptr() const;
+  void set_check_command_ptr(commands::command* cmd);
+  commands::command* get_check_command_ptr() const;
 
   timeperiod *check_period_ptr;
 
@@ -192,6 +199,8 @@ class checkable {
   std::time_t _last_hard_state_change;
   enum state_type _state_type;
   double _percent_state_change;
+  commands::command*  _event_handler_ptr;
+  commands::command*  _check_command_ptr;
 };
 
 CCE_END()

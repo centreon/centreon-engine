@@ -1313,3 +1313,140 @@ bool is_contact_for_notifier(com::centreon::engine::notifier* notif, contact* cn
 
   return false;
 }
+
+/**
+ *  This method resolves pointers involved in this notifier life. If a pointer
+ *  cannot be resolved, an exception is thrown.
+ *
+ * @param w Warnings given by the method.
+ * @param e Errors given by the method. An exception is thrown is at less an
+ * error is rised.
+ */
+void notifier::resolve(int& w, int& e) {
+  int warnings{0}, errors{0};
+
+  /* check the event handler command */
+  if (!get_event_handler().empty()) {
+    size_t pos{get_event_handler().find_first_of('!')};
+    std::string cmd_name{get_event_handler().substr(0, pos)};
+
+    command_map::iterator cmd_found{
+        commands::command::commands.find(cmd_name)};
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
+        logger(log_verification_error, basic)
+        << "Error: Event handler command '" << cmd_name
+        << "' specified for host '" << get_display_name()
+        << "' not defined anywhere";
+        errors++;
+    }
+    else
+      /* save the pointer to the event handler command for later */
+      set_event_handler_ptr(cmd_found->second.get());
+  }
+
+  /* hosts that don't have check commands defined shouldn't ever be checked... */
+  if (!get_check_command().empty()) {
+    size_t pos{get_check_command().find_first_of('!')};
+    std::string cmd_name{get_check_command().substr(0, pos)};
+
+    command_map::iterator cmd_found{commands::command::commands.find(cmd_name)};
+
+    if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
+      logger(log_verification_error, basic)
+        << "Error: Notifier check command '" << cmd_name
+        << "' specified for host '" << get_display_name()
+        << "' is not defined anywhere!",
+      errors++;
+    }
+    else
+      /* save the pointer to the check command for later */
+      set_check_command_ptr(cmd_found->second.get());
+  }
+
+  if (!get_check_period().empty()) {
+    timeperiod_map::const_iterator
+      found_it{timeperiod::timeperiods.find(get_check_period())};
+
+    if (found_it == timeperiod::timeperiods.end() || !found_it->second) {
+      logger(log_verification_error, basic)
+        << "Error: Check period '" << get_check_period()
+        << "' specified for host '" << get_display_name()
+        << "' is not defined anywhere!";
+      errors++;
+    }
+    else
+      /* save the pointer to the check timeperiod for later */
+      check_period_ptr = found_it->second.get();
+  }
+
+  /* check all contacts */
+  for (contact_map_unsafe::iterator it{get_contacts().begin()},
+       end{get_contacts().end()};
+       it != end; ++it) {
+    contact_map::const_iterator found_it{contact::contacts.find(it->first)};
+    if (found_it == contact::contacts.end() || !found_it->second.get()) {
+      logger(log_verification_error, basic)
+          << "Error: Contact '" << it->first << "' specified in host '"
+          << get_display_name() << "' is not defined anywhere!";
+      errors++;
+    }
+    else
+      /* save the pointer to the contact */
+      it->second = found_it->second.get();
+  }
+
+  /* check all contact groups */
+  for (contactgroup_map_unsafe::const_iterator it{get_contactgroups().begin()},
+       end{get_contactgroups().end()};
+       it != end; ++it) {
+    // Find the contact group.
+    contactgroup_map::const_iterator found_it{
+        contactgroup::contactgroups.find(it->first)};
+
+    if (found_it == contactgroup::contactgroups.end() ||
+        !found_it->second.get()) {
+      logger(log_verification_error, basic)
+          << "Error: Contact group '" << it->first << "' specified in host '"
+          << get_display_name() << "' is not defined anywhere!";
+      errors++;
+    }
+    else {
+    }
+  }
+
+  // Check notification timeperiod.
+  if (!get_notification_period().empty()) {
+    timeperiod_map::const_iterator
+      found_it{timeperiod::timeperiods.find(get_notification_period())};
+
+    if (found_it == timeperiod::timeperiods.end() || !found_it->second.get()) {
+      logger(log_verification_error, basic)
+        << "Error: Notification period '" << get_notification_period()
+        << "' specified for host '" << get_display_name()
+        << "' is not defined anywhere!";
+      errors++;
+    }
+    else
+      // Save the pointer to the notification timeperiod for later.
+      notification_period_ptr = found_it->second.get();
+  }
+
+  // Check for sane recovery options.
+  if (get_notifications_enabled()
+      && get_notify_on(notifier::recovery)
+      && !get_notify_on(notifier::down)
+      && !get_notify_on(notifier::unreachable)) {
+    logger(log_verification_error, basic)
+      << "Warning: Recovery notification option in host '" << get_display_name()
+      << "' definition doesn't make any sense - specify down and/or "
+         "unreachable options as well";
+    warnings++;
+  }
+
+  w += warnings;
+  e += errors;
+
+  if (e)
+    throw engine_error() << "Cannot resolve host '" << get_display_name() << "'";
+}

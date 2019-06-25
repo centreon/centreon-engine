@@ -442,6 +442,6 @@ void applier::contact::resolve_object(
 
   // Resolve contact.
   if (!check_contact(ct_it->second, &config_warnings, &config_errors))
-    throw (engine_error() << "Cannot resolve contact '"
-           << obj.contact_name() << "'");
+    throw engine_error() << "Cannot resolve contact '"
+           << obj.contact_name() << "'";
 }

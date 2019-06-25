@@ -245,6 +245,7 @@ class                notifier : public checkable {
   std::unordered_map<std::string, contact*> const& get_contacts() const;
   contactgroup_map_unsafe& get_contactgroups();
   contactgroup_map_unsafe const& get_contactgroups() const;
+  void resolve(int& w, int& e);
 
   int                state_history[MAX_STATE_HISTORY_ENTRIES];
 
@@ -304,7 +305,6 @@ class                notifier : public checkable {
                      _escalations;
   bool               _problem_has_been_acknowledged;
   bool               _has_been_checked;
-  bool               _event_handler_enabled;
   bool               _no_more_notifications;
 
   /* DEPRECATED */

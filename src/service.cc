@@ -361,11 +361,11 @@ std::ostream& operator<<(std::ostream& os, service_map_unsafe const& obj) {
 std::ostream& operator<<(std::ostream& os,
                          com::centreon::engine::service const& obj) {
   std::string evt_str;
-  if (obj.event_handler_ptr)
-    evt_str = obj.event_handler_ptr->get_name();
+  if (obj.get_event_handler_ptr())
+    evt_str = obj.get_event_handler_ptr()->get_name();
   std::string cmd_str;
-  if (obj.check_command_ptr)
-    cmd_str = obj.check_command_ptr->get_name();
+  if (obj.get_check_command_ptr())
+    cmd_str = obj.get_check_command_ptr()->get_name();
   std::string chk_period_str;
   if (obj.check_period_ptr)
     chk_period_str = obj.check_period_ptr->get_name();

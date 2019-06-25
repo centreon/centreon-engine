@@ -812,11 +812,11 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   std::shared_ptr<hostgroup> hg{obj.get_parent_groups().front()};
 
   std::string evt_str;
-  if (obj.event_handler_ptr)
-    evt_str = obj.event_handler_ptr->get_name();
+  if (obj.get_event_handler_ptr())
+    evt_str = obj.get_event_handler_ptr()->get_name();
   std::string cmd_str;
-  if (obj.check_command_ptr)
-    cmd_str = obj.check_command_ptr->get_name();
+  if (obj.get_check_command_ptr())
+    cmd_str = obj.get_check_command_ptr()->get_name();
   std::string chk_period_str;
   if (obj.check_period_ptr)
     chk_period_str = obj.check_period_ptr->get_name();
@@ -4159,4 +4159,83 @@ bool host::get_notify_on_current_state() const {
 
 bool host::is_in_downtime() const {
   return get_scheduled_downtime_depth() > 0;
+}
+
+/**
+ *  This method resolves pointers involved in this host life. If a pointer
+ *  cannot be resolved, an exception is thrown.
+ *
+ * @param w Warnings given by the method.
+ * @param e Errors given by the method. An exception is thrown is at less an
+ * error is rised.
+ */
+void host::resolve(int& w, int& e) {
+  int warnings{0}, errors{0};
+
+  try {
+    notifier::resolve(warnings, errors);
+  }
+  catch (std::exception const& e) {
+    logger(log_verification_error, basic)
+      << "Error: Host '" << _name
+      << "' has problem in its notifier part: " << e.what();
+  }
+
+  if (services.empty()) {
+    logger(log_verification_error, basic)
+      << "Warning: Host '" << _name
+      << "' has no services associated with it!";
+    ++w;
+  }
+  else {
+    for (service_map_unsafe::iterator
+           it{services.begin()}, end{services.end()};
+           it != end;
+           ++it) {
+      service_map::const_iterator found{service::services.find(it->first)};
+      if (found == service::services.end() || !found->second) {
+        logger(log_verification_error, basic)
+          << "Error: Host '" << _name
+          << "' has a service '" << it->first.second << "' that does not exist!";
+      }
+      else {
+        ++errors;
+        it->second = found->second.get();
+      }
+    }
+  }
+
+  /* check all parent parent host */
+  for (host_map_unsafe::iterator
+         it(parent_hosts.begin()),
+         end(parent_hosts.end());
+       it != end;
+       it++) {
+
+    host_map::const_iterator it_host{host::hosts.find(it->first)};
+    if (it_host == host::hosts.end() || !it_host->second) {
+      logger(log_verification_error, basic)
+        << "Error: '" << it->first << "' is not a "
+        "valid parent for host '" << _name << "'!";
+      errors++;
+    }
+    else {
+      it->second = it_host->second.get();
+      it_host->second->add_child_link(this); //add a reverse (child) link to make searches faster later on
+    }
+  }
+
+  /* check for illegal characters in host name */
+  if (contains_illegal_object_chars(_name.c_str())) {
+    logger(log_verification_error, basic)
+      << "Error: The name of host '" << _name
+      << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  w += warnings;
+  e += errors;
+
+  if (e)
+    throw engine_error() << "Cannot resolve host '" << _name << "'";
 }

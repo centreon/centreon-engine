@@ -219,8 +219,6 @@ class                           service : public notifier {
   int                           pending_flex_downtime;
   uint64_t                      flapping_comment_id;
 
-  commands::command*            event_handler_ptr;
-  commands::command*            check_command_ptr;
   std::list<servicegroup*> const&
                                 get_parent_groups() const;
   std::list<servicegroup*>&

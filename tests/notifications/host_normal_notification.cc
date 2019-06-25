@@ -64,6 +64,7 @@ class HostNotification : public ::testing::Test {
     hst.parse("_HOST_ID", "12");
     hst.parse("contacts", "admin");
     hst_aply.add_object(hst);
+    hst_aply.resolve_object(hst);
     host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
     _host->set_current_state(engine::host::state_up);

@@ -343,7 +343,7 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
       errors++;
     }
     else
-      svc->event_handler_ptr = cmd_found->second.get();
+      svc->set_event_handler_ptr(cmd_found->second.get());
 
     delete[] buf;
     /* save the pointer to the event handler for later */
@@ -365,7 +365,7 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
     errors++;
   }
   else
-    svc->check_command_ptr = cmd_found->second.get();
+    svc->set_check_command_ptr(cmd_found->second.get());
 
   delete[] buf;
 
@@ -556,7 +556,7 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
         errors++;
     }
     else
-      hst->event_handler_ptr = cmd_found->second.get();
+      hst->set_event_handler_ptr(cmd_found->second.get());
 
     delete[] buf;
 
@@ -583,7 +583,7 @@ int check_host(std::shared_ptr<host> hst, int* w, int* e) {
       errors++;
     }
     else
-      hst->check_command_ptr = cmd_found->second.get(); /* save the pointer to the check command for later */
+      hst->set_check_command_ptr(cmd_found->second.get()); /* save the pointer to the check command for later */
 
     delete[] buf;
   }

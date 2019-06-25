@@ -284,7 +284,7 @@ void checker::run(
   // Preamble.
   if (!hst)
     throw (engine_error() << "Attempt to run check on invalid host");
-  if (!hst->check_command_ptr)
+  if (!hst->get_check_command_ptr())
     throw (engine_error() << "Attempt to run active check on host '"
            << hst->get_name() << "' with no check command");
 
@@ -377,7 +377,7 @@ void checker::run(
   std::string tmp;
   get_raw_command_line_r(
     &macros,
-    hst->check_command_ptr,
+    hst->get_check_command_ptr(),
     hst->get_check_command().c_str(),
     tmp,
     0);
@@ -413,9 +413,9 @@ void checker::run(
 
   // Get command object.
   command_map::iterator found{
-    commands::command::commands.find(hst->check_command_ptr->get_name())};
+    commands::command::commands.find(hst->get_check_command_ptr()->get_name())};
    if(found == commands::command::commands.end() || !found->second)
-     throw (engine_error() << "unknow command " << hst->check_command_ptr->get_name());
+     throw (engine_error() << "unknow command " << hst->get_check_command_ptr()->get_name());
 
   std::string processed_cmd(found->second->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
@@ -534,7 +534,7 @@ void checker::run(
   if (!svc->get_host_ptr())
     throw engine_error()
            << "Attempt to run check on service with invalid host";
-  if (!svc->check_command_ptr)
+  if (!svc->get_check_command_ptr())
     throw engine_error() << "Attempt to run active check on service '"
            << svc->get_description() << "' on host '" << svc->get_host_ptr()->get_name()
            << "' with no check command";
@@ -614,7 +614,7 @@ void checker::run(
   std::string tmp;
   get_raw_command_line_r(
     &macros,
-    svc->check_command_ptr,
+    svc->get_check_command_ptr(),
     svc->get_check_command().c_str(),
     tmp,
     0);
@@ -645,9 +645,9 @@ void checker::run(
 
   // Get command object.
   command_map::iterator found{
-    commands::command::commands.find(svc->check_command_ptr->get_name())};
+    commands::command::commands.find(svc->get_check_command_ptr()->get_name())};
   if(found == commands::command::commands.end() || !found->second)
-    throw (engine_error() << "unknow command " << svc->check_command_ptr->get_name());
+    throw (engine_error() << "unknow command " << svc->get_check_command_ptr()->get_name());
 
   std::string processed_cmd(found->second->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));
@@ -757,7 +757,7 @@ void checker::run_sync(
   if (!hst)
     throw (engine_error()
            << "Attempt to run synchronous check on invalid host");
-  if (!hst->check_command_ptr)
+  if (!hst->get_check_command_ptr())
     throw (engine_error()
            << "Attempt to run synchronous active check on host '"
            << hst->get_name() << "' with no check command");
@@ -996,7 +996,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   if (!hst)
     throw (engine_error()
            << "Attempt to run synchronous check on invalid host");
-  if (!hst->check_command_ptr)
+  if (!hst->get_check_command_ptr())
     throw (engine_error()
            << "Attempt to run synchronous active check on host '"
            << hst->get_name() << "' with no check command");
@@ -1043,7 +1043,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   std::string tmp;
   get_raw_command_line_r(
     &macros,
-    hst->check_command_ptr,
+    hst->get_check_command_ptr(),
     hst->get_check_command().c_str(),
     tmp,
     0);
@@ -1056,9 +1056,9 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
 
   // Get command object.
   command_map::iterator found{
-    commands::command::commands.find(hst->check_command_ptr->get_name())};
+    commands::command::commands.find(hst->get_check_command_ptr()->get_name())};
   if(found == commands::command::commands.end() || !found->second)
-    throw (engine_error() << "unknow command " << hst->check_command_ptr->get_name());
+    throw (engine_error() << "unknow command " << hst->get_check_command_ptr()->get_name());
 
   std::string processed_cmd(found->second->process_cmd(&macros));
   char* tmp_processed_cmd(string::dup(processed_cmd));
@@ -1088,7 +1088,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
 
   // Debug messages.
   logger(dbg_commands, more)
-    << "Raw host check command: " << hst->check_command_ptr->get_command_line();
+    << "Raw host check command: " << hst->get_check_command_ptr()->get_command_line();
   logger(dbg_commands, more)
     << "Processed host check ommand: " << processed_cmd;
 
