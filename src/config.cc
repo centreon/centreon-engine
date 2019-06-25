@@ -308,7 +308,8 @@ int check_service(std::shared_ptr<service> svc, int* w, int* e) {
     svc->set_host_ptr(it->second.get());
 
   /* add a reverse link from the host to the service for faster lookups later */
-  svc->get_host_ptr()->services[{svc->get_hostname(), svc->get_description()}] = svc.get();
+  svc->get_host_ptr()->services.insert(
+      {{svc->get_hostname(), svc->get_description()}, svc.get()});
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -1342,55 +1343,5 @@ int check_hostescalation(std::shared_ptr<hostescalation> he, int* w, int* e) {
   // Add errors.
   if (e)
     *e += errors;
-  return errors == 0;
-}
-
-/**
- *  Check and resolve a time period.
- *
- *  @param[in,out] tp Time period object.
- *  @param[out]    w  Warnings.
- *  @param[out]    e  Errors.
- *
- *  @return Non-zero on success.
- */
-int check_timeperiod(std::shared_ptr<timeperiod> tp, int* w, int* e) {
-  (void)w;
-  int errors(0);
-
-  // Check for illegal characters in timeperiod name.
-  if (contains_illegal_object_chars(tp->get_name().c_str())) {
-    logger(log_verification_error, basic)
-      << "Error: The name of time period '" << tp->get_name()
-      << "' contains one or more illegal characters.";
-    errors++;
-  }
-
-  // Check for valid timeperiod names in exclusion list.
-  for (timeperiodexclusion::iterator
-         it(tp->exclusions.begin()),
-         end(tp->exclusions.end());
-       it != end;
-       ++it) {
-    timeperiod_map::const_iterator
-      found(timeperiod::timeperiods.find(it->first));
-
-    if (found == timeperiod::timeperiods.end()) {
-      logger(log_verification_error, basic)
-        << "Error: Excluded time period '"
-        << it->first
-        << "' specified in timeperiod '" << tp->get_name()
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save the timeperiod pointer for later.
-    it->second = found->second;
-  }
-
-  // Add errors.
-  if (e)
-    *e += errors;
-
   return errors == 0;
 }

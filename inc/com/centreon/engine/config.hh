@@ -42,7 +42,6 @@ int check_servicedependency(std::shared_ptr<com::centreon::engine::servicedepend
 int check_hostdependency(std::shared_ptr<com::centreon::engine::hostdependency> hd, int* w, int* e);
 int check_serviceescalation(std::shared_ptr<com::centreon::engine::serviceescalation> se, int* w, int* e);
 int check_hostescalation(std::shared_ptr<com::centreon::engine::hostescalation> he, int* w, int* e);
-int check_timeperiod(std::shared_ptr<com::centreon::engine::timeperiod> tp, int* w, int* e);
 
 #  ifdef __cplusplus
 }
