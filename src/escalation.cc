@@ -17,10 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/escalation.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/timeperiod.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 escalation::escalation(int first_notification,
                        int last_notification,
@@ -115,4 +118,61 @@ bool escalation::is_viable(int state, int notification_number) const {
   if (number < get_first_notification() || number > get_last_notification())
     return false;
   return true;
+}
+
+void escalation::resolve(int& w, int& e) {
+  int errors{0};
+  // Find the timeperiod.
+  if (!get_escalation_period().empty()) {
+    timeperiod_map::const_iterator
+      it{timeperiod::timeperiods.find(get_escalation_period())};
+
+    if (it == timeperiod::timeperiods.end() || !it->second) {
+      logger(log_verification_error, basic)
+        << "Error: Escalation period '" << get_escalation_period()
+        << "' specified in escalation is not defined anywhere!";
+      errors++;
+    }
+    else
+      // Save the timeperiod pointer for later.
+      escalation_period_ptr = it->second.get();
+  }
+
+  // Check all contacts.
+  for (std::pair<std::string, contact*> const& p : this->contacts()) {
+    // Find the contact.
+    contact_map::const_iterator ct_it{contact::contacts.find(p.first)};
+    if (ct_it == contact::contacts.end()) {
+      logger(log_verification_error, basic)
+        << "Error: Contact '" << p.first
+        << "' specified in escalation for this notifier is not defined anywhere!";
+      errors++;
+    }
+  }
+
+  // Check all contact groups.
+  for (contactgroup_map_unsafe::iterator
+         it{contact_groups().begin()},
+         end{contact_groups().end()};
+       it != end;
+       ++it) {
+    // Find the contact group.
+    contactgroup_map::iterator it_cg{contactgroup::contactgroups.find(it->first)};
+
+    if (it_cg == contactgroup::contactgroups.end() || !it_cg->second) {
+      logger(log_verification_error, basic)
+        << "Error: Contact group '"
+        << it->first
+        << "' specified in escalation for this notifier is not defined anywhere!";
+      errors++;
+    } else {
+      // Save the contactgroup pointer for later.
+      it->second = it_cg->second.get();
+    }
+  }
+
+  if (errors) {
+    e += errors;
+    throw engine_error() << "Cannot resolve notifier escalation";
+  }
 }

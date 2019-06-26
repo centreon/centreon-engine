@@ -38,7 +38,7 @@ CCE_END()
 typedef std::unordered_map<std::string,
   std::shared_ptr<com::centreon::engine::timeperiod>> timeperiod_map;
 typedef std::unordered_multimap<std::string,
-  std::shared_ptr<com::centreon::engine::timeperiod>> timeperiodexclusion;
+  com::centreon::engine::timeperiod*> timeperiodexclusion;
 
 CCE_BEGIN()
 
@@ -50,13 +50,20 @@ class                timeperiod {
   void                set_name(std::string const& name);
   std::string const   get_alias() const;
   void                set_alias(std::string const& alias);
+  timeperiodexclusion const& get_exclusions() const;
+  timeperiodexclusion& get_exclusions();
+  void get_next_valid_time_per_timeperiod(time_t preferred_time,
+                                          time_t* invalid_time);
+  void get_next_invalid_time_per_timeperiod(time_t preferred_time,
+                                            time_t* invalid_time);
+
+  void resolve(int& w, int& e);
 
   bool                operator==(timeperiod const& obj) throw ();
   bool                operator!=(timeperiod const& obj) throw ();
 
   std::array<timerange_list, 7> days;
   std::array<daterange_list, DATERANGE_TYPES> exceptions;
-  timeperiodexclusion exclusions;
 
   static timeperiod_map
                       timeperiods;
@@ -64,6 +71,7 @@ class                timeperiod {
  private:
   std::string         _name;
   std::string         _alias;
+  timeperiodexclusion _exclusions;
 };
 
 CCE_END()

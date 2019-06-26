@@ -241,10 +241,12 @@ class                notifier : public checkable {
   std::unordered_set<contact*>
                      get_contacts_to_notify(notification_category cat, int state);
   notifier_type      get_notifier_type() const;
+  std::unordered_map<std::string, contact*>& get_contacts();
+  std::unordered_map<std::string, contact*> const& get_contacts() const;
+  contactgroup_map_unsafe& get_contactgroups();
+  contactgroup_map_unsafe const& get_contactgroups() const;
+  void resolve(int& w, int& e);
 
-  std::unordered_map<std::string, std::shared_ptr<contact>>
-                     contacts;
-  contactgroup_map   contact_groups;
   int                state_history[MAX_STATE_HISTORY_ENTRIES];
 
   std::unordered_map<std::string, customvariable>
@@ -303,17 +305,21 @@ class                notifier : public checkable {
                      _escalations;
   bool               _problem_has_been_acknowledged;
   bool               _has_been_checked;
-  bool               _event_handler_enabled;
   bool               _no_more_notifications;
 
   /* DEPRECATED */
   int                _current_notification_number;
 
   /* New ones */
-  int                _notification_number;
-  reason_type        _type;
+  int _notification_number;
+  reason_type _type;
+  std::unordered_map<std::string, contact*> _contacts;
+  contactgroup_map_unsafe _contact_groups;
 };
 
 CCE_END()
+
+bool is_contact_for_notifier(com::centreon::engine::notifier* notif,
+                             com::centreon::engine::contact* cntct);
 
 #endif  // !CCE_NOTIFIER_HH

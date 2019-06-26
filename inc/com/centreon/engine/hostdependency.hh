@@ -60,6 +60,7 @@ class                           hostdependency : public dependency {
   bool                          check_for_circular_hostdependency_path(
                                   hostdependency* dep,
                                   types dependency_type);
+  void resolve(int& w, int& e);
 
   bool                          operator==(hostdependency const& obj) throw ();
   bool                          operator<(hostdependency const& obj) throw ();

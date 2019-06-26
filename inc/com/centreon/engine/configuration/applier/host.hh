@@ -33,9 +33,9 @@ namespace          configuration {
     class          host {
     public:
                    host();
-                   host(host const& right);
+                   host(host const& right) = delete;
                    ~host() throw ();
-      host&        operator=(host const& right);
+      host&        operator=(host const& right) = delete;
       void         add_object(
                      configuration::host const& obj);
       void         expand_objects(configuration::state& s);

@@ -39,30 +39,9 @@ using namespace com::centreon::engine::configuration;
 applier::host::host() {}
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-applier::host::host(applier::host const& right) {
-  (void)right;
-}
-
-/**
  *  Destructor.
  */
 applier::host::~host() throw () {}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-applier::host& applier::host::operator=(applier::host const& right) {
-  (void)right;
-  return (*this);
-}
 
 /**
  *  Add new host.
@@ -168,7 +147,7 @@ void applier::host::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    h->contacts.insert({*it, nullptr});
+    h->get_contacts().insert({*it, nullptr});
 
   // Contact groups.
   for (set_string::const_iterator
@@ -176,7 +155,7 @@ void applier::host::add_object(
          end(obj.contactgroups().end());
        it != end;
        ++it)
-    h->contact_groups.insert({*it, nullptr});
+    h->get_contactgroups().insert({*it, nullptr});
 
   // Custom variables.
   for (map_customvar::const_iterator
@@ -364,7 +343,7 @@ void applier::host::modify_object(
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
     // Delete old contacts.
-    it_obj->second->contacts.clear();
+    it_obj->second->get_contacts().clear();
 
     // Add contacts to host.
     for (set_string::const_iterator
@@ -372,13 +351,13 @@ void applier::host::modify_object(
            end(obj.contacts().end());
          it != end;
          ++it)
-      it_obj->second->contacts.insert({*it, nullptr});
+      it_obj->second->get_contacts().insert({*it, nullptr});
   }
 
   // Contact groups.
   if (obj.contactgroups() != obj_old.contactgroups()) {
     // Delete old contact groups.
-    it_obj->second->contact_groups.clear();
+    it_obj->second->get_contactgroups().clear();
 
     // Add contact groups to host.
     for (set_string::const_iterator
@@ -386,7 +365,7 @@ void applier::host::modify_object(
            end(obj.contactgroups().end());
          it != end;
          ++it)
-      it_obj->second->contact_groups.insert({*it, nullptr});
+      it_obj->second->get_contactgroups().insert({*it, nullptr});
   }
 
   // Custom variables.
@@ -533,7 +512,5 @@ void applier::host::resolve_object(
   it->second->set_total_service_check_interval(0);
 
   // Resolve host.
-  if (!check_host(it->second, &config_warnings, &config_errors))
-    throw (engine_error() << "Cannot resolve host '"
-           << obj.host_name() << "'");
+  it->second->resolve(config_warnings, config_errors);
 }

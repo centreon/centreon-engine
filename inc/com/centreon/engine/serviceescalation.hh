@@ -46,6 +46,7 @@ class serviceescalation : public escalation {
   std::string const& get_hostname() const;
   std::string const& get_description() const;
   bool is_viable(int state, int notification_number) const override;
+  void resolve(int& w, int& e) override;
 
   static serviceescalation_mmap serviceescalations;
 

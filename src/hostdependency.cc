@@ -232,3 +232,66 @@ bool hostdependency::check_for_circular_hostdependency_path(
 
   return false;
 }
+
+void hostdependency::resolve(int& w, int& e) {
+  (void)w;
+  int errors{0};
+
+  // Find the dependent host.
+  host_map::const_iterator it{host::hosts.find(_dependent_hostname)};
+  if (it == host::hosts.end() || !it->second) {
+    logger(log_verification_error, basic)
+      << "Error: Dependent host specified in host dependency for "
+         "host '" << _dependent_hostname
+      << "' is not defined anywhere!";
+    errors++;
+    dependent_host_ptr = nullptr;
+  }
+  else
+    dependent_host_ptr = it->second.get();
+
+  // Find the host we're depending on.
+  it = host::hosts.find(_hostname);
+  if (it == host::hosts.end() || !it->second) {
+    logger(log_verification_error, basic)
+      << "Error: Host specified in host dependency for host '"
+      << _dependent_hostname << "' is not defined anywhere!";
+    errors++;
+    master_host_ptr = nullptr;
+  }
+  else
+    master_host_ptr = it->second.get();
+
+  // Make sure they're not the same host.
+  if (dependent_host_ptr == master_host_ptr) {
+    logger(log_verification_error, basic)
+      << "Error: Host dependency definition for host '"
+      << _dependent_hostname
+      << "' is circular (it depends on itself)!";
+    errors++;
+  }
+
+  // Find the timeperiod.
+  if (!_dependency_period.empty()) {
+    timeperiod_map::const_iterator
+      it{timeperiod::timeperiods.find(_dependency_period)};
+
+    if (it == timeperiod::timeperiods.end() || !it->second) {
+      logger(log_verification_error, basic)
+        << "Error: Dependency period '" << this->get_dependency_period()
+        << "' specified in host dependency for host '"
+        << _dependent_hostname
+        << "' is not defined anywhere!";
+      errors++;
+      dependency_period_ptr = nullptr;
+    }
+    else
+      dependency_period_ptr = it->second.get();
+  }
+
+  // Add errors.
+  e += errors;
+
+  if (errors)
+    throw engine_error() << "Cannot resolve host dependency";
+}

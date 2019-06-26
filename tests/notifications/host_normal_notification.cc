@@ -23,12 +23,15 @@
 #include <gtest/gtest.h>
 #include <time.h>
 #include "com/centreon/engine/configuration/applier/command.hh"
+#include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include <com/centreon/process_manager.hh>
 #include "com/centreon/engine/error.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/timezone_manager.hh"
@@ -43,19 +46,28 @@ extern configuration::state* config;
 class HostNotification : public ::testing::Test {
  public:
   void SetUp() override {
-    if (config == NULL)
+    if (!config)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
     timezone_manager::load();
 
+    configuration::applier::contact ct_aply;
+    configuration::contact ctct{valid_contact_config()};
+    process_manager::load();
+    ct_aply.add_object(ctct);
+    ct_aply.expand_objects(*config);
+    ct_aply.resolve_object(ctct);
+
     configuration::applier::host hst_aply;
     configuration::host hst;
     hst.parse("host_name", "test_host");
     hst.parse("address", "127.0.0.1");
     hst.parse("_HOST_ID", "12");
+    hst.parse("contacts", "admin");
     hst_aply.add_object(hst);
+    hst_aply.resolve_object(hst);
     host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
     _host->set_current_state(engine::host::state_up);
@@ -65,10 +77,40 @@ class HostNotification : public ::testing::Test {
   }
 
   void TearDown() override {
+    process_manager::unload();
     timezone_manager::unload();
     configuration::applier::state::unload();
     delete config;
     config = NULL;
+  }
+
+  configuration::contact valid_contact_config() const {
+    // Add command.
+    {
+      configuration::command cmd;
+      cmd.parse("command_name", "cmd");
+      cmd.parse("command_line", "true");
+      configuration::applier::command aplyr;
+      aplyr.add_object(cmd);
+    }
+    // Add timeperiod.
+    {
+      configuration::timeperiod tperiod;
+      tperiod.parse("timeperiod_name", "24x7");
+      tperiod.parse("alias", "24x7");
+      tperiod.parse("monday", "00:00-24:00");
+      configuration::applier::timeperiod aplyr;
+      aplyr.add_object(tperiod);
+    }
+    // Valid contact configuration
+    // (will generate 0 warnings or 0 errors).
+    configuration::contact ctct;
+    ctct.parse("contact_name", "admin");
+    ctct.parse("host_notification_period", "24x7");
+    ctct.parse("service_notification_period", "24x7");
+    ctct.parse("host_notification_commands", "cmd");
+    ctct.parse("service_notification_commands", "cmd");
+    return ctct;
   }
 
  protected:
@@ -95,6 +137,85 @@ TEST_F(HostNotification, SimpleNormalHostNotification) {
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
+TEST_F(HostNotification, SimpleNormalHostNotificationNotificationsdisabled) {
+  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+   * If we call time(), it is not the glibc time() function that will be called.
+   */
+  config->enable_notifications(false);
+  set_time(43200);
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::hostescalation> host_escalation{
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+
+  ASSERT_TRUE(host_escalation);
+  uint64_t id{_host->get_next_notification_id()};
+  _host->notification_period_ptr = tperiod.get();
+  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(id, _host->get_next_notification_id());
+}
+
+TEST_F(HostNotification, SimpleNormalHostNotificationNotifierNotifdisabled) {
+  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+   * If we call time(), it is not the glibc time() function that will be called.
+   */
+  set_time(43200);
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::hostescalation> host_escalation{
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+
+  ASSERT_TRUE(host_escalation);
+  uint64_t id{_host->get_next_notification_id()};
+  _host->set_notifications_enabled(false);
+  _host->notification_period_ptr = tperiod.get();
+  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(id, _host->get_next_notification_id());
+}
+
+// FIXME DBR: this test should validate the notification_interval but for
+// now since notifications don't work, we can not make this test to work.
+//TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
+//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+//   * If we call time(), it is not the glibc time() function that will be called.
+//   */
+//  set_time(43200);
+//  std::unique_ptr<engine::timeperiod> tperiod{
+//      new engine::timeperiod("tperiod", "alias")};
+//  for (int i = 0; i < 7; ++i)
+//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+//
+//  std::unique_ptr<engine::hostescalation> host_escalation{
+//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+//
+//  ASSERT_TRUE(host_escalation);
+//  uint64_t id{_host->get_next_notification_id()};
+//  /* We configure the notification interval to 2 minutes */
+//  _host->set_notification_interval(2);
+//  _host->notification_period_ptr = tperiod.get();
+//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "",
+//                          notifier::notification_option_none),
+//            OK);
+//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
+//
+//  /* Only 100 seconds since the previous notification. */
+//  set_time(43300);
+//  id = _host->get_next_notification_id();
+//  /* Because of the notification not totally implemented, we must force the
+//   * notification number to be greater than 0 */
+//  _host->set_notification_number(1);
+//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
+//
+//  /* No notification, because the delay is too short */
+//  ASSERT_EQ(id, _host->get_next_notification_id());
+//}
+
 TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
@@ -111,6 +232,28 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
+}
+
+TEST_F(HostNotification, SimpleNormalHostNotificationForcedWithNotificationDisabled) {
+  config->enable_notifications(false);
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  set_time(20000);
+
+  uint64_t id{_host->get_next_notification_id()};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
+
+  std::unique_ptr<engine::hostescalation> host_escalation{
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+  _host->notification_period_ptr = tperiod.get();
+
+  ASSERT_TRUE(host_escalation);
+  ASSERT_EQ(
+      _host->notify(
+          notifier::notification_normal, "", "", notifier::notification_option_forced),
+      OK);
+  ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
 TEST_F(HostNotification, SimpleNormalHostNotificationForcedNotification) {

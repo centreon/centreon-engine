@@ -77,8 +77,7 @@ void timeperiod_creator::new_exclusion(
   if (!target)
     target = _timeperiods.begin()->get();
 
-  target->exclusions.insert({excluded->get_name(), excluded});
-  return ;
+  target->get_exclusions().insert({excluded->get_name(), excluded.get()});
 }
 
 /**

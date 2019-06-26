@@ -361,8 +361,6 @@ int cmd_schedule_check(int cmd, char* args) {
   if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
-  logger(log_runtime_warning, basic) << "Warning: COUCOU 1";
-
   if (cmd == CMD_SCHEDULE_HOST_CHECK
       || cmd == CMD_SCHEDULE_FORCED_HOST_CHECK
       || cmd == CMD_SCHEDULE_HOST_SVC_CHECKS
@@ -2004,13 +2002,13 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_HOST_EVENT_HANDLER:
     temp_host->set_event_handler(temp_ptr);
-    temp_host->event_handler_ptr = cmd_found->second.get();
+    temp_host->set_event_handler_ptr(cmd_found->second.get());
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_HOST_CHECK_COMMAND:
     temp_host->set_check_command(temp_ptr);
-    temp_host->check_command_ptr = cmd_found->second.get();
+    temp_host->set_check_command_ptr(cmd_found->second.get());
     attr = MODATTR_CHECK_COMMAND;
     break;
 
@@ -2029,14 +2027,14 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_SVC_EVENT_HANDLER:
     found_svc->second->set_event_handler(temp_ptr);
-    found_svc->second->event_handler_ptr = cmd_found->second.get();
+    found_svc->second->set_event_handler_ptr(cmd_found->second.get());
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_SVC_CHECK_COMMAND:
     found_svc->second->set_check_command(temp_ptr);
     delete[] temp_ptr;
-    found_svc->second->check_command_ptr = cmd_found->second.get();
+    found_svc->second->set_check_command_ptr(cmd_found->second.get());
     attr = MODATTR_CHECK_COMMAND;
     break;
 

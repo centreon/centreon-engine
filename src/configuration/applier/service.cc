@@ -200,7 +200,7 @@ void applier::service::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    svc->contacts.insert({*it, nullptr});
+    svc->get_contacts().insert({*it, nullptr});
 
   // Add contactgroups.
   for (set_string::const_iterator
@@ -208,7 +208,7 @@ void applier::service::add_object(
          end(obj.contactgroups().end());
        it != end;
        ++it)
-    svc->contact_groups.insert({*it, nullptr});
+    svc->get_contactgroups().insert({*it, nullptr});
 
   // Add custom variables.
   for (map_customvar::const_iterator
@@ -430,7 +430,7 @@ void applier::service::modify_object(
   // Contacts.
   if (obj.contacts() != obj_old.contacts()) {
     // Delete old contacts.
-    s->contacts.clear();
+    s->get_contacts().clear();
 
     // Add contacts to host.
     for (set_string::const_iterator
@@ -438,13 +438,13 @@ void applier::service::modify_object(
            end(obj.contacts().end());
          it != end;
          ++it)
-      s->contacts.insert({*it, nullptr});
+      s->get_contacts().insert({*it, nullptr});
   }
 
   // Contact groups.
   if (obj.contactgroups() != obj_old.contactgroups()) {
     // Delete old contact groups.
-    s->contact_groups.clear();
+    s->get_contactgroups().clear();
 
     // Add contact groups to host.
     for (set_string::const_iterator
@@ -452,7 +452,7 @@ void applier::service::modify_object(
            end(obj.contactgroups().end());
          it != end;
          ++it)
-      s->contact_groups.insert({*it, nullptr});
+      s->get_contactgroups().insert({*it, nullptr});
   }
 
   // Custom variables.
@@ -563,12 +563,7 @@ void applier::service::resolve_object(
   }
 
   // Resolve service.
-  if (!check_service(it->second, &config_warnings, &config_errors))
-      throw (engine_error() << "Cannot resolve service '"
-             << obj.service_description() << "' of host '"
-             << *obj.hosts().begin() << "'");
-
-  return ;
+  it->second->resolve(config_warnings, config_errors);
 }
 
 /**

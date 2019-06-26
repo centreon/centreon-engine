@@ -67,6 +67,7 @@ class                 servicedependency : public dependency {
   bool                check_for_circular_servicedependency_path(
                         servicedependency* dep,
                         types dependency_type);
+  void resolve(int& w, int& e);
 
   bool                operator==(servicedependency const& obj) throw ();
   bool                operator<(servicedependency const& obj) throw ();

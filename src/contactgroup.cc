@@ -94,20 +94,12 @@ std::string const& contactgroup::get_name() const {
   return _name;
 }
 
-void contactgroup::add_member(contact* cntct) {
-  _members.insert({cntct->get_name(), cntct});
-
-  timeval tv(get_broker_timestamp(NULL));
-  broker_group(
-    NEBTYPE_CONTACTGROUP_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    this,
-    &tv);
-}
-
 void contactgroup::clear_members() {
   _members.clear();
+}
+
+contact_map_unsafe& contactgroup::get_members() {
+  return _members;
 }
 
 contact_map_unsafe const& contactgroup::get_members() const {
@@ -124,10 +116,10 @@ void contactgroup::set_alias(std::string const& alias) {
 
 std::ostream& operator<<(
                 std::ostream& os,
-                contactgroup_map const& obj)
+                contactgroup_map_unsafe const& obj)
 {
-  for (contactgroup_map::const_iterator
-         it(obj.begin()), end(obj.end());
+  for (contactgroup_map_unsafe::const_iterator
+         it{obj.begin()}, end{obj.end()};
        it != end;
        ++it) {
     os << it->first;
@@ -137,4 +129,35 @@ std::ostream& operator<<(
       os << "";
   }
   return os;
+}
+
+void contactgroup::resolve(int& w, int& e) {
+  int errors{0};
+
+  for (contact_map_unsafe::iterator it{_members.begin()},
+      end{_members.end()}; it != end; ++it) {
+    /* Check members */
+    if (!it->second) {
+      logger(log_verification_error, basic)
+        << "Error: Contact '" << it->first
+        << "' specified in contact group '" << _name
+        << "' is not defined anywhere!";
+      errors++;
+    }
+    else
+      it->second->get_parent_groups().push_back(this);
+  }
+
+  /* Check for illegal characters in contact group name. */
+  if (contains_illegal_object_chars(const_cast<char*>(_name.c_str()))) {
+    logger(log_verification_error, basic)
+      << "Error: The name of contact group '" << _name
+      << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  e += errors;
+  if (errors)
+    throw engine_error() << "Error: Cannot resolve contact group " << _name
+                         << "'";
 }

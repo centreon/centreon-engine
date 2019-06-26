@@ -671,12 +671,12 @@ bool host::operator==(host const& other) throw() {
          get_retry_interval() == other.get_retry_interval() &&
          get_max_attempts() == other.get_max_attempts() &&
          get_event_handler() == other.get_event_handler() &&
-         ((contact_groups.size() == other.contact_groups.size()) &&
-          std::equal(contact_groups.begin(), contact_groups.end(),
-                     other.contact_groups.begin())) &&
-         ((contacts.size() == other.contacts.size()) &&
-          std::equal(contacts.begin(), contacts.end(),
-                     other.contacts.begin())) &&
+         (get_contactgroups().size() == other.get_contactgroups().size() &&
+          std::equal(get_contactgroups().begin(), get_contactgroups().end(),
+                     other.get_contactgroups().begin())) &&
+         (get_contacts().size() == other.get_contacts().size() &&
+          std::equal(get_contacts().begin(), get_contacts().end(),
+                     other.get_contacts().begin())) &&
          get_notification_interval() == other.get_notification_interval() &&
          get_first_notification_delay() ==
              other.get_first_notification_delay() &&
@@ -788,8 +788,8 @@ bool host::operator!=(host const& other) throw() {
   return !operator==(other);
 }
 
-std::ostream& operator<<(std::ostream& os, host_map const& obj) {
-  for (host_map::const_iterator it(obj.begin()), end(obj.end()); it != end;
+std::ostream& operator<<(std::ostream& os, host_map_unsafe const& obj) {
+  for (host_map_unsafe::const_iterator it{obj.begin()}, end{obj.end()}; it != end;
        ++it) {
     os << it->first;
     if (next(it) != end)
@@ -812,11 +812,11 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   std::shared_ptr<hostgroup> hg{obj.get_parent_groups().front()};
 
   std::string evt_str;
-  if (obj.event_handler_ptr)
-    evt_str = obj.event_handler_ptr->get_name();
+  if (obj.get_event_handler_ptr())
+    evt_str = obj.get_event_handler_ptr()->get_name();
   std::string cmd_str;
-  if (obj.check_command_ptr)
-    cmd_str = obj.check_command_ptr->get_name();
+  if (obj.get_check_command_ptr())
+    cmd_str = obj.get_check_command_ptr()->get_name();
   std::string chk_period_str;
   if (obj.check_period_ptr)
     chk_period_str = obj.check_period_ptr->get_name();
@@ -829,18 +829,18 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   std::string p_oss;
   std::string child_oss;
 
-  if (obj.contact_groups.empty())
+  if (obj.get_contactgroups().empty())
     cg_oss = "\"NULL\"";
   else {
     std::ostringstream oss;
-    oss << obj.contact_groups;
+    oss << obj.get_contactgroups();
     cg_oss = oss.str();
   }
-  if (obj.contacts.empty())
+  if (obj.get_contacts().empty())
     c_oss = "\"NULL\"";
   else {
     std::ostringstream oss;
-    oss << obj.contacts;
+    oss << obj.get_contacts();
     c_oss = oss.str();
   }
   if (obj.parent_hosts.empty())
@@ -1156,7 +1156,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
 
   os << "  state_history:                        ";
   for (unsigned int i(0),
-       end(sizeof(obj.state_history) / sizeof(obj.state_history[0]));
+       end{sizeof(obj.state_history) / sizeof(obj.state_history[0])};
        i < end; ++i)
     os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
 
@@ -1210,35 +1210,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
 
   os << "\n}\n";
   return os;
-}
-
-/**
- *  Tests whether a contact is a contact for a particular host.
- *
- *  @param[in] hst   Target host.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_contact_for_host(com::centreon::engine::host* hst, contact* cntct) {
-  if (!hst || !cntct)
-    return false;
-
-  // Search all individual contacts of this host.
-  for (contact_map::iterator it(hst->contacts.begin()),
-       end(hst->contacts.end());
-       it != end; ++it)
-    if (it->second.get() == cntct)
-      return true;
-
-  for (contactgroup_map::iterator it(hst->contact_groups.begin()),
-       end(hst->contact_groups.end());
-       it != end; ++it)
-    if (it->second->get_members().find(cntct->get_name()) ==
-        it->second->get_members().end())
-      return true;
-
-  return false;
 }
 
 /**
@@ -1297,7 +1268,7 @@ int is_host_immediate_parent_of_host(com::centreon::engine::host* child_host,
  */
 int number_of_immediate_child_hosts(com::centreon::engine::host* hst) {
   int children(0);
-  for (host_map::iterator it(host::hosts.begin()), end(host::hosts.end());
+  for (host_map::iterator it{host::hosts.begin()}, end{host::hosts.end()};
        it != end; ++it)
     if (is_host_immediate_child_of_host(hst, it->second.get()))
       ++children;
@@ -1315,7 +1286,7 @@ int number_of_immediate_child_hosts(com::centreon::engine::host* hst) {
  */
 int number_of_immediate_parent_hosts(com::centreon::engine::host* hst) {
   int parents(0);
-  for (host_map::iterator it(host::hosts.begin()), end(host::hosts.end());
+  for (host_map::iterator it{host::hosts.begin()}, end{host::hosts.end()};
        it != end; ++it)
     if (is_host_immediate_parent_of_host(hst, it->second.get()))
       ++parents;
@@ -1333,7 +1304,7 @@ int number_of_immediate_parent_hosts(com::centreon::engine::host* hst) {
  */
 int number_of_total_child_hosts(com::centreon::engine::host* hst) {
   int children(0);
-  for (host_map::iterator it(host::hosts.begin()), end(host::hosts.end());
+  for (host_map::iterator it{host::hosts.begin()}, end{host::hosts.end()};
        it != end; ++it)
     if (is_host_immediate_child_of_host(hst, it->second.get()))
       children += number_of_total_child_hosts(it->second.get()) + 1;
@@ -1351,7 +1322,7 @@ int number_of_total_child_hosts(com::centreon::engine::host* hst) {
  */
 int number_of_total_parent_hosts(com::centreon::engine::host* hst) {
   int parents(0);
-  for (host_map::iterator it(host::hosts.begin()), end(host::hosts.end());
+  for (host_map::iterator it{host::hosts.begin()}, end{host::hosts.end()};
        it != end; ++it)
     if (is_host_immediate_parent_of_host(hst, it->second.get()))
       parents += number_of_total_parent_hosts(it->second.get()) + 1;
@@ -3429,8 +3400,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
        * somewhere and we should catch the recovery as soon as possible */
       logger(dbg_checks, more) << "Propagating checks to parent host(s)...";
 
-      for (host_map_unsafe::iterator it(parent_hosts.begin()),
-             end(parent_hosts.end());
+      for (host_map_unsafe::iterator it{parent_hosts.begin()},
+             end{parent_hosts.end()};
            it != end; it++) {
         if (!it->second)
           continue;
@@ -3446,8 +3417,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
        * result of this recovery) switch to UP or DOWN states */
       logger(dbg_checks, more) << "Propagating checks to child host(s)...";
 
-      for (host_map_unsafe::iterator it(child_hosts.begin()),
-             end(child_hosts.end());
+      for (host_map_unsafe::iterator it{child_hosts.begin()},
+             end{child_hosts.end()};
            it != end; it++) {
         if (!it->second)
           continue;
@@ -3571,8 +3542,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
             << "** WARNING: Max attempts = 1, so we have to run serial "
                "checks of all parent hosts!";
 
-          for (host_map_unsafe::iterator it(parent_hosts.begin()),
-                 end(parent_hosts.end());
+          for (host_map_unsafe::iterator it{parent_hosts.begin()},
+                 end{parent_hosts.end()};
                it != end; it++) {
             if (!it->second)
               continue;
@@ -3628,8 +3599,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
         logger(dbg_checks, more)
           << "Propagating check to immediate non-UNREACHABLE child hosts...";
 
-        for (host_map_unsafe::iterator it(child_hosts.begin()),
-               end(child_hosts.end());
+        for (host_map_unsafe::iterator it{child_hosts.begin()},
+               end{child_hosts.end()};
              it != end; it++) {
           if (!it->second)
             continue;
@@ -3693,8 +3664,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
           << "Propagating checks to immediate parent hosts that "
              "are UP...";
 
-        for (host_map_unsafe::iterator it(parent_hosts.begin()),
-               end(parent_hosts.end());
+        for (host_map_unsafe::iterator it{parent_hosts.begin()},
+               end{parent_hosts.end()};
              it != end; it++) {
           if (it->second == nullptr)
             continue;
@@ -3739,8 +3710,8 @@ int host::process_check_result_3x(enum host::host_state new_state,
             dependencies(state::instance().hostdependencies());
           for (umultimap<std::string,
                          std::shared_ptr<hostdependency> >::const_iterator
-                 it(dependencies.find(id)),
-                 end(dependencies.end());
+                 it{dependencies.find(id)},
+                 end{dependencies.end()};
                it != end && it->first == id; ++it) {
             hostdependency* temp_dependency(&*it->second);
             if (temp_dependency->dependent_host_ptr == this &&
@@ -3905,8 +3876,8 @@ enum host::host_state host::determine_host_reachability() {
   else {
 
     for (host_map_unsafe::iterator
-           it(parent_hosts.begin()),
-           end(parent_hosts.end());
+           it{parent_hosts.begin()},
+           end{parent_hosts.end()};
          it != end;
          it++) {
 
@@ -3972,7 +3943,7 @@ uint64_t host::check_dependencies(int dependency_type) {
 
   /* check all dependencies... */
   for (hostdependency_mmap::const_iterator
-         it(dependencies.find(id)), end(dependencies.end());
+         it{dependencies.find(id)}, end{dependencies.end()};
        it != end && it->first == id;
        ++it) {
     hostdependency* temp_dependency(&*it->second);
@@ -4044,8 +4015,8 @@ void host::check_result_freshness() {
 
   /* check all hosts... */
   for (host_map::iterator
-         it(host::hosts.begin()),
-         end(host::hosts.end());
+         it{host::hosts.begin()},
+         end{host::hosts.end()};
        it != end;
        ++it) {
 
@@ -4131,8 +4102,8 @@ void host::check_for_orphaned() {
 
   /* check all hosts... */
   for (host_map::iterator
-         it(host::hosts.begin()),
-         end(host::hosts.end());
+         it{host::hosts.begin()},
+         end{host::hosts.end()};
        it != end;
        ++it) {
 
@@ -4190,15 +4161,93 @@ bool host::is_in_downtime() const {
   return get_scheduled_downtime_depth() > 0;
 }
 
-std::ostream& operator<<(std::ostream& os, host_map_unsafe const& obj) {
-  for (host_map_unsafe::const_iterator it{obj.begin()}, end{obj.end()};
-       it != end; ++it) {
-    os << it->first;
-    if (next(it) != end)
-      os << ", ";
-    else
-      os << "";
-  }
-  return os;
-}
+/**
+ *  This method resolves pointers involved in this host life. If a pointer
+ *  cannot be resolved, an exception is thrown.
+ *
+ * @param w Warnings given by the method.
+ * @param e Errors given by the method. An exception is thrown is at less an
+ * error is rised.
+ */
+void host::resolve(int& w, int& e) {
+  int warnings{0}, errors{0};
 
+  try {
+    notifier::resolve(warnings, errors);
+  }
+  catch (std::exception const& e) {
+    logger(log_verification_error, basic)
+      << "Error: Host '" << _name
+      << "' has problem in its notifier part: " << e.what();
+  }
+
+  if (services.empty()) {
+    logger(log_verification_error, basic)
+      << "Warning: Host '" << _name
+      << "' has no services associated with it!";
+    ++w;
+  }
+  else {
+    for (service_map_unsafe::iterator
+           it{services.begin()}, end{services.end()};
+           it != end;
+           ++it) {
+      service_map::const_iterator found{service::services.find(it->first)};
+      if (found == service::services.end() || !found->second) {
+        logger(log_verification_error, basic)
+          << "Error: Host '" << _name
+          << "' has a service '" << it->first.second << "' that does not exist!";
+      }
+      else {
+        ++errors;
+        it->second = found->second.get();
+      }
+    }
+  }
+
+  /* check all parent parent host */
+  for (host_map_unsafe::iterator
+         it(parent_hosts.begin()),
+         end(parent_hosts.end());
+       it != end;
+       it++) {
+
+    host_map::const_iterator it_host{host::hosts.find(it->first)};
+    if (it_host == host::hosts.end() || !it_host->second) {
+      logger(log_verification_error, basic)
+        << "Error: '" << it->first << "' is not a "
+        "valid parent for host '" << _name << "'!";
+      errors++;
+    }
+    else {
+      it->second = it_host->second.get();
+      it_host->second->add_child_link(this); //add a reverse (child) link to make searches faster later on
+    }
+  }
+
+  /* check for illegal characters in host name */
+  if (contains_illegal_object_chars(_name.c_str())) {
+    logger(log_verification_error, basic)
+      << "Error: The name of host '" << _name
+      << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  // Check for sane recovery options.
+  if (get_notifications_enabled()
+      && get_notify_on(notifier::recovery)
+      && !get_notify_on(notifier::down)
+      && !get_notify_on(notifier::unreachable)) {
+    logger(log_verification_error, basic)
+      << "Warning: Recovery notification option in host '" << get_display_name()
+      << "' definition doesn't make any sense - specify down and/or "
+         "unreachable options as well";
+    warnings++;
+  }
+
+  w += warnings;
+  e += errors;
+
+  if (errors)
+    throw engine_error() << "Cannot resolve host '" << _name << "'";
+}

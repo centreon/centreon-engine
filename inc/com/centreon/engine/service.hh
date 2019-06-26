@@ -203,6 +203,7 @@ class                           service : public notifier {
   static void                   check_for_orphaned();
   static void                   check_result_freshness();
   bool                          is_in_downtime() const override;
+  void resolve(int& w, int& e);
 
   int                           process_performance_data;
   int                           accept_passive_service_checks;
@@ -219,8 +220,6 @@ class                           service : public notifier {
   int                           pending_flex_downtime;
   uint64_t                      flapping_comment_id;
 
-  commands::command*            event_handler_ptr;
-  commands::command*            check_command_ptr;
   std::list<servicegroup*> const&
                                 get_parent_groups() const;
   std::list<servicegroup*>&
@@ -309,12 +308,6 @@ com::centreon::engine::service* add_service(
            int retain_nonstatus_information,
            bool obsess_over,
            std::string const& timezone);
-int      is_contact_for_service(
-           com::centreon::engine::service* svc,
-           com::centreon::engine::contact* cntct);
-int      is_escalated_contact_for_service(
-           com::centreon::engine::service* svc,
-           com::centreon::engine::contact* cntct);
 
 #  ifdef __cplusplus
 }

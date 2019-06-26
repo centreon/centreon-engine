@@ -376,3 +376,19 @@ bool checkable::get_should_be_scheduled() const { return _should_be_scheduled; }
 void checkable::set_should_be_scheduled(bool should_be_scheduled) {
   _should_be_scheduled = should_be_scheduled;
 }
+
+commands::command* checkable::get_event_handler_ptr() const {
+  return _event_handler_ptr;
+}
+
+void checkable::set_event_handler_ptr(commands::command* cmd) {
+  _event_handler_ptr = cmd;
+}
+
+commands::command* checkable::get_check_command_ptr() const {
+  return _check_command_ptr;
+}
+
+void checkable::set_check_command_ptr(commands::command* cmd) {
+  _check_command_ptr = cmd;
+}

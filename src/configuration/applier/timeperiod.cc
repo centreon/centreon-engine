@@ -95,8 +95,6 @@ void applier::timeperiod::add_object(
   _add_time_ranges(obj.timeranges(), tp.get());
   _add_exceptions(obj.exceptions(), tp.get());
   _add_exclusions(obj.exclude(), tp.get());
-
-  return ;
 }
 
 /**
@@ -109,7 +107,6 @@ void applier::timeperiod::add_object(
  */
 void applier::timeperiod::expand_objects(configuration::state& s) {
   (void)s;
-  return ;
 }
 
 /**
@@ -173,7 +170,7 @@ void applier::timeperiod::modify_object(
   // Exclusions modified ?
   if (obj.exclude() != old_cfg.exclude()) {
     // Delete old exclusions.
-    tp->exclusions.clear();
+    tp->get_exclusions().clear();
     // Create new exclusions.
     _add_exclusions(obj.exclude(), tp);
   }
@@ -187,8 +184,6 @@ void applier::timeperiod::modify_object(
     tp,
     CMD_NONE,
     &tv);
-
-  return ;
 }
 
 /**
@@ -223,8 +218,6 @@ void applier::timeperiod::remove_object(
 
   // Remove time period from the global configuration set.
   config->timeperiods().erase(obj);
-
-  return ;
 }
 
 /**
@@ -243,17 +236,13 @@ void applier::timeperiod::resolve_object(
 
   // Find time period.
   timeperiod_map::iterator
-    it(engine::timeperiod::timeperiods.find(obj.key()));
+    it{engine::timeperiod::timeperiods.find(obj.key())};
   if (engine::timeperiod::timeperiods.end() == it || !it->second)
-    throw (engine_error() << "Cannot resolve non-existing "
-           << "time period '" << obj.timeperiod_name() << "'");
+    throw engine_error() << "Cannot resolve non-existing "
+           << "time period '" << obj.timeperiod_name() << "'";
 
   // Resolve time period.
-  if (!check_timeperiod(it->second, &config_warnings, &config_errors))
-    throw (engine_error() << "Cannot resolve time period '"
-           << obj.timeperiod_name() << "'");
-
-  return ;
+  it->second->resolve(config_warnings, config_errors);
 }
 
 /**
@@ -270,8 +259,7 @@ void applier::timeperiod::_add_exclusions(
          end(exclusions.end());
        it != end;
        ++it)
-    tp->exclusions.insert({*it, nullptr});
-  return ;
+    tp->get_exclusions().insert({*it, nullptr});
 }
 
 /**
@@ -325,7 +313,6 @@ void applier::timeperiod::_add_exceptions(
           (*it4)->times.push_back(tr);
       }
     }
-  return ;
 }
 
 /**

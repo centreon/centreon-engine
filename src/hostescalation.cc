@@ -101,3 +101,33 @@ bool hostescalation::is_viable(int state, int notification_number) const {
   else
     return retval;
 }
+
+void hostescalation::resolve(int& w, int& e) {
+  (void)w;
+  int errors{0};
+
+  // Find the host.
+  host_map::const_iterator it(host::hosts.find(this->get_hostname()));
+  if (it == host::hosts.end() || !it->second) {
+    logger(log_verification_error, basic)
+      << "Error: Host '" << this->get_hostname()
+      << "' specified in host escalation is not defined anywhere!";
+    errors++;
+    notifier_ptr = nullptr;
+  }
+  else
+    notifier_ptr = it->second.get();
+
+  try {
+    escalation::resolve(w, errors);
+  }
+  catch (std::exception const& ee) {
+    logger(log_verification_error, basic)
+      << "Error: Notifier escalation error: " << ee.what();
+  }
+
+  // Add errors.
+  e += errors;
+  if (errors)
+    throw engine_error() << "Cannot resolve host escalation";
+}

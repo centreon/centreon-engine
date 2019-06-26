@@ -95,3 +95,35 @@ bool serviceescalation::is_viable(int state, int notification_number) const {
   else
     return retval;
 }
+
+void serviceescalation::resolve(int& w, int& e) {
+  (void)w;
+  int errors{0};
+
+  // Find the service.
+  service_map::const_iterator found{service::services.find(
+    {get_hostname(), get_description()})};
+  if (found == service::services.end() || !found->second) {
+    logger(log_verification_error, basic) << "Error: Service '"
+        << this->get_description() << "' on host '" << this->get_hostname()
+        << "' specified in service escalation is not defined anywhere!";
+    errors++;
+    notifier_ptr = nullptr;
+  }
+  else
+    notifier_ptr = found->second.get();
+
+  try {
+    escalation::resolve(w, errors);
+  }
+  catch (std::exception const& ee) {
+    logger(log_verification_error, basic)
+      << "Error: Notifier escalation error: " << ee.what();
+  }
+
+  // Add errors.
+  if (errors) {
+    e += errors;
+    throw engine_error() << "Cannot resolve service escalation";
+  }
+}

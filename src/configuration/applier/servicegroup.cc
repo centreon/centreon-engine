@@ -285,9 +285,7 @@ void applier::servicegroup::resolve_object(
            << "service group '" << obj.servicegroup_name() << "'";
 
   // Resolve service group.
-  if (!check_servicegroup(it->second, &config_warnings, &config_errors))
-    throw (engine_error() << "Cannot resolve service group '"
-           << obj.servicegroup_name() << "'");
+  it->second->resolve(config_warnings, config_errors);
 }
 
 /**

@@ -28,8 +28,6 @@
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/logging.hh"
-#  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/contactgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/notifier.hh"
 #  include "com/centreon/engine/service.hh"
@@ -37,9 +35,7 @@
 
 /* Forward declaration. */
 CCE_BEGIN()
-namespace commands {
-  class command;
-}
+class contact;
 class host;
 class hostgroup;
 class hostescalation;
@@ -158,7 +154,6 @@ class                host : public notifier {
   void               grab_macros_r(nagios_macros* mac) override;
   bool               operator==(host const& other) throw ();
   bool               operator!=(host const& other) throw ();
-  int                is_escalated_contact(contact* cntct);
   bool               is_result_fresh(time_t current_time, int log_this);
 
   int                run_sync_check_3x(enum host::host_state* check_result_code,
@@ -284,14 +279,12 @@ class                host : public notifier {
   timeperiod*        get_notification_timeperiod() const override;
   bool               get_notify_on_current_state() const override;
   bool               is_in_downtime() const override;
+  void resolve(int& w, int& e);
 
   host_map_unsafe     parent_hosts;
   host_map_unsafe     child_hosts;
   static host_map     hosts;
   static host_id_map  hosts_by_id;
-
-  commands::command*  event_handler_ptr;
-  commands::command*  check_command_ptr;
 
   service_map_unsafe  services;
   std::list<hostgroup*> const&
@@ -344,8 +337,6 @@ private:
 
 CCE_END()
 
-int                   is_contact_for_host(com::centreon::engine::host* hst,
-                          com::centreon::engine::contact* cntct);
 int                   is_host_immediate_child_of_host(
                                     com::centreon::engine::host* parent,
                                     com::centreon::engine::host* child);
@@ -363,7 +354,6 @@ int                   number_of_total_parent_hosts(
 
 std::ostream&         operator<<(std::ostream& os,
                             com::centreon::engine::host const& obj);
-std::ostream&         operator<<(std::ostream& os, host_map const& obj);
 std::ostream&         operator<<(std::ostream& os, host_map_unsafe const& obj);
 
 CCE_BEGIN()

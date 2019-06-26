@@ -17,11 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/servicedependency.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/servicedependency.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -315,4 +316,78 @@ bool servicedependency::check_for_circular_servicedependency_path(
   }
 
   return false;
+}
+
+void servicedependency::resolve(int& w, int& e) {
+  (void)w;
+  int errors{0};
+
+  // Find the dependent service.
+  service_map::const_iterator found{service::services.find(
+    {get_dependent_hostname(), get_dependent_service_description()})};
+
+  if (found == service::services.end() || !found->second) {
+    logger(log_verification_error, basic)
+      << "Error: Dependent service '"
+      << get_dependent_service_description() << "' on host '"
+      << get_dependent_hostname()
+      << "' specified in service dependency for service '"
+      << get_service_description() << "' on host '"
+      << get_hostname() << "' is not defined anywhere!";
+    errors++;
+  }
+  else
+    dependent_service_ptr = found->second.get();
+
+  // Save pointer for later.
+  found = service::services.find({get_hostname(), get_service_description()});
+
+  // Find the service we're depending on.
+  if (found == service::services.end() || !found->second) {
+    logger(log_verification_error, basic)
+      << "Error: Service '" << get_service_description() << "' on host '"
+      << get_hostname()
+      << "' specified in service dependency for service '"
+      << get_dependent_service_description() << "' on host '"
+      << get_dependent_hostname() << "' is not defined anywhere!";
+    errors++;
+  }
+  else
+    // Save pointer for later.
+    master_service_ptr = found->second.get();
+
+  // Make sure they're not the same service.
+  if (dependent_service_ptr == master_service_ptr) {
+    logger(log_verification_error, basic)
+      << "Error: Service dependency definition for service '"
+      << get_dependent_service_description() << "' on host '"
+      << get_dependent_hostname()
+      << "' is circular (it depends on itself)!";
+    errors++;
+  }
+
+  // Find the timeperiod.
+  if (!get_dependency_period().empty()) {
+    timeperiod* temp_timeperiod(nullptr);
+    timeperiod_map::const_iterator
+      it{timeperiod::timeperiods.find(get_dependency_period())};
+
+    if (it == timeperiod::timeperiods.end() || !it->second) {
+      logger(log_verification_error, basic)
+        << "Error: Dependency period '" << get_dependency_period()
+        << "' specified in service dependency for service '"
+        << get_dependent_service_description() << "' on host '"
+        << get_dependent_hostname() << "' is not defined anywhere!";
+      errors++;
+    }
+    else
+      // Save the timeperiod pointer for later.
+      dependency_period_ptr = temp_timeperiod;
+  }
+
+  // Add errors.
+  if (errors) {
+    e += errors;
+    throw engine_error() << "Cannot resolve service dependency";
+  }
 }

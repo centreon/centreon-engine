@@ -315,7 +315,7 @@ int run_service_event_handler(nagios_macros* mac, com::centreon::engine::service
   /* get the raw command line */
   get_raw_command_line_r(
     mac,
-    svc->event_handler_ptr,
+    svc->get_event_handler_ptr(),
     svc->get_event_handler().c_str(),
     raw_command,
     macro_options);
@@ -672,7 +672,7 @@ int run_host_event_handler(nagios_macros* mac,
   /* get the raw command line */
   get_raw_command_line_r(
     mac,
-    hst->event_handler_ptr,
+    hst->get_event_handler_ptr(),
     hst->get_event_handler().c_str(),
     raw_command,
     macro_options);
