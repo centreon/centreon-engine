@@ -179,43 +179,6 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierNotifdisabled) {
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-// FIXME DBR: this test should validate the notification_interval but for
-// now since notifications don't work, we can not make this test to work.
-//TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
-//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be called.
-//   */
-//  set_time(43200);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
-//
-//  ASSERT_TRUE(host_escalation);
-//  uint64_t id{_host->get_next_notification_id()};
-//  /* We configure the notification interval to 2 minutes */
-//  _host->set_notification_interval(2);
-//  _host->notification_period_ptr = tperiod.get();
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//
-//  /* Only 100 seconds since the previous notification. */
-//  set_time(43300);
-//  id = _host->get_next_notification_id();
-//  /* Because of the notification not totally implemented, we must force the
-//   * notification number to be greater than 0 */
-//  _host->set_notification_number(1);
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
-//
-//  /* No notification, because the delay is too short */
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-
 TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
@@ -486,4 +449,40 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateAfterFirstNotifDelay
           notifier::notification_normal, "", "", notifier::notification_option_none),
       OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
+}
+
+TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
+  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+   * If we call time(), it is not the glibc time() function that will be called.
+   */
+  set_time(43200);
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  for (int i = 0; i < tperiod->days.size(); ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::hostescalation> host_escalation{
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+
+  ASSERT_TRUE(host_escalation);
+  uint64_t id{_host->get_next_notification_id()};
+  /* We configure the notification interval to 2 minutes */
+  _host->set_notification_interval(2);
+  _host->notification_period_ptr = tperiod.get();
+  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
+  ASSERT_EQ(id + 1, _host->get_next_notification_id());
+
+  /* Only 100 seconds since the previous notification. */
+  set_time(43300);
+  id = _host->get_next_notification_id();
+  /* Because of the notification not totally implemented, we must force the
+   * notification number to be greater than 0 */
+  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
+
+  /* No notification, because the delay is too short */
+  ASSERT_EQ(id, _host->get_next_notification_id());
 }

@@ -66,8 +66,9 @@ class HostRecovery : public ::testing::Test {
     _current_time = 43200;
     set_time(_current_time);
     _tperiod.reset(new engine::timeperiod("tperiod", "alias"));
-    for (int i = 0; i < 7; ++i)
-      _tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+    for (int i = 0; i < _tperiod->days.size(); ++i)
+      _tperiod->days[i].push_back(
+          std::make_shared<engine::timerange>(0, 86400));
 
     std::unique_ptr<engine::hostescalation> host_escalation{
         new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};

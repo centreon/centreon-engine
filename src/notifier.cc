@@ -156,7 +156,8 @@ void notifier::set_notification_number(int num) {
   update_status(false);
 }
 
-bool notifier::_is_notification_viable_normal(notification_option options) const {
+bool notifier::_is_notification_viable_normal(
+    notification_option options) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
   /* forced notifications bust through everything */
@@ -236,7 +237,7 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
 
   if (_notification_number >= 1 && _notification_interval > 0) {
     if (_last_notification + _notification_interval * config->interval_length()
-        < now) {
+        > now) {
       logger(dbg_notifications, more)
         << "This notifier problem has been sent at " << _last_notification
         << " so it won't be sent until "
@@ -248,14 +249,9 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
   return true;
 }
 
-bool notifier::_is_notification_viable_recovery(notification_option options) const {
-  bool retval;
-  /* forced notifications bust through everything */
-  if (options & notification_option_forced) {
-    logger(dbg_notifications, more)
-        << "This is a forced notification, so we'll send it out.";
-    return true;
-  }
+bool notifier::_is_notification_viable_recovery(
+    notification_option options) const {
+  logger(dbg_functions, basic) << "notifier::is_notification_viable_recovery()";
 
   /* are notifications enabled? */
   if (!config->enable_notifications()) {
@@ -273,26 +269,59 @@ bool notifier::_is_notification_viable_recovery(notification_option options) con
     return false;
   }
 
-  /* Recovery is sent on state OK or UP */
-  if (get_current_state_int() == 0) {
-    /* Filtering conditions are similar to normal notifications */
-    retval = _is_notification_viable_normal(options);
-    if (retval) {
-      timezone_locker lock{get_timezone()};
-      time_t now;
-      time(&now);
-      retval = (get_last_hard_state_change() + _recovery_notification_delay <= now);
-      if (!retval)
-        logger(dbg_notifications, more)
-          << "This notifier is configured with a recovery notification delay. "
-          << "It won't send any recovery notification until timestamp "
-          << " so it won't be sent until "
-          << (get_last_hard_state_change() + _recovery_notification_delay);
-    }
+  timeperiod* tp{get_notification_timeperiod()};
+  timezone_locker lock{get_timezone()};
+  std::time_t now;
+  std::time(&now);
+
+  if (!check_time_against_period(now, tp)) {
+    logger(dbg_notifications, more)
+        << "This notifier shouldn't have notifications sent out "
+           "at this time.";
+    return false;
   }
-  else
-    retval = false;
-  return retval;
+
+  /* if this notifier is currently in a scheduled downtime period, don't send
+   * the notification */
+  if (is_in_downtime()) {
+    logger(dbg_notifications, more)
+        << "This notifier is currently in a scheduled downtime, so "
+           "we won't send notifications.";
+    return false;
+  }
+
+  /* if this notifier is flapping, don't send the notification */
+  if (get_is_flapping()) {
+    logger(dbg_notifications, more)
+        << "This notifier is flapping, so we won't send notifications.";
+    return false;
+  }
+
+  if (get_state_type() != hard) {
+    logger(dbg_notifications, more)
+        << "This notifier is in soft state, so we won't send notifications.";
+    return false;
+  }
+
+  /* Recovery is sent on state OK or UP */
+  if (get_current_state_int() != 0 || !get_notify_on(recovery)) {
+    logger(dbg_notifications, more)
+        << "This notifier state is not UP/OK are is not configured to send a "
+           "recovery notification";
+    return false;
+  }
+
+  if (get_last_hard_state_change() +
+          _recovery_notification_delay * config->interval_length() >
+      now) {
+    logger(dbg_notifications, more)
+        << "This notifier is configured with a recovery notification delay. "
+        << "It won't send any recovery notification until timestamp "
+        << " so it won't be sent until "
+        << (get_last_hard_state_change() + _recovery_notification_delay);
+    return false;
+  }
+  return true;
 }
 
 bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
@@ -533,9 +562,6 @@ int notifier::notify(notifier::reason_type type,
     _type = type;
     ++_notification_number;
   }
-  /* The previous notification failed. What should we do? */
-  else {
-  }
 
   std::unique_ptr<notification> notif{
       new notification(this, _type, not_author, not_data, options,
@@ -547,12 +573,15 @@ int notifier::notify(notifier::reason_type type,
 
   /* Let's make the notification. */
   int retval{notif->execute(to_notify)};
-  if (retval != OK) {
-    /* A new attempt is needed, maybe we won't increment it everytimes. */
-    _notification_number++;
-  } else {
-    /* No current notification */
-    _notification_number = 0;
+
+  if (retval == OK) {
+    _last_notification = std::time(nullptr);
+    /* The notification has been sent.
+     * Should we increment the notification number? */
+    if (cat == cat_normal)
+      _notification_number++;
+    else
+      _notification_number = 0;
   }
 
   return retval;
