@@ -177,3 +177,41 @@ std::ostream& operator<<(std::ostream& os,
     "}\n";
   return (os);
 }
+
+void hostgroup::resolve(int& w, int& e) {
+  (void)w;
+  int errors{0};
+
+  // Check all group members.
+  for (host_map_unsafe::iterator it{members.begin()},
+       end{members.end()};
+       it != end; ++it) {
+    host_map::const_iterator it_host{host::hosts.find(it->first)};
+    if (it_host == host::hosts.end() || !it_host->second) {
+      logger(log_verification_error, basic)
+          << "Error: Host '" << it->first << "' specified in host group '"
+          << get_group_name() << "' is not defined anywhere!";
+      errors++;
+    }
+    // Save a pointer to this hostgroup for faster host/group
+    // membership lookups later.
+    else {
+      it_host->second->get_parent_groups().push_back(this);
+      // Save host pointer for later.
+      it->second = it_host->second.get();
+    }
+  }
+
+  // Check for illegal characters in hostgroup name.
+  if (contains_illegal_object_chars(get_group_name().c_str())) {
+    logger(log_verification_error, basic)
+        << "Error: The name of hostgroup '" << get_group_name()
+        << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  if (errors) {
+    e += errors;
+    throw engine_error() << "Cannot resolve host group '" << get_group_name() << "'";
+  }
+}

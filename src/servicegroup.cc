@@ -179,3 +179,43 @@ bool engine::is_servicegroup_exist(std::string const& name) throw () {
     it{servicegroup::servicegroups.find(name)};
   return it != servicegroup::servicegroups.end();
 }
+
+void servicegroup::resolve(int& w, int& e) {
+  (void)w;
+  int errors{0};
+
+  // Check all group members.
+  for (service_map_unsafe::iterator it(members.begin()),
+       end(members.end());
+       it != end; ++it) {
+    service_map::const_iterator found(service::services.find(it->first));
+
+    if (found == service::services.end() || !found->second) {
+      logger(log_verification_error, basic)
+          << "Error: Service '" << it->first.second << "' on host '"
+          << it->first.first << "' specified in service group '" << _group_name
+          << "' is not defined anywhere!";
+      errors++;
+    }
+    // Save a pointer to this servicegroup for faster service/group
+    // membership lookups later.
+    else {
+      found->second->get_parent_groups().push_back(this);
+      // Save service pointer for later.
+      it->second = found->second.get();
+    }
+  }
+
+  // Check for illegal characters in servicegroup name.
+  if (contains_illegal_object_chars(_group_name.c_str())) {
+    logger(log_verification_error, basic)
+      << "Error: The name of servicegroup '" << _group_name
+      << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  if (errors) {
+    e += errors;
+    throw engine_error() << "Cannot resolve servicegroup " << _group_name;
+  }
+}

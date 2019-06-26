@@ -1165,3 +1165,112 @@ int contact::check_host_notification_viability(host* hst,
 
   return OK;
 }
+
+void contact::resolve(int& w, int& e) {
+  int warnings{0}, errors{0};
+
+  /* check service notification commands */
+  if (get_service_notification_commands().empty()) {
+    logger(log_verification_error, basic)
+      << "Error: Contact '" << _name << "' has no service "
+      "notification commands defined!";
+    errors++;
+  }
+
+  /* check host notification commands */
+  if (get_host_notification_commands().empty()) {
+    logger(log_verification_error, basic)
+      << "Error: Contact '" << _name << "' has no host "
+      "notification commands defined!";
+    errors++;
+  }
+
+  /* check service notification timeperiod */
+  if (get_service_notification_period().empty()) {
+    logger(log_verification_error, basic)
+      << "Warning: Contact '" << _name << "' has no service "
+      "notification time period defined!";
+    warnings++;
+    service_notification_period_ptr = nullptr;
+  }
+  else {
+    timeperiod_map::const_iterator
+      it(timeperiod::timeperiods.find(get_service_notification_period()));
+
+    if (it == timeperiod::timeperiods.end() || !it->second) {
+      logger(log_verification_error, basic)
+        << "Error: Service notification period '"
+        << get_service_notification_period()
+        << "' specified for contact '" << _name
+        << "' is not defined anywhere!";
+      errors++;
+      service_notification_period_ptr = nullptr;
+    }
+    else
+      /* save the pointer to the service notification timeperiod for later */
+      service_notification_period_ptr = it->second.get();
+  }
+
+  /* check host notification timeperiod */
+  if (get_host_notification_period().empty()) {
+    logger(log_verification_error, basic)
+      << "Warning: Contact '" << _name << "' has no host "
+      "notification time period defined!";
+    warnings++;
+    host_notification_period_ptr = nullptr;
+  }
+  else {
+    timeperiod_map::const_iterator
+      it(timeperiod::timeperiods.find(get_host_notification_period()));
+
+    if (it == timeperiod::timeperiods.end() || !it->second) {
+      logger(log_verification_error, basic)
+        << "Error: Host notification period '"
+        << get_host_notification_period()
+        << "' specified for contact '" << _name
+        << "' is not defined anywhere!";
+      errors++;
+      host_notification_period_ptr = nullptr;
+    }
+    else
+      /* save the pointer to the host notification timeperiod for later */
+      host_notification_period_ptr = it->second.get();
+  }
+
+  /* check for sane host recovery options */
+  if (notify_on(notifier::host_notification, notifier::recovery)
+      && !notify_on(notifier::host_notification, notifier::down)
+      && !notify_on(notifier::host_notification, notifier::unreachable)) {
+    logger(log_verification_error, basic)
+      << "Warning: Host recovery notification option for contact '"
+      << _name << "' doesn't make any sense - specify down "
+      "and/or unreachable options as well";
+    warnings++;
+  }
+
+  /* check for sane service recovery options */
+  if (notify_on(notifier::service_notification, notifier::recovery)
+      && !notify_on(notifier::service_notification, notifier::critical)
+      && !notify_on(notifier::service_notification, notifier::warning)) {
+    logger(log_verification_error, basic)
+      << "Warning: Service recovery notification option for contact '"
+      << _name << "' doesn't make any sense - specify critical "
+      "and/or warning options as well";
+    warnings++;
+  }
+
+  /* check for illegal characters in contact name */
+  if (contains_illegal_object_chars(const_cast<char*>(_name.c_str()))) {
+    logger(log_verification_error, basic)
+      << "Error: The name of contact '" << _name
+      << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  w += warnings;
+  e += errors;
+
+  if (errors)
+    throw engine_error() << "Cannot resolve contact '"
+           << _name << "'";
+}

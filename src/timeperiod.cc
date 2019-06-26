@@ -839,7 +839,7 @@ bool check_time_against_period(
     return true;
 
   // Faked next valid time must be tested time.
-  time_t next_valid_time((time_t)-1);
+  time_t next_valid_time{(time_t)-1};
   tperiod->get_next_valid_time_per_timeperiod(test_time, &next_valid_time);
   return next_valid_time == test_time;
 }
@@ -1097,16 +1097,16 @@ void timeperiod::get_next_valid_time_per_timeperiod(
 
     // Browse all date range types in precedence order.
     bool skip_this_day(false);
-    for (unsigned int daterange_type(0);
-         (daterange_type < DATERANGE_TYPES)
-         && (earliest_time == (time_t)-1)
+    for (size_t daterange_type{0};
+         daterange_type < DATERANGE_TYPES
+         && earliest_time == (time_t)-1
          && !skip_this_day;
          ++daterange_type) {
       // Browse all date ranges of a given type. The earliest valid
       // time found in any date range will be valid.
       for (daterange_list::iterator
-             it{this->exceptions[daterange_type].begin()},
-             end{this->exceptions[daterange_type].end()};
+             it{exceptions[daterange_type].begin()},
+             end{exceptions[daterange_type].end()};
            it != end;
            ++it) {
         // Get next range limits and check that we are within bounds.

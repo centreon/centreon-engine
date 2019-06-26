@@ -253,8 +253,7 @@ void applier::hostescalation::resolve_object(
   for (std::list<std::shared_ptr<engine::escalation> >::const_iterator
            itt{it->second->get_escalations().begin()},
        end{it->second->get_escalations().end()};
-       itt != end;
-       ++itt) {
+       itt != end; ++itt) {
     /* It's a pity but for now we don't have any idea or key to verify if
      * the hostescalation is the good one. */
     if ((*itt)->get_first_notification() == obj.first_notification() &&
@@ -270,11 +269,7 @@ void applier::hostescalation::resolve_object(
             (obj.escalation_options() &
              configuration::hostescalation::recovery)) {
       // Resolve host escalation.
-      if (!check_hostescalation(
-               std::static_pointer_cast<engine::hostescalation>(*itt),
-               &config_warnings,
-               &config_errors))
-        throw engine_error() << "Cannot resolve host escalation";
+      (*itt)->resolve(config_warnings, config_errors);
     } else
       throw engine_error() << "Cannot resolve non-existing host escalation";
   }

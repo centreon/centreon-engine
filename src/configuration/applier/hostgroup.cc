@@ -264,9 +264,7 @@ void applier::hostgroup::resolve_object(
            << "host group '" << obj.hostgroup_name() << "'";
 
   // Resolve host group.
-  if (!check_hostgroup(it->second, &config_warnings, &config_errors))
-    throw (engine_error() << "Cannot resolve host group '"
-           << obj.hostgroup_name() << "'");
+  it->second->resolve(config_warnings, config_errors);
 }
 
 /**

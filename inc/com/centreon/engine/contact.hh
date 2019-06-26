@@ -138,6 +138,7 @@ class                           contact {
   bool                          should_be_notified(
                                   notifier::notification_category cat,
                                   notifier const& notif) const;
+  void resolve(int& w, int& e);
 
   static contact_map            contacts;
 

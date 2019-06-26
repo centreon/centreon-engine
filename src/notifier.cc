@@ -1369,6 +1369,7 @@ void notifier::resolve(int& w, int& e) {
       << "Warning: Notifier '" << get_display_name()
       << "' has no check time period defined!";
     warnings++;
+    check_period_ptr = nullptr;
   }
   else {
     timeperiod_map::const_iterator
@@ -1380,6 +1381,7 @@ void notifier::resolve(int& w, int& e) {
         << "' specified for host '" << get_display_name()
         << "' is not defined anywhere!";
       errors++;
+      check_period_ptr = nullptr;
     }
     else
       /* save the pointer to the check timeperiod for later */
@@ -1417,8 +1419,6 @@ void notifier::resolve(int& w, int& e) {
           << get_display_name() << "' is not defined anywhere!";
       errors++;
     }
-    else {
-    }
   }
 
   // Check notification timeperiod.
@@ -1432,6 +1432,7 @@ void notifier::resolve(int& w, int& e) {
         << "' specified for notifier '" << get_display_name()
         << "' is not defined anywhere!";
       errors++;
+      notification_period_ptr = nullptr;
     }
     else
       // Save the pointer to the notification timeperiod for later.
@@ -1442,6 +1443,7 @@ void notifier::resolve(int& w, int& e) {
       << "Warning: Notifier '" << get_display_name()
       << "' has no notification time period defined!";
     warnings++;
+    notification_period_ptr = nullptr;
   }
 
   w += warnings;

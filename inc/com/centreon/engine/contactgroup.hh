@@ -56,8 +56,9 @@ class contactgroup {
    void               set_alias(std::string const &alias);
    void               add_member(contact* cntct);
    void               clear_members();
-   contact_map_unsafe const&
-                      get_members() const;
+   contact_map_unsafe& get_members();
+   contact_map_unsafe const& get_members() const;
+   void resolve(int& w, int& e);
 
    contactgroup& operator=(contactgroup const& other);
 

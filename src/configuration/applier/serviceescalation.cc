@@ -274,9 +274,7 @@ void applier::serviceescalation::resolve_object(
         (*itt)->get_escalate_on(notifier::unreachable) == (obj.escalation_options() & configuration::hostescalation::unreachable) &&
         (*itt)->get_escalate_on(notifier::recovery) == (obj.escalation_options() & configuration::hostescalation::recovery)) {
       // Resolve service escalation.
-      if (!check_serviceescalation(std::static_pointer_cast<engine::serviceescalation>(*itt), &config_warnings,
-                                &config_errors))
-        throw engine_error() << "Cannot resolve service escalation";
+      (*itt)->resolve(config_warnings, config_errors);
     } else
       throw engine_error() << "Cannot resolve non-existing service escalation";
   }

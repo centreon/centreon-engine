@@ -45,6 +45,7 @@ class hostescalation : public escalation {
 
   std::string const& get_hostname() const;
   bool is_viable(int state, int notification_number) const override;
+  void resolve(int& w, int& e) override;
 
   static hostescalation_mmap hostescalations;
 

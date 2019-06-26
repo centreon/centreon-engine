@@ -78,8 +78,8 @@ void applier::contactgroup::add_object(
 
   if(engine::contactgroup::contactgroups.find(name) !=
     engine::contactgroup::contactgroups.end())
-    throw (engine_error() << "Contactgroup '" << name << 
-        "' has already been defined");
+    throw engine_error() << "Contactgroup '" << name <<
+        "' has already been defined";
 
   // Add contact group to the global configuration set.
   config->contactgroups().insert(obj);
@@ -100,8 +100,15 @@ void applier::contactgroup::add_object(
         << "' is not defined anywhere!";
       throw engine_error() << "Error: Cannot resolve contact group "
          << obj.contactgroup_name() << "'";
-    } else
-      cg->add_member(ct_it->second.get());
+    } else {
+      cg->get_members().insert({ct_it->first, ct_it->second.get()});
+      timeval tv{get_broker_timestamp(nullptr)};
+      broker_group(NEBTYPE_CONTACTGROUP_ADD,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          cg.get(),
+          &tv);
+    }
   }
 
   engine::contactgroup::contactgroups.insert({name, cg});
@@ -130,8 +137,6 @@ void applier::contactgroup::expand_objects(configuration::state& s) {
        it != end;
        ++it)
     s.contactgroups().insert(it->second);
-
-  return ;
 }
 
 /**
@@ -188,8 +193,15 @@ void applier::contactgroup::modify_object(
         throw engine_error() << "Error: Cannot resolve contact group "
            << obj.contactgroup_name() << "'";
       }
-      else
-        it_obj->second->add_member(ct_it->second.get());
+      else {
+        it_obj->second->get_members().insert({ct_it->first, ct_it->second.get()});
+        timeval tv{get_broker_timestamp(nullptr)};
+        broker_group(NEBTYPE_CONTACTGROUP_ADD,
+            NEBFLAG_NONE,
+            NEBATTR_NONE,
+            it_obj->second.get(),
+            &tv);
+      }
     }
   }
 
@@ -238,8 +250,6 @@ void applier::contactgroup::remove_object(
 
   // Remove contact group from the global configuration set.
   config->contactgroups().erase(obj);
-
-  return ;
 }
 
 /**
@@ -255,17 +265,13 @@ void applier::contactgroup::resolve_object(
 
   // Find contact group.
   contactgroup_map::iterator
-    it(engine::contactgroup::contactgroups.find(obj.key()));
+    it{engine::contactgroup::contactgroups.find(obj.key())};
   if (engine::contactgroup::contactgroups.end() == it || !it->second)
-    throw (engine_error() << "Error: Cannot resolve non-existing "
-           << "contact group '" << obj.contactgroup_name() << "'");
+    throw engine_error() << "Error: Cannot resolve non-existing "
+           << "contact group '" << obj.contactgroup_name() << "'";
 
   // Resolve contact group.
-  if (!check_contactgroup(it->second, &config_warnings, &config_errors))
-    throw (engine_error() << "Error: Cannot resolve contact group "
-           << obj.contactgroup_name() << "'");
-
-  return ;
+  it->second->resolve(config_warnings, config_errors);
 }
 
 /**
@@ -300,10 +306,10 @@ void applier::contactgroup::_resolve_members(
       // Find contactgroup entry.
       set_contactgroup::iterator it2(s.contactgroups_find(*it));
       if (it2 == s.contactgroups().end())
-        throw (engine_error()
+        throw engine_error()
                << "Error: Could not add non-existing contact group member '"
                << *it << "' to contactgroup '"
-               << obj.contactgroup_name() << "'");
+               << obj.contactgroup_name() << "'";
 
       // Resolve contactgroup member.
       _resolve_members(s, *it2);
@@ -315,6 +321,4 @@ void applier::contactgroup::_resolve_members(
                                resolved_group.members().end());
     }
   }
-
-  return ;
 }
