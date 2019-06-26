@@ -1619,6 +1619,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   /* get the unprocessed return code */
   /* NOTE: for passive checks, this is the final/processed state */
   svc_res = static_cast<enum service::service_state>(queued_check_result->get_return_code());
+  hst_res = static_cast<enum host::host_state>(queued_check_result->get_return_code());
 
   /* adjust return code (active checks only) */
   if (queued_check_result->get_check_type() == check_active) {

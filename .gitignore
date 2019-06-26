@@ -23,3 +23,4 @@ scripts/centengine.pc
 scripts/centengine.sh
 src/simumod/neb.cc
 tags
+gtest.cbp
