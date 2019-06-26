@@ -102,7 +102,7 @@ void applier::contactgroup::add_object(
          << obj.contactgroup_name() << "'";
     } else {
       cg->get_members().insert({ct_it->first, ct_it->second.get()});
-      timeval tv{get_broker_timestamp(nullptr)};
+      timeval tv(get_broker_timestamp(nullptr));
       broker_group(NEBTYPE_CONTACTGROUP_ADD,
           NEBFLAG_NONE,
           NEBATTR_NONE,
@@ -195,7 +195,7 @@ void applier::contactgroup::modify_object(
       }
       else {
         it_obj->second->get_members().insert({ct_it->first, ct_it->second.get()});
-        timeval tv{get_broker_timestamp(nullptr)};
+        timeval tv(get_broker_timestamp(nullptr));
         broker_group(NEBTYPE_CONTACTGROUP_ADD,
             NEBFLAG_NONE,
             NEBATTR_NONE,
