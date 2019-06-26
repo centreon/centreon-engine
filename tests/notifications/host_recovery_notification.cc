@@ -173,7 +173,6 @@ TEST_F(HostRecovery,
   _host->set_state_type(engine::host::hard);
   _host->set_recovery_notification_delay(600);
   // Time too short. No notification will be sent.
-  _host->set_last_hard_state_change(_current_time);
   set_time(_current_time + 300);
   uint64_t id{_host->get_next_notification_id()};
   ASSERT_EQ(_host->notify(notifier::notification_recovery,

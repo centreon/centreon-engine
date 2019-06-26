@@ -531,14 +531,6 @@ void host::set_should_reschedule_current_check(bool should_reschedule) {
   _should_reschedule_current_check = should_reschedule;
 }
 
-//int host::get_current_notification_number() const {
-//  return _current_notification_number;
-//}
-//
-//void host::set_current_notification_number(int current_notification_number) {
-//  _current_notification_number = current_notification_number;
-//}
-
 int host::get_check_flapping_recovery_notification() const {
   return _check_flapping_recovery_notification;
 }
@@ -2135,7 +2127,7 @@ void host::set_flap(double percent_change,
 
   /* see if we should check to send a recovery notification out when flapping
    * stops */
-  if (get_current_state() !=  host::state_up && get_current_notification_number() > 0)
+  if (get_current_state() != host::state_up && get_current_notification_number() > 0)
     set_check_flapping_recovery_notification(true);
   else
     set_check_flapping_recovery_notification(false);
@@ -3243,7 +3235,7 @@ void host::handle_flap_detection_disabled() {
         notifier::notification_option_none);
 
     /* clear the recovery notification flag */
-    this->set_check_flapping_recovery_notification(false);
+    set_check_flapping_recovery_notification(false);
   }
 
   /* update host status */
