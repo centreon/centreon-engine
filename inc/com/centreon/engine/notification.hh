@@ -37,6 +37,7 @@ class notification {
                uint64_t notification_id,
                uint32_t notification_number);
   int execute(std::unordered_set<contact*> const& to_notify);
+  notifier::reason_type get_reason() const;
 
  private:
   notifier* _parent;

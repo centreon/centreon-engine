@@ -170,11 +170,8 @@ int host_downtime::unschedule() {
            "cancelled.";
 
       /* send a notification */
-      it->second->notify(
-        notifier::notification_downtimecancelled,
-        "",
-        "",
-        notifier::notification_option_none);
+      it->second->notify(notifier::reason_downtimecancelled, "", "",
+                         notifier::notification_option_none);
     }
   }
   return OK;
@@ -374,7 +371,7 @@ int host_downtime::handle() {
 
       /* send a notification */
       it_hst->second->notify(
-        notifier::notification_downtimeend,
+        notifier::reason_downtimeend,
         get_author(),
         get_comment(),
         notifier::notification_option_none);
@@ -460,11 +457,8 @@ int host_downtime::handle() {
         << ";STARTED; Host has entered a period of scheduled downtime";
 
       /* send a notification */
-      it_hst->second->notify(
-        notifier::notification_downtimestart,
-        get_author(),
-        get_comment(),
-        notifier::notification_option_none);
+      it_hst->second->notify(notifier::reason_downtimestart, get_author(),
+                             get_comment(), notifier::notification_option_none);
     }
 
     /* increment the downtime depth variable */

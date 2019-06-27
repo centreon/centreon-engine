@@ -178,9 +178,9 @@ class                           service : public notifier {
   void                          grab_macros_r(nagios_macros* mac) override;
   int                           notify_contact(nagios_macros* mac,
                                                contact* cntct,
-                                               int type,
-                                               char const* not_author,
-                                               char const* not_data,
+                                               reason_type type,
+                                               std::string const& not_author,
+                                               std::string const& not_data,
                                                int options,
                                                int escalated) override;
   void                          update_notification_flags() override;

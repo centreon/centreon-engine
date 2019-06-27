@@ -81,7 +81,7 @@ bool serviceescalation::is_viable(int state, int notification_number) const {
 
   bool retval{escalation::is_viable(state, notification_number)};
   if (retval) {
-    std::array<notifier::notification_type, 4> nt = {
+    std::array<notifier::notification_flag, 4> nt = {
       notifier::ok,
       notifier::warning,
       notifier::critical,

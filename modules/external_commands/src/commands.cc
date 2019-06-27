@@ -2925,11 +2925,8 @@ void acknowledge_host_problem(
 
   /* send out an acknowledgement notification */
   if (notify)
-    hst->notify(
-      notifier::notification_acknowledgement,
-      ack_author,
-      ack_data,
-      notifier::notification_option_none);
+    hst->notify(notifier::reason_acknowledgement, ack_author, ack_data,
+                notifier::notification_option_none);
 
   /* update the status log with the host info */
   hst->update_status(false);
@@ -2991,7 +2988,7 @@ void acknowledge_service_problem(
   /* send out an acknowledgement notification */
   if (notify)
     svc->notify(
-      notifier::notification_acknowledgement,
+      notifier::reason_acknowledgement,
       ack_author,
       ack_data,
       notifier::notification_option_none);

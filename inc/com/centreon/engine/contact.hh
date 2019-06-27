@@ -55,10 +55,11 @@ namespace commands {
  */
 class                           contact {
  public:
-  typedef bool (contact::* to_notify)(notifier const&) const;
-                                contact();
-                                ~contact();
-                                contact(contact const& other) = delete;
+  typedef bool (contact::*to_notify)(notifier::reason_type,
+                                     notifier const&) const;
+  contact();
+  ~contact();
+  contact(contact const& other) = delete;
   contact&                      operator=(contact const& other) = delete;
   void                          update_status_info(bool aggregated_dump);
 
@@ -87,11 +88,11 @@ class                           contact {
   void                          set_retain_nonstatus_information(bool retain);
   std::string const&            get_timezone() const;
   void                          set_timezone(std::string const& timezone);
-  bool                          notify_on(notifier::notifier_type type, notifier::notification_type notif) const;
+  bool                          notify_on(notifier::notifier_type type, notifier::notification_flag notif) const;
   uint32_t                      notify_on(notifier::notifier_type type) const;
   void                          set_notify_on(notifier::notifier_type type, uint32_t notif);
-  void                          add_notify_on(notifier::notifier_type type, notifier::notification_type notif);
-  void                          remove_notify_on(notifier::notifier_type type, notifier::notification_type notif);
+  void                          add_notify_on(notifier::notifier_type type, notifier::notification_flag notif);
+  void                          remove_notify_on(notifier::notifier_type type, notifier::notification_flag notif);
   uint32_t                      notify_on(notifier::notifier_type type, notifier::notifier_type notif) const;
   std::string const&            get_host_notification_period() const;
   void                          set_host_notification_period(std::string const& period);
@@ -127,16 +128,17 @@ class                           contact {
                                 get_parent_groups() const;
   std::list<contactgroup*>&
                                 get_parent_groups();
-  int                           check_service_notification_viability(
-                                  service* svc,
-                                  unsigned int type,
-                                  int options);
-  int                           check_host_notification_viability(
-                                  host* hst,
-                                  notifier::notification_category type,
-                                  int options);
+  //int                           check_service_notification_viability(
+  //                                service* svc,
+  //                                unsigned int type,
+  //                                int options);
+  //int                           check_host_notification_viability(
+  //                                host* hst,
+  //                                notifier::notification_category type,
+  //                                int options);
   bool                          should_be_notified(
                                   notifier::notification_category cat,
+                                  notifier::reason_type type,
                                   notifier const& notif) const;
   void resolve(int& w, int& e);
 
@@ -145,13 +147,18 @@ class                           contact {
  private:
   static std::array<to_notify, 6> const _to_notify;
 
-  bool _to_notify_normal(notifier const& notif) const;
-  bool _to_notify_recovery(notifier const& notif) const;
-  bool _to_notify_acknowledgement(notifier const& notif) const;
-  bool _to_notify_flapping(notifier const& notif) const;
-  bool _to_notify_downtime(notifier const& notif) const;
-  bool _to_notify_custom(notifier const& notif) const;
-
+  bool _to_notify_normal(notifier::reason_type type,
+                         notifier const& notif) const;
+  bool _to_notify_recovery(notifier::reason_type type,
+                           notifier const& notif) const;
+  bool _to_notify_acknowledgement(notifier::reason_type type,
+                                  notifier const& notif) const;
+  bool _to_notify_flapping(notifier::reason_type type,
+                           notifier const& notif) const;
+  bool _to_notify_downtime(notifier::reason_type type,
+                           notifier const& notif) const;
+  bool _to_notify_custom(notifier::reason_type type,
+                         notifier const& notif) const;
 
   std::vector<std::string>      _addresses;
   std::string                   _alias;

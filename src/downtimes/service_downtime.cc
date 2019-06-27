@@ -188,11 +188,8 @@ int service_downtime::unschedule() {
            "for service has been cancelled.";
 
       /* send a notification */
-      found->second->notify(
-        notifier::notification_downtimecancelled,
-        "",
-        "",
-        notifier::notification_option_none);
+      found->second->notify(notifier::reason_downtimecancelled, "", "",
+                            notifier::notification_option_none);
     }
   }
   return OK;
@@ -393,11 +390,8 @@ int service_downtime::handle() {
         "downtime";
 
       /* send a notification */
-      found->second->notify(
-        notifier::notification_downtimeend,
-        get_author(),
-        get_comment(),
-        notifier::notification_option_none);
+      found->second->notify(notifier::reason_downtimeend, get_author(),
+                            get_comment(), notifier::notification_option_none);
     }
 
     /* update the status data */
@@ -477,11 +471,8 @@ int service_downtime::handle() {
         "downtime";
 
       /* send a notification */
-      found->second->notify(
-        notifier::notification_downtimestart,
-        get_author(),
-        get_comment(),
-        notifier::notification_option_none);
+      found->second->notify(notifier::reason_downtimestart, get_author(),
+                            get_comment(), notifier::notification_option_none);
     }
 
     /* increment the downtime depth variable */

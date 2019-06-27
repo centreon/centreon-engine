@@ -236,8 +236,6 @@ class                host : public notifier {
   void               set_last_time_up(time_t last_time);
   bool               get_is_being_freshened() const;
   void               set_is_being_freshened(bool is_being_freshened);
-  int                get_check_flapping_recovery_notification() const;
-  void               set_check_flapping_recovery_notification(int check_flapping_recovery_notification);
   int                get_pending_flex_downtime() const;
   void               set_pending_flex_downtime(int pending_flex_downtime);
   time_t             get_last_state_history_update() const;
@@ -264,9 +262,9 @@ class                host : public notifier {
   void               set_initial_state(enum host_state current_state);
   int                notify_contact(nagios_macros* mac,
                                     contact* cntct,
-                                    int type,
-                                    char const* not_author,
-                                    char const* not_data,
+                                    reason_type type,
+                                    std::string const& not_author,
+                                    std::string const& not_data,
                                     int options,
                                     int escalated) override;
   void               update_notification_flags() override;
@@ -318,7 +316,6 @@ private:
   time_t              _last_time_unreachable;
   time_t              _last_time_up;
   bool                _is_being_freshened;
-  int                 _check_flapping_recovery_notification;
   int                 _pending_flex_downtime;
   time_t              _last_state_history_update;
   unsigned long       _flapping_comment_id;

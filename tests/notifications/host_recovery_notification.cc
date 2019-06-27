@@ -76,7 +76,7 @@ class HostRecovery : public ::testing::Test {
     uint64_t id{_host->get_next_notification_id()};
     _host->notification_period_ptr = _tperiod.get();
     /* Sending a notification */
-    _host->notify(notifier::notification_normal,
+    _host->notify(notifier::reason_normal,
                   "",
                   "",
                   notifier::notification_option_none);
@@ -105,7 +105,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithDownState) {
   set_time(_current_time + 300);
 
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),
@@ -127,7 +127,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithHardUpState) {
   _host->set_state_type(engine::host::hard);
   _host->set_last_hard_state_change(_current_time);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),
@@ -148,7 +148,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithSoftUpState) {
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::soft);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),
@@ -171,11 +171,12 @@ TEST_F(HostRecovery,
 
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::hard);
+  _host->set_last_hard_state_change(_current_time);
   _host->set_recovery_notification_delay(600);
   // Time too short. No notification will be sent.
   set_time(_current_time + 300);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),

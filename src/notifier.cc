@@ -39,10 +39,17 @@ using namespace com::centreon::engine::configuration::applier;
 // std::unordered_map<std::string, std::shared_ptr<contact>>
 // notifier::current_notifications;
 
-std::array<std::string, 8> const notifier::tab_notification_str{
-    {"NORMAL",       "ACKNOWLEDGEMENT",   "FLAPPINGSTART",
-     "FLAPPINGSTOP", "FLAPPINGDISABLED",  "DOWNTIMESTART",
-     "DOWNTIMEEND",  "DOWNTIMECANCELLED", }};
+std::array<std::string, 9> const notifier::tab_notification_str{{
+    "NORMAL",
+    "RECOVERY",
+    "ACKNOWLEDGEMENT",
+    "FLAPPINGSTART",
+    "FLAPPINGSTOP",
+    "FLAPPINGDISABLED",
+    "DOWNTIMESTART",
+    "DOWNTIMEEND",
+    "DOWNTIMECANCELLED",
+}};
 
 std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
@@ -156,7 +163,7 @@ void notifier::set_notification_number(int num) {
   update_status(false);
 }
 
-bool notifier::_is_notification_viable_normal(
+bool notifier::_is_notification_viable_normal(reason_type type,
     notification_option options) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
@@ -250,6 +257,7 @@ bool notifier::_is_notification_viable_normal(
 }
 
 bool notifier::_is_notification_viable_recovery(
+    reason_type type,
     notification_option options) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_recovery()";
 
@@ -324,7 +332,11 @@ bool notifier::_is_notification_viable_recovery(
   return true;
 }
 
-bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
+bool notifier::_is_notification_viable_acknowledgement(
+    reason_type type,
+    notification_option options) const {
+  logger(dbg_functions, basic)
+      << "notifier::is_notification_viable_acknowledgement()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -356,7 +368,11 @@ bool notifier::_is_notification_viable_acknowledgement(notification_option optio
   return true;
 }
 
-bool notifier::_is_notification_viable_flapping(notification_option options) const {
+bool notifier::_is_notification_viable_flapping(
+    reason_type type,
+    notification_option options) const {
+  logger(dbg_functions, basic)
+      << "notifier::is_notification_viable_flapping()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -381,9 +397,31 @@ bool notifier::_is_notification_viable_flapping(notification_option options) con
   }
 
   /* Don't send a notification if we are not supposed to */
-  if (!get_notify_on(flapping)) {
+  notification_flag f;
+  switch (type) {
+    case reason_flappingstart:
+      f = flappingstart;
+      break;
+    case reason_flappingstop:
+      f = flappingstop;
+      break;
+    case reason_flappingdisabled:
+      f = flappingdisabled;
+      break;
+  }
+  if (!get_notify_on(f)) {
     logger(dbg_notifications, more)
-      << "We shouldn't notify about FLAPPING events for this notifier.";
+        << "We shouldn't notify about " << tab_notification_str[type]
+        << " events for this notifier.";
+    return false;
+  }
+
+  /* Don't send a notification if is has already been sent */
+  if (_notification[cat_flapping] &&
+      _notification[cat_flapping]->get_reason() == type) {
+    logger(dbg_notifications, more)
+        << "We shouldn't notify about a " << tab_notification_str[type]
+        << " event: already sent.";
     return false;
   }
 
@@ -396,7 +434,10 @@ bool notifier::_is_notification_viable_flapping(notification_option options) con
   return true;
 }
 
-bool notifier::_is_notification_viable_downtime(notification_option options) const {
+bool notifier::_is_notification_viable_downtime(
+    reason_type type,
+    notification_option options) const {
+  logger(dbg_functions, basic) << "notifier::is_notification_viable_downtime()";
 
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
@@ -423,14 +464,14 @@ bool notifier::_is_notification_viable_downtime(notification_option options) con
 
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
-      << "Notifications are disabled, so notifications won't be sent out.";
+        << "Notifications are disabled, so notifications won't be sent out.";
     return false;
   }
 
   /* Don't send a notification if we are not supposed to */
   if (!get_notify_on(downtime)) {
     logger(dbg_notifications, more)
-      << "We shouldn't notify about DOWNTIME events for this notifier.";
+        << "We shouldn't notify about DOWNTIME events for this notifier.";
     return false;
   }
 
@@ -438,14 +479,18 @@ bool notifier::_is_notification_viable_downtime(notification_option options) con
    * service, we don't care of the host, so the use of
    * get_scheduled_downtime_depth()) */
   if (get_scheduled_downtime_depth() > 0) {
-    logger(dbg_notifications, more)
-      << "We shouldn't notify about DOWNTIME events during scheduled downtime.";
+    logger(dbg_notifications, more) << "We shouldn't notify about DOWNTIME "
+                                       "events during scheduled downtime.";
     return false;
   }
   return true;
 }
 
-bool notifier::_is_notification_viable_custom(notification_option options) const {
+bool notifier::_is_notification_viable_custom(
+    reason_type type,
+    notification_option options) const {
+  logger(dbg_functions, basic)
+      << "notifier::is_notification_viable_custom()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -478,7 +523,10 @@ bool notifier::_is_notification_viable_custom(notification_option options) const
   return true;
 }
 
-std::unordered_set<contact*> notifier::get_contacts_to_notify(notification_category cat, int state) {
+std::unordered_set<contact*> notifier::get_contacts_to_notify(
+    notification_category cat,
+    reason_type type,
+    int state) {
   std::unordered_set<contact*> retval;
 
   /* Let's start looking at escalations */
@@ -493,7 +541,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(notification_categ
       for (contact_map_unsafe::const_iterator cit{(*it)->contacts().begin()},
            cend{(*it)->contacts().end()};
            cit != cend; ++cit)
-        if (cit->second->should_be_notified(cat, *this))
+        if (cit->second->should_be_notified(cat, type, *this))
           retval.insert(cit->second);
 
       /* For each contact group, we also add its contacts. */
@@ -503,7 +551,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(notification_categ
             cend{cgit->second->get_members().end()};
             cit != cend;
             ++cit)
-          if (cit->second->should_be_notified(cat, *this))
+          if (cit->second->should_be_notified(cat, type, *this))
             retval.insert(cit->second);
       }
     }
@@ -540,8 +588,9 @@ notifier::notification_category notifier::get_category(reason_type type) const {
 }
 
 bool notifier::is_notification_viable(notification_category cat,
+                                      reason_type type,
                                       notification_option options) {
-  return (this->*(_is_notification_viable[cat]))(options);
+  return (this->*(_is_notification_viable[cat]))(type, options);
 }
 
 int notifier::notify(notifier::reason_type type,
@@ -553,29 +602,30 @@ int notifier::notify(notifier::reason_type type,
   notification_category cat{get_category(type)};
 
   /* Has this notification got sense? */
-  if (!is_notification_viable(cat, options))
+  if (!is_notification_viable(cat, type, options))
     return OK;
 
   /* For a first notification, we store what type of notification we try to
-   *    * send and we fix the notification number to 1. */
+   * send and we fix the notification number to 1. */
   if (_notification_number == 0) {
     _type = type;
     ++_notification_number;
   }
 
-  std::unique_ptr<notification> notif{
+  std::shared_ptr<notification> notif{
       new notification(this, _type, not_author, not_data, options,
                        _next_notification_id++, _notification_number)};
 
   /* What are the contacts to notify? */
   std::unordered_set<contact*> to_notify{
-      get_contacts_to_notify(cat, get_current_state_int())};
+      get_contacts_to_notify(cat, type, get_current_state_int())};
 
   /* Let's make the notification. */
   int retval{notif->execute(to_notify)};
 
   if (retval == OK) {
     _last_notification = std::time(nullptr);
+    _notification[cat] = notif;
     /* The notification has been sent.
      * Should we increment the notification number? */
     if (cat == cat_normal)
@@ -950,19 +1000,19 @@ void notifier::set_notification_period(std::string const& notification_period) {
   _notification_period = notification_period;
 }
 
-bool notifier::get_notify_on(notification_type type) const {
+bool notifier::get_notify_on(notification_flag type) const {
   return _out_notification_type & type;
 }
 
 uint32_t notifier::get_notify_on() const { return _out_notification_type; }
 
-void notifier::add_notify_on(notification_type type) {
+void notifier::add_notify_on(notification_flag type) {
   _out_notification_type |= type;
 }
 
 void notifier::set_notify_on(uint32_t type) { _out_notification_type = type; }
 
-void notifier::remove_notify_on(notification_type type) {
+void notifier::remove_notify_on(notification_flag type) {
   _out_notification_type &= ~type;
 }
 
@@ -991,23 +1041,23 @@ void notifier::set_notifications_enabled(bool notifications_enabled) {
   _notifications_enabled = notifications_enabled;
 }
 
-bool notifier::get_notified_on(notification_type type) const {
-  return _in_notification_type & type;
+bool notifier::get_notified_on(notification_flag type) const {
+  return _current_notifications & type;
 }
 
-uint32_t notifier::get_notified_on() const { return _in_notification_type; }
+uint32_t notifier::get_notified_on() const { return _current_notifications; }
 
-void notifier::add_notified_on(notification_type type) {
-  _in_notification_type |= type;
+void notifier::add_notified_on(notification_flag type) {
+  _current_notifications |= type;
 }
 
-void notifier::set_notified_on(uint32_t type) { _in_notification_type = type; }
+void notifier::set_notified_on(uint32_t type) { _current_notifications = type; }
 
-void notifier::remove_notified_on(notification_type type) {
-  _in_notification_type &= ~type;
+void notifier::remove_notified_on(notification_flag type) {
+  _current_notifications &= ~type;
 }
 
-bool notifier::get_flap_detection_on(notification_type type) const {
+bool notifier::get_flap_detection_on(notification_flag type) const {
   return _stalk_type & type;
 }
 
@@ -1015,11 +1065,11 @@ uint32_t notifier::get_flap_detection_on() const { return _stalk_type; }
 
 void notifier::set_flap_detection_on(uint32_t type) { _stalk_type = type; }
 
-void notifier::add_flap_detection_on(notification_type type) {
+void notifier::add_flap_detection_on(notification_flag type) {
   _stalk_type |= type;
 }
 
-bool notifier::get_stalk_on(notification_type type) const {
+bool notifier::get_stalk_on(notification_flag type) const {
   return _stalk_type & type;
 }
 
@@ -1027,7 +1077,7 @@ uint32_t notifier::get_stalk_on() const { return _stalk_type; }
 
 void notifier::set_stalk_on(uint32_t type) { _stalk_type = type; }
 
-void notifier::add_stalk_on(notification_type type) { _stalk_type |= type; }
+void notifier::add_stalk_on(notification_flag type) { _stalk_type |= type; }
 
 uint32_t notifier::get_modified_attributes() const {
   return _modified_attributes;

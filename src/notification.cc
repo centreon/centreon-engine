@@ -42,26 +42,26 @@ notification::notification(notifier* parent,
       _id{notification_id},
       _number{notification_number} {
   switch (_type) {
-    case notifier::notification_normal:
+    case notifier::reason_normal:
       _category = notifier::cat_normal;
       break;
-      case notifier::notification_recovery:
+      case notifier::reason_recovery:
       _category = notifier::cat_recovery;
       break;
-    case notifier::notification_acknowledgement:
+    case notifier::reason_acknowledgement:
       _category = notifier::cat_acknowledgement;
       break;
-    case notifier::notification_flappingstop:
-    case notifier::notification_flappingstart:
-    case notifier::notification_flappingdisabled:
+    case notifier::reason_flappingstop:
+    case notifier::reason_flappingstart:
+    case notifier::reason_flappingdisabled:
       _category = notifier::cat_flapping;
       break;
-    case notifier::notification_downtimestart:
-    case notifier::notification_downtimeend:
-    case notifier::notification_downtimecancelled:
+    case notifier::reason_downtimestart:
+    case notifier::reason_downtimeend:
+    case notifier::reason_downtimecancelled:
       _category = notifier::cat_downtime;
       break;
-    case notifier::notification_custom:
+    case notifier::reason_custom:
       _category = notifier::cat_custom;
       break;
   }
@@ -121,31 +121,31 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
 
   /* set the notification type macro */
   switch (_type) {
-    case notifier::notification_acknowledgement:
+    case notifier::reason_acknowledgement:
       mac.x[MACRO_NOTIFICATIONTYPE] = "ACKNOWLEDGEMENT";
       break;
-    case notifier::notification_flappingstart:
+    case notifier::reason_flappingstart:
       mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTART";
       break;
-    case notifier::notification_flappingstop:
+    case notifier::reason_flappingstop:
       mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTOP";
       break;
-    case notifier::notification_flappingdisabled:
+    case notifier::reason_flappingdisabled:
       mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGDISABLED";
       break;
-    case notifier::notification_downtimestart:
+    case notifier::reason_downtimestart:
       mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMESTART";
       break;
-    case notifier::notification_downtimeend:
+    case notifier::reason_downtimeend:
       mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMEEND";
       break;
-    case notifier::notification_downtimecancelled:
+    case notifier::reason_downtimecancelled:
       mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMECANCELLED";
       break;
-    case notifier::notification_custom:
+    case notifier::reason_custom:
       mac.x[MACRO_NOTIFICATIONTYPE] = "CUSTOM";
       break;
-    case notifier::notification_recovery:
+    case notifier::reason_recovery:
       mac.x[MACRO_NOTIFICATIONTYPE] = "RECOVERY";
       break;
     default:
@@ -194,4 +194,8 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
   logger(dbg_notifications, basic)
       << contacts_notified << " contacts were notified.";
   return OK;
+}
+
+notifier::reason_type notification::get_reason() const {
+  return _type;
 }
