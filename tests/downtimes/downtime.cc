@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 - 2019 Centreon (https://www.centreon.com/)
+ * Copyright 2019 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ TEST_F(DowntimeExternalCommand, AddUnkownHostDowntime) {
 
   ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now, const_cast<char *>(s.str().c_str())), ERROR);
 
-  ASSERT_EQ(0, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
 }
 
 TEST_F(DowntimeExternalCommand, AddHostDowntime) {
@@ -81,11 +81,11 @@ TEST_F(DowntimeExternalCommand, AddHostDowntime) {
   s << "test_srv;" << now << ";"
     << now + 1 << ";1;0;1;admin;host";
 
-  ASSERT_EQ(0, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
 
   ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now, const_cast<char *>(s.str().c_str())), OK);
 
-  ASSERT_EQ(1, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
   ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->first, 20000);
   ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->get_hostname(), "test_srv");
   ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->get_duration(), 1);
@@ -93,5 +93,5 @@ TEST_F(DowntimeExternalCommand, AddHostDowntime) {
   ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->handle(), OK);
   set_time(20001);
   ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->handle(), OK);
-  ASSERT_EQ(0, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
 }

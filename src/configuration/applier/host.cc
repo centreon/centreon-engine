@@ -291,11 +291,22 @@ void applier::host::modify_object(
   it_obj->second->set_check_interval(static_cast<double>(obj.check_interval()));
   it_obj->second->set_retry_interval(static_cast<double>(obj.retry_interval()));
   it_obj->second->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
-  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::up ? notifier::recovery : notifier::none);
-  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::down ? notifier::down : notifier::none);
-  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
-  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::flapping ? notifier::flapping : notifier::none);
-  it_obj->second->add_notify_on(obj.notification_options() & configuration::host::downtime ? notifier::downtime : notifier::none);
+  it_obj->second->set_notify_on(
+      (obj.notification_options() & configuration::host::up ? notifier::recovery
+                                                            : notifier::none) |
+      (obj.notification_options() & configuration::host::down
+           ? notifier::down
+           : notifier::none) |
+      (obj.notification_options() & configuration::host::unreachable
+           ? notifier::unreachable
+           : notifier::none) |
+      (obj.notification_options() & configuration::host::flapping
+           ? (notifier::flappingstart | notifier::flappingstop |
+              notifier::flappingdisabled)
+           : notifier::none) |
+      (obj.notification_options() & configuration::host::downtime
+           ? notifier::downtime
+           : notifier::none));
   it_obj->second->set_notification_interval(static_cast<double>(obj.notification_interval()));
   it_obj->second->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
   it_obj->second->set_notification_period(obj.notification_period());

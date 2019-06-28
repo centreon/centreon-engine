@@ -462,10 +462,10 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::configuration::applier::state::unload();
   com::centreon::engine::checks::checker::unload();
   delete config;
-  config = NULL;
+  config = nullptr;
   com::centreon::engine::timezone_manager::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 
-  return (retval);
+  return retval;
 }

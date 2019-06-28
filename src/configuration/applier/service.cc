@@ -366,12 +366,26 @@ void applier::service::modify_object(
   s->set_retry_interval(obj.retry_interval());
   s->set_max_attempts(obj.max_check_attempts());
 
-  s->add_notify_on(obj.notification_options() & configuration::service::unknown? notifier::unknown : notifier::none);
-  s->add_notify_on(obj.notification_options() & configuration::service::warning ? notifier::warning : notifier::none);
-  s->add_notify_on(obj.notification_options() & configuration::service::critical ? notifier::critical : notifier::none);
-  s->add_notify_on(obj.notification_options() & configuration::service::ok ? notifier::recovery : notifier::none);
-  s->add_notify_on(obj.notification_options() & configuration::service::flapping ? notifier::flapping : notifier::none);
-  s->add_notify_on(obj.notification_options() & configuration::service::downtime ? notifier::downtime : notifier::none);
+  s->set_notify_on(
+      (obj.notification_options() & configuration::service::unknown
+           ? notifier::unknown
+           : notifier::none) |
+      (obj.notification_options() & configuration::service::warning
+           ? notifier::warning
+           : notifier::none) |
+      (obj.notification_options() & configuration::service::critical
+           ? notifier::critical
+           : notifier::none) |
+      (obj.notification_options() & configuration::service::ok
+           ? notifier::recovery
+           : notifier::none) |
+      (obj.notification_options() & configuration::service::flapping
+           ? (notifier::flappingstart | notifier::flappingstop |
+              notifier::flappingdisabled)
+           : notifier::none) |
+      (obj.notification_options() & configuration::service::downtime
+           ? notifier::downtime
+           : notifier::none));
 
   s->set_notification_interval(static_cast<double>(obj.notification_interval()));
   s->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));

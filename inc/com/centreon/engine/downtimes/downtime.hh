@@ -42,8 +42,8 @@ class                          downtime {
                                  uint64_t triggered_by,
                                  int32_t duration,
                                  uint64_t downtime_id);
-                               downtime(downtime const& other);
-                               downtime(downtime&& other);
+                               downtime(downtime const& other) = delete;
+                               downtime(downtime&& other) = delete;
   virtual                      ~downtime();
 
   int                          get_type() const;

@@ -250,19 +250,40 @@ void applier::contact::modify_object(
     c->set_pager(obj.pager());
   if (c->get_addresses() != obj.address())
     c->set_addresses(obj.address());
-  c->set_notify_on(notifier::service_notification,
-      (obj.service_notification_options() & service::unknown ? notifier::unknown : notifier::none) |
-      (obj.service_notification_options() & service::warning ? notifier::warning : notifier::none) |
-      (obj.service_notification_options() & service::critical ? notifier::critical : notifier::none) |
-      (obj.service_notification_options() & service::ok ? notifier::recovery : notifier::none) |
-      (obj.service_notification_options() & service::flapping ? notifier::flapping : notifier::none) |
-      (obj.service_notification_options() & service::downtime ? notifier::downtime : notifier::none));
-  c->set_notify_on(notifier::host_notification,
-      (obj.host_notification_options() & host::down ? notifier::down : notifier::none) |
-      (obj.host_notification_options() & host::unreachable ? notifier::unreachable : notifier::none) |
-      (obj.host_notification_options() & host::up ? notifier::recovery : notifier::none) |
-      (obj.host_notification_options() & host::flapping ? notifier::flapping : notifier::none) |
-      (obj.host_notification_options() & host::downtime ? notifier::downtime : notifier::none));
+  c->set_notify_on(
+      notifier::service_notification,
+      (obj.service_notification_options() & service::unknown ? notifier::unknown
+                                                             : notifier::none) |
+          (obj.service_notification_options() & service::warning
+               ? notifier::warning
+               : notifier::none) |
+          (obj.service_notification_options() & service::critical
+               ? notifier::critical
+               : notifier::none) |
+          (obj.service_notification_options() & service::ok ? notifier::recovery
+                                                            : notifier::none) |
+          (obj.service_notification_options() & service::flapping
+               ? (notifier::flappingstart | notifier::flappingstop |
+                  notifier::flappingdisabled)
+               : notifier::none) |
+          (obj.service_notification_options() & service::downtime
+               ? notifier::downtime
+               : notifier::none));
+  c->set_notify_on(
+      notifier::host_notification,
+      (obj.host_notification_options() & host::down ? notifier::down
+                                                    : notifier::none) |
+          (obj.host_notification_options() & host::unreachable
+               ? notifier::unreachable
+               : notifier::none) |
+          (obj.host_notification_options() & host::up ? notifier::recovery
+                                                      : notifier::none) |
+          (obj.host_notification_options() & host::flapping
+               ? (notifier::flappingstart | notifier::flappingstop |
+                  notifier::flappingdisabled)
+               : notifier::none) |
+          (obj.host_notification_options() & host::downtime ? notifier::downtime
+                                                            : notifier::none));
   if (c->get_host_notification_period() != obj.host_notification_period())
     c->set_host_notification_period(obj.host_notification_period());
   if (c->get_service_notification_period() != obj.service_notification_period())
@@ -399,7 +420,6 @@ void applier::contact::resolve_object(
     throw (engine_error()
            << "Cannot resolve non-existing contact '"
            << obj.contact_name() << "'");
-  engine::contact* c{ct_it->second.get()};
 
   // Add all the host notification commands.
   for (list_string::const_iterator

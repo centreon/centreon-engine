@@ -32,8 +32,8 @@ serviceescalation_mmap serviceescalation::serviceescalations;
 
 serviceescalation::serviceescalation(std::string const& hostname,
                                      std::string const& description,
-                                     int first_notification,
-                                     int last_notification,
+                                     uint32_t first_notification,
+                                     uint32_t last_notification,
                                      double notification_interval,
                                      std::string const& escalation_period,
                                      uint32_t escalate_on)
@@ -75,13 +75,13 @@ std::string const& serviceescalation::get_description() const {
  *
  * @return A boolean.
  */
-bool serviceescalation::is_viable(int state, int notification_number) const {
+bool serviceescalation::is_viable(int state, uint32_t notification_number) const {
   logger(dbg_functions, basic)
     << "serviceescalation::is_viable()";
 
   bool retval{escalation::is_viable(state, notification_number)};
   if (retval) {
-    std::array<notifier::notification_type, 4> nt = {
+    std::array<notifier::notification_flag, 4> nt = {
       notifier::ok,
       notifier::warning,
       notifier::critical,

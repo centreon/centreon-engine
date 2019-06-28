@@ -1,21 +1,21 @@
 /*
-** Copyright 2017-2018 Centreon
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2017 - 2019 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 
 #include <cstring>
 #include <iostream>
@@ -66,16 +66,17 @@ class HostRecovery : public ::testing::Test {
     _current_time = 43200;
     set_time(_current_time);
     _tperiod.reset(new engine::timeperiod("tperiod", "alias"));
-    for (int i = 0; i < 7; ++i)
-      _tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+    for (size_t i = 0; i < _tperiod->days.size(); ++i)
+      _tperiod->days[i].push_back(
+          std::make_shared<engine::timerange>(0, 86400));
 
     std::unique_ptr<engine::hostescalation> host_escalation{
         new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
 
-    uint64_t id{_host->get_next_notification_id()};
+    _host->get_next_notification_id();
     _host->notification_period_ptr = _tperiod.get();
     /* Sending a notification */
-    _host->notify(notifier::notification_normal,
+    _host->notify(notifier::reason_normal,
                   "",
                   "",
                   notifier::notification_option_none);
@@ -104,7 +105,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithDownState) {
   set_time(_current_time + 300);
 
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),
@@ -126,7 +127,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithHardUpState) {
   _host->set_state_type(engine::host::hard);
   _host->set_last_hard_state_change(_current_time);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),
@@ -147,7 +148,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithSoftUpState) {
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::soft);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),
@@ -170,12 +171,12 @@ TEST_F(HostRecovery,
 
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::hard);
+  _host->set_last_hard_state_change(_current_time);
   _host->set_recovery_notification_delay(600);
   // Time too short. No notification will be sent.
-  _host->set_last_hard_state_change(_current_time);
   set_time(_current_time + 300);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::notification_recovery,
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
                           "",
                           "",
                           notifier::notification_option_none),

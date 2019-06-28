@@ -104,20 +104,9 @@ daterange* timeperiod_creator::new_calendar_date(
   if (!target)
     target = _timeperiods.begin()->get();
 
-    std::shared_ptr<daterange> dr{
-      new daterange(
-        DATERANGE_CALENDAR_DATE,
-        start_year,
-        start_month,
-        start_day,
-        0,
-        0,
-        end_year,
-        end_month,
-        end_day,
-        0,
-        0,
-        0)};
+  std::shared_ptr<daterange> dr{
+      new daterange(DATERANGE_CALENDAR_DATE, start_year, start_month, start_day,
+                    0, 0, end_year, end_month, end_day, 0, 0, 0)};
 
   target->exceptions[DATERANGE_CALENDAR_DATE].push_back(dr);
   return dr.get();

@@ -400,16 +400,16 @@ bool check_result::process_check_result_queue(std::string const& dirname) {
   struct dirent* dirfile(nullptr);
   while ((dirfile = readdir(dirp)) != nullptr) {
     // Create /path/to/file.
-    char file[MAX_FILENAME_LENGTH];
-    snprintf(file, sizeof(file), "%s/%s", dirname.c_str(), dirfile->d_name);
-    file[sizeof(file) - 1] = '\x0';
+    std::string file{dirname};
+    file.append("/");
+    file.append(dirfile->d_name);
 
     // Process this if it's a check result file...
     struct stat stat_buf;
     struct stat ok_stat_buf;
     int x(strlen(dirfile->d_name));
     if (x == 7 && dirfile->d_name[0] == 'c') {
-      if (stat(file, &stat_buf) == -1) {
+      if (stat(file.c_str(), &stat_buf) == -1) {
         logger(logging::log_runtime_warning, logging::basic)
           << "Warning: Could not stat() check result file '"
           << file << "'.";
@@ -447,5 +447,5 @@ bool check_result::process_check_result_queue(std::string const& dirname) {
   }
   closedir(dirp);
 
-  return (result);
+  return result;
 }

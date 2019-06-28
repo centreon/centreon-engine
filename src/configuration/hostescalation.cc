@@ -37,9 +37,9 @@ hostescalation::setters const hostescalation::_setters[] = {
   { "contacts",              SETTER(std::string const&, _set_contacts) },
   { "escalation_options",    SETTER(std::string const&, _set_escalation_options) },
   { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
-  { "first_notification",    SETTER(unsigned int, _set_first_notification) },
-  { "last_notification",     SETTER(unsigned int, _set_last_notification) },
-  { "notification_interval", SETTER(unsigned int, _set_notification_interval) }
+  { "first_notification",    SETTER(uint32_t, _set_first_notification) },
+  { "last_notification",     SETTER(uint32_t, _set_last_notification) },
+  { "notification_interval", SETTER(uint32_t, _set_notification_interval) }
 };
 
 // Default values.

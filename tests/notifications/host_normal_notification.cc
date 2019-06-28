@@ -1,21 +1,21 @@
 /*
-** Copyright 2017-2018 Centreon
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2017 - 2019 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 
 #include <cstring>
 #include <iostream>
@@ -88,9 +88,13 @@ class HostNotification : public ::testing::Test {
     // Add command.
     {
       configuration::command cmd;
-      cmd.parse("command_name", "cmd");
-      cmd.parse("command_line", "true");
+      cmd.parse("command_name", "hcmd");
+      cmd.parse("command_line", "echo!host notification command");
       configuration::applier::command aplyr;
+      aplyr.add_object(cmd);
+
+      cmd.parse("command_name", "scmd");
+      cmd.parse("command_line", "echo!service notification command");
       aplyr.add_object(cmd);
     }
     // Add timeperiod.
@@ -108,8 +112,8 @@ class HostNotification : public ::testing::Test {
     ctct.parse("contact_name", "admin");
     ctct.parse("host_notification_period", "24x7");
     ctct.parse("service_notification_period", "24x7");
-    ctct.parse("host_notification_commands", "cmd");
-    ctct.parse("service_notification_commands", "cmd");
+    ctct.parse("host_notification_commands", "hcmd");
+    ctct.parse("service_notification_commands", "scmd");
     return ctct;
   }
 
@@ -133,7 +137,9 @@ TEST_F(HostNotification, SimpleNormalHostNotification) {
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
   _host->notification_period_ptr = tperiod.get();
-  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
@@ -154,7 +160,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotificationsdisabled) {
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
   _host->notification_period_ptr = tperiod.get();
-  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -175,46 +183,11 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierNotifdisabled) {
   uint64_t id{_host->get_next_notification_id()};
   _host->set_notifications_enabled(false);
   _host->notification_period_ptr = tperiod.get();
-  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
-
-// FIXME DBR: this test should validate the notification_interval but for
-// now since notifications don't work, we can not make this test to work.
-//TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
-//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be called.
-//   */
-//  set_time(43200);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
-//
-//  ASSERT_TRUE(host_escalation);
-//  uint64_t id{_host->get_next_notification_id()};
-//  /* We configure the notification interval to 2 minutes */
-//  _host->set_notification_interval(2);
-//  _host->notification_period_ptr = tperiod.get();
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//
-//  /* Only 100 seconds since the previous notification. */
-//  set_time(43300);
-//  id = _host->get_next_notification_id();
-//  /* Because of the notification not totally implemented, we must force the
-//   * notification number to be greater than 0 */
-//  _host->set_notification_number(1);
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
-//
-//  /* No notification, because the delay is too short */
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
 
 TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
   std::unique_ptr<engine::timeperiod> tperiod{
@@ -230,7 +203,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
   _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
-  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -249,10 +224,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationForcedWithNotificationDisab
   _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_forced),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_forced),
+            OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
@@ -270,10 +244,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationForcedNotification) {
   _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_forced),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_forced),
+            OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
 }
 
@@ -292,10 +265,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithDowntime) {
   _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -314,10 +286,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithFlapping) {
   _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -336,10 +307,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithSoftState) {
   _host->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(host_escalation);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -358,10 +328,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithHardStateAcknowledged) 
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -381,10 +350,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousTooSoon) {
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
   _host->set_last_notification(19999);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -406,10 +374,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousWithNullInterv
   _host->set_last_notification(19500);
   _host->set_notification_number(1);
   _host->set_notification_interval(0);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -430,10 +397,9 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateNotNotified) {
   ASSERT_TRUE(host_escalation);
   _host->remove_notify_on(notifier::down);
   _host->set_current_state(engine::host::state_down);
-  ASSERT_EQ(
-      _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
@@ -458,7 +424,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateBeforeFirstNotifDela
   _host->set_first_notification_delay(5);
   ASSERT_EQ(
       _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
+          notifier::reason_normal, "", "", notifier::notification_option_none),
       OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
@@ -483,7 +449,43 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateAfterFirstNotifDelay
   _host->set_first_notification_delay(5);
   ASSERT_EQ(
       _host->notify(
-          notifier::notification_normal, "", "", notifier::notification_option_none),
+          notifier::reason_normal, "", "", notifier::notification_option_none),
       OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
+}
+
+TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
+  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+   * If we call time(), it is not the glibc time() function that will be called.
+   */
+  set_time(43200);
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  for (uint32_t i = 0; i < tperiod->days.size(); ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::hostescalation> host_escalation{
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+
+  ASSERT_TRUE(host_escalation);
+  uint64_t id{_host->get_next_notification_id()};
+  /* We configure the notification interval to 2 minutes */
+  _host->set_notification_interval(2);
+  _host->notification_period_ptr = tperiod.get();
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
+  ASSERT_EQ(id + 1, _host->get_next_notification_id());
+
+  /* Only 100 seconds since the previous notification. */
+  set_time(43300);
+  id = _host->get_next_notification_id();
+  /* Because of the notification not totally implemented, we must force the
+   * notification number to be greater than 0 */
+  ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
+                          notifier::notification_option_none),
+            OK);
+
+  /* No notification, because the delay is too short */
+  ASSERT_EQ(id, _host->get_next_notification_id());
 }

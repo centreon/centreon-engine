@@ -131,7 +131,7 @@ bool downtime_finder::_match_criteria(
     retval = (expected == dt.get_triggered_by());
   }
   else if (crit.first == "duration") {
-    unsigned long expected(strtoul(crit.second.c_str(), nullptr, 0));
+    int32_t expected{std::stoi(crit.second)};
     retval = (expected == dt.get_duration());
   }
   else if (crit.first == "author")
@@ -162,7 +162,7 @@ bool downtime_finder::_match_criteria(
     retval = (crit.second == dt.get_service_description());
   }
   else if (crit.first == "start") {
-    time_t expected(strtoll(crit.second.c_str(), nullptr, 0));
+    time_t expected(std::stoull(crit.second, nullptr, 0));
     retval = (expected == dt.get_start_time());
   }
   else if (crit.first == "end") {
@@ -178,7 +178,7 @@ bool downtime_finder::_match_criteria(
     retval = (expected == dt.get_triggered_by());
   }
   else if (crit.first == "duration") {
-    unsigned long expected(strtoul(crit.second.c_str(), nullptr, 0));
+    int32_t expected(std::stoul(crit.second));
     retval = (expected == dt.get_duration());
   }
   else if (crit.first == "author")

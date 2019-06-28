@@ -281,7 +281,9 @@ host::host(uint64_t host_id,
   _out_notification_type = none;
   _out_notification_type |= (notify_down > 0 ? down : 0);
   _out_notification_type |= (notify_downtime > 0 ? downtime : 0);
-  _out_notification_type |= (notify_flapping > 0 ? flapping : 0);
+  _out_notification_type |=
+      (notify_flapping > 0 ? (flappingstart | flappingstop | flappingdisabled)
+                           : 0);
   _out_notification_type |= (notify_up > 0 ? recovery : 0);
   _out_notification_type |=
       (notify_unreachable > 0 ? unreachable : 0);
@@ -531,23 +533,6 @@ void host::set_should_reschedule_current_check(bool should_reschedule) {
   _should_reschedule_current_check = should_reschedule;
 }
 
-//int host::get_current_notification_number() const {
-//  return _current_notification_number;
-//}
-//
-//void host::set_current_notification_number(int current_notification_number) {
-//  _current_notification_number = current_notification_number;
-//}
-
-int host::get_check_flapping_recovery_notification() const {
-  return _check_flapping_recovery_notification;
-}
-
-void host::set_check_flapping_recovery_notification(
-    int check_flapping_recovery_notification) {
-  _check_flapping_recovery_notification = check_flapping_recovery_notification;
-}
-
 int host::get_pending_flex_downtime() const {
   return _pending_flex_downtime;
 }
@@ -755,8 +740,6 @@ bool host::operator==(host const& other) throw() {
              other.get_current_notification_number() &&
          get_no_more_notifications() == other.get_no_more_notifications() &&
          get_current_notification_id() == other.get_current_notification_id() &&
-         get_check_flapping_recovery_notification() ==
-             other.get_check_flapping_recovery_notification() &&
          get_scheduled_downtime_depth() ==
              other.get_scheduled_downtime_depth() &&
          get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
@@ -923,8 +906,14 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
         "  notify_on_recovery:                   "
      << obj.get_notify_on(notifier::recovery)
      << "\n"
-        "  notify_on_flapping:                   "
-     << obj.get_notify_on(notifier::flapping)
+        "  notify_on_flappingstart:                   "
+     << obj.get_notify_on(notifier::flappingstart)
+     << "\n"
+        "  notify_on_flappingstop:                   "
+     << obj.get_notify_on(notifier::flappingstop)
+     << "\n"
+        "  notify_on_flappingdisabled:                   "
+     << obj.get_notify_on(notifier::flappingdisabled)
      << "\n"
         "  notify_on_downtime:                   "
      << obj.get_notify_on(notifier::downtime)
@@ -1145,9 +1134,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
         "  current_notification_id:              "
      << obj.get_current_notification_id()
      << "\n"
-        "  check_flapping_recovery_notification: "
-     << obj.get_check_flapping_recovery_notification()
-     << "\n"
         "  scheduled_downtime_depth:             "
      << obj.get_scheduled_downtime_depth()
      << "\n"
@@ -1365,7 +1351,7 @@ bool engine::is_host_exist(uint64_t host_id) throw() {
  */
 uint64_t engine::get_host_id(std::string const& name) {
   host_map::const_iterator found{host::hosts.find(name)};
-  return found != host::hosts.end() ? found->second->get_host_id() : 0;
+  return found != host::hosts.end() ? found->second->get_host_id() : 0u;
 }
 
 /**
@@ -2133,16 +2119,9 @@ void host::set_flap(double percent_change,
                        HOST_FLAPPING, this, percent_change, high_threshold,
                        low_threshold, nullptr);
 
-  /* see if we should check to send a recovery notification out when flapping
-   * stops */
-  if (get_current_state() !=  host::state_up && get_current_notification_number() > 0)
-    set_check_flapping_recovery_notification(true);
-  else
-    set_check_flapping_recovery_notification(false);
-
   /* send a notification */
   if (allow_flapstart_notification)
-    notify(notification_flappingstart, "", "", notifier::notification_option_none);
+    notify(reason_flappingstart, "", "", notifier::notification_option_none);
 }
 
 /* handles a host that has stopped flapping */
@@ -2175,15 +2154,10 @@ void host::clear_flap(double percent_change,
                        percent_change, high_threshold, low_threshold, nullptr);
 
   /* send a notification */
-  notify(notification_flappingstop, "", "", notifier::notification_option_none);
+  notify(reason_flappingstop, "", "", notifier::notification_option_none);
 
-  /* should we send a recovery notification? */
-  if (get_check_flapping_recovery_notification() &&
-      get_current_state() ==  host::state_up)
-    notify(notification_normal, "", "", notifier::notification_option_none);
-
-  /* clear the recovery notification flag */
-  set_check_flapping_recovery_notification(false);
+  /* Send a recovery notification if needed */
+  notify(reason_recovery, "", "", notifier::notification_option_none);
 }
 
 /* updates host status info */
@@ -2589,7 +2563,7 @@ int host::handle_state() {
 
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (get_state_type() == hard)
-      notify(notification_normal, "", "", notifier::notification_option_none);
+      notify(reason_normal, "", "", notifier::notification_option_none);
 
     /* handle the host state change */
     handle_host_event(this);
@@ -2614,7 +2588,7 @@ int host::handle_state() {
     if ((get_current_state() !=  host::state_up ||
          (get_current_state() ==  host::state_up && !_recovery_been_sent)) &&
         get_state_type() == hard) {
-      notify(notification_normal,
+      notify(reason_normal,
              "",
              "",
              notifier::notification_option_none);
@@ -2725,10 +2699,10 @@ void host::grab_macros_r(nagios_macros* mac) {
 /* notify a specific contact that an entire host is down or up */
 int host::notify_contact(nagios_macros* mac,
                          contact* cntct,
-                         int type,
-                         char const* not_author,
-                         char const* not_data,
-                         int options,
+                         notifier::reason_type type,
+                         std::string const& not_author,
+                         std::string const& not_data,
+                         int options __attribute((unused)),
                          int escalated) {
   std::string raw_command;
   std::string processed_command;
@@ -2750,10 +2724,12 @@ int host::notify_contact(nagios_macros* mac,
    * acknowledgements are no longer excluded from this test -
    * added 8/19/02 Tom Bertelson
    */
-  notification_category cat{get_category(static_cast<notifier::reason_type>(type))};
-  if (cntct->check_host_notification_viability(this, cat, options) ==
-      ERROR)
+  notification_category cat{get_category(type)};
+  if (!cntct->should_be_notified(cat, type, *this))
     return ERROR;
+//  if (cntct->check_host_notification_viability(this, cat, options) ==
+//      ERROR)
+//    return ERROR;
 
   logger(dbg_notifications, most)
       << "** Notifying contact '" << cntct->get_name() << "'";
@@ -2767,7 +2743,7 @@ int host::notify_contact(nagios_macros* mac,
   neb_result = broker_contact_notification_data(
       NEBTYPE_CONTACTNOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE,
       host_notification, type, start_time, end_time, (void*)this, cntct,
-      not_author, not_data, escalated, nullptr);
+      not_author.c_str(), not_data.c_str(), escalated, nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
     return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -2785,8 +2761,8 @@ int host::notify_contact(nagios_macros* mac,
     neb_result = broker_contact_notification_method_data(
         NEBTYPE_CONTACTNOTIFICATIONMETHOD_START, NEBFLAG_NONE, NEBATTR_NONE,
         host_notification, type, method_start_time, method_end_time,
-        (void*)this, cntct, cmd->get_command_line().c_str(), not_author,
-        not_data, escalated, nullptr);
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author.c_str(),
+        not_data.c_str(), escalated, nullptr);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -2812,7 +2788,7 @@ int host::notify_contact(nagios_macros* mac,
         << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config->log_notifications() == true) {
+    if (config->log_notifications()) {
       char const* host_state_str("UP");
       if ((unsigned int)this->get_current_state() < tab_host_states.size())
         // sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
@@ -2824,17 +2800,10 @@ int host::notify_contact(nagios_macros* mac,
         notification_str = tab_notification_str[type].c_str();
 
       std::string info;
-      switch (type) {
-        case notification_custom:
-          notification_str = "CUSTOM";
-
-        case notification_acknowledgement:
-          info.append(";")
-              .append(not_author ? not_author : "")
-              .append(";")
-              .append(not_data ? not_data : "");
-          break;
-      }
+      if (type == reason_custom)
+        notification_str = "CUSTOM";
+      else if (type == reason_acknowledgement)
+        info.append(";").append(not_author).append(";").append(not_data);
 
       std::string host_notification_state;
       if (strcmp(notification_str, "NORMAL") == 0)
@@ -2878,8 +2847,8 @@ int host::notify_contact(nagios_macros* mac,
     broker_contact_notification_method_data(
         NEBTYPE_CONTACTNOTIFICATIONMETHOD_END, NEBFLAG_NONE, NEBATTR_NONE,
         host_notification, type, method_start_time, method_end_time,
-        (void*)this, cntct, cmd->get_command_line().c_str(), not_author,
-        not_data, escalated, nullptr);
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author.c_str(),
+        not_data.c_str(), escalated, nullptr);
   }
 
   /* get end time */
@@ -2892,7 +2861,7 @@ int host::notify_contact(nagios_macros* mac,
   broker_contact_notification_data(
       NEBTYPE_CONTACTNOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
       host_notification, type, start_time, end_time, (void*)this, cntct,
-      not_author, not_data, escalated, nullptr);
+      not_author.c_str(), not_data.c_str(), escalated, nullptr);
 
   return OK;
 }
@@ -3033,7 +3002,7 @@ void host::enable_flap_detection() {
  */
 bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
                                                 int options) const {
-  int notification_number;
+  uint32_t notification_number;
   time_t current_time;
 
   logger(dbg_functions, basic)
@@ -3201,7 +3170,7 @@ void host::handle_flap_detection_disabled() {
     << "handle_host_flap_detection_disabled()";
 
   /* if the host was flapping, remove the flapping indicator */
-  if (this->get_is_flapping()) {
+  if (get_is_flapping()) {
     this->set_is_flapping(false);
 
     /* delete the original comment we added earlier */
@@ -3228,22 +3197,13 @@ void host::handle_flap_detection_disabled() {
 
     /* send a notification */
     notify(
-      notification_flappingdisabled,
+      reason_flappingdisabled,
       "",
       "",
       notifier::notification_option_none);
 
-    /* should we send a recovery notification? */
-    if (this->get_check_flapping_recovery_notification()
-        && this->get_current_state() == host::state_up)
-      notify(
-        notification_normal,
-        "",
-        "",
-        notifier::notification_option_none);
-
-    /* clear the recovery notification flag */
-    this->set_check_flapping_recovery_notification(false);
+    /* Send a recovery notification if needed */
+    notify(reason_normal, "", "", notification_option_none);
   }
 
   /* update host status */
@@ -3251,15 +3211,13 @@ void host::handle_flap_detection_disabled() {
 }
 
 int host::perform_on_demand_check(enum host::host_state* check_return_code,
-  int check_options, int use_cached_result, unsigned long check_timestamp_horizon) {
-  logger(dbg_functions, basic)
-    << "perform_on_demand_host_check()";
+                                  int check_options,
+                                  int use_cached_result,
+                                  unsigned long check_timestamp_horizon) {
+  logger(dbg_functions, basic) << "perform_on_demand_host_check()";
 
-  perform_on_demand_check_3x(
-    check_return_code,
-    check_options,
-    use_cached_result,
-    check_timestamp_horizon);
+  perform_on_demand_check_3x(check_return_code, check_options,
+                             use_cached_result, check_timestamp_horizon);
   return OK;
 }
 
@@ -4152,7 +4110,7 @@ std::string const& host::get_current_state_as_string() const {
 }
 
 bool host::get_notify_on_current_state() const {
-  notification_type type[]{up, down, unreachable};
+  notification_flag type[]{up, down, unreachable};
   bool retval = get_notify_on(type[get_current_state()]);
   return retval;
 }

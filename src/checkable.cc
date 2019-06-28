@@ -46,10 +46,10 @@ checkable::checkable(std::string const& display_name,
                      int freshness_threshold,
                      bool obsess_over,
                      std::string const& timezone)
-    : _display_name{display_name},
+    : check_period_ptr{nullptr},
+      _display_name{display_name},
       _check_command{check_command},
       _check_interval{check_interval},
-      check_period_ptr{nullptr},
       _retry_interval{retry_interval},
       _max_attempts{max_attempts},
       _check_period{check_period},
@@ -79,7 +79,9 @@ checkable::checkable(std::string const& display_name,
       _latency{0.0},
       _next_check{0L},
       _should_be_scheduled{true},
-      _state_history_index{0} {
+      _state_history_index{0},
+      _last_hard_state_change{0},
+      _state_type{soft} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for checkable '" << display_name

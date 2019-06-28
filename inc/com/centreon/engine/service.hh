@@ -178,9 +178,9 @@ class                           service : public notifier {
   void                          grab_macros_r(nagios_macros* mac) override;
   int                           notify_contact(nagios_macros* mac,
                                                contact* cntct,
-                                               int type,
-                                               char const* not_author,
-                                               char const* not_data,
+                                               reason_type type,
+                                               std::string const& not_author,
+                                               std::string const& not_data,
                                                int options,
                                                int escalated) override;
   void                          update_notification_flags() override;
@@ -244,11 +244,11 @@ class                           service : public notifier {
   time_t                        _last_time_unknown;
   time_t                        _last_time_critical;
   int                           _is_volatile;
-  enum service_state            _last_state;
-  enum service_state            _last_hard_state;
-  enum service_state            _current_state;
   enum service_state            _initial_state;
-  std::list<servicegroup *>     _servicegroups;
+  enum service_state            _current_state;
+  enum service_state            _last_hard_state;
+  enum service_state            _last_state;
+  std::list<servicegroup*>      _servicegroups;
   host*                         _host_ptr;
 };
 CCE_END()

@@ -147,9 +147,6 @@ void applier::host::_update(
       obj.set_current_notification_id(*state.current_notification_id());
     if (state.percent_state_change().is_set())
       obj.set_percent_state_change(*state.percent_state_change());
-    if (state.check_flapping_recovery_notification().is_set())
-      obj.set_check_flapping_recovery_notification(
-        *state.check_flapping_recovery_notification());
     if (state.state_history().is_set()) {
       utils::set_state_history(
         *state.state_history(),
@@ -311,11 +308,6 @@ void applier::host::_update(
       false,
       false,
       allow_flapstart_notification);
-
-    // host was flapping before and isn't now, so clear recovery
-    // check variable if host isn't flapping now.
-    if (state.is_flapping() && !obj.get_is_flapping())
-      obj.set_check_flapping_recovery_notification(false);
   }
 
   // handle new vars added in 2.x.

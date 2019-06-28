@@ -34,7 +34,6 @@ using namespace com::centreon::engine::string;
 
 servicegroup_map servicegroup::servicegroups;
 
-
 /**
  *  Create a new service group
  *
@@ -52,18 +51,18 @@ servicegroup::servicegroup(uint64_t id,
                            std::string const& notes,
                            std::string const& notes_url,
                            std::string const& action_url)
-    : _group_name{group_name},
+    : _id{id},
+      _group_name{group_name},
       _alias{alias.empty() ? group_name : alias},
       _notes{notes},
       _notes_url{notes_url},
       _action_url{action_url} {
-
   // Check if the service group already exist.
   if (is_servicegroup_exist(group_name)) {
-    logger(log_config_error, basic)
-      << "Error: Servicegroup '" << group_name << "' has already been defined";
-    throw engine_error() << "Could not register service group '"
-                         << group_name << "'";
+    logger(log_config_error, basic) << "Error: Servicegroup '" << group_name
+                                    << "' has already been defined";
+    throw engine_error() << "Could not register service group '" << group_name
+                         << "'";
   }
 }
 

@@ -68,7 +68,7 @@ namespace                  configuration {
     std::string const&     escalation_period() const throw ();
     bool                   escalation_period_defined() const throw ();
     void                   first_notification(unsigned int n) throw ();
-    unsigned int           first_notification() const throw ();
+    uint32_t               first_notification() const throw ();
     set_string&            hostgroups() throw ();
     set_string const&      hostgroups() const throw ();
     set_string&            hosts() throw ();

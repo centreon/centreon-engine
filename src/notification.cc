@@ -1,21 +1,21 @@
 /*
-** Copyright 2019 Centreon
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2019 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
@@ -42,32 +42,32 @@ notification::notification(notifier* parent,
       _id{notification_id},
       _number{notification_number} {
   switch (_type) {
-    case notifier::notification_normal:
+    case notifier::reason_normal:
       _category = notifier::cat_normal;
       break;
-      case notifier::notification_recovery:
+      case notifier::reason_recovery:
       _category = notifier::cat_recovery;
       break;
-    case notifier::notification_acknowledgement:
+    case notifier::reason_acknowledgement:
       _category = notifier::cat_acknowledgement;
       break;
-    case notifier::notification_flappingstop:
-    case notifier::notification_flappingstart:
-    case notifier::notification_flappingdisabled:
+    case notifier::reason_flappingstop:
+    case notifier::reason_flappingstart:
+    case notifier::reason_flappingdisabled:
       _category = notifier::cat_flapping;
       break;
-    case notifier::notification_downtimestart:
-    case notifier::notification_downtimeend:
-    case notifier::notification_downtimecancelled:
+    case notifier::reason_downtimestart:
+    case notifier::reason_downtimeend:
+    case notifier::reason_downtimecancelled:
       _category = notifier::cat_downtime;
       break;
-    case notifier::notification_custom:
+    case notifier::reason_custom:
       _category = notifier::cat_custom;
       break;
   }
 }
 
-int notification::execute(std::unordered_set<contact*> const& to_notify) {
+int notification::execute(std::unordered_set<contact*>&& to_notify) {
   uint32_t contacts_notified{0};
 
   struct timeval start_time;
@@ -121,31 +121,31 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
 
   /* set the notification type macro */
   switch (_type) {
-    case notifier::notification_acknowledgement:
+    case notifier::reason_acknowledgement:
       mac.x[MACRO_NOTIFICATIONTYPE] = "ACKNOWLEDGEMENT";
       break;
-    case notifier::notification_flappingstart:
+    case notifier::reason_flappingstart:
       mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTART";
       break;
-    case notifier::notification_flappingstop:
+    case notifier::reason_flappingstop:
       mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTOP";
       break;
-    case notifier::notification_flappingdisabled:
+    case notifier::reason_flappingdisabled:
       mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGDISABLED";
       break;
-    case notifier::notification_downtimestart:
+    case notifier::reason_downtimestart:
       mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMESTART";
       break;
-    case notifier::notification_downtimeend:
+    case notifier::reason_downtimeend:
       mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMEEND";
       break;
-    case notifier::notification_downtimecancelled:
+    case notifier::reason_downtimecancelled:
       mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMECANCELLED";
       break;
-    case notifier::notification_custom:
+    case notifier::reason_custom:
       mac.x[MACRO_NOTIFICATIONTYPE] = "CUSTOM";
       break;
-    case notifier::notification_recovery:
+    case notifier::reason_recovery:
       mac.x[MACRO_NOTIFICATIONTYPE] = "RECOVERY";
       break;
     default:
@@ -191,7 +191,12 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
       contacts_notified++;
   }
 
+  _notified_contacts = to_notify;
   logger(dbg_notifications, basic)
       << contacts_notified << " contacts were notified.";
   return OK;
+}
+
+notifier::reason_type notification::get_reason() const {
+  return _type;
 }

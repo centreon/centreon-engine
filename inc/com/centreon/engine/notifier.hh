@@ -1,21 +1,21 @@
 /*
-** Copyright 2019 Centreon
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2019 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 
 #ifndef CCE_NOTIFIER_HH
 #define CCE_NOTIFIER_HH
@@ -37,6 +37,7 @@ CCE_BEGIN()
 class escalation;
 class contact;
 class timeperiod;
+class notification;
 
 class                notifier : public checkable {
  public:
@@ -49,21 +50,27 @@ class                notifier : public checkable {
     cat_custom,
   };
 
-  enum               notification_type {
-    none =            0,
+  enum               notification_flag {
+    none =              0,
     // Host
-    up   =            1 << 0,
-    down =            1 << 1,
-    unreachable =     1 << 2,
+    up   =              1 << 0,
+    down =              1 << 1,
+    unreachable =       1 << 2,
     // Service
-    ok =              1 << 3,
-    warning =         1 << 4,
-    critical =        1 << 5,
-    unknown =         1 << 6,
-    // Common
-    recovery =        1 << 7,
-    flapping =        1 << 8,
-    downtime =        1 << 9,
+    ok =                1 << 3,
+    warning =           1 << 4,
+    critical =          1 << 5,
+    unknown =           1 << 6,
+    // Flapping
+    flappingstart =     1 << 8,
+    flappingstop =      1 << 9,
+    flappingdisabled =  1 << 10,
+
+    // Recovery
+    recovery =          1 << 11,
+
+    // Downtime
+    downtime =          1 << 12,
   };
 
   enum               notifier_type {
@@ -72,16 +79,16 @@ class                notifier : public checkable {
   };
 
   enum               reason_type {
-    notification_normal,
-    notification_recovery,
-    notification_acknowledgement,
-    notification_flappingstart,
-    notification_flappingstop,
-    notification_flappingdisabled,
-    notification_downtimestart,
-    notification_downtimeend,
-    notification_downtimecancelled,
-    notification_custom = 99,
+    reason_normal,
+    reason_recovery,
+    reason_acknowledgement,
+    reason_flappingstart,
+    reason_flappingstop,
+    reason_flappingdisabled,
+    reason_downtimestart,
+    reason_downtimeend,
+    reason_downtimecancelled,
+    reason_custom = 99,
   };
 
   enum                notification_option {
@@ -91,14 +98,16 @@ class                notifier : public checkable {
     notification_option_increment = 4,
   };
 
-  static std::array<std::string, 8> const tab_notification_str;
+  static std::array<std::string, 9> const tab_notification_str;
+
   static std::array<std::string, 2> const tab_state_type;
 
-  typedef bool (notifier::* is_viable)(notification_option) const;
+  typedef bool (notifier::*is_viable)(reason_type type,
+                                      notification_option) const;
 
   //static void        inc_next_notification_id();
 
-                     notifier(notifier_type notification_type,
+                     notifier(notifier_type notification_flag,
                               std::string const& display_name,
                               std::string const& check_command,
                               bool checks_enabled,
@@ -129,28 +138,28 @@ class                notifier : public checkable {
                      ~notifier() {}
 
 
-  bool               get_notify_on(notification_type type) const;
+  bool               get_notify_on(notification_flag type) const;
   uint32_t           get_notify_on() const;
   void               set_notify_on(uint32_t type);
-  void               add_notify_on(notification_type type);
-  void               remove_notify_on(notification_type type);
+  void               add_notify_on(notification_flag type);
+  void               remove_notify_on(notification_flag type);
   virtual bool       get_notify_on_current_state() const = 0;
 
-  bool               get_notified_on(notification_type type) const;
+  bool               get_notified_on(notification_flag type) const;
   uint32_t           get_notified_on() const;
   void               set_notified_on(uint32_t type);
-  void               add_notified_on(notification_type type);
-  void               remove_notified_on(notification_type type);
+  void               add_notified_on(notification_flag type);
+  void               remove_notified_on(notification_flag type);
 
-  bool               get_stalk_on(notification_type type) const;
+  bool               get_stalk_on(notification_flag type) const;
   uint32_t           get_stalk_on() const;
   void               set_stalk_on(uint32_t type);
-  void               add_stalk_on(notification_type type);
+  void               add_stalk_on(notification_flag type);
 
-  bool               get_flap_detection_on(notification_type type) const;
+  bool               get_flap_detection_on(notification_flag type) const;
   uint32_t           get_flap_detection_on() const;
   void               set_flap_detection_on(uint32_t type);
-  void               add_flap_detection_on(notification_type type);
+  void               add_flap_detection_on(notification_flag type);
 
 
   unsigned long      get_current_event_id() const;
@@ -176,9 +185,9 @@ class                notifier : public checkable {
   virtual void       grab_macros_r(nagios_macros* mac) = 0;
   virtual int        notify_contact(nagios_macros* mac,
                                     contact* cntct,
-                                    int type,
-                                    char const* not_author,
-                                    char const* not_data,
+                                    reason_type type,
+                                    std::string const& not_author,
+                                    std::string const& not_data,
                                     int options,
                                     int escalated) = 0;
   time_t             get_next_notification() const;
@@ -236,10 +245,12 @@ class                notifier : public checkable {
   virtual timeperiod* get_notification_timeperiod() const = 0;
   notification_category
                      get_category(reason_type type) const;
-  bool               is_notification_viable(notification_category cat,
-                                      notification_option options);
-  std::unordered_set<contact*>
-                     get_contacts_to_notify(notification_category cat, int state);
+  bool is_notification_viable(notification_category cat,
+                              reason_type type,
+                              notification_option options);
+  std::unordered_set<contact*> get_contacts_to_notify(notification_category cat,
+                                                      reason_type type,
+                                                      int state);
   notifier_type      get_notifier_type() const;
   std::unordered_map<std::string, contact*>& get_contacts();
   std::unordered_map<std::string, contact*> const& get_contacts() const;
@@ -260,8 +271,8 @@ class                notifier : public checkable {
 
  protected:
   notifier_type      _notifier_type;
-  int                _stalk_type;
-  int                _flap_type;
+  uint32_t           _stalk_type;
+  uint32_t           _flap_type;
   unsigned long      _current_event_id;
   unsigned long      _last_event_id;
   unsigned long      _current_problem_id;
@@ -278,24 +289,25 @@ class                notifier : public checkable {
   double             _notification_interval;
   std::string        _notification_period;
   uint32_t           _out_notification_type;
-  uint32_t           _in_notification_type;
+  uint32_t           _current_notifications;
   uint32_t           _modified_attributes;
 
  private:
   static std::array<is_viable, 6> const _is_notification_viable;
 
-  bool               _is_notification_viable_normal(
-                                            notification_option options) const;
-  bool               _is_notification_viable_recovery(
-                                            notification_option options) const;
-  bool               _is_notification_viable_acknowledgement(
-                                            notification_option options) const;
-  bool               _is_notification_viable_flapping(
-                                            notification_option options) const;
-  bool               _is_notification_viable_downtime(
-                                            notification_option options) const;
-  bool               _is_notification_viable_custom(
-                                            notification_option options) const;
+  bool _is_notification_viable_normal(reason_type type,
+                                      notification_option options) const;
+  bool _is_notification_viable_recovery(reason_type type,
+                                        notification_option options) const;
+  bool _is_notification_viable_acknowledgement(
+      reason_type type,
+      notification_option options) const;
+  bool _is_notification_viable_flapping(reason_type type,
+                                        notification_option options) const;
+  bool _is_notification_viable_downtime(reason_type type,
+                                        notification_option options) const;
+  bool _is_notification_viable_custom(reason_type type,
+                                      notification_option options) const;
 
   static uint64_t    _next_notification_id;
   uint32_t           _first_notification_delay;
@@ -315,6 +327,7 @@ class                notifier : public checkable {
   reason_type _type;
   std::unordered_map<std::string, contact*> _contacts;
   contactgroup_map_unsafe _contact_groups;
+  std::array<std::shared_ptr<notification>, 6> _notification;
 };
 
 CCE_END()

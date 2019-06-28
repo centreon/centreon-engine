@@ -131,7 +131,7 @@ std::ostream& operator<<(
   return os;
 }
 
-void contactgroup::resolve(int& w, int& e) {
+void contactgroup::resolve(int& w __attribute__((unused)), int& e) {
   int errors{0};
 
   for (contact_map_unsafe::iterator it{_members.begin()},

@@ -47,8 +47,8 @@ hostescalation_mmap hostescalation::hostescalations;
  *  @param[in] escalate_on_recovery    Escalate on recovery ?
  */
 hostescalation::hostescalation(std::string const& host_name,
-                               int first_notification,
-                               int last_notification,
+                               uint32_t first_notification,
+                               uint32_t last_notification,
                                double notification_interval,
                                std::string const& escalation_period,
                                uint32_t escalate_on)
@@ -82,13 +82,13 @@ std::string const& hostescalation::get_hostname() const {
  *
  * @return A boolean.
  */
-bool hostescalation::is_viable(int state, int notification_number) const {
+bool hostescalation::is_viable(int state, uint32_t notification_number) const {
   logger(dbg_functions, basic)
     << "serviceescalation::is_viable()";
 
   bool retval{escalation::is_viable(state, notification_number)};
   if (retval) {
-    std::array<notifier::notification_type, 3> nt = {
+    std::array<notifier::notification_flag, 3> nt = {
       notifier::up,
       notifier::down,
       notifier::unreachable,

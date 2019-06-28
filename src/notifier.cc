@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
@@ -39,10 +38,17 @@ using namespace com::centreon::engine::configuration::applier;
 // std::unordered_map<std::string, std::shared_ptr<contact>>
 // notifier::current_notifications;
 
-std::array<std::string, 8> const notifier::tab_notification_str{
-    {"NORMAL",       "ACKNOWLEDGEMENT",   "FLAPPINGSTART",
-     "FLAPPINGSTOP", "FLAPPINGDISABLED",  "DOWNTIMESTART",
-     "DOWNTIMEEND",  "DOWNTIMECANCELLED", }};
+std::array<std::string, 9> const notifier::tab_notification_str{{
+    "NORMAL",
+    "RECOVERY",
+    "ACKNOWLEDGEMENT",
+    "FLAPPINGSTART",
+    "FLAPPINGSTOP",
+    "FLAPPINGDISABLED",
+    "DOWNTIMESTART",
+    "DOWNTIMEEND",
+    "DOWNTIMECANCELLED",
+}};
 
 std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
@@ -94,10 +100,10 @@ notifier::notifier(notifier::notifier_type notifier_type,
           flap_detection_enabled, low_flap_threshold,  high_flap_threshold,
           check_freshness,        freshness_threshold, obsess_over,
           timezone},
+      notification_period_ptr{nullptr},
       _notifier_type{notifier_type},
       _notification_interval{notification_interval},
       _notification_period{notification_period},
-      notification_period_ptr{nullptr},
       _first_notification_delay{first_notification_delay},
       _recovery_notification_delay{recovery_notification_delay},
       _notifications_enabled{notifications_enabled},
@@ -156,7 +162,9 @@ void notifier::set_notification_number(int num) {
   update_status(false);
 }
 
-bool notifier::_is_notification_viable_normal(notification_option options) const {
+bool notifier::_is_notification_viable_normal(
+    reason_type type __attribute__((unused)),
+    notification_option options) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
   /* forced notifications bust through everything */
@@ -227,16 +235,20 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
     return false;
   }
 
-  if (_first_notification_delay > 0 && _notification_number == 0 && get_last_hard_state_change() + _first_notification_delay * config->interval_length() > now) {
+  if (_first_notification_delay > 0 && _notification_number == 0 &&
+      get_last_hard_state_change() +
+              _first_notification_delay * config->interval_length() >
+          now) {
     logger(dbg_notifications, more)
-      << "This notifier is configured with a first notification delay, we won't send notification until "
-      << "timestamp " << (_first_notification_delay * config->interval_length());
+        << "This notifier is configured with a first notification delay, we "
+           "won't send notification until timestamp "
+        << (_first_notification_delay * config->interval_length());
     return false;
   }
 
   if (_notification_number >= 1 && _notification_interval > 0) {
     if (_last_notification + _notification_interval * config->interval_length()
-        < now) {
+        > now) {
       logger(dbg_notifications, more)
         << "This notifier problem has been sent at " << _last_notification
         << " so it won't be sent until "
@@ -248,14 +260,10 @@ bool notifier::_is_notification_viable_normal(notification_option options) const
   return true;
 }
 
-bool notifier::_is_notification_viable_recovery(notification_option options) const {
-  bool retval;
-  /* forced notifications bust through everything */
-  if (options & notification_option_forced) {
-    logger(dbg_notifications, more)
-        << "This is a forced notification, so we'll send it out.";
-    return true;
-  }
+bool notifier::_is_notification_viable_recovery(
+    reason_type type __attribute__((unused)),
+    notification_option options __attribute__((unused))) const {
+  logger(dbg_functions, basic) << "notifier::is_notification_viable_recovery()";
 
   /* are notifications enabled? */
   if (!config->enable_notifications()) {
@@ -273,29 +281,66 @@ bool notifier::_is_notification_viable_recovery(notification_option options) con
     return false;
   }
 
-  /* Recovery is sent on state OK or UP */
-  if (get_current_state_int() == 0) {
-    /* Filtering conditions are similar to normal notifications */
-    retval = _is_notification_viable_normal(options);
-    if (retval) {
-      timezone_locker lock{get_timezone()};
-      time_t now;
-      time(&now);
-      retval = (get_last_hard_state_change() + _recovery_notification_delay <= now);
-      if (!retval)
-        logger(dbg_notifications, more)
-          << "This notifier is configured with a recovery notification delay. "
-          << "It won't send any recovery notification until timestamp "
-          << " so it won't be sent until "
-          << (get_last_hard_state_change() + _recovery_notification_delay);
-    }
+  timeperiod* tp{get_notification_timeperiod()};
+  timezone_locker lock{get_timezone()};
+  std::time_t now;
+  std::time(&now);
+
+  if (!check_time_against_period(now, tp)) {
+    logger(dbg_notifications, more)
+        << "This notifier shouldn't have notifications sent out "
+           "at this time.";
+    return false;
   }
-  else
-    retval = false;
-  return retval;
+
+  /* if this notifier is currently in a scheduled downtime period, don't send
+   * the notification */
+  if (is_in_downtime()) {
+    logger(dbg_notifications, more)
+        << "This notifier is currently in a scheduled downtime, so "
+           "we won't send notifications.";
+    return false;
+  }
+
+  /* if this notifier is flapping, don't send the notification */
+  if (get_is_flapping()) {
+    logger(dbg_notifications, more)
+        << "This notifier is flapping, so we won't send notifications.";
+    return false;
+  }
+
+  if (get_state_type() != hard) {
+    logger(dbg_notifications, more)
+        << "This notifier is in soft state, so we won't send notifications.";
+    return false;
+  }
+
+  /* Recovery is sent on state OK or UP */
+  if (get_current_state_int() != 0 || !get_notify_on(recovery)) {
+    logger(dbg_notifications, more)
+        << "This notifier state is not UP/OK are is not configured to send a "
+           "recovery notification";
+    return false;
+  }
+
+  if (get_last_hard_state_change() +
+          _recovery_notification_delay * config->interval_length() >
+      now) {
+    logger(dbg_notifications, more)
+        << "This notifier is configured with a recovery notification delay. "
+        << "It won't send any recovery notification until timestamp "
+        << " so it won't be sent until "
+        << (get_last_hard_state_change() + _recovery_notification_delay);
+    return false;
+  }
+  return true;
 }
 
-bool notifier::_is_notification_viable_acknowledgement(notification_option options) const {
+bool notifier::_is_notification_viable_acknowledgement(
+    reason_type type __attribute__((unused)),
+    notification_option options) const {
+  logger(dbg_functions, basic)
+      << "notifier::is_notification_viable_acknowledgement()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -327,7 +372,11 @@ bool notifier::_is_notification_viable_acknowledgement(notification_option optio
   return true;
 }
 
-bool notifier::_is_notification_viable_flapping(notification_option options) const {
+bool notifier::_is_notification_viable_flapping(
+    reason_type type,
+    notification_option options) const {
+  logger(dbg_functions, basic)
+      << "notifier::is_notification_viable_flapping()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -352,9 +401,27 @@ bool notifier::_is_notification_viable_flapping(notification_option options) con
   }
 
   /* Don't send a notification if we are not supposed to */
-  if (!get_notify_on(flapping)) {
+  notification_flag f;
+  if (type == reason_flappingstart)
+    f = flappingstart;
+  else if (type == reason_flappingstop)
+    f = flappingstop;
+  else
+    f = flappingdisabled;
+
+  if (!get_notify_on(f)) {
     logger(dbg_notifications, more)
-      << "We shouldn't notify about FLAPPING events for this notifier.";
+        << "We shouldn't notify about " << tab_notification_str[type]
+        << " events for this notifier.";
+    return false;
+  }
+
+  /* Don't send a notification if is has already been sent */
+  if (_notification[cat_flapping] &&
+      _notification[cat_flapping]->get_reason() == type) {
+    logger(dbg_notifications, more)
+        << "We shouldn't notify about a " << tab_notification_str[type]
+        << " event: already sent.";
     return false;
   }
 
@@ -367,7 +434,10 @@ bool notifier::_is_notification_viable_flapping(notification_option options) con
   return true;
 }
 
-bool notifier::_is_notification_viable_downtime(notification_option options) const {
+bool notifier::_is_notification_viable_downtime(
+    reason_type type __attribute__((unused)),
+    notification_option options) const {
+  logger(dbg_functions, basic) << "notifier::is_notification_viable_downtime()";
 
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
@@ -394,14 +464,14 @@ bool notifier::_is_notification_viable_downtime(notification_option options) con
 
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
-      << "Notifications are disabled, so notifications won't be sent out.";
+        << "Notifications are disabled, so notifications won't be sent out.";
     return false;
   }
 
   /* Don't send a notification if we are not supposed to */
   if (!get_notify_on(downtime)) {
     logger(dbg_notifications, more)
-      << "We shouldn't notify about DOWNTIME events for this notifier.";
+        << "We shouldn't notify about DOWNTIME events for this notifier.";
     return false;
   }
 
@@ -409,14 +479,18 @@ bool notifier::_is_notification_viable_downtime(notification_option options) con
    * service, we don't care of the host, so the use of
    * get_scheduled_downtime_depth()) */
   if (get_scheduled_downtime_depth() > 0) {
-    logger(dbg_notifications, more)
-      << "We shouldn't notify about DOWNTIME events during scheduled downtime.";
+    logger(dbg_notifications, more) << "We shouldn't notify about DOWNTIME "
+                                       "events during scheduled downtime.";
     return false;
   }
   return true;
 }
 
-bool notifier::_is_notification_viable_custom(notification_option options) const {
+bool notifier::_is_notification_viable_custom(
+    reason_type type __attribute__((unused)),
+    notification_option options) const {
+  logger(dbg_functions, basic)
+      << "notifier::is_notification_viable_custom()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -449,7 +523,10 @@ bool notifier::_is_notification_viable_custom(notification_option options) const
   return true;
 }
 
-std::unordered_set<contact*> notifier::get_contacts_to_notify(notification_category cat, int state) {
+std::unordered_set<contact*> notifier::get_contacts_to_notify(
+    notification_category cat,
+    reason_type type,
+    int state __attribute__((unused))) {
   std::unordered_set<contact*> retval;
 
   /* Let's start looking at escalations */
@@ -464,17 +541,19 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(notification_categ
       for (contact_map_unsafe::const_iterator cit{(*it)->contacts().begin()},
            cend{(*it)->contacts().end()};
            cit != cend; ++cit)
-        if (cit->second->should_be_notified(cat, *this))
+        if (cit->second->should_be_notified(cat, type, *this))
           retval.insert(cit->second);
 
       /* For each contact group, we also add its contacts. */
-      for (contactgroup_map_unsafe::const_iterator cgit{(*it)->contact_groups().begin()}, cgend{(*it)->contact_groups().end()};
-          cgit != cgend; ++cgit) {
-        for (contact_map_unsafe::const_iterator cit{cgit->second->get_members().begin()},
-            cend{cgit->second->get_members().end()};
-            cit != cend;
-            ++cit)
-          if (cit->second->should_be_notified(cat, *this))
+      for (contactgroup_map_unsafe::const_iterator
+               cgit{(*it)->contact_groups().begin()},
+           cgend{(*it)->contact_groups().end()};
+           cgit != cgend; ++cgit) {
+        for (contact_map_unsafe::const_iterator
+                 cit{cgit->second->get_members().begin()},
+             cend{cgit->second->get_members().end()};
+             cit != cend; ++cit)
+          if (cit->second->should_be_notified(cat, type, *this))
             retval.insert(cit->second);
       }
     }
@@ -511,8 +590,9 @@ notifier::notification_category notifier::get_category(reason_type type) const {
 }
 
 bool notifier::is_notification_viable(notification_category cat,
+                                      reason_type type,
                                       notification_option options) {
-  return (this->*(_is_notification_viable[cat]))(options);
+  return (this->*(_is_notification_viable[cat]))(type, options);
 }
 
 int notifier::notify(notifier::reason_type type,
@@ -524,35 +604,36 @@ int notifier::notify(notifier::reason_type type,
   notification_category cat{get_category(type)};
 
   /* Has this notification got sense? */
-  if (!is_notification_viable(cat, options))
+  if (!is_notification_viable(cat, type, options))
     return OK;
 
   /* For a first notification, we store what type of notification we try to
-   *    * send and we fix the notification number to 1. */
+   * send and we fix the notification number to 1. */
   if (_notification_number == 0) {
     _type = type;
     ++_notification_number;
   }
-  /* The previous notification failed. What should we do? */
-  else {
-  }
 
-  std::unique_ptr<notification> notif{
+  std::shared_ptr<notification> notif{
       new notification(this, _type, not_author, not_data, options,
                        _next_notification_id++, _notification_number)};
 
   /* What are the contacts to notify? */
   std::unordered_set<contact*> to_notify{
-      get_contacts_to_notify(cat, get_current_state_int())};
+      get_contacts_to_notify(cat, type, get_current_state_int())};
 
   /* Let's make the notification. */
-  int retval{notif->execute(to_notify)};
-  if (retval != OK) {
-    /* A new attempt is needed, maybe we won't increment it everytimes. */
-    _notification_number++;
-  } else {
-    /* No current notification */
-    _notification_number = 0;
+  int retval{notif->execute(std::move(to_notify))};
+
+  if (retval == OK) {
+    _last_notification = std::time(nullptr);
+    _notification[cat] = notif;
+    /* The notification has been sent.
+     * Should we increment the notification number? */
+    if (cat == cat_normal)
+      _notification_number++;
+    else
+      _notification_number = 0;
   }
 
   return retval;
@@ -921,19 +1002,19 @@ void notifier::set_notification_period(std::string const& notification_period) {
   _notification_period = notification_period;
 }
 
-bool notifier::get_notify_on(notification_type type) const {
+bool notifier::get_notify_on(notification_flag type) const {
   return _out_notification_type & type;
 }
 
 uint32_t notifier::get_notify_on() const { return _out_notification_type; }
 
-void notifier::add_notify_on(notification_type type) {
+void notifier::add_notify_on(notification_flag type) {
   _out_notification_type |= type;
 }
 
 void notifier::set_notify_on(uint32_t type) { _out_notification_type = type; }
 
-void notifier::remove_notify_on(notification_type type) {
+void notifier::remove_notify_on(notification_flag type) {
   _out_notification_type &= ~type;
 }
 
@@ -962,23 +1043,23 @@ void notifier::set_notifications_enabled(bool notifications_enabled) {
   _notifications_enabled = notifications_enabled;
 }
 
-bool notifier::get_notified_on(notification_type type) const {
-  return _in_notification_type & type;
+bool notifier::get_notified_on(notification_flag type) const {
+  return _current_notifications & type;
 }
 
-uint32_t notifier::get_notified_on() const { return _in_notification_type; }
+uint32_t notifier::get_notified_on() const { return _current_notifications; }
 
-void notifier::add_notified_on(notification_type type) {
-  _in_notification_type |= type;
+void notifier::add_notified_on(notification_flag type) {
+  _current_notifications |= type;
 }
 
-void notifier::set_notified_on(uint32_t type) { _in_notification_type = type; }
+void notifier::set_notified_on(uint32_t type) { _current_notifications = type; }
 
-void notifier::remove_notified_on(notification_type type) {
-  _in_notification_type &= ~type;
+void notifier::remove_notified_on(notification_flag type) {
+  _current_notifications &= ~type;
 }
 
-bool notifier::get_flap_detection_on(notification_type type) const {
+bool notifier::get_flap_detection_on(notification_flag type) const {
   return _stalk_type & type;
 }
 
@@ -986,11 +1067,11 @@ uint32_t notifier::get_flap_detection_on() const { return _stalk_type; }
 
 void notifier::set_flap_detection_on(uint32_t type) { _stalk_type = type; }
 
-void notifier::add_flap_detection_on(notification_type type) {
+void notifier::add_flap_detection_on(notification_flag type) {
   _stalk_type |= type;
 }
 
-bool notifier::get_stalk_on(notification_type type) const {
+bool notifier::get_stalk_on(notification_flag type) const {
   return _stalk_type & type;
 }
 
@@ -998,7 +1079,7 @@ uint32_t notifier::get_stalk_on() const { return _stalk_type; }
 
 void notifier::set_stalk_on(uint32_t type) { _stalk_type = type; }
 
-void notifier::add_stalk_on(notification_type type) { _stalk_type |= type; }
+void notifier::add_stalk_on(notification_flag type) { _stalk_type |= type; }
 
 uint32_t notifier::get_modified_attributes() const {
   return _modified_attributes;

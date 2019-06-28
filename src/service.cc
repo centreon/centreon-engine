@@ -449,8 +449,14 @@ std::ostream& operator<<(std::ostream& os,
         "  notify_on_recovery:                   "
      << obj.get_notify_on(notifier::recovery)
      << "\n"
-        "  notify_on_flapping:                   "
-     << obj.get_notify_on(notifier::flapping)
+        "  notify_on_flappingstart:              "
+     << obj.get_notify_on(notifier::flappingstart)
+     << "\n"
+        "  notify_on_flappingstop:               "
+     << obj.get_notify_on(notifier::flappingstop)
+     << "\n"
+        "  notify_on_flappingdisabled:           "
+     << obj.get_notify_on(notifier::flappingdisabled)
      << "\n"
         "  notify_on_downtime:                   "
      << obj.get_notify_on(notifier::downtime)
@@ -816,7 +822,10 @@ com::centreon::engine::service* add_service(
     notify_on = none;
     notify_on |= (notify_critical > 0 ? notifier::critical : 0);
     notify_on |= (notify_downtime > 0 ? notifier::downtime : 0);
-    notify_on |= (notify_flapping > 0 ? notifier::flapping : 0);
+    notify_on |= (notify_flapping > 0
+                      ? (notifier::flappingstart | notifier::flappingstop |
+                         notifier::flappingdisabled)
+                      : 0);
     notify_on |= (notify_recovery > 0 ? notifier::recovery : 0);
     notify_on |= (notify_unknown > 0 ? notifier::unknown : 0);
     notify_on |= (notify_warning > 0 ? notifier::warning : 0);
@@ -1502,7 +1511,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
-      notify(notification_normal, "", "", notification_option_none);
+      notify(reason_normal, "", "", notification_option_none);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event();
@@ -1529,7 +1538,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* Check if we need to send a recovery notification */
     if (!_recovery_been_sent && !hard_state_change)
-      notify(notification_normal, "", "", notification_option_none);
+      notify(reason_normal, "", "", notification_option_none);
 
     /* should we obsessive over service checks? */
     if (config->obsess_over_services())
@@ -1668,7 +1677,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         route_result = hst->get_current_state();
 
         /* possibly re-send host notifications... */
-        hst->notify(notification_normal, "", "", notification_option_none);
+        hst->notify(reason_normal, "", "", notification_option_none);
       }
     }
 
@@ -1851,7 +1860,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* (re)send notifications out about this service problem if the host is up
        * (and was at last check also) and the dependencies were okay... */
-      notify(notification_normal, "", "", notification_option_none);
+      notify(reason_normal, "", "", notification_option_none);
 
       /* run the service event handler if we changed state from the last hard
        * state or if this service is flagged as being volatile */
@@ -2583,7 +2592,7 @@ void service::set_flap(double percent_change,
 
   /* send a notification */
   if (allow_flapstart_notification)
-    notify(notification_flappingstart, "", "",
+    notify(reason_flappingstart, "", "",
            notification_option_none);
 }
 
@@ -2619,12 +2628,12 @@ void service::clear_flap(double percent_change,
                        percent_change, high_threshold, low_threshold, nullptr);
 
   /* send a notification */
-  notify(notification_flappingstop, "", "", notification_option_none);
+  notify(reason_flappingstop, "", "", notification_option_none);
 
   /* should we send a recovery notification? */
   if (this->check_flapping_recovery_notification &&
       _current_state == service::state_ok)
-    notify(notification_normal, "", "", notification_option_none);
+    notify(reason_normal, "", "", notification_option_none);
 
   /* clear the recovery notification flag */
   this->check_flapping_recovery_notification = false;
@@ -3109,10 +3118,10 @@ void service::grab_macros_r(nagios_macros* mac) {
 /* notify a specific contact about a service problem or recovery */
 int service::notify_contact(nagios_macros* mac,
                             contact* cntct,
-                            int type,
-                            char const* not_author,
-                            char const* not_data,
-                            int options,
+                            reason_type type,
+                            std::string const& not_author,
+                            std::string const& not_data,
+                            int options __attribute__((unused)),
                             int escalated) {
   std::string raw_command;
   std::string processed_command;
@@ -3132,9 +3141,12 @@ int service::notify_contact(nagios_macros* mac,
    * acknowledgements are no longer excluded from this test -
    * added 8/19/02 Tom Bertelson
    */
-  if (cntct->check_service_notification_viability(this, type,
-                                                   options) == ERROR)
+  notification_category cat{get_category(type)};
+  if (!cntct->should_be_notified(cat, type, *this))
     return ERROR;
+//  if (cntct->check_service_notification_viability(this, type,
+//                                                   options) == ERROR)
+//    return ERROR;
 
   logger(dbg_notifications, most)
       << "** Notifying contact '" << cntct->get_name() << "'";
@@ -3148,7 +3160,7 @@ int service::notify_contact(nagios_macros* mac,
   neb_result = broker_contact_notification_data(
       NEBTYPE_CONTACTNOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE,
       service_notification, type, start_time, end_time, (void*)this, cntct,
-      not_author, not_data, escalated, nullptr);
+      not_author.c_str(), not_data.c_str(), escalated, nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
     return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -3166,8 +3178,8 @@ int service::notify_contact(nagios_macros* mac,
     neb_result = broker_contact_notification_method_data(
         NEBTYPE_CONTACTNOTIFICATIONMETHOD_START, NEBFLAG_NONE, NEBATTR_NONE,
         service_notification, type, method_start_time, method_end_time,
-        (void*)this, cntct, cmd->get_command_line().c_str(), not_author,
-        not_data, escalated, nullptr);
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author.c_str(),
+        not_data.c_str(), escalated, nullptr);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -3204,17 +3216,10 @@ int service::notify_contact(nagios_macros* mac,
         notification_str = tab_notification_str[type].c_str();
 
       std::string info;
-      switch (type) {
-        case notification_custom:
-          notification_str = "CUSTOM";
-
-        case notification_acknowledgement:
-          info.append(";")
-              .append(not_author ? not_author : "")
-              .append(";")
-              .append(not_data ? not_data : "");
-          break;
-      }
+      if (type == reason_custom)
+        notification_str = "CUSTOM";
+      else if (type == reason_acknowledgement)
+        info.append(";").append(not_author).append(";").append(not_data);
 
       std::string service_notification_state;
       if (strcmp(notification_str, "NORMAL") == 0)
@@ -3259,8 +3264,8 @@ int service::notify_contact(nagios_macros* mac,
     broker_contact_notification_method_data(
         NEBTYPE_CONTACTNOTIFICATIONMETHOD_END, NEBFLAG_NONE, NEBATTR_NONE,
         service_notification, type, method_start_time, method_end_time,
-        (void*)this, cntct, cmd->get_command_line().c_str(), not_author,
-        not_data, escalated, nullptr);
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author.c_str(),
+        not_data.c_str(), escalated, nullptr);
   }
 
   /* get end time */
@@ -3273,7 +3278,7 @@ int service::notify_contact(nagios_macros* mac,
   broker_contact_notification_data(
       NEBTYPE_CONTACTNOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
       service_notification, type, start_time, end_time, (void*)this, cntct,
-      not_author, not_data, escalated, nullptr);
+      not_author.c_str(), not_data.c_str(), escalated, nullptr);
   return OK;
 }
 
@@ -3361,7 +3366,7 @@ time_t service::get_next_notification_time(time_t offset) {
 bool service::is_valid_escalation_for_notification(
     std::shared_ptr<escalation> e,
     int options) const {
-  int notification_number;
+  uint32_t notification_number;
   time_t current_time;
 
   logger(dbg_functions, basic)
@@ -3565,7 +3570,7 @@ void service::handle_flap_detection_disabled() {
 
     /* send a notification */
     this->notify(
-      notification_flappingdisabled,
+      reason_flappingdisabled,
       "",
       "",
       notification_option_none);
@@ -3574,7 +3579,7 @@ void service::handle_flap_detection_disabled() {
     if (this->check_flapping_recovery_notification
         && this->_current_state == service::state_ok)
       this->notify(
-        notification_normal,
+        reason_normal,
         "",
         "",
         notification_option_none);
@@ -3812,7 +3817,7 @@ std::string const& service::get_current_state_as_string() const {
 }
 
 bool service::get_notify_on_current_state() const {
-  notification_type type[]{ok, warning, critical, unknown};
+  notification_flag type[]{ok, warning, critical, unknown};
   return get_notify_on(type[get_current_state()]);
 }
 

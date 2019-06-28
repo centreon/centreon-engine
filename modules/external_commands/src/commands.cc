@@ -242,7 +242,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
 }
 
 /* removes a host or service comment from the status log */
-int cmd_delete_comment(int cmd, char* args) {
+int cmd_delete_comment(int cmd __attribute__((unused)), char* args) {
   uint64_t comment_id{0};
 
   /* get the comment id we should delete */
@@ -2925,11 +2925,8 @@ void acknowledge_host_problem(
 
   /* send out an acknowledgement notification */
   if (notify)
-    hst->notify(
-      notifier::notification_acknowledgement,
-      ack_author,
-      ack_data,
-      notifier::notification_option_none);
+    hst->notify(notifier::reason_acknowledgement, ack_author, ack_data,
+                notifier::notification_option_none);
 
   /* update the status log with the host info */
   hst->update_status(false);
@@ -2991,7 +2988,7 @@ void acknowledge_service_problem(
   /* send out an acknowledgement notification */
   if (notify)
     svc->notify(
-      notifier::notification_acknowledgement,
+      notifier::reason_acknowledgement,
       ack_author,
       ack_data,
       notifier::notification_option_none);

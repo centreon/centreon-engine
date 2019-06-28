@@ -57,7 +57,7 @@ namespace                  configuration {
     bool                   operator!=(host const& other) const throw ();
     bool                   operator<(host const& other) const throw ();
     void                   check_validity() const override;
-    key_type const         key() const throw ();
+    key_type               key() const throw ();
     void                   merge(configuration::hostextinfo const& obj);
     void                   merge(object const& obj) override;
     bool                   parse(char const* key, char const* value) override;

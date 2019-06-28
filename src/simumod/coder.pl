@@ -44,7 +44,7 @@ while (<F>) {
  *
  *  \@return 0 on success and -1 otherwise.
  */
-static int callback_$fname(int callback_type, void* data) {
+static int callback_$fname(int callback_type __attribute__((unused)), void* data) {
   $v* neb_data(
     static_cast<$v*>(data));
 

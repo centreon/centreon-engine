@@ -25,8 +25,8 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
-escalation::escalation(int first_notification,
-                       int last_notification,
+escalation::escalation(uint32_t first_notification,
+                       uint32_t last_notification,
                        double notification_interval,
                        std::string const& escalation_period,
                        uint32_t escalate_on)
@@ -41,11 +41,11 @@ std::string const& escalation::get_escalation_period() const {
   return _escalation_period;
 }
 
-int escalation::get_first_notification() const {
+uint32_t escalation::get_first_notification() const {
   return _first_notification;
 }
 
-int escalation::get_last_notification() const {
+uint32_t escalation::get_last_notification() const {
   return _last_notification;
 }
 
@@ -57,11 +57,11 @@ void escalation::set_notification_interval(double notification_interval) {
   _notification_interval = notification_interval;
 }
 
-void escalation::add_escalate_on(notifier::notification_type type) {
+void escalation::add_escalate_on(notifier::notification_flag type) {
   _escalate_on |= type;
 }
 
-void escalation::remove_escalate_on(notifier::notification_type type) {
+void escalation::remove_escalate_on(notifier::notification_flag type) {
   _escalate_on &= ~type;
 }
 
@@ -73,7 +73,7 @@ void escalation::set_escalate_on(uint32_t escalate_on) {
   _escalate_on = escalate_on;
 }
 
-bool escalation::get_escalate_on(notifier::notification_type type) const {
+bool escalation::get_escalate_on(notifier::notification_flag type) const {
   return _escalate_on & type;
 }
 
@@ -102,12 +102,12 @@ contactgroup_map_unsafe& escalation::contact_groups() {
  *
  * @return A boolean.
  */
-bool escalation::is_viable(int state, int notification_number) const {
+bool escalation::is_viable(int state, uint32_t notification_number) const {
   std::time_t current_time;
   std::time(&current_time);
 
   /* In case of a recovery, we are interested by the last notification */
-  int number{state == 0 ?
+  uint32_t number{state == 0 ?
     notification_number - 1 : notification_number};
 
   /* Skip this escalation if current_time is outside its timeperiod */
@@ -120,7 +120,7 @@ bool escalation::is_viable(int state, int notification_number) const {
   return true;
 }
 
-void escalation::resolve(int& w, int& e) {
+void escalation::resolve(int& w __attribute__((unused)), int& e) {
   int errors{0};
   // Find the timeperiod.
   if (!get_escalation_period().empty()) {

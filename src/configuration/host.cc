@@ -430,7 +430,7 @@ void host::check_validity() const {
  *
  *  @return Host name.
  */
-host::key_type const host::key() const throw () {
+host::key_type host::key() const throw () {
   return _host_id;
 }
 

@@ -1,21 +1,21 @@
 /*
-** Copyright 2017-2018 Centreon
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2017 - 2019 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 
 #include <cstring>
 #include <iostream>
@@ -81,14 +81,14 @@ TEST_F(ApplierHost, HostRenamed) {
   hst_aply.add_object(hst);
   host_map const&
     hm(engine::host::hosts);
-  ASSERT_EQ(hm.size(), 1);
+  ASSERT_EQ(hm.size(), 1u);
   std::shared_ptr<com::centreon::engine::host> h1(hm.begin()->second);
   ASSERT_TRUE(h1->get_name() == "test_host");
 
   ASSERT_TRUE(hst.parse("host_name", "test_host1"));
   hst_aply.modify_object(hst);
-  ASSERT_EQ(hm.size(), 1);
+  ASSERT_EQ(hm.size(), 1u);
   h1 = hm.begin()->second;
   ASSERT_TRUE(h1->get_name() == "test_host1");
-  ASSERT_EQ(get_host_id(h1->get_name()), 12);
+  ASSERT_EQ(get_host_id(h1->get_name()), 12u);
 }
