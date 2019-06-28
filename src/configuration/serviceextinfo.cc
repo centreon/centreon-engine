@@ -26,7 +26,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<serviceextinfo, type, &serviceextinfo::method>::generic
 
-serviceextinfo::setters const serviceextinfo::_setters[] = {
+std::unordered_map<std::string, serviceextinfo::setter_func> const serviceextinfo::_setters{
   { "host_name",           SETTER(std::string const&, _set_hosts) },
   { "hostgroup",           SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",      SETTER(std::string const&, _set_hostgroups) },
@@ -77,7 +77,7 @@ serviceextinfo& serviceextinfo::operator=(serviceextinfo const& right) {
     _notes_url = right._notes_url;
     _service_description = right._service_description;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -107,7 +107,7 @@ bool serviceextinfo::operator==(serviceextinfo const& right) const throw () {
  *  @return True if is not the same serviceextinfo, otherwise false.
  */
 bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -158,12 +158,11 @@ void serviceextinfo::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool serviceextinfo::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+  std::unordered_map<std::string, serviceextinfo::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return false;
 }
 
 /**
@@ -172,7 +171,7 @@ bool serviceextinfo::parse(char const* key, char const* value) {
  *  @return The action_url.
  */
 std::string const& serviceextinfo::action_url() const throw () {
-  return (_action_url);
+  return _action_url;
 }
 
 /**
@@ -181,7 +180,7 @@ std::string const& serviceextinfo::action_url() const throw () {
  *  @return The icon_image.
  */
 std::string const& serviceextinfo::icon_image() const throw () {
-  return (_icon_image);
+  return _icon_image;
 }
 
 /**
@@ -190,7 +189,7 @@ std::string const& serviceextinfo::icon_image() const throw () {
  *  @return The icon_image_alt.
  */
 std::string const& serviceextinfo::icon_image_alt() const throw () {
-  return (_icon_image_alt);
+  return _icon_image_alt;
 }
 
 /**
@@ -199,7 +198,7 @@ std::string const& serviceextinfo::icon_image_alt() const throw () {
  *  @return The hostgroups.
  */
 set_string const& serviceextinfo::hostgroups() const throw () {
-  return (*_hostgroups);
+  return *_hostgroups;
 }
 
 /**
@@ -208,7 +207,7 @@ set_string const& serviceextinfo::hostgroups() const throw () {
  *  @return The hosts.
  */
 set_string const& serviceextinfo::hosts() const throw () {
-  return (*_hosts);
+  return *_hosts;
 }
 
 /**
@@ -217,7 +216,7 @@ set_string const& serviceextinfo::hosts() const throw () {
  *  @return The notes.
  */
 std::string const& serviceextinfo::notes() const throw () {
-  return (_notes);
+  return _notes;
 }
 
 /**
@@ -226,7 +225,7 @@ std::string const& serviceextinfo::notes() const throw () {
  *  @return The notes_url.
  */
 std::string const& serviceextinfo::notes_url() const throw () {
-  return (_notes_url);
+  return _notes_url;
 }
 
 /**
@@ -235,7 +234,7 @@ std::string const& serviceextinfo::notes_url() const throw () {
  *  @return The service_description.
  */
 std::string const& serviceextinfo::service_description() const throw () {
-  return (_service_description);
+  return _service_description;
 }
 
 /**
@@ -247,7 +246,7 @@ std::string const& serviceextinfo::service_description() const throw () {
  */
 bool serviceextinfo::_set_action_url(std::string const& value) {
   _action_url = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -259,7 +258,7 @@ bool serviceextinfo::_set_action_url(std::string const& value) {
  */
 bool serviceextinfo::_set_icon_image(std::string const& value) {
   _icon_image = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -271,7 +270,7 @@ bool serviceextinfo::_set_icon_image(std::string const& value) {
  */
 bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -283,7 +282,7 @@ bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
  */
 bool serviceextinfo::_set_hosts(std::string const& value) {
   _hosts = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -295,7 +294,7 @@ bool serviceextinfo::_set_hosts(std::string const& value) {
  */
 bool serviceextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -307,7 +306,7 @@ bool serviceextinfo::_set_hostgroups(std::string const& value) {
  */
 bool serviceextinfo::_set_notes(std::string const& value) {
   _notes = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -319,7 +318,7 @@ bool serviceextinfo::_set_notes(std::string const& value) {
  */
 bool serviceextinfo::_set_notes_url(std::string const& value) {
   _notes_url = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -331,5 +330,5 @@ bool serviceextinfo::_set_notes_url(std::string const& value) {
  */
 bool serviceextinfo::_set_service_description(std::string const& value) {
   _service_description = value;
-  return (true);
+  return true;
 }

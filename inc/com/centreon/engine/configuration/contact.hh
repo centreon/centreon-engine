@@ -75,10 +75,7 @@ namespace                  configuration {
     std::string const&     timezone() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(contact&, char const*);
-    };
+    typedef bool (*setter_func)(contact&, char const*);
 
     bool                   _set_address(
                              std::string const& key,
@@ -120,7 +117,7 @@ namespace                  configuration {
     std::string            _service_notification_period;
     opt<bool>              _service_notifications_enabled;
     opt<std::string>       _timezone;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<contact> contact_ptr;

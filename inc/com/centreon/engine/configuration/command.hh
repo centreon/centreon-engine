@@ -53,10 +53,8 @@ namespace                  configuration {
     std::string const&     connector() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(command&, char const*);
-    };
+    typedef bool (*setter_func)(command&, char const*);
+
     bool                   _set_command_line(std::string const& value);
     bool                   _set_command_name(std::string const& value);
     bool                   _set_connector(std::string const& value);
@@ -64,7 +62,7 @@ namespace                  configuration {
     std::string            _command_line;
     std::string            _command_name;
     std::string            _connector;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<command> command_ptr;

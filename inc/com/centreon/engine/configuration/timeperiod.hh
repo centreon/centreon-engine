@@ -62,10 +62,7 @@ namespace                  configuration {
                            timeranges() const throw ();
 
   private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(timeperiod&, char const*);
-    };
+    typedef bool (*setter_func)(timeperiod&, char const*);
 
     bool                   _add_calendar_date(std::string const& line);
     bool                   _add_other_date(std::string const& line);
@@ -92,7 +89,7 @@ namespace                  configuration {
     bool                   _set_timeperiod_name(std::string const& value);
 
     std::string            _alias;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
     std::vector<std::list<daterange> >
                            _exceptions;
     group<set_string>      _exclude;

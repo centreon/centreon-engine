@@ -60,10 +60,7 @@ namespace                  configuration {
     std::string const&     notes_url() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(hostgroup&, char const*);
-    };
+    typedef bool (*setter_func)(hostgroup&, char const*);
 
     bool                   _set_action_url(std::string const& value);
     bool                   _set_alias(std::string const& value);
@@ -82,7 +79,7 @@ namespace                  configuration {
     group<set_string>      _members;
     std::string            _notes;
     std::string            _notes_url;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<hostgroup> hostgroup_ptr;

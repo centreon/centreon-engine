@@ -26,7 +26,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<servicegroup, type, &servicegroup::method>::generic
 
-servicegroup::setters const servicegroup::_setters[] = {
+std::unordered_map<std::string, servicegroup::setter_func> const servicegroup::_setters{
   { "servicegroup_id",      SETTER(unsigned int, _set_servicegroup_id) },
   { "servicegroup_name",    SETTER(std::string const&, _set_servicegroup_name) },
   { "alias",                SETTER(std::string const&, _set_alias) },
@@ -82,7 +82,7 @@ servicegroup& servicegroup::operator=(servicegroup const& right) {
     _servicegroup_members = right._servicegroup_members;
     _servicegroup_name = right._servicegroup_name;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -112,7 +112,7 @@ bool servicegroup::operator==(servicegroup const& right) const throw () {
  *  @return True if is not the same servicegroup, otherwise false.
  */
 bool servicegroup::operator!=(servicegroup const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -126,18 +126,18 @@ bool servicegroup::operator<(servicegroup const& right) const throw () {
   // servicegroup_name has to be first in this operator.
   // The configuration diff mechanism relies on this.
   if (_servicegroup_name != right._servicegroup_name)
-    return (_servicegroup_name < right._servicegroup_name);
+    return _servicegroup_name < right._servicegroup_name;
   else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
+    return _action_url < right._action_url;
   else if (_servicegroup_id != right._servicegroup_id)
-    return (_servicegroup_id < right._servicegroup_id);
+    return _servicegroup_id < right._servicegroup_id;
   else if (_notes != right._notes)
-    return (_notes < right._notes);
+    return _notes < right._notes;
   else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
+    return _notes_url < right._notes_url;
   else if (_servicegroup_members != right._servicegroup_members)
-    return (_servicegroup_members < right._servicegroup_members);
-  return (_members < right._members);
+    return _servicegroup_members < right._servicegroup_members;
+  return _members < right._members;
 }
 
 /**
@@ -158,7 +158,7 @@ void servicegroup::check_validity() const {
  *  @return The service group name.
  */
 servicegroup::key_type const& servicegroup::key() const throw () {
-  return (_servicegroup_name);
+  return _servicegroup_name;
 }
 
 /**
@@ -190,12 +190,11 @@ void servicegroup::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool servicegroup::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+  std::unordered_map<std::string, servicegroup::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return false;
 }
 
 /**
@@ -204,7 +203,7 @@ bool servicegroup::parse(char const* key, char const* value) {
  *  @return The action_url.
  */
 std::string const& servicegroup::action_url() const throw () {
-  return (_action_url);
+  return _action_url;
 }
 
 /**
@@ -213,7 +212,7 @@ std::string const& servicegroup::action_url() const throw () {
  *  @return The alias.
  */
 std::string const& servicegroup::alias() const throw () {
-  return (_alias);
+  return _alias;
 }
 
 /**
@@ -222,7 +221,7 @@ std::string const& servicegroup::alias() const throw () {
  *  @return The members.
  */
 set_pair_string& servicegroup::members() throw () {
-  return (*_members);
+  return *_members;
 }
 
 /**
@@ -231,7 +230,7 @@ set_pair_string& servicegroup::members() throw () {
  *  @return The members.
  */
 set_pair_string const& servicegroup::members() const throw () {
-  return (*_members);
+  return *_members;
 }
 
 /**
@@ -240,7 +239,7 @@ set_pair_string const& servicegroup::members() const throw () {
  *  @return The notes.
  */
 std::string const& servicegroup::notes() const throw () {
-  return (_notes);
+  return _notes;
 }
 
 /**
@@ -249,7 +248,7 @@ std::string const& servicegroup::notes() const throw () {
  *  @return The notes_url.
  */
 std::string const& servicegroup::notes_url() const throw () {
-  return (_notes_url);
+  return _notes_url;
 }
 
 /**
@@ -258,7 +257,7 @@ std::string const& servicegroup::notes_url() const throw () {
  *  @return  The service groupd id.
  */
 unsigned int servicegroup::servicegroup_id() const throw() {
-  return (_servicegroup_id);
+  return _servicegroup_id;
 }
 
 /**
@@ -267,7 +266,7 @@ unsigned int servicegroup::servicegroup_id() const throw() {
  *  @return The servicegroup_members.
  */
 set_string& servicegroup::servicegroup_members() throw () {
-  return (*_servicegroup_members);
+  return *_servicegroup_members;
 }
 
 /**
@@ -276,7 +275,7 @@ set_string& servicegroup::servicegroup_members() throw () {
  *  @return The servicegroup_members.
  */
 set_string const& servicegroup::servicegroup_members() const throw () {
-  return (*_servicegroup_members);
+  return *_servicegroup_members;
 }
 
 /**
@@ -285,7 +284,7 @@ set_string const& servicegroup::servicegroup_members() const throw () {
  *  @return The servicegroup_name.
  */
 std::string const& servicegroup::servicegroup_name() const throw () {
-  return (_servicegroup_name);
+  return _servicegroup_name;
 }
 
 /**
@@ -297,7 +296,7 @@ std::string const& servicegroup::servicegroup_name() const throw () {
  */
 bool servicegroup::_set_action_url(std::string const& value) {
   _action_url = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -309,7 +308,7 @@ bool servicegroup::_set_action_url(std::string const& value) {
  */
 bool servicegroup::_set_alias(std::string const& value) {
   _alias = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -321,7 +320,7 @@ bool servicegroup::_set_alias(std::string const& value) {
  */
 bool servicegroup::_set_members(std::string const& value) {
   _members = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -333,7 +332,7 @@ bool servicegroup::_set_members(std::string const& value) {
  */
 bool servicegroup::_set_notes(std::string const& value) {
   _notes = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -345,7 +344,7 @@ bool servicegroup::_set_notes(std::string const& value) {
  */
 bool servicegroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -357,7 +356,7 @@ bool servicegroup::_set_notes_url(std::string const& value) {
  */
 bool servicegroup::_set_servicegroup_id(unsigned int value) {
   _servicegroup_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -369,7 +368,7 @@ bool servicegroup::_set_servicegroup_id(unsigned int value) {
  */
 bool servicegroup::_set_servicegroup_members(std::string const& value) {
   _servicegroup_members = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -381,5 +380,5 @@ bool servicegroup::_set_servicegroup_members(std::string const& value) {
  */
 bool servicegroup::_set_servicegroup_name(std::string const& value) {
   _servicegroup_name = value;
-  return (true);
+  return true;
 }

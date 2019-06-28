@@ -83,10 +83,7 @@ namespace                  configuration {
     unsigned int           notification_failure_options() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(hostdependency&, char const*);
-    };
+    typedef bool (*setter_func)(hostdependency&, char const*);
 
     bool                   _set_dependency_period(std::string const& value);
     bool                   _set_dependent_hostgroups(std::string const& value);
@@ -106,7 +103,7 @@ namespace                  configuration {
     group<set_string>      _hosts;
     opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<hostdependency>  hostdependency_ptr;

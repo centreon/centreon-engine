@@ -27,7 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostescalation, type, &hostescalation::method>::generic
 
-hostescalation::setters const hostescalation::_setters[] = {
+std::unordered_map<std::string, hostescalation::setter_func> const hostescalation::_setters{
   { "hostgroup",             SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
@@ -95,7 +95,7 @@ hostescalation& hostescalation::operator=(hostescalation const& right) {
     _last_notification = right._last_notification;
     _notification_interval = right._notification_interval;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -126,7 +126,7 @@ bool hostescalation::operator==(hostescalation const& right) const throw () {
  *  @return True if is not the same hostescalation, otherwise false.
  */
 bool hostescalation::operator!=(hostescalation const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -138,22 +138,22 @@ bool hostescalation::operator!=(hostescalation const& right) const throw () {
  */
 bool hostescalation::operator<(hostescalation const& right) const {
   if (_hosts != right._hosts)
-    return (_hosts < right._hosts);
+    return _hosts < right._hosts;
   else if (_hostgroups != right._hostgroups)
-    return (_hostgroups < right._hostgroups);
+    return _hostgroups < right._hostgroups;
   else if (_contacts != right._contacts)
-    return (_contacts < right._contacts);
+    return _contacts < right._contacts;
   else if (_contactgroups != right._contactgroups)
-    return (_contactgroups < right._contactgroups);
+    return _contactgroups < right._contactgroups;
   else if (_escalation_options != right._escalation_options)
-    return (_escalation_options < right._escalation_options);
+    return _escalation_options < right._escalation_options;
   else if (_escalation_period != right._escalation_period)
-    return (_escalation_period < right._escalation_period);
+    return _escalation_period < right._escalation_period;
   else if (_first_notification != right._first_notification)
-    return (_first_notification < right._first_notification);
+    return _first_notification < right._first_notification;
   else if (_last_notification != right._last_notification)
-    return (_last_notification < right._last_notification);
-  return (_notification_interval < right._notification_interval);
+    return _last_notification < right._last_notification;
+  return _notification_interval < right._notification_interval;
 }
 
 /**
@@ -208,12 +208,11 @@ void hostescalation::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool hostescalation::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+  std::unordered_map<std::string, hostescalation::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return false;
 }
 
 /**
@@ -222,7 +221,7 @@ bool hostescalation::parse(char const* key, char const* value) {
  *  @return The contact groups.
  */
 set_string& hostescalation::contactgroups() throw () {
-  return (*_contactgroups);
+  return *_contactgroups;
 }
 
 /**
@@ -231,7 +230,7 @@ set_string& hostescalation::contactgroups() throw () {
  *  @return The contactgroups.
  */
 set_string const& hostescalation::contactgroups() const throw () {
-  return (*_contactgroups);
+  return *_contactgroups;
 }
 
 /**
@@ -240,7 +239,7 @@ set_string const& hostescalation::contactgroups() const throw () {
  *  @return True if contact groups were defined.
  */
 bool hostescalation::contactgroups_defined() const throw () {
-  return (_contactgroups.is_set());
+  return _contactgroups.is_set();
 }
 
 /**
@@ -249,7 +248,7 @@ bool hostescalation::contactgroups_defined() const throw () {
  *  @return The contacts.
  */
 set_string& hostescalation::contacts() throw () {
-  return (*_contacts);
+  return *_contacts;
 }
 
 /**
@@ -258,7 +257,7 @@ set_string& hostescalation::contacts() throw () {
  *  @return The contacts.
  */
 set_string const& hostescalation::contacts() const throw () {
-  return (*_contacts);
+  return *_contacts;
 }
 
 /**
@@ -267,7 +266,7 @@ set_string const& hostescalation::contacts() const throw () {
  *  @return True if contacts were defined.
  */
 bool hostescalation::contacts_defined() const throw () {
-  return (_contacts.is_set());
+  return _contacts.is_set();
 }
 
 /**
@@ -287,7 +286,7 @@ void hostescalation::escalation_options(
  *  @return The escalation_options.
  */
 unsigned short hostescalation::escalation_options() const throw () {
-  return (_escalation_options);
+  return _escalation_options;
 }
 
 /**
@@ -306,7 +305,7 @@ void hostescalation::escalation_period(std::string const& period) {
  *  @return The escalation_period.
  */
 std::string const& hostescalation::escalation_period() const throw () {
-  return (_escalation_period);
+  return _escalation_period;
 }
 
 /**
@@ -315,7 +314,7 @@ std::string const& hostescalation::escalation_period() const throw () {
  *  @return True if escalation period was defined.
  */
 bool hostescalation::escalation_period_defined() const throw () {
-  return (_escalation_period.is_set());
+  return _escalation_period.is_set();
 }
 
 /**
@@ -334,7 +333,7 @@ void hostescalation::first_notification(unsigned int n) throw () {
  *  @return The first_notification.
  */
 unsigned int hostescalation::first_notification() const throw () {
-  return (_first_notification);
+  return _first_notification;
 }
 
 /**
@@ -343,7 +342,7 @@ unsigned int hostescalation::first_notification() const throw () {
  *  @return The host groups.
  */
 set_string& hostescalation::hostgroups() throw () {
-  return (*_hostgroups);
+  return *_hostgroups;
 }
 
 /**
@@ -352,7 +351,7 @@ set_string& hostescalation::hostgroups() throw () {
  *  @return The hostgroups.
  */
 set_string const& hostescalation::hostgroups() const throw () {
-  return (*_hostgroups);
+  return *_hostgroups;
 }
 
 /**
@@ -361,7 +360,7 @@ set_string const& hostescalation::hostgroups() const throw () {
  *  @return The hosts.
  */
 set_string& hostescalation::hosts() throw () {
-  return (*_hosts);
+  return *_hosts;
 }
 
 /**
@@ -370,7 +369,7 @@ set_string& hostescalation::hosts() throw () {
  *  @return The hosts.
  */
 set_string const& hostescalation::hosts() const throw () {
-  return (*_hosts);
+  return *_hosts;
 }
 
 /**
@@ -389,7 +388,7 @@ void hostescalation::last_notification(unsigned int n) throw () {
  *  @return The last_notification.
  */
 unsigned int hostescalation::last_notification() const throw () {
-  return (_last_notification);
+  return _last_notification;
 }
 
 /**
@@ -408,7 +407,7 @@ void hostescalation::notification_interval(unsigned int interval) {
  *  @return The notification_interval.
  */
 unsigned int hostescalation::notification_interval() const throw () {
-  return (_notification_interval);
+  return _notification_interval;
 }
 
 /**
@@ -417,7 +416,7 @@ unsigned int hostescalation::notification_interval() const throw () {
  *  @return True if the notification interval was defined.
  */
 bool hostescalation::notification_interval_defined() const throw () {
-  return (_notification_interval.is_set());
+  return _notification_interval.is_set();
 }
 
 /**
@@ -429,7 +428,7 @@ bool hostescalation::notification_interval_defined() const throw () {
  */
 bool hostescalation::_set_contactgroups(std::string const& value) {
   _contactgroups = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -441,7 +440,7 @@ bool hostescalation::_set_contactgroups(std::string const& value) {
  */
 bool hostescalation::_set_contacts(std::string const& value) {
   _contacts = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -471,10 +470,10 @@ bool hostescalation::_set_escalation_options(std::string const& value) {
     else if (*it == "a" || *it == "all")
       options = down | unreachable | recovery;
     else
-      return (false);
+      return false;
   }
   _escalation_options = options;
-  return (true);
+  return true;
 }
 
 /**
@@ -486,7 +485,7 @@ bool hostescalation::_set_escalation_options(std::string const& value) {
  */
 bool hostescalation::_set_escalation_period(std::string const& value) {
   _escalation_period = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -498,7 +497,7 @@ bool hostescalation::_set_escalation_period(std::string const& value) {
  */
 bool hostescalation::_set_first_notification(unsigned int value) {
   _first_notification = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -510,7 +509,7 @@ bool hostescalation::_set_first_notification(unsigned int value) {
  */
 bool hostescalation::_set_hostgroups(std::string const& value) {
   _hostgroups = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -522,7 +521,7 @@ bool hostescalation::_set_hostgroups(std::string const& value) {
  */
 bool hostescalation::_set_hosts(std::string const& value) {
   _hosts = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -534,7 +533,7 @@ bool hostescalation::_set_hosts(std::string const& value) {
  */
 bool hostescalation::_set_last_notification(unsigned int value) {
   _last_notification = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -546,5 +545,5 @@ bool hostescalation::_set_last_notification(unsigned int value) {
  */
 bool hostescalation::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
-  return (true);
+  return true;
 }

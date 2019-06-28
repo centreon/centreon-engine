@@ -27,7 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<command, type, &command::method>::generic
 
-command::setters const command::_setters[] = {
+std::unordered_map<std::string, command::setter_func> const command::_setters{
   { "command_line", SETTER(std::string const&, _set_command_line) },
   { "command_name", SETTER(std::string const&, _set_command_name) },
   { "connector",    SETTER(std::string const&, _set_connector) }
@@ -161,12 +161,11 @@ void command::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool command::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+  std::unordered_map<std::string, command::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return false;
 }
 
 /**

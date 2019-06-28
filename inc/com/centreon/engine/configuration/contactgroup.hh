@@ -56,10 +56,7 @@ namespace                  configuration {
     set_string const&      members() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(contactgroup&, char const*);
-    };
+    typedef bool (*setter_func)(contactgroup&, char const*);
 
     bool                   _set_alias(std::string const& value);
     bool                   _set_contactgroup_members(std::string const& value);
@@ -70,7 +67,7 @@ namespace                  configuration {
     group<set_string>      _contactgroup_members;
     std::string            _contactgroup_name;
     group<set_string>      _members;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<contactgroup> contactgroup_ptr;

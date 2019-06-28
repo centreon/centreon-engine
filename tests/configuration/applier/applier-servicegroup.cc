@@ -236,7 +236,7 @@ TEST_F(ApplierServicegroup, RemoveServicegroupFromConfig) {
   grp1 = *config->servicegroups_find("big_group");
   ASSERT_TRUE(grp1.members().size() == 1);
 
-  ASSERT_EQ(engine::servicegroup::servicegroups.size(), 2);
+  ASSERT_EQ(engine::servicegroup::servicegroups.size(), 2u);
   aply_grp.remove_object(grp);
-  ASSERT_EQ(engine::servicegroup::servicegroups.size(), 1);
+  ASSERT_EQ(engine::servicegroup::servicegroups.size(), 1u);
 }

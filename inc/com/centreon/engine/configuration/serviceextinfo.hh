@@ -57,10 +57,7 @@ namespace                  configuration {
     std::string const&     service_description() const throw ();
 
   private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(serviceextinfo&, char const*);
-    };
+    typedef bool (*setter_func)(serviceextinfo&, char const*);
 
     bool                   _set_action_url(std::string const& value);
     bool                   _set_icon_image(std::string const& value);
@@ -79,7 +76,7 @@ namespace                  configuration {
     std::string            _notes;
     std::string            _notes_url;
     std::string            _service_description;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<serviceextinfo> serviceextinfo_ptr;

@@ -34,7 +34,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<host, type, &host::method>::generic
 
-host::setters const host::_setters[] = {
+std::unordered_map<std::string, host::setter_func> const host::_setters{
   { "host_name",                    SETTER(std::string const&, _set_host_name) },
   { "host_id",                      SETTER(uint64_t, _set_host_id)},
   { "_HOST_ID",                     SETTER(uint64_t, _set_host_id)},
@@ -520,11 +520,10 @@ void host::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool host::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return (_setters[i].func)(*this, value);
+  std::unordered_map<std::string, host::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
   if (key[0] == '_') {
     std::unordered_map<std::string, customvariable>::iterator it(_customvariables.find(key + 1));
     if (it == _customvariables.end())

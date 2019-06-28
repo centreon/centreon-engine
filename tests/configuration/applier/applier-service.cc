@@ -104,9 +104,9 @@ TEST_F(ApplierService, NewServiceFromConfig) {
   svc_aply.add_object(svc);
   svc_aply.expand_objects(*config);
   service_id_map const& sm(engine::service::services_by_id);
-  ASSERT_EQ(sm.size(), 1);
-  ASSERT_EQ(sm.begin()->first.first, 1);
-  ASSERT_EQ(sm.begin()->first.second, 3);
+  ASSERT_EQ(sm.size(), 1u);
+  ASSERT_EQ(sm.begin()->first.first, 1u);
+  ASSERT_EQ(sm.begin()->first.second, 3u);
 
   // Service is not resolved, host is null now.
   ASSERT_TRUE(!sm.begin()->second->get_host_ptr());
@@ -145,7 +145,7 @@ TEST_F(ApplierService, ServicesEquality) {
   ASSERT_TRUE(csvc.parse("service_id", "12346"));
   ASSERT_NO_THROW(svc_aply.add_object(csvc));
   service_map const& sm(engine::service::services);
-  ASSERT_EQ(sm.size(), 2);
+  ASSERT_EQ(sm.size(), 2u);
   service_map::const_iterator it(sm.begin());
   std::shared_ptr<com::centreon::engine::service> svc1(it->second);
   ++it;
@@ -206,7 +206,7 @@ TEST_F(ApplierService, ServicesCheckValidity) {
 
   service_map const&
     sm(engine::service::services);
-  ASSERT_EQ(sm.size(), 1);
+  ASSERT_EQ(sm.size(), 1u);
 
   host_map const& hm(engine::host::hosts);
   ASSERT_EQ(sm.begin()->second->get_host_ptr(), hm.begin()->second.get());

@@ -89,10 +89,7 @@ namespace                  configuration {
     list_string const&     service_description() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(serviceescalation&, char const*);
-    };
+    typedef bool (*setter_func)(serviceescalation&, char const*);
 
     bool                   _set_contactgroups(std::string const& value);
     bool                   _set_contacts(std::string const& value);
@@ -117,7 +114,7 @@ namespace                  configuration {
     opt<unsigned int>      _notification_interval;
     group<list_string>     _servicegroups;
     group<list_string>     _service_description;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<serviceescalation> serviceescalation_ptr;

@@ -26,7 +26,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostgroup, type, &hostgroup::method>::generic
 
-hostgroup::setters const hostgroup::_setters[] = {
+std::unordered_map<std::string, hostgroup::setter_func> const hostgroup::_setters{
   { "hostgroup_id",      SETTER(unsigned int, _set_hostgroup_id) },
   { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_name) },
   { "alias",             SETTER(std::string const&, _set_alias) },
@@ -81,7 +81,7 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
     _notes = right._notes;
     _notes_url = right._notes_url;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -111,7 +111,7 @@ bool hostgroup::operator==(hostgroup const& right) const throw () {
  *  @return True if is not the same hostgroup, otherwise false.
  */
 bool hostgroup::operator!=(hostgroup const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -125,20 +125,20 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
   // hostgroup_name has to be first in this operator.
   // The configuration diff mechanism relies on this.
   if (_hostgroup_name != right._hostgroup_name)
-    return (_hostgroup_name < right._hostgroup_name);
+    return _hostgroup_name < right._hostgroup_name;
   else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
+    return _action_url < right._action_url;
   else if (_alias != right._alias)
-    return (_alias < right._alias);
+    return _alias < right._alias;
   else if (_hostgroup_id != right._hostgroup_id)
-    return (_hostgroup_id < right._hostgroup_id);
+    return _hostgroup_id < right._hostgroup_id;
   else if (_notes != right._notes)
-    return (_notes < right._notes);
+    return _notes < right._notes;
   else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
+    return _notes_url < right._notes_url;
   else if (_hostgroup_members != right._hostgroup_members)
-    return (_hostgroup_members < right._hostgroup_members);
-  return (_members < right._members);
+    return _hostgroup_members < right._hostgroup_members;
+  return _members < right._members;
 }
 
 /**
@@ -159,7 +159,7 @@ void hostgroup::check_validity() const {
  *  @return The host group name.
  */
 hostgroup::key_type const& hostgroup::key() const throw () {
-  return (_hostgroup_name);
+  return _hostgroup_name;
 }
 
 /**
@@ -190,12 +190,11 @@ void hostgroup::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool hostgroup::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+  std::unordered_map<std::string, hostgroup::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return false;
 }
 
 /**
@@ -204,7 +203,7 @@ bool hostgroup::parse(char const* key, char const* value) {
  *  @return The action_url.
  */
 std::string const& hostgroup::action_url() const throw () {
-  return (_action_url);
+  return _action_url;
 }
 
 /**
@@ -213,7 +212,7 @@ std::string const& hostgroup::action_url() const throw () {
  *  @return The alias.
  */
 std::string const& hostgroup::alias() const throw () {
-  return (_alias);
+  return _alias;
 }
 
 /**
@@ -222,7 +221,7 @@ std::string const& hostgroup::alias() const throw () {
  *  @return  The hostgroup id.
  */
 unsigned int hostgroup::hostgroup_id() const throw() {
-  return (_hostgroup_id);
+  return _hostgroup_id;
 }
 
 /**
@@ -231,7 +230,7 @@ unsigned int hostgroup::hostgroup_id() const throw() {
  *  @return The hostgroup_members.
  */
 set_string& hostgroup::hostgroup_members() throw () {
-  return (*_hostgroup_members);
+  return *_hostgroup_members;
 }
 
 /**
@@ -240,7 +239,7 @@ set_string& hostgroup::hostgroup_members() throw () {
  *  @return The hostgroup_members.
  */
 set_string const& hostgroup::hostgroup_members() const throw () {
-  return (*_hostgroup_members);
+  return *_hostgroup_members;
 }
 
 /**
@@ -249,7 +248,7 @@ set_string const& hostgroup::hostgroup_members() const throw () {
  *  @return The hostgroup_name.
  */
 std::string const& hostgroup::hostgroup_name() const throw () {
-  return (_hostgroup_name);
+  return _hostgroup_name;
 }
 
 /**
@@ -258,7 +257,7 @@ std::string const& hostgroup::hostgroup_name() const throw () {
  *  @return The members.
  */
 set_string& hostgroup::members() throw () {
-  return (*_members);
+  return *_members;
 }
 
 /**
@@ -267,7 +266,7 @@ set_string& hostgroup::members() throw () {
  *  @return The members.
  */
 set_string const& hostgroup::members() const throw () {
-  return (*_members);
+  return *_members;
 }
 
 /**
@@ -276,7 +275,7 @@ set_string const& hostgroup::members() const throw () {
  *  @return The notes.
  */
 std::string const& hostgroup::notes() const throw () {
-  return (_notes);
+  return _notes;
 }
 
 /**
@@ -285,7 +284,7 @@ std::string const& hostgroup::notes() const throw () {
  *  @return The notes_url.
  */
 std::string const& hostgroup::notes_url() const throw () {
-  return (_notes_url);
+  return _notes_url;
 }
 
 /**
@@ -297,7 +296,7 @@ std::string const& hostgroup::notes_url() const throw () {
  */
 bool hostgroup::_set_action_url(std::string const& value) {
   _action_url = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -309,7 +308,7 @@ bool hostgroup::_set_action_url(std::string const& value) {
  */
 bool hostgroup::_set_alias(std::string const& value) {
   _alias = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -321,7 +320,7 @@ bool hostgroup::_set_alias(std::string const& value) {
  */
 bool hostgroup::_set_hostgroup_id(unsigned int value) {
   _hostgroup_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -333,7 +332,7 @@ bool hostgroup::_set_hostgroup_id(unsigned int value) {
  */
 bool hostgroup::_set_hostgroup_members(std::string const& value) {
   _hostgroup_members = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -345,7 +344,7 @@ bool hostgroup::_set_hostgroup_members(std::string const& value) {
  */
 bool hostgroup::_set_hostgroup_name(std::string const& value) {
   _hostgroup_name = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -357,7 +356,7 @@ bool hostgroup::_set_hostgroup_name(std::string const& value) {
  */
 bool hostgroup::_set_members(std::string const& value) {
   _members = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -369,7 +368,7 @@ bool hostgroup::_set_members(std::string const& value) {
  */
 bool hostgroup::_set_notes(std::string const& value) {
   _notes = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -381,5 +380,5 @@ bool hostgroup::_set_notes(std::string const& value) {
  */
 bool hostgroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
-  return (true);
+  return true;
 }

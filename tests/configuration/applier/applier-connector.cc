@@ -59,8 +59,8 @@ TEST_F(ApplierConnector, UnusableConnectorFromConfig) {
   configuration::connector cnn("connector");
   aply.add_object(cnn);
   set_connector s(config->connectors());
-  ASSERT_EQ(s.size(), 1);
-  ASSERT_EQ(commands::connector::connectors.size(), 1);
+  ASSERT_EQ(s.size(), 1u);
+  ASSERT_EQ(commands::connector::connectors.size(), 1u);
 
 }
 

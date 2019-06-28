@@ -27,7 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<connector, type, &connector::method>::generic
 
-connector::setters const connector::_setters[] = {
+std::unordered_map<std::string, connector::setter_func> const connector::_setters{
   { "connector_line", SETTER(std::string const&, _set_connector_line) },
   { "connector_name", SETTER(std::string const&, _set_connector_name) }
 };
@@ -69,7 +69,7 @@ connector& connector::operator=(connector const& right) {
     _connector_line = right._connector_line;
     _connector_name = right._connector_name;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -93,7 +93,7 @@ bool connector::operator==(connector const& right) const throw () {
  *  @return True if is not the same connector, otherwise false.
  */
 bool connector::operator!=(connector const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -105,8 +105,8 @@ bool connector::operator!=(connector const& right) const throw () {
  */
 bool connector::operator<(connector const& right) const throw () {
   if (_connector_name != right._connector_name)
-    return (_connector_name < right._connector_name);
-  return (_connector_line < right._connector_line);
+    return _connector_name < right._connector_name;
+  return _connector_line < right._connector_line;
 }
 
 /**
@@ -130,7 +130,7 @@ void connector::check_validity() const {
  *  @return The connector name.
  */
 connector::key_type const& connector::key() const throw () {
-  return (_connector_name);
+  return _connector_name;
 }
 
 /**
@@ -156,12 +156,11 @@ void connector::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool connector::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+  std::unordered_map<std::string, connector::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return false;
 }
 
 /**
@@ -170,7 +169,7 @@ bool connector::parse(char const* key, char const* value) {
  *  @return The connector_line.
  */
 std::string const& connector::connector_line() const throw () {
-  return (_connector_line);
+  return _connector_line;
 }
 
 /**
@@ -179,7 +178,7 @@ std::string const& connector::connector_line() const throw () {
  *  @return The connector_name.
  */
 std::string const& connector::connector_name() const throw () {
-  return (_connector_name);
+  return _connector_name;
 }
 
 /**
@@ -191,7 +190,7 @@ std::string const& connector::connector_name() const throw () {
  */
 bool connector::_set_connector_line(std::string const& value) {
   _connector_line = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -203,5 +202,5 @@ bool connector::_set_connector_line(std::string const& value) {
  */
 bool connector::_set_connector_name(std::string const& value) {
   _connector_name = value;
-  return (true);
+  return true;
 }
