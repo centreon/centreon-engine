@@ -55,12 +55,14 @@ if (WITH_TESTING)
     "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/external_commands/host.cc"
     "${TESTS_DIR}/main.cc"
+    "${TESTS_DIR}/notifications/host_downtime_notification.cc"
     "${TESTS_DIR}/notifications/host_flapping_notification.cc"
     "${TESTS_DIR}/notifications/host_normal_notification.cc"
     "${TESTS_DIR}/notifications/host_recovery_notification.cc"
     "${TESTS_DIR}/perfdata/perfdata.cc"
     "${TESTS_DIR}/retention/host.cc"
     "${TESTS_DIR}/retention/service.cc"
+    "${TESTS_DIR}/test_engine.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/between_two_years.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/calendar_date.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/dst_backward.cc"
@@ -76,6 +78,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/timeperiod/get_next_valid_time/specific_month_date.cc"
     "${TESTS_DIR}/timeperiod/utils.cc"
     # Headers.
+    "${TESTS_DIR}/test_engine.hh"
     "${TESTS_DIR}/timeperiod/utils.hh"
   )
   target_link_libraries("ut" "gtest" "cce_core")

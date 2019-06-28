@@ -20,8 +20,9 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <gtest/gtest.h>
 #include <time.h>
+#include "../test_engine.hh"
+#include "../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -31,10 +32,9 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include <com/centreon/process_manager.hh>
 #include "com/centreon/engine/error.hh"
-#include "../timeperiod/utils.hh"
 #include "com/centreon/engine/timezone_manager.hh"
+#include "com/centreon/process_manager.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -43,7 +43,7 @@ using namespace com::centreon::engine::configuration::applier;
 
 extern configuration::state* config;
 
-class HostFlappingNotification : public ::testing::Test {
+class HostFlappingNotification : public TestEngine {
  public:
   void SetUp() override {
     if (!config)
@@ -82,43 +82,6 @@ class HostFlappingNotification : public ::testing::Test {
     configuration::applier::state::unload();
     delete config;
     config = NULL;
-  }
-
-  configuration::contact valid_contact_config() const {
-    // Add command.
-    {
-      configuration::command cmd;
-      cmd.parse("command_name", "cmd");
-      cmd.parse("command_line", "true");
-      configuration::applier::command aplyr;
-      aplyr.add_object(cmd);
-    }
-    // Add timeperiod.
-    {
-      configuration::timeperiod tperiod;
-      tperiod.parse("timeperiod_name", "24x7");
-      tperiod.parse("alias", "24x7");
-      tperiod.parse("monday", "00:00-24:00");
-      tperiod.parse("tuesday", "00:00-24:00");
-      tperiod.parse("wednesday", "00:00-24:00");
-      tperiod.parse("thursday", "00:00-24:00");
-      tperiod.parse("friday", "00:00-24:00");
-      tperiod.parse("saterday", "00:00-24:00");
-      tperiod.parse("sunday", "00:00-24:00");
-      configuration::applier::timeperiod aplyr;
-      aplyr.add_object(tperiod);
-    }
-    // Valid contact configuration
-    // (will generate 0 warnings or 0 errors).
-    configuration::contact ctct;
-    ctct.parse("contact_name", "admin");
-    ctct.parse("host_notification_period", "24x7");
-    ctct.parse("service_notification_period", "24x7");
-    ctct.parse("host_notification_commands", "cmd");
-    ctct.parse("service_notification_commands", "cmd");
-    ctct.parse("host_notification_options", "r,f");
-    ctct.parse("host_notifications_enabled", "1");
-    return ctct;
   }
 
  protected:
