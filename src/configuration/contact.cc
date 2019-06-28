@@ -31,7 +31,7 @@ using namespace com::centreon::engine::configuration;
   &object::setter<contact, type, &contact::method>::generic
 #define ADDRESS_PROPERTY "address"
 
-contact::setters const contact::_setters[] = {
+std::unordered_map<std::string, contact::setter_func> const contact::_setters{
   { "contact_name",                  SETTER(std::string const&, _set_contact_name) },
   { "alias",                         SETTER(std::string const&, _set_alias) },
   { "contact_groups",                SETTER(std::string const&, _set_contactgroups) },
@@ -298,11 +298,10 @@ void contact::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool contact::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return (_setters[i].func)(*this, value);
+  std::unordered_map<std::string, contact::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
   if (!strncmp(key, ADDRESS_PROPERTY, sizeof(ADDRESS_PROPERTY) - 1))
     return _set_address(key + sizeof(ADDRESS_PROPERTY) - 1, value);
   else if (key[0] == '_') {

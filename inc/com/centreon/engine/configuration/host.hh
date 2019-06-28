@@ -117,10 +117,7 @@ namespace                  configuration {
     bool                   set_acknowledgement_timeout(int value);
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(host&, char const*);
-    };
+    typedef bool (*setter_func)(host&, char const*);
 
     bool                   _set_action_url(std::string const& value);
     bool                   _set_address(std::string const& value);
@@ -214,7 +211,7 @@ namespace                  configuration {
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
     opt<unsigned int>      _recovery_notification_delay;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
     opt<unsigned int>      _stalking_options;
     std::string            _statusmap_image;
     opt<std::string>       _timezone;

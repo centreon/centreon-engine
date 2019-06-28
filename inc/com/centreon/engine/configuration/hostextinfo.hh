@@ -61,10 +61,7 @@ namespace                  configuration {
     std::string const&     vrml_image() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(hostextinfo&, char const*);
-    };
+    typedef bool (*setter_func)(hostextinfo&, char const*);
 
     bool                   _set_action_url(std::string const& value);
     bool                   _set_coords_2d(std::string const& value);
@@ -87,7 +84,7 @@ namespace                  configuration {
     std::string            _icon_image_alt;
     std::string            _notes;
     std::string            _notes_url;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
     std::string            _statusmap_image;
     std::string            _vrml_image;
   };

@@ -63,10 +63,7 @@ namespace                   configuration {
     std::string const&      servicegroup_name() const throw ();
 
    private:
-    struct                  setters {
-      char const*           name;
-      bool                  (*func)(servicegroup&, char const*);
-    };
+    typedef bool (*setter_func)(servicegroup&, char const*);
 
     bool                    _set_action_url(std::string const& value);
     bool                    _set_alias(std::string const& value);
@@ -85,7 +82,7 @@ namespace                   configuration {
     unsigned int            _servicegroup_id;
     group<set_string>       _servicegroup_members;
     std::string             _servicegroup_name;
-    static setters const    _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<servicegroup> servicegroup_ptr;

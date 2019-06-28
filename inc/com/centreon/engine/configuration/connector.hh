@@ -53,17 +53,14 @@ namespace                  configuration {
     std::string const&     connector_name() const throw ();
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(connector&, char const*);
-    };
+    typedef bool (*setter_func)(connector&, char const*);
 
     bool                   _set_connector_line(std::string const& value);
     bool                   _set_connector_name(std::string const& value);
 
     std::string            _connector_line;
     std::string            _connector_name;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
   };
 
   typedef std::shared_ptr<connector> connector_ptr;

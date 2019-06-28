@@ -30,7 +30,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<timeperiod, type, &timeperiod::method>::generic
 
-timeperiod::setters const timeperiod::_setters[] = {
+std::unordered_map<std::string, timeperiod::setter_func> const timeperiod::_setters{
   { "alias",           SETTER(std::string const&, _set_alias) },
   { "exclude",         SETTER(std::string const&, _set_exclude) },
   { "timeperiod_name", SETTER(std::string const&, _set_timeperiod_name) }
@@ -81,7 +81,7 @@ timeperiod& timeperiod::operator=(timeperiod const& right) {
     _timeperiod_name = right._timeperiod_name;
     _timeranges = right._timeranges;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -108,7 +108,7 @@ bool timeperiod::operator==(timeperiod const& right) const throw () {
  *  @return True if is not the same timeperiod, otherwise false.
  */
 bool timeperiod::operator!=(timeperiod const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -120,14 +120,14 @@ bool timeperiod::operator!=(timeperiod const& right) const throw () {
  */
 bool timeperiod::operator<(timeperiod const& right) const throw () {
   if (_timeperiod_name != right._timeperiod_name)
-    return (_timeperiod_name < right._timeperiod_name);
+    return _timeperiod_name < right._timeperiod_name;
   else if (_alias != right._alias)
-    return (_alias < right._alias);
+    return _alias < right._alias;
   else if (_exclude != right._exclude)
-    return (_exclude < right._exclude);
+    return _exclude < right._exclude;
   else if (_timeranges != right._timeranges)
-    return (_timeranges < right._timeranges);
-  return (_exceptions < right._exceptions);
+    return _timeranges < right._timeranges;
+  return _exceptions < right._exceptions;
 }
 
 /**
@@ -148,7 +148,7 @@ void timeperiod::check_validity() const {
  *  @return The time period name.
  */
 timeperiod::key_type const& timeperiod::key() const throw () {
-  return (_timeperiod_name);
+  return _timeperiod_name;
 }
 
 /**
@@ -190,12 +190,11 @@ void timeperiod::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool timeperiod::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (_add_week_day(key, value));
+  std::unordered_map<std::string, timeperiod::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return _add_week_day(key, value);
 }
 
 /**
@@ -208,7 +207,7 @@ bool timeperiod::parse(char const* key, char const* value) {
 bool timeperiod::parse(std::string const& line) {
   std::size_t pos(line.find_first_of(" \t\r", 0));
   if (pos == std::string::npos)
-    return (false);
+    return false;
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
   string::trim(value);
@@ -217,8 +216,8 @@ bool timeperiod::parse(std::string const& line) {
       || parse(key.c_str(), string::trim(value).c_str())
       || _add_calendar_date(line)
       || _add_other_date(line))
-    return (true);
-  return (false);
+    return true;
+  return false;
 }
 
 /**
@@ -227,7 +226,7 @@ bool timeperiod::parse(std::string const& line) {
  *  @return The alias value.
  */
 std::string const& timeperiod::alias() const throw () {
-  return (_alias);
+  return _alias;
 }
 
 /**
@@ -236,7 +235,7 @@ std::string const& timeperiod::alias() const throw () {
  *  @return The exceptions value.
  */
 std::vector<std::list<daterange> > const& timeperiod::exceptions() const throw () {
-  return (_exceptions);
+  return _exceptions;
 }
 
 /**
@@ -245,7 +244,7 @@ std::vector<std::list<daterange> > const& timeperiod::exceptions() const throw (
  *  @return The exclude value.
  */
 set_string const& timeperiod::exclude() const throw () {
-  return (*_exclude);
+  return *_exclude;
 }
 
 /**
@@ -254,7 +253,7 @@ set_string const& timeperiod::exclude() const throw () {
  *  @return The timeperiod_name value.
  */
 std::string const& timeperiod::timeperiod_name() const throw () {
-  return (_timeperiod_name);
+  return _timeperiod_name;
 }
 
 /**
@@ -263,7 +262,7 @@ std::string const& timeperiod::timeperiod_name() const throw () {
  *  @return The timeranges list.
  */
 std::vector<std::list<timerange> > const& timeperiod::timeranges() const throw () {
-  return (_timeranges);
+  return _timeranges;
 }
 
 /**
@@ -286,16 +285,16 @@ bool timeperiod::_build_timeranges(
        ++it) {
     std::size_t pos(it->find('-'));
     if (pos == std::string::npos)
-      return (false);
+      return false;
     unsigned long start_time;
     if (!_build_time_t(it->substr(0, pos), start_time))
-      return (false);
+      return false;
     unsigned long end_time;
     if (!_build_time_t(it->substr(pos + 1), end_time))
-      return (false);
+      return false;
     timeranges.push_front(timerange(start_time, end_time));
   }
-  return (true);
+  return true;
 }
 
 /**
@@ -311,15 +310,15 @@ bool timeperiod::_build_time_t(
        unsigned long& ret) {
   std::size_t pos(time_str.find(':'));
   if (pos == std::string::npos)
-    return (false);
+    return false;
   unsigned long hours;
   if (!string::to(time_str.substr(0, pos).c_str(), hours))
-    return (false);
+    return false;
   unsigned long minutes;
   if (!string::to(time_str.substr(pos + 1).c_str(), minutes))
-    return (false);
+    return false;
   ret = hours * 3600 + minutes * 60;
-  return (true);
+  return true;
 }
 
 /**
@@ -350,8 +349,8 @@ bool timeperiod::_has_similar_daterange(
         && it->week_day_end() == range.week_day_end()
         && it->week_day_end_offset() == range.week_day_end_offset()
         && it->skip_interval() == range.skip_interval())
-      return (true);
-  return (false);
+      return true;
+  return false;
 }
 
 /**
@@ -423,7 +422,7 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
 
     std::list<timerange> timeranges;
     if (!_build_timeranges(line.substr(pos), timeranges))
-      return (false);
+      return false;
 
     daterange range(daterange::calendar_date);
     range.year_start(year_start);
@@ -436,9 +435,9 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
     range.timeranges(timeranges);
 
     _exceptions[daterange::calendar_date].push_front(range);
-    return (true);
+    return true;
   }
-  return (false);
+  return false;
 }
 
 /**
@@ -463,7 +462,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   char buffer[4][4096];
 
   if (line.size() > 1024)
-    return (false);
+    return false;
 
   if (sscanf(
         line.c_str(),
@@ -668,14 +667,14 @@ bool timeperiod::_add_other_date(std::string const& line) {
 
     std::list<timerange> timeranges;
     if (!_build_timeranges(line.substr(pos), timeranges))
-      return (false);
+      return false;
 
     range.timeranges(timeranges);
     _exceptions[type].push_front(range);
-    return (true);
+    return true;
   }
 
-  return (false);
+  return false;
 }
 
 /**
@@ -691,12 +690,12 @@ bool timeperiod::_add_week_day(
        std::string const& value) {
   unsigned int day_id;
   if (!_get_day_id(key, day_id))
-    return (false);
+    return false;
 
   if (!_build_timeranges(value, _timeranges[day_id]))
-    return (false);
+    return false;
 
-  return (true);
+  return true;
 }
 
 /**
@@ -726,8 +725,8 @@ bool timeperiod::_get_month_id(
   };
   for (id = 0; id < sizeof(months) / sizeof(months[0]); ++id)
     if (name == months[id])
-      return (true);
-  return (false);
+      return true;
+  return false;
 }
 
 /**
@@ -752,8 +751,8 @@ bool timeperiod::_get_day_id(
   };
   for (id = 0; id < sizeof(days) / sizeof(days[0]); ++id)
     if (name == days[id])
-      return (true);
-  return (false);
+      return true;
+  return false;
 }
 
 /**
@@ -765,7 +764,7 @@ bool timeperiod::_get_day_id(
  */
 bool timeperiod::_set_alias(std::string const& value) {
   _alias = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -777,7 +776,7 @@ bool timeperiod::_set_alias(std::string const& value) {
  */
 bool timeperiod::_set_exclude(std::string const& value) {
   _exclude = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -789,5 +788,5 @@ bool timeperiod::_set_exclude(std::string const& value) {
  */
 bool timeperiod::_set_timeperiod_name(std::string const& value) {
   _timeperiod_name = value;
-  return (true);
+  return true;
 }

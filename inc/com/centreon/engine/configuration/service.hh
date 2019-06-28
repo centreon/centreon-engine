@@ -132,10 +132,7 @@ namespace                  configuration {
     bool                   set_acknowledgement_timeout(int value);
 
    private:
-    struct                 setters {
-      char const*          name;
-      bool                 (*func)(service&, char const*);
-    };
+    typedef bool (*setter_func)(service&, char const*);
 
     bool                   _set_action_url(std::string const& value);
     bool                   _set_check_command(std::string const& value);
@@ -224,7 +221,7 @@ namespace                  configuration {
     group<set_string>      _servicegroups;
     std::string            _service_description;
     uint64_t               _service_id;
-    static setters const   _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
     opt<unsigned short>    _stalking_options;
     opt<std::string>       _timezone;
  };

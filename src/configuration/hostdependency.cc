@@ -32,7 +32,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<hostdependency, type, &hostdependency::method>::generic
 
-hostdependency::setters const hostdependency::_setters[] = {
+std::unordered_map<std::string, hostdependency::setter_func> const hostdependency::_setters{
   { "hostgroup",                     SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",                    SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",                SETTER(std::string const&, _set_hostgroups) },
@@ -103,7 +103,7 @@ hostdependency& hostdependency::operator=(hostdependency const& right) {
     _inherits_parent = right._inherits_parent;
     _notification_failure_options = right._notification_failure_options;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -134,7 +134,7 @@ bool hostdependency::operator==(hostdependency const& right) const throw () {
  *  @return True if is not the same hostdependency, otherwise false.
  */
 bool hostdependency::operator!=(hostdependency const& right) const throw () {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -146,23 +146,23 @@ bool hostdependency::operator!=(hostdependency const& right) const throw () {
  */
 bool hostdependency::operator<(hostdependency const& right) const {
   if (_dependent_hosts != right._dependent_hosts)
-    return (_dependent_hosts < right._dependent_hosts);
+    return _dependent_hosts < right._dependent_hosts;
   else if (_hosts != right._hosts)
-    return (_hosts < right._hosts);
+    return _hosts < right._hosts;
   else if (_hostgroups != right._hostgroups)
-    return (_hostgroups < right._hostgroups);
+    return _hostgroups < right._hostgroups;
   else if (_dependent_hostgroups != right._dependent_hostgroups)
-    return (_dependent_hostgroups < right._dependent_hostgroups);
+    return _dependent_hostgroups < right._dependent_hostgroups;
   else if (_dependency_type != right._dependency_type)
-    return (_dependency_type < right._dependency_type);
+    return _dependency_type < right._dependency_type;
   else if (_dependency_period != right._dependency_period)
-    return (_dependency_period < right._dependency_period);
+    return _dependency_period < right._dependency_period;
   else if (_execution_failure_options
            != right._execution_failure_options)
     return (_execution_failure_options
             < right._execution_failure_options);
   else if (_inherits_parent != right._inherits_parent)
-    return (_inherits_parent < right._inherits_parent);
+    return _inherits_parent < right._inherits_parent;
   return (_notification_failure_options
           < right._notification_failure_options);
 }
@@ -206,7 +206,7 @@ void hostdependency::check_validity() const {
  *  @return This object.
  */
 hostdependency::key_type const& hostdependency::key() const throw () {
-  return (*this);
+  return *this;
 }
 
 /**
@@ -239,12 +239,11 @@ void hostdependency::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool hostdependency::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+  std::unordered_map<std::string, hostdependency::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+  return false;
 }
 
 /**
@@ -263,7 +262,7 @@ void hostdependency::dependency_period(std::string const& period) {
  *  @return The dependency_period.
  */
 std::string const& hostdependency::dependency_period() const throw () {
-  return (_dependency_period);
+  return _dependency_period;
 }
 
 /**
@@ -283,7 +282,7 @@ void hostdependency::dependency_type(
  *  @return Dependency type.
  */
 hostdependency::dependency_kind hostdependency::dependency_type() const throw () {
-  return (_dependency_type);
+  return _dependency_type;
 }
 
 /**
@@ -292,7 +291,7 @@ hostdependency::dependency_kind hostdependency::dependency_type() const throw ()
  *  @return Dependent host groups.
  */
 set_string& hostdependency::dependent_hostgroups() throw () {
-  return (*_dependent_hostgroups);
+  return *_dependent_hostgroups;
 }
 
 /**
@@ -301,7 +300,7 @@ set_string& hostdependency::dependent_hostgroups() throw () {
  *  @return The dependent_hostgroups.
  */
 set_string const& hostdependency::dependent_hostgroups() const throw () {
-  return (*_dependent_hostgroups);
+  return *_dependent_hostgroups;
 }
 
 /**
@@ -310,7 +309,7 @@ set_string const& hostdependency::dependent_hostgroups() const throw () {
  *  @return The dependent hosts.
  */
 set_string& hostdependency::dependent_hosts() throw () {
-  return (*_dependent_hosts);
+  return *_dependent_hosts;
 }
 
 /**
@@ -319,7 +318,7 @@ set_string& hostdependency::dependent_hosts() throw () {
  *  @return The dependent_hosts.
  */
 set_string const& hostdependency::dependent_hosts() const throw () {
-  return (*_dependent_hosts);
+  return *_dependent_hosts;
 }
 
 /**
@@ -339,7 +338,7 @@ void hostdependency::execution_failure_options(
  *  @return The execution_failure_options.
  */
 unsigned int hostdependency::execution_failure_options() const throw () {
-  return (_execution_failure_options);
+  return _execution_failure_options;
 }
 
 /**
@@ -348,7 +347,7 @@ unsigned int hostdependency::execution_failure_options() const throw () {
  *  @return The host groups.
  */
 set_string& hostdependency::hostgroups() throw () {
-  return (*_hostgroups);
+  return *_hostgroups;
 }
 
 /**
@@ -357,7 +356,7 @@ set_string& hostdependency::hostgroups() throw () {
  *  @return The hostgroups.
  */
 set_string const& hostdependency::hostgroups() const throw () {
-  return (*_hostgroups);
+  return *_hostgroups;
 }
 
 /**
@@ -366,7 +365,7 @@ set_string const& hostdependency::hostgroups() const throw () {
  *  @return The hosts.
  */
 set_string& hostdependency::hosts() throw () {
-  return (*_hosts);
+  return *_hosts;
 }
 
 /**
@@ -375,7 +374,7 @@ set_string& hostdependency::hosts() throw () {
  *  @return The hosts.
  */
 set_string const& hostdependency::hosts() const throw () {
-  return (*_hosts);
+  return *_hosts;
 }
 
 /**
@@ -394,7 +393,7 @@ void hostdependency::inherits_parent(bool inherit) throw () {
  *  @return The inherits_parent.
  */
 bool hostdependency::inherits_parent() const throw () {
-  return (_inherits_parent);
+  return _inherits_parent;
 }
 
 /**
@@ -414,7 +413,7 @@ void hostdependency::notification_failure_options(
  *  @return The notification_failure_options.
  */
 unsigned int hostdependency::notification_failure_options() const throw () {
-  return (_notification_failure_options);
+  return _notification_failure_options;
 }
 
 /**
@@ -426,7 +425,7 @@ unsigned int hostdependency::notification_failure_options() const throw () {
  */
 bool hostdependency::_set_dependency_period(std::string const& value) {
   _dependency_period = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -438,7 +437,7 @@ bool hostdependency::_set_dependency_period(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -450,7 +449,7 @@ bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -482,10 +481,10 @@ bool hostdependency::_set_execution_failure_options(std::string const& value) {
     else if (*it == "a" || *it == "all")
       options = up | down | unreachable | pending;
     else
-      return (false);
+      return false;
   }
   _execution_failure_options = options;
-  return (true);
+  return true;
 }
 
 /**
@@ -497,7 +496,7 @@ bool hostdependency::_set_execution_failure_options(std::string const& value) {
  */
 bool hostdependency::_set_hostgroups(std::string const& value) {
   _hostgroups = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -509,7 +508,7 @@ bool hostdependency::_set_hostgroups(std::string const& value) {
  */
 bool hostdependency::_set_hosts(std::string const& value) {
   _hosts = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -521,7 +520,7 @@ bool hostdependency::_set_hosts(std::string const& value) {
  */
 bool hostdependency::_set_inherits_parent(bool value) {
   _inherits_parent = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -553,8 +552,8 @@ bool hostdependency::_set_notification_failure_options(std::string const& value)
     else if (*it == "a" || *it == "all")
       options = up | down | unreachable | pending;
     else
-      return (false);
+      return false;
   }
   _notification_failure_options = options;
-  return (true);
+  return true;
 }

@@ -427,10 +427,7 @@ namespace               configuration {
     void                use_true_regexp_matching(bool value);
 
   private:
-    struct              setters {
-      char const*       name;
-      bool              (*func)(state&, char const*);
-    };
+    typedef bool (*setter_func)(state&, char const*);
 
     void                _set_aggregate_status_updates(std::string const& value);
     void                _set_auth_file(std::string const& value);
@@ -627,8 +624,7 @@ namespace               configuration {
     std::string         _service_perfdata_file_processing_command;
     unsigned int        _service_perfdata_file_processing_interval;
     std::string         _service_perfdata_file_template;
-    static setters const
-                        _setters[];
+    static std::unordered_map<std::string, setter_func> const _setters;
     float               _sleep_time;
     bool                _soft_state_dependencies;
     std::string         _state_retention_file;
