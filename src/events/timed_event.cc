@@ -210,7 +210,7 @@ static void _exec_event_scheduled_downtime(timed_event* event) {
 
   // process scheduled downtime info.
   if (event->event_data) {
-    handle_scheduled_downtime_by_id(*(unsigned long*)event->event_data);
+    handle_scheduled_downtime_by_id(*(uint64_t*)event->event_data);
     delete static_cast<unsigned long*>(event->event_data);
     event->event_data = NULL;
   }

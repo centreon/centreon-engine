@@ -262,7 +262,7 @@ struct grab_service_redirection {
         true}},
       // Notification ID.
       {MACRO_SERVICENOTIFICATIONID,
-       {&get_member_as_string<service, unsigned long, &service::current_notification_id>,
+       {&get_member_as_string<service, uint64_t , &service::current_notification_id>,
         true}},
       // Event ID.
       {MACRO_SERVICEEVENTID,

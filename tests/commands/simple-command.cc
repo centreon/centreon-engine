@@ -114,7 +114,7 @@ TEST_F(SimpleCommand, NewCommandAsync) {
   ASSERT_EQ(cc, "/bin/echo bonjour");
   cmd->run(cc, mac, 2);
   int timeout{0};
-  while (timeout < 50 && lstnr->get_result().output == "") {
+  while (timeout < 60 && lstnr->get_result().output == "") {
     usleep(100000);
     ++timeout;
   }

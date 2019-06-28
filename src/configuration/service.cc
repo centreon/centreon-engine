@@ -40,8 +40,8 @@ std::unordered_map<std::string, service::setter_func> const service::_setters{
   { "hosts",                        SETTER(std::string const&, _set_hosts) },
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
   { "service_description",          SETTER(std::string const&, _set_service_description) },
-  { "service_id",                   SETTER(unsigned long, _set_service_id) },
-  { "_SERVICE_ID",                  SETTER(unsigned long, _set_service_id) },
+  { "service_id",                   SETTER(uint64_t, _set_service_id) },
+  { "_SERVICE_ID",                  SETTER(uint64_t, _set_service_id) },
   { "acknowledgement_timeout",      SETTER(int, set_acknowledgement_timeout) },
   { "description",                  SETTER(std::string const&, _set_service_description) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
@@ -787,8 +787,8 @@ set_string const& service::hosts() const throw () {
  *
  *  @return Service's host's ID.
  */
-unsigned long service::host_id() const throw () {
-  unsigned long host_id(get_host_id(_hosts->begin()->c_str()));
+uint64_t service::host_id() const throw () {
+  uint64_t host_id(get_host_id(_hosts->begin()->c_str()));
   return host_id;
 }
 
@@ -1033,7 +1033,7 @@ std::string const& service::service_description() const throw () {
  *
  *  @return  The service id.
  */
-unsigned long service::service_id() const throw() {
+uint64_t service::service_id() const throw() {
   return _service_id;
 }
 
@@ -1644,7 +1644,7 @@ bool service::_set_service_description(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool service::_set_service_id(unsigned long value) {
+bool service::_set_service_id(uint64_t value) {
   _service_id = value;
   return true;
 }

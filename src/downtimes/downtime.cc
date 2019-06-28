@@ -79,7 +79,7 @@ downtime::downtime(int type,
 downtime::~downtime() {}
 
 /* handles scheduled downtime (id passed from timed event queue) */
-int handle_scheduled_downtime_by_id(unsigned long downtime_id) {
+int handle_scheduled_downtime_by_id(uint64_t downtime_id) {
   std::shared_ptr<downtime> temp_downtime{
       downtime_manager::instance().find_downtime(ANY_DOWNTIME, downtime_id)};
   /* find the downtime entry */

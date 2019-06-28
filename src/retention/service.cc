@@ -38,10 +38,10 @@ service::setters const service::_setters[] = {
   { "check_period",                         SETTER(std::string const&, _set_check_period) },
   { "check_type",                           SETTER(int, _set_check_type) },
   { "current_attempt",                      SETTER(int, _set_current_attempt) },
-  { "current_event_id",                     SETTER(unsigned long, _set_current_event_id) },
-  { "current_notification_id",              SETTER(unsigned long, _set_current_notification_id) },
+  { "current_event_id",                     SETTER(uint64_t, _set_current_event_id) },
+  { "current_notification_id",              SETTER(uint64_t, _set_current_notification_id) },
   { "current_notification_number",          SETTER(int, _set_current_notification_number) },
-  { "current_problem_id",                   SETTER(unsigned long, _set_current_problem_id) },
+  { "current_problem_id",                   SETTER(uint64_t, _set_current_problem_id) },
   { "current_state",                        SETTER(int, _set_current_state) },
   { "event_handler",                        SETTER(std::string const&, _set_event_handler) },
   { "event_handler_enabled",                SETTER(bool, _set_event_handler_enabled) },
@@ -52,11 +52,11 @@ service::setters const service::_setters[] = {
   { "is_flapping",                          SETTER(bool, _set_is_flapping) },
   { "last_acknowledgement",                 SETTER(time_t, _set_last_acknowledgement) },
   { "last_check",                           SETTER(time_t, _set_last_check) },
-  { "last_event_id",                        SETTER(unsigned long, _set_last_event_id) },
+  { "last_event_id",                        SETTER(uint64_t, _set_last_event_id) },
   { "last_hard_state",                      SETTER(time_t, _set_last_hard_state) },
   { "last_hard_state_change",               SETTER(time_t, _set_last_hard_state_change) },
   { "last_notification",                    SETTER(time_t, _set_last_notification) },
-  { "last_problem_id",                      SETTER(unsigned long, _set_last_problem_id) },
+  { "last_problem_id",                      SETTER(uint64_t, _set_last_problem_id) },
   { "last_state",                           SETTER(time_t, _set_last_state) },
   { "last_state_change",                    SETTER(time_t, _set_last_state_change) },
   { "last_time_critical",                   SETTER(time_t, _set_last_time_critical) },
@@ -82,7 +82,7 @@ service::setters const service::_setters[] = {
   { "process_performance_data",             SETTER(int, _set_process_performance_data) },
   { "recovery_been_sent",                   SETTER(bool, _set_recovery_been_sent)},
   { "retry_check_interval",                 SETTER(unsigned int, _set_retry_check_interval) },
-  { "service_id",                           SETTER(unsigned long, _set_service_id) },
+  { "service_id",                           SETTER(uint64_t, _set_service_id) },
   { "service_description",                  SETTER(std::string const&, _set_service_description) },
   { "state_history",                        SETTER(std::string const&, _set_state_history) },
   { "state_type",                           SETTER(int, _set_state_type) }
@@ -398,7 +398,7 @@ opt<int> const& service::current_attempt() const throw () {
  *
  *  @return The current_event_id.
  */
-opt<unsigned long> const& service::current_event_id() const throw () {
+opt<uint64_t> const& service::current_event_id() const throw () {
   return (_current_event_id);
 }
 
@@ -407,7 +407,7 @@ opt<unsigned long> const& service::current_event_id() const throw () {
  *
  *  @return The current_notification_id.
  */
-opt<unsigned long> const& service::current_notification_id() const throw () {
+opt<uint64_t> const& service::current_notification_id() const throw () {
   return (_current_notification_id);
 }
 
@@ -425,7 +425,7 @@ opt<int> const& service::current_notification_number() const throw () {
  *
  *  @return The current_problem_id.
  */
-opt<unsigned long> const& service::current_problem_id() const throw () {
+opt<uint64_t> const& service::current_problem_id() const throw () {
   return (_current_problem_id);
 }
 
@@ -524,7 +524,7 @@ opt<time_t> const& service::last_check() const throw () {
  *
  *  @return The last_event_id.
  */
-opt<unsigned long> const& service::last_event_id() const throw () {
+opt<uint64_t> const& service::last_event_id() const throw () {
   return (_last_event_id);
 }
 
@@ -560,7 +560,7 @@ opt<time_t> const& service::last_notification() const throw () {
  *
  *  @return The last_problem_id.
  */
-opt<unsigned long> const& service::last_problem_id() const throw () {
+opt<uint64_t> const& service::last_problem_id() const throw () {
   return (_last_problem_id);
 }
 
@@ -794,7 +794,7 @@ opt<unsigned int> const& service::retry_check_interval() const throw () {
  *
  *  @return The service_id.
  */
-unsigned long service::service_id() const throw () {
+uint64_t service::service_id() const throw () {
   return (_service_id);
 }
 
@@ -930,7 +930,7 @@ bool service::_set_current_attempt(int value) {
  *
  *  @param[in] value The new current_event_id.
  */
-bool service::_set_current_event_id(unsigned long value) {
+bool service::_set_current_event_id(uint64_t value) {
   _current_event_id = value;
   return (true);
 }
@@ -940,7 +940,7 @@ bool service::_set_current_event_id(unsigned long value) {
  *
  *  @param[in] value The new current_notification_id.
  */
-bool service::_set_current_notification_id(unsigned long value) {
+bool service::_set_current_notification_id(uint64_t value) {
   _current_notification_id = value;
   return (true);
 }
@@ -960,7 +960,7 @@ bool service::_set_current_notification_number(int value) {
  *
  *  @param[in] value The new current_problem_id.
  */
-bool service::_set_current_problem_id(unsigned long value) {
+bool service::_set_current_problem_id(uint64_t value) {
   _current_problem_id = value;
   return (true);
 }
@@ -1070,7 +1070,7 @@ bool service::_set_last_check(time_t value) {
  *
  *  @param[in] value The new last_event_id.
  */
-bool service::_set_last_event_id(unsigned long value) {
+bool service::_set_last_event_id(uint64_t value) {
   _last_event_id = value;
   return (true);
 }
@@ -1110,7 +1110,7 @@ bool service::_set_last_notification(time_t value) {
  *
  *  @param[in] value The new last_problem_id.
  */
-bool service::_set_last_problem_id(unsigned long value) {
+bool service::_set_last_problem_id(uint64_t value) {
   _last_problem_id = value;
   return (true);
 }
@@ -1373,7 +1373,7 @@ bool service::_set_retry_check_interval(unsigned int value) {
  *
  *  @param[in] value The new service_id.
  */
-bool service::_set_service_id(unsigned long value) {
+bool service::_set_service_id(uint64_t value) {
   _service_id = value;
   return (true);
 }
