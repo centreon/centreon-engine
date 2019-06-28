@@ -35,7 +35,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<service, type, &service::method>::generic
 
-service::setters const service::_setters[] = {
+std::unordered_map<std::string, service::setter_func> const service::_setters{
   { "host",                         SETTER(std::string const&, _set_hosts) },
   { "hosts",                        SETTER(std::string const&, _set_hosts) },
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
@@ -521,13 +521,14 @@ void service::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool service::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return (_setters[i].func)(*this, value);
+  std::unordered_map<std::string, service::setter_func>::const_iterator
+    it{_setters.find(key)};
+  if (it != _setters.end())
+    return (it->second)(*this, value);
+
   if (key[0] == '_') {
-    std::unordered_map<std::string, customvariable>::iterator it(_customvariables.find(key + 1));
+    std::unordered_map<std::string, customvariable>::iterator it{
+        _customvariables.find(key + 1)};
     if (it == _customvariables.end())
       _customvariables.insert({key + 1, customvariable(value)});
     else

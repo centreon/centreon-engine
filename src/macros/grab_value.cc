@@ -91,8 +91,6 @@ static int handle_host_macro(
       hg = it->second.get();
 
     if (hg) {
-      size_t delimiter_len{strlen(arg2)};
-
       // Concatenate macro values for all hostgroup members.
       for (host_map_unsafe::iterator
              it(hg->members.begin()),
@@ -259,9 +257,6 @@ static int handle_service_macro(
         if (sg_it == servicegroup::servicegroups.end() || !found->second)
           retval = ERROR;
         else {
-          servicegroup* sg{sg_it->second.get()};
-          size_t delimiter_len(strlen(arg2));
-
           // Concatenate macro values for all servicegroup members.
           for (service_map_unsafe::iterator
                  it(sg_it->second->members.begin()),
@@ -328,7 +323,6 @@ static int handle_servicegroup_macro(
   if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
     retval = ERROR;
   else {
-    servicegroup* sg{sg_it->second.get()};
     retval = ERROR;
     // Get the servicegroup macro value.
     retval = grab_standard_servicegroup_macro_r(
@@ -389,8 +383,6 @@ static int handle_contact_macro(
     if (cg == contactgroup::contactgroups.end() || !cg->second)
       retval = ERROR;
     else {
-      size_t delimiter_len(strlen(arg2));
-
       // Concatenate macro values for all contactgroup members.
       for(contact_map_unsafe::const_iterator
             it{cg->second->get_members().begin()},
@@ -1032,9 +1024,7 @@ int grab_macro_value_r(
   char* macro_name = nullptr;
   char* arg[2] = { nullptr, nullptr };
   contact* temp_contact = nullptr;
-  contactgroup* temp_contactgroup = nullptr;
   std::string temp_buffer;
-  int delimiter_len = 0;
   unsigned int x;
   int result = OK;
 
@@ -1161,17 +1151,16 @@ int grab_macro_value_r(
     else {
       /* on-demand contact macro with a contactgroup and a delimiter */
       if (arg[1] != nullptr) {
-        contactgroup_map::iterator cg_it{contactgroup::contactgroups.find(arg[0])};
+        contactgroup_map::iterator cg_it{
+            contactgroup::contactgroups.find(arg[0])};
         if (cg_it == contactgroup::contactgroups.end() || !cg_it->second)
           return ERROR;
 
-        delimiter_len = strlen(arg[1]);
-
         /* concatenate macro values for all contactgroup members */
-      for(contact_map_unsafe::const_iterator
-            it{cg_it->second->get_members().begin()},
-            end{cg_it->second->get_members().end()};
-            it != end; ++it) {
+        for (contact_map_unsafe::const_iterator
+                 it{cg_it->second->get_members().begin()},
+             end{cg_it->second->get_members().end()};
+             it != end; ++it) {
           if (!it->second)
             continue;
 
