@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
@@ -266,7 +265,6 @@ bool notifier::_is_notification_viable_recovery(
     notification_option options __attribute__((unused))) const {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_recovery()";
 
-  std::cout << "RECOVERY1" << std::endl;
   /* are notifications enabled? */
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
@@ -275,7 +273,6 @@ bool notifier::_is_notification_viable_recovery(
     return false;
   }
 
-  std::cout << "RECOVERY2" << std::endl;
   /* are notifications temporarily disabled for this notifier? */
   if (!get_notifications_enabled()) {
     logger(dbg_notifications, more)
@@ -284,7 +281,6 @@ bool notifier::_is_notification_viable_recovery(
     return false;
   }
 
-  std::cout << "RECOVERY3" << std::endl;
   timeperiod* tp{get_notification_timeperiod()};
   timezone_locker lock{get_timezone()};
   std::time_t now;
@@ -296,7 +292,6 @@ bool notifier::_is_notification_viable_recovery(
            "at this time.";
     return false;
   }
-  std::cout << "RECOVERY4" << std::endl;
 
   /* if this notifier is currently in a scheduled downtime period, don't send
    * the notification */
@@ -306,7 +301,6 @@ bool notifier::_is_notification_viable_recovery(
            "we won't send notifications.";
     return false;
   }
-  std::cout << "RECOVERY5" << std::endl;
 
   /* if this notifier is flapping, don't send the notification */
   if (get_is_flapping()) {
@@ -314,14 +308,12 @@ bool notifier::_is_notification_viable_recovery(
         << "This notifier is flapping, so we won't send notifications.";
     return false;
   }
-  std::cout << "RECOVERY6" << std::endl;
 
   if (get_state_type() != hard) {
     logger(dbg_notifications, more)
         << "This notifier is in soft state, so we won't send notifications.";
     return false;
   }
-  std::cout << "RECOVERY7" << std::endl;
 
   /* Recovery is sent on state OK or UP */
   if (get_current_state_int() != 0 || !get_notify_on(recovery)) {
@@ -330,15 +322,10 @@ bool notifier::_is_notification_viable_recovery(
            "recovery notification";
     return false;
   }
-  std::cout << "RECOVERY8" << std::endl;
 
   if (get_last_hard_state_change() +
           _recovery_notification_delay * config->interval_length() >
       now) {
-    std::cout << "RECOVERY8.1: " << get_last_hard_state_change() << std::endl;
-    std::cout << "RECOVERY8.2: " << _recovery_notification_delay << std::endl;
-    std::cout << "RECOVERY8.3: " << config->interval_length() << std::endl;
-    std::cout << "RECOVERY8.4: " << now << std::endl;
     logger(dbg_notifications, more)
         << "This notifier is configured with a recovery notification delay. "
         << "It won't send any recovery notification until timestamp "
@@ -346,7 +333,6 @@ bool notifier::_is_notification_viable_recovery(
         << (get_last_hard_state_change() + _recovery_notification_delay);
     return false;
   }
-  std::cout << "RECOVERY9" << std::endl;
   return true;
 }
 
