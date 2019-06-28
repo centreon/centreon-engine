@@ -116,6 +116,8 @@ class HostFlappingNotification : public ::testing::Test {
     ctct.parse("service_notification_period", "24x7");
     ctct.parse("host_notification_commands", "cmd");
     ctct.parse("service_notification_commands", "cmd");
+    ctct.parse("host_notification_options", "r,f");
+    ctct.parse("host_notifications_enabled", "1");
     return ctct;
   }
 
@@ -149,20 +151,29 @@ TEST_F(HostFlappingNotification, SimpleHostFlapping) {
   uint64_t id{_host->get_next_notification_id()};
   _host->notification_period_ptr = tperiod.get();
   _host->set_is_flapping(true);
+  testing::internal::CaptureStdout();
   ASSERT_EQ(_host->notify(notifier::reason_flappingstart, "", "",
                           notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
-
   set_time(43500);
   _host->set_is_flapping(false);
   ASSERT_EQ(_host->notify(notifier::reason_flappingstop, "", "",
                           notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 2, _host->get_next_notification_id());
+
   ASSERT_EQ(_host->notify(notifier::reason_recovery, "", "",
                           notifier::notification_option_none),
             OK);
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t step1{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;")};
+  size_t step2{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;")};
+  ASSERT_NE(step1, std::string::npos);
+  ASSERT_NE(step2, std::string::npos);
+  ASSERT_LE(step1, step2);
+
   ASSERT_EQ(id + 3, _host->get_next_notification_id());
 }
 
@@ -248,353 +259,3 @@ TEST_F(HostFlappingNotification, SimpleHostFlappingStopTwoTimes) {
             OK);
   ASSERT_EQ(id + 2, _host->get_next_notification_id());
 }
-
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationNotificationsdisabled) {
-//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be called.
-//   */
-//  config->enable_notifications(false);
-//  set_time(43200);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
-//
-//  ASSERT_TRUE(host_escalation);
-//  uint64_t id{_host->get_next_notification_id()};
-//  _host->notification_period_ptr = tperiod.get();
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationNotifierNotifdisabled) {
-//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be called.
-//   */
-//  set_time(43200);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
-//
-//  ASSERT_TRUE(host_escalation);
-//  uint64_t id{_host->get_next_notification_id()};
-//  _host->set_notifications_enabled(false);
-//  _host->notification_period_ptr = tperiod.get();
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  ASSERT_TRUE(host_escalation);
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "", notifier::notification_option_none), OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationForcedWithNotificationDisabled) {
-//  config->enable_notifications(false);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  ASSERT_TRUE(host_escalation);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_forced),
-//      OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationForcedNotification) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  ASSERT_TRUE(host_escalation);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_forced),
-//      OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationWithDowntime) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  _host->set_scheduled_downtime_depth(30);
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  ASSERT_TRUE(host_escalation);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationWithFlapping) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  _host->set_is_flapping(true);
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  ASSERT_TRUE(host_escalation);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationWithSoftState) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  _host->set_state_type(checkable::soft);
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  ASSERT_TRUE(host_escalation);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationWithHardStateAcknowledged) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  _host->set_problem_has_been_acknowledged(true);
-//  ASSERT_TRUE(host_escalation);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationAfterPreviousTooSoon) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  _host->set_problem_has_been_acknowledged(true);
-//  ASSERT_TRUE(host_escalation);
-//  _host->set_last_notification(19999);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationAfterPreviousWithNullInterval) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  _host->set_problem_has_been_acknowledged(true);
-//  ASSERT_TRUE(host_escalation);
-//  _host->set_last_notification(19500);
-//  _host->set_notification_number(1);
-//  _host->set_notification_interval(0);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationOnStateNotNotified) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  _host->set_problem_has_been_acknowledged(false);
-//  ASSERT_TRUE(host_escalation);
-//  _host->remove_notify_on(notifier::down);
-//  _host->set_current_state(engine::host::state_down);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationOnStateBeforeFirstNotifDelay) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  _host->set_problem_has_been_acknowledged(false);
-//  ASSERT_TRUE(host_escalation);
-//  _host->set_current_state(engine::host::state_down);
-//  _host->set_last_hard_state_change(20000 - 200);
-//  /* It is multiplicated by config->interval_length(): we set 5 for 5*60 */
-//  _host->set_first_notification_delay(5);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationOnStateAfterFirstNotifDelay) {
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  set_time(20000);
-//
-//  uint64_t id{_host->get_next_notification_id()};
-//  for (int i = 0; i < 7; ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-//  _host->notification_period_ptr = tperiod.get();
-//
-//  _host->set_problem_has_been_acknowledged(false);
-//  ASSERT_TRUE(host_escalation);
-//  _host->set_current_state(engine::host::state_down);
-//  _host->set_last_hard_state_change(20000 - 400);
-//  _host->set_first_notification_delay(5);
-//  ASSERT_EQ(
-//      _host->notify(
-//          notifier::notification_normal, "", "", notifier::notification_option_none),
-//      OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//}
-//
-//TEST_F(HostFlappingNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
-//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be called.
-//   */
-//  set_time(43200);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  for (int i = 0; i < tperiod->days.size(); ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
-//
-//  ASSERT_TRUE(host_escalation);
-//  uint64_t id{_host->get_next_notification_id()};
-//  /* We configure the notification interval to 2 minutes */
-//  _host->set_notification_interval(2);
-//  _host->notification_period_ptr = tperiod.get();
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//
-//  /* Only 100 seconds since the previous notification. */
-//  set_time(43300);
-//  id = _host->get_next_notification_id();
-//  /* Because of the notification not totally implemented, we must force the
-//   * notification number to be greater than 0 */
-//  ASSERT_EQ(_host->notify(notifier::notification_normal, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//
-//  /* No notification, because the delay is too short */
-//  ASSERT_EQ(id, _host->get_next_notification_id());
-//}
