@@ -952,7 +952,9 @@ bool contact::should_be_notified(notifier::notification_category cat,
   return (this->*(_to_notify[cat]))(type, notif);
 }
 
-bool contact::_to_notify_normal(notifier::reason_type type, notifier const& notif) const {
+bool contact::_to_notify_normal(notifier::reason_type type
+                                __attribute__((unused)),
+                                notifier const& notif) const {
   logger(dbg_functions, basic)
     << "contact::_to_notify_normal()";
   notifier::notifier_type nt{notif.get_notifier_type()};
@@ -978,7 +980,9 @@ bool contact::_to_notify_normal(notifier::reason_type type, notifier const& noti
   return true;
 }
 
-bool contact::_to_notify_recovery(notifier::reason_type type, notifier const& notif) const {
+bool contact::_to_notify_recovery(notifier::reason_type type
+                                  __attribute__((unused)),
+                                  notifier const& notif) const {
   logger(dbg_functions, basic)
     << "contact::_to_notify_recovery()";
   notifier::notifier_type nt{notif.get_notifier_type()};
@@ -1015,7 +1019,10 @@ bool contact::_to_notify_recovery(notifier::reason_type type, notifier const& no
   return retval;
 }
 
-bool contact::_to_notify_acknowledgement(notifier::reason_type type, notifier const& notif) const {
+bool contact::_to_notify_acknowledgement(notifier::reason_type type
+                                         __attribute__((unused)),
+                                         notifier const& notif
+                                         __attribute__((unused))) const {
   logger(dbg_functions, basic)
     << "contact::_to_notify_acknowledgement()";
   logger(dbg_notifications, most)
@@ -1034,17 +1041,12 @@ bool contact::_to_notify_flapping(notifier::reason_type type,
   notifier::notifier_type nt{notif.get_notifier_type()};
 
   notifier::notification_flag what_notif;
-  switch (type) {
-    case notifier::reason_flappingstart:
-      what_notif = notifier::flappingstart;
-      break;
-    case notifier::reason_flappingstop:
-      what_notif = notifier::flappingstop;
-      break;
-    case notifier::reason_flappingdisabled:
-      what_notif = notifier::flappingdisabled;
-      break;
-  }
+  if (type == notifier::reason_flappingstart)
+    what_notif = notifier::flappingstart;
+  else if (type == notifier::reason_flappingstop)
+    what_notif = notifier::flappingstop;
+  else
+    what_notif = notifier::flappingdisabled;
 
   if (!notify_on(nt, what_notif)) {
     logger(dbg_notifications, most)
@@ -1055,7 +1057,8 @@ bool contact::_to_notify_flapping(notifier::reason_type type,
   return true;
 }
 
-bool contact::_to_notify_downtime(notifier::reason_type type,
+bool contact::_to_notify_downtime(notifier::reason_type type
+                                  __attribute__((unused)),
                                   notifier const& notif) const {
   logger(dbg_functions, basic)
     << "contact::_to_notify_downtime()";
@@ -1073,8 +1076,10 @@ bool contact::_to_notify_downtime(notifier::reason_type type,
   return true;
 }
 
-bool contact::_to_notify_custom(notifier::reason_type type,
-                                notifier const& notif) const {
+bool contact::_to_notify_custom(notifier::reason_type type
+                                __attribute__((unused)),
+                                notifier const& notif
+                                __attribute__((unused))) const {
   logger(dbg_functions, basic)
     << "contact::_to_notify_custom()";
   logger(dbg_notifications, most)

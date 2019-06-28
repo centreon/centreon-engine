@@ -112,7 +112,7 @@ TEST_F(SimpleCommand, NewCommandAsync) {
   nagios_macros mac;
   std::string cc(cmd->process_cmd(&mac));
   ASSERT_EQ(cc, "/bin/echo bonjour");
-  uint64_t id{cmd->run(cc, mac, 2)};
+  cmd->run(cc, mac, 2);
   int timeout{0};
   while (timeout < 50 && lstnr->get_result().output == "") {
     usleep(100000);

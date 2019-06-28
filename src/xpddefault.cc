@@ -63,7 +63,6 @@ static pthread_mutex_t xpddefault_service_perfdata_fp_lock;
 // initializes performance data.
 int xpddefault_initialize_performance_data() {
   char* temp_command_name(nullptr);
-  commands::command* temp_command(nullptr);
 
   // reset vars.
   xpddefault_host_perfdata_command_ptr = nullptr;

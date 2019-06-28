@@ -67,7 +67,7 @@ notification::notification(notifier* parent,
   }
 }
 
-int notification::execute(std::unordered_set<contact*> const& to_notify) {
+int notification::execute(std::unordered_set<contact*>&& to_notify) {
   uint32_t contacts_notified{0};
 
   struct timeval start_time;
@@ -191,6 +191,7 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
       contacts_notified++;
   }
 
+  _notified_contacts = to_notify;
   logger(dbg_notifications, basic)
       << contacts_notified << " contacts were notified.";
   return OK;

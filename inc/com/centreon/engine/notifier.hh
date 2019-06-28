@@ -271,8 +271,8 @@ class                notifier : public checkable {
 
  protected:
   notifier_type      _notifier_type;
-  int                _stalk_type;
-  int                _flap_type;
+  uint32_t           _stalk_type;
+  uint32_t           _flap_type;
   unsigned long      _current_event_id;
   unsigned long      _last_event_id;
   unsigned long      _current_problem_id;

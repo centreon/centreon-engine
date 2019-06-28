@@ -244,11 +244,11 @@ class                           service : public notifier {
   time_t                        _last_time_unknown;
   time_t                        _last_time_critical;
   int                           _is_volatile;
-  enum service_state            _last_state;
-  enum service_state            _last_hard_state;
-  enum service_state            _current_state;
   enum service_state            _initial_state;
-  std::list<servicegroup *>     _servicegroups;
+  enum service_state            _current_state;
+  enum service_state            _last_hard_state;
+  enum service_state            _last_state;
+  std::list<servicegroup*>      _servicegroups;
   host*                         _host_ptr;
 };
 CCE_END()

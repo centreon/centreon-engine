@@ -37,15 +37,15 @@ class serviceescalation : public escalation {
  public:
   serviceescalation(std::string const& hostname,
                     std::string const& description,
-                    int first_notification,
-                    int last_notification,
+                    uint32_t first_notification,
+                    uint32_t last_notification,
                     double notification_interval,
                     std::string const& escalation_period,
                     uint32_t escalate_on);
   virtual ~serviceescalation();
   std::string const& get_hostname() const;
   std::string const& get_description() const;
-  bool is_viable(int state, int notification_number) const override;
+  bool is_viable(int state, uint32_t notification_number) const override;
   void resolve(int& w, int& e) override;
 
   static serviceescalation_mmap serviceescalations;

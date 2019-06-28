@@ -76,10 +76,6 @@ downtime::downtime(int type,
         << "can not create a host downtime on host with empty name";
 }
 
-downtime::downtime(downtime const& other) {}
-
-downtime::downtime(downtime&& other) {}
-
 downtime::~downtime() {}
 
 /* handles scheduled downtime (id passed from timed event queue) */

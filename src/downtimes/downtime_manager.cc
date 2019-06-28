@@ -354,7 +354,6 @@ void downtime_manager::initialize_downtime_data() {
 
 /* removes invalid and old downtime entries from the downtime file */
 int downtime_manager::xdddefault_validate_downtime_data() {
-  int update_file = false;
   int save = true;
 
   /* remove stale downtimes */
@@ -369,7 +368,6 @@ int downtime_manager::xdddefault_validate_downtime_data() {
     /* delete downtimes with invalid host names, invalid service descriptions
      * or that have expired. */
     if (temp_downtime->is_stale()) {
-      update_file = true;
       it = _scheduled_downtimes.erase(it);
     } else
       ++it;
@@ -392,10 +390,8 @@ int downtime_manager::xdddefault_validate_downtime_data() {
       save = false;
 
     /* delete the downtime */
-    if (!save) {
-      update_file = true;
+    if (!save)
       it = _scheduled_downtimes.erase(it);
-    }
   }
 
   return OK;

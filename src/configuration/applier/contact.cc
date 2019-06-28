@@ -420,7 +420,6 @@ void applier::contact::resolve_object(
     throw (engine_error()
            << "Cannot resolve non-existing contact '"
            << obj.contact_name() << "'");
-  engine::contact* c{ct_it->second.get()};
 
   // Add all the host notification commands.
   for (list_string::const_iterator

@@ -279,7 +279,8 @@ static time_t calculate_time_from_weekday_of_month(
   t.tm_mon = month;
   t.tm_mday = 1;
   t.tm_isdst = -1;
-  time_t midnight(mktime(&t));
+  mktime(&t);
+  time_t midnight;
 
   // How many days must we advance to reach the first instance of the
   // weekday this month ?
@@ -1245,7 +1246,7 @@ void get_next_valid_time(
  * @param e[out] Number of errors produced during this resolution.
  *
  */
-void timeperiod::resolve(int& w, int& e) {
+void timeperiod::resolve(int& w __attribute__((unused)), int& e) {
   int errors{0};
 
   // Check for illegal characters in timeperiod name.

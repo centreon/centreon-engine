@@ -3121,7 +3121,7 @@ int service::notify_contact(nagios_macros* mac,
                             reason_type type,
                             std::string const& not_author,
                             std::string const& not_data,
-                            int options,
+                            int options __attribute__((unused)),
                             int escalated) {
   std::string raw_command;
   std::string processed_command;
@@ -3216,17 +3216,10 @@ int service::notify_contact(nagios_macros* mac,
         notification_str = tab_notification_str[type].c_str();
 
       std::string info;
-      switch (type) {
-        case reason_custom:
-          notification_str = "CUSTOM";
-
-        case reason_acknowledgement:
-          info.append(";")
-              .append(not_author)
-              .append(";")
-              .append(not_data);
-          break;
-      }
+      if (type == reason_custom)
+        notification_str = "CUSTOM";
+      else if (type == reason_acknowledgement)
+        info.append(";").append(not_author).append(";").append(not_data);
 
       std::string service_notification_state;
       if (strcmp(notification_str, "NORMAL") == 0)
@@ -3373,7 +3366,7 @@ time_t service::get_next_notification_time(time_t offset) {
 bool service::is_valid_escalation_for_notification(
     std::shared_ptr<escalation> e,
     int options) const {
-  int notification_number;
+  uint32_t notification_number;
   time_t current_time;
 
   logger(dbg_functions, basic)

@@ -115,7 +115,6 @@ std::ostream& dump::contact(std::ostream& os, com::centreon::engine::contact con
  *  @return The output stream.
  */
 std::ostream& dump::contacts(std::ostream& os) {
-  configuration::applier::state const& config(configuration::applier::state::instance());
   for (contact_map::const_iterator
          it{contact::contacts.begin()},
          end{contact::contacts.end()};

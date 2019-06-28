@@ -88,9 +88,13 @@ class HostNotification : public ::testing::Test {
     // Add command.
     {
       configuration::command cmd;
-      cmd.parse("command_name", "cmd");
-      cmd.parse("command_line", "true");
+      cmd.parse("command_name", "hcmd");
+      cmd.parse("command_line", "echo!host notification command");
       configuration::applier::command aplyr;
+      aplyr.add_object(cmd);
+
+      cmd.parse("command_name", "scmd");
+      cmd.parse("command_line", "echo!service notification command");
       aplyr.add_object(cmd);
     }
     // Add timeperiod.
@@ -108,8 +112,8 @@ class HostNotification : public ::testing::Test {
     ctct.parse("contact_name", "admin");
     ctct.parse("host_notification_period", "24x7");
     ctct.parse("service_notification_period", "24x7");
-    ctct.parse("host_notification_commands", "cmd");
-    ctct.parse("service_notification_commands", "cmd");
+    ctct.parse("host_notification_commands", "hcmd");
+    ctct.parse("service_notification_commands", "scmd");
     return ctct;
   }
 
@@ -457,7 +461,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
   set_time(43200);
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
-  for (int i = 0; i < tperiod->days.size(); ++i)
+  for (uint32_t i = 0; i < tperiod->days.size(); ++i)
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{

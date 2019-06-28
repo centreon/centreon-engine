@@ -1351,7 +1351,7 @@ bool engine::is_host_exist(uint64_t host_id) throw() {
  */
 uint64_t engine::get_host_id(std::string const& name) {
   host_map::const_iterator found{host::hosts.find(name)};
-  return found != host::hosts.end() ? found->second->get_host_id() : 0;
+  return found != host::hosts.end() ? found->second->get_host_id() : 0u;
 }
 
 /**
@@ -2702,7 +2702,7 @@ int host::notify_contact(nagios_macros* mac,
                          notifier::reason_type type,
                          std::string const& not_author,
                          std::string const& not_data,
-                         int options,
+                         int options __attribute((unused)),
                          int escalated) {
   std::string raw_command;
   std::string processed_command;
@@ -2800,17 +2800,10 @@ int host::notify_contact(nagios_macros* mac,
         notification_str = tab_notification_str[type].c_str();
 
       std::string info;
-      switch (type) {
-        case reason_custom:
-          notification_str = "CUSTOM";
-
-        case reason_acknowledgement:
-          info.append(";")
-              .append(not_author)
-              .append(";")
-              .append(not_data);
-          break;
-      }
+      if (type == reason_custom)
+        notification_str = "CUSTOM";
+      else if (type == reason_acknowledgement)
+        info.append(";").append(not_author).append(";").append(not_data);
 
       std::string host_notification_state;
       if (strcmp(notification_str, "NORMAL") == 0)
@@ -3009,7 +3002,7 @@ void host::enable_flap_detection() {
  */
 bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
                                                 int options) const {
-  int notification_number;
+  uint32_t notification_number;
   time_t current_time;
 
   logger(dbg_functions, basic)

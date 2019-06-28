@@ -62,10 +62,10 @@ TEST_F(ApplierCommand, UnusableCommandFromConfig) {
   configuration::command cmd("cmd");
   ASSERT_THROW(aply.add_object(cmd), std::exception);
   set_command s(config->commands());
-  ASSERT_EQ(s.size(), 1);
+  ASSERT_EQ(s.size(), 1u);
   std::unordered_map<std::string, std::shared_ptr<commands::command>> cm(
     commands::command::commands);
-  ASSERT_EQ(cm.size(), 0);
+  ASSERT_EQ(cm.size(), 0u);
 }
 
 // Given a command applier
@@ -78,7 +78,7 @@ TEST_F(ApplierCommand, NewCommandFromConfig) {
   cmd.parse("command_line", "echo 1");
   aply.add_object(cmd);
   set_command s(config->commands());
-  ASSERT_EQ(s.size(), 1);
+  ASSERT_EQ(s.size(), 1u);
   command_map::iterator found{
     commands::command::commands.find("cmd")};
   ASSERT_FALSE(found == commands::command::commands.end());
@@ -98,7 +98,7 @@ TEST_F(ApplierCommand, NewCommandWithEmptyConnectorFromConfig) {
   cmd.parse("connector", "perl");
   ASSERT_THROW(aply.add_object(cmd), std::exception);
   set_command s(config->commands());
-  ASSERT_EQ(s.size(), 1);
+  ASSERT_EQ(s.size(), 1u);
   command_map::iterator found{
     commands::command::commands.find("cmd")};
   ASSERT_TRUE(found == commands::command::commands.end());
@@ -145,7 +145,7 @@ TEST_F(ApplierCommand, NewCommandAndConnectorWithSameName) {
   aply.add_object(cmd);
 
   set_command s(config->commands());
-  ASSERT_EQ(s.size(), 1);
+  ASSERT_EQ(s.size(), 1u);
   command_map::iterator found{
     commands::command::commands.find("cmd")};
   ASSERT_FALSE(found == commands::command::commands.end());

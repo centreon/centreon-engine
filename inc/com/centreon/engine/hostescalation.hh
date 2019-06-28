@@ -36,15 +36,15 @@ CCE_BEGIN()
 class hostescalation : public escalation {
  public:
   hostescalation(std::string const& host_name,
-                 int first_notification,
-                 int last_notification,
+                 uint32_t first_notification,
+                 uint32_t last_notification,
                  double notification_interval,
                  std::string const& escalation_period,
                  uint32_t escalate_on);
   virtual ~hostescalation();
 
   std::string const& get_hostname() const;
-  bool is_viable(int state, int notification_number) const override;
+  bool is_viable(int state, uint32_t notification_number) const override;
   void resolve(int& w, int& e) override;
 
   static hostescalation_mmap hostescalations;

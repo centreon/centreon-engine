@@ -70,7 +70,6 @@ int grab_custom_macro_value_r(
       std::string const& arg1,
       std::string const& arg2,
       std::string& output) {
-  contactgroup* temp_contactgroup = nullptr;
   std::string temp_buffer;
   int result = OK;
 
@@ -395,9 +394,6 @@ int grab_standard_hostgroup_macro_r(
       hostgroup* temp_hostgroup,
       std::string & output) {
   std::string temp_buffer;
-  unsigned int temp_len = 0;
-  unsigned int init_len = 0;
-
   if (temp_hostgroup == nullptr)
     return ERROR;
 
@@ -481,8 +477,6 @@ int grab_standard_servicegroup_macro_r(
       servicegroup* temp_servicegroup,
       std::string & output) {
   std::string temp_buffer;
-  unsigned int temp_len = 0;
-  unsigned int init_len = 0;
 
   if (temp_servicegroup == nullptr)
     return ERROR;
