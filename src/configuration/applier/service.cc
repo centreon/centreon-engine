@@ -20,7 +20,6 @@
 #include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -406,22 +405,14 @@ void applier::service::modify_object(
   s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::unknown ? notifier::unknown : notifier::none);
   s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::critical ? notifier::critical : notifier::none);
 
-  modify_if_different(
-    s->process_performance_data,
-    static_cast<int>(obj.process_perf_data()));
+  s->process_performance_data = static_cast<int>(obj.process_perf_data());
   s->set_check_freshness(obj.check_freshness());
   s->set_freshness_threshold(obj.freshness_threshold());
-  modify_if_different(
-    s->accept_passive_service_checks,
-    static_cast<int>(obj.checks_passive()));
+  s->accept_passive_service_checks = static_cast<int>(obj.checks_passive());
   s->set_event_handler(obj.event_handler());
   s->set_checks_enabled(obj.checks_active());
-  modify_if_different(
-    s->retain_status_information,
-    static_cast<int>(obj.retain_status_information()));
-  modify_if_different(
-    s->retain_nonstatus_information,
-    static_cast<int>(obj.retain_nonstatus_information()));
+  s->retain_status_information = static_cast<int>(obj.retain_status_information());
+  s->retain_nonstatus_information = static_cast<int>(obj.retain_nonstatus_information());
   s->set_notifications_enabled(obj.notifications_enabled());
   s->set_obsess_over(obj.obsess_over_service());
   s->set_notes(obj.notes());

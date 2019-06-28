@@ -24,7 +24,6 @@
 #include "com/centreon/engine/commands/forward.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
-#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"

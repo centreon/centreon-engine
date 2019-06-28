@@ -53,17 +53,17 @@ using namespace com::centreon::engine::logging;
 static int handle_host_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   int retval;
-  if (arg2 == nullptr) {
+  if (arg2.empty()) {
     // Find the host for on-demand macros
     // or use saved host pointer.
     host *hst = nullptr;
 
-    if(arg1) {
+    if(!arg1.empty()) {
       host_map::const_iterator it(host::hosts.find(arg1));
       if (it != host::hosts.end())
         hst = it->second.get();
@@ -143,8 +143,8 @@ static int handle_host_macro(
 static int handle_hostgroup_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   (void)arg2;
@@ -155,7 +155,7 @@ static int handle_hostgroup_macro(
   // Use the saved hostgroup pointer
   // or find the hostgroup for on-demand macros.
   hostgroup* hg(nullptr);
-  if (arg1) {
+  if (!arg1.empty()) {
     hostgroup_map::const_iterator
       it(hostgroup::hostgroups.find(arg1));
     if(it != hostgroup::hostgroups.end())
@@ -194,15 +194,15 @@ static int handle_hostgroup_macro(
 static int handle_service_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   // Return value.
   int retval;
 
   // Use saved service pointer.
-  if (!arg1 && !arg2) {
+  if (arg1.empty() && arg2.empty()) {
     if (!mac->service_ptr)
       retval = ERROR;
     else
@@ -216,10 +216,10 @@ static int handle_service_macro(
   // Else and ondemand macro...
   else {
     // If first arg is blank, it means use the current host name.
-    if (!arg1 || (arg1[0] == '\0')) {
+    if (arg1.empty()) {
       if (!mac->host_ptr)
         retval = ERROR;
-      else if (arg2) {
+      else if (!arg2.empty()) {
         service_map::const_iterator
           found(service::services.find({mac->host_ptr->get_name(), arg2}));
 
@@ -237,7 +237,7 @@ static int handle_service_macro(
       else
         retval = ERROR;
     }
-    else if (arg1 && arg2) {
+    else if (!arg1.empty() && !arg2.empty()) {
       // On-demand macro with both host and service name.
       service_map::const_iterator
         found(service::services.find({arg1, arg2}));
@@ -308,8 +308,8 @@ static int handle_service_macro(
 static int handle_servicegroup_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   (void)arg2;
@@ -353,14 +353,14 @@ static int handle_servicegroup_macro(
 static int handle_contact_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   // Return value.
   int retval;
 
-  if (!arg2) {
+  if (arg2.empty()) {
     // Find the contact for on-demand macros
     // or use saved contact pointer.
     contact_map::const_iterator ct_it{contact::contacts.find(arg1)};
@@ -378,7 +378,7 @@ static int handle_contact_macro(
     }
   }
   // A contact macro with a contactgroup name and delimiter.
-  else if (arg1 && arg2) {
+  else if (!arg1.empty() && !arg2.empty()) {
     contactgroup_map::iterator cg{contactgroup::contactgroups.find(arg1)};
     if (cg == contactgroup::contactgroups.end() || !cg->second)
       retval = ERROR;
@@ -431,8 +431,8 @@ static int handle_contact_macro(
 static int handle_contactgroup_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   (void)arg2;
@@ -474,8 +474,8 @@ static int handle_contactgroup_macro(
 static int handle_notification_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   (void)arg1;
@@ -504,8 +504,8 @@ static int handle_notification_macro(
 static int handle_datetime_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   // Calculate macros.
@@ -535,8 +535,8 @@ static int handle_datetime_macro(
 static int handle_static_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string& output,
              int* free_macro) {
   (void)mac;
@@ -565,8 +565,8 @@ static int handle_static_macro(
 static int handle_summary_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             std::string const& arg1,
+             std::string const& arg2,
              std::string &output,
              int* free_macro) {
   (void)arg1;
@@ -759,7 +759,7 @@ static int handle_summary_macro(
 
 // Redirection object.
 struct grab_value_redirection {
-  typedef std::unordered_map<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, std::string&, int*)> entry;
+  typedef std::unordered_map<unsigned int, int (*)(nagios_macros*, int, std::string const&, std::string const&, std::string&, int*)> entry;
   entry routines;
   grab_value_redirection() {
     // Host macros.
@@ -1015,7 +1015,7 @@ extern "C" {
 /* this is the big one */
 int grab_macro_value_r(
       nagios_macros* mac,
-      char* macro_buffer,
+      char const* macro_buffer,
       std::string& output,
       int* clean_options,
       int* free_macro) {

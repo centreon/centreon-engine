@@ -22,7 +22,6 @@
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
-#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
@@ -88,28 +87,27 @@ void applier::contact::add_object(configuration::contact const& obj) {
   config->contacts().insert(obj);
 
   // Create address list.
-  char const* addresses[MAX_CONTACT_ADDRESSES];
-  memset(addresses, 0, sizeof(addresses));
+  std::array<std::string, MAX_CONTACT_ADDRESSES> addresses;
   {
-    unsigned int i(0);
+    unsigned int i{0};
     for (tab_string::const_iterator
            it(obj.address().begin()),
            end(obj.address().end());
          it != end;
          ++it, ++i)
-      addresses[i] = NULL_IF_EMPTY(*it);
+      addresses[i] = *it;
   }
 
   // Create contact.
   std::shared_ptr<com::centreon::engine::contact>
     c(add_contact(
         obj.contact_name(),
-        NULL_IF_EMPTY(obj.alias()),
-        NULL_IF_EMPTY(obj.email()),
-        NULL_IF_EMPTY(obj.pager()),
+        obj.alias(),
+        obj.email(),
+        obj.pager(),
         addresses,
-        NULL_IF_EMPTY(obj.service_notification_period()),
-        NULL_IF_EMPTY(obj.host_notification_period()),
+        obj.service_notification_period(),
+        obj.host_notification_period(),
         static_cast<bool>(
           obj.service_notification_options() & service::ok),
         static_cast<bool>(

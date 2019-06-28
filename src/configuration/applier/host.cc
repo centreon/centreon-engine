@@ -22,7 +22,6 @@
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
-#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"

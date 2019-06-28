@@ -277,7 +277,7 @@ class                host : public notifier {
   timeperiod*        get_notification_timeperiod() const override;
   bool               get_notify_on_current_state() const override;
   bool               is_in_downtime() const override;
-  void resolve(int& w, int& e);
+  void               resolve(int& w, int& e);
 
   host_map_unsafe     parent_hosts;
   host_map_unsafe     child_hosts;

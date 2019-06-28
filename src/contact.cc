@@ -421,12 +421,12 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
  */
 std::shared_ptr<contact> add_contact(
            std::string const& name,
-           char const* alias,
-           char const* email,
-           char const* pager,
-           char const* const* addresses,
-           char const* svc_notification_period,
-           char const* host_notification_period,
+           std::string const& alias,
+           std::string const& email,
+           std::string const& pager,
+           std::array<std::string, MAX_CONTACT_ADDRESSES> const& addresses,
+           std::string const& svc_notification_period,
+           std::string const& host_notification_period,
            int notify_service_ok,
            int notify_service_critical,
            int notify_service_warning,
@@ -464,22 +464,17 @@ std::shared_ptr<contact> add_contact(
   try {
     // Duplicate vars.
     obj->set_name(name);
-    obj->set_alias(!alias ? name : alias);
-    if (email)
-      obj->set_email(email);
-    if (host_notification_period)
-      obj->set_host_notification_period(host_notification_period);
-    if (pager)
-      obj->set_pager(pager);
-    if (svc_notification_period)
-      obj->set_service_notification_period(svc_notification_period);
-    if (addresses) {
-      std::vector<std::string> addr;
-      for (unsigned int x(0); x < MAX_CONTACT_ADDRESSES; ++x)
-        if (addresses[x])
-          addr[x] = string::dup(addresses[x]);
-      obj->set_addresses(addr);
-    }
+    obj->set_alias(alias.empty() ? name : alias);
+    obj->set_email(email);
+    obj->set_host_notification_period(host_notification_period);
+    obj->set_pager(pager);
+    obj->set_service_notification_period(svc_notification_period);
+    std::vector<std::string> addr;
+    addr.resize(MAX_CONTACT_ADDRESSES);
+
+    for (unsigned int x(0); x < MAX_CONTACT_ADDRESSES; ++x)
+      addr[x] = addresses[x];
+    obj->set_addresses(addr);
 
     // Set remaining contact properties.
     obj->set_can_submit_commands(can_submit_commands > 0);

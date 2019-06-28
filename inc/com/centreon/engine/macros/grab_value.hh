@@ -29,7 +29,7 @@ extern "C" {
 
 int grab_macro_value_r(
       nagios_macros* mac,
-      char* macro_buffer,
+      char const* macro_buffer,
       std::string& output,
       int* clean_options,
       int* free_macro);

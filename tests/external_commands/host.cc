@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <gtest/gtest.h>
+#include <com/centreon/engine/configuration/applier/macros.hh>
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -50,12 +51,10 @@ class HostExternalCommand : public ::testing::Test {
   }
 };
 
-TEST_F(HostExternalCommand, AddUnkownHostDowntime) {
-}
-
 TEST_F(HostExternalCommand, AddHostDowntime) {
   configuration::applier::host hst_aply;
   configuration::host hst;
+
   ASSERT_TRUE(hst.parse("host_name", "test_srv"));
   ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
   ASSERT_TRUE(hst.parse("_HOST_ID", "1"));
