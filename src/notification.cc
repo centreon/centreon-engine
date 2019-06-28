@@ -102,7 +102,7 @@ int notification::execute(std::unordered_set<contact*>&& to_notify) {
         cend{contact::contacts.end()};
         cit != cend; ++cit) {
       if (cit->second->get_alias() == _author) {
-        author = it->second.get();
+        author = cit->second.get();
         break;
       }
     }
