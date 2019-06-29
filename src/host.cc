@@ -736,8 +736,6 @@ bool host::operator==(host const& other) throw() {
          get_has_been_checked() == other.get_has_been_checked() &&
          get_is_being_freshened() == other.get_is_being_freshened() &&
          get_notified_on() == other.get_notified_on() &&
-         get_current_notification_number() ==
-             other.get_current_notification_number() &&
          get_no_more_notifications() == other.get_no_more_notifications() &&
          get_current_notification_id() == other.get_current_notification_id() &&
          get_scheduled_downtime_depth() ==
@@ -1124,9 +1122,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << "\n"
         "  notified_on_unreachable:              "
      << obj.get_notified_on(notifier::unreachable)
-     << "\n"
-        "  current_notification_number:          "
-     << obj.get_current_notification_number()
      << "\n"
         "  no_more_notifications:                "
      << obj.get_no_more_notifications()
@@ -2494,7 +2489,7 @@ int host::handle_state() {
     state_change = true;
 
   /* if the host state has changed... */
-  if (state_change == true) {
+  if (state_change) {
     /* update last state change times */
     if (get_state_type() == soft ||
         get_last_state() != get_current_state())
@@ -2556,11 +2551,6 @@ int host::handle_state() {
     /*if(this->state_type==hard) */
     downtime_manager::instance().check_pending_flex_host_downtime(this);
 
-    if (get_current_state() ==  host::state_up) {
-      _recovery_been_sent = false;
-      _initial_notif_time = 0;
-    }
-
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (get_state_type() == hard)
       notify(reason_normal, "", "", notifier::notification_option_none);
@@ -2571,39 +2561,23 @@ int host::handle_state() {
     /* the host just recovered, so reset the current host attempt */
     if (get_current_state() ==  host::state_up)
       set_current_attempt(1);
-
-    /* the host recovered, so reset the current notification number and state
-     * flags (after the recovery notification has gone out) */
-    if (get_current_state() ==  host::state_up && _recovery_been_sent) {
-      set_current_notification_number(0);
-      set_notified_on(none);
-    }
   }
-
   /* else the host state has not changed */
   else {
-    bool old_recovery_been_sent{_recovery_been_sent};
-
     /* notify contacts if needed */
-    if ((get_current_state() !=  host::state_up ||
-         (get_current_state() ==  host::state_up && !_recovery_been_sent)) &&
-        get_state_type() == hard) {
+    if (get_current_state() != host::state_up)
       notify(reason_normal,
              "",
              "",
              notifier::notification_option_none);
-    }
-
-    /* the host recovered, so reset the current notification number and state
-     * flags (after the recovery notification has gone out) */
-    if (!old_recovery_been_sent && _recovery_been_sent &&
-        get_current_state() ==  host::state_up) {
-      set_current_notification_number(0);
-      set_notified_on(none);
-    }
+    else
+      notify(reason_recovery,
+             "",
+             "",
+             notifier::notification_option_none);
 
     /* if we're in a soft state and we should log host retries, do so now... */
-    if (get_state_type() == soft && config->log_host_retries() == true)
+    if (get_state_type() == soft && config->log_host_retries())
       log_event();
   }
 

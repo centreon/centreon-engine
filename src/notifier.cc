@@ -980,13 +980,9 @@ void notifier::set_last_acknowledgement(time_t ack) {
   _last_acknowledgement = ack;
 }
 
-void notifier::set_recovery_been_sent(bool sent) { _recovery_been_sent = sent; }
-
 time_t notifier::get_last_acknowledgement() const {
   return _last_acknowledgement;
 }
-
-bool notifier::get_recovery_been_sent() const { return _recovery_been_sent; }
 
 double notifier::get_notification_interval(void) const {
   return _notification_interval;

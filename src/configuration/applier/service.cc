@@ -191,7 +191,6 @@ void applier::service::add_object(
   svc->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                    config->interval_length());
   svc->set_last_acknowledgement(0);
-  svc->set_recovery_been_sent(true);
 
   // Add contacts.
   for (set_string::const_iterator

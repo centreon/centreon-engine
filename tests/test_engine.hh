@@ -22,12 +22,15 @@
 
 #include <gtest/gtest.h>
 #include "com/centreon/engine/configuration/contact.hh"
+#include "com/centreon/engine/configuration/host.hh"
 
 using namespace com::centreon::engine;
 
 class TestEngine : public ::testing::Test {
  public:
   configuration::contact valid_contact_config() const;
+  configuration::host new_configuration_host(std::string const& hostname,
+                                             std::string const& contacts);
 };
 
 #endif /* !TEST_ENGINE_HH */

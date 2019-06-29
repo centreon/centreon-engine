@@ -60,14 +60,11 @@ class HostDowntimeNotification : public TestEngine {
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
 
-    configuration::applier::host hst_aply;
-    configuration::host hst;
-    hst.parse("host_name", "test_host");
-    hst.parse("address", "127.0.0.1");
-    hst.parse("_HOST_ID", "12");
-    hst.parse("contacts", "admin");
-    hst_aply.add_object(hst);
-    hst_aply.resolve_object(hst);
+    configuration::host hst{new_configuration_host("test_host", "admin")};
+    configuration::applier::host aply;
+    aply.add_object(hst);
+    aply.resolve_object(hst);
+
     host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
     _host->set_current_state(engine::host::state_up);

@@ -138,7 +138,6 @@ void applier::host::add_object(
   h->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                  config->interval_length());
   h->set_last_acknowledgement(0);
-  h->set_recovery_been_sent(true);
 
   // Contacts
   for (set_string::const_iterator

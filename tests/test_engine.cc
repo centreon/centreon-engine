@@ -62,3 +62,14 @@ configuration::contact TestEngine::valid_contact_config() const {
   ctct.parse("host_notifications_enabled", "1");
   return ctct;
 }
+
+configuration::host TestEngine::new_configuration_host(
+    std::string const& hostname,
+    std::string const& contacts) {
+  configuration::host hst;
+  hst.parse("host_name", hostname.c_str());
+  hst.parse("address", "127.0.0.1");
+  hst.parse("_HOST_ID", "12");
+  hst.parse("contacts", contacts.c_str());
+  return hst;
+}

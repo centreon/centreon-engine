@@ -79,7 +79,6 @@ host::setters const host::_setters[] = {
   { "plugin_output",                        SETTER(std::string const&, _set_plugin_output) },
   { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "process_performance_data",             SETTER(int, _set_process_performance_data) },
-  { "recovery_been_sent",                   SETTER(bool, _set_recovery_been_sent)},
   { "retry_check_interval",                 SETTER(unsigned int, _set_retry_check_interval) },
   { "state_history",                        SETTER(std::string const&, _set_state_history) },
   { "state_type",                           SETTER(int, _set_state_type) }
@@ -166,7 +165,6 @@ host& host::operator=(host const& right) {
     _plugin_output = right._plugin_output;
     _problem_has_been_acknowledged = right._problem_has_been_acknowledged;
     _process_performance_data = right._process_performance_data;
-    _recovery_been_sent = right._recovery_been_sent;
     _retry_check_interval = right._retry_check_interval;
     _state_history = right._state_history;
     _state_type = right._state_type;
@@ -234,7 +232,6 @@ bool host::operator==(host const& right) const throw () {
           && _plugin_output == right._plugin_output
           && _problem_has_been_acknowledged == right._problem_has_been_acknowledged
           && _process_performance_data == right._process_performance_data
-          && _recovery_been_sent == right._recovery_been_sent
           && _retry_check_interval == right._retry_check_interval
           && _state_history == right._state_history
           && _state_type == right._state_type);
@@ -729,15 +726,6 @@ opt<bool> const& host::problem_has_been_acknowledged() const throw () {
  */
 opt<int> const& host::process_performance_data() const throw () {
   return _process_performance_data;
-}
-
-/**
- *  Get recovery_been_sent.
- *
- *  @return The recovery_been_sent.
- */
-opt<bool> const& host::recovery_been_sent() const throw () {
-  return _recovery_been_sent;
 }
 
 /**
@@ -1279,17 +1267,6 @@ bool host::_set_process_performance_data(int value) {
   _process_performance_data = value;
   return true;
 }
-
-/**
- *  Set _set_recovery_been_sent.
- *
- *  @param[in] value The new _set_recovery_been_sent.
- */
-bool host::_set_recovery_been_sent(bool value) {
-  _recovery_been_sent = value;
-  return true;
-}
-
 
 /**
  *  Set retry_check_interval.
