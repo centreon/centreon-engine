@@ -110,7 +110,9 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _problem_has_been_acknowledged{false},
       _has_been_checked{false},
       _no_more_notifications{false},
-      _notification_number{0} {
+      _notification_number{0},
+      _stalk_type{0},
+      _flap_type{0} {
 
   if (notification_interval < 0 || check_interval < 0 || retry_interval <= 0) {
     logger(log_config_error, basic)
@@ -1060,15 +1062,15 @@ void notifier::remove_notified_on(notification_flag type) {
 }
 
 bool notifier::get_flap_detection_on(notification_flag type) const {
-  return _stalk_type & type;
+  return _flap_type & type;
 }
 
-uint32_t notifier::get_flap_detection_on() const { return _stalk_type; }
+uint32_t notifier::get_flap_detection_on() const { return _flap_type; }
 
-void notifier::set_flap_detection_on(uint32_t type) { _stalk_type = type; }
+void notifier::set_flap_detection_on(uint32_t type) { _flap_type = type; }
 
 void notifier::add_flap_detection_on(notification_flag type) {
-  _stalk_type |= type;
+  _flap_type |= type;
 }
 
 bool notifier::get_stalk_on(notification_flag type) const {

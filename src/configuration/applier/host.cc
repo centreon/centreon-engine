@@ -318,9 +318,9 @@ void applier::host::modify_object(
   it_obj->second->set_flap_detection_enabled(obj.flap_detection_enabled());
   it_obj->second->set_low_flap_threshold(obj.low_flap_threshold());
   it_obj->second->set_high_flap_threshold(obj.high_flap_threshold());
-  it_obj->second->set_flap_detection_on(obj.flap_detection_options() & configuration::host::up ? notifier::recovery : notifier::none);
-  it_obj->second->set_flap_detection_on(obj.flap_detection_options() & configuration::host::down ? notifier::down : notifier::none);
-  it_obj->second->set_flap_detection_on(obj.flap_detection_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
+  it_obj->second->add_flap_detection_on(obj.flap_detection_options() & configuration::host::up ? notifier::up : notifier::none);
+  it_obj->second->add_flap_detection_on(obj.flap_detection_options() & configuration::host::down ? notifier::down : notifier::none);
+  it_obj->second->add_flap_detection_on(obj.flap_detection_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);
   it_obj->second->add_stalk_on(obj.stalking_options() & configuration::host::up ? notifier::up : notifier::none);
   it_obj->second->add_stalk_on(obj.stalking_options() & configuration::host::down ? notifier::down : notifier::none);
   it_obj->second->add_stalk_on(obj.stalking_options() & configuration::host::unreachable ? notifier::unreachable : notifier::none);

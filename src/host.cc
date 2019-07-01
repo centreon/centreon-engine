@@ -906,13 +906,13 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
         "  notify_on_recovery:                   "
      << obj.get_notify_on(notifier::recovery)
      << "\n"
-        "  notify_on_flappingstart:                   "
+        "  notify_on_flappingstart:              "
      << obj.get_notify_on(notifier::flappingstart)
      << "\n"
-        "  notify_on_flappingstop:                   "
+        "  notify_on_flappingstop:               "
      << obj.get_notify_on(notifier::flappingstop)
      << "\n"
-        "  notify_on_flappingdisabled:                   "
+        "  notify_on_flappingdisabled:           "
      << obj.get_notify_on(notifier::flappingdisabled)
      << "\n"
         "  notify_on_downtime:                   "
@@ -963,7 +963,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
         "  checks_enabled:                       "
      << obj.get_checks_enabled()
      << "\n"
-        "  accept_passive_checks:           "
+        "  accept_passive_checks:                "
      << obj.get_accept_passive_checks()
      << "\n"
         "  event_handler_enabled:                "
@@ -1189,7 +1189,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << notif_period_str
      << "\n"
         "  hostgroups_ptr:                       "
-     << hg->get_group_name() << "\n";
+     << (hg ? hg->get_group_name() : "") << "\n";
 
   for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
     os << cv.first << " ; ";
