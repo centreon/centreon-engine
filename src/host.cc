@@ -59,12 +59,12 @@ std::array<std::pair<uint32_t, std::string>, 3> const host::tab_host_states{
 host_map host::hosts;
 host_id_map host::hosts_by_id;
 
-static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
-  for (unsigned int i(0); i < size; ++i)
-    if (tab1[i] != tab2[i])
-      return (false);
-  return (true);
-}
+//static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
+//  for (unsigned int i(0); i < size; ++i)
+//    if (tab1[i] != tab2[i])
+//      return (false);
+//  return (true);
+//}
 
 /*
  *  @param[in] name                          Host name.
@@ -228,18 +228,18 @@ host::host(uint64_t host_id,
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
   if (host_id == 0) {
     logger(log_config_error, basic) << "Error: Host must contain a host id "
                                        "because it comes from a database";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
   if (notification_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for host '" << name
         << "'";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
 
   // Check if the host already exists.
@@ -247,7 +247,7 @@ host::host(uint64_t host_id,
   if (is_host_exist(id)) {
     logger(log_config_error, basic)
         << "Error: Host '" << name << "' has already been defined";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
 
   _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
@@ -310,7 +310,7 @@ void host::set_host_id(uint64_t id) {
   _id = id;
 }
 
-void host::add_child_link(host* child) {
+void host::add_child_host(host* child) {
   // Make sure we have the data we need.
   if (!child)
     throw engine_error() << "add child link called with nullptr ptr";
@@ -328,14 +328,14 @@ void host::add_parent_host(std::string const& host_name) {
   if (host_name.empty()) {
     logger(log_config_error, basic)
         << "add child link called with bad host_name";
-    throw(engine_error() << "add child link called with bad host_name");
+    throw engine_error() << "add child link called with bad host_name";
   }
 
   // A host cannot be a parent/child of itself.
   if (_name == host_name) {
     logger(log_config_error, basic)
         << "Error: Host '" << _name << "' cannot be a child/parent of itself";
-    throw(engine_error() << "host is child/parent itself");
+    throw engine_error() << "host is child/parent itself";
   }
 
   parent_hosts.insert({host_name, nullptr});
@@ -741,8 +741,8 @@ bool host::operator==(host const& other) throw() {
          get_scheduled_downtime_depth() ==
              other.get_scheduled_downtime_depth() &&
          get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
-         is_equal(state_history, other.state_history,
-                  MAX_STATE_HISTORY_ENTRIES) &&
+         std::equal(state_history.begin(), state_history.end(),
+                     other.state_history.begin()) &&
          get_state_history_index() == other.get_state_history_index() &&
          get_last_state_history_update() ==
              other.get_last_state_history_update() &&
@@ -2552,7 +2552,9 @@ int host::handle_state() {
     downtime_manager::instance().check_pending_flex_host_downtime(this);
 
     /* notify contacts about the recovery or problem if its a "hard" state */
-    if (get_state_type() == hard)
+    if (get_current_state_int() == 0)
+      notify(reason_recovery, "", "", notifier::notification_option_none);
+    else
       notify(reason_normal, "", "", notifier::notification_option_none);
 
     /* handle the host state change */
@@ -3669,7 +3671,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
                            << ", Final State=" << _current_state;
 
   /* handle the host state */
-  this->handle_state();
+  handle_state();
 
   logger(dbg_checks, more) << "Post-handle_host_state() Host: "
                            << _name
@@ -3992,8 +3994,13 @@ void host::check_result_freshness() {
   }
 }
 
-/* adjusts current host check attempt before a new check is performed */
-int host::adjust_check_attempt(bool is_active) {
+/**
+ *  Adjusts current host check attempt before a new check is performed.
+ *
+ * @param is_active Boolean telling if the check is active or not.
+ *
+ */
+void host::adjust_check_attempt(bool is_active) {
   logger(dbg_functions, basic)
     << "adjust_host_check_attempt_3x()";
 
@@ -4018,7 +4025,6 @@ int host::adjust_check_attempt(bool is_active) {
 
   logger(dbg_checks, most)
     << "New check attempt number = " << get_current_attempt();
-  return OK;
 }
 
 /* check for hosts that never returned from a check... */
@@ -4153,7 +4159,7 @@ void host::resolve(int& w, int& e) {
     }
     else {
       it->second = it_host->second.get();
-      it_host->second->add_child_link(this); //add a reverse (child) link to make searches faster later on
+      it_host->second->add_child_host(this); //add a reverse (child) link to make searches faster later on
     }
   }
 

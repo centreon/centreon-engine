@@ -159,7 +159,7 @@ int compare_hashdata(
       result = strcmp(val1b, val2b);
   }
 
-  return (result);
+  return result;
 }
 
 /*
@@ -332,7 +332,6 @@ void get_time_breakdown(
   *hours = temp_hours;
   *minutes = temp_minutes;
   *seconds = temp_seconds;
-  return;
 }
 
 char* resize_string(char* str, size_t size) {

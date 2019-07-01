@@ -54,13 +54,6 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
-static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
-  for (unsigned int i(0); i < size; ++i)
-    if (tab1[i] != tab2[i])
-      return (false);
-  return (true);
-}
-
 std::array<std::pair<uint32_t, std::string>, 4> const
     service::tab_service_states{{{NSLOG_SERVICE_OK, "OK"},
                                  {NSLOG_SERVICE_WARNING, "WARNING"},
@@ -312,8 +305,7 @@ bool service::operator==(service const& other) {
          this->check_options == other.check_options &&
          get_scheduled_downtime_depth() == other.get_scheduled_downtime_depth() &&
          this->pending_flex_downtime == other.pending_flex_downtime &&
-         is_equal(state_history, other.state_history,
-                  MAX_STATE_HISTORY_ENTRIES) &&
+         std::equal(state_history.begin(), state_history.end(), other.state_history.begin()) &&
          get_state_history_index() == other.get_state_history_index() &&
          get_is_flapping() == other.get_is_flapping() &&
          this->flapping_comment_id == other.flapping_comment_id &&

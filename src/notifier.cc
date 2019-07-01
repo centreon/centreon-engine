@@ -335,6 +335,20 @@ bool notifier::_is_notification_viable_recovery(
         << (get_last_hard_state_change() + _recovery_notification_delay);
     return false;
   }
+
+  if (_notification_number == 0) {
+    logger(dbg_notifications, more)
+      << "No notification has been sent to announce a problem. So no recovery"
+      << " notification will be sent";
+    return false;
+  }
+
+  if (!_notification[cat_normal]) {
+    logger(dbg_notifications, more)
+      << "We should not send a notification since no normal notification has"
+         " been sent before";
+    return false;
+  }
   return true;
 }
 
@@ -611,13 +625,11 @@ int notifier::notify(notifier::reason_type type,
 
   /* For a first notification, we store what type of notification we try to
    * send and we fix the notification number to 1. */
-  if (_notification_number == 0) {
-    _type = type;
+  if (_notification_number == 0)
     ++_notification_number;
-  }
 
   std::shared_ptr<notification> notif{
-      new notification(this, _type, not_author, not_data, options,
+      new notification(this, type, not_author, not_data, options,
                        _next_notification_id++, _notification_number)};
 
   /* What are the contacts to notify? */
@@ -634,6 +646,8 @@ int notifier::notify(notifier::reason_type type,
      * Should we increment the notification number? */
     if (cat == cat_normal)
       _notification_number++;
+    else if (cat == cat_recovery)
+      _notification[cat_normal].reset();
     else
       _notification_number = 0;
   }

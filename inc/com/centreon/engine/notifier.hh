@@ -256,7 +256,7 @@ class                notifier : public checkable {
   contactgroup_map_unsafe const& get_contactgroups() const;
   void resolve(int& w, int& e);
 
-  int                state_history[MAX_STATE_HISTORY_ENTRIES];
+  std::array<int, MAX_STATE_HISTORY_ENTRIES> state_history;
 
   std::unordered_map<std::string, customvariable>
     custom_variables;

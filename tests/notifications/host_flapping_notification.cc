@@ -94,7 +94,7 @@ class HostFlappingNotification : public TestEngine {
 // notification.
 // When it is no more flapping
 // Then it can throw a flappingstop notification followed by a recovery
-// notification.
+// notification. And no recovery is sent since the notification number is 0.
 TEST_F(HostFlappingNotification, SimpleHostFlapping) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
@@ -136,8 +136,6 @@ TEST_F(HostFlappingNotification, SimpleHostFlapping) {
   ASSERT_NE(step1, std::string::npos);
   ASSERT_NE(step2, std::string::npos);
   ASSERT_LE(step1, step2);
-
-  ASSERT_EQ(id + 3, _host->get_next_notification_id());
 }
 
 // Given a host UP

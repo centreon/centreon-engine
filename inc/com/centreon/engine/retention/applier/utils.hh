@@ -20,6 +20,7 @@
 #ifndef CCE_RETENTION_APPLIER_UTILS_HH
 #  define CCE_RETENTION_APPLIER_UTILS_HH
 
+#  include <array>
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/namespace.hh"
@@ -32,7 +33,7 @@ namespace     retention {
       bool    is_command_exist(std::string const& command_line);
       void    set_state_history(
                 std::vector<int> const& values,
-                int state_history[]);
+                std::array<int, MAX_STATE_HISTORY_ENTRIES>& state_history);
     }
   }
 }
