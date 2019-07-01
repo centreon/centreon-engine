@@ -3842,9 +3842,9 @@ enum host::host_state host::determine_host_reachability() {
       if (!it->second)
         continue;
 
-      is_host_present = true;
       /* bail out as soon as we find one parent host that is UP */
       if (it->second->get_current_state() ==  host::state_up) {
+        is_host_present = true;
         /* set the current state */
         state =  host::state_down;
         logger(dbg_checks, most)

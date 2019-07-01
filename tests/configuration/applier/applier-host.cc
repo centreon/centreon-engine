@@ -22,6 +22,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
@@ -30,6 +31,12 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/macros/grab_value.hh"
+#include "com/centreon/engine/macros/grab_host.hh"
+#include "com/centreon/engine/timezone_manager.hh"
+#include "com/centreon/engine/utils.hh"
+
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -44,12 +51,14 @@ class ApplierHost : public ::testing::Test {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
+    checks::checker::load();
+    timezone_manager::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
+    checks::checker::unload();
+    timezone_manager::unload();
     delete config;
     config = NULL;
   }
@@ -91,4 +100,53 @@ TEST_F(ApplierHost, HostRenamed) {
   h1 = hm.begin()->second;
   ASSERT_TRUE(h1->get_name() == "test_host1");
   ASSERT_EQ(get_host_id(h1->get_name()), 12u);
+}
+
+// Given host configuration without host_id
+// Then the applier add_object throws an exception.
+TEST_F(ApplierHost, HostParentDownChildUnreachable) {
+  configuration::applier::host hst_aply;
+  configuration::applier::command cmd_aply;
+  configuration::host hst_child;
+  configuration::host hst_parent;
+
+  configuration::command cmd("base_centreon_ping");
+  cmd.parse("command_line", "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w $_HOSTWARNING$ -c $_HOSTCRITICAL$");
+  cmd_aply.add_object(cmd);
+
+  ASSERT_TRUE(hst_child.parse("host_name", "child_host"));
+  ASSERT_TRUE(hst_child.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst_child.parse("parents", "parent_host"));
+  ASSERT_TRUE(hst_child.parse("_HOST_ID", "1"));
+  ASSERT_TRUE(hst_child.parse("_PACKETNUMBER", "42"));
+  ASSERT_TRUE(hst_child.parse("_WARNING", "200,20%"));
+  ASSERT_TRUE(hst_child.parse("_CRITICAL", "400,50%"));
+  ASSERT_TRUE(hst_child.parse("check_command", "base_centreon_ping"));
+  hst_aply.add_object(hst_child);
+
+  ASSERT_TRUE(hst_parent.parse("host_name", "parent_host"));
+  ASSERT_TRUE(hst_parent.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst_parent.parse("_HOST_ID", "2"));
+  ASSERT_TRUE(hst_parent.parse("_PACKETNUMBER", "42"));
+  ASSERT_TRUE(hst_parent.parse("_WARNING", "200,20%"));
+  ASSERT_TRUE(hst_parent.parse("_CRITICAL", "400,50%"));
+  ASSERT_TRUE(hst_parent.parse("check_command", "base_centreon_ping"));
+  hst_aply.add_object(hst_parent);
+
+  ASSERT_EQ(engine::host::hosts.size(), 2u);
+
+  hst_aply.expand_objects(*config);
+  hst_aply.resolve_object(hst_child);
+  hst_aply.resolve_object(hst_parent);
+
+  host_map::iterator child = engine::host::hosts.find("child_host");
+  host_map::iterator parent = engine::host::hosts.find("parent_host");
+
+  ASSERT_EQ(parent->second->child_hosts.size(), 1);
+  ASSERT_EQ(child->second->parent_hosts.size(), 1);
+
+  engine::host::host_state result;
+  parent->second->run_sync_check_3x(&result, 0, 0, 0);
+  child->second->run_sync_check_3x(&result, 0, 0, 0);
+  ASSERT_EQ(child->second->get_current_state(), engine::host::state_unreachable);
 }
