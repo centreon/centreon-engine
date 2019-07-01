@@ -58,7 +58,7 @@ configuration::contact TestEngine::valid_contact_config() const {
   ctct.parse("service_notification_period", "24x7");
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
-  ctct.parse("host_notification_options", "r,f,s");
+  ctct.parse("host_notification_options", "d,r,f,s");
   ctct.parse("host_notifications_enabled", "1");
   return ctct;
 }

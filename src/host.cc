@@ -2450,7 +2450,7 @@ void host::check_for_expired_acknowledgement() {
 /* top level host state handler - occurs after every host check (soft/hard and
  * active/passive) */
 int host::handle_state() {
-  int state_change = false;
+  bool state_change = false;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic) << "handle_host_state()";
@@ -3300,7 +3300,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         << ";" << get_plugin_output();
   }
   /******* HOST WAS DOWN/UNREACHABLE INITIALLY *******/
-  if (_current_state !=  host::state_up) {
+  if (_current_state != host::state_up) {
     logger(dbg_checks, more) << "Host was DOWN/UNREACHABLE.";
 
     /***** HOST IS NOW UP *****/
