@@ -59,13 +59,6 @@ std::array<std::pair<uint32_t, std::string>, 3> const host::tab_host_states{
 host_map host::hosts;
 host_id_map host::hosts_by_id;
 
-//static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
-//  for (unsigned int i(0); i < size; ++i)
-//    if (tab1[i] != tab2[i])
-//      return (false);
-//  return (true);
-//}
-
 /*
  *  @param[in] name                          Host name.
  *  @param[in] display_name                  Display name.

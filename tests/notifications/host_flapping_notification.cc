@@ -222,68 +222,66 @@ TEST_F(HostFlappingNotification, SimpleHostFlappingStopTwoTimes) {
   ASSERT_EQ(id + 2, _host->get_next_notification_id());
 }
 
-//TEST_F(HostFlappingNotification, CheckFlapping) {
-//  config->enable_flap_detection(true);
-//  _host->set_flap_detection_enabled(true);
-//  _host->add_flap_detection_on(engine::host::up);
-//  _host->add_flap_detection_on(engine::host::down);
-//  _host->set_notification_interval(1);
-//  set_time(45000);
-//  _host->set_current_state(engine::host::state_up);
-//  _host->set_last_hard_state(engine::host::state_up);
-//  _host->set_last_hard_state_change(50000);
-//  _host->set_state_type(checkable::hard);
-//  _host->set_first_notification_delay(3);
-//  // This loop is to store many UP in the state history.
-//  for (int i = 1; i < 22; i++) {
-//    // When i == 0, the state_down is soft => no notification
-//    // When i == 1, the state_down is soft => no notification
-//    // When i == 2, the state_down is hard down => notification
-//    set_time(45000 + i * 60);
-//    _host->set_last_state(_host->get_current_state());
-//    if (notifier::hard == _host->get_state_type())
-//      _host->set_last_hard_state(_host->get_current_state());
-//    _host->process_check_result_3x(
-//        engine::host::state_up,
-//        "The host is up", CHECK_OPTION_NONE, 0, true, 0);
-//  }
-//  testing::internal::CaptureStdout();
-//  for (int i = 1; i < 7; i++) {
-//    // When i == 0, the state_down is soft => no notification
-//    // When i == 1, the state_down is soft => no notification
-//    // When i == 2, the state_down is hard down => notification
-//    std::cout << "Step " << i << ":";
-//    set_time(50000 + i * 60);
-//    _host->set_last_state(_host->get_current_state());
-//    if (notifier::hard == _host->get_state_type())
-//      _host->set_last_hard_state(_host->get_current_state());
-//    _host->process_check_result_3x(
-//        i % 2 == 0 ? engine::host::state_up : engine::host::state_down,
-//        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
-//  }
-//
-//  for (int i = 1; i < 18; i++) {
-//    // When i == 0, the state_down is soft => no notification
-//    // When i == 1, the state_down is soft => no notification
-//    // When i == 2, the state_down is hard down => notification
-//    std::cout << "Step " << i << ":";
-//    set_time(50420 + i * 60);
-//    _host->set_last_state(_host->get_current_state());
-//    if (notifier::hard == _host->get_state_type())
-//      _host->set_last_hard_state(_host->get_current_state());
-//    _host->process_check_result_3x(
-//        engine::host::state_down,
-//        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
-//  }
-//
-//  std::string out{testing::internal::GetCapturedStdout()};
-//  std::regex re1(
-//      "Step 6:\\[\\d+\\] \\[\\d+\\] HOST NOTIFICATION: admin;test_host;FLAPPINGSTART \\(UP\\);cmd;");
-//  std::regex re2("Step 17:\\[\\d+\\] \\[\\d+\\] HOST FLAPPING ALERT: test_host;STOPPED;");
-//  std::regex re3(
-//      "\\[\\d+\\] \\[\\d+\\] HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP \\(DOWN\\);cmd;");
-//  std::smatch match;
-//  ASSERT_TRUE(std::regex_search(out, match, re1));
-//  ASSERT_TRUE(std::regex_search(out, match, re2));
-//  ASSERT_TRUE(std::regex_search(out, match, re3));
-//}
+TEST_F(HostFlappingNotification, CheckFlapping) {
+  config->enable_flap_detection(true);
+  _host->set_flap_detection_enabled(true);
+  _host->add_flap_detection_on(engine::host::up);
+  _host->add_flap_detection_on(engine::host::down);
+  _host->set_notification_interval(1);
+  set_time(45000);
+  _host->set_current_state(engine::host::state_up);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  _host->set_first_notification_delay(3);
+  // This loop is to store many UP in the state history.
+  for (int i = 1; i < 22; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    set_time(45000 + i * 60);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+    _host->process_check_result_3x(
+        engine::host::state_up,
+        "The host is up", CHECK_OPTION_NONE, 0, true, 0);
+  }
+  testing::internal::CaptureStdout();
+  for (int i = 1; i < 8; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    std::cout << "Step " << i << ":";
+    set_time(50000 + i * 60);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+    _host->process_check_result_3x(
+        i % 2 == 0 ? engine::host::state_up : engine::host::state_down,
+        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
+  }
+
+  for (int i = 1; i < 18; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    std::cout << "Step " << i << ":";
+    set_time(50420 + i * 60);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+    _host->process_check_result_3x(
+        engine::host::state_down,
+        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
+  }
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t m1{out.find("Step 6:")};
+  size_t m2{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;", m1 + 1)};
+  size_t m3{out.find("Step 7:", m2 + 1)};
+  size_t m4{out.find("Step 17:", m3 + 1)};
+  size_t m5{out.find("HOST FLAPPING ALERT: test_host;STOPPED;", m4 + 1)};
+  size_t m6{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP (DOWN);cmd;", m5 + 1)};
+  ASSERT_NE(m6, std::string::npos);
+}
