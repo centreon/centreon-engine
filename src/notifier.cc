@@ -110,8 +110,8 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _problem_has_been_acknowledged{false},
       _has_been_checked{false},
       _no_more_notifications{false},
-      _notification_number{0},
       _stalk_type{0},
+      _notification_number{0},
       _flap_type{0} {
 
   if (notification_interval < 0 || check_interval < 0 || retry_interval <= 0) {
