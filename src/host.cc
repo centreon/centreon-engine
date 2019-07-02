@@ -59,12 +59,12 @@ std::array<std::pair<uint32_t, std::string>, 3> const host::tab_host_states{
 host_map host::hosts;
 host_id_map host::hosts_by_id;
 
-static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
-  for (unsigned int i(0); i < size; ++i)
-    if (tab1[i] != tab2[i])
-      return (false);
-  return (true);
-}
+//static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
+//  for (unsigned int i(0); i < size; ++i)
+//    if (tab1[i] != tab2[i])
+//      return (false);
+//  return (true);
+//}
 
 /*
  *  @param[in] name                          Host name.
@@ -228,18 +228,18 @@ host::host(uint64_t host_id,
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
   if (host_id == 0) {
     logger(log_config_error, basic) << "Error: Host must contain a host id "
                                        "because it comes from a database";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
   if (notification_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for host '" << name
         << "'";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
 
   // Check if the host already exists.
@@ -247,7 +247,7 @@ host::host(uint64_t host_id,
   if (is_host_exist(id)) {
     logger(log_config_error, basic)
         << "Error: Host '" << name << "' has already been defined";
-    throw(engine_error() << "Could not register host '" << name << "'");
+    throw engine_error() << "Could not register host '" << name << "'";
   }
 
   _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
@@ -310,7 +310,7 @@ void host::set_host_id(uint64_t id) {
   _id = id;
 }
 
-void host::add_child_link(host* child) {
+void host::add_child_host(host* child) {
   // Make sure we have the data we need.
   if (!child)
     throw engine_error() << "add child link called with nullptr ptr";
@@ -328,14 +328,14 @@ void host::add_parent_host(std::string const& host_name) {
   if (host_name.empty()) {
     logger(log_config_error, basic)
         << "add child link called with bad host_name";
-    throw(engine_error() << "add child link called with bad host_name");
+    throw engine_error() << "add child link called with bad host_name";
   }
 
   // A host cannot be a parent/child of itself.
   if (_name == host_name) {
     logger(log_config_error, basic)
         << "Error: Host '" << _name << "' cannot be a child/parent of itself";
-    throw(engine_error() << "host is child/parent itself");
+    throw engine_error() << "host is child/parent itself";
   }
 
   parent_hosts.insert({host_name, nullptr});
@@ -736,15 +736,13 @@ bool host::operator==(host const& other) throw() {
          get_has_been_checked() == other.get_has_been_checked() &&
          get_is_being_freshened() == other.get_is_being_freshened() &&
          get_notified_on() == other.get_notified_on() &&
-         get_current_notification_number() ==
-             other.get_current_notification_number() &&
          get_no_more_notifications() == other.get_no_more_notifications() &&
          get_current_notification_id() == other.get_current_notification_id() &&
          get_scheduled_downtime_depth() ==
              other.get_scheduled_downtime_depth() &&
          get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
-         is_equal(state_history, other.state_history,
-                  MAX_STATE_HISTORY_ENTRIES) &&
+         std::equal(state_history.begin(), state_history.end(),
+                     other.state_history.begin()) &&
          get_state_history_index() == other.get_state_history_index() &&
          get_last_state_history_update() ==
              other.get_last_state_history_update() &&
@@ -1124,9 +1122,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << "\n"
         "  notified_on_unreachable:              "
      << obj.get_notified_on(notifier::unreachable)
-     << "\n"
-        "  current_notification_number:          "
-     << obj.get_current_notification_number()
      << "\n"
         "  no_more_notifications:                "
      << obj.get_no_more_notifications()
@@ -1925,10 +1920,10 @@ void host::schedule_check(time_t check_time, int options) {
 }
 
 /* detects host flapping */
-void host::check_for_flapping(int update,
-                              int actual_check,
-                              int allow_flapstart_notification) {
-  int update_history = true;
+void host::check_for_flapping(bool update,
+                              bool actual_check,
+                              bool allow_flapstart_notification) {
+  bool update_history;
   int is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
@@ -2052,11 +2047,9 @@ void host::check_for_flapping(int update,
   if (curved_percent_change > low_threshold &&
       curved_percent_change < high_threshold)
     return;
-
   /* we're below the lower bound, so we're not flapping */
   else if (curved_percent_change <= low_threshold)
     is_flapping = false;
-
   /* else we're above the upper bound, so we are flapping */
   else if (curved_percent_change >= high_threshold)
     is_flapping = true;
@@ -2078,7 +2071,7 @@ void host::check_for_flapping(int update,
 void host::set_flap(double percent_change,
                     double high_threshold,
                     double low_threshold,
-                    int allow_flapstart_notification) {
+                    bool allow_flapstart_notification) {
   logger(dbg_functions, basic) << "set_host_flap()";
 
   logger(dbg_flapping, more) << "Host '" << get_name() << "' started flapping!";
@@ -2455,7 +2448,7 @@ void host::check_for_expired_acknowledgement() {
 /* top level host state handler - occurs after every host check (soft/hard and
  * active/passive) */
 int host::handle_state() {
-  int state_change = false;
+  bool state_change = false;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic) << "handle_host_state()";
@@ -2494,7 +2487,7 @@ int host::handle_state() {
     state_change = true;
 
   /* if the host state has changed... */
-  if (state_change == true) {
+  if (state_change) {
     /* update last state change times */
     if (get_state_type() == soft ||
         get_last_state() != get_current_state())
@@ -2556,13 +2549,10 @@ int host::handle_state() {
     /*if(this->state_type==hard) */
     downtime_manager::instance().check_pending_flex_host_downtime(this);
 
-    if (get_current_state() ==  host::state_up) {
-      _recovery_been_sent = false;
-      _initial_notif_time = 0;
-    }
-
     /* notify contacts about the recovery or problem if its a "hard" state */
-    if (get_state_type() == hard)
+    if (get_current_state_int() == 0)
+      notify(reason_recovery, "", "", notifier::notification_option_none);
+    else
       notify(reason_normal, "", "", notifier::notification_option_none);
 
     /* handle the host state change */
@@ -2571,39 +2561,23 @@ int host::handle_state() {
     /* the host just recovered, so reset the current host attempt */
     if (get_current_state() ==  host::state_up)
       set_current_attempt(1);
-
-    /* the host recovered, so reset the current notification number and state
-     * flags (after the recovery notification has gone out) */
-    if (get_current_state() ==  host::state_up && _recovery_been_sent) {
-      set_current_notification_number(0);
-      set_notified_on(none);
-    }
   }
-
   /* else the host state has not changed */
   else {
-    bool old_recovery_been_sent{_recovery_been_sent};
-
     /* notify contacts if needed */
-    if ((get_current_state() !=  host::state_up ||
-         (get_current_state() ==  host::state_up && !_recovery_been_sent)) &&
-        get_state_type() == hard) {
+    if (get_current_state() != host::state_up)
       notify(reason_normal,
              "",
              "",
              notifier::notification_option_none);
-    }
-
-    /* the host recovered, so reset the current notification number and state
-     * flags (after the recovery notification has gone out) */
-    if (!old_recovery_been_sent && _recovery_been_sent &&
-        get_current_state() ==  host::state_up) {
-      set_current_notification_number(0);
-      set_notified_on(none);
-    }
+    else
+      notify(reason_recovery,
+             "",
+             "",
+             notifier::notification_option_none);
 
     /* if we're in a soft state and we should log host retries, do so now... */
-    if (get_state_type() == soft && config->log_host_retries() == true)
+    if (get_state_type() == soft && config->log_host_retries())
       log_event();
   }
 
@@ -3324,7 +3298,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         << ";" << get_plugin_output();
   }
   /******* HOST WAS DOWN/UNREACHABLE INITIALLY *******/
-  if (_current_state !=  host::state_up) {
+  if (_current_state != host::state_up) {
     logger(dbg_checks, more) << "Host was DOWN/UNREACHABLE.";
 
     /***** HOST IS NOW UP *****/
@@ -3695,7 +3669,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
                            << ", Final State=" << _current_state;
 
   /* handle the host state */
-  this->handle_state();
+  handle_state();
 
   logger(dbg_checks, more) << "Post-handle_host_state() Host: "
                            << _name
@@ -4018,8 +3992,13 @@ void host::check_result_freshness() {
   }
 }
 
-/* adjusts current host check attempt before a new check is performed */
-int host::adjust_check_attempt(bool is_active) {
+/**
+ *  Adjusts current host check attempt before a new check is performed.
+ *
+ * @param is_active Boolean telling if the check is active or not.
+ *
+ */
+void host::adjust_check_attempt(bool is_active) {
   logger(dbg_functions, basic)
     << "adjust_host_check_attempt_3x()";
 
@@ -4044,7 +4023,6 @@ int host::adjust_check_attempt(bool is_active) {
 
   logger(dbg_checks, most)
     << "New check attempt number = " << get_current_attempt();
-  return OK;
 }
 
 /* check for hosts that never returned from a check... */
@@ -4179,7 +4157,7 @@ void host::resolve(int& w, int& e) {
     }
     else {
       it->second = it_host->second.get();
-      it_host->second->add_child_link(this); //add a reverse (child) link to make searches faster later on
+      it_host->second->add_child_host(this); //add a reverse (child) link to make searches faster later on
     }
   }
 

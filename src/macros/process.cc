@@ -36,10 +36,6 @@ int process_macros_r(
       std::string & output_buffer,
       int options) {
   char* temp_buffer = nullptr;
-  char* save_buffer = nullptr;
-  char* buf_ptr = nullptr;
-  char* delim_ptr = nullptr;
-  int in_macro = false;
   std::string selected_macro;
   std::string cleaned_macro;
   int clean_macro = false;
@@ -55,8 +51,6 @@ int process_macros_r(
 
   if (input_buffer.empty())
     return ERROR;
-
-  in_macro = false;
 
   logger(dbg_macros, more)
     << "**** BEGIN MACRO PROCESSING ***********\n"
@@ -78,7 +72,6 @@ int process_macros_r(
         size_t pos{input_buffer.find("$", where + 1)};
 
         if (pos != std::string::npos) {
-          size_t begin = it - input_buffer.begin();
           std::string const& token(input_buffer.substr(where +1, pos - where - 1));
           std::string token_resolved;
           /* reset clean options */

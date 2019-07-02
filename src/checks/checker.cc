@@ -908,9 +908,6 @@ void checker::run_sync(
     const_cast<char*>(hst->get_long_plugin_output().c_str()),
     const_cast<char*>(hst->get_perf_data().c_str()),
     nullptr);
-
-  // End.
-  return;
 }
 
 /**

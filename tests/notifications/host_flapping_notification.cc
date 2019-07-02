@@ -20,8 +20,10 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <gtest/gtest.h>
+#include <regex>
 #include <time.h>
+#include "../test_engine.hh"
+#include "../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -31,10 +33,9 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include <com/centreon/process_manager.hh>
 #include "com/centreon/engine/error.hh"
-#include "../timeperiod/utils.hh"
 #include "com/centreon/engine/timezone_manager.hh"
+#include "com/centreon/process_manager.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -43,7 +44,7 @@ using namespace com::centreon::engine::configuration::applier;
 
 extern configuration::state* config;
 
-class HostFlappingNotification : public ::testing::Test {
+class HostFlappingNotification : public TestEngine {
  public:
   void SetUp() override {
     if (!config)
@@ -84,43 +85,6 @@ class HostFlappingNotification : public ::testing::Test {
     config = NULL;
   }
 
-  configuration::contact valid_contact_config() const {
-    // Add command.
-    {
-      configuration::command cmd;
-      cmd.parse("command_name", "cmd");
-      cmd.parse("command_line", "true");
-      configuration::applier::command aplyr;
-      aplyr.add_object(cmd);
-    }
-    // Add timeperiod.
-    {
-      configuration::timeperiod tperiod;
-      tperiod.parse("timeperiod_name", "24x7");
-      tperiod.parse("alias", "24x7");
-      tperiod.parse("monday", "00:00-24:00");
-      tperiod.parse("tuesday", "00:00-24:00");
-      tperiod.parse("wednesday", "00:00-24:00");
-      tperiod.parse("thursday", "00:00-24:00");
-      tperiod.parse("friday", "00:00-24:00");
-      tperiod.parse("saterday", "00:00-24:00");
-      tperiod.parse("sunday", "00:00-24:00");
-      configuration::applier::timeperiod aplyr;
-      aplyr.add_object(tperiod);
-    }
-    // Valid contact configuration
-    // (will generate 0 warnings or 0 errors).
-    configuration::contact ctct;
-    ctct.parse("contact_name", "admin");
-    ctct.parse("host_notification_period", "24x7");
-    ctct.parse("service_notification_period", "24x7");
-    ctct.parse("host_notification_commands", "cmd");
-    ctct.parse("service_notification_commands", "cmd");
-    ctct.parse("host_notification_options", "r,f");
-    ctct.parse("host_notifications_enabled", "1");
-    return ctct;
-  }
-
  protected:
   std::shared_ptr<engine::host> _host;
 };
@@ -131,7 +95,7 @@ class HostFlappingNotification : public ::testing::Test {
 // notification.
 // When it is no more flapping
 // Then it can throw a flappingstop notification followed by a recovery
-// notification.
+// notification. And no recovery is sent since the notification number is 0.
 TEST_F(HostFlappingNotification, SimpleHostFlapping) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
@@ -173,8 +137,6 @@ TEST_F(HostFlappingNotification, SimpleHostFlapping) {
   ASSERT_NE(step1, std::string::npos);
   ASSERT_NE(step2, std::string::npos);
   ASSERT_LE(step1, step2);
-
-  ASSERT_EQ(id + 3, _host->get_next_notification_id());
 }
 
 // Given a host UP
@@ -259,3 +221,69 @@ TEST_F(HostFlappingNotification, SimpleHostFlappingStopTwoTimes) {
             OK);
   ASSERT_EQ(id + 2, _host->get_next_notification_id());
 }
+
+//TEST_F(HostFlappingNotification, CheckFlapping) {
+//  config->enable_flap_detection(true);
+//  _host->set_flap_detection_enabled(true);
+//  _host->add_flap_detection_on(engine::host::up);
+//  _host->add_flap_detection_on(engine::host::down);
+//  _host->set_notification_interval(1);
+//  set_time(45000);
+//  _host->set_current_state(engine::host::state_up);
+//  _host->set_last_hard_state(engine::host::state_up);
+//  _host->set_last_hard_state_change(50000);
+//  _host->set_state_type(checkable::hard);
+//  _host->set_first_notification_delay(3);
+//  // This loop is to store many UP in the state history.
+//  for (int i = 1; i < 22; i++) {
+//    // When i == 0, the state_down is soft => no notification
+//    // When i == 1, the state_down is soft => no notification
+//    // When i == 2, the state_down is hard down => notification
+//    set_time(45000 + i * 60);
+//    _host->set_last_state(_host->get_current_state());
+//    if (notifier::hard == _host->get_state_type())
+//      _host->set_last_hard_state(_host->get_current_state());
+//    _host->process_check_result_3x(
+//        engine::host::state_up,
+//        "The host is up", CHECK_OPTION_NONE, 0, true, 0);
+//  }
+//  testing::internal::CaptureStdout();
+//  for (int i = 1; i < 7; i++) {
+//    // When i == 0, the state_down is soft => no notification
+//    // When i == 1, the state_down is soft => no notification
+//    // When i == 2, the state_down is hard down => notification
+//    std::cout << "Step " << i << ":";
+//    set_time(50000 + i * 60);
+//    _host->set_last_state(_host->get_current_state());
+//    if (notifier::hard == _host->get_state_type())
+//      _host->set_last_hard_state(_host->get_current_state());
+//    _host->process_check_result_3x(
+//        i % 2 == 0 ? engine::host::state_up : engine::host::state_down,
+//        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
+//  }
+//
+//  for (int i = 1; i < 18; i++) {
+//    // When i == 0, the state_down is soft => no notification
+//    // When i == 1, the state_down is soft => no notification
+//    // When i == 2, the state_down is hard down => notification
+//    std::cout << "Step " << i << ":";
+//    set_time(50420 + i * 60);
+//    _host->set_last_state(_host->get_current_state());
+//    if (notifier::hard == _host->get_state_type())
+//      _host->set_last_hard_state(_host->get_current_state());
+//    _host->process_check_result_3x(
+//        engine::host::state_down,
+//        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
+//  }
+//
+//  std::string out{testing::internal::GetCapturedStdout()};
+//  std::regex re1(
+//      "Step 6:\\[\\d+\\] \\[\\d+\\] HOST NOTIFICATION: admin;test_host;FLAPPINGSTART \\(UP\\);cmd;");
+//  std::regex re2("Step 17:\\[\\d+\\] \\[\\d+\\] HOST FLAPPING ALERT: test_host;STOPPED;");
+//  std::regex re3(
+//      "\\[\\d+\\] \\[\\d+\\] HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP \\(DOWN\\);cmd;");
+//  std::smatch match;
+//  ASSERT_TRUE(std::regex_search(out, match, re1));
+//  ASSERT_TRUE(std::regex_search(out, match, re2));
+//  ASSERT_TRUE(std::regex_search(out, match, re3));
+//}

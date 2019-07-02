@@ -98,7 +98,6 @@ namespace                         retention {
     std::string const&            service_description() const throw ();
     opt<std::vector<int> > const& state_history() const throw ();
     opt<int> const&               state_type() const throw ();
-    opt<bool> const&              recovery_been_sent() const throw();
 
   private:
     struct                        setters {
@@ -163,7 +162,6 @@ namespace                         retention {
     bool                          _set_service_description(std::string const& value);
     bool                          _set_state_history(std::string const& value);
     bool                          _set_state_type(int value);
-    bool                          _set_recovery_been_sent(bool value);
 
     opt<int>                      _acknowledgement_type;
     opt<bool>                     _active_checks_enabled;
@@ -218,7 +216,6 @@ namespace                         retention {
     opt<std::string>              _plugin_output;
     opt<bool>                     _problem_has_been_acknowledged;
     opt<int>                      _process_performance_data;
-    opt<bool>                     _recovery_been_sent;
     opt<unsigned int>             _retry_check_interval;
     uint64_t                      _service_id;
     std::string                   _service_description;

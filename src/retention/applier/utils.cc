@@ -48,10 +48,10 @@ bool utils::is_command_exist(std::string const& command_line) {
  */
 void utils::set_state_history(
        std::vector<int> const& values,
-       int state_history[]) {
-  unsigned int end(MAX_STATE_HISTORY_ENTRIES);
+       std::array<int, MAX_STATE_HISTORY_ENTRIES>& state_history) {
+  size_t end{MAX_STATE_HISTORY_ENTRIES};
   if (end > values.size())
     end = values.size();
-  for (unsigned int i(0); i < end; ++i)
+  for (unsigned int i{0}; i < end; ++i)
     state_history[i] = values[i];
 }

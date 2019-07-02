@@ -204,7 +204,9 @@ print qq(  }
  *
  *  \@return 0 on success, any other value on failure.
  */
-int nebmodule_init(int flags, char const* args, void* handle) {
+int nebmodule_init(int flags __attribute__((unused)),
+                   char const* args __attribute__((unused)),
+                   void* handle) {
   char* env = getenv("SIMUMOD");
   if (env && *env) {
     foutput.open(env);

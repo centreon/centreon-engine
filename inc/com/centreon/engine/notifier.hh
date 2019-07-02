@@ -201,8 +201,6 @@ class                notifier : public checkable {
   void               set_acknowledgement_timeout(int timeout);
   void               set_last_acknowledgement(time_t ack);
   time_t             get_last_acknowledgement() const;
-  void               set_recovery_been_sent(bool sent);
-  bool               get_recovery_been_sent() const;
   double             get_notification_interval(void) const;
   void               set_notification_interval(double notification_interval);
   std::string const& get_notification_period() const;
@@ -258,7 +256,7 @@ class                notifier : public checkable {
   contactgroup_map_unsafe const& get_contactgroups() const;
   void resolve(int& w, int& e);
 
-  int                state_history[MAX_STATE_HISTORY_ENTRIES];
+  std::array<int, MAX_STATE_HISTORY_ENTRIES> state_history;
 
   std::unordered_map<std::string, customvariable>
     custom_variables;
@@ -285,7 +283,6 @@ class                notifier : public checkable {
   time_t             _initial_notif_time;
   int                _acknowledgement_timeout;
   time_t             _last_acknowledgement;
-  bool               _recovery_been_sent;
   double             _notification_interval;
   std::string        _notification_period;
   uint32_t           _out_notification_type;

@@ -18,10 +18,12 @@
  */
 
 #include <cstring>
+#include <regex>
 #include <iostream>
 #include <memory>
 #include <gtest/gtest.h>
 #include <time.h>
+#include "../test_engine.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -43,7 +45,7 @@ using namespace com::centreon::engine::configuration::applier;
 
 extern configuration::state* config;
 
-class HostNotification : public ::testing::Test {
+class HostNotification : public TestEngine {
  public:
   void SetUp() override {
     if (!config)
@@ -60,12 +62,8 @@ class HostNotification : public ::testing::Test {
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
 
+    configuration::host hst{new_configuration_host("test_host", "admin")};
     configuration::applier::host hst_aply;
-    configuration::host hst;
-    hst.parse("host_name", "test_host");
-    hst.parse("address", "127.0.0.1");
-    hst.parse("_HOST_ID", "12");
-    hst.parse("contacts", "admin");
     hst_aply.add_object(hst);
     hst_aply.resolve_object(hst);
     host_map const& hm{engine::host::hosts};
@@ -82,39 +80,6 @@ class HostNotification : public ::testing::Test {
     configuration::applier::state::unload();
     delete config;
     config = NULL;
-  }
-
-  configuration::contact valid_contact_config() const {
-    // Add command.
-    {
-      configuration::command cmd;
-      cmd.parse("command_name", "hcmd");
-      cmd.parse("command_line", "echo!host notification command");
-      configuration::applier::command aplyr;
-      aplyr.add_object(cmd);
-
-      cmd.parse("command_name", "scmd");
-      cmd.parse("command_line", "echo!service notification command");
-      aplyr.add_object(cmd);
-    }
-    // Add timeperiod.
-    {
-      configuration::timeperiod tperiod;
-      tperiod.parse("timeperiod_name", "24x7");
-      tperiod.parse("alias", "24x7");
-      tperiod.parse("monday", "00:00-24:00");
-      configuration::applier::timeperiod aplyr;
-      aplyr.add_object(tperiod);
-    }
-    // Valid contact configuration
-    // (will generate 0 warnings or 0 errors).
-    configuration::contact ctct;
-    ctct.parse("contact_name", "admin");
-    ctct.parse("host_notification_period", "24x7");
-    ctct.parse("service_notification_period", "24x7");
-    ctct.parse("host_notification_commands", "hcmd");
-    ctct.parse("service_notification_commands", "scmd");
-    return ctct;
   }
 
  protected:
@@ -489,3 +454,109 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
   /* No notification, because the delay is too short */
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
+
+TEST_F(HostNotification, SimpleCheck) {
+  set_time(50000);
+  _host->set_current_state(engine::host::state_up);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 3; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    set_time(50500 + i * 500);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+    _host->process_check_result_3x(engine::host::state_down,
+        "The host is down",
+        CHECK_OPTION_NONE,
+        0,
+        true,
+        0);
+  }
+
+  for (int i = 0; i < 2; i++) {
+    // When i == 0, the state_up is hard (return to up) => Recovery notification
+    // When i == 1, the state_up is still here (no change) => no notification
+    set_time(52500 + i * 500);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+    _host->process_check_result_3x(engine::host::state_up,
+        "The host is up",
+        CHECK_OPTION_NONE,
+        0,
+        true,
+        0);
+  }
+  std::string out{testing::internal::GetCapturedStdout()};
+  // Only sent when i == 2
+  size_t step1{out.find("HOST ALERT: test_host;DOWN;HARD;1;")};
+  // Not found because the alert is sent only one time.
+  size_t step2{out.find("HOST ALERT: test_host;DOWN;HARD;1;", step1 + 1)};
+  // Sent when i == 0 on the second loop.
+  size_t step3{out.find("HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;")};
+  ASSERT_LE(step1, step3);
+  ASSERT_EQ(step2, std::string::npos);
+  ASSERT_NE(step3, std::string::npos);
+}
+
+//TEST_F(HostNotification, CheckFirstNotificationDelay) {
+//  set_time(50000);
+//  _host->set_current_state(engine::host::state_up);
+//  _host->set_last_hard_state(engine::host::state_up);
+//  _host->set_last_hard_state_change(50000);
+//  _host->set_state_type(checkable::hard);
+//  _host->set_first_notification_delay(3);
+//  testing::internal::CaptureStdout();
+//  std::cout << "notification interval: " << _host->get_notification_interval() << std::endl;
+//  for (int i = 1; i < 40; i++) {
+//    // When i == 0, the state_down is soft => no notification
+//    // When i == 1, the state_down is soft => no notification
+//    // When i == 2, the state_down is hard down => notification
+//    std::cout << "Step " << i << ":";
+//    set_time(50000 + i * 60);
+//    _host->set_last_state(_host->get_current_state());
+//    if (notifier::hard == _host->get_state_type())
+//      _host->set_last_hard_state(_host->get_current_state());
+//    _host->process_check_result_3x(engine::host::state_down,
+//        "The host is down",
+//        CHECK_OPTION_NONE,
+//        0,
+//        true,
+//        0);
+//  }
+//
+//  for (int i = 0; i < 3; i++) {
+//    // When i == 0, the state_up is hard (return to up) => Recovery notification
+//    // When i == 1, the state_up is still here (no change) => no notification
+//    std::cout << "New step " << i << std::endl;
+//    set_time(50600 + i * 60);
+//    _host->set_last_state(_host->get_current_state());
+//    if (notifier::hard == _host->get_state_type())
+//      _host->set_last_hard_state(_host->get_current_state());
+//    _host->process_check_result_3x(engine::host::state_up,
+//        "The host is up",
+//        CHECK_OPTION_NONE,
+//        0,
+//        true,
+//        0);
+//  }
+//  std::string out{testing::internal::GetCapturedStdout()};
+//  // Only sent when i == 2
+//  std::regex re1(
+//      "Step 5:\\[\\d*\\] \\[\\d+\\] HOST NOTIFICATION: "
+//      "admin;test_host;DOWN;cmd;");
+//  std::regex re2(
+//      "Step 35:\\[\\d*\\] \\[\\d+\\] HOST NOTIFICATION: "
+//      "admin;test_host;DOWN;cmd;");
+//  std::regex re3("HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;");
+//  std::smatch match;
+//  ASSERT_TRUE(std::regex_search(out, match, re1));
+//  ASSERT_TRUE(std::regex_search(out, match, re2));
+//  ASSERT_NE(out.find("HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;"),
+//            std::string::npos);
+//}

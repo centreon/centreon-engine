@@ -990,28 +990,7 @@ bool contact::_to_notify_recovery(notifier::reason_type type
     return false;
   }
 
-  bool retval{false};
-  if (nt == notifier::service_notification) {
-    std::array<notifier::notification_flag, 4> pb{notifier::warning, notifier::critical, notifier::unknown};
-    for (notifier::notification_flag t : pb)
-      if (notif.get_notified_on(t) && notify_on(nt, t)) {
-        retval = true;
-        break;
-      }
-  }
-  else {
-    std::array<notifier::notification_flag, 3> pb{notifier::down, notifier::unreachable};
-    for (notifier::notification_flag t : pb)
-      if (notif.get_notified_on(t) && notify_on(nt, t)) {
-        retval = true;
-        break;
-      }
-  }
-  if (!retval)
-    logger(dbg_notifications, most)
-      << "We shouldn't notify the contact about this recovery since it is not "
-      "configured to receive a problem notification.";
-  return retval;
+  return true;
 }
 
 bool contact::_to_notify_acknowledgement(notifier::reason_type type

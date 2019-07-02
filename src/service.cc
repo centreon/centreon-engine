@@ -54,13 +54,6 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
-static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
-  for (unsigned int i(0); i < size; ++i)
-    if (tab1[i] != tab2[i])
-      return (false);
-  return (true);
-}
-
 std::array<std::pair<uint32_t, std::string>, 4> const
     service::tab_service_states{{{NSLOG_SERVICE_OK, "OK"},
                                  {NSLOG_SERVICE_WARNING, "WARNING"},
@@ -312,8 +305,7 @@ bool service::operator==(service const& other) {
          this->check_options == other.check_options &&
          get_scheduled_downtime_depth() == other.get_scheduled_downtime_depth() &&
          this->pending_flex_downtime == other.pending_flex_downtime &&
-         is_equal(state_history, other.state_history,
-                  MAX_STATE_HISTORY_ENTRIES) &&
+         std::equal(state_history.begin(), state_history.end(), other.state_history.begin()) &&
          get_state_history_index() == other.get_state_history_index() &&
          get_is_flapping() == other.get_is_flapping() &&
          this->flapping_comment_id == other.flapping_comment_id &&
@@ -1498,10 +1490,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       log_event();
       state_was_logged = true;
 
-      /* Set the recovery been sent parameter. */
-      _recovery_been_sent = false;
-      _initial_notif_time = 0;
-
       /* 10/04/07 check to see if the service and/or associate host is flapping
        */
       /* this should be done before a notification is sent out to ensure the
@@ -1537,8 +1525,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       logger(dbg_checks, more) << "Service did not change state.";
 
     /* Check if we need to send a recovery notification */
-    if (!_recovery_been_sent && !hard_state_change)
-      notify(reason_normal, "", "", notification_option_none);
+    notify(reason_recovery, "", "", notification_option_none);
 
     /* should we obsessive over service checks? */
     if (config->obsess_over_services())
@@ -1551,11 +1538,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     _last_hard_state = service::state_ok;
     _last_notification = static_cast<time_t>(0);
     _next_notification = static_cast<time_t>(0);
-    if (_recovery_been_sent) {
-      this->current_notification_number = 0;
-      set_notified_on(none);
-      _initial_notif_time = static_cast<time_t>(0);
-    }
     set_problem_has_been_acknowledged(false);
     this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     set_no_more_notifications(false);

@@ -118,7 +118,7 @@ class                host : public notifier {
                      ~host() {}
   uint64_t           get_host_id(void) const;
   void               set_host_id(uint64_t id);
-  void               add_child_link(host* child);
+  void               add_child_host(host* child);
   void               add_parent_host(std::string const& host_name);
   int                log_event();
   int                handle_async_check_result_3x(
@@ -132,13 +132,13 @@ class                host : public notifier {
                                      time_t* preferred_time);
   void               schedule_check(time_t check_time,
                                     int options);
-  void               check_for_flapping(int update,
-                                        int actual_check,
-                                        int allow_flapstart_notification);
+  void               check_for_flapping(bool update,
+                                        bool actual_check,
+                                        bool allow_flapstart_notification);
   void               set_flap(double percent_change,
                               double high_threshold,
                               double low_threshold,
-                              int allow_flapstart_notification);
+                              bool allow_flapstart_notification);
   void               clear_flap(double percent_change,
                                 double high_threshold,
                                 double low_threshold);
@@ -177,7 +177,7 @@ class                host : public notifier {
                                                  unsigned long check_timestamp_horizon);
   int                perform_scheduled_check(int check_options,
                                                  double latency);
-  int                adjust_check_attempt(bool is_active);
+  void               adjust_check_attempt(bool is_active);
   uint64_t           check_dependencies(int dependency_type) override;
   static void        check_for_orphaned();
   static void        check_result_freshness();
