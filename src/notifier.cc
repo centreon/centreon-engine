@@ -158,7 +158,7 @@ void notifier::set_last_problem_id(unsigned long last_problem_id) {
  */
 void notifier::set_notification_number(int num) {
   /* set the notification number */
-  _current_notification_number = num;
+  _notification_number = num;
 
   /* update the status log with the host info */
   update_status(false);
@@ -1339,12 +1339,8 @@ void notifier::set_no_more_notifications(bool no_more_notifications) {
 //  return OK;
 //}
 
-int notifier::get_current_notification_number() const {
-  return _current_notification_number;
-}
-
-void notifier::set_current_notification_number(int number) {
-  _current_notification_number = number;
+int notifier::get_notification_number() const {
+  return _notification_number;
 }
 
 /**

@@ -325,7 +325,7 @@ struct grab_host_redirection {
      {&get_member_as_string<host,
                             int,
                             notifier,
-                            &notifier::get_current_notification_number>,
+                            &notifier::get_notification_number>,
       true}},
     {MACRO_HOSTNOTIFICATIONID,
      {&get_member_as_string<host,

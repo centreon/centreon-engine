@@ -2983,9 +2983,9 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
    * previous problem
    */
   if (get_current_state() ==  host::state_up)
-    notification_number = get_current_notification_number() - 1;
+    notification_number = get_notification_number() - 1;
   else
-    notification_number = get_current_notification_number();
+    notification_number = get_notification_number();
 
   /* find the host this escalation entry is associated with */
   if (e->notifier_ptr != this)

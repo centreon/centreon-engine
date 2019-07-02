@@ -17,11 +17,11 @@
  *
  */
 
+#include "test_engine.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
+#include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
-#include "com/centreon/engine/configuration/applier/timeperiod.hh"
-#include "test_engine.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
@@ -72,4 +72,17 @@ configuration::host TestEngine::new_configuration_host(
   hst.parse("_HOST_ID", "12");
   hst.parse("contacts", contacts.c_str());
   return hst;
+}
+
+configuration::service TestEngine::new_configuration_service(
+    std::string const& hostname,
+    std::string const& description,
+    std::string const& contacts) {
+  configuration::service svc;
+  svc.parse("host_name", hostname.c_str());
+  svc.parse("description", description.c_str());
+  svc.parse("_HOST_ID", "12");
+  svc.parse("_SERVICE_ID", "13");
+  svc.parse("contacts", contacts.c_str());
+  return svc;
 }
