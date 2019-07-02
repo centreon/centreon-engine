@@ -36,7 +36,7 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
-
+#include "com/centreon/process_manager.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -53,12 +53,14 @@ class ApplierHost : public ::testing::Test {
     configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
     timezone_manager::load();
+    process_manager::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
     checks::checker::unload();
     timezone_manager::unload();
+    process_manager::unload();
     delete config;
     config = NULL;
   }
