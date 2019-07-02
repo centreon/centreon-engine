@@ -132,13 +132,13 @@ class                host : public notifier {
                                      time_t* preferred_time);
   void               schedule_check(time_t check_time,
                                     int options);
-  void               check_for_flapping(int update,
-                                        int actual_check,
-                                        int allow_flapstart_notification);
+  void               check_for_flapping(bool update,
+                                        bool actual_check,
+                                        bool allow_flapstart_notification);
   void               set_flap(double percent_change,
                               double high_threshold,
                               double low_threshold,
-                              int allow_flapstart_notification);
+                              bool allow_flapstart_notification);
   void               clear_flap(double percent_change,
                                 double high_threshold,
                                 double low_threshold);

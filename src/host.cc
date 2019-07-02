@@ -1920,10 +1920,10 @@ void host::schedule_check(time_t check_time, int options) {
 }
 
 /* detects host flapping */
-void host::check_for_flapping(int update,
-                              int actual_check,
-                              int allow_flapstart_notification) {
-  int update_history = true;
+void host::check_for_flapping(bool update,
+                              bool actual_check,
+                              bool allow_flapstart_notification) {
+  bool update_history;
   int is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
@@ -2047,11 +2047,9 @@ void host::check_for_flapping(int update,
   if (curved_percent_change > low_threshold &&
       curved_percent_change < high_threshold)
     return;
-
   /* we're below the lower bound, so we're not flapping */
   else if (curved_percent_change <= low_threshold)
     is_flapping = false;
-
   /* else we're above the upper bound, so we are flapping */
   else if (curved_percent_change >= high_threshold)
     is_flapping = true;
@@ -2073,7 +2071,7 @@ void host::check_for_flapping(int update,
 void host::set_flap(double percent_change,
                     double high_threshold,
                     double low_threshold,
-                    int allow_flapstart_notification) {
+                    bool allow_flapstart_notification) {
   logger(dbg_functions, basic) << "set_host_flap()";
 
   logger(dbg_flapping, more) << "Host '" << get_name() << "' started flapping!";
