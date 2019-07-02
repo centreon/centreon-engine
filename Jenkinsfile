@@ -1,7 +1,7 @@
 /*
 ** Variables.
 */
-def serie = '19.10'
+def serie = '19.04'
 def maintenanceBranch = "${serie}.x"
 if (env.BRANCH_NAME.startsWith('release-')) {
   env.BUILD = 'RELEASE'
@@ -24,14 +24,6 @@ stage('Source') {
     source = readProperties file: 'source.properties'
     env.VERSION = "${source.VERSION}"
     env.RELEASE = "${source.RELEASE}"
-    publishHTML([
-      allowMissing: false,
-      keepAll: true,
-      reportDir: 'summary',
-      reportFiles: 'index.html',
-      reportName: 'Centreon Engine Build Artifacts',
-      reportTitles: ''
-    ])
   }
 }
 
@@ -55,34 +47,6 @@ try {
           }
         }
       }
-    },
-    'debian9': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian9"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
-    },
-    'debian10': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian10"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Unit tests stage failure.');
@@ -94,24 +58,6 @@ try {
       node {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
-      }
-    },
-    'debian9': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian9"
-      }
-    },
-    'debian9-armhf': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian9-armhf"
-      }
-    },
-    'debian10': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
       }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
