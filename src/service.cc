@@ -3187,7 +3187,7 @@ int service::notify_contact(nagios_macros* mac,
         << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config->log_notifications() == true) {
+    if (config->log_notifications()) {
       char const* service_state_str("UNKNOWN");
       if ((unsigned int)_current_state < tab_service_states.size())
         service_state_str =
@@ -3231,7 +3231,7 @@ int service::notify_contact(nagios_macros* mac,
     }
 
     /* check to see if the notification command timed out */
-    if (early_timeout == true) {
+    if (early_timeout) {
       logger(log_service_notification | log_runtime_warning, basic)
           << "Warning: Contact '" << cntct->get_name()
           << "' service notification command '" << processed_command

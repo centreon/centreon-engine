@@ -42,7 +42,7 @@ namespace         modules {
     public:
                   processing();
                   ~processing() throw ();
-      bool        execute(char const* cmd) const;
+      bool        execute(std::string const& cmd) const;
       bool        is_thread_safe(char const* cmd) const;
 
     private:

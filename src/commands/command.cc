@@ -65,7 +65,7 @@ commands::command::~command() throw () {}
  *  @return True if object have the same value.
  */
 bool commands::command::operator==(command const& right) const throw() {
-  return (_name == right._name && _command_line == right._command_line);
+  return _name == right._name && _command_line == right._command_line;
 }
 
 /**
@@ -76,7 +76,7 @@ bool commands::command::operator==(command const& right) const throw() {
  *  @return True if object have the different value.
  */
 bool commands::command::operator!=(command const& right) const throw() {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -85,7 +85,7 @@ bool commands::command::operator!=(command const& right) const throw() {
  *  @return The command line.
  */
 std::string const& commands::command::get_command_line() const throw() {
-  return (_command_line);
+  return _command_line;
 }
 
 /**
@@ -94,7 +94,7 @@ std::string const& commands::command::get_command_line() const throw() {
  *  @return The command name.
  */
 std::string const& commands::command::get_name() const throw() {
-  return (_name);
+  return _name;
 }
 
 /**
@@ -141,7 +141,7 @@ commands::command& commands::command::operator=(commands::command const& right) 
     _listener = right._listener;
     _name = right._name;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -154,7 +154,7 @@ commands::command& commands::command::operator=(commands::command const& right) 
 std::string commands::command::process_cmd(nagios_macros* macros) const {
   std::string command_line;
   process_macros_r(macros, _command_line, command_line, 0);
-  return (command_line);
+  return command_line;
 }
 
 /**
@@ -164,5 +164,5 @@ std::string commands::command::process_cmd(nagios_macros* macros) const {
  */
 unsigned long commands::command::get_uniq_id() {
   concurrency::locker locker(&_lock_id);
-  return (++_id);
+  return ++_id;
 }

@@ -59,7 +59,9 @@ configuration::contact TestEngine::valid_contact_config() const {
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
   ctct.parse("host_notification_options", "d,r,f,s");
+  ctct.parse("service_notification_options", "a");
   ctct.parse("host_notifications_enabled", "1");
+  ctct.parse("service_notifications_enabled", "1");
   return ctct;
 }
 
@@ -84,5 +86,12 @@ configuration::service TestEngine::new_configuration_service(
   svc.parse("_HOST_ID", "12");
   svc.parse("_SERVICE_ID", "13");
   svc.parse("contacts", contacts.c_str());
+
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  svc.parse("check_command", "cmd");
+  configuration::applier::command cmd_aply;
+  cmd_aply.add_object(cmd);
+
   return svc;
 }

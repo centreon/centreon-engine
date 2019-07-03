@@ -127,10 +127,8 @@ void applier::host::add_object(
         obj.obsess_over_host(),
         obj.timezone())};
 
-
   engine::host::hosts.insert({h->get_name(), h});
   engine::host::hosts_by_id.insert({obj.host_id(), h});
-
 
   h->set_initial_notif_time(0);
   h->set_should_reschedule_current_check(false);

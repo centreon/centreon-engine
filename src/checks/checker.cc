@@ -81,7 +81,7 @@ void checker::push_check_result(check_result const& result) {
 }
 
 /**
- *  Reap and process all result recive by execution process.
+ *  Reap and process all result received by execution process.
  */
 void checker::reap() {
   logger(dbg_functions, basic)

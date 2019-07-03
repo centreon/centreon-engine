@@ -1625,11 +1625,11 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
     /* if we're not doing aggressive host checking, let WARNING states indicate
      * the host is up (fake the result to be state_ok) */
     if (!config->use_aggressive_host_checking() && svc_res ==  service::state_warning)
-      svc_res =  service::state_ok;
+      svc_res = service::state_ok;
 
     /* OK states means the host is UP */
-    if (svc_res ==  service::state_ok)
-      hst_res =  host::state_up;
+    if (svc_res == service::state_ok)
+      hst_res = host::state_up;
 
     /* any problem state indicates the host is not UP */
     else
@@ -1639,10 +1639,9 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   /******************* PROCESS THE CHECK RESULTS ******************/
 
   /* process the host check result */
-  this->process_check_result_3x(hst_res,
-                               old_plugin_output,
-                               CHECK_OPTION_NONE, reschedule_check, true,
-                               config->cached_host_check_horizon());
+  process_check_result_3x(hst_res, old_plugin_output, CHECK_OPTION_NONE,
+                          reschedule_check, true,
+                          config->cached_host_check_horizon());
 
   logger(dbg_checks, more) << "** Async check result for host '" << get_name()
                            << "' handled: new state=" << get_current_state();
@@ -2757,10 +2756,10 @@ int host::notify_contact(nagios_macros* mac,
     /* log the notification to program log file */
     if (config->log_notifications()) {
       char const* host_state_str("UP");
-      if ((unsigned int)this->get_current_state() < tab_host_states.size())
+      if ((unsigned int)_current_state < tab_host_states.size())
         // sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
         host_state_str =
-            tab_host_states[this->get_current_state()].second.c_str();
+            tab_host_states[_current_state].second.c_str();
 
       char const* notification_str("");
       if ((unsigned int)type < tab_notification_str.size())
@@ -2799,7 +2798,7 @@ int host::notify_contact(nagios_macros* mac,
     }
 
     /* check to see if the notification timed out */
-    if (early_timeout == true) {
+    if (early_timeout) {
       logger(log_host_notification | log_runtime_warning, basic)
           << "Warning: Contact '" << cntct->get_name()
           << "' host notification command '" << processed_command
