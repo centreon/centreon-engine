@@ -325,7 +325,7 @@ void raw::finished(process& p) throw () {
 
     // Forward result to the listener.
     if (_listener)
-      (_listener->finished)(res);
+      _listener->finished(res);
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)

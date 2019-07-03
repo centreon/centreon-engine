@@ -206,7 +206,6 @@ class                           service : public notifier {
   void resolve(int& w, int& e);
 
   int                           process_performance_data;
-  int                           accept_passive_service_checks;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
   int                           acknowledgement_type;

@@ -433,7 +433,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "notified_on_unknown=" << obj.get_notified_on(notifier::unknown) << "\n"
     "notified_on_warning=" << obj.get_notified_on(notifier::warning) << "\n"
     "obsess_over_service=" << obj.get_obsess_over() << "\n"
-    "passive_checks_enabled=" << obj.accept_passive_service_checks << "\n"
+    "passive_checks_enabled=" << obj.get_accept_passive_checks() << "\n"
     "percent_state_change=" << std::setprecision(2) << std::fixed
                             << obj.get_percent_state_change() << "\n"
     "performance_data=" << obj.get_perf_data() << "\n"

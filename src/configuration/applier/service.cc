@@ -407,7 +407,7 @@ void applier::service::modify_object(
   s->process_performance_data = static_cast<int>(obj.process_perf_data());
   s->set_check_freshness(obj.check_freshness());
   s->set_freshness_threshold(obj.freshness_threshold());
-  s->accept_passive_service_checks = static_cast<int>(obj.checks_passive());
+  s->set_accept_passive_checks(obj.checks_passive());
   s->set_event_handler(obj.event_handler());
   s->set_checks_enabled(obj.checks_active());
   s->retain_status_information = static_cast<int>(obj.retain_status_information());
