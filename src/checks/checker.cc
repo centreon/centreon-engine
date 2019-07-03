@@ -240,7 +240,6 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  return;
 }
 
 /**
@@ -973,7 +972,6 @@ void checker::finished(commands::result const& res) throw () {
   // Queue check result.
   concurrency::locker lock(&_mut_reap);
   _to_reap_partial[res.command_id] = result;
-  return;
 }
 
 /**

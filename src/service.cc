@@ -2008,9 +2008,10 @@ int service::log_event() {
 
 // int service::get_check_viability(...)  << check_service_check_viability()
 /* detects service flapping */
-void service::check_for_flapping(int update, int allow_flapstart_notification) {
-  int update_history = true;
-  int is_flapping = false;
+void service::check_for_flapping(bool update,
+                                 bool allow_flapstart_notification) {
+  bool update_history;
+  bool is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
   int last_state_history_value = service::state_ok;

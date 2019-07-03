@@ -144,12 +144,14 @@ class                           service : public notifier {
                                   check_result* queued_check_result);
   int                           log_event();
   void                          check_for_flapping(
-                                              int update,
-                                              int allow_flapstart_notification);
+                                            bool update,
+                                            bool allow_flapstart_notification);
   int                           handle_service_event();
   int                           obsessive_compulsive_service_check_processor();
   int                           update_service_performance_data();
-  int                           run_scheduled_check(int check_options, double latency);
+  int                           run_scheduled_check(
+                                            int check_options,
+                                            double latency);
   int                           run_async_check(int check_options,
                                                 double latency,
                                                 int scheduled_check,

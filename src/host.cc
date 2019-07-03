@@ -1916,7 +1916,7 @@ void host::check_for_flapping(bool update,
                               bool actual_check,
                               bool allow_flapstart_notification) {
   bool update_history;
-  int is_flapping = false;
+  bool is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
   int last_state_history_value =  host::state_up;

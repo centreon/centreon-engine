@@ -93,9 +93,9 @@ class ServiceNotification : public TestEngine {
   }
 
   void TearDown() override {
+    checks::checker::unload();
     process_manager::unload();
     timezone_manager::unload();
-    checks::checker::unload();
     configuration::applier::state::unload();
     delete config;
     config = NULL;
@@ -601,13 +601,10 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
     checks::checker::instance().reap();
   }
   std::string out{testing::internal::GetCapturedStdout()};
-  std::cout << "################################################################################" << std::endl;
-  std::cout << "out = " << out << std::endl;
-  std::cout << "################################################################################" << std::endl;
   size_t m1{out.find("Step 5:")};
-  size_t m2{out.find(" HOST NOTIFICATION: admin;test_host;DOWN;cmd;", m1 + 1)};
+  size_t m2{out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;DOWN;cmd;service critical", m1 + 1)};
   size_t m3{out.find("Step 35:", m2 + 1)};
-  size_t m4{out.find(" HOST NOTIFICATION: admin;test_host;DOWN;cmd;", m3 + 1)};
-  size_t m5{out.find(" HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;", m4 + 1)};
+  size_t m4{out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;DOWN;cmd;service critical", m3 + 1)};
+  size_t m5{out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY (OK);cmd;service ok", m4 + 1)};
   ASSERT_NE(m5, std::string::npos);
 }
