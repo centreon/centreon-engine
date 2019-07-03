@@ -54,6 +54,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/downtimes/downtime_finder.cc"
     "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/external_commands/host.cc"
+    "${TESTS_DIR}/external_commands/service.cc"
     "${TESTS_DIR}/main.cc"
     "${TESTS_DIR}/notifications/host_downtime_notification.cc"
     "${TESTS_DIR}/notifications/host_flapping_notification.cc"

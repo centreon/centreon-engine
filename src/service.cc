@@ -3757,7 +3757,7 @@ void service::check_result_freshness() {
 
     /* skip services that have both active and passive checks disabled */
     if (!it->second->get_checks_enabled()
-      && !it->second->accept_passive_service_checks)
+      && !it->second->get_accept_passive_checks())
       continue;
 
     /* skip services that are already being freshened */

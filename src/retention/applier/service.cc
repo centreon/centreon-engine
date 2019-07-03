@@ -182,7 +182,7 @@ void applier::service::_update(
 
     if (state.passive_checks_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_PASSIVE_CHECKS_ENABLED))
-      obj.accept_passive_service_checks = *state.passive_checks_enabled();
+      obj.set_accept_passive_checks(*state.passive_checks_enabled());
 
     if (state.event_handler_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_EVENT_HANDLER_ENABLED))

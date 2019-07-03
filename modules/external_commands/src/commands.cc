@@ -603,7 +603,7 @@ int process_passive_service_check(
   }
 
   /* skip this is we aren't accepting passive checks for this service */
-  if (found->second->accept_passive_service_checks == false)
+  if (!found->second->get_accept_passive_checks())
     return ERROR;
 
   timeval tv;
@@ -3161,14 +3161,14 @@ void enable_passive_service_checks(service* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
-  if (svc->accept_passive_service_checks)
+  if (svc->get_accept_passive_checks())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* set the passive check flag */
-  svc->accept_passive_service_checks = true;
+  svc->set_accept_passive_checks(true);
 
   /* send data to event broker */
   broker_adaptive_service_data(
@@ -3190,14 +3190,14 @@ void disable_passive_service_checks(service* svc) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* no change */
-  if (svc->accept_passive_service_checks == false)
+  if (!svc->get_accept_passive_checks())
     return;
 
   /* set the attribute modified flag */
   svc->add_modified_attributes(attr);
 
   /* set the passive check flag */
-  svc->accept_passive_service_checks = false;
+  svc->set_accept_passive_checks(false);
 
   /* send data to event broker */
   broker_adaptive_service_data(
