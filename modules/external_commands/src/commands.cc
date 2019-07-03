@@ -228,7 +228,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
              (cmd == CMD_ADD_HOST_COMMENT) ? comment::host : comment::service,
              comment::user,
              host_name,
-             svc_description,
+             svc_description ? svc_description : "",
              entry_time,
              user,
              comment_data,
@@ -236,7 +236,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
              comment::external,
              false,
              (time_t)0)};
-  comment::comments.insert({com->get_comment_id(), std::move(com)});
+  comment::comments.insert({com->get_comment_id(), com});
 
   return OK;
 }
@@ -2944,7 +2944,7 @@ void acknowledge_host_problem(
       comment::internal,
       false,
       (time_t)0)};
-  comment::comments.insert({com->get_comment_id(), std::move(com)});
+  comment::comments.insert({com->get_comment_id(), com});
 }
 
 /* acknowledges a service problem */
@@ -3009,7 +3009,7 @@ void acknowledge_service_problem(
       comment::internal,
       false,
       (time_t)0)};
-  comment::comments.insert({com->get_comment_id(), std::move(com)});
+  comment::comments.insert({com->get_comment_id(), com});
 }
 
 /* removes a host acknowledgement */

@@ -75,3 +75,48 @@ TEST_F(HostExternalCommand, AddHostDowntime) {
   ASSERT_NE(out.find("PASSIVE HOST CHECK"), std::string::npos);
   ASSERT_NE(out.find("HOST ALERT"), std::string::npos);
 }
+
+TEST_F(HostExternalCommand, AddHostComment) {
+  configuration::applier::host hst_aply;
+  configuration::host hst;
+  configuration::host hst2;
+
+  ASSERT_TRUE(hst.parse("host_name", "test_srv"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+
+  ASSERT_TRUE(hst2.parse("host_name", "test_srv2"));
+  ASSERT_TRUE(hst2.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst2.parse("_HOST_ID", "2"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst2));
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  std::string cmd_com1{"test_srv;1;user;this is a first comment"};
+  std::string cmd_com2{"test_srv;1;user;this is a second comment"};
+  std::string cmd_com3{"test_srv;1;user;this is a third comment"};
+  std::string cmd_com4{"test_srv;1;user;this is a fourth comment"};
+  std::string cmd_com5{"test_srv2;1;user;this is a fifth comment"};
+  std::string cmd_del{"1"};
+  std::string cmd_del_last{"5"};
+  std::string cmd_del_all{"test_srv"};
+
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com1.c_str()));
+  ASSERT_EQ(comment::comments.size(), 1);
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com2.c_str()));
+  ASSERT_EQ(comment::comments.size(), 2);
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com3.c_str()));
+  ASSERT_EQ(comment::comments.size(), 3);
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com4.c_str()));
+  ASSERT_EQ(comment::comments.size(), 4);
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com5.c_str()));
+  ASSERT_EQ(comment::comments.size(), 5);
+  cmd_delete_comment(CMD_DEL_HOST_COMMENT, const_cast<char *>(cmd_del.c_str()));
+  ASSERT_EQ(comment::comments.size(), 4);
+  cmd_delete_all_comments(CMD_DEL_ALL_HOST_COMMENTS, const_cast<char *>(cmd_del_all.c_str()));
+  ASSERT_EQ(comment::comments.size(), 1);
+  cmd_delete_comment(CMD_DEL_HOST_COMMENT, const_cast<char *>(cmd_del_last.c_str()));
+  ASSERT_EQ(comment::comments.size(), 0);
+}

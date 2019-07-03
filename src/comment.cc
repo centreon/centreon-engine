@@ -61,15 +61,14 @@ comment::comment(comment::type comment_type,
   _author = author;
   _comment_data = comment_data;
 
-  if (!comment_id)
+  if (!comment_id) {
     _comment_id = _next_comment_id;
-  else
+    _next_comment_id = 1llu;
+    while(comments.find(_next_comment_id) != comments.end() || _next_comment_id == _comment_id)
+      _next_comment_id++;
+  } else {
     is_added = false;
-
-  _next_comment_id = 1llu;
-  while(comments.find(_next_comment_id) != comments.end()
-        && _next_comment_id != _comment_id)
-    _next_comment_id++;
+  }
 
   broker_comment_data(
     NEBTYPE_COMMENT_LOAD,

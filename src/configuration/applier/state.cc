@@ -196,6 +196,8 @@ applier::state::~state() throw() {
   engine::host::hosts.clear();
   engine::host::hosts_by_id.clear();
   engine::timeperiod::timeperiods.clear();
+  engine::comment::comments.clear();
+  engine::comment::set_next_comment_id(1llu);
 
   xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
