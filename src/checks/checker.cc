@@ -623,7 +623,7 @@ void checker::run(
   ++currently_running_service_checks;
 
   // Set the execution flag.
-  svc->is_executing = true;
+  svc->set_is_executing(true);
 
   // Init check result info.
   check_result check_result_info(service_check,

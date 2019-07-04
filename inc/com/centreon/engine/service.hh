@@ -211,14 +211,11 @@ class                           service : public notifier {
   int                           retain_status_information;
   int                           retain_nonstatus_information;
   int                           acknowledgement_type;
-  int                           host_problem_at_last_check;
   int                           check_flapping_recovery_notification;
   int                           is_being_freshened;
   int                           current_notification_number;
   uint64_t                      current_notification_id;
-  int                           is_executing;
   int                           check_options;
-  int                           pending_flex_downtime;
   uint64_t                      flapping_comment_id;
 
   std::list<servicegroup*> const&
@@ -228,6 +225,7 @@ class                           service : public notifier {
   void                          set_host_ptr(host* h);
   host const*                   get_host_ptr() const;
   host*                         get_host_ptr();
+  bool                          get_host_problem_at_last_check() const;
 
   static service_map            services;
   static service_id_map         services_by_id;
@@ -251,6 +249,7 @@ class                           service : public notifier {
   enum service_state            _last_state;
   std::list<servicegroup*>      _servicegroups;
   host*                         _host_ptr;
+  bool _host_problem_at_last_check;
 };
 CCE_END()
 

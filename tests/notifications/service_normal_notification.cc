@@ -531,7 +531,7 @@ TEST_F(ServiceNotification, SimpleCheck) {
   for (int i = 0; i < 2; i++) {
     // When i == 0, the state_up is hard (return to up) => Recovery notification
     // When i == 1, the state_up is still here (no change) => no notification
-    set_time(52500 + i * 500);
+    set_time(56500 + i * 500);
     std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
     oss << '[' << now << ']'
@@ -541,6 +541,9 @@ TEST_F(ServiceNotification, SimpleCheck) {
     checks::checker::instance().reap();
   }
   std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << "################################################################################" << std::endl;
+  std::cout << "out = " << out << std::endl;
+  std::cout << "################################################################################" << std::endl;
   size_t step1{out.find(
       "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;service down")};
   size_t step2{
@@ -601,6 +604,9 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
     checks::checker::instance().reap();
   }
   std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << "################################################################################" << std::endl;
+  std::cout << "out = " << out << std::endl;
+  std::cout << "################################################################################" << std::endl;
   size_t m1{out.find("Step 5:")};
   size_t m2{out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;DOWN;cmd;service critical", m1 + 1)};
   size_t m3{out.find("Step 35:", m2 + 1)};

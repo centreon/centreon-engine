@@ -252,8 +252,10 @@ class                notifier : public checkable {
   contactgroup_map_unsafe& get_contactgroups();
   contactgroup_map_unsafe const& get_contactgroups() const;
   void resolve(int& w, int& e);
-
-  std::array<int, MAX_STATE_HISTORY_ENTRIES> state_history;
+  std::array<int, MAX_STATE_HISTORY_ENTRIES> const& get_state_history() const;
+  std::array<int, MAX_STATE_HISTORY_ENTRIES>& get_state_history();
+  int get_pending_flex_downtime() const;
+  void set_pending_flex_downtime(int pending_flex_downtime);
 
   std::unordered_map<std::string, customvariable>
     custom_variables;
@@ -319,6 +321,8 @@ class                notifier : public checkable {
   std::unordered_map<std::string, contact*> _contacts;
   contactgroup_map_unsafe _contact_groups;
   std::array<std::shared_ptr<notification>, 6> _notification;
+  std::array<int, MAX_STATE_HISTORY_ENTRIES> _state_history;
+  int _pending_flex_downtime;
 };
 
 CCE_END()

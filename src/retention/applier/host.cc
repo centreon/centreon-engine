@@ -150,7 +150,7 @@ void applier::host::_update(
     if (state.state_history().is_set()) {
       utils::set_state_history(
         *state.state_history(),
-        obj.state_history);
+        obj.get_state_history());
       obj.set_state_history_index(0);
     }
   }

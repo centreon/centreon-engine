@@ -128,14 +128,6 @@ class                           contact {
                                 get_parent_groups() const;
   std::list<contactgroup*>&
                                 get_parent_groups();
-  //int                           check_service_notification_viability(
-  //                                service* svc,
-  //                                unsigned int type,
-  //                                int options);
-  //int                           check_host_notification_viability(
-  //                                host* hst,
-  //                                notifier::notification_category type,
-  //                                int options);
   bool                          should_be_notified(
                                   notifier::notification_category cat,
                                   notifier::reason_type type,

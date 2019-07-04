@@ -217,7 +217,8 @@ host::host(uint64_t host_id,
                check_freshness,
                freshness_threshold,
                obsess_over_host,
-               timezone} {
+               timezone},
+    _last_state_history_update{0} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -470,14 +471,6 @@ void host::set_acknowledgement_type(int acknowledgement_type) {
   _acknowledgement_type = acknowledgement_type;
 }
 
-bool host::get_is_executing() const {
-  return _is_executing;
-}
-
-void host::set_is_executing(bool is_executing) {
-  _is_executing = is_executing;
-}
-
 int host::get_check_options() const {
   return _check_options;
 }
@@ -524,14 +517,6 @@ bool host::get_should_reschedule_current_check() const {
 
 void host::set_should_reschedule_current_check(bool should_reschedule) {
   _should_reschedule_current_check = should_reschedule;
-}
-
-int host::get_pending_flex_downtime() const {
-  return _pending_flex_downtime;
-}
-
-void host::set_pending_flex_downtime(int pending_flex_downtime) {
-  _pending_flex_downtime = pending_flex_downtime;
 }
 
 time_t host::get_last_state_history_update() const {
@@ -734,8 +719,8 @@ bool host::operator==(host const& other) throw() {
          get_scheduled_downtime_depth() ==
              other.get_scheduled_downtime_depth() &&
          get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
-         std::equal(state_history.begin(), state_history.end(),
-                     other.state_history.begin()) &&
+         std::equal(get_state_history().begin(), get_state_history().end(),
+                     other.get_state_history().begin()) &&
          get_state_history_index() == other.get_state_history_index() &&
          get_last_state_history_update() ==
              other.get_last_state_history_update() &&
@@ -1129,10 +1114,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << obj.get_pending_flex_downtime() << "\n";
 
   os << "  state_history:                        ";
-  for (unsigned int i(0),
-       end{sizeof(obj.state_history) / sizeof(obj.state_history[0])};
-       i < end; ++i)
-    os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
+  for (size_t i{0}, end{obj.get_state_history().size()}; i < end; ++i)
+    os << obj.get_state_history()[i] << (i + 1 < end ? ", " : "\n");
 
   os << "  state_history_index:                  "
      << obj.get_state_history_index()
@@ -1919,7 +1902,7 @@ void host::check_for_flapping(bool update,
   bool is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
-  int last_state_history_value =  host::state_up;
+  int last_state_history_value = host::state_up;
   unsigned long wait_threshold = 0L;
   double curved_changes = 0.0;
   double curved_percent_change = 0.0;
@@ -1981,7 +1964,7 @@ void host::check_for_flapping(bool update,
     set_last_state_history_update(current_time);
 
     /* record the current state in the state history */
-    this->state_history[get_state_history_index()] = get_current_state();
+    get_state_history()[get_state_history_index()] = get_current_state();
 
     /* increment state history index to next available slot */
     set_state_history_index(get_state_history_index() + 1);
@@ -1993,20 +1976,20 @@ void host::check_for_flapping(bool update,
   for (x = 0, y = get_state_history_index(); x < MAX_STATE_HISTORY_ENTRIES;
        x++) {
     if (x == 0) {
-      last_state_history_value = this->state_history[y];
+      last_state_history_value = get_state_history()[y];
       y++;
       if (y >= MAX_STATE_HISTORY_ENTRIES)
         y = 0;
       continue;
     }
 
-    if (last_state_history_value != this->state_history[y])
+    if (last_state_history_value != get_state_history()[y])
       curved_changes +=
           (((double)(x - 1) * (high_curve_value - low_curve_value)) /
            ((double)(MAX_STATE_HISTORY_ENTRIES - 2))) +
           low_curve_value;
 
-    last_state_history_value = this->state_history[y];
+    last_state_history_value = get_state_history()[y];
 
     y++;
     if (y >= MAX_STATE_HISTORY_ENTRIES)

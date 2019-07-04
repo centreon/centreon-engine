@@ -80,8 +80,11 @@ checkable::checkable(std::string const& display_name,
       _next_check{0L},
       _should_be_scheduled{true},
       _state_history_index{0},
+      _last_state_change{0},
       _last_hard_state_change{0},
-      _state_type{soft} {
+      _state_type{soft},
+      _check_command_ptr{nullptr},
+      _is_executing{false} {
   if (check_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid check_interval value for checkable '" << display_name
@@ -393,4 +396,12 @@ commands::command* checkable::get_check_command_ptr() const {
 
 void checkable::set_check_command_ptr(commands::command* cmd) {
   _check_command_ptr = cmd;
+}
+
+bool checkable::get_is_executing() const {
+  return _is_executing;
+}
+
+void checkable::set_is_executing(bool is_executing) {
+  _is_executing = is_executing;
 }

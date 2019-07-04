@@ -247,8 +247,8 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
     "state_type=" << obj.get_state_type ()<< "\n";
 
   os << "state_history=";
-  for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
-    os << (x > 0 ? "," : "") << obj.state_history[(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
+  for (unsigned int x(0); x < obj.get_state_history().size(); ++x)
+    os << (x > 0 ? "," : "") << obj.get_state_history()[(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
   os << "\n";
 
   dump::customvariables(os, obj.custom_variables);
@@ -445,7 +445,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
-    os << (x > 0 ? "," : "") << obj.state_history[(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
+    os << (x > 0 ? "," : "") << obj.get_state_history()[(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
   os << "\n";
 
   dump::customvariables(os, obj.custom_variables);

@@ -195,4 +195,3 @@ TEST_F(ApplierContactgroup, SetContactgroupMembers) {
   // grp1 must be reload because the expand_objects reload them totally.
   ASSERT_TRUE(config->contactgroups_find("big_group")->members().size() == 1);
 }
-

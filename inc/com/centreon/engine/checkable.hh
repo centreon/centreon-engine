@@ -155,6 +155,8 @@ class checkable {
   commands::command* get_event_handler_ptr() const;
   void set_check_command_ptr(commands::command* cmd);
   commands::command* get_check_command_ptr() const;
+  bool get_is_executing() const;
+  void set_is_executing(bool is_executing);
 
   timeperiod *check_period_ptr;
 
@@ -201,6 +203,7 @@ class checkable {
   double _percent_state_change;
   commands::command*  _event_handler_ptr;
   commands::command*  _check_command_ptr;
+  bool _is_executing;
 };
 
 CCE_END()

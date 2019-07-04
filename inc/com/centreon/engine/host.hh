@@ -224,8 +224,6 @@ class                host : public notifier {
   void               set_should_be_drawn(int should_be_drawn);
   int                get_acknowledgement_type() const;
   void               set_acknowledgement_type(int acknowledgement_type);
-  bool               get_is_executing() const;
-  void               set_is_executing(bool is_executing);
   int                get_check_options() const;
   void               set_check_options(int check_options);
   time_t             get_last_time_down() const;
@@ -236,8 +234,6 @@ class                host : public notifier {
   void               set_last_time_up(time_t last_time);
   bool               get_is_being_freshened() const;
   void               set_is_being_freshened(bool is_being_freshened);
-  int                get_pending_flex_downtime() const;
-  void               set_pending_flex_downtime(int pending_flex_downtime);
   time_t             get_last_state_history_update() const;
   void               set_last_state_history_update(time_t last_state_history_update);
   unsigned long      get_flapping_comment_id() const;
@@ -309,14 +305,12 @@ private:
   int                 _z_3d;
   int                 _should_be_drawn;
   int                 _acknowledgement_type;
-  bool                _is_executing;
   bool                _should_reschedule_current_check;
   int                 _check_options;
   time_t              _last_time_down;
   time_t              _last_time_unreachable;
   time_t              _last_time_up;
   bool                _is_being_freshened;
-  int                 _pending_flex_downtime;
   time_t              _last_state_history_update;
   unsigned long       _flapping_comment_id;
   int                 _total_services;
