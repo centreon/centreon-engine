@@ -227,44 +227,43 @@ processing::processing()
 
 processing::~processing() throw() {}
 
-bool processing::execute(char const* cmd) const {
+bool processing::execute(std::string const& cmdstr) const {
   logger(dbg_functions, basic) << "processing external command";
 
-  if (!cmd)
-    return (false);
+  char const* cmd{cmdstr.c_str()};
+  size_t len{cmdstr.size()};
 
-  // Trim command
+  // Left trim command
   while (*cmd && isspace(*cmd))
     ++cmd;
-  unsigned int len(strlen(cmd));
-  unsigned int end(len);
-  while (end && isspace(cmd[end - 1]))
+  if (*cmd != '[')
+    return false;
+
+  // Right trim just by recomputing the optimal length value.
+  char const* end{cmd + len - 1};
+  while (end != cmd && isspace(*end))
     --end;
-  char* command(new char[end + 1]);
-  memcpy(command, cmd, end);
-  command[end] = 0;
 
-  logger(dbg_external_command, most) << "raw command: " << command;
+  cmd++;
+  char* tmp;
+  time_t entry_time{static_cast<time_t>(strtoul(cmd, &tmp, 10))};
 
-  if (end < 15 || command[0] != '[' || command[11] != ']' ||
-      command[12] != ' ') {
-    delete[] command;
-    return (false);
+  while (*tmp && isspace(*tmp))
+    ++tmp;
+  if (*tmp != ']' || tmp[1] != ' ')
+    return false;
+
+  cmd = tmp + 2;
+  char const* a;
+  for (a = cmd; *a && *a != ';'; ++a);
+
+  std::string command_name(cmd, a - cmd);
+  std::string args;
+  if (*a == ';') {
+    a++;
+    args = std::string(a, end - a + 1);
   }
 
-  unsigned int start(13);
-  while (command[start]) {
-    if (command[start] == ';') {
-      command[start] = 0;
-      ++start;
-      break;
-    }
-    ++start;
-  }
-
-  time_t entry_time(static_cast<time_t>(strtoul(command + 1, NULL, 10)));
-  char* command_name(command + 13);
-  char* args(command + start);
   int command_id(CMD_CUSTOM_COMMAND);
 
   umap<std::string, command_info>::const_iterator it;
@@ -277,12 +276,11 @@ bool processing::execute(char const* cmd) const {
       lock.unlock();
       logger(log_external_command | log_runtime_warning, basic)
           << "Warning: Unrecognized external command -> " << command_name;
-      delete[] command;
-      return (false);
+      return false;
     }
 
     // Update statistics for external commands.
-    update_check_stats(EXTERNAL_COMMAND_STATS, time(NULL));
+    update_check_stats(EXTERNAL_COMMAND_STATS, std::time(nullptr));
   }
 
   // Log the external command.
@@ -302,22 +300,22 @@ bool processing::execute(char const* cmd) const {
 
   // Send data to event broker.
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_START, NEBFLAG_NONE,
-                          NEBATTR_NONE, command_id, entry_time, command_name,
-                          args, NULL);
+                          NEBATTR_NONE, command_id, entry_time,
+                          const_cast<char*>(command_name.c_str()),
+                          const_cast<char*>(args.c_str()), nullptr);
 
   {
     concurrency::locker lock(&_mutex);
     if (it != _lst_command.end())
-      (*it->second.func)(command_id, entry_time, args);
+      (*it->second.func)(command_id, entry_time, const_cast<char*>(args.c_str()));
   }
 
   // Send data to event broker.
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_END, NEBFLAG_NONE,
-                          NEBATTR_NONE, command_id, entry_time, command_name,
-                          args, NULL);
-
-  delete[] command;
-  return (true);
+                          NEBATTR_NONE, command_id, entry_time,
+                          const_cast<char*>(command_name.c_str()),
+                          const_cast<char*>(args.c_str()), nullptr);
+  return true;
 }
 
 /**

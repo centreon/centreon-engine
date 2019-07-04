@@ -171,10 +171,7 @@ class                notifier : public checkable {
   unsigned long      get_last_problem_id() const;
   void               set_last_problem_id(unsigned long last_problem_id);
 
-  void               set_notification_number(int num);
   virtual void       update_status(bool aggregated_dump) = 0;
-//  virtual bool       check_notification_viability(reason_type type,
-//                                                  int options) = 0;
   int                notify(reason_type type,
                             std::string const& not_author,
                             std::string const& not_data,
@@ -235,8 +232,8 @@ class                notifier : public checkable {
   bool               get_no_more_notifications() const;
   void               set_no_more_notifications(bool no_more_notifications);
   bool               notifications_available(int options) const;
-  int                get_current_notification_number() const;
-  void               set_current_notification_number(int number);
+  int                get_notification_number() const;
+  void               set_notification_number(int number);
 
   virtual uint64_t   check_dependencies(int dependency_type) = 0;
   uint64_t           get_next_notification_id() const;
@@ -255,8 +252,10 @@ class                notifier : public checkable {
   contactgroup_map_unsafe& get_contactgroups();
   contactgroup_map_unsafe const& get_contactgroups() const;
   void resolve(int& w, int& e);
-
-  std::array<int, MAX_STATE_HISTORY_ENTRIES> state_history;
+  std::array<int, MAX_STATE_HISTORY_ENTRIES> const& get_state_history() const;
+  std::array<int, MAX_STATE_HISTORY_ENTRIES>& get_state_history();
+  int get_pending_flex_downtime() const;
+  void set_pending_flex_downtime(int pending_flex_downtime);
 
   std::unordered_map<std::string, customvariable>
     custom_variables;
@@ -316,15 +315,14 @@ class                notifier : public checkable {
   bool               _has_been_checked;
   bool               _no_more_notifications;
 
-  /* DEPRECATED */
-  int                _current_notification_number;
-
   /* New ones */
   int _notification_number;
   reason_type _type;
   std::unordered_map<std::string, contact*> _contacts;
   contactgroup_map_unsafe _contact_groups;
   std::array<std::shared_ptr<notification>, 6> _notification;
+  std::array<int, MAX_STATE_HISTORY_ENTRIES> _state_history;
+  int _pending_flex_downtime;
 };
 
 CCE_END()

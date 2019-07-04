@@ -112,7 +112,9 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _no_more_notifications{false},
       _stalk_type{0},
       _notification_number{0},
-      _flap_type{0} {
+      _flap_type{0},
+      _state_history{},
+      _pending_flex_downtime{0} {
 
   if (notification_interval < 0 || check_interval < 0 || retry_interval <= 0) {
     logger(log_config_error, basic)
@@ -158,7 +160,7 @@ void notifier::set_last_problem_id(unsigned long last_problem_id) {
  */
 void notifier::set_notification_number(int num) {
   /* set the notification number */
-  _current_notification_number = num;
+  _notification_number = num;
 
   /* update the status log with the host info */
   update_status(false);
@@ -1339,12 +1341,8 @@ void notifier::set_no_more_notifications(bool no_more_notifications) {
 //  return OK;
 //}
 
-int notifier::get_current_notification_number() const {
-  return _current_notification_number;
-}
-
-void notifier::set_current_notification_number(int number) {
-  _current_notification_number = number;
+int notifier::get_notification_number() const {
+  return _notification_number;
 }
 
 /**
@@ -1543,4 +1541,20 @@ void notifier::resolve(int& w, int& e) {
 
   if (e)
     throw engine_error() << "Cannot resolve host '" << get_display_name() << "'";
+}
+
+std::array<int, MAX_STATE_HISTORY_ENTRIES> const& notifier::get_state_history() const {
+  return _state_history;
+}
+
+std::array<int, MAX_STATE_HISTORY_ENTRIES>& notifier::get_state_history() {
+  return _state_history;
+}
+
+int notifier::get_pending_flex_downtime() const {
+  return _pending_flex_downtime;
+}
+
+void notifier::set_pending_flex_downtime(int pending_flex_downtime) {
+  _pending_flex_downtime = pending_flex_downtime;
 }

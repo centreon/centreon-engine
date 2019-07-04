@@ -129,7 +129,8 @@ service::service(std::string const& hostname,
       _current_state{initial_state},
       _last_hard_state{initial_state},
       _last_state{initial_state},
-      _host_ptr{nullptr} {
+      _host_ptr{nullptr},
+      _host_problem_at_last_check{false} {
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
 
@@ -265,7 +266,7 @@ bool service::operator==(service const& other) {
          get_problem_has_been_acknowledged() ==
              other.get_problem_has_been_acknowledged() &&
          this->acknowledgement_type == other.acknowledgement_type &&
-         this->host_problem_at_last_check == other.host_problem_at_last_check &&
+         _host_problem_at_last_check == other._host_problem_at_last_check &&
          get_check_type() == other.get_check_type() &&
          _current_state == other.get_current_state() &&
          _last_state == other.get_last_state() &&
@@ -301,11 +302,11 @@ bool service::operator==(service const& other) {
          this->current_notification_id == other.current_notification_id &&
          get_latency() == other.get_latency() &&
          get_execution_time() == other.get_execution_time() &&
-         this->is_executing == other.is_executing &&
+         get_is_executing() == other.get_is_executing() &&
          this->check_options == other.check_options &&
          get_scheduled_downtime_depth() == other.get_scheduled_downtime_depth() &&
-         this->pending_flex_downtime == other.pending_flex_downtime &&
-         std::equal(state_history.begin(), state_history.end(), other.state_history.begin()) &&
+         get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
+         std::equal(get_state_history().begin(), get_state_history().end(), other.get_state_history().begin()) &&
          get_state_history_index() == other.get_state_history_index() &&
          get_is_flapping() == other.get_is_flapping() &&
          this->flapping_comment_id == other.flapping_comment_id &&
@@ -525,7 +526,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_problem_has_been_acknowledged()
      << "\n  acknowledgement_type:                 " << obj.acknowledgement_type
      << "\n  host_problem_at_last_check:           "
-     << obj.host_problem_at_last_check
+     << obj.get_host_problem_at_last_check()
      << "\n  check_type:                           " << obj.get_check_type()
      << "\n  current_state:                        " << obj.get_current_state()
      << "\n  last_state:                           " << obj.get_last_state()
@@ -580,18 +581,16 @@ std::ostream& operator<<(std::ostream& os,
      << obj.current_notification_id
      << "\n  latency:                              " << obj.get_latency()
      << "\n  execution_time:                       " << obj.get_execution_time()
-     << "\n  is_executing:                         " << obj.is_executing
+     << "\n  is_executing:                         " << obj.get_is_executing()
      << "\n  check_options:                        " << obj.check_options
      << "\n  scheduled_downtime_depth:             "
      << obj.get_scheduled_downtime_depth()
      << "\n  pending_flex_downtime:                "
-     << obj.pending_flex_downtime << "\n";
+     << obj.get_pending_flex_downtime() << "\n";
 
   os << "  state_history:                        ";
-  for (unsigned int i(0),
-       end(sizeof(obj.state_history) / sizeof(obj.state_history[0]));
-       i < end; ++i)
-    os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
+  for (size_t i{0}, end{obj.get_state_history().size()}; i < end; ++i)
+    os << obj.get_state_history()[i] << (i + 1 < end ? ", " : "\n");
 
   os << "  state_history_index:                  " << obj.get_state_history_index()
      << "\n  is_flapping:                          " << obj.get_is_flapping()
@@ -1097,7 +1096,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /* clear the execution flag if this was an active check */
   if (queued_check_result->get_check_type() == check_active)
-    this->is_executing = false;
+    set_is_executing(false);
 
   /* DISCARD INVALID FRESHNESS CHECK RESULTS */
   /* If a services goes stale, Engine will initiate a forced check in
@@ -1333,7 +1332,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * attempt gets reset to 1 if this check is not made, the service recovery
    * looks like a soft recovery instead of a hard one
    */
-  if (this->host_problem_at_last_check && _current_state == service::state_ok) {
+  if (_host_problem_at_last_check && _current_state == service::state_ok) {
     logger(dbg_checks, most) << "Service had a HARD STATE CHANGE!!";
     hard_state_change = true;
   }
@@ -1532,7 +1531,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       obsessive_compulsive_service_check_processor();
 
     /* reset all service variables because its okay now... */
-    this->host_problem_at_last_check = false;
+    _host_problem_at_last_check = false;
     set_current_attempt(1);
     set_state_type(hard);
     _last_hard_state = service::state_ok;
@@ -1687,15 +1686,15 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* put service into a hard state without attempting check retries and
        * don't send out notifications about it */
-      this->host_problem_at_last_check = true;
+      _host_problem_at_last_check = true;
     }
 
     /* the host is up - it recovered since the last time the service was
        checked... */
-    else if (this->host_problem_at_last_check) {
+    else if (_host_problem_at_last_check) {
       /* next time the service is checked we shouldn't get into this same
        * case... */
-      this->host_problem_at_last_check = false;
+      _host_problem_at_last_check = false;
 
       /* reset the current check counter, so we give the service a chance */
       /* this helps prevent the case where service has N max check attempts, N-1
@@ -1828,8 +1827,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * had a hard error */
       /* we need to check for both, state_change (SOFT) and hard_state_change
        * (HARD) values */
-      if (((true == hard_state_change) || (true == state_change)) &&
-          (this->pending_flex_downtime > 0))
+      if ((hard_state_change || state_change) &&
+          get_pending_flex_downtime() > 0)
         downtime_manager::instance().check_pending_flex_service_downtime(this);
 
       /* 10/04/07 check to see if the service and/or associate host is flapping
@@ -1965,7 +1964,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       update_check_stats(ACTIVE_CACHED_SERVICE_CHECK_STATS, current_time);
     }
 
-    if (svc->is_executing)
+    if (svc->get_is_executing())
       run_async_check = false;
 
     if (run_async_check)
@@ -2008,9 +2007,10 @@ int service::log_event() {
 
 // int service::get_check_viability(...)  << check_service_check_viability()
 /* detects service flapping */
-void service::check_for_flapping(int update, int allow_flapstart_notification) {
-  int update_history = true;
-  int is_flapping = false;
+void service::check_for_flapping(bool update,
+                                 bool allow_flapstart_notification) {
+  bool update_history;
+  bool is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
   int last_state_history_value = service::state_ok;
@@ -2064,7 +2064,7 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
   /* record current service state */
   if (update_history) {
     /* record the current state in the state history */
-    state_history[get_state_history_index()] = _current_state;
+    get_state_history()[get_state_history_index()] = _current_state;
 
     /* increment state history index to next available slot */
     set_state_history_index(get_state_history_index() + 1);
@@ -2076,20 +2076,20 @@ void service::check_for_flapping(int update, int allow_flapstart_notification) {
   for (x = 0, y = get_state_history_index(); x < MAX_STATE_HISTORY_ENTRIES;
        x++) {
     if (x == 0) {
-      last_state_history_value = state_history[y];
+      last_state_history_value = get_state_history()[y];
       y++;
       if (y >= MAX_STATE_HISTORY_ENTRIES)
         y = 0;
       continue;
     }
 
-    if (last_state_history_value != state_history[y])
+    if (last_state_history_value != get_state_history()[y])
       curved_changes +=
           (((double)(x - 1) * (high_curve_value - low_curve_value)) /
            ((double)(MAX_STATE_HISTORY_ENTRIES - 2))) +
           low_curve_value;
 
-    last_state_history_value = state_history[y];
+    last_state_history_value = get_state_history()[y];
 
     y++;
     if (y >= MAX_STATE_HISTORY_ENTRIES)
@@ -3187,7 +3187,7 @@ int service::notify_contact(nagios_macros* mac,
         << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config->log_notifications() == true) {
+    if (config->log_notifications()) {
       char const* service_state_str("UNKNOWN");
       if ((unsigned int)_current_state < tab_service_states.size())
         service_state_str =
@@ -3231,7 +3231,7 @@ int service::notify_contact(nagios_macros* mac,
     }
 
     /* check to see if the notification command timed out */
-    if (early_timeout == true) {
+    if (early_timeout) {
       logger(log_service_notification | log_runtime_warning, basic)
           << "Warning: Contact '" << cntct->get_name()
           << "' service notification command '" << processed_command
@@ -3684,7 +3684,7 @@ void service::check_for_orphaned() {
        ++it) {
 
     /* skip services that are not currently executing */
-    if (!it->second->is_executing)
+    if (!it->second->get_is_executing())
       continue;
 
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
@@ -3714,7 +3714,7 @@ void service::check_for_orphaned() {
         currently_running_service_checks--;
 
       /* disable the executing flag */
-      it->second->is_executing = false;
+      it->second->set_is_executing(false);
 
       /* schedule an immediate check of the service */
       it->second->schedule_check(current_time, CHECK_OPTION_ORPHAN_CHECK);
@@ -3752,7 +3752,7 @@ void service::check_result_freshness() {
       continue;
 
     /* skip services that are currently executing (problems here will be caught by orphaned service check) */
-    if (it->second->is_executing)
+    if (it->second->get_is_executing())
       continue;
 
     /* skip services that have both active and passive checks disabled */
@@ -3903,4 +3903,8 @@ void service::resolve(int& w, int& e) {
   if (errors)
     throw engine_error() << "Cannot resolve service '" << _description
                          << "' of host '" << _hostname << "'";
+}
+
+bool service::get_host_problem_at_last_check() const {
+  return _host_problem_at_last_check;
 }

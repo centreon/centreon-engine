@@ -531,8 +531,6 @@ void applier::service::remove_object(
 
   // Remove service from the global configuration set.
   config->services().erase(obj);
-
-  return ;
 }
 
 /**

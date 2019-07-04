@@ -273,7 +273,7 @@ int xsddefault_save_status_data() {
          "\tno_more_notifications=" << it->second->get_no_more_notifications()
                                     << "\n"
          "\tcurrent_notification_number=" <<
-           it->second->get_current_notification_number() << "\n"
+           it->second->get_notification_number() << "\n"
          "\tcurrent_notification_id=" <<
            it->second->get_current_notification_id() << "\n"
          "\tnotifications_enabled=" << it->second->get_notifications_enabled()

@@ -213,8 +213,7 @@ void applier::contact::expand_objects(configuration::state& s) {
  *
  *  @param[in] obj  The new contact to modify into the monitoring engine.
  */
-void applier::contact::modify_object(
-                         configuration::contact const& obj) {
+void applier::contact::modify_object(configuration::contact const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying contact '" << obj.contact_name() << "'.";
@@ -222,15 +221,14 @@ void applier::contact::modify_object(
   // Find old configuration.
   set_contact::iterator it_cfg(config->contacts_find(obj.key()));
   if (it_cfg == config->contacts().end())
-    throw (engine_error() << "Cannot modify non-existing contact '"
-           << obj.contact_name() << "'");
+    throw engine_error() << "Cannot modify non-existing contact '"
+           << obj.contact_name() << "'";
 
   // Find contact object.
-  umap<std::string, std::shared_ptr<com::centreon::engine::contact> >::iterator
-    it_obj(engine::contact::contacts.find(obj.key()));
+  contact_map::iterator it_obj(engine::contact::contacts.find(obj.key()));
   if (it_obj == engine::contact::contacts.end())
-    throw (engine_error() << "Could not modify non-existing "
-           << "contact object '" << obj.contact_name() << "'");
+    throw engine_error() << "Could not modify non-existing "
+           << "contact object '" << obj.contact_name() << "'";
   engine::contact* c(it_obj->second.get());
 
   // Update the global configuration set.
@@ -378,7 +376,7 @@ void applier::contact::remove_object(
     engine::contact* cntct(it->second.get());
 
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
+    timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_contact_data(
       NEBTYPE_CONTACT_DELETE,
       NEBFLAG_NONE,

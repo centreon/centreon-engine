@@ -24,6 +24,7 @@
 #  include <set>
 #  include <string>
 #  include <vector>
+#  include "com/centreon/engine/timeperiod.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
@@ -52,13 +53,13 @@ namespace         configuration {
      private:
       void        _add_exclusions(
                     std::set<std::string> const& exclusions,
-                    engine::timeperiod* tp);
+                    com::centreon::engine::timeperiod* tp);
       void        _add_exceptions(
                     std::vector<std::list<daterange> > const& exceptions,
-                    engine::timeperiod* tp);
+                    com::centreon::engine::timeperiod* tp);
       void        _add_time_ranges(
                     std::vector<std::list<timerange> > const& ranges,
-                    engine::timeperiod* tp);
+                    com::centreon::engine::timeperiod* tp);
     };
   }
 }

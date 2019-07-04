@@ -144,12 +144,14 @@ class                           service : public notifier {
                                   check_result* queued_check_result);
   int                           log_event();
   void                          check_for_flapping(
-                                              int update,
-                                              int allow_flapstart_notification);
+                                            bool update,
+                                            bool allow_flapstart_notification);
   int                           handle_service_event();
   int                           obsessive_compulsive_service_check_processor();
   int                           update_service_performance_data();
-  int                           run_scheduled_check(int check_options, double latency);
+  int                           run_scheduled_check(
+                                            int check_options,
+                                            double latency);
   int                           run_async_check(int check_options,
                                                 double latency,
                                                 int scheduled_check,
@@ -209,14 +211,11 @@ class                           service : public notifier {
   int                           retain_status_information;
   int                           retain_nonstatus_information;
   int                           acknowledgement_type;
-  int                           host_problem_at_last_check;
   int                           check_flapping_recovery_notification;
   int                           is_being_freshened;
   int                           current_notification_number;
   uint64_t                      current_notification_id;
-  int                           is_executing;
   int                           check_options;
-  int                           pending_flex_downtime;
   uint64_t                      flapping_comment_id;
 
   std::list<servicegroup*> const&
@@ -226,6 +225,7 @@ class                           service : public notifier {
   void                          set_host_ptr(host* h);
   host const*                   get_host_ptr() const;
   host*                         get_host_ptr();
+  bool                          get_host_problem_at_last_check() const;
 
   static service_map            services;
   static service_id_map         services_by_id;
@@ -249,6 +249,7 @@ class                           service : public notifier {
   enum service_state            _last_state;
   std::list<servicegroup*>      _servicegroups;
   host*                         _host_ptr;
+  bool _host_problem_at_last_check;
 };
 CCE_END()
 

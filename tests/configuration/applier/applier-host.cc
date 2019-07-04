@@ -144,8 +144,8 @@ TEST_F(ApplierHost, HostParentDownChildUnreachable) {
   host_map::iterator child = engine::host::hosts.find("child_host");
   host_map::iterator parent = engine::host::hosts.find("parent_host");
 
-  ASSERT_EQ(parent->second->child_hosts.size(), 1);
-  ASSERT_EQ(child->second->parent_hosts.size(), 1);
+  ASSERT_EQ(parent->second->child_hosts.size(), 1u);
+  ASSERT_EQ(child->second->parent_hosts.size(), 1u);
 
   engine::host::host_state result;
   parent->second->run_sync_check_3x(&result, 0, 0, 0);

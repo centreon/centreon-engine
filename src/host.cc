@@ -59,13 +59,6 @@ std::array<std::pair<uint32_t, std::string>, 3> const host::tab_host_states{
 host_map host::hosts;
 host_id_map host::hosts_by_id;
 
-//static bool is_equal(int const* tab1, int const* tab2, unsigned int size) {
-//  for (unsigned int i(0); i < size; ++i)
-//    if (tab1[i] != tab2[i])
-//      return (false);
-//  return (true);
-//}
-
 /*
  *  @param[in] name                          Host name.
  *  @param[in] display_name                  Display name.
@@ -224,7 +217,8 @@ host::host(uint64_t host_id,
                check_freshness,
                freshness_threshold,
                obsess_over_host,
-               timezone} {
+               timezone},
+    _last_state_history_update{0} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -477,14 +471,6 @@ void host::set_acknowledgement_type(int acknowledgement_type) {
   _acknowledgement_type = acknowledgement_type;
 }
 
-bool host::get_is_executing() const {
-  return _is_executing;
-}
-
-void host::set_is_executing(bool is_executing) {
-  _is_executing = is_executing;
-}
-
 int host::get_check_options() const {
   return _check_options;
 }
@@ -531,14 +517,6 @@ bool host::get_should_reschedule_current_check() const {
 
 void host::set_should_reschedule_current_check(bool should_reschedule) {
   _should_reschedule_current_check = should_reschedule;
-}
-
-int host::get_pending_flex_downtime() const {
-  return _pending_flex_downtime;
-}
-
-void host::set_pending_flex_downtime(int pending_flex_downtime) {
-  _pending_flex_downtime = pending_flex_downtime;
 }
 
 time_t host::get_last_state_history_update() const {
@@ -741,8 +719,8 @@ bool host::operator==(host const& other) throw() {
          get_scheduled_downtime_depth() ==
              other.get_scheduled_downtime_depth() &&
          get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
-         std::equal(state_history.begin(), state_history.end(),
-                     other.state_history.begin()) &&
+         std::equal(get_state_history().begin(), get_state_history().end(),
+                     other.get_state_history().begin()) &&
          get_state_history_index() == other.get_state_history_index() &&
          get_last_state_history_update() ==
              other.get_last_state_history_update() &&
@@ -1136,10 +1114,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << obj.get_pending_flex_downtime() << "\n";
 
   os << "  state_history:                        ";
-  for (unsigned int i(0),
-       end{sizeof(obj.state_history) / sizeof(obj.state_history[0])};
-       i < end; ++i)
-    os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
+  for (size_t i{0}, end{obj.get_state_history().size()}; i < end; ++i)
+    os << obj.get_state_history()[i] << (i + 1 < end ? ", " : "\n");
 
   os << "  state_history_index:                  "
      << obj.get_state_history_index()
@@ -1632,11 +1608,11 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
     /* if we're not doing aggressive host checking, let WARNING states indicate
      * the host is up (fake the result to be state_ok) */
     if (!config->use_aggressive_host_checking() && svc_res ==  service::state_warning)
-      svc_res =  service::state_ok;
+      svc_res = service::state_ok;
 
     /* OK states means the host is UP */
-    if (svc_res ==  service::state_ok)
-      hst_res =  host::state_up;
+    if (svc_res == service::state_ok)
+      hst_res = host::state_up;
 
     /* any problem state indicates the host is not UP */
     else
@@ -1646,10 +1622,9 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   /******************* PROCESS THE CHECK RESULTS ******************/
 
   /* process the host check result */
-  this->process_check_result_3x(hst_res,
-                               old_plugin_output,
-                               CHECK_OPTION_NONE, reschedule_check, true,
-                               config->cached_host_check_horizon());
+  process_check_result_3x(hst_res, old_plugin_output, CHECK_OPTION_NONE,
+                          reschedule_check, true,
+                          config->cached_host_check_horizon());
 
   logger(dbg_checks, more) << "** Async check result for host '" << get_name()
                            << "' handled: new state=" << get_current_state();
@@ -1924,10 +1899,10 @@ void host::check_for_flapping(bool update,
                               bool actual_check,
                               bool allow_flapstart_notification) {
   bool update_history;
-  int is_flapping = false;
+  bool is_flapping = false;
   unsigned int x = 0;
   unsigned int y = 0;
-  int last_state_history_value =  host::state_up;
+  int last_state_history_value = host::state_up;
   unsigned long wait_threshold = 0L;
   double curved_changes = 0.0;
   double curved_percent_change = 0.0;
@@ -1989,7 +1964,7 @@ void host::check_for_flapping(bool update,
     set_last_state_history_update(current_time);
 
     /* record the current state in the state history */
-    this->state_history[get_state_history_index()] = get_current_state();
+    get_state_history()[get_state_history_index()] = get_current_state();
 
     /* increment state history index to next available slot */
     set_state_history_index(get_state_history_index() + 1);
@@ -2001,20 +1976,20 @@ void host::check_for_flapping(bool update,
   for (x = 0, y = get_state_history_index(); x < MAX_STATE_HISTORY_ENTRIES;
        x++) {
     if (x == 0) {
-      last_state_history_value = this->state_history[y];
+      last_state_history_value = get_state_history()[y];
       y++;
       if (y >= MAX_STATE_HISTORY_ENTRIES)
         y = 0;
       continue;
     }
 
-    if (last_state_history_value != this->state_history[y])
+    if (last_state_history_value != get_state_history()[y])
       curved_changes +=
           (((double)(x - 1) * (high_curve_value - low_curve_value)) /
            ((double)(MAX_STATE_HISTORY_ENTRIES - 2))) +
           low_curve_value;
 
-    last_state_history_value = this->state_history[y];
+    last_state_history_value = get_state_history()[y];
 
     y++;
     if (y >= MAX_STATE_HISTORY_ENTRIES)
@@ -2764,10 +2739,10 @@ int host::notify_contact(nagios_macros* mac,
     /* log the notification to program log file */
     if (config->log_notifications()) {
       char const* host_state_str("UP");
-      if ((unsigned int)this->get_current_state() < tab_host_states.size())
+      if ((unsigned int)_current_state < tab_host_states.size())
         // sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
         host_state_str =
-            tab_host_states[this->get_current_state()].second.c_str();
+            tab_host_states[_current_state].second.c_str();
 
       char const* notification_str("");
       if ((unsigned int)type < tab_notification_str.size())
@@ -2806,7 +2781,7 @@ int host::notify_contact(nagios_macros* mac,
     }
 
     /* check to see if the notification timed out */
-    if (early_timeout == true) {
+    if (early_timeout) {
       logger(log_host_notification | log_runtime_warning, basic)
           << "Warning: Contact '" << cntct->get_name()
           << "' host notification command '" << processed_command
@@ -2990,9 +2965,9 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
    * previous problem
    */
   if (get_current_state() ==  host::state_up)
-    notification_number = get_current_notification_number() - 1;
+    notification_number = get_notification_number() - 1;
   else
-    notification_number = get_current_notification_number();
+    notification_number = get_notification_number();
 
   /* find the host this escalation entry is associated with */
   if (e->notifier_ptr != this)

@@ -504,59 +504,52 @@ TEST_F(HostNotification, SimpleCheck) {
   ASSERT_NE(step3, std::string::npos);
 }
 
-//TEST_F(HostNotification, CheckFirstNotificationDelay) {
-//  set_time(50000);
-//  _host->set_current_state(engine::host::state_up);
-//  _host->set_last_hard_state(engine::host::state_up);
-//  _host->set_last_hard_state_change(50000);
-//  _host->set_state_type(checkable::hard);
-//  _host->set_first_notification_delay(3);
-//  testing::internal::CaptureStdout();
-//  std::cout << "notification interval: " << _host->get_notification_interval() << std::endl;
-//  for (int i = 1; i < 40; i++) {
-//    // When i == 0, the state_down is soft => no notification
-//    // When i == 1, the state_down is soft => no notification
-//    // When i == 2, the state_down is hard down => notification
-//    std::cout << "Step " << i << ":";
-//    set_time(50000 + i * 60);
-//    _host->set_last_state(_host->get_current_state());
-//    if (notifier::hard == _host->get_state_type())
-//      _host->set_last_hard_state(_host->get_current_state());
-//    _host->process_check_result_3x(engine::host::state_down,
-//        "The host is down",
-//        CHECK_OPTION_NONE,
-//        0,
-//        true,
-//        0);
-//  }
-//
-//  for (int i = 0; i < 3; i++) {
-//    // When i == 0, the state_up is hard (return to up) => Recovery notification
-//    // When i == 1, the state_up is still here (no change) => no notification
-//    std::cout << "New step " << i << std::endl;
-//    set_time(50600 + i * 60);
-//    _host->set_last_state(_host->get_current_state());
-//    if (notifier::hard == _host->get_state_type())
-//      _host->set_last_hard_state(_host->get_current_state());
-//    _host->process_check_result_3x(engine::host::state_up,
-//        "The host is up",
-//        CHECK_OPTION_NONE,
-//        0,
-//        true,
-//        0);
-//  }
-//  std::string out{testing::internal::GetCapturedStdout()};
-//  // Only sent when i == 2
-//  std::regex re1(
-//      "Step 5:\\[\\d*\\] \\[\\d+\\] HOST NOTIFICATION: "
-//      "admin;test_host;DOWN;cmd;");
-//  std::regex re2(
-//      "Step 35:\\[\\d*\\] \\[\\d+\\] HOST NOTIFICATION: "
-//      "admin;test_host;DOWN;cmd;");
-//  std::regex re3("HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;");
-//  std::smatch match;
-//  ASSERT_TRUE(std::regex_search(out, match, re1));
-//  ASSERT_TRUE(std::regex_search(out, match, re2));
-//  ASSERT_NE(out.find("HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;"),
-//            std::string::npos);
-//}
+TEST_F(HostNotification, CheckFirstNotificationDelay) {
+  set_time(50000);
+  _host->set_current_state(engine::host::state_up);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  _host->set_first_notification_delay(3);
+  testing::internal::CaptureStdout();
+  std::cout << "notification interval: " << _host->get_notification_interval() << std::endl;
+  for (int i = 1; i < 40; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    std::cout << "Step " << i << ":";
+    set_time(50000 + i * 60);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+    _host->process_check_result_3x(engine::host::state_down,
+        "The host is down",
+        CHECK_OPTION_NONE,
+        0,
+        true,
+        0);
+  }
+
+  for (int i = 0; i < 3; i++) {
+    // When i == 0, the state_up is hard (return to up) => Recovery notification
+    // When i == 1, the state_up is still here (no change) => no notification
+    std::cout << "New step " << i << std::endl;
+    set_time(50600 + i * 60);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+    _host->process_check_result_3x(engine::host::state_up,
+        "The host is up",
+        CHECK_OPTION_NONE,
+        0,
+        true,
+        0);
+  }
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t m1{out.find("Step 5:")};
+  size_t m2{out.find(" HOST NOTIFICATION: admin;test_host;DOWN;cmd;", m1 + 1)};
+  size_t m3{out.find("Step 35:", m2 + 1)};
+  size_t m4{out.find(" HOST NOTIFICATION: admin;test_host;DOWN;cmd;", m3 + 1)};
+  size_t m5{out.find(" HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;", m4 + 1)};
+  ASSERT_NE(m5, std::string::npos);
+}

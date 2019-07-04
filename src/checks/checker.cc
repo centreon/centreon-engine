@@ -81,7 +81,7 @@ void checker::push_check_result(check_result const& result) {
 }
 
 /**
- *  Reap and process all result recive by execution process.
+ *  Reap and process all result received by execution process.
  */
 void checker::reap() {
   logger(dbg_functions, basic)
@@ -240,7 +240,6 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  return;
 }
 
 /**
@@ -624,7 +623,7 @@ void checker::run(
   ++currently_running_service_checks;
 
   // Set the execution flag.
-  svc->is_executing = true;
+  svc->set_is_executing(true);
 
   // Init check result info.
   check_result check_result_info(service_check,
@@ -973,7 +972,6 @@ void checker::finished(commands::result const& res) throw () {
   // Queue check result.
   concurrency::locker lock(&_mut_reap);
   _to_reap_partial[res.command_id] = result;
-  return;
 }
 
 /**

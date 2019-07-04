@@ -142,7 +142,7 @@ void applier::host::_update(
     if (state.last_notification().is_set())
       obj.set_last_notification(*state.last_notification());
     if (state.current_notification_number().is_set())
-      obj.set_current_notification_number(*state.current_notification_number());
+      obj.set_notification_number(*state.current_notification_number());
     if (state.current_notification_id().is_set())
       obj.set_current_notification_id(*state.current_notification_id());
     if (state.percent_state_change().is_set())
@@ -150,7 +150,7 @@ void applier::host::_update(
     if (state.state_history().is_set()) {
       utils::set_state_history(
         *state.state_history(),
-        obj.state_history);
+        obj.get_state_history());
       obj.set_state_history_index(0);
     }
   }

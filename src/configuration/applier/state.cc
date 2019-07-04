@@ -736,8 +736,6 @@ void applier::state::_apply(
       }
     }
   }
-
-  return ;
 }
 
 /**

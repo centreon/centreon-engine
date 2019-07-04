@@ -161,9 +161,8 @@ int process_external_commands_from_file(
 }
 
 /* external command processor */
-int process_external_command(char const* cmd) {
+void process_external_command(char const* cmd) {
   modules::external_commands::gl_processor.execute(cmd);
-  return OK;
 }
 
 /******************************************************************/
@@ -694,7 +693,7 @@ int process_passive_host_check(
       char const* output) {
   char const* real_host_name(nullptr);
   /* skip this host check result if we aren't accepting passive host checks */
-  if (config->accept_passive_service_checks() == false)
+  if (!config->accept_passive_service_checks())
     return ERROR;
 
   /* make sure we have all required data */
