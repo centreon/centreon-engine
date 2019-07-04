@@ -250,14 +250,23 @@ bool notifier::_is_notification_viable_normal(
     return false;
   }
 
-  if (_notification_number >= 1 && _notification_interval > 0) {
-    if (_last_notification + _notification_interval * config->interval_length()
-        > now) {
+  if (_notification_number >= 1) {
+    if (_notification_interval == 0) {
       logger(dbg_notifications, more)
-        << "This notifier problem has been sent at " << _last_notification
-        << " so it won't be sent until "
-        << (_notification_interval * config->interval_length());
+        << "This notifier problem has already been sent at " << _last_notification
+        << " so, since the notification interval is 0, it won't be sent"
+        << " anymore";
       return false;
+    }
+    else if (_notification_interval > 0) {
+      if (_last_notification + _notification_interval * config->interval_length()
+          > now) {
+        logger(dbg_notifications, more)
+          << "This notifier problem has been sent at " << _last_notification
+          << " so it won't be sent until "
+          << (_notification_interval * config->interval_length());
+        return false;
+      }
     }
   }
 

@@ -541,9 +541,6 @@ TEST_F(ServiceNotification, SimpleCheck) {
     checks::checker::instance().reap();
   }
   std::string out{testing::internal::GetCapturedStdout()};
-  std::cout << "################################################################################" << std::endl;
-  std::cout << "out = " << out << std::endl;
-  std::cout << "################################################################################" << std::endl;
   size_t step1{out.find(
       "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;service down")};
   size_t step2{
@@ -604,13 +601,72 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
     checks::checker::instance().reap();
   }
   std::string out{testing::internal::GetCapturedStdout()};
-  std::cout << "################################################################################" << std::endl;
-  std::cout << "out = " << out << std::endl;
-  std::cout << "################################################################################" << std::endl;
   size_t m1{out.find("Step 5:")};
   size_t m2{out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;DOWN;cmd;service critical", m1 + 1)};
   size_t m3{out.find("Step 35:", m2 + 1)};
   size_t m4{out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;DOWN;cmd;service critical", m3 + 1)};
   size_t m5{out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY (OK);cmd;service ok", m4 + 1)};
   ASSERT_NE(m5, std::string::npos);
+}
+
+// Given a service with a notification interval = 0 and a
+// first_delay_notification = 0
+// When a normal notification should be sent, it is sent only one time.
+TEST_F(ServiceNotification, CheckNotifIntervZero) {
+  set_time(50000);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_notification_interval(0);
+  _svc->set_accept_passive_checks(true);
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 10; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    set_time(50500 + i * 500);
+    _svc->set_last_state(_svc->get_current_state());
+    if (notifier::hard == _svc->get_state_type())
+      _svc->set_last_hard_state(_svc->get_current_state());
+
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  for (int i = 0; i < 2; i++) {
+    // When i == 0, the state_up is hard (return to up) => Recovery notification
+    // When i == 1, the state_up is still here (no change) => no notification
+    set_time(56500 + i * 500);
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t step1{out.find(
+      "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;service down")};
+  size_t step2{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_svc;CRITICAL;cmd;service down",
+               step1 + 1)};
+  size_t step3{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_svc;CRITICAL;cmd;service down",
+               step2 + 1)};
+  // Sent when i == 0 on the second loop.
+  size_t step4{
+      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok",
+               step2 + 1)};
+  ASSERT_EQ(step3, std::string::npos);
+  ASSERT_NE(step4, std::string::npos);
 }
