@@ -93,12 +93,12 @@ class ServiceNotification : public TestEngine {
   }
 
   void TearDown() override {
-    checks::checker::unload();
     process_manager::unload();
     timezone_manager::unload();
     configuration::applier::state::unload();
     delete config;
     config = NULL;
+    checks::checker::unload();
   }
 
  protected:

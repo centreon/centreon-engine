@@ -218,7 +218,8 @@ host::host(uint64_t host_id,
                freshness_threshold,
                obsess_over_host,
                timezone},
-    _last_state_history_update{0} {
+    _last_state_history_update{0},
+    _total_services{0} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
