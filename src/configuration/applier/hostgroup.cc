@@ -225,8 +225,6 @@ void applier::hostgroup::remove_object(
   if (it != engine::hostgroup::hostgroups.end()) {
     engine::hostgroup* grp(it->second.get());
 
-    engine::hostgroup::hostgroups.erase(grp->get_group_name());
-
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
     broker_group(

@@ -106,7 +106,7 @@ TEST_F(ApplierHost, HostRenamed) {
 
 // Given host configuration without host_id
 // Then the applier add_object throws an exception.
-TEST_F(ApplierHost, HostParentDownChildUnreachable) {
+TEST_F(ApplierHost, HostParentChildUnreachable) {
   configuration::applier::host hst_aply;
   configuration::applier::command cmd_aply;
   configuration::host hst_child;
