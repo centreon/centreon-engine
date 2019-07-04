@@ -51,16 +51,16 @@ class ApplierHost : public ::testing::Test {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
-    checks::checker::load();
     timezone_manager::load();
     process_manager::load();
+    checks::checker::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
-    checks::checker::unload();
     timezone_manager::unload();
     process_manager::unload();
+    checks::checker::unload();
     delete config;
     config = NULL;
   }

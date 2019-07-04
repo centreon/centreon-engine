@@ -151,6 +151,7 @@ unsigned long raw::run(
 
     concurrency::locker lock(&_lock);
     _processes_busy.erase(p);
+    delete p;
     throw;
   }
   return (command_id);
@@ -560,10 +561,10 @@ process* raw::_get_free_process() {
     p->enable_stream(process::in, false);
     p->enable_stream(process::err, false);
     p->setpgid_on_exec(config->use_setpgid());
-    return (p);
+    return p;
   }
   // Get a free process.
   process* p(_processes_free.front());
   _processes_free.pop_front();
-  return (p);
+  return p;
 }
