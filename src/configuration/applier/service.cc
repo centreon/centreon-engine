@@ -506,7 +506,7 @@ void applier::service::remove_object(
       host_name,
       service_description,
       (time_t)0,
-      NULL);
+      "");
 
     // Remove events related to this service.
     applier::scheduler::instance().remove_service(obj);
