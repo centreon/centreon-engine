@@ -79,13 +79,15 @@ TEST_F(ServiceExternalCommand, AddServiceDowntime) {
   cmd_aply.add_object(cmd);
 
   hst.parse("check_command", "cmd");
-  hst_aply.add_object(hst);
-  hst_aply.expand_objects(*config);
-  hst_aply.resolve_object(hst);
-
   svc.parse("check_command", "cmd");
+
+  hst_aply.add_object(hst);
   svc_aply.add_object(svc);
+
+  hst_aply.expand_objects(*config);
   svc_aply.expand_objects(*config);
+
+  hst_aply.resolve_object(hst);
   svc_aply.resolve_object(svc);
 
   set_time(20000);

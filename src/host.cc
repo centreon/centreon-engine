@@ -4117,6 +4117,15 @@ void host::resolve(int& w, int& e) {
       << "' has problem in its notifier part: " << e.what();
   }
 
+  for(service_map::iterator
+        it_svc{service::services.begin()},
+        end_svc{service::services.end()};
+      it_svc != end_svc;
+      ++it_svc) {
+    if (_name == it_svc->first.first)
+      services.insert({it_svc->first, nullptr});
+  }
+
   if (services.empty()) {
     logger(log_verification_error, basic)
       << "Warning: Host '" << _name
@@ -4133,9 +4142,9 @@ void host::resolve(int& w, int& e) {
         logger(log_verification_error, basic)
           << "Error: Host '" << _name
           << "' has a service '" << it->first.second << "' that does not exist!";
+        ++errors;
       }
       else {
-        ++errors;
         it->second = found->second.get();
       }
     }
