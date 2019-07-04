@@ -417,6 +417,8 @@ void applier::contact::resolve_object(
            << "Cannot resolve non-existing contact '"
            << obj.contact_name() << "'");
 
+  ct_it->second->get_host_notification_commands().clear();
+
   // Add all the host notification commands.
   for (list_string::const_iterator
          it(obj.host_notification_commands().begin()),
@@ -434,6 +436,8 @@ void applier::contact::resolve_object(
           << "': the command does not exist");
     }
   }
+
+  ct_it->second->get_service_notification_commands().clear();
 
   // Add all the service notification commands.
   for (list_string::const_iterator
