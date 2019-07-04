@@ -1504,20 +1504,21 @@ void notifier::resolve(int& w, int& e) {
   }
 
   /* check all contact groups */
-  for (contactgroup_map_unsafe::const_iterator it{get_contactgroups().begin()},
+  for (contactgroup_map_unsafe::iterator it{get_contactgroups().begin()},
        end{get_contactgroups().end()};
        it != end; ++it) {
     // Find the contact group.
     contactgroup_map::const_iterator found_it{
         contactgroup::contactgroups.find(it->first)};
 
-    if (found_it == contactgroup::contactgroups.end() ||
-        !found_it->second.get()) {
+    if (found_it == contactgroup::contactgroups.end()) {
       logger(log_verification_error, basic)
           << "Error: Contact group '" << it->first << "' specified in host '"
           << get_display_name() << "' is not defined anywhere!";
       errors++;
     }
+    else
+      it->second = found_it->second.get();
   }
 
   // Check notification timeperiod.

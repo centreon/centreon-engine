@@ -19,16 +19,19 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include "../../test_engine.hh"
 #include "../../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
+#include "com/centreon/engine/configuration/applier/contact.hh"
+#include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/service.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -37,7 +40,7 @@ using namespace com::centreon::engine::configuration::applier;
 
 extern configuration::state* config;
 
-class ApplierService : public ::testing::Test {
+class ApplierService : public TestEngine {
  public:
   void SetUp() override {
     if (config == NULL)
@@ -265,4 +268,59 @@ TEST_F(ApplierService, ServicesStalkingOptions) {
     csvc.stalking_options(),
     configuration::service::ok | configuration::service::warning
       | configuration::service::unknown | configuration::service::critical);
+}
+
+// Given a viable contact
+// When it is added to a contactgroup
+// And when this contactgroup is added to a service
+// Then after the service resolution, we can see the contactgroup stored in the
+// service with the contact inside it.
+TEST_F(ApplierService, ContactgroupResolution) {
+  configuration::contact ctct{valid_contact_config()};
+  configuration::applier::contact ct_aply;
+  ct_aply.add_object(ctct);
+  configuration::contactgroup cg;
+  cg.parse("contactgroup_name", "contactgroup_test");
+  cg.parse("members", "admin");
+  configuration::applier::contactgroup cg_aply;
+  cg_aply.add_object(cg);
+  cg_aply.resolve_object(cg);
+  configuration::applier::host hst_aply;
+  configuration::applier::service svc_aply;
+  configuration::service svc;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  hst.parse("host_id", "1");
+  hst_aply.add_object(hst);
+  svc.parse("host", "test_host");
+  svc.parse("service_description", "test description");
+  svc.parse("service_id", "3");
+  svc.parse("contact_groups", "contactgroup_test");
+
+  configuration::applier::command cmd_aply;
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  svc.parse("check_command", "cmd");
+  cmd_aply.add_object(cmd);
+
+  svc_aply.add_object(svc);
+  svc_aply.expand_objects(*config);
+  svc_aply.resolve_object(svc);
+  service_id_map const& sm(engine::service::services_by_id);
+  ASSERT_EQ(sm.size(), 1u);
+  ASSERT_EQ(sm.begin()->first.first, 1u);
+  ASSERT_EQ(sm.begin()->first.second, 3u);
+
+  contactgroup_map_unsafe cgs{sm.begin()->second->get_contactgroups()};
+  ASSERT_EQ(cgs.size(), 1u);
+  ASSERT_EQ(cgs.begin()->first, "contactgroup_test");
+  contact_map_unsafe::iterator itt{cgs.begin()->second->get_members().find("admin")};
+
+  ASSERT_NE(itt, cgs.begin()->second->get_members().end());
+
+  contact_map::const_iterator it{engine::contact::contacts.find("admin")};
+  ASSERT_NE(it, engine::contact::contacts.end());
+
+  ASSERT_EQ(itt->second, it->second.get());
 }
