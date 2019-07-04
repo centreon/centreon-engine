@@ -474,7 +474,6 @@ void applier::service::modify_object(
     MODATTR_ALL,
     MODATTR_ALL,
     &tv);
-  return ;
 }
 
 /**
