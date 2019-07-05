@@ -323,7 +323,6 @@ static int handle_servicegroup_macro(
   if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
     retval = ERROR;
   else {
-    retval = ERROR;
     // Get the servicegroup macro value.
     retval = grab_standard_servicegroup_macro_r(
                mac,
