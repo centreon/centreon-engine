@@ -354,6 +354,16 @@ void applier::service::modify_object(
   config->services().insert(obj);
 
   // Modify properties.
+  if(it_obj->second->get_hostname() != *obj.hosts().begin() ||
+       it_obj->second->get_description() != obj.service_description()) {
+    engine::service::services.erase({it_obj->second->get_hostname(),
+                                     it_obj->second->get_description()});
+    engine::service::services.insert({{*obj.hosts().begin(),
+                                       obj.service_description()},
+                                      it_obj->second});
+  }
+
+  s->set_hostname(*obj.hosts().begin());
   s->set_description(obj.service_description());
   s->set_display_name(obj.display_name()),
   s->set_check_command(obj.check_command());
@@ -421,12 +431,8 @@ void applier::service::modify_object(
   s->set_icon_image_alt(obj.icon_image_alt());
   s->set_is_volatile(obj.is_volatile());
   s->set_timezone(obj.timezone());
-  engine::service::services[
-    {*obj.hosts().begin(),obj.service_description()}]->set_host_id(
-      obj.host_id());
-  engine::service::services[
-    {*obj.hosts().begin(),obj.service_description()}]->set_service_id(
-      obj.service_id());
+  s->set_host_id(obj.host_id());
+  s->set_service_id(obj.service_id());
   s->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                    config->interval_length());
   s->set_recovery_notification_delay(obj.recovery_notification_delay());

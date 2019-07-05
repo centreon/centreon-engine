@@ -208,7 +208,7 @@ int shutdown_command_file_worker_thread(void) {
 
     /* wait for the worker thread to exit */
     if (result == 0)
-      result = pthread_join(worker_threads[COMMAND_WORKER_THREAD], NULL);
+      pthread_join(worker_threads[COMMAND_WORKER_THREAD], NULL);
     /* we're being called from a fork()'ed child process - can't cancel thread, so just cleanup memory */
     else {
       cleanup_command_file_worker_thread(NULL);

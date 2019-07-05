@@ -126,11 +126,9 @@ loop::~loop() throw () {
  *  Slot to dispatch Centreon Engine events.
  */
 void loop::_dispatching() {
-  bool quit(false);
-  while (!quit) {
+  while (true) {
     // See if we should exit or restart (a signal was encountered).
     if (sigshutdown) {
-      quit = true;
       break;
     }
 
@@ -139,7 +137,6 @@ void loop::_dispatching() {
       logger(log_runtime_error, basic)
         << "There aren't any events that need to be handled! "
         << "Exiting...";
-      quit = true;
       break;
     }
 

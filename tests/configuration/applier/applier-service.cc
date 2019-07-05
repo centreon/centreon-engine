@@ -116,6 +116,96 @@ TEST_F(ApplierService, NewServiceFromConfig) {
   ASSERT_TRUE(sm.begin()->second->get_description() == "test description");
 }
 
+// Given service configuration with a host defined
+// Then the applier add_object creates the service
+TEST_F(ApplierService, RenameServiceFromConfig) {
+  configuration::applier::host hst_aply;
+  configuration::applier::service svc_aply;
+  configuration::service svc;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  // The host id is not given
+  ASSERT_THROW(hst_aply.add_object(hst), std::exception);
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_TRUE(svc.parse("host", "test_host"));
+  ASSERT_TRUE(svc.parse("service_description", "test description"));
+  ASSERT_TRUE(svc.parse("service_id", "3"));
+
+  configuration::applier::command cmd_aply;
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  svc.parse("check_command", "cmd");
+  cmd_aply.add_object(cmd);
+
+  svc_aply.add_object(svc);
+  svc_aply.expand_objects(*config);
+
+  ASSERT_TRUE(svc.parse("service_description", "test description2"));
+  svc_aply.modify_object(svc);
+  svc_aply.expand_objects(*config);
+
+  service_id_map const& sm(engine::service::services_by_id);
+  ASSERT_EQ(sm.size(), 1u);
+  ASSERT_EQ(sm.begin()->first.first, 1u);
+  ASSERT_EQ(sm.begin()->first.second, 3u);
+
+  // Service is not resolved, host is null now.
+  ASSERT_TRUE(!sm.begin()->second->get_host_ptr());
+  ASSERT_TRUE(sm.begin()->second->get_description() == "test description2");
+
+  std::string s{engine::service::services[{"test_host", "test description2"}]->get_description()};
+  ASSERT_TRUE(s == "test description2");
+}
+
+// Given service configuration with a host defined
+// Then the applier add_object creates the service
+TEST_F(ApplierService, RemoveServiceFromConfig) {
+  configuration::applier::host hst_aply;
+  configuration::applier::service svc_aply;
+  configuration::service svc;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  // The host id is not given
+  ASSERT_THROW(hst_aply.add_object(hst), std::exception);
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_TRUE(svc.parse("host", "test_host"));
+  ASSERT_TRUE(svc.parse("service_description", "test description"));
+  ASSERT_TRUE(svc.parse("service_id", "3"));
+
+  configuration::applier::command cmd_aply;
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  svc.parse("check_command", "cmd");
+  cmd_aply.add_object(cmd);
+
+  svc_aply.add_object(svc);
+  svc_aply.expand_objects(*config);
+
+  ASSERT_EQ(engine::service::services_by_id.size(), 1u);
+  svc_aply.remove_object(svc);
+  ASSERT_EQ(engine::service::services_by_id.size(), 0u);
+
+  ASSERT_TRUE(svc.parse("service_description", "test description2"));
+  svc_aply.add_object(svc);
+  svc_aply.expand_objects(*config);
+
+  service_id_map const& sm(engine::service::services_by_id);
+  ASSERT_EQ(sm.size(), 1u);
+  ASSERT_EQ(sm.begin()->first.first, 1u);
+  ASSERT_EQ(sm.begin()->first.second, 3u);
+
+  // Service is not resolved, host is null now.
+  ASSERT_TRUE(!sm.begin()->second->get_host_ptr());
+  ASSERT_TRUE(sm.begin()->second->get_description() == "test description2");
+
+  std::string s{engine::service::services[{"test_host", "test description2"}]->get_description()};
+  ASSERT_TRUE(s == "test description2");
+}
+
 // Given a service configuration,
 // When we duplicate it, we get a configuration equal to the previous one.
 // When two services are generated from the same configuration
