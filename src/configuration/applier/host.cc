@@ -453,9 +453,6 @@ void applier::host::remove_object(
     // Remove events related to this host.
     applier::scheduler::instance().remove_host(obj);
 
-    // Remove host from its list.
-    com::centreon::engine::host::hosts.erase(it->second->get_name());
-
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_host_data(

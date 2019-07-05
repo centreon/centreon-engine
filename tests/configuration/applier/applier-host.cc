@@ -90,7 +90,7 @@ TEST_F(ApplierHost, HostRenamed) {
   ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
   ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
   hst_aply.add_object(hst);
-  host_map const&
+  host_map const &
     hm(engine::host::hosts);
   ASSERT_EQ(hm.size(), 1u);
   std::shared_ptr<com::centreon::engine::host> h1(hm.begin()->second);
@@ -100,6 +100,31 @@ TEST_F(ApplierHost, HostRenamed) {
   hst_aply.modify_object(hst);
   ASSERT_EQ(hm.size(), 1u);
   h1 = hm.begin()->second;
+  ASSERT_TRUE(h1->get_name() == "test_host1");
+  ASSERT_EQ(get_host_id(h1->get_name()), 12u);
+}
+
+TEST_F(ApplierHost, HostRemoved) {
+  configuration::applier::host hst_aply;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
+  hst_aply.add_object(hst);
+  host_map const&
+    hm(engine::host::hosts);
+  ASSERT_EQ(hm.size(), 1u);
+  std::shared_ptr<com::centreon::engine::host> h1(hm.begin()->second);
+  ASSERT_TRUE(h1->get_name() == "test_host");
+
+  ASSERT_TRUE(hst.parse("host_name", "test_host1"));
+  hst_aply.remove_object(hst);
+
+  ASSERT_EQ(hm.size(), 0u);
+  ASSERT_TRUE(hst.parse("host_name", "test_host1"));
+  hst_aply.add_object(hst);
+  h1 = hm.begin()->second;
+  ASSERT_EQ(hm.size(), 1u);
   ASSERT_TRUE(h1->get_name() == "test_host1");
   ASSERT_EQ(get_host_id(h1->get_name()), 12u);
 }

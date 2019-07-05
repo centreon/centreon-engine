@@ -243,9 +243,6 @@ void applier::hostdependency::remove_object(
   if (it != applier::state::instance().hostdependencies().end()) {
     com::centreon::engine::hostdependency* dependency(it->second.get());
 
-    // Remove host dependency from its list.
-    engine::hostdependency::hostdependencies.erase(it->first);
-
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_dependency_data(
@@ -255,6 +252,8 @@ void applier::hostdependency::remove_object(
       dependency,
       &tv);
 
+    // Remove host dependency from its list.
+    engine::hostdependency::hostdependencies.erase(it->first);
     // Erase host dependency (will effectively delete the object).
     applier::state::instance().hostdependencies().erase(it);
   }

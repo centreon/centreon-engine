@@ -307,9 +307,6 @@ void applier::servicedependency::remove_object(
     it(applier::state::instance().servicedependencies_find(obj.key()));
   if (it != applier::state::instance().servicedependencies().end()) {
 
-    // Remove service dependency from its list.
-    engine::servicedependency::servicedependencies.erase(it);
-
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_dependency_data(
@@ -319,6 +316,8 @@ void applier::servicedependency::remove_object(
       it->second.get(),
       &tv);
 
+    // Remove service dependency from its list.
+    engine::servicedependency::servicedependencies.erase(it);
     // Erase service dependency (will effectively delete the object).
     applier::state::instance().servicedependencies().erase(it);
   }
