@@ -448,7 +448,7 @@ void applier::host::remove_object(
       obj.host_name(),
       "",
       (time_t)0,
-      nullptr);
+      "");
 
     // Remove events related to this host.
     applier::scheduler::instance().remove_host(obj);
