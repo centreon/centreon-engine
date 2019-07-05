@@ -213,7 +213,6 @@ class                           service : public notifier {
   int                           acknowledgement_type;
   int                           check_flapping_recovery_notification;
   int                           is_being_freshened;
-  int                           current_notification_number;
   uint64_t                      current_notification_id;
   int                           check_options;
   uint64_t                      flapping_comment_id;
