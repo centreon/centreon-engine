@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <unordered_map>
 #include <unistd.h>
 #include "com/centreon/concurrency/locker.hh"
@@ -146,6 +147,7 @@ void applier::state::apply(
  *  @return Singleton instance.
  */
 applier::state& applier::state::instance() {
+  assert(_instance);
   return *_instance;
 }
 

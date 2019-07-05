@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <cstring>
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
@@ -91,6 +92,7 @@ void applier::macros::apply(configuration::state& config) {
  *  @return Singleton instance.
  */
 applier::macros& applier::macros::instance() {
+  assert(_instance);
   return (*_instance);
 }
 

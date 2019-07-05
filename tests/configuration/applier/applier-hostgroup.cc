@@ -107,8 +107,8 @@ TEST_F(ApplierHostGroup, NewHostGroup) {
   ASSERT_NO_THROW(hst_aply.resolve_object(hst_c));
   ASSERT_NO_THROW(hg_aply.resolve_object(hg));
 
-  ASSERT_EQ(engine::hostgroup::hostgroups.size(), 1);
-  ASSERT_EQ(engine::hostgroup::hostgroups.begin()->second->members.size(), 3);
+  ASSERT_EQ(engine::hostgroup::hostgroups.size(), 1u);
+  ASSERT_EQ(engine::hostgroup::hostgroups.begin()->second->members.size(), 3u);
 }
 
 // Given a host configuration
@@ -153,7 +153,8 @@ TEST_F(ApplierHostGroup, HostRenamed) {
   ASSERT_NO_THROW(hst_aply.expand_objects(*config));
   ASSERT_NO_THROW(hg_aply.expand_objects(*config));
 
-  ASSERT_EQ(engine::hostgroup::hostgroups.size(), 1);
-  ASSERT_EQ(engine::hostgroup::hostgroups.begin()->second->members.size(), 2);
-  ASSERT_TRUE(engine::hostgroup::hostgroups.begin()->second->get_group_name() == "temp_hg");
+  ASSERT_EQ(engine::hostgroup::hostgroups.size(), 1u);
+  ASSERT_EQ(engine::hostgroup::hostgroups.begin()->second->members.size(), 2u);
+  ASSERT_EQ(engine::hostgroup::hostgroups.begin()->second->get_group_name(),
+            "temp_hg");
 }

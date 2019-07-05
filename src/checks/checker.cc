@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
@@ -57,6 +58,7 @@ static checker* _instance = nullptr;
  *  @return This singleton.
  */
 checker& checker::instance() {
+  assert(_instance);
   return *_instance;
 }
 

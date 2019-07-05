@@ -52,11 +52,11 @@ class ServiceNotification : public TestEngine {
   void SetUp() override {
     if (!config)
       config = new configuration::state;
+    timezone_manager::load();
     configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
     checks::checker::load();
-    timezone_manager::load();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{valid_contact_config()};
@@ -93,12 +93,12 @@ class ServiceNotification : public TestEngine {
   }
 
   void TearDown() override {
-    process_manager::unload();
-    timezone_manager::unload();
     configuration::applier::state::unload();
+    checks::checker::unload();
     delete config;
     config = NULL;
-    checks::checker::unload();
+    timezone_manager::unload();
+    process_manager::unload();
   }
 
  protected:

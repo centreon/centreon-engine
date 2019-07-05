@@ -148,7 +148,7 @@ void applier::service::_update(
              : notifier::none));
 
     if (state.current_notification_number().is_set())
-      obj.current_notification_number = *state.current_notification_number();
+      obj.set_notification_number(*state.current_notification_number());
     if (state.current_notification_id().is_set())
       obj.set_current_notification_id(*state.current_notification_id());
     if (state.last_notification().is_set())

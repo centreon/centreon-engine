@@ -286,8 +286,6 @@ bool service::operator==(service const& other) {
          get_last_notification() == other.get_last_notification() &&
          get_next_notification() == other.get_next_notification() &&
          get_no_more_notifications() == other.get_no_more_notifications() &&
-         this->check_flapping_recovery_notification ==
-             other.check_flapping_recovery_notification &&
          get_last_state_change() == other.get_last_state_change() &&
          get_last_hard_state_change() == other.get_last_hard_state_change() &&
          _last_time_ok == other.get_last_time_ok() &&
@@ -297,8 +295,7 @@ bool service::operator==(service const& other) {
          get_has_been_checked() == other.get_has_been_checked() &&
          this->is_being_freshened == other.is_being_freshened &&
          get_notified_on() == other.get_notified_on() &&
-         this->current_notification_number ==
-             other.current_notification_number &&
+         get_notification_number() == other.get_notification_number() &&
          this->current_notification_id == other.current_notification_id &&
          get_latency() == other.get_latency() &&
          get_execution_time() == other.get_execution_time() &&
@@ -553,8 +550,6 @@ std::ostream& operator<<(std::ostream& os,
      << string::ctime(obj.get_next_notification())
      << "\n  no_more_notifications:                "
      << obj.get_no_more_notifications()
-     << "\n  check_flapping_recovery_notification: "
-     << obj.check_flapping_recovery_notification
      << "\n  last_state_change:                    "
      << string::ctime(obj.get_last_state_change())
      << "\n  last_hard_state_change:               "
@@ -576,7 +571,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  notified_on_critical:                 "
      << obj.get_notified_on(notifier::critical)
      << "\n  current_notification_number:          "
-     << obj.current_notification_number
+     << obj.get_notification_number()
      << "\n  current_notification_id:              "
      << obj.current_notification_id
      << "\n  latency:                              " << obj.get_latency()
@@ -2565,13 +2560,6 @@ void service::set_flap(double percent_change,
                        SERVICE_FLAPPING, this, percent_change, high_threshold,
                        low_threshold, nullptr);
 
-  /* see if we should check to send a recovery notification out when flapping
-   * stops */
-  if (_current_state != service::state_ok && this->current_notification_number > 0)
-    this->check_flapping_recovery_notification = true;
-  else
-    this->check_flapping_recovery_notification = false;
-
   /* send a notification */
   if (allow_flapstart_notification)
     notify(reason_flappingstart, "", "",
@@ -2613,12 +2601,7 @@ void service::clear_flap(double percent_change,
   notify(reason_flappingstop, "", "", notification_option_none);
 
   /* should we send a recovery notification? */
-  if (this->check_flapping_recovery_notification &&
-      _current_state == service::state_ok)
-    notify(reason_normal, "", "", notification_option_none);
-
-  /* clear the recovery notification flag */
-  this->check_flapping_recovery_notification = false;
+  notify(reason_recovery, "", "", notification_option_none);
 }
 
 /* enables flap detection for a specific service */
@@ -2688,15 +2671,6 @@ void service::update_status(bool aggregated_dump) {
   if (!aggregated_dump)
     broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE, NEBFLAG_NONE,
                           NEBATTR_NONE, this, nullptr);
-}
-
-/* sets the current notification number for a specific service */
-void service::set_notification_number(int num) {
-  /* set the notification number */
-  current_notification_number = num;
-
-  /* update the status log with the service info */
-  update_status(false);
 }
 
 /**
@@ -3362,9 +3336,9 @@ bool service::is_valid_escalation_for_notification(
    * previous problem
    */
   if (_current_state == service::state_ok)
-    notification_number = current_notification_number - 1;
+    notification_number = get_notification_number() - 1;
   else
-    notification_number = current_notification_number;
+    notification_number = get_notification_number();
 
   /* find the service this escalation entry is associated with */
   if (e->notifier_ptr != this)
@@ -3558,20 +3532,11 @@ void service::handle_flap_detection_disabled() {
       notification_option_none);
 
     /* should we send a recovery notification? */
-    if (this->check_flapping_recovery_notification
-        && this->_current_state == service::state_ok)
-      this->notify(
-        reason_normal,
-        "",
-        "",
-        notification_option_none);
-
-    /* clear the recovery notification flag */
-    this->check_flapping_recovery_notification = false;
+    notify(reason_recovery, "", "", notification_option_none);
   }
 
   /* update service status */
-  this->update_status(false);
+  update_status(false);
 }
 
 bool service::get_is_volatile() const {

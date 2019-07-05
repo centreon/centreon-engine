@@ -258,7 +258,7 @@ struct grab_service_redirection {
        {&get_duration_sec_old<service>, true}},
       // Notification number.
       {MACRO_SERVICENOTIFICATIONNUMBER,
-       {&get_member_as_string< service, int, &service::current_notification_number>,
+       {&get_member_as_string< service, int, notifier, &notifier::get_notification_number>,
         true}},
       // Notification ID.
       {MACRO_SERVICENOTIFICATIONID,

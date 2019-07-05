@@ -48,16 +48,16 @@ class ApplierCommand : public ::testing::Test {
     if (config == nullptr)
       config = new configuration::state;
     applier::state::load();  // Needed to create a contact
-    checks::checker::load();
     timezone_manager::load();
+    checks::checker::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
     checks::checker::unload();
-    timezone_manager::unload();
     delete config;
     config = nullptr;
+    timezone_manager::unload();
   }
 
 };

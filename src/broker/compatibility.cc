@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
@@ -45,7 +46,8 @@ extern "C" {
  *  Get instance of compatibility singleton.
  */
 compatibility& compatibility::instance() {
-  return (*_instance);
+  assert(_instance);
+  return *_instance;
 }
 
 /**
@@ -54,7 +56,6 @@ compatibility& compatibility::instance() {
 void compatibility::load() {
   if (!_instance)
     _instance = new compatibility;
-  return;
 }
 
 /**
@@ -63,7 +64,6 @@ void compatibility::load() {
 void compatibility::unload() {
   delete _instance;
   _instance = NULL;
-  return;
 }
 
 /**

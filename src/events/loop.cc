@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <cstdlib>
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
@@ -47,7 +48,8 @@ static loop* _instance = NULL;
  *  @return The singleton.
  */
 loop& loop::instance() {
-  return (*_instance);
+  assert(_instance);
+  return *_instance;
 }
 
 /**

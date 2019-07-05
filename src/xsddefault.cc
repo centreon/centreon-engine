@@ -353,7 +353,7 @@ int xsddefault_save_status_data() {
          "\tlast_check=" << static_cast<unsigned long>(it->second->get_last_check()) << "\n"
          "\tnext_check=" << static_cast<unsigned long>(it->second->get_next_check()) << "\n"
          "\tcheck_options=" << it->second->check_options << "\n"
-         "\tcurrent_notification_number=" << it->second->current_notification_number << "\n"
+         "\tcurrent_notification_number=" << it->second->get_notification_number() << "\n"
          "\tcurrent_notification_id=" << it->second->current_notification_id << "\n"
          "\tlast_notification=" << static_cast<unsigned long>(it->second->get_last_notification()) << "\n"
          "\tnext_notification=" << static_cast<unsigned long>(it->second->get_next_notification()) << "\n"
