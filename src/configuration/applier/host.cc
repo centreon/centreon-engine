@@ -466,7 +466,7 @@ void applier::host::remove_object(
       &tv);
 
     // Erase host object (will effectively delete the object).
-    engine::host::hosts.erase(obj.host_name());
+    engine::host::hosts.erase(it->second->get_name());
     engine::host::hosts_by_id.erase(it);
   }
 
