@@ -648,7 +648,7 @@ int notifier::notify(notifier::reason_type type,
       get_contacts_to_notify(cat, type, get_current_state_int())};
 
   /* Let's make the notification. */
-  int retval{notif->execute(std::move(to_notify))};
+  int retval{notif->execute(to_notify)};
 
   if (retval == OK) {
     _last_notification = std::time(nullptr);
@@ -657,10 +657,11 @@ int notifier::notify(notifier::reason_type type,
      * Should we increment the notification number? */
     if (cat == cat_normal)
       _notification_number++;
-    else if (cat == cat_recovery)
-      _notification[cat_normal].reset();
-    else
+    else {
+      if (cat == cat_recovery)
+        _notification[cat_normal].reset();
       _notification_number = 0;
+    }
   }
 
   return retval;

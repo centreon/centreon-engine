@@ -670,3 +670,65 @@ TEST_F(ServiceNotification, CheckNotifIntervZero) {
   ASSERT_EQ(step3, std::string::npos);
   ASSERT_NE(step4, std::string::npos);
 }
+
+// Given a service with a notification interval = 0 and a
+// first_delay_notification = 0
+// When a normal notification is sent and then it is recovered.
+// Then at the next problem, a new normal notification is sent.
+TEST_F(ServiceNotification, NormalRecoveryTwoTimes) {
+  int now{50000};
+  set_time(now);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_notification_interval(0);
+  _svc->set_accept_passive_checks(true);
+  testing::internal::CaptureStdout();
+
+  for (int j = 0; j < 2; j++) {
+    for (int i = 0; i < 3; i++) {
+      // When i == 0, the state_critical is soft => no notification
+      // When i == 1, the state_critical is soft => no notification
+      // When i == 2, the state_critical is hard down => notification
+      now += 500;
+      set_time(now);
+      _svc->set_last_state(_svc->get_current_state());
+      if (notifier::hard == _svc->get_state_type())
+        _svc->set_last_hard_state(_svc->get_current_state());
+
+      std::ostringstream oss;
+      std::time_t now{std::time(nullptr)};
+      oss << '[' << now << ']'
+          << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      std::string cmd{oss.str()};
+      process_external_command(cmd.c_str());
+      checks::checker::instance().reap();
+    }
+
+    for (int i = 0; i < 2; i++) {
+      // When i == 0, the state_ok is hard (return to up) => Recovery notification
+      // When i == 1, the state_ok is still here (no change) => no notification
+      now += 500;
+      set_time(now);
+      std::ostringstream oss;
+      std::time_t now{std::time(nullptr)};
+      oss << '[' << now << ']'
+          << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      std::string cmd{oss.str()};
+      process_external_command(cmd.c_str());
+      checks::checker::instance().reap();
+    }
+  }
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t step1{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;CRITICAL;cmd;service critical")};
+  size_t step2{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY (OK);cmd;service ok", step1 + 1)};
+  size_t step3{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;CRITICAL;cmd;service critical", step2 + 1)};
+  size_t step4{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY (OK);cmd;service ok", step3 + 1)};
+  ASSERT_NE(step4, std::string::npos);
+}

@@ -67,7 +67,7 @@ notification::notification(notifier* parent,
   }
 }
 
-int notification::execute(std::unordered_set<contact*>&& to_notify) {
+int notification::execute(std::unordered_set<contact*> const& to_notify) {
   uint32_t contacts_notified{0};
 
   struct timeval start_time;

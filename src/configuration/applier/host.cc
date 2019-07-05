@@ -430,8 +430,7 @@ void applier::host::modify_object(
  *
  *  @param[in] obj The new host to remove from the monitoring engine.
  */
-void applier::host::remove_object(
-                      configuration::host const& obj) {
+void applier::host::remove_object(configuration::host const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing host '" << obj.host_name() << "'.";
