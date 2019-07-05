@@ -45,7 +45,7 @@ notification::notification(notifier* parent,
     case notifier::reason_normal:
       _category = notifier::cat_normal;
       break;
-      case notifier::reason_recovery:
+    case notifier::reason_recovery:
       _category = notifier::cat_recovery;
       break;
     case notifier::reason_acknowledgement:
@@ -67,7 +67,7 @@ notification::notification(notifier* parent,
   }
 }
 
-int notification::execute(std::unordered_set<contact*>&& to_notify) {
+int notification::execute(std::unordered_set<contact*> const& to_notify) {
   uint32_t contacts_notified{0};
 
   struct timeval start_time;
@@ -97,10 +97,9 @@ int notification::execute(std::unordered_set<contact*>&& to_notify) {
   if (it != contact::contacts.end())
     author = it->second.get();
   else {
-    for (contact_map::const_iterator
-        cit{contact::contacts.begin()},
-        cend{contact::contacts.end()};
-        cit != cend; ++cit) {
+    for (contact_map::const_iterator cit{contact::contacts.begin()},
+         cend{contact::contacts.end()};
+         cit != cend; ++cit) {
       if (cit->second->get_alias() == _author) {
         author = cit->second.get();
         break;
@@ -157,17 +156,18 @@ int notification::execute(std::unordered_set<contact*>&& to_notify) {
     /* set the notification number macro */
     mac.x[MACRO_HOSTNOTIFICATIONNUMBER] = std::to_string(_number);
 
-    /* The $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility */
+    /* The $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
+     */
     mac.x[MACRO_NOTIFICATIONNUMBER] = mac.x[MACRO_HOSTNOTIFICATIONNUMBER];
 
     /* Set the notification id macro */
     mac.x[MACRO_HOSTNOTIFICATIONID] = std::to_string(_id);
-  }
-  else {
+  } else {
     /* set the notification number macro */
     mac.x[MACRO_SERVICENOTIFICATIONNUMBER] = std::to_string(_number);
 
-    /* The $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility */
+    /* The $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
+     */
     mac.x[MACRO_NOTIFICATIONNUMBER] = mac.x[MACRO_SERVICENOTIFICATIONNUMBER];
 
     /* Set the notification id macro */

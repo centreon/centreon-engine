@@ -102,6 +102,8 @@ notifier::notifier(notifier::notifier_type notifier_type,
           timezone},
       notification_period_ptr{nullptr},
       _notifier_type{notifier_type},
+      _stalk_type{0},
+      _flap_type{0},
       _notification_interval{notification_interval},
       _notification_period{notification_period},
       _first_notification_delay{first_notification_delay},
@@ -110,12 +112,9 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _problem_has_been_acknowledged{false},
       _has_been_checked{false},
       _no_more_notifications{false},
-      _stalk_type{0},
       _notification_number{0},
-      _flap_type{0},
       _state_history{},
       _pending_flex_downtime{0} {
-
   if (notification_interval < 0 || check_interval < 0 || retry_interval <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for notifier '"
@@ -206,36 +205,39 @@ bool notifier::_is_notification_viable_normal(
     return false;
   }
 
-  /* if this notifier is currently in a scheduled downtime period, don't send the notification */
+  /* if this notifier is currently in a scheduled downtime period, don't send
+   * the notification */
   if (is_in_downtime()) {
     logger(dbg_notifications, more)
-      << "This notifier is currently in a scheduled downtime, so "
-      "we won't send notifications.";
+        << "This notifier is currently in a scheduled downtime, so "
+           "we won't send notifications.";
     return false;
   }
 
   /* if this notifier is flapping, don't send the notification */
   if (get_is_flapping()) {
     logger(dbg_notifications, more)
-      << "This notifier is flapping, so we won't send notifications.";
+        << "This notifier is flapping, so we won't send notifications.";
     return false;
   }
 
   if (get_state_type() != hard) {
     logger(dbg_notifications, more)
-      << "This notifier is in soft state, so we won't send notifications.";
+        << "This notifier is in soft state, so we won't send notifications.";
     return false;
   }
 
   if (get_problem_has_been_acknowledged()) {
     logger(dbg_notifications, more)
-      << "This notifier problem has been acknowledged, so we won't send notifications.";
+        << "This notifier problem has been acknowledged, so we won't send "
+           "notifications.";
     return false;
   }
 
   if (!get_notify_on_current_state()) {
     logger(dbg_notifications, more)
-      << "This notifier is not configured to notify the state " << get_current_state_as_string();
+        << "This notifier is not configured to notify the state "
+        << get_current_state_as_string();
     return false;
   }
 
@@ -253,18 +255,19 @@ bool notifier::_is_notification_viable_normal(
   if (_notification_number >= 1) {
     if (_notification_interval == 0) {
       logger(dbg_notifications, more)
-        << "This notifier problem has already been sent at " << _last_notification
-        << " so, since the notification interval is 0, it won't be sent"
-        << " anymore";
+          << "This notifier problem has already been sent at "
+          << _last_notification
+          << " so, since the notification interval is 0, it won't be sent"
+          << " anymore";
       return false;
     }
     else if (_notification_interval > 0) {
       if (_last_notification + _notification_interval * config->interval_length()
           > now) {
         logger(dbg_notifications, more)
-          << "This notifier problem has been sent at " << _last_notification
-          << " so it won't be sent until "
-          << (_notification_interval * config->interval_length());
+            << "This notifier problem has been sent at " << _last_notification
+            << " so it won't be sent until "
+            << (_notification_interval * config->interval_length());
         return false;
       }
     }
@@ -349,15 +352,15 @@ bool notifier::_is_notification_viable_recovery(
 
   if (_notification_number == 0) {
     logger(dbg_notifications, more)
-      << "No notification has been sent to announce a problem. So no recovery"
-      << " notification will be sent";
+        << "No notification has been sent to announce a problem. So no recovery"
+        << " notification will be sent";
     return false;
   }
 
   if (!_notification[cat_normal]) {
     logger(dbg_notifications, more)
-      << "We should not send a notification since no normal notification has"
-         " been sent before";
+        << "We should not send a notification since no normal notification has"
+           " been sent before";
     return false;
   }
   return true;
@@ -392,8 +395,8 @@ bool notifier::_is_notification_viable_acknowledgement(
   }
 
   if (get_current_state_int() == 0) {
-    logger(dbg_notifications, more)
-      << "The notifier is currently OK/UP, so we won't send an acknowledgement.";
+    logger(dbg_notifications, more) << "The notifier is currently OK/UP, so we "
+                                       "won't send an acknowledgement.";
     return false;
   }
   return true;
@@ -402,8 +405,7 @@ bool notifier::_is_notification_viable_acknowledgement(
 bool notifier::_is_notification_viable_flapping(
     reason_type type,
     notification_option options) const {
-  logger(dbg_functions, basic)
-      << "notifier::is_notification_viable_flapping()";
+  logger(dbg_functions, basic) << "notifier::is_notification_viable_flapping()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -454,8 +456,8 @@ bool notifier::_is_notification_viable_flapping(
 
   /* Don't send notifications during scheduled downtime */
   if (is_in_downtime()) {
-    logger(dbg_notifications, more)
-      << "We shouldn't notify about FLAPPING events during scheduled downtime.";
+    logger(dbg_notifications, more) << "We shouldn't notify about FLAPPING "
+                                       "events during scheduled downtime.";
     return false;
   }
   return true;
@@ -516,8 +518,7 @@ bool notifier::_is_notification_viable_downtime(
 bool notifier::_is_notification_viable_custom(
     reason_type type __attribute__((unused)),
     notification_option options) const {
-  logger(dbg_functions, basic)
-      << "notifier::is_notification_viable_custom()";
+  logger(dbg_functions, basic) << "notifier::is_notification_viable_custom()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -544,7 +545,7 @@ bool notifier::_is_notification_viable_custom(
   /* Don't send notifications during scheduled downtime */
   if (is_in_downtime()) {
     logger(dbg_notifications, more)
-      << "We shouldn't send a CUSTOM notification during scheduled downtime.";
+        << "We shouldn't send a CUSTOM notification during scheduled downtime.";
     return false;
   }
   return true;
@@ -558,10 +559,9 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
 
   /* Let's start looking at escalations */
   for (std::list<std::shared_ptr<escalation>>::const_iterator
-         it{_escalations.begin()},
-         end{_escalations.end()};
-       it != end;
-       ++it) {
+           it{_escalations.begin()},
+       end{_escalations.end()};
+       it != end; ++it) {
     if ((*it)->is_viable(get_current_state_int(), _notification_number)) {
       /* Construction of the set containing contacts to notify. We don't know
        * for the moment if those contacts accept notification. */
@@ -612,7 +612,10 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
 notifier::notification_category notifier::get_category(reason_type type) const {
   if (type == 99)
     return cat_custom;
-  notification_category cat[] = {cat_normal, cat_recovery, cat_acknowledgement, cat_flapping, cat_flapping, cat_flapping, cat_downtime, cat_downtime, cat_downtime, cat_custom};
+  notification_category cat[] = {
+      cat_normal,   cat_recovery, cat_acknowledgement, cat_flapping,
+      cat_flapping, cat_flapping, cat_downtime,        cat_downtime,
+      cat_downtime, cat_custom};
   return cat[static_cast<size_t>(type)];
 }
 
@@ -626,7 +629,6 @@ int notifier::notify(notifier::reason_type type,
                      std::string const& not_author,
                      std::string const& not_data,
                      notification_option options) {
-
   logger(dbg_functions, basic) << "notifier::notify()";
   notification_category cat{get_category(type)};
 
@@ -648,7 +650,7 @@ int notifier::notify(notifier::reason_type type,
       get_contacts_to_notify(cat, type, get_current_state_int())};
 
   /* Let's make the notification. */
-  int retval{notif->execute(std::move(to_notify))};
+  int retval{notif->execute(to_notify)};
 
   if (retval == OK) {
     _last_notification = std::time(nullptr);
@@ -657,10 +659,11 @@ int notifier::notify(notifier::reason_type type,
      * Should we increment the notification number? */
     if (cat == cat_normal)
       _notification_number++;
-    else if (cat == cat_recovery)
-      _notification[cat_normal].reset();
-    else
+    else {
+      if (cat == cat_recovery)
+        _notification[cat_normal].reset();
       _notification_number = 0;
+    }
   }
 
   return retval;
@@ -1116,11 +1119,11 @@ void notifier::add_modified_attributes(uint32_t attr) {
   _modified_attributes |= attr;
 }
 
-std::list<std::shared_ptr<escalation> >& notifier::get_escalations() {
+std::list<std::shared_ptr<escalation>>& notifier::get_escalations() {
   return _escalations;
 }
 
-std::list<std::shared_ptr<escalation> > const& notifier::get_escalations()
+std::list<std::shared_ptr<escalation>> const& notifier::get_escalations()
     const {
   return _escalations;
 }
@@ -1143,7 +1146,8 @@ bool notifier::is_escalated_contact(contact* cntct) const {
 
   for (std::shared_ptr<escalation> const& e : get_escalations()) {
     // Search all contacts of this host escalation.
-    contact_map_unsafe::const_iterator itt{e->contacts().find(cntct->get_name())};
+    contact_map_unsafe::const_iterator itt{
+        e->contacts().find(cntct->get_name())};
     if (itt != e->contacts().end()) {
       assert(itt->second == cntct);
       return true;
@@ -1152,8 +1156,7 @@ bool notifier::is_escalated_contact(contact* cntct) const {
     // Search all contactgroups of this host escalation.
     for (contactgroup_map_unsafe::iterator itt(e->contact_groups().begin()),
          end(e->contact_groups().begin());
-         itt != end;
-         ++itt)
+         itt != end; ++itt)
       if (itt->second->get_members().find(cntct->get_name()) !=
           itt->second->get_members().end())
         return true;
@@ -1391,7 +1394,8 @@ contactgroup_map_unsafe const& notifier::get_contactgroups() const {
  *
  *  @return true or false.
  */
-bool is_contact_for_notifier(com::centreon::engine::notifier* notif, contact* cntct) {
+bool is_contact_for_notifier(com::centreon::engine::notifier* notif,
+                             contact* cntct) {
   if (!notif || !cntct)
     return false;
 
@@ -1429,22 +1433,21 @@ void notifier::resolve(int& w, int& e) {
     size_t pos{get_event_handler().find_first_of('!')};
     std::string cmd_name{get_event_handler().substr(0, pos)};
 
-    command_map::iterator cmd_found{
-        commands::command::commands.find(cmd_name)};
+    command_map::iterator cmd_found{commands::command::commands.find(cmd_name)};
 
     if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
-        logger(log_verification_error, basic)
-        << "Error: Event handler command '" << cmd_name
-        << "' specified for host '" << get_display_name()
-        << "' not defined anywhere";
-        errors++;
-    }
-    else
+      logger(log_verification_error, basic)
+          << "Error: Event handler command '" << cmd_name
+          << "' specified for host '" << get_display_name()
+          << "' not defined anywhere";
+      errors++;
+    } else
       /* save the pointer to the event handler command for later */
       set_event_handler_ptr(cmd_found->second.get());
   }
 
-  /* hosts that don't have check commands defined shouldn't ever be checked... */
+  /* hosts that don't have check commands defined shouldn't ever be checked...
+   */
   if (!get_check_command().empty()) {
     size_t pos{get_check_command().find_first_of('!')};
     std::string cmd_name{get_check_command().substr(0, pos)};
@@ -1453,36 +1456,33 @@ void notifier::resolve(int& w, int& e) {
 
     if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
       logger(log_verification_error, basic)
-        << "Error: Notifier check command '" << cmd_name
-        << "' specified for host '" << get_display_name()
-        << "' is not defined anywhere!",
-      errors++;
-    }
-    else
+          << "Error: Notifier check command '" << cmd_name
+          << "' specified for host '" << get_display_name()
+          << "' is not defined anywhere!",
+          errors++;
+    } else
       /* save the pointer to the check command for later */
       set_check_command_ptr(cmd_found->second.get());
   }
 
   if (get_check_period().empty()) {
     logger(log_verification_error, basic)
-      << "Warning: Notifier '" << get_display_name()
-      << "' has no check time period defined!";
+        << "Warning: Notifier '" << get_display_name()
+        << "' has no check time period defined!";
     warnings++;
     check_period_ptr = nullptr;
-  }
-  else {
-    timeperiod_map::const_iterator
-      found_it{timeperiod::timeperiods.find(get_check_period())};
+  } else {
+    timeperiod_map::const_iterator found_it{
+        timeperiod::timeperiods.find(get_check_period())};
 
     if (found_it == timeperiod::timeperiods.end() || !found_it->second) {
       logger(log_verification_error, basic)
-        << "Error: Check period '" << get_check_period()
-        << "' specified for host '" << get_display_name()
-        << "' is not defined anywhere!";
+          << "Error: Check period '" << get_check_period()
+          << "' specified for host '" << get_display_name()
+          << "' is not defined anywhere!";
       errors++;
       check_period_ptr = nullptr;
-    }
-    else
+    } else
       /* save the pointer to the check timeperiod for later */
       check_period_ptr = found_it->second.get();
   }
@@ -1497,8 +1497,7 @@ void notifier::resolve(int& w, int& e) {
           << "Error: Contact '" << it->first << "' specified in notifier '"
           << get_display_name() << "' is not defined anywhere!";
       errors++;
-    }
-    else
+    } else
       /* save the pointer to the contact */
       it->second = found_it->second.get();
   }
@@ -1516,32 +1515,29 @@ void notifier::resolve(int& w, int& e) {
           << "Error: Contact group '" << it->first << "' specified in host '"
           << get_display_name() << "' is not defined anywhere!";
       errors++;
-    }
-    else
+    } else
       it->second = found_it->second.get();
   }
 
   // Check notification timeperiod.
   if (!get_notification_period().empty()) {
-    timeperiod_map::const_iterator
-      found_it{timeperiod::timeperiods.find(get_notification_period())};
+    timeperiod_map::const_iterator found_it{
+        timeperiod::timeperiods.find(get_notification_period())};
 
     if (found_it == timeperiod::timeperiods.end() || !found_it->second.get()) {
       logger(log_verification_error, basic)
-        << "Error: Notification period '" << get_notification_period()
-        << "' specified for notifier '" << get_display_name()
-        << "' is not defined anywhere!";
+          << "Error: Notification period '" << get_notification_period()
+          << "' specified for notifier '" << get_display_name()
+          << "' is not defined anywhere!";
       errors++;
       notification_period_ptr = nullptr;
-    }
-    else
+    } else
       // Save the pointer to the notification timeperiod for later.
       notification_period_ptr = found_it->second.get();
-  }
-  else if (get_notifications_enabled()) {
+  } else if (get_notifications_enabled()) {
     logger(log_verification_error, basic)
-      << "Warning: Notifier '" << get_display_name()
-      << "' has no notification time period defined!";
+        << "Warning: Notifier '" << get_display_name()
+        << "' has no notification time period defined!";
     warnings++;
     notification_period_ptr = nullptr;
   }
@@ -1550,7 +1546,8 @@ void notifier::resolve(int& w, int& e) {
   e += errors;
 
   if (e)
-    throw engine_error() << "Cannot resolve host '" << get_display_name() << "'";
+    throw engine_error() << "Cannot resolve host '" << get_display_name()
+                         << "'";
 }
 
 std::array<int, MAX_STATE_HISTORY_ENTRIES> const& notifier::get_state_history() const {

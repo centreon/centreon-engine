@@ -96,7 +96,6 @@ void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
     concurrency::locker lock(&_lock);
     _cv_lock.wake_one();
   }
-  return ;
 }
 
 /**
@@ -813,28 +812,22 @@ void applier::state::_processing(
   gettimeofday(tv, nullptr);
 
   // Expand timeperiods.
-  _expand<configuration::timeperiod, applier::timeperiod>(
-    new_cfg);
+  _expand<configuration::timeperiod, applier::timeperiod>(new_cfg);
 
   // Expand connectors.
-  _expand<configuration::connector, applier::connector>(
-    new_cfg);
+  _expand<configuration::connector, applier::connector>(new_cfg);
 
   // Expand commands.
-  _expand<configuration::command, applier::command>(
-    new_cfg);
+  _expand<configuration::command, applier::command>(new_cfg);
 
   // Expand contacts.
-  _expand<configuration::contact, applier::contact>(
-    new_cfg);
+  _expand<configuration::contact, applier::contact>(new_cfg);
 
   // Expand contactgroups.
-  _expand<configuration::contactgroup, applier::contactgroup>(
-    new_cfg);
+  _expand<configuration::contactgroup, applier::contactgroup>(new_cfg);
 
   // Expand hosts.
-  _expand<configuration::host, applier::host>(
-    new_cfg);
+  _expand<configuration::host, applier::host>(new_cfg);
 
   // Expand hostgroups.
   _expand<configuration::hostgroup, applier::hostgroup>(
