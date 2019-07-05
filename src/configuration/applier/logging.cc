@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <syslog.h>
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/globals.hh"
@@ -77,6 +78,7 @@ void applier::logging::apply(state& config) {
  *  @return Singleton instance.
  */
 applier::logging& applier::logging::instance() {
+  assert(_instance);
   return (*_instance);
 }
 

@@ -2673,15 +2673,6 @@ void service::update_status(bool aggregated_dump) {
                           NEBATTR_NONE, this, nullptr);
 }
 
-/* sets the current notification number for a specific service */
-void service::set_notification_number(int num) {
-  /* set the notification number */
-  set_notification_number(num);
-
-  /* update the status log with the service info */
-  update_status(false);
-}
-
 /**
  * @brief Checks the viability of sending out a service alert (top level
  * filters)

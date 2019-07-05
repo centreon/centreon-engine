@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <cstdlib>
 #include <map>
 #include "com/centreon/engine/broker/loader.hh"
@@ -87,6 +88,7 @@ std::list<std::shared_ptr<broker::handle> > const& loader::get_modules() const {
  *  @return Class instance.
  */
 loader& loader::instance() {
+  assert(_instance);
   return (*_instance);
 }
 

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/string.hh"
@@ -76,6 +77,7 @@ void applier::globals::apply(state& config) {
  *  @return Singleton instance.
  */
 applier::globals& applier::globals::instance() {
+  assert(_instance);
   return (*_instance);
 }
 

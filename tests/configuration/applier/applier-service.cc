@@ -21,6 +21,7 @@
 #include <memory>
 #include "../../test_engine.hh"
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
@@ -46,10 +47,12 @@ class ApplierService : public TestEngine {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load(); // Needed to create a contact
+    checks::checker::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
+    checks::checker::unload();
     delete config;
     config = NULL;
     ASSERT_TRUE(engine::host::hosts.empty());

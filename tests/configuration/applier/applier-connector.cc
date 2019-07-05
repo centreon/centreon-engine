@@ -19,12 +19,14 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon;
@@ -40,12 +42,16 @@ class ApplierConnector : public ::testing::Test {
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
+    timezone_manager::load();
+    checks::checker::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
+    checks::checker::unload();
     delete config;
-    config = NULL;
+    config = nullptr;
+    timezone_manager::unload();
   }
 
 };

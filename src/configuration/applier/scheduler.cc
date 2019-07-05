@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstring>
@@ -184,6 +185,7 @@ void applier::scheduler::apply(
  *  @return Singleton instance.
  */
 applier::scheduler& applier::scheduler::instance() {
+  assert(_instance);
   return (*_instance);
 }
 

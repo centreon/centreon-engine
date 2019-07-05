@@ -50,10 +50,10 @@ class HostNotification : public TestEngine {
   void SetUp() override {
     if (!config)
       config = new configuration::state;
+    timezone_manager::load();
     configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
-    timezone_manager::load();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{valid_contact_config()};
@@ -75,11 +75,11 @@ class HostNotification : public TestEngine {
   }
 
   void TearDown() override {
-    process_manager::unload();
-    timezone_manager::unload();
     configuration::applier::state::unload();
     delete config;
     config = NULL;
+    timezone_manager::unload();
+    process_manager::unload();
   }
 
  protected:
