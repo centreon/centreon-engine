@@ -20,6 +20,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -35,7 +36,9 @@ extern configuration::state* config;
 class ConfigContact : public ::testing::Test {
  public:
   void SetUp() override {
-    if (config == NULL)
+    clib::load();
+    com::centreon::logging::engine::load();
+    if (config == nullptr)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
   }
@@ -43,7 +46,9 @@ class ConfigContact : public ::testing::Test {
   void TearDown() override {
     configuration::applier::state::unload();
     delete config;
-    config = NULL;
+    config = nullptr;
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
 };

@@ -20,6 +20,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
@@ -49,12 +50,16 @@ class ApplierContact : public ::testing::Test {
     config_warnings = 0;
     if (config == nullptr)
       config = new configuration::state;
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
     checks::checker::unload();
     delete config;
     config = nullptr;

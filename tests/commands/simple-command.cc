@@ -22,7 +22,7 @@
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/process_manager.hh"
+#include "com/centreon/clib.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -36,13 +36,13 @@ class SimpleCommand : public ::testing::Test {
 //    set_time(20);
     if (config == NULL)
       config = new configuration::state;
-    process_manager::load();
+    clib::load();
     configuration::applier::state::load();  // Needed to store commands
   }
 
   void TearDown() override {
     configuration::applier::state::unload();  // Needed to store commands
-    process_manager::unload();
+    clib::unload();
     delete config;
     config = NULL;
   }

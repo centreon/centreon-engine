@@ -22,6 +22,8 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <time.h>
+#include "../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
@@ -29,8 +31,8 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/error.hh"
-#include "../timeperiod/utils.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
 using namespace com::centreon;
@@ -43,12 +45,15 @@ extern configuration::state* config;
 class HostRecovery : public ::testing::Test {
  public:
   void SetUp() override {
-    if (config == NULL)
+    clib::load();
+    com::centreon::logging::engine::load();
+    if (config == nullptr)
       config = new configuration::state;
+    timezone_manager::load();
     configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
-    timezone_manager::load();
+    checks::checker::load();
 
     configuration::applier::host hst_aply;
     configuration::host hst;
@@ -83,10 +88,13 @@ class HostRecovery : public ::testing::Test {
   }
 
   void TearDown() override {
-    timezone_manager::unload();
     configuration::applier::state::unload();
+    checks::checker::unload();
     delete config;
-    config = NULL;
+    config = nullptr;
+    timezone_manager::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
  protected:
