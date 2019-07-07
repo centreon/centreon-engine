@@ -834,8 +834,7 @@ int init_macrox_names() {
   unsigned int x = 0;
 
   /* initialize macro names */
-  for (x = 0; x < MACRO_X_COUNT; x++)
-    macro_x_names[x] = nullptr;
+  memset(macro_x_names, 0, MACRO_X_COUNT * sizeof(char*));
 
   /* initialize each macro name */
   add_macrox_name(HOSTNAME);

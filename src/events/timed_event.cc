@@ -212,7 +212,7 @@ static void _exec_event_scheduled_downtime(timed_event* event) {
   if (event->event_data) {
     handle_scheduled_downtime_by_id(*(uint64_t*)event->event_data);
     delete static_cast<unsigned long*>(event->event_data);
-    event->event_data = NULL;
+    event->event_data = nullptr;
   }
 }
 
@@ -364,8 +364,8 @@ void add_event(
   logger(dbg_functions, basic)
     << "add_event()";
 
-  event->next = NULL;
-  event->prev = NULL;
+  event->next = nullptr;
+  event->prev = nullptr;
 
   if (event_list == &event_list_low)
     quick_timed_event.insert(hash_timed_event::low, event);
@@ -419,7 +419,7 @@ void add_event(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     event,
-    NULL);
+    nullptr);
 }
 
 /**
@@ -1042,13 +1042,13 @@ bool operator==(
   else if (obj1.event_data != obj2.event_data)
     return false;
 
-  return (obj1.run_time == obj2.run_time
+  return obj1.run_time == obj2.run_time
           && obj1.recurring == obj2.recurring
           && obj1.event_interval == obj2.event_interval
           && obj1.compensate_for_time_change == obj2.compensate_for_time_change
           && obj1.timing_func == obj2.timing_func
           && obj1.event_args == obj2.event_args
-          && obj1.event_options == obj2.event_options);
+          && obj1.event_options == obj2.event_options;
 }
 
 /**

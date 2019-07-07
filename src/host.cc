@@ -769,7 +769,7 @@ std::ostream& operator<<(std::ostream& os, host_map_unsafe const& obj) {
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, host const& obj) {
-  std::shared_ptr<hostgroup> hg{obj.get_parent_groups().front()};
+  hostgroup* hg{obj.get_parent_groups().front()};
 
   std::string evt_str;
   if (obj.get_event_handler_ptr())
@@ -1365,7 +1365,6 @@ int host::log_event() {
 
 /* process results of an asynchronous host check */
 int host::handle_async_check_result_3x(check_result* queued_check_result) {
-  time_t current_time;
   enum service::service_state svc_res{service::state_ok};
   enum host::host_state hst_res{host::state_up};
   int reschedule_check{false};
@@ -1380,7 +1379,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   if (queued_check_result == nullptr)
     return ERROR;
 
-  time(&current_time);
+  time_t current_time{std::time(nullptr)};
 
   execution_time = (double)((double)(queued_check_result->get_finish_time().tv_sec -
                                      queued_check_result->get_start_time().tv_sec) +
@@ -1675,7 +1674,7 @@ int host::run_scheduled_check(int check_options, double latency) {
     /* only attempt to (re)schedule checks that should get checked... */
     if (get_should_be_scheduled()) {
       /* get current time */
-      time(&current_time);
+      current_time = time(nullptr);
 
       /* determine next time we should check the host if needed */
       /* if host has no check interval, schedule it again for 5 minutes from now
@@ -3273,6 +3272,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
         << "PASSIVE HOST CHECK: " << _name << ";" << new_state
         << ";" << get_plugin_output();
   }
+
   /******* HOST WAS DOWN/UNREACHABLE INITIALLY *******/
   if (_current_state != host::state_up) {
     logger(dbg_checks, more) << "Host was DOWN/UNREACHABLE.";
@@ -3684,7 +3684,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
     set_should_be_scheduled(true);
 
     /* get the new current time */
-    time(&current_time);
+    current_time = std::time(nullptr);
 
     /* make sure we don't get ourselves into too much trouble... */
     if (current_time > next_check)

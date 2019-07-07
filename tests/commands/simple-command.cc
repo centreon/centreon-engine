@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <mutex>
 #include <gtest/gtest.h>
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/commands/raw.hh"
@@ -33,32 +34,37 @@ extern configuration::state* config;
 class SimpleCommand : public ::testing::Test {
  public:
   void SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
+    configuration::applier::state::load();  // Needed to store commands
 //    set_time(20);
     if (config == NULL)
       config = new configuration::state;
-    clib::load();
-    configuration::applier::state::load();  // Needed to store commands
   }
 
   void TearDown() override {
     configuration::applier::state::unload();  // Needed to store commands
-    clib::unload();
     delete config;
     config = NULL;
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 };
 
 class my_listener : public commands::command_listener {
  public:
   result const& get_result() const {
+    std::lock_guard<std::mutex> guard(_mutex);
     return _res;
   }
 
   void finished(result const& res) throw () override {
+    std::lock_guard<std::mutex> guard(_mutex);
     _res = res;
   }
 
  private:
+  mutable std::mutex _mutex;
   commands::result _res;
 };
 
