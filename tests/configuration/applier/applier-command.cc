@@ -21,6 +21,7 @@
 #include <string>
 #include <unordered_map>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
@@ -30,8 +31,8 @@
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
+#include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
 
@@ -47,6 +48,8 @@ class ApplierCommand : public ::testing::Test {
   void SetUp() override {
     if (config == nullptr)
       config = new configuration::state;
+    clib::load();
+    com::centreon::logging::engine::load();
     applier::state::load();  // Needed to create a contact
     timezone_manager::load();
     checks::checker::load();
@@ -54,6 +57,8 @@ class ApplierCommand : public ::testing::Test {
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
     checks::checker::unload();
     delete config;
     config = nullptr;

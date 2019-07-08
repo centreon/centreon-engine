@@ -138,7 +138,6 @@ void applier::state::apply(
     concurrency::locker lock(&_lock);
     _cv_lock.wake_one();
   }
-  return ;
 }
 
 /**
@@ -158,7 +157,6 @@ void applier::state::load() {
   if (!_instance) {
     _instance = new applier::state;
   }
-  return ;
 }
 
 /**

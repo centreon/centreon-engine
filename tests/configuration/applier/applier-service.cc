@@ -21,6 +21,7 @@
 #include <memory>
 #include "../../test_engine.hh"
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
@@ -44,7 +45,9 @@ extern configuration::state* config;
 class ApplierService : public TestEngine {
  public:
   void SetUp() override {
-    if (config == NULL)
+    clib::load();
+    com::centreon::logging::engine::load();
+    if (config == nullptr)
       config = new configuration::state;
     configuration::applier::state::load(); // Needed to create a contact
     checks::checker::load();
@@ -54,9 +57,9 @@ class ApplierService : public TestEngine {
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;
-    config = NULL;
-    ASSERT_TRUE(engine::host::hosts.empty());
-    ASSERT_TRUE(engine::service::services.empty());
+    config = nullptr;
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 };
 

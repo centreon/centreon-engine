@@ -93,7 +93,7 @@ void applier::macros::apply(configuration::state& config) {
  */
 applier::macros& applier::macros::instance() {
   assert(_instance);
-  return (*_instance);
+  return *_instance;
 }
 
 /**

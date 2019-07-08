@@ -34,7 +34,7 @@
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 
-static loop* _instance = NULL;
+static loop* _instance = nullptr;
 
 /**************************************
 *                                     *
@@ -113,16 +113,12 @@ void loop::unload() {
  */
 loop::loop()
   : _need_reload(0),
-    _reload_running(false) {
-
-}
+    _reload_running(false) {}
 
 /**
  *  Destructor.
  */
-loop::~loop() throw () {
-
-}
+loop::~loop() throw () {}
 
 /**
  *  Slot to dispatch Centreon Engine events.

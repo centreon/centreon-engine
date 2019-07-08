@@ -18,15 +18,19 @@
 */
 
 #include <gtest/gtest.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 class      GetNextValidTimeExclusionTest : public ::testing::Test {
  public:
   void     SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();
     _computed = (time_t)-1;
     _tp = _creator.new_timeperiod();
@@ -38,6 +42,8 @@ class      GetNextValidTimeExclusionTest : public ::testing::Test {
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
   void     calendar_date_full_days_exclusion() {

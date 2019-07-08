@@ -22,6 +22,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -32,11 +33,10 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/host.hh"
-#include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
+#include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
-#include "com/centreon/process_manager.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -48,21 +48,23 @@ extern configuration::state* config;
 class ApplierHost : public ::testing::Test {
  public:
   void SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     if (config == NULL)
       config = new configuration::state;
-    configuration::applier::state::load();  // Needed to create a contact
     timezone_manager::load();
-    process_manager::load();
+    configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
-    timezone_manager::unload();
-    process_manager::unload();
     checks::checker::unload();
     delete config;
-    config = NULL;
+    config = nullptr;
+    timezone_manager::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
 };

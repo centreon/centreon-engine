@@ -21,6 +21,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -44,7 +45,9 @@ class ApplierServicegroup : public ::testing::Test {
   void SetUp() override {
     config_errors = 0;
     config_warnings = 0;
-    if (config == NULL)
+    clib::load();
+    com::centreon::logging::engine::load();
+    if (config == nullptr)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a service
     checks::checker::load();
@@ -54,7 +57,9 @@ class ApplierServicegroup : public ::testing::Test {
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;
-    config = NULL;
+    config = nullptr;
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 };
 

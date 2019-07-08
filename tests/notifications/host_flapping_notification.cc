@@ -24,6 +24,7 @@
 #include <time.h>
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -33,9 +34,9 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/timezone_manager.hh"
-#include "com/centreon/process_manager.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -47,16 +48,18 @@ extern configuration::state* config;
 class HostFlappingNotification : public TestEngine {
  public:
   void SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     if (!config)
       config = new configuration::state;
+    timezone_manager::load();
     configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
-    timezone_manager::load();
+    checks::checker::load();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{valid_contact_config()};
-    process_manager::load();
     ct_aply.add_object(ctct);
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
@@ -78,11 +81,13 @@ class HostFlappingNotification : public TestEngine {
   }
 
   void TearDown() override {
-    process_manager::unload();
-    timezone_manager::unload();
     configuration::applier::state::unload();
+    checks::checker::unload();
     delete config;
-    config = NULL;
+    config = nullptr;
+    timezone_manager::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
  protected:
