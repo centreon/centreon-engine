@@ -23,6 +23,7 @@
 
 # include "com/centreon/engine/contact.hh"
 # include "com/centreon/engine/contactgroup.hh"
+# include "com/centreon/engine/customvariable.hh"
 # include "com/centreon/engine/host.hh"
 # include "com/centreon/engine/hostgroup.hh"
 # include "com/centreon/engine/service.hh"
@@ -223,12 +224,9 @@ class nagios_macros {
   com::centreon::engine::servicegroup*  servicegroup_ptr;
   com::centreon::engine::contact*       contact_ptr;
   com::centreon::engine::contactgroup*  contactgroup_ptr;
-  std::unordered_map<std::string, com::centreon::engine::customvariable>
-                                        custom_host_vars;
-  std::unordered_map<std::string, com::centreon::engine::customvariable>
-                                        custom_service_vars;
-  std::unordered_map<std::string, com::centreon::engine::customvariable>
-                                        custom_contact_vars;
+  com::centreon::engine::map_customvar  custom_host_vars;
+  com::centreon::engine::map_customvar  custom_service_vars;
+  com::centreon::engine::map_customvar  custom_contact_vars;
 };
 
 #endif /* !CCE_MACROS_DEFINES_HH_ */

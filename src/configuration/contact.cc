@@ -305,11 +305,11 @@ bool contact::parse(char const* key, char const* value) {
   if (!strncmp(key, ADDRESS_PROPERTY, sizeof(ADDRESS_PROPERTY) - 1))
     return _set_address(key + sizeof(ADDRESS_PROPERTY) - 1, value);
   else if (key[0] == '_') {
-    std::unordered_map<std::string, customvariable>::iterator it(_customvariables.find(key + 1));
+    map_customvar::iterator it(_customvariables.find(key + 1));
     if (it == _customvariables.end())
-      _customvariables.insert({key + 1, customvariable(value)});
+      _customvariables.insert({key + 1, std::shared_ptr<customvariable>{new customvariable(value)}});
     else
-      it->second.set_value(value);
+      it->second->set_value(value);
 
     return true;
   }

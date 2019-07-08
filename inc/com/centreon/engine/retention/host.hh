@@ -58,8 +58,7 @@ namespace                         retention {
     opt<int> const&               current_notification_number() const throw ();
     opt<uint64_t> const&          current_problem_id() const throw ();
     opt<int> const&               current_state() const throw ();
-    std::unordered_map<std::string, engine::customvariable> const&
-                                  customvariables() const throw ();
+    map_customvar const&          customvariables() const throw ();
     opt<std::string> const&       event_handler() const throw ();
     opt<bool> const&              event_handler_enabled() const throw ();
     opt<bool> const&              flap_detection_enabled() const throw ();

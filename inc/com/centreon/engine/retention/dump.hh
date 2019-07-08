@@ -22,6 +22,7 @@
 
 #  include <ostream>
 #  include <unordered_map>
+#  include "com/centreon/engine/customvariable.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
@@ -42,7 +43,7 @@ namespace         retention {
     std::ostream& comments(std::ostream& os);
     std::ostream& contact(std::ostream& os, contact const& obj);
     std::ostream& contacts(std::ostream& os);
-    std::ostream& customvariables(std::ostream& os, std::unordered_map<std::string, customvariable> const& obj);
+    std::ostream& customvariables(std::ostream& os, com::centreon::engine::map_customvar const& obj);
     std::ostream& scheduled_downtime(std::ostream& os, downtimes::downtime const& obj);
     std::ostream& downtimes(std::ostream& os);
     std::ostream& header(std::ostream& os);

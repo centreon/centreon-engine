@@ -258,8 +258,7 @@ class                notifier : public checkable {
   void set_pending_flex_downtime(int pending_flex_downtime);
   virtual bool get_is_volatile() const = 0;
 
-  std::unordered_map<std::string, customvariable>
-    custom_variables;
+  map_customvar custom_variables;
 
 //  static int         add_notification(nagios_macros* mac, std::shared_ptr<contact> cntct);
 

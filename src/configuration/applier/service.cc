@@ -250,8 +250,7 @@ void applier::service::expand_objects(configuration::state& s) {
          ++it) {
       if (!s.enable_macros_filter()
           || s.macros_filter().find(it->first) != s.macros_filter().end()) {
-        customvariable& cv(const_cast<customvariable&>(it->second));
-        cv.set_sent(true);
+        it->second->set_sent(true);
       }
     }
 

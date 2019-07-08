@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_CUSTOMVARIABLE_HH
 #  define CCE_OBJECTS_CUSTOMVARIABLE_HH
 
+#  include <memory>
 #  include <unordered_map>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
@@ -63,7 +64,7 @@ class                customvariable {
   bool               _modified;
 };
 
-typedef std::unordered_map<std::string, customvariable> map_customvar;
+typedef std::unordered_map<std::string, std::shared_ptr<customvariable>> map_customvar;
 
 CCE_END()
 

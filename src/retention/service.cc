@@ -278,7 +278,7 @@ bool service::set(char const* key, char const* value) {
 
   // Custom variables.
   if ((key[0] == '_') && value[0] && value[1] && value[2]) {
-    _customvariables.insert(std::make_pair(key + 1, customvariable(key + 1, value + 2)));
+    _customvariables.insert({key + 1, std::shared_ptr<customvariable>{new customvariable(key + 1, value + 2)}});
     return true;
   }
 

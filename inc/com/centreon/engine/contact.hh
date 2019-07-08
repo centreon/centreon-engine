@@ -178,8 +178,7 @@ class                           contact {
   std::list<contactgroup*>     _contactgroups;
 
  public:
-  std::unordered_map<std::string, customvariable>
-                                custom_variables;
+  map_customvar                 custom_variables;
 
   timeperiod*                   host_notification_period_ptr;
   timeperiod*                   service_notification_period_ptr;

@@ -258,7 +258,7 @@ void applier::host::_update(
              end(state.customvariables().end());
            it != end;
            ++it)
-        obj.custom_variables[it->first].update(it->second.get_value());
+        obj.custom_variables[it->first]->update(it->second->get_value());
     }
   }
   // Adjust modified attributes if necessary.
@@ -270,8 +270,8 @@ void applier::host::_update(
   // Adjust modified attributes if no custom variable has been changed.
   if (obj.get_modified_attributes() & MODATTR_CUSTOM_VARIABLE) {
     bool at_least_one_modified(false);
-    for (std::pair<std::string, customvariable> const& cv : obj.custom_variables) {
-      if (cv.second.has_been_modified()) {
+    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : obj.custom_variables) {
+      if (cv.second->has_been_modified()) {
         at_least_one_modified = true;
         break;
       }

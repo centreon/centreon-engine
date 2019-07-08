@@ -1061,10 +1061,10 @@ int grab_macro_value_r(
   /***** X MACROS *****/
   /* see if this is an x macro */
   for (x = 0; x < MACRO_X_COUNT; x++) {
-    if (macro_x_names[x] == nullptr)
+    if (macro_x_names[x].empty())
       continue;
 
-    if (!strcmp(macro_name, macro_x_names[x])) {
+    if (macro_x_names[x] == macro_name) {
       logger(dbg_macros, most)
         << "  macros[" << x << "] (" << macro_x_names[x] << ") match.";
 

@@ -134,10 +134,10 @@ std::ostream& dump::contacts(std::ostream& os) {
  */
 std::ostream& dump::customvariables(
                 std::ostream& os,
-                std::unordered_map<std::string, customvariable> const& obj) {
-  for (std::pair<std::string, customvariable> const& cv : obj)
-    os << "_" << cv.first << "=" << cv.second.has_been_modified() << ","
-       << cv.second.get_value() << "\n";
+                map_customvar const& obj) {
+  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : obj)
+    os << "_" << cv.first << "=" << cv.second->has_been_modified() << ","
+       << cv.second->get_value() << "\n";
   return os;
 }
 

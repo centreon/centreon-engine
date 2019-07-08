@@ -85,7 +85,7 @@ int grab_standard_contact_macro_r(
 int grab_custom_object_macro_r(
       nagios_macros* mac,
       std::string const& macro_name,
-      std::unordered_map<std::string, com::centreon::engine::customvariable> const& vars,
+      com::centreon::engine::map_customvar const& vars,
       std::string& output);
 
 int init_macros();

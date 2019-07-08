@@ -686,7 +686,7 @@ int grab_standard_contactgroup_macro(
 int grab_custom_object_macro_r(
       nagios_macros* mac,
       std::string const& macro_name,
-      std::unordered_map<std::string, customvariable> const& vars,
+      map_customvar const& vars,
       std::string & output) {
   int result = ERROR;
 
@@ -696,10 +696,10 @@ int grab_custom_object_macro_r(
     return ERROR;
 
   /* get the custom variable */
-  for (std::pair<std::string, customvariable> const& cv : vars) {
+  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : vars) {
 
     if (macro_name == cv.first) {
-      output = cv.second.get_value();
+      output = cv.second->get_value();
       result = OK;
       break;
     }
@@ -829,12 +829,14 @@ int init_macros() {
  * initializes the names of macros, using this nifty little macro
  * which ensures we never add any typos to the list
  */
-#define add_macrox_name(name) macro_x_names[MACRO_##name] = string::dup(#name)
+#define add_macrox_name(name) macro_x_names[MACRO_##name] = #name
 int init_macrox_names() {
   unsigned int x = 0;
 
   /* initialize macro names */
-  memset(macro_x_names, 0, MACRO_X_COUNT * sizeof(char*));
+
+  for (x = 0; x < MACRO_X_COUNT; x++)
+    macro_x_names[x].clear();
 
   /* initialize each macro name */
   add_macrox_name(HOSTNAME);
@@ -1011,8 +1013,7 @@ int free_macrox_names() {
 
   /* free each macro name */
   for (x = 0; x < MACRO_X_COUNT; x++) {
-    delete[] macro_x_names[x];
-    macro_x_names[x] = nullptr;
+    macro_x_names[x].clear();
   }
   return OK;
 }
