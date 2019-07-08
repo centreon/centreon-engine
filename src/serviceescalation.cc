@@ -50,8 +50,6 @@ serviceescalation::serviceescalation(std::string const& hostname,
 }
 
 serviceescalation::~serviceescalation() {
-  logger(logging::dbg_config, logging::more)
-    << "Removing a service escalation (destructor).";
   // Notify event broker.
   timeval tv(get_broker_timestamp(nullptr));
   broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE, NEBFLAG_NONE,

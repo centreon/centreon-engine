@@ -636,10 +636,10 @@ void applier::service::_inherits_special_vars(
     configuration::set_host::const_iterator
       it(s.hosts_find(obj.hosts().begin()->c_str()));
     if (it == s.hosts().end())
-      throw (engine_error()
+      throw engine_error()
              << "Could not inherit special variables for service '"
              << obj.service_description() << "': host '"
-             << *obj.hosts().begin() << "' does not exist");
+             << *obj.hosts().begin() << "' does not exist";
 
     // Inherits variables.
     if (!obj.contacts_defined() && !obj.contactgroups_defined()) {

@@ -372,14 +372,9 @@ void applier::serviceescalation::_inherits_special_vars(
       || !obj.notification_interval_defined()
       || !obj.escalation_period_defined()) {
     // Find service.
-    unsigned int host_id(get_host_id(obj.hosts().front().c_str()));
-    unsigned int service_id(get_service_id(
-                   obj.hosts().front().c_str(),
-                   obj.hosts().front().c_str()));
-    configuration::set_service::const_iterator
-      it(s.services_find(std::make_pair(
-                                host_id,
-                                service_id)));
+    configuration::set_service::const_iterator it{
+      s.services_find(*obj.hosts().begin(),
+          obj.service_description().front())};
     if (it == s.services().end())
       throw (engine_error() << "Could not inherit special "
              << "variables from service '"

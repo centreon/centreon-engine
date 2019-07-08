@@ -248,7 +248,12 @@ void applier::hostescalation::resolve_object(
   logger(logging::dbg_config, logging::more) << "Resolving a host escalation.";
 
   uint64_t host_id{get_host_id(*obj.hosts().begin())};
+
   host_id_map::iterator it{engine::host::hosts_by_id.find(host_id)};
+  if (engine::host::hosts_by_id.end() == it)
+    throw engine_error() << "Cannot resolve non-existing host with id "
+           << host_id;
+
   for (std::list<std::shared_ptr<engine::escalation> >::const_iterator
            itt{it->second->get_escalations().begin()},
        end{it->second->get_escalations().end()};
@@ -260,12 +265,12 @@ void applier::hostescalation::resolve_object(
         (*itt)->get_notification_interval() == obj.notification_interval() &&
         (*itt)->get_escalation_period() == obj.escalation_period() &&
         (*itt)->get_escalate_on(notifier::down) ==
-            (obj.escalation_options() & configuration::hostescalation::down) &&
+            static_cast<bool>(obj.escalation_options() & configuration::hostescalation::down) &&
         (*itt)->get_escalate_on(notifier::unreachable) ==
-            (obj.escalation_options() &
+            static_cast<bool>(obj.escalation_options() &
              configuration::hostescalation::unreachable) &&
         (*itt)->get_escalate_on(notifier::recovery) ==
-            (obj.escalation_options() &
+            static_cast<bool>(obj.escalation_options() &
              configuration::hostescalation::recovery)) {
       // Resolve host escalation.
       (*itt)->resolve(config_warnings, config_errors);
@@ -320,10 +325,10 @@ void applier::hostescalation::_inherits_special_vars(
       !obj.escalation_period_defined()) {
     // Find host.
     configuration::set_host::const_iterator it(
-        s.hosts_find(get_host_id(obj.hosts().begin()->c_str())));
+        s.hosts_find(*obj.hosts().begin()));
     if (it == s.hosts().end())
-      throw(engine_error() << "Could not inherit special variables from host '"
-                           << *obj.hosts().begin() << "': host does not exist");
+      throw engine_error() << "Could not inherit special variables from host '"
+                           << *obj.hosts().begin() << "': host does not exist";
 
     // Inherits variables.
     if (!obj.contacts_defined())

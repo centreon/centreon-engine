@@ -253,14 +253,14 @@ void applier::host::modify_object(
   // Find the configuration object.
   set_host::iterator it_cfg(config->hosts_find(obj.key()));
   if (it_cfg == config->hosts().end())
-    throw (engine_error() << "Cannot modify non-existing host '"
-           << obj.host_name() << "'");
+    throw engine_error() << "Cannot modify non-existing host '"
+           << obj.host_name() << "'";
 
   // Find host object.
   host_id_map::iterator it_obj(engine::host::hosts_by_id.find(obj.key()));
   if (it_obj == engine::host::hosts_by_id.end())
-    throw (engine_error() << "Could not modify non-existing "
-           << "host object '" << obj.host_name() << "'");
+    throw engine_error() << "Could not modify non-existing "
+           << "host object '" << obj.host_name() << "'";
 
   // Update the global configuration set.
   configuration::host obj_old(*it_cfg);
