@@ -105,3 +105,60 @@ TEST_F(ServiceExternalCommand, AddServiceDowntime) {
 
   ASSERT_NE(out.find("PASSIVE SERVICE CHECK"), std::string::npos);
 }
+
+TEST_F(ServiceExternalCommand, AddServiceComment) {
+  configuration::applier::host hst_aply;
+  configuration::applier::service svc_aply;
+  configuration::applier::command cmd_aply;
+  configuration::service svc;
+  configuration::host hst;
+  configuration::command cmd("cmd");
+
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+
+  ASSERT_TRUE(svc.parse("host", "test_host"));
+  ASSERT_TRUE(svc.parse("service_description", "test_description"));
+  ASSERT_TRUE(svc.parse("service_id", "3"));
+
+  cmd.parse("command_line", "/usr/bin/echo 1");
+  cmd_aply.add_object(cmd);
+
+  hst.parse("check_command", "cmd");
+  svc.parse("check_command", "cmd");
+
+  hst_aply.add_object(hst);
+  svc_aply.add_object(svc);
+
+  hst_aply.expand_objects(*config);
+  svc_aply.expand_objects(*config);
+
+  hst_aply.resolve_object(hst);
+  svc_aply.resolve_object(svc);
+
+  std::string cmd_com1{"test_host;test_description;1;user;this is a first comment"};
+  std::string cmd_com2{"test_host;test_description;1;user;this is a second comment"};
+  std::string cmd_com3{"test_host;test_description;1;user;this is a third comment"};
+  std::string cmd_com4{"test_host;test_description;1;user;this is a fourth comment"};
+  std::string cmd_del{"1"};
+  std::string cmd_del_last{"5"};
+  std::string cmd_del_all{"test_host;test_description"};
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com1.c_str()));
+  ASSERT_EQ(comment::comments.size(), 1u);
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com2.c_str()));
+  ASSERT_EQ(comment::comments.size(), 2u);
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com3.c_str()));
+  ASSERT_EQ(comment::comments.size(), 3u);
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com4.c_str()));
+  ASSERT_EQ(comment::comments.size(), 4u);
+  cmd_delete_comment(CMD_ADD_SVC_COMMENT, const_cast<char *>(cmd_del.c_str()));
+  ASSERT_EQ(comment::comments.size(), 3u);
+  cmd_delete_all_comments(CMD_DEL_ALL_SVC_COMMENTS, const_cast<char *>(cmd_del_all.c_str()));
+  ASSERT_EQ(comment::comments.size(), 0u);
+}
