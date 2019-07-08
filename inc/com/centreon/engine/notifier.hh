@@ -256,6 +256,7 @@ class                notifier : public checkable {
   std::array<int, MAX_STATE_HISTORY_ENTRIES>& get_state_history();
   int get_pending_flex_downtime() const;
   void set_pending_flex_downtime(int pending_flex_downtime);
+  virtual bool get_is_volatile() const = 0;
 
   std::unordered_map<std::string, customvariable>
     custom_variables;

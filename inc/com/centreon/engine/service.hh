@@ -193,8 +193,8 @@ class                           service : public notifier {
                                   int options) const override;
   bool                          is_result_fresh(time_t current_time, int log_this);
   void                          handle_flap_detection_disabled();
-  bool                          get_is_volatile() const;
-  void                          set_is_volatile(bool vol);
+  bool get_is_volatile() const override;
+  void set_is_volatile(bool vol);
   timeperiod*                   get_notification_timeperiod() const override;
   bool                          get_notify_on_current_state() const override;
 

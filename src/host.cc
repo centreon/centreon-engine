@@ -4172,3 +4172,7 @@ void host::resolve(int& w, int& e) {
   if (errors)
     throw engine_error() << "Cannot resolve host '" << _name << "'";
 }
+
+bool host::get_is_volatile() const {
+  return false;
+}
