@@ -277,7 +277,7 @@ void applier::servicegroup::resolve_object(
     << "Removing service group '" << obj.servicegroup_name() << "'";
 
   // Find service group.
-  umap<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
+  servicegroup_map::const_iterator
     it{engine::servicegroup::servicegroups.find(obj.key())};
   if (it == engine::servicegroup::servicegroups.end())
     throw engine_error() << "Cannot resolve non-existing "

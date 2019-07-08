@@ -24,7 +24,6 @@
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 // Forward declaration.
 struct timed_event_struct;

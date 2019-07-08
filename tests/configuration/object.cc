@@ -36,7 +36,7 @@ TEST(ConfigurationObjectResolveTemplateTest, NoInheritanceOverride) {
   obj.configuration::object::parse("use parent");
   configuration::service parent;
   parent.parse("contacts", "contact2");
-  umap<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
   templates["parent"] = std::shared_ptr<configuration::object>(
     new configuration::service(parent));
   obj.resolve_template(templates);
@@ -55,7 +55,7 @@ TEST(ConfigurationObjectResolveTemplateTest, BasicInheritance) {
   obj.configuration::object::parse("use parent");
   configuration::service parent;
   parent.configuration::object::parse("contacts contact1");
-  umap<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
   templates["parent"] = std::shared_ptr<configuration::object>(
     new configuration::service(parent));
   obj.resolve_template(templates);
@@ -76,7 +76,7 @@ TEST(ConfigurationObjectResolveTemplateTest, BasicAdditiveInheritance) {
   obj.configuration::object::parse("use parent");
   configuration::service parent;
   parent.configuration::object::parse("contacts contact2");
-  umap<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
   templates["parent"] = std::shared_ptr<configuration::object>(
     new configuration::service(parent));
   obj.resolve_template(templates);
@@ -102,7 +102,7 @@ TEST(ConfigurationObjectResolveTemplateTest,
   parent1.configuration::object::parse("contacts contact2");
   configuration::service parent2;
   parent2.configuration::object::parse("contacts contact3");
-  umap<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
   templates["parent1"] = std::shared_ptr<configuration::object>(
     new configuration::service(parent1));
   templates["parent2"] = std::shared_ptr<configuration::object>(
@@ -129,7 +129,7 @@ TEST(ConfigurationObjectResolveTemplateTest,
   parent1.configuration::object::parse("contacts +contact1");
   configuration::service parent2;
   parent2.configuration::object::parse("contacts +contact2");
-  umap<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
   templates["parent1"] = std::shared_ptr<configuration::object>(
     new configuration::service(parent1));
   templates["parent2"] = std::shared_ptr<configuration::object>(
@@ -156,7 +156,7 @@ TEST(ConfigurationObjectResolveTemplateTest,
   parent1.configuration::object::parse("contacts +contact2");
   configuration::service parent2;
   parent2.configuration::object::parse("contacts +contact3");
-  umap<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
   templates["parent1"] = std::shared_ptr<configuration::object>(
     new configuration::service(parent1));
   templates["parent2"] = std::shared_ptr<configuration::object>(
@@ -200,7 +200,7 @@ TEST(ConfigurationObjectResolveTemplateTest, RecursiveAdditiveInheritance) {
     oss << "contacts +contact" << i + 2;
     parents[i].configuration::object::parse(oss.str());
   }
-  umap<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
   for (int i(0); i < 6; ++i) {
     std::ostringstream oss;
     oss << "parent" << i + 1;

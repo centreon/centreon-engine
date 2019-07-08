@@ -27,7 +27,6 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/process.hh"
 #  include "com/centreon/process_listener.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -90,7 +89,7 @@ namespace               commands {
     process*            _get_free_process();
 
     concurrency::mutex  _lock;
-    umap<process*, unsigned long>
+    std::unordered_map<process*, unsigned long>
                         _processes_busy;
     std::list<process*> _processes_free;
   };

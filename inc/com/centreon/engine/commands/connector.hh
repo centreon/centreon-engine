@@ -29,7 +29,6 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/process.hh"
 #  include "com/centreon/process_listener.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 namespace commands {
@@ -119,13 +118,13 @@ namespace                commands {
     concurrency::condvar _cv_query;
     std::string          _data_available;
     bool                 _is_running;
-    umap<unsigned long, std::shared_ptr<query_info> >
+    std::unordered_map<unsigned long, std::shared_ptr<query_info> >
                          _queries;
     bool                 _query_quit_ok;
     bool                 _query_version_ok;
     concurrency::mutex   _lock;
     process              _process;
-    umap<unsigned long, result>
+    std::unordered_map<unsigned long, result>
                          _results;
     restart              _restart;
     bool                 _try_to_restart;

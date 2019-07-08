@@ -29,7 +29,6 @@
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/service.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -77,10 +76,10 @@ class checker : public commands::command_listener {
   void finished(commands::result const& res) throw() override;
   host::host_state _execute_sync(host* hst);
 
-  umap<unsigned long, check_result> _list_id;
+  std::unordered_map<unsigned long, check_result> _list_id;
   concurrency::mutex _mut_reap;
   std::queue<check_result> _to_reap;
-  umap<unsigned long, check_result> _to_reap_partial;
+  std::unordered_map<unsigned long, check_result> _to_reap_partial;
 };
 }
 

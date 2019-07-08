@@ -30,7 +30,7 @@ class timeperiod;
 CCE_END()
 
 typedef std::unordered_multimap<std::pair<std::string, std::string>,
-  std::shared_ptr<com::centreon::engine::servicedependency>> servicedependency_mmap;
+  std::shared_ptr<com::centreon::engine::servicedependency>, pair_hash> servicedependency_mmap;
 
 CCE_BEGIN()
 class                 servicedependency : public dependency {

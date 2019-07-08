@@ -1767,17 +1767,14 @@ int service::handle_async_check_result(check_result* queued_check_result) {
          * execution */
         /* we do this because we might be sending out a notification soon and we
          * want the dependency logic to be accurate */
-        std::pair<std::string, std::string> id(
-            std::make_pair(_hostname, _description));
-        umultimap<std::pair<std::string, std::string>,
-                  std::shared_ptr<servicedependency>> const&
+        std::pair<std::string, std::string> id({_hostname, _description});
+        servicedependency_mmap const&
             dependencies(state::instance().servicedependencies());
-        for (umultimap<std::pair<std::string, std::string>,
-                       std::shared_ptr<servicedependency>>::const_iterator
-                 it(dependencies.find(id)),
-             end(dependencies.end());
+        for (servicedependency_mmap::const_iterator
+               it{dependencies.find(id)},
+               end{dependencies.end()};
              it != end && it->first == id; ++it) {
-          servicedependency* temp_dependency(&*it->second);
+          servicedependency* temp_dependency(&*it->second.get());
 
           if (temp_dependency->dependent_service_ptr == this &&
               temp_dependency->master_service_ptr != nullptr) {

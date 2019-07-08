@@ -174,7 +174,7 @@ std::ostream& operator<<(std::ostream& os, servicegroup const& obj) {
  *  @return True if the servicegroup is found, otherwise false.
  */
 bool engine::is_servicegroup_exist(std::string const& name) throw () {
-  umap<std::string, std::shared_ptr<servicegroup> >::const_iterator
+  servicegroup_map::const_iterator
     it{servicegroup::servicegroups.find(name)};
   return it != servicegroup::servicegroups.end();
 }

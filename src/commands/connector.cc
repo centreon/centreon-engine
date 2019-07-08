@@ -244,7 +244,7 @@ void connector::run(
   // Waiting result.
   concurrency::locker lock(&_lock);
   while (true) {
-    umap<unsigned long, result>::iterator
+    std::unordered_map<unsigned long, result>::iterator
       it(_results.find(command_id));
     if (it != _results.end()) {
       res = it->second;
@@ -498,7 +498,7 @@ void connector::_connector_start() {
       << _queries.size();
 
     // Resend commands.
-    for (umap<unsigned long, std::shared_ptr<query_info> >::iterator
+    for (std::unordered_map<unsigned long, std::shared_ptr<query_info> >::iterator
            it(_queries.begin()), end(_queries.end());
          it != end;
          ++it) {
@@ -622,7 +622,7 @@ void connector::_recv_query_execute(char const* data) {
       concurrency::locker lock(&_lock);
 
       // Get query information with the command_id.
-      umap<unsigned long, std::shared_ptr<query_info> >::iterator
+      std::unordered_map<unsigned long, std::shared_ptr<query_info> >::iterator
         it(_queries.find(command_id));
       if (it == _queries.end()) {
         logger(dbg_commands, basic)
@@ -831,7 +831,7 @@ void connector::restart::_run() {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _c->_name << "': " << e.what();
 
-    umap<unsigned long, std::shared_ptr<query_info> > tmp_queries;
+    std::unordered_map<unsigned long, std::shared_ptr<query_info> > tmp_queries;
     {
       concurrency::locker lock(&_c->_lock);
       _c->_try_to_restart = false;
@@ -840,7 +840,7 @@ void connector::restart::_run() {
     }
 
     // Resend commands.
-    for (umap<unsigned long, std::shared_ptr<query_info> >::iterator
+    for (std::unordered_map<unsigned long, std::shared_ptr<query_info> >::iterator
            it(tmp_queries.begin()), end(tmp_queries.end());
          it != end;
          ++it) {

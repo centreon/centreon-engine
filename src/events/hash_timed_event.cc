@@ -18,6 +18,7 @@
 */
 
 #include <cstddef>
+#include <unordered_map>
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/events/sched_info.hh"
@@ -111,7 +112,7 @@ void hash_timed_event::erase(priority p, timed_event* event) {
  *  @param[in] ptr  The event data.
  */
 timed_event* hash_timed_event::find(priority p, type t, void* ptr) {
-  umap<void*, timed_event*>::iterator it(_hevent[t][p].find(ptr));
+  std::unordered_map<void*, timed_event*>::iterator it(_hevent[t][p].find(ptr));
   if (it == _hevent[t][p].end())
     return (NULL);
   return (it->second);

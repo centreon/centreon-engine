@@ -211,7 +211,7 @@ applier::state::~state() throw() {
  *
  *  @return The current hostdependencies.
  */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> > const& applier::state::hostdependencies() const throw () {
+hostdependency_mmap const& applier::state::hostdependencies() const throw () {
   return _hostdependencies;
 }
 
@@ -220,7 +220,7 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> > 
  *
  *  @return The current hostdependencies.
  */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >& applier::state::hostdependencies() throw () {
+hostdependency_mmap& applier::state::hostdependencies() throw () {
   return _hostdependencies;
 }
 
@@ -232,8 +232,8 @@ umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >&
  *  @return Iterator to the element if found, hostdependencies().end()
  *          otherwise.
  */
-umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> >::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
-  typedef umultimap<std::string, std::shared_ptr<com::centreon::engine::hostdependency> > collection;
+hostdependency_mmap::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
+  typedef hostdependency_mmap collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _hostdependencies.equal_range(*k.dependent_hosts().begin());
   while (p.first != p.second) {
@@ -303,7 +303,7 @@ servicedependency_mmap& applier::state::servicedependencies() throw () {
  *          servicedependencies().end() otherwise.
  */
 servicedependency_mmap ::iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) {
-  typedef umultimap<std::pair<std::string, std::string>, std::shared_ptr<engine::servicedependency> > collection;
+  typedef servicedependency_mmap collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _servicedependencies.equal_range(std::make_pair(k.dependent_hosts().front(), k.dependent_service_description().front()));
   while (p.first != p.second) {

@@ -267,7 +267,7 @@ void raw::finished(process& p) throw () {
     {
       concurrency::locker lock(&_lock);
       // Find process from the busy list.
-      umap<process*, unsigned long>::iterator
+      std::unordered_map<process*, unsigned long>::iterator
         it(_processes_busy.find(&p));
       if (it == _processes_busy.end()) {
         // Put the process into the free list.

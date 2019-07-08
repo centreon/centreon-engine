@@ -122,9 +122,9 @@ void checker::reap() {
     // Merge partial check results.
     while (!_to_reap_partial.empty()) {
       // Find the two parts.
-      umap<unsigned long, check_result>::iterator
+      std::unordered_map<unsigned long, check_result>::iterator
         it_partial(_to_reap_partial.begin());
-      umap<unsigned long, check_result>::iterator
+      std::unordered_map<unsigned long, check_result>::iterator
         it_id(_list_id.find(it_partial->first));
       if (_list_id.end() == it_id) {
         logger(log_runtime_warning, basic)

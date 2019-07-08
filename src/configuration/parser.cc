@@ -252,7 +252,7 @@ void parser::_apply_serviceextinfo() {
  */
 file_info const& parser::_get_file_info(object* obj) const {
   if (obj) {
-    umap<object*, file_info>::const_iterator it(_objects_info.find(obj));
+    std::unordered_map<object*, file_info>::const_iterator it(_objects_info.find(obj));
     if (it != _objects_info.end())
       return (it->second);
   }

@@ -38,7 +38,6 @@
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -119,7 +118,7 @@ namespace              configuration {
     std::string        _current_path;
     list_object        _lst_objects[15];
     map_object         _map_objects[15];
-    umap<object*, file_info>
+    std::unordered_map<object*, file_info>
                        _objects_info;
     unsigned int       _read_options;
     static store       _store[];

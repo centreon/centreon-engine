@@ -21,7 +21,6 @@
 #  define CCE_EVENTS_HASH_TIMED_EVENT_HH
 
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 // Forward declaration.
 struct timed_event_struct;
@@ -64,7 +63,7 @@ namespace               events {
   private:
     hash_timed_event&   _internal_copy(hash_timed_event const& right);
 
-    umap<void*, timed_event_struct*>
+    std::unordered_map<void*, timed_event_struct*>
                         _hevent[type_num][priority_num];
   };
 }

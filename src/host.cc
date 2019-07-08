@@ -3614,14 +3614,13 @@ int host::process_check_result_3x(enum host::host_state new_state,
                "one depends on...";
 
           std::string id(_name);
-          umultimap<std::string, std::shared_ptr<hostdependency> > const&
+          hostdependency_mmap const&
             dependencies(state::instance().hostdependencies());
-          for (umultimap<std::string,
-                         std::shared_ptr<hostdependency> >::const_iterator
+          for (hostdependency_mmap::const_iterator
                  it{dependencies.find(id)},
                  end{dependencies.end()};
                it != end && it->first == id; ++it) {
-            hostdependency* temp_dependency(&*it->second);
+            hostdependency* temp_dependency(it->second.get());
             if (temp_dependency->dependent_host_ptr == this &&
               temp_dependency->master_host_ptr != nullptr) {
               master_host = (host*) temp_dependency->master_host_ptr;

@@ -28,7 +28,6 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/unordered_hash.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::macros;
@@ -246,7 +245,7 @@ static std::string get_host_macro_timezone(host& hst, nagios_macros* mac) {
 
 // Redirection object.
 struct grab_host_redirection {
-  typedef umap<unsigned int, std::pair<std::string (*)(host&, nagios_macros*), bool>>
+  typedef std::unordered_map<unsigned int, std::pair<std::string (*)(host&, nagios_macros*), bool>>
       entry;
   entry routines{
       {MACRO_HOSTNAME,

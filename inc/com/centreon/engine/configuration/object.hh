@@ -26,9 +26,9 @@
 #  include <memory>
 #  include <set>
 #  include <string>
+#  include <unordered_map>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/string.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 typedef std::list<std::string>             list_string;
 typedef std::set<std::string>              set_string;
@@ -72,7 +72,7 @@ namespace                  configuration {
     virtual bool           parse(char const* key, char const* value);
     virtual bool           parse(std::string const& line);
     void                   resolve_template(
-                             umap<std::string,
+    std::unordered_map<std::string,
                                std::shared_ptr<object> >& templates);
     bool                   should_register() const throw ();
     object_type            type() const throw ();
@@ -115,7 +115,7 @@ namespace                  configuration {
 
   typedef std::shared_ptr<object>       object_ptr;
   typedef std::list<object_ptr>         list_object;
-  typedef umap<std::string, object_ptr> map_object;
+  typedef std::unordered_map<std::string, object_ptr> map_object;
 }
 
 CCE_END()

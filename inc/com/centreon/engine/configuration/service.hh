@@ -229,7 +229,7 @@ namespace                  configuration {
   typedef std::shared_ptr<service> service_ptr;
   typedef std::list<service_ptr>   list_service;
   typedef std::set<service>        set_service;
-  typedef umap<std::pair<std::string, std::string>, service_ptr> map_service;
+  typedef std::unordered_map<std::pair<std::string, std::string>, service_ptr> map_service;
 }
 
 CCE_END()

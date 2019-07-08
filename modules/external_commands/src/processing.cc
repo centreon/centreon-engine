@@ -266,7 +266,7 @@ bool processing::execute(std::string const& cmdstr) const {
 
   int command_id(CMD_CUSTOM_COMMAND);
 
-  umap<std::string, command_info>::const_iterator it;
+  std::unordered_map<std::string, command_info>::const_iterator it;
   {
     concurrency::locker lock(&_mutex);
     it = _lst_command.find(command_name);
@@ -328,7 +328,7 @@ bool processing::execute(std::string const& cmdstr) const {
 bool processing::is_thread_safe(char const* cmd) const {
   char const* ptr(cmd + strspn(cmd, "[]0123456789 "));
   std::string short_cmd(ptr, strcspn(ptr, ";"));
-  umap<std::string, command_info>::const_iterator it;
+  std::unordered_map<std::string, command_info>::const_iterator it;
   concurrency::locker lock(&_mutex);
   it = _lst_command.find(short_cmd);
   return ((it != _lst_command.end()) && (it->second.thread_safe));

@@ -72,10 +72,10 @@ void applier::macros::apply(configuration::state& config) {
   _set_macro(MACRO_HOSTPERFDATAFILE, config.host_perfdata_file());
   _set_macro(MACRO_SERVICEPERFDATAFILE, config.service_perfdata_file());
 
-  umap<std::string, std::string> const& users(config.user());
+  std::unordered_map<std::string, std::string> const& users(config.user());
   applier::state::instance().user_macros() = users;
   // Save old style user macros into old style structures.
-  for (umap<std::string, std::string>::const_iterator
+  for (std::unordered_map<std::string, std::string>::const_iterator
          it = users.begin(),
          end = users.end();
        it != end;

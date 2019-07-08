@@ -3424,7 +3424,7 @@ void state::translate_passive_host_checks(bool value) {
  *
  *  @return The users resources list.
  */
-umap<std::string, std::string> const& state::user() const throw () {
+std::unordered_map<std::string, std::string> const& state::user() const throw () {
   return _users;
 }
 
@@ -3433,7 +3433,7 @@ umap<std::string, std::string> const& state::user() const throw () {
  *
  *  @param[in] value The new users list.
  */
-void state::user(umap<std::string, std::string> const& value) {
+void state::user(std::unordered_map<std::string, std::string> const& value) {
   _users = value;
 }
 
