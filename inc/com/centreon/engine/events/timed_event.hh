@@ -26,6 +26,7 @@
 #  include <list>
 #  include <stdint.h>
 #  include <time.h>
+#  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 class timed_event;
