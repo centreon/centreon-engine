@@ -167,7 +167,7 @@ void notifier::set_notification_number(int num) {
 
 bool notifier::_is_notification_viable_normal(
     reason_type type __attribute__((unused)),
-    notification_option options) const {
+    notification_option options) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
   /* On volatile services notifications are always sent */
@@ -285,97 +285,104 @@ bool notifier::_is_notification_viable_normal(
 
 bool notifier::_is_notification_viable_recovery(
     reason_type type __attribute__((unused)),
-    notification_option options __attribute__((unused))) const {
+    notification_option options __attribute__((unused))) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_recovery()";
+  bool retval{true};
+  bool send_later{false};
 
   /* are notifications enabled? */
   if (!config->enable_notifications()) {
     logger(dbg_notifications, more)
         << "Notifications are disabled, so notifications will "
            "not be sent out.";
-    return false;
+    retval = false;
   }
-
   /* are notifications temporarily disabled for this notifier? */
-  if (!get_notifications_enabled()) {
+  else if (!get_notifications_enabled()) {
     logger(dbg_notifications, more)
         << "Notifications are temporarily disabled for "
            "this notifier, so we won't send one out.";
-    return false;
+    retval = false;
+  }
+  else {
+    timeperiod* tp{get_notification_timeperiod()};
+    timezone_locker lock{get_timezone()};
+    std::time_t now;
+    std::time(&now);
+
+    if (!check_time_against_period(now, tp)) {
+      logger(dbg_notifications, more)
+          << "This notifier shouldn't have notifications sent out "
+             "at this time.";
+      retval = false;
+    }
+    /* if this notifier is currently in a scheduled downtime period, don't send
+     * the notification */
+    else if (is_in_downtime()) {
+      logger(dbg_notifications, more)
+          << "This notifier is currently in a scheduled downtime, so "
+             "we won't send notifications.";
+      retval = false;
+    }
+    /* if this notifier is flapping, don't send the notification */
+    else if (get_is_flapping()) {
+      logger(dbg_notifications, more)
+          << "This notifier is flapping, so we won't send notifications.";
+      retval = false;
+      send_later = true;
+    }
+    else if (get_state_type() != hard) {
+      logger(dbg_notifications, more)
+          << "This notifier is in soft state, so we won't send notifications.";
+      retval = false;
+      send_later = true;
+    }
+    /* Recovery is sent on state OK or UP */
+    else if (get_current_state_int() != 0 || !get_notify_on(recovery)) {
+      logger(dbg_notifications, more)
+          << "This notifier state is not UP/OK are is not configured to send a "
+             "recovery notification";
+      retval = false;
+      send_later = true;
+    }
+    else if (get_last_hard_state_change() +
+            _recovery_notification_delay * config->interval_length() >
+        now) {
+      logger(dbg_notifications, more)
+          << "This notifier is configured with a recovery notification delay. "
+          << "It won't send any recovery notification until timestamp "
+          << " so it won't be sent until "
+          << (get_last_hard_state_change() + _recovery_notification_delay);
+      retval = false;
+      send_later = true;
+    }
+    else if (_notification_number == 0) {
+      logger(dbg_notifications, more)
+          << "No notification has been sent to announce a problem. So no recovery"
+          << " notification will be sent";
+      retval = false;
+    }
+    else if (!_notification[cat_normal]) {
+      logger(dbg_notifications, more)
+          << "We should not send a notification since no normal notification has"
+             " been sent before";
+      retval = false;
+    }
   }
 
-  timeperiod* tp{get_notification_timeperiod()};
-  timezone_locker lock{get_timezone()};
-  std::time_t now;
-  std::time(&now);
-
-  if (!check_time_against_period(now, tp)) {
-    logger(dbg_notifications, more)
-        << "This notifier shouldn't have notifications sent out "
-           "at this time.";
-    return false;
+  if (!retval) {
+    if (!send_later) {
+      _notification[cat_normal].reset();
+      _notification_number = 0;
+    }
   }
 
-  /* if this notifier is currently in a scheduled downtime period, don't send
-   * the notification */
-  if (is_in_downtime()) {
-    logger(dbg_notifications, more)
-        << "This notifier is currently in a scheduled downtime, so "
-           "we won't send notifications.";
-    return false;
-  }
-
-  /* if this notifier is flapping, don't send the notification */
-  if (get_is_flapping()) {
-    logger(dbg_notifications, more)
-        << "This notifier is flapping, so we won't send notifications.";
-    return false;
-  }
-
-  if (get_state_type() != hard) {
-    logger(dbg_notifications, more)
-        << "This notifier is in soft state, so we won't send notifications.";
-    return false;
-  }
-
-  /* Recovery is sent on state OK or UP */
-  if (get_current_state_int() != 0 || !get_notify_on(recovery)) {
-    logger(dbg_notifications, more)
-        << "This notifier state is not UP/OK are is not configured to send a "
-           "recovery notification";
-    return false;
-  }
-
-  if (get_last_hard_state_change() +
-          _recovery_notification_delay * config->interval_length() >
-      now) {
-    logger(dbg_notifications, more)
-        << "This notifier is configured with a recovery notification delay. "
-        << "It won't send any recovery notification until timestamp "
-        << " so it won't be sent until "
-        << (get_last_hard_state_change() + _recovery_notification_delay);
-    return false;
-  }
-
-  if (_notification_number == 0) {
-    logger(dbg_notifications, more)
-        << "No notification has been sent to announce a problem. So no recovery"
-        << " notification will be sent";
-    return false;
-  }
-
-  if (!_notification[cat_normal]) {
-    logger(dbg_notifications, more)
-        << "We should not send a notification since no normal notification has"
-           " been sent before";
-    return false;
-  }
-  return true;
+  return retval;
 }
 
 bool notifier::_is_notification_viable_acknowledgement(
     reason_type type __attribute__((unused)),
-    notification_option options) const {
+    notification_option options) {
   logger(dbg_functions, basic)
       << "notifier::is_notification_viable_acknowledgement()";
   /* forced notifications bust through everything */
@@ -411,7 +418,7 @@ bool notifier::_is_notification_viable_acknowledgement(
 
 bool notifier::_is_notification_viable_flapping(
     reason_type type,
-    notification_option options) const {
+    notification_option options) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_flapping()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
@@ -472,7 +479,7 @@ bool notifier::_is_notification_viable_flapping(
 
 bool notifier::_is_notification_viable_downtime(
     reason_type type __attribute__((unused)),
-    notification_option options) const {
+    notification_option options) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_downtime()";
 
   /* forced notifications bust through everything */
@@ -524,7 +531,7 @@ bool notifier::_is_notification_viable_downtime(
 
 bool notifier::_is_notification_viable_custom(
     reason_type type __attribute__((unused)),
-    notification_option options) const {
+    notification_option options) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_custom()";
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
