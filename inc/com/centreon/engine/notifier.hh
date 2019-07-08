@@ -103,7 +103,7 @@ class                notifier : public checkable {
   static std::array<std::string, 2> const tab_state_type;
 
   typedef bool (notifier::*is_viable)(reason_type type,
-                                      notification_option) const;
+                                      notification_option);
 
   //static void        inc_next_notification_id();
 
@@ -293,18 +293,18 @@ class                notifier : public checkable {
   static std::array<is_viable, 6> const _is_notification_viable;
 
   bool _is_notification_viable_normal(reason_type type,
-                                      notification_option options) const;
+                                      notification_option options);
   bool _is_notification_viable_recovery(reason_type type,
-                                        notification_option options) const;
+                                        notification_option options);
   bool _is_notification_viable_acknowledgement(
       reason_type type,
-      notification_option options) const;
+      notification_option options);
   bool _is_notification_viable_flapping(reason_type type,
-                                        notification_option options) const;
+                                        notification_option options);
   bool _is_notification_viable_downtime(reason_type type,
-                                        notification_option options) const;
+                                        notification_option options);
   bool _is_notification_viable_custom(reason_type type,
-                                      notification_option options) const;
+                                      notification_option options);
 
   static uint64_t    _next_notification_id;
   uint32_t           _first_notification_delay;
