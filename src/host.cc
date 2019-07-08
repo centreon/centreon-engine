@@ -1781,6 +1781,7 @@ void host::schedule_check(time_t check_time, int options) {
   }
   /* allocate memory for a new event item */
   new_event = new timed_event;
+  memset(new_event, 0, sizeof(*new_event));
 
   /* default is to use the new event */
   use_original_event = false;
@@ -1793,7 +1794,7 @@ void host::schedule_check(time_t check_time, int options) {
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
-  temp_event = quick_timed_event.find(hash_timed_event::low,
+  temp_event = quick_timed_event.find(timed_event::low,
                                       hash_timed_event::host_check, this);
 
   /* we found another host check event for this host in the queue - what should
@@ -1848,12 +1849,13 @@ void host::schedule_check(time_t check_time, int options) {
 
     /* the originally queued event won the battle, so keep it */
     if (use_original_event) {
+      remove_event(new_event, timed_event::low);
       delete new_event;
     }
 
     /* else use the new event, so remove the old */
     else {
-      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      remove_event(temp_event, timed_event::low);
       delete temp_event;
     }
   }
@@ -1878,7 +1880,7 @@ void host::schedule_check(time_t check_time, int options) {
     new_event->event_interval = 0L;
     new_event->timing_func = nullptr;
     new_event->compensate_for_time_change = true;
-    reschedule_event(new_event, &event_list_low, &event_list_low_tail);
+    reschedule_event(new_event, timed_event::low);
   }
 
   else {

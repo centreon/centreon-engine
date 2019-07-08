@@ -472,30 +472,31 @@ void free_memory(nagios_macros* mac) {
   downtimes::downtime_manager::instance().clear_scheduled_downtimes();
 
   // Free memory for the high priority event list.
-  for (timed_event* this_event(event_list_high); this_event;) {
-    timed_event* next_event(this_event->next);
-    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>(this_event->event_data);
-      this_event->event_data = nullptr;
+  for (timed_event_list::iterator
+         it(timed_event::event_list_high.begin()),
+         end(timed_event::event_list_high.end());
+       it != end;) {
+    //timed_event* next_event(this_event->next);
+    if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long *>((*it)->event_data);
+      (*it)->event_data = nullptr;
     }
-    delete this_event;
-    this_event = next_event;
+    it = timed_event::event_list_high.erase(it);
   }
-  event_list_high = nullptr;
-  quick_timed_event.clear(hash_timed_event::high);
+  quick_timed_event.clear(timed_event::high);
 
   // Free memory for the low priority event list.
-  for (timed_event* this_event(event_list_low); this_event;) {
-    timed_event* next_event(this_event->next);
-    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>(this_event->event_data);
-      this_event->event_data = nullptr;
+  for (timed_event_list::iterator
+         it(timed_event::event_list_low.begin()),
+         end(timed_event::event_list_low.end());
+       it != end;) {
+    if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long *>((*it)->event_data);
+      (*it)->event_data = nullptr;
     }
-    delete this_event;
-    this_event = next_event;
+    it = timed_event::event_list_low.erase(it);
   }
-  event_list_low = nullptr;
-  quick_timed_event.clear(hash_timed_event::low);
+  quick_timed_event.clear(timed_event::low);
 
   /*
   ** Free memory associated with macros. It's ok to only free the

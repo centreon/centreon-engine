@@ -64,16 +64,20 @@ void adjust_check_scheduling() {
   time_t last_window_time(first_window_time + config->auto_rescheduling_window());
 
   // get current scheduling data.
-  for (timed_event* tmp(event_list_low); tmp; tmp = tmp->next) {
+  for (timed_event_list::iterator
+         it{timed_event::event_list_low.begin()},
+         end{timed_event::event_list_low.end()};
+       it != end;
+       ++it) {
     // skip events outside of our current window.
-    if (tmp->run_time <= first_window_time)
+    if ((*it)->run_time <= first_window_time)
       continue;
-    if (tmp->run_time > last_window_time)
+    if ((*it)->run_time > last_window_time)
       break;
 
-    if (tmp->event_type == EVENT_HOST_CHECK) {
+    if ((*it)->event_type == EVENT_HOST_CHECK) {
 
-      if (!(hst = (host*)tmp->event_data))
+      if (!(hst = (host*)(*it)->event_data))
         continue;
 
       // ignore forced checks.
@@ -81,10 +85,10 @@ void adjust_check_scheduling() {
         continue;
 
       // does the last check "bump" into this one?
-      if ((last_check_time + last_check_exec_time) > tmp->run_time)
+      if ((last_check_time + last_check_exec_time) > (*it)->run_time)
         adjust_scheduling = true;
 
-      last_check_time = tmp->run_time;
+      last_check_time = (*it)->run_time;
 
       // calculate time needed to perform check.
       // NOTE: host check execution time is not taken into account,
@@ -93,8 +97,8 @@ void adjust_check_scheduling() {
       total_check_exec_time += last_check_exec_time;
     }
 
-    else if (tmp->event_type == EVENT_SERVICE_CHECK) {
-      if (!(svc = (com::centreon::engine::service*)tmp->event_data))
+    else if ((*it)->event_type == EVENT_SERVICE_CHECK) {
+      if (!(svc = (com::centreon::engine::service*)(*it)->event_data))
         continue;
 
       // ignore forced checks.
@@ -102,10 +106,10 @@ void adjust_check_scheduling() {
         continue;
 
       // does the last check "bump" into this one?
-      if ((last_check_time + last_check_exec_time) > tmp->run_time)
+      if ((last_check_time + last_check_exec_time) > (*it)->run_time)
         adjust_scheduling = true;
 
-      last_check_time = tmp->run_time;
+      last_check_time = (*it)->run_time;
 
       // calculate time needed to perform check.
       // NOTE: service check execution time is not taken into
@@ -138,17 +142,20 @@ void adjust_check_scheduling() {
 
   // adjust check scheduling.
   double current_icd_offset(inter_check_delay / 2.0);
-  for (timed_event* tmp(event_list_low); tmp; tmp = tmp->next) {
-
+  for (timed_event_list::iterator
+         it{timed_event::event_list_low.begin()},
+         end{timed_event::event_list_low.end()};
+       it != end;
+       ++it) {
     // skip events outside of our current window.
-    if (tmp->run_time <= first_window_time)
+    if ((*it)->run_time <= first_window_time)
       continue;
-    if (tmp->run_time > last_window_time)
+    if ((*it)->run_time > last_window_time)
       break;
 
-    if (tmp->event_type == EVENT_HOST_CHECK) {
+    if ((*it)->event_type == EVENT_HOST_CHECK) {
 
-      if (!(hst = (host*)tmp->event_data))
+      if (!(hst = (host*)(*it)->event_data))
         continue;
 
       // ignore forced checks.
@@ -160,8 +167,8 @@ void adjust_check_scheduling() {
             + projected_host_check_overhead)
            * exec_time_factor);
     }
-    else if (tmp->event_type == EVENT_SERVICE_CHECK) {
-      if (!(svc = (com::centreon::engine::service*)tmp->event_data))
+    else if ((*it)->event_type == EVENT_SERVICE_CHECK) {
+      if (!(svc = (com::centreon::engine::service*)(*it)->event_data))
         continue;
 
       // ignore forced checks.
@@ -182,13 +189,13 @@ void adjust_check_scheduling() {
              (time_t)(first_window_time
                       + (unsigned long)new_run_time_offset));
 
-    if (tmp->event_type == EVENT_HOST_CHECK) {
-      tmp->run_time = new_run_time;
+    if ((*it)->event_type == EVENT_HOST_CHECK) {
+      (*it)->run_time = new_run_time;
       hst->set_next_check(new_run_time);
       hst->update_status(false);
     }
     else {
-      tmp->run_time = new_run_time;
+      (*it)->run_time = new_run_time;
       svc->set_next_check(new_run_time);
       svc->update_status(false);
     }
@@ -199,7 +206,7 @@ void adjust_check_scheduling() {
 
   // resort event list (some events may be out of order at
   // this point).
-  resort_event_list(&event_list_low, &event_list_low_tail);
+  resort_event_list(timed_event::low);
   return;
 }
 

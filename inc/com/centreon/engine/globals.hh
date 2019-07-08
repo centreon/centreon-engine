@@ -96,10 +96,6 @@ extern pthread_t                 worker_threads[];
 
 extern check_stats               check_statistics[];
 
-extern timed_event*              event_list_low;
-extern timed_event*              event_list_low_tail;
-extern timed_event*              event_list_high;
-extern timed_event*              event_list_high_tail;
 extern sched_info                scheduling_info;
 
 extern std::string               macro_x_names[];

@@ -70,15 +70,19 @@ int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
     return ERROR;
 
   /* remove scheduled entry from event queue */
-  for (temp_event = event_list_high; temp_event != nullptr;
-       temp_event = temp_event->next) {
-    if (temp_event->event_type != EVENT_SCHEDULED_DOWNTIME)
+  for (timed_event_list::iterator
+         it(timed_event::event_list_high.begin()),
+         end(timed_event::event_list_high.end());
+       it != end;
+       ++it) {
+    temp_event = *it;
+    if ((*it)->event_type != EVENT_SCHEDULED_DOWNTIME)
       continue;
-    if (((uint64_t)temp_event->event_data) == downtime_id)
+    if (((uint64_t)(*it)->event_data) == downtime_id)
       break;
   }
   if (temp_event != nullptr)
-    remove_event(temp_event, &event_list_high, &event_list_high_tail);
+    remove_event(temp_event, timed_event::high);
 
   /* delete downtime entry */
   if (temp_downtime->get_type() == HOST_DOWNTIME)

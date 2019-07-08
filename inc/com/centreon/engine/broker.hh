@@ -26,6 +26,7 @@
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/service.hh"
+#  include "com/centreon/engine/events/timed_event.hh"
 #  include "com/centreon/engine/timeperiod.hh"
 
 /* Event broker options. */
@@ -297,12 +298,6 @@
 /* Downtime. */
 #  define NEBATTR_DOWNTIME_STOP_NORMAL             1
 #  define NEBATTR_DOWNTIME_STOP_CANCELLED          2
-
-// Forward declaration.
-struct command_struct;
-struct customvariablesmember_struct;
-struct timed_event_struct;
-struct timeperiod_struct;
 
 #  ifdef __cplusplus
 extern "C" {
@@ -648,7 +643,7 @@ void           broker_timed_event(
                  int type,
                  int flags,
                  int attr,
-                 timed_event_struct* event,
+                 com::centreon::engine::timed_event* event,
                  struct timeval const* timestamp);
 struct timeval get_broker_timestamp(struct timeval const* timestamp);
 

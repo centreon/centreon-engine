@@ -80,7 +80,7 @@ void applier::scheduler::apply(
     host_map::const_iterator hst(hosts.find(it->host_name().c_str()));
     if (hst != hosts.end()) {
       bool has_event(quick_timed_event.find(
-                                         events::hash_timed_event::low,
+                                         timed_event::low,
                                          events::hash_timed_event::host_check,
                                          hst->second.get()));
       bool should_schedule(it->checks_active()
@@ -107,7 +107,7 @@ void applier::scheduler::apply(
         it->host_id(), it->service_id()}));
     if (svc != services.end()) {
       bool has_event(quick_timed_event.find(
-                                         events::hash_timed_event::low,
+                                         timed_event::low,
                                          events::hash_timed_event::service_check,
                                          svc->second.get()));
       bool should_schedule(it->checks_active()
@@ -269,8 +269,8 @@ applier::scheduler::scheduler()
  *  Default destructor.
  */
 applier::scheduler::~scheduler() throw () {
-  deleter::listmember(event_list_low, &deleter::timedevent);
-  deleter::listmember(event_list_high, &deleter::timedevent);
+  timed_event::event_list_low.clear();
+  timed_event::event_list_high.clear();
 }
 
 /**
@@ -860,7 +860,7 @@ void applier::scheduler::_get_services(
  */
 void applier::scheduler::_remove_misc_event(timed_event*& evt) {
   if (evt) {
-    remove_event(evt, &event_list_high, &event_list_high_tail);
+    remove_event(evt, timed_event::high);
     delete evt;
     evt = NULL;
   }
@@ -1124,17 +1124,17 @@ void applier::scheduler::_unschedule_host_events(
        ++it) {
     timed_event* evt(NULL);
     while ((evt = quick_timed_event.find(
-                    events::hash_timed_event::low,
+                    timed_event::low,
                     events::hash_timed_event::host_check,
                     *it))) {
-      remove_event(evt, &event_list_low, &event_list_low_tail);
+      remove_event(evt, timed_event::low);
       delete evt;
     }
     while ((evt = quick_timed_event.find(
-                    events::hash_timed_event::low,
+                    timed_event::low,
                     events::hash_timed_event::expire_host_ack,
                     *it))) {
-      remove_event(evt, &event_list_low, &event_list_low_tail);
+      remove_event(evt, timed_event::low);
       delete evt;
     }
   }
@@ -1155,17 +1155,17 @@ void applier::scheduler::_unschedule_service_events(
        ++it) {
     timed_event* evt(NULL);
     while ((evt = quick_timed_event.find(
-                    events::hash_timed_event::low,
+                    timed_event::low,
                     events::hash_timed_event::service_check,
                     *it))) {
-      remove_event(evt, &event_list_low, &event_list_low_tail);
+      remove_event(evt, timed_event::low);
       delete evt;
     }
     while ((evt = quick_timed_event.find(
-                    events::hash_timed_event::low,
+                    timed_event::low,
                     events::hash_timed_event::expire_service_ack,
                     *it))) {
-      remove_event(evt, &event_list_low, &event_list_low_tail);
+      remove_event(evt, timed_event::low);
       delete evt;
     }
   }

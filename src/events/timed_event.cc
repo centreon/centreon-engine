@@ -38,6 +38,9 @@ using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine;
 
+timed_event_list timed_event::event_list_high;
+timed_event_list timed_event::event_list_low;
+
 /**
  *  Execute service check.
  *
@@ -359,55 +362,42 @@ static void _exec_event_user_function(timed_event* event) {
  */
 void add_event(
        timed_event* event,
-       timed_event** event_list,
-       timed_event** event_list_tail) {
+       timed_event::priority priority) {
   logger(dbg_functions, basic)
     << "add_event()";
 
-  event->next = nullptr;
-  event->prev = nullptr;
+  timed_event_list *list;
 
-  if (event_list == &event_list_low)
-    quick_timed_event.insert(hash_timed_event::low, event);
-  else if (event_list == &event_list_high)
-    quick_timed_event.insert(hash_timed_event::high, event);
-
-  timed_event* first_event(*event_list);
+  if (priority == timed_event::low) {
+    quick_timed_event.insert(timed_event::low, event);
+    list = &timed_event::event_list_low;
+  } else {
+    quick_timed_event.insert(timed_event::high, event);
+    list = &timed_event::event_list_high;
+  }
 
   // add the event to the head of the list if there are
   // no other events.
-  if (!(*event_list)) {
-    *event_list = event;
-    *event_list_tail = event;
+  if (list->empty()) {
+    list->push_front(event);
   }
 
   // add event to head of the list if it should be executed first.
-  else if (event->run_time < first_event->run_time) {
-    event->prev = NULL;
-    (*event_list)->prev = event;
-    event->next = *event_list;
-    *event_list = event;
+  else if (event->run_time < (*list->begin())->run_time) {
+    list->push_front(event);
   }
 
   // else place the event according to next execution time.
   else {
     // start from the end of the list, as new events are likely to
     // be executed in the future, rather than now...
-    for (timed_event* tmp(*event_list_tail); tmp; tmp = tmp->prev) {
-      if (event->run_time >= tmp->run_time) {
-        event->next = tmp->next;
-        event->prev = tmp;
-        tmp->next = event;
-        if (!event->next)
-          *event_list_tail = event;
-        else
-          event->next->prev = event;
-        break;
-      }
-      else if (!tmp->prev) {
-        tmp->prev = event;
-        event->next = tmp;
-        *event_list = event;
+    for(timed_event_list::reverse_iterator
+          it(list->rbegin()),
+          end(list->rend());
+        it != end;
+        ++it) {
+      if (event->run_time >= (*it)->run_time) {
+        list->insert(it.base(), event);
         break;
       }
     }
@@ -509,62 +499,70 @@ void compensate_for_system_time_change(
     << " in time) has been detected.  Compensating...";
 
   // adjust the next run time for all high priority timed events.
-  for (timed_event* tmp(event_list_high); tmp; tmp = tmp->next) {
+  for (timed_event_list::iterator
+         it(timed_event::event_list_high.begin()),
+         end(timed_event::event_list_high.end());
+       it != end;
+       ++it) {
 
     // skip special events that occur at specific times...
-    if (!tmp->compensate_for_time_change)
+    if (!(*it)->compensate_for_time_change)
       continue;
 
     // use custom timing function.
-    if (tmp->timing_func) {
+    if ((*it)->timing_func) {
       union {
         time_t (*func)(void);
         void* data;
       } timing;
-      timing.data = tmp->timing_func;
-      tmp->run_time = (*timing.func)();
+      timing.data = (*it)->timing_func;
+      (*it)->run_time = (*timing.func)();
     }
 
     // else use standard adjustment.
     else
-      tmp->run_time = adjust_timestamp_for_time_change(
+      (*it)->run_time = adjust_timestamp_for_time_change(
         last_time,
         current_time,
         time_difference,
-        tmp->run_time);
+        (*it)->run_time);
   }
 
   // resort event list (some events may be out of order at this point).
-  resort_event_list(&event_list_high, &event_list_high_tail);
+  resort_event_list(timed_event::high);
 
   // adjust the next run time for all low priority timed events.
-  for (timed_event* tmp(event_list_low); tmp; tmp = tmp->next) {
+  for (timed_event_list::iterator
+         it(timed_event::event_list_low.begin()),
+         end(timed_event::event_list_low.end());
+       it != end;
+       ++it) {
 
     // skip special events that occur at specific times...
-    if (!tmp->compensate_for_time_change)
+    if (!(*it)->compensate_for_time_change)
       continue;
 
     // use custom timing function.
-    if (tmp->timing_func) {
+    if ((*it)->timing_func) {
       union {
         time_t (*func)(void);
         void* data;
       } timing;
-      timing.data = tmp->timing_func;
-      tmp->run_time = (*timing.func)();
+      timing.data = (*it)->timing_func;
+      (*it)->run_time = (*timing.func)();
     }
 
     // else use standard adjustment.
     else
-      tmp->run_time = adjust_timestamp_for_time_change(
+      (*it)->run_time = adjust_timestamp_for_time_change(
         last_time,
         current_time,
         time_difference,
-        tmp->run_time);
+        (*it)->run_time);
   }
 
   // resort event list (some events may be out of order at this point).
-  resort_event_list(&event_list_low, &event_list_low_tail);
+  resort_event_list(timed_event::low);
 
   // adjust service timestamps.
   for (service_map::iterator
@@ -751,8 +749,7 @@ int handle_timed_event(timed_event* event) {
  */
 void remove_event(
        timed_event* event,
-       timed_event** event_list,
-       timed_event** event_list_tail) {
+       timed_event::priority priority) {
   logger(dbg_functions, basic)
     << "remove_event()";
 
@@ -764,36 +761,15 @@ void remove_event(
     event,
     NULL);
 
-  if (!(*event_list) || !event)
+  if (!event)
     return;
 
-  if (*event_list == event_list_low)
-    quick_timed_event.erase(hash_timed_event::low, event);
-  else if (*event_list == event_list_high)
-    quick_timed_event.erase(hash_timed_event::high, event);
-
-  if (*event_list == event) {
-    event->prev = NULL;
-    *event_list = event->next;
-    if (!(*event_list))
-      *event_list_tail = NULL;
-    else
-      (*event_list)->prev = NULL;
-  }
-
-  else {
-    for (timed_event* tmp(*event_list); tmp; tmp = tmp->next) {
-      if (tmp->next == event) {
-        tmp->next = tmp->next->next;
-        if (!tmp->next)
-          *event_list_tail = tmp;
-        else
-          tmp->next->prev = tmp;
-        event->next = NULL;
-        event->prev = NULL;
-        break;
-      }
-    }
+  if (priority == timed_event::low) {
+    quick_timed_event.erase(timed_event::low, event);
+    timed_event::event_list_low.remove(event);
+  } else {
+    quick_timed_event.erase(timed_event::high, event);
+    timed_event::event_list_high.remove(event);
   }
 }
 
@@ -806,8 +782,7 @@ void remove_event(
  */
 void reschedule_event(
        timed_event* event,
-       timed_event** event_list,
-       timed_event** event_list_tail) {
+       timed_event::priority priority) {
   logger(dbg_functions, basic)
     << "reschedule_event()";
 
@@ -834,7 +809,14 @@ void reschedule_event(
   }
 
   // add the event to the event list.
-  add_event(event, event_list, event_list_tail);
+  add_event(event, priority);
+}
+
+static bool compare_event(timed_event* const& first, timed_event* const& second)
+{
+  if (first->run_time < second->run_time)
+    return true;
+  return false;
 }
 
 /**
@@ -844,31 +826,34 @@ void reschedule_event(
  *  @param[in,out] event_list      The head of the event list.
  *  @param[in,out] event_list_tail The tail of the event list.
  */
-void resort_event_list(
-       timed_event** event_list,
-       timed_event** event_list_tail) {
+void resort_event_list(timed_event::priority priority) {
+  timed_event_list *list;
+
   logger(dbg_functions, basic)
     << "resort_event_list()";
 
   // move current event list to temp list.
-  if (*event_list == event_list_low)
-    quick_timed_event.clear(hash_timed_event::low);
-  else if (*event_list == event_list_high)
-    quick_timed_event.clear(hash_timed_event::high);
-  timed_event* temp_event_list(*event_list);
-  *event_list = NULL;
-
-  // move all events to the new event list.
-  timed_event* next_event(NULL);
-  for (timed_event* tmp(temp_event_list); tmp; tmp = next_event) {
-    next_event = tmp->next;
-
-    // add the event to the newly created event list so it
-    // will be resorted.
-    tmp->next = NULL;
-    tmp->prev = NULL;
-    add_event(tmp, event_list, event_list_tail);
+  if (priority == timed_event::low) {
+    quick_timed_event.clear(timed_event::low);
+    list = &timed_event::event_list_low;
+  } else {
+    quick_timed_event.clear(timed_event::high);
+    list = &timed_event::event_list_high;
   }
+  list->sort(compare_event);
+
+  // send event data to broker.
+  for (timed_event_list::iterator
+         it{list->begin()},
+         end{list->end()};
+       it != end;
+       ++it)
+    broker_timed_event(
+      NEBTYPE_TIMEDEVENT_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      (*it),
+      nullptr);
 }
 
 /**
@@ -952,9 +937,9 @@ timed_event* events::schedule(
 
   // add the event to the event list.
   if (high_priority)
-    add_event(evt, &event_list_high, &event_list_high_tail);
+    add_event(evt, timed_event::high);
   else
-    add_event(evt, &event_list_low, &event_list_low_tail);
+    add_event(evt, timed_event::low);
   return evt;
 }
 

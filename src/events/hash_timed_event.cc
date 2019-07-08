@@ -61,7 +61,7 @@ hash_timed_event& hash_timed_event::operator=(hash_timed_event const& right) {
  *
  *  @param[in] p  The hash list priority to clear.
  */
-void hash_timed_event::clear(priority p) {
+void hash_timed_event::clear(timed_event::priority p) {
   for (int i(0); i < type_num; ++i)
     _hevent[i][p].clear();
   return;
@@ -73,7 +73,7 @@ void hash_timed_event::clear(priority p) {
  *  @param[in] p  The hash list priority to clear.
  *  @param[in] t  The hash list type to clear.
  */
-void hash_timed_event::clear(priority p, type t) {
+void hash_timed_event::clear(timed_event::priority p, type t) {
   _hevent[t][p].clear();
   return;
 }
@@ -84,7 +84,7 @@ void hash_timed_event::clear(priority p, type t) {
  *  @param[in] p      The hash list priority.
  *  @param[in] event  The event to remove.
  */
-void hash_timed_event::erase(priority p, timed_event* event) {
+void hash_timed_event::erase(timed_event::priority p, timed_event* event) {
   if (!event)
     return ;
   switch(event->event_type) {
@@ -111,7 +111,7 @@ void hash_timed_event::erase(priority p, timed_event* event) {
  *  @param[in] t    The hash list priority.
  *  @param[in] ptr  The event data.
  */
-timed_event* hash_timed_event::find(priority p, type t, void* ptr) {
+com::centreon::engine::timed_event* hash_timed_event::find(timed_event::priority p, type t, void* ptr) {
   std::unordered_map<void*, timed_event*>::iterator it(_hevent[t][p].find(ptr));
   if (it == _hevent[t][p].end())
     return (NULL);
@@ -124,7 +124,7 @@ timed_event* hash_timed_event::find(priority p, type t, void* ptr) {
  *  @param[in] p      The hash list priority.
  *  @param[in] event  The event to add.
  */
-void hash_timed_event::insert(priority p, timed_event* event) {
+void hash_timed_event::insert(timed_event::priority p, timed_event* event) {
   if (!event || !event->event_data)
     return;
   switch (event->event_type) {
@@ -154,7 +154,7 @@ void hash_timed_event::insert(priority p, timed_event* event) {
 hash_timed_event& hash_timed_event::_internal_copy(hash_timed_event const& other) {
   if (this != &other)
     for (int i(0); i < type_num; ++i)
-      for (int j(0); j < priority_num; ++j)
+      for (int j(0); j < timed_event::priority_num; ++j)
         _hevent[i][j] = other._hevent[i][j];
   return (*this);
 }

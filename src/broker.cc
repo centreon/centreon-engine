@@ -1771,7 +1771,7 @@ void broker_timed_event(
        int type,
        int flags,
        int attr,
-       timed_event* event,
+       com::centreon::engine::timed_event* event,
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_TIMED_EVENTS))
