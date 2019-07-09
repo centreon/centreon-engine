@@ -70,9 +70,9 @@ service::service(std::string const& hostname,
                  bool checks_enabled,
                  bool accept_passive_checks,
                  enum service::service_state initial_state,
-                 double check_interval,
-                 double retry_interval,
-                 double notification_interval,
+                 uint32_t check_interval,
+                 uint32_t retry_interval,
+                 uint32_t notification_interval,
                  int max_attempts,
                  uint32_t first_notification_delay,
                  uint32_t recovery_notification_delay,
@@ -3254,7 +3254,7 @@ time_t service::get_next_notification_time(time_t offset) {
       << "Calculating next valid notification time...";
 
   /* default notification interval */
-  double interval_to_use{_notification_interval};
+  uint32_t interval_to_use{_notification_interval};
 
   logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
 

@@ -778,7 +778,8 @@ TEST_F(ServiceNotification, ServiceEscalation) {
   ct_aply.resolve_object(ctct);
 
   configuration::applier::contactgroup cg_aply;
-  configuration::contactgroup cg{new_configuration_contactgroup("test_cg", "test_contact")};
+  configuration::contactgroup cg{
+      new_configuration_contactgroup("test_cg", "test_contact")};
   cg_aply.add_object(cg);
   cg_aply.expand_objects(*config);
   cg_aply.resolve_object(cg);
@@ -811,7 +812,6 @@ TEST_F(ServiceNotification, ServiceEscalation) {
     // When i == 2, the state_critical is hard down => notification
     now += 300;
     std::cout << "NOW = " << now << std::endl;
-    std::cout << "NOTIFICATION NUMBER " << i << " = " << _svc->get_notification_number() << std::endl;
     set_time(now);
     _svc->set_last_state(_svc->get_current_state());
     if (notifier::hard == _svc->get_state_type())
@@ -827,22 +827,52 @@ TEST_F(ServiceNotification, ServiceEscalation) {
     checks::checker::instance().reap();
   }
 
+  // When i == 0, the state_ok is hard (return to up) => Recovery
+  // notification When i == 1, the state_ok is still here (no change) => no
+  // notification
+  now += 300;
+  set_time(now);
+  std::ostringstream oss;
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
   std::string out{testing::internal::GetCapturedStdout()};
-  std::cout << out << std::endl;
-  size_t step1{out.find(
-      "SERVICE NOTIFICATION: "
-      "admin;test_host;test_svc;CRITICAL;cmd;service critical")};
-  size_t step2{out.find(
-      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
-      "(OK);cmd;service ok",
-      step1 + 1)};
-  size_t step3{out.find(
-      "SERVICE NOTIFICATION: "
-      "admin;test_host;test_svc;CRITICAL;cmd;service critical",
-      step2 + 1)};
-  size_t step4{out.find(
-      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
-      "(OK);cmd;service ok",
-      step3 + 1)};
-  ASSERT_NE(step4, std::string::npos);
+  size_t step1{out.find("NOW = 50900")};
+  size_t step2{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_svc;CRITICAL;cmd;service critical",
+               step1 + 1)};
+  size_t step3{out.find("NOW = 51200", step2 + 1)};
+  size_t step4{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step3 + 1)};
+  size_t step5{out.find("NOW = 51800", step4 + 1)};
+  size_t step6{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step5 + 1)};
+  size_t step7{out.find("NOW = 52400", step6 + 1)};
+  size_t step8{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step7 + 1)};
+  size_t step9{out.find("NOW = 53000", step8 + 1)};
+  size_t step10{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step9 + 1)};
+  size_t step11{out.find("NOW = 53600", step10 + 1)};
+  size_t step12{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step11 + 1)};
+  size_t step13{
+      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok",
+               step12 + 1)};
+  ASSERT_NE(step13, std::string::npos);
 }

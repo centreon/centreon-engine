@@ -28,8 +28,8 @@ checkable::checkable(std::string const& display_name,
                      std::string const& check_command,
                      bool checks_enabled,
                      bool accept_passive_checks,
-                     double check_interval,
-                     double retry_interval,
+                     uint32_t check_interval,
+                     uint32_t retry_interval,
                      int max_attempts,
                      std::string const& check_period,
                      std::string const& event_handler,
@@ -132,9 +132,9 @@ void checkable::set_check_command(std::string const& check_command) {
   _check_command = check_command;
 }
 
-double checkable::get_check_interval() const { return _check_interval; }
+uint32_t checkable::get_check_interval() const { return _check_interval; }
 
-void checkable::set_check_interval(double check_interval) {
+void checkable::set_check_interval(uint32_t check_interval) {
   _check_interval = check_interval;
 }
 

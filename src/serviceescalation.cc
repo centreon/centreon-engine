@@ -68,24 +68,26 @@ std::string const& serviceescalation::get_description() const {
  *
  * @return A boolean.
  */
-bool serviceescalation::is_viable(int state, uint32_t notification_number) const {
-  logger(dbg_functions, basic)
-    << "serviceescalation::is_viable()";
+bool serviceescalation::is_viable(int state,
+                                  uint32_t notification_number) const {
+  logger(dbg_functions, basic) << "serviceescalation::is_viable()";
 
   bool retval{escalation::is_viable(state, notification_number)};
   if (retval) {
+    /* In case of a recovery notification, the escalation must be viable */
+    if (state == 0)
+      return true;
     std::array<notifier::notification_flag, 4> nt = {
-      notifier::ok,
-      notifier::warning,
-      notifier::critical,
-      notifier::unknown,
+        notifier::ok,
+        notifier::warning,
+        notifier::critical,
+        notifier::unknown,
     };
 
     if (!get_escalate_on(nt[state]))
       return false;
     return true;
-  }
-  else
+  } else
     return retval;
 }
 

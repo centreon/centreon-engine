@@ -83,7 +83,7 @@ configuration::serviceescalation TestEngine::new_configuration_serviceescalation
   configuration::serviceescalation se;
   se.parse("first_notification", "2");
   se.parse("last_notification", "11");
-  se.parse("notification_interval", "4");
+  se.parse("notification_interval", "9");
   se.parse("escalation_options", "w,u,c,r");
   se.parse("host_name", hostname.c_str());
   se.parse("service_description", svc_desc.c_str());

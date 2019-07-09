@@ -35,9 +35,11 @@ class notification {
                std::string const& message,
                uint32_t options,
                uint64_t notification_id,
-               uint32_t notification_number);
+               uint32_t notification_number,
+               uint32_t notification_interval);
   int execute(std::unordered_set<contact*> const& to_notify);
   notifier::reason_type get_reason() const;
+  uint32_t get_notification_interval() const;
 
  private:
   notifier* _parent;
@@ -50,6 +52,7 @@ class notification {
   uint64_t _id;
   uint32_t _number;
   std::unordered_set<contact*> _notified_contacts;
+  uint32_t _interval;
 };
 CCE_END()
 

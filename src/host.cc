@@ -141,15 +141,15 @@ host::host(uint64_t host_id,
            std::string const& address,
            std::string const& check_period,
            enum host::host_state initial_state,
-           double check_interval,
-           double retry_interval,
+           uint32_t check_interval,
+           uint32_t retry_interval,
            int max_attempts,
            int notify_up,
            int notify_down,
            int notify_unreachable,
            int notify_flapping,
            int notify_downtime,
-           double notification_interval,
+           uint32_t notification_interval,
            uint32_t first_notification_delay,
            uint32_t recovery_notification_delay,
            std::string const& notification_period,
@@ -2834,7 +2834,7 @@ time_t host::get_next_notification_time(time_t offset) {
       << "Calculating next valid notification time...";
 
   /* default notification interval */
-  double interval_to_use{get_notification_interval()};
+  uint32_t interval_to_use{get_notification_interval()};
 
   logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
 

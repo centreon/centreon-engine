@@ -275,11 +275,18 @@ void applier::serviceescalation::resolve_object(
          it{p.first}; it != p.second; ++it) {
     if (it->second->get_first_notification() == obj.first_notification() &&
         it->second->get_last_notification() == obj.last_notification() &&
-        it->second->get_notification_interval() == obj.notification_interval() &&
+        it->second->get_notification_interval() ==
+            obj.notification_interval() &&
         it->second->get_escalation_period() == obj.escalation_period() &&
-        it->second->get_escalate_on(notifier::warning) == static_cast<bool>(obj.escalation_options() & configuration::serviceescalation::warning) &&
-        it->second->get_escalate_on(notifier::critical) == static_cast<bool>(obj.escalation_options() & configuration::serviceescalation::critical) &&
-        it->second->get_escalate_on(notifier::recovery) == static_cast<bool>(obj.escalation_options() & configuration::hostescalation::recovery)) {
+        it->second->get_escalate_on(notifier::warning) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::warning) &&
+        it->second->get_escalate_on(notifier::critical) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::critical) &&
+        it->second->get_escalate_on(notifier::recovery) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::hostescalation::recovery)) {
       found = true;
       // Resolve service escalation.
       it->second->resolve(config_warnings, config_errors);
