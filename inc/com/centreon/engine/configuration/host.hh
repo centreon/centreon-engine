@@ -136,6 +136,7 @@ namespace                  configuration {
     bool                   _set_event_handler(std::string const& value);
     bool                   _set_event_handler_enabled(bool value);
     bool                   _set_failure_prediction_enabled(bool value);
+    bool                   _set_failure_prediction_options(std::string const& value);
     bool                   _set_first_notification_delay(unsigned int value);
     bool                   _set_flap_detection_enabled(bool value);
     bool                   _set_flap_detection_options(std::string const& value);

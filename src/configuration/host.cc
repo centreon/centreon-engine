@@ -51,6 +51,7 @@ std::unordered_map<std::string, host::setter_func> const host::_setters{
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
   { "event_handler",                SETTER(std::string const&, _set_event_handler) },
+  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "notes",                        SETTER(std::string const&, _set_notes) },
   { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
   { "action_url",                   SETTER(std::string const&, _set_action_url) },
@@ -82,6 +83,7 @@ std::unordered_map<std::string, host::setter_func> const host::_setters{
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
+  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
   { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
@@ -1241,6 +1243,39 @@ bool host::_set_event_handler(std::string const& value) {
 bool host::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
   return true;
+}
+
+/**
+ *  Set failure_prediction_enabled value.
+ *
+ *  @param[in] value The new failure_prediction_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool host::_set_failure_prediction_enabled(bool value) {
+  (void)value;
+  logger(log_verification_error, basic)
+    << "Warning: host failure_prediction_enabled is deprecated"
+    << " This option will not be supported in 20.04.";
+  ++config_warnings;
+  return true;
+}
+
+/**
+ *  Set failure_prediction_options value.
+ *
+ *  @param[in] value The new failure_prediction_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool host::_set_failure_prediction_options(
+       std::string const& value) {
+  (void)value;
+  logger(log_verification_error, basic)
+    << "Warning: service failure_prediction_options is deprecated"
+    << " This option will not be supported in 20.04.";
+  ++config_warnings;
+  return (true);
 }
 
 /**

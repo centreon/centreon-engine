@@ -56,6 +56,7 @@ std::unordered_map<std::string, service::setter_func> const service::_setters{
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
+  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "notes",                        SETTER(std::string const&, _set_notes) },
   { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
   { "action_url",                   SETTER(std::string const&, _set_action_url) },
@@ -70,6 +71,7 @@ std::unordered_map<std::string, service::setter_func> const service::_setters{
   { "recovery_notification_delay",  SETTER(unsigned int, _set_recovery_notification_delay) },
   { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
   { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
+  { "parallelize_check",            SETTER(bool, _set_parallelize_check) },
   { "is_volatile",                  SETTER(bool, _set_is_volatile) },
   { "obsess_over_service",          SETTER(bool, _set_obsess_over_service) },
   { "event_handler_enabled",        SETTER(bool, _set_event_handler_enabled) },
@@ -85,6 +87,7 @@ std::unordered_map<std::string, service::setter_func> const service::_setters{
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
+  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
   { "timezone",                     SETTER(std::string const&, _set_timezone) }
@@ -1249,6 +1252,38 @@ bool service::_set_event_handler_enabled(bool value) {
 }
 
 /**
+ *  Set failure_prediction_enabled value.
+ *
+ *  @param[in] value The new failure_prediction_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_failure_prediction_enabled(bool value) {
+  (void)value;
+  logger(log_verification_error, basic)
+    << "Warning: service failure_prediction_enabled is deprecated."
+    << " This option will not be supported in 20.04.";
+  ++config_warnings;
+  return true;
+}
+
+/**
+ *  Set failure_prediction_options value.
+ *
+ *  @param[in] value The new failure_prediction_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_failure_prediction_options(std::string const& value) {
+  (void)value;
+  logger(log_verification_error, basic)
+    << "Warning: service failure_prediction_options is deprecated."
+    << " This option will not be supported in 20.04.";
+  ++config_warnings;
+  return true;
+}
+
+/**
  *  Set first_notification_delay value.
  *
  *  @param[in] value The new first_notification_delay value.
@@ -1548,6 +1583,22 @@ bool service::_set_notification_period(std::string const& value) {
  */
 bool service::_set_obsess_over_service(bool value) {
   _obsess_over_service = value;
+  return true;
+}
+
+/**
+ *  Set parallelize_check value.
+ *
+ *  @param[in] value The new parallelize_check value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_parallelize_check(bool value) {
+  (void)value;
+  logger(log_verification_error, basic)
+    << "Warning: service parallelize_check is deprecated"
+    << " This option will not be supported in 20.04.";
+  ++config_warnings;
   return true;
 }
 
