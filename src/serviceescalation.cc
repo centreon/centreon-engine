@@ -74,9 +74,6 @@ bool serviceescalation::is_viable(int state,
 
   bool retval{escalation::is_viable(state, notification_number)};
   if (retval) {
-    /* In case of a recovery notification, the escalation must be viable */
-    if (state == 0)
-      return true;
     std::array<notifier::notification_flag, 4> nt = {
         notifier::ok,
         notifier::warning,

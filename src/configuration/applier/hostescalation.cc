@@ -68,7 +68,7 @@ void applier::hostescalation::add_object(
                ? notifier::unreachable
                : notifier::none) |
           ((obj.escalation_options() & configuration::hostescalation::recovery)
-               ? notifier::recovery
+               ? notifier::up
                : notifier::none))};
 
   // Add new items to the configuration state.
@@ -169,7 +169,7 @@ void applier::hostescalation::remove_object(
 
   for (hostescalation_mmap::iterator it{range.first}, end{range.second};
        it != end; ++it) {
-    std::list<escalation*>& escalations{hit->second->get_escalations()};
+    std::list<escalation*>& escalations(hit->second->get_escalations());
     for (std::list<engine::escalation*>::iterator itt{escalations.begin()},
          next_itt{escalations.begin()}, end{escalations.end()};
          itt != end; itt = next_itt) {
@@ -186,7 +186,7 @@ void applier::hostescalation::remove_object(
           (*itt)->get_escalate_on(notifier::unreachable) ==
               static_cast<bool>(obj.escalation_options() &
                                 configuration::hostescalation::unreachable) &&
-          (*itt)->get_escalate_on(notifier::recovery) ==
+          (*itt)->get_escalate_on(notifier::up) ==
               static_cast<bool>(obj.escalation_options() &
                                 configuration::hostescalation::recovery)) {
         // We have the hostescalation to remove.
@@ -219,7 +219,7 @@ void applier::hostescalation::resolve_object(
   // Find host escalation
   bool found{false};
   std::string const& hostname{*obj.hosts().begin()};
-  auto p{engine::hostescalation::hostescalations.equal_range(hostname)};
+  auto p(engine::hostescalation::hostescalations.equal_range(hostname));
 
   if (p.first == p.second)
     throw engine_error() << "Cannot find host escalations concerning host '"
@@ -238,7 +238,7 @@ void applier::hostescalation::resolve_object(
         it->second->get_escalate_on(notifier::unreachable) ==
             static_cast<bool>(obj.escalation_options() &
                               configuration::hostescalation::unreachable) &&
-        it->second->get_escalate_on(notifier::recovery) ==
+        it->second->get_escalate_on(notifier::up) ==
             static_cast<bool>(obj.escalation_options() &
                               configuration::hostescalation::recovery)) {
       found = true;

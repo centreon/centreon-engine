@@ -255,7 +255,7 @@ void applier::contact::modify_object(configuration::contact const& obj) {
           (obj.service_notification_options() & service::critical
                ? notifier::critical
                : notifier::none) |
-          (obj.service_notification_options() & service::ok ? notifier::recovery
+          (obj.service_notification_options() & service::ok ? notifier::ok
                                                             : notifier::none) |
           (obj.service_notification_options() & service::flapping
                ? (notifier::flappingstart | notifier::flappingstop |
@@ -271,7 +271,7 @@ void applier::contact::modify_object(configuration::contact const& obj) {
           (obj.host_notification_options() & host::unreachable
                ? notifier::unreachable
                : notifier::none) |
-          (obj.host_notification_options() & host::up ? notifier::recovery
+          (obj.host_notification_options() & host::up ? notifier::up
                                                       : notifier::none) |
           (obj.host_notification_options() & host::flapping
                ? (notifier::flappingstart | notifier::flappingstop |

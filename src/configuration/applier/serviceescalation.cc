@@ -77,7 +77,7 @@ void applier::serviceescalation::add_object(
                : notifier::none) |
           ((obj.escalation_options() &
             configuration::serviceescalation::recovery)
-               ? notifier::recovery
+               ? notifier::ok
                : notifier::none))};
 
   // Add new items to tail the list.
@@ -201,16 +201,16 @@ void applier::serviceescalation::remove_object(
           (*itt)->get_last_notification() == obj.last_notification() &&
           (*itt)->get_notification_interval() == obj.notification_interval() &&
           (*itt)->get_escalation_period() == obj.escalation_period() &&
-          (*itt)->get_escalate_on(notifier::down) ==
+          (*itt)->get_escalate_on(notifier::unknown) ==
               static_cast<bool>(obj.escalation_options() &
                                 configuration::serviceescalation::unknown) &&
-          (*itt)->get_escalate_on(notifier::recovery) ==
+          (*itt)->get_escalate_on(notifier::ok) ==
               static_cast<bool>(obj.escalation_options() &
                                 configuration::serviceescalation::recovery) &&
-          (*itt)->get_escalate_on(notifier::unreachable) ==
+          (*itt)->get_escalate_on(notifier::critical) ==
               static_cast<bool>(obj.escalation_options() &
                                 configuration::serviceescalation::critical) &&
-          (*itt)->get_escalate_on(notifier::recovery) ==
+          (*itt)->get_escalate_on(notifier::warning) ==
               static_cast<bool>(obj.escalation_options() &
                                 configuration::serviceescalation::warning)) {
         // We have the serviceescalation to remove.
@@ -245,8 +245,8 @@ void applier::serviceescalation::resolve_object(
   bool found{false};
   std::string const& hostname{*obj.hosts().begin()};
   std::string const& desc{obj.service_description().front()};
-  auto p{engine::serviceescalation::serviceescalations.equal_range(
-      {hostname, desc})};
+  auto p(engine::serviceescalation::serviceescalations.equal_range(
+      {hostname, desc}));
   if (p.first == p.second)
     throw engine_error() << "Cannot find service escalations "
                          << "concerning host '" << hostname << "' and service '"
@@ -267,7 +267,7 @@ void applier::serviceescalation::resolve_object(
         it->second->get_escalate_on(notifier::critical) ==
             static_cast<bool>(obj.escalation_options() &
                               configuration::serviceescalation::critical) &&
-        it->second->get_escalate_on(notifier::recovery) ==
+        it->second->get_escalate_on(notifier::ok) ==
             static_cast<bool>(obj.escalation_options() &
                               configuration::hostescalation::recovery)) {
       found = true;

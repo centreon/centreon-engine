@@ -384,7 +384,7 @@ void applier::service::modify_object(
            ? notifier::critical
            : notifier::none) |
       (obj.notification_options() & configuration::service::ok
-           ? notifier::recovery
+           ? notifier::ok
            : notifier::none) |
       (obj.notification_options() & configuration::service::flapping
            ? (notifier::flappingstart | notifier::flappingstop |

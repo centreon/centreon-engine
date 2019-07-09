@@ -437,7 +437,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_notify_on(notifier::critical)
      << "\n"
         "  notify_on_recovery:                   "
-     << obj.get_notify_on(notifier::recovery)
+     << obj.get_notify_on(notifier::ok)
      << "\n"
         "  notify_on_flappingstart:              "
      << obj.get_notify_on(notifier::flappingstart)
@@ -812,7 +812,7 @@ com::centreon::engine::service* add_service(
                       ? (notifier::flappingstart | notifier::flappingstop |
                          notifier::flappingdisabled)
                       : 0);
-    notify_on |= (notify_recovery > 0 ? notifier::recovery : 0);
+    notify_on |= (notify_recovery > 0 ? notifier::ok : 0);
     notify_on |= (notify_unknown > 0 ? notifier::unknown : 0);
     notify_on |= (notify_warning > 0 ? notifier::warning : 0);
     obj->set_notify_on(notify_on);
@@ -3365,7 +3365,7 @@ bool service::is_valid_escalation_for_notification(
 
   /* skip this escalation if the state options don't match */
   if (_current_state == service::state_ok &&
-      !e->get_escalate_on(recovery))
+      !e->get_escalate_on(ok))
     return false;
   else if (_current_state == service::state_warning &&
            !e->get_escalate_on(warning))
@@ -3826,7 +3826,7 @@ void service::resolve(int& w, int& e) {
 
   // Check for sane recovery options.
   if (get_notifications_enabled()
-      && get_notify_on(notifier::recovery)
+      && get_notify_on(notifier::ok)
       && !get_notify_on(notifier::warning)
       && !get_notify_on(notifier::critical)) {
     logger(log_verification_error, basic)

@@ -639,39 +639,58 @@ TEST_F(HostNotification, HostEscalation) {
 
   std::string out{testing::internal::GetCapturedStdout()};
   std::cout << out << std::endl;
-  size_t step1{out.find("NOW = 50900")};
+  size_t step1{out.find("NOW = 50300")};
+  ASSERT_NE(step1, std::string::npos);
   size_t step2{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;CRITICAL;cmd;service critical",
+      out.find("HOST NOTIFICATION: "
+               "admin;test_host;DOWN;cmd;Down host",
                step1 + 1)};
-  size_t step3{out.find("NOW = 51200", step2 + 1)};
+  ASSERT_NE(step2, std::string::npos);
+  size_t step3{out.find("NOW = 50600", step2 + 1)};
+  ASSERT_NE(step3, std::string::npos);
   size_t step4{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
                step3 + 1)};
-  size_t step5{out.find("NOW = 51800", step4 + 1)};
+  ASSERT_NE(step4, std::string::npos);
+  size_t step5{out.find("NOW = 51200", step4 + 1)};
+  ASSERT_NE(step5, std::string::npos);
   size_t step6{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
                step5 + 1)};
-  size_t step7{out.find("NOW = 52400", step6 + 1)};
+  ASSERT_NE(step6, std::string::npos);
+  size_t step7{out.find("NOW = 51800", step6 + 1)};
+  ASSERT_NE(step7, std::string::npos);
   size_t step8{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
                step7 + 1)};
-  size_t step9{out.find("NOW = 53000", step8 + 1)};
+  ASSERT_NE(step8, std::string::npos);
+  size_t step9{out.find("NOW = 52400", step8 + 1)};
+  ASSERT_NE(step9, std::string::npos);
   size_t step10{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
                step9 + 1)};
-  size_t step11{out.find("NOW = 53600", step10 + 1)};
+  ASSERT_NE(step10, std::string::npos);
+  size_t step11{out.find("NOW = 53000", step10 + 1)};
+  ASSERT_NE(step11, std::string::npos);
   size_t step12{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
                step11 + 1)};
-  size_t step13{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
-               "(OK);cmd;service ok",
-               step12 + 1)};
+  ASSERT_NE(step12, std::string::npos);
+  size_t step13{out.find("NOW = 53600", step12 + 1)};
   ASSERT_NE(step13, std::string::npos);
+  size_t step14{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step13 + 1)};
+  ASSERT_NE(step14, std::string::npos);
+  size_t step15{
+      out.find("HOST NOTIFICATION: test_contact;test_host;RECOVERY "
+               "(UP);cmd;Host up",
+               step14 + 1)};
+  ASSERT_NE(step15, std::string::npos);
 }

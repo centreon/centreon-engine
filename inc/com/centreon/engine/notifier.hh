@@ -62,15 +62,12 @@ class                notifier : public checkable {
     critical =          1 << 5,
     unknown =           1 << 6,
     // Flapping
-    flappingstart =     1 << 8,
-    flappingstop =      1 << 9,
-    flappingdisabled =  1 << 10,
-
-    // Recovery
-    recovery =          1 << 11,
+    flappingstart =     1 << 7,
+    flappingstop =      1 << 8,
+    flappingdisabled =  1 << 9,
 
     // Downtime
-    downtime =          1 << 12,
+    downtime =          1 << 10,
   };
 
   enum               notifier_type {

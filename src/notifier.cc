@@ -341,7 +341,7 @@ bool notifier::_is_notification_viable_recovery(
       send_later = true;
     }
     /* Recovery is sent on state OK or UP */
-    else if (get_current_state_int() != 0 || !get_notify_on(recovery)) {
+    else if (get_current_state_int() != 0 || !(get_notify_on(up) || get_notify_on(ok))) {
       logger(dbg_notifications, more)
           << "This notifier state is not UP/OK are is not configured to send a "
              "recovery notification";

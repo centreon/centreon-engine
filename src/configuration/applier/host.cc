@@ -287,7 +287,7 @@ void applier::host::modify_object(
   it_obj->second->set_retry_interval(static_cast<double>(obj.retry_interval()));
   it_obj->second->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
   it_obj->second->set_notify_on(
-      (obj.notification_options() & configuration::host::up ? notifier::recovery
+      (obj.notification_options() & configuration::host::up ? notifier::up
                                                             : notifier::none) |
       (obj.notification_options() & configuration::host::down
            ? notifier::down
