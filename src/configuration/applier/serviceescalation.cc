@@ -139,7 +139,7 @@ void applier::serviceescalation::expand_objects(configuration::state& s) {
        it_esc != end_esc;
        ++it_esc) {
     // Expanded services.
-    std::set<std::pair<std::string, std::string> > expanded_services;
+    std::set<std::pair<std::string, std::string>> expanded_services;
     _expand_services(
       it_esc->hosts(),
       it_esc->hostgroups(),
@@ -233,7 +233,12 @@ void applier::serviceescalation::remove_object(
           (*itt)->get_escalate_on(notifier::recovery) ==
               (obj.escalation_options() &
                configuration::hostescalation::recovery)) {
-        // We have the hostescalation to remove.
+        // We have the serviceescalation to remove.
+
+        // Notify event broker.
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE,
+            NEBFLAG_NONE, NEBATTR_NONE, (*itt).get(), &tv);
         escalations.erase(itt);
         break;
       }
@@ -258,6 +263,11 @@ void applier::serviceescalation::resolve_object(
 
   service_map::iterator it{engine::service::services.find(
     {*obj.hosts().begin(), obj.service_description().front()})};
+  if (it == engine::service::services.end())
+    throw engine_error() << "Cannot find service '"
+      << obj.service_description().front()
+      << "' attached to this serviceescalation";
+  bool found{false};
   for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
       itt{it->second->get_escalations().begin()},
       end{it->second->get_escalations().end()};
@@ -272,11 +282,13 @@ void applier::serviceescalation::resolve_object(
         (*itt)->get_escalate_on(notifier::down) == (obj.escalation_options() & configuration::hostescalation::down) &&
         (*itt)->get_escalate_on(notifier::unreachable) == (obj.escalation_options() & configuration::hostescalation::unreachable) &&
         (*itt)->get_escalate_on(notifier::recovery) == (obj.escalation_options() & configuration::hostescalation::recovery)) {
+      found = true;
       // Resolve service escalation.
       (*itt)->resolve(config_warnings, config_errors);
-    } else
-      throw engine_error() << "Cannot resolve non-existing service escalation";
+    }
   }
+  if (!found)
+    throw engine_error() << "Cannot resolve non-existing service escalation";
 }
 
 /**

@@ -652,8 +652,7 @@ int notifier::notify(notifier::reason_type type,
 
   /* For a first notification, we store what type of notification we try to
    * send and we fix the notification number to 1. */
-  if (_notification_number == 0)
-    ++_notification_number;
+  ++_notification_number;
 
   std::shared_ptr<notification> notif{
       new notification(this, type, not_author, not_data, options,
@@ -671,9 +670,7 @@ int notifier::notify(notifier::reason_type type,
     _notification[cat] = notif;
     /* The notification has been sent.
      * Should we increment the notification number? */
-    if (cat == cat_normal)
-      _notification_number++;
-    else {
+    if (cat != cat_normal) {
       if (cat == cat_recovery)
         _notification[cat_normal].reset();
       _notification_number = 0;

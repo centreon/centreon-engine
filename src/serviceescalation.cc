@@ -49,12 +49,7 @@ serviceescalation::serviceescalation(std::string const& hostname,
                          << "on a service without description";
 }
 
-serviceescalation::~serviceescalation() {
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE, NEBFLAG_NONE,
-                                  NEBATTR_NONE, this, &tv);
-}
+serviceescalation::~serviceescalation() {}
 
 std::string const& serviceescalation::get_hostname() const {
   return _hostname;

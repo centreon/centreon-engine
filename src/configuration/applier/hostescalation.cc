@@ -226,6 +226,12 @@ void applier::hostescalation::remove_object(
               (obj.escalation_options() &
                configuration::hostescalation::recovery)) {
         // We have the hostescalation to remove.
+
+        // Notify event broker.
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE,
+            NEBFLAG_NONE, NEBATTR_NONE, (*itt).get(), &tv);
+
         escalations.erase(itt);
         break;
       }

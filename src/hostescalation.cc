@@ -60,14 +60,7 @@ hostescalation::hostescalation(std::string const& host_name,
                          << "on host '" << host_name << "'";
 }
 
-hostescalation::~hostescalation() {
-  logger(logging::dbg_config, logging::more)
-    << "Removing a host escalation (destructor).";
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE, NEBFLAG_NONE,
-                                  NEBATTR_NONE, this, &tv);
-}
+hostescalation::~hostescalation() {}
 
 std::string const& hostescalation::get_hostname() const {
   return _hostname;

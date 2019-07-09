@@ -372,7 +372,7 @@ TEST_F(ApplierService, ServicesStalkingOptions) {
 // Then after the service resolution, we can see the contactgroup stored in the
 // service with the contact inside it.
 TEST_F(ApplierService, ContactgroupResolution) {
-  configuration::contact ctct{valid_contact_config()};
+  configuration::contact ctct{new_configuration_contact("admin", true)};
   configuration::applier::contact ct_aply;
   ct_aply.add_object(ctct);
   configuration::contactgroup cg;

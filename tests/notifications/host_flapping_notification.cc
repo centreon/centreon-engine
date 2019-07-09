@@ -59,7 +59,7 @@ class HostFlappingNotification : public TestEngine {
     checks::checker::load();
 
     configuration::applier::contact ct_aply;
-    configuration::contact ctct{valid_contact_config()};
+    configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
