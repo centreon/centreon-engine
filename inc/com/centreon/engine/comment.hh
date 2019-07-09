@@ -47,7 +47,7 @@ class             comment{
   };
 
   enum            type {
-    host,
+    host = 1,
     service
   };
 
