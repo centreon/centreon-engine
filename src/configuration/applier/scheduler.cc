@@ -269,8 +269,37 @@ applier::scheduler::scheduler()
  *  Default destructor.
  */
 applier::scheduler::~scheduler() throw () {
-  timed_event::event_list_low.clear();
-  timed_event::event_list_high.clear();
+  timed_event *evt;
+
+  for (timed_event_list::iterator
+         it{timed_event::event_list_low.begin()},
+         end{timed_event::event_list_low.end()};
+       it != end;) {
+    if((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long *>((*it)->event_data);
+      (*it)->event_data = nullptr;
+    }
+    evt = (*it);
+    it = timed_event::event_list_low.erase(it);
+    delete evt;
+  }
+
+  for (timed_event_list::iterator
+         it{timed_event::event_list_high.begin()},
+         end{timed_event::event_list_high.end()};
+       it != end;
+       ++it) {
+    if((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long *>((*it)->event_data);
+      (*it)->event_data = nullptr;
+    }
+    evt = (*it);
+    it = timed_event::event_list_high.erase(it);
+    delete evt;
+  }
+
+  quick_timed_event.clear(timed_event::low);
+  quick_timed_event.clear(timed_event::high);
 }
 
 /**
