@@ -147,6 +147,7 @@ namespace                  configuration {
     bool                   _set_event_handler(std::string const& value);
     bool                   _set_event_handler_enabled(bool value);
     bool                   _set_failure_prediction_enabled(bool value);
+    bool                   _set_failure_prediction_options(std::string const& value);
     bool                   _set_first_notification_delay(unsigned int value);
     bool                   _set_flap_detection_enabled(bool value);
     bool                   _set_flap_detection_options(std::string const& value);
@@ -167,6 +168,7 @@ namespace                  configuration {
     bool                   _set_notification_interval(unsigned int value);
     bool                   _set_notification_period(std::string const& value);
     bool                   _set_obsess_over_service(bool value);
+    bool                   _set_parallelize_check(bool value);
     bool                   _set_process_perf_data(bool value);
     bool                   _set_retain_nonstatus_information(bool value);
     bool                   _set_retain_status_information(bool value);
