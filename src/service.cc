@@ -3262,7 +3262,7 @@ time_t service::get_next_notification_time(time_t offset) {
    * search all the escalation entries for valid matches for this service (at
    * its current notification number)
    */
-  for (std::shared_ptr<escalation>& e : get_escalations()) {
+  for (escalation const* e : get_escalations()) {
     /* interval < 0 means to use non-escalated interval */
     if (e->get_notification_interval() < 0.0)
       continue;
@@ -3317,7 +3317,7 @@ time_t service::get_next_notification_time(time_t offset) {
  * service notification
  */
 bool service::is_valid_escalation_for_notification(
-    std::shared_ptr<escalation> e,
+    escalation const* e,
     int options) const {
   uint32_t notification_number;
   time_t current_time;

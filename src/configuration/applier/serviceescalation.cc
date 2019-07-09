@@ -211,8 +211,8 @@ void applier::serviceescalation::remove_object(
   for (serviceescalation_mmap::iterator
        it{range.first}, end{range.second};
        it != end; ++it) {
-    std::list<std::shared_ptr<escalation>>& escalations(sit->second->get_escalations());
-    for (std::list<std::shared_ptr<engine::escalation>>::iterator
+    std::list<escalation*>& escalations(sit->second->get_escalations());
+    for (std::list<engine::escalation*>::iterator
         itt{escalations.begin()},
         next_itt{escalations.begin()},
         end{escalations.end()};
@@ -238,7 +238,7 @@ void applier::serviceescalation::remove_object(
         // Notify event broker.
         timeval tv(get_broker_timestamp(nullptr));
         broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE,
-            NEBFLAG_NONE, NEBATTR_NONE, (*itt).get(), &tv);
+            NEBFLAG_NONE, NEBATTR_NONE, *itt, &tv);
         escalations.erase(itt);
         break;
       }
@@ -256,35 +256,34 @@ void applier::serviceescalation::remove_object(
  *  @param[in] obj  Serviceescalation object.
  */
 void applier::serviceescalation::resolve_object(
-       configuration::serviceescalation const& obj) {
+    configuration::serviceescalation const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
       << "Resolving a service escalation.";
 
-  service_map::iterator it{engine::service::services.find(
-    {*obj.hosts().begin(), obj.service_description().front()})};
-  if (it == engine::service::services.end())
-    throw engine_error() << "Cannot find service '"
-      << obj.service_description().front()
-      << "' attached to this serviceescalation";
+  // Find service escalation
   bool found{false};
-  for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
-      itt{it->second->get_escalations().begin()},
-      end{it->second->get_escalations().end()};
-      itt != end;
-      ++itt) {
-    /* It's a pity but for now we don't have any idea or key to verify if
-     * the hostescalation is the good one. */
-    if ((*itt)->get_first_notification() == obj.first_notification() &&
-        (*itt)->get_last_notification() == obj.last_notification() &&
-        (*itt)->get_notification_interval() == obj.notification_interval() &&
-        (*itt)->get_escalation_period() == obj.escalation_period() &&
-        (*itt)->get_escalate_on(notifier::down) == (obj.escalation_options() & configuration::hostescalation::down) &&
-        (*itt)->get_escalate_on(notifier::unreachable) == (obj.escalation_options() & configuration::hostescalation::unreachable) &&
-        (*itt)->get_escalate_on(notifier::recovery) == (obj.escalation_options() & configuration::hostescalation::recovery)) {
+  std::string const& hostname{*obj.hosts().begin()};
+  std::string const& desc{obj.service_description().front()};
+  auto p{engine::serviceescalation::serviceescalations.equal_range(
+      {hostname, desc})};
+  if (p.first == p.second)
+    throw engine_error() << "Cannot find service escalations '"
+                         << "concerning host '" << hostname << "' and service '"
+                         << desc << "'";
+  for (serviceescalation_mmap::iterator
+         it{p.first}; it != p.second; ++it) {
+    if (it->second->get_first_notification() == obj.first_notification() &&
+        it->second->get_last_notification() == obj.last_notification() &&
+        it->second->get_notification_interval() == obj.notification_interval() &&
+        it->second->get_escalation_period() == obj.escalation_period() &&
+        it->second->get_escalate_on(notifier::warning) == static_cast<bool>(obj.escalation_options() & configuration::serviceescalation::warning) &&
+        it->second->get_escalate_on(notifier::critical) == static_cast<bool>(obj.escalation_options() & configuration::serviceescalation::critical) &&
+        it->second->get_escalate_on(notifier::recovery) == static_cast<bool>(obj.escalation_options() & configuration::hostescalation::recovery)) {
       found = true;
       // Resolve service escalation.
-      (*itt)->resolve(config_warnings, config_errors);
+      it->second->resolve(config_warnings, config_errors);
+      break;
     }
   }
   if (!found)

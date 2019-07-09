@@ -268,7 +268,7 @@ class                host : public notifier {
   time_t             get_next_notification_time(time_t offset) override;
   void               schedule_acknowledgement_expiration();
   bool               is_valid_escalation_for_notification(
-                       std::shared_ptr<escalation> e,
+                       escalation const* e,
                        int options) const override;
   void               handle_flap_detection_disabled();
   timeperiod*        get_notification_timeperiod() const override;

@@ -552,9 +552,9 @@ void applier::service::resolve_object(
   // Find service.
   service_id_map::iterator it(engine::service::services_by_id.find(obj.key()));
   if (engine::service::services_by_id.end() == it)
-    throw (engine_error() << "Cannot resolve non-existing service '"
+    throw engine_error() << "Cannot resolve non-existing service '"
            << obj.service_description() << "' of host '"
-           << *obj.hosts().begin() << "'");
+           << *obj.hosts().begin() << "'";
 
   // Remove service group links.
   it->second->get_parent_groups().clear();

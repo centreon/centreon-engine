@@ -170,8 +170,6 @@ void applier::servicedependency::add_object(
     NEBATTR_NONE,
     sd.get(),
     &tv);
-
-  return ;
 }
 
 /**
@@ -323,8 +321,6 @@ void applier::servicedependency::remove_object(
 
   // Remove dependency from the global configuration set.
   config->servicedependencies().erase(obj);
-
-  return ;
 }
 
 /**

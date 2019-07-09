@@ -2842,7 +2842,7 @@ time_t host::get_next_notification_time(time_t offset) {
    * check all the host escalation entries for valid matches for this host
    * (at its current notification number)
    */
-  for (std::shared_ptr<escalation>& e : get_escalations()) {
+  for (escalation* e : get_escalations()) {
     /* interval < 0 means to use non-escalated interval */
     if (e->get_notification_interval() < 0.0)
       continue;
@@ -2951,7 +2951,7 @@ void host::enable_flap_detection() {
  * checks to see if a host escalation entry is a match for the current host
  * notification
  */
-bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
+bool host::is_valid_escalation_for_notification(escalation const* e,
                                                 int options) const {
   uint32_t notification_number;
   time_t current_time;

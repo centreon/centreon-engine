@@ -100,7 +100,7 @@ void applier::hostescalation::add_object(
   uint64_t host_id{get_host_id(he->get_hostname())};
   host_id_map::iterator it{engine::host::hosts_by_id.find(host_id)};
   if (it != engine::host::hosts_by_id.end())
-    it->second->add_escalation(he);
+    it->second->get_escalations().push_back(he.get());
 
   // Add new items to the list.
   engine::hostescalation::hostescalations.insert({he->get_hostname(), he});
@@ -201,9 +201,8 @@ void applier::hostescalation::remove_object(
   for (hostescalation_mmap::iterator it{range.first}, end{range.second};
        it != end;
        ++it) {
-    std::list<std::shared_ptr<escalation> >& escalations(
-        hit->second->get_escalations());
-    for (std::list<std::shared_ptr<engine::escalation> >::iterator
+    std::list<escalation*>& escalations{hit->second->get_escalations()};
+    for (std::list<engine::escalation*>::iterator
              itt{escalations.begin()},
          next_itt{escalations.begin()},
          end{escalations.end()};
@@ -230,7 +229,7 @@ void applier::hostescalation::remove_object(
         // Notify event broker.
         timeval tv(get_broker_timestamp(nullptr));
         broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE,
-            NEBFLAG_NONE, NEBATTR_NONE, (*itt).get(), &tv);
+            NEBFLAG_NONE, NEBATTR_NONE, *itt, &tv);
 
         escalations.erase(itt);
         break;
@@ -260,7 +259,7 @@ void applier::hostescalation::resolve_object(
     throw engine_error() << "Cannot resolve non-existing host with id "
            << host_id;
 
-  for (std::list<std::shared_ptr<engine::escalation> >::const_iterator
+  for (std::list<engine::escalation*>::const_iterator
            itt{it->second->get_escalations().begin()},
        end{it->second->get_escalations().end()};
        itt != end; ++itt) {

@@ -98,13 +98,15 @@ void serviceescalation::resolve(int& w, int& e) {
     {get_hostname(), get_description()})};
   if (found == service::services.end() || !found->second) {
     logger(log_verification_error, basic) << "Error: Service '"
-        << this->get_description() << "' on host '" << this->get_hostname()
+        << get_description() << "' on host '" << get_hostname()
         << "' specified in service escalation is not defined anywhere!";
     errors++;
     notifier_ptr = nullptr;
   }
-  else
+  else {
     notifier_ptr = found->second.get();
+    notifier_ptr->get_escalations().push_back(this);
+  }
 
   try {
     escalation::resolve(w, errors);

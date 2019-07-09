@@ -210,17 +210,16 @@ class                notifier : public checkable {
   bool               get_notifications_enabled() const;
   void               set_notifications_enabled(bool notifications_enabled);
   bool               should_notification_be_escalated() const;
-  std::list<std::shared_ptr<escalation>>&
+  std::list<escalation*>&
                      get_escalations();
-  std::list<std::shared_ptr<escalation>> const&
+  std::list<escalation*> const&
                      get_escalations() const;
-  void               add_escalation(std::shared_ptr<escalation> e);
   bool               is_escalated_contact(contact* cntct) const;
   void               create_notification_list(nagios_macros* mac,
                                 int options,
                                 bool* esclated);
   virtual bool       is_valid_escalation_for_notification(
-                                std::shared_ptr<escalation> e,
+                                escalation const* e,
                                 int options) const = 0;
   void               add_modified_attributes(uint32_t attr);
   uint32_t           get_modified_attributes() const;
@@ -309,7 +308,7 @@ class                notifier : public checkable {
   uint32_t           _first_notification_delay;
   uint32_t           _recovery_notification_delay;
   bool               _notifications_enabled;
-  std::list<std::shared_ptr<escalation>>
+  std::list<escalation*>
                      _escalations;
   bool               _problem_has_been_acknowledged;
   bool               _has_been_checked;

@@ -189,7 +189,7 @@ class                           service : public notifier {
   bool                          operator==(service const& other);
   bool                          operator!=(service const& other) throw();
   bool                          is_valid_escalation_for_notification(
-                                  std::shared_ptr<escalation> e,
+                                  escalation const* e,
                                   int options) const override;
   bool                          is_result_fresh(time_t current_time, int log_this);
   void                          handle_flap_detection_disabled();

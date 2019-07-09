@@ -572,7 +572,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
   std::unordered_set<contact*> retval;
 
   /* Let's start looking at escalations */
-  for (std::list<std::shared_ptr<escalation>>::const_iterator
+  for (std::list<escalation*>::const_iterator
            it{_escalations.begin()},
        end{_escalations.end()};
        it != end; ++it) {
@@ -1130,17 +1130,12 @@ void notifier::add_modified_attributes(uint32_t attr) {
   _modified_attributes |= attr;
 }
 
-std::list<std::shared_ptr<escalation>>& notifier::get_escalations() {
+std::list<escalation*>& notifier::get_escalations() {
   return _escalations;
 }
 
-std::list<std::shared_ptr<escalation>> const& notifier::get_escalations()
-    const {
+std::list<escalation*> const& notifier::get_escalations() const {
   return _escalations;
-}
-
-void notifier::add_escalation(std::shared_ptr<escalation> e) {
-  _escalations.push_back(e);
 }
 
 /**
@@ -1155,7 +1150,7 @@ bool notifier::is_escalated_contact(contact* cntct) const {
   if (!cntct)
     return false;
 
-  for (std::shared_ptr<escalation> const& e : get_escalations()) {
+  for (escalation const* e : get_escalations()) {
     // Search all contacts of this host escalation.
     contact_map_unsafe::const_iterator itt{
         e->contacts().find(cntct->get_name())};
@@ -1165,7 +1160,8 @@ bool notifier::is_escalated_contact(contact* cntct) const {
     }
 
     // Search all contactgroups of this host escalation.
-    for (contactgroup_map_unsafe::iterator itt(e->contact_groups().begin()),
+    for (contactgroup_map_unsafe::const_iterator
+             itt(e->contact_groups().begin()),
          end(e->contact_groups().begin());
          itt != end; ++itt)
       if (itt->second->get_members().find(cntct->get_name()) !=
@@ -1300,7 +1296,7 @@ bool notifier::should_notification_be_escalated() const {
   logger(dbg_functions, basic)
       << "notifier::should_notification_be_escalated()";
 
-  for (std::shared_ptr<escalation> const& e : get_escalations()) {
+  for (escalation const* e : get_escalations()) {
     // We found a matching entry, so escalate this notification!
     if (is_valid_escalation_for_notification(e, notification_option_none)) {
       logger(dbg_notifications, more)
