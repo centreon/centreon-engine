@@ -769,7 +769,7 @@ TEST_F(ServiceNotification, NormalRecoveryTwoTimes) {
 // and notification_interval = 4
 // When a normal notification is sent 11 times,
 // Then contacts from the escalation are notified when notification number
-// is among {2, 6} which is the intersection of [2,11] and {4t+2; t in N}.
+// is in [2,6] and are separated by at less 4*60s.
 TEST_F(ServiceNotification, ServiceEscalation) {
   configuration::applier::contact ct_aply;
   configuration::contact ctct{new_configuration_contact("test_contact", false)};

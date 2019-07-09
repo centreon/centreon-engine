@@ -34,10 +34,10 @@ namespace             configuration {
   namespace           applier {
     class             hostescalation {
      public:
-                      hostescalation();
-                      hostescalation(hostescalation const& right);
-                      ~hostescalation() throw ();
-      hostescalation& operator=(hostescalation const& right);
+      hostescalation();
+      hostescalation(hostescalation const& right) = delete;
+      ~hostescalation() throw();
+      hostescalation& operator=(hostescalation const& right) = delete;
       void            add_object(
                         configuration::hostescalation const& obj);
       void            expand_objects(configuration::state& s);

@@ -102,6 +102,19 @@ configuration::host TestEngine::new_configuration_host(
   return hst;
 }
 
+configuration::hostescalation TestEngine::new_configuration_hostescalation(
+    std::string const& hostname,
+    std::string const& contactgroup) {
+  configuration::hostescalation he;
+  he.parse("first_notification", "2");
+  he.parse("last_notification", "11");
+  he.parse("notification_interval", "9");
+  he.parse("escalation_options", "d,u,r");
+  he.parse("host_name", hostname.c_str());
+  he.parse("contact_groups", contactgroup.c_str());
+  return he;
+}
+
 configuration::service TestEngine::new_configuration_service(
     std::string const& hostname,
     std::string const& description,

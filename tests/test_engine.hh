@@ -24,6 +24,7 @@
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
+#include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 
@@ -39,6 +40,9 @@ class TestEngine : public ::testing::Test {
       std::string const& hostname,
       std::string const& description,
       std::string const& contacts);
+  configuration::hostescalation new_configuration_hostescalation(
+      std::string const& hostname,
+      std::string const& contactgroup);
   configuration::serviceescalation new_configuration_serviceescalation(
       std::string const& hostname,
       std::string const& svc_desc,
