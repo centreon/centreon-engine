@@ -68,9 +68,9 @@ notifier::notifier(notifier::notifier_type notifier_type,
                    std::string const& check_command,
                    bool checks_enabled,
                    bool accept_passive_checks,
-                   double check_interval,
-                   double retry_interval,
-                   double notification_interval,
+                   uint32_t check_interval,
+                   uint32_t retry_interval,
+                   uint32_t notification_interval,
                    int max_attempts,
                    uint32_t first_notification_delay,
                    uint32_t recovery_notification_delay,
@@ -260,7 +260,11 @@ bool notifier::_is_notification_viable_normal(
   }
 
   if (_notification_number >= 1) {
-    if (_notification_interval == 0) {
+    uint32_t notification_interval{
+        !_notification[cat_normal]
+            ? _notification_interval
+            : _notification[cat_normal]->get_notification_interval()};
+    if (notification_interval == 0) {
       logger(dbg_notifications, more)
           << "This notifier problem has already been sent at "
           << _last_notification
@@ -268,18 +272,17 @@ bool notifier::_is_notification_viable_normal(
           << " anymore";
       return false;
     }
-    else if (_notification_interval > 0) {
-      if (_last_notification + _notification_interval * config->interval_length()
+    else if (notification_interval > 0) {
+      if (_last_notification + notification_interval * config->interval_length()
           > now) {
         logger(dbg_notifications, more)
             << "This notifier problem has been sent at " << _last_notification
             << " so it won't be sent until "
-            << (_notification_interval * config->interval_length());
+            << (notification_interval * config->interval_length());
         return false;
       }
     }
   }
-
   return true;
 }
 
@@ -338,7 +341,7 @@ bool notifier::_is_notification_viable_recovery(
       send_later = true;
     }
     /* Recovery is sent on state OK or UP */
-    else if (get_current_state_int() != 0 || !get_notify_on(recovery)) {
+    else if (get_current_state_int() != 0 || !(get_notify_on(up) || get_notify_on(ok))) {
       logger(dbg_notifications, more)
           << "This notifier state is not UP/OK are is not configured to send a "
              "recovery notification";
@@ -568,15 +571,29 @@ bool notifier::_is_notification_viable_custom(
 std::unordered_set<contact*> notifier::get_contacts_to_notify(
     notification_category cat,
     reason_type type,
-    int state __attribute__((unused))) {
+    uint32_t& notification_interval) {
   std::unordered_set<contact*> retval;
+  bool escalated{false};
+  uint32_t notif_interv{_notification_interval};
 
   /* Let's start looking at escalations */
-  for (std::list<std::shared_ptr<escalation>>::const_iterator
+  for (std::list<escalation*>::const_iterator
            it{_escalations.begin()},
        end{_escalations.end()};
        it != end; ++it) {
     if ((*it)->is_viable(get_current_state_int(), _notification_number)) {
+      /* Among escalations, we choose the smallest notification interval. */
+      if (escalated) {
+        if ((*it)->get_notification_interval() < notif_interv)
+          notif_interv = (*it)->get_notification_interval();
+      }
+      else {
+        /* Here is the first escalation, so we take its notification_interval.
+         */
+        escalated = true;
+        notif_interv = (*it)->get_notification_interval();
+      }
+
       /* Construction of the set containing contacts to notify. We don't know
        * for the moment if those contacts accept notification. */
       for (contact_map_unsafe::const_iterator cit{(*it)->contacts().begin()},
@@ -600,7 +617,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
     }
   }
 
-  if (retval.empty()) {
+  if (!escalated) {
     /* Construction of the set containing contacts to notify. We don't know
      * for the moment if those contacts accept notification. */
     for (contact_map_unsafe::const_iterator it{get_contacts().begin()},
@@ -620,6 +637,8 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
         retval.insert(cit->second);
     }
   }
+
+  notification_interval = notif_interv;
   return retval;
 }
 
@@ -652,16 +671,17 @@ int notifier::notify(notifier::reason_type type,
 
   /* For a first notification, we store what type of notification we try to
    * send and we fix the notification number to 1. */
-  if (_notification_number == 0)
+  if (type != reason_recovery)
     ++_notification_number;
 
-  std::shared_ptr<notification> notif{
-      new notification(this, type, not_author, not_data, options,
-                       _next_notification_id++, _notification_number)};
-
   /* What are the contacts to notify? */
+  uint32_t notification_interval;
   std::unordered_set<contact*> to_notify{
-      get_contacts_to_notify(cat, type, get_current_state_int())};
+      get_contacts_to_notify(cat, type, notification_interval)};
+
+  std::shared_ptr<notification> notif{new notification(
+      this, type, not_author, not_data, options, _next_notification_id++,
+      _notification_number, notification_interval)};
 
   /* Let's make the notification. */
   int retval{notif->execute(to_notify)};
@@ -671,9 +691,7 @@ int notifier::notify(notifier::reason_type type,
     _notification[cat] = notif;
     /* The notification has been sent.
      * Should we increment the notification number? */
-    if (cat == cat_normal)
-      _notification_number++;
-    else {
+    if (cat != cat_normal) {
       if (cat == cat_recovery)
         _notification[cat_normal].reset();
       _notification_number = 0;
@@ -1026,11 +1044,11 @@ time_t notifier::get_last_acknowledgement() const {
   return _last_acknowledgement;
 }
 
-double notifier::get_notification_interval(void) const {
+uint32_t notifier::get_notification_interval(void) const {
   return _notification_interval;
 }
 
-void notifier::set_notification_interval(double notification_interval) {
+void notifier::set_notification_interval(uint32_t notification_interval) {
   _notification_interval = notification_interval;
 }
 
@@ -1133,50 +1151,46 @@ void notifier::add_modified_attributes(uint32_t attr) {
   _modified_attributes |= attr;
 }
 
-std::list<std::shared_ptr<escalation>>& notifier::get_escalations() {
+std::list<escalation*>& notifier::get_escalations() {
   return _escalations;
 }
 
-std::list<std::shared_ptr<escalation>> const& notifier::get_escalations()
-    const {
+std::list<escalation*> const& notifier::get_escalations() const {
   return _escalations;
 }
 
-void notifier::add_escalation(std::shared_ptr<escalation> e) {
-  _escalations.push_back(e);
-}
-
-/**
- *  Tests whether or not a contact is an escalated contact for a
- *  particular host.
- *
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-bool notifier::is_escalated_contact(contact* cntct) const {
-  if (!cntct)
-    return false;
-
-  for (std::shared_ptr<escalation> const& e : get_escalations()) {
-    // Search all contacts of this host escalation.
-    contact_map_unsafe::const_iterator itt{
-        e->contacts().find(cntct->get_name())};
-    if (itt != e->contacts().end()) {
-      assert(itt->second == cntct);
-      return true;
-    }
-
-    // Search all contactgroups of this host escalation.
-    for (contactgroup_map_unsafe::iterator itt(e->contact_groups().begin()),
-         end(e->contact_groups().begin());
-         itt != end; ++itt)
-      if (itt->second->get_members().find(cntct->get_name()) !=
-          itt->second->get_members().end())
-        return true;
-  }
-  return false;
-}
+///**
+// *  Tests whether or not a contact is an escalated contact for a
+// *  particular host.
+// *
+// *  @param[in] cntct Target contact.
+// *
+// *  @return true or false.
+// */
+//bool notifier::is_escalated_contact(contact* cntct) const {
+//  if (!cntct)
+//    return false;
+//
+//  for (escalation const* e : get_escalations()) {
+//    // Search all contacts of this host escalation.
+//    contact_map_unsafe::const_iterator itt{
+//        e->contacts().find(cntct->get_name())};
+//    if (itt != e->contacts().end()) {
+//      assert(itt->second == cntct);
+//      return true;
+//    }
+//
+//    // Search all contactgroups of this host escalation.
+//    for (contactgroup_map_unsafe::const_iterator
+//             itt(e->contact_groups().begin()),
+//         end(e->contact_groups().begin());
+//         itt != end; ++itt)
+//      if (itt->second->get_members().find(cntct->get_name()) !=
+//          itt->second->get_members().end())
+//        return true;
+//  }
+//  return false;
+//}
 
 /**
  * @brief Create a list of contacts to be notified for this notifier.
@@ -1303,7 +1317,7 @@ bool notifier::should_notification_be_escalated() const {
   logger(dbg_functions, basic)
       << "notifier::should_notification_be_escalated()";
 
-  for (std::shared_ptr<escalation> const& e : get_escalations()) {
+  for (escalation const* e : get_escalations()) {
     // We found a matching entry, so escalate this notification!
     if (is_valid_escalation_for_notification(e, notification_option_none)) {
       logger(dbg_notifications, more)

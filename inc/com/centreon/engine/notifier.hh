@@ -62,15 +62,12 @@ class                notifier : public checkable {
     critical =          1 << 5,
     unknown =           1 << 6,
     // Flapping
-    flappingstart =     1 << 8,
-    flappingstop =      1 << 9,
-    flappingdisabled =  1 << 10,
-
-    // Recovery
-    recovery =          1 << 11,
+    flappingstart =     1 << 7,
+    flappingstop =      1 << 8,
+    flappingdisabled =  1 << 9,
 
     // Downtime
-    downtime =          1 << 12,
+    downtime =          1 << 10,
   };
 
   enum               notifier_type {
@@ -112,9 +109,9 @@ class                notifier : public checkable {
                               std::string const& check_command,
                               bool checks_enabled,
                               bool accept_passive_checks,
-                              double check_interval,
-                              double retry_interval,
-                              double notification_interval,
+                              uint32_t check_interval,
+                              uint32_t retry_interval,
+                              uint32_t notification_interval,
                               int max_attempts,
                               uint32_t first_notification_delay,
                               uint32_t recovery_notification_delay,
@@ -198,8 +195,8 @@ class                notifier : public checkable {
   void               set_acknowledgement_timeout(int timeout);
   void               set_last_acknowledgement(time_t ack);
   time_t             get_last_acknowledgement() const;
-  double             get_notification_interval(void) const;
-  void               set_notification_interval(double notification_interval);
+  uint32_t           get_notification_interval(void) const;
+  void               set_notification_interval(uint32_t notification_interval);
   std::string const& get_notification_period() const;
   void               set_notification_period(std::string const& notification_period);
 
@@ -210,17 +207,16 @@ class                notifier : public checkable {
   bool               get_notifications_enabled() const;
   void               set_notifications_enabled(bool notifications_enabled);
   bool               should_notification_be_escalated() const;
-  std::list<std::shared_ptr<escalation>>&
+  std::list<escalation*>&
                      get_escalations();
-  std::list<std::shared_ptr<escalation>> const&
+  std::list<escalation*> const&
                      get_escalations() const;
-  void               add_escalation(std::shared_ptr<escalation> e);
-  bool               is_escalated_contact(contact* cntct) const;
-  void               create_notification_list(nagios_macros* mac,
-                                int options,
-                                bool* esclated);
+//  bool               is_escalated_contact(contact* cntct) const;
+//  void               create_notification_list(nagios_macros* mac,
+//                                int options,
+//                                bool* esclated);
   virtual bool       is_valid_escalation_for_notification(
-                                std::shared_ptr<escalation> e,
+                                escalation const* e,
                                 int options) const = 0;
   void               add_modified_attributes(uint32_t attr);
   uint32_t           get_modified_attributes() const;
@@ -243,9 +239,10 @@ class                notifier : public checkable {
   bool is_notification_viable(notification_category cat,
                               reason_type type,
                               notification_option options);
-  std::unordered_set<contact*> get_contacts_to_notify(notification_category cat,
-                                                      reason_type type,
-                                                      int state);
+  std::unordered_set<contact*> get_contacts_to_notify(
+      notification_category cat,
+      reason_type type,
+      uint32_t& notification_interval);
   notifier_type      get_notifier_type() const;
   std::unordered_map<std::string, contact*>& get_contacts();
   std::unordered_map<std::string, contact*> const& get_contacts() const;
@@ -282,7 +279,7 @@ class                notifier : public checkable {
   time_t             _initial_notif_time;
   int                _acknowledgement_timeout;
   time_t             _last_acknowledgement;
-  double             _notification_interval;
+  uint32_t           _notification_interval;
   std::string        _notification_period;
   uint32_t           _out_notification_type;
   uint32_t           _current_notifications;
@@ -309,7 +306,7 @@ class                notifier : public checkable {
   uint32_t           _first_notification_delay;
   uint32_t           _recovery_notification_delay;
   bool               _notifications_enabled;
-  std::list<std::shared_ptr<escalation>>
+  std::list<escalation*>
                      _escalations;
   bool               _problem_has_been_acknowledged;
   bool               _has_been_checked;

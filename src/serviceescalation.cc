@@ -49,14 +49,7 @@ serviceescalation::serviceescalation(std::string const& hostname,
                          << "on a service without description";
 }
 
-serviceescalation::~serviceescalation() {
-  logger(logging::dbg_config, logging::more)
-    << "Removing a service escalation (destructor).";
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE, NEBFLAG_NONE,
-                                  NEBATTR_NONE, this, &tv);
-}
+serviceescalation::~serviceescalation() {}
 
 std::string const& serviceescalation::get_hostname() const {
   return _hostname;
@@ -75,24 +68,23 @@ std::string const& serviceescalation::get_description() const {
  *
  * @return A boolean.
  */
-bool serviceescalation::is_viable(int state, uint32_t notification_number) const {
-  logger(dbg_functions, basic)
-    << "serviceescalation::is_viable()";
+bool serviceescalation::is_viable(int state,
+                                  uint32_t notification_number) const {
+  logger(dbg_functions, basic) << "serviceescalation::is_viable()";
 
   bool retval{escalation::is_viable(state, notification_number)};
   if (retval) {
     std::array<notifier::notification_flag, 4> nt = {
-      notifier::ok,
-      notifier::warning,
-      notifier::critical,
-      notifier::unknown,
+        notifier::ok,
+        notifier::warning,
+        notifier::critical,
+        notifier::unknown,
     };
 
     if (!get_escalate_on(nt[state]))
       return false;
     return true;
-  }
-  else
+  } else
     return retval;
 }
 
@@ -105,13 +97,15 @@ void serviceescalation::resolve(int& w, int& e) {
     {get_hostname(), get_description()})};
   if (found == service::services.end() || !found->second) {
     logger(log_verification_error, basic) << "Error: Service '"
-        << this->get_description() << "' on host '" << this->get_hostname()
+        << get_description() << "' on host '" << get_hostname()
         << "' specified in service escalation is not defined anywhere!";
     errors++;
     notifier_ptr = nullptr;
   }
-  else
+  else {
     notifier_ptr = found->second.get();
+    notifier_ptr->get_escalations().push_back(this);
+  }
 
   try {
     escalation::resolve(w, errors);

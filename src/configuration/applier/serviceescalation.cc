@@ -32,32 +32,9 @@ using namespace com::centreon::engine::configuration;
 applier::serviceescalation::serviceescalation() {}
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-applier::serviceescalation::serviceescalation(
-                              applier::serviceescalation const& right) {
-  (void)right;
-}
-
-/**
  *  Destructor.
  */
 applier::serviceescalation::~serviceescalation() throw () {}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-applier::serviceescalation& applier::serviceescalation::operator=(
-                              applier::serviceescalation const& right) {
-  (void)right;
-  return (*this);
-}
 
 /**
  *  Add new service escalation.
@@ -70,8 +47,8 @@ void applier::serviceescalation::add_object(
   // Check service escalation.
   if ((obj.hosts().size() != 1) || !obj.hostgroups().empty() ||
       obj.service_description().size() != 1 || !obj.servicegroups().empty())
-    throw engine_error()
-          << "Could not create service escalation with multiple hosts / host groups / services / service groups";
+    throw engine_error() << "Could not create service escalation with multiple "
+                            "hosts / host groups / services / service groups";
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -100,7 +77,7 @@ void applier::serviceescalation::add_object(
                : notifier::none) |
           ((obj.escalation_options() &
             configuration::serviceescalation::recovery)
-               ? notifier::recovery
+               ? notifier::ok
                : notifier::none))};
 
   // Add new items to tail the list.
@@ -139,7 +116,7 @@ void applier::serviceescalation::expand_objects(configuration::state& s) {
        it_esc != end_esc;
        ++it_esc) {
     // Expanded services.
-    std::set<std::pair<std::string, std::string> > expanded_services;
+    std::set<std::pair<std::string, std::string>> expanded_services;
     _expand_services(
       it_esc->hosts(),
       it_esc->hostgroups(),
@@ -181,12 +158,13 @@ void applier::serviceescalation::expand_objects(configuration::state& s) {
  *  @param[in] obj  Unused.
  */
 void applier::serviceescalation::modify_object(
-       configuration::serviceescalation const& obj) {
+    configuration::serviceescalation const& obj) {
   (void)obj;
-  throw (engine_error() << "Could not modify a service "
-         << "escalation: service escalation objects can only be added "
-         << "or removed, this is likely a software bug that you should "
-         << "report to Centreon Engine developers");
+  throw engine_error()
+      << "Could not modify a service "
+      << "escalation: service escalation objects can only be added "
+      << "or removed, this is likely a software bug that you should "
+      << "report to Centreon Engine developers";
 }
 
 /**
@@ -196,27 +174,26 @@ void applier::serviceescalation::modify_object(
  *                  engine.
  */
 void applier::serviceescalation::remove_object(
-       configuration::serviceescalation const& obj) {
+    configuration::serviceescalation const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing a service escalation.";
+      << "Removing a service escalation.";
 
   // Find service escalation.
-  std::string const& host_name{*obj.hosts().begin()};
+  std::string const& host_name{obj.hosts().front()};
   std::string const& description{obj.service_description().front()};
   std::pair<serviceescalation_mmap::iterator, serviceescalation_mmap::iterator>
-      range{engine::serviceescalation::serviceescalations.equal_range({host_name, description})};
-  service_map::iterator sit{engine::service::services.find({host_name, description})};
+      range{engine::serviceescalation::serviceescalations.equal_range(
+          {host_name, description})};
+  service_map::iterator sit{
+      engine::service::services.find({host_name, description})};
 
-  for (serviceescalation_mmap::iterator
-       it{range.first}, end{range.second};
+  for (serviceescalation_mmap::iterator it{range.first}, end{range.second};
        it != end; ++it) {
-    std::list<std::shared_ptr<escalation>>& escalations(sit->second->get_escalations());
-    for (std::list<std::shared_ptr<engine::escalation>>::iterator
-        itt{escalations.begin()},
-        next_itt{escalations.begin()},
-        end{escalations.end()};
-        itt != end; itt = next_itt) {
+    std::list<escalation*>& escalations(sit->second->get_escalations());
+    for (std::list<engine::escalation*>::iterator itt{escalations.begin()},
+         next_itt{escalations.begin()}, end{escalations.end()};
+         itt != end; itt = next_itt) {
       ++next_itt;
       /* It's a pity but for now we don't have any possibility or key to verify
        * if the hostescalation is the good one. */
@@ -224,16 +201,24 @@ void applier::serviceescalation::remove_object(
           (*itt)->get_last_notification() == obj.last_notification() &&
           (*itt)->get_notification_interval() == obj.notification_interval() &&
           (*itt)->get_escalation_period() == obj.escalation_period() &&
-          (*itt)->get_escalate_on(notifier::down) ==
-              (obj.escalation_options() &
-               configuration::hostescalation::down) &&
-          (*itt)->get_escalate_on(notifier::unreachable) ==
-              (obj.escalation_options() &
-               configuration::hostescalation::unreachable) &&
-          (*itt)->get_escalate_on(notifier::recovery) ==
-              (obj.escalation_options() &
-               configuration::hostescalation::recovery)) {
-        // We have the hostescalation to remove.
+          (*itt)->get_escalate_on(notifier::unknown) ==
+              static_cast<bool>(obj.escalation_options() &
+                                configuration::serviceescalation::unknown) &&
+          (*itt)->get_escalate_on(notifier::ok) ==
+              static_cast<bool>(obj.escalation_options() &
+                                configuration::serviceescalation::recovery) &&
+          (*itt)->get_escalate_on(notifier::critical) ==
+              static_cast<bool>(obj.escalation_options() &
+                                configuration::serviceescalation::critical) &&
+          (*itt)->get_escalate_on(notifier::warning) ==
+              static_cast<bool>(obj.escalation_options() &
+                                configuration::serviceescalation::warning)) {
+        // We have the serviceescalation to remove.
+
+        // Notify event broker.
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE,
+                                        NEBFLAG_NONE, NEBATTR_NONE, *itt, &tv);
         escalations.erase(itt);
         break;
       }
@@ -251,32 +236,48 @@ void applier::serviceescalation::remove_object(
  *  @param[in] obj  Serviceescalation object.
  */
 void applier::serviceescalation::resolve_object(
-       configuration::serviceescalation const& obj) {
+    configuration::serviceescalation const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
       << "Resolving a service escalation.";
 
-  service_map::iterator it{engine::service::services.find(
-    {*obj.hosts().begin(), obj.service_description().front()})};
-  for (std::list<std::shared_ptr<engine::escalation>>::const_iterator
-      itt{it->second->get_escalations().begin()},
-      end{it->second->get_escalations().end()};
-      itt != end;
-      ++itt) {
-    /* It's a pity but for now we don't have any idea or key to verify if
-     * the hostescalation is the good one. */
-    if ((*itt)->get_first_notification() == obj.first_notification() &&
-        (*itt)->get_last_notification() == obj.last_notification() &&
-        (*itt)->get_notification_interval() == obj.notification_interval() &&
-        (*itt)->get_escalation_period() == obj.escalation_period() &&
-        (*itt)->get_escalate_on(notifier::down) == (obj.escalation_options() & configuration::hostescalation::down) &&
-        (*itt)->get_escalate_on(notifier::unreachable) == (obj.escalation_options() & configuration::hostescalation::unreachable) &&
-        (*itt)->get_escalate_on(notifier::recovery) == (obj.escalation_options() & configuration::hostescalation::recovery)) {
+  // Find service escalation
+  bool found{false};
+  std::string const& hostname{*obj.hosts().begin()};
+  std::string const& desc{obj.service_description().front()};
+  auto p(engine::serviceescalation::serviceescalations.equal_range(
+      {hostname, desc}));
+  if (p.first == p.second)
+    throw engine_error() << "Cannot find service escalations "
+                         << "concerning host '" << hostname << "' and service '"
+                         << desc << "'";
+  for (serviceescalation_mmap::iterator
+         it{p.first}; it != p.second; ++it) {
+    if (it->second->get_first_notification() == obj.first_notification() &&
+        it->second->get_last_notification() == obj.last_notification() &&
+        it->second->get_notification_interval() ==
+            obj.notification_interval() &&
+        it->second->get_escalation_period() == obj.escalation_period() &&
+        it->second->get_escalate_on(notifier::warning) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::warning) &&
+        it->second->get_escalate_on(notifier::unknown) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::unknown) &&
+        it->second->get_escalate_on(notifier::critical) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::critical) &&
+        it->second->get_escalate_on(notifier::ok) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::hostescalation::recovery)) {
+      found = true;
       // Resolve service escalation.
-      (*itt)->resolve(config_warnings, config_errors);
-    } else
-      throw engine_error() << "Cannot resolve non-existing service escalation";
+      it->second->resolve(config_warnings, config_errors);
+      break;
+    }
   }
+  if (!found)
+    throw engine_error() << "Cannot resolve non-existing service escalation";
 }
 
 /**
@@ -364,27 +365,21 @@ void applier::serviceescalation::_expand_services(
  *  @param[in]     s   Configuration state.
  */
 void applier::serviceescalation::_inherits_special_vars(
-       configuration::serviceescalation& obj,
-       configuration::state const& s) {
+    configuration::serviceescalation& obj,
+    configuration::state const& s) {
   // Detect if any special variables has not been defined.
-  if (!obj.contacts_defined()
-      || !obj.contactgroups_defined()
-      || !obj.notification_interval_defined()
-      || !obj.escalation_period_defined()) {
+  if (!obj.contacts_defined() || !obj.contactgroups_defined() ||
+      !obj.notification_interval_defined() ||
+      !obj.escalation_period_defined()) {
     // Find service.
-    unsigned int host_id(get_host_id(obj.hosts().front().c_str()));
-    unsigned int service_id(get_service_id(
-                   obj.hosts().front().c_str(),
-                   obj.hosts().front().c_str()));
-    configuration::set_service::const_iterator
-      it(s.services_find(std::make_pair(
-                                host_id,
-                                service_id)));
+    configuration::set_service::const_iterator it{s.services_find(
+        obj.hosts().front(), obj.service_description().front())};
     if (it == s.services().end())
-      throw (engine_error() << "Could not inherit special "
-             << "variables from service '"
-             << obj.service_description().front() << "' of host '"
-             << obj.hosts().front() << "': service does not exist");
+      throw engine_error() << "Could not inherit special "
+                           << "variables from service '"
+                           << obj.service_description().front() << "' of host '"
+                           << obj.hosts().front()
+                           << "': service does not exist";
 
     // Inherits variables.
     if (!obj.contacts_defined())

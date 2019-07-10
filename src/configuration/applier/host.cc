@@ -253,14 +253,14 @@ void applier::host::modify_object(
   // Find the configuration object.
   set_host::iterator it_cfg(config->hosts_find(obj.key()));
   if (it_cfg == config->hosts().end())
-    throw (engine_error() << "Cannot modify non-existing host '"
-           << obj.host_name() << "'");
+    throw engine_error() << "Cannot modify non-existing host '"
+           << obj.host_name() << "'";
 
   // Find host object.
   host_id_map::iterator it_obj(engine::host::hosts_by_id.find(obj.key()));
   if (it_obj == engine::host::hosts_by_id.end())
-    throw (engine_error() << "Could not modify non-existing "
-           << "host object '" << obj.host_name() << "'");
+    throw engine_error() << "Could not modify non-existing "
+           << "host object '" << obj.host_name() << "'";
 
   // Update the global configuration set.
   configuration::host obj_old(*it_cfg);
@@ -287,7 +287,7 @@ void applier::host::modify_object(
   it_obj->second->set_retry_interval(static_cast<double>(obj.retry_interval()));
   it_obj->second->set_max_attempts(static_cast<int>(obj.max_check_attempts()));
   it_obj->second->set_notify_on(
-      (obj.notification_options() & configuration::host::up ? notifier::recovery
+      (obj.notification_options() & configuration::host::up ? notifier::up
                                                             : notifier::none) |
       (obj.notification_options() & configuration::host::down
            ? notifier::down

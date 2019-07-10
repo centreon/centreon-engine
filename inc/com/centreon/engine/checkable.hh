@@ -46,8 +46,8 @@ class checkable {
             std::string const& check_command,
             bool checks_enabled,
             bool accept_passive_checks,
-            double check_interval,
-            double retry_interval,
+            uint32_t check_interval,
+            uint32_t retry_interval,
             int max_attempts,
             std::string const& check_period,
             std::string const& event_handler,
@@ -70,8 +70,8 @@ class checkable {
   void set_display_name(std::string const& name);
   std::string const& get_check_command() const;
   void set_check_command(std::string const& check_command);
-  double get_check_interval() const;
-  void set_check_interval(double check_interval);
+  uint32_t get_check_interval() const;
+  void set_check_interval(uint32_t check_interval);
   double get_retry_interval() const;
   void set_retry_interval(double retry_interval);
   int get_max_attempts() const;
@@ -163,8 +163,8 @@ class checkable {
  private:
   std::string _display_name;
   std::string _check_command;
-  double _check_interval;
-  double _retry_interval;
+  uint32_t _check_interval;
+  uint32_t _retry_interval;
   int _max_attempts;
   std::string _check_period;
   std::string _event_handler;

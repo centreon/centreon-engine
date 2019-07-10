@@ -28,8 +28,10 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
+#include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
+#include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
@@ -61,7 +63,7 @@ class ServiceNotification : public TestEngine {
     checks::checker::load();
 
     configuration::applier::contact ct_aply;
-    configuration::contact ctct{valid_contact_config()};
+    configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
@@ -120,15 +122,16 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotification) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0,
-                                    "tperiod", 7)};
+      new engine::serviceescalation(
+          "test_host", "test_svc", 0, 1, 1.0, "tperiod", 7)};
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
   _svc->notification_period_ptr = tperiod.get();
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id + 1, _svc->get_next_notification_id());
 }
 
@@ -145,15 +148,16 @@ TEST_F(ServiceNotification,
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0,
-                                    "tperiod", 7)};
+      new engine::serviceescalation(
+          "test_host", "test_svc", 0, 1, 1.0, "tperiod", 7)};
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
   _svc->notification_period_ptr = tperiod.get();
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -169,16 +173,17 @@ TEST_F(ServiceNotification,
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0,
-                                    "tperiod", 7)};
+      new engine::serviceescalation(
+          "test_host", "test_svc", 0, 1, 1.0, "tperiod", 7)};
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
   _svc->set_notifications_enabled(false);
   _svc->notification_period_ptr = tperiod.get();
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -189,17 +194,18 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationOutsideTimeperiod) {
 
   uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i)
-    tperiod->days[i].push_back(
-        std::make_shared<engine::timerange>(43200, 86400));
+    tperiod->days[i]
+        .push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
   _svc->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -212,15 +218,17 @@ TEST_F(ServiceNotification,
 
   uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i)
-    tperiod->days[i].push_back(
-        std::make_shared<engine::timerange>(43200, 86400));
+    tperiod->days[i]
+        .push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
   _svc->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
+  ASSERT_EQ(_svc->notify(notifier::reason_normal,
+                         "",
+                         "",
                          notifier::notification_option_forced),
             OK);
   ASSERT_EQ(id + 1, _svc->get_next_notification_id());
@@ -233,15 +241,17 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationForcedNotification) {
 
   uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i)
-    tperiod->days[i].push_back(
-        std::make_shared<engine::timerange>(43200, 86400));
+    tperiod->days[i]
+        .push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
   _svc->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
+  ASSERT_EQ(_svc->notify(notifier::reason_normal,
+                         "",
+                         "",
                          notifier::notification_option_forced),
             OK);
   ASSERT_EQ(id + 1, _svc->get_next_notification_id());
@@ -262,9 +272,10 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationWithDowntime) {
   _svc->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -283,9 +294,10 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationWithFlapping) {
   _svc->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -304,9 +316,10 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationWithSoftState) {
   _svc->notification_period_ptr = tperiod.get();
 
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -326,9 +339,10 @@ TEST_F(ServiceNotification,
 
   _svc->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -349,9 +363,10 @@ TEST_F(ServiceNotification,
   _svc->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(service_escalation);
   _svc->set_last_notification(19999);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -374,9 +389,10 @@ TEST_F(ServiceNotification,
   _svc->set_last_notification(19500);
   _svc->set_notification_number(1);
   _svc->set_notification_interval(0);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -397,9 +413,10 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationOnStateNotNotified) {
   ASSERT_TRUE(service_escalation);
   _svc->remove_notify_on(notifier::critical);
   _svc->set_current_state(engine::service::state_critical);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -423,9 +440,10 @@ TEST_F(ServiceNotification,
   _svc->set_last_hard_state_change(20000 - 200);
   /* It is multiplicated by config->interval_length(): we set 5 for 5*60 */
   _svc->set_first_notification_delay(5);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
 
@@ -448,9 +466,10 @@ TEST_F(ServiceNotification,
   _svc->set_current_state(engine::service::state_critical);
   _svc->set_last_hard_state_change(20000 - 400);
   _svc->set_first_notification_delay(5);
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id + 1, _svc->get_next_notification_id());
 }
 
@@ -466,17 +485,18 @@ TEST_F(ServiceNotification,
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0,
-                                    "tperiod", 7)};
+      new engine::serviceescalation(
+          "test_host", "test_svc", 0, 1, 1.0, "tperiod", 7)};
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
   /* We configure the notification interval to 2 minutes */
   _svc->set_notification_interval(2);
   _svc->notification_period_ptr = tperiod.get();
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
   ASSERT_EQ(id + 1, _svc->get_next_notification_id());
 
   /* Only 100 seconds since the previous notification. */
@@ -484,9 +504,10 @@ TEST_F(ServiceNotification,
   id = _svc->get_next_notification_id();
   /* Because of the notification not totally implemented, we must force the
    * notification number to be greater than 0 */
-  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
-                         notifier::notification_option_none),
-            OK);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
 
   /* No notification, because the delay is too short */
   ASSERT_EQ(id, _svc->get_next_notification_id());
@@ -533,19 +554,19 @@ TEST_F(ServiceNotification, SimpleCheck) {
   std::string out{testing::internal::GetCapturedStdout()};
   size_t step1{out.find(
       "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;service down")};
-  size_t step2{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;CRITICAL;cmd;service down",
-               step1 + 1)};
-  size_t step3{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;CRITICAL;cmd;service down",
-               step2 + 1)};
+  size_t step2{out.find(
+      "SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;CRITICAL;cmd;service down",
+      step1 + 1)};
+  size_t step3{out.find(
+      "SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;CRITICAL;cmd;service down",
+      step2 + 1)};
   // Sent when i == 0 on the second loop.
-  size_t step4{
-      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
-               "(OK);cmd;service ok",
-               step2 + 1)};
+  size_t step4{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      step2 + 1)};
   ASSERT_EQ(step3, std::string::npos);
   ASSERT_NE(step4, std::string::npos);
 }
@@ -594,19 +615,19 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
   }
   std::string out{testing::internal::GetCapturedStdout()};
   size_t m1{out.find("Step 5:")};
-  size_t m2{
-      out.find(" SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;DOWN;cmd;service critical",
-               m1 + 1)};
+  size_t m2{out.find(
+      " SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;DOWN;cmd;service critical",
+      m1 + 1)};
   size_t m3{out.find("Step 35:", m2 + 1)};
-  size_t m4{
-      out.find(" SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;DOWN;cmd;service critical",
-               m3 + 1)};
-  size_t m5{
-      out.find(" SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
-               "(OK);cmd;service ok",
-               m4 + 1)};
+  size_t m4{out.find(
+      " SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;DOWN;cmd;service critical",
+      m3 + 1)};
+  size_t m5{out.find(
+      " SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      m4 + 1)};
   ASSERT_NE(m5, std::string::npos);
 }
 
@@ -655,19 +676,19 @@ TEST_F(ServiceNotification, CheckNotifIntervZero) {
   std::string out{testing::internal::GetCapturedStdout()};
   size_t step1{out.find(
       "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;service down")};
-  size_t step2{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;CRITICAL;cmd;service down",
-               step1 + 1)};
-  size_t step3{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;CRITICAL;cmd;service down",
-               step2 + 1)};
+  size_t step2{out.find(
+      "SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;CRITICAL;cmd;service down",
+      step1 + 1)};
+  size_t step3{out.find(
+      "SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;CRITICAL;cmd;service down",
+      step2 + 1)};
   // Sent when i == 0 on the second loop.
-  size_t step4{
-      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
-               "(OK);cmd;service ok",
-               step2 + 1)};
+  size_t step4{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      step2 + 1)};
   ASSERT_EQ(step3, std::string::npos);
   ASSERT_NE(step4, std::string::npos);
 }
@@ -725,20 +746,133 @@ TEST_F(ServiceNotification, NormalRecoveryTwoTimes) {
   }
 
   std::string out{testing::internal::GetCapturedStdout()};
-  size_t step1{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;CRITICAL;cmd;service critical")};
+  size_t step1{out.find(
+      "SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;CRITICAL;cmd;service critical")};
+  size_t step2{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      step1 + 1)};
+  size_t step3{out.find(
+      "SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;CRITICAL;cmd;service critical",
+      step2 + 1)};
+  size_t step4{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      step3 + 1)};
+  ASSERT_NE(step4, std::string::npos);
+}
+
+// Given a service with a notification interval = 2, a
+// first_delay_notification = 0, an escalation from 2 to 12 with a contactgroup
+// and notification_interval = 4
+// When a normal notification is sent 11 times,
+// Then contacts from the escalation are notified when notification number
+// is in [2,6] and are separated by at less 4*60s.
+TEST_F(ServiceNotification, ServiceEscalation) {
+  configuration::applier::contact ct_aply;
+  configuration::contact ctct{new_configuration_contact("test_contact", false)};
+  ct_aply.add_object(ctct);
+  ct_aply.expand_objects(*config);
+  ct_aply.resolve_object(ctct);
+
+  configuration::applier::contactgroup cg_aply;
+  configuration::contactgroup cg{
+      new_configuration_contactgroup("test_cg", "test_contact")};
+  cg_aply.add_object(cg);
+  cg_aply.expand_objects(*config);
+  cg_aply.resolve_object(cg);
+
+  configuration::applier::serviceescalation se_aply;
+  configuration::serviceescalation se{
+      new_configuration_serviceescalation("test_host", "test_svc", "test_cg")};
+  se_aply.add_object(se);
+  se_aply.expand_objects(*config);
+  se_aply.resolve_object(se);
+
+  int now{50000};
+  set_time(now);
+
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_notification_interval(1);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(now);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 12; i++) {
+    // When i == 0, the state_critical is soft => no notification
+    // When i == 1, the state_critical is soft => no notification
+    // When i == 2, the state_critical is hard down => notification
+    now += 300;
+    std::cout << "NOW = " << now << std::endl;
+    set_time(now);
+    _svc->set_last_state(_svc->get_current_state());
+    if (notifier::hard == _svc->get_state_type())
+      _svc->set_last_hard_state(_svc->get_current_state());
+
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
+           "critical";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  // When i == 0, the state_ok is hard (return to up) => Recovery
+  // notification When i == 1, the state_ok is still here (no change) => no
+  // notification
+  now += 300;
+  set_time(now);
+  std::ostringstream oss;
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t step1{out.find("NOW = 50900")};
   size_t step2{
-      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
-               "(OK);cmd;service ok",
-               step1 + 1)};
-  size_t step3{
       out.find("SERVICE NOTIFICATION: "
                "admin;test_host;test_svc;CRITICAL;cmd;service critical",
-               step2 + 1)};
+               step1 + 1)};
+  size_t step3{out.find("NOW = 51200", step2 + 1)};
   size_t step4{
-      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
-               "(OK);cmd;service ok",
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
                step3 + 1)};
-  ASSERT_NE(step4, std::string::npos);
+  size_t step5{out.find("NOW = 51800", step4 + 1)};
+  size_t step6{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step5 + 1)};
+  size_t step7{out.find("NOW = 52400", step6 + 1)};
+  size_t step8{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step7 + 1)};
+  size_t step9{out.find("NOW = 53000", step8 + 1)};
+  size_t step10{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step9 + 1)};
+  size_t step11{out.find("NOW = 53600", step10 + 1)};
+  size_t step12{
+      out.find("SERVICE NOTIFICATION: "
+               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               step11 + 1)};
+  size_t step13{
+      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok",
+               step12 + 1)};
+  ASSERT_NE(step13, std::string::npos);
 }

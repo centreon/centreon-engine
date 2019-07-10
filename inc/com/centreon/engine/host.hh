@@ -66,15 +66,15 @@ class                host : public notifier {
                            std::string const& address,
                            std::string const& check_period,
                            enum host::host_state initial_state,
-                           double check_interval,
-                           double retry_interval,
+                           uint32_t check_interval,
+                           uint32_t retry_interval,
                            int max_attempts,
                            int notify_up,
                            int notify_down,
                            int notify_unreachable,
                            int notify_flapping,
                            int notify_downtime,
-                           double notification_interval,
+                           uint32_t notification_interval,
                            uint32_t first_notification_delay,
                            uint32_t recovery_notification_delay,
                            std::string const& notification_period,
@@ -268,7 +268,7 @@ class                host : public notifier {
   time_t             get_next_notification_time(time_t offset) override;
   void               schedule_acknowledgement_expiration();
   bool               is_valid_escalation_for_notification(
-                       std::shared_ptr<escalation> e,
+                       escalation const* e,
                        int options) const override;
   void               handle_flap_detection_disabled();
   timeperiod*        get_notification_timeperiod() const override;

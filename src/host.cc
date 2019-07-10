@@ -141,15 +141,15 @@ host::host(uint64_t host_id,
            std::string const& address,
            std::string const& check_period,
            enum host::host_state initial_state,
-           double check_interval,
-           double retry_interval,
+           uint32_t check_interval,
+           uint32_t retry_interval,
            int max_attempts,
            int notify_up,
            int notify_down,
            int notify_unreachable,
            int notify_flapping,
            int notify_downtime,
-           double notification_interval,
+           uint32_t notification_interval,
            uint32_t first_notification_delay,
            uint32_t recovery_notification_delay,
            std::string const& notification_period,
@@ -279,7 +279,7 @@ host::host(uint64_t host_id,
   _out_notification_type |=
       (notify_flapping > 0 ? (flappingstart | flappingstop | flappingdisabled)
                            : 0);
-  _out_notification_type |= (notify_up > 0 ? recovery : 0);
+  _out_notification_type |= (notify_up > 0 ? up : 0);
   _out_notification_type |=
       (notify_unreachable > 0 ? unreachable : 0);
   _process_performance_data = process_perfdata;
@@ -881,7 +881,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << obj.get_notify_on(notifier::unreachable)
      << "\n"
         "  notify_on_recovery:                   "
-     << obj.get_notify_on(notifier::recovery)
+     << obj.get_notify_on(notifier::up)
      << "\n"
         "  notify_on_flappingstart:              "
      << obj.get_notify_on(notifier::flappingstart)
@@ -2834,7 +2834,7 @@ time_t host::get_next_notification_time(time_t offset) {
       << "Calculating next valid notification time...";
 
   /* default notification interval */
-  double interval_to_use{get_notification_interval()};
+  uint32_t interval_to_use{get_notification_interval()};
 
   logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
 
@@ -2842,7 +2842,7 @@ time_t host::get_next_notification_time(time_t offset) {
    * check all the host escalation entries for valid matches for this host
    * (at its current notification number)
    */
-  for (std::shared_ptr<escalation>& e : get_escalations()) {
+  for (escalation* e : get_escalations()) {
     /* interval < 0 means to use non-escalated interval */
     if (e->get_notification_interval() < 0.0)
       continue;
@@ -2951,7 +2951,7 @@ void host::enable_flap_detection() {
  * checks to see if a host escalation entry is a match for the current host
  * notification
  */
-bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
+bool host::is_valid_escalation_for_notification(escalation const* e,
                                                 int options) const {
   uint32_t notification_number;
   time_t current_time;
@@ -2998,7 +2998,7 @@ bool host::is_valid_escalation_for_notification(std::shared_ptr<escalation> e,
     return false;
 
   /* skip this escalation if the state options don't match */
-  if (get_current_state() ==  host::state_up && !e->get_escalate_on(recovery))
+  if (get_current_state() ==  host::state_up && !e->get_escalate_on(up))
     return false;
   else if (get_current_state() ==  host::state_down &&
            !e->get_escalate_on(down))
@@ -4157,7 +4157,7 @@ void host::resolve(int& w, int& e) {
 
   // Check for sane recovery options.
   if (get_notifications_enabled()
-      && get_notify_on(notifier::recovery)
+      && get_notify_on(notifier::up)
       && !get_notify_on(notifier::down)
       && !get_notify_on(notifier::unreachable)) {
     logger(log_verification_error, basic)

@@ -33,14 +33,16 @@ notification::notification(notifier* parent,
                            std::string const& message,
                            uint32_t options,
                            uint64_t notification_id,
-                           uint32_t notification_number)
+                           uint32_t notification_number,
+                           uint32_t notification_interval)
     : _parent{parent},
       _type{type},
       _author{author},
       _message{message},
       _options{options},
       _id{notification_id},
-      _number{notification_number} {
+      _number{notification_number},
+      _interval{notification_interval} {
   switch (_type) {
     case notifier::reason_normal:
       _category = notifier::cat_normal;
@@ -199,4 +201,8 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
 
 notifier::reason_type notification::get_reason() const {
   return _type;
+}
+
+uint32_t notification::get_notification_interval() const {
+  return _interval;
 }

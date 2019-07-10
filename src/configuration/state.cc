@@ -3010,6 +3010,24 @@ set_service::iterator state::services_find(
   return _services.end();
 }
 
+set_service::const_iterator state::services_find(
+    std::string const& host_name, std::string const& service_desc) const {
+  configuration::service below_searched;
+  below_searched.hosts().insert(host_name);
+  below_searched.service_description() = service_desc;
+  set_service::iterator
+    it(_services.upper_bound(below_searched));
+  if (it != _services.end()
+      && *it->hosts().begin() == host_name
+      && it->service_description() == service_desc)
+    return it;
+  else if (it != _services.begin()
+           && *(--it)->hosts().begin() == host_name
+           && it->service_description() == service_desc)
+    return it;
+  return _services.end();
+}
+
 /**
  *  Get service_check_timeout value.
  *

@@ -22,20 +22,34 @@
 
 #include <gtest/gtest.h>
 #include "com/centreon/engine/configuration/contact.hh"
+#include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
+#include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
+#include "com/centreon/engine/configuration/serviceescalation.hh"
 
 using namespace com::centreon::engine;
 
 class TestEngine : public ::testing::Test {
  public:
-  configuration::contact valid_contact_config() const;
+  configuration::contact new_configuration_contact(std::string const& name,
+                                                   bool full) const;
   configuration::host new_configuration_host(std::string const& hostname,
                                              std::string const& contacts);
   configuration::service new_configuration_service(
       std::string const& hostname,
       std::string const& description,
       std::string const& contacts);
+  configuration::hostescalation new_configuration_hostescalation(
+      std::string const& hostname,
+      std::string const& contactgroup);
+  configuration::serviceescalation new_configuration_serviceescalation(
+      std::string const& hostname,
+      std::string const& svc_desc,
+      std::string const& contactgroup);
+  configuration::contactgroup new_configuration_contactgroup(
+      std::string const& name,
+      std::string const& contactname);
 };
 
 #endif /* !TEST_ENGINE_HH */

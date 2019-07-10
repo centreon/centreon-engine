@@ -60,14 +60,7 @@ hostescalation::hostescalation(std::string const& host_name,
                          << "on host '" << host_name << "'";
 }
 
-hostescalation::~hostescalation() {
-  logger(logging::dbg_config, logging::more)
-    << "Removing a host escalation (destructor).";
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE, NEBFLAG_NONE,
-                                  NEBATTR_NONE, this, &tv);
-}
+hostescalation::~hostescalation() {}
 
 std::string const& hostescalation::get_hostname() const {
   return _hostname;
@@ -107,27 +100,28 @@ void hostescalation::resolve(int& w, int& e) {
   int errors{0};
 
   // Find the host.
-  host_map::const_iterator it(host::hosts.find(this->get_hostname()));
-  if (it == host::hosts.end() || !it->second) {
+  host_map::const_iterator found(host::hosts.find(this->get_hostname()));
+  if (found == host::hosts.end() || !found->second) {
     logger(log_verification_error, basic)
-      << "Error: Host '" << this->get_hostname()
-      << "' specified in host escalation is not defined anywhere!";
+        << "Error: Host '" << this->get_hostname()
+        << "' specified in host escalation is not defined anywhere!";
     errors++;
     notifier_ptr = nullptr;
+  } else {
+    notifier_ptr = found->second.get();
+    notifier_ptr->get_escalations().push_back(this);
   }
-  else
-    notifier_ptr = it->second.get();
 
   try {
     escalation::resolve(w, errors);
-  }
-  catch (std::exception const& ee) {
+  } catch (std::exception const& ee) {
     logger(log_verification_error, basic)
-      << "Error: Notifier escalation error: " << ee.what();
+        << "Error: Notifier escalation error: " << ee.what();
   }
 
   // Add errors.
-  e += errors;
-  if (errors)
+  if (errors) {
+    e += errors;
     throw engine_error() << "Cannot resolve host escalation";
+  }
 }

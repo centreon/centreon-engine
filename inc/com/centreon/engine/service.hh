@@ -76,38 +76,38 @@ class                           service : public notifier {
     state_unknown
   };
 
-                                service(std::string const& hostname,
-                                        std::string const& description,
-                                        std::string const& display_name,
-                                        std::string const& check_command,
-                                        bool checks_enabled,
-                                        bool accept_passive_checks,
-                                        enum service::service_state initial_state,
-                                        double check_interval,
-                                        double retry_interval,
-                                        double notification_interval,
-                                        int max_attempts,
-                                        uint32_t first_notification_delay,
-                                        uint32_t recovery_notification_delay,
-                                        std::string const& notification_period,
-                                        bool notifications_enabled,
-                                        bool is_volatile,
-                                        std::string const& check_period,
-                                        std::string const& event_handler,
-                                        bool event_handler_enabled,
-                                        std::string const& notes,
-                                        std::string const& notes_url,
-                                        std::string const& action_url,
-                                        std::string const& icon_image,
-                                        std::string const& icon_image_alt,
-                                        bool flap_detection_enabled,
-                                        double low_flap_threshold,
-                                        double high_flap_threshold,
-                                        bool check_freshness,
-                                        int freshness_threshold,
-                                        bool obsess_over,
-                                        std::string const& timezone);
-                                ~service();
+  service(std::string const& hostname,
+          std::string const& description,
+          std::string const& display_name,
+          std::string const& check_command,
+          bool checks_enabled,
+          bool accept_passive_checks,
+          enum service::service_state initial_state,
+          uint32_t check_interval,
+          uint32_t retry_interval,
+          uint32_t notification_interval,
+          int max_attempts,
+          uint32_t first_notification_delay,
+          uint32_t recovery_notification_delay,
+          std::string const& notification_period,
+          bool notifications_enabled,
+          bool is_volatile,
+          std::string const& check_period,
+          std::string const& event_handler,
+          bool event_handler_enabled,
+          std::string const& notes,
+          std::string const& notes_url,
+          std::string const& action_url,
+          std::string const& icon_image,
+          std::string const& icon_image_alt,
+          bool flap_detection_enabled,
+          double low_flap_threshold,
+          double high_flap_threshold,
+          bool check_freshness,
+          int freshness_threshold,
+          bool obsess_over,
+          std::string const& timezone);
+  ~service();
   void                          set_host_id(uint64_t host_id);
   uint64_t                      get_host_id() const;
   void                          set_service_id(uint64_t service_id);
@@ -189,7 +189,7 @@ class                           service : public notifier {
   bool                          operator==(service const& other);
   bool                          operator!=(service const& other) throw();
   bool                          is_valid_escalation_for_notification(
-                                  std::shared_ptr<escalation> e,
+                                  escalation const* e,
                                   int options) const override;
   bool                          is_result_fresh(time_t current_time, int log_this);
   void                          handle_flap_detection_disabled();

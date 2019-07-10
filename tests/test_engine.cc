@@ -26,34 +26,36 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
 
-configuration::contact TestEngine::valid_contact_config() const {
-  // Add command.
-  {
-    configuration::command cmd;
-    cmd.parse("command_name", "cmd");
-    cmd.parse("command_line", "true");
-    configuration::applier::command aplyr;
-    aplyr.add_object(cmd);
-  }
-  // Add timeperiod.
-  {
-    configuration::timeperiod tperiod;
-    tperiod.parse("timeperiod_name", "24x7");
-    tperiod.parse("alias", "24x7");
-    tperiod.parse("monday", "00:00-24:00");
-    tperiod.parse("tuesday", "00:00-24:00");
-    tperiod.parse("wednesday", "00:00-24:00");
-    tperiod.parse("thursday", "00:00-24:00");
-    tperiod.parse("friday", "00:00-24:00");
-    tperiod.parse("saterday", "00:00-24:00");
-    tperiod.parse("sunday", "00:00-24:00");
-    configuration::applier::timeperiod aplyr;
-    aplyr.add_object(tperiod);
+configuration::contact TestEngine::new_configuration_contact(std::string const& name, bool full) const {
+  if (full) {
+    // Add command.
+    {
+      configuration::command cmd;
+      cmd.parse("command_name", "cmd");
+      cmd.parse("command_line", "true");
+      configuration::applier::command aplyr;
+      aplyr.add_object(cmd);
+    }
+    // Add timeperiod.
+    {
+      configuration::timeperiod tperiod;
+      tperiod.parse("timeperiod_name", "24x7");
+      tperiod.parse("alias", "24x7");
+      tperiod.parse("monday", "00:00-24:00");
+      tperiod.parse("tuesday", "00:00-24:00");
+      tperiod.parse("wednesday", "00:00-24:00");
+      tperiod.parse("thursday", "00:00-24:00");
+      tperiod.parse("friday", "00:00-24:00");
+      tperiod.parse("saterday", "00:00-24:00");
+      tperiod.parse("sunday", "00:00-24:00");
+      configuration::applier::timeperiod aplyr;
+      aplyr.add_object(tperiod);
+    }
   }
   // Valid contact configuration
   // (will generate 0 warnings or 0 errors).
   configuration::contact ctct;
-  ctct.parse("contact_name", "admin");
+  ctct.parse("contact_name", name.c_str());
   ctct.parse("host_notification_period", "24x7");
   ctct.parse("service_notification_period", "24x7");
   ctct.parse("host_notification_commands", "cmd");
@@ -65,6 +67,30 @@ configuration::contact TestEngine::valid_contact_config() const {
   return ctct;
 }
 
+configuration::contactgroup TestEngine::new_configuration_contactgroup(
+    std::string const& name, std::string const& contactname) {
+  configuration::contactgroup cg;
+  cg.parse("contactgroup_name", name.c_str());
+  cg.parse("alias", name.c_str());
+  cg.parse("members", contactname.c_str());
+  return cg;
+}
+
+configuration::serviceescalation TestEngine::new_configuration_serviceescalation(
+    std::string const& hostname,
+    std::string const& svc_desc,
+    std::string const& contactgroup) {
+  configuration::serviceescalation se;
+  se.parse("first_notification", "2");
+  se.parse("last_notification", "11");
+  se.parse("notification_interval", "9");
+  se.parse("escalation_options", "w,u,c,r");
+  se.parse("host_name", hostname.c_str());
+  se.parse("service_description", svc_desc.c_str());
+  se.parse("contact_groups", contactgroup.c_str());
+  return se;
+}
+
 configuration::host TestEngine::new_configuration_host(
     std::string const& hostname,
     std::string const& contacts) {
@@ -74,6 +100,19 @@ configuration::host TestEngine::new_configuration_host(
   hst.parse("_HOST_ID", "12");
   hst.parse("contacts", contacts.c_str());
   return hst;
+}
+
+configuration::hostescalation TestEngine::new_configuration_hostescalation(
+    std::string const& hostname,
+    std::string const& contactgroup) {
+  configuration::hostescalation he;
+  he.parse("first_notification", "2");
+  he.parse("last_notification", "11");
+  he.parse("notification_interval", "9");
+  he.parse("escalation_options", "d,u,r");
+  he.parse("host_name", hostname.c_str());
+  he.parse("contact_groups", contactgroup.c_str());
+  return he;
 }
 
 configuration::service TestEngine::new_configuration_service(

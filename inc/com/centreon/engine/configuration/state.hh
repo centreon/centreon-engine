@@ -358,6 +358,9 @@ namespace               configuration {
                         services_find(service::key_type const& k) const;
     set_service::iterator
                         services_find(service::key_type const& k);
+    set_service::const_iterator
+                        services_find(std::string const& host_name,
+                                      std::string const& service_desc) const;
     unsigned int        service_check_timeout() const throw ();
     void                service_check_timeout(unsigned int value);
     unsigned int        service_freshness_check_interval() const throw ();

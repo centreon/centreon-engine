@@ -115,7 +115,8 @@ bool escalation::is_viable(int state, uint32_t notification_number) const {
       !check_time_against_period(current_time, escalation_period_ptr))
     return false;
 
-  if (number < get_first_notification() || number > get_last_notification())
+  if (number < _first_notification ||
+      (number > _last_notification && _last_notification != 0))
     return false;
   return true;
 }

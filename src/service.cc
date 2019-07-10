@@ -70,9 +70,9 @@ service::service(std::string const& hostname,
                  bool checks_enabled,
                  bool accept_passive_checks,
                  enum service::service_state initial_state,
-                 double check_interval,
-                 double retry_interval,
-                 double notification_interval,
+                 uint32_t check_interval,
+                 uint32_t retry_interval,
+                 uint32_t notification_interval,
                  int max_attempts,
                  uint32_t first_notification_delay,
                  uint32_t recovery_notification_delay,
@@ -437,7 +437,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_notify_on(notifier::critical)
      << "\n"
         "  notify_on_recovery:                   "
-     << obj.get_notify_on(notifier::recovery)
+     << obj.get_notify_on(notifier::ok)
      << "\n"
         "  notify_on_flappingstart:              "
      << obj.get_notify_on(notifier::flappingstart)
@@ -812,7 +812,7 @@ com::centreon::engine::service* add_service(
                       ? (notifier::flappingstart | notifier::flappingstop |
                          notifier::flappingdisabled)
                       : 0);
-    notify_on |= (notify_recovery > 0 ? notifier::recovery : 0);
+    notify_on |= (notify_recovery > 0 ? notifier::ok : 0);
     notify_on |= (notify_unknown > 0 ? notifier::unknown : 0);
     notify_on |= (notify_warning > 0 ? notifier::warning : 0);
     obj->set_notify_on(notify_on);
@@ -3254,7 +3254,7 @@ time_t service::get_next_notification_time(time_t offset) {
       << "Calculating next valid notification time...";
 
   /* default notification interval */
-  double interval_to_use{_notification_interval};
+  uint32_t interval_to_use{_notification_interval};
 
   logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
 
@@ -3262,7 +3262,7 @@ time_t service::get_next_notification_time(time_t offset) {
    * search all the escalation entries for valid matches for this service (at
    * its current notification number)
    */
-  for (std::shared_ptr<escalation>& e : get_escalations()) {
+  for (escalation const* e : get_escalations()) {
     /* interval < 0 means to use non-escalated interval */
     if (e->get_notification_interval() < 0.0)
       continue;
@@ -3317,7 +3317,7 @@ time_t service::get_next_notification_time(time_t offset) {
  * service notification
  */
 bool service::is_valid_escalation_for_notification(
-    std::shared_ptr<escalation> e,
+    escalation const* e,
     int options) const {
   uint32_t notification_number;
   time_t current_time;
@@ -3365,7 +3365,7 @@ bool service::is_valid_escalation_for_notification(
 
   /* skip this escalation if the state options don't match */
   if (_current_state == service::state_ok &&
-      !e->get_escalate_on(recovery))
+      !e->get_escalate_on(ok))
     return false;
   else if (_current_state == service::state_warning &&
            !e->get_escalate_on(warning))
@@ -3826,7 +3826,7 @@ void service::resolve(int& w, int& e) {
 
   // Check for sane recovery options.
   if (get_notifications_enabled()
-      && get_notify_on(notifier::recovery)
+      && get_notify_on(notifier::ok)
       && !get_notify_on(notifier::warning)
       && !get_notify_on(notifier::critical)) {
     logger(log_verification_error, basic)

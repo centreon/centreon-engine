@@ -29,14 +29,18 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
+#include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
+#include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
+#include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
 using namespace com::centreon;
@@ -60,7 +64,7 @@ class HostNotification : public TestEngine {
     checks::checker::load();
 
     configuration::applier::contact ct_aply;
-    configuration::contact ctct{valid_contact_config()};
+    configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
@@ -557,4 +561,136 @@ TEST_F(HostNotification, CheckFirstNotificationDelay) {
   size_t m4{out.find(" HOST NOTIFICATION: admin;test_host;DOWN;cmd;", m3 + 1)};
   size_t m5{out.find(" HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;", m4 + 1)};
   ASSERT_NE(m5, std::string::npos);
+}
+
+// Given a host with a notification interval = 2, a
+// first_delay_notification = 0, an escalation from 2 to 12 with a contactgroup
+// and notification_interval = 4
+// When a normal notification is sent 11 times,
+// Then contacts from the escalation are notified when notification number
+// is in [2,6] and are separated by at less 4*60s.
+TEST_F(HostNotification, HostEscalation) {
+  configuration::applier::contact ct_aply;
+  configuration::contact ctct{new_configuration_contact("test_contact", false)};
+  ct_aply.add_object(ctct);
+  ct_aply.expand_objects(*config);
+  ct_aply.resolve_object(ctct);
+
+  configuration::applier::contactgroup cg_aply;
+  configuration::contactgroup cg{
+      new_configuration_contactgroup("test_cg", "test_contact")};
+  cg_aply.add_object(cg);
+  cg_aply.expand_objects(*config);
+  cg_aply.resolve_object(cg);
+
+  configuration::applier::hostescalation he_aply;
+  configuration::hostescalation he{
+      new_configuration_hostescalation("test_host", "test_cg")};
+  he_aply.add_object(he);
+  he_aply.expand_objects(*config);
+  he_aply.resolve_object(he);
+
+  int now{50000};
+  set_time(now);
+
+  _host->set_current_state(engine::host::state_up);
+  _host->set_notification_interval(1);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(now);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 12; i++) {
+    // When i == 0, the state_critical is soft => no notification
+    // When i == 1, the state_critical is soft => no notification
+    // When i == 2, the state_critical is hard down => notification
+    now += 300;
+    std::cout << "NOW = " << now << std::endl;
+    set_time(now);
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_current_state());
+
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_HOST_CHECK_RESULT;test_host;1;Down host";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  // When i == 0, the state_ok is hard (return to up) => Recovery
+  // notification When i == 1, the state_ok is still here (no change) => no
+  // notification
+  now += 300;
+  set_time(now);
+  std::ostringstream oss;
+  oss << '[' << now << ']'
+      << " PROCESS_HOST_CHECK_RESULT;test_host;0;Host up";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t step1{out.find("NOW = 50300")};
+  ASSERT_NE(step1, std::string::npos);
+  size_t step2{
+      out.find("HOST NOTIFICATION: "
+               "admin;test_host;DOWN;cmd;Down host",
+               step1 + 1)};
+  ASSERT_NE(step2, std::string::npos);
+  size_t step3{out.find("NOW = 50600", step2 + 1)};
+  ASSERT_NE(step3, std::string::npos);
+  size_t step4{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step3 + 1)};
+  ASSERT_NE(step4, std::string::npos);
+  size_t step5{out.find("NOW = 51200", step4 + 1)};
+  ASSERT_NE(step5, std::string::npos);
+  size_t step6{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step5 + 1)};
+  ASSERT_NE(step6, std::string::npos);
+  size_t step7{out.find("NOW = 51800", step6 + 1)};
+  ASSERT_NE(step7, std::string::npos);
+  size_t step8{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step7 + 1)};
+  ASSERT_NE(step8, std::string::npos);
+  size_t step9{out.find("NOW = 52400", step8 + 1)};
+  ASSERT_NE(step9, std::string::npos);
+  size_t step10{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step9 + 1)};
+  ASSERT_NE(step10, std::string::npos);
+  size_t step11{out.find("NOW = 53000", step10 + 1)};
+  ASSERT_NE(step11, std::string::npos);
+  size_t step12{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step11 + 1)};
+  ASSERT_NE(step12, std::string::npos);
+  size_t step13{out.find("NOW = 53600", step12 + 1)};
+  ASSERT_NE(step13, std::string::npos);
+  size_t step14{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step13 + 1)};
+  ASSERT_NE(step14, std::string::npos);
+  size_t step15{
+      out.find("HOST NOTIFICATION: test_contact;test_host;RECOVERY "
+               "(UP);cmd;Host up",
+               step14 + 1)};
+  ASSERT_NE(step15, std::string::npos);
 }

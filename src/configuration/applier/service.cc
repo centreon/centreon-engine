@@ -384,7 +384,7 @@ void applier::service::modify_object(
            ? notifier::critical
            : notifier::none) |
       (obj.notification_options() & configuration::service::ok
-           ? notifier::recovery
+           ? notifier::ok
            : notifier::none) |
       (obj.notification_options() & configuration::service::flapping
            ? (notifier::flappingstart | notifier::flappingstop |
@@ -552,9 +552,9 @@ void applier::service::resolve_object(
   // Find service.
   service_id_map::iterator it(engine::service::services_by_id.find(obj.key()));
   if (engine::service::services_by_id.end() == it)
-    throw (engine_error() << "Cannot resolve non-existing service '"
+    throw engine_error() << "Cannot resolve non-existing service '"
            << obj.service_description() << "' of host '"
-           << *obj.hosts().begin() << "'");
+           << *obj.hosts().begin() << "'";
 
   // Remove service group links.
   it->second->get_parent_groups().clear();
@@ -636,10 +636,10 @@ void applier::service::_inherits_special_vars(
     configuration::set_host::const_iterator
       it(s.hosts_find(obj.hosts().begin()->c_str()));
     if (it == s.hosts().end())
-      throw (engine_error()
+      throw engine_error()
              << "Could not inherit special variables for service '"
              << obj.service_description() << "': host '"
-             << *obj.hosts().begin() << "' does not exist");
+             << *obj.hosts().begin() << "' does not exist";
 
     // Inherits variables.
     if (!obj.contacts_defined() && !obj.contactgroups_defined()) {

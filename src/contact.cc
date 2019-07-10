@@ -339,14 +339,14 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  notify_on_service_unknown:         " << obj.notify_on(notifier::service_notification, notifier::unknown) << "\n"
     "  notify_on_service_warning:         " << obj.notify_on(notifier::service_notification, notifier::warning) << "\n"
     "  notify_on_service_critical:        " << obj.notify_on(notifier::service_notification, notifier::critical) << "\n"
-    "  notify_on_service_recovery:        " << obj.notify_on(notifier::service_notification, notifier::recovery) << "\n"
+    "  notify_on_service_recovery:        " << obj.notify_on(notifier::service_notification, notifier::ok) << "\n"
     "  notify_on_service_flappingstart:   " << obj.notify_on(notifier::service_notification, notifier::flappingstart) << "\n"
     "  notify_on_service_flappingstop:    " << obj.notify_on(notifier::service_notification, notifier::flappingstop) << "\n"
     "  notify_on_service_flappingdisabled:" << obj.notify_on(notifier::service_notification, notifier::flappingdisabled) << "\n"
     "  notify_on_service_downtime:        " << obj.notify_on(notifier::service_notification, notifier::downtime) << "\n"
     "  notify_on_host_down:               " << obj.notify_on(notifier::host_notification, notifier::down) << "\n"
     "  notify_on_host_unreachable:        " << obj.notify_on(notifier::host_notification, notifier::unreachable) << "\n"
-    "  notify_on_host_recovery:           " << obj.notify_on(notifier::host_notification, notifier::recovery) << "\n"
+    "  notify_on_host_recovery:           " << obj.notify_on(notifier::host_notification, notifier::up) << "\n"
     "  notify_on_host_flappingstart:      " << obj.notify_on(notifier::host_notification, notifier::flappingstart) << "\n"
     "  notify_on_host_flappingstop:       " << obj.notify_on(notifier::host_notification, notifier::flappingstop) << "\n"
     "  notify_on_host_flappingdisabled:   " << obj.notify_on(notifier::host_notification, notifier::flappingdisabled) << "\n"
@@ -489,13 +489,13 @@ std::shared_ptr<contact> add_contact(
                                      notifier::flappingstop |
                                      notifier::flappingdisabled)
          : notifier::none) |
-        (notify_host_up > 0 ? notifier::recovery : notifier::none) |
+        (notify_host_up > 0 ? notifier::up : notifier::none) |
         (notify_host_unreachable > 0 ? notifier::unreachable : notifier::none));
     obj->set_notify_on(notifier::service_notification,
         (notify_service_critical > 0 ? notifier::critical : notifier::none) |
         (notify_service_downtime > 0 ? notifier::downtime : notifier::none) |
         (notify_service_flapping > 0 ? (notifier::flappingstart | notifier::flappingstop | notifier::flappingdisabled) : notifier::none) |
-        (notify_service_ok > 0 ? notifier::recovery : notifier::none) |
+        (notify_service_ok > 0 ? notifier::ok : notifier::none) |
         (notify_service_unknown > 0 ? notifier::unknown : notifier::none) |
         (notify_service_warning > 0 ? notifier::warning : notifier::none));
     obj->set_retain_nonstatus_information(retain_nonstatus_information > 0);
@@ -982,7 +982,7 @@ bool contact::_to_notify_recovery(notifier::reason_type type
     << "contact::_to_notify_recovery()";
   notifier::notifier_type nt{notif.get_notifier_type()};
 
-  if (!notify_on(nt, notifier::recovery)) {
+  if (!notify_on(nt, notifier::ok) && !notify_on(nt, notifier::up)) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about a "
       << (nt == notifier::service_notification ? "service" : "host")
@@ -1257,7 +1257,7 @@ void contact::resolve(int& w, int& e) {
   }
 
   /* check for sane host recovery options */
-  if (notify_on(notifier::host_notification, notifier::recovery)
+  if (notify_on(notifier::host_notification, notifier::up)
       && !notify_on(notifier::host_notification, notifier::down)
       && !notify_on(notifier::host_notification, notifier::unreachable)) {
     logger(log_verification_error, basic)
@@ -1268,7 +1268,7 @@ void contact::resolve(int& w, int& e) {
   }
 
   /* check for sane service recovery options */
-  if (notify_on(notifier::service_notification, notifier::recovery)
+  if (notify_on(notifier::service_notification, notifier::ok)
       && !notify_on(notifier::service_notification, notifier::critical)
       && !notify_on(notifier::service_notification, notifier::warning)) {
     logger(log_verification_error, basic)
