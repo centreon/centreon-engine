@@ -182,51 +182,64 @@ void applier::serviceescalation::remove_object(
   // Find service escalation.
   std::string const& host_name{obj.hosts().front()};
   std::string const& description{obj.service_description().front()};
+  /* Let's get a range of escalations for the concerned service */
   std::pair<serviceescalation_mmap::iterator, serviceescalation_mmap::iterator>
       range{engine::serviceescalation::serviceescalations.equal_range(
           {host_name, description})};
+  /* Let's get the service... */
   service_map::iterator sit{
       engine::service::services.find({host_name, description})};
+  if (sit == engine::service::services.end())
+    throw engine_error() << "Cannot find service '"
+                         << host_name << "/" << description << "'";
+
+  /* ... and its escalations */
+  std::list<escalation*>& srv_escalations(sit->second->get_escalations());
 
   for (serviceescalation_mmap::iterator it{range.first}, end{range.second};
        it != end; ++it) {
-    std::list<escalation*>& escalations(sit->second->get_escalations());
-    for (std::list<engine::escalation*>::iterator itt{escalations.begin()},
-         next_itt{escalations.begin()}, end{escalations.end()};
-         itt != end; itt = next_itt) {
-      ++next_itt;
-      /* It's a pity but for now we don't have any possibility or key to verify
-       * if the hostescalation is the good one. */
-      if ((*itt)->get_first_notification() == obj.first_notification() &&
-          (*itt)->get_last_notification() == obj.last_notification() &&
-          (*itt)->get_notification_interval() == obj.notification_interval() &&
-          (*itt)->get_escalation_period() == obj.escalation_period() &&
-          (*itt)->get_escalate_on(notifier::unknown) ==
-              static_cast<bool>(obj.escalation_options() &
-                                configuration::serviceescalation::unknown) &&
-          (*itt)->get_escalate_on(notifier::ok) ==
-              static_cast<bool>(obj.escalation_options() &
-                                configuration::serviceescalation::recovery) &&
-          (*itt)->get_escalate_on(notifier::critical) ==
-              static_cast<bool>(obj.escalation_options() &
-                                configuration::serviceescalation::critical) &&
-          (*itt)->get_escalate_on(notifier::warning) ==
-              static_cast<bool>(obj.escalation_options() &
-                                configuration::serviceescalation::warning)) {
-        // We have the serviceescalation to remove.
+    if (it->second->get_first_notification() == obj.first_notification() &&
+        it->second->get_last_notification() == obj.last_notification() &&
+        it->second->get_notification_interval() == obj.notification_interval() &&
+        it->second->get_escalation_period() == obj.escalation_period() &&
+        it->second->get_escalate_on(notifier::unknown) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::unknown) &&
+        it->second->get_escalate_on(notifier::ok) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::recovery) &&
+        it->second->get_escalate_on(notifier::critical) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::critical) &&
+        it->second->get_escalate_on(notifier::warning) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::serviceescalation::warning)) {
+      // We have the serviceescalation to remove.
 
-        // Notify event broker.
-        timeval tv(get_broker_timestamp(nullptr));
-        broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE,
-                                        NEBFLAG_NONE, NEBATTR_NONE, *itt, &tv);
-        escalations.erase(itt);
-        break;
+      // Notify event broker.
+      timeval tv(get_broker_timestamp(nullptr));
+      broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_DELETE,
+                                      NEBFLAG_NONE, NEBATTR_NONE,
+                                      it->second.get(), &tv);
+
+      /* We need also to remove the escalation from the service */
+      for (std::list<engine::escalation*>::iterator
+               eit{srv_escalations.begin()},
+           eend{srv_escalations.end()};
+           eit != eend; ++eit) {
+        if (*eit == it->second.get()) {
+          srv_escalations.erase(eit);
+          break;
+        }
       }
+
+      // Remove escalation from the global configuration set.
+      engine::serviceescalation::serviceescalations.erase(it);
+      break;
     }
-    // Remove escalation from the global configuration set.
-    engine::serviceescalation::serviceescalations.erase(it);
   }
 
+  /* And we clear the configuration */
   config->serviceescalations().erase(obj);
 }
 

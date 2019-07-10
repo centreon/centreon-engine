@@ -165,44 +165,55 @@ void applier::hostescalation::remove_object(
   std::string const& host_name{*obj.hosts().begin()};
   std::pair<hostescalation_mmap::iterator, hostescalation_mmap::iterator> range{
       engine::hostescalation::hostescalations.equal_range(host_name)};
+
+  /* Let's get the host... */
   host_map::iterator hit{engine::host::hosts.find(host_name)};
+  /* ... and its escalations */
+  if (hit == engine::host::hosts.end())
+    throw engine_error() << "Cannot find host '" << host_name << "'";
+  std::list<escalation*>& escalations(hit->second->get_escalations());
 
   for (hostescalation_mmap::iterator it{range.first}, end{range.second};
        it != end; ++it) {
-    std::list<escalation*>& escalations(hit->second->get_escalations());
-    for (std::list<engine::escalation*>::iterator itt{escalations.begin()},
-         next_itt{escalations.begin()}, end{escalations.end()};
-         itt != end; itt = next_itt) {
-      ++next_itt;
-      /* It's a pity but for now we don't have any possibility or key to verify
-       * if the hostescalation is the good one. */
-      if ((*itt)->get_first_notification() == obj.first_notification() &&
-          (*itt)->get_last_notification() == obj.last_notification() &&
-          (*itt)->get_notification_interval() == obj.notification_interval() &&
-          (*itt)->get_escalation_period() == obj.escalation_period() &&
-          (*itt)->get_escalate_on(notifier::down) ==
-              static_cast<bool>(obj.escalation_options() &
-                                configuration::hostescalation::down) &&
-          (*itt)->get_escalate_on(notifier::unreachable) ==
-              static_cast<bool>(obj.escalation_options() &
-                                configuration::hostescalation::unreachable) &&
-          (*itt)->get_escalate_on(notifier::up) ==
-              static_cast<bool>(obj.escalation_options() &
-                                configuration::hostescalation::recovery)) {
-        // We have the hostescalation to remove.
+    /* It's a pity but for now we don't have any possibility or key to verify
+     * if the hostescalation is the good one. */
+    if (it->second->get_first_notification() == obj.first_notification() &&
+        it->second->get_last_notification() == obj.last_notification() &&
+        it->second->get_notification_interval() == obj.notification_interval() &&
+        it->second->get_escalation_period() == obj.escalation_period() &&
+        it->second->get_escalate_on(notifier::down) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::hostescalation::down) &&
+        it->second->get_escalate_on(notifier::unreachable) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::hostescalation::unreachable) &&
+        it->second->get_escalate_on(notifier::up) ==
+            static_cast<bool>(obj.escalation_options() &
+                              configuration::hostescalation::recovery)) {
+      // We have the hostescalation to remove.
 
-        // Notify event broker.
-        timeval tv(get_broker_timestamp(nullptr));
-        broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE,
-                                        NEBFLAG_NONE, NEBATTR_NONE, *itt, &tv);
-        escalations.erase(itt);
-        break;
+      // Notify event broker.
+      timeval tv(get_broker_timestamp(nullptr));
+      broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE,
+                                      NEBFLAG_NONE, NEBATTR_NONE, it->second.get(), &tv);
+
+      /* We need also to remove the escalation from the host */
+      for (std::list<engine::escalation*>::iterator heit{escalations.begin()},
+           heend{escalations.end()};
+           heit != heend; ++heit) {
+        if (*heit == it->second.get()) {
+          escalations.erase(heit);
+          break;
+        }
       }
+
+      // Remove host escalation from the global configuration set.
+      engine::hostescalation::hostescalations.erase(it);
+      break;
     }
-    // Remove host escalation from the global configuration set.
-    engine::hostescalation::hostescalations.erase(it);
   }
 
+  /* And we clear the configuration */
   config->hostescalations().erase(obj);
 }
 
