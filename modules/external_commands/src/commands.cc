@@ -1540,7 +1540,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
   unsigned long sattr(MODATTR_NONE);
   host_map::const_iterator
       it;
-  std::pair<uint64_t, uint64_t> id;
   service_map::const_iterator found_svc;
   contact_map::iterator cnct;
 
@@ -1845,7 +1844,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
   unsigned long hattr{MODATTR_NONE};
   unsigned long sattr{MODATTR_NONE};
   host_map::const_iterator it;
-  std::pair<uint64_t, uint64_t> id;
   service_map::const_iterator found_svc;
   contact_map::iterator cnct;
 

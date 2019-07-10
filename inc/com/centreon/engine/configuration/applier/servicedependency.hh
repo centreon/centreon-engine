@@ -27,40 +27,35 @@
 
 CCE_BEGIN()
 
-namespace                configuration {
-  // Forward declarations.
-  class                  servicedependency;
-  class                  state;
+namespace configuration {
+// Forward declarations.
+class servicedependency;
+class state;
 
-  namespace              applier {
-    class                servicedependency {
-     public:
-                         servicedependency();
-                         servicedependency(
-                           servicedependency const& right);
-                         ~servicedependency() throw ();
-      servicedependency& operator=(servicedependency const& right);
-      void               add_object(
-                           configuration::servicedependency const& obj);
-      void               expand_objects(configuration::state& s);
-      void               modify_object(
-                           configuration::servicedependency const& obj);
-      void               remove_object(
-                           configuration::servicedependency const& obj);
-      void               resolve_object(
-                           configuration::servicedependency const& obj);
+namespace applier {
+class servicedependency {
+ public:
+  servicedependency();
+  servicedependency(servicedependency const& right) = delete;
+  ~servicedependency() throw();
+  servicedependency& operator=(servicedependency const& right) = delete;
+  void add_object(configuration::servicedependency const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::servicedependency const& obj);
+  void remove_object(configuration::servicedependency const& obj);
+  void resolve_object(configuration::servicedependency const& obj);
 
-     private:
-      void               _expand_services(
-                           std::list<std::string> const& hst,
-                           std::list<std::string> const& hg,
-                           std::list<std::string> const& svc,
-                           std::list<std::string> const& sg,
-                           configuration::state& s,
-                           std::set<std::pair<std::string, std::string> >& expanded);
-    };
-  }
-}
+ private:
+  void _expand_services(
+      std::list<std::string> const& hst,
+      std::list<std::string> const& hg,
+      std::list<std::string> const& svc,
+      std::list<std::string> const& sg,
+      configuration::state& s,
+      std::set<std::pair<std::string, std::string> >& expanded);
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 

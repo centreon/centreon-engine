@@ -277,24 +277,6 @@ hostdependency_mmap::iterator applier::state::hostdependencies_find(configuratio
 }
 
 /**
- *  Get the current servicedependencies.
- *
- *  @return The current servicedependencies.
- */
-servicedependency_mmap const& applier::state::servicedependencies() const throw () {
-  return _servicedependencies;
-}
-
-/**
- *  Get the current servicedependencies.
- *
- *  @return The current servicedependencies.
- */
-servicedependency_mmap& applier::state::servicedependencies() throw () {
-  return _servicedependencies;
-}
-
-/**
  *  Find a service dependency from its key.
  *
  *  @param[in] k The service dependency configuration.

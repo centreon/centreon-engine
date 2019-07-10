@@ -30,10 +30,9 @@
 # include "com/centreon/engine/namespace.hh"
 # include "common.hh"
 
-// Forward declarations
-struct nagios_macros;
-
+class nagios_macros;
 CCE_BEGIN()
+// Forward declarations
 class escalation;
 class contact;
 class timeperiod;
