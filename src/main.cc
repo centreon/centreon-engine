@@ -258,7 +258,7 @@ int main(int argc, char* argv[]) {
           << "Checked " << hostescalation::hostescalations.size() << " host escalations.\n"
           << "Checked " << hostgroup::hostgroups.size() << " host groups.\n"
           << "Checked " << host::hosts.size() << " hosts.\n"
-          << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
+          << "Checked " << servicedependency::servicedependencies.size() << " service dependencies.\n"
           << "Checked " << serviceescalation::serviceescalations.size() << " service escalations.\n"
           << "Checked " << servicegroup::servicegroups.size() << " service groups.\n"
           << "Checked " << service::services.size() << " services.\n"

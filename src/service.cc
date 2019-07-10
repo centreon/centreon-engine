@@ -1769,7 +1769,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
          * want the dependency logic to be accurate */
         std::pair<std::string, std::string> id({_hostname, _description});
         servicedependency_mmap const&
-            dependencies(state::instance().servicedependencies());
+            dependencies{servicedependency::servicedependencies};
         for (servicedependency_mmap::const_iterator
                it{dependencies.find(id)},
                end{dependencies.end()};
@@ -3571,8 +3571,8 @@ uint64_t service::check_dependencies(
 
   std::pair<std::string, std::string>
     id(_hostname, _description);
-  servicedependency_mmap const& dependencies(
-    state::instance().servicedependencies());
+  servicedependency_mmap const& dependencies{
+    servicedependency::servicedependencies};
   for (servicedependency_mmap::const_iterator
          it(dependencies.find(id)), end(dependencies.end());
        it != end && it->first == id;

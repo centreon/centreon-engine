@@ -80,7 +80,7 @@ void applier::serviceescalation::add_object(
                ? notifier::ok
                : notifier::none))};
 
-  // Add new items to tail the list.
+  // Add new items to the global list.
   engine::serviceescalation::serviceescalations.insert(
       {{se->get_hostname(), se->get_description()}, se});
 

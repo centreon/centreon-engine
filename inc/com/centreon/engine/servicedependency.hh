@@ -19,8 +19,9 @@
 
 #ifndef CCE_OBJECTS_SERVICEDEPENDENCY_HH
 #  define CCE_OBJECTS_SERVICEDEPENDENCY_HH
-#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/dependency.hh"
+#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/configuration/servicedependency.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
@@ -77,6 +78,8 @@ class                 servicedependency : public dependency {
 
   static servicedependency_mmap
                       servicedependencies;
+  static servicedependency_mmap::iterator servicedependencies_find(
+      configuration::servicedependency const& k);
 
  private:
   std::string         _dependent_service_description;

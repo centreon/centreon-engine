@@ -18,7 +18,6 @@
 */
 
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -28,7 +27,6 @@
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
@@ -391,3 +389,62 @@ void servicedependency::resolve(int& w, int& e) {
     throw engine_error() << "Cannot resolve service dependency";
   }
 }
+
+/**
+ *  Find a service dependency from its key.
+ *
+ *  @param[in] k The service dependency configuration.
+ *
+ *  @return Iterator to the element if found,
+ *          servicedependencies().end() otherwise.
+ */
+servicedependency_mmap::iterator servicedependency::servicedependencies_find(
+    configuration::servicedependency const& k) {
+  typedef servicedependency_mmap collection;
+  std::pair<collection::iterator, collection::iterator> p;
+  p = servicedependencies.equal_range(std::make_pair(
+      k.dependent_hosts().front(), k.dependent_service_description().front()));
+  while (p.first != p.second) {
+    configuration::servicedependency current;
+    current.configuration::object::operator=(k);
+    current.dependent_hosts().push_back(
+        p.first->second->get_dependent_hostname());
+    current.dependent_service_description().push_back(
+        p.first->second->get_dependent_service_description());
+    current.hosts().push_back(p.first->second->get_hostname());
+    current.service_description().push_back(
+        p.first->second->get_service_description());
+    current.dependency_period(p.first->second->get_dependency_period());
+    current.inherits_parent(p.first->second->get_inherits_parent());
+    unsigned int options((p.first->second->get_fail_on_ok()
+                              ? configuration::servicedependency::ok
+                              : 0) |
+                         (p.first->second->get_fail_on_warning()
+                              ? configuration::servicedependency::warning
+                              : 0) |
+                         (p.first->second->get_fail_on_unknown()
+                              ? configuration::servicedependency::unknown
+                              : 0) |
+                         (p.first->second->get_fail_on_critical()
+                              ? configuration::servicedependency::critical
+                              : 0) |
+                         (p.first->second->get_fail_on_pending()
+                              ? configuration::servicedependency::pending
+                              : 0));
+    if (p.first->second->get_dependency_type() ==
+        engine::dependency::notification) {
+      current.dependency_type(
+          configuration::servicedependency::notification_dependency);
+      current.notification_failure_options(options);
+    } else {
+      current.dependency_type(
+          configuration::servicedependency::execution_dependency);
+      current.execution_failure_options(options);
+    }
+    if (current == k)
+      break;
+    ++p.first;
+  }
+  return (p.first == p.second) ? servicedependencies.end() : p.first;
+}
+
