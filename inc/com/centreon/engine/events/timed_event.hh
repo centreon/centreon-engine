@@ -42,6 +42,8 @@ class                        timed_event{
     high = 1,
     priority_num
   };
+                            timed_event();
+
   unsigned int               event_type;
   time_t                     run_time;
   int                        recurring;

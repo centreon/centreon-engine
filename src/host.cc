@@ -1781,7 +1781,6 @@ void host::schedule_check(time_t check_time, int options) {
   }
   /* allocate memory for a new event item */
   new_event = new timed_event;
-  memset(new_event, 0, sizeof(*new_event));
 
   /* default is to use the new event */
   use_original_event = false;
