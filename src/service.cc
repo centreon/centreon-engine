@@ -1768,7 +1768,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* we do this because we might be sending out a notification soon and we
          * want the dependency logic to be accurate */
         std::pair<std::string, std::string> id({_hostname, _description});
-        auto p{servicedependency::servicedependencies.equal_range(id)};
+        auto p(servicedependency::servicedependencies.equal_range(id));
         for (servicedependency_mmap::const_iterator
                it{p.first},
                end{p.second};
@@ -3568,8 +3568,8 @@ bool service::authorized_by_dependencies(
   logger(dbg_functions, basic)
     << "service::authorized_by_dependencies()";
 
-  auto p{servicedependency::servicedependencies.equal_range(
-      {_hostname, _description})};
+  auto p(servicedependency::servicedependencies.equal_range(
+      {_hostname, _description}));
   for (servicedependency_mmap::const_iterator
       it{p.first}, end{p.second};
       it != end; ++it) {

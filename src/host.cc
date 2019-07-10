@@ -3844,7 +3844,7 @@ bool host::authorized_by_dependencies(dependency::types dependency_type) const {
   logger(dbg_functions, basic)
     << "host::authorized_by_dependencies()";
 
-  auto p{hostdependency::hostdependencies.equal_range(_name)};
+  auto p(hostdependency::hostdependencies.equal_range(_name));
   for (hostdependency_mmap::const_iterator it{p.first}, end{p.second};
        it != end; ++it) {
     hostdependency* dep{it->second.get()};

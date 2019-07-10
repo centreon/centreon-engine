@@ -1035,7 +1035,7 @@ TEST_F(ServiceNotification, ServiceDependency) {
   _svc->set_state_type(checkable::hard);
   _svc->set_accept_passive_checks(true);
 
-  service_map& sm{engine::service::services};
+  service_map& sm(engine::service::services);
   service_map::iterator it{sm.find({"test_host", "dep_svc"})};
   ASSERT_NE(it, sm.end());
   engine::service* dep_svc{it->second.get()};
