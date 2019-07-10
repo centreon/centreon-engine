@@ -101,7 +101,7 @@ configuration::servicedependency TestEngine::new_configuration_servicedependency
   sd.parse("master_description", service.c_str());
   sd.parse("dependent_host", dep_hostname.c_str());
   sd.parse("dependent_description", dep_service.c_str());
-  sd.parse("notification_failure_options", "o,u,w,c,p");
+  sd.parse("notification_failure_options", "u,w,c");
   sd.dependency_type(configuration::servicedependency::notification_dependency);
   return sd;
 }

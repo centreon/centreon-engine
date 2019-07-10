@@ -95,6 +95,12 @@ void servicedependency::set_service_description(
   _service_description = service_description;
 }
 
+bool servicedependency::get_fail_on(int state) const {
+  std::array<bool, 4> retval{_fail_on_ok, _fail_on_warning, _fail_on_critical,
+                             _fail_on_unknown};
+  return retval[state];
+}
+
 bool servicedependency::get_fail_on_ok() const {
   return _fail_on_ok;
 }
@@ -135,7 +141,7 @@ void servicedependency::set_fail_on_critical(bool fail_on_critical) {
  *  @return True if is the same object, otherwise false.
  */
 bool servicedependency::operator==(servicedependency const& obj) throw() {
-  return static_cast<dependency>(*this) == obj &&
+  return *this == obj &&
          _dependent_service_description ==
              obj.get_dependent_service_description() &&
          _service_description == obj.get_service_description() &&
@@ -143,32 +149,6 @@ bool servicedependency::operator==(servicedependency const& obj) throw() {
          _fail_on_warning == obj.get_fail_on_warning() &&
          _fail_on_unknown == obj.get_fail_on_unknown() &&
          _fail_on_critical == obj.get_fail_on_critical();
-}
-
-/**
- *  Less-than operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if the first object is strictly less than the second.
- */
-bool servicedependency::operator<(servicedependency const& obj) throw() {
-  if (static_cast<dependency>(*this) != obj)
-    return static_cast<dependency>(*this) < obj;
-  else if (_dependent_service_description !=
-           obj.get_dependent_service_description())
-    return _dependent_service_description <
-           obj.get_dependent_service_description();
-  else if (_service_description != obj.get_service_description())
-    return _service_description < obj.get_service_description();
-  else if (_fail_on_ok != obj.get_fail_on_ok())
-    return _fail_on_ok < obj.get_fail_on_ok();
-  else if (_fail_on_warning != obj.get_fail_on_warning())
-    return _fail_on_warning < obj.get_fail_on_warning();
-  else if (_fail_on_critical != obj.get_fail_on_critical())
-    return _fail_on_critical < obj.get_fail_on_critical();
-  return _fail_on_unknown < obj.get_fail_on_unknown();
 }
 
 /**

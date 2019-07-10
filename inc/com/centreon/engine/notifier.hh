@@ -27,7 +27,7 @@
 # include "com/centreon/engine/checkable.hh"
 # include "com/centreon/engine/contactgroup.hh"
 # include "com/centreon/engine/customvariable.hh"
-# include "com/centreon/engine/namespace.hh"
+# include "com/centreon/engine/dependency.hh"
 # include "common.hh"
 
 class nagios_macros;
@@ -230,7 +230,8 @@ class                notifier : public checkable {
   int                get_notification_number() const;
   void               set_notification_number(int number);
 
-  virtual uint64_t   check_dependencies(int dependency_type) = 0;
+  virtual bool authorized_by_dependencies(
+      dependency::types dependency_type) const = 0;
   uint64_t           get_next_notification_id() const;
   virtual timeperiod* get_notification_timeperiod() const = 0;
   notification_category

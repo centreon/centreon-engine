@@ -68,6 +68,11 @@ hostdependency::hostdependency(std::string const& dependent_hostname,
       _fail_on_down{fail_on_down},
       _fail_on_unreachable{fail_on_unreachable} {}
 
+bool hostdependency::get_fail_on(int state) const {
+  std::array<bool, 3> retval{_fail_on_up, _fail_on_down, _fail_on_unreachable};
+  return retval[state];
+}
+
 bool hostdependency::get_fail_on_up() const {
   return _fail_on_up;
 }
@@ -100,7 +105,7 @@ void hostdependency::set_fail_on_unreachable(bool fail_on_unreachable) {
  *  @return True if is the same object, otherwise false.
  */
 bool hostdependency::operator==(hostdependency const& obj) throw() {
-  return static_cast<dependency>(*this) == obj &&
+  return *this == obj &&
          _fail_on_up == obj.get_fail_on_up() &&
          _fail_on_down == obj.get_fail_on_down() &&
          _fail_on_unreachable == obj.get_fail_on_unreachable();
