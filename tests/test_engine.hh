@@ -47,6 +47,10 @@ class TestEngine : public ::testing::Test {
       std::string const& hostname,
       std::string const& svc_desc,
       std::string const& contactgroup);
+  configuration::serviceescalation new_configuration_serviceescalation_contact(
+    std::string const& hostname,
+    std::string const& svc_desc,
+    std::string const& contact);
   configuration::contactgroup new_configuration_contactgroup(
       std::string const& name,
       std::string const& contactname);

@@ -582,6 +582,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
            it{_escalations.begin()},
        end{_escalations.end()};
        it != end; ++it) {
+    assert(*it);
     if ((*it)->is_viable(get_current_state_int(), _notification_number)) {
       /* Among escalations, we choose the smallest notification interval. */
       if (escalated) {
@@ -599,9 +600,11 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
        * for the moment if those contacts accept notification. */
       for (contact_map_unsafe::const_iterator cit{(*it)->contacts().begin()},
            cend{(*it)->contacts().end()};
-           cit != cend; ++cit)
+           cit != cend; ++cit) {
+        assert(cit->second);
         if (cit->second->should_be_notified(cat, type, *this))
           retval.insert(cit->second);
+      }
 
       /* For each contact group, we also add its contacts. */
       for (contactgroup_map_unsafe::const_iterator
@@ -611,9 +614,11 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
         for (contact_map_unsafe::const_iterator
                  cit{cgit->second->get_members().begin()},
              cend{cgit->second->get_members().end()};
-             cit != cend; ++cit)
+             cit != cend; ++cit) {
+          assert(cit->second);
           if (cit->second->should_be_notified(cat, type, *this))
             retval.insert(cit->second);
+        }
       }
     }
   }
@@ -623,8 +628,10 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
      * for the moment if those contacts accept notification. */
     for (contact_map_unsafe::const_iterator it{get_contacts().begin()},
          end{get_contacts().end()};
-         it != end; ++it)
+         it != end; ++it) {
+      assert(it->second);
       retval.insert(it->second);
+    }
 
     /* For each contact group, we also add its contacts. */
     for (contactgroup_map_unsafe::const_iterator
@@ -634,8 +641,10 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
       for (contact_map_unsafe::const_iterator
                cit{it->second->get_members().begin()},
            cend{it->second->get_members().end()};
-           cit != cend; ++cit)
+           cit != cend; ++cit) {
+        assert(cit->second);
         retval.insert(cit->second);
+      }
     }
   }
 
@@ -1438,10 +1447,12 @@ bool is_contact_for_notifier(com::centreon::engine::notifier* notif,
   for (contactgroup_map_unsafe::const_iterator
            it{notif->get_contactgroups().begin()},
        end{notif->get_contactgroups().end()};
-       it != end; ++it)
+       it != end; ++it) {
+    assert(it->second);
     if (it->second->get_members().find(cntct->get_name()) ==
         it->second->get_members().end())
       return true;
+  }
 
   return false;
 }

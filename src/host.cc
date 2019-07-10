@@ -3025,37 +3025,37 @@ bool host::is_result_fresh(
   int tseconds = 0;
 
   logger(dbg_checks, most)
-    << "Checking freshness of host '" << this->get_name() << "'...";
+    << "Checking freshness of host '" << _name << "'...";
 
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
-  if (this->get_freshness_threshold() == 0) {
+  if (get_freshness_threshold() == 0) {
     double interval;
-    if ((hard == this->get_state_type())
-        || (host::state_up == this->get_current_state()))
-      interval = this->get_check_interval();
+    if ((hard == get_state_type())
+        || (host::state_up == get_current_state()))
+      interval = get_check_interval();
     else
-      interval = this->get_retry_interval();
+      interval = get_retry_interval();
     freshness_threshold
       = static_cast<int>((interval * config->interval_length())
-                         + this->get_latency()
+                         + get_latency()
                          + config->additional_freshness_latency());
   }
   else
-    freshness_threshold = this->get_freshness_threshold();
+    freshness_threshold = get_freshness_threshold();
 
   logger(dbg_checks, most)
-    << "Freshness thresholds: host=" << this->get_freshness_threshold()
+    << "Freshness thresholds: host=" << get_freshness_threshold()
     << ", use=" << freshness_threshold;
 
   /* calculate expiration time */
   /* CHANGED 11/10/05 EG - program start is only used in expiration time calculation if > last check AND active checks are enabled, so active checks can become stale immediately upon program startup */
-  if (!this->get_has_been_checked())
+  if (!get_has_been_checked())
     expiration_time = (time_t)(event_start + freshness_threshold);
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (hosts never go stale). */
   /* CHANGED 10/07/07 EG - Added max_host_check_spread to expiration time as suggested by Altinity */
-  else if (this->get_checks_enabled()
+  else if (get_checks_enabled()
            && event_start > get_last_check()
-           && this->get_freshness_threshold() == 0)
+           && get_freshness_threshold() == 0)
     expiration_time
       = (time_t)(event_start + freshness_threshold
                  + (config->max_host_check_spread()
@@ -3065,7 +3065,7 @@ bool host::is_result_fresh(
       = (time_t)(get_last_check() + freshness_threshold);
 
   logger(dbg_checks, most)
-    << "HBC: " << this->get_has_been_checked()
+    << "HBC: " << get_has_been_checked()
     << ", PS: " << program_start
     << ", ES: " << event_start
     << ", LC: " << get_last_check()
@@ -3090,7 +3090,7 @@ bool host::is_result_fresh(
     /* log a warning */
     if (log_this)
       logger(log_runtime_warning, basic)
-        << "Warning: The results of host '" << this->get_name()
+        << "Warning: The results of host '" << _name
         << "' are stale by " << days << "d " << hours << "h "
         << minutes << "m " << seconds << "s (threshold="
         << tdays << "d " << thours << "h " << tminutes << "m "
@@ -3098,7 +3098,7 @@ bool host::is_result_fresh(
         " the host.";
 
     logger(dbg_checks, more)
-      << "Check results for host '" << this->get_name()
+      << "Check results for host '" << _name
       << "' are stale by " << days << "d " << hours << "h " << minutes
       << "m " << seconds << "s (threshold=" << tdays << "d " << thours
       << "h " << tminutes << "m " << tseconds << "s).  "

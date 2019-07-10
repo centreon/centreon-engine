@@ -77,9 +77,9 @@ configuration::contactgroup TestEngine::new_configuration_contactgroup(
 }
 
 configuration::serviceescalation TestEngine::new_configuration_serviceescalation(
-    std::string const& hostname,
-    std::string const& svc_desc,
-    std::string const& contactgroup) {
+  std::string const& hostname,
+  std::string const& svc_desc,
+  std::string const& contactgroup) {
   configuration::serviceescalation se;
   se.parse("first_notification", "2");
   se.parse("last_notification", "11");
@@ -88,6 +88,21 @@ configuration::serviceescalation TestEngine::new_configuration_serviceescalation
   se.parse("host_name", hostname.c_str());
   se.parse("service_description", svc_desc.c_str());
   se.parse("contact_groups", contactgroup.c_str());
+  return se;
+}
+
+configuration::serviceescalation TestEngine::new_configuration_serviceescalation_contact(
+  std::string const& hostname,
+  std::string const& svc_desc,
+  std::string const& contact) {
+  configuration::serviceescalation se;
+  se.parse("first_notification", "2");
+  se.parse("last_notification", "11");
+  se.parse("notification_interval", "9");
+  se.parse("escalation_options", "w,u,c,r");
+  se.parse("host_name", hostname.c_str());
+  se.parse("service_description", svc_desc.c_str());
+  se.parse("contacts", contact.c_str());
   return se;
 }
 
