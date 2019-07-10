@@ -1768,18 +1768,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* we do this because we might be sending out a notification soon and we
          * want the dependency logic to be accurate */
         std::pair<std::string, std::string> id({_hostname, _description});
-        servicedependency_mmap const&
-            dependencies{servicedependency::servicedependencies};
+        auto p{servicedependency::servicedependencies.equal_range(id)};
         for (servicedependency_mmap::const_iterator
-               it{dependencies.find(id)},
-               end{dependencies.end()};
-             it != end && it->first == id; ++it) {
-          servicedependency* temp_dependency(&*it->second.get());
+               it{p.first},
+               end{p.second};
+             it != end; ++it) {
+          servicedependency* temp_dependency{it->second.get()};
 
           if (temp_dependency->dependent_service_ptr == this &&
-              temp_dependency->master_service_ptr != nullptr) {
-            master_service = (com::centreon::engine::service*)
-                                 temp_dependency->master_service_ptr;
+              temp_dependency->master_service_ptr) {
+            master_service = temp_dependency->master_service_ptr;
             logger(dbg_checks, most)
                 << "Predictive check of service '"
                 << master_service->get_description() << "' on host '"
