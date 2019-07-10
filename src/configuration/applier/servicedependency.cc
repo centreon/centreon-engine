@@ -261,8 +261,8 @@ void applier::servicedependency::remove_object(
 
   // Find service dependency.
   servicedependency_mmap::iterator
-    it(applier::state::instance().servicedependencies_find(obj.key()));
-  if (it != applier::state::instance().servicedependencies().end()) {
+    it(engine::servicedependency::servicedependencies_find(obj.key()));
+  if (it != engine::servicedependency::servicedependencies.end()) {
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
@@ -275,8 +275,6 @@ void applier::servicedependency::remove_object(
 
     // Remove service dependency from its list.
     engine::servicedependency::servicedependencies.erase(it);
-    // Erase service dependency (will effectively delete the object).
-    applier::state::instance().servicedependencies().erase(it);
   }
 
   // Remove dependency from the global configuration set.
@@ -296,10 +294,9 @@ void applier::servicedependency::resolve_object(
 
   // Find service dependency.
   servicedependency_mmap::iterator
-    it(applier::state::instance().servicedependencies_find(obj.key()));
-  if (applier::state::instance().servicedependencies().end() == it)
-    throw (engine_error() << "Cannot resolve non-existing "
-           << "service dependency");
+    it(engine::servicedependency::servicedependencies_find(obj.key()));
+  if (engine::servicedependency::servicedependencies.end() == it)
+    throw engine_error() << "Cannot resolve non-existing service dependency";
 
   // Resolve service dependency.
   it->second->resolve(config_warnings, config_errors);
