@@ -26,6 +26,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
+#include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 
 using namespace com::centreon::engine;
@@ -39,10 +40,16 @@ class TestEngine : public ::testing::Test {
   configuration::service new_configuration_service(
       std::string const& hostname,
       std::string const& description,
-      std::string const& contacts);
+      std::string const& contacts,
+      uint64_t svc_id = 13);
   configuration::hostescalation new_configuration_hostescalation(
       std::string const& hostname,
       std::string const& contactgroup);
+  configuration::servicedependency new_configuration_servicedependency(
+      std::string const& hostname,
+      std::string const& description,
+      std::string const& dep_hostname,
+      std::string const& dep_description);
   configuration::serviceescalation new_configuration_serviceescalation(
       std::string const& hostname,
       std::string const& svc_desc,

@@ -1768,18 +1768,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* we do this because we might be sending out a notification soon and we
          * want the dependency logic to be accurate */
         std::pair<std::string, std::string> id({_hostname, _description});
-        servicedependency_mmap const&
-            dependencies{servicedependency::servicedependencies};
+        auto p{servicedependency::servicedependencies.equal_range(id)};
         for (servicedependency_mmap::const_iterator
-               it{dependencies.find(id)},
-               end{dependencies.end()};
-             it != end && it->first == id; ++it) {
-          servicedependency* temp_dependency(&*it->second.get());
+               it{p.first},
+               end{p.second};
+             it != end; ++it) {
+          servicedependency* temp_dependency{it->second.get()};
 
           if (temp_dependency->dependent_service_ptr == this &&
-              temp_dependency->master_service_ptr != nullptr) {
-            master_service = (com::centreon::engine::service*)
-                                 temp_dependency->master_service_ptr;
+              temp_dependency->master_service_ptr) {
+            master_service = temp_dependency->master_service_ptr;
             logger(dbg_checks, most)
                 << "Predictive check of service '"
                 << master_service->get_description() << "' on host '"
@@ -3045,8 +3043,7 @@ int service::verify_check_viability(int check_options,
     }
 
     /* check service dependencies for execution */
-    if (check_dependencies(hostdependency::execution) ==
-        DEPENDENCIES_FAILED) {
+    if (!authorized_by_dependencies(hostdependency::execution)) {
       preferred_time = current_time + check_interval;
       perform_check = false;
 
@@ -3558,73 +3555,67 @@ timeperiod* service::get_notification_timeperiod() const {
                                  : _host_ptr->notification_period_ptr;
 }
 
-/* handles asynchronous service check results */
-/* checks service dependencies */
-uint64_t service::check_dependencies(
-  int dependency_type) {
-  service* temp_service = nullptr;
-  int state =  service::state_ok;
-  time_t current_time = 0L;
-
+/**
+ *  This function returns a boolean telling if the master services of this one
+ *  authorize it or forbide it to make its job (execution or notification).
+ *
+ * @param dependency_type execution / notification
+ *
+ * @return true if it is authorized.
+ */
+bool service::authorized_by_dependencies(
+    dependency::types dependency_type) const {
   logger(dbg_functions, basic)
-    << "check_service_dependencies()";
+    << "service::authorized_by_dependencies()";
 
-  std::pair<std::string, std::string>
-    id(_hostname, _description);
-  servicedependency_mmap const& dependencies{
-    servicedependency::servicedependencies};
+  auto p{servicedependency::servicedependencies.equal_range(
+      {_hostname, _description})};
   for (servicedependency_mmap::const_iterator
-         it(dependencies.find(id)), end(dependencies.end());
-       it != end && it->first == id;
-       ++it) {
-    servicedependency* temp_dependency(&*it->second);
+      it{p.first}, end{p.second};
+      it != end; ++it) {
 
-    /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->get_dependency_type() != dependency_type)
+    servicedependency* dep{it->second.get()};
+    /* Only check dependencies of the desired type (notification or execution) */
+    if (dep->get_dependency_type() != dependency_type)
       continue;
 
-    /* find the service we depend on... */
-    if ((temp_service = temp_dependency->master_service_ptr) == nullptr)
+    /* Find the service we depend on */
+    if (!dep->master_service_ptr)
       continue;
 
-    /* skip this dependency if it has a timeperiod and the current time isn't valid */
-    time(&current_time);
-    if (!check_time_against_period(
-      current_time,
-      temp_dependency->dependency_period_ptr))
-      return DEPENDENCIES_OK;
+    /* Skip this dependency if it has a timepriod and the the current time is
+     * not valid */
+    time_t current_time{std::time(nullptr)};
+    if (!dep->get_dependency_period().empty() &&
+        !check_time_against_period(current_time, dep->dependency_period_ptr))
+      return true;
 
-    /* get the status to use (use last hard state if its currently in a soft state) */
-    if (temp_service->get_state_type() == notifier::soft
-      && !config->soft_state_dependencies())
-      state = temp_service->get_last_hard_state();
-    else
-      state = temp_service->get_current_state();
+    /* Get the status to use (use last hard state if it's currently in a soft
+     * state) */
+    service_state state =
+        (dep->master_service_ptr->get_state_type() == notifier::soft &&
+         !config->soft_state_dependencies())
+            ? dep->master_service_ptr->get_last_hard_state()
+            : dep->master_service_ptr->get_current_state();
 
-    /* is the service we depend on in state that fails the dependency tests? */
-    if (state ==  service::state_ok && temp_dependency->get_fail_on_ok())
-      return DEPENDENCIES_FAILED;
-    if (state ==  service::state_warning
-      && temp_dependency->get_fail_on_warning())
-      return DEPENDENCIES_FAILED;
-    if (state ==  service::state_unknown
-      && temp_dependency->get_fail_on_unknown())
-      return DEPENDENCIES_FAILED;
-    if (state ==  service::state_critical
-      && temp_dependency->get_fail_on_critical())
-      return DEPENDENCIES_FAILED;
-    if ((state ==  service::state_ok && !temp_service->get_has_been_checked())
-      && temp_dependency->get_fail_on_pending())
-      return DEPENDENCIES_FAILED;
+    /* Is the service we depend on in state that fails the dependency tests? */
+    if (dep->get_fail_on(state))
+      return false;
 
-    /* immediate dependencies ok at this point - check parent dependencies if necessary */
-    if (temp_dependency->get_inherits_parent()) {
-      if (temp_service->check_dependencies(
-        dependency_type) != DEPENDENCIES_OK)
-        return DEPENDENCIES_FAILED;
+    if (state == service::state_ok &&
+        !dep->master_service_ptr->get_has_been_checked() &&
+        dep->get_fail_on_pending())
+      return false;
+
+    /* Immediate dependencies ok at this point - check parent dependencies if
+     * necessary */
+    if (dep->get_inherits_parent()) {
+      if (!dep->master_service_ptr->authorized_by_dependencies(
+        dependency_type))
+        return false;
     }
   }
-  return DEPENDENCIES_OK;
+  return true;
 }
 
 /* check for services that never returned from a check... */

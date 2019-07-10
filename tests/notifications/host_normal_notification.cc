@@ -111,6 +111,10 @@ TEST_F(HostNotification, SimpleNormalHostNotification) {
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
   _host->notification_period_ptr = tperiod.get();
+  _host->set_current_state(engine::host::state_down);
+  _host->set_last_state(engine::host::state_down);
+  _host->set_last_hard_state_change(43200);
+  _host->set_state_type(checkable::hard);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
                           notifier::notification_option_none),
             OK);
@@ -446,6 +450,10 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
   /* We configure the notification interval to 2 minutes */
   _host->set_notification_interval(2);
   _host->notification_period_ptr = tperiod.get();
+  _host->set_current_state(engine::host::state_down);
+  _host->set_last_state(engine::host::state_down);
+  _host->set_last_hard_state_change(43200);
+  _host->set_state_type(checkable::hard);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
                           notifier::notification_option_none),
             OK);

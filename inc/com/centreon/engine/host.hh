@@ -178,7 +178,8 @@ class                host : public notifier {
   int                perform_scheduled_check(int check_options,
                                                  double latency);
   void               adjust_check_attempt(bool is_active);
-  uint64_t           check_dependencies(int dependency_type) override;
+  bool authorized_by_dependencies(
+      dependency::types dependency_type) const override;
   static void        check_for_orphaned();
   static void        check_result_freshness();
 

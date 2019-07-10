@@ -77,9 +77,9 @@ configuration::contactgroup TestEngine::new_configuration_contactgroup(
 }
 
 configuration::serviceescalation TestEngine::new_configuration_serviceescalation(
-  std::string const& hostname,
-  std::string const& svc_desc,
-  std::string const& contactgroup) {
+    std::string const& hostname,
+    std::string const& svc_desc,
+    std::string const& contactgroup) {
   configuration::serviceescalation se;
   se.parse("first_notification", "2");
   se.parse("last_notification", "11");
@@ -89,6 +89,21 @@ configuration::serviceescalation TestEngine::new_configuration_serviceescalation
   se.parse("service_description", svc_desc.c_str());
   se.parse("contact_groups", contactgroup.c_str());
   return se;
+}
+
+configuration::servicedependency TestEngine::new_configuration_servicedependency(
+    std::string const& hostname,
+    std::string const& service,
+    std::string const& dep_hostname,
+    std::string const& dep_service) {
+  configuration::servicedependency sd;
+  sd.parse("master_host", hostname.c_str());
+  sd.parse("master_description", service.c_str());
+  sd.parse("dependent_host", dep_hostname.c_str());
+  sd.parse("dependent_description", dep_service.c_str());
+  sd.parse("notification_failure_options", "u,w,c");
+  sd.dependency_type(configuration::servicedependency::notification_dependency);
+  return sd;
 }
 
 configuration::serviceescalation TestEngine::new_configuration_serviceescalation_contact(
@@ -133,12 +148,13 @@ configuration::hostescalation TestEngine::new_configuration_hostescalation(
 configuration::service TestEngine::new_configuration_service(
     std::string const& hostname,
     std::string const& description,
-    std::string const& contacts) {
+    std::string const& contacts,
+    uint64_t svc_id) {
   configuration::service svc;
   svc.parse("host_name", hostname.c_str());
   svc.parse("description", description.c_str());
   svc.parse("_HOST_ID", "12");
-  svc.parse("_SERVICE_ID", "13");
+  svc.parse("_SERVICE_ID", std::to_string(svc_id).c_str());
   svc.parse("contacts", contacts.c_str());
 
   configuration::command cmd("cmd");

@@ -62,7 +62,8 @@ class                         dependency {
     bool circular_path_checked);
   bool                          get_contains_circular_path() const;
   void                          set_contains_circular_path(
-    bool contains_circular_path);
+      bool contains_circular_path);
+  virtual bool get_fail_on(int state) const = 0;
 
   virtual bool                  operator==(dependency const& obj) throw ();
   bool                          operator!=(dependency const& obj) throw ();

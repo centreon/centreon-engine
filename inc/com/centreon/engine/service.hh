@@ -198,7 +198,8 @@ class                           service : public notifier {
   timeperiod*                   get_notification_timeperiod() const override;
   bool                          get_notify_on_current_state() const override;
 
-  uint64_t                      check_dependencies(int dependency_type) override;
+  bool authorized_by_dependencies(
+      dependency::types dependency_type) const override;
   static void                   check_for_orphaned();
   static void                   check_result_freshness();
   bool                          is_in_downtime() const override;

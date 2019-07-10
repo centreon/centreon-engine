@@ -2311,7 +2311,7 @@ void host::check_for_expired_acknowledgement() {
 //  }
 //
 //  /* check notification dependencies */
-//  if (check_dependencies(hostdependency::notification) ==
+//  if (authorized_by_dependencies(hostdependency::notification) ==
 //      DEPENDENCIES_FAILED) {
 //    logger(dbg_notifications, more)
 //        << "Notification dependencies for this host have failed, "
@@ -2627,8 +2627,7 @@ int host::verify_check_viability(int check_options,
     }
 
     /* check host dependencies for execution */
-    if (check_dependencies(hostdependency::execution) ==
-        DEPENDENCIES_FAILED) {
+    if (!authorized_by_dependencies(hostdependency::execution)) {
       preferred_time = current_time + check_interval;
       perform_check = false;
     }
@@ -3833,70 +3832,63 @@ int host::perform_scheduled_check(
   return OK;
 }
 
-/* checks host dependencies */
-uint64_t host::check_dependencies(int dependency_type) {
-  host* temp_host = nullptr;
-  enum host::host_state state = host::state_up;
-  time_t current_time = 0L;
-
+/**
+ *  This function returns a boolean telling if the master hosts of this one
+ *  authorize it or forbide it to make its job (execution or notification).
+ *
+ * @param dependency_type execution / notification
+ *
+ * @return true if it is authorized.
+ */
+bool host::authorized_by_dependencies(dependency::types dependency_type) const {
   logger(dbg_functions, basic)
-    << "check_host_dependencies()";
+    << "host::authorized_by_dependencies()";
 
-  std::string id(_name);
-  hostdependency_mmap const& dependencies(hostdependency::hostdependencies);
-
-  /* check all dependencies... */
-  for (hostdependency_mmap::const_iterator
-         it{dependencies.find(id)}, end{dependencies.end()};
-       it != end && it->first == id;
-       ++it) {
-    hostdependency* temp_dependency(&*it->second);
-
-    /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->get_dependency_type() != dependency_type)
+  auto p{hostdependency::hostdependencies.equal_range(_name)};
+  for (hostdependency_mmap::const_iterator it{p.first}, end{p.second};
+       it != end; ++it) {
+    hostdependency* dep{it->second.get()};
+    /* Only check dependencies of the desired type (notification or execution) */
+    if (dep->get_dependency_type() != dependency_type)
       continue;
 
-    /* find the host we depend on... */
-    if ((temp_host = temp_dependency->master_host_ptr) == nullptr)
+    /* Find the host we depend on */
+    if (!dep->master_host_ptr)
       continue;
 
-    /* skip this dependency if it has a timeperiod and the current time isn't valid */
-    time(&current_time);
-    if (!temp_dependency->get_dependency_period().empty()
-      && !check_time_against_period(
-        current_time,
-        temp_dependency->dependency_period_ptr))
-      return DEPENDENCIES_OK;
+    /* Skip this dependency if it has a timepriod and the current time is
+     * not valid */
+    time_t current_time{std::time(nullptr)};
+    if (!dep->get_dependency_period().empty() &&
+        !check_time_against_period(current_time, dep->dependency_period_ptr))
+      return true;
 
-    /* get the status to use (use last hard state if its currently in a soft state) */
-    if (temp_host->get_state_type() == notifier::soft
-      && !config->soft_state_dependencies())
-      state = temp_host->get_last_hard_state();
-    else
-      state = temp_host->get_current_state();
+    /* Get the status to use (use last hard state if it's currently in a soft
+     * state) */
+    host_state state =
+        (dep->master_host_ptr->get_state_type() == notifier::soft &&
+         !config->soft_state_dependencies())
+            ? dep->master_host_ptr->get_last_hard_state()
+            : dep->master_host_ptr->get_current_state();
 
-    /* is the host we depend on in state that fails the dependency tests? */
-    if (state == host::state_up && temp_dependency->get_fail_on_up())
-      return DEPENDENCIES_FAILED;
-    if (state == host::state_down && temp_dependency->get_fail_on_down())
-      return DEPENDENCIES_FAILED;
-    if (state == host::state_unreachable
-      && temp_dependency->get_fail_on_unreachable())
-      return DEPENDENCIES_FAILED;
-    if ((state == host::state_up && !temp_host->get_has_been_checked())
-      && temp_dependency->get_fail_on_pending())
-      return DEPENDENCIES_FAILED;
+    /* Is the host we depend on in state that fails the dependency tests? */
+    if (dep->get_fail_on(state))
+      return false;
 
-    /* immediate dependencies ok at this point - check parent dependencies if necessary */
-    if (temp_dependency->get_inherits_parent()) {
-      if (check_dependencies(dependency_type) != DEPENDENCIES_OK)
-        return DEPENDENCIES_FAILED;
+    if (state == host::state_up &&
+        !dep->master_host_ptr->get_has_been_checked() &&
+        dep->get_fail_on_pending())
+      return false;
+
+    /* Immediate dependencies ok at this point - check parent dependencies if
+     * necessary */
+    if (dep->get_inherits_parent()) {
+      if (!dep->master_host_ptr->authorized_by_dependencies(dependency_type))
+        return false;
     }
   }
-  return DEPENDENCIES_OK;
+  return true;
 }
-
-
 
 /* check freshness of host results */
 void host::check_result_freshness() {

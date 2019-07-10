@@ -27,10 +27,6 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/notifier.hh"
 
-// Service dependency values
-#  define DEPENDENCIES_OK     0
-#  define DEPENDENCIES_FAILED 1
-
 enum check_source {
   service_check,
   host_check

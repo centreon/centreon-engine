@@ -62,6 +62,7 @@ class                           hostdependency : public dependency {
                                   hostdependency* dep,
                                   types dependency_type);
   void resolve(int& w, int& e);
+  bool get_fail_on(int state) const override;
 
   bool                          operator==(hostdependency const& obj) throw ();
   bool                          operator<(hostdependency const& obj) throw ();

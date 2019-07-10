@@ -69,9 +69,9 @@ class                 servicedependency : public dependency {
                         servicedependency* dep,
                         types dependency_type);
   void resolve(int& w, int& e);
+  bool get_fail_on(int state) const override;
 
   bool                operator==(servicedependency const& obj) throw ();
-  bool                operator<(servicedependency const& obj) throw ();
 
   service*            master_service_ptr;
   service*            dependent_service_ptr;

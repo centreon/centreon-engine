@@ -242,6 +242,12 @@ bool notifier::_is_notification_viable_normal(
     return false;
   }
 
+  if (get_current_state_int() == 0) {
+    logger(dbg_notifications, more)
+        << "We don't send a normal notification when the state is ok/up";
+    return false;
+  }
+
   if (!get_notify_on_current_state()) {
     logger(dbg_notifications, more)
         << "This notifier is not configured to notify the state "
@@ -257,6 +263,13 @@ bool notifier::_is_notification_viable_normal(
         << "This notifier is configured with a first notification delay, we "
            "won't send notification until timestamp "
         << (_first_notification_delay * config->interval_length());
+    return false;
+  }
+
+  if (!authorized_by_dependencies(dependency::notification)) {
+    logger(dbg_notifications, more)
+        << "This notifier won't send any notification since it depends on"
+           " another notifier that has already sent one";
     return false;
   }
 
