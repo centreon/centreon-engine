@@ -32,32 +32,9 @@ using namespace com::centreon::engine::configuration;
 applier::hostdependency::hostdependency() {}
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-applier::hostdependency::hostdependency(
-                           applier::hostdependency const& right) {
-  (void)right;
-}
-
-/**
  *  Destructor.
  */
 applier::hostdependency::~hostdependency() throw () {}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-applier::hostdependency& applier::hostdependency::operator=(
-                           applier::hostdependency const& right) {
-  (void)right;
-  return *this;
-}
 
 /**
  *  Add new hostdependency.
@@ -111,8 +88,6 @@ void applier::hostdependency::add_object(
          & configuration::hostdependency::pending),
        obj.dependency_period())};
 
-  state::instance().hostdependencies().insert(
-    {*obj.dependent_hosts().begin(), hd});
   engine::hostdependency::hostdependencies.insert(
     {*obj.dependent_hosts().begin(), hd});
 
@@ -173,7 +148,7 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
                end2(dependent_hosts.end());
              it2 != end2;
              ++it2)
-          for (unsigned int i(0); i < 2; ++i) {
+          for (int i(0); i < 2; ++i) {
             // Create host dependency instance.
             configuration::hostdependency hdep(*it_dep);
             hdep.hostgroups().clear();
@@ -218,11 +193,10 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
 void applier::hostdependency::modify_object(
        configuration::hostdependency const& obj) {
   (void)obj;
-  throw (engine_error() << "Could not modify a host dependency: "
+  throw engine_error() << "Could not modify a host dependency: "
          << "Host dependency objects can only be added or removed, "
          << "this is likely a software bug that you should report to "
-         << "Centreon Engine developers");
-  return ;
+         << "Centreon Engine developers";
 }
 
 /**
@@ -239,8 +213,8 @@ void applier::hostdependency::remove_object(
 
   // Find host dependency.
   hostdependency_mmap::iterator
-    it(applier::state::instance().hostdependencies_find(obj.key()));
-  if (it != applier::state::instance().hostdependencies().end()) {
+    it(engine::hostdependency::hostdependencies_find(obj.key()));
+  if (it != engine::hostdependency::hostdependencies.end()) {
     com::centreon::engine::hostdependency* dependency(it->second.get());
 
     // Notify event broker.
@@ -253,9 +227,7 @@ void applier::hostdependency::remove_object(
       &tv);
 
     // Remove host dependency from its list.
-    engine::hostdependency::hostdependencies.erase(it->first);
-    // Erase host dependency (will effectively delete the object).
-    applier::state::instance().hostdependencies().erase(it);
+    engine::hostdependency::hostdependencies.erase(it);
   }
 
   // Remove dependency from the global configuration set.
@@ -275,12 +247,12 @@ void applier::hostdependency::resolve_object(
   logger(logging::dbg_config, logging::more)
     << "Resolving a host dependency.";
 
-  // Find host dependency.
+  // Find host escalation
   hostdependency_mmap::iterator
-    it(applier::state::instance().hostdependencies_find(obj.key()));
-  if (applier::state::instance().hostdependencies().end() == it)
-    throw (engine_error() << "Cannot resolve non-existing "
-           << "host dependency");
+    it{engine::hostdependency::hostdependencies_find(obj.key())};
+
+  if (engine::hostdependency::hostdependencies.end() == it)
+    throw engine_error() << "Cannot resolve non-existing host escalation";
 
   // Resolve host dependency.
   it->second->resolve(config_warnings, config_errors);

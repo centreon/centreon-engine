@@ -295,3 +295,52 @@ void hostdependency::resolve(int& w, int& e) {
   if (errors)
     throw engine_error() << "Cannot resolve host dependency";
 }
+
+
+/**
+ *  Find a service dependency from its key.
+ *
+ *  @param[in] k The service dependency configuration.
+ *
+ *  @return Iterator to the element if found,
+ *          servicedependencies().end() otherwise.
+ */
+hostdependency_mmap::iterator hostdependency::hostdependencies_find(
+  const com::centreon::engine::configuration::hostdependency &k) {
+  typedef hostdependency_mmap collection;
+  std::pair<collection::iterator, collection::iterator> p;
+
+  p = hostdependencies.equal_range(*k.dependent_hosts().begin());
+  while (p.first != p.second) {
+    configuration::hostdependency current;
+    current.configuration::object::operator=(k);
+    current.dependent_hosts().insert(
+      p.first->second->get_dependent_hostname());
+    current.hosts().insert(p.first->second->get_hostname());
+    current.dependency_period((!p.first->second->get_dependency_period().empty()
+      ? p.first->second->get_dependency_period().c_str() : ""));
+    current.inherits_parent(p.first->second->get_inherits_parent());
+    unsigned int options(
+      (p.first->second->get_fail_on_up()
+        ? configuration::hostdependency::up : 0)
+          | (p.first->second->get_fail_on_down()
+            ? configuration::hostdependency::down : 0)
+               | (p.first->second->get_fail_on_unreachable()
+                 ? configuration::hostdependency::unreachable: 0)
+                   | (p.first->second->get_fail_on_pending()
+                     ? configuration::hostdependency::pending : 0));
+    if (p.first->second->get_dependency_type() == engine::hostdependency::notification) {
+      current.dependency_type(
+        configuration::hostdependency::notification_dependency);
+      current.notification_failure_options(options);
+    } else {
+      current.dependency_type(
+        configuration::hostdependency::execution_dependency);
+      current.execution_failure_options(options);
+    }
+    if (current == k)
+      break ;
+    ++p.first;
+  }
+  return (p.first == p.second) ? hostdependencies.end() : p.first;
+}

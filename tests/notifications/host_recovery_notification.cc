@@ -33,6 +33,7 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/hostescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
 using namespace com::centreon;

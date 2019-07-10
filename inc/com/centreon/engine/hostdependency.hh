@@ -23,6 +23,7 @@
 #  include <ostream>
 #  include <string>
 #  include "com/centreon/engine/dependency.hh"
+#  include "com/centreon/engine/configuration/hostdependency.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
@@ -66,6 +67,8 @@ class                           hostdependency : public dependency {
   bool                          operator<(hostdependency const& obj) throw ();
 
   static hostdependency_mmap    hostdependencies;
+  static hostdependency_mmap::iterator
+                                hostdependencies_find(configuration::hostdependency const& k);
 
   host*                         master_host_ptr;
   host*                         dependent_host_ptr;

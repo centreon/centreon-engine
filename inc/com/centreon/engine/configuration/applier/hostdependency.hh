@@ -35,9 +35,9 @@ namespace             configuration {
     class             hostdependency {
      public:
                       hostdependency();
-                      hostdependency(hostdependency const& right);
+                      hostdependency(hostdependency const& right) = delete;
                       ~hostdependency() throw ();
-      hostdependency& operator=(hostdependency const& right);
+      hostdependency& operator=(hostdependency const& right) = delete;
       void            add_object(
                         configuration::hostdependency const& obj);
       void            expand_objects(configuration::state& s);

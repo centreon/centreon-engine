@@ -3615,13 +3615,10 @@ int host::process_check_result_3x(enum host::host_state new_state,
             << "Propagating predictive dependency checks to hosts this "
                "one depends on...";
 
-          std::string id(_name);
-          hostdependency_mmap const&
-            dependencies(state::instance().hostdependencies());
           for (hostdependency_mmap::const_iterator
-                 it{dependencies.find(id)},
-                 end{dependencies.end()};
-               it != end && it->first == id; ++it) {
+                 it{hostdependency::hostdependencies.find(_name)},
+                 end{hostdependency::hostdependencies.end()};
+               it != end && it->first == _name; ++it) {
             hostdependency* temp_dependency(it->second.get());
             if (temp_dependency->dependent_host_ptr == this &&
               temp_dependency->master_host_ptr != nullptr) {
@@ -3847,8 +3844,7 @@ uint64_t host::check_dependencies(int dependency_type) {
     << "check_host_dependencies()";
 
   std::string id(_name);
-  hostdependency_mmap const&
-    dependencies(state::instance().hostdependencies());
+  hostdependency_mmap const& dependencies(hostdependency::hostdependencies);
 
   /* check all dependencies... */
   for (hostdependency_mmap::const_iterator

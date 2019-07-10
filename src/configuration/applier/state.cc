@@ -193,8 +193,11 @@ applier::state::~state() throw() {
   engine::service::services.clear();
   engine::service::services_by_id.clear();
   engine::servicedependency::servicedependencies.clear();
+  engine::serviceescalation::serviceescalations.clear();
   engine::host::hosts.clear();
   engine::host::hosts_by_id.clear();
+  engine::hostdependency::hostdependencies.clear();
+  engine::hostescalation::hostescalations.clear();
   engine::timeperiod::timeperiods.clear();
   engine::comment::comments.clear();
   engine::comment::set_next_comment_id(1llu);
@@ -204,77 +207,6 @@ applier::state::~state() throw() {
   applier::macros::unload();
   applier::globals::unload();
   applier::logging::unload();
-}
-
-
-/**
- *  Get the current hostdependencies.
- *
- *  @return The current hostdependencies.
- */
-hostdependency_mmap const& applier::state::hostdependencies() const throw () {
-  return _hostdependencies;
-}
-
-/**
- *  Get the current hostdependencies.
- *
- *  @return The current hostdependencies.
- */
-hostdependency_mmap& applier::state::hostdependencies() throw () {
-  return _hostdependencies;
-}
-
-/**
- *  Get a host dependency from its key.
- *
- *  @param[in] k Host dependency key.
- *
- *  @return Iterator to the element if found, hostdependencies().end()
- *          otherwise.
- */
-hostdependency_mmap::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
-  typedef hostdependency_mmap collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = _hostdependencies.equal_range(*k.dependent_hosts().begin());
-  while (p.first != p.second) {
-    configuration::hostdependency current;
-    current.configuration::object::operator=(k);
-    current.dependent_hosts().insert(
-                                p.first->second->get_dependent_hostname());
-    current.hosts().insert(p.first->second->get_hostname());
-    current.dependency_period((!p.first->second->get_dependency_period().empty()
-                              ? p.first->second->get_dependency_period().c_str()
-                              : ""));
-    current.inherits_parent(p.first->second->get_inherits_parent());
-    unsigned int options(
-      (p.first->second->get_fail_on_up()
-       ? configuration::hostdependency::up
-       : 0)
-      | (p.first->second->get_fail_on_down()
-         ? configuration::hostdependency::down
-         : 0)
-      | (p.first->second->get_fail_on_unreachable()
-         ? configuration::hostdependency::unreachable
-         : 0)
-      | (p.first->second->get_fail_on_pending()
-         ? configuration::hostdependency::pending
-         : 0));
-    if (p.first->second->get_dependency_type() == engine::hostdependency::notification) {
-      current.dependency_type(
-                configuration::hostdependency::notification_dependency);
-      current.notification_failure_options(options);
-    }
-    else {
-      current.dependency_type(
-                configuration::hostdependency::execution_dependency);
-      current.execution_failure_options(options);
-    }
-    if (current == k)
-      break ;
-    ++p.first;
-  }
-  return (p.first == p.second) ? _hostdependencies.end() : p.first;
 }
 
 /**

@@ -254,7 +254,7 @@ int main(int argc, char* argv[]) {
           << "Checked " << commands::command::commands.size() << " commands.\n"
           << "Checked " << commands::connector::connectors.size() << " connectors.\n"
           << "Checked " << contact::contacts.size() << " contacts.\n"
-          << "Checked " << applier.hostdependencies().size() << " host dependencies.\n"
+          << "Checked " << hostdependency::hostdependencies.size() << " host dependencies.\n"
           << "Checked " << hostescalation::hostescalations.size() << " host escalations.\n"
           << "Checked " << hostgroup::hostgroups.size() << " host groups.\n"
           << "Checked " << host::hosts.size() << " hosts.\n"

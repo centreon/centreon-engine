@@ -27,14 +27,11 @@
 #  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
-#  include "com/centreon/engine/hostdependency.hh"
-#  include "com/centreon/engine/hostescalation.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/servicedependency.hh"
 #  include "com/centreon/engine/timeperiod.hh"
 
 CCE_BEGIN()
-class serviceescalation;
 
 // Forward declaration.
 namespace commands {
@@ -68,12 +65,6 @@ namespace           configuration {
       static void   load();
       static void   unload();
 
-      hostdependency_mmap const&
-                    hostdependencies() const throw ();
-      hostdependency_mmap&
-                    hostdependencies() throw ();
-      hostdependency_mmap::iterator
-                    hostdependencies_find(configuration::hostdependency::key_type const& k);
       servicedependency_mmap const&
                     servicedependencies() const throw ();
       servicedependency_mmap&
@@ -120,8 +111,6 @@ namespace           configuration {
 
       concurrency::condvar
                     _cv_lock;
-      hostdependency_mmap
-                    _hostdependencies;
       concurrency::mutex
                     _lock;
       processing_state
