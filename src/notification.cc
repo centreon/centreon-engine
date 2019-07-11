@@ -193,7 +193,16 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
       contacts_notified++;
   }
 
-  _notified_contacts = to_notify;
+  /* get the time we finished */
+  gettimeofday(&end_time, nullptr);
+
+  /* send data to event broker */
+  broker_notification_data(NEBTYPE_NOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
+                           _parent->get_notifier_type(), _type, start_time,
+                           end_time, (void*)_parent, _author.c_str(),
+                           _message.c_str(), _escalated, contacts_notified,
+                           nullptr);
+
   logger(dbg_notifications, basic)
       << contacts_notified << " contacts were notified.";
   return OK;

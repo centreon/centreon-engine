@@ -117,21 +117,6 @@ configuration::servicedependency TestEngine::new_configuration_servicedependency
   return sd;
 }
 
-configuration::serviceescalation TestEngine::new_configuration_serviceescalation_contact(
-  std::string const& hostname,
-  std::string const& svc_desc,
-  std::string const& contact) {
-  configuration::serviceescalation se;
-  se.parse("first_notification", "2");
-  se.parse("last_notification", "11");
-  se.parse("notification_interval", "9");
-  se.parse("escalation_options", "w,u,c,r");
-  se.parse("host_name", hostname.c_str());
-  se.parse("service_description", svc_desc.c_str());
-  se.parse("contacts", contact.c_str());
-  return se;
-}
-
 configuration::host TestEngine::new_configuration_host(
     std::string const& hostname,
     std::string const& contacts,

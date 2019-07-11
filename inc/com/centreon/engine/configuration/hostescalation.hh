@@ -58,9 +58,6 @@ namespace                  configuration {
     set_string&            contactgroups() throw ();
     set_string const&      contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
-    set_string&            contacts() throw ();
-    set_string const&      contacts() const throw ();
-    bool                   contacts_defined() const throw ();
     void                   escalation_options(
                              unsigned short options) throw ();
     unsigned short         escalation_options() const throw ();
@@ -83,7 +80,6 @@ namespace                  configuration {
     typedef bool (*setter_func)(hostescalation&, char const*);
 
     bool                   _set_contactgroups(std::string const& value);
-    bool                   _set_contacts(std::string const& value);
     bool                   _set_escalation_options(std::string const& value);
     bool                   _set_escalation_period(std::string const& value);
     bool                   _set_first_notification(unsigned int value);
@@ -93,7 +89,6 @@ namespace                  configuration {
     bool                   _set_notification_interval(unsigned int value);
 
     group<set_string>      _contactgroups;
-    group<set_string>      _contacts;
     opt<unsigned short>    _escalation_options;
     opt<std::string>       _escalation_period;
     opt<unsigned int>      _first_notification;

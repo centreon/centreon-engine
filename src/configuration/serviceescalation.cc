@@ -39,7 +39,6 @@ std::unordered_map<std::string, serviceescalation::setter_func> const serviceesc
   { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
   { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
-  { "contacts",              SETTER(std::string const&, _set_contacts) },
   { "escalation_options",    SETTER(std::string const&, _set_escalation_options) },
   { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
   { "first_notification",    SETTER(unsigned int, _set_first_notification) },
@@ -89,7 +88,6 @@ serviceescalation& serviceescalation::operator=(serviceescalation const& right) 
   if (this != &right) {
     object::operator=(right);
     _contactgroups = right._contactgroups;
-    _contacts = right._contacts;
     _escalation_options = right._escalation_options;
     _escalation_period = right._escalation_period;
     _first_notification = right._first_notification;
@@ -113,7 +111,6 @@ serviceescalation& serviceescalation::operator=(serviceescalation const& right) 
 bool serviceescalation::operator==(serviceescalation const& right) const throw () {
   return (object::operator==(right)
           && _contactgroups == right._contactgroups
-          && _contacts == right._contacts
           && _escalation_options == right._escalation_options
           && _escalation_period == right._escalation_period
           && _first_notification == right._first_notification
@@ -152,8 +149,6 @@ bool serviceescalation::operator<(serviceescalation const& right) const {
     return _service_description < right._service_description;
   else if (_servicegroups != right._servicegroups)
     return _servicegroups < right._servicegroups;
-  else if (_contacts != right._contacts)
-    return _contacts < right._contacts;
   else if (_contactgroups != right._contactgroups)
     return _contactgroups < right._contactgroups;
   else if (_escalation_options != right._escalation_options)
@@ -208,7 +203,6 @@ void serviceescalation::merge(object const& obj) {
   serviceescalation const& tmpl(static_cast<serviceescalation const&>(obj));
 
   MRG_INHERIT(_contactgroups);
-  MRG_INHERIT(_contacts);
   MRG_OPTION(_escalation_options);
   MRG_OPTION(_escalation_period);
   MRG_OPTION(_first_notification);
@@ -261,33 +255,6 @@ set_string const& serviceescalation::contactgroups() const throw () {
  */
 bool serviceescalation::contactgroups_defined() const throw () {
   return _contactgroups.is_set();
-}
-
-/**
- *  Get contacts.
- *
- *  @return The contacts;
- */
-set_string& serviceescalation::contacts() throw () {
-  return *_contacts;
-}
-
-/**
- *  Get contacts.
- *
- *  @return The contacts.
- */
-set_string const& serviceescalation::contacts() const throw () {
-  return *_contacts;
-}
-
-/**
- *  Check if contacts were defined.
- *
- *  @return True if contacts were defined.
- */
-bool serviceescalation::contacts_defined() const throw () {
-  return _contacts.is_set();
 }
 
 /**
@@ -487,18 +454,6 @@ list_string const& serviceescalation::service_description() const throw () {
  */
 bool serviceescalation::_set_contactgroups(std::string const& value) {
   _contactgroups = value;
-  return true;
-}
-
-/**
- *  Set contacts value.
- *
- *  @param[in] value The new contacts value.
- *
- *  @return True on success, otherwise false.
- */
-bool serviceescalation::_set_contacts(std::string const& value) {
-  _contacts = value;
   return true;
 }
 

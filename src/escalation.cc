@@ -77,14 +77,6 @@ bool escalation::get_escalate_on(notifier::notification_flag type) const {
   return _escalate_on & type;
 }
 
-contact_map_unsafe const& escalation::contacts() const {
-  return _contacts;
-}
-
-contact_map_unsafe& escalation::contacts() {
-  return _contacts;
-}
-
 contactgroup_map_unsafe const& escalation::contact_groups() const {
   return _contact_groups;
 }
@@ -137,25 +129,6 @@ void escalation::resolve(int& w __attribute__((unused)), int& e) {
     else
       // Save the timeperiod pointer for later.
       escalation_period_ptr = it->second.get();
-  }
-
-  // Check all contacts.
-  for (contact_map_unsafe::iterator
-         it_c{contacts().begin()},
-         end_c{contacts().end()};
-       it_c != end_c;
-       ++it_c) {
-    // Find the contact.
-    contact_map::const_iterator ct_it{contact::contacts.find(it_c->first)};
-    if (ct_it == contact::contacts.end()) {
-      logger(log_verification_error, basic)
-        << "Error: Contact '" << it_c->first
-        << "' specified in escalation for this notifier is not defined anywhere!";
-      errors++;
-    } else {
-      // Save the contact pointer for later.
-      it_c->second = ct_it->second.get();
-    }
   }
 
   // Check all contact groups.

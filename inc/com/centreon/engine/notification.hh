@@ -51,7 +51,6 @@ class notification {
   bool _escalated;
   uint64_t _id;
   uint32_t _number;
-  std::unordered_set<contact*> _notified_contacts;
   uint32_t _interval;
 };
 CCE_END()
