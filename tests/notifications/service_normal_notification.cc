@@ -992,7 +992,6 @@ TEST_F(ServiceNotification, ServiceEscalationContact) {
   ASSERT_NE(step13, std::string::npos);
 }
 
-
 TEST_F(ServiceNotification, ServiceDependency) {
   configuration::applier::contact ct_aply;
   configuration::contact ctct{new_configuration_contact("test_contact", false)};

@@ -132,8 +132,10 @@ int pre_flight_circular_check(int* w, int* e) {
          end(host::hosts.end());
        it != end;
        ++it)
-    if (dfs_host_path(it->second.get()) == DFS_LOOPY)
+    if (dfs_host_path(it->second.get()) == DFS_LOOPY) {
       errors = 1;
+      break;
+    }
 
   for (host_map::iterator
          it(host::hosts.begin()),
@@ -172,10 +174,10 @@ int pre_flight_circular_check(int* w, int* e) {
               hostdependency::execution);
     if (found) {
       logger(log_verification_error, basic)
-        << "Error: A circular execution dependency (which could result "
-        "in a deadlock) exists for service '"
-        << it->second->get_service_description() << "' on host '"
-        << it->second->get_hostname() << "'!";
+          << "Error: A circular execution dependency (which could result "
+             "in a deadlock) exists for service '"
+          << it->second->get_service_description() << "' on host '"
+          << it->second->get_hostname() << "'!";
       errors++;
     }
   }
@@ -235,9 +237,9 @@ int pre_flight_circular_check(int* w, int* e) {
       it->second.get(), hostdependency::execution);
     if (found) {
       logger(log_verification_error, basic)
-        << "Error: A circular execution dependency (which could "
-        "result in a deadlock) exists for host '"
-        << it->second->get_hostname() << "'!";
+          << "Error: A circular execution dependency (which could "
+             "result in a deadlock) exists for host '"
+          << it->second->get_hostname() << "'!";
       errors++;
     }
   }

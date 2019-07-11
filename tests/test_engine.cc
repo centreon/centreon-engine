@@ -91,6 +91,17 @@ configuration::serviceescalation TestEngine::new_configuration_serviceescalation
   return se;
 }
 
+configuration::hostdependency TestEngine::new_configuration_hostdependency(
+    std::string const& hostname,
+    std::string const& dep_hostname) {
+  configuration::hostdependency hd;
+  hd.parse("master_host", hostname.c_str());
+  hd.parse("dependent_host", dep_hostname.c_str());
+  hd.parse("notification_failure_options", "u,d");
+  hd.dependency_type(configuration::hostdependency::notification_dependency);
+  return hd;
+}
+
 configuration::servicedependency TestEngine::new_configuration_servicedependency(
     std::string const& hostname,
     std::string const& service,
@@ -123,11 +134,12 @@ configuration::serviceescalation TestEngine::new_configuration_serviceescalation
 
 configuration::host TestEngine::new_configuration_host(
     std::string const& hostname,
-    std::string const& contacts) {
+    std::string const& contacts,
+    uint64_t hst_id) {
   configuration::host hst;
   hst.parse("host_name", hostname.c_str());
   hst.parse("address", "127.0.0.1");
-  hst.parse("_HOST_ID", "12");
+  hst.parse("_HOST_ID", std::to_string(hst_id).c_str());
   hst.parse("contacts", contacts.c_str());
   return hst;
 }
