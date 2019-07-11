@@ -244,9 +244,12 @@ std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
 bool servicedependency::check_for_circular_servicedependency_path(
     servicedependency* dep,
     types dependency_type) {
+  if (!dep)
+    return false;
+
   // This is not the proper dependency type.
-  if ((_dependency_type != dependency_type) ||
-      (dep->get_dependency_type() != dependency_type))
+  if (_dependency_type != dependency_type ||
+      dep->get_dependency_type() != dependency_type)
     return false;
 
   // Don't go into a loop, don't bother checking anymore if we know this
@@ -275,8 +278,8 @@ bool servicedependency::check_for_circular_servicedependency_path(
 
   // Notification dependencies are ok at this point as long as they
   // don't inherit.
-  if ((dependency_type == dependency::notification) &&
-      (!dep->get_inherits_parent()))
+  if (dependency_type == dependency::notification &&
+      !dep->get_inherits_parent())
     return false;
 
   // Check all parent dependencies.
@@ -288,8 +291,8 @@ bool servicedependency::check_for_circular_servicedependency_path(
     if (dep->master_service_ptr != it->second->dependent_service_ptr)
       continue;
 
-    if (this->check_for_circular_servicedependency_path(it->second.get(),
-                                                        dependency_type))
+    if (check_for_circular_servicedependency_path(it->second.get(),
+                                                  dependency_type))
       return true;
   }
 
@@ -313,6 +316,7 @@ void servicedependency::resolve(int& w, int& e) {
       << get_service_description() << "' on host '"
       << get_hostname() << "' is not defined anywhere!";
     errors++;
+    dependent_service_ptr = nullptr;
   }
   else
     dependent_service_ptr = found->second.get();
@@ -329,13 +333,14 @@ void servicedependency::resolve(int& w, int& e) {
       << get_dependent_service_description() << "' on host '"
       << get_dependent_hostname() << "' is not defined anywhere!";
     errors++;
+    master_service_ptr = nullptr;
   }
   else
     // Save pointer for later.
     master_service_ptr = found->second.get();
 
   // Make sure they're not the same service.
-  if (dependent_service_ptr == master_service_ptr) {
+  if (dependent_service_ptr == master_service_ptr && dependent_service_ptr != nullptr) {
     logger(log_verification_error, basic)
       << "Error: Service dependency definition for service '"
       << get_dependent_service_description() << "' on host '"
@@ -346,7 +351,6 @@ void servicedependency::resolve(int& w, int& e) {
 
   // Find the timeperiod.
   if (!get_dependency_period().empty()) {
-    timeperiod* temp_timeperiod(nullptr);
     timeperiod_map::const_iterator
       it{timeperiod::timeperiods.find(get_dependency_period())};
 
@@ -357,10 +361,11 @@ void servicedependency::resolve(int& w, int& e) {
         << get_dependent_service_description() << "' on host '"
         << get_dependent_hostname() << "' is not defined anywhere!";
       errors++;
+      dependency_period_ptr = nullptr;
     }
     else
       // Save the timeperiod pointer for later.
-      dependency_period_ptr = temp_timeperiod;
+      dependency_period_ptr = it->second.get();
   }
 
   // Add errors.

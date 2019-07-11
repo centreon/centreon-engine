@@ -31,6 +31,7 @@
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
+#include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -39,6 +40,7 @@
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/timezone_manager.hh"
@@ -701,4 +703,139 @@ TEST_F(HostNotification, HostEscalation) {
                "(UP);cmd;Host up",
                step14 + 1)};
   ASSERT_NE(step15, std::string::npos);
+}
+
+TEST_F(HostNotification, HostDependency) {
+  configuration::applier::contact ct_aply;
+  configuration::contact ctct{new_configuration_contact("test_contact", false)};
+  ct_aply.add_object(ctct);
+  ct_aply.expand_objects(*config);
+  ct_aply.resolve_object(ctct);
+
+  configuration::applier::contactgroup cg_aply;
+  configuration::contactgroup cg{
+      new_configuration_contactgroup("test_cg", "test_contact")};
+  cg_aply.add_object(cg);
+  cg_aply.expand_objects(*config);
+  cg_aply.resolve_object(cg);
+
+  configuration::applier::host h_aply;
+  configuration::host h{new_configuration_host("dep_host", "admin", 15)};
+  h_aply.add_object(h);
+  h_aply.expand_objects(*config);
+  h_aply.resolve_object(h);
+
+  configuration::applier::hostdependency hd_aply;
+  configuration::hostdependency hd{
+      new_configuration_hostdependency("test_host", "dep_host")};
+  hd_aply.expand_objects(*config);
+  hd_aply.add_object(hd);
+  hd_aply.resolve_object(hd);
+
+  int now{50000};
+  set_time(now);
+
+  int w{0}, e{0};
+  pre_flight_circular_check(&w, &e);
+
+  ASSERT_EQ(w, 0);
+  ASSERT_EQ(e, 0);
+
+  _host->set_current_state(engine::host::state_up);
+  _host->set_notification_interval(1);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(now);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+
+  host_map& hm(engine::host::hosts);
+  host_map::iterator it{hm.find("dep_host")};
+  ASSERT_NE(it, hm.end());
+  engine::host* dep_host{it->second.get()};
+
+  testing::internal::CaptureStdout();
+  _host->set_last_state(engine::host::state_up);
+  if (notifier::hard == _host->get_state_type())
+    _host->set_last_hard_state(_host->get_current_state());
+
+  dep_host->set_current_state(engine::host::state_up);
+  dep_host->set_last_state(dep_host->get_current_state());
+  if (notifier::hard == dep_host->get_state_type())
+    dep_host->set_last_hard_state(dep_host->get_current_state());
+
+  // Here, we get a notification
+  for (int i = 0; i < 3; ++i) {
+    dep_host->set_last_state(dep_host->get_current_state());
+    if (notifier::hard == dep_host->get_state_type())
+      dep_host->set_last_hard_state(dep_host->get_last_state());
+    now += 300;
+    set_time(now);
+    std::ostringstream oss;
+    oss << '[' << now << ']'
+        << " PROCESS_HOST_CHECK_RESULT;dep_host;1;host down";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+    dep_host->set_last_state(dep_host->get_current_state());
+  }
+
+  dep_host->set_last_state(dep_host->get_current_state());
+  if (notifier::hard == dep_host->get_state_type())
+    dep_host->set_last_hard_state(dep_host->get_last_state());
+  now += 300;
+  set_time(now);
+  std::ostringstream oss;
+  oss << '[' << now << ']' << " PROCESS_HOST_CHECK_RESULT;dep_host;0;host up";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  dep_host->set_last_state(dep_host->get_current_state());
+
+  for (int i = 0; i < 3; ++i) {
+    _host->set_last_state(_host->get_current_state());
+    if (notifier::hard == _host->get_state_type())
+      _host->set_last_hard_state(_host->get_last_state());
+    now += 300;
+    set_time(now);
+    std::ostringstream oss;
+    oss << '[' << now << ']'
+        << " PROCESS_HOST_CHECK_RESULT;test_host;1;host down";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  // Here, we won't have any notification
+  for (int i = 0; i < 3; ++i) {
+    dep_host->set_last_state(dep_host->get_current_state());
+    if (notifier::hard == dep_host->get_state_type())
+      dep_host->set_last_hard_state(dep_host->get_last_state());
+    now += 300;
+    set_time(now);
+    std::ostringstream oss;
+    oss << '[' << now << ']'
+        << " PROCESS_HOST_CHECK_RESULT;dep_host;1;how down";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+    dep_host->set_last_state(dep_host->get_current_state());
+  }
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << "out = " << out << std::endl;
+  size_t step1{
+      out.find("HOST NOTIFICATION: admin;dep_host;DOWN;cmd;host down")};
+  size_t step2{
+      out.find("HOST NOTIFICATION: admin;dep_host;RECOVERY (UP);cmd;host up",
+               step1 + 1)};
+  size_t step3{out.find("HOST NOTIFICATION: admin;test_host;DOWN;cmd;host down",
+                        step2 + 1)};
+  size_t step4{out.find("HOST NOTIFICATION: admin;dep_host;DOWN;cmd;host down",
+                        step3 + 1)};
+  ASSERT_NE(step3, std::string::npos);
+  ASSERT_EQ(step4, std::string::npos);
 }

@@ -24,6 +24,7 @@
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
+#include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
@@ -36,7 +37,8 @@ class TestEngine : public ::testing::Test {
   configuration::contact new_configuration_contact(std::string const& name,
                                                    bool full) const;
   configuration::host new_configuration_host(std::string const& hostname,
-                                             std::string const& contacts);
+                                             std::string const& contacts,
+                                             uint64_t hst_id = 12);
   configuration::service new_configuration_service(
       std::string const& hostname,
       std::string const& description,
@@ -45,6 +47,9 @@ class TestEngine : public ::testing::Test {
   configuration::hostescalation new_configuration_hostescalation(
       std::string const& hostname,
       std::string const& contactgroup);
+  configuration::hostdependency new_configuration_hostdependency(
+      std::string const& hostname,
+      std::string const& dep_hostname);
   configuration::servicedependency new_configuration_servicedependency(
       std::string const& hostname,
       std::string const& description,

@@ -188,8 +188,8 @@ bool hostdependency::check_for_circular_hostdependency_path(
     return false;
 
   // This is not the proper dependency type.
-  if ((_dependency_type != dependency_type) ||
-      (dep->get_dependency_type() != dependency_type))
+  if (_dependency_type != dependency_type ||
+      dep->get_dependency_type() != dependency_type)
     return false;
 
   // Don't go into a loop, don't bother checking anymore if we know this
@@ -208,7 +208,7 @@ bool hostdependency::check_for_circular_hostdependency_path(
 
   // Is this host dependent on the root host?
   if (dep != this) {
-    if (dependent_host_ptr == dep->master_host_ptr) {
+    if (master_host_ptr == dep->master_host_ptr) {
       _contains_circular_path = true;
       dep->set_contains_circular_path(true);
       return true;
@@ -217,7 +217,7 @@ bool hostdependency::check_for_circular_hostdependency_path(
 
   // Notification dependencies are ok at this point as long as they
   // don't inherit.
-  if ((dependency_type == hostdependency::notification) &&
+  if (dependency_type == dependency::notification &&
       !dep->get_inherits_parent())
     return false;
 
@@ -230,8 +230,8 @@ bool hostdependency::check_for_circular_hostdependency_path(
     if (dep->master_host_ptr != it->second->dependent_host_ptr)
       continue;
 
-    if (this->check_for_circular_hostdependency_path(it->second.get(),
-                                                     dependency_type))
+    if (check_for_circular_hostdependency_path(it->second.get(),
+                                               dependency_type))
       return true;
   }
 
@@ -268,7 +268,7 @@ void hostdependency::resolve(int& w, int& e) {
     master_host_ptr = it->second.get();
 
   // Make sure they're not the same host.
-  if (dependent_host_ptr == master_host_ptr) {
+  if (dependent_host_ptr == master_host_ptr && dependent_host_ptr != nullptr) {
     logger(log_verification_error, basic)
       << "Error: Host dependency definition for host '"
       << _dependent_hostname
@@ -295,10 +295,10 @@ void hostdependency::resolve(int& w, int& e) {
   }
 
   // Add errors.
-  e += errors;
-
-  if (errors)
+  if (errors) {
+    e += errors;
     throw engine_error() << "Cannot resolve host dependency";
+  }
 }
 
 

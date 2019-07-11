@@ -43,62 +43,71 @@ applier::hostdependency::~hostdependency() throw () {}
  *                  engine.
  */
 void applier::hostdependency::add_object(
-                                configuration::hostdependency const& obj) {
+    configuration::hostdependency const& obj) {
   // Check host dependency.
-  if ((obj.hosts().size() != 1)
-      || !obj.hostgroups().empty()
-      || (obj.dependent_hosts().size() != 1)
-      || !obj.dependent_hostgroups().empty())
-    throw (engine_error() << "Could not create host dependency "
-           "with multiple (dependent) host / host groups");
-  if ((obj.dependency_type()
-       != configuration::hostdependency::execution_dependency)
-      && (obj.dependency_type()
-          != configuration::hostdependency::notification_dependency))
-    throw (engine_error() << "Could not create unexpanded "
-           << "host dependency of '" << *obj.dependent_hosts().begin()
-           << "' on '" << *obj.hosts().begin() << "'");
+  if ((obj.hosts().size() != 1) || !obj.hostgroups().empty() ||
+      (obj.dependent_hosts().size() != 1) ||
+      !obj.dependent_hostgroups().empty())
+    throw engine_error() << "Could not create host dependency "
+                            "with multiple (dependent) host / host groups";
+  if ((obj.dependency_type() !=
+       configuration::hostdependency::execution_dependency) &&
+      (obj.dependency_type() !=
+       configuration::hostdependency::notification_dependency))
+    throw engine_error() << "Could not create unexpanded "
+                         << "host dependency of '"
+                         << *obj.dependent_hosts().begin() << "' on '"
+                         << *obj.hosts().begin() << "'";
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new host dependency of host '"
-    << *obj.dependent_hosts().begin() << "' on host '"
-    << *obj.hosts().begin() << "'.";
+      << "Creating new host dependency of host '"
+      << *obj.dependent_hosts().begin() << "' on host '" << *obj.hosts().begin()
+      << "'.";
 
   // Add dependency to the global configuration set.
   config->hostdependencies().insert(obj);
 
-  std::shared_ptr<engine::hostdependency> hd{
-    new engine::hostdependency(
-       *obj.dependent_hosts().begin(),
-       *obj.hosts().begin(),
-       static_cast<engine::hostdependency::types>(obj.dependency_type()),
-       obj.inherits_parent(),
-       static_cast<bool>(
-         obj.execution_failure_options()
-         & configuration::hostdependency::up),
-       static_cast<bool>(
-         obj.execution_failure_options()
-         & configuration::hostdependency::down),
-       static_cast<bool>(
-         obj.execution_failure_options()
-         & configuration::hostdependency::unreachable),
-       static_cast<bool>(
-         obj.execution_failure_options()
-         & configuration::hostdependency::pending),
-       obj.dependency_period())};
+  std::shared_ptr<engine::hostdependency> hd;
+
+  if (obj.dependency_type() ==
+      configuration::hostdependency::execution_dependency)
+    // Create executon dependency.
+    hd = std::make_shared<engine::hostdependency>(
+        *obj.dependent_hosts().begin(), *obj.hosts().begin(),
+        static_cast<engine::hostdependency::types>(obj.dependency_type()),
+        obj.inherits_parent(),
+        static_cast<bool>(obj.execution_failure_options() &
+                          configuration::hostdependency::up),
+        static_cast<bool>(obj.execution_failure_options() &
+                          configuration::hostdependency::down),
+        static_cast<bool>(obj.execution_failure_options() &
+                          configuration::hostdependency::unreachable),
+        static_cast<bool>(obj.execution_failure_options() &
+                          configuration::hostdependency::pending),
+        obj.dependency_period());
+  else
+    // Create notification dependency.
+    hd = std::make_shared<engine::hostdependency>(
+        *obj.dependent_hosts().begin(), *obj.hosts().begin(),
+        static_cast<engine::hostdependency::types>(obj.dependency_type()),
+        obj.inherits_parent(),
+        static_cast<bool>(obj.notification_failure_options() &
+                          configuration::hostdependency::up),
+        static_cast<bool>(obj.notification_failure_options() &
+                          configuration::hostdependency::down),
+        static_cast<bool>(obj.notification_failure_options() &
+                          configuration::hostdependency::unreachable),
+        static_cast<bool>(obj.notification_failure_options() &
+                          configuration::hostdependency::pending),
+        obj.dependency_period());
 
   engine::hostdependency::hostdependencies.insert(
-    {*obj.dependent_hosts().begin(), hd});
+      {*obj.dependent_hosts().begin(), hd});
 
   timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_dependency_data(
-    NEBTYPE_HOSTDEPENDENCY_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    hd.get(),
-    &tv);
-  return ;
+  broker_adaptive_dependency_data(NEBTYPE_HOSTDEPENDENCY_ADD, NEBFLAG_NONE,
+                                  NEBATTR_NONE, hd.get(), &tv);
 }
 
 /**
@@ -178,8 +187,6 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
 
   // Set expanded host dependencies in configuration state.
   s.hostdependencies().swap(expanded);
-
-  return ;
 }
 
 /**
@@ -232,8 +239,6 @@ void applier::hostdependency::remove_object(
 
   // Remove dependency from the global configuration set.
   config->hostdependencies().erase(obj);
-
-  return ;
 }
 
 /**
@@ -267,31 +272,23 @@ void applier::hostdependency::resolve_object(
  *  @param[out]    expanded   Expanded hosts.
  */
 void applier::hostdependency::_expand_hosts(
-                                std::set<std::string> const& hosts,
-                                std::set<std::string> const& hostgroups,
-                                configuration::state& s,
-                                std::set<std::string>& expanded) {
+    std::set<std::string> const& hosts,
+    std::set<std::string> const& hostgroups,
+    configuration::state& s,
+    std::set<std::string>& expanded) {
   // Copy hosts.
   expanded = hosts;
 
   // Browse host groups.
-  for (set_string::const_iterator
-         it(hostgroups.begin()),
-         end(hostgroups.end());
-       it != end;
-       ++it) {
+  for (set_string::const_iterator it(hostgroups.begin()), end(hostgroups.end());
+       it != end; ++it) {
     // Find host group.
     set_hostgroup::iterator it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
-      throw (engine_error()
-             << "Could not expand non-existing host group '"
-             << *it << "'");
+      throw engine_error() << "Could not expand non-existing host group '"
+                           << *it << "'";
 
     // Add host group members.
-    expanded.insert(
-               it_group->members().begin(),
-               it_group->members().end());
+    expanded.insert(it_group->members().begin(), it_group->members().end());
   }
-
-  return ;
 }
