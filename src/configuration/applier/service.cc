@@ -408,6 +408,7 @@ void applier::service::modify_object(
   s->set_low_flap_threshold(obj.low_flap_threshold());
   s->set_high_flap_threshold(obj.high_flap_threshold());
 
+  s->set_flap_detection_on(notifier::none);
   s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::ok ? notifier::ok : notifier::none);
   s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::warning ? notifier::warning : notifier::none);
   s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::unknown ? notifier::unknown : notifier::none);

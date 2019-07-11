@@ -2104,7 +2104,7 @@ void service::check_for_flapping(bool update,
 
   /* don't do anything if we don't have flap detection enabled for this service
    */
-  if (get_flap_detection_enabled())
+  if (!get_flap_detection_enabled())
     return;
 
   /* are we flapping, undecided, or what?... */
