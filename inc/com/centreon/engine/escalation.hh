@@ -21,7 +21,6 @@
 #define CCE_ESCALATION_HH
 
 #include <string>
-#include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/notifier.hh"
@@ -50,8 +49,6 @@ class                escalation {
   void               set_escalate_on(uint32_t escalate_on);
   virtual bool       is_viable(int state, uint32_t notification_number) const;
 
-  contact_map_unsafe const& contacts() const;
-  contact_map_unsafe& contacts();
   contactgroup_map_unsafe const& contact_groups() const;
   contactgroup_map_unsafe&       contact_groups();
   virtual void resolve(int& w, int& e);
@@ -65,7 +62,6 @@ class                escalation {
   double             _notification_interval;
   std::string        _escalation_period;
   uint32_t           _escalate_on;
-  contact_map_unsafe        _contacts;
   contactgroup_map_unsafe _contact_groups;
 };
 CCE_END()

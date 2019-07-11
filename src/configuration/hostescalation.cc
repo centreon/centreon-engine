@@ -34,7 +34,6 @@ std::unordered_map<std::string, hostescalation::setter_func> const hostescalatio
   { "host",                  SETTER(std::string const&, _set_hosts) },
   { "host_name",             SETTER(std::string const&, _set_hosts) },
   { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
-  { "contacts",              SETTER(std::string const&, _set_contacts) },
   { "escalation_options",    SETTER(std::string const&, _set_escalation_options) },
   { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
   { "first_notification",    SETTER(uint32_t, _set_first_notification) },
@@ -84,7 +83,6 @@ hostescalation& hostescalation::operator=(hostescalation const& right) {
   if (this != &right) {
     object::operator=(right);
     _contactgroups = right._contactgroups;
-    _contacts = right._contacts;
     _escalation_options = right._escalation_options;
     _escalation_period = right._escalation_period;
     _first_notification = right._first_notification;
@@ -103,17 +101,14 @@ hostescalation& hostescalation::operator=(hostescalation const& right) {
  *
  *  @return True if is the same hostescalation, otherwise false.
  */
-bool hostescalation::operator==(hostescalation const& right) const throw () {
-  return (object::operator==(right)
-          && _contactgroups == right._contactgroups
-          && _contacts == right._contacts
-          && _escalation_options == right._escalation_options
-          && _escalation_period == right._escalation_period
-          && _first_notification == right._first_notification
-          && _hostgroups == right._hostgroups
-          && _hosts == right._hosts
-          && _last_notification == right._last_notification
-          && _notification_interval == right._notification_interval);
+bool hostescalation::operator==(hostescalation const& right) const throw() {
+  return (object::operator==(right) && _contactgroups == right._contactgroups &&
+          _escalation_options == right._escalation_options &&
+          _escalation_period == right._escalation_period &&
+          _first_notification == right._first_notification &&
+          _hostgroups == right._hostgroups && _hosts == right._hosts &&
+          _last_notification == right._last_notification &&
+          _notification_interval == right._notification_interval);
 }
 
 /**
@@ -139,8 +134,6 @@ bool hostescalation::operator<(hostescalation const& right) const {
     return _hosts < right._hosts;
   else if (_hostgroups != right._hostgroups)
     return _hostgroups < right._hostgroups;
-  else if (_contacts != right._contacts)
-    return _contacts < right._contacts;
   else if (_contactgroups != right._contactgroups)
     return _contactgroups < right._contactgroups;
   else if (_escalation_options != right._escalation_options)
@@ -187,7 +180,6 @@ void hostescalation::merge(object const& obj) {
   hostescalation const& tmpl(static_cast<hostescalation const&>(obj));
 
   MRG_INHERIT(_contactgroups);
-  MRG_INHERIT(_contacts);
   MRG_OPTION(_escalation_options);
   MRG_OPTION(_escalation_period);
   MRG_OPTION(_first_notification);
@@ -238,33 +230,6 @@ set_string const& hostescalation::contactgroups() const throw () {
  */
 bool hostescalation::contactgroups_defined() const throw () {
   return _contactgroups.is_set();
-}
-
-/**
- *  Get contacts.
- *
- *  @return The contacts.
- */
-set_string& hostescalation::contacts() throw () {
-  return *_contacts;
-}
-
-/**
- *  Get contacts.
- *
- *  @return The contacts.
- */
-set_string const& hostescalation::contacts() const throw () {
-  return *_contacts;
-}
-
-/**
- *  Check if contacts were defined.
- *
- *  @return True if contacts were defined.
- */
-bool hostescalation::contacts_defined() const throw () {
-  return _contacts.is_set();
 }
 
 /**
@@ -426,18 +391,6 @@ bool hostescalation::notification_interval_defined() const throw () {
  */
 bool hostescalation::_set_contactgroups(std::string const& value) {
   _contactgroups = value;
-  return true;
-}
-
-/**
- *  Set contacts value.
- *
- *  @param[in] value The new contacts value.
- *
- *  @return True on success, otherwise false.
- */
-bool hostescalation::_set_contacts(std::string const& value) {
-  _contacts = value;
   return true;
 }
 

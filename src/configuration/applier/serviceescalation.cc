@@ -89,12 +89,6 @@ void applier::serviceescalation::add_object(
   broker_adaptive_escalation_data(NEBTYPE_SERVICEESCALATION_ADD, NEBFLAG_NONE,
                                   NEBATTR_NONE, se.get(), &tv);
 
-  // Add contacts to host escalation.
-  for (set_string::const_iterator it(obj.contacts().begin()),
-       end(obj.contacts().end());
-       it != end; ++it)
-    se->contacts().insert({*it, nullptr});
-
   // Add contact groups to service escalation.
   for (set_string::const_iterator it(obj.contactgroups().begin()),
        end(obj.contactgroups().end());
@@ -381,7 +375,7 @@ void applier::serviceescalation::_inherits_special_vars(
     configuration::serviceescalation& obj,
     configuration::state const& s) {
   // Detect if any special variables has not been defined.
-  if (!obj.contacts_defined() || !obj.contactgroups_defined() ||
+  if (!obj.contactgroups_defined() ||
       !obj.notification_interval_defined() ||
       !obj.escalation_period_defined()) {
     // Find service.
@@ -395,8 +389,6 @@ void applier::serviceescalation::_inherits_special_vars(
                            << "': service does not exist";
 
     // Inherits variables.
-    if (!obj.contacts_defined())
-      obj.contacts() = it->contacts();
     if (!obj.contactgroups_defined())
       obj.contactgroups() = it->contactgroups();
     if (!obj.notification_interval_defined())

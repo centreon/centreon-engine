@@ -80,13 +80,6 @@ void applier::hostescalation::add_object(
   broker_adaptive_escalation_data(
       NEBTYPE_HOSTESCALATION_ADD, NEBFLAG_NONE, NEBATTR_NONE, he.get(), &tv);
 
-  // Add contacts to host escalation.
-  for (set_string::const_iterator it(obj.contacts().begin()),
-       end(obj.contacts().end());
-       it != end;
-       ++it)
-    he->contacts().insert({*it, nullptr});
-
   // Add contact groups to host escalation.
   for (set_string::const_iterator it(obj.contactgroups().begin()),
        end(obj.contactgroups().end());
@@ -303,7 +296,7 @@ void applier::hostescalation::_inherits_special_vars(
     configuration::hostescalation& obj,
     configuration::state& s) {
   // Detect if any special variable has not been defined.
-  if (!obj.contacts_defined() || !obj.contactgroups_defined() ||
+  if (!obj.contactgroups_defined() ||
       !obj.notification_interval_defined() ||
       !obj.escalation_period_defined()) {
     // Find host.
@@ -314,8 +307,6 @@ void applier::hostescalation::_inherits_special_vars(
                            << *obj.hosts().begin() << "': host does not exist";
 
     // Inherits variables.
-    if (!obj.contacts_defined())
-      obj.contacts() = it->contacts();
     if (!obj.contactgroups_defined())
       obj.contactgroups() = it->contactgroups();
     if (!obj.notification_interval_defined())

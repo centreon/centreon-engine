@@ -609,16 +609,6 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
         notif_interv = (*it)->get_notification_interval();
       }
 
-      /* Construction of the set containing contacts to notify. We don't know
-       * for the moment if those contacts accept notification. */
-      for (contact_map_unsafe::const_iterator cit{(*it)->contacts().begin()},
-           cend{(*it)->contacts().end()};
-           cit != cend; ++cit) {
-        assert(cit->second);
-        if (cit->second->should_be_notified(cat, type, *this))
-          retval.insert(cit->second);
-      }
-
       /* For each contact group, we also add its contacts. */
       for (contactgroup_map_unsafe::const_iterator
                cgit{(*it)->contact_groups().begin()},
