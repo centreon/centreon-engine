@@ -467,11 +467,11 @@ time_t adjust_timestamp_for_time_change(time_t last_time,
 void compensate_for_system_time_change(
        unsigned long last_time,
        unsigned long current_time) {
-  int days(0);
-  int hours(0);
-  int minutes(0);
-  int seconds(0);
-  unsigned long time_difference(0L);
+  int days{0};
+  int hours{0};
+  int minutes{0};
+  int seconds{0};
+  unsigned long time_difference{0L};
 
   logger(dbg_functions, basic)
     << "compensate_for_system_time_change()";

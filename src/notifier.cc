@@ -1608,3 +1608,75 @@ int notifier::get_pending_flex_downtime() const {
 void notifier::set_pending_flex_downtime(int pending_flex_downtime) {
   _pending_flex_downtime = pending_flex_downtime;
 }
+
+/**
+ * @brief Calculates next acceptable re-notification time for this notifier.
+ *
+ * @param offset
+ *
+ * @return a timestamp
+ */
+time_t notifier::get_next_notification_time(time_t offset) {
+  bool have_escalated_interval{false};
+
+  logger(dbg_functions, basic) << "notifier::get_next_notification_time()";
+  logger(dbg_notifications, most)
+      << "Calculating next valid notification time...";
+
+  /* default notification interval */
+  uint32_t interval_to_use{_notification_interval};
+
+  logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
+
+  /*
+   * search all the escalation entries for valid matches for this service (at
+   * its current notification number)
+   */
+  for (escalation const* e : get_escalations()) {
+    /* interval < 0 means to use non-escalated interval */
+    if (e->get_notification_interval() < 0.0)
+      continue;
+
+    /* skip this entry if it isn't appropriate */
+    if (!is_valid_escalation_for_notification(e, notification_option_none))
+      continue;
+
+    logger(dbg_notifications, most)
+        << "Found a valid escalation w/ interval of "
+        << e->get_notification_interval();
+
+    /*
+     * if we haven't used a notification interval from an escalation yet,
+     * use this one
+     */
+    if (!have_escalated_interval) {
+      have_escalated_interval = true;
+      interval_to_use = e->get_notification_interval();
+    }
+    /* else use the shortest of all valid escalation intervals */
+    else if (e->get_notification_interval() < interval_to_use)
+      interval_to_use = e->get_notification_interval();
+
+    logger(dbg_notifications, most) << "New interval: " << interval_to_use;
+  }
+
+  /*
+   * if notification interval is 0, we shouldn't send any more problem
+   * notifications (unless service is volatile)
+   */
+  if (interval_to_use == 0.0 && !get_is_volatile())
+    set_no_more_notifications(true);
+  else
+    set_no_more_notifications(false);
+
+  logger(dbg_notifications, most) << "Interval used for calculating next valid "
+                                     "notification time: "
+                                  << interval_to_use;
+
+  /* calculate next notification time */
+  time_t next_notification{
+      offset +
+      static_cast<time_t>(interval_to_use * config->interval_length())};
+
+  return next_notification;
+}

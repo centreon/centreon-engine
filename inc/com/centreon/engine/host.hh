@@ -266,7 +266,6 @@ class                host : public notifier {
                                     int options,
                                     int escalated) override;
   void               update_notification_flags() override;
-  time_t             get_next_notification_time(time_t offset) override;
   void               schedule_acknowledgement_expiration();
   bool               is_valid_escalation_for_notification(
                        escalation const* e,

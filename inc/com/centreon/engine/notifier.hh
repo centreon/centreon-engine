@@ -188,7 +188,7 @@ class                notifier : public checkable {
   time_t             get_last_notification() const;
   void               set_last_notification(time_t last_notification);
   virtual void       update_notification_flags() = 0;
-  virtual time_t     get_next_notification_time(time_t offset) = 0;
+  time_t get_next_notification_time(time_t offset);
   void               set_initial_notif_time(time_t notif_time);
   time_t             get_initial_notif_time() const;
   void               set_acknowledgement_timeout(int timeout);

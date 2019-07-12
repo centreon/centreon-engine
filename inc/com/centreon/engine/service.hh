@@ -183,7 +183,6 @@ class                           service : public notifier {
                                                int options,
                                                int escalated) override;
   void                          update_notification_flags() override;
-  time_t                        get_next_notification_time(time_t offset) override;
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
   bool                          operator==(service const& other);
