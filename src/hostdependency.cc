@@ -208,7 +208,7 @@ bool hostdependency::check_for_circular_hostdependency_path(
 
   // Is this host dependent on the root host?
   if (dep != this) {
-    if (master_host_ptr == dep->master_host_ptr) {
+    if (dependent_host_ptr == dep->master_host_ptr) {
       _contains_circular_path = true;
       dep->set_contains_circular_path(true);
       return true;

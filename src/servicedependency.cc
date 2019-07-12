@@ -269,7 +269,7 @@ bool servicedependency::check_for_circular_servicedependency_path(
   // Is this service dependent on the root service?
   // Is this host dependent on the root host?
   if (dep != this) {
-    if (master_service_ptr == dep->master_service_ptr) {
+    if (dependent_service_ptr == dep->master_service_ptr) {
       _contains_circular_path = true;
       dep->set_contains_circular_path(true);
       return true;

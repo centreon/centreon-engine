@@ -171,7 +171,7 @@ int pre_flight_circular_check(int* w, int* e) {
 
     found = it->second->check_for_circular_servicedependency_path(
               it->second.get(),
-              hostdependency::execution);
+              dependency::execution);
     if (found) {
       logger(log_verification_error, basic)
           << "Error: A circular execution dependency (which could result "
@@ -199,7 +199,7 @@ int pre_flight_circular_check(int* w, int* e) {
 
     found = it->second->check_for_circular_servicedependency_path(
               it->second.get(),
-              hostdependency::notification);
+              dependency::notification);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "
@@ -234,7 +234,7 @@ int pre_flight_circular_check(int* w, int* e) {
       it2->second->set_circular_path_checked(false);
 
     found = it->second->check_for_circular_hostdependency_path(
-      it->second.get(), hostdependency::execution);
+      it->second.get(), dependency::execution);
     if (found) {
       logger(log_verification_error, basic)
           << "Error: A circular execution dependency (which could "
@@ -260,7 +260,7 @@ int pre_flight_circular_check(int* w, int* e) {
       it2->second->set_circular_path_checked(false);
 
     found = it->second->check_for_circular_hostdependency_path(
-      it->second.get(), hostdependency::notification);
+      it->second.get(), dependency::notification);
     if (found) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "

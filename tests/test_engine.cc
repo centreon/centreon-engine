@@ -98,6 +98,7 @@ configuration::hostdependency TestEngine::new_configuration_hostdependency(
   hd.parse("master_host", hostname.c_str());
   hd.parse("dependent_host", dep_hostname.c_str());
   hd.parse("notification_failure_options", "u,d");
+  hd.parse("inherits_parent", "1");
   hd.dependency_type(configuration::hostdependency::notification_dependency);
   return hd;
 }
