@@ -98,20 +98,6 @@ void hostdependency::set_fail_on_unreachable(bool fail_on_unreachable) {
 }
 
 /**
- *  Equal operator.
- *
- *  @param[in] obj The object to compare.
- *
- *  @return True if is the same object, otherwise false.
- */
-bool hostdependency::operator==(hostdependency const& obj) throw() {
-  return *this == obj &&
-         _fail_on_up == obj.get_fail_on_up() &&
-         _fail_on_down == obj.get_fail_on_down() &&
-         _fail_on_unreachable == obj.get_fail_on_unreachable();
-}
-
-/**
  *  Dump hostdependency content into the stream.
  *
  *  @param[out] os  The output stream.

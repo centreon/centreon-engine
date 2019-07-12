@@ -134,24 +134,6 @@ void servicedependency::set_fail_on_critical(bool fail_on_critical) {
 }
 
 /**
- *  Equal operator.
- *
- *  @param[in] obj The object to compare.
- *
- *  @return True if is the same object, otherwise false.
- */
-bool servicedependency::operator==(servicedependency const& obj) throw() {
-  return *this == obj &&
-         _dependent_service_description ==
-             obj.get_dependent_service_description() &&
-         _service_description == obj.get_service_description() &&
-         _fail_on_ok == obj.get_fail_on_ok() &&
-         _fail_on_warning == obj.get_fail_on_warning() &&
-         _fail_on_unknown == obj.get_fail_on_unknown() &&
-         _fail_on_critical == obj.get_fail_on_critical();
-}
-
-/**
  *  Dump servicedependency content into the stream.
  *
  *  @param[out] os  The output stream.

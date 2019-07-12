@@ -153,7 +153,6 @@ void string::split(
   }
   std::string tmp(last ? data.substr(last) : data);
   out.push_back(trim(tmp));
-  return ;
 }
 
 /**
@@ -170,7 +169,6 @@ void string::split(
   std::list<std::string> elements;
   split(data, elements, delim);
   out.insert(elements.begin(), elements.end());
-  return ;
 }
 
 /**
@@ -197,7 +195,6 @@ void string::split(
              << "Not enough elements in the line to make pairs");
     out.insert(std::make_pair(*first, *it));
   }
-  return ;
 }
 
 /**

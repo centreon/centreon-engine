@@ -64,7 +64,7 @@ class                           hostdependency : public dependency {
   void resolve(int& w, int& e);
   bool get_fail_on(int state) const override;
 
-  bool                          operator==(hostdependency const& obj) throw ();
+  bool operator==(hostdependency const& obj) = delete;
   bool                          operator<(hostdependency const& obj) throw ();
 
   static hostdependency_mmap    hostdependencies;

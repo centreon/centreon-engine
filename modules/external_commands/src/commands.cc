@@ -2186,8 +2186,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
 /* changes a custom host or service variable */
 int cmd_change_object_custom_var(int cmd, char* args) {
-  host* temp_host(nullptr);
-  contact* temp_contact(nullptr);
 
   /* get the host or contact name */
   char* temp_ptr(index(args, ';'));
@@ -2230,7 +2228,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   switch (cmd) {
   case CMD_CHANGE_CUSTOM_HOST_VAR:
     {
-      temp_host = nullptr;
+      host* temp_host{nullptr};
       host_map::const_iterator
       it_h(host::hosts.find(name1));
       if (it_h != host::hosts.end())
@@ -2276,15 +2274,15 @@ int cmd_change_object_custom_var(int cmd, char* args) {
         return ERROR;
       map_customvar::iterator it(cnct_it->second->custom_variables.find(varname));
       if (it == cnct_it->second->custom_variables.end())
-        temp_contact->custom_variables.insert({std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
+        cnct_it->second->custom_variables.insert({std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
       else
         it->second->update(std::move(varvalue));
 
       /* set the modified attributes and update the status of the object */
-      temp_contact->custom_variables.insert(
+      cnct_it->second->custom_variables.insert(
           {std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
-      temp_contact->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
-      temp_contact->update_status_info(false);
+      cnct_it->second->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
+      cnct_it->second->update_status_info(false);
     }
     break;
   default:
