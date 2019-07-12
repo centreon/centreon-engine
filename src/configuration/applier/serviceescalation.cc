@@ -276,7 +276,7 @@ void applier::serviceescalation::resolve_object(
                               configuration::serviceescalation::critical) &&
         it->second->get_escalate_on(notifier::ok) ==
             static_cast<bool>(obj.escalation_options() &
-                              configuration::hostescalation::recovery)) {
+                              configuration::serviceescalation::recovery)) {
       found = true;
       // Resolve service escalation.
       it->second->resolve(config_warnings, config_errors);
