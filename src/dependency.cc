@@ -35,7 +35,9 @@ dependency::dependency(std::string const& dependent_hostname,
       _hostname{hostname},
       _dependency_period{dependency_period},
       _inherits_parent{inherits_parent},
-      _fail_on_pending{fail_on_pending} {
+      _fail_on_pending{fail_on_pending},
+      _circular_path_checked{false},
+      _contains_circular_path{false} {
   if (dependent_hostname.empty() || hostname.empty()) {
     logger(log_config_error, basic)
         << "Error: NULL host name in host dependency definition";
