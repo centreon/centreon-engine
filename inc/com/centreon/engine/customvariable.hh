@@ -39,11 +39,6 @@ class                customvariable {
                      customvariable(
                        std::string const& value = "",
                        bool is_sent = true);
-                     customvariable(
-                       std::string&& value,
-                       bool is_sent = true);
-                     customvariable(
-                       std::string const& value);
                      customvariable(customvariable const& other);
                      ~customvariable();
   customvariable&    operator=(customvariable const& other);

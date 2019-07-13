@@ -354,7 +354,7 @@ int xsddefault_save_status_data() {
          "\tnext_check=" << static_cast<unsigned long>(it->second->get_next_check()) << "\n"
          "\tcheck_options=" << it->second->check_options << "\n"
          "\tcurrent_notification_number=" << it->second->get_notification_number() << "\n"
-         "\tcurrent_notification_id=" << it->second->current_notification_id << "\n"
+         "\tcurrent_notification_id=" << it->second->get_current_notification_id() << "\n"
          "\tlast_notification=" << static_cast<unsigned long>(it->second->get_last_notification()) << "\n"
          "\tnext_notification=" << static_cast<unsigned long>(it->second->get_next_notification()) << "\n"
          "\tno_more_notifications=" << it->second->get_no_more_notifications() << "\n"
@@ -404,7 +404,7 @@ int xsddefault_save_status_data() {
          "\thost_notifications_enabled=" << cntct->get_host_notifications_enabled() << "\n"
          "\tservice_notifications_enabled=" << cntct->get_service_notifications_enabled() << "\n";
     // custom variables
-    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : cntct->custom_variables) {
+    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : cntct->get_custom_variables()) {
       if (!cv.first.empty())
         stream << "\t_" << cv.first << "=" << cv.second->has_been_modified() << ";"
                << cv.second->get_value() << "\n";

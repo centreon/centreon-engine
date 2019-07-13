@@ -152,8 +152,8 @@ class                host : public notifier {
                                             int* time_is_valid,
                                             time_t* new_time);
   void               grab_macros_r(nagios_macros* mac) override;
-  bool               operator==(host const& other) throw ();
-  bool               operator!=(host const& other) throw ();
+  bool               operator==(host const& other) = delete; //throw ();
+  bool               operator!=(host const& other) = delete; //throw ();
   bool               is_result_fresh(time_t current_time, int log_this);
 
   int                run_sync_check_3x(enum host::host_state* check_result_code,

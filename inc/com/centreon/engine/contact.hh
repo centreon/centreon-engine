@@ -61,6 +61,8 @@ class                           contact {
   ~contact();
   contact(contact const& other) = delete;
   contact&                      operator=(contact const& other) = delete;
+  bool operator==(contact const& other) = delete;
+  bool operator!=(contact const& other) = delete;
   void                          update_status_info(bool aggregated_dump);
 
   // Base properties.
@@ -133,6 +135,12 @@ class                           contact {
                                   notifier::reason_type type,
                                   notifier const& notif) const;
   void resolve(int& w, int& e);
+  map_customvar const& get_custom_variables() const;
+  map_customvar& get_custom_variables();
+  timeperiod* get_host_notification_period_ptr() const;
+  void set_host_notification_period_ptr(timeperiod* period);
+  timeperiod* get_service_notification_period_ptr() const;
+  void set_service_notification_period_ptr(timeperiod* period);
 
   static contact_map            contacts;
 
@@ -175,13 +183,10 @@ class                           contact {
                                 _host_notification_commands;
   std::list<std::shared_ptr<commands::command>>
                                 _service_notification_commands;
-  std::list<contactgroup*>     _contactgroups;
-
- public:
-  map_customvar                 custom_variables;
-
-  timeperiod*                   host_notification_period_ptr;
-  timeperiod*                   service_notification_period_ptr;
+  std::list<contactgroup*> _contactgroups;
+  map_customvar _custom_variables;
+  timeperiod* _host_notification_period_ptr;
+  timeperiod* _service_notification_period_ptr;
 };
 
 CCE_END()
@@ -212,12 +217,12 @@ std::shared_ptr<com::centreon::engine::contact> add_contact(
            int retain_status_information,
            int retain_nonstatus_information);
 
-bool          operator==(
-                com::centreon::engine::contact const& obj1,
-                com::centreon::engine::contact const& obj2) throw ();
-bool          operator!=(
-                com::centreon::engine::contact const& obj1,
-                com::centreon::engine::contact const& obj2) throw ();
+//bool          operator==(
+//                com::centreon::engine::contact const& obj1,
+//                com::centreon::engine::contact const& obj2) throw ();
+//bool          operator!=(
+//                com::centreon::engine::contact const& obj1,
+//                com::centreon::engine::contact const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os,
                          com::centreon::engine::contact const& obj);
 std::ostream& operator<<(std::ostream& os, contact_map_unsafe const& obj);
