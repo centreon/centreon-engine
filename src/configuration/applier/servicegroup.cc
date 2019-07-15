@@ -88,7 +88,7 @@ void applier::servicegroup::add_object(
   engine::servicegroup::servicegroups.insert({sg->get_group_name(), sg});
 
   // Add servicegroup id to the other props.
-  engine::servicegroup::servicegroups[obj.servicegroup_name()]->set_id(obj.servicegroup_id());
+  sg->set_id(obj.servicegroup_id());
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(nullptr));
@@ -104,18 +104,8 @@ void applier::servicegroup::add_object(
          it(obj.members().begin()),
          end(obj.members().end());
        it != end;
-       ++it) {
+       ++it)
     sg->members[{it->first, it->second}] = nullptr;
-    // Notify event broker.
-    tv = get_broker_timestamp(NULL);
-    broker_group_member(
-      NEBTYPE_SERVICEGROUPMEMBER_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      nullptr,
-      sg.get(),
-      &tv);
-  }
 }
 
 /**
@@ -208,18 +198,8 @@ void applier::servicegroup::modify_object(
            it(obj.members().begin()),
            end(obj.members().end());
          it != end;
-         ++it) {
+         ++it)
       sg->members[{it->first, it->second}] = nullptr;
-      // Notify event broker.
-      timeval tv = get_broker_timestamp(NULL);
-      broker_group_member(
-        NEBTYPE_SERVICEGROUPMEMBER_ADD,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        nullptr,
-        sg,
-        &tv);
-    }
   }
 
   // Notify event broker.

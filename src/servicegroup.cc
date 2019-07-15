@@ -199,6 +199,18 @@ void servicegroup::resolve(int& w, int& e) {
     // Save a pointer to this servicegroup for faster service/group
     // membership lookups later.
     else {
+      //Update or add of group for name
+      if (found->second.get() != it->second) {
+        // Notify event broker.
+        timeval tv = get_broker_timestamp(NULL);
+        broker_group_member(
+          NEBTYPE_SERVICEGROUPMEMBER_ADD,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          found->second.get(),
+          this,
+          &tv);
+      }
       found->second->get_parent_groups().push_back(this);
       // Save service pointer for later.
       it->second = found->second.get();
