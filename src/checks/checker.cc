@@ -600,7 +600,7 @@ void checker::run(
 
   // Clear check options.
   if (scheduled_check)
-    svc->check_options = CHECK_OPTION_NONE;
+    svc->set_check_options(CHECK_OPTION_NONE);
 
   // Update latency for event broker and macros.
   double old_latency(svc->get_latency());

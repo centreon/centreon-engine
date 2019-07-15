@@ -69,6 +69,8 @@ servicedependency::servicedependency(std::string const& dependent_hostname,
                                      std::string const& dependency_period)
     : dependency{dependent_hostname, hostname,        dependency_type,
                  inherits_parent,    fail_on_pending, dependency_period},
+      master_service_ptr{nullptr},
+      dependent_service_ptr{nullptr},
       _dependent_service_description{dependent_svc_desc},
       _service_description{service_description},
       _fail_on_ok{fail_on_ok},

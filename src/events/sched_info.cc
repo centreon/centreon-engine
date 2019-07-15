@@ -102,7 +102,7 @@ void adjust_check_scheduling() {
         continue;
 
       // ignore forced checks.
-      if (svc->check_options & CHECK_OPTION_FORCE_EXECUTION)
+      if (svc->get_check_options() & CHECK_OPTION_FORCE_EXECUTION)
         continue;
 
       // does the last check "bump" into this one?
@@ -172,7 +172,7 @@ void adjust_check_scheduling() {
         continue;
 
       // ignore forced checks.
-      if (svc->check_options & CHECK_OPTION_FORCE_EXECUTION)
+      if (svc->get_check_options() & CHECK_OPTION_FORCE_EXECUTION)
         continue;
 
       // NOTE: service check execution time is not taken into

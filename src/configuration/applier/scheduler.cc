@@ -1102,7 +1102,7 @@ void applier::scheduler::_schedule_service_events(
       // scheduled before Centreon Engine was restarted.
       if (!(!svc.get_checks_enabled()
             && svc.get_next_check()
-            && (svc.check_options & CHECK_OPTION_FORCE_EXECUTION)))
+            && (svc.get_check_options() & CHECK_OPTION_FORCE_EXECUTION)))
         continue;
     }
     services_to_schedule.insert(std::make_pair(svc.get_next_check(), &svc));
@@ -1126,7 +1126,7 @@ void applier::scheduler::_schedule_service_events(
               true,
               (void*)&svc,
               NULL,
-              svc.check_options);
+              svc.get_check_options());
   }
 
   // Schedule acknowledgement expirations.

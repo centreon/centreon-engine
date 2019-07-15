@@ -2958,8 +2958,8 @@ void acknowledge_service_problem(
   svc->set_problem_has_been_acknowledged(true);
 
   /* set the acknowledgement type */
-  svc->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
-    ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
+  svc->set_acknowledgement_type((type == ACKNOWLEDGEMENT_STICKY)
+    ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL);
 
   /* schedule acknowledgement expiration */
   time_t current_time(time(nullptr));

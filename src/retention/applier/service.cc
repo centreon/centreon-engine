@@ -79,7 +79,7 @@ void applier::service::_update(
                                 ~config.retained_host_attribute_mask());
   }
 
-  if (obj.retain_status_information) {
+  if (obj.get_retain_status_information()) {
     if (state.has_been_checked().is_set())
       obj.set_has_been_checked(*state.has_been_checked());
     if (state.check_execution_time().is_set())
@@ -135,7 +135,7 @@ void applier::service::_update(
     if (state.check_options().is_set()
         && config.use_retained_scheduling_info()
         && scheduling_info_is_ok)
-      obj.check_options = *state.check_options();
+      obj.set_check_options(*state.check_options());
     obj.set_notified_on(
         (state.notified_on_unknown().is_set() && *state.notified_on_unknown()
              ? notifier::unknown
@@ -156,7 +156,7 @@ void applier::service::_update(
     if (state.percent_state_change().is_set())
       obj.set_percent_state_change(*state.percent_state_change());
     if (state.check_flapping_recovery_notification().is_set())
-      obj.check_flapping_recovery_notification = *state.check_flapping_recovery_notification();
+      obj.set_check_flapping_recovery_notification(*state.check_flapping_recovery_notification());
     if (state.state_history().is_set()) {
       utils::set_state_history(
         *state.state_history(),
@@ -165,12 +165,12 @@ void applier::service::_update(
     }
   }
 
-  if (obj.retain_nonstatus_information) {
+  if (obj.get_retain_nonstatus_information()) {
     if (state.problem_has_been_acknowledged().is_set())
       obj.set_problem_has_been_acknowledged(*state.problem_has_been_acknowledged());
 
     if (state.acknowledgement_type().is_set())
-      obj.acknowledgement_type = *state.acknowledgement_type();
+      obj.set_acknowledgement_type(*state.acknowledgement_type());
 
     if (state.notifications_enabled().is_set()
         && (obj.get_modified_attributes() & MODATTR_NOTIFICATIONS_ENABLED))
@@ -194,7 +194,7 @@ void applier::service::_update(
 
     if (state.process_performance_data().is_set()
         && (obj.get_modified_attributes() & MODATTR_PERFORMANCE_DATA_ENABLED))
-      obj.process_performance_data = *state.process_performance_data();
+      obj.set_process_performance_data(*state.process_performance_data());
 
     if (state.obsess_over_service().is_set()
         && (obj.get_modified_attributes() & MODATTR_OBSESSIVE_HANDLER_ENABLED))
@@ -317,7 +317,7 @@ void applier::service::_update(
     // service was flapping before and isn't now, so clear
     // recovery check variable if service isn't flapping now.
     if (state.is_flapping() && !obj.get_is_flapping())
-      obj.check_flapping_recovery_notification = false;
+      obj.set_check_flapping_recovery_notification(false);
   }
 
   // handle new vars added in 2.x.

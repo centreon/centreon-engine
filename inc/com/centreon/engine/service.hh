@@ -136,6 +136,22 @@ class                           service : public notifier {
   void                          set_last_hard_state(enum service_state last_hard_state);
   enum service_state            get_initial_state() const;
   void                          set_initial_state(enum service_state current_state);
+  uint64_t                      get_flapping_comment_id(void) const;
+  void                          set_flapping_comment_id(uint64_t comment_id);
+  int                           get_check_options(void) const;
+  void                          set_check_options(int option);
+  int                           get_acknowledgement_type(void) const;
+  void                          set_acknowledgement_type(int acknowledge_type);
+  int                           get_process_performance_data(void) const;
+  void                          set_process_performance_data(int perf_data);
+  int                           get_retain_status_information(void) const;
+  void                          set_retain_status_information(bool retain_status_informations);
+  bool                          get_retain_nonstatus_information(void) const;
+  void                          set_retain_nonstatus_information(bool retain_non_status_informations);
+  bool                          get_is_being_freshened(void) const;
+  void                          set_is_being_freshened(bool freshened);
+  bool                          get_check_flapping_recovery_notification(void) const;
+  void                          set_check_flapping_recovery_notification(bool check);
   bool                          recovered() const override;
   int                           get_current_state_int() const override;
   std::string const&            get_current_state_as_string() const override;
@@ -204,15 +220,6 @@ class                           service : public notifier {
   bool                          is_in_downtime() const override;
   void resolve(int& w, int& e);
 
-  int                           process_performance_data;
-  int                           retain_status_information;
-  int                           retain_nonstatus_information;
-  int                           acknowledgement_type;
-  int                           check_flapping_recovery_notification;
-  int                           is_being_freshened;
-  int                           check_options;
-  uint64_t                      flapping_comment_id;
-
   std::list<servicegroup*> const&
                                 get_parent_groups() const;
   std::list<servicegroup*>&
@@ -233,6 +240,15 @@ class                           service : public notifier {
   std::string                   _event_handler_args;
   std::string                   _check_command_args;
 
+  int                           _process_performance_data;
+  bool                          _retain_status_information;
+  bool                          _retain_nonstatus_information;
+  int                           _acknowledgement_type;
+  bool                          _check_flapping_recovery_notification;
+  bool                          _is_being_freshened;
+  int                           _check_options;
+  uint64_t                      _flapping_comment_id;
+
   time_t                        _last_time_ok;
   time_t                        _last_time_warning;
   time_t                        _last_time_unknown;
@@ -244,7 +260,7 @@ class                           service : public notifier {
   enum service_state            _last_state;
   std::list<servicegroup*>      _servicegroups;
   host*                         _host_ptr;
-  bool _host_problem_at_last_check;
+  bool                          _host_problem_at_last_check;
 };
 CCE_END()
 

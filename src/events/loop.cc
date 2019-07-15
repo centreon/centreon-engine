@@ -279,7 +279,7 @@ void loop::_dispatching() {
         }
 
         // Forced checks override normal check logic.
-        if (temp_service->check_options & CHECK_OPTION_FORCE_EXECUTION)
+        if (temp_service->get_check_options() & CHECK_OPTION_FORCE_EXECUTION)
           run_event = true;
 
         // Reschedule the check if we can't run it now.

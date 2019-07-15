@@ -64,6 +64,8 @@ hostdependency::hostdependency(std::string const& dependent_hostname,
                  inherits_parent,
                  fail_on_pending,
                  dependency_period),
+      master_host_ptr{nullptr},
+      dependent_host_ptr{nullptr},
       _fail_on_up{fail_on_up},
       _fail_on_down{fail_on_down},
       _fail_on_unreachable{fail_on_unreachable} {}

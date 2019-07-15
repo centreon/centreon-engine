@@ -178,8 +178,8 @@ host::host(uint64_t host_id,
            std::string const& icon_image_alt,
            std::string const& vrml_image,
            std::string const& statusmap_image,
-           int x_2d,
-           int y_2d,
+           double x_2d,
+           double y_2d,
            bool have_2d_coords,
            double x_3d,
            double y_3d,
@@ -226,16 +226,39 @@ host::host(uint64_t host_id,
                freshness_threshold,
                obsess_over_host,
                timezone},
-    _last_time_down{},
-    _last_time_unreachable{},
-    _last_time_up{},
-    _is_being_freshened{},
+    _id{host_id},
+    _name{name},
+    _address{address},
+    _process_performance_data{process_perfdata},
+    _retain_status_information{retain_status_information > 0},
+    _retain_nonstatus_information{retain_nonstatus_information > 0},
+    _statusmap_image{statusmap_image},
+    _vrml_image{vrml_image},
+    _have_2d_coords{have_2d_coords > 0},
+    _have_3d_coords{have_3d_coords > 0},
+     _x_2d{x_2d},
+     _x_3d{x_3d},
+     _y_2d{y_2d},
+     _y_3d{y_3d},
+     _z_3d{z_3d},
+    _should_be_drawn{should_be_drawn > 0},
+    _acknowledgement_type{ACKNOWLEDGEMENT_NONE},
+    _should_reschedule_current_check{false},
+    _check_options{CHECK_OPTION_NONE},
+    _last_time_down{0},
+    _last_time_unreachable{0},
+    _last_time_up{0},
+    _is_being_freshened{false},
     _last_state_history_update{0},
-    _flapping_comment_id{},
-    _total_services{},
-    _total_service_check_interval{},
-    _circular_path_checked{},
-    _contains_circular_path{} {
+    _flapping_comment_id{0},
+    _total_services{0},
+    _total_service_check_interval{0},
+    _circular_path_checked{false},
+    _contains_circular_path{false},
+    _last_state{initial_state},
+    _last_hard_state{initial_state},
+    _current_state{initial_state},
+    _initial_state{initial_state} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -255,41 +278,16 @@ host::host(uint64_t host_id,
     throw engine_error() << "Could not register host '" << name << "'";
   }
 
-  _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-  _check_options = CHECK_OPTION_NONE;
+  // Duplicate string vars.
+  _alias = !alias.empty() ? alias : name;
+
+  set_current_attempt(initial_state ==  host::state_up ? 1 : max_attempts);
   set_modified_attributes(MODATTR_NONE);
   set_state_type(hard);
 
-  _initial_state = initial_state;
-
-  _id = host_id;
-  _should_reschedule_current_check = false;
-
-  // Duplicate string vars.
-  _name = name;
-  _address = address;
-  _alias = !alias.empty() ? alias : name;
-  _statusmap_image = statusmap_image;
-  _vrml_image = vrml_image;
-
-  set_current_attempt(initial_state ==  host::state_up ? 1 : max_attempts);
-  _current_state = initial_state;
   set_flap_type((flap_detection_on_down > 0 ? down : 0) |
                 (flap_detection_on_unreachable > 0 ? unreachable : 0) |
                 (flap_detection_on_up > 0 ? up : 0));
-  _have_2d_coords = (have_2d_coords > 0);
-  _have_3d_coords = (have_3d_coords > 0);
-  _last_hard_state = initial_state;
-  _last_state = initial_state;
-  _process_performance_data = process_perfdata;
-  _retain_nonstatus_information = (retain_nonstatus_information > 0);
-  _retain_status_information = (retain_status_information > 0);
-  _should_be_drawn = (should_be_drawn > 0);
-  _x_2d = x_2d;
-  _x_3d = x_3d;
-  _y_2d = y_2d;
-  _y_3d = y_3d;
-  _z_3d = z_3d;
 }
 
 uint64_t host::get_host_id(void) const {
@@ -411,43 +409,43 @@ void host::set_have_3d_coords(bool has_coords) {
   _have_3d_coords = has_coords;
 }
 
-int host::get_x_2d() const {
+double host::get_x_2d() const {
   return _x_2d;
 }
 
-void host::set_x_2d(int x) {
+void host::set_x_2d(double x) {
   _x_2d = x;
 }
 
-int host::get_y_2d() const {
+double host::get_y_2d() const {
   return _y_2d;
 }
 
-void host::set_y_2d(int y) {
+void host::set_y_2d(double y) {
   _y_2d = y;
 }
 
-int host::get_x_3d() const {
+double host::get_x_3d() const {
   return _x_3d;
 }
 
-void host::set_x_3d(int x) {
+void host::set_x_3d(double x) {
   _x_3d = x;
 }
 
-int host::get_y_3d() const {
+double host::get_y_3d() const {
   return _y_3d;
 }
 
-void host::set_y_3d(int y) {
+void host::set_y_3d(double y) {
   _y_3d = y;
 }
 
-int host::get_z_3d() const {
+double host::get_z_3d() const {
   return _z_3d;
 }
 
-void host::set_z_3d(int z) {
+void host::set_z_3d(double z) {
   _z_3d = z;
 }
 

@@ -124,12 +124,22 @@ service::service(std::string const& hostname,
                freshness_threshold,
                obsess_over,
                timezone},
+      _process_performance_data{0},
+      _retain_status_information{0},
+      _retain_nonstatus_information{0},
+      _acknowledgement_type{0},
+      _check_flapping_recovery_notification{0},
+      _is_being_freshened{0},
+      _check_options{0},
+      _flapping_comment_id{0},
+      _host_id{0},
+      _service_id{0},
       _hostname{hostname},
       _description{description},
-      _last_time_ok{},
-      _last_time_warning{},
-      _last_time_unknown{},
-      _last_time_critical{},
+      _last_time_ok{0},
+      _last_time_warning{0},
+      _last_time_unknown{0},
+      _last_time_critical{0},
       _is_volatile{is_volatile},
       _initial_state{initial_state},
       _current_state{initial_state},
@@ -205,6 +215,71 @@ enum service::service_state service::get_initial_state() const {
 void service::set_initial_state(enum service::service_state current_state) {
   _initial_state = current_state;
 }
+
+uint64_t service::get_flapping_comment_id(void) const {
+  return _flapping_comment_id;
+}
+
+void service::set_flapping_comment_id(uint64_t comment_id) {
+  _flapping_comment_id = comment_id;
+}
+
+int service::get_check_options(void) const {
+  return _check_options;
+}
+
+void service::set_check_options(int option) {
+  _check_options = option;
+}
+
+int service::get_acknowledgement_type(void) const {
+  return _acknowledgement_type;
+}
+
+void service::set_acknowledgement_type(int acknowledge_type) {
+  _acknowledgement_type = acknowledge_type;
+}
+
+int service::get_process_performance_data(void) const {
+  return _process_performance_data;
+}
+
+void service::set_process_performance_data(int perf_data) {
+  _process_performance_data = perf_data;
+}
+
+int service::get_retain_status_information(void) const {
+  return _retain_status_information;
+}
+
+void service::set_retain_status_information(bool retain_status_informations) {
+  _retain_status_information = retain_status_informations;
+}
+
+bool service::get_retain_nonstatus_information(void) const {
+  return _retain_nonstatus_information;
+}
+
+void service::set_retain_nonstatus_information(bool retain_non_status_informations) {
+  _retain_nonstatus_information = retain_non_status_informations;
+}
+
+bool service::get_is_being_freshened(void) const {
+  return _is_being_freshened;
+}
+
+void service::set_is_being_freshened(bool freshened) {
+  _is_being_freshened = freshened;
+}
+
+bool service::get_check_flapping_recovery_notification(void) const {
+  return _check_flapping_recovery_notification;
+}
+
+void service::set_check_flapping_recovery_notification(bool check) {
+  _check_flapping_recovery_notification = check;
+}
+
 
 bool service::recovered() const {
   return _current_state == service::state_ok;
@@ -500,7 +575,7 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_flap_detection_on(notifier::critical)
      << "\n"
         "  process_performance_data:             "
-     << obj.process_performance_data
+     << obj.get_process_performance_data()
      << "\n"
         "  check_freshness:                      "
      << obj.get_check_freshness()
@@ -514,9 +589,9 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_event_handler_enabled()
      << "\n  checks_enabled:                       " << obj.get_checks_enabled()
      << "\n  retain_status_information:            "
-     << obj.retain_status_information
+     << obj.get_retain_status_information()
      << "\n  retain_nonstatus_information:         "
-     << obj.retain_nonstatus_information
+     << obj.get_retain_nonstatus_information()
      << "\n  notifications_enabled:                "
      << obj.get_notifications_enabled()
      << "\n  obsess_over_service:                  " << obj.get_obsess_over()
@@ -527,7 +602,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  icon_image_alt:                       " << obj.get_icon_image_alt()
      << "\n  problem_has_been_acknowledged:        "
      << obj.get_problem_has_been_acknowledged()
-     << "\n  acknowledgement_type:                 " << obj.acknowledgement_type
+     << "\n  acknowledgement_type:                 " << obj.get_acknowledgement_type()
      << "\n  host_problem_at_last_check:           "
      << obj.get_host_problem_at_last_check()
      << "\n  check_type:                           " << obj.get_check_type()
@@ -569,7 +644,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  last_time_critical:                   "
      << string::ctime(obj.get_last_time_critical())
      << "\n  has_been_checked:                     " << obj.get_has_been_checked()
-     << "\n  is_being_freshened:                   " << obj.is_being_freshened
+     << "\n  is_being_freshened:                   " << obj.get_is_being_freshened()
      << "\n  notified_on_unknown:                  "
      << obj.get_notified_on(notifier::unknown)
      << "\n  notified_on_warning:                  "
@@ -583,7 +658,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  latency:                              " << obj.get_latency()
      << "\n  execution_time:                       " << obj.get_execution_time()
      << "\n  is_executing:                         " << obj.get_is_executing()
-     << "\n  check_options:                        " << obj.check_options
+     << "\n  check_options:                        " << obj.get_check_options()
      << "\n  scheduled_downtime_depth:             "
      << obj.get_scheduled_downtime_depth()
      << "\n  pending_flex_downtime:                "
@@ -595,7 +670,7 @@ std::ostream& operator<<(std::ostream& os,
 
   os << "  state_history_index:                  " << obj.get_state_history_index()
      << "\n  is_flapping:                          " << obj.get_is_flapping()
-     << "\n  flapping_comment_id:                  " << obj.flapping_comment_id
+     << "\n  flapping_comment_id:                  " << obj.get_flapping_comment_id()
      << "\n  percent_state_change:                 " << obj.get_percent_state_change()
      << "\n  modified_attributes:                  "
      << obj.get_modified_attributes()
@@ -800,8 +875,8 @@ com::centreon::engine::service* add_service(
       flap_detection_enabled, low_flap_threshold, high_flap_threshold,
       check_freshness, freshness_threshold, obsess_over_service, timezone)};
   try {
-    obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    obj->check_options = CHECK_OPTION_NONE;
+    obj->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+    obj->set_check_options(CHECK_OPTION_NONE);
     uint32_t flap_detection_on;
     flap_detection_on = none;
     flap_detection_on |= (flap_detection_on_critical > 0 ? notifier::critical : 0);
@@ -822,9 +897,9 @@ com::centreon::engine::service* add_service(
     notify_on |= (notify_unknown > 0 ? notifier::unknown : 0);
     notify_on |= (notify_warning > 0 ? notifier::warning : 0);
     obj->set_notify_on(notify_on);
-    obj->process_performance_data = (process_perfdata > 0);
-    obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
-    obj->retain_status_information = (retain_status_information > 0);
+    obj->set_process_performance_data(process_perfdata > 0);
+    obj->set_retain_nonstatus_information(retain_nonstatus_information > 0);
+    obj->set_retain_status_information(retain_status_information > 0);
     obj->set_should_be_scheduled(true);
     uint32_t stalk_on;
     stalk_on = none;
@@ -863,7 +938,7 @@ void service::check_for_expired_acknowledgement() {
             << "Acknowledgement of service '" << get_description()
             << "' on host '" << this->get_host_ptr()->get_name() << "' just expired";
         set_problem_has_been_acknowledged(false);
-        this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+        this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
         update_status(false);
       }
     }
@@ -1093,7 +1168,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * determined to be stale)
    */
   if (queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK)
-    this->is_being_freshened = false;
+    this->set_is_being_freshened(false);
 
   /* clear the execution flag if this was an active check */
   if (queued_check_result->get_check_type() == check_active)
@@ -1363,17 +1438,17 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /* reset notification suppression option */
     set_no_more_notifications(false);
 
-    if (ACKNOWLEDGEMENT_NORMAL == this->acknowledgement_type &&
+    if (ACKNOWLEDGEMENT_NORMAL == this->get_acknowledgement_type() &&
         (state_change || !hard_state_change)) {
       set_problem_has_been_acknowledged(false);
-      this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+      this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
       /* remove any non-persistant comments associated with the ack */
       comment::delete_service_acknowledgement_comments(this);
-    } else if (this->acknowledgement_type == ACKNOWLEDGEMENT_STICKY &&
+    } else if (this->get_acknowledgement_type() == ACKNOWLEDGEMENT_STICKY &&
                _current_state == service::state_ok) {
       set_problem_has_been_acknowledged(false);
-      this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+      this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
       /* remove any non-persistant comments associated with the ack */
       comment::delete_service_acknowledgement_comments(this);
@@ -1438,7 +1513,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /* reset the acknowledgement flag (this should already have been done, but
      * just in case...) */
     set_problem_has_been_acknowledged(false);
-    this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+    this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
     /* verify the route to the host and send out host recovery notifications */
     if (hst->get_current_state() !=  host::state_up) {
@@ -1539,7 +1614,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_last_notification(static_cast<time_t>(0));
     set_next_notification(static_cast<time_t>(0));
     set_problem_has_been_acknowledged(false);
-    this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+    this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
     set_no_more_notifications(false);
 
     if (reschedule_check)
@@ -2267,7 +2342,7 @@ int service::update_service_performance_data() {
     return OK;
 
   /* should we process performance data for this service? */
-  if (!this->process_performance_data)
+  if (!this->get_process_performance_data())
     return OK;
 
   /* process the performance data! */
@@ -2465,7 +2540,7 @@ void service::schedule_check(time_t check_time, int options) {
   }
 
   // Save check options for retention purposes.
-  this->check_options = options;
+  this->set_check_options(options);
 
   // Schedule a new event.
   if (!use_original_event) {
@@ -2551,7 +2626,7 @@ void service::set_flap(double percent_change,
 
   comment::comments.insert({com->get_comment_id(), com});
 
-  this->flapping_comment_id = com->get_comment_id();
+  this->set_flapping_comment_id(com->get_comment_id());
 
   /* set the flapping indicator */
   set_is_flapping(true);
@@ -2586,9 +2661,9 @@ void service::clear_flap(double percent_change,
       << percent_change << "% change < " << low_threshold << "% threshold)";
 
   /* delete the comment we added earlier */
-  if (this->flapping_comment_id != 0)
-    comment::delete_comment(this->flapping_comment_id);
-  this->flapping_comment_id = 0;
+  if (this->get_flapping_comment_id() != 0)
+    comment::delete_comment(this->get_flapping_comment_id());
+  this->set_flapping_comment_id(0);
 
   /* clear the flapping indicator */
   set_is_flapping(false);
@@ -3435,9 +3510,9 @@ void service::handle_flap_detection_disabled() {
     set_is_flapping(false);
 
     /* delete the original comment we added earlier */
-    if (this->flapping_comment_id != 0)
-      comment::delete_comment(this->flapping_comment_id);
-    this->flapping_comment_id = 0;
+    if (this->get_flapping_comment_id() != 0)
+      comment::delete_comment(this->get_flapping_comment_id());
+    this->set_flapping_comment_id(0);
 
     /* log a notice - this one is parsed by the history CGI */
     logger(log_info_message, basic)
@@ -3653,7 +3728,7 @@ void service::check_result_freshness() {
       continue;
 
     /* skip services that are already being freshened */
-    if (it->second->is_being_freshened)
+    if (it->second->get_is_being_freshened())
       continue;
 
     // See if the time is right...
@@ -3675,7 +3750,7 @@ void service::check_result_freshness() {
     if (!it->second->is_result_fresh(current_time, true)) {
 
       /* set the freshen flag */
-      it->second->is_being_freshened = true;
+      it->second->set_is_being_freshened(true);
 
       /* schedule an immediate forced check of the service */
       it->second->schedule_check(

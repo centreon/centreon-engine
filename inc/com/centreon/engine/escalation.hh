@@ -57,8 +57,8 @@ class                escalation {
   timeperiod*        escalation_period_ptr;
 
  private:
-  uint32_t _first_notification;
-  uint32_t _last_notification;
+  uint32_t           _first_notification;
+  uint32_t           _last_notification;
   double             _notification_interval;
   std::string        _escalation_period;
   uint32_t           _escalate_on;

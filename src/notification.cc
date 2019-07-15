@@ -43,30 +43,7 @@ notification::notification(notifier* parent,
       _id{notification_id},
       _number{notification_number},
       _interval{notification_interval} {
-  switch (_type) {
-    case notifier::reason_normal:
-      _category = notifier::cat_normal;
-      break;
-    case notifier::reason_recovery:
-      _category = notifier::cat_recovery;
-      break;
-    case notifier::reason_acknowledgement:
-      _category = notifier::cat_acknowledgement;
-      break;
-    case notifier::reason_flappingstop:
-    case notifier::reason_flappingstart:
-    case notifier::reason_flappingdisabled:
-      _category = notifier::cat_flapping;
-      break;
-    case notifier::reason_downtimestart:
-    case notifier::reason_downtimeend:
-    case notifier::reason_downtimecancelled:
-      _category = notifier::cat_downtime;
-      break;
-    case notifier::reason_custom:
-      _category = notifier::cat_custom;
-      break;
-  }
+
 }
 
 int notification::execute(std::unordered_set<contact*> const& to_notify) {

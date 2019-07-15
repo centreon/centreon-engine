@@ -284,7 +284,7 @@ class                notifier : public checkable {
                                       notification_option options);
 
   notifier_type      _notifier_type;
-  int32_t _stalk_type;
+  int32_t            _stalk_type;
   uint32_t           _flap_type;
   unsigned long      _current_event_id;
   unsigned long      _last_event_id;
@@ -294,7 +294,7 @@ class                notifier : public checkable {
   time_t             _initial_notif_time;
   int                _acknowledgement_timeout;
   time_t             _last_acknowledgement;
-  int32_t _out_notification_type;
+  int32_t            _out_notification_type;
   uint32_t           _current_notifications;
   uint32_t           _notification_interval;
   uint32_t           _modified_attributes;

@@ -47,19 +47,20 @@ comment::comment(comment::type comment_type,
                  bool expires,
                  time_t expire_time,
                  uint64_t comment_id)
+  : _comment_type{comment_type},
+    _entry_type{entry_type},
+    _comment_id{comment_id},
+    _source{source},
+    _persistent{persistent},
+    _entry_time{entry_time},
+    _expires{expires},
+    _expire_time{expire_time},
+    _host_name{host_name},
+    _service_description{service_description},
+    _author{author},
+    _comment_data{comment_data}
 {
   bool is_added = true;
-  _comment_type = comment_type;
-  _entry_type = entry_type;
-  _source = source;
-  _persistent = persistent;
-  _entry_time = entry_time;
-  _expires = expires;
-  _expire_time = expire_time;
-  _host_name = host_name;
-  _service_description = service_description;
-  _author = author;
-  _comment_data = comment_data;
 
   if (!comment_id) {
     _comment_id = _next_comment_id;

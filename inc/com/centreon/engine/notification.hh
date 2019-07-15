@@ -44,7 +44,6 @@ class notification {
  private:
   notifier* _parent;
   notifier::reason_type _type;
-  notifier::notification_category _category;
   std::string _author;
   std::string _message;
   uint32_t _options;

@@ -991,7 +991,7 @@ void broker_flapping_data(
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
     ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
-    ds.comment_id = temp_service->flapping_comment_id;
+    ds.comment_id = temp_service->get_flapping_comment_id();
   }
   else {
     temp_host = (host*)data;

@@ -414,14 +414,14 @@ void applier::service::modify_object(
   s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::unknown ? notifier::unknown : notifier::none);
   s->add_flap_detection_on(obj.flap_detection_options() & configuration::service::critical ? notifier::critical : notifier::none);
 
-  s->process_performance_data = static_cast<int>(obj.process_perf_data());
+  s->set_process_performance_data(static_cast<int>(obj.process_perf_data()));
   s->set_check_freshness(obj.check_freshness());
   s->set_freshness_threshold(obj.freshness_threshold());
   s->set_accept_passive_checks(obj.checks_passive());
   s->set_event_handler(obj.event_handler());
   s->set_checks_enabled(obj.checks_active());
-  s->retain_status_information = static_cast<int>(obj.retain_status_information());
-  s->retain_nonstatus_information = static_cast<int>(obj.retain_nonstatus_information());
+  s->set_retain_status_information(static_cast<bool>(obj.retain_status_information()));
+  s->set_retain_nonstatus_information(static_cast<bool>(obj.retain_nonstatus_information()));
   s->set_notifications_enabled(obj.notifications_enabled());
   s->set_obsess_over(obj.obsess_over_service());
   s->set_notes(obj.notes());
