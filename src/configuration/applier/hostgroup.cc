@@ -137,12 +137,14 @@ void applier::hostgroup::expand_objects(configuration::state& s) {
  *  @param[in] obj  The new hostgroup to modify into the monitoring
  *                  engine.
  */
+#include <iostream>
 void applier::hostgroup::modify_object(
                            configuration::hostgroup const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying hostgroup '" << obj.hostgroup_name() << "'";
 
+  std::cout << "1" << std::endl;
   // Find old configuration.
   set_hostgroup::iterator
     it_cfg(config->hostgroups_find(obj.key()));
@@ -150,6 +152,7 @@ void applier::hostgroup::modify_object(
     throw (engine_error() << "Could not modify non-existing "
            << "host group '" << obj.hostgroup_name() << "'");
 
+  std::cout << "2" << std::endl;
   // Find host group object.
   hostgroup_map::iterator
     it_obj(engine::hostgroup::hostgroups.find(obj.key()));
@@ -157,10 +160,16 @@ void applier::hostgroup::modify_object(
     throw (engine_error() << "Could not modify non-existing "
            << "host group object '" << obj.hostgroup_name() << "'");
 
+  std::cout << "3" << std::endl;
+
+  std::cout << it_obj->second << std::endl;
+
   // Update the global configuration set.
   configuration::hostgroup old_cfg(*it_cfg);
   config->hostgroups().erase(it_cfg);
   config->hostgroups().insert(obj);
+
+  std::cout << "4" << std::endl;
 
   it_obj->second->set_action_url(obj.action_url());
   it_obj->second->set_alias(obj.alias());
@@ -168,9 +177,12 @@ void applier::hostgroup::modify_object(
   it_obj->second->set_notes_url(obj.notes_url());
   it_obj->second->set_id(obj.hostgroup_id());
 
+  std::cout << 5 << std::endl;
+
   // Were members modified ?
   if (obj.members() != old_cfg.members()) {
     // Delete all old host group members.
+    std::cout << 6 << std::endl;
     for(host_map_unsafe::iterator
           it(it_obj->second->members.begin()),
           end(it_obj->second->members.end());
@@ -186,7 +198,8 @@ void applier::hostgroup::modify_object(
         &tv);
     }
 
-    (*it_obj).second->members.clear();
+    std::cout << 7 << std::endl;
+    it_obj->second->members.clear();
     for (set_string::const_iterator
            it(obj.members().begin()),
            end(obj.members().end());
@@ -195,6 +208,7 @@ void applier::hostgroup::modify_object(
       it_obj->second->members.insert({*it, nullptr});
   }
 
+  std::cout << 8 << std::endl;
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
   broker_group(
@@ -203,6 +217,7 @@ void applier::hostgroup::modify_object(
     NEBATTR_NONE,
     it_obj->second.get(),
     &tv);
+  std::cout << 9 << std::endl;
 }
 
 /**
