@@ -123,15 +123,9 @@ service::service(std::string const& hostname,
                check_freshness,
                freshness_threshold,
                obsess_over,
-               timezone},
+               timezone, 0, 0},
       _process_performance_data{0},
-      _retain_status_information{0},
-      _retain_nonstatus_information{0},
-      _acknowledgement_type{0},
       _check_flapping_recovery_notification{0},
-      _is_being_freshened{0},
-      _check_options{0},
-      _flapping_comment_id{0},
       _host_id{0},
       _service_id{0},
       _hostname{hostname},
@@ -216,30 +210,6 @@ void service::set_initial_state(enum service::service_state current_state) {
   _initial_state = current_state;
 }
 
-uint64_t service::get_flapping_comment_id(void) const {
-  return _flapping_comment_id;
-}
-
-void service::set_flapping_comment_id(uint64_t comment_id) {
-  _flapping_comment_id = comment_id;
-}
-
-int service::get_check_options(void) const {
-  return _check_options;
-}
-
-void service::set_check_options(int option) {
-  _check_options = option;
-}
-
-int service::get_acknowledgement_type(void) const {
-  return _acknowledgement_type;
-}
-
-void service::set_acknowledgement_type(int acknowledge_type) {
-  _acknowledgement_type = acknowledge_type;
-}
-
 int service::get_process_performance_data(void) const {
   return _process_performance_data;
 }
@@ -248,29 +218,6 @@ void service::set_process_performance_data(int perf_data) {
   _process_performance_data = perf_data;
 }
 
-int service::get_retain_status_information(void) const {
-  return _retain_status_information;
-}
-
-void service::set_retain_status_information(bool retain_status_informations) {
-  _retain_status_information = retain_status_informations;
-}
-
-bool service::get_retain_nonstatus_information(void) const {
-  return _retain_nonstatus_information;
-}
-
-void service::set_retain_nonstatus_information(bool retain_non_status_informations) {
-  _retain_nonstatus_information = retain_non_status_informations;
-}
-
-bool service::get_is_being_freshened(void) const {
-  return _is_being_freshened;
-}
-
-void service::set_is_being_freshened(bool freshened) {
-  _is_being_freshened = freshened;
-}
 
 bool service::get_check_flapping_recovery_notification(void) const {
   return _check_flapping_recovery_notification;

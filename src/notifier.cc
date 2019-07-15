@@ -93,7 +93,9 @@ notifier::notifier(notifier::notifier_type notifier_type,
                    bool check_freshness,
                    int freshness_threshold,
                    bool obsess_over,
-                   std::string const& timezone)
+                   std::string const& timezone,
+                   bool retain_status_information,
+                   bool retain_nonstatus_information)
     : checkable{
           display_name,           check_command,       checks_enabled,
           accept_passive_checks,  check_interval,      retry_interval,
@@ -129,7 +131,14 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _has_been_checked{false},
       _no_more_notifications{false},
       _notification_number{0},
-      _pending_flex_downtime{0} {
+      _pending_flex_downtime{0},
+      _flapping_comment_id{0},
+      _check_options{CHECK_OPTION_NONE},
+      _acknowledgement_type{ACKNOWLEDGEMENT_NONE},
+      _retain_status_information{retain_status_information},
+      _retain_nonstatus_information{retain_nonstatus_information},
+      _is_being_freshened{false}
+      {
   if (retry_interval <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for notifier '"
@@ -1186,6 +1195,55 @@ std::list<escalation*>& notifier::get_escalations() {
 std::list<escalation*> const& notifier::get_escalations() const {
   return _escalations;
 }
+
+uint64_t notifier::get_flapping_comment_id(void) const {
+  return _flapping_comment_id;
+}
+
+void notifier::set_flapping_comment_id(uint64_t comment_id) {
+  _flapping_comment_id = comment_id;
+}
+
+int notifier::get_check_options(void) const {
+  return _check_options;
+}
+
+void notifier::set_check_options(int option) {
+  _check_options = option;
+}
+
+int notifier::get_acknowledgement_type(void) const {
+  return _acknowledgement_type;
+}
+
+void notifier::set_acknowledgement_type(int acknowledge_type) {
+  _acknowledgement_type = acknowledge_type;
+}
+
+int notifier::get_retain_status_information(void) const {
+  return _retain_status_information;
+}
+
+void notifier::set_retain_status_information(bool retain_status_informations) {
+  _retain_status_information = retain_status_informations;
+}
+
+bool notifier::get_retain_nonstatus_information(void) const {
+  return _retain_nonstatus_information;
+}
+
+void notifier::set_retain_nonstatus_information(bool retain_non_status_informations) {
+  _retain_nonstatus_information = retain_non_status_informations;
+}
+
+bool notifier::get_is_being_freshened(void) const {
+  return _is_being_freshened;
+}
+
+void notifier::set_is_being_freshened(bool freshened) {
+  _is_being_freshened = freshened;
+}
+
 
 ///**
 // *  Tests whether or not a contact is an escalated contact for a

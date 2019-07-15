@@ -225,13 +225,13 @@ host::host(uint64_t host_id,
                check_freshness,
                freshness_threshold,
                obsess_over_host,
-               timezone},
+               timezone,
+               retain_status_information > 0,
+               retain_nonstatus_information > 0},
     _id{host_id},
     _name{name},
     _address{address},
     _process_performance_data{process_perfdata},
-    _retain_status_information{retain_status_information > 0},
-    _retain_nonstatus_information{retain_nonstatus_information > 0},
     _statusmap_image{statusmap_image},
     _vrml_image{vrml_image},
     _have_2d_coords{have_2d_coords > 0},
@@ -242,15 +242,11 @@ host::host(uint64_t host_id,
      _y_3d{y_3d},
      _z_3d{z_3d},
     _should_be_drawn{should_be_drawn > 0},
-    _acknowledgement_type{ACKNOWLEDGEMENT_NONE},
     _should_reschedule_current_check{false},
-    _check_options{CHECK_OPTION_NONE},
     _last_time_down{0},
     _last_time_unreachable{0},
     _last_time_up{0},
-    _is_being_freshened{false},
     _last_state_history_update{0},
-    _flapping_comment_id{0},
     _total_services{0},
     _total_service_check_interval{0},
     _circular_path_checked{false},
@@ -361,22 +357,6 @@ void host::set_process_performance_data(bool process_performance_data) {
   _process_performance_data = process_performance_data;
 }
 
-bool host::get_retain_status_information() const {
-  return _retain_status_information;
-}
-
-void host::set_retain_status_information(bool retain_status_information) {
-  _retain_status_information = retain_status_information;
-}
-
-bool host::get_retain_nonstatus_information() const {
-  return _retain_nonstatus_information;
-}
-
-void host::set_retain_nonstatus_information(bool retain_nonstatus_information) {
-  _retain_nonstatus_information = retain_nonstatus_information;
-}
-
 std::string const& host::get_vrml_image() const {
   return _vrml_image;
 }
@@ -457,22 +437,6 @@ void host::set_should_be_drawn(int should_be_drawn) {
   _should_be_drawn = should_be_drawn;
 }
 
-int host::get_acknowledgement_type() const {
-  return _acknowledgement_type;
-}
-
-void host::set_acknowledgement_type(int acknowledgement_type) {
-  _acknowledgement_type = acknowledgement_type;
-}
-
-int host::get_check_options() const {
-  return _check_options;
-}
-
-void host::set_check_options(int check_options) {
-  _check_options = check_options;
-}
-
 time_t host::get_last_time_down() const {
   return _last_time_down;
 }
@@ -497,14 +461,6 @@ void host::set_last_time_up(time_t last_time) {
   _last_time_up = last_time;
 }
 
-bool host::get_is_being_freshened() const {
-  return _is_being_freshened;
-}
-
-void host::set_is_being_freshened(bool is_being_freshened) {
-  _is_being_freshened = is_being_freshened;
-}
-
 bool host::get_should_reschedule_current_check() const {
   return _should_reschedule_current_check;
 }
@@ -519,14 +475,6 @@ time_t host::get_last_state_history_update() const {
 
 void host::set_last_state_history_update(time_t last_state_history_update) {
   _last_state_history_update = last_state_history_update;
-}
-
-unsigned long host::get_flapping_comment_id() const {
-  return _flapping_comment_id;
-}
-
-void host::set_flapping_comment_id(unsigned long flapping_comment_id) {
-  _flapping_comment_id = flapping_comment_id;
 }
 
 int host::get_total_services() const {

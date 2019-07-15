@@ -130,7 +130,9 @@ class                notifier : public checkable {
                               bool check_freshness,
                               int freshness_threshold,
                               bool obsess_over,
-                              std::string const& timezone);
+                              std::string const& timezone,
+                              bool retain_status_information,
+                              bool retain_nonstatus_information);
                      ~notifier() {}
 
 
@@ -205,6 +207,18 @@ class                notifier : public checkable {
   void               set_recovery_notification_delay(uint32_t notification_delay);
   bool               get_notifications_enabled() const;
   void               set_notifications_enabled(bool notifications_enabled);
+  uint64_t           get_flapping_comment_id(void) const;
+  void               set_flapping_comment_id(uint64_t comment_id);
+  int                get_check_options(void) const;
+  void               set_check_options(int option);
+  int                get_acknowledgement_type(void) const;
+  void               set_acknowledgement_type(int acknowledge_type);
+  int                get_retain_status_information(void) const;
+  void               set_retain_status_information(bool retain_status_informations);
+  bool               get_retain_nonstatus_information(void) const;
+  void               set_retain_nonstatus_information(bool retain_non_status_informations);
+  bool               get_is_being_freshened(void) const;
+  void               set_is_being_freshened(bool freshened);
   bool               should_notification_be_escalated() const;
   std::list<escalation*>&
                      get_escalations();
@@ -311,6 +325,12 @@ class                notifier : public checkable {
   bool               _problem_has_been_acknowledged;
   bool               _has_been_checked;
   bool               _no_more_notifications;
+  uint64_t           _flapping_comment_id;
+  int                _check_options;
+  int                _acknowledgement_type;
+  bool               _retain_status_information;
+  bool               _retain_nonstatus_information;
+  bool               _is_being_freshened;
 
   /* New ones */
   int _notification_number;
