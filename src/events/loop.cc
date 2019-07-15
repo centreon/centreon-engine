@@ -219,7 +219,6 @@ void loop::_dispatching() {
 
       timed_event::event_list_high.pop_front();
       // We may have just removed the only item from the list.
-      quick_timed_event.erase(timed_event::high, temp_event);
 
       // Handle the event.
       handle_timed_event(temp_event);
@@ -369,8 +368,6 @@ void loop::_dispatching() {
         timed_event* temp_event(*timed_event::event_list_low.begin());
         timed_event::event_list_low.pop_front();
         // We may have just removed the only item from the list.
-
-        quick_timed_event.erase(timed_event::low, temp_event);
 
         // Handle the event.
         logger(dbg_events, more)

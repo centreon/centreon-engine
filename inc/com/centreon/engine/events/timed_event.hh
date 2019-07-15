@@ -56,6 +56,8 @@ class                        timed_event{
 
   static timed_event_list    event_list_high;
   static timed_event_list    event_list_low;
+
+  static timed_event*        find_event(timed_event::priority, int event, void *data);
 };
 CCE_END()
 

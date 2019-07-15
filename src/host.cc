@@ -26,7 +26,6 @@
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/host.hh"
@@ -1735,8 +1734,7 @@ void host::schedule_check(time_t check_time, int options) {
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
-  temp_event = quick_timed_event.find(timed_event::low,
-                                      hash_timed_event::host_check, this);
+  temp_event = timed_event::find_event(timed_event::low, EVENT_HOST_CHECK, this);
 
   /* we found another host check event for this host in the queue - what should
    * we do? */

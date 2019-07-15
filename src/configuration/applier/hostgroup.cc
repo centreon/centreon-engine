@@ -156,19 +156,17 @@ void applier::hostgroup::modify_object(
   if (it_obj == engine::hostgroup::hostgroups.end())
     throw (engine_error() << "Could not modify non-existing "
            << "host group object '" << obj.hostgroup_name() << "'");
-  com::centreon::engine::hostgroup* hg(it_obj->second.get());
 
   // Update the global configuration set.
   configuration::hostgroup old_cfg(*it_cfg);
   config->hostgroups().erase(it_cfg);
   config->hostgroups().insert(obj);
 
-  hg->set_action_url(obj.action_url());
-  hg->set_alias(obj.alias());
-  hg->set_notes(obj.notes());
-  hg->set_notes_url(obj.notes_url());
-
-  engine::hostgroup::hostgroups[obj.hostgroup_name()]->set_id(obj.hostgroup_id());
+  it_obj->second->set_action_url(obj.action_url());
+  it_obj->second->set_alias(obj.alias());
+  it_obj->second->set_notes(obj.notes());
+  it_obj->second->set_notes_url(obj.notes_url());
+  it_obj->second->set_id(obj.hostgroup_id());
 
   // Were members modified ?
   if (obj.members() != old_cfg.members()) {
@@ -184,17 +182,17 @@ void applier::hostgroup::modify_object(
         NEBFLAG_NONE,
         NEBATTR_NONE,
         it->second,
-        hg,
+        it_obj->second.get(),
         &tv);
     }
 
-    (*it_obj).second->members.clear();
+    it_obj->second->members.clear();
     for (set_string::const_iterator
            it(obj.members().begin()),
            end(obj.members().end());
          it != end;
          ++it)
-      hg->members.insert({*it, nullptr});
+      it_obj->second->members.insert({*it, nullptr});
   }
 
   // Notify event broker.
@@ -203,7 +201,7 @@ void applier::hostgroup::modify_object(
     NEBTYPE_HOSTGROUP_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hg,
+    it_obj->second.get(),
     &tv);
 }
 

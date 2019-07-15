@@ -381,10 +381,8 @@ void add_event(
   timed_event_list *list;
 
   if (priority == timed_event::low) {
-    quick_timed_event.insert(timed_event::low, event);
     list = &timed_event::event_list_low;
   } else {
-    quick_timed_event.insert(timed_event::high, event);
     list = &timed_event::event_list_high;
   }
 
@@ -777,12 +775,35 @@ void remove_event(
     return;
 
   if (priority == timed_event::low) {
-    quick_timed_event.erase(timed_event::low, event);
     timed_event::event_list_low.remove(event);
   } else {
-    quick_timed_event.erase(timed_event::high, event);
     timed_event::event_list_high.remove(event);
   }
+}
+
+timed_event* timed_event::find_event(timed_event::priority priority, int event_type, void *data)
+{
+  timed_event_list *list;
+
+  logger(dbg_functions, basic)
+    << "resort_event_list()";
+
+  // move current event list to temp list.
+  if (priority == timed_event::low) {
+    list = &timed_event::event_list_low;
+  } else {
+    list = &timed_event::event_list_high;
+  }
+
+  for (timed_event_list::iterator
+         it{list->begin()},
+         end{list->end()};
+       it != end;
+       ++it)
+    if ((*it)->event_type == event_type && (*it)->event_data == data)
+      return (*it);
+
+  return nullptr;
 }
 
 /**
@@ -846,10 +867,8 @@ void resort_event_list(timed_event::priority priority) {
 
   // move current event list to temp list.
   if (priority == timed_event::low) {
-    quick_timed_event.clear(timed_event::low);
     list = &timed_event::event_list_low;
   } else {
-    quick_timed_event.clear(timed_event::high);
     list = &timed_event::event_list_high;
   }
   list->sort(compare_event);

@@ -27,7 +27,6 @@
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/hostdependency.hh"
@@ -2435,8 +2434,9 @@ void service::schedule_check(time_t check_time, int options) {
 
   // Default is to use the new event.
   bool use_original_event(false);
-  timed_event* temp_event = quick_timed_event.find(
-    timed_event::low, hash_timed_event::service_check, this);
+  timed_event* temp_event = timed_event::find_event(timed_event::low,
+                                                    EVENT_SERVICE_CHECK,
+                                                    this);
 
   // We found another service check event for this service in
   // the queue - what should we do?

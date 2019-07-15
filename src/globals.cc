@@ -27,7 +27,6 @@
 using namespace com::centreon::engine;
 
 configuration::state* config(NULL);
-events::hash_timed_event quick_timed_event;
 
 char const*         sigs[] = {
   "EXIT", "HUP", "INT", "QUIT", "ILL",
