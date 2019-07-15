@@ -119,7 +119,7 @@ TEST_F(HostFlappingNotification, SimpleHostFlapping) {
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   _host->set_is_flapping(true);
   testing::internal::CaptureStdout();
   ASSERT_EQ(_host->notify(notifier::reason_flappingstart, "", "",
@@ -167,7 +167,7 @@ TEST_F(HostFlappingNotification, SimpleHostFlappingStartTwoTimes) {
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   _host->set_is_flapping(true);
   ASSERT_EQ(_host->notify(notifier::reason_flappingstart, "", "",
                           notifier::notification_option_none),
@@ -206,7 +206,7 @@ TEST_F(HostFlappingNotification, SimpleHostFlappingStopTwoTimes) {
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   _host->set_is_flapping(true);
   ASSERT_EQ(_host->notify(notifier::reason_flappingstart, "", "",
                           notifier::notification_option_none),

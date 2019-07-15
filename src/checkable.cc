@@ -83,6 +83,8 @@ checkable::checkable(std::string const& display_name,
       _last_state_change{0},
       _last_hard_state_change{0},
       _state_type{soft},
+      _percent_state_change{0.0},
+      _event_handler_ptr{nullptr},
       _check_command_ptr{nullptr},
       _is_executing{false} {
   if (check_interval < 0) {

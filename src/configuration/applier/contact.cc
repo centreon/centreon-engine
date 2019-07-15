@@ -149,7 +149,7 @@ void applier::contact::add_object(configuration::contact const& obj) {
            end(obj.customvariables().end());
        it != end;
        ++it)
-    c->custom_variables.insert({it->first, it->second});
+    c->get_custom_variables().insert({it->first, it->second});
 }
 
 /**
@@ -339,7 +339,7 @@ void applier::contact::modify_object(configuration::contact const& obj) {
 
   // Custom variables.
   if (std::operator!=(obj.customvariables(), old_cfg.customvariables()))
-    c->custom_variables = obj.customvariables();
+    c->get_custom_variables() = obj.customvariables();
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));

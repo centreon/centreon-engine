@@ -32,16 +32,6 @@ customvariable::customvariable(std::string const& value, bool is_sent)
   : _value{value}, _is_sent{is_sent}, _modified{true} {}
 
 /**
- *  Constructor
- *
- *  @param value The value of the customvariable stored as a string
- *  @param is_sent A boolean telling if this custom variable must be sent to
- *  broker
- */
-customvariable::customvariable(std::string&& value, bool is_sent)
-  : _value{value}, _is_sent{is_sent}, _modified{true} {}
-
-/**
  *  Copy constructor
  *
  * @param other Another customvariable

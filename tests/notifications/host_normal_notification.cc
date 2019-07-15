@@ -112,7 +112,7 @@ TEST_F(HostNotification, SimpleNormalHostNotification) {
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   _host->set_current_state(engine::host::state_down);
   _host->set_last_state(engine::host::state_down);
   _host->set_last_hard_state_change(43200);
@@ -139,7 +139,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotificationsdisabled) {
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
                           notifier::notification_option_none),
             OK);
@@ -162,7 +162,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierNotifdisabled) {
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
   _host->set_notifications_enabled(false);
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
                           notifier::notification_option_none),
             OK);
@@ -180,7 +180,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
@@ -201,7 +201,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationForcedWithNotificationDisab
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
@@ -221,7 +221,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationForcedNotification) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
@@ -242,7 +242,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithDowntime) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
@@ -263,7 +263,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithFlapping) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
@@ -284,7 +284,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithSoftState) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
   ASSERT_EQ(_host->notify(notifier::reason_normal, "", "",
@@ -304,7 +304,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithHardStateAcknowledged) 
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
@@ -325,7 +325,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousTooSoon) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
@@ -347,7 +347,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousWithNullInterv
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(host_escalation);
@@ -371,7 +371,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateNotNotified) {
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(false);
   ASSERT_TRUE(host_escalation);
@@ -394,7 +394,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateBeforeFirstNotifDela
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(false);
   ASSERT_TRUE(host_escalation);
@@ -420,7 +420,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateAfterFirstNotifDelay
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(false);
   ASSERT_TRUE(host_escalation);
@@ -451,7 +451,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
   uint64_t id{_host->get_next_notification_id()};
   /* We configure the notification interval to 2 minutes */
   _host->set_notification_interval(2);
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   _host->set_current_state(engine::host::state_down);
   _host->set_last_state(engine::host::state_down);
   _host->set_last_hard_state_change(43200);

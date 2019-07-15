@@ -73,6 +73,8 @@ notifier::notifier(notifier::notifier_type notifier_type,
                    uint32_t retry_interval,
                    uint32_t notification_interval,
                    int max_attempts,
+                   int32_t notify,
+                   int32_t stalk,
                    uint32_t first_notification_delay,
                    uint32_t recovery_notification_delay,
                    std::string const& notification_period,
@@ -101,12 +103,25 @@ notifier::notifier(notifier::notifier_type notifier_type,
           flap_detection_enabled, low_flap_threshold,  high_flap_threshold,
           check_freshness,        freshness_threshold, obsess_over,
           timezone},
-      notification_period_ptr{nullptr},
       _notifier_type{notifier_type},
-      _stalk_type{0},
+      _stalk_type{stalk},
       _flap_type{0},
+      _current_event_id{},
+      _last_event_id{},
+      _current_problem_id{},
+      _last_problem_id{},
+      _initial_notif_time{},
+      _acknowledgement_timeout{},
+      _last_acknowledgement{},
+      _out_notification_type{notify},
+      _current_notifications{},
       _notification_interval{notification_interval},
+      _modified_attributes{},
+      _current_notification_id{0UL},
+      _next_notification{0UL},
+      _last_notification{0UL},
       _notification_period{notification_period},
+      _notification_period_ptr{nullptr},
       _first_notification_delay{first_notification_delay},
       _recovery_notification_delay{recovery_notification_delay},
       _notifications_enabled{notifications_enabled},
@@ -114,9 +129,8 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _has_been_checked{false},
       _no_more_notifications{false},
       _notification_number{0},
-      _state_history{},
       _pending_flex_downtime{0} {
-  if (notification_interval < 0 || check_interval < 0 || retry_interval <= 0) {
+  if (retry_interval <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for notifier '"
         << display_name << "'";
@@ -692,8 +706,9 @@ int notifier::notify(notifier::reason_type type,
   std::unordered_set<contact*> to_notify{
       get_contacts_to_notify(cat, type, notification_interval)};
 
+  _current_notification_id = _next_notification_id++;
   std::shared_ptr<notification> notif{new notification(
-      this, type, not_author, not_data, options, _next_notification_id++,
+      this, type, not_author, not_data, options, _current_notification_id,
       _notification_number, notification_interval)};
 
   /* Let's make the notification. */
@@ -1573,16 +1588,16 @@ void notifier::resolve(int& w, int& e) {
           << "' specified for notifier '" << get_display_name()
           << "' is not defined anywhere!";
       errors++;
-      notification_period_ptr = nullptr;
+      _notification_period_ptr = nullptr;
     } else
       // Save the pointer to the notification timeperiod for later.
-      notification_period_ptr = found_it->second.get();
+      _notification_period_ptr = found_it->second.get();
   } else if (get_notifications_enabled()) {
     logger(log_verification_error, basic)
         << "Warning: Notifier '" << get_display_name()
         << "' has no notification time period defined!";
     warnings++;
-    notification_period_ptr = nullptr;
+    _notification_period_ptr = nullptr;
   }
 
   w += warnings;
@@ -1607,4 +1622,92 @@ int notifier::get_pending_flex_downtime() const {
 
 void notifier::set_pending_flex_downtime(int pending_flex_downtime) {
   _pending_flex_downtime = pending_flex_downtime;
+}
+
+/**
+ * @brief Calculates next acceptable re-notification time for this notifier.
+ *
+ * @param offset
+ *
+ * @return a timestamp
+ */
+time_t notifier::get_next_notification_time(time_t offset) {
+  bool have_escalated_interval{false};
+
+  logger(dbg_functions, basic) << "notifier::get_next_notification_time()";
+  logger(dbg_notifications, most)
+      << "Calculating next valid notification time...";
+
+  /* default notification interval */
+  uint32_t interval_to_use{_notification_interval};
+
+  logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
+
+  /*
+   * search all the escalation entries for valid matches for this service (at
+   * its current notification number)
+   */
+  for (escalation const* e : get_escalations()) {
+    /* interval < 0 means to use non-escalated interval */
+    if (e->get_notification_interval() < 0.0)
+      continue;
+
+    /* skip this entry if it isn't appropriate */
+    if (!is_valid_escalation_for_notification(e, notification_option_none))
+      continue;
+
+    logger(dbg_notifications, most)
+        << "Found a valid escalation w/ interval of "
+        << e->get_notification_interval();
+
+    /*
+     * if we haven't used a notification interval from an escalation yet,
+     * use this one
+     */
+    if (!have_escalated_interval) {
+      have_escalated_interval = true;
+      interval_to_use = e->get_notification_interval();
+    }
+    /* else use the shortest of all valid escalation intervals */
+    else if (e->get_notification_interval() < interval_to_use)
+      interval_to_use = e->get_notification_interval();
+
+    logger(dbg_notifications, most) << "New interval: " << interval_to_use;
+  }
+
+  /*
+   * if notification interval is 0, we shouldn't send any more problem
+   * notifications (unless service is volatile)
+   */
+  if (interval_to_use == 0.0 && !get_is_volatile())
+    set_no_more_notifications(true);
+  else
+    set_no_more_notifications(false);
+
+  logger(dbg_notifications, most) << "Interval used for calculating next valid "
+                                     "notification time: "
+                                  << interval_to_use;
+
+  /* calculate next notification time */
+  time_t next_notification{
+      offset +
+      static_cast<time_t>(interval_to_use * config->interval_length())};
+
+  return next_notification;
+}
+
+void notifier::set_flap_type(uint32_t type) {
+  _flap_type = type;
+}
+
+timeperiod* notifier::get_notification_period_ptr() const {
+  return _notification_period_ptr;
+}
+
+int notifier::get_acknowledgement_timeout() const {
+  return _acknowledgement_timeout;
+}
+
+void notifier::set_notification_period_ptr(timeperiod* tp) {
+  _notification_period_ptr = tp;
 }

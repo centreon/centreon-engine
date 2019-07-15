@@ -2018,7 +2018,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
   case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
     temp_host->set_notification_period(temp_ptr);
     delete[] temp_ptr;
-    temp_host->notification_period_ptr = temp_timeperiod;
+    temp_host->set_notification_period_ptr(temp_timeperiod);
     attr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
@@ -2043,19 +2043,19 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
   case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
     found_svc->second->set_notification_period(temp_ptr);
-    found_svc->second->notification_period_ptr = temp_timeperiod;
+    found_svc->second->set_notification_period_ptr(temp_timeperiod);
     attr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
     cnct->second->set_host_notification_period(temp_ptr);
-    cnct->second->host_notification_period_ptr = temp_timeperiod;
+    cnct->second->set_host_notification_period_ptr(temp_timeperiod);
     hattr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
   case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     cnct->second->set_service_notification_period(temp_ptr);
-    cnct->second->service_notification_period_ptr = temp_timeperiod;
+    cnct->second->set_service_notification_period_ptr(temp_timeperiod);
     sattr = MODATTR_NOTIFICATION_TIMEPERIOD;
     break;
 
@@ -2237,9 +2237,9 @@ int cmd_change_object_custom_var(int cmd, char* args) {
         return ERROR;
       map_customvar::iterator it(temp_host->custom_variables.find(varname));
       if (it == temp_host->custom_variables.end())
-        temp_host->custom_variables.insert({std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
+        temp_host->custom_variables.insert({varname, std::shared_ptr<customvariable>{new customvariable(varvalue)}});
       else
-        it->second->update(std::move(varvalue));
+        it->second->update(varvalue);
 
       /* set the modified attributes and update the status of the object */
       temp_host->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
@@ -2256,13 +2256,13 @@ int cmd_change_object_custom_var(int cmd, char* args) {
         return ERROR;
       map_customvar::iterator it(found->second->custom_variables.find(varname));
       if (it == found->second->custom_variables.end())
-        found->second->custom_variables.insert({std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
+        found->second->custom_variables.insert({varname, std::shared_ptr<customvariable>{new customvariable(varvalue)}});
       else
-        it->second->update(std::move(varvalue));
+        it->second->update(varvalue);
 
       /* set the modified attributes and update the status of the object */
       found->second->custom_variables.insert(
-        {std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
+        {std::move(varname), std::shared_ptr<customvariable>{new customvariable(varvalue)}});
       found->second->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
       found->second->update_status(false);
     }
@@ -2272,15 +2272,15 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       contact_map::iterator cnct_it = contact::contacts.find(name1);
       if (cnct_it == contact::contacts.end() || !cnct_it->second)
         return ERROR;
-      map_customvar::iterator it(cnct_it->second->custom_variables.find(varname));
-      if (it == cnct_it->second->custom_variables.end())
-        cnct_it->second->custom_variables.insert({std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
+      map_customvar::iterator it(cnct_it->second->get_custom_variables().find(varname));
+      if (it == cnct_it->second->get_custom_variables().end())
+        cnct_it->second->get_custom_variables().insert({varname, std::make_shared<customvariable>(varvalue)});
       else
-        it->second->update(std::move(varvalue));
+        it->second->update(varvalue);
 
       /* set the modified attributes and update the status of the object */
-      cnct_it->second->custom_variables.insert(
-          {std::move(varname), std::shared_ptr<customvariable>{new customvariable(std::move(varvalue))}});
+      cnct_it->second->get_custom_variables().insert(
+          {varname, std::make_shared<customvariable>(varvalue)});
       cnct_it->second->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
       cnct_it->second->update_status_info(false);
     }

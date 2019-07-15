@@ -260,32 +260,32 @@ void contact::set_timezone(std::string const& timezone) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool operator==(
-       contact const& obj1,
-       contact const& obj2) throw () {
-  return obj1.get_name() == obj2.get_name()
-         && obj1.get_alias() == obj2.get_alias()
-         && obj1.get_email() == obj2.get_email()
-         && obj1.get_pager() == obj2.get_pager()
-         && obj1.get_addresses() == obj2.get_addresses()
-         && obj1.get_host_notification_commands() == obj2.get_host_notification_commands()
-         && obj1.get_service_notification_commands() == obj2.get_service_notification_commands()
-         && obj1.notify_on(notifier::service_notification) == obj2.notify_on(notifier::service_notification)
-         && obj1.notify_on(notifier::host_notification) == obj2.notify_on(notifier::host_notification)
-         && obj1.get_host_notification_period() == obj2.get_host_notification_period()
-         && obj1.get_service_notification_period() == obj2.get_service_notification_period()
-         && obj1.get_host_notifications_enabled() == obj2.get_host_notifications_enabled()
-         && obj1.get_service_notifications_enabled() == obj2.get_service_notifications_enabled()
-         && obj1.get_can_submit_commands() == obj2.get_can_submit_commands()
-         && obj1.get_retain_status_information() == obj2.get_retain_status_information()
-         && obj1.get_retain_nonstatus_information() == obj2.get_retain_nonstatus_information()
-         && obj1.custom_variables == obj2.custom_variables
-         && obj1.get_last_host_notification() == obj2.get_last_host_notification()
-         && obj1.get_last_service_notification() == obj2.get_last_service_notification()
-         && obj1.get_modified_attributes() == obj2.get_modified_attributes()
-         && obj1.get_modified_host_attributes() == obj2.get_modified_host_attributes()
-         && obj1.get_modified_service_attributes() == obj2.get_modified_service_attributes();
-}
+//bool operator==(
+//       contact const& obj1,
+//       contact const& obj2) throw () {
+//  return obj1.get_name() == obj2.get_name()
+//         && obj1.get_alias() == obj2.get_alias()
+//         && obj1.get_email() == obj2.get_email()
+//         && obj1.get_pager() == obj2.get_pager()
+//         && obj1.get_addresses() == obj2.get_addresses()
+//         && obj1.get_host_notification_commands() == obj2.get_host_notification_commands()
+//         && obj1.get_service_notification_commands() == obj2.get_service_notification_commands()
+//         && obj1.notify_on(notifier::service_notification) == obj2.notify_on(notifier::service_notification)
+//         && obj1.notify_on(notifier::host_notification) == obj2.notify_on(notifier::host_notification)
+//         && obj1.get_host_notification_period() == obj2.get_host_notification_period()
+//         && obj1.get_service_notification_period() == obj2.get_service_notification_period()
+//         && obj1.get_host_notifications_enabled() == obj2.get_host_notifications_enabled()
+//         && obj1.get_service_notifications_enabled() == obj2.get_service_notifications_enabled()
+//         && obj1.get_can_submit_commands() == obj2.get_can_submit_commands()
+//         && obj1.get_retain_status_information() == obj2.get_retain_status_information()
+//         && obj1.get_retain_nonstatus_information() == obj2.get_retain_nonstatus_information()
+//         && obj1.custom_variables == obj2.custom_variables
+//         && obj1.get_last_host_notification() == obj2.get_last_host_notification()
+//         && obj1.get_last_service_notification() == obj2.get_last_service_notification()
+//         && obj1.get_modified_attributes() == obj2.get_modified_attributes()
+//         && obj1.get_modified_host_attributes() == obj2.get_modified_host_attributes()
+//         && obj1.get_modified_service_attributes() == obj2.get_modified_service_attributes();
+//}
 
 /**
  *  Not equal operator.
@@ -295,11 +295,11 @@ bool operator==(
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool operator!=(
-       contact const& obj1,
-       contact const& obj2) throw () {
-  return !operator==(obj1, obj2);
-}
+//bool operator!=(
+//       contact const& obj1,
+//       contact const& obj2) throw () {
+//  return !operator==(obj1, obj2);
+//}
 
 /**
  *  Dump contact content into the stream.
@@ -312,11 +312,11 @@ bool operator!=(
 std::ostream& operator<<(std::ostream& os, contact const& obj) {
   std::string cg_name{obj.get_parent_groups().front()->get_name()};
   std::string hst_notif_str;
-  if (obj.host_notification_period_ptr)
-    hst_notif_str = obj.host_notification_period_ptr->get_name();
+  if (obj.get_host_notification_period_ptr())
+    hst_notif_str = obj.get_host_notification_period_ptr()->get_name();
   std::string svc_notif_str;
-  if (obj.service_notification_period_ptr)
-    svc_notif_str = obj.service_notification_period_ptr->get_name();
+  if (obj.get_service_notification_period_ptr())
+    svc_notif_str = obj.get_service_notification_period_ptr()->get_name();
 
   os << "contact {\n"
     "  name:                            " << obj.get_name() << "\n"
@@ -367,7 +367,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  service_notification_period_ptr:   " << svc_notif_str << "\n"
     "  contactgroups_ptr:                 " << cg_name << "\n"
     "  customvariables:                   ";
-  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : obj.custom_variables)
+  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : obj.get_custom_variables())
     os << cv.first << " ; ";
   os << "}\n";
   return os;
@@ -527,12 +527,21 @@ std::shared_ptr<contact> add_contact(
 
 contact::contact()
  : _addresses(MAX_CONTACT_ADDRESSES),
-   _notify_on{0, 0} {}
+   _can_submit_commands{false},
+   _last_host_notification{0UL},
+   _last_service_notification{0UL},
+   _modified_attributes{0UL},
+   _modified_host_attributes{0UL},
+   _modified_service_attributes{0UL},
+   _retain_status_information{false},
+   _retain_nonstatus_information{false},
+   _notify_on{0, 0},
+   _host_notifications_enabled{false},
+   _service_notifications_enabled{false},
+   _host_notification_period_ptr{nullptr},
+   _service_notification_period_ptr{nullptr} {}
 
-contact::~contact() {
-  // host_notification_period_ptr not free.
-  // service_notification_period_ptr not free.
-}
+contact::~contact() {}
 
 void contact::set_notify_on(notifier::notifier_type type, uint32_t notif) {
   _notify_on[type] = notif;
@@ -937,7 +946,7 @@ bool contact::should_be_notified(notifier::notification_category cat,
     timezone_locker lock(get_timezone());
     if (!check_time_against_period(
           std::time(nullptr),
-          this->service_notification_period_ptr)) {
+          get_service_notification_period_ptr())) {
       logger(dbg_notifications, most)
         << "This contact shouldn't be notified at this time.";
       return false;
@@ -1210,7 +1219,7 @@ void contact::resolve(int& w, int& e) {
       << "Warning: Contact '" << _name << "' has no service "
       "notification time period defined!";
     warnings++;
-    service_notification_period_ptr = nullptr;
+    _service_notification_period_ptr = nullptr;
   }
   else {
     timeperiod_map::const_iterator
@@ -1223,11 +1232,11 @@ void contact::resolve(int& w, int& e) {
         << "' specified for contact '" << _name
         << "' is not defined anywhere!";
       errors++;
-      service_notification_period_ptr = nullptr;
+      _service_notification_period_ptr = nullptr;
     }
     else
       /* save the pointer to the service notification timeperiod for later */
-      service_notification_period_ptr = it->second.get();
+      _service_notification_period_ptr = it->second.get();
   }
 
   /* check host notification timeperiod */
@@ -1236,7 +1245,7 @@ void contact::resolve(int& w, int& e) {
       << "Warning: Contact '" << _name << "' has no host "
       "notification time period defined!";
     warnings++;
-    host_notification_period_ptr = nullptr;
+    _host_notification_period_ptr = nullptr;
   }
   else {
     timeperiod_map::const_iterator
@@ -1249,11 +1258,11 @@ void contact::resolve(int& w, int& e) {
         << "' specified for contact '" << _name
         << "' is not defined anywhere!";
       errors++;
-      host_notification_period_ptr = nullptr;
+      _host_notification_period_ptr = nullptr;
     }
     else
       /* save the pointer to the host notification timeperiod for later */
-      host_notification_period_ptr = it->second.get();
+      _host_notification_period_ptr = it->second.get();
   }
 
   /* check for sane host recovery options */
@@ -1292,4 +1301,28 @@ void contact::resolve(int& w, int& e) {
   if (errors)
     throw engine_error() << "Cannot resolve contact '"
            << _name << "'";
+}
+
+timeperiod* contact::get_host_notification_period_ptr() const {
+  return _host_notification_period_ptr;
+}
+
+void contact::set_host_notification_period_ptr(timeperiod* period) {
+  _host_notification_period_ptr = period;
+}
+
+timeperiod* contact::get_service_notification_period_ptr() const {
+  return _service_notification_period_ptr;
+}
+
+void contact::set_service_notification_period_ptr(timeperiod* period) {
+  _service_notification_period_ptr = period;
+}
+
+map_customvar const& contact::get_custom_variables() const {
+  return _custom_variables;
+}
+
+map_customvar& contact::get_custom_variables() {
+  return _custom_variables;
 }

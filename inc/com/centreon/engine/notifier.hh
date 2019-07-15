@@ -101,8 +101,6 @@ class                notifier : public checkable {
   typedef bool (notifier::*is_viable)(reason_type type,
                                       notification_option);
 
-  //static void        inc_next_notification_id();
-
                      notifier(notifier_type notification_flag,
                               std::string const& display_name,
                               std::string const& check_command,
@@ -112,6 +110,8 @@ class                notifier : public checkable {
                               uint32_t retry_interval,
                               uint32_t notification_interval,
                               int max_attempts,
+                              int32_t notify,
+                              int32_t stalk,
                               uint32_t first_notification_delay,
                               uint32_t recovery_notification_delay,
                               std::string const& notification_period,
@@ -188,7 +188,7 @@ class                notifier : public checkable {
   time_t             get_last_notification() const;
   void               set_last_notification(time_t last_notification);
   virtual void       update_notification_flags() = 0;
-  virtual time_t     get_next_notification_time(time_t offset) = 0;
+  time_t get_next_notification_time(time_t offset);
   void               set_initial_notif_time(time_t notif_time);
   time_t             get_initial_notif_time() const;
   void               set_acknowledgement_timeout(int timeout);
@@ -254,6 +254,10 @@ class                notifier : public checkable {
   int get_pending_flex_downtime() const;
   void set_pending_flex_downtime(int pending_flex_downtime);
   virtual bool get_is_volatile() const = 0;
+  void set_flap_type(uint32_t type);
+  timeperiod* get_notification_period_ptr() const;
+  void set_notification_period_ptr(timeperiod* tp);
+  int get_acknowledgement_timeout() const;
 
   map_customvar custom_variables;
 
@@ -261,32 +265,9 @@ class                notifier : public checkable {
 
   static std::unordered_map<std::string, std::shared_ptr<contact>> current_notifications;
 
-  timeperiod          *notification_period_ptr;
-
- protected:
-  notifier_type      _notifier_type;
-  uint32_t           _stalk_type;
-  uint32_t           _flap_type;
-  unsigned long      _current_event_id;
-  unsigned long      _last_event_id;
-  unsigned long      _current_problem_id;
-  unsigned long      _last_problem_id;
-
-  uint64_t           _current_notification_id;
-  time_t             _next_notification;
-  time_t             _last_notification;
-
-  time_t             _initial_notif_time;
-  int                _acknowledgement_timeout;
-  time_t             _last_acknowledgement;
-  uint32_t           _notification_interval;
-  std::string        _notification_period;
-  uint32_t           _out_notification_type;
-  uint32_t           _current_notifications;
-  uint32_t           _modified_attributes;
-
  private:
   static std::array<is_viable, 6> const _is_notification_viable;
+  static uint64_t    _next_notification_id;
 
   bool _is_notification_viable_normal(reason_type type,
                                       notification_option options);
@@ -302,7 +283,26 @@ class                notifier : public checkable {
   bool _is_notification_viable_custom(reason_type type,
                                       notification_option options);
 
-  static uint64_t    _next_notification_id;
+  notifier_type      _notifier_type;
+  int32_t _stalk_type;
+  uint32_t           _flap_type;
+  unsigned long      _current_event_id;
+  unsigned long      _last_event_id;
+  unsigned long      _current_problem_id;
+  unsigned long      _last_problem_id;
+
+  time_t             _initial_notif_time;
+  int                _acknowledgement_timeout;
+  time_t             _last_acknowledgement;
+  int32_t _out_notification_type;
+  uint32_t           _current_notifications;
+  uint32_t           _notification_interval;
+  uint32_t           _modified_attributes;
+  uint64_t           _current_notification_id;
+  time_t             _next_notification;
+  time_t             _last_notification;
+  std::string        _notification_period;
+  timeperiod* _notification_period_ptr;
   uint32_t           _first_notification_delay;
   uint32_t           _recovery_notification_delay;
   bool               _notifications_enabled;
@@ -314,7 +314,7 @@ class                notifier : public checkable {
 
   /* New ones */
   int _notification_number;
-  reason_type _type;
+  //reason_type _type;
   std::unordered_map<std::string, contact*> _contacts;
   contactgroup_map_unsafe _contact_groups;
   std::array<std::shared_ptr<notification>, 6> _notification;

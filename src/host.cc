@@ -199,6 +199,14 @@ host::host(uint64_t host_id,
                retry_interval,
                notification_interval,
                max_attempts,
+               (notify_up > 0 ? up : 0) |
+               (notify_down > 0 ? down : 0) |
+               (notify_downtime > 0 ? downtime : 0) |
+               (notify_flapping > 0 ? (flappingstart | flappingstop | flappingdisabled) : 0) |
+               (notify_unreachable > 0 ? unreachable : 0),
+               (stalk_on_down > 0 ? down : 0) |
+               (stalk_on_unreachable > 0 ? unreachable : 0) |
+               (stalk_on_up > 0 ? up : 0),
                first_notification_delay,
                recovery_notification_delay,
                notification_period,
@@ -218,8 +226,16 @@ host::host(uint64_t host_id,
                freshness_threshold,
                obsess_over_host,
                timezone},
+    _last_time_down{},
+    _last_time_unreachable{},
+    _last_time_up{},
+    _is_being_freshened{},
     _last_state_history_update{0},
-    _total_services{0} {
+    _flapping_comment_id{},
+    _total_services{},
+    _total_service_check_interval{},
+    _circular_path_checked{},
+    _contains_circular_path{} {
   // Make sure we have the data we need.
   if (name.empty() || address.empty()) {
     logger(log_config_error, basic) << "Error: Host name or address is nullptr";
@@ -228,12 +244,6 @@ host::host(uint64_t host_id,
   if (host_id == 0) {
     logger(log_config_error, basic) << "Error: Host must contain a host id "
                                        "because it comes from a database";
-    throw engine_error() << "Could not register host '" << name << "'";
-  }
-  if (notification_interval < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid notification_interval value for host '" << name
-        << "'";
     throw engine_error() << "Could not register host '" << name << "'";
   }
 
@@ -247,7 +257,7 @@ host::host(uint64_t host_id,
 
   _acknowledgement_type = ACKNOWLEDGEMENT_NONE;
   _check_options = CHECK_OPTION_NONE;
-  _modified_attributes = MODATTR_NONE;
+  set_modified_attributes(MODATTR_NONE);
   set_state_type(hard);
 
   _initial_state = initial_state;
@@ -264,32 +274,17 @@ host::host(uint64_t host_id,
 
   set_current_attempt(initial_state ==  host::state_up ? 1 : max_attempts);
   _current_state = initial_state;
-  _flap_type = none;
-  _flap_type |= (flap_detection_on_down > 0 ? down : 0);
-  _flap_type |= (flap_detection_on_unreachable > 0 ? unreachable : 0);
-  _flap_type |= (flap_detection_on_up > 0 ? up : 0);
+  set_flap_type((flap_detection_on_down > 0 ? down : 0) |
+                (flap_detection_on_unreachable > 0 ? unreachable : 0) |
+                (flap_detection_on_up > 0 ? up : 0));
   _have_2d_coords = (have_2d_coords > 0);
   _have_3d_coords = (have_3d_coords > 0);
   _last_hard_state = initial_state;
   _last_state = initial_state;
-  _notification_interval = notification_interval;
-  _out_notification_type = none;
-  _out_notification_type |= (notify_down > 0 ? down : 0);
-  _out_notification_type |= (notify_downtime > 0 ? downtime : 0);
-  _out_notification_type |=
-      (notify_flapping > 0 ? (flappingstart | flappingstop | flappingdisabled)
-                           : 0);
-  _out_notification_type |= (notify_up > 0 ? up : 0);
-  _out_notification_type |=
-      (notify_unreachable > 0 ? unreachable : 0);
   _process_performance_data = process_perfdata;
   _retain_nonstatus_information = (retain_nonstatus_information > 0);
   _retain_status_information = (retain_status_information > 0);
   _should_be_drawn = (should_be_drawn > 0);
-  _stalk_type = none;
-  _stalk_type |= (stalk_on_down > 0 ? down : 0);
-  _stalk_type |= (stalk_on_unreachable > 0 ? unreachable : 0);
-  _stalk_type |= (stalk_on_up > 0 ? up : 0);
   _x_2d = x_2d;
   _x_3d = x_3d;
   _y_2d = y_2d;
@@ -617,124 +612,124 @@ int host::get_current_state_int() const {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool host::operator==(host const& other) throw() {
-  return get_name() == other.get_name() &&
-         get_display_name() == other.get_display_name() &&
-         get_alias() == other.get_alias() &&
-         get_address() == other.get_address() &&
-         ((parent_hosts.size() == other.parent_hosts.size()) &&
-          std::equal(parent_hosts.begin(), parent_hosts.end(),
-                     other.parent_hosts.begin()))
-         // Children do not need to be tested, they are
-         // created as parent back links.
-         // Services do not need to be tested, they are
-         // created as services back links.
-         && get_check_command() == other.get_check_command() &&
-         get_initial_state() == other.get_initial_state() &&
-         get_check_interval() == other.get_check_interval() &&
-         get_retry_interval() == other.get_retry_interval() &&
-         get_max_attempts() == other.get_max_attempts() &&
-         get_event_handler() == other.get_event_handler() &&
-         (get_contactgroups().size() == other.get_contactgroups().size() &&
-          std::equal(get_contactgroups().begin(), get_contactgroups().end(),
-                     other.get_contactgroups().begin())) &&
-         (get_contacts().size() == other.get_contacts().size() &&
-          std::equal(get_contacts().begin(), get_contacts().end(),
-                     other.get_contacts().begin())) &&
-         get_notification_interval() == other.get_notification_interval() &&
-         get_first_notification_delay() ==
-             other.get_first_notification_delay() &&
-         get_recovery_notification_delay() ==
-             other.get_recovery_notification_delay() &&
-         get_notify_on() == other.get_notify_on() &&
-         get_notification_period() == other.get_notification_period() &&
-         get_check_period() == other.get_check_period() &&
-         get_flap_detection_enabled() == other.get_flap_detection_enabled() &&
-         get_low_flap_threshold() == other.get_low_flap_threshold() &&
-         get_high_flap_threshold() == other.get_high_flap_threshold() &&
-         _flap_type == other.get_flap_detection_on() &&
-         _stalk_type == other.get_stalk_on() &&
-         get_check_freshness() == other.get_check_freshness() &&
-         get_freshness_threshold() == other.get_freshness_threshold() &&
-         get_process_performance_data() ==
-             other.get_process_performance_data() &&
-         get_checks_enabled() == other.get_checks_enabled() &&
-         get_accept_passive_checks() ==
-             other.get_accept_passive_checks() &&
-         get_event_handler_enabled() == other.get_event_handler_enabled() &&
-         get_retain_status_information() ==
-             other.get_retain_status_information() &&
-         get_retain_nonstatus_information() ==
-             other.get_retain_nonstatus_information() &&
-         get_obsess_over() == other.get_obsess_over() &&
-         get_notes() == other.get_notes() &&
-         get_notes_url() == other.get_notes_url() &&
-         get_action_url() == other.get_action_url() &&
-         get_icon_image() == other.get_icon_image() &&
-         get_icon_image_alt() == other.get_icon_image_alt() &&
-         get_vrml_image() == other.get_vrml_image() &&
-         get_statusmap_image() == other.get_statusmap_image() &&
-         get_have_2d_coords() == other.get_have_2d_coords() &&
-         get_x_2d() == other.get_x_2d() && get_y_2d() == other.get_y_2d() &&
-         get_have_3d_coords() == other.get_have_3d_coords() &&
-         get_x_3d() == other.get_x_3d() && get_y_3d() == other.get_y_3d() &&
-         get_z_3d() == other.get_z_3d() &&
-         get_should_be_drawn() == other.get_should_be_drawn() &&
-         custom_variables == other.custom_variables &&
-         get_problem_has_been_acknowledged() ==
-             other.get_problem_has_been_acknowledged() &&
-         get_acknowledgement_type() == other.get_acknowledgement_type() &&
-         get_check_type() == other.get_check_type() &&
-         get_current_state() == other.get_current_state() &&
-         get_last_state() == other.get_last_state() &&
-         get_last_hard_state() == other.get_last_hard_state() &&
-         get_plugin_output() == other.get_plugin_output() &&
-         get_long_plugin_output() == other.get_long_plugin_output() &&
-         get_perf_data() == other.get_perf_data() &&
-         get_state_type() == other.get_state_type() &&
-         get_current_attempt() == other.get_current_attempt() &&
-         get_current_event_id() == other.get_current_event_id() &&
-         get_last_event_id() == other.get_last_event_id() &&
-         get_current_problem_id() == other.get_current_problem_id() &&
-         get_last_problem_id() == other.get_last_problem_id() &&
-         get_latency() == other.get_latency() &&
-         get_execution_time() == other.get_execution_time() &&
-         get_is_executing() == other.get_is_executing() &&
-         get_check_options() == other.get_check_options() &&
-         get_notifications_enabled() == other.get_notifications_enabled() &&
-         get_last_notification() == other.get_last_notification() &&
-         get_next_notification() == other.get_next_notification() &&
-         get_next_check() == other.get_next_check() &&
-         get_should_be_scheduled() == other.get_should_be_scheduled() &&
-         get_last_check() == other.get_last_check() &&
-         get_last_state_change() == other.get_last_state_change() &&
-         get_last_hard_state_change() == other.get_last_hard_state_change() &&
-         get_last_time_up() == other.get_last_time_up() &&
-         get_last_time_down() == other.get_last_time_down() &&
-         get_last_time_unreachable() == other.get_last_time_unreachable() &&
-         get_has_been_checked() == other.get_has_been_checked() &&
-         get_is_being_freshened() == other.get_is_being_freshened() &&
-         get_notified_on() == other.get_notified_on() &&
-         get_no_more_notifications() == other.get_no_more_notifications() &&
-         get_current_notification_id() == other.get_current_notification_id() &&
-         get_scheduled_downtime_depth() ==
-             other.get_scheduled_downtime_depth() &&
-         get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
-         std::equal(get_state_history().begin(), get_state_history().end(),
-                     other.get_state_history().begin()) &&
-         get_state_history_index() == other.get_state_history_index() &&
-         get_last_state_history_update() ==
-             other.get_last_state_history_update() &&
-         get_is_flapping() == other.get_is_flapping() &&
-         get_flapping_comment_id() == other.get_flapping_comment_id() &&
-         get_percent_state_change() == other.get_percent_state_change() &&
-         get_total_services() == other.get_total_services() &&
-         get_total_service_check_interval() ==
-             other.get_total_service_check_interval() &&
-         get_modified_attributes() == other.get_modified_attributes() &&
-         get_circular_path_checked() == other.get_circular_path_checked() &&
-         get_contains_circular_path() == other.get_contains_circular_path();
-}
+//bool host::operator==(host const& other) throw() {
+//  return get_name() == other.get_name() &&
+//         get_display_name() == other.get_display_name() &&
+//         get_alias() == other.get_alias() &&
+//         get_address() == other.get_address() &&
+//         ((parent_hosts.size() == other.parent_hosts.size()) &&
+//          std::equal(parent_hosts.begin(), parent_hosts.end(),
+//                     other.parent_hosts.begin()))
+//         // Children do not need to be tested, they are
+//         // created as parent back links.
+//         // Services do not need to be tested, they are
+//         // created as services back links.
+//         && get_check_command() == other.get_check_command() &&
+//         get_initial_state() == other.get_initial_state() &&
+//         get_check_interval() == other.get_check_interval() &&
+//         get_retry_interval() == other.get_retry_interval() &&
+//         get_max_attempts() == other.get_max_attempts() &&
+//         get_event_handler() == other.get_event_handler() &&
+//         (get_contactgroups().size() == other.get_contactgroups().size() &&
+//          std::equal(get_contactgroups().begin(), get_contactgroups().end(),
+//                     other.get_contactgroups().begin())) &&
+//         (get_contacts().size() == other.get_contacts().size() &&
+//          std::equal(get_contacts().begin(), get_contacts().end(),
+//                     other.get_contacts().begin())) &&
+//         get_notification_interval() == other.get_notification_interval() &&
+//         get_first_notification_delay() ==
+//             other.get_first_notification_delay() &&
+//         get_recovery_notification_delay() ==
+//             other.get_recovery_notification_delay() &&
+//         get_notify_on() == other.get_notify_on() &&
+//         get_notification_period() == other.get_notification_period() &&
+//         get_check_period() == other.get_check_period() &&
+//         get_flap_detection_enabled() == other.get_flap_detection_enabled() &&
+//         get_low_flap_threshold() == other.get_low_flap_threshold() &&
+//         get_high_flap_threshold() == other.get_high_flap_threshold() &&
+//         get_flap_type() == other.get_flap_detection_on() &&
+//         get_stalk_type() == other.get_stalk_on() &&
+//         get_check_freshness() == other.get_check_freshness() &&
+//         get_freshness_threshold() == other.get_freshness_threshold() &&
+//         get_process_performance_data() ==
+//             other.get_process_performance_data() &&
+//         get_checks_enabled() == other.get_checks_enabled() &&
+//         get_accept_passive_checks() ==
+//             other.get_accept_passive_checks() &&
+//         get_event_handler_enabled() == other.get_event_handler_enabled() &&
+//         get_retain_status_information() ==
+//             other.get_retain_status_information() &&
+//         get_retain_nonstatus_information() ==
+//             other.get_retain_nonstatus_information() &&
+//         get_obsess_over() == other.get_obsess_over() &&
+//         get_notes() == other.get_notes() &&
+//         get_notes_url() == other.get_notes_url() &&
+//         get_action_url() == other.get_action_url() &&
+//         get_icon_image() == other.get_icon_image() &&
+//         get_icon_image_alt() == other.get_icon_image_alt() &&
+//         get_vrml_image() == other.get_vrml_image() &&
+//         get_statusmap_image() == other.get_statusmap_image() &&
+//         get_have_2d_coords() == other.get_have_2d_coords() &&
+//         get_x_2d() == other.get_x_2d() && get_y_2d() == other.get_y_2d() &&
+//         get_have_3d_coords() == other.get_have_3d_coords() &&
+//         get_x_3d() == other.get_x_3d() && get_y_3d() == other.get_y_3d() &&
+//         get_z_3d() == other.get_z_3d() &&
+//         get_should_be_drawn() == other.get_should_be_drawn() &&
+//         custom_variables == other.custom_variables &&
+//         get_problem_has_been_acknowledged() ==
+//             other.get_problem_has_been_acknowledged() &&
+//         get_acknowledgement_type() == other.get_acknowledgement_type() &&
+//         get_check_type() == other.get_check_type() &&
+//         get_current_state() == other.get_current_state() &&
+//         get_last_state() == other.get_last_state() &&
+//         get_last_hard_state() == other.get_last_hard_state() &&
+//         get_plugin_output() == other.get_plugin_output() &&
+//         get_long_plugin_output() == other.get_long_plugin_output() &&
+//         get_perf_data() == other.get_perf_data() &&
+//         get_state_type() == other.get_state_type() &&
+//         get_current_attempt() == other.get_current_attempt() &&
+//         get_current_event_id() == other.get_current_event_id() &&
+//         get_last_event_id() == other.get_last_event_id() &&
+//         get_current_problem_id() == other.get_current_problem_id() &&
+//         get_last_problem_id() == other.get_last_problem_id() &&
+//         get_latency() == other.get_latency() &&
+//         get_execution_time() == other.get_execution_time() &&
+//         get_is_executing() == other.get_is_executing() &&
+//         get_check_options() == other.get_check_options() &&
+//         get_notifications_enabled() == other.get_notifications_enabled() &&
+//         get_last_notification() == other.get_last_notification() &&
+//         get_next_notification() == other.get_next_notification() &&
+//         get_next_check() == other.get_next_check() &&
+//         get_should_be_scheduled() == other.get_should_be_scheduled() &&
+//         get_last_check() == other.get_last_check() &&
+//         get_last_state_change() == other.get_last_state_change() &&
+//         get_last_hard_state_change() == other.get_last_hard_state_change() &&
+//         get_last_time_up() == other.get_last_time_up() &&
+//         get_last_time_down() == other.get_last_time_down() &&
+//         get_last_time_unreachable() == other.get_last_time_unreachable() &&
+//         get_has_been_checked() == other.get_has_been_checked() &&
+//         get_is_being_freshened() == other.get_is_being_freshened() &&
+//         get_notified_on() == other.get_notified_on() &&
+//         get_no_more_notifications() == other.get_no_more_notifications() &&
+//         get_current_notification_id() == other.get_current_notification_id() &&
+//         get_scheduled_downtime_depth() ==
+//             other.get_scheduled_downtime_depth() &&
+//         get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
+//         std::equal(get_state_history().begin(), get_state_history().end(),
+//                     other.get_state_history().begin()) &&
+//         get_state_history_index() == other.get_state_history_index() &&
+//         get_last_state_history_update() ==
+//             other.get_last_state_history_update() &&
+//         get_is_flapping() == other.get_is_flapping() &&
+//         get_flapping_comment_id() == other.get_flapping_comment_id() &&
+//         get_percent_state_change() == other.get_percent_state_change() &&
+//         get_total_services() == other.get_total_services() &&
+//         get_total_service_check_interval() ==
+//             other.get_total_service_check_interval() &&
+//         get_modified_attributes() == other.get_modified_attributes() &&
+//         get_circular_path_checked() == other.get_circular_path_checked() &&
+//         get_contains_circular_path() == other.get_contains_circular_path();
+//}
 
 /**
  *  Not equal operator.
@@ -744,9 +739,9 @@ bool host::operator==(host const& other) throw() {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool host::operator!=(host const& other) throw() {
-  return !operator==(other);
-}
+//bool host::operator!=(host const& other) throw() {
+//  return !operator==(other);
+//}
 
 std::ostream& operator<<(std::ostream& os, host_map_unsafe const& obj) {
   for (host_map_unsafe::const_iterator it{obj.begin()}, end{obj.end()}; it != end;
@@ -780,9 +775,10 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   std::string chk_period_str;
   if (obj.check_period_ptr)
     chk_period_str = obj.check_period_ptr->get_name();
+
   std::string notif_period_str;
-  if (obj.notification_period_ptr)
-    notif_period_str = obj.notification_period_ptr->get_name();
+  if (obj.get_notification_period_ptr())
+    notif_period_str = obj.get_notification_period_ptr()->get_name();
 
   std::string cg_oss;
   std::string c_oss;
@@ -1331,9 +1327,9 @@ uint64_t engine::get_host_id(std::string const& name) {
  *
  */
 void host::schedule_acknowledgement_expiration() {
-  if (_acknowledgement_timeout > 0 && _last_acknowledgement != (time_t)0) {
+  if (get_acknowledgement_timeout() > 0 && get_last_acknowledgement() != (time_t)0) {
     schedule_new_event(EVENT_EXPIRE_HOST_ACK, false,
-                       _last_acknowledgement + _acknowledgement_timeout, false,
+                       get_last_acknowledgement() + get_acknowledgement_timeout(), false,
                        0, nullptr, true, this, nullptr, 0);
   }
 }
@@ -2143,9 +2139,9 @@ void host::update_status(bool aggregated_dump) {
  */
 void host::check_for_expired_acknowledgement() {
   if (get_problem_has_been_acknowledged()) {
-    if (_acknowledgement_timeout > 0) {
+    if (get_acknowledgement_timeout() > 0) {
       time_t now(time(nullptr));
-      if (_last_acknowledgement + _acknowledgement_timeout >= now) {
+      if (get_last_acknowledgement() + get_acknowledgement_timeout() >= now) {
         logger(log_info_message, basic)
             << "Acknowledgement of host '" << get_name() << "' just expired";
         set_problem_has_been_acknowledged(false);
@@ -2823,69 +2819,6 @@ void host::update_notification_flags() {
     add_notified_on(unreachable);
 }
 
-/* calculates next acceptable re-notification time for a host */
-time_t host::get_next_notification_time(time_t offset) {
-  bool have_escalated_interval{false};
-
-  logger(dbg_functions, basic) << "host::get_next_notification_time()";
-  logger(dbg_notifications, most)
-      << "Calculating next valid notification time...";
-
-  /* default notification interval */
-  uint32_t interval_to_use{get_notification_interval()};
-
-  logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
-
-  /*
-   * check all the host escalation entries for valid matches for this host
-   * (at its current notification number)
-   */
-  for (escalation* e : get_escalations()) {
-    /* interval < 0 means to use non-escalated interval */
-    if (e->get_notification_interval() < 0.0)
-      continue;
-
-    /* skip this entry if it isn't appropriate */
-    if (!is_valid_escalation_for_notification(e, notifier::notification_option_none))
-      continue;
-
-    logger(dbg_notifications, most)
-        << "Found a valid escalation w/ interval of "
-        << e->get_notification_interval();
-
-    /*
-     * if we haven't used a notification interval from an escalation yet,
-     * use this one
-     */
-    if (!have_escalated_interval) {
-      have_escalated_interval = true;
-      interval_to_use = e->get_notification_interval();
-    }
-
-    /* else use the shortest of all valid escalation intervals  */
-    else if (e->get_notification_interval() < interval_to_use)
-      interval_to_use = e->get_notification_interval();
-
-    logger(dbg_notifications, most) << "New interval: " << interval_to_use;
-  }
-
-  /* if interval is 0, no more notifications should be sent */
-  if (interval_to_use == 0.0)
-    set_no_more_notifications(true);
-  else
-    set_no_more_notifications(false);
-
-  logger(dbg_notifications, most)
-      << "Interval used for calculating next valid notification time: "
-      << interval_to_use;
-
-  /* calculate next notification time */
-  time_t next_notification{static_cast<time_t>(
-      offset + interval_to_use * config->interval_length())};
-
-  return next_notification;
-}
-
 /* disables flap detection for a specific host */
 void host::disable_flap_detection() {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
@@ -2900,7 +2833,7 @@ void host::disable_flap_detection() {
     return;
 
   /* set the attribute modified flag */
-  _modified_attributes |= attr;
+  add_modified_attributes(attr);
 
   /* set the flap detection enabled flag */
   set_flap_detection_enabled(false);
@@ -2928,7 +2861,7 @@ void host::enable_flap_detection() {
     return;
 
   /* set the attribute modified flag */
-  _modified_attributes |= attr;
+  add_modified_attributes(attr);
 
   /* set the flap detection enabled flag */
   set_flap_detection_enabled(true);
@@ -3818,10 +3751,6 @@ std::list<hostgroup*>& host::get_parent_groups() {
   return _hostgroups;
 }
 
-timeperiod* host::get_notification_timeperiod() const {
-  return notification_period_ptr;
-}
-
 /* execute a scheduled host check using either the 2.x or 3.x logic */
 int host::perform_scheduled_check(
   int check_options,
@@ -4163,4 +4092,9 @@ void host::resolve(int& w, int& e) {
 
 bool host::get_is_volatile() const {
   return false;
+}
+
+timeperiod* host::get_notification_timeperiod() const {
+  /* if the service has no notification period, inherit one from the host */
+  return get_notification_period_ptr();
 }

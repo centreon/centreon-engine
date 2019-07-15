@@ -386,7 +386,7 @@ void raw::_build_custom_contact_macro_environment(
   // Build custom contact variable.
   contact* cntct(macros.contact_ptr);
   if (cntct) {
-    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : cntct->custom_variables) {
+    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : cntct->get_custom_variables()) {
       if (!cv.first.empty()) {
         std::string name("_CONTACT");
         name.append(cv.first);

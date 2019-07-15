@@ -132,7 +132,7 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotification) {
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
   ASSERT_EQ(
       _svc->notify(
           notifier::reason_normal, "", "", notifier::notification_option_none),
@@ -158,7 +158,7 @@ TEST_F(ServiceNotification,
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
   ASSERT_EQ(
       _svc->notify(
           notifier::reason_normal, "", "", notifier::notification_option_none),
@@ -184,7 +184,7 @@ TEST_F(ServiceNotification,
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
   _svc->set_notifications_enabled(false);
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
   ASSERT_EQ(
       _svc->notify(
           notifier::reason_normal, "", "", notifier::notification_option_none),
@@ -204,7 +204,7 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationOutsideTimeperiod) {
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(service_escalation);
   ASSERT_EQ(
@@ -228,7 +228,7 @@ TEST_F(ServiceNotification,
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(service_escalation);
   ASSERT_EQ(_svc->notify(notifier::reason_normal,
@@ -251,7 +251,7 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationForcedNotification) {
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(service_escalation);
   ASSERT_EQ(_svc->notify(notifier::reason_normal,
@@ -274,7 +274,7 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationWithDowntime) {
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(service_escalation);
   ASSERT_EQ(
@@ -296,7 +296,7 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationWithFlapping) {
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(service_escalation);
   ASSERT_EQ(
@@ -318,7 +318,7 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationWithSoftState) {
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(service_escalation);
   ASSERT_EQ(
@@ -340,7 +340,7 @@ TEST_F(ServiceNotification,
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   _svc->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(service_escalation);
@@ -363,7 +363,7 @@ TEST_F(ServiceNotification,
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   _svc->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(service_escalation);
@@ -387,7 +387,7 @@ TEST_F(ServiceNotification,
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   _svc->set_problem_has_been_acknowledged(true);
   ASSERT_TRUE(service_escalation);
@@ -412,7 +412,7 @@ TEST_F(ServiceNotification, SimpleNormalServiceNotificationOnStateNotNotified) {
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   _svc->set_problem_has_been_acknowledged(false);
   ASSERT_TRUE(service_escalation);
@@ -437,7 +437,7 @@ TEST_F(ServiceNotification,
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   _svc->set_problem_has_been_acknowledged(false);
   ASSERT_TRUE(service_escalation);
@@ -464,7 +464,7 @@ TEST_F(ServiceNotification,
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
       new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7)};
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
 
   _svc->set_problem_has_been_acknowledged(false);
   ASSERT_TRUE(service_escalation);
@@ -501,7 +501,7 @@ TEST_F(ServiceNotification,
   uint64_t id{_svc->get_next_notification_id()};
   /* We configure the notification interval to 2 minutes */
   _svc->set_notification_interval(2);
-  _svc->notification_period_ptr = tperiod.get();
+  _svc->set_notification_period_ptr(tperiod.get());
   ASSERT_EQ(
       _svc->notify(
           notifier::reason_normal, "", "", notifier::notification_option_none),

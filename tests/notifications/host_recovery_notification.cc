@@ -80,7 +80,7 @@ class HostRecovery : public ::testing::Test {
         new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
 
     _host->get_next_notification_id();
-    _host->notification_period_ptr = _tperiod.get();
+    _host->set_notification_period_ptr(_tperiod.get());
     /* Sending a notification */
     _host->notify(notifier::reason_normal,
                   "",

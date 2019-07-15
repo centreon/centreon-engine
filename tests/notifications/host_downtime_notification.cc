@@ -112,7 +112,7 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntime) {
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   testing::internal::CaptureStdout();
   ASSERT_EQ(_host->notify(notifier::reason_downtimestart, "", "",
                           notifier::notification_option_none),
@@ -159,7 +159,7 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntimeWithContactNotReceivingNotif)
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
-  _host->notification_period_ptr = tperiod.get();
+  _host->set_notification_period_ptr(tperiod.get());
   testing::internal::CaptureStdout();
   ASSERT_EQ(_host->notify(notifier::reason_downtimestart, "", "",
                           notifier::notification_option_none),

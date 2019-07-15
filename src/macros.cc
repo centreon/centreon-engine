@@ -235,7 +235,7 @@ int grab_custom_macro_value_r(
       result = grab_custom_object_macro_r(
                  mac,
                  macro_name.substr(8),
-                 temp_contact->custom_variables,
+                 temp_contact->get_custom_variables(),
                  output);
     }
     /* a contact macro with a contactgroup name and delimiter */

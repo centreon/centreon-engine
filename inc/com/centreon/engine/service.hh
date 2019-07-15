@@ -183,11 +183,10 @@ class                           service : public notifier {
                                                int options,
                                                int escalated) override;
   void                          update_notification_flags() override;
-  time_t                        get_next_notification_time(time_t offset) override;
   void                          check_for_expired_acknowledgement();
   void                          schedule_acknowledgement_expiration();
-  bool                          operator==(service const& other);
-  bool                          operator!=(service const& other) throw();
+  bool                          operator==(service const& other) = delete;
+  bool                          operator!=(service const& other) = delete; // throw();
   bool                          is_valid_escalation_for_notification(
                                   escalation const* e,
                                   int options) const override;
@@ -211,7 +210,6 @@ class                           service : public notifier {
   int                           acknowledgement_type;
   int                           check_flapping_recovery_notification;
   int                           is_being_freshened;
-  uint64_t                      current_notification_id;
   int                           check_options;
   uint64_t                      flapping_comment_id;
 

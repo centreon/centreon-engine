@@ -102,7 +102,7 @@ std::ostream& dump::contact(std::ostream& os, com::centreon::engine::contact con
     "modified_service_attributes=" << (obj.get_modified_service_attributes() & ~config->retained_contact_service_attribute_mask()) << "\n"
     "service_notification_period=" << obj.get_service_notification_period() << "\n"
     "service_notifications_enabled=" << obj.get_service_notifications_enabled() << "\n";
-  dump::customvariables(os, obj.custom_variables);
+  dump::customvariables(os, obj.get_custom_variables());
   os << "}\n";
   return os;
 }
@@ -400,7 +400,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     "check_type=" << obj.get_check_type() << "\n"
     "current_attempt=" << obj.get_current_attempt() << "\n"
     "current_event_id=" << obj.get_current_event_id() << "\n"
-    "current_notification_id=" << obj.current_notification_id << "\n"
+    "current_notification_id=" << obj.get_current_notification_id() << "\n"
     "current_notification_number=" << obj.get_notification_number() << "\n"
     "current_problem_id=" << obj.get_current_problem_id() << "\n"
     "current_state=" << obj.get_current_state() << "\n"

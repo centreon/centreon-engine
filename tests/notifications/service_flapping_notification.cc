@@ -146,7 +146,7 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlapping) {
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_service->get_next_notification_id()};
-  _service->notification_period_ptr = tperiod.get();
+  _service->set_notification_period_ptr(tperiod.get());
   _service->set_is_flapping(true);
   testing::internal::CaptureStdout();
   ASSERT_EQ(_service->notify(notifier::reason_flappingstart, "", "",
@@ -194,7 +194,7 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlappingStartTwoTimes) {
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_service->get_next_notification_id()};
-  _service->notification_period_ptr = tperiod.get();
+  _service->set_notification_period_ptr(tperiod.get());
   _service->set_is_flapping(true);
   ASSERT_EQ(_service->notify(notifier::reason_flappingstart, "", "",
                           notifier::notification_option_none),
@@ -233,7 +233,7 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlappingStopTwoTimes) {
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_service->get_next_notification_id()};
-  _service->notification_period_ptr = tperiod.get();
+  _service->set_notification_period_ptr(tperiod.get());
   _service->set_is_flapping(true);
   ASSERT_EQ(_service->notify(notifier::reason_flappingstart, "", "",
                           notifier::notification_option_none),

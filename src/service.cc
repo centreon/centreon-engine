@@ -103,6 +103,8 @@ service::service(std::string const& hostname,
                retry_interval,
                notification_interval,
                max_attempts,
+               0u,    // notify
+               0u,    // stalk
                first_notification_delay,
                recovery_notification_delay,
                notification_period,
@@ -124,6 +126,10 @@ service::service(std::string const& hostname,
                timezone},
       _hostname{hostname},
       _description{description},
+      _last_time_ok{},
+      _last_time_warning{},
+      _last_time_unknown{},
+      _last_time_critical{},
       _is_volatile{is_volatile},
       _initial_state{initial_state},
       _current_state{initial_state},
@@ -216,102 +222,102 @@ int service::get_current_state_int() const {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool service::operator==(service const& other) {
-  return get_hostname() == other.get_hostname() &&
-         get_description() == other.get_description() &&
-         get_display_name() == other.get_display_name() &&
-         get_check_command() == other.get_check_command() &&
-         get_event_handler() == other.get_event_handler() &&
-         get_initial_state() == other.get_initial_state() &&
-         get_check_interval() == other.get_check_interval() &&
-         get_retry_interval() == other.get_retry_interval() &&
-         get_max_attempts() == other.get_max_attempts() &&
-         (get_contactgroups().size() == other.get_contactgroups().size() &&
-          std::equal(get_contactgroups().begin(), get_contactgroups().end(),
-                     other.get_contactgroups().begin())) &&
-         (get_contacts().size() == other.get_contacts().size() &&
-          std::equal(get_contacts().begin(), get_contacts().end(),
-                     other.get_contacts().begin())) &&
-         this->get_notification_interval() == other.get_notification_interval() &&
-         get_first_notification_delay() == get_first_notification_delay() &&
-         get_recovery_notification_delay() == get_recovery_notification_delay() &&
-         get_notify_on() == other.get_notify_on() &&
-         get_stalk_on() == other.get_stalk_on() &&
-         get_is_volatile() == other.get_is_volatile() &&
-         get_notification_period() == other.get_notification_period() &&
-         get_check_period() == other.get_check_period() &&
-         get_flap_detection_enabled() ==
-             other.get_flap_detection_enabled() &&
-         get_low_flap_threshold() == other.get_low_flap_threshold() &&
-         get_high_flap_threshold() == other.get_high_flap_threshold() &&
-         _flap_type == other.get_flap_detection_on() &&
-         this->process_performance_data == other.process_performance_data &&
-         get_check_freshness() == other.get_check_freshness() &&
-         get_freshness_threshold() == other.get_freshness_threshold() &&
-         get_accept_passive_checks() ==
-             other.get_accept_passive_checks() &&
-         get_event_handler_enabled() == other.get_event_handler_enabled() &&
-         get_checks_enabled() == other.get_checks_enabled() &&
-         this->retain_status_information == other.retain_status_information &&
-         this->retain_nonstatus_information ==
-             other.retain_nonstatus_information &&
-         get_notifications_enabled() == other.get_notifications_enabled() &&
-         get_obsess_over() == other.get_obsess_over() &&
-         get_notes() == other.get_notes() &&
-         get_notes_url() == other.get_notes_url() &&
-         get_action_url() == other.get_action_url() &&
-         get_icon_image() == other.get_icon_image() &&
-         get_icon_image_alt() == other.get_icon_image_alt() &&
-         this->custom_variables == other.custom_variables &&
-         get_problem_has_been_acknowledged() ==
-             other.get_problem_has_been_acknowledged() &&
-         this->acknowledgement_type == other.acknowledgement_type &&
-         _host_problem_at_last_check == other._host_problem_at_last_check &&
-         get_check_type() == other.get_check_type() &&
-         _current_state == other.get_current_state() &&
-         _last_state == other.get_last_state() &&
-         _last_hard_state == other.get_last_hard_state() &&
-         get_plugin_output() == other.get_plugin_output() &&
-         get_long_plugin_output() == other.get_long_plugin_output() &&
-         get_perf_data() == other.get_perf_data() &&
-         get_state_type() == other.get_state_type() &&
-         get_next_check() == other.get_next_check() &&
-         get_should_be_scheduled() == other.get_should_be_scheduled() &&
-         get_last_check() == other.get_last_check() &&
-         get_current_attempt() == other.get_current_attempt() &&
-         _current_event_id == other.get_current_event_id() &&
-         _last_event_id == other.get_last_event_id() &&
-         _current_problem_id == other.get_current_problem_id() &&
-         _last_problem_id == other.get_last_problem_id() &&
-         get_last_notification() == other.get_last_notification() &&
-         get_next_notification() == other.get_next_notification() &&
-         get_no_more_notifications() == other.get_no_more_notifications() &&
-         get_last_state_change() == other.get_last_state_change() &&
-         get_last_hard_state_change() == other.get_last_hard_state_change() &&
-         _last_time_ok == other.get_last_time_ok() &&
-         _last_time_warning == other.get_last_time_warning() &&
-         _last_time_unknown == other.get_last_time_unknown() &&
-         _last_time_critical == other.get_last_time_critical() &&
-         get_has_been_checked() == other.get_has_been_checked() &&
-         this->is_being_freshened == other.is_being_freshened &&
-         get_notified_on() == other.get_notified_on() &&
-         get_notification_number() == other.get_notification_number() &&
-         this->current_notification_id == other.current_notification_id &&
-         get_latency() == other.get_latency() &&
-         get_execution_time() == other.get_execution_time() &&
-         get_is_executing() == other.get_is_executing() &&
-         this->check_options == other.check_options &&
-         get_scheduled_downtime_depth() == other.get_scheduled_downtime_depth() &&
-         get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
-         std::equal(get_state_history().begin(), get_state_history().end(), other.get_state_history().begin()) &&
-         get_state_history_index() == other.get_state_history_index() &&
-         get_is_flapping() == other.get_is_flapping() &&
-         this->flapping_comment_id == other.flapping_comment_id &&
-         get_percent_state_change() == other.get_percent_state_change() &&
-         _modified_attributes == other._modified_attributes &&
-         _event_handler_args == other.get_event_handler_args() &&
-         _check_command_args == other.get_check_command_args();
-}
+//bool service::operator==(service const& other) {
+//  return get_hostname() == other.get_hostname() &&
+//         get_description() == other.get_description() &&
+//         get_display_name() == other.get_display_name() &&
+//         get_check_command() == other.get_check_command() &&
+//         get_event_handler() == other.get_event_handler() &&
+//         get_initial_state() == other.get_initial_state() &&
+//         get_check_interval() == other.get_check_interval() &&
+//         get_retry_interval() == other.get_retry_interval() &&
+//         get_max_attempts() == other.get_max_attempts() &&
+//         (get_contactgroups().size() == other.get_contactgroups().size() &&
+//          std::equal(get_contactgroups().begin(), get_contactgroups().end(),
+//                     other.get_contactgroups().begin())) &&
+//         (get_contacts().size() == other.get_contacts().size() &&
+//          std::equal(get_contacts().begin(), get_contacts().end(),
+//                     other.get_contacts().begin())) &&
+//         this->get_notification_interval() == other.get_notification_interval() &&
+//         get_first_notification_delay() == get_first_notification_delay() &&
+//         get_recovery_notification_delay() == get_recovery_notification_delay() &&
+//         get_notify_on() == other.get_notify_on() &&
+//         get_stalk_on() == other.get_stalk_on() &&
+//         get_is_volatile() == other.get_is_volatile() &&
+//         get_notification_period() == other.get_notification_period() &&
+//         get_check_period() == other.get_check_period() &&
+//         get_flap_detection_enabled() ==
+//             other.get_flap_detection_enabled() &&
+//         get_low_flap_threshold() == other.get_low_flap_threshold() &&
+//         get_high_flap_threshold() == other.get_high_flap_threshold() &&
+//         _flap_type == other.get_flap_detection_on() &&
+//         this->process_performance_data == other.process_performance_data &&
+//         get_check_freshness() == other.get_check_freshness() &&
+//         get_freshness_threshold() == other.get_freshness_threshold() &&
+//         get_accept_passive_checks() ==
+//             other.get_accept_passive_checks() &&
+//         get_event_handler_enabled() == other.get_event_handler_enabled() &&
+//         get_checks_enabled() == other.get_checks_enabled() &&
+//         this->retain_status_information == other.retain_status_information &&
+//         this->retain_nonstatus_information ==
+//             other.retain_nonstatus_information &&
+//         get_notifications_enabled() == other.get_notifications_enabled() &&
+//         get_obsess_over() == other.get_obsess_over() &&
+//         get_notes() == other.get_notes() &&
+//         get_notes_url() == other.get_notes_url() &&
+//         get_action_url() == other.get_action_url() &&
+//         get_icon_image() == other.get_icon_image() &&
+//         get_icon_image_alt() == other.get_icon_image_alt() &&
+//         this->custom_variables == other.custom_variables &&
+//         get_problem_has_been_acknowledged() ==
+//             other.get_problem_has_been_acknowledged() &&
+//         this->acknowledgement_type == other.acknowledgement_type &&
+//         _host_problem_at_last_check == other._host_problem_at_last_check &&
+//         get_check_type() == other.get_check_type() &&
+//         _current_state == other.get_current_state() &&
+//         _last_state == other.get_last_state() &&
+//         _last_hard_state == other.get_last_hard_state() &&
+//         get_plugin_output() == other.get_plugin_output() &&
+//         get_long_plugin_output() == other.get_long_plugin_output() &&
+//         get_perf_data() == other.get_perf_data() &&
+//         get_state_type() == other.get_state_type() &&
+//         get_next_check() == other.get_next_check() &&
+//         get_should_be_scheduled() == other.get_should_be_scheduled() &&
+//         get_last_check() == other.get_last_check() &&
+//         get_current_attempt() == other.get_current_attempt() &&
+//         _current_event_id == other.get_current_event_id() &&
+//         _last_event_id == other.get_last_event_id() &&
+//         _current_problem_id == other.get_current_problem_id() &&
+//         _last_problem_id == other.get_last_problem_id() &&
+//         get_last_notification() == other.get_last_notification() &&
+//         get_next_notification() == other.get_next_notification() &&
+//         get_no_more_notifications() == other.get_no_more_notifications() &&
+//         get_last_state_change() == other.get_last_state_change() &&
+//         get_last_hard_state_change() == other.get_last_hard_state_change() &&
+//         _last_time_ok == other.get_last_time_ok() &&
+//         _last_time_warning == other.get_last_time_warning() &&
+//         _last_time_unknown == other.get_last_time_unknown() &&
+//         _last_time_critical == other.get_last_time_critical() &&
+//         get_has_been_checked() == other.get_has_been_checked() &&
+//         this->is_being_freshened == other.is_being_freshened &&
+//         get_notified_on() == other.get_notified_on() &&
+//         get_notification_number() == other.get_notification_number() &&
+//         this->current_notification_id == other.current_notification_id &&
+//         get_latency() == other.get_latency() &&
+//         get_execution_time() == other.get_execution_time() &&
+//         get_is_executing() == other.get_is_executing() &&
+//         this->check_options == other.check_options &&
+//         get_scheduled_downtime_depth() == other.get_scheduled_downtime_depth() &&
+//         get_pending_flex_downtime() == other.get_pending_flex_downtime() &&
+//         std::equal(get_state_history().begin(), get_state_history().end(), other.get_state_history().begin()) &&
+//         get_state_history_index() == other.get_state_history_index() &&
+//         get_is_flapping() == other.get_is_flapping() &&
+//         this->flapping_comment_id == other.flapping_comment_id &&
+//         get_percent_state_change() == other.get_percent_state_change() &&
+//         _modified_attributes == other._modified_attributes &&
+//         _event_handler_args == other.get_event_handler_args() &&
+//         _check_command_args == other.get_check_command_args();
+//}
 
 /**
  *  Not equal operator.
@@ -320,9 +326,9 @@ bool service::operator==(service const& other) {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool service::operator!=(service const& other) throw() {
-  return !operator==(other);
-}
+//bool service::operator!=(service const& other) throw() {
+//  return !operator==(other);
+//}
 
 /**
  *  Dump a service_map content into the stream.
@@ -360,8 +366,8 @@ std::ostream& operator<<(std::ostream& os,
   if (obj.check_period_ptr)
     chk_period_str = obj.check_period_ptr->get_name();
   std::string notif_period_str;
-  if (obj.notification_period_ptr)
-    notif_period_str = obj.notification_period_ptr->get_name();
+  if (obj.get_notification_period_ptr())
+    notif_period_str = obj.get_notification_period_ptr()->get_name();
   std::string svcgrp_str;
   if (!obj.get_parent_groups().empty())
     svcgrp_str = obj.get_parent_groups().front()->get_group_name();
@@ -573,7 +579,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  current_notification_number:          "
      << obj.get_notification_number()
      << "\n  current_notification_id:              "
-     << obj.current_notification_id
+     << obj.get_current_notification_id()
      << "\n  latency:                              " << obj.get_latency()
      << "\n  execution_time:                       " << obj.get_execution_time()
      << "\n  is_executing:                         " << obj.get_is_executing()
@@ -785,7 +791,7 @@ com::centreon::engine::service* add_service(
   }
 
   // Allocate memory.
-  std::shared_ptr<service> obj{new service(
+  std::shared_ptr<service> obj{std::make_shared<service>(
       host_name, description, display_name.empty() ? description : display_name,
       check_command, checks_enabled, accept_passive_checks, initial_state, check_interval,
       retry_interval, notification_interval, max_attempts, first_notification_delay, recovery_notification_delay,
@@ -850,9 +856,9 @@ com::centreon::engine::service* add_service(
  */
 void service::check_for_expired_acknowledgement() {
   if (get_problem_has_been_acknowledged()) {
-    if (_acknowledgement_timeout > 0) {
+    if (get_acknowledgement_timeout() > 0) {
       time_t now(time(nullptr));
-      if (_last_acknowledgement + _acknowledgement_timeout >= now) {
+      if (get_last_acknowledgement() + get_acknowledgement_timeout() >= now) {
         logger(log_info_message, basic)
             << "Acknowledgement of service '" << get_description()
             << "' on host '" << this->get_host_ptr()->get_name() << "' just expired";
@@ -931,9 +937,9 @@ uint64_t engine::get_service_id(std::string const& host,
  *
  */
 void service::schedule_acknowledgement_expiration() {
-  if (_acknowledgement_timeout > 0 && _last_acknowledgement != (time_t)0)
+  if (get_acknowledgement_timeout() > 0 && get_last_acknowledgement() != (time_t)0)
     schedule_new_event(EVENT_EXPIRE_SERVICE_ACK, false,
-                       _last_acknowledgement + _acknowledgement_timeout, false,
+                       get_last_acknowledgement() + get_acknowledgement_timeout(), false,
                        0, nullptr, true, this, nullptr, 0);
 }
 
@@ -1400,8 +1406,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* update the event and problem ids */
   if (state_change) {
     /* always update the event id on a state change */
-    _last_event_id = _current_event_id;
-    _current_event_id = next_event_id;
+    set_last_event_id(get_current_event_id());
+    set_current_event_id(next_event_id);
     next_event_id++;
 
     /* update the problem id when transitioning to a problem state */
@@ -1416,8 +1422,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /* clear the problem id when transitioning from a problem state to an OK
      * state */
     if (_current_state == service::state_ok) {
-      _last_problem_id = _current_problem_id;
-      _current_problem_id = 0L;
+      set_last_problem_id(get_current_problem_id());
+      set_current_problem_id(0L);
     }
   }
 
@@ -1530,8 +1536,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_current_attempt(1);
     set_state_type(hard);
     _last_hard_state = service::state_ok;
-    _last_notification = static_cast<time_t>(0);
-    _next_notification = static_cast<time_t>(0);
+    set_last_notification(static_cast<time_t>(0));
+    set_next_notification(static_cast<time_t>(0));
     set_problem_has_been_acknowledged(false);
     this->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     set_no_more_notifications(false);
@@ -2614,7 +2620,7 @@ void service::enable_flap_detection() {
     return;
 
   /* set the attribute modified flag */
-  _modified_attributes |= attr;
+  add_modified_attributes(attr);
 
   /* set the flap detection enabled flag */
   set_flap_detection_enabled(true);
@@ -2646,7 +2652,7 @@ void service::disable_flap_detection() {
     return;
 
   /* set the attribute modified flag */
-  _modified_attributes |= attr;
+  add_modified_attributes(attr);
 
   /* set the flap detection enabled flag */
   set_flap_detection_enabled(false);
@@ -2654,7 +2660,7 @@ void service::disable_flap_detection() {
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
                                NEBATTR_NONE, this, CMD_NONE, attr,
-                               _modified_attributes, nullptr);
+                               get_modified_attributes(), nullptr);
 
   /* handle the details... */
   handle_flap_detection_disabled();
@@ -3242,73 +3248,6 @@ void service::update_notification_flags() {
     add_notified_on(critical);
 }
 
-/* calculates next acceptable re-notification time for a service */
-time_t service::get_next_notification_time(time_t offset) {
-  bool have_escalated_interval{false};
-
-  logger(dbg_functions, basic) << "service::get_next_notification_time()";
-  logger(dbg_notifications, most)
-      << "Calculating next valid notification time...";
-
-  /* default notification interval */
-  uint32_t interval_to_use{_notification_interval};
-
-  logger(dbg_notifications, most) << "Default interval: " << interval_to_use;
-
-  /*
-   * search all the escalation entries for valid matches for this service (at
-   * its current notification number)
-   */
-  for (escalation const* e : get_escalations()) {
-    /* interval < 0 means to use non-escalated interval */
-    if (e->get_notification_interval() < 0.0)
-      continue;
-
-    /* skip this entry if it isn't appropriate */
-    if (!is_valid_escalation_for_notification(e, notification_option_none))
-      continue;
-
-    logger(dbg_notifications, most)
-        << "Found a valid escalation w/ interval of "
-        << e->get_notification_interval();
-
-    /*
-     * if we haven't used a notification interval from an escalation yet,
-     * use this one
-     */
-    if (!have_escalated_interval) {
-      have_escalated_interval = true;
-      interval_to_use = e->get_notification_interval();
-    }
-
-    /* else use the shortest of all valid escalation intervals */
-    else if (e->get_notification_interval() < interval_to_use)
-      interval_to_use = e->get_notification_interval();
-
-    logger(dbg_notifications, most) << "New interval: " << interval_to_use;
-  }
-
-  /*
-   * if notification interval is 0, we shouldn't send any more problem
-   * notifications (unless service is volatile)
-   */
-  if (interval_to_use == 0.0 && !get_is_volatile())
-    set_no_more_notifications(true);
-  else
-    set_no_more_notifications(false);
-
-  logger(dbg_notifications, most) << "Interval used for calculating next valid "
-                                     "notification time: "
-                                  << interval_to_use;
-
-  /* calculate next notification time */
-  time_t next_notification{
-      offset +
-      static_cast<time_t>(interval_to_use * config->interval_length())};
-
-  return next_notification;
-}
-
 /*
  * checks to see if a service escalation entry is a match for the current
  * service notification
@@ -3551,8 +3490,8 @@ std::list<servicegroup*>& service::get_parent_groups() {
 
 timeperiod* service::get_notification_timeperiod() const {
   /* if the service has no notification period, inherit one from the host */
-  return notification_period_ptr ? notification_period_ptr
-                                 : _host_ptr->notification_period_ptr;
+  return get_notification_period_ptr() ? get_notification_period_ptr()
+                                 : _host_ptr->get_notification_period_ptr();
 }
 
 /**
