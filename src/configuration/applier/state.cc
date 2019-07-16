@@ -453,6 +453,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
         << "Error: Global host event handler command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
+      global_host_event_handler_ptr = nullptr;
     }
     else
       global_host_event_handler_ptr = found->second.get();
@@ -469,6 +470,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
       << "Error: Global service event handler command '"
       << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
+      global_service_event_handler_ptr = nullptr;
     }
     else
       global_service_event_handler_ptr = found->second.get();
@@ -489,6 +491,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
         << "Error: Obsessive compulsive service processor command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
+      ocsp_command_ptr = nullptr;
     }
     else
       ocsp_command_ptr = found->second.get();
@@ -504,6 +507,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
         << "Error: Obsessive compulsive host processor command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
+      ochp_command_ptr = nullptr;
     }
     else
       ochp_command_ptr = found->second.get();
