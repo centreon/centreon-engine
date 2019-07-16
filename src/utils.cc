@@ -483,7 +483,6 @@ void free_memory(nagios_macros* mac) {
     }
     it = timed_event::event_list_high.erase(it);
   }
-  quick_timed_event.clear(timed_event::high);
 
   // Free memory for the low priority event list.
   for (timed_event_list::iterator
@@ -496,7 +495,6 @@ void free_memory(nagios_macros* mac) {
     }
     it = timed_event::event_list_low.erase(it);
   }
-  quick_timed_event.clear(timed_event::low);
 
   /*
   ** Free memory associated with macros. It's ok to only free the

@@ -245,9 +245,7 @@ int main(int argc, char* argv[]) {
           p.parse(config_file, config);
         }
 
-        configuration::applier::state&
-          applier(configuration::applier::state::instance());
-        applier.apply(config);
+        configuration::applier::state::instance().apply(config);
 
         logger(logging::log_info_message, logging::basic)
           << "\n"
