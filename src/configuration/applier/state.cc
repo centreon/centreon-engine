@@ -790,11 +790,12 @@ void applier::state::_processing(
     config->serviceescalations(),
     new_cfg.serviceescalations());
 
-  lock();
   // Timing.
   gettimeofday(tv + 1, nullptr);
 
   try {
+    std::lock_guard<std::mutex> locker(_apply_lock);
+
     // Apply logging configurations.
     applier::logging::instance().apply(new_cfg);
 
@@ -999,11 +1000,8 @@ void applier::state::_processing(
   }
   catch (...) {
     _processing_state = state_error;
-    unlock();
     throw;
   }
-
-  unlock();
 
   has_already_been_loaded = true;
   _processing_state = state_ready;
