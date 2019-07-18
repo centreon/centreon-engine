@@ -124,9 +124,8 @@ loop::~loop() throw () {}
 void loop::_dispatching() {
   while (true) {
     // See if we should exit or restart (a signal was encountered).
-    if (sigshutdown) {
+    if (sigshutdown)
       break;
-    }
 
     // If we don't have any events to handle, exit.
     if (timed_event::event_list_high.empty() && timed_event::event_list_low.empty()) {

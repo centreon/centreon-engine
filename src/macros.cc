@@ -696,10 +696,10 @@ int grab_custom_object_macro_r(
     return ERROR;
 
   /* get the custom variable */
-  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : vars) {
+  for (std::pair<std::string, customvariable> const& cv : vars) {
 
     if (macro_name == cv.first) {
-      output = cv.second->get_value();
+      output = cv.second.get_value();
       result = OK;
       break;
     }
@@ -834,7 +834,6 @@ int init_macrox_names() {
   unsigned int x = 0;
 
   /* initialize macro names */
-
   for (x = 0; x < MACRO_X_COUNT; x++)
     macro_x_names[x].clear();
 

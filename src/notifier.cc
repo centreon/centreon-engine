@@ -54,12 +54,12 @@ std::array<std::string, 9> const notifier::tab_notification_str{{
 std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
 std::array<notifier::is_viable, 6> const notifier::_is_notification_viable{{
-  &notifier::_is_notification_viable_normal,
-  &notifier::_is_notification_viable_recovery,
-  &notifier::_is_notification_viable_acknowledgement,
-  &notifier::_is_notification_viable_flapping,
-  &notifier::_is_notification_viable_downtime,
-  &notifier::_is_notification_viable_custom,
+    &notifier::_is_notification_viable_normal,
+    &notifier::_is_notification_viable_recovery,
+    &notifier::_is_notification_viable_acknowledgement,
+    &notifier::_is_notification_viable_flapping,
+    &notifier::_is_notification_viable_downtime,
+    &notifier::_is_notification_viable_custom,
 }};
 
 uint64_t notifier::_next_notification_id{1L};
@@ -96,15 +96,28 @@ notifier::notifier(notifier::notifier_type notifier_type,
                    std::string const& timezone,
                    bool retain_status_information,
                    bool retain_nonstatus_information)
-    : checkable{
-          display_name,           check_command,       checks_enabled,
-          accept_passive_checks,  check_interval,      retry_interval,
-          max_attempts,           check_period,        event_handler,
-          event_handler_enabled,  notes,               notes_url,
-          action_url,             icon_image,          icon_image_alt,
-          flap_detection_enabled, low_flap_threshold,  high_flap_threshold,
-          check_freshness,        freshness_threshold, obsess_over,
-          timezone},
+    : checkable{display_name,
+                check_command,
+                checks_enabled,
+                accept_passive_checks,
+                check_interval,
+                retry_interval,
+                max_attempts,
+                check_period,
+                event_handler,
+                event_handler_enabled,
+                notes,
+                notes_url,
+                action_url,
+                icon_image,
+                icon_image_alt,
+                flap_detection_enabled,
+                low_flap_threshold,
+                high_flap_threshold,
+                check_freshness,
+                freshness_threshold,
+                obsess_over,
+                timezone},
       _notifier_type{notifier_type},
       _stalk_type{stalk},
       _flap_type{0},
@@ -130,15 +143,14 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _problem_has_been_acknowledged{false},
       _has_been_checked{false},
       _no_more_notifications{false},
-      _notification_number{0},
-      _pending_flex_downtime{0},
       _flapping_comment_id{0},
       _check_options{CHECK_OPTION_NONE},
       _acknowledgement_type{ACKNOWLEDGEMENT_NONE},
       _retain_status_information{retain_status_information},
       _retain_nonstatus_information{retain_nonstatus_information},
-      _is_being_freshened{false}
-      {
+      _is_being_freshened{false},
+      _notification_number{0},
+      _pending_flex_downtime{0} {
   if (retry_interval <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for notifier '"

@@ -157,6 +157,10 @@ TEST_F(ApplierServicegroup, ResolveServicegroup) {
   cmd.parse("command_line", "echo 1");
   svc.parse("check_command", "cmd");
   aply_cmd.add_object(cmd);
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+
   aply_svc.add_object(svc);
   ASSERT_TRUE(svc.parse("servicegroups", "test_group"));
   grp.parse("members", "test_host,test");
@@ -189,6 +193,10 @@ TEST_F(ApplierServicegroup, SetServicegroupMembers) {
   cmd.parse("command_line", "echo 1");
   svc.parse("check_command", "cmd");
   aply_cmd.add_object(cmd);
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+
   aply_svc.add_object(svc);
   ASSERT_TRUE(svc.parse("servicegroups", "test_group"));
   grp.parse("members", "test_host,test");
@@ -229,6 +237,10 @@ TEST_F(ApplierServicegroup, RemoveServicegroupFromConfig) {
   cmd.parse("command_line", "echo 1");
   svc.parse("check_command", "cmd");
   aply_cmd.add_object(cmd);
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+
   aply_svc.add_object(svc);
   ASSERT_TRUE(svc.parse("servicegroups", "test_group"));
   grp.parse("members", "test_host,test");

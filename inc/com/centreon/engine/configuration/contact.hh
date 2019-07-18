@@ -59,7 +59,8 @@ namespace                  configuration {
     set_string&            contactgroups() throw ();
     set_string const&      contactgroups() const throw ();
     std::string const&     contact_name() const throw ();
-    map_customvar const&   customvariables() const throw ();
+    map_customvar const& customvariables() const throw ();
+    map_customvar& customvariables() throw ();
     std::string const&     email() const throw ();
     bool                   host_notifications_enabled() const throw ();
     list_string const&     host_notification_commands() const throw ();

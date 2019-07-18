@@ -80,7 +80,8 @@ namespace                  configuration {
     set_string&            contacts() throw ();
     set_string const&      contacts() const throw ();
     bool                   contacts_defined() const throw ();
-    map_customvar const&   customvariables() const throw ();
+    map_customvar const& customvariables() const throw ();
+    map_customvar& customvariables() throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
     bool                   event_handler_enabled() const throw ();
@@ -94,7 +95,7 @@ namespace                  configuration {
     set_string&            hosts() throw ();
     set_string const&      hosts() const throw ();
     uint64_t               host_id() const throw ();
-    void                   host_id(uint64_t id);
+    void                   set_host_id(uint64_t id);
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();
     unsigned int           initial_state() const throw ();
@@ -124,6 +125,7 @@ namespace                  configuration {
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
     uint64_t               service_id() const throw();
+    bool                   set_service_id(uint64_t value);
     unsigned short         stalking_options() const throw ();
     void                   timezone(std::string const& time_zone);
     std::string const&     timezone() const throw ();
@@ -176,7 +178,6 @@ namespace                  configuration {
     bool                   _set_recovery_notification_delay(unsigned int value);
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
-    bool                   _set_service_id(uint64_t value);
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_timezone(std::string const& value);
 
@@ -222,6 +223,7 @@ namespace                  configuration {
     opt<unsigned int>      _recovery_notification_delay;
     group<set_string>      _servicegroups;
     std::string            _service_description;
+    uint64_t               _host_id;
     uint64_t               _service_id;
     static std::unordered_map<std::string, setter_func> const _setters;
     opt<unsigned short>    _stalking_options;

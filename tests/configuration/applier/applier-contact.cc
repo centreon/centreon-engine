@@ -152,7 +152,7 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   ASSERT_TRUE(ctct.parse("service_notification_commands", "svc1,svc2"));
   ASSERT_TRUE(ctct.parse("_superVar", "superValue"));
   ASSERT_TRUE(ctct.customvariables().size() == 1);
-  ASSERT_TRUE(ctct.customvariables().at("superVar")->get_value() == "superValue");
+  ASSERT_TRUE(ctct.customvariables().at("superVar").get_value() == "superValue");
 
   configuration::applier::command cmd_aply;
   configuration::applier::connector cnn_aply;
@@ -177,8 +177,8 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   contact_map::const_iterator ct_it{engine::contact::contacts.find("test")};
   ASSERT_TRUE(ct_it != engine::contact::contacts.end());
   ASSERT_EQ(ct_it->second->get_custom_variables().size(), 2u);
-  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar"]->get_value() == "Super");
-  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar1"]->get_value() == "Super1");
+  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar"].get_value() == "Super");
+  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar1"].get_value() == "Super1");
   ASSERT_TRUE(ct_it->second->get_alias() == "newAlias");
   ASSERT_FALSE(ct_it->second->notify_on(notifier::service_notification, notifier::unknown));
 

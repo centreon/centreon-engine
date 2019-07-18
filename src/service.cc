@@ -123,12 +123,12 @@ service::service(std::string const& hostname,
                freshness_threshold,
                obsess_over,
                timezone, 0, 0},
-      _process_performance_data{0},
-      _check_flapping_recovery_notification{0},
       _host_id{0},
       _service_id{0},
       _hostname{hostname},
       _description{description},
+      _process_performance_data{0},
+      _check_flapping_recovery_notification{0},
       _last_time_ok{0},
       _last_time_warning{0},
       _last_time_unknown{0},
@@ -632,7 +632,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  notification_period_ptr:              " << notif_period_str
      << "\n  servicegroups_ptr:                    " << svcgrp_str << "\n";
 
-  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : obj.custom_variables)
+  for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
     os << cv.first << " ; ";
 
   os << "\n}\n";

@@ -168,14 +168,12 @@ void applier::contact::expand_objects(configuration::state& s) {
        it_contact != end_contact;
        ++it_contact) {
     // Should custom variables be sent to broker ?
-    for (map_customvar::const_iterator
-           it(it_contact->customvariables().begin()),
-           end(it_contact->customvariables().end());
-         it != end;
-         ++it) {
+    map_customvar& mcv(const_cast<map_customvar&>(it_contact->customvariables()));
+    for (map_customvar::iterator it{mcv.begin()}, end{mcv.end()};
+         it != end; ++it) {
       if (!s.enable_macros_filter()
           || s.macros_filter().find(it->first) != s.macros_filter().end()) {
-        it->second->set_sent(true);
+        it->second.set_sent(true);
       }
     }
 

@@ -65,7 +65,7 @@ int                 additional_freshness_latency(15);
 int                 config_errors(0);
 int                 config_warnings(0);
 int                 sig_id(0);
-int                 sighup(false);
+bool                sighup{false};
 int                 sigrestart(false);
 int                 sigshutdown(false);
 int                 test_scheduling(false);

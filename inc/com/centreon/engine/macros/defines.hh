@@ -207,26 +207,26 @@
 class nagios_macros {
  public:
   nagios_macros()
-    : host_ptr{nullptr},
-      hostgroup_ptr{nullptr},
-      service_ptr{nullptr},
-      servicegroup_ptr{nullptr},
-      contact_ptr{nullptr},
-      contactgroup_ptr{nullptr} {};
+      : host_ptr{nullptr},
+        hostgroup_ptr{nullptr},
+        service_ptr{nullptr},
+        servicegroup_ptr{nullptr},
+        contact_ptr{nullptr},
+        contactgroup_ptr{nullptr} {};
 
   std::array<std::string, MACRO_X_COUNT> x;
   std::array<std::string, MAX_COMMAND_ARGUMENTS> argv;
   std::array<std::string, MAX_CONTACT_ADDRESSES> contactaddress;
-  std::string                           ondemand;
-  com::centreon::engine::host*          host_ptr;
-  com::centreon::engine::hostgroup*     hostgroup_ptr;
-  com::centreon::engine::service*       service_ptr;
-  com::centreon::engine::servicegroup*  servicegroup_ptr;
-  com::centreon::engine::contact*       contact_ptr;
-  com::centreon::engine::contactgroup*  contactgroup_ptr;
-  com::centreon::engine::map_customvar  custom_host_vars;
-  com::centreon::engine::map_customvar  custom_service_vars;
-  com::centreon::engine::map_customvar  custom_contact_vars;
+  std::string ondemand;
+  com::centreon::engine::host* host_ptr;
+  com::centreon::engine::hostgroup* hostgroup_ptr;
+  com::centreon::engine::service* service_ptr;
+  com::centreon::engine::servicegroup* servicegroup_ptr;
+  com::centreon::engine::contact* contact_ptr;
+  com::centreon::engine::contactgroup* contactgroup_ptr;
+  com::centreon::engine::map_customvar custom_host_vars;
+  com::centreon::engine::map_customvar custom_service_vars;
+  com::centreon::engine::map_customvar custom_contact_vars;
 };
 
 #endif /* !CCE_MACROS_DEFINES_HH_ */

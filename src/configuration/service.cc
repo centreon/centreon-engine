@@ -40,8 +40,8 @@ std::unordered_map<std::string, service::setter_func> const service::_setters{
   { "hosts",                        SETTER(std::string const&, _set_hosts) },
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
   { "service_description",          SETTER(std::string const&, _set_service_description) },
-  { "service_id",                   SETTER(uint64_t, _set_service_id) },
-  { "_SERVICE_ID",                  SETTER(uint64_t, _set_service_id) },
+  { "service_id",                   SETTER(uint64_t, set_service_id) },
+  { "_SERVICE_ID",                  SETTER(uint64_t, set_service_id) },
   { "acknowledgement_timeout",      SETTER(int, set_acknowledgement_timeout) },
   { "description",                  SETTER(std::string const&, _set_service_description) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
@@ -160,6 +160,7 @@ service::service()
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
     _recovery_notification_delay(0),
+    _host_id(0),
     _service_id(0),
     _stalking_options(default_stalking_options) {}
 
@@ -168,9 +169,54 @@ service::service()
  *
  *  @param[in] other  The service to copy.
  */
-service::service(service const& other) : object(other) {
-  operator=(other);
-}
+service::service(service const& other)
+  : object(other),
+    _acknowledgement_timeout(other._acknowledgement_timeout),
+    _action_url(other._action_url),
+    _checks_active(other._checks_active),
+    _checks_passive(other._checks_passive),
+    _check_command(other._check_command),
+    _check_command_is_important(other._check_command_is_important),
+    _check_freshness(other._check_freshness),
+    _check_interval(other._check_interval),
+    _check_period(other._check_period),
+    _contactgroups(other._contactgroups),
+    _contacts(other._contacts),
+    _customvariables(other._customvariables),
+    _display_name(other._display_name),
+    _event_handler(other._event_handler),
+    _event_handler_enabled(other._event_handler_enabled),
+    _first_notification_delay(other._first_notification_delay),
+    _flap_detection_enabled(other._flap_detection_enabled),
+    _flap_detection_options(other._flap_detection_options),
+    _freshness_threshold(other._freshness_threshold),
+    _high_flap_threshold(other._high_flap_threshold),
+    _hostgroups(other._hostgroups),
+    _hosts(other._hosts),
+    _icon_image(other._icon_image),
+    _icon_image_alt(other._icon_image_alt),
+    _initial_state(other._initial_state),
+    _is_volatile(other._is_volatile),
+    _low_flap_threshold(other._low_flap_threshold),
+    _max_check_attempts(other._max_check_attempts),
+    _notes(other._notes),
+    _notes_url(other._notes_url),
+    _notifications_enabled(other._notifications_enabled),
+    _notification_interval(other._notification_interval),
+    _notification_options(other._notification_options),
+    _notification_period(other._notification_period),
+    _obsess_over_service(other._obsess_over_service),
+    _process_perf_data(other._process_perf_data),
+    _retain_nonstatus_information(other._retain_nonstatus_information),
+    _retain_status_information(other._retain_status_information),
+    _retry_interval(other._retry_interval),
+    _recovery_notification_delay(other._recovery_notification_delay),
+    _servicegroups(other._servicegroups),
+    _service_description(other._service_description),
+    _host_id(other._host_id),
+    _service_id(other._service_id),
+    _stalking_options(other._stalking_options),
+    _timezone(other._timezone) {}
 
 /**
  *  Destructor.
@@ -229,6 +275,7 @@ service& service::operator=(service const& other) {
     _recovery_notification_delay = other._recovery_notification_delay;
     _servicegroups = other._servicegroups;
     _service_description = other._service_description;
+    _host_id = other._host_id;
     _service_id = other._service_id;
     _stalking_options = other._stalking_options;
     _timezone = other._timezone;
@@ -244,52 +291,244 @@ service& service::operator=(service const& other) {
  *  @return True if is the same service, otherwise false.
  */
 bool service::operator==(service const& other) const throw () {
-  return (object::operator==(other)
-          && _acknowledgement_timeout == other._acknowledgement_timeout
-          && _action_url == other._action_url
-          && _checks_active == other._checks_active
-          && _checks_passive == other._checks_passive
-          && _check_command == other._check_command
-          && _check_command_is_important == other._check_command_is_important
-          && _check_freshness == other._check_freshness
-          && _check_interval == other._check_interval
-          && _check_period == other._check_period
-          && _contactgroups == other._contactgroups
-          && _contacts == other._contacts
-          && std::operator==(_customvariables, other._customvariables)
-          && _display_name == other._display_name
-          && _event_handler == other._event_handler
-          && _event_handler_enabled == other._event_handler_enabled
-          && _first_notification_delay == other._first_notification_delay
-          && _flap_detection_enabled == other._flap_detection_enabled
-          && _flap_detection_options == other._flap_detection_options
-          && _freshness_threshold == other._freshness_threshold
-          && _high_flap_threshold == other._high_flap_threshold
-          && _hostgroups == other._hostgroups
-          && _hosts == other._hosts
-          && _icon_image == other._icon_image
-          && _icon_image_alt == other._icon_image_alt
-          && _initial_state == other._initial_state
-          && _is_volatile == other._is_volatile
-          && _low_flap_threshold == other._low_flap_threshold
-          && _max_check_attempts == other._max_check_attempts
-          && _notes == other._notes
-          && _notes_url == other._notes_url
-          && _notifications_enabled == other._notifications_enabled
-          && _notification_interval == other._notification_interval
-          && _notification_options == other._notification_options
-          && _notification_period == other._notification_period
-          && _obsess_over_service == other._obsess_over_service
-          && _process_perf_data == other._process_perf_data
-          && _retain_nonstatus_information == other._retain_nonstatus_information
-          && _retain_status_information == other._retain_status_information
-          && _retry_interval == other._retry_interval
-          && _recovery_notification_delay == other._recovery_notification_delay
-          && _servicegroups == other._servicegroups
-          && _service_description == other._service_description
-          && _service_id == other._service_id
-          && _stalking_options == other._stalking_options
-          && _timezone == other._timezone);
+  if (!object::operator==(other)) {
+    logger(log_process_info, basic)
+      << "configuration::equality => object don't match";
+    return false;
+  }
+  if (_acknowledgement_timeout != other._acknowledgement_timeout) {
+    logger(log_process_info, basic)
+      << "configuration::equality => acknowledgement_timeout don't match";
+    return false;
+  }
+  if (_action_url != other._action_url) {
+    logger(log_process_info, basic)
+      << "configuration::equality => action_url don't match";
+    return false;
+  }
+  if (_checks_active != other._checks_active) {
+    logger(log_process_info, basic)
+      << "configuration::equality => checks_active don't match";
+    return false;
+  }
+  if (_checks_passive != other._checks_passive) {
+    logger(log_process_info, basic)
+      << "configuration::equality => checks_passive don't match";
+    return false;
+  }
+  if (_check_command != other._check_command) {
+    logger(log_process_info, basic)
+      << "configuration::equality => checks_passive don't match";
+    return false;
+  }
+  if (_check_command_is_important != other._check_command_is_important) {
+    logger(log_process_info, basic)
+      << "configuration::equality => check_command don't match";
+    return false;
+  }
+  if (_check_freshness != other._check_freshness) {
+    logger(log_process_info, basic)
+      << "configuration::equality => check_freshness don't match";
+    return false;
+  }
+  if (_check_interval != other._check_interval) {
+    logger(log_process_info, basic)
+      << "configuration::equality => check_interval don't match";
+    return false;
+  }
+  if (_check_period != other._check_period) {
+    logger(log_process_info, basic)
+      << "configuration::equality => check_period don't match";
+    return false;
+  }
+  if (_contactgroups != other._contactgroups) {
+    logger(log_process_info, basic)
+      << "configuration::equality => contactgroups don't match";
+    return false;
+  }
+  if (_contacts != other._contacts) {
+    logger(log_process_info, basic)
+      << "configuration::equality => contacts don't match";
+    return false;
+  }
+  if (std::operator!=(_customvariables, other._customvariables)) {
+    logger(log_process_info, basic)
+      << "configuration::equality => customvariables don't match";
+    return false;
+  }
+  if (_display_name != other._display_name) {
+    logger(log_process_info, basic)
+      << "configuration::equality => display_name don't match";
+    return false;
+  }
+  if (_event_handler != other._event_handler) {
+    logger(log_process_info, basic)
+      << "configuration::equality => event_handler don't match";
+    return false;
+  }
+  if (_event_handler_enabled != other._event_handler_enabled) {
+    logger(log_process_info, basic)
+      << "configuration::equality => event_handler don't match";
+    return false;
+  }
+  if (_first_notification_delay != other._first_notification_delay) {
+    logger(log_process_info, basic)
+      << "configuration::equality => first_notification_delay don't match";
+    return false;
+  }
+  if (_flap_detection_enabled != other._flap_detection_enabled) {
+    logger(log_process_info, basic)
+      << "configuration::equality => flap_detection_enabled don't match";
+    return false;
+  }
+  if (_flap_detection_options != other._flap_detection_options) {
+    logger(log_process_info, basic)
+      << "configuration::equality => flap_detection_options don't match";
+    return false;
+  }
+  if (_freshness_threshold != other._freshness_threshold) {
+    logger(log_process_info, basic)
+      << "configuration::equality => freshness_threshold don't match";
+    return false;
+  }
+  if (_high_flap_threshold != other._high_flap_threshold) {
+    logger(log_process_info, basic)
+      << "configuration::equality => high_flap_threshold don't match";
+    return false;
+  }
+  if (_hostgroups != other._hostgroups) {
+    logger(log_process_info, basic)
+      << "configuration::equality => hostgroups don't match";
+    return false;
+  }
+  if (_hosts != other._hosts) {
+    logger(log_process_info, basic)
+      << "configuration::equality => _hosts don't match";
+    return false;
+  }
+  if (_icon_image != other._icon_image) {
+    logger(log_process_info, basic)
+      << "configuration::equality => icon_image don't match";
+    return false;
+  }
+  if (_icon_image_alt != other._icon_image_alt) {
+    logger(log_process_info, basic)
+      << "configuration::equality => icon_image_alt don't match";
+    return false;
+  }
+  if (_initial_state != other._initial_state) {
+    logger(log_process_info, basic)
+      << "configuration::equality => initial_state don't match";
+    return false;
+  }
+  if (_is_volatile != other._is_volatile) {
+    logger(log_process_info, basic)
+      << "configuration::equality => is_volatile don't match";
+    return false;
+  }
+  if (_low_flap_threshold != other._low_flap_threshold) {
+    logger(log_process_info, basic)
+      << "configuration::equality => low_flap_threshold don't match";
+    return false;
+  }
+  if (_max_check_attempts != other._max_check_attempts) {
+    logger(log_process_info, basic)
+      << "configuration::equality => max_check_attempts don't match";
+    return false;
+  }
+  if (_notes != other._notes) {
+    logger(log_process_info, basic)
+      << "configuration::equality => notes don't match";
+    return false;
+  }
+  if (_notes_url != other._notes_url) {
+    logger(log_process_info, basic)
+      << "configuration::equality => notes_url don't match";
+    return false;
+  }
+  if (_notifications_enabled != other._notifications_enabled) {
+    logger(log_process_info, basic)
+      << "configuration::equality => notifications_enabled don't match";
+    return false;
+  }
+  if (_notification_interval != other._notification_interval) {
+    logger(log_process_info, basic)
+      << "configuration::equality => notification_interval don't match";
+    return false;
+  }
+  if (_notification_options != other._notification_options) {
+    logger(log_process_info, basic)
+      << "configuration::equality => notification_options don't match";
+    return false;
+  }
+  if (_notification_period != other._notification_period) {
+    logger(log_process_info, basic)
+      << "configuration::equality => notification_period don't match";
+    return false;
+  }
+  if (_obsess_over_service != other._obsess_over_service) {
+    logger(log_process_info, basic)
+      << "configuration::equality => obsess_over_service don't match";
+    return false;
+  }
+  if (_process_perf_data != other._process_perf_data) {
+    logger(log_process_info, basic)
+      << "configuration::equality => process_perf_data don't match";
+    return false;
+  }
+  if (_retain_nonstatus_information != other._retain_nonstatus_information) {
+    logger(log_process_info, basic)
+      << "configuration::equality => retain_nonstatus_information don't match";
+    return false;
+  }
+  if (_retain_status_information != other._retain_status_information) {
+    logger(log_process_info, basic)
+      << "configuration::equality => retain_status_information don't match";
+    return false;
+  }
+  if (_retry_interval != other._retry_interval) {
+    logger(log_process_info, basic)
+      << "configuration::equality => retry_interval don't match";
+    return false;
+  }
+  if (_recovery_notification_delay != other._recovery_notification_delay) {
+    logger(log_process_info, basic)
+      << "configuration::equality => recovery_notification_delay don't match";
+    return false;
+  }
+  if (_servicegroups != other._servicegroups) {
+    logger(log_process_info, basic)
+      << "configuration::equality => servicegroups don't match";
+    return false;
+  }
+  if (_service_description != other._service_description) {
+    logger(log_process_info, basic)
+      << "configuration::equality => service_description don't match";
+    return false;
+  }
+  if (_host_id != other._host_id) {
+    logger(log_process_info, basic)
+      << "configuration::equality => host_id don't match";
+    return false;
+  }
+  if (_service_id != other._service_id) {
+    logger(log_process_info, basic)
+      << "configuration::equality => service_id don't match";
+    return false;
+  }
+  if (_stalking_options != other._stalking_options) {
+    logger(log_process_info, basic)
+      << "configuration::equality => stalking_options don't match";
+    return false;
+  }
+  if (_timezone != other._timezone) {
+    logger(log_process_info, basic)
+      << "configuration::equality => timezone don't match";
+    return false;
+  }
+  logger(log_process_info, basic)
+    << "configuration::equality => OK";
+  return true;
 }
 
 /**
@@ -313,7 +552,11 @@ bool service::operator!=(service const& other) const throw () {
 bool service::operator<(service const& other) const throw () {
   // hosts and service_description have to be first in this operator.
   // The configuration diff mechanism relies on this.
-  if (_hosts != other._hosts)
+  if (_host_id != other._host_id)
+    return _host_id < other._host_id;
+  else if (_service_id != other._service_id)
+    return _service_id < other._service_id;
+  else if (_hosts != other._hosts)
     return _hosts < other._hosts;
   else if (_service_description != other._service_description)
     return _service_description < other._service_description;
@@ -393,20 +636,18 @@ bool service::operator<(service const& other) const throw () {
     return _process_perf_data < other._process_perf_data;
   else if (_retain_nonstatus_information
            != other._retain_nonstatus_information)
-    return (_retain_nonstatus_information
-            < other._retain_nonstatus_information);
+    return _retain_nonstatus_information
+            < other._retain_nonstatus_information;
   else if (_retain_status_information
            != other._retain_status_information)
-    return (_retain_status_information
-            < other._retain_status_information);
+    return _retain_status_information
+            < other._retain_status_information;
   else if (_retry_interval != other._retry_interval)
     return _retry_interval < other._retry_interval;
   else if (_recovery_notification_delay
            != other._recovery_notification_delay)
-    return (_recovery_notification_delay
-            < other._recovery_notification_delay);
-  else if (_service_id != other._service_id)
-    return _service_id < other._service_id;
+    return _recovery_notification_delay
+            < other._recovery_notification_delay;
   else if (_servicegroups != other._servicegroups)
     return _servicegroups < other._servicegroups;
   else if (_stalking_options != other._stalking_options)
@@ -428,9 +669,8 @@ void service::check_validity() const {
            << "' is not attached to any host or host group (properties "
            << "'host_name' or 'hostgroup_name', respectively)");
   if (_check_command.empty())
-    throw (engine_error() << "Service '" << _service_description
-           << "' has no check command (property 'check_command')");
-  return ;
+    throw engine_error() << "Service '" << _service_description
+           << "' has no check command (property 'check_command')";
 }
 
 /**
@@ -439,10 +679,7 @@ void service::check_validity() const {
  *  @return A pair with host name and service description.
  */
 service::key_type service::key() const {
-  key_type k;
-  if (!_hosts->empty())
-    k.first = get_host_id((*_hosts).begin()->c_str());
-  k.second = _service_id;
+  key_type k{_host_id, _service_id};
   return k;
 }
 
@@ -533,9 +770,9 @@ bool service::parse(char const* key, char const* value) {
     map_customvar::iterator it{
         _customvariables.find(key + 1)};
     if (it == _customvariables.end())
-      _customvariables.insert({key + 1, std::shared_ptr<customvariable>{new customvariable(value)}});
+      _customvariables.insert({key + 1, customvariable(value)});
     else
-      it->second->set_value(value);
+      it->second.set_value(value);
 
     return true;
   }
@@ -678,6 +915,15 @@ com::centreon::engine::map_customvar const& service::customvariables() const thr
 }
 
 /**
+ *  Get customvariables.
+ *
+ *  @return The customvariables.
+ */
+com::centreon::engine::map_customvar& service::customvariables() throw () {
+  return _customvariables;
+}
+
+/**
  *  Get display_name.
  *
  *  @return The display_name.
@@ -791,8 +1037,7 @@ set_string const& service::hosts() const throw () {
  *  @return Service's host's ID.
  */
 uint64_t service::host_id() const throw () {
-  uint64_t host_id(get_host_id(_hosts->begin()->c_str()));
-  return host_id;
+  return _host_id;
 }
 
 /**
@@ -1695,7 +1940,7 @@ bool service::_set_service_description(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool service::_set_service_id(uint64_t value) {
+bool service::set_service_id(uint64_t value) {
   _service_id = value;
   return true;
 }
@@ -1745,4 +1990,13 @@ bool service::_set_stalking_options(std::string const& value) {
 bool service::_set_timezone(std::string const& value) {
   _timezone = value;
   return true;
+}
+
+/**
+ *  Set the host id.
+ *
+ * @param value The host id.
+ */
+void service::set_host_id(uint64_t value) {
+  _host_id = value;
 }

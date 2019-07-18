@@ -110,8 +110,11 @@ TEST_F(ApplierService, NewServiceFromConfig) {
   svc.parse("check_command", "cmd");
   cmd_aply.add_object(cmd);
 
+  // No need here to call svc_aply.expand_objects(*config) because the configuration
+  // service is not stored in configuration::state.
+  // We just have to set the host_id manually.
+  svc.set_host_id(1);
   svc_aply.add_object(svc);
-  svc_aply.expand_objects(*config);
   service_id_map const& sm(engine::service::services_by_id);
   ASSERT_EQ(sm.size(), 1u);
   ASSERT_EQ(sm.begin()->first.first, 1u);
@@ -145,8 +148,10 @@ TEST_F(ApplierService, RenameServiceFromConfig) {
   svc.parse("check_command", "cmd");
   cmd_aply.add_object(cmd);
 
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(1);
+
   svc_aply.add_object(svc);
-  svc_aply.expand_objects(*config);
 
   ASSERT_TRUE(svc.parse("service_description", "test description2"));
   svc_aply.modify_object(svc);
@@ -188,16 +193,21 @@ TEST_F(ApplierService, RemoveServiceFromConfig) {
   svc.parse("check_command", "cmd");
   cmd_aply.add_object(cmd);
 
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(1);
+
   svc_aply.add_object(svc);
-  svc_aply.expand_objects(*config);
 
   ASSERT_EQ(engine::service::services_by_id.size(), 1u);
   svc_aply.remove_object(svc);
   ASSERT_EQ(engine::service::services_by_id.size(), 0u);
 
   ASSERT_TRUE(svc.parse("service_description", "test description2"));
+
+  // We have to fake the expand_object on configuration::service
+  svc.set_host_id(1);
+
   svc_aply.add_object(svc);
-  svc_aply.expand_objects(*config);
 
   service_id_map const& sm(engine::service::services_by_id);
   ASSERT_EQ(sm.size(), 1u);
@@ -237,6 +247,9 @@ TEST_F(ApplierService, ServicesEquality) {
   cmd.parse("command_line", "echo 1");
   csvc.parse("check_command", "cmd");
   cmd_aply.add_object(cmd);
+
+  // We have to fake the expand_object on configuration::service
+  csvc.set_host_id(1);
 
   svc_aply.add_object(csvc);
   ASSERT_TRUE(csvc.parse("service_description", "test description2"));
@@ -296,6 +309,10 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   ASSERT_TRUE(hst.parse("address", "10.11.12.13"));
   ASSERT_TRUE(hst.parse("host_id", "124"));
   hst_aply.add_object(hst);
+
+  // We fake here the expand_object on configuration::service
+  csvc.set_host_id(124);
+
   svc_aply.add_object(csvc);
   ASSERT_TRUE(csvc.parse("service_description", "foo"));
 
@@ -400,8 +417,10 @@ TEST_F(ApplierService, ContactgroupResolution) {
   svc.parse("check_command", "cmd");
   cmd_aply.add_object(cmd);
 
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(1);
+
   svc_aply.add_object(svc);
-  svc_aply.expand_objects(*config);
   svc_aply.resolve_object(svc);
   service_id_map const& sm(engine::service::services_by_id);
   ASSERT_EQ(sm.size(), 1u);
