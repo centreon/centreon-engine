@@ -21,10 +21,9 @@
 #  define CCE_CONFIGURATION_APPLIER_STATE_HH
 
 #  include <memory>
+#  include <mutex>
 #  include <string>
 #  include <utility>
-#  include "com/centreon/concurrency/condvar.hh"
-#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -54,13 +53,10 @@ namespace           configuration {
      */
     class           state {
     public:
+      void          apply(configuration::state& new_cfg);
       void          apply(
                       configuration::state& new_cfg,
-                      bool waiting_thread = false);
-      void          apply(
-                      configuration::state& new_cfg,
-                      retention::state& state,
-                      bool waiting_thread = false);
+                      retention::state& state);
       static state& instance();
       static void   load();
       static void   unload();
@@ -75,9 +71,10 @@ namespace           configuration {
                     user_macros();
       std::unordered_map<std::string, std::string>::const_iterator
                     user_macros_find(std::string const& key) const;
-      void          try_lock();
+      void          lock();
+      void          unlock();
 
-    private:
+     private:
       enum          processing_state {
         state_waiting,
         state_apply,
@@ -100,19 +97,14 @@ namespace           configuration {
       void          _expand(configuration::state& new_state);
       void          _processing(
                       configuration::state& new_cfg,
-                      bool waiting_thread,
                       retention::state* state = NULL);
       template      <typename ConfigurationType,
                      typename ApplierType>
       void          _resolve(
                       std::set<ConfigurationType>& cfg);
 
+      std::mutex    _apply_lock;
       state*        _config;
-
-      concurrency::condvar
-                    _cv_lock;
-      concurrency::mutex
-                    _lock;
       processing_state
                     _processing_state;
 

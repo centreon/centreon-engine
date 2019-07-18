@@ -22,8 +22,11 @@
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
+#include <thread>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/concurrency/thread.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,6 +34,7 @@
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/engine.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 
@@ -58,7 +62,6 @@ loop& loop::instance() {
 void loop::load() {
   if (!_instance)
     _instance = new loop;
-  return;
 }
 
 /**
@@ -82,13 +85,12 @@ void loop::run() {
   _sleep_event.recurring = false;
   _sleep_event.event_interval = 0L;
   _sleep_event.compensate_for_time_change = false;
-  _sleep_event.timing_func = NULL;
-  _sleep_event.event_data = NULL;
-  _sleep_event.event_args = NULL;
+  _sleep_event.timing_func = nullptr;
+  _sleep_event.event_data = nullptr;
+  _sleep_event.event_args = nullptr;
   _sleep_event.event_options = 0;
 
   _dispatching();
-  return;
 }
 
 /**
@@ -96,8 +98,7 @@ void loop::run() {
  */
 void loop::unload() {
   delete _instance;
-  _instance = NULL;
-  return;
+  _instance = nullptr;
 }
 
 /**************************************
@@ -142,27 +143,33 @@ void loop::_dispatching() {
     }
 
     // Start reload configuration.
-    if (_need_reload && !_reload_running) {
-      _reload_running = true;
+    if (_need_reload) {
+      std::thread t([](){
+        try {
+          configuration::state config;
+          {
+            configuration::parser p;
+            std::string path(::config->cfg_main());
+            p.parse(path, config);
+          }
+          configuration::applier::state::instance().apply(config);
+          logger(log_info_message, basic)
+            << "Configuration reloaded, main loop continuing.";
+        }
+        catch (std::exception const& e) {
+          logger(log_config_error, most)
+            << "Error: " << e.what();
+        }
+      });
+
       _need_reload = 0;
-      _reload_configuration.start();
-    }
-    else if (_reload_running) {
-      // Start locking engine to apply configuration.
-      if (!_reload_configuration.is_finished())
-        _reload_configuration.try_lock();
-      // Reload configuration ending.
-      else {
-        _reload_configuration.wait();
-        _reload_running = false;
-        logger(log_info_message, basic)
-           << "Configuration reloaded, main loop continuing.";
-      }
     }
 
     // Get the current time.
     time_t current_time;
     time(&current_time);
+
+    configuration::applier::state::instance().lock();
 
     // Hey, wait a second...  we traveled back in time!
     if (current_time < _last_time)
@@ -406,10 +413,10 @@ void loop::_dispatching() {
             NEBFLAG_NONE,
             NEBATTR_NONE,
             CMD_NONE,
-            time(NULL),
-            NULL,
-            NULL,
-            NULL);
+            time(nullptr),
+            nullptr,
+            nullptr,
+            nullptr);
         }
 
         // Set time to sleep so we don't hog the CPU...
@@ -429,12 +436,13 @@ void loop::_dispatching() {
           NEBFLAG_NONE,
           NEBATTR_NONE,
           &_sleep_event,
-          NULL);
+          nullptr);
 
         // Wait a while so we don't hog the CPU...
         concurrency::thread::nsleep(
           (unsigned long)(config->sleep_time() * 1000000000l));
       }
+
+      configuration::applier::state::instance().unlock();
   }
-  return;
 }
