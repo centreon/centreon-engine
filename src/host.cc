@@ -26,6 +26,7 @@
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/host.hh"
@@ -231,13 +232,13 @@ host::host(uint64_t host_id,
     _name{name},
     _address{address},
     _process_performance_data{process_perfdata},
-    _statusmap_image{statusmap_image},
     _vrml_image{vrml_image},
+    _statusmap_image{statusmap_image},
     _have_2d_coords{have_2d_coords > 0},
     _have_3d_coords{have_3d_coords > 0},
      _x_2d{x_2d},
-     _x_3d{x_3d},
      _y_2d{y_2d},
+     _x_3d{x_3d},
      _y_3d{y_3d},
      _z_3d{z_3d},
     _should_be_drawn{should_be_drawn > 0},
@@ -1104,7 +1105,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
         "  hostgroups_ptr:                       "
      << (hg ? hg->get_group_name() : "") << "\n";
 
-  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : obj.custom_variables)
+  for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
     os << cv.first << " ; ";
 
   os << "\n}\n";
@@ -1734,7 +1735,8 @@ void host::schedule_check(time_t check_time, int options) {
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
-  temp_event = timed_event::find_event(timed_event::low, EVENT_HOST_CHECK, this);
+  temp_event = quick_timed_event.find(timed_event::low,
+                                      hash_timed_event::host_check, this);
 
   /* we found another host check event for this host in the queue - what should
    * we do? */

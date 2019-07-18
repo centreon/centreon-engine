@@ -61,6 +61,7 @@ namespace                         retention {
     opt<bool> const&              event_handler_enabled() const throw ();
     opt<bool> const&              flap_detection_enabled() const throw ();
     opt<bool> const&              has_been_checked() const throw ();
+    uint64_t                      host_id() const throw ();
     std::string const&            host_name() const throw ();
     opt<bool> const&              is_flapping() const throw ();
     opt<time_t> const&            last_acknowledgement() const throw ();
@@ -125,6 +126,7 @@ namespace                         retention {
     bool                          _set_failure_prediction_enabled(bool value);
     bool                          _set_flap_detection_enabled(bool value);
     bool                          _set_has_been_checked(bool value);
+    bool                          _set_host_id(uint64_t value);
     bool                          _set_host_name(std::string const& value);
     bool                          _set_is_flapping(bool value);
     bool                          _set_last_acknowledgement(time_t value);
@@ -183,6 +185,7 @@ namespace                         retention {
     opt<bool>                     _event_handler_enabled;
     opt<bool>                     _flap_detection_enabled;
     opt<bool>                     _has_been_checked;
+    uint64_t                      _host_id;
     std::string                   _host_name;
     opt<bool>                     _is_flapping;
     opt<time_t>                   _last_acknowledgement;

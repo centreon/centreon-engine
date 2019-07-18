@@ -307,9 +307,9 @@ bool contact::parse(char const* key, char const* value) {
   else if (key[0] == '_') {
     map_customvar::iterator it(_customvariables.find(key + 1));
     if (it == _customvariables.end())
-      _customvariables.insert({key + 1, std::make_shared<customvariable>(value)});
+      _customvariables.insert({key + 1, customvariable(value)});
     else
-      it->second->set_value(value);
+      it->second.set_value(value);
 
     return true;
   }
@@ -376,6 +376,15 @@ std::string const& contact::contact_name() const throw () {
  *  @return The customvariables.
  */
 map_customvar const& contact::customvariables() const throw () {
+  return _customvariables;
+}
+
+/**
+ *  Get customvariables.
+ *
+ *  @return The customvariables.
+ */
+map_customvar& contact::customvariables() throw () {
   return _customvariables;
 }
 

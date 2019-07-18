@@ -132,7 +132,7 @@ bool contact::set(char const* key, char const* value) {
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   if ((key[0] == '_') && (strlen(value) > 3)) {
-    _customvariables.insert({key + 1, std::shared_ptr<customvariable>{new customvariable(key + 1, value + 2)}});
+    _customvariables.insert({key + 1, customvariable(key + 1, value + 2)});
     return true;
   }
   return false;

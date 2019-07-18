@@ -47,7 +47,7 @@ reload::~reload() throw () {}
  */
 bool reload::is_finished() const {
   concurrency::locker lock(&_lock);
-  return (_is_finished);
+  return _is_finished;
 }
 
 /**
@@ -56,14 +56,6 @@ bool reload::is_finished() const {
 void reload::start() {
   _set_is_finished(false);
   exec();
-  return ;
-}
-
-/**
- *  Try to lock engine if necessary.
- */
-void reload::try_lock() {
-  configuration::applier::state::instance().try_lock();
 }
 
 /**
@@ -71,7 +63,6 @@ void reload::try_lock() {
  */
 void reload::wait() {
   concurrency::thread::wait();
-  return ;
 }
 
 /**
@@ -86,7 +77,7 @@ void reload::_run() {
       std::string path(::config->cfg_main());
       p.parse(path, config);
     }
-    configuration::applier::state::instance().apply(config, true);
+    configuration::applier::state::instance().apply(config);
   }
   catch (std::exception const& e) {
     logger(log_config_error, most)

@@ -83,6 +83,10 @@ TEST_F(ServiceExternalCommand, AddServiceDowntime) {
   svc.parse("check_command", "cmd");
 
   hst_aply.add_object(hst);
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(1);
+
   svc_aply.add_object(svc);
 
   hst_aply.expand_objects(*config);
@@ -129,6 +133,10 @@ TEST_F(ServiceExternalCommand, AddServiceComment) {
   svc.parse("check_command", "cmd");
 
   hst_aply.add_object(hst);
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(1);
+
   svc_aply.add_object(svc);
 
   hst_aply.expand_objects(*config);

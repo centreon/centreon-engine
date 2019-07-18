@@ -19,7 +19,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <unordered_map>
 #include <map>
+#include <mutex>
+#include <thread>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "nagios.h"
@@ -27,6 +30,7 @@
 using namespace com::centreon::engine;
 
 configuration::state* config(NULL);
+events::hash_timed_event quick_timed_event;
 
 char const*         sigs[] = {
   "EXIT", "HUP", "INT", "QUIT", "ILL",
@@ -65,7 +69,7 @@ int                 additional_freshness_latency(15);
 int                 config_errors(0);
 int                 config_warnings(0);
 int                 sig_id(0);
-int                 sighup(false);
+bool                sighup{false};
 int                 sigrestart(false);
 int                 sigshutdown(false);
 int                 test_scheduling(false);

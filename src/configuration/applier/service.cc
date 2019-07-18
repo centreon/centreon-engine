@@ -18,6 +18,7 @@
 */
 
 #include <algorithm>
+#include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
@@ -102,6 +103,10 @@ void applier::service::add_object(
     throw engine_error() << "Could not create service '"
            << obj.service_description()
            << "' with multiple host groups defined";
+  else if (!obj.host_id())
+    throw engine_error() << "No host_id available for the host '"
+           << *obj.hosts().begin() << "' - unable to create service '"
+           << obj.service_description() << "'";
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -243,14 +248,14 @@ void applier::service::expand_objects(configuration::state& s) {
        it_svc != end_svc;
        ++it_svc) {
     // Should custom variables be sent to broker ?
-    for (map_customvar::const_iterator
-           it(it_svc->customvariables().begin()),
-           end(it_svc->customvariables().end());
+    for (map_customvar::iterator
+           it(const_cast<map_customvar&>(it_svc->customvariables()).begin()),
+           end(const_cast<map_customvar&>(it_svc->customvariables()).end());
          it != end;
          ++it) {
       if (!s.enable_macros_filter()
           || s.macros_filter().find(it->first) != s.macros_filter().end()) {
-        it->second->set_sent(true);
+        it->second.set_sent(true);
       }
     }
 
@@ -312,7 +317,6 @@ void applier::service::expand_objects(configuration::state& s) {
   // Set expanded services in configuration state.
   s.services().swap(expanded);
 
-  return ;
 }
 
 /**
@@ -334,18 +338,18 @@ void applier::service::modify_object(
   // Find the configuration object.
   set_service::iterator it_cfg(config->services_find(obj.key()));
   if (it_cfg == config->services().end())
-    throw (engine_error() << "Cannot modify non-existing "
+    throw engine_error() << "Cannot modify non-existing "
            "service '" << service_description << "' of host '"
-           << host_name << "'");
+           << host_name << "'";
 
   // Find service object.
   service_id_map::iterator it_obj(engine::service::services_by_id.find(
     obj.key()));
   if (it_obj == engine::service::services_by_id.end())
-    throw (engine_error() << "Could not modify non-existing "
+    throw engine_error() << "Could not modify non-existing "
            << "service object '" << service_description
-           << "' of host '" << host_name << "'");
-  std::shared_ptr<engine::service> s(it_obj->second);
+           << "' of host '" << host_name << "'";
+  std::shared_ptr<engine::service> s{it_obj->second};
 
   // Update the global configuration set.
   configuration::service obj_old(*it_cfg);
@@ -493,6 +497,7 @@ void applier::service::remove_object(
   std::string const& host_name(*obj.hosts().begin());
   std::string const& service_description(obj.service_description());
 
+  assert(obj.key().first);
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing service '" << service_description
@@ -643,6 +648,8 @@ void applier::service::_inherits_special_vars(
              << *obj.hosts().begin() << "' does not exist";
 
     // Inherits variables.
+    if (!obj.host_id())
+      obj.set_host_id(it->host_id());
     if (!obj.contacts_defined() && !obj.contactgroups_defined()) {
       obj.contacts() = it->contacts();
       obj.contactgroups() = it->contactgroups();
@@ -654,6 +661,4 @@ void applier::service::_inherits_special_vars(
     if (!obj.timezone_defined())
       obj.timezone(it->timezone());
   }
-
-  return ;
 }

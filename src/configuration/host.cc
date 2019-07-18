@@ -529,9 +529,9 @@ bool host::parse(char const* key, char const* value) {
   if (key[0] == '_') {
     map_customvar::iterator it(_customvariables.find(key + 1));
     if (it == _customvariables.end())
-      _customvariables.insert({key + 1, std::shared_ptr<customvariable>{new customvariable(value)}});
+      _customvariables.insert({key + 1, customvariable(value)});
     else
-      it->second->set_value(value);
+      it->second.set_value(value);
 
     return true;
   }
@@ -661,6 +661,15 @@ point_3d const& host::coords_3d() const throw () {
  *  @return The customvariables.
  */
 engine::map_customvar const& host::customvariables() const throw () {
+  return _customvariables;
+}
+
+/**
+ *  Get customvariables.
+ *
+ *  @return The customvariables.
+ */
+engine::map_customvar& host::customvariables() throw () {
   return _customvariables;
 }
 

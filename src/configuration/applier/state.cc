@@ -66,13 +66,12 @@ static applier::state* _instance(nullptr);
  *  Apply new configuration.
  *
  *  @param[in] new_cfg        The new configuration.
- *  @param[in] waiting_thread True to wait thread after calulate differencies.
  */
-void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
+void applier::state::apply(configuration::state& new_cfg) {
   configuration::state save(*config);
   try {
     _processing_state = state_ready;
-    _processing(new_cfg, waiting_thread);
+    _processing(new_cfg);
   }
   catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
@@ -88,14 +87,8 @@ void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
     if (_processing_state == state_error) {
       logger(dbg_config, more)
         << "configuration: try to restore old configuration";
-      _processing(save, waiting_thread);
+      _processing(save);
     }
-  }
-
-  // wake up waiting thread.
-  if (waiting_thread) {
-    concurrency::locker lock(&_lock);
-    _cv_lock.wake_one();
   }
 }
 
@@ -104,16 +97,14 @@ void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
  *
  *  @param[in] new_cfg        The new configuration.
  *  @param[in] state          The retention to use.
- *  @param[in] waiting_thread True to wait thread after calulate differencies.
  */
 void applier::state::apply(
        configuration::state& new_cfg,
-       retention::state& state,
-       bool waiting_thread) {
+       retention::state& state) {
   configuration::state save(*config);
   try {
     _processing_state = state_ready;
-    _processing(new_cfg, waiting_thread, &state);
+    _processing(new_cfg, &state);
   }
   catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
@@ -129,14 +120,8 @@ void applier::state::apply(
     if (_processing_state == state_error) {
       logger(dbg_config, more)
         << "configuration: try to restore old configuration";
-      _processing(save, waiting_thread, &state);
+      _processing(save, &state);
     }
-  }
-
-  // wake up waiting thread.
-  if (waiting_thread) {
-    concurrency::locker lock(&_lock);
-    _cv_lock.wake_one();
   }
 }
 
@@ -227,17 +212,6 @@ std::unordered_map<std::string, std::string>& applier::state::user_macros() {
  */
 std::unordered_map<std::string, std::string>::const_iterator applier::state::user_macros_find(std::string const& key) const {
   return _user_macros.find(key);
-}
-
-/**
- *  Try to lock.
- */
-void applier::state::try_lock() {
-  concurrency::locker lock(&_lock);
-  if (_processing_state == state_waiting) {
-    _cv_lock.wake_one();
-    _cv_lock.wait(&_lock);
-  }
 }
 
 /*
@@ -453,7 +427,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
         << "Error: Global host event handler command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
-      global_host_event_handler_ptr = nullptr;
     }
     else
       global_host_event_handler_ptr = found->second.get();
@@ -470,7 +443,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
       << "Error: Global service event handler command '"
       << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
-      global_service_event_handler_ptr = nullptr;
     }
     else
       global_service_event_handler_ptr = found->second.get();
@@ -491,7 +463,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
         << "Error: Obsessive compulsive service processor command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
-      ocsp_command_ptr = nullptr;
     }
     else
       ocsp_command_ptr = found->second.get();
@@ -507,7 +478,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
         << "Error: Obsessive compulsive host processor command '"
         << temp_command_name << "' is not defined anywhere!";
       ++config_errors;
-      ochp_command_ptr = nullptr;
     }
     else
       ochp_command_ptr = found->second.get();
@@ -650,12 +620,10 @@ void applier::state::_expand(configuration::state& new_state) {
  *  Process new configuration and apply it.
  *
  *  @param[in] new_cfg        The new configuration.
- *  @param[in] waiting_thread True to wait thread after calulate differencies.
  *  @param[in] state          The retention to use.
  */
 void applier::state::_processing(
        configuration::state& new_cfg,
-       bool waiting_thread,
        retention::state* state) {
   // Timing.
   struct timeval tv[5];
@@ -768,8 +736,8 @@ void applier::state::_processing(
   // Build difference for services.
   difference<set_service> diff_services;
   diff_services.parse(
-    config->services(),
-    new_cfg.services());
+      config->services(),
+      new_cfg.services());
 
   // Build difference for servicegroups.
   difference<set_servicegroup> diff_servicegroups;
@@ -803,14 +771,6 @@ void applier::state::_processing(
 
   // Timing.
   gettimeofday(tv + 1, nullptr);
-
-  if (waiting_thread && _processing_state == state_ready) {
-    concurrency::locker lock(&_lock);
-    _processing_state = state_waiting;
-    // Wait to stop engine before apply configuration.
-    _cv_lock.wait(&_lock);
-    _processing_state = state_apply;
-  }
 
   try {
     // Apply logging configurations.

@@ -155,6 +155,9 @@ configuration::service TestEngine::new_configuration_service(
   svc.parse("_SERVICE_ID", std::to_string(svc_id).c_str());
   svc.parse("contacts", contacts.c_str());
 
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+
   configuration::command cmd("cmd");
   cmd.parse("command_line", "echo 1");
   svc.parse("check_command", "cmd");

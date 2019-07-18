@@ -28,6 +28,7 @@
 #include "com/centreon/engine/deleter/timedevent.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -78,9 +79,10 @@ void applier::scheduler::apply(
     host_map const& hosts{engine::host::hosts};
     host_map::const_iterator hst(hosts.find(it->host_name().c_str()));
     if (hst != hosts.end()) {
-      bool has_event(timed_event::find_event(timed_event::low,
-                                             EVENT_HOST_CHECK,
-                                             hst->second.get()));
+      bool has_event(quick_timed_event.find(
+                                         timed_event::low,
+                                         events::hash_timed_event::host_check,
+                                         hst->second.get()));
       bool should_schedule(it->checks_active()
                            && (it->check_interval() > 0));
       if (has_event && should_schedule) {
@@ -104,9 +106,10 @@ void applier::scheduler::apply(
       svc(engine::service::services_by_id.find({
         it->host_id(), it->service_id()}));
     if (svc != services.end()) {
-      bool has_event(timed_event::find_event(timed_event::low,
-                                             EVENT_SERVICE_CHECK,
-                                             svc->second.get()));
+      bool has_event(quick_timed_event.find(
+                                         timed_event::low,
+                                         events::hash_timed_event::service_check,
+                                         svc->second.get()));
       bool should_schedule(it->checks_active()
                            && (it->check_interval() > 0));
       if (has_event && should_schedule) {
@@ -294,6 +297,9 @@ applier::scheduler::~scheduler() throw () {
     it = timed_event::event_list_high.erase(it);
     delete evt;
   }
+
+  quick_timed_event.clear(timed_event::low);
+  quick_timed_event.clear(timed_event::high);
 }
 
 /**
@@ -1146,15 +1152,17 @@ void applier::scheduler::_unschedule_host_events(
        it != end;
        ++it) {
     timed_event* evt(NULL);
-    while ((evt = timed_event::find_event(timed_event::low,
-                                          EVENT_HOST_CHECK,
-                                          *it))) {
+    while ((evt = quick_timed_event.find(
+                    timed_event::low,
+                    events::hash_timed_event::host_check,
+                    *it))) {
       remove_event(evt, timed_event::low);
       delete evt;
     }
-    while ((evt = timed_event::find_event(timed_event::low,
-                                          EVENT_EXPIRE_HOST_ACK,
-                                          *it))) {
+    while ((evt = quick_timed_event.find(
+                    timed_event::low,
+                    events::hash_timed_event::expire_host_ack,
+                    *it))) {
       remove_event(evt, timed_event::low);
       delete evt;
     }
@@ -1175,15 +1183,17 @@ void applier::scheduler::_unschedule_service_events(
        it != end;
        ++it) {
     timed_event* evt(NULL);
-    while ((evt = timed_event::find_event(timed_event::low,
-                                          EVENT_SERVICE_CHECK,
-                                          *it))) {
+    while ((evt = quick_timed_event.find(
+                    timed_event::low,
+                    events::hash_timed_event::service_check,
+                    *it))) {
       remove_event(evt, timed_event::low);
       delete evt;
     }
-    while ((evt = timed_event::find_event(timed_event::low,
-                                          EVENT_EXPIRE_SERVICE_ACK,
-                                          *it))) {
+    while ((evt = quick_timed_event.find(
+                    timed_event::low,
+                    events::hash_timed_event::expire_service_ack,
+                    *it))) {
       remove_event(evt, timed_event::low);
       delete evt;
     }

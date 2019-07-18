@@ -1210,6 +1210,7 @@ int grab_macro_value_r(
     /*** New style user macros ***/
     output =
       configuration::applier::state::instance().user_macros_find(macro_name)->second;
+
     result = true;
   }
   /* no macro matched... */

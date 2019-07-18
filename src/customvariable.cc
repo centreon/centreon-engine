@@ -108,6 +108,22 @@ bool customvariable::operator==(customvariable const& other) const {
 }
 
 /**
+ *  Order comparison operator of the customvariable
+ *
+ *  The comparison is made in this order:
+ *  * the name of the customvariable
+ *  * the value of the customvariable
+ *  * the flag telling if the customvariable is sent
+ *
+ * @param other Another customvariable
+ *
+ * @return A boolean telling if this customvariable is before the other one.
+ */
+bool customvariable::operator<(customvariable const& other) const {
+  return _value < other._value || _is_sent < other._is_sent;
+}
+
+/**
  *  Difference comparison operator of the customvariable
  *
  * @param other The customvariable to compare with.

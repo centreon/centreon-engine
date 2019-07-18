@@ -87,6 +87,10 @@ class ServiceFlappingNotification : public TestEngine {
     svc.parse("_SERVICE_ID", "12");
     svc.parse("check_command", "cmd");
     svc.parse("contacts", "admin");
+
+    // We fake here the expand_object on configuration::service
+    svc.set_host_id(12);
+
     svc_aply.add_object(svc);
     svc_aply.resolve_object(svc);
 

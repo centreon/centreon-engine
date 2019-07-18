@@ -199,14 +199,14 @@ void applier::host::expand_objects(configuration::state& s) {
        ++it_host) {
 
     // Should custom variables be sent to broker ?
-    for (map_customvar::const_iterator
-           it(it_host->customvariables().begin()),
-           end(it_host->customvariables().end());
+    for (map_customvar::iterator
+           it(const_cast<map_customvar&>(it_host->customvariables()).begin()),
+           end(const_cast<map_customvar&>(it_host->customvariables()).end());
          it != end;
          ++it) {
       if (!s.enable_macros_filter()
           || s.macros_filter().find(it->first) != s.macros_filter().end()) {
-        it->second->set_sent(true);
+        it->second.set_sent(true);
       }
     }
 

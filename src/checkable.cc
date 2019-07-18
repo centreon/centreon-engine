@@ -87,15 +87,8 @@ checkable::checkable(std::string const& display_name,
       _event_handler_ptr{nullptr},
       _check_command_ptr{nullptr},
       _is_executing{false} {
-  if (check_interval < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid check_interval value for checkable '" << display_name
-        << "'";
-    throw engine_error() << "Could not register checkable '" << display_name
-                         << "'";
-  }
 
-  if (max_attempts < 0 || check_interval < 0 || retry_interval <= 0) {
+  if (max_attempts < 0 || retry_interval <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid max_attempts, check_interval or retry_interval"
            " value for checkable '" << display_name << "'";

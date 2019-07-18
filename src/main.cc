@@ -245,7 +245,9 @@ int main(int argc, char* argv[]) {
           p.parse(config_file, config);
         }
 
-        configuration::applier::state::instance().apply(config);
+        configuration::applier::state&
+          applier(configuration::applier::state::instance());
+        applier.apply(config);
 
         logger(logging::log_info_message, logging::basic)
           << "\n"
@@ -340,7 +342,7 @@ int main(int argc, char* argv[]) {
         // Get program (re)start time and save as macro. Needs to be
         // done after we read config files, as user may have overridden
         // timezone offset.
-        program_start = time(NULL);
+        program_start = std::time(nullptr);
         mac->x[MACRO_PROCESSSTARTTIME] = program_start;
 
         // Load broker modules.

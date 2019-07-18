@@ -33,9 +33,9 @@ escalation::escalation(uint32_t first_notification,
     : notifier_ptr{nullptr},
       escalation_period_ptr{nullptr},
       _first_notification{first_notification},
+      _last_notification{last_notification},
       _notification_interval{
           (notification_interval < 0) ? 0 : notification_interval},
-      _last_notification{last_notification},
       _escalation_period{escalation_period},
       _escalate_on{escalate_on} {}
 

@@ -22,8 +22,10 @@
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
-#include "com/centreon/engine/broker.hh"
 #include "com/centreon/concurrency/thread.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,6 +33,7 @@
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/engine.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 
@@ -124,9 +127,8 @@ loop::~loop() throw () {}
 void loop::_dispatching() {
   while (true) {
     // See if we should exit or restart (a signal was encountered).
-    if (sigshutdown) {
+    if (sigshutdown)
       break;
-    }
 
     // If we don't have any events to handle, exit.
     if (timed_event::event_list_high.empty() && timed_event::event_list_low.empty()) {
@@ -143,22 +145,21 @@ void loop::_dispatching() {
     }
 
     // Start reload configuration.
-    if (_need_reload && !_reload_running) {
-      _reload_running = true;
-      _need_reload = 0;
-      _reload_configuration.start();
-    }
-    else if (_reload_running) {
-      // Start locking engine to apply configuration.
-      if (!_reload_configuration.is_finished())
-        _reload_configuration.try_lock();
-      // Reload configuration ending.
-      else {
-        _reload_configuration.wait();
-        _reload_running = false;
-        logger(log_info_message, basic)
-           << "Configuration reloaded, main loop continuing.";
+    if (_need_reload) {
+      try {
+        configuration::state config;
+        {
+          configuration::parser p;
+          std::string path(::config->cfg_main());
+          p.parse(path, config);
+        }
+        configuration::applier::state::instance().apply(config);
       }
+      catch (std::exception const& e) {
+        logger(log_config_error, most)
+          << "Error: " << e.what();
+      }
+      _need_reload = 0;
     }
 
     // Get the current time.
@@ -219,6 +220,7 @@ void loop::_dispatching() {
 
       timed_event::event_list_high.pop_front();
       // We may have just removed the only item from the list.
+      quick_timed_event.erase(timed_event::high, temp_event);
 
       // Handle the event.
       handle_timed_event(temp_event);
@@ -368,6 +370,8 @@ void loop::_dispatching() {
         timed_event* temp_event(*timed_event::event_list_low.begin());
         timed_event::event_list_low.pop_front();
         // We may have just removed the only item from the list.
+
+        quick_timed_event.erase(timed_event::low, temp_event);
 
         // Handle the event.
         logger(dbg_events, more)

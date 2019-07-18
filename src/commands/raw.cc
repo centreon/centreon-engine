@@ -386,7 +386,7 @@ void raw::_build_custom_contact_macro_environment(
   // Build custom contact variable.
   contact* cntct(macros.contact_ptr);
   if (cntct) {
-    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : cntct->get_custom_variables()) {
+    for (std::pair<std::string, customvariable> const& cv : cntct->get_custom_variables()) {
       if (!cv.first.empty()) {
         std::string name("_CONTACT");
         name.append(cv.first);
@@ -395,10 +395,10 @@ void raw::_build_custom_contact_macro_environment(
     }
   }
   // Set custom contact variable into the environement
-  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : macros.custom_contact_vars) {
+  for (std::pair<std::string, customvariable> const& cv : macros.custom_contact_vars) {
     if (!cv.first.empty()) {
       std::string value(clean_macro_chars(
-            cv.second->get_value(),
+            cv.second.get_value(),
             STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
       std::string line;
       line.append(MACRO_ENV_VAR_PREFIX);
@@ -422,7 +422,7 @@ void raw::_build_custom_host_macro_environment(
   // Build custom host variable.
   host* hst(macros.host_ptr);
   if (hst) {
-    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : hst->custom_variables) {
+    for (std::pair<std::string, customvariable> const& cv : hst->custom_variables) {
       if (!cv.first.empty()) {
         std::string name("_HOST");
         name.append(cv.first);
@@ -431,10 +431,10 @@ void raw::_build_custom_host_macro_environment(
     }
   }
   // Set custom host variable into the environement
-  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : macros.custom_host_vars) {
+  for (std::pair<std::string, customvariable> const& cv : macros.custom_host_vars) {
     if (!cv.first.empty()) {
       std::string value(clean_macro_chars(
-            cv.second->get_value(),
+            cv.second.get_value(),
             STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
       std::string line;
       line.append(MACRO_ENV_VAR_PREFIX);
@@ -458,7 +458,7 @@ void raw::_build_custom_service_macro_environment(
   // Build custom service variable.
   service* svc(macros.service_ptr);
   if (svc) {
-    for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : svc->custom_variables) {
+    for (std::pair<std::string, customvariable> const& cv : svc->custom_variables) {
       if (!cv.first.empty()) {
         std::string name("_SERVICE");
         name.append(cv.first);
@@ -467,10 +467,10 @@ void raw::_build_custom_service_macro_environment(
     }
   }
   // Set custom service variable into the environement
-  for (std::pair<std::string, std::shared_ptr<customvariable>> const& cv : macros.custom_service_vars) {
+  for (std::pair<std::string, customvariable> const& cv : macros.custom_service_vars) {
     if (!cv.first.empty()) {
       std::string value(clean_macro_chars(
-            cv.second->get_value(),
+            cv.second.get_value(),
             STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
       std::string line;
       line.append(MACRO_ENV_VAR_PREFIX);
