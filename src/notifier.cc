@@ -150,9 +150,8 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _retain_nonstatus_information{retain_nonstatus_information},
       _is_being_freshened{false},
       _notification_number{0},
-      _pending_flex_downtime{0},
-      _state_history{}
-      {
+      _state_history{},
+      _pending_flex_downtime{0} {
   if (retry_interval <= 0) {
     logger(log_config_error, basic)
         << "Error: Invalid notification_interval value for notifier '"
