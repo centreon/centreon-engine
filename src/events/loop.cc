@@ -417,7 +417,7 @@ void loop::_dispatching() {
     else if ((timed_event::event_list_high.empty() ||
               current_time <
                (*timed_event::event_list_high.begin())->run_time) &&
-             (!timed_event::event_list_low.empty() ||
+             (timed_event::event_list_low.empty() ||
               current_time <
                (*timed_event::event_list_low.begin())->run_time)) {
       logger(dbg_events, most)
