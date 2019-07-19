@@ -36,7 +36,7 @@ namespace               configuration {
                         hostgroup();
                         hostgroup(hostgroup const& right);
                         ~hostgroup() throw ();
-      hostgroup&        operator=(hostgroup const& right);
+      hostgroup&        operator=(hostgroup const& right) = delete;
       void              add_object(
                           configuration::hostgroup const& obj);
       void              expand_objects(configuration::state& s);

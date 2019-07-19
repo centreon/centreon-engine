@@ -1861,10 +1861,10 @@ set_hostgroup::const_iterator state::hostgroups_find(
   configuration::hostgroup below_searched(k);
   set_hostgroup::const_iterator
     it(_hostgroups.upper_bound(below_searched));
-  if ((it != _hostgroups.end()) && (it->hostgroup_name() == k))
+  if (it != _hostgroups.end() && it->hostgroup_name() == k)
     return it;
-  else if ((it != _hostgroups.begin())
-           && ((--it)->hostgroup_name() == k))
+  else if (it != _hostgroups.begin()
+           && (--it)->hostgroup_name() == k)
     return it;
   return _hostgroups.end();
 }

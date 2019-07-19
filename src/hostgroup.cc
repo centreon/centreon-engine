@@ -191,6 +191,7 @@ void hostgroup::resolve(int& w, int& e) {
       logger(log_verification_error, basic)
           << "Error: Host '" << it->first << "' specified in host group '"
           << get_group_name() << "' is not defined anywhere!";
+      it->second = nullptr;
       errors++;
     }
     // Save a pointer to this hostgroup for faster host/group
@@ -199,7 +200,7 @@ void hostgroup::resolve(int& w, int& e) {
       //Update or add of group for name
       if (it_host->second.get() != it->second) {
         // Notify event broker.
-        timeval tv = get_broker_timestamp(NULL);
+        timeval tv = get_broker_timestamp(nullptr);
         broker_group_member(
           NEBTYPE_HOSTGROUPMEMBER_ADD,
           NEBFLAG_NONE,
