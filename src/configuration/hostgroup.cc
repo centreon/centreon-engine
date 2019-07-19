@@ -19,9 +19,11 @@
 
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<hostgroup, type, &hostgroup::method>::generic
@@ -31,7 +33,6 @@ std::unordered_map<std::string, hostgroup::setter_func> const hostgroup::_setter
   { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_name) },
   { "alias",             SETTER(std::string const&, _set_alias) },
   { "members",           SETTER(std::string const&, _set_members) },
-  { "hostgroup_members", SETTER(std::string const&, _set_hostgroup_members) },
   { "notes",             SETTER(std::string const&, _set_notes) },
   { "notes_url",         SETTER(std::string const&, _set_notes_url) },
   { "action_url",        SETTER(std::string const&, _set_action_url) }
@@ -75,7 +76,6 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
     _action_url = right._action_url;
     _alias = right._alias;
     _hostgroup_id = right._hostgroup_id;
-    _hostgroup_members = right._hostgroup_members;
     _hostgroup_name = right._hostgroup_name;
     _members = right._members;
     _notes = right._notes;
@@ -92,15 +92,47 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
  *  @return True if is the same hostgroup, otherwise false.
  */
 bool hostgroup::operator==(hostgroup const& right) const throw () {
-  return (object::operator==(right)
-          && _action_url == right._action_url
-          && _alias == right._alias
-          && _hostgroup_id == right._hostgroup_id
-          && _hostgroup_members == right._hostgroup_members
-          && _hostgroup_name == right._hostgroup_name
-          && _members == right._members
-          && _notes == right._notes
-          && _notes_url == right._notes_url);
+  if (!object::operator==(right)) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => object don't match";
+    return false;
+  }
+  if (_action_url != right._action_url) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => action url don't match";
+    return false;
+  }
+  if (_alias != right._alias) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => alias don't match";
+    return false;
+  }
+  if (_hostgroup_id != right._hostgroup_id) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => hostgroup id don't match";
+    return false;
+  }
+  if (_hostgroup_name != right._hostgroup_name) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => hostgroup name don't match";
+    return false;
+  }
+  if (_members != right._members) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => members don't match";
+    return false;
+  }
+  if (_notes != right._notes) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => notes don't match";
+    return false;
+  }
+  if (_notes_url != right._notes_url) {
+    logger(log_process_info, most)
+      << "configuration::hostgroup::equality => notes url don't match";
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -136,8 +168,6 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
     return _notes < right._notes;
   else if (_notes_url != right._notes_url)
     return _notes_url < right._notes_url;
-  else if (_hostgroup_members != right._hostgroup_members)
-    return _hostgroup_members < right._hostgroup_members;
   return _members < right._members;
 }
 
@@ -174,7 +204,6 @@ void hostgroup::merge(object const& obj) {
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
   MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_alias);
-  MRG_INHERIT(_hostgroup_members);
   MRG_DEFAULT(_hostgroup_name);
   MRG_INHERIT(_members);
   MRG_DEFAULT(_notes);
@@ -222,24 +251,6 @@ std::string const& hostgroup::alias() const throw () {
  */
 unsigned int hostgroup::hostgroup_id() const throw() {
   return _hostgroup_id;
-}
-
-/**
- *  Get hostgroup_members.
- *
- *  @return The hostgroup_members.
- */
-set_string& hostgroup::hostgroup_members() throw () {
-  return *_hostgroup_members;
-}
-
-/**
- *  Get hostgroup_members.
- *
- *  @return The hostgroup_members.
- */
-set_string const& hostgroup::hostgroup_members() const throw () {
-  return *_hostgroup_members;
 }
 
 /**
@@ -320,18 +331,6 @@ bool hostgroup::_set_alias(std::string const& value) {
  */
 bool hostgroup::_set_hostgroup_id(unsigned int value) {
   _hostgroup_id = value;
-  return true;
-}
-
-/**
- *  Set hostgroup_members value.
- *
- *  @param[in] value The new hostgroup_members value.
- *
- *  @return True on success, otherwise false.
- */
-bool hostgroup::_set_hostgroup_members(std::string const& value) {
-  _hostgroup_members = value;
   return true;
 }
 
