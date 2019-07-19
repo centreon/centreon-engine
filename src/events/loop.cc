@@ -19,12 +19,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <atomic>
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
-#include <thread>
+#include <future>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/events/defines.hh"
@@ -119,10 +119,34 @@ loop::loop()
  */
 loop::~loop() throw () {}
 
+static void apply_conf(std::atomic<bool>* reloading) {
+  logger(log_info_message, more)
+    << "Starting to reload configuration.";
+  try {
+    configuration::state config;
+    {
+      configuration::parser p;
+      std::string path(::config->cfg_main());
+      p.parse(path, config);
+    }
+    configuration::applier::state::instance().apply(config);
+    logger(log_info_message, basic)
+      << "Configuration reloaded, main loop continuing.";
+  }
+  catch (std::exception const& e) {
+    logger(log_config_error, most)
+      << "Error: " << e.what();
+  }
+  *reloading = false;
+  logger(log_info_message, more)
+    << "Reload configuration finished.";
+}
+
 /**
  *  Slot to dispatch Centreon Engine events.
  */
 void loop::_dispatching() {
+  std::atomic<bool> reloading{false};
   while (true) {
     // See if we should exit or restart (a signal was encountered).
     if (sigshutdown)
@@ -144,23 +168,17 @@ void loop::_dispatching() {
 
     // Start reload configuration.
     if (_need_reload) {
-      std::thread t([](){
-        try {
-          configuration::state config;
-          {
-            configuration::parser p;
-            std::string path(::config->cfg_main());
-            p.parse(path, config);
-          }
-          configuration::applier::state::instance().apply(config);
-          logger(log_info_message, basic)
-            << "Configuration reloaded, main loop continuing.";
-        }
-        catch (std::exception const& e) {
-          logger(log_config_error, most)
-            << "Error: " << e.what();
-        }
-      });
+      logger(log_info_message, most)
+        << "Need reload.";
+      if (!reloading) {
+        logger(log_info_message, most)
+          << "Reloading...";
+        reloading = true;
+        std::async(std::launch::async, apply_conf, &reloading);
+      }
+      else
+        logger(log_info_message, most)
+          << "Already reloading...";
 
       _need_reload = 0;
     }
@@ -396,53 +414,43 @@ void loop::_dispatching() {
       }
     }
     // We don't have anything to do at this moment in time...
-    else
-      if ((timed_event::event_list_high.empty()
-           || (current_time < (*timed_event::event_list_high.begin())->run_time))
-          && (!timed_event::event_list_low.empty()
-              || (current_time < (*timed_event::event_list_low.begin())->run_time))) {
-        logger(dbg_events, most)
+    else if ((timed_event::event_list_high.empty() ||
+              current_time <
+               (*timed_event::event_list_high.begin())->run_time) &&
+             (!timed_event::event_list_low.empty() ||
+              current_time <
+               (*timed_event::event_list_low.begin())->run_time)) {
+      logger(dbg_events, most)
           << "No events to execute at the moment. Idling for a bit...";
 
-        // Check for external commands if we're supposed to check as
-        // often as possible.
-        if (config->command_check_interval() == -1) {
-          // Send data to event broker.
-          broker_external_command(
-            NEBTYPE_EXTERNALCOMMAND_CHECK,
-            NEBFLAG_NONE,
-            NEBATTR_NONE,
-            CMD_NONE,
-            time(nullptr),
-            nullptr,
-            nullptr,
-            nullptr);
-        }
-
-        // Set time to sleep so we don't hog the CPU...
-        timespec sleep_time;
-        sleep_time.tv_sec = (time_t)config->sleep_time();
-        sleep_time.tv_nsec
-          = (long)((config->sleep_time()
-                    - (double)sleep_time.tv_sec) * 1000000000ull);
-
-        // Populate fake "sleep" event.
-        _sleep_event.run_time = current_time;
-        _sleep_event.event_data = (void*)&sleep_time;
-
-        // Send event data to broker.
-        broker_timed_event(
-          NEBTYPE_TIMEDEVENT_SLEEP,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          &_sleep_event,
-          nullptr);
-
-        // Wait a while so we don't hog the CPU...
-        concurrency::thread::nsleep(
-          (unsigned long)(config->sleep_time() * 1000000000l));
+      // Check for external commands if we're supposed to check as
+      // often as possible.
+      if (config->command_check_interval() == -1) {
+        // Send data to event broker.
+        broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK, NEBFLAG_NONE,
+                                NEBATTR_NONE, CMD_NONE, time(nullptr), nullptr,
+                                nullptr, nullptr);
       }
 
-      configuration::applier::state::instance().unlock();
+      // Set time to sleep so we don't hog the CPU...
+      timespec sleep_time;
+      sleep_time.tv_sec = (time_t)config->sleep_time();
+      sleep_time.tv_nsec =
+          (long)((config->sleep_time() - (double)sleep_time.tv_sec) *
+                 1000000000ull);
+
+      // Populate fake "sleep" event.
+      _sleep_event.run_time = current_time;
+      _sleep_event.event_data = (void*)&sleep_time;
+
+      // Send event data to broker.
+      broker_timed_event(NEBTYPE_TIMEDEVENT_SLEEP, NEBFLAG_NONE, NEBATTR_NONE,
+                         &_sleep_event, nullptr);
+
+      // Wait a while so we don't hog the CPU...
+      concurrency::thread::nsleep(
+          (unsigned long)(config->sleep_time() * 1000000000l));
+    }
+    configuration::applier::state::instance().unlock();
   }
 }
