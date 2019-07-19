@@ -479,7 +479,7 @@ void checker::run(
       // Update check result.
       struct timeval tv;
       tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - check_result_info.get_finish_time().tv_sec * 1000000ull;
+      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
       check_result_info.set_finish_time(tv);
       check_result_info.set_early_timeout(false);
       check_result_info.set_return_code(notifier::unknown);
@@ -709,7 +709,7 @@ void checker::run(
       timeval tv;
       tv.tv_sec = now.to_seconds();
       tv.tv_usec = now.to_useconds()
-        - check_result_info.get_finish_time().tv_sec * 1000000ull;
+        - tv.tv_sec * 1000000ull;
       check_result_info.set_finish_time(tv);
 
       check_result_info.set_early_timeout(false);
@@ -963,7 +963,7 @@ void checker::finished(commands::result const& res) throw () {
   struct timeval tv;
   // Update check result.
   tv.tv_sec = res.end_time.to_seconds();
-  tv.tv_usec = res.end_time.to_useconds()- result.get_finish_time().tv_sec * 1000000ull;
+  tv.tv_usec = res.end_time.to_useconds()- tv.tv_sec * 1000000ull;
   result.set_finish_time(tv);
   result.set_early_timeout(res.exit_status == process::timeout);
   result.set_return_code(res.exit_code);

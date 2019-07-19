@@ -251,10 +251,10 @@ struct grab_service_redirection {
         true}},
       // Duration.
       {MACRO_SERVICEDURATION,
-       {&get_duration_old<service>, true}},
+       {&get_duration<service>, true}},
       // Duration in seconds.
       {MACRO_SERVICEDURATIONSEC,
-       {&get_duration_sec_old<service>, true}},
+       {&get_duration_sec<service>, true}},
       // Notification number.
       {MACRO_SERVICENOTIFICATIONNUMBER,
        {&get_member_as_string< service, int, notifier, &notifier::get_notification_number>,

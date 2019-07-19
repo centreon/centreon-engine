@@ -124,39 +124,6 @@ void hostgroup::set_action_url(std::string const& action_url) {
   _action_url = action_url;
 }
 
-
-/**
- *  Equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is the same object, otherwise false.
- */
-bool hostgroup::operator==(hostgroup const& obj) throw () {
-  return (_group_name == obj._group_name
-          && _alias == obj._alias
-          && ((members.size() == obj.members.size()) &&
-            std::equal(members.begin(),
-                      members.end(),
-                       obj.members.begin()))
-          && _notes == obj._notes
-          && _notes_url == obj._notes_url
-          && _action_url == obj._action_url);
-}
-
-/**
- *  Not equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is not the same object, otherwise false.
- */
-bool hostgroup::operator!=(hostgroup const& obj) throw () {
-  return !(*this == obj);
-}
-
 /**
  *  Dump hostgroup content into the stream.
  *

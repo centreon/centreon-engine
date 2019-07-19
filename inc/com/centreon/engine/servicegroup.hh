@@ -59,8 +59,8 @@ class                     servicegroup {
   void                    set_action_url(std::string const& action_url);
   void resolve(int& w, int& e);
 
-  bool                    operator==(servicegroup const& obj) throw ();
-  bool                    operator!=(servicegroup const& obj) throw ();
+  bool                    operator==(servicegroup const& obj) = delete;
+  bool                    operator!=(servicegroup const& obj) = delete;
 
   static servicegroup_map servicegroups;
   service_map_unsafe      members;

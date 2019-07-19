@@ -56,8 +56,8 @@ class                     hostgroup {
   void                     set_notes_url(std::string const& notes_url);
   std::string const&       get_action_url() const;
   void                     set_action_url(std::string const& action_url);
-  bool                     operator==(hostgroup const& obj) throw ();
-  bool                     operator!=(hostgroup const& obj1) throw ();
+  bool                     operator==(hostgroup const& obj) = delete;
+  bool                     operator!=(hostgroup const& obj1) = delete;
   void resolve(int& w, int& e);
 
   host_map_unsafe          members;

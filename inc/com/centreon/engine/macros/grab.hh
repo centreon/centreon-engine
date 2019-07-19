@@ -111,40 +111,6 @@ namespace  macros {
   }
 
   /**
-   *  Extract duration.
-   *
-   *  @param[in] t   Base object.
-   *  @param[in] mac Unused.
-   *
-   *  @return Duration in a newly allocated string.
-   */
-  //TODO SGA to remove with service rework
-  template <typename T>
-  std::string get_duration_old(T& t, nagios_macros* mac) {
-    (void)mac;
-
-    // Get duration.
-    time_t now(time(nullptr));
-    unsigned long duration(now - t.get_last_state_change());
-
-    // Break down duration.
-    unsigned int days(duration / (24 * 60 * 60));
-    duration %= (24 * 60 * 60);
-    unsigned int hours(duration / (60 * 60));
-    duration %= (60 * 60);
-    unsigned int minutes(duration / 60);
-    duration %= 60;
-
-    // Stringify duration.
-    std::ostringstream oss;
-    oss << days << "d "
-        << hours << "h "
-        << minutes << "m "
-        << duration << "s";
-    return oss.str();
-  }
-
-  /**
    *  Extract duration in seconds.
    *
    *  @param[in] t   Base object.
@@ -154,25 +120,6 @@ namespace  macros {
    */
   template <typename T>
   std::string get_duration_sec(T& t, nagios_macros* mac) {
-    (void)mac;
-
-    // Get duration.
-    time_t now(time(nullptr));
-    unsigned long duration(now - t.get_last_state_change());
-    return std::to_string(duration);
-  }
-
-  /**
-   *  Extract duration in seconds.
-   *
-   *  @param[in] t   Base object.
-   *  @param[in] mac Unused.
-   *
-   *  @return Duration in second in a newly allocated string.
-   */
-  //TODO SGA to remove with service
-  template <typename T>
-  std::string get_duration_sec_old(T& t, nagios_macros* mac) {
     (void)mac;
 
     // Get duration.

@@ -30,7 +30,6 @@ CCE_END()
 
 typedef std::unordered_multimap<std::string,
 std::shared_ptr<com::centreon::engine::hostescalation>> hostescalation_mmap;
-typedef std::unordered_multimap<std::string, com::centreon::engine::hostescalation*> hostescalation_mmap_unsafe;
 
 CCE_BEGIN()
 class hostescalation : public escalation {

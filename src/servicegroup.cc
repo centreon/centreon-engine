@@ -115,38 +115,6 @@ void servicegroup::set_action_url(std::string const& action_url) {
 }
 
 /**
- *  Equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is the same object, otherwise false.
- */
-bool servicegroup::operator==(servicegroup const& obj) throw () {
-  return (_group_name ==  obj.get_group_name()
-          && _alias == obj.get_alias()
-          && ((members.size() == obj.members.size()) &&
-            std::equal(members.begin(),
-                       members.end(),
-                       obj.members.begin()))
-          && _notes == obj.get_notes()
-          && _notes_url == obj.get_notes_url()
-          && _action_url == obj.get_action_url());
-}
-
-/**
- *  Not equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is not the same object, otherwise false.
- */
-bool servicegroup::operator!=(servicegroup const& obj) throw () {
-  return !(*this == obj);
-}
-
-/**
  *  Dump servicegroup content into the stream.
  *
  *  @param[out] os  The output stream.
