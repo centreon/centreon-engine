@@ -781,7 +781,7 @@ void remove_event(
   }
 }
 
-timed_event* timed_event::find_event(timed_event::priority priority, int event_type, void *data)
+timed_event* timed_event::find_event(timed_event::priority priority, uint32_t event_type, void *data)
 {
   timed_event_list *list;
 
@@ -801,7 +801,7 @@ timed_event* timed_event::find_event(timed_event::priority priority, int event_t
        it != end;
        ++it)
     if ((*it)->event_type == event_type && (*it)->event_data == data)
-      return (*it);
+      return *it;
 
   return nullptr;
 }

@@ -44,7 +44,7 @@ class                        timed_event{
   };
                             timed_event();
 
-  unsigned int               event_type;
+  uint32_t                   event_type;
   time_t                     run_time;
   int                        recurring;
   unsigned long              event_interval;
@@ -57,7 +57,7 @@ class                        timed_event{
   static timed_event_list    event_list_high;
   static timed_event_list    event_list_low;
 
-  static timed_event*        find_event(timed_event::priority, int event, void *data);
+  static timed_event*        find_event(timed_event::priority, uint32_t event, void *data);
 };
 CCE_END()
 
