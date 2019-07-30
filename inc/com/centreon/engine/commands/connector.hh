@@ -109,7 +109,7 @@ namespace                commands {
     void                 _recv_query_version(char const* data);
     void                 _send_query_execute(
                            std::string const& cmdline,
-                           unsigned int command_id,
+                           uint64_t command_id,
                            timestamp const& start,
                            unsigned int timeout);
     void                 _send_query_quit();

@@ -43,7 +43,7 @@ namespace              commands {
     result&            operator=(result const& right);
     bool               operator==(result const& right) const throw ();
     bool               operator!=(result const& right) const throw ();
-    unsigned long      command_id;
+    uint64_t command_id;
     timestamp          end_time;
     int                exit_code;
     process::status    exit_status;

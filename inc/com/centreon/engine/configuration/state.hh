@@ -143,7 +143,6 @@ namespace               configuration {
     bool                check_orphaned_services() const throw ();
     unsigned int        check_reaper_interval() const throw ();
     void                check_reaper_interval(unsigned int value);
-    std::string const&  check_result_path() const throw ();
     void                check_result_path(std::string const& value);
     bool                check_service_freshness() const throw ();
     void                check_service_freshness(bool value);
@@ -410,7 +409,6 @@ namespace               configuration {
     void                user(unsigned int key, std::string const& value);
     bool                use_aggressive_host_checking() const throw ();
     void                use_aggressive_host_checking(bool value);
-    bool                use_check_result_path() const throw ();
     void                use_check_result_path(bool value);
     bool                use_large_installation_tweaks() const throw ();
     void                use_large_installation_tweaks(bool value);
@@ -528,7 +526,6 @@ namespace               configuration {
     bool                _check_orphaned_hosts;
     bool                _check_orphaned_services;
     unsigned int        _check_reaper_interval;
-    std::string         _check_result_path;
     bool                _check_service_freshness;
     set_command         _commands;
     int                 _command_check_interval;
@@ -639,7 +636,6 @@ namespace               configuration {
     std::unordered_map<std::string, std::string>
                         _users;
     bool                _use_aggressive_host_checking;
-    bool                _use_check_result_path;
     bool                _use_large_installation_tweaks;
     bool                _use_regexp_matches;
     bool                _use_retained_program_state;

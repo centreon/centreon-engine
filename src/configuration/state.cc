@@ -203,7 +203,6 @@ static bool const                      default_check_host_freshness(false);
 static bool const                      default_check_orphaned_hosts(true);
 static bool const                      default_check_orphaned_services(true);
 static unsigned int const              default_check_reaper_interval(10);
-static std::string const               default_check_result_path(DEFAULT_CHECK_RESULT_PATH);
 static bool const                      default_check_service_freshness(true);
 static int const                       default_command_check_interval(-1);
 static std::string const               default_command_file(DEFAULT_COMMAND_FILE);
@@ -285,7 +284,6 @@ static unsigned int const              default_status_update_interval(60);
 static unsigned int const              default_time_change_threshold(900);
 static bool const                      default_translate_passive_host_checks(false);
 static bool const                      default_use_aggressive_host_checking(false);
-static bool const                      default_use_check_result_path(false);
 static bool const                      default_use_large_installation_tweaks(false);
 static bool const                      default_use_regexp_matches(false);
 static bool const                      default_use_retained_program_state(true);
@@ -315,7 +313,6 @@ state::state()
     _check_orphaned_hosts(default_check_orphaned_hosts),
     _check_orphaned_services(default_check_orphaned_services),
     _check_reaper_interval(default_check_reaper_interval),
-    _check_result_path(default_check_result_path),
     _check_service_freshness(default_check_service_freshness),
     _command_check_interval(default_command_check_interval),
     _command_check_interval_is_seconds(false),
@@ -398,7 +395,6 @@ state::state()
     _time_change_threshold(default_time_change_threshold),
     _translate_passive_host_checks(default_translate_passive_host_checks),
     _use_aggressive_host_checking(default_use_aggressive_host_checking),
-    _use_check_result_path(default_use_check_result_path),
     _use_large_installation_tweaks(default_use_large_installation_tweaks),
     _use_regexp_matches(default_use_regexp_matches),
     _use_retained_program_state(default_use_retained_program_state),
@@ -448,7 +444,6 @@ state& state::operator=(state const& right) {
     _check_orphaned_hosts = right._check_orphaned_hosts;
     _check_orphaned_services = right._check_orphaned_services;
     _check_reaper_interval = right._check_reaper_interval;
-    _check_result_path = right._check_result_path;
     _check_service_freshness = right._check_service_freshness;
     _commands = right._commands;
     _command_check_interval = right._command_check_interval;
@@ -552,7 +547,6 @@ state& state::operator=(state const& right) {
     _translate_passive_host_checks = right._translate_passive_host_checks;
     _users = right._users;
     _use_aggressive_host_checking = right._use_aggressive_host_checking;
-    _use_check_result_path = right._use_check_result_path;
     _use_large_installation_tweaks = right._use_large_installation_tweaks;
     _use_regexp_matches = right._use_regexp_matches;
     _use_retained_program_state = right._use_retained_program_state;
@@ -590,7 +584,6 @@ bool state::operator==(state const& right) const throw () {
           && _check_orphaned_hosts == right._check_orphaned_hosts
           && _check_orphaned_services == right._check_orphaned_services
           && _check_reaper_interval == right._check_reaper_interval
-          && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
           && _commands == right._commands
           && _command_check_interval == right._command_check_interval
@@ -694,7 +687,6 @@ bool state::operator==(state const& right) const throw () {
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
           && _use_aggressive_host_checking == right._use_aggressive_host_checking
-          && _use_check_result_path == right._use_check_result_path
           && _use_large_installation_tweaks == right._use_large_installation_tweaks
           && _use_regexp_matches == right._use_regexp_matches
           && _use_retained_program_state == right._use_retained_program_state
@@ -1090,15 +1082,6 @@ void state::check_reaper_interval(unsigned int value) {
 }
 
 /**
- *  Get check_result_path value.
- *
- *  @return The check_result_path value.
- */
-std::string const& state::check_result_path() const throw () {
-  return _check_result_path;
-}
-
-/**
  *  Set check_result_path value.
  *
  *  @param[in] value The new check_result_path value.
@@ -1106,7 +1089,6 @@ std::string const& state::check_result_path() const throw () {
 void state::check_result_path(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: check_result_path is deprecated";
-  _check_result_path = value;
   ++config_warnings;
 }
 
@@ -3493,21 +3475,14 @@ void state::use_aggressive_host_checking(bool value) {
 }
 
 /**
- *  Get use_check_result_path value.
- *
- *  @return The use_check_result_path value.
- */
-bool state::use_check_result_path() const throw () {
-  return _use_check_result_path;
-}
-
-/**
  *  Set use_check_result_path value.
  *
  *  @param[in] value The new use_check_result_path value.
  */
 void state::use_check_result_path(bool value) {
-  _use_check_result_path = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: check_result_path variable ignored";
 }
 
 /**
@@ -3748,7 +3723,10 @@ void state::_set_check_for_updates(std::string const& value) {
  *  @param[in] value The new check_result_path value.
  */
 void state::_set_check_result_path(std::string const& value) {
-  _check_result_path = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: check_result_path variable ignored";
+  ++config_warnings;
 }
 
 /**

@@ -235,8 +235,6 @@ void applier::host::expand_objects(configuration::state& s) {
       s.hostgroups().insert(backup);
     }
   }
-
-  return ;
 }
 
 /**
@@ -421,8 +419,6 @@ void applier::host::modify_object(
     MODATTR_ALL,
     MODATTR_ALL,
     &tv);
-
-  return ;
 }
 
 /**
@@ -471,8 +467,6 @@ void applier::host::remove_object(configuration::host const& obj) {
 
   // Remove host from the global configuration set.
   config->hosts().erase(obj);
-
-  return ;
 }
 
 /**

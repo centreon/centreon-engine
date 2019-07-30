@@ -613,8 +613,8 @@ int process_passive_service_check(
   set_tv.tv_usec = 0;
 
   check_result result(service_check,
-                      real_host_name,
-                      svc_description,
+                      found->second->get_host_id(),
+                      found->second->get_service_id(),
                       checkable::check_passive,
                       CHECK_OPTION_NONE,
                       false,
@@ -636,7 +636,7 @@ int process_passive_service_check(
     result.set_latency(0.0);
   }
 
-  checks::checker::instance().push_check_result(result);
+  checks::checker::instance().push_check_result(std::move(result));
 
   return OK;
 }
@@ -740,8 +740,8 @@ int process_passive_host_check(
   tv_start.tv_usec = 0;
 
   check_result result(host_check,
-                      real_host_name,
-                      "",
+                      it->second->get_host_id(),
+                      0UL,
                       checkable::check_passive,
                       CHECK_OPTION_NONE,
                       false,
@@ -755,15 +755,13 @@ int process_passive_host_check(
                       output);
 
   /* make sure the return code is within bounds */
-  if (result.get_return_code() < 0 || result.get_return_code() > 3) {
+  if (result.get_return_code() < 0 || result.get_return_code() > 3)
     result.set_return_code(service::state_unknown);
-  }
 
-  if (result.get_latency() < 0.0) {
+  if (result.get_latency() < 0.0)
     result.set_latency(0.0);
-  }
 
-  checks::checker::instance().push_check_result(result);
+  checks::checker::instance().push_check_result(std::move(result));
 
   return OK;
 }

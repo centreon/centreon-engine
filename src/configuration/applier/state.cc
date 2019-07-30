@@ -315,8 +315,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->check_orphaned_hosts(new_cfg.check_orphaned_hosts());
   config->check_orphaned_services(new_cfg.check_orphaned_services());
   config->check_reaper_interval(new_cfg.check_reaper_interval());
-  if (config->check_result_path() != new_cfg.check_result_path())
-    config->check_result_path(new_cfg.check_result_path());
   config->check_service_freshness(new_cfg.check_service_freshness());
   config->command_check_interval(new_cfg.command_check_interval(),
                                  new_cfg.command_check_interval_is_seconds());
@@ -403,7 +401,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->time_change_threshold(new_cfg.time_change_threshold());
   config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
   config->use_aggressive_host_checking(new_cfg.use_aggressive_host_checking());
-  config->use_check_result_path(new_cfg.use_check_result_path());
   config->use_large_installation_tweaks(new_cfg.use_large_installation_tweaks());
   config->use_regexp_matches(new_cfg.use_regexp_matches());
   config->use_retained_program_state(new_cfg.use_retained_program_state());

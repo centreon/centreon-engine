@@ -33,7 +33,6 @@ static applier::globals* _instance = NULL;
  *  @param[in] config The new configuration.
  */
 void applier::globals::apply(state& config) {
-  _set_global(::check_result_path, config.check_result_path());
   _set_global(::debug_file, config.debug_file());
   _set_global(::global_host_event_handler, config.global_host_event_handler());
   _set_global(::global_service_event_handler, config.global_service_event_handler());
