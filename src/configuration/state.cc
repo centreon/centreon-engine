@@ -1087,6 +1087,7 @@ void state::check_reaper_interval(unsigned int value) {
  *  @param[in] value The new check_result_path value.
  */
 void state::check_result_path(std::string const& value) {
+  (void) value;
   logger(log_config_warning, basic)
     << "Warning: check_result_path is deprecated";
   ++config_warnings;
