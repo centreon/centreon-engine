@@ -3713,6 +3713,8 @@ std::string const& service::get_current_state_as_string() const {
 }
 
 bool service::get_notify_on_current_state() const {
+  if (_host_ptr->get_current_state() != host::state_up && _host_ptr->get_state_type())
+    return false;
   notification_flag type[]{ok, warning, critical, unknown};
   return get_notify_on(type[get_current_state()]);
 }

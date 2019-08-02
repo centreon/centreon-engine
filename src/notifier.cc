@@ -287,8 +287,9 @@ bool notifier::_is_notification_viable_normal(
 
   if (!get_notify_on_current_state()) {
     logger(dbg_notifications, more)
-        << "This notifier is not configured to notify the state "
-        << get_current_state_as_string();
+        << "This notifier is unable to notify the state "
+        << get_current_state_as_string()
+        << ": not configured for that or, for a service, its host may be down";
     return false;
   }
 
