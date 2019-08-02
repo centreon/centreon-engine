@@ -58,7 +58,7 @@ namespace         commands {
      *  @return Command execution result.
      */
     result const& get_result() const throw () {
-      return (_res);
+      return _res;
     }
 
     /**

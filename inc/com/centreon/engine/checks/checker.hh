@@ -44,7 +44,8 @@ class checker : public commands::command_listener {
  public:
   static checker& instance();
   static void load();
-  void push_check_result(check_result const& result);
+  void push_check_result(check_result const* result);
+  void push_check_result(check_result&& result);
   void reap();
   bool reaper_is_empty();
   void run(host* hst,
@@ -76,10 +77,10 @@ class checker : public commands::command_listener {
   void finished(commands::result const& res) throw() override;
   host::host_state _execute_sync(host* hst);
 
-  std::unordered_map<unsigned long, check_result> _list_id;
+  std::unordered_map<uint64_t, check_result> _list_id;
   concurrency::mutex _mut_reap;
   std::queue<check_result> _to_reap;
-  std::unordered_map<unsigned long, check_result> _to_reap_partial;
+  std::unordered_map<uint64_t, check_result> _to_reap_partial;
 };
 }
 

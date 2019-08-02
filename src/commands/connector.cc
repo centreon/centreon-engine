@@ -759,7 +759,7 @@ void connector::_recv_query_version(char const* data) {
  */
 void connector::_send_query_execute(
                   std::string const& cmdline,
-                  unsigned int command_id,
+                  uint64_t command_id,
                   timestamp const& start,
                   unsigned int timeout) {
   logger(dbg_commands, basic)

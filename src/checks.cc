@@ -25,6 +25,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <utility>
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/globals.hh"
@@ -36,8 +37,8 @@ check_result_list check_result::results;
 
 check_result::check_result()
   : _object_check_type{host_check},
-    _host_name{""},
-    _service_description{""},
+    _host_id{0UL},
+    _service_id{0UL},
     _check_type(checkable::check_active),
     _check_options{CHECK_OPTION_NONE},
     _reschedule_check{false},
@@ -47,16 +48,63 @@ check_result::check_result()
     _return_code{0},
     _output{""}
 {
-  timeval tv;
-  tv.tv_usec = 0;
-  tv.tv_sec = 0;
+  timeval tv{0, 0};
   _start_time = tv;
   _finish_time = tv;
 }
 
+check_result::check_result(check_result const& other)
+    : _object_check_type{other._object_check_type},
+      _host_id{other._host_id},
+      _service_id{other._service_id},
+      _check_type{other._check_type},
+      _check_options{other._check_options},
+      _reschedule_check{other._reschedule_check},
+      _latency{other._latency},
+      _start_time(other._start_time),
+      _finish_time(other._finish_time),
+      _early_timeout{other._early_timeout},
+      _exited_ok{other._exited_ok},
+      _return_code{other._return_code},
+      _output{other._output} {}
+
+check_result& check_result::operator=(check_result const& other) {
+  if (this != &other) {
+    _object_check_type = other._object_check_type;
+    _host_id = other._host_id;
+    _service_id = other._service_id;
+    _check_type = other._check_type;
+    _check_options = other._check_options;
+    _reschedule_check = other._reschedule_check;
+    _latency = other._latency;
+    _start_time = other._start_time;
+    _finish_time = other._finish_time;
+    _early_timeout = other._early_timeout;
+    _exited_ok = other._exited_ok;
+    _return_code = other._return_code;
+    _output = other._output;
+  }
+  return *this;
+}
+
+check_result::check_result(check_result&& other)
+    : _object_check_type{other._object_check_type},
+      _host_id{other._host_id},
+      _service_id{other._service_id},
+      _check_type{other._check_type},
+      _check_options{other._check_options},
+      _reschedule_check{other._reschedule_check},
+      _latency{other._latency},
+      _start_time(other._start_time),
+      _finish_time(other._finish_time),
+      _early_timeout{other._early_timeout},
+      _exited_ok{other._exited_ok},
+      _return_code{other._return_code},
+      _output{std::move(other._output)} {}
+
 check_result::check_result(enum check_source object_check_type,
-                           std::string const& hostname,
-                           std::string const& service_description,
+                           uint64_t host_id,
+                           uint64_t service_id,
                            enum checkable::check_type check_type,
                            int check_options,
                            bool reschedule_check,
@@ -68,8 +116,8 @@ check_result::check_result(enum check_source object_check_type,
                            int return_code,
                            std::string const& output)
   : _object_check_type{object_check_type},
-    _host_name{hostname},
-    _service_description{service_description},
+    _host_id{host_id},
+    _service_id{service_id},
     _check_type(check_type),
     _check_options{check_options},
     _reschedule_check{reschedule_check},
@@ -89,20 +137,20 @@ void check_result::set_object_check_type(enum check_source object_check_type) {
   _object_check_type = object_check_type;
 }
 
-std::string const& check_result::get_hostname() const {
-  return _host_name;
+uint64_t check_result::get_host_id() const {
+  return _host_id;
 }
 
-void check_result::set_hostname(std::string const& hostname) {
-  _host_name = hostname;
+void check_result::set_host_id(uint64_t host_id) {
+  _host_id = host_id;
 }
 
-std::string const& check_result::get_service_description() const {
-  return _service_description;
+uint64_t check_result::get_service_id() const {
+  return _service_id;
 }
 
-void check_result::set_service_description(std::string const& service_description) {
-  _service_description = service_description;
+void check_result::set_service_id(uint64_t service_id) {
+  _service_id = service_id;
 }
 
 struct timeval check_result::get_finish_time() const {
@@ -219,7 +267,10 @@ bool check_result::process_check_result_file(std::string const& fname) {
   char* v2(nullptr);
   char* var(nullptr);
   char* val(nullptr);
-  while (1) {
+
+  std::string hostname;
+  std::string service_description;
+  while (true) {
     // Free memory.
     delete[] input;
 
@@ -236,22 +287,21 @@ bool check_result::process_check_result_file(std::string const& fname) {
       // We have something...
       if (new_cr) {
         // Do we have the minimum amount of data?
-        if (!new_cr->get_hostname().empty() && !new_cr->get_output().empty()) {
+        if (new_cr->get_host_id() && !new_cr->get_output().empty()) {
           // Add check result to list in memory.
-          checks::checker::instance().push_check_result(*new_cr);
+          checks::checker::instance().push_check_result(new_cr);
 
           // Reset pointer.
+          delete new_cr;
           new_cr = nullptr;
         }
           // Discard partial input.
         else {
-          timeval tv;
-          tv.tv_sec = 0;
-          tv.tv_usec = 0;
+          timeval tv{0, 0};
 
           new_cr->set_object_check_type(host_check);
-          new_cr->set_hostname("");
-          new_cr->set_service_description("");
+          new_cr->set_host_id(0);
+          new_cr->set_service_id(0);
           new_cr->set_check_type(checkable::check_active);
           new_cr->set_check_options(CHECK_OPTION_NONE);
           new_cr->set_reschedule_check(false);
@@ -287,10 +337,14 @@ bool check_result::process_check_result_file(std::string const& fname) {
     }
 
     // Process variable.
-    if (!strcmp(var, "host_name"))
-      new_cr->set_hostname(val);
+    if (!strcmp(var, "host_name")) {
+      hostname = val;
+      host_map::const_iterator it{host::hosts.find(hostname)};
+      if (it != host::hosts.end())
+        new_cr->set_host_id(it->second->get_host_id());
+    }
     else if (!strcmp(var, "service_description")) {
-      new_cr->set_service_description(val);
+      service_description = val;
       new_cr->set_object_check_type(service_check);
     }
     else if (!strcmp(var, "check_type"))
@@ -335,20 +389,26 @@ bool check_result::process_check_result_file(std::string const& fname) {
 
   // We have something.
   if (new_cr) {
+    if (!service_description.empty() && !hostname.empty()) {
+      service_map::const_iterator it{service::services.find({hostname, service_description})};
+      if (it != service::services.end())
+        new_cr->set_service_id(it->second->get_service_id());
+    }
+
     // Do we have the minimum amount of data?
-    if (!new_cr->get_hostname().empty() && !new_cr->get_output().empty()) {
+    if (new_cr->get_host_id() && !new_cr->get_output().empty()) {
       // Add check result to list in memory.
-      checks::checker::instance().push_check_result(*new_cr);
+      checks::checker::instance().push_check_result(new_cr);
 
       // Reset pointer.
+      delete new_cr;
       new_cr = nullptr;
     }
 
       // Discard partial input and free memory for current check result
       // record.
-    else {
+    else
       delete new_cr;
-    }
   }
 
   // Free memory and close file.

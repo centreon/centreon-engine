@@ -68,7 +68,6 @@ checker& checker::instance() {
 void checker::load() {
   if (!_instance)
     _instance = new checker;
-  return;
 }
 
 /**
@@ -76,10 +75,20 @@ void checker::load() {
  *
  *  @param[in] result The check_result to process later.
  */
-void checker::push_check_result(check_result const& result) {
+void checker::push_check_result(check_result&& result) {
   concurrency::locker lock(&_mut_reap);
   _to_reap.push(result);
-  return;
+}
+
+/**
+ *  Add into the queue a result to reap later.
+ *
+ *  @param[in] result The check_result to process later.
+ */
+void checker::push_check_result(check_result const* result) {
+  check_result res{*result};
+  concurrency::locker lock(&_mut_reap);
+  _to_reap.push(res);
 }
 
 /**
@@ -122,9 +131,9 @@ void checker::reap() {
     // Merge partial check results.
     while (!_to_reap_partial.empty()) {
       // Find the two parts.
-      std::unordered_map<unsigned long, check_result>::iterator
+      std::unordered_map<uint64_t, check_result>::iterator
         it_partial(_to_reap_partial.begin());
-      std::unordered_map<unsigned long, check_result>::iterator
+      std::unordered_map<uint64_t, check_result>::iterator
         it_id(_list_id.find(it_partial->first));
       if (_list_id.end() == it_id) {
         logger(log_runtime_warning, basic)
@@ -134,8 +143,7 @@ void checker::reap() {
         // Extract base part.
         logger(dbg_checks, basic)
           << "command ID (" << it_partial->first << ") executed";
-        check_result result;
-        result = it_id->second;
+        check_result result{std::move(it_id->second)};
         _list_id.erase(it_id);
 
         // Merge check result.
@@ -163,54 +171,52 @@ void checker::reap() {
 
       // Service check result.
       if (service_check == result.get_object_check_type()) {
-        service_map::iterator
-          it = service::services.find({result.get_hostname(),
-                                       result.get_service_description()});
-        if (it == service::services.end()) {
+        service_id_map::iterator it = service::services_by_id.find(
+            {result.get_host_id(), result.get_service_id()});
+        if (it == service::services_by_id.end()) {
           logger(log_runtime_error, basic)
-            << "Warning: Check result queue contained results for "
-            << "service '" << result.get_service_description() << "' on "
-            << "host '" << result.get_hostname() << "', but the service "
-            << "could not be found! Perhaps you forgot to define the "
-            << "service in your config files ?";
+              << "Warning: Check result queue contained results for service "
+              << result.get_host_id() << "/" << result.get_service_id()
+              << ", but the service could not be found! Perhaps you forgot to "
+                 "define the service in your config files ?";
         }
-        try {
-          // Check if the service exists.
-          logger(dbg_checks, more)
-            << "Handling check result for service '"
-            << result.get_service_description() << "' on host '"
-            << result.get_hostname() << "'...";
-          it->second->handle_async_check_result(&result);
-        }
-        catch (std::exception const &e) {
-          logger(log_runtime_warning, basic)
-            << "Check result queue errors for "
-            << "host '" << result.get_hostname()
-            << "' service '"  << result.get_service_description() << "' ex: "
-            << e.what();
+        else {
+          try {
+            // Check if the service exists.
+            logger(dbg_checks, more)
+                << "Handling check result for service " << result.get_host_id()
+                << "/" << result.get_service_id() << "...";
+            it->second->handle_async_check_result(&result);
+          }
+          catch (std::exception const &e) {
+            logger(log_runtime_warning, basic)
+                << "Check result queue errors for service "
+                << result.get_host_id() << "/" << result.get_service_id()
+                << " : " << e.what();
+          }
         }
       }
       // Host check result.
       else {
-        host_map::iterator it = host::hosts.find(result.get_hostname());
-        if (it == host::hosts.end())
+        host_id_map::iterator it = host::hosts_by_id.find(result.get_host_id());
+        if (it == host::hosts_by_id.end())
           logger(log_runtime_warning, basic)
             << "Warning: Check result queue contained results for "
-            << "host '" << result.get_hostname() << "', but the host could "
+            << "host " << result.get_host_id() << ", but the host could "
             << "not be found! Perhaps you forgot to define the host in "
             << "your config files ?";
         else {
           try {
             // Process the check result.
             logger(dbg_checks, more)
-              << "Handling check result for host '"
-              << result.get_hostname() << "'...";
+              << "Handling check result for host "
+              << result.get_host_id() << "...";
             it->second->handle_async_check_result_3x(&result);
           }
           catch (std::exception const &e) {
             logger(log_runtime_error, basic)
               << "Check result queue errors for "
-              << "host '" << result.get_hostname() << "' ex : "
+              << "host " << result.get_host_id() << " : "
               << e.what();
           }
         }
@@ -267,14 +273,13 @@ bool checker::reaper_is_empty() {
  *
  *  @return True is the check start correctly.
  */
-void checker::run(
-                host* hst,
-                int check_options,
-                double latency,
-                bool scheduled_check,
-                bool reschedule_check,
-                int* time_is_valid,
-                time_t* preferred_time) {
+void checker::run(host* hst,
+                  int check_options,
+                  double latency,
+                  bool scheduled_check,
+                  bool reschedule_check,
+                  int* time_is_valid,
+                  time_t* preferred_time) {
   logger(dbg_functions, basic)
     << "checker::run: hst=" << hst
     << ", check_options=" << check_options
@@ -284,10 +289,10 @@ void checker::run(
 
   // Preamble.
   if (!hst)
-    throw (engine_error() << "Attempt to run check on invalid host");
+    throw engine_error() << "Attempt to run check on invalid host";
   if (!hst->get_check_command_ptr())
-    throw (engine_error() << "Attempt to run active check on host '"
-           << hst->get_name() << "' with no check command");
+    throw engine_error() << "Attempt to run active check on host '"
+           << hst->get_name() << "' with no check command";
 
   logger(dbg_checks, basic)
     << "** Running async check of host '" << hst->get_name() << "'...";
@@ -297,8 +302,8 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    throw (checks_viability_failure() << "Check of host '" << hst->get_name()
-           << "' is not viable");
+    throw checks_viability_failure() << "Check of host '" << hst->get_name()
+           << "' is not viable";
 
   // If this check is a rescheduled check, propagate the rescheduled check flag
   // to the host. This solves the problem when a new host check is
@@ -321,7 +326,7 @@ void checker::run(
   timeval end_time;
   memset(&start_time, 0, sizeof(start_time));
   memset(&end_time, 0, sizeof(end_time));
-  int res(broker_host_check(
+  int res{broker_host_check(
             NEBTYPE_HOSTCHECK_ASYNC_PRECHECK,
             NEBFLAG_NONE,
             NEBATTR_NONE,
@@ -341,13 +346,13 @@ void checker::run(
             nullptr,
             nullptr,
             nullptr,
-            nullptr));
+            nullptr)};
 
   // Host check was cancel by NEB module. Reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res)
-    throw (engine_error()
+    throw engine_error()
            << "Some broker module cancelled check of host '"
-           << hst->get_name() << "'");
+           << hst->get_name() << "'";
   // Host check was overriden by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res) {
     logger(dbg_functions, basic)
@@ -398,8 +403,8 @@ void checker::run(
 
   // Init check result info.
   check_result check_result_info(host_check,
-                                 hst->get_name(),
-                                 "",
+                                 hst->get_host_id(),
+                                 0UL,
                                  checkable::check_active,
                                  check_options,
                                  reschedule_check,
@@ -497,7 +502,6 @@ void checker::run(
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  return;
 }
 
 /**
@@ -629,8 +633,8 @@ void checker::run(
 
   // Init check result info.
   check_result check_result_info(service_check,
-                                 svc->get_hostname(),
-                                 svc->get_description(),
+                                 svc->get_host_id(),
+                                 svc->get_service_id(),
                                  checkable::check_active,
                                  check_options,
                                  reschedule_check,
@@ -728,7 +732,6 @@ void checker::run(
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  return;
 }
 
 /**
@@ -917,7 +920,6 @@ void checker::run_sync(
 void checker::unload() {
   delete _instance;
   _instance = nullptr;
-  return;
 }
 
 /**************************************
