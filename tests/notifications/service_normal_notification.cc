@@ -1022,3 +1022,41 @@ TEST_F(ServiceNotification, ServiceDependency) {
   ASSERT_NE(step3, std::string::npos);
   ASSERT_EQ(step4, std::string::npos);
 }
+
+TEST_F(ServiceNotification, NoServiceNotificationWhenHostDown) {
+  set_time(50000);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  _host->set_last_hard_state_change(50000);
+  _host->set_last_hard_state(engine::host::state_down);
+  _host->set_state_type(checkable::hard);
+  _host->set_current_state(engine::host::state_down);
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 3; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => no notification because host down
+    set_time(50500 + i * 500);
+    _svc->set_last_state(_svc->get_current_state());
+    if (notifier::hard == _svc->get_state_type())
+      _svc->set_last_hard_state(_svc->get_current_state());
+
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t step{out.find(
+      "SERVICE NOTIFICATION: "
+      "admin;test_host;test_svc;CRITICAL;cmd;service down")};
+  ASSERT_EQ(step, std::string::npos);
+}
+
