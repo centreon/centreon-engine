@@ -19,10 +19,12 @@
 
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<serviceescalation, type, &serviceescalation::method>::generic
@@ -97,6 +99,7 @@ serviceescalation& serviceescalation::operator=(serviceescalation const& right) 
     _notification_interval = right._notification_interval;
     _servicegroups = right._servicegroups;
     _service_description = right._service_description;
+    _uuid = right._uuid;
   }
   return *this;
 }
@@ -108,18 +111,76 @@ serviceescalation& serviceescalation::operator=(serviceescalation const& right) 
  *
  *  @return True if is the same serviceescalation, otherwise false.
  */
-bool serviceescalation::operator==(serviceescalation const& right) const throw () {
-  return (object::operator==(right)
-          && _contactgroups == right._contactgroups
-          && _escalation_options == right._escalation_options
-          && _escalation_period == right._escalation_period
-          && _first_notification == right._first_notification
-          && _hostgroups == right._hostgroups
-          && _hosts == right._hosts
-          && _last_notification == right._last_notification
-          && _notification_interval == right._notification_interval
-          && _servicegroups == right._servicegroups
-          && _service_description == right._service_description);
+bool serviceescalation::operator==(serviceescalation const& right) const
+    throw() {
+  /* No comparison is made on the UUID because it is used between the
+   * configuration object and the object. Since this object is randomly
+   * constructor in almost all cases, we can have two equal escalations
+   * with different uuid.*/
+  if (!object::operator==(right)) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => object don't match";
+    return false;
+  }
+  if (_contactgroups != right._contactgroups) {
+    logger(log_process_info, most) << "configuration::serviceescalation::"
+                                      "equality => contact groups don't match";
+    return false;
+  }
+  if (_escalation_options != right._escalation_options) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => escalation options "
+           "don't match";
+    return false;
+  }
+  if (_escalation_period != right._escalation_period) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => escalation periods "
+           "don't match";
+    return false;
+  }
+  if (_first_notification != right._first_notification) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => first notifications "
+           "don't match";
+    return false;
+  }
+  if (_hostgroups != right._hostgroups) {
+    logger(log_process_info, most) << "configuration::serviceescalation::"
+                                      "equality => host groups don't match";
+    return false;
+  }
+  if (_hosts != right._hosts) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => hosts don't match";
+    return false;
+  }
+  if (_last_notification != right._last_notification) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => last notification "
+           "don't match";
+    return false;
+  }
+  if (_notification_interval != right._notification_interval) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => notification "
+           "interval don't match";
+    return false;
+  }
+  if (_servicegroups != right._servicegroups) {
+    logger(log_process_info, most) << "configuration::serviceescalation::"
+                                      "equality => service groups don't match";
+    return false;
+  }
+  if (_service_description != right._service_description) {
+    logger(log_process_info, most)
+        << "configuration::serviceescalation::equality => service descriptions "
+           "don't match";
+    return false;
+  }
+  logger(log_process_info, most)
+      << "configuration::serviceescalation::equality => OK";
+  return true;
 }
 
 /**
@@ -586,4 +647,13 @@ bool serviceescalation::_set_servicegroups(std::string const& value) {
 bool serviceescalation::_set_service_description(std::string const& value) {
   _service_description = value;
   return true;
+}
+
+/**
+ *  Get uuid value.
+ *
+ *  @return uuid.
+ */
+Uuid const& serviceescalation::uuid(void) const {
+  return _uuid;
 }

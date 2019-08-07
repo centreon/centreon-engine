@@ -151,7 +151,6 @@ void applier::state::load() {
 void applier::state::unload() {
   delete _instance;
   _instance = nullptr;
-  return ;
 }
 
 /**
@@ -590,6 +589,209 @@ void applier::state::_apply(
   }
 }
 
+#ifdef DEBUG_CONFIG
+/**
+ *  A method to check service escalations pointers of each service are well
+ *  defined.
+ *
+ *  If something wrong is found, an exception is thrown.
+ */
+void applier::state::_check_serviceescalations() const {
+  for (auto const& p : engine::service::services) {
+    engine::service const* srv{p.second.get()};
+
+    std::unordered_set<uint64_t> s;
+    for (auto const& escalation : srv->get_escalations()) {
+      s.insert((uint64_t)static_cast<void*>(escalation));
+      bool found = false;
+      for (auto const& e : engine::serviceescalation::serviceescalations) {
+        if (e.second.get() == escalation) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        logger(log_config_error, basic)
+          << "Error on serviceescalation !!! The service "
+          << srv->get_hostname() << "/" << srv->get_description()
+          << " contains a non existing service escalation";
+        throw engine_error() << "This is a bug";
+      }
+    }
+    if (s.size() != srv->get_escalations().size()) {
+      logger(log_config_error, basic)
+          << "Error on serviceescalation !!! Some escalations are stored "
+             "several times in service "
+          << srv->get_hostname() << "/" << srv->get_description()
+          << "set size: " << s.size()
+          << " ; list size: " << srv->get_escalations().size();
+      throw engine_error() << "This is a bug";
+    }
+  }
+}
+
+/**
+ *  A method to check host escalations pointers of each host are well
+ *  defined.
+ *
+ *  If something wrong is found, an exception is thrown.
+ */
+void applier::state::_check_hostescalations() const {
+  for (auto const& p : engine::host::hosts) {
+    engine::host const* hst{p.second.get()};
+
+    for (auto const& escalation : hst->get_escalations()) {
+      bool found = false;
+      for (auto const& e : engine::serviceescalation::serviceescalations) {
+        if (e.second.get() == escalation) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        logger(log_config_error, basic)
+          << "Error on hostescalation !!! The host "
+          << hst->get_name()
+          << " contains a non existing host escalation";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+}
+
+/**
+ *  A method to check contacts pointers of each possible container are well
+ *  defined.
+ *
+ *  If something wrong is found, an exception is thrown.
+ */
+void applier::state::_check_contacts() const {
+  for (auto const& p : engine::contactgroup::contactgroups) {
+    engine::contactgroup const* cg{p.second.get()};
+    for (auto const& pp : cg->get_members()) {
+      contact_map::iterator found{engine::contact::contacts.find(pp.first)};
+      if (found == engine::contact::contacts.end() || found->second.get() != pp.second) {
+        logger(log_config_error, basic)
+          << "Error on contact !!! The contact " << pp.first << " used in contactgroup " << p.first << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+
+  for (auto const& p : engine::service::services) {
+    for (auto const& pp : p.second->get_contacts()) {
+      contact_map::iterator found{engine::contact::contacts.find(pp.first)};
+      if (found == engine::contact::contacts.end() || found->second.get() != pp.second) {
+        logger(log_config_error, basic)
+          << "Error on contact !!! The contact " << pp.first << " used in service " << p.second->get_hostname() << '/' << p.second->get_description() << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+
+  for (auto const& p : engine::host::hosts) {
+    for (auto const& pp : p.second->get_contacts()) {
+      contact_map::iterator found{engine::contact::contacts.find(pp.first)};
+      if (found == engine::contact::contacts.end() || found->second.get() != pp.second) {
+        logger(log_config_error, basic)
+          << "Error on contact !!! The contact " << pp.first << " used in service " << p.second->get_name() << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+}
+
+/**
+ *  A method to check services pointers of each possible container are well
+ *  defined.
+ *
+ *  If something wrong is found, an exception is thrown.
+ */
+void applier::state::_check_services() const {
+  for (auto const& p : engine::servicedependency::servicedependencies) {
+    engine::servicedependency const* sd{p.second.get()};
+    std::list<engine::service*> svcs{sd->master_service_ptr,
+                                     sd->dependent_service_ptr};
+    for (engine::service const* svc : svcs) {
+      service_id_map::const_iterator found{engine::service::services_by_id.find(
+          {svc->get_host_id(), svc->get_service_id()})};
+      if (found == engine::service::services_by_id.end() ||
+          found->second.get() != svc) {
+        logger(log_config_error, basic)
+            << "Error on service !!! The service " << p.first.first << '/' << p.first.second
+            << " used in service dependency " << p.first.first << '/' << p.first.second
+            << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+
+  for (auto const& p : engine::service::services_by_id) {
+    service_map::const_iterator found{engine::service::services.find(
+        {p.second->get_hostname(), p.second->get_description()})};
+    if (found == engine::service::services.end() ||
+        found->second.get() != p.second.get()) {
+      logger(log_config_error, basic)
+          << "Error on service !!! The service " << p.first.first << '/'
+          << p.first.second
+          << " defined in services is not defined in services_by_id";
+      throw engine_error() << "This is a bug";
+    }
+  }
+  if (engine::service::services_by_id.size() != engine::service::services.size()) {
+    logger(log_config_error, basic)
+        << "Error on service !!! services_by_id contains services that are not in "
+           "services. The first one size is "
+        << engine::service::services.size() << " whereas the second size is "
+        << engine::service::services.size();
+    throw engine_error() << "This is a bug";
+  }
+}
+
+/**
+ *  A method to check hosts pointers of each possible container are well
+ *  defined.
+ *
+ *  If something wrong is found, an exception is thrown.
+ */
+void applier::state::_check_hosts() const {
+  auto find_host_by_name = [] (engine::host const* hst,
+                               std::string const& where) {
+    host_map::const_iterator found{engine::host::hosts.find(hst->get_name())};
+    if (found == engine::host::hosts.end() || found->second.get() != hst) {
+      logger(log_config_error, basic)
+          << "Error on host !!! The host " << hst->get_name() << " used in "
+          << where << " is not defined or badly defined in hosts";
+      throw engine_error() << "This is a bug";
+    }
+  };
+
+  for (auto const& p : engine::hostdependency::hostdependencies) {
+    engine::hostdependency const* sd{p.second.get()};
+    std::list<engine::host*> hsts{sd->master_host_ptr,
+                                     sd->dependent_host_ptr};
+    for (engine::host const* hst : hsts)
+      find_host_by_name(hst, "hostdependency");
+  }
+
+  for (auto const& p : engine::host::hosts_by_id)
+    find_host_by_name(p.second.get(), "hosts_by_id");
+
+  if (engine::host::hosts_by_id.size() != engine::host::hosts.size()) {
+    logger(log_config_error, basic)
+        << "Error on host !!! hosts_by_id contains hosts that are not in "
+           "hosts. The first one size is "
+        << engine::service::services.size() << " whereas the second size is "
+        << engine::service::services.size();
+    throw engine_error() << "This is a bug";
+  }
+
+  for (auto const& p : engine::service::services)
+    find_host_by_name(p.second->get_host_ptr(), "service");
+
+}
+#endif
+
 /**
  *  Apply retention.
  *
@@ -634,7 +836,6 @@ void applier::state::_expand(configuration::state& new_state) {
     else
       throw ;
   }
-  return ;
 }
 
 /**
@@ -902,6 +1103,18 @@ void applier::state::_processing(
     _resolve<configuration::serviceescalation, applier::serviceescalation>(
       config->serviceescalations());
 
+#ifdef DEBUG_CONFIG
+    logger(log_config_error, basic)
+      << "WARNING!! You are using a version of centreon engine for developers!!!"
+      " This is not a production version.";
+    // Checks on configuration
+    _check_serviceescalations();
+    _check_hostescalations();
+    _check_contacts();
+    _check_services();
+    _check_hosts();
+#endif
+
     // Load retention.
     if (state)
       _apply(new_cfg, *state);
@@ -1033,5 +1246,4 @@ void applier::state::_resolve(
         throw ;
     }
   }
-  return ;
 }

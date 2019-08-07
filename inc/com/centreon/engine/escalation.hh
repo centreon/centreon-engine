@@ -24,45 +24,49 @@
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/notifier.hh"
+#include "com/centreon/engine/shared.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
 class timeperiod;
 
-class                escalation {
+class escalation {
  public:
-                     escalation(uint32_t first_notification,
-                                uint32_t last_notification,
-                                double notification_interval,
-                                std::string const& escalation_period,
-                                uint32_t escalate_on);
+  escalation(uint32_t first_notification,
+             uint32_t last_notification,
+             double notification_interval,
+             std::string const& escalation_period,
+             uint32_t escalate_on,
+             Uuid const& uuid);
 
   std::string const& get_escalation_period() const;
-  uint32_t           get_first_notification() const;
-  uint32_t           get_last_notification() const;
-  double             get_notification_interval() const;
-  void               set_notification_interval(double notification_interval);
-  void               add_escalate_on(notifier::notification_flag type);
-  void               remove_escalate_on(notifier::notification_flag type);
-  uint32_t           get_escalate_on() const;
-  bool               get_escalate_on(notifier::notification_flag type) const;
-  void               set_escalate_on(uint32_t escalate_on);
-  virtual bool       is_viable(int state, uint32_t notification_number) const;
+  uint32_t get_first_notification() const;
+  uint32_t get_last_notification() const;
+  double get_notification_interval() const;
+  void set_notification_interval(double notification_interval);
+  void add_escalate_on(notifier::notification_flag type);
+  void remove_escalate_on(notifier::notification_flag type);
+  uint32_t get_escalate_on() const;
+  bool get_escalate_on(notifier::notification_flag type) const;
+  void set_escalate_on(uint32_t escalate_on);
+  virtual bool is_viable(int state, uint32_t notification_number) const;
+  Uuid const& get_uuid() const;
 
   contactgroup_map_unsafe const& contact_groups() const;
-  contactgroup_map_unsafe&       contact_groups();
+  contactgroup_map_unsafe& contact_groups();
   virtual void resolve(int& w, int& e);
 
-  notifier*          notifier_ptr;
-  timeperiod*        escalation_period_ptr;
+  notifier* notifier_ptr;
+  timeperiod* escalation_period_ptr;
 
  private:
-  uint32_t           _first_notification;
-  uint32_t           _last_notification;
-  double             _notification_interval;
-  std::string        _escalation_period;
-  uint32_t           _escalate_on;
+  uint32_t _first_notification;
+  uint32_t _last_notification;
+  double _notification_interval;
+  std::string _escalation_period;
+  uint32_t _escalate_on;
   contactgroup_map_unsafe _contact_groups;
+  Uuid _uuid;
 };
 CCE_END()
 

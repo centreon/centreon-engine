@@ -650,6 +650,14 @@ if (WITH_SIMU)
   add_subdirectory("simumod")
 endif ()
 
+# DEBUG_CONFIG enables checks on configuration. Those checks are not free and
+# may slow down engine reloads. But it provides a way to check bugs in
+# the configuration system.
+option(WITH_DEBUG_CONFIG "Enables checks on configuration. This is an option for developers." OFF)
+if (WITH_DEBUG_CONFIG)
+  add_definitions(-DDEBUG_CONFIG)
+endif ()
+
 # Configure files.
 configure_file("${INC_DIR}/compatibility/common.h.in"
   "${INC_DIR}/compatibility/common.h")

@@ -29,7 +29,8 @@ escalation::escalation(uint32_t first_notification,
                        uint32_t last_notification,
                        double notification_interval,
                        std::string const& escalation_period,
-                       uint32_t escalate_on)
+                       uint32_t escalate_on,
+                       Uuid const& uuid)
     : notifier_ptr{nullptr},
       escalation_period_ptr{nullptr},
       _first_notification{first_notification},
@@ -37,7 +38,8 @@ escalation::escalation(uint32_t first_notification,
       _notification_interval{
           (notification_interval < 0) ? 0 : notification_interval},
       _escalation_period{escalation_period},
-      _escalate_on{escalate_on} {}
+      _escalate_on{escalate_on},
+      _uuid{uuid} {}
 
 std::string const& escalation::get_escalation_period() const {
   return _escalation_period;
@@ -158,4 +160,8 @@ void escalation::resolve(int& w __attribute__((unused)), int& e) {
     e += errors;
     throw engine_error() << "Cannot resolve notifier escalation";
   }
+}
+
+Uuid const& escalation::get_uuid() const {
+  return _uuid;
 }

@@ -108,7 +108,7 @@ TEST_F(HostNotification, SimpleNormalHostNotification) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
@@ -135,7 +135,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotificationsdisabled) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
@@ -157,7 +157,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierNotifdisabled) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
@@ -179,7 +179,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOutsideTimeperiod) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
@@ -200,7 +200,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationForcedWithNotificationDisab
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
@@ -220,7 +220,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationForcedNotification) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(43200, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
@@ -241,7 +241,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithDowntime) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
@@ -262,7 +262,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithFlapping) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
@@ -283,7 +283,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithSoftState) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(host_escalation);
@@ -303,7 +303,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationWithHardStateAcknowledged) 
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(true);
@@ -324,7 +324,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousTooSoon) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(true);
@@ -346,7 +346,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationAfterPreviousWithNullInterv
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(true);
@@ -370,7 +370,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateNotNotified) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(false);
@@ -393,7 +393,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateBeforeFirstNotifDela
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(false);
@@ -419,7 +419,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationOnStateAfterFirstNotifDelay
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "", 7, Uuid())};
   _host->set_notification_period_ptr(tperiod.get());
 
   _host->set_problem_has_been_acknowledged(false);
@@ -445,7 +445,7 @@ TEST_F(HostNotification, SimpleNormalHostNotificationNotifierDelayTooShort) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};

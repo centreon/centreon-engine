@@ -814,12 +814,14 @@ com::centreon::engine::service* add_service(
   // Allocate memory.
   std::shared_ptr<service> obj{std::make_shared<service>(
       host_name, description, display_name.empty() ? description : display_name,
-      check_command, checks_enabled, accept_passive_checks, initial_state, check_interval,
-      retry_interval, notification_interval, max_attempts, first_notification_delay, recovery_notification_delay,
-      notification_period, notifications_enabled, is_volatile, check_period, event_handler, event_handler_enabled,
-      notes, notes_url, action_url, icon_image, icon_image_alt,
-      flap_detection_enabled, low_flap_threshold, high_flap_threshold,
-      check_freshness, freshness_threshold, obsess_over_service, timezone)};
+      check_command, checks_enabled, accept_passive_checks, initial_state,
+      check_interval, retry_interval, notification_interval, max_attempts,
+      first_notification_delay, recovery_notification_delay,
+      notification_period, notifications_enabled, is_volatile, check_period,
+      event_handler, event_handler_enabled, notes, notes_url, action_url,
+      icon_image, icon_image_alt, flap_detection_enabled, low_flap_threshold,
+      high_flap_threshold, check_freshness, freshness_threshold,
+      obsess_over_service, timezone)};
   try {
     obj->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
     obj->set_check_options(CHECK_OPTION_NONE);

@@ -224,10 +224,6 @@ class                notifier : public checkable {
                      get_escalations();
   std::list<escalation*> const&
                      get_escalations() const;
-//  bool               is_escalated_contact(contact* cntct) const;
-//  void               create_notification_list(nagios_macros* mac,
-//                                int options,
-//                                bool* esclated);
   virtual bool       is_valid_escalation_for_notification(
                                 escalation const* e,
                                 int options) const = 0;
@@ -274,10 +270,6 @@ class                notifier : public checkable {
   int get_acknowledgement_timeout() const;
 
   map_customvar custom_variables;
-
-//  static int         add_notification(nagios_macros* mac, std::shared_ptr<contact> cntct);
-
-  static std::unordered_map<std::string, std::shared_ptr<contact>> current_notifications;
 
  private:
   static std::array<is_viable, 6> const _is_notification_viable;

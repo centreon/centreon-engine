@@ -21,7 +21,6 @@
 #ifndef CCE_STATUSDATA_HH
 #  define CCE_STATUSDATA_HH
 
-#  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/service.hh"
 

@@ -85,6 +85,15 @@ namespace           configuration {
                     state();
                     state(state const&);
                     ~state() throw ();
+
+#ifdef DEBUG_CONFIG
+                    void _check_serviceescalations() const;
+                    void _check_hostescalations() const;
+                    void _check_contacts() const;
+                    void _check_services() const;
+                    void _check_hosts() const;
+#endif
+
       state&        operator=(state const&);
       void          _apply(configuration::state const& new_cfg);
       template      <typename ConfigurationType, typename ApplierType>

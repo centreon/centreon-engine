@@ -188,7 +188,7 @@ void applier::service::add_object(
              << "' of host '" << *obj.hosts().begin() << "'";
   svc->set_initial_notif_time(0);
   engine::service::services[
-    {*obj.hosts().begin(),obj.service_description()}]->set_host_id(
+    {*obj.hosts().begin(), obj.service_description()}]->set_host_id(
       obj.host_id());
   engine::service::services[
     {*obj.hosts().begin(), obj.service_description()}]->set_service_id(

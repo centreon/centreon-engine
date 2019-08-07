@@ -25,7 +25,6 @@
 #  include <time.h>
 #  include "com/centreon/engine/contact.hh"
 #  include "com/centreon/engine/host.hh"
-//#  include "com/centreon/engine/service.hh"
 
 CCE_BEGIN()
 class comment;

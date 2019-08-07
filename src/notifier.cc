@@ -633,7 +633,6 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
            it{_escalations.begin()},
        end{_escalations.end()};
        it != end; ++it) {
-    assert(*it);
     if ((*it)->is_viable(get_current_state_int(), _notification_number)) {
       /* Among escalations, we choose the smallest notification interval. */
       if (escalated) {
@@ -1253,6 +1252,9 @@ bool is_contact_for_notifier(com::centreon::engine::notifier* notif,
  */
 void notifier::resolve(int& w, int& e) {
   int warnings{0}, errors{0};
+
+  /* This list will be filled in {hostescalation,serviceescalation}::resolve */
+  _escalations.clear();
 
   /* check the event handler command */
   if (!get_event_handler().empty()) {

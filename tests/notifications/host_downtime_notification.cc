@@ -108,7 +108,7 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntime) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};
@@ -155,7 +155,7 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntimeWithContactNotReceivingNotif)
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::hostescalation> host_escalation{
-      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(host_escalation);
   uint64_t id{_host->get_next_notification_id()};

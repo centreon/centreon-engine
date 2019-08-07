@@ -26,6 +26,7 @@
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/shared.hh"
 
 CCE_BEGIN()
 
@@ -75,6 +76,7 @@ namespace                  configuration {
     void                   notification_interval(unsigned int interval);
     unsigned int           notification_interval() const throw ();
     bool                   notification_interval_defined() const throw ();
+    Uuid const&            uuid() const;
 
    private:
     typedef bool (*setter_func)(hostescalation&, char const*);
@@ -97,6 +99,7 @@ namespace                  configuration {
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
     static std::unordered_map<std::string, setter_func> const _setters;
+    Uuid                   _uuid;
   };
 
   typedef std::shared_ptr<hostescalation> hostescalation_ptr;
