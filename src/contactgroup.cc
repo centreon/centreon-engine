@@ -144,7 +144,7 @@ void contactgroup::resolve(int& w __attribute__((unused)), int& e) {
       errors++;
     }
     else
-      it->second->get_parent_groups().push_back(this);
+      it->second->get_parent_groups()[_name] = this;
   }
 
   /* Check for illegal characters in contact group name. */

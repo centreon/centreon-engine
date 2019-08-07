@@ -51,9 +51,10 @@ hostescalation::hostescalation(std::string const& host_name,
                                uint32_t last_notification,
                                double notification_interval,
                                std::string const& escalation_period,
-                               uint32_t escalate_on)
+                               uint32_t escalate_on,
+                               Uuid const& uuid)
     : escalation{first_notification, last_notification, notification_interval,
-                 escalation_period, escalate_on},
+                 escalation_period, escalate_on, uuid},
       _hostname{host_name} {
   if (host_name.empty())
     throw engine_error() << "Could not create escalation "

@@ -23,8 +23,9 @@
 #  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/opt.hh"
+#  include "com/centreon/engine/shared.hh"
 
 CCE_BEGIN()
 
@@ -84,6 +85,7 @@ namespace                  configuration {
     list_string const&     servicegroups() const throw ();
     list_string&           service_description() throw ();
     list_string const&     service_description() const throw ();
+    Uuid const&            uuid() const;
 
    private:
     typedef bool (*setter_func)(serviceescalation&, char const*);
@@ -110,6 +112,7 @@ namespace                  configuration {
     group<list_string>     _servicegroups;
     group<list_string>     _service_description;
     static std::unordered_map<std::string, setter_func> const _setters;
+    Uuid                   _uuid;
   };
 
   typedef std::shared_ptr<serviceescalation> serviceescalation_ptr;

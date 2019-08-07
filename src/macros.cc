@@ -54,7 +54,7 @@ int grab_contact_macros_r(nagios_macros* mac, contact* cntct) {
   /* save pointer to first/primary contactgroup for later */
   if (!cntct->get_parent_groups().empty())
     mac->contactgroup_ptr
-      = cntct->get_parent_groups().front();
+      = cntct->get_parent_groups().begin()->second;
   return OK;
 }
 
@@ -588,16 +588,16 @@ int grab_standard_contact_macro_r(
     std::string buf;
     /* get the contactgroup names */
     /* find all contactgroups this contact is a member of */
-    for (std::list<contactgroup*>::const_iterator
+    for (contactgroup_map_unsafe::const_iterator
            it{temp_contact->get_parent_groups().begin()},
            end{temp_contact->get_parent_groups().end()};
          it != end; ++it) {
-      if (!*it)
+      if (!it->second)
         continue;
 
       if (!buf.empty())
         buf.append(",");
-      buf.append((*it)->get_name());
+      buf.append(it->first);
     }
     if (!buf.empty())
       output = buf;

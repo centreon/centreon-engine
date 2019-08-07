@@ -126,10 +126,8 @@ class                           contact {
                                 get_service_notification_commands() const;
   std::list<std::shared_ptr<commands::command>>&
                                 get_service_notification_commands();
-  std::list<contactgroup*> const&
-                                get_parent_groups() const;
-  std::list<contactgroup*>&
-                                get_parent_groups();
+  contactgroup_map_unsafe const& get_parent_groups() const;
+  contactgroup_map_unsafe& get_parent_groups();
   bool                          should_be_notified(
                                   notifier::notification_category cat,
                                   notifier::reason_type type,
@@ -183,7 +181,7 @@ class                           contact {
                                 _host_notification_commands;
   std::list<std::shared_ptr<commands::command>>
                                 _service_notification_commands;
-  std::list<contactgroup*> _contactgroups;
+  contactgroup_map_unsafe _contactgroups;
   map_customvar _custom_variables;
   timeperiod* _host_notification_period_ptr;
   timeperiod* _service_notification_period_ptr;

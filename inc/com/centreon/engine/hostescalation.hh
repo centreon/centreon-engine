@@ -39,7 +39,8 @@ class hostescalation : public escalation {
                  uint32_t last_notification,
                  double notification_interval,
                  std::string const& escalation_period,
-                 uint32_t escalate_on);
+                 uint32_t escalate_on,
+                 Uuid const& uuid);
   virtual ~hostescalation();
 
   std::string const& get_hostname() const;

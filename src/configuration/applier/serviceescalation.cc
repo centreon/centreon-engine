@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
@@ -78,7 +79,7 @@ void applier::serviceescalation::add_object(
           ((obj.escalation_options() &
             configuration::serviceescalation::recovery)
                ? notifier::ok
-               : notifier::none))};
+               : notifier::none), obj.uuid())};
 
   // Add new items to the global list.
   engine::serviceescalation::serviceescalations.insert(
@@ -103,6 +104,9 @@ void applier::serviceescalation::add_object(
  */
 void applier::serviceescalation::expand_objects(configuration::state& s) {
   // Browse all escalations.
+  logger(logging::dbg_config, logging::more)
+      << "Expanding service escalations";
+
   configuration::set_serviceescalation expanded;
   for (configuration::set_serviceescalation::const_iterator
          it_esc(s.serviceescalations().begin()),
@@ -192,22 +196,7 @@ void applier::serviceescalation::remove_object(
 
   for (serviceescalation_mmap::iterator it{range.first}, end{range.second};
        it != end; ++it) {
-    if (it->second->get_first_notification() == obj.first_notification() &&
-        it->second->get_last_notification() == obj.last_notification() &&
-        it->second->get_notification_interval() == obj.notification_interval() &&
-        it->second->get_escalation_period() == obj.escalation_period() &&
-        it->second->get_escalate_on(notifier::unknown) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::unknown) &&
-        it->second->get_escalate_on(notifier::ok) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::recovery) &&
-        it->second->get_escalate_on(notifier::critical) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::critical) &&
-        it->second->get_escalate_on(notifier::warning) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::warning)) {
+    if (it->second->get_uuid() == obj.uuid()) {
       // We have the serviceescalation to remove.
 
       // Notify event broker.
@@ -260,23 +249,7 @@ void applier::serviceescalation::resolve_object(
                          << desc << "'";
   for (serviceescalation_mmap::iterator
          it{p.first}; it != p.second; ++it) {
-    if (it->second->get_first_notification() == obj.first_notification() &&
-        it->second->get_last_notification() == obj.last_notification() &&
-        it->second->get_notification_interval() ==
-            obj.notification_interval() &&
-        it->second->get_escalation_period() == obj.escalation_period() &&
-        it->second->get_escalate_on(notifier::warning) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::warning) &&
-        it->second->get_escalate_on(notifier::unknown) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::unknown) &&
-        it->second->get_escalate_on(notifier::critical) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::critical) &&
-        it->second->get_escalate_on(notifier::ok) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::serviceescalation::recovery)) {
+    if (it->second->get_uuid() == obj.uuid()) {
       found = true;
       // Resolve service escalation.
       it->second->resolve(config_warnings, config_errors);
@@ -298,12 +271,12 @@ void applier::serviceescalation::resolve_object(
  *  @param[out]    expanded Expanded services.
  */
 void applier::serviceescalation::_expand_services(
-       std::list<std::string> const& hst,
-       std::list<std::string> const& hg,
-       std::list<std::string> const& svc,
-       std::list<std::string> const& sg,
-       configuration::state& s,
-       std::set<std::pair<std::string, std::string> >& expanded) {
+    std::list<std::string> const& hst,
+    std::list<std::string> const& hg,
+    std::list<std::string> const& svc,
+    std::list<std::string> const& sg,
+    configuration::state& s,
+    std::set<std::pair<std::string, std::string>>& expanded) {
   // Expanded hosts.
   std::set<std::string> all_hosts;
 
@@ -320,8 +293,8 @@ void applier::serviceescalation::_expand_services(
     configuration::set_hostgroup::iterator
       it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
-      throw (engine_error() << "Could not resolve host group '"
-             << *it << "'");
+      throw engine_error() << "Could not resolve host group '"
+             << *it << "'";
 
     // Add host group members.
     all_hosts.insert(
@@ -340,7 +313,7 @@ void applier::serviceescalation::_expand_services(
            end_service(svc.end());
          it_service != end_service;
          ++it_service)
-      expanded.insert(std::make_pair(*it_host, *it_service));
+      expanded.insert({*it_host, *it_service});
 
   // Service groups.
   for (std::list<std::string>::const_iterator
@@ -352,8 +325,8 @@ void applier::serviceescalation::_expand_services(
     configuration::set_servicegroup::iterator
       it_group(s.servicegroups_find(*it));
     if (it_group == s.servicegroups().end())
-      throw (engine_error() << "Could not resolve service group '"
-             << *it << "'");
+      throw engine_error() << "Could not resolve service group '"
+             << *it << "'";
 
     // Add service group members.
     for (set_pair_string::const_iterator

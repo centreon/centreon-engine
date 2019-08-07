@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include "com/centreon/engine/checkable.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -88,28 +89,28 @@ checkable::checkable(std::string const& display_name,
       _check_command_ptr{nullptr},
       _is_executing{false} {
 
-  if (max_attempts < 0 || retry_interval <= 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid max_attempts, check_interval or retry_interval"
-           " value for checkable '" << display_name << "'";
+  if (max_attempts <= 0 || retry_interval <= 0 || freshness_threshold < 0) {
+    std::ostringstream oss;
+    bool empty{true};
+    oss << "Error: In checkable '" << display_name << "' - ";
+    if (max_attempts <= 0) {
+      empty = false;
+      oss << "Invalid max_attempts: value should be positive";
+    }
+    if (retry_interval <= 0) {
+      if (!empty)
+        oss << " - ";
+      empty = false;
+      oss << "Invalid retry_interval: value should be positive";
+    }
+    if (freshness_threshold < 0) {
+      if (!empty)
+        oss << " - ";
+      oss << "Invalid freshness_threshold: value should be positive or 0";
+    }
+    logger(log_config_error, basic) << oss.str();
     throw engine_error() << "Could not register checkable '" << display_name
-                         << "'";
-  }
-
-  if (max_attempts <= 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid max_check_attempts value for checkable '"
-        << display_name << "'";
-    throw engine_error() << "Could not register checkable '" << display_name
-                         << "'";
-  }
-
-  if (freshness_threshold < 0) {
-    logger(log_config_error, basic)
-        << "Error: Invalid freshness_threshold value for checkable '"
-        << display_name << "'";
-    throw engine_error() << "Could not register checkable '" << display_name
-                         << "'";
+      << "'";
   }
 }
 

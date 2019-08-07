@@ -77,7 +77,7 @@ class HostRecovery : public ::testing::Test {
           std::make_shared<engine::timerange>(0, 86400));
 
     std::unique_ptr<engine::hostescalation> host_escalation{
-        new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
+        new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
 
     _host->get_next_notification_id();
     _host->set_notification_period_ptr(_tperiod.get());

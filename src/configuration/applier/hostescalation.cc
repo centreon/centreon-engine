@@ -69,7 +69,7 @@ void applier::hostescalation::add_object(
                : notifier::none) |
           ((obj.escalation_options() & configuration::hostescalation::recovery)
                ? notifier::up
-               : notifier::none))};
+               : notifier::none), obj.uuid())};
 
   // Add new items to the configuration state.
   engine::hostescalation::hostescalations.insert(
@@ -232,19 +232,7 @@ void applier::hostescalation::resolve_object(
   for (hostescalation_mmap::iterator it{p.first}; it != p.second; ++it) {
     /* It's a pity but for now we don't have any idea or key to verify if
      * the hostescalation is the good one. */
-    if (it->second->get_first_notification() == obj.first_notification() &&
-        it->second->get_last_notification() == obj.last_notification() &&
-        it->second->get_notification_interval() == obj.notification_interval() &&
-        it->second->get_escalation_period() == obj.escalation_period() &&
-        it->second->get_escalate_on(notifier::down) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::hostescalation::down) &&
-        it->second->get_escalate_on(notifier::unreachable) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::hostescalation::unreachable) &&
-        it->second->get_escalate_on(notifier::up) ==
-            static_cast<bool>(obj.escalation_options() &
-                              configuration::hostescalation::recovery)) {
+    if (it->second->get_uuid() == obj.uuid()) {
       found = true;
       // Resolve host escalation.
       it->second->resolve(config_warnings, config_errors);
