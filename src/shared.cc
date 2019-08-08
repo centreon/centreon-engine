@@ -411,7 +411,7 @@ bool Uuid::operator==(Uuid const& uuid) const {
   return true;
 }
 
-std::string Uuid::to_string() {
+std::string Uuid::to_string() const {
   std::string uuid("", 37);
   int c;
 

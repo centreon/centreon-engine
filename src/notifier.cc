@@ -648,8 +648,8 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
 
       /* For each contact group, we also add its contacts. */
       for (contactgroup_map_unsafe::const_iterator
-               cgit{(*it)->contact_groups().begin()},
-           cgend{(*it)->contact_groups().end()};
+               cgit{(*it)->get_contactgroups().begin()},
+           cgend{(*it)->get_contactgroups().end()};
            cgit != cgend; ++cgit) {
         for (contact_map_unsafe::const_iterator
                  cit{cgit->second->get_members().begin()},

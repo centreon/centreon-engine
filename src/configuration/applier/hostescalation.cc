@@ -85,7 +85,7 @@ void applier::hostescalation::add_object(
        end(obj.contactgroups().end());
        it != end;
        ++it)
-    he->contact_groups().insert({*it, nullptr});
+    he->get_contactgroups().insert({*it, nullptr});
 }
 
 /**

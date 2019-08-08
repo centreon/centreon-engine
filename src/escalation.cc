@@ -81,11 +81,11 @@ bool escalation::get_escalate_on(notifier::notification_flag type) const {
   return _escalate_on & type;
 }
 
-contactgroup_map_unsafe const& escalation::contact_groups() const {
+contactgroup_map_unsafe const& escalation::get_contactgroups() const {
   return _contact_groups;
 }
 
-contactgroup_map_unsafe& escalation::contact_groups() {
+contactgroup_map_unsafe& escalation::get_contactgroups() {
   return _contact_groups;
 }
 
@@ -137,8 +137,8 @@ void escalation::resolve(int& w __attribute__((unused)), int& e) {
 
   // Check all contact groups.
   for (contactgroup_map_unsafe::iterator
-         it{contact_groups().begin()},
-         end{contact_groups().end()};
+         it{_contact_groups.begin()},
+         end{_contact_groups.end()};
        it != end;
        ++it) {
     // Find the contact group.
