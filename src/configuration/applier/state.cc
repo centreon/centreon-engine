@@ -702,6 +702,59 @@ void applier::state::_check_contacts() const {
 }
 
 /**
+ *  A method to check contactgroups pointers of each possible container are well
+ *  defined.
+ *
+ *  If something wrong is found, an exception is thrown.
+ */
+void applier::state::_check_contactgroups() const {
+  for (auto const& p : engine::service::services) {
+    engine::service const* svc{p.second.get()};
+    for (auto const& pp : svc->get_contactgroups()) {
+      contactgroup_map::iterator found{engine::contactgroup::contactgroups.find(pp.first)};
+      if (found == engine::contactgroup::contactgroups.end() || found->second.get() != pp.second) {
+        logger(log_config_error, basic)
+          << "Error on contactgroup !!! The contactgroup " << pp.first << " used in service " << p.first.first << '/' << p.first.second << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+
+  for (auto const& p : engine::host::hosts) {
+    for (auto const& pp : p.second->get_contactgroups()) {
+      contactgroup_map::iterator found{engine::contactgroup::contactgroups.find(pp.first)};
+      if (found == engine::contactgroup::contactgroups.end() || found->second.get() != pp.second) {
+        logger(log_config_error, basic)
+          << "Error on contactgroup !!! The contactgroup " << pp.first << " used in host " << p.first << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+
+  for (auto const& p : engine::serviceescalation::serviceescalations) {
+    for (auto const& pp : p.second->get_contactgroups()) {
+      contactgroup_map::iterator found{engine::contactgroup::contactgroups.find(pp.first)};
+      if (found == engine::contactgroup::contactgroups.end() || found->second.get() != pp.second) {
+        logger(log_config_error, basic)
+          << "Error on contactgroup !!! The contactgroup " << pp.first << " used in serviceescalation " << p.second->get_uuid().to_string() << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+
+  for (auto const& p : engine::hostescalation::hostescalations) {
+    for (auto const& pp : p.second->get_contactgroups()) {
+      contactgroup_map::iterator found{engine::contactgroup::contactgroups.find(pp.first)};
+      if (found == engine::contactgroup::contactgroups.end() || found->second.get() != pp.second) {
+        logger(log_config_error, basic)
+          << "Error on contactgroup !!! The contactgroup " << pp.first << " used in hostescalation " << p.second->get_uuid().to_string() << " is not or badly defined";
+        throw engine_error() << "This is a bug";
+      }
+    }
+  }
+}
+
+/**
  *  A method to check services pointers of each possible container are well
  *  defined.
  *
@@ -790,6 +843,7 @@ void applier::state::_check_hosts() const {
     find_host_by_name(p.second->get_host_ptr(), "service");
 
 }
+
 #endif
 
 /**
@@ -1111,6 +1165,7 @@ void applier::state::_processing(
     _check_serviceescalations();
     _check_hostescalations();
     _check_contacts();
+    _check_contactgroups();
     _check_services();
     _check_hosts();
 #endif

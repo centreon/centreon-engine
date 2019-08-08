@@ -90,6 +90,7 @@ namespace           configuration {
                     void _check_serviceescalations() const;
                     void _check_hostescalations() const;
                     void _check_contacts() const;
+                    void _check_contactgroups() const;
                     void _check_services() const;
                     void _check_hosts() const;
 #endif

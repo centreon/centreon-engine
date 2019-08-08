@@ -52,8 +52,8 @@ class escalation {
   virtual bool is_viable(int state, uint32_t notification_number) const;
   Uuid const& get_uuid() const;
 
-  contactgroup_map_unsafe const& contact_groups() const;
-  contactgroup_map_unsafe& contact_groups();
+  contactgroup_map_unsafe const& get_contactgroups() const;
+  contactgroup_map_unsafe& get_contactgroups();
   virtual void resolve(int& w, int& e);
 
   notifier* notifier_ptr;

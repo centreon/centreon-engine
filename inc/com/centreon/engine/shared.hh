@@ -37,7 +37,7 @@ class Uuid {
 
   bool operator==(Uuid const& uuid) const;
 
-  std::string to_string();
+  std::string to_string() const;
 
  private:
   uint32_t	_time_low;

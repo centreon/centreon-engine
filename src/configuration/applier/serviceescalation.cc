@@ -94,7 +94,7 @@ void applier::serviceescalation::add_object(
   for (set_string::const_iterator it(obj.contactgroups().begin()),
        end(obj.contactgroups().end());
        it != end; ++it)
-    se->contact_groups().insert({*it, nullptr});
+    se->get_contactgroups().insert({*it, nullptr});
 }
 
 /**
