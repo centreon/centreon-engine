@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
