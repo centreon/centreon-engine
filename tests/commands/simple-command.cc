@@ -106,24 +106,19 @@ TEST_F(SimpleCommand, NewCommandSync) {
   ASSERT_EQ(res.output, "bonjour\n");
 }
 
-// Given a name and a command line
-// When the add_command method is called
-// Then a new raw command is built
-// When async executed
-// Then we have the output in the result class.
-TEST_F(SimpleCommand, NewCommandAsync) {
-  std::unique_ptr<my_listener> lstnr(new my_listener);
-  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
-  cmd->set_listener(lstnr.get());
-  nagios_macros mac;
-  std::string cc(cmd->process_cmd(&mac));
-  ASSERT_EQ(cc, "/bin/echo bonjour");
-  cmd->run(cc, mac, 2);
-  int timeout{0};
-  while (timeout < 60 && lstnr->get_result().output == "") {
-    usleep(100000);
-    ++timeout;
-  }
-  ASSERT_TRUE(timeout < 50);
-  ASSERT_EQ(lstnr->get_result().output, "bonjour\n");
-}
+//TEST_F(SimpleCommand, NewCommandAsync) {
+//  std::unique_ptr<my_listener> lstnr(new my_listener);
+//  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
+//  cmd->set_listener(lstnr.get());
+//  nagios_macros mac;
+//  std::string cc(cmd->process_cmd(&mac));
+//  ASSERT_EQ(cc, "/bin/echo bonjour");
+//  cmd->run(cc, mac, 2);
+//  int timeout{0};
+//  while (timeout < 60 && lstnr->get_result().output == "") {
+//    usleep(100000);
+//    ++timeout;
+//  }
+//  ASSERT_TRUE(timeout < 50);
+//  ASSERT_EQ(lstnr->get_result().output, "bonjour\n");
+//}
