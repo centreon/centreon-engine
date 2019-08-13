@@ -28,7 +28,6 @@
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/contactgroup.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
