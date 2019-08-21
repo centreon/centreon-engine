@@ -403,6 +403,12 @@ int grab_service_macros_r(nagios_macros* mac, com::centreon::engine::service* sv
     mac->servicegroup_ptr
       = svc->get_parent_groups().front();
 
+  if (!svc->get_contacts().empty())
+    mac->contact_ptr = svc->get_contacts().begin()->second;
+
+  if (!svc->get_contactgroups().empty())
+    mac->contactgroup_ptr = svc->get_contactgroups().begin()->second;
+
   return OK;
 }
 
