@@ -360,21 +360,29 @@ static int handle_contact_macro(
   int retval;
 
   if (arg2.empty()) {
+    contact *cnct;
     // Find the contact for on-demand macros
     // or use saved contact pointer.
-    contact_map::const_iterator ct_it{contact::contacts.find(arg1)};
-    if (ct_it == contact::contacts.end())
-      retval = ERROR;
-    else {
+    if (!arg1.empty()) {
+      contact_map::const_iterator ct_it{contact::contacts.find(arg1)};
+      if (ct_it == contact::contacts.end())
+        return ERROR;
+      cnct = ct_it->second.get();
+    } else
+      cnct = mac->contact_ptr;
+
+    if (!cnct)
+      return ERROR;
+
       // Get the contact macro value.
-      retval = grab_standard_contact_macro_r(
-                 mac,
-                 macro_type,
-                 ct_it->second.get(),
-                 output);
-      if (OK == retval)
-        *free_macro = true;
-    }
+    retval = grab_standard_contact_macro_r(
+      mac,
+      macro_type,
+      cnct,
+      output);
+
+    if (OK == retval)
+      *free_macro = true;
   }
   // A contact macro with a contactgroup name and delimiter.
   else if (!arg1.empty() && !arg2.empty()) {

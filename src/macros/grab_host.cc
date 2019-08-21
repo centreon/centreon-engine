@@ -454,6 +454,12 @@ int grab_host_macros_r(nagios_macros *mac, host *hst) {
   if (!hst->get_parent_groups().empty())
     mac->hostgroup_ptr = hst->get_parent_groups().front();
 
+  if (!hst->get_contacts().empty())
+    mac->contact_ptr = hst->get_contacts().begin()->second;
+
+  if (!hst->get_contactgroups().empty())
+    mac->contactgroup_ptr = hst->get_contactgroups().begin()->second;
+
   return OK;
 }
 
