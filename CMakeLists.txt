@@ -706,6 +706,8 @@ set(
   "${SRC_DIR}/nebmods.cc"
   "${SRC_DIR}/notification.cc"
   "${SRC_DIR}/notifier.cc"
+  "${SRC_DIR}/process_manager.cc"
+  "${SRC_DIR}/process.cc"
   "${SRC_DIR}/sehandlers.cc"
   "${SRC_DIR}/service.cc"
   "${SRC_DIR}/servicedependency.cc"

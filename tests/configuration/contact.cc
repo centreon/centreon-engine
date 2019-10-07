@@ -17,12 +17,10 @@
  *
  */
 
-#include <memory>
-#include <gtest/gtest.h>
-#include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/contact.hh"
+#include <gtest/gtest.h>
+#include <memory>
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
 
 using namespace com::centreon;
@@ -35,8 +33,6 @@ extern configuration::state* config;
 class ConfigContact : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     if (config == nullptr)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
@@ -46,10 +42,7 @@ class ConfigContact : public ::testing::Test {
     configuration::applier::state::unload();
     delete config;
     config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
-
 };
 
 // When I create a configuration::contact with an empty name
@@ -68,7 +61,7 @@ TEST_F(ConfigContact, NewContactWithNoName) {
 // Then comparaison between contacts works as expected.
 // When I merge a second contact into a first contact,
 // Then the final contact is filled as expected.
-//TEST_F(ConfigContact, NewContactFromContact) {
+// TEST_F(ConfigContact, NewContactFromContact) {
 //  configuration::contact ctct("test");
 //  ASSERT_TRUE(ctct.parse("contact_name", "test_contact_name"));
 //  ASSERT_EQ(ctct.contact_name(), "test_contact_name");
@@ -91,16 +84,17 @@ TEST_F(ConfigContact, NewContactWithNoName) {
 //  ASSERT_EQ(ctct.pager(), "test_pager");
 //  ASSERT_TRUE(ctct.parse("host_notification_period", "test_notif_period"));
 //  ASSERT_EQ(ctct.host_notification_period(), "test_notif_period");
-//  ASSERT_TRUE(ctct.parse("service_notification_period", "test_srv_notif_period"));
-//  ASSERT_EQ(ctct.service_notification_period(), "test_srv_notif_period");
+//  ASSERT_TRUE(ctct.parse("service_notification_period",
+//  "test_srv_notif_period")); ASSERT_EQ(ctct.service_notification_period(),
+//  "test_srv_notif_period");
 //  {
 //    std::list<std::string> mylist;
 //    mylist.push_back("command1");
 //    mylist.push_back("command2");
-//    ASSERT_TRUE(ctct.parse("host_notification_commands", "command1,command2"));
-//    ASSERT_EQ(ctct.host_notification_commands(), mylist);
-//    ASSERT_TRUE(ctct.parse("service_notification_commands", "command1,command2,command3"));
-//    mylist.push_back("command3");
+//    ASSERT_TRUE(ctct.parse("host_notification_commands",
+//    "command1,command2")); ASSERT_EQ(ctct.host_notification_commands(),
+//    mylist); ASSERT_TRUE(ctct.parse("service_notification_commands",
+//    "command1,command2,command3")); mylist.push_back("command3");
 //    ASSERT_EQ(ctct.service_notification_commands(), mylist);
 //  }
 //
@@ -186,4 +180,3 @@ TEST_F(ConfigContact, NewContactWithNoName) {
 //  map_customvar cv(ctct.customvariables());
 //  ASSERT_EQ(cv["MyVariable"], "Hello");
 //}
-

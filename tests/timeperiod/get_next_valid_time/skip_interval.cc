@@ -18,8 +18,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "com/centreon/clib.hh"
-#include "com/centreon/logging/engine.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -29,17 +28,10 @@ using namespace com::centreon::engine;
 class GetNextValidTimeSkipIntervalTest : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     _computed = (time_t)-1;
     _creator.new_timeperiod();
     _now = strtotimet("2016-11-24 6:00:00");
     set_time(_now);
-  }
-
-  void TearDown() override {
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 
   void calendar_date_skip() {

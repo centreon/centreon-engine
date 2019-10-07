@@ -17,22 +17,17 @@
  *
  */
 
-#include <cstring>
-#include <iostream>
-#include <memory>
 #include <gtest/gtest.h>
 #include <time.h>
+#include <cstring>
+#include <memory>
 #include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
-#include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/host.hh"
-#include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/hostescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
@@ -46,8 +41,6 @@ extern configuration::state* config;
 class HostRecovery : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     if (config == nullptr)
       config = new configuration::state;
     timezone_manager::load();
@@ -77,14 +70,13 @@ class HostRecovery : public ::testing::Test {
           std::make_shared<engine::timerange>(0, 86400));
 
     std::unique_ptr<engine::hostescalation> host_escalation{
-        new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
+        new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7,
+                                   Uuid())};
 
     _host->get_next_notification_id();
     _host->set_notification_period_ptr(_tperiod.get());
     /* Sending a notification */
-    _host->notify(notifier::reason_normal,
-                  "",
-                  "",
+    _host->notify(notifier::reason_normal, "", "",
                   notifier::notification_option_none);
   }
 
@@ -94,8 +86,6 @@ class HostRecovery : public ::testing::Test {
     delete config;
     config = nullptr;
     timezone_manager::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 
  protected:
@@ -114,9 +104,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithDownState) {
   set_time(_current_time + 300);
 
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::reason_recovery,
-                          "",
-                          "",
+  ASSERT_EQ(_host->notify(notifier::reason_recovery, "", "",
                           notifier::notification_option_none),
             OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
@@ -136,9 +124,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithHardUpState) {
   _host->set_state_type(engine::host::hard);
   _host->set_last_hard_state_change(_current_time);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::reason_recovery,
-                          "",
-                          "",
+  ASSERT_EQ(_host->notify(notifier::reason_recovery, "", "",
                           notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 1, _host->get_next_notification_id());
@@ -157,9 +143,7 @@ TEST_F(HostRecovery, SimpleRecoveryHostNotificationWithSoftUpState) {
   _host->set_current_state(engine::host::state_up);
   _host->set_state_type(engine::host::soft);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::reason_recovery,
-                          "",
-                          "",
+  ASSERT_EQ(_host->notify(notifier::reason_recovery, "", "",
                           notifier::notification_option_none),
             OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
@@ -185,9 +169,7 @@ TEST_F(HostRecovery,
   // Time too short. No notification will be sent.
   set_time(_current_time + 300);
   uint64_t id{_host->get_next_notification_id()};
-  ASSERT_EQ(_host->notify(notifier::reason_recovery,
-                          "",
-                          "",
+  ASSERT_EQ(_host->notify(notifier::reason_recovery, "", "",
                           notifier::notification_option_none),
             OK);
   ASSERT_EQ(id, _host->get_next_notification_id());

@@ -21,7 +21,6 @@
 #include <memory>
 #include "../../test_engine.hh"
 #include "../../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
@@ -45,11 +44,9 @@ extern configuration::state* config;
 class ApplierService : public TestEngine {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     if (config == nullptr)
       config = new configuration::state;
-    configuration::applier::state::load(); // Needed to create a contact
+    configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
   }
 
@@ -58,8 +55,6 @@ class ApplierService : public TestEngine {
     checks::checker::unload();
     delete config;
     config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 };
 
@@ -110,9 +105,9 @@ TEST_F(ApplierService, NewServiceFromConfig) {
   svc.parse("check_command", "cmd");
   cmd_aply.add_object(cmd);
 
-  // No need here to call svc_aply.expand_objects(*config) because the configuration
-  // service is not stored in configuration::state.
-  // We just have to set the host_id manually.
+  // No need here to call svc_aply.expand_objects(*config) because the
+  // configuration service is not stored in configuration::state. We just have
+  // to set the host_id manually.
   svc.set_host_id(1);
   svc_aply.add_object(svc);
   service_id_map const& sm(engine::service::services_by_id);
@@ -166,7 +161,8 @@ TEST_F(ApplierService, RenameServiceFromConfig) {
   ASSERT_TRUE(!sm.begin()->second->get_host_ptr());
   ASSERT_TRUE(sm.begin()->second->get_description() == "test description2");
 
-  std::string s{engine::service::services[{"test_host", "test description2"}]->get_description()};
+  std::string s{engine::service::services[{"test_host", "test description2"}]
+                    ->get_description()};
   ASSERT_TRUE(s == "test description2");
 }
 
@@ -218,7 +214,8 @@ TEST_F(ApplierService, RemoveServiceFromConfig) {
   ASSERT_TRUE(!sm.begin()->second->get_host_ptr());
   ASSERT_TRUE(sm.begin()->second->get_description() == "test description2");
 
-  std::string s{engine::service::services[{"test_host", "test description2"}]->get_description()};
+  std::string s{engine::service::services[{"test_host", "test description2"}]
+                    ->get_description()};
   ASSERT_TRUE(s == "test description2");
 }
 
@@ -320,8 +317,7 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   ASSERT_NO_THROW(csvc.check_validity());
   svc_aply.resolve_object(csvc);
 
-  service_map const&
-    sm(engine::service::services);
+  service_map const& sm(engine::service::services);
   ASSERT_EQ(sm.size(), 1u);
 
   host_map const& hm(engine::host::hosts);
@@ -346,10 +342,10 @@ TEST_F(ApplierService, ServicesFlapOptionsNone) {
 TEST_F(ApplierService, ServicesFlapOptionsAll) {
   configuration::service csvc;
   csvc.parse("flap_detection_options", "a");
-  ASSERT_EQ(
-    csvc.flap_detection_options(),
-    configuration::service::ok | configuration::service::warning
-      | configuration::service::critical | configuration::service::unknown);
+  ASSERT_EQ(csvc.flap_detection_options(),
+            configuration::service::ok | configuration::service::warning |
+                configuration::service::critical |
+                configuration::service::unknown);
 }
 
 // Given a service configuration,
@@ -372,15 +368,14 @@ TEST_F(ApplierService, ServicesInitialState) {
 TEST_F(ApplierService, ServicesStalkingOptions) {
   configuration::service csvc;
   ASSERT_TRUE(csvc.parse("stalking_options", "c,w"));
-  ASSERT_EQ(
-    csvc.stalking_options(),
-    configuration::service::critical | configuration::service::warning);
+  ASSERT_EQ(csvc.stalking_options(),
+            configuration::service::critical | configuration::service::warning);
 
   ASSERT_TRUE(csvc.parse("stalking_options", "a"));
-  ASSERT_EQ(
-    csvc.stalking_options(),
-    configuration::service::ok | configuration::service::warning
-      | configuration::service::unknown | configuration::service::critical);
+  ASSERT_EQ(csvc.stalking_options(), configuration::service::ok |
+                                         configuration::service::warning |
+                                         configuration::service::unknown |
+                                         configuration::service::critical);
 }
 
 // Given a viable contact
@@ -430,7 +425,8 @@ TEST_F(ApplierService, ContactgroupResolution) {
   contactgroup_map_unsafe cgs{sm.begin()->second->get_contactgroups()};
   ASSERT_EQ(cgs.size(), 1u);
   ASSERT_EQ(cgs.begin()->first, "contactgroup_test");
-  contact_map_unsafe::iterator itt{cgs.begin()->second->get_members().find("admin")};
+  contact_map_unsafe::iterator itt{
+      cgs.begin()->second->get_members().find("admin")};
 
   ASSERT_NE(itt, cgs.begin()->second->get_members().end());
 

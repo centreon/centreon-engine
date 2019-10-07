@@ -17,14 +17,13 @@
  *
  */
 
-#include <iostream>
+#include "com/centreon/engine/downtimes/downtime.hh"
 #include <gtest/gtest.h>
+#include <iostream>
 #include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/host_downtime.hh"
@@ -40,8 +39,6 @@ extern configuration::state* config;
 class DowntimeExternalCommand : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     if (config == nullptr)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
@@ -52,8 +49,6 @@ class DowntimeExternalCommand : public ::testing::Test {
     downtime_manager::instance().clear_scheduled_downtimes();
     delete config;
     config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 };
 
@@ -63,10 +58,12 @@ TEST_F(DowntimeExternalCommand, AddUnkownHostDowntime) {
   time_t now = time(nullptr);
 
   std::stringstream s;
-  s << "SCHEDULE_HOST_DOWNTIME;test_srv;" << now << ";"
-            << now << ";1;0;7200;admin;host";
+  s << "SCHEDULE_HOST_DOWNTIME;test_srv;" << now << ";" << now
+    << ";1;0;7200;admin;host";
 
-  ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now, const_cast<char *>(s.str().c_str())), ERROR);
+  ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now,
+                                  const_cast<char*>(s.str().c_str())),
+            ERROR);
 
   ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
 }
@@ -84,20 +81,43 @@ TEST_F(DowntimeExternalCommand, AddHostDowntime) {
   time_t now = time(nullptr);
 
   std::stringstream s;
-  s << "test_srv;" << now << ";"
-    << now + 1 << ";1;0;1;admin;host";
+  s << "test_srv;" << now << ";" << now + 1 << ";1;0;1;admin;host";
 
   ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
 
-  ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now, const_cast<char *>(s.str().c_str())), OK);
+  ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now,
+                                  const_cast<char*>(s.str().c_str())),
+            OK);
 
   ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
-  ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->first, 20000);
-  ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->get_hostname(), "test_srv");
-  ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->get_duration(), 1);
-  ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->get_end_time(), 20001);
-  ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->handle(), OK);
+  ASSERT_EQ(
+      downtime_manager::instance().get_scheduled_downtimes().begin()->first,
+      20000);
+  ASSERT_EQ(downtime_manager::instance()
+                .get_scheduled_downtimes()
+                .begin()
+                ->second->get_hostname(),
+            "test_srv");
+  ASSERT_EQ(downtime_manager::instance()
+                .get_scheduled_downtimes()
+                .begin()
+                ->second->get_duration(),
+            1);
+  ASSERT_EQ(downtime_manager::instance()
+                .get_scheduled_downtimes()
+                .begin()
+                ->second->get_end_time(),
+            20001);
+  ASSERT_EQ(downtime_manager::instance()
+                .get_scheduled_downtimes()
+                .begin()
+                ->second->handle(),
+            OK);
   set_time(20001);
-  ASSERT_EQ(downtime_manager::instance().get_scheduled_downtimes().begin()->second->handle(), OK);
+  ASSERT_EQ(downtime_manager::instance()
+                .get_scheduled_downtimes()
+                .begin()
+                ->second->handle(),
+            OK);
   ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
 }

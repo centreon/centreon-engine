@@ -25,8 +25,8 @@
 #  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/process.hh"
-#  include "com/centreon/process_listener.hh"
+#  include "com/centreon/engine/process.hh"
+#  include "com/centreon/engine/process_listener.hh"
 
 CCE_BEGIN()
 

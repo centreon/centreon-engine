@@ -17,16 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
-#include <map>
-#include <cstring>
+#include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include <gtest/gtest.h>
-#include "com/centreon/clib.hh"
+#include <map>
+#include <memory>
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
 
 using namespace com::centreon;
@@ -36,25 +34,24 @@ using namespace com::centreon::engine::downtimes;
 extern configuration::state* config;
 
 class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
-public:
- void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-   if (config == nullptr)
-     config = new configuration::state;
-   configuration::applier::state::load();  // Needed to create a contact
-   new_downtime(1, "first_host", "test_service", 123456789, 134567892, 1, 0, 42,
-                "test_author", "other_comment");
-   new_downtime(2, "test_host", "", 234567891, 134567892, 1, 0, 84,
-                "other_author", "test_comment");
-   new_downtime(3, "other_host", "other_service", 123456789, 345678921, 0, 2,
-                42, "", "test_comment");
-   new_downtime(4, "test_host", "test_service", 234567891, 345678921, 0, 2, 84,
-                "test_author", "");
-   new_downtime(5, "other_host", "test_service", 123456789, 134567892, 1, 2, 42,
-                "test_author", "test_comment");
-   _dtf.reset(new downtime_finder(downtime_manager::instance().get_scheduled_downtimes()));
- }
+ public:
+  void SetUp() override {
+    if (config == nullptr)
+      config = new configuration::state;
+    configuration::applier::state::load();  // Needed to create a contact
+    new_downtime(1, "first_host", "test_service", 123456789, 134567892, 1, 0,
+                 42, "test_author", "other_comment");
+    new_downtime(2, "test_host", "", 234567891, 134567892, 1, 0, 84,
+                 "other_author", "test_comment");
+    new_downtime(3, "other_host", "other_service", 123456789, 345678921, 0, 2,
+                 42, "", "test_comment");
+    new_downtime(4, "test_host", "test_service", 234567891, 345678921, 0, 2, 84,
+                 "test_author", "");
+    new_downtime(5, "other_host", "test_service", 123456789, 134567892, 1, 2,
+                 42, "test_author", "test_comment");
+    _dtf.reset(new downtime_finder(
+        downtime_manager::instance().get_scheduled_downtimes()));
+  }
 
   void TearDown() override {
     _dtf.reset();
@@ -62,8 +59,6 @@ public:
     downtime_manager::instance().clear_scheduled_downtimes();
     delete config;
     config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 
   downtime* new_downtime(unsigned long downtime_id,
@@ -156,8 +151,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, NullAuthorFound) {
 
 // Given a downtime_finder object with the test downtime list
 // And a downtime of the test list has a null comment
-// When find_matching_all() is called with the criteria ("comment", "anycomment")
-// Then an empty result_set is returned
+// When find_matching_all() is called with the criteria ("comment",
+// "anycomment") Then an empty result_set is returned
 TEST_F(DowntimeFinderFindMatchingAllTest, NullCommentNotFound) {
   criterias.push_back(downtime_finder::criteria("comment", "anycomment"));
   result = _dtf->find_matching_all(criterias);
@@ -187,8 +182,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleHosts) {
 }
 
 // Given a downtime_finder object with the test downtime list
-// When find_matching_all() is called with the criteria ("service", "test_service")
-// Then all downtimes of service /test_service/ are returned
+// When find_matching_all() is called with the criteria ("service",
+// "test_service") Then all downtimes of service /test_service/ are returned
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleServices) {
   criterias.push_back(downtime_finder::criteria("service", "test_service"));
   result = _dtf->find_matching_all(criterias);
@@ -257,8 +252,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleDuration) {
 }
 
 // Given a downtime_finder object with the test downtime list
-// When find_matching_all() is called with the criteria ("author", "test_author")
-// Then all downtimes from author /test_author/ are returned
+// When find_matching_all() is called with the criteria ("author",
+// "test_author") Then all downtimes from author /test_author/ are returned
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleAuthor) {
   criterias.push_back(downtime_finder::criteria("author", "test_author"));
   result = _dtf->find_matching_all(criterias);
@@ -269,8 +264,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleAuthor) {
 }
 
 // Given a downtime_finder object with the test downtime list
-// When find_matching_all() is called with the criteria ("comment", "test_comment")
-// Then all downtimes with comment "test_comment" are returned
+// When find_matching_all() is called with the criteria ("comment",
+// "test_comment") Then all downtimes with comment "test_comment" are returned
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleComment) {
   criterias.push_back(downtime_finder::criteria("comment", "test_comment"));
   result = _dtf->find_matching_all(criterias);
@@ -281,8 +276,9 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleComment) {
 }
 
 // Given a downtime_finder object with the test downtime list
-// When findMatchinAll() is called with criterias ("author", "test_author"), ("duration", "42") and ("comment", "test_comment")
-// Then all downtimes matching the criterias are returned
+// When findMatchinAll() is called with criterias ("author", "test_author"),
+// ("duration", "42") and ("comment", "test_comment") Then all downtimes
+// matching the criterias are returned
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleCriterias) {
   criterias.push_back(downtime_finder::criteria("author", "test_author"));
   criterias.push_back(downtime_finder::criteria("duration", "42"));

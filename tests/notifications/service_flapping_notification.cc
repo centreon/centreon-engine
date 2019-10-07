@@ -17,25 +17,21 @@
  *
  */
 
+#include <time.h>
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <regex>
-#include <time.h>
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
@@ -50,8 +46,6 @@ extern configuration::state* config;
 class ServiceFlappingNotification : public TestEngine {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     if (!config)
       config = new configuration::state;
     timezone_manager::load();
@@ -117,8 +111,6 @@ class ServiceFlappingNotification : public TestEngine {
     delete config;
     config = nullptr;
     timezone_manager::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 
  protected:
@@ -141,12 +133,13 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlapping) {
   // FIXME DBR: should not we find a better solution than fixing this each time?
   _service->set_last_hard_state_change(43000);
   std::unique_ptr<engine::timeperiod> tperiod{
-    new engine::timeperiod("tperiod", "alias")};
+      new engine::timeperiod("tperiod", "alias")};
   for (size_t i = 0; i < tperiod->days.size(); ++i)
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-    new engine::serviceescalation("host_name", "test_description", 0, 1, 1.0, "tperiod", 7, Uuid())};
+      new engine::serviceescalation("host_name", "test_description", 0, 1, 1.0,
+                                    "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_service->get_next_notification_id()};
@@ -154,23 +147,27 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlapping) {
   _service->set_is_flapping(true);
   testing::internal::CaptureStdout();
   ASSERT_EQ(_service->notify(notifier::reason_flappingstart, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 1, _service->get_next_notification_id());
   set_time(43500);
   _service->set_is_flapping(false);
   ASSERT_EQ(_service->notify(notifier::reason_flappingstop, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 2, _service->get_next_notification_id());
 
   ASSERT_EQ(_service->notify(notifier::reason_recovery, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
 
   std::string out{testing::internal::GetCapturedStdout()};
-  size_t step1{out.find("SERVICE NOTIFICATION: admin;test_host;test_description;FLAPPINGSTART (OK);cmd;")};
-  size_t step2{out.find("SERVICE NOTIFICATION: admin;test_host;test_description;FLAPPINGSTART (OK);cmd;")};
+  size_t step1{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_description;FLAPPINGSTART (OK);cmd;")};
+  size_t step2{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_description;FLAPPINGSTART (OK);cmd;")};
   ASSERT_NE(step1, std::string::npos);
   ASSERT_NE(step2, std::string::npos);
   ASSERT_LE(step1, step2);
@@ -189,26 +186,27 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlappingStartTwoTimes) {
   set_time(43000);
   _service->set_notification_interval(2);
   std::unique_ptr<engine::timeperiod> tperiod{
-    new engine::timeperiod("tperiod", "alias")};
+      new engine::timeperiod("tperiod", "alias")};
   for (uint32_t i = 0; i < tperiod->days.size(); ++i)
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-    new engine::serviceescalation("host_name", "test_description", 0, 1, 1.0, "tperiod", 7, Uuid())};
+      new engine::serviceescalation("host_name", "test_description", 0, 1, 1.0,
+                                    "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_service->get_next_notification_id()};
   _service->set_notification_period_ptr(tperiod.get());
   _service->set_is_flapping(true);
   ASSERT_EQ(_service->notify(notifier::reason_flappingstart, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 1, _service->get_next_notification_id());
 
   set_time(43050);
   /* Notification already sent, no notification should be sent. */
   ASSERT_EQ(_service->notify(notifier::reason_flappingstart, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 1, _service->get_next_notification_id());
 }
@@ -228,33 +226,34 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlappingStopTwoTimes) {
   set_time(43000);
   _service->set_notification_interval(2);
   std::unique_ptr<engine::timeperiod> tperiod{
-    new engine::timeperiod("tperiod", "alias")};
+      new engine::timeperiod("tperiod", "alias")};
   for (uint32_t i = 0; i < tperiod->days.size(); ++i)
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-    new engine::serviceescalation("host_name", "test_description", 0, 1, 1.0, "tperiod", 7, Uuid())};
+      new engine::serviceescalation("host_name", "test_description", 0, 1, 1.0,
+                                    "tperiod", 7, Uuid())};
 
   ASSERT_TRUE(service_escalation);
   uint64_t id{_service->get_next_notification_id()};
   _service->set_notification_period_ptr(tperiod.get());
   _service->set_is_flapping(true);
   ASSERT_EQ(_service->notify(notifier::reason_flappingstart, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 1, _service->get_next_notification_id());
 
   set_time(43050);
   /* Flappingstop notification: sent. */
   ASSERT_EQ(_service->notify(notifier::reason_flappingstop, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 2, _service->get_next_notification_id());
 
   set_time(43100);
   /* Second flappingstop notification: not sent. */
   ASSERT_EQ(_service->notify(notifier::reason_flappingstop, "", "",
-                          notifier::notification_option_none),
+                             notifier::notification_option_none),
             OK);
   ASSERT_EQ(id + 2, _service->get_next_notification_id());
 }
@@ -279,7 +278,6 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   _service->set_first_notification_delay(3);
   _service->set_max_attempts(1);
 
-
   // This loop is to store many UP in the state history.
   for (int i = 1; i < 22; i++) {
     // When i == 0, the state_critical is soft => no notification
@@ -295,7 +293,8 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
     std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
     oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;0;service ok";
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;0;service "
+           "ok";
     std::string cmd{oss.str()};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
@@ -316,7 +315,8 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
     std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
     oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;" << ((i % 2 == 1) ? "2;service critical" : "0;service ok");
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;"
+        << ((i % 2 == 1) ? "2;service critical" : "0;service ok");
     std::string cmd{oss.str()};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
@@ -336,7 +336,8 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
     std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
     oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;2;service critical";
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;2;service "
+           "critical";
     std::string cmd{oss.str()};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
@@ -345,10 +346,17 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   std::string out{testing::internal::GetCapturedStdout()};
 
   size_t m1{out.find("Step 6:")};
-  size_t m2{out.find("SERVICE NOTIFICATION: admin;test_host;test_description;FLAPPINGSTART (OK);cmd;", m1 + 1)};
+  size_t m2{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_description;FLAPPINGSTART (OK);cmd;",
+               m1 + 1)};
   size_t m3{out.find("Step 7:", m2 + 1)};
   size_t m4{out.find("Step 17:", m3 + 1)};
-  size_t m5{out.find("SERVICE FLAPPING ALERT: test_host;test_description;STOPPED;", m4 + 1)};
-  size_t m6{out.find("SERVICE NOTIFICATION: admin;test_host;test_description;FLAPPINGSTOP (CRITICAL);cmd;", m5 + 1)};
+  size_t m5{out.find(
+      "SERVICE FLAPPING ALERT: test_host;test_description;STOPPED;", m4 + 1)};
+  size_t m6{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_description;FLAPPINGSTOP (CRITICAL);cmd;",
+               m5 + 1)};
   ASSERT_NE(m6, std::string::npos);
 }

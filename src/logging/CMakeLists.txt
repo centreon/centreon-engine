@@ -27,14 +27,23 @@ set(
   ${FILES}
 
   # Sources.
+  "${SRC_DIR}/backend.cc"
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/debug_file.cc"
-  # "${SRC_DIR}/dumpers.cc"
+  "${SRC_DIR}/engine.cc"
+  "${SRC_DIR}/file.cc"
+  "${SRC_DIR}/syslogger.cc"
+  "${SRC_DIR}/temp_logger.cc"
 
   # Headers.
-  "${INC_DIR}/logger.hh"
+  "${INC_DIR}/backend.hh"
   "${INC_DIR}/broker.hh"
   "${INC_DIR}/debug_file.hh"
+  "${INC_DIR}/engine.hh"
+  "${INC_DIR}/file.hh"
+  "${INC_DIR}/logger.hh"
+  "${INC_DIR}/syslogger.hh"
+  "${INC_DIR}/temp_logger.hh"
   # "${INC_DIR}/dumpers.hh"
 
   PARENT_SCOPE

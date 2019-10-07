@@ -17,10 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
 #include <gtest/gtest.h>
-#include "com/centreon/clib.hh"
-#include "com/centreon/logging/engine.hh"
+#include <cstring>
+#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -29,16 +28,6 @@ using namespace com::centreon::engine;
 
 class GetNextValidTimeSpecificMonthDateTest : public ::testing::Test {
  public:
-  void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-  }
-
-  void TearDown() override {
-    com::centreon::logging::engine::unload();
-    clib::unload();
-  }
-
   void default_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);

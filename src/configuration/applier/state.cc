@@ -230,6 +230,7 @@ void applier::state::unlock() {
   _apply_lock.unlock();
 }
 
+#include <iostream>
 /*
  *  Update all new globals.
  *
@@ -321,6 +322,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
                                  new_cfg.command_check_interval_is_seconds());
   config->date_format(new_cfg.date_format());
   config->debug_file(new_cfg.debug_file());
+  std::cout << new_cfg.debug_level() << std::endl;
   config->debug_level(new_cfg.debug_level());
   config->debug_verbosity(new_cfg.debug_verbosity());
   config->enable_environment_macros(new_cfg.enable_environment_macros());

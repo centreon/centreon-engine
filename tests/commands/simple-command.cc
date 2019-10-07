@@ -17,15 +17,12 @@
  *
  */
 
+#include <gtest/gtest.h>
 #include <memory>
 #include <mutex>
-#include <gtest/gtest.h>
-#include "../timeperiod/utils.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/clib.hh"
 
-using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
@@ -34,10 +31,8 @@ extern configuration::state* config;
 class SimpleCommand : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     configuration::applier::state::load();  // Needed to store commands
-//    set_time(20);
+                                            //    set_time(20);
     if (config == NULL)
       config = new configuration::state;
   }
@@ -46,8 +41,6 @@ class SimpleCommand : public ::testing::Test {
     configuration::applier::state::unload();  // Needed to store commands
     delete config;
     config = NULL;
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 };
 
@@ -58,7 +51,7 @@ class my_listener : public commands::command_listener {
     return _res;
   }
 
-  void finished(result const& res) throw () override {
+  void finished(result const& res) throw() override {
     std::lock_guard<std::mutex> guard(_mutex);
     _res = res;
   }
@@ -97,7 +90,8 @@ TEST_F(SimpleCommand, CommandAlreadyExisting) {
 // When sync executed
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandSync) {
-  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
+  std::unique_ptr<commands::command> cmd{
+      new commands::raw("test", "/bin/echo bonjour")};
   nagios_macros mac;
   commands::result res;
   std::string cc(cmd->process_cmd(&mac));
@@ -113,7 +107,8 @@ TEST_F(SimpleCommand, NewCommandSync) {
 // Then we have the output in the result class.
 TEST_F(SimpleCommand, NewCommandAsync) {
   std::unique_ptr<my_listener> lstnr(new my_listener);
-  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/echo bonjour")};
+  std::unique_ptr<commands::command> cmd{
+      new commands::raw("test", "/bin/echo bonjour")};
   cmd->set_listener(lstnr.get());
   nagios_macros mac;
   std::string cc(cmd->process_cmd(&mac));
@@ -131,7 +126,8 @@ TEST_F(SimpleCommand, NewCommandAsync) {
 
 TEST_F(SimpleCommand, LongCommandAsync) {
   std::unique_ptr<my_listener> lstnr(new my_listener);
-  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/sleep 3")};
+  std::unique_ptr<commands::command> cmd{
+      new commands::raw("test", "/bin/sleep 3")};
   cmd->set_listener(lstnr.get());
   nagios_macros mac;
   std::string cc(cmd->process_cmd(&mac));

@@ -18,20 +18,15 @@
 */
 
 #include <gtest/gtest.h>
-#include "com/centreon/clib.hh"
 
-class  CentreonEngineEnvironment : public testing::Environment {
-public:
+class CentreonEngineEnvironment : public testing::Environment {
+ public:
   void SetUp() override {
     setenv("TZ", ":Europe/Paris", 1);
-    com::centreon::clib::load(com::centreon::clib::with_logging_engine);
-    return ;
+    return;
   }
 
-  void TearDown() override {
-    com::centreon::clib::unload();
-    return ;
-  }
+  void TearDown() override { return; }
 };
 
 /**
