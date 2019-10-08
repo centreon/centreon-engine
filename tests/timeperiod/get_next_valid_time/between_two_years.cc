@@ -18,6 +18,7 @@
 */
 
 #include <gtest/gtest.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
@@ -25,9 +26,11 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-class GetNextValidTimeBetweenTwoYears : public ::testing::Test {
+class        GetNextValidTimeBetweenTwoYears : public ::testing::Test {
  public:
-  void SetUp() override {
+  void       SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();
     _creator.new_timeperiod();
     _computed = (time_t)-1;
@@ -35,32 +38,51 @@ class GetNextValidTimeBetweenTwoYears : public ::testing::Test {
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
-  //
+//
   // DATE RANGES
   //
 
-  void calendar_date() {
-    daterange* dr(_creator.new_calendar_date(2016, 11, 20, 2017, 0, 10));
+  void       calendar_date() {
+    daterange* dr(_creator.new_calendar_date(
+                             2016,
+                             11,
+                             20,
+                             2017,
+                             0,
+                             10));
     _creator.new_timerange(0, 0, 24, 0, dr);
-    dr = _creator.new_calendar_date(2017, 11, 20, 2018, 0, 10);
+    dr = _creator.new_calendar_date(
+                    2017,
+                    11,
+                    20,
+                    2018,
+                    0,
+                    10);
     _creator.new_timerange(0, 0, 24, 0, dr);
   }
 
-  void specific_month_date() {
+  void       specific_month_date() {
     daterange* dr(_creator.new_specific_month_date(11, 20, 0, 10));
     _creator.new_timerange(0, 0, 24, 0, dr);
   }
 
-  void generic_month_date() {
+  void       generic_month_date() {
     daterange* dr(_creator.new_generic_month_date(20, 10));
     _creator.new_timerange(0, 0, 24, 0, dr);
   }
 
-  void offset_weekday_of_specific_month() {
-    daterange* dr(
-        _creator.new_offset_weekday_of_specific_month(11, 2, 3, 0, 2, 2));
+  void       offset_weekday_of_specific_month() {
+    daterange* dr(_creator.new_offset_weekday_of_specific_month(
+                             11,
+                             2,
+                             3,
+                             0,
+                             2,
+                             2));
     _creator.new_timerange(0, 0, 24, 0, dr);
   }
 
@@ -68,35 +90,35 @@ class GetNextValidTimeBetweenTwoYears : public ::testing::Test {
   // CURRENT TIME
   //
 
-  void before_timeperiod() {
+  void       before_timeperiod() {
     _now = strtotimet("2016-12-15 12:00:00");
     set_time(_now);
   }
 
-  void before_new_year() {
+  void       before_new_year() {
     _now = strtotimet("2016-12-25 12:00:00");
     set_time(_now);
   }
 
-  void at_new_year() {
+  void       at_new_year() {
     _now = strtotimet("2017-01-01 00:00:00");
     set_time(_now);
   }
 
-  void after_new_year() {
+  void       after_new_year() {
     _now = strtotimet("2017-01-02 12:00:00");
     set_time(_now);
   }
 
-  void after_timeperiod() {
+  void       after_timeperiod() {
     _now = strtotimet("2017-01-15 12:00:00");
     set_time(_now);
   }
 
  protected:
-  time_t _computed;
+  time_t             _computed;
   timeperiod_creator _creator;
-  time_t _now;
+  time_t             _now;
 };
 
 //
@@ -130,6 +152,7 @@ class GetNextValidTimeBetweenTwoYears : public ::testing::Test {
 // And we are after the timeperiod
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the timeperiod in the new year
+
 
 //
 // CALENDAR DATE TESTS
@@ -252,16 +275,14 @@ TEST_F(GetNextValidTimeBetweenTwoYears, GenericMonthDateAfterTimeperiod) {
 // OFFSET WEEKDAY OF SPECIFIC MONTH TESTS
 //
 
-TEST_F(GetNextValidTimeBetweenTwoYears,
-       OffsetWeekdayOfSpecificMonthBeforeTimeperiod) {
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthBeforeTimeperiod) {
   offset_weekday_of_specific_month();
   before_timeperiod();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-12-20 00:00:00"));
 }
 
-TEST_F(GetNextValidTimeBetweenTwoYears,
-       OffsetWeekdayOfSpecificMonthBeforeNewYear) {
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthBeforeNewYear) {
   offset_weekday_of_specific_month();
   before_new_year();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
@@ -275,16 +296,14 @@ TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthAtNewYear) {
   ASSERT_EQ(_computed, strtotimet("2017-01-01 00:00:00"));
 }
 
-TEST_F(GetNextValidTimeBetweenTwoYears,
-       OffsetWeekdayOfSpecificMonthAfterNewYear) {
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthAfterNewYear) {
   offset_weekday_of_specific_month();
   after_new_year();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2017-01-02 12:00:00"));
 }
 
-TEST_F(GetNextValidTimeBetweenTwoYears,
-       OffsetWeekdayOfSpecificMonthAfterTimeperiod) {
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthAfterTimeperiod) {
   offset_weekday_of_specific_month();
   after_timeperiod();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());

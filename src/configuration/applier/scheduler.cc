@@ -38,6 +38,7 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
+using namespace com::centreon::logging;
 
 static applier::scheduler* _instance(NULL);
 

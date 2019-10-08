@@ -20,14 +20,21 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <regex>
+#include <time.h>
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
-#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/clib.hh"
+#include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
+#include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
+#include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/hostescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
@@ -42,6 +49,8 @@ extern configuration::state* config;
 class HostFlappingNotification : public TestEngine {
  public:
   void SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     if (!config)
       config = new configuration::state;
     timezone_manager::load();
@@ -78,6 +87,8 @@ class HostFlappingNotification : public TestEngine {
     delete config;
     config = nullptr;
     timezone_manager::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
  protected:
@@ -127,10 +138,8 @@ TEST_F(HostFlappingNotification, SimpleHostFlapping) {
             OK);
 
   std::string out{testing::internal::GetCapturedStdout()};
-  size_t step1{
-      out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;")};
-  size_t step2{
-      out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;")};
+  size_t step1{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;")};
+  size_t step2{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;")};
   ASSERT_NE(step1, std::string::npos);
   ASSERT_NE(step2, std::string::npos);
   ASSERT_LE(step1, step2);
@@ -240,8 +249,9 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
     _host->set_last_state(_host->get_current_state());
     if (notifier::hard == _host->get_state_type())
       _host->set_last_hard_state(_host->get_current_state());
-    _host->process_check_result_3x(engine::host::state_up, "The host is up",
-                                   CHECK_OPTION_NONE, 0, true, 0);
+    _host->process_check_result_3x(
+        engine::host::state_up,
+        "The host is up", CHECK_OPTION_NONE, 0, true, 0);
   }
   testing::internal::CaptureStdout();
   for (int i = 1; i < 8; i++) {
@@ -267,19 +277,17 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
     _host->set_last_state(_host->get_current_state());
     if (notifier::hard == _host->get_state_type())
       _host->set_last_hard_state(_host->get_current_state());
-    _host->process_check_result_3x(engine::host::state_down,
-                                   "The host is flapping", CHECK_OPTION_NONE, 0,
-                                   true, 0);
+    _host->process_check_result_3x(
+        engine::host::state_down,
+        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
   }
 
   std::string out{testing::internal::GetCapturedStdout()};
   size_t m1{out.find("Step 6:")};
-  size_t m2{out.find(
-      "HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;", m1 + 1)};
+  size_t m2{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;", m1 + 1)};
   size_t m3{out.find("Step 7:", m2 + 1)};
   size_t m4{out.find("Step 17:", m3 + 1)};
   size_t m5{out.find("HOST FLAPPING ALERT: test_host;STOPPED;", m4 + 1)};
-  size_t m6{out.find(
-      "HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP (DOWN);cmd;", m5 + 1)};
+  size_t m6{out.find("HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP (DOWN);cmd;", m5 + 1)};
   ASSERT_NE(m6, std::string::npos);
 }

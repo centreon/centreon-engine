@@ -18,90 +18,86 @@
 */
 
 #ifndef CCE_LOGGING_LOGGER_HH
-#define CCE_LOGGING_LOGGER_HH
+#  define CCE_LOGGING_LOGGER_HH
 
-#include "com/centreon/engine/logging/engine.hh"
-#include "com/centreon/engine/logging/temp_logger.hh"
-#include "com/centreon/engine/namespace.hh"
-#include "com/centreon/namespace.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/logging/temp_logger.hh"
 
 CCE_BEGIN()
 
 namespace logging {
-/**
- *  @enum object::e_type
- *  Logging types.
- */
-enum type_value {
-  none = 0ull,
+  /**
+   *  @enum object::e_type
+   *  Logging types.
+   */
+  enum    type_value {
+    none                     = 0ull,
 
-  log_runtime_error = (1ull << 1),
-  log_runtime_warning = (1ull << 2),
-  log_verification_error = (1ull << 3),
-  log_verification_warning = (1ull << 4),
-  log_config_error = (1ull << 5),
-  log_config_warning = (1ull << 6),
-  log_process_info = (1ull << 7),
-  log_event_handler = (1ull << 8),
-  log_external_command = (1ull << 9),
-  log_host_up = (1ull << 10),
-  log_host_down = (1ull << 11),
-  log_host_unreachable = (1ull << 12),
-  log_service_ok = (1ull << 13),
-  log_service_unknown = (1ull << 14),
-  log_service_warning = (1ull << 15),
-  log_service_critical = (1ull << 16),
-  log_passive_check = (1ull << 17),
-  log_info_message = (1ull << 18),
-  log_host_notification = (1ull << 19),
-  log_service_notification = (1ull << 20),
-  log_all = (1ull << 21),
+    log_runtime_error        = 1ull,
+    log_runtime_warning      = 2ull,
+    log_verification_error   = 4ull,
+    log_verification_warning = 8ull,
+    log_config_error         = 16ull,
+    log_config_warning       = 32ull,
+    log_process_info         = 64ull,
+    log_event_handler        = 128ull,
+    log_external_command     = 512ull,
+    log_host_up              = 1024ull,
+    log_host_down            = 2048ull,
+    log_host_unreachable     = 4096ull,
+    log_service_ok           = 8192ull,
+    log_service_unknown      = 16384ull,
+    log_service_warning      = 32768ull,
+    log_service_critical     = 65536ull,
+    log_passive_check        = 131072ull,
+    log_info_message         = 262144ull,
+    log_host_notification    = 524288ull,
+    log_service_notification = 1048576ull,
+    log_all                  = 2096895ull,
 
-  dbg_functions = (1ull << 32),
-  dbg_config = (1ull << 33),
-  dbg_process = (1ull << 34),
-  dbg_statusdata = (1ull << 34),
-  dbg_retentiondata = (1ull << 34),
-  dbg_events = (1ull << 35),
-  dbg_checks = (1ull << 36),
-  dbg_ipc = (1ull << 36),
-  dbg_flapping = (1ull << 36),
-  dbg_eventhandlers = (1ull << 36),
-  dbg_perfdata = (1ull << 36),
-  dbg_notifications = (1ull << 37),
-  dbg_eventbroker = (1ull << 38),
-  dbg_external_command = (1ull << 39),
-  dbg_commands = (1ull << 40),
-  dbg_downtime = (1ull << 41),
-  dbg_comments = (1ull << 42),
-  dbg_macros = (1ull << 43),
-  dbg_all = (1ull << 44),
+    dbg_functions            = (1ull << 32),
+    dbg_config               = (2ull << 32),
+    dbg_process              = (4ull << 32),
+    dbg_statusdata           = (4ull << 32),
+    dbg_retentiondata        = (4ull << 32),
+    dbg_events               = (8ull << 32),
+    dbg_checks               = (16ull << 32),
+    dbg_ipc                  = (16ull << 32),
+    dbg_flapping             = (16ull << 32),
+    dbg_eventhandlers        = (16ull << 32),
+    dbg_perfdata             = (16ull << 32),
+    dbg_notifications        = (32ull << 32),
+    dbg_eventbroker          = (64ull << 32),
+    dbg_external_command     = (128ull << 32),
+    dbg_commands             = (256ull << 32),
+    dbg_downtime             = (512ull << 32),
+    dbg_comments             = (1024ull << 32),
+    dbg_macros               = (2048ull << 32),
+    dbg_all                  = (4095ull << 32),
 
-  type_info = (1ull << 61),
-  type_debug = (1ull << 62),
-  type_error = (1ull << 63),
+    all                      = log_all | dbg_all
+  };
 
-  all = log_all | dbg_all
-};
-
-/**
- *  @enum object::e_verbose
- *  Logging verbosity.
- */
-enum verbosity_level { basic = 0u, more = 1u, most = 2u };
-}  // namespace logging
+  /**
+   *  @enum object::e_verbose
+   *  Logging verbosity.
+   */
+  enum    verbosity_level {
+    basic = 0u,
+    more  = 1u,
+    most  = 2u
+  };
+}
 
 CCE_END()
 
-#define logger(type, verbose)                                              \
-  for (unsigned int __com_centreon_engine_logging_define_ui(0);            \
-       !__com_centreon_engine_logging_define_ui &&                         \
-       com::centreon::engine::logging::engine::instance().is_log(type,     \
-                                                                 verbose); \
-       ++__com_centreon_engine_logging_define_ui)                          \
-  com::centreon::engine::logging::temp_logger(type, verbose)
+#  define logger(type, verbose) \
+  for (unsigned int __com_centreon_engine_logging_define_ui(0); \
+       !__com_centreon_engine_logging_define_ui \
+       && com::centreon::logging::engine::instance().is_log( \
+               type, \
+               verbose); \
+       ++__com_centreon_engine_logging_define_ui) \
+    com::centreon::logging::temp_logger(type, verbose)
 
-#define log_error(verbose) \
-  logger(com::centreon::engine::logging::type_error, verbose) << "[error] "
-
-#endif  // !CCE_LOGGING_LOGGER_HH
+#endif // !CCE_LOGGING_LOGGER_HH

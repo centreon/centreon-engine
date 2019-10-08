@@ -17,9 +17,10 @@
  *
  */
 
-#include <gtest/gtest.h>
 #include <memory>
+#include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
@@ -44,11 +45,15 @@ class ApplierContactgroup : public ::testing::Test {
     config_warnings = 0;
     if (config == NULL)
       config = new configuration::state;
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();  // Needed to create a contact
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
     delete config;
     config = NULL;
   }
@@ -83,7 +88,7 @@ TEST_F(ApplierContactgroup, ModifyUnexistingContactgroupFromConfig) {
 // And a configuration contactgroup in configuration
 // When we modify the contactgroup configuration
 // Then the applier modify_object updates the contactgroup.
-// TEST_F(ApplierContactgroup, ModifyContactgroupFromConfig) {
+//TEST_F(ApplierContactgroup, ModifyContactgroupFromConfig) {
 //  configuration::applier::contactgroup aply;
 //  configuration::contactgroup cg("test");
 //  ASSERT_TRUE(cg.parse("members", "contact"));
@@ -111,27 +116,28 @@ TEST_F(ApplierContactgroup, RemoveContactgroupFromConfig) {
   caply.add_object(ct);
   ASSERT_TRUE(cg.parse("members", "contact"));
   aply.add_object(cg);
-  ASSERT_FALSE(engine::contactgroup::contactgroups.empty());
+  ASSERT_FALSE(
+    engine::contactgroup::contactgroups.empty());
 
   aply.remove_object(cg);
-  ASSERT_TRUE(engine::contactgroup::contactgroups.empty());
+  ASSERT_TRUE(
+    engine::contactgroup::contactgroups.empty());
 }
 
 // Given a contactgroup applier and a configuration contactgroup
 // Then the add_object() of the applier creates the contactgroup.
-// TEST_F(ApplierContactgroup, NewContactgroupFromConfig) {
+//TEST_F(ApplierContactgroup, NewContactgroupFromConfig) {
 //  configuration::applier::contactgroup aplyr;
 //  configuration::contactgroup grp("test_group");
 //  aplyr.add_object(grp);
-//  contactgroup_map const&
-//  cgs(configuration::applier::state::instance().contactgroups());
+//  contactgroup_map const& cgs(configuration::applier::state::instance().contactgroups());
 //  ASSERT_EQ(cgs.size(), 1);
 //}
 //
 //// Given an empty contactgroup
 //// When the resolve_object() method is called
 //// Then no warning, nor error are given
-// TEST_F(ApplierContactgroup, ResolveEmptyContactgroup) {
+//TEST_F(ApplierContactgroup, ResolveEmptyContactgroup) {
 //  configuration::applier::contactgroup aplyr;
 //  configuration::contactgroup grp("test");
 //  aplyr.add_object(grp);

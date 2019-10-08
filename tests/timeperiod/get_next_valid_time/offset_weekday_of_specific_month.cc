@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
@@ -26,18 +27,21 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-class GetNextValidTimeOffsetWeekdayOfSpecificMonthTest
-    : public ::testing::Test {
+class         GetNextValidTimeOffsetWeekdayOfSpecificMonthTest : public ::testing::Test {
  public:
   void SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
-  void default_data_set() {
+  void        default_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);
     // tuesday 4 october 10:45-14:25
@@ -49,7 +53,7 @@ class GetNextValidTimeOffsetWeekdayOfSpecificMonthTest
     _creator.new_timerange(18, 30, 21, 15, dr);
   }
 
-  void negative_offset_data_set() {
+  void        negative_offset_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);
     // tuesday -4 october 10:45-14:25
@@ -121,8 +125,7 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfSpecificMonthTest, AfterRanges) {
 // And we are earlier than these dates
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the next date's timerange
-TEST_F(GetNextValidTimeOffsetWeekdayOfSpecificMonthTest,
-       BeforeNegativeDateRanges) {
+TEST_F(GetNextValidTimeOffsetWeekdayOfSpecificMonthTest, BeforeNegativeDateRanges) {
   negative_offset_data_set();
   time_t now(strtotimet("2016-10-03 12:00:00"));
   set_time(now);
@@ -135,8 +138,7 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfSpecificMonthTest,
 // And we are between two offset weekdays ranges
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the next daterange's timerange
-TEST_F(GetNextValidTimeOffsetWeekdayOfSpecificMonthTest,
-       BetweenNegativeDateRanges) {
+TEST_F(GetNextValidTimeOffsetWeekdayOfSpecificMonthTest, BetweenNegativeDateRanges) {
   negative_offset_data_set();
   time_t now(strtotimet("2016-10-08 12:00:00"));
   set_time(now);

@@ -24,8 +24,8 @@
 #include <memory>
 #include "../../test_engine.hh"
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
@@ -36,6 +36,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
@@ -51,6 +52,8 @@ extern configuration::state* config;
 class HostDependency : public TestEngine {
  public:
   void SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     if (!config)
       config = new configuration::state;
     timezone_manager::load();
@@ -86,19 +89,21 @@ class HostDependency : public TestEngine {
     delete config;
     config = nullptr;
     timezone_manager::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 };
 
 TEST_F(HostDependency, CircularDependency2) {
   configuration::applier::hostdependency hd_aply;
-  configuration::hostdependency hd1{
-      new_configuration_hostdependency("host1", "host2")};
+  configuration::hostdependency hd1{new_configuration_hostdependency(
+    "host1", "host2")};
   hd_aply.expand_objects(*config);
   hd_aply.add_object(hd1);
   hd_aply.resolve_object(hd1);
 
-  configuration::hostdependency hd2{
-      new_configuration_hostdependency("host2", "host1")};
+  configuration::hostdependency hd2{new_configuration_hostdependency(
+    "host2", "host1")};
   hd_aply.expand_objects(*config);
   hd_aply.add_object(hd2);
   hd_aply.resolve_object(hd2);
@@ -109,20 +114,20 @@ TEST_F(HostDependency, CircularDependency2) {
 
 TEST_F(HostDependency, CircularDependency3) {
   configuration::applier::hostdependency hd_aply;
-  configuration::hostdependency hd1{
-      new_configuration_hostdependency("host1", "host2")};
+  configuration::hostdependency hd1{new_configuration_hostdependency(
+    "host1", "host2")};
   hd_aply.expand_objects(*config);
   hd_aply.add_object(hd1);
   hd_aply.resolve_object(hd1);
 
-  configuration::hostdependency hd2{
-      new_configuration_hostdependency("host2", "host3")};
+  configuration::hostdependency hd2{new_configuration_hostdependency(
+    "host2", "host3")};
   hd_aply.expand_objects(*config);
   hd_aply.add_object(hd2);
   hd_aply.resolve_object(hd2);
 
-  configuration::hostdependency hd3{
-      new_configuration_hostdependency("host3", "host1")};
+  configuration::hostdependency hd3{new_configuration_hostdependency(
+    "host3", "host1")};
   hd_aply.expand_objects(*config);
   hd_aply.add_object(hd3);
   hd_aply.resolve_object(hd3);

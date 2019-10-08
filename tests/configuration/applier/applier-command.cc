@@ -21,11 +21,13 @@
 #include <string>
 #include <unordered_map>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
@@ -47,6 +49,8 @@ class ApplierCommand : public ::testing::Test {
   void SetUp() override {
     if (config == nullptr)
       config = new configuration::state;
+    clib::load();
+    com::centreon::logging::engine::load();
     applier::state::load();  // Needed to create a contact
     timezone_manager::load();
     checks::checker::load();
@@ -54,11 +58,14 @@ class ApplierCommand : public ::testing::Test {
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
     checks::checker::unload();
     delete config;
     config = nullptr;
     timezone_manager::unload();
   }
+
 };
 
 // Given a command applier
@@ -72,7 +79,7 @@ TEST_F(ApplierCommand, UnusableCommandFromConfig) {
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1u);
   std::unordered_map<std::string, std::shared_ptr<commands::command>> cm(
-      commands::command::commands);
+    commands::command::commands);
   ASSERT_EQ(cm.size(), 0u);
 }
 
@@ -87,7 +94,8 @@ TEST_F(ApplierCommand, NewCommandFromConfig) {
   aply.add_object(cmd);
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1u);
-  command_map::iterator found{commands::command::commands.find("cmd")};
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
   ASSERT_FALSE(found == commands::command::commands.end());
   ASSERT_FALSE(!found->second);
   ASSERT_EQ(found->second->get_name(), "cmd");
@@ -106,7 +114,8 @@ TEST_F(ApplierCommand, NewCommandWithEmptyConnectorFromConfig) {
   ASSERT_THROW(aply.add_object(cmd), std::exception);
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1u);
-  command_map::iterator found{commands::command::commands.find("cmd")};
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
   ASSERT_TRUE(found == commands::command::commands.end());
 }
 
@@ -126,13 +135,12 @@ TEST_F(ApplierCommand, NewCommandWithConnectorFromConfig) {
   cnn_aply.add_object(cnn);
   aply.add_object(cmd);
 
-  //  set_command s(config->commands());
-  //  ASSERT_EQ(s.size(), 1);
-  //  commands::command const*
-  //  cc(applier::state::instance().find_command("cmd"));
-  //  ASSERT_EQ(cc->get_name(), "cmd");
-  //  ASSERT_EQ(cc->get_command_line(), "echo 1");
-  //  aply.resolve_object(cmd);
+//  set_command s(config->commands());
+//  ASSERT_EQ(s.size(), 1);
+//  commands::command const* cc(applier::state::instance().find_command("cmd"));
+//  ASSERT_EQ(cc->get_name(), "cmd");
+//  ASSERT_EQ(cc->get_command_line(), "echo 1");
+//  aply.resolve_object(cmd);
 }
 
 // Given some command/connector appliers
@@ -153,7 +161,8 @@ TEST_F(ApplierCommand, NewCommandAndConnectorWithSameName) {
 
   set_command s(config->commands());
   ASSERT_EQ(s.size(), 1u);
-  command_map::iterator found{commands::command::commands.find("cmd")};
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
   ASSERT_FALSE(found == commands::command::commands.end());
   ASSERT_FALSE(!found->second);
 
@@ -162,7 +171,7 @@ TEST_F(ApplierCommand, NewCommandAndConnectorWithSameName) {
 
   aply.resolve_object(cmd);
   connector_map::iterator found_con{
-      commands::connector::connectors.find("cmd")};
+    commands::connector::connectors.find("cmd")};
   ASSERT_TRUE(found_con != commands::connector::connectors.end());
   ASSERT_TRUE(found_con->second);
 
@@ -187,10 +196,9 @@ TEST_F(ApplierCommand, ModifyCommandWithConnector) {
 
   cmd.parse("command_line", "date");
   aply.modify_object(cmd);
-  //  commands::command const*
-  //  cc(applier::state::instance().find_command("cmd"));
-  //  ASSERT_EQ(cc->get_name(), "cmd");
-  //  ASSERT_EQ(cc->get_command_line(), "date");
+//  commands::command const* cc(applier::state::instance().find_command("cmd"));
+//  ASSERT_EQ(cc->get_name(), "cmd");
+//  ASSERT_EQ(cc->get_command_line(), "date");
 }
 
 // When a non existing command is removed
@@ -215,7 +223,8 @@ TEST_F(ApplierCommand, RemoveCommand) {
   aply.add_object(cmd);
 
   aply.remove_object(cmd);
-  command_map::iterator found{commands::command::commands.find("cmd")};
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
   ASSERT_EQ(found, commands::command::commands.end());
   ASSERT_TRUE(config->commands().size() == 0);
 }
@@ -236,7 +245,8 @@ TEST_F(ApplierCommand, RemoveCommandWithConnector) {
   aply.add_object(cmd);
 
   aply.remove_object(cmd);
-  command_map::iterator found{commands::command::commands.find("cmd")};
+  command_map::iterator found{
+    commands::command::commands.find("cmd")};
   ASSERT_EQ(found, commands::command::commands.end());
   ASSERT_TRUE(config->commands().size() == 0);
 }
@@ -250,9 +260,7 @@ TEST_F(ApplierCommand, ComplexCommand) {
   configuration::applier::host hst_aply;
 
   configuration::command cmd("base_centreon_ping");
-  cmd.parse("command_line",
-            "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w "
-            "$_HOSTWARNING$ -c $_HOSTCRITICAL$");
+  cmd.parse("command_line", "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w $_HOSTWARNING$ -c $_HOSTCRITICAL$");
   cmd_aply.add_object(cmd);
 
   configuration::host hst;
@@ -266,7 +274,7 @@ TEST_F(ApplierCommand, ComplexCommand) {
   hst_aply.add_object(hst);
 
   command_map::iterator cmd_found{
-      commands::command::commands.find("base_centreon_ping")};
+    commands::command::commands.find("base_centreon_ping")};
   ASSERT_NE(cmd_found, commands::command::commands.end());
   ASSERT_TRUE(config->commands().size() == 1);
 
@@ -279,10 +287,8 @@ TEST_F(ApplierCommand, ComplexCommand) {
   ASSERT_TRUE(hst_found->second->custom_variables.size() == 3);
   nagios_macros macros;
   grab_host_macros_r(&macros, hst_found->second.get());
-  std::string processed_cmd(
-      hst_found->second->get_check_command_ptr()->process_cmd(&macros));
-  ASSERT_EQ(processed_cmd,
-            "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50%");
+  std::string processed_cmd(hst_found->second->get_check_command_ptr()->process_cmd(&macros));
+  ASSERT_EQ(processed_cmd, "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50%");
 }
 
 // Given simple command (without connector) applier already applied with
@@ -295,10 +301,9 @@ TEST_F(ApplierCommand, ComplexCommandWithContact) {
   configuration::applier::contact cnt_aply;
 
   configuration::command cmd("base_centreon_ping");
-  cmd.parse("command_line",
-            "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w "
-            "$_HOSTWARNING$ -c $_HOSTCRITICAL$ $CONTACTNAME$");
+  cmd.parse("command_line", "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w $_HOSTWARNING$ -c $_HOSTCRITICAL$ $CONTACTNAME$");
   cmd_aply.add_object(cmd);
+
 
   configuration::contact cnt;
   ASSERT_TRUE(cnt.parse("contact_name", "user"));
@@ -320,7 +325,7 @@ TEST_F(ApplierCommand, ComplexCommandWithContact) {
   hst_aply.add_object(hst);
 
   command_map::iterator cmd_found{
-      commands::command::commands.find("base_centreon_ping")};
+    commands::command::commands.find("base_centreon_ping")};
   ASSERT_NE(cmd_found, commands::command::commands.end());
   ASSERT_TRUE(config->commands().size() == 1);
 
@@ -333,8 +338,6 @@ TEST_F(ApplierCommand, ComplexCommandWithContact) {
   ASSERT_TRUE(hst_found->second->custom_variables.size() == 3);
   nagios_macros macros;
   grab_host_macros_r(&macros, hst_found->second.get());
-  std::string processed_cmd(
-      hst_found->second->get_check_command_ptr()->process_cmd(&macros));
-  ASSERT_EQ(processed_cmd,
-            "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50% user");
+  std::string processed_cmd(hst_found->second->get_check_command_ptr()->process_cmd(&macros));
+  ASSERT_EQ(processed_cmd, "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50% user");
 }

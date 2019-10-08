@@ -24,14 +24,14 @@ if (WITH_TESTING)
 
   set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/3rdparty)
 
-  ExternalProject_Add(googletest
-    GIT_REPOSITORY https://github.com/google/googletest/
-    TIMEOUT 10
-    INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-    LOG_CONFIGURE ON
-    LOG_BUILD ON
-    CMAKE_ARGS -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS})
+  ExternalProject_Add( googletest
+                       GIT_REPOSITORY https://github.com/google/googletest/
+                       TIMEOUT 10
+                       INSTALL_COMMAND ""
+                       LOG_DOWNLOAD ON
+                       LOG_CONFIGURE ON
+                       LOG_BUILD ON
+                       CMAKE_ARGS -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS})
 
   ExternalProject_Get_Property(googletest source_dir)
   ExternalProject_Get_Property(googletest binary_dir)
@@ -39,7 +39,7 @@ if (WITH_TESTING)
   link_directories(${binary_dir}/lib)
   include_directories(${source_dir}/googletest/include)
 
-  # Tests directory.
+# Tests directory.
   # Add root inclusion direction.
   set(MODULE_DIR "${PROJECT_SOURCE_DIR}/modules/external_commands")
   set(INC_DIR "${MODULE_DIR}/inc/com/centreon/engine/modules/external_commands")
@@ -54,8 +54,6 @@ if (WITH_TESTING)
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/commands.cc"
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/internal.cc"
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/processing.cc"
-    "${PROJECT_SOURCE_DIR}/src/process_manager.cc"
-    "${PROJECT_SOURCE_DIR}/src/process.cc"
     "${TESTS_DIR}/parse-check-output.cc"
     "${TESTS_DIR}/commands/simple-command.cc"
     "${TESTS_DIR}/configuration/applier/applier-command.cc"
@@ -106,19 +104,19 @@ if (WITH_TESTING)
     # Headers.
     "${TESTS_DIR}/test_engine.hh"
     "${TESTS_DIR}/timeperiod/utils.hh"
-    )
+  )
 
-  add_dependencies(ut googletest)
+add_dependencies(ut googletest)
   target_link_libraries(ut gtest cce_core pthread gcov)
 
   add_test(NAME tests COMMAND ut)
 
   if (WITH_COVERAGE)
-    set(COVERAGE_EXCLUDES '${PROJECT_BINARY_DIR}/*' '${PROJECT_SOURCE_DIR}/tests/*' '/usr/include/* ')
+  set(COVERAGE_EXCLUDES '${PROJECT_BINARY_DIR}/*' '${PROJECT_SOURCE_DIR}/tests/*' '/usr/include/* ')
     SETUP_TARGET_FOR_COVERAGE(
-      NAME test-coverage
-      EXECUTABLE ut
-      DEPENDENCIES ut
+        NAME test-coverage
+        EXECUTABLE ut
+        DEPENDENCIES ut
     )
   endif ()
 endif ()

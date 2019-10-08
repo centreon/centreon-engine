@@ -20,8 +20,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/process.hh"
+#include "com/centreon/process.hh"
 #include "test/paths.hh"
 
 using namespace com::centreon::engine;
@@ -37,6 +38,9 @@ using namespace com::centreon::engine;
 int main(int argc, char* argv[]) {
   int retval(EXIT_FAILURE);
   try {
+    // Initialization.
+    com::centreon::clib::load();
+
     // Check arguments.
     if (argc < 2)
       throw (engine_error() << "USAGE: "
@@ -54,10 +58,10 @@ int main(int argc, char* argv[]) {
     cmd.append("'");
 
     // Run process.
-    com::centreon::engine::process centengined;
-    centengined.enable_stream(com::centreon::engine::process::in, false);
-    centengined.enable_stream(com::centreon::engine::process::out, false);
-    centengined.enable_stream(com::centreon::engine::process::err, false);
+    com::centreon::process centengined;
+    centengined.enable_stream(com::centreon::process::in, false);
+    centengined.enable_stream(com::centreon::process::out, false);
+    centengined.enable_stream(com::centreon::process::err, false);
     centengined.exec(cmd);
     bool reached_timeout(!centengined.wait(timeout * 1000));
     if (!reached_timeout)
@@ -70,7 +74,7 @@ int main(int argc, char* argv[]) {
 
     // Reaching here means success.
     retval = (((centengined.exit_status()
-                == com::centreon::engine::process::normal)
+                == com::centreon::process::normal)
                && (centengined.exit_code() == EXIT_SUCCESS))
               ? EXIT_SUCCESS
               : EXIT_FAILURE);
@@ -81,6 +85,9 @@ int main(int argc, char* argv[]) {
   catch (...) {
     std::cerr << "unknown error" << std::endl;
   }
+
+  // Shutdown.
+  com::centreon::clib::unload();
 
   return (retval);
 }

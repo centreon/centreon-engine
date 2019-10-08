@@ -16,9 +16,10 @@
  * For more information : contact@centreon.com
  *
  */
-#include <gtest/gtest.h>
 #include <memory>
+#include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
@@ -41,6 +42,8 @@ class ApplierConnector : public ::testing::Test {
   void SetUp() override {
     if (config == NULL)
       config = new configuration::state;
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();  // Needed to create a contact
     timezone_manager::load();
     checks::checker::load();
@@ -49,10 +52,13 @@ class ApplierConnector : public ::testing::Test {
   void TearDown() override {
     timezone_manager::unload();
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
     checks::checker::unload();
     delete config;
     config = nullptr;
   }
+
 };
 
 // Given a connector applier
@@ -66,6 +72,7 @@ TEST_F(ApplierConnector, UnusableConnectorFromConfig) {
   set_connector s(config->connectors());
   ASSERT_EQ(s.size(), 1u);
   ASSERT_EQ(commands::connector::connectors.size(), 1u);
+
 }
 
 // Given a connector applier already applied
@@ -82,7 +89,7 @@ TEST_F(ApplierConnector, ModifyConnector) {
   aply.modify_object(cnn);
 
   connector_map::iterator found_con{
-      commands::connector::connectors.find("connector")};
+    commands::connector::connectors.find("connector")};
   ASSERT_FALSE(found_con == commands::connector::connectors.end());
   ASSERT_FALSE(!found_con->second);
 

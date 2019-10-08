@@ -18,6 +18,7 @@
 */
 
 #include <gtest/gtest.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
@@ -25,9 +26,11 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-class GetNextValidTimeForwardDST : public ::testing::Test {
+class        GetNextValidTimeForwardDST : public ::testing::Test {
  public:
-  void SetUp() override {
+  void       SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();
     _creator.new_timeperiod();
     _computed = (time_t)-1;
@@ -35,6 +38,8 @@ class GetNextValidTimeForwardDST : public ::testing::Test {
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
   //
@@ -54,7 +59,13 @@ class GetNextValidTimeForwardDST : public ::testing::Test {
   }
 
   daterange* dst_offset_weekday_of_specific_month() {
-    return (_creator.new_offset_weekday_of_specific_month(2, 0, 4, 2, 0, 4));
+    return (_creator.new_offset_weekday_of_specific_month(
+                       2,
+                       0,
+                       4,
+                       2,
+                       0,
+                       4));
   }
 
   daterange* dst_offset_weekday_of_generic_month() {
@@ -65,11 +76,11 @@ class GetNextValidTimeForwardDST : public ::testing::Test {
   // TIME RANGES
   //
 
-  void timerange_includes_dst(daterange* dr) {
+  void       timerange_includes_dst(daterange* dr) {
     _creator.new_timerange(1, 0, 4, 0, dr);
   }
 
-  void timerange_excludes_dst(daterange* dr) {
+  void       timerange_excludes_dst(daterange* dr) {
     _creator.new_timerange(1, 0, 2, 0, dr);
     _creator.new_timerange(3, 0, 4, 0, dr);
   }
@@ -78,15 +89,15 @@ class GetNextValidTimeForwardDST : public ::testing::Test {
   // CURRENT TIME
   //
 
-  void at_dst() {
+  void       at_dst() {
     _now = strtotimet("2017-03-26 01:59:59") + 1;
     set_time(_now);
   }
 
  protected:
-  time_t _computed;
+  time_t             _computed;
   timeperiod_creator _creator;
-  time_t _now;
+  time_t             _now;
 };
 
 //
@@ -107,8 +118,8 @@ class GetNextValidTimeForwardDST : public ::testing::Test {
 // And the timeranges excludes the DST range
 // And we are at DST
 // When get_next_valid_time() is callled
-// Then the next valid time is the beginning of the timerange in the new
-// timezone
+// Then the next valid time is the beginning of the timerange in the new timezone
+
 
 //
 // CALENDAR DATE TESTS
@@ -174,8 +185,7 @@ TEST_F(GetNextValidTimeForwardDST, GenericMonthDateExcludeDSTNowAtDST) {
 // OFFSET WEEKDAY OF SPECIFIC MONTH DATE TESTS
 //
 
-TEST_F(GetNextValidTimeForwardDST,
-       OffsetWeekdayOfSpecificMonthIncludeDSTNowAtDST) {
+TEST_F(GetNextValidTimeForwardDST, OffsetWeekdayOfSpecificMonthIncludeDSTNowAtDST) {
   daterange* dr(dst_offset_weekday_of_specific_month());
   timerange_includes_dst(dr);
   at_dst();
@@ -183,8 +193,7 @@ TEST_F(GetNextValidTimeForwardDST,
   ASSERT_EQ(_computed, strtotimet("2017-03-26 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeForwardDST,
-       OffsetWeekdayOfSpecificMonthExcludeDSTNowAtDST) {
+TEST_F(GetNextValidTimeForwardDST, OffsetWeekdayOfSpecificMonthExcludeDSTNowAtDST) {
   daterange* dr(dst_offset_weekday_of_specific_month());
   timerange_excludes_dst(dr);
   at_dst();
@@ -196,8 +205,7 @@ TEST_F(GetNextValidTimeForwardDST,
 // OFFSET WEEKDAY OF GENERIC MONTH DATE TESTS
 //
 
-TEST_F(GetNextValidTimeForwardDST,
-       OffsetWeekdayOfGenericMonthIncludeDSTNowAtDST) {
+TEST_F(GetNextValidTimeForwardDST, OffsetWeekdayOfGenericMonthIncludeDSTNowAtDST) {
   daterange* dr(dst_offset_weekday_of_generic_month());
   timerange_includes_dst(dr);
   at_dst();
@@ -205,8 +213,7 @@ TEST_F(GetNextValidTimeForwardDST,
   ASSERT_EQ(_computed, strtotimet("2017-03-26 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeForwardDST,
-       OffsetWeekdayOfGenericMonthExcludeDSTNowAtDST) {
+TEST_F(GetNextValidTimeForwardDST, OffsetWeekdayOfGenericMonthExcludeDSTNowAtDST) {
   daterange* dr(dst_offset_weekday_of_generic_month());
   timerange_excludes_dst(dr);
   at_dst();

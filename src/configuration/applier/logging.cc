@@ -17,13 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/logging.hh"
-#include <syslog.h>
 #include <cassert>
+#include <syslog.h>
+#include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/debug_file.hh"
-#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/logging/engine.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -37,7 +37,7 @@ static applier::logging* _instance = NULL;
  */
 void applier::logging::apply(state& config) {
   if (verify_config || test_scheduling)
-    return;
+    return ;
 
   // Syslog.
   if (config.use_syslog() && !_syslog)
@@ -55,16 +55,19 @@ void applier::logging::apply(state& config) {
   }
 
   // Debug file.
-  if ((config.debug_file() == "") || !config.debug_level() ||
-      !config.debug_verbosity()) {
+  if ((config.debug_file() == "")
+      || !config.debug_level()
+      || !config.debug_verbosity()) {
     _del_debug();
     _debug_level = config.debug_level();
     _debug_verbosity = config.debug_verbosity();
     _debug_max_size = config.max_debug_file_size();
-  } else if (!_debug || config.debug_file() != _debug->filename() ||
-             config.debug_level() != _debug_level ||
-             config.debug_verbosity() != _debug_verbosity ||
-             config.max_debug_file_size() != _debug_max_size)
+  }
+  else if (!_debug
+           || config.debug_file() != _debug->filename()
+           || config.debug_level() != _debug_level
+           || config.debug_verbosity() != _debug_verbosity
+           || config.max_debug_file_size() != _debug_max_size)
     _add_debug(config);
   return;
 }
@@ -101,14 +104,14 @@ void applier::logging::unload() {
  *  Default constructor.
  */
 applier::logging::logging()
-    : _debug(NULL),
-      _debug_level(0),
-      _debug_max_size(0),
-      _debug_verbosity(0),
-      _log(NULL),
-      _stderr(NULL),
-      _stdout(NULL),
-      _syslog(NULL) {
+  : _debug(NULL),
+    _debug_level(0),
+    _debug_max_size(0),
+    _debug_verbosity(0),
+    _log(NULL),
+    _stderr(NULL),
+    _stdout(NULL),
+    _syslog(NULL) {
   _add_stdout();
   _add_stderr();
 }
@@ -119,14 +122,14 @@ applier::logging::logging()
  *  @param[in] config The initial confiuration.
  */
 applier::logging::logging(state& config)
-    : _debug(NULL),
-      _debug_level(0),
-      _debug_max_size(0),
-      _debug_verbosity(0),
-      _log(NULL),
-      _stderr(NULL),
-      _stdout(NULL),
-      _syslog(NULL) {
+  : _debug(NULL),
+    _debug_level(0),
+    _debug_max_size(0),
+    _debug_verbosity(0),
+    _log(NULL),
+    _stderr(NULL),
+    _stdout(NULL),
+    _syslog(NULL) {
   _add_stdout();
   _add_stderr();
   apply(config);
@@ -148,24 +151,30 @@ applier::logging::~logging() throw() {
  */
 void applier::logging::_add_stdout() {
   if (!_stdout) {
-    _stdout = new engine::logging::file(stdout);
+    _stdout = new com::centreon::logging::file(stdout);
     unsigned long long type(
-        engine::logging::log_process_info |
-        engine::logging::log_verification_error |
-        engine::logging::log_verification_warning |
-        engine::logging::log_config_error |
-        engine::logging::log_config_warning |
-        engine::logging::log_event_handler |
-        engine::logging::log_external_command | engine::logging::log_host_up |
-        engine::logging::log_host_down | engine::logging::log_host_unreachable |
-        engine::logging::log_service_ok | engine::logging::log_service_unknown |
-        engine::logging::log_service_warning |
-        engine::logging::log_service_critical |
-        engine::logging::log_passive_check | engine::logging::log_info_message |
-        engine::logging::log_host_notification |
-        engine::logging::log_service_notification);
-    engine::logging::engine::instance().add(_stdout, type,
-                                            engine::logging::most);
+                           engine::logging::log_process_info
+                         | engine::logging::log_verification_error
+                         | engine::logging::log_verification_warning
+                         | engine::logging::log_config_error
+                         | engine::logging::log_config_warning
+                         | engine::logging::log_event_handler
+                         | engine::logging::log_external_command
+                         | engine::logging::log_host_up
+                         | engine::logging::log_host_down
+                         | engine::logging::log_host_unreachable
+                         | engine::logging::log_service_ok
+                         | engine::logging::log_service_unknown
+                         | engine::logging::log_service_warning
+                         | engine::logging::log_service_critical
+                         | engine::logging::log_passive_check
+                         | engine::logging::log_info_message
+                         | engine::logging::log_host_notification
+                         | engine::logging::log_service_notification);
+    com::centreon::logging::engine::instance().add(
+                                                 _stdout,
+                                                 type,
+                                                 engine::logging::most);
   }
   return;
 }
@@ -175,11 +184,14 @@ void applier::logging::_add_stdout() {
  */
 void applier::logging::_add_stderr() {
   if (!_stderr) {
-    _stderr = new engine::logging::file(stderr);
-    unsigned long long type(engine::logging::log_runtime_error |
-                            engine::logging::log_runtime_warning);
-    engine::logging::engine::instance().add(_stderr, type,
-                                            engine::logging::most);
+    _stderr = new com::centreon::logging::file(stderr);
+    unsigned long long type(
+                         engine::logging::log_runtime_error
+                         | engine::logging::log_runtime_warning);
+    com::centreon::logging::engine::instance().add(
+                                                 _stderr,
+                                                 type,
+                                                 engine::logging::most);
   }
   return;
 }
@@ -188,9 +200,13 @@ void applier::logging::_add_stderr() {
  */
 void applier::logging::_add_syslog() {
   if (!_syslog) {
-    _syslog = new engine::logging::syslogger("centreon-engine", LOG_USER);
-    engine::logging::engine::instance().add(_syslog, engine::logging::log_all,
-                                            engine::logging::basic);
+    _syslog = new com::centreon::logging::syslogger(
+                                            "centreon-engine",
+                                            LOG_USER);
+    com::centreon::logging::engine::instance().add(
+                                                 _syslog,
+                                                 engine::logging::log_all,
+                                                 engine::logging::basic);
   }
   return;
 }
@@ -200,9 +216,14 @@ void applier::logging::_add_syslog() {
  */
 void applier::logging::_add_log_file(state const& config) {
   _del_log_file();
-  _log = new engine::logging::file(config.log_file(), true, config.log_pid());
-  engine::logging::engine::instance().add(_log, engine::logging::log_all,
-                                          engine::logging::most);
+  _log = new com::centreon::logging::file(
+                                       config.log_file(),
+                                       true,
+                                       config.log_pid());
+  com::centreon::logging::engine::instance().add(
+                                               _log,
+                                               engine::logging::log_all,
+                                               engine::logging::most);
   return;
 }
 
@@ -214,10 +235,13 @@ void applier::logging::_add_debug(state const& config) {
   _debug_level = (config.debug_level() << 32) | engine::logging::log_all;
   _debug_verbosity = config.debug_verbosity();
   _debug_max_size = config.max_debug_file_size();
-  _debug = new com::centreon::engine::logging::debug_file(config.debug_file(),
-                                                          _debug_max_size);
-  engine::logging::engine::instance().add(_debug, _debug_level,
-                                          _debug_verbosity);
+  _debug = new com::centreon::engine::logging::debug_file(
+                                                 config.debug_file(),
+                                                 _debug_max_size);
+  com::centreon::logging::engine::instance().add(
+                                               _debug,
+                                               _debug_level,
+                                               _debug_verbosity);
   return;
 }
 
@@ -226,7 +250,7 @@ void applier::logging::_add_debug(state const& config) {
  */
 void applier::logging::_del_syslog() {
   if (_syslog) {
-    engine::logging::engine::instance().remove(_syslog);
+    com::centreon::logging::engine::instance().remove(_syslog);
     delete _syslog;
     _syslog = NULL;
   }
@@ -238,7 +262,7 @@ void applier::logging::_del_syslog() {
  */
 void applier::logging::_del_log_file() {
   if (_log) {
-    engine::logging::engine::instance().remove(_log);
+    com::centreon::logging::engine::instance().remove(_log);
     delete _log;
     _log = NULL;
   }
@@ -250,7 +274,7 @@ void applier::logging::_del_log_file() {
  */
 void applier::logging::_del_debug() {
   if (_debug) {
-    engine::logging::engine::instance().remove(_debug);
+    com::centreon::logging::engine::instance().remove(_debug);
     delete _debug;
     _debug = NULL;
   }
@@ -262,7 +286,7 @@ void applier::logging::_del_debug() {
  */
 void applier::logging::_del_stdout() {
   if (_stdout) {
-    engine::logging::engine::instance().remove(_stdout);
+    com::centreon::logging::engine::instance().remove(_stdout);
     delete _stdout;
     _stdout = NULL;
   }
@@ -274,7 +298,7 @@ void applier::logging::_del_stdout() {
  */
 void applier::logging::_del_stderr() {
   if (_stderr) {
-    engine::logging::engine::instance().remove(_stderr);
+    com::centreon::logging::engine::instance().remove(_stderr);
     delete _stderr;
     _stderr = NULL;
   }

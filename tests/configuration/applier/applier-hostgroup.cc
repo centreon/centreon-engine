@@ -17,11 +17,12 @@
  *
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -48,6 +49,8 @@ extern configuration::state* config;
 class ApplierHostGroup : public ::testing::Test {
  public:
   void SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     if (config == nullptr)
       config = new configuration::state;
     timezone_manager::load();
@@ -61,7 +64,10 @@ class ApplierHostGroup : public ::testing::Test {
     delete config;
     config = nullptr;
     timezone_manager::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
+
 };
 
 // Given host configuration without host_id
