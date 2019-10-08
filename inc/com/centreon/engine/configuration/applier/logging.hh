@@ -18,60 +18,65 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_LOGGING_HH
-#define CCE_CONFIGURATION_APPLIER_LOGGING_HH
+#  define CCE_CONFIGURATION_APPLIER_LOGGING_HH
 
-#include <string>
-#include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/logging/file.hh"
-#include "com/centreon/engine/logging/syslogger.hh"
-#include "com/centreon/engine/namespace.hh"
+#  include <string>
+#  include "com/centreon/engine/configuration/state.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/logging/file.hh"
+#  include "com/centreon/logging/syslogger.hh"
 
 CCE_BEGIN()
 
-namespace configuration {
-namespace applier {
-/**
- *  @class logging logging.hh
- *  @brief Simple configuration applier for logging class.
- *
- *  Simple configuration applier for logging class.
- */
-class logging {
- public:
-  void apply(state& config);
-  static logging& instance();
-  static void load();
-  static void unload();
+namespace                configuration {
+  namespace              applier {
+    /**
+     *  @class logging logging.hh
+     *  @brief Simple configuration applier for logging class.
+     *
+     *  Simple configuration applier for logging class.
+     */
+    class                logging {
+    public:
+      void               apply(state& config);
+      static logging&    instance();
+      static void        load();
+      static void        unload();
 
- private:
-  logging();
-  logging(state& config);
-  logging(logging const&);
-  ~logging() throw();
-  logging& operator=(logging const&);
-  void _add_stdout();
-  void _add_stderr();
-  void _add_syslog();
-  void _add_log_file(state const& config);
-  void _add_debug(state const& config);
-  void _del_syslog();
-  void _del_log_file();
-  void _del_debug();
-  void _del_stdout();
-  void _del_stderr();
+    private:
+                         logging();
+                         logging(state& config);
+                         logging(logging const&);
+                         ~logging() throw ();
+      logging&           operator=(logging const&);
+      void               _add_stdout();
+      void               _add_stderr();
+      void               _add_syslog();
+      void               _add_log_file(state const& config);
+      void               _add_debug(state const& config);
+      void               _del_syslog();
+      void               _del_log_file();
+      void               _del_debug();
+      void               _del_stdout();
+      void               _del_stderr();
 
-  engine::logging::file* _debug;
-  unsigned long long _debug_level;
-  unsigned long _debug_max_size;
-  unsigned int _debug_verbosity;
-  engine::logging::file* _log;
-  engine::logging::file* _stderr;
-  engine::logging::file* _stdout;
-  engine::logging::syslogger* _syslog;
-};
-}  // namespace applier
-}  // namespace configuration
+      com::centreon::logging::file*
+                         _debug;
+      unsigned long long _debug_level;
+      unsigned long      _debug_max_size;
+      unsigned int       _debug_verbosity;
+      com::centreon::logging::file*
+                         _log;
+      com::centreon::logging::file*
+                         _stderr;
+      com::centreon::logging::file*
+                         _stdout;
+      com::centreon::logging::syslogger*
+                         _syslog;
+    };
+  }
+}
 
 CCE_END()
 
-#endif  // !CCE_CONFIGURATION_APPLIER_LOGGING_HH
+#endif // !CCE_CONFIGURATION_APPLIER_LOGGING_HH

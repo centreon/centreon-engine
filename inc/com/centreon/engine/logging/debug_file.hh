@@ -18,31 +18,33 @@
 */
 
 #ifndef CCE_LOGGING_DEBUG_FILE_HH
-#define CCE_LOGGING_DEBUG_FILE_HH
+#  define CCE_LOGGING_DEBUG_FILE_HH
 
-#include "com/centreon/engine/logging/file.hh"
-#include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/logging/file.hh"
 
 CCE_BEGIN()
 
-namespace logging {
-/**
- *  @class debug_file debug_file.hh "com/centreon/engine/logging/debug_file.hh"
- *  @brief Debug file.
- *
- *  Engine debug file.
- */
-class debug_file : public file {
- public:
-  debug_file(std::string const& path, long long max_size = 0);
-  ~debug_file() throw() override;
+namespace        logging {
+  /**
+   *  @class debug_file debug_file.hh "com/centreon/engine/logging/debug_file.hh"
+   *  @brief Debug file.
+   *
+   *  Engine debug file.
+   */
+  class          debug_file : public com::centreon::logging::file {
+  public:
+                 debug_file(
+                   std::string const& path,
+                   long long max_size = 0);
+                 ~debug_file() throw () override;
 
- private:
-  debug_file(debug_file const& other);
-  debug_file& operator=(debug_file const& other);
-};
-}  // namespace logging
+  private:
+                 debug_file(debug_file const& other);
+    debug_file&  operator=(debug_file const& other);
+  };
+}
 
 CCE_END()
 
-#endif  // !CCE_LOGGING_DEBUG_FILE_HH
+#endif // !CCE_LOGGING_DEBUG_FILE_HH

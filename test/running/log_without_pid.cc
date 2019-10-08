@@ -23,12 +23,13 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/io/file_stream.hh"
-#include "com/centreon/engine/process.hh"
+#include "com/centreon/process.hh"
 #include "test/paths.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon;
 
 /**
  *  See if the log contain pid
@@ -58,6 +59,9 @@ int main() {
   std::string log_file = "nagios_without_pid.log";
 
   try {
+    // Initialization.
+    clib::load();
+
     // Run centengine to generate precache file.
     {
       // Generate command-line.
@@ -102,6 +106,9 @@ int main() {
 
   // Remove temporary files.
   ::remove(log_file.c_str());
+
+  // Cleanup.
+  clib::unload();
 
   return (retval);
 }

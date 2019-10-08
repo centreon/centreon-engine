@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/broker.hh"
 #include <cstring>
 #include "com/centreon/concurrency/locker.hh"
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/exceptions/basic.hh"
@@ -29,16 +29,17 @@ using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
  */
 broker::broker()
-    : backend(false, false, logging::no_time, false), _enable(false) {
+  : backend(false, false, com::centreon::logging::none, false),
+    _enable(false) {
   memset(&_thread, 0, sizeof(_thread));
   open();
 }
@@ -48,14 +49,16 @@ broker::broker()
  *
  *  @param[in] right Object to copy.
  */
-broker::broker(broker const& right) : backend(right), _enable(false) {
+broker::broker(broker const& right)
+  : backend(right),
+    _enable(false) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-broker::~broker() throw() {
+broker::~broker() throw () {
   close();
 }
 
@@ -80,7 +83,7 @@ broker& broker::operator=(broker const& right) {
 /**
  *  Close broker log.
  */
-void broker::close() throw() {
+void broker::close() throw () {
   concurrency::locker lock(&_lock);
   _enable = false;
 }
@@ -93,10 +96,11 @@ void broker::close() throw() {
  *  @param[in] message  Message to log.
  *  @param[in] size     Message length.
  */
-void broker::log(unsigned long long types,
-                 unsigned int verbose,
-                 char const* message,
-                 unsigned int size) throw() {
+void broker::log(
+               unsigned long long types,
+               unsigned int verbose,
+               char const* message,
+               unsigned int size) throw () {
   (void)verbose;
 
   // Broker is only notified of non-debug log messages.
@@ -110,8 +114,14 @@ void broker::log(unsigned long long types,
       strcpy(copy.get(), message);
 
       // Event broker callback.
-      broker_log_data(NEBTYPE_LOG_DATA, NEBFLAG_NONE, NEBATTR_NONE, copy.get(),
-                      types, time(NULL), NULL);
+      broker_log_data(
+        NEBTYPE_LOG_DATA,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        copy.get(),
+        types,
+        time(NULL),
+        NULL);
 
       // Reset thread.
       memset(&_thread, 0, sizeof(_thread));
@@ -135,3 +145,4 @@ void broker::reopen() {
   concurrency::locker lock(&_lock);
   _enable = true;
 }
+

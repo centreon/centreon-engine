@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/logging/debug_file.hh"
 #include <cassert>
 #include <cstdlib>
+#include "com/centreon/engine/logging/debug_file.hh"
 
 using namespace com::centreon::engine::logging;
 
@@ -29,18 +29,28 @@ using namespace com::centreon::engine::logging;
  *  @param[in] path      Path to the debug file.
  *  @param[in] max_size  Maximum debug file size.
  */
-debug_file::debug_file(std::string const& path, long long max_size)
-    : file(path, true, true, second, false, max_size) {}
+debug_file::debug_file(
+              std::string const& path,
+              long long max_size)
+  : com::centreon::logging::file(
+                              path,
+                              true,
+                              true,
+                              com::centreon::logging::second,
+                              false,
+                              max_size)
+  {}
 
 /**
  *  Destructor.
  */
-debug_file::~debug_file() throw() {}
+debug_file::~debug_file() throw () {}
 
 /**
  *  Copy constructor.
  */
-debug_file::debug_file(debug_file const& other) : file("") {
+debug_file::debug_file(debug_file const& other)
+  : com::centreon::logging::file("") {
   (void)other;
   assert(!"debug file is not copyable");
   abort();

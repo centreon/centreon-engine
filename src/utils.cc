@@ -19,13 +19,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/utils.hh"
-#include <dirent.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
@@ -33,7 +26,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <dirent.h>
+#include <fcntl.h>
 #include <iomanip>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
@@ -49,6 +48,7 @@
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -60,14 +60,17 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* executes a system command - used for notifications, event handlers, etc. */
-int my_system_r(nagios_macros* mac,
-                std::string const& cmd,
-                int timeout,
-                int* early_timeout,
-                double* exectime,
-                std::string& output,
-                unsigned int max_output_length) {
-  logger(dbg_functions, basic) << "my_system_r()";
+int my_system_r(
+      nagios_macros* mac,
+      std::string const& cmd,
+      int timeout,
+      int* early_timeout,
+      double* exectime,
+      std::string& output,
+      unsigned int max_output_length) {
+
+  logger(dbg_functions, basic)
+    << "my_system_r()";
 
   // initialize return variables.
   *early_timeout = false;
@@ -78,7 +81,8 @@ int my_system_r(nagios_macros* mac,
     return notifier::ok;
   }
 
-  logger(dbg_commands, more) << "Running command '" << cmd << "'...";
+  logger(dbg_commands, more)
+    << "Running command '" << cmd << "'...";
 
   timeval start_time = timeval();
   timeval end_time = timeval();
@@ -87,17 +91,27 @@ int my_system_r(nagios_macros* mac,
   gettimeofday(&start_time, nullptr);
 
   // send event broker.
-  broker_system_command(NEBTYPE_SYSTEM_COMMAND_START, NEBFLAG_NONE,
-                        NEBATTR_NONE, start_time, end_time, *exectime, timeout,
-                        *early_timeout, notifier::ok,
-                        const_cast<char*>(cmd.c_str()), nullptr, nullptr);
+  broker_system_command(
+    NEBTYPE_SYSTEM_COMMAND_START,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    start_time,
+    end_time,
+    *exectime,
+    timeout,
+    *early_timeout,
+    notifier::ok,
+    const_cast<char *>(cmd.c_str()),
+    nullptr,
+    nullptr);
 
   commands::raw raw_cmd("system", cmd);
   commands::result res;
   raw_cmd.run(cmd, *mac, timeout, res);
 
   end_time.tv_sec = res.end_time.to_seconds();
-  end_time.tv_usec = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
+  end_time.tv_usec
+    = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
   *exectime = (res.end_time - res.start_time).to_seconds();
   *early_timeout = res.exit_status == process::timeout;
   if (max_output_length > 0)
@@ -107,15 +121,26 @@ int my_system_r(nagios_macros* mac,
   int result(res.exit_code);
 
   logger(dbg_commands, more)
-      << logging::setprecision(3) << "Execution time=" << *exectime
-      << " sec, early timeout=" << *early_timeout << ", result=" << result
-      << ", output=" << output;
+    << com::centreon::logging::setprecision(3)
+    << "Execution time=" << *exectime
+    << " sec, early timeout=" << *early_timeout
+    << ", result=" << result << ", output="
+    << output;
 
   // send event broker.
-  broker_system_command(NEBTYPE_SYSTEM_COMMAND_END, NEBFLAG_NONE, NEBATTR_NONE,
-                        start_time, end_time, *exectime, timeout,
-                        *early_timeout, result, const_cast<char*>(cmd.c_str()),
-                        const_cast<char*>(output.c_str()), nullptr);
+  broker_system_command(
+    NEBTYPE_SYSTEM_COMMAND_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    start_time,
+    end_time,
+    *exectime,
+    timeout,
+    *early_timeout,
+    result,
+    const_cast<char *>(cmd.c_str()),
+    const_cast<char *>(output.c_str()),
+    nullptr);
 
   return result;
 }
@@ -129,11 +154,12 @@ char const* my_ctime(time_t const* t) {
 }
 
 /* given a "raw" command, return the "expanded" or "whole" command line */
-int get_raw_command_line_r(nagios_macros* mac,
-                           commands::command* cmd_ptr,
-                           char const* cmd,
-                           std::string& full_command,
-                           int macro_options) {
+int get_raw_command_line_r(
+      nagios_macros* mac,
+      commands::command* cmd_ptr,
+      char const* cmd,
+      std::string& full_command,
+      int macro_options) {
   char temp_arg[MAX_COMMAND_BUFFER] = "";
   std::string arg_buffer;
   unsigned int x = 0;
@@ -141,7 +167,8 @@ int get_raw_command_line_r(nagios_macros* mac,
   int arg_index = 0;
   int escaped = false;
 
-  logger(dbg_functions, basic) << "get_raw_command_line_r()";
+  logger(dbg_functions, basic)
+    << "get_raw_command_line_r()";
 
   /* clear the argv macros */
   clear_argv_macros_r(mac);
@@ -152,7 +179,7 @@ int get_raw_command_line_r(nagios_macros* mac,
   }
 
   logger(dbg_commands | dbg_checks | dbg_macros, most)
-      << "Raw Command Input: " << cmd_ptr->get_command_line();
+    << "Raw Command Input: " << cmd_ptr->get_command_line();
 
   /* get the full command line */
   full_command = cmd_ptr->get_command_line();
@@ -174,6 +201,7 @@ int get_raw_command_line_r(nagios_macros* mac,
       /* get the next argument */
       /* can't use strtok(), as that's used in process_macros... */
       for (arg_index++, y = 0; y < sizeof(temp_arg) - 1; arg_index++) {
+
         /* backslashes escape */
         if (cmd[arg_index] == '\\' && escaped == false) {
           escaped = true;
@@ -181,8 +209,9 @@ int get_raw_command_line_r(nagios_macros* mac,
         }
 
         /* end of argument */
-        if ((cmd[arg_index] == '!' && escaped == false) ||
-            cmd[arg_index] == '\x0')
+        if ((cmd[arg_index] == '!'
+             && escaped == false)
+            || cmd[arg_index] == '\x0')
           break;
 
         /* normal of escaped char */
@@ -225,6 +254,7 @@ void setup_sighandler() {
   signal(SIGHUP, sighandler);
 }
 
+
 /* handle signals */
 void sighandler(int sig) {
   if (sig < 0)
@@ -259,12 +289,13 @@ void sighandler(int sig) {
  * @param[in] newlines_are_escaped To consider input newlines as escaped.
  *
  */
-void parse_check_output(std::string const& buffer,
-                        std::string& short_buffer,
-                        std::string& long_buffer,
-                        std::string& pd_buffer,
-                        bool escape_newlines_please,
-                        bool newlines_are_escaped) {
+void parse_check_output(
+      std::string const& buffer,
+      std::string& short_buffer,
+      std::string& long_buffer,
+      std::string& pd_buffer,
+      bool escape_newlines_please,
+      bool newlines_are_escaped) {
   bool long_pipe{false};
   bool perfdata_already_filled{false};
 
@@ -276,15 +307,15 @@ void parse_check_output(std::string const& buffer,
   size_t start_line{0}, end_line, pos_line;
   int line_number{1};
   while (!eof) {
-    if (newlines_are_escaped &&
-        (pos_line = buffer.find("\\n", start_line)) != std::string::npos) {
+    if (newlines_are_escaped && (pos_line = buffer.find("\\n", start_line)) != std::string::npos) {
       end_line = pos_line;
       pos_line += 2;
-    } else if ((pos_line = buffer.find("\n", start_line)) !=
-               std::string::npos) {
+    }
+    else if ((pos_line = buffer.find("\n", start_line)) != std::string::npos) {
       end_line = pos_line;
       pos_line++;
-    } else {
+    }
+    else {
       end_line = buffer.size();
       eof = true;
     }
@@ -310,7 +341,8 @@ void parse_check_output(std::string const& buffer,
         short_buffer.append(line.substr(0, end_line));
         pd_buffer.append(line.substr(pipe));
         perfdata_already_filled = true;
-      } else {
+      }
+      else {
         if (line_number > 2)
           long_buffer.append(escape_newlines_please ? "\\n" : "\n");
         long_buffer.append(line.substr(0, end_line));
@@ -320,7 +352,8 @@ void parse_check_output(std::string const& buffer,
         // Now, all new lines contain perfdata.
         long_pipe = true;
       }
-    } else {
+    }
+    else {
       /* Let's trim the output */
       end_line = line.size();
       while (end_line > 1 && std::isspace(line[end_line - 1]))
@@ -333,7 +366,8 @@ void parse_check_output(std::string const& buffer,
           if (line_number > 2)
             long_buffer.append(escape_newlines_please ? "\\n" : "\n");
           long_buffer.append(line);
-        } else {
+        }
+        else {
           if (perfdata_already_filled)
             pd_buffer.append(" ");
           pd_buffer.append(line);
@@ -380,6 +414,7 @@ int compare_strings(char* val1a, char* val2a) {
 /************************* FILE FUNCTIONS *************************/
 /******************************************************************/
 
+
 /**
  *  Set the close-on-exec flag on the file descriptor.
  *
@@ -413,9 +448,9 @@ void cleanup() {
   // Unload modules.
   if (!test_scheduling && !verify_config) {
     neb_free_callback_list();
-    neb_unload_all_modules(NEBMODULE_FORCE_UNLOAD, sigshutdown
-                                                       ? NEBMODULE_NEB_SHUTDOWN
-                                                       : NEBMODULE_NEB_RESTART);
+    neb_unload_all_modules(
+      NEBMODULE_FORCE_UNLOAD,
+      sigshutdown ? NEBMODULE_NEB_SHUTDOWN : NEBMODULE_NEB_RESTART);
     neb_free_module_list();
     neb_deinit_modules();
   }
@@ -437,23 +472,25 @@ void free_memory(nagios_macros* mac) {
   downtimes::downtime_manager::instance().clear_scheduled_downtimes();
 
   // Free memory for the high priority event list.
-  for (timed_event_list::iterator it(timed_event::event_list_high.begin()),
-       end(timed_event::event_list_high.end());
+  for (timed_event_list::iterator
+         it(timed_event::event_list_high.begin()),
+         end(timed_event::event_list_high.end());
        it != end;) {
-    // timed_event* next_event(this_event->next);
+    //timed_event* next_event(this_event->next);
     if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>((*it)->event_data);
+      delete static_cast<unsigned long *>((*it)->event_data);
       (*it)->event_data = nullptr;
     }
     it = timed_event::event_list_high.erase(it);
   }
 
   // Free memory for the low priority event list.
-  for (timed_event_list::iterator it(timed_event::event_list_low.begin()),
-       end(timed_event::event_list_low.end());
+  for (timed_event_list::iterator
+         it(timed_event::event_list_low.begin()),
+         end(timed_event::event_list_low.end());
        it != end;) {
     if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>((*it)->event_data);
+      delete static_cast<unsigned long *>((*it)->event_data);
       (*it)->event_data = nullptr;
     }
     it = timed_event::event_list_low.erase(it);

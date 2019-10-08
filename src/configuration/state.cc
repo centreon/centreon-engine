@@ -1485,14 +1485,11 @@ unsigned long long state::debug_level() const throw () {
  *
  *  @param[in] value The new debug_level value.
  */
-#include <iostream>
 void state::debug_level(unsigned long long value) {
   if (value == std::numeric_limits<unsigned long>::max())
     _debug_level = static_cast<unsigned long long>(all);
   else
     _debug_level = value;
-
-  std::cout << "dl : " << _debug_level << std::endl;
 }
 
 /**

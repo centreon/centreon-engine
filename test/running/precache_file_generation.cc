@@ -23,12 +23,13 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/io/file_stream.hh"
-#include "com/centreon/engine/process.hh"
+#include "com/centreon/process.hh"
 #include "test/paths.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon;
 
 /**
  *  Check that precache files are properly generated.
@@ -43,6 +44,9 @@ int main() {
   std::string precache_file;
 
   try {
+    // Initialization.
+    clib::load();
+
     // Generate temporary file names.
     {
       char* ptr;
@@ -140,6 +144,9 @@ int main() {
   // Remove temporary files.
   ::remove(conf_file.c_str());
   ::remove(precache_file.c_str());
+
+  // Cleanup.
+  clib::unload();
 
   return (retval);
 }

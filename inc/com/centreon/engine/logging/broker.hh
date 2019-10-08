@@ -18,42 +18,44 @@
 */
 
 #ifndef CCE_LOGGING_BROKER_HH
-#define CCE_LOGGING_BROKER_HH
+#  define CCE_LOGGING_BROKER_HH
 
-#include "com/centreon/concurrency/thread.hh"
-#include "com/centreon/engine/logging/backend.hh"
-#include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/concurrency/thread.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/logging/backend.hh"
 
 CCE_BEGIN()
 
-namespace logging {
-/**
- *  @class broker broker.hh
- *  @brief Call broker for all logging message.
- *
- *  Call broker for all logging message without debug.
- */
-class broker : public logging::backend {
- private:
-  bool _enable;
-  concurrency::thread_id _thread;
+namespace                      logging {
+  /**
+   *  @class broker broker.hh
+   *  @brief Call broker for all logging message.
+   *
+   *  Call broker for all logging message without debug.
+   */
+  class                        broker
+    : public com::centreon::logging::backend {
+  public:
+                               broker();
+                               broker(broker const& right);
+                               ~broker() throw () override;
+    broker&                    operator=(broker const& right);
+    void                       close() throw () override;
+    void                       log(
+                                 unsigned long long types,
+                                 unsigned int verbose,
+                                 char const* msg,
+                                 unsigned int size) throw () override;
+    void                        open() override;
+    void                        reopen() override;
 
- public:
-  broker();
-  broker(broker const& right);
-  ~broker() throw() override;
-  broker& operator=(broker const& right);
 
-  void close() throw() override;
-  void log(unsigned long long types,
-           unsigned int verbose,
-           char const* msg,
-           unsigned int size) throw() override;
-  void open() override;
-  void reopen() override;
-};
-}  // namespace logging
+  private:
+    bool                       _enable;
+    concurrency::thread_id     _thread;
+  };
+}
 
 CCE_END()
 
-#endif  // !CCE_LOGGING_BROKER_HH
+#endif // !CCE_LOGGING_BROKER_HH

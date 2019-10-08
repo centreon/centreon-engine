@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "tests/timeperiod/utils.hh"
@@ -26,17 +27,21 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-class GetNextValidTimeCalendarDateTest : public ::testing::Test {
+class         GetNextValidTimeCalendarDateTest : public ::testing::Test {
  public:
-  void SetUp() override {
+  void       SetUp() override {
+    clib::load();
+    com::centreon::logging::engine::load();
     configuration::applier::state::load();
   }
 
   void TearDown() override {
     configuration::applier::state::unload();
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 
-  void default_data_set() {
+  void        default_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);
     // 2016-10-25 10:45-14:25

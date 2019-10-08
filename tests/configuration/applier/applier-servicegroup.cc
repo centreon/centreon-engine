@@ -17,10 +17,11 @@
  *
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
 #include <memory>
+#include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -44,6 +45,8 @@ class ApplierServicegroup : public ::testing::Test {
   void SetUp() override {
     config_errors = 0;
     config_warnings = 0;
+    clib::load();
+    com::centreon::logging::engine::load();
     if (config == nullptr)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a service
@@ -55,6 +58,8 @@ class ApplierServicegroup : public ::testing::Test {
     checks::checker::unload();
     delete config;
     config = nullptr;
+    com::centreon::logging::engine::unload();
+    clib::unload();
   }
 };
 
@@ -92,10 +97,8 @@ TEST_F(ApplierServicegroup, ModifyServicegroupFromConfig) {
   configuration::servicegroup sg("test");
   ASSERT_TRUE(sg.parse("members", "host1,service1"));
   aply.add_object(sg);
-  std::unordered_map<
-      std::string,
-      std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator it{
-      engine::servicegroup::servicegroups.find("test")};
+  std::unordered_map<std::string, std::shared_ptr<com::centreon::engine::servicegroup> >::const_iterator
+    it{engine::servicegroup::servicegroups.find("test")};
   ASSERT_TRUE(it->second->get_alias() == "test");
 
   ASSERT_TRUE(sg.parse("alias", "test_renamed"));

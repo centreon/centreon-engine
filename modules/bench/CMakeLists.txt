@@ -36,13 +36,9 @@ if (WITH_BENCH)
 
   # Passive checks benchmarking command line tool.
   add_executable("centengine_bench_passive"
-    "${PROJECT_SOURCE_DIR}/src/process_manager.cc"
-    "${PROJECT_SOURCE_DIR}/src/process.cc"
-    "${PROJECT_SOURCE_DIR}/src/logging/temp_logger.cc"
-    "${PROJECT_SOURCE_DIR}/src/logging/engine.cc"
     "${SRC_DIR}/passive/engine_cfg.cc"
     "${SRC_DIR}/passive/main.cc")
-  target_link_libraries("centengine_bench_passive" ${CLIB_LIBRARIES} pthread)
+  target_link_libraries("centengine_bench_passive" ${CLIB_LIBRARIES})
   install(TARGETS "centengine_bench_passive"
     DESTINATION "${PREFIX_BIN}"
     COMPONENT "bench")
