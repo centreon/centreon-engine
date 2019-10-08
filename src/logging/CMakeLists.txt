@@ -44,7 +44,6 @@ set(
   "${INC_DIR}/logger.hh"
   "${INC_DIR}/syslogger.hh"
   "${INC_DIR}/temp_logger.hh"
-  # "${INC_DIR}/dumpers.hh"
 
   PARENT_SCOPE
 )
