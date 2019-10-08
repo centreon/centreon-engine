@@ -27,8 +27,7 @@
 #include <sstream>
 #include <string>
 #include <unistd.h>
-#include "com/centreon/clib.hh"
-#include "com/centreon/process.hh"
+#include "com/centreon/engine/process.hh"
 #include "engine_cfg.hh"
 
 /**
@@ -39,7 +38,6 @@
  */
 int main(int argc, char* argv[]) {
   // Initialization.
-  com::centreon::clib::load();
   srandom(getpid());
   signal(SIGPIPE, SIG_IGN);
 
@@ -144,10 +142,10 @@ int main(int argc, char* argv[]) {
     std::string cmdline(engine);
     cmdline.append(" ");
     cmdline.append(cfg_files.main_file());
-    com::centreon::process centengine;
-    centengine.enable_stream(com::centreon::process::in, false);
-    centengine.enable_stream(com::centreon::process::out, false);
-    centengine.enable_stream(com::centreon::process::err, false);
+    com::centreon::engine::process centengine;
+    centengine.enable_stream(com::centreon::engine::process::in, false);
+    centengine.enable_stream(com::centreon::engine::process::out, false);
+    centengine.enable_stream(com::centreon::engine::process::err, false);
     centengine.exec(cmdline);
     while (access(cfg_files.command_file().c_str(), F_OK))
       sleep(1);
@@ -275,9 +273,6 @@ int main(int argc, char* argv[]) {
       << "some count of external commands compatible with a configuration\n"
       << "file generated with the same parameters.\n";
   }
-
-  // Unload Clib.
-  com::centreon::clib::unload();
 
   return (EXIT_SUCCESS);
 }
