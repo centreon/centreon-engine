@@ -69,7 +69,6 @@ void applier::logging::apply(state& config) {
            || config.debug_verbosity() != _debug_verbosity
            || config.max_debug_file_size() != _debug_max_size)
     _add_debug(config);
-  return;
 }
 
 /**
@@ -88,7 +87,6 @@ applier::logging& applier::logging::instance() {
 void applier::logging::load() {
   if (!_instance)
     _instance = new applier::logging;
-  return;
 }
 
 /**
@@ -97,7 +95,6 @@ void applier::logging::load() {
 void applier::logging::unload() {
   delete _instance;
   _instance = NULL;
-  return;
 }
 
 /**
@@ -176,7 +173,6 @@ void applier::logging::_add_stdout() {
                                                  type,
                                                  engine::logging::most);
   }
-  return;
 }
 
 /**
@@ -193,7 +189,6 @@ void applier::logging::_add_stderr() {
                                                  type,
                                                  engine::logging::most);
   }
-  return;
 }
 /**
  *  Add syslog object logging.
@@ -208,7 +203,6 @@ void applier::logging::_add_syslog() {
                                                  engine::logging::log_all,
                                                  engine::logging::basic);
   }
-  return;
 }
 
 /**
@@ -224,7 +218,6 @@ void applier::logging::_add_log_file(state const& config) {
                                                _log,
                                                engine::logging::log_all,
                                                engine::logging::most);
-  return;
 }
 
 /**
@@ -242,7 +235,6 @@ void applier::logging::_add_debug(state const& config) {
                                                _debug,
                                                _debug_level,
                                                _debug_verbosity);
-  return;
 }
 
 /**
@@ -254,7 +246,6 @@ void applier::logging::_del_syslog() {
     delete _syslog;
     _syslog = NULL;
   }
-  return;
 }
 
 /**
@@ -266,7 +257,6 @@ void applier::logging::_del_log_file() {
     delete _log;
     _log = NULL;
   }
-  return;
 }
 
 /**
@@ -278,7 +268,6 @@ void applier::logging::_del_debug() {
     delete _debug;
     _debug = NULL;
   }
-  return;
 }
 
 /**
@@ -290,7 +279,6 @@ void applier::logging::_del_stdout() {
     delete _stdout;
     _stdout = NULL;
   }
-  return;
 }
 
 /**
@@ -302,5 +290,4 @@ void applier::logging::_del_stderr() {
     delete _stderr;
     _stderr = NULL;
   }
-  return;
 }
