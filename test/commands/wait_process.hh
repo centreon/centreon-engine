@@ -18,117 +18,106 @@
 */
 
 #ifndef TEST_COMMANDS_WAIT_PROCESS_HH
-#  define TEST_COMMANDS_WAIT_PROCESS_HH
+#define TEST_COMMANDS_WAIT_PROCESS_HH
 
-#  include <cassert>
-#  include <cstdlib>
-#  include "com/centreon/concurrency/condvar.hh"
-#  include "com/centreon/concurrency/locker.hh"
-#  include "com/centreon/concurrency/mutex.hh"
-#  include "com/centreon/engine/commands/command.hh"
-#  include "com/centreon/engine/commands/command_listener.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <cassert>
+#include <condition_variable>
+#include <cstdlib>
+#include <mutex>
+#include "com/centreon/engine/commands/command.hh"
+#include "com/centreon/engine/commands/command_listener.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace         commands {
+namespace commands {
+/**
+ *  @class wait_process
+ *  @brief Wait the response of the asynchrone command.
+ */
+class wait_process : public command_listener {
+ public:
   /**
-   *  @class wait_process
-   *  @brief Wait the response of the asynchrone command.
+   *  Constructor.
+   *
+   *  @param[in] cmd Process.
    */
-  class           wait_process : public command_listener {
-  public:
-    /**
-     *  Constructor.
-     *
-     *  @param[in] cmd Process.
-     */
-                  wait_process(command* cmd) : _cmd(cmd) {
-      _cmd->set_listener(this);
-    }
+  wait_process(command* cmd) : _cmd(cmd) { _cmd->set_listener(this); }
 
-    /**
-     *  Destructor.
-     */
-                  ~wait_process() throw () {}
+  /**
+   *  Destructor.
+   */
+  ~wait_process() noexcept {}
 
-    /**
-     *  Get command result.
-     *
-     *  @return Command execution result.
-     */
-    result const& get_result() const throw () {
-      return _res;
-    }
+  /**
+   *  Get command result.
+   *
+   *  @return Command execution result.
+   */
+  result const& get_result() const noexcept { return _res; }
 
-    /**
-     *  Wait for process to terminate.
-     */
-    void          wait() const throw () {
-      concurrency::locker lock(&_mtx);
-      while (!_res.command_id)
-        _condvar.wait(&_mtx);
-      return ;
-    }
+  /**
+   *  Wait for process to terminate.
+   */
+  void wait() const noexcept {
+    std::lock_guard<std::mutex> lock(_mtx);
+    while (!_res.command_id)
+      _condvar.wait(_mtx);
+  }
 
-  private:
-    /**
-     *  Copy constructor.
-     *
-     *  @param[in] right Object to copy.
-     */
-                  wait_process(wait_process const& right)
-      : command_listener(right) {
-      _internal_copy(right);
-    }
+ private:
+  /**
+   *  Copy constructor.
+   *
+   *  @param[in] right Object to copy.
+   */
+  wait_process(wait_process const& right) : command_listener(right) {
+    _internal_copy(right);
+  }
 
-    /**
-     *  Assignment operator.
-     *
-     *  @param[in] right Object to copy.
-     *
-     *  @return This object.
-     */
-    wait_process& operator=(wait_process const& right) {
-      _internal_copy(right);
-      return (*this);
-    }
+  /**
+   *  Assignment operator.
+   *
+   *  @param[in] right Object to copy.
+   *
+   *  @return This object.
+   */
+  wait_process& operator=(wait_process const& right) {
+    _internal_copy(right);
+    return *this;
+  }
 
-    /**
-     *  Copy internal data members.
-     *
-     *  @param[in] right Object to copy.
-     */
-    void          _internal_copy(wait_process const& right) {
-      (void)right;
-      assert(!"cannot copy class waiting for process termination");
-      abort();
-      return ;
-    }
+  /**
+   *  Copy internal data members.
+   *
+   *  @param[in] right Object to copy.
+   */
+  void _internal_copy(wait_process const& right) {
+    (void)right;
+    assert(!"cannot copy class waiting for process termination");
+    abort();
+  }
 
-    /**
-     *  Called when process has finished.
-     *
-     *  @param[in] res Result.
-     */
-    void          finished(result const& res) throw () {
-      concurrency::locker lock(&_mtx);
-      _res = res;
-      _cmd->set_listener(NULL);
-      _condvar.wake_all();
-      return ;
-    }
+  /**
+   *  Called when process has finished.
+   *
+   *  @param[in] res Result.
+   */
+  void finished(result const& res) noexcept {
+    std::lock_guard<std::mutex> lock(_mtx);
+    _res = res;
+    _cmd->set_listener(NULL);
+    _condvar.notify_all();
+  }
 
-    command*      _cmd;
-    mutable concurrency::condvar
-                  _condvar;
-    mutable concurrency::mutex
-                  _mtx;
-    result        _res;
-  };
+  command* _cmd;
+  mutable std::condition_variable _condvar;
+  mutable std::mutex _mtx;
+  result _res;
+};
 }
 
 CCE_END()
 
-#endif // !TEST_COMMANDS_WAIT_PROCESS_HH
+#endif  // !TEST_COMMANDS_WAIT_PROCESS_HH
 

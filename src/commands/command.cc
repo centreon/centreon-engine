@@ -29,7 +29,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 
 static concurrency::mutex _lock_id;
-static unsigned long      _id = 0;
+static unsigned long _id = 0;
 
 command_map commands::command::commands;
 
@@ -40,22 +40,18 @@ command_map commands::command::commands;
  *  @param[in] command_line The command line.
  *  @param[in] listener     The command listener to catch events.
  */
-commands::command::command(
-                     std::string const& name,
-                     std::string const& command_line,
-                     command_listener* listener)
-  : _command_line(command_line),
-    _listener(listener),
-    _name(name) {
+commands::command::command(std::string const& name,
+                           std::string const& command_line,
+                           command_listener* listener)
+    : _command_line(command_line), _listener(listener), _name(name) {
   if (_name.empty())
-    throw (engine_error()
-      << "Could not create a command with an empty name");
+    throw(engine_error() << "Could not create a command with an empty name");
 }
 
 /**
  *  Destructor.
  */
-commands::command::~command() throw () {}
+commands::command::~command() noexcept {}
 
 /**
  *  Compare two result.
@@ -64,7 +60,7 @@ commands::command::~command() throw () {}
  *
  *  @return True if object have the same value.
  */
-bool commands::command::operator==(command const& right) const throw() {
+bool commands::command::operator==(command const& right) const noexcept {
   return _name == right._name && _command_line == right._command_line;
 }
 
@@ -75,7 +71,7 @@ bool commands::command::operator==(command const& right) const throw() {
  *
  *  @return True if object have the different value.
  */
-bool commands::command::operator!=(command const& right) const throw() {
+bool commands::command::operator!=(command const& right) const noexcept {
   return !operator==(right);
 }
 
@@ -84,7 +80,7 @@ bool commands::command::operator!=(command const& right) const throw() {
  *
  *  @return The command line.
  */
-std::string const& commands::command::get_command_line() const throw() {
+std::string const& commands::command::get_command_line() const noexcept {
   return _command_line;
 }
 
@@ -93,7 +89,7 @@ std::string const& commands::command::get_command_line() const throw() {
  *
  *  @return The command name.
  */
-std::string const& commands::command::get_name() const throw() {
+std::string const& commands::command::get_name() const noexcept {
   return _name;
 }
 
@@ -102,10 +98,8 @@ std::string const& commands::command::get_name() const throw() {
  *
  *  @param[in] command_line The command line.
  */
-void commands::command::set_command_line(
-                          std::string const& command_line) {
+void commands::command::set_command_line(std::string const& command_line) {
   _command_line = command_line;
-  return;
 }
 
 /**
@@ -114,9 +108,8 @@ void commands::command::set_command_line(
  *  @param[in] listener  The listener who catch events.
  */
 void commands::command::set_listener(
-                          commands::command_listener* listener) throw () {
+    commands::command_listener* listener) noexcept {
   _listener = listener;
-  return;
 }
 
 /**
@@ -124,9 +117,7 @@ void commands::command::set_listener(
  *
  *  @param[in] right The copy class.
  */
-commands::command::command(commands::command const& right) {
-  operator=(right);
-}
+commands::command::command(commands::command const& right) { operator=(right); }
 
 /**
  *  Default copy operatro.
@@ -135,7 +126,8 @@ commands::command::command(commands::command const& right) {
  *
  *  @return This object.
  */
-commands::command& commands::command::operator=(commands::command const& right) {
+commands::command& commands::command::operator=(
+    commands::command const& right) {
   if (this != &right) {
     _command_line = right._command_line;
     _listener = right._listener;
