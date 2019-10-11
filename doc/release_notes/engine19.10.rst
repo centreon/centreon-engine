@@ -18,7 +18,7 @@ Pipes in results
 Pipes are allowed in the centreon-engine plugin return value.
 
 ***********
-Improvments
+Improvements
 ***********
 
 Optimizations
