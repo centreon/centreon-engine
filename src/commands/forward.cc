@@ -18,8 +18,6 @@
 */
 
 #include <cstdlib>
-#include <list>
-#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/forward.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"

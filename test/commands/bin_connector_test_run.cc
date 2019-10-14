@@ -24,8 +24,8 @@
 #include <ctime>
 #include <list>
 #include <string>
+#include <thread>
 #include <unistd.h>
-#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/exceptions/basic.hh"
 #include "com/centreon/misc/command_line.hh"
@@ -47,10 +47,10 @@ using namespace com::centreon::engine::commands;
  */
 static std::string execute_process(
                      char** argv,
-                     unsigned int timeout,
+                     uint32_t timeout,
                      int* exit_code) {
   std::string output;
-  unsigned int i(0);
+  uint32_t i(0);
   while (argv[i]) {
     output += argv[i];
     if (argv[++i])
@@ -64,16 +64,16 @@ static std::string execute_process(
 
   std::string const& arg(argv[1]);
   if (arg == "--timeout=on")
-    concurrency::thread::sleep(timeout  + 1);
+    std::this_thread::sleep_for(std::chrono::seconds(timeout + 1));
   else if (arg == "--timeout=off")
     *exit_code = STATE_OK;
   else if (arg.find("--kill=") == 0) {
     std::string value(arg.substr(7));
-    unsigned int start_time(strtoul(value.c_str(), NULL, 0));
-    unsigned int now(time(NULL));
+    uint32_t start_time(strtoul(value.c_str(), NULL, 0));
+    uint32_t now(time(NULL));
 
     if (now < start_time + 1) {
-      concurrency::thread::sleep(1);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
       char* ptr(NULL);
       ptr[0] = 0;
     }
@@ -99,7 +99,7 @@ static void query_execute(char const* q) {
     throw (basic_error() << "invalid query execute: "
            "invalid command_id");
   startptr = endptr + 1;
-  unsigned int timeout(strtol(startptr, &endptr, 10));
+  uint32_t timeout(strtol(startptr, &endptr, 10));
   if (startptr == endptr)
     throw (basic_error() << "invalid query execute: "
            "invalid is_executed");
@@ -201,7 +201,7 @@ static int wait(std::string& query) {
   std::string response(responses.front());
   char const* query_str(response.c_str());
   char* endptr(NULL);
-  unsigned int id(strtol(query_str, &endptr, 10));
+  uint32_t id(strtol(query_str, &endptr, 10));
   if (query_str == endptr) {
     responses.pop_front();
     throw (basic_error() << "invalid query");
@@ -234,7 +234,7 @@ int main() {
       int id(wait(query));
 
       if (id == -1
-          || static_cast<unsigned int>(id)
+          || static_cast<uint32_t>(id)
           >= sizeof(tab_send_query) / sizeof(*tab_send_query)
           || !tab_send_query[id])
         throw (basic_error() << "reveive bad request id: id=" << id);

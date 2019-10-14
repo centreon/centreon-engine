@@ -21,9 +21,11 @@
 
 #include <atomic>
 #include <cassert>
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
 #include <future>
+#include <thread>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
@@ -409,8 +411,8 @@ void loop::_dispatching() {
       else {
         logger(dbg_events, most)
           << "Did not execute scheduled event. Idling for a bit...";
-        concurrency::thread::nsleep(
-          (unsigned long)(config->sleep_time() * 1000000000l));
+        uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
+        std::this_thread::sleep_for(std::chrono::nanoseconds(d));
       }
     }
     // We don't have anything to do at this moment in time...
@@ -448,8 +450,8 @@ void loop::_dispatching() {
                          &_sleep_event, nullptr);
 
       // Wait a while so we don't hog the CPU...
-      concurrency::thread::nsleep(
-          (unsigned long)(config->sleep_time() * 1000000000l));
+      uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
+      std::this_thread::sleep_for(std::chrono::nanoseconds(d));
     }
     configuration::applier::state::instance().unlock();
   }

@@ -177,7 +177,6 @@ void loader::unload_modules() {
       << "' unloaded successfully.";
   }
   _modules.clear();
-  return;
 }
 
 /**************************************

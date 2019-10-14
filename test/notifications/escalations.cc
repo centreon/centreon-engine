@@ -20,7 +20,6 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"

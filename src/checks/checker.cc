@@ -23,7 +23,6 @@
 #include <cstring>
 #include <sstream>
 #include <sys/time.h>
-#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/exceptions/interruption.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
@@ -76,7 +75,7 @@ void checker::load() {
  *  @param[in] result The check_result to process later.
  */
 void checker::push_check_result(check_result&& result) {
-  concurrency::locker lock(&_mut_reap);
+  std::lock_guard<std::mutex> lock(_mut_reap);
   _to_reap.push(result);
 }
 
@@ -87,7 +86,7 @@ void checker::push_check_result(check_result&& result) {
  */
 void checker::push_check_result(check_result const* result) {
   check_result res{*result};
-  concurrency::locker lock(&_mut_reap);
+  std::lock_guard<std::mutex> lock(_mut_reap);
   _to_reap.push(res);
 }
 
@@ -111,7 +110,7 @@ void checker::reap() {
 
   // Keep compatibility with old check result list.
   if (!check_result::results.empty()) {
-    concurrency::locker lock(&_mut_reap);
+    std::lock_guard<std::mutex> lock(_mut_reap);
     check_result* cr(nullptr);
     for (check_result_list::iterator
            it(check_result::results.begin()),
@@ -126,7 +125,7 @@ void checker::reap() {
   // Reap check results.
   unsigned int reaped_checks(0);
   { // Scope to release mutex in all termination cases.
-    concurrency::locker lock(&_mut_reap);
+    std::unique_lock<std::mutex> lock(_mut_reap);
 
     // Merge partial check results.
     while (!_to_reap_partial.empty()) {
@@ -241,7 +240,7 @@ void checker::reap() {
       }
 
       // Mutex needed to access list.
-      lock.relock();
+      lock.lock();
     }
   }
 
@@ -256,7 +255,7 @@ void checker::reap() {
  *  @return True if the reper queue is empty, otherwise false.
  */
 bool checker::reaper_is_empty() {
-  concurrency::locker lock(&_mut_reap);
+  std::lock_guard<std::mutex> lock(_mut_reap);
   return _to_reap.empty();
 }
 
@@ -492,7 +491,7 @@ void checker::run(host* hst,
       check_result_info.set_output("(Execute command failed)");
 
       // Queue check result.
-      concurrency::locker lock(&_mut_reap);
+      std::lock_guard<std::mutex> lock(_mut_reap);
       _to_reap.push(check_result_info);
 
       logger(log_runtime_warning, basic)
@@ -722,7 +721,7 @@ void checker::run(
       check_result_info.set_output("(Execute command failed)");
 
       // Queue check result.
-      concurrency::locker lock(&_mut_reap);
+      std::lock_guard<std::mutex> lock(_mut_reap);
       _to_reap.push(check_result_info);
 
       logger(log_runtime_warning, basic)
@@ -941,7 +940,7 @@ checker::checker()
  */
 checker::~checker() throw () {
   try {
-    concurrency::locker lock(&_mut_reap);
+    std::lock_guard<std::mutex> lock(_mut_reap);
     while (!_to_reap.empty()) {
       _to_reap.pop();
     }
@@ -974,7 +973,7 @@ void checker::finished(commands::result const& res) throw () {
   result.set_output(res.output);
 
   // Queue check result.
-  concurrency::locker lock(&_mut_reap);
+  std::lock_guard<std::mutex> lock(_mut_reap);
   _to_reap_partial[res.command_id] = result;
 }
 

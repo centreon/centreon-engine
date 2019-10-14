@@ -20,7 +20,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include "com/centreon/concurrency/thread.hh"
+#include <thread>
 #include "com/centreon/engine/common.hh"
 
 using namespace com::centreon;
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
   // Never return to test the timeout.
   if (!strcmp(argv[1], "--timeout=on"))
     while (true)
-      concurrency::thread::sleep(1);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // Check a classic return.
   if (!strcmp(argv[1], "--timeout=off"))

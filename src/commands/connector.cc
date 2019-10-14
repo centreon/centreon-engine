@@ -19,7 +19,6 @@
 
 #include <cstdlib>
 #include <list>
-#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -121,7 +120,7 @@ com::centreon::engine::commands::command* connector::clone() const {
 unsigned long connector::run(
                            std::string const& processed_cmd,
                            nagios_macros& macros,
-                           unsigned int timeout) {
+                           uint32_t timeout) {
   (void)macros;
 
   logger(dbg_commands, basic)
@@ -141,7 +140,7 @@ unsigned long connector::run(
 
   try {
     {
-      concurrency::locker lock(&_lock);
+      std::lock_guard<std::mutex> lock(_lock);
 
       // Start connector if is not running.
       if (!_is_running) {
@@ -176,7 +175,7 @@ unsigned long connector::run(
       << "connector::run: start command failed: id=" << command_id;
     throw;
   }
-  return (command_id);
+  return command_id;
 }
 
 /**
@@ -190,7 +189,7 @@ unsigned long connector::run(
 void connector::run(
                   std::string const& processed_cmd,
                   nagios_macros& macros,
-                  unsigned int timeout,
+                  uint32_t timeout,
                   result& res) {
   (void)macros;
 
@@ -211,7 +210,7 @@ void connector::run(
 
   try {
     {
-      concurrency::locker lock(&_lock);
+      std::unique_lock<std::mutex> lock(_lock);
 
       // Start connector if is not running.
       if (!_is_running) {
@@ -220,7 +219,7 @@ void connector::run(
                  << "' failed to restart");
         lock.unlock();
         _connector_start();
-        lock.relock();
+        lock.lock();
       }
 
       // Send check to the connector.
@@ -242,7 +241,7 @@ void connector::run(
   }
 
   // Waiting result.
-  concurrency::locker lock(&_lock);
+  std::unique_lock<std::mutex> lock(_lock);
   while (true) {
     std::unordered_map<unsigned long, result>::iterator
       it(_results.find(command_id));
@@ -251,9 +250,8 @@ void connector::run(
       _results.erase(it);
       break ;
     }
-    _cv_query.wait(&_lock);
+    _cv_query.wait(lock);
   }
-  return;
 }
 
 /**
@@ -267,7 +265,7 @@ void connector::set_command_line(std::string const& command_line) {
 
     // Change command line.
     {
-      concurrency::locker lock(&_lock);
+      std::lock_guard<std::mutex> lock(_lock);
       command::set_command_line(command_line);
     }
 
@@ -280,7 +278,7 @@ void connector::set_command_line(std::string const& command_line) {
  *
  *  @param[in] p  The process to get data on stdout.
  */
-void connector::data_is_available(process& p) throw () {
+void connector::data_is_available(process& p) noexcept {
   typedef void (connector::*recv_query)(char const*);
   static recv_query tab_recv_query[] = {
     nullptr,
@@ -301,8 +299,6 @@ void connector::data_is_available(process& p) throw () {
     std::string data;
     p.read(data);
 
-    // concurrency::locker lock(&_lock);
-
     // Split outpout into queries responses.
     std::list<std::string> responses;
     {
@@ -310,7 +306,7 @@ void connector::data_is_available(process& p) throw () {
       ending.append("\0", 1);
 
       {
-        concurrency::locker lock(&_lock);
+        std::lock_guard<std::mutex> lock(_lock);
         _data_available.append(data);
         while (_data_available.size() > 0) {
           size_t pos(_data_available.find(ending));
@@ -333,7 +329,7 @@ void connector::data_is_available(process& p) throw () {
          ++it) {
       char const* data(it->c_str());
       char* endptr(nullptr);
-      unsigned int id(strtol(data, &endptr, 10));
+      uint32_t id(strtol(data, &endptr, 10));
       logger(dbg_commands, basic)
         << "connector::data_is_available: request id=" << id;
       // Invalid query.
@@ -352,7 +348,6 @@ void connector::data_is_available(process& p) throw () {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _name << "' error: " << e.what();
   }
-  return;
 }
 
 /**
@@ -360,9 +355,8 @@ void connector::data_is_available(process& p) throw () {
  *
  *  @param[in] p  Unused param.
  */
-void connector::data_is_available_err(process& p) throw () {
+void connector::data_is_available_err(process& p) noexcept {
   (void)p;
-  return;
 }
 
 /**
@@ -371,12 +365,12 @@ void connector::data_is_available_err(process& p) throw () {
  *
  *  @param[in] p  The process to finished.
  */
-void connector::finished(process& p) throw () {
+void connector::finished(process& p) noexcept {
   try {
     logger(dbg_commands, basic)
       << "connector::finished: process=" << &p;
 
-    concurrency::locker lock(&_lock);
+    std::lock_guard<std::mutex> lock(_lock);
     _is_running = false;
     _data_available.clear();
 
@@ -392,14 +386,13 @@ void connector::finished(process& p) throw () {
     }
     // Connector probably quit without sending exit return.
     else
-      _cv_query.wake_all();
+      _cv_query.notify_all();
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
       << "Error: Connector '" << _name
       << "' termination routine failed: " << e.what();
   }
-  return;
 }
 
 /**
@@ -407,7 +400,7 @@ void connector::finished(process& p) throw () {
  */
 void connector::_connector_close() {
   {
-    concurrency::locker lock(&_lock);
+    std::lock_guard<std::mutex> lock(_lock);
 
     // Exit if connector is not running.
     if (!_is_running)
@@ -418,7 +411,7 @@ void connector::_connector_close() {
     << "connector::_connector_close: process=" << &_process;
 
   {
-    concurrency::locker lock(&_lock);
+    std::unique_lock<std::mutex> lock(_lock);
 
     // Set variable to dosn't restart connector.
     _try_to_restart = false;
@@ -430,9 +423,10 @@ void connector::_connector_close() {
     _send_query_quit();
 
     // Waiting connector quit.
-    bool is_timeout(!_cv_query.wait(
-                       &_lock,
-                       config->service_check_timeout() * 1000));
+    bool is_timeout{
+        _cv_query.wait_for(
+            lock, std::chrono::seconds(config->service_check_timeout())) ==
+        std::cv_status::timeout};
     if (is_timeout || !_query_quit_ok) {
       _process.kill();
       if (is_timeout)
@@ -444,7 +438,6 @@ void connector::_connector_close() {
 
   // Waiting the end of the process.
   _process.wait();
-  return;
 }
 
 /**
@@ -455,7 +448,7 @@ void connector::_connector_start() {
     << "connector::_connector_start: process=" << &_process;
 
   {
-    concurrency::locker lock(&_lock);
+    std::lock_guard<std::mutex> lock(_lock);
 
     // Reset variables.
     _query_quit_ok = false;
@@ -467,15 +460,16 @@ void connector::_connector_start() {
   _process.exec(_command_line);
 
   {
-    concurrency::locker lock(&_lock);
+    std::unique_lock<std::mutex> lock(_lock);
 
     // Ask connector version.
     _send_query_version();
 
     // Waiting connector version, or 1 seconds.
-    bool is_timeout(!_cv_query.wait(
-                       &_lock,
-                       config->service_check_timeout() * 1000));
+    bool is_timeout{
+        _cv_query.wait_for(
+            lock, std::chrono::seconds(config->service_check_timeout())) ==
+        std::cv_status::timeout};
     if (is_timeout || !_query_version_ok) {
       _process.kill();
       _try_to_restart = false;
@@ -492,7 +486,7 @@ void connector::_connector_start() {
     << "Connector '" << _name << "' has started";
 
   {
-    concurrency::locker lock(&_lock);
+    std::lock_guard<std::mutex> lock(_lock);
     logger(dbg_commands, basic)
       << "connector::_connector_start: resend queries: queries.size="
       << _queries.size();
@@ -511,7 +505,6 @@ void connector::_connector_start() {
         info->timeout);
     }
   }
-  return;
 }
 
 /**
@@ -530,7 +523,6 @@ void connector::_internal_copy(connector const& right) {
     _results.clear();
     _try_to_restart = true;
   }
-  return;
 }
 
 /**
@@ -538,7 +530,7 @@ void connector::_internal_copy(connector const& right) {
  *
  *  @return The ending string.
  */
-std::string const& connector::_query_ending() const throw () {
+std::string const& connector::_query_ending() const noexcept {
   static std::string ending(3, '\0');
   return (ending);
 }
@@ -582,7 +574,6 @@ void connector::_recv_query_error(char const* data) {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _name << "': " << e.what();
   }
-  return;
 }
 
 /**
@@ -619,7 +610,7 @@ void connector::_recv_query_execute(char const* data) {
 
     std::shared_ptr<query_info> info;
     {
-      concurrency::locker lock(&_lock);
+      std::lock_guard<std::mutex> lock(_lock);
 
       // Get query information with the command_id.
       std::unordered_map<unsigned long, std::shared_ptr<query_info> >::iterator
@@ -648,7 +639,7 @@ void connector::_recv_query_execute(char const* data) {
 
     // Check if the check timeout.
     if (info->timeout > 0
-        && static_cast<unsigned int>(execution_time) > info->timeout) {
+        && static_cast<uint32_t>(execution_time) > info->timeout) {
       res.exit_status = process::timeout;
       res.output = "(Process Timeout)";
     }
@@ -676,17 +667,16 @@ void connector::_recv_query_execute(char const* data) {
         (_listener->finished)(res);
     }
     else {
-      concurrency::locker lock(&_lock);
+      std::lock_guard<std::mutex> lock(_lock);
       // Push result into list of results.
       _results[command_id] = res;
-      _cv_query.wake_all();
+      _cv_query.notify_all();
     }
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _name << "': " << e.what();
   }
-  return;
 }
 
 /**
@@ -699,10 +689,9 @@ void connector::_recv_query_quit(char const* data) {
   logger(dbg_commands, basic)
     << "connector::_recv_query_quit";
 
-  concurrency::locker lock(&_lock);
+  std::lock_guard<std::mutex> lock(_lock);
   _query_quit_ok = true;
-  _cv_query.wake_all();
-  return;
+  _cv_query.notify_all();
 }
 
 /**
@@ -720,7 +709,7 @@ void connector::_recv_query_version(char const* data) {
     // engine version supported by the connector.
     int version[2];
     char* endptr(nullptr);
-    for (unsigned int i(0); i < 2; ++i) {
+    for (uint32_t i(0); i < 2; ++i) {
       version[i] = strtol(data, &endptr, 10);
       if (data == endptr)
         throw (engine_error()
@@ -743,10 +732,9 @@ void connector::_recv_query_version(char const* data) {
       << "Warning: Connector '" << _name << "': " << e.what();
   }
 
-  concurrency::locker lock(&_lock);
+  std::lock_guard<std::mutex> lock(_lock);
   _query_version_ok = version_ok;
-  _cv_query.wake_all();
-  return;
+  _cv_query.notify_all();
 }
 
 /**
@@ -761,7 +749,7 @@ void connector::_send_query_execute(
                   std::string const& cmdline,
                   uint64_t command_id,
                   timestamp const& start,
-                  unsigned int timeout) {
+                  uint32_t timeout) {
   logger(dbg_commands, basic)
     << "connector::_send_query_execute: "
     "id=" << command_id << ", "
@@ -777,7 +765,6 @@ void connector::_send_query_execute(
       << cmdline << '\0'
       << _query_ending();
   _process.write(oss.str());
-  return;
 }
 
 /**
@@ -789,7 +776,6 @@ void connector::_send_query_quit() {
 
   std::string query("4\0", 2);
   _process.write(query + _query_ending());
-  return;
 }
 
 /**
@@ -801,7 +787,6 @@ void connector::_send_query_version() {
 
   std::string query("0\0", 2);
   _process.write(query + _query_ending());
-  return;
 }
 
 /**
@@ -814,7 +799,7 @@ connector::restart::restart(connector* c) : _c(c) {}
 /**
  *  Destructor.
  */
-connector::restart::~restart() throw () {}
+connector::restart::~restart() noexcept {}
 
 /**
  *  Execute restart.
@@ -833,7 +818,7 @@ void connector::restart::_run() {
 
     std::unordered_map<unsigned long, std::shared_ptr<query_info> > tmp_queries;
     {
-      concurrency::locker lock(&_c->_lock);
+      std::lock_guard<std::mutex> lock(_c->_lock);
       _c->_try_to_restart = false;
       tmp_queries = _c->_queries;
       _c->_queries.clear();
@@ -871,14 +856,13 @@ void connector::restart::_run() {
           (_c->_listener->finished)(res);
       }
       else {
-        concurrency::locker lock(&_c->_lock);
+        std::lock_guard<std::mutex> lock(_c->_lock);
         // Push result into list of results.
         _c->_results[command_id] = res;
-        _c->_cv_query.wake_all();
+        _c->_cv_query.notify_all();
       }
     }
   }
-  return;
 }
 
 /**

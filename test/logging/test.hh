@@ -18,50 +18,47 @@
 */
 
 #ifndef TEST_LOGGING_COMMON_HH
-#  define TEST_LOGGING_COMMON_HH
+#define TEST_LOGGING_COMMON_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/logging/backend.hh"
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/logging/backend.hh"
 
 CCE_BEGIN()
 
-namespace               logging {
-  /**
-   *  @class test test.hh
-   *  @brief Class test for testing logging system.
-   *
-   *  Simple Class for testing logging system.
-   */
-  class                 test
-    : public com::centreon::logging::backend {
-  public:
-                        test(
-                          std::string const& msg,
-                          unsigned long long type,
-                          unsigned int verbosity,
-                          unsigned int total_call);
-                        ~test() throw ();
-    void                close() throw ();
-    void                flush() throw ();
-    static unsigned int get_nb_instance();
-    void                log(
-                          unsigned long long type,
-                          unsigned int verbosity,
-                          char const* message,
-                          unsigned int size) throw ();
-    void                open();
-    void                reopen();
+namespace logging {
+/**
+ *  @class test test.hh
+ *  @brief Class test for testing logging system.
+ *
+ *  Simple Class for testing logging system.
+ */
+class test : public com::centreon::logging::backend {
+ public:
+  test(std::string const& msg,
+       uint64_t type,
+       uint32_t verbosity,
+       uint32_t total_call);
+  ~test() throw();
+  void close() throw();
+  void flush() throw();
+  static uint32_t get_nb_instance();
+  void log(uint64_t type,
+           uint32_t verbosity,
+           char const* message,
+           uint32_t size) throw();
+  void open();
+  void reopen();
 
-  private:
-    std::string         _msg;
-    unsigned int        _nb_call;
-    static unsigned int _nb_instance;
-    unsigned int        _total_call;
-    unsigned long long  _type;
-    unsigned int        _verbosity;
-  };
+ private:
+  std::string _msg;
+  uint32_t _nb_call;
+  static uint32_t _nb_instance;
+  uint32_t _total_call;
+  uint64_t _type;
+  uint32_t _verbosity;
+};
 }
 
 CCE_END()
 
-#endif // !TEST_LOGGING_COMMON_HH
+#endif  // !TEST_LOGGING_COMMON_HH

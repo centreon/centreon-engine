@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/environment.hh"
 #include "com/centreon/engine/error.hh"
@@ -64,19 +63,18 @@ raw::raw(raw const& right) : command(right), process_listener(right) {}
 /**
  *  Destructor.
  */
-raw::~raw() throw () {
+raw::~raw() noexcept {
   try {
-    concurrency::locker lock(&_lock);
+    std::unique_lock<std::mutex> lock(_lock);
     while (!_processes_busy.empty()) {
-      process* p(_processes_busy.begin()->first);
+      process* p{_processes_busy.begin()->first};
       lock.unlock();
       p->wait();
-      lock.relock();
+      lock.lock();
     }
-    for (std::list<process*>::const_iterator
-           it(_processes_free.begin()), end(_processes_free.end());
-         it != end;
-         ++it)
+    for (auto it = _processes_free.begin(), end = _processes_free.end();
+        it != end;
+        ++it)
       delete *it;
   }
   catch (std::exception const& e) {
@@ -95,7 +93,7 @@ raw::~raw() throw () {
 raw& raw::operator=(raw const& right) {
   if (this != &right)
     command::operator=(right);
-  return (*this);
+  return *this;
 }
 
 /**
@@ -104,7 +102,7 @@ raw& raw::operator=(raw const& right) {
  *  @return Return a pointer on a copy object.
  */
 commands::command* raw::clone() const {
-  return (new raw(*this));
+  return new raw(*this);
 }
 
 /**
@@ -116,18 +114,17 @@ commands::command* raw::clone() const {
  *
  *  @return The command id.
  */
-unsigned long raw::run(
-                     std::string const& processed_cmd,
-                     nagios_macros& macros,
-                     unsigned int timeout) {
+uint64_t raw::run(std::string const& processed_cmd,
+                  nagios_macros& macros,
+                  uint32_t timeout) {
   logger(dbg_commands, basic)
     << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Get process and put into the busy list.
   process* p(nullptr);
-  unsigned long command_id(get_uniq_id());
+  uint64_t command_id(get_uniq_id());
   {
-    concurrency::locker lock(&_lock);
+    std::lock_guard<std::mutex> lock(_lock);
     p = _get_free_process();
     _processes_busy[p] = command_id;
   }
@@ -149,12 +146,12 @@ unsigned long raw::run(
     logger(dbg_commands, basic)
       << "raw::run: start process failed: id=" << command_id;
 
-    concurrency::locker lock(&_lock);
+    std::lock_guard<std::mutex> lock(_lock);
     _processes_busy.erase(p);
     delete p;
     throw;
   }
-  return (command_id);
+  return command_id;
 }
 
 /**
@@ -168,14 +165,14 @@ unsigned long raw::run(
 void raw::run(
             std::string const& processed_cmd,
             nagios_macros& macros,
-            unsigned int timeout,
+            uint32_t timeout,
             result& res) {
   logger(dbg_commands, basic)
     << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Get process.
   process p;
-  unsigned long command_id(get_uniq_id());
+  uint64_t command_id(get_uniq_id());
 
   logger(dbg_commands, basic)
     << "raw::run: id=" << command_id << ", process=" << &p;
@@ -239,7 +236,7 @@ void raw::run(
  *
  *  @param[in] p  Unused.
  */
-void raw::data_is_available(process& p) throw () {
+void raw::data_is_available(process& p) noexcept {
   (void)p;
 }
 
@@ -248,7 +245,7 @@ void raw::data_is_available(process& p) throw () {
  *
  *  @param[in] p  Unused.
  */
-void raw::data_is_available_err(process& p) throw () {
+void raw::data_is_available_err(process& p) noexcept {
   (void)p;
 }
 
@@ -258,17 +255,17 @@ void raw::data_is_available_err(process& p) throw () {
  *
  *  @param[in] p  The process to finished.
  */
-void raw::finished(process& p) throw () {
+void raw::finished(process& p) noexcept {
   try {
     logger(dbg_commands, basic)
       << "raw::finished: process=" << &p;
 
-    unsigned long command_id(0);
+    uint64_t command_id(0);
     {
-      concurrency::locker lock(&_lock);
+      std::unique_lock<std::mutex> lock(_lock);
       // Find process from the busy list.
-      std::unordered_map<process*, unsigned long>::iterator
-        it(_processes_busy.find(&p));
+      std::unordered_map<process*, uint64_t>::iterator
+        it = _processes_busy.find(&p);
       if (it == _processes_busy.end()) {
         // Put the process into the free list.
         _processes_free.push_back(&p);
@@ -295,7 +292,7 @@ void raw::finished(process& p) throw () {
 
     // Release process, put into the free list.
     {
-      concurrency::locker lock(&_lock);
+      std::lock_guard<std::mutex> lock(_lock);
       _processes_free.push_back(&p);
     }
 
@@ -334,7 +331,7 @@ void raw::finished(process& p) throw () {
       << e.what();
 
     // Release process, put into the free list.
-    concurrency::locker lock(&_lock);
+    std::lock_guard<std::mutex> lock(_lock);
     _processes_free.push_back(&p);
   }
 }
@@ -348,7 +345,7 @@ void raw::finished(process& p) throw () {
 void raw::_build_argv_macro_environment(
             nagios_macros const& macros,
             environment& env) {
-  for (unsigned int i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
+  for (uint32_t i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
     std::ostringstream oss;
     oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << macros.argv[i];
     env.add(oss.str());
@@ -367,7 +364,7 @@ void raw::_build_contact_address_environment(
   if (!macros.contact_ptr)
     return ;
   std::vector<std::string> const& address(macros.contact_ptr->get_addresses());
-  for (unsigned int i(0); i < address.size(); ++i) {
+  for (uint32_t i(0); i < address.size(); ++i) {
     std::ostringstream oss;
     oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS" << i << "=" << address[i];
     env.add(oss.str());
@@ -510,7 +507,7 @@ void raw::_build_environment_macros(
 void raw::_build_macrosx_environment(
             nagios_macros& macros,
             environment& env) {
-  for (unsigned int i(0); i < MACRO_X_COUNT; ++i) {
+  for (uint32_t i(0); i < MACRO_X_COUNT; ++i) {
     int release_memory(0);
 
     // Need to grab macros?
