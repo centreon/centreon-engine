@@ -121,76 +121,8 @@ else ()
   endif ()
 endif ()
 
-# Check headers.
-include(CheckIncludeFileCXX)
-check_include_file_cxx("algorithm" HAVE_ALGORITHM)
-check_include_file_cxx("ctype.h" HAVE_CTYPE_H)
-check_include_file_cxx("dirent.h" HAVE_DIRENT_H)
-check_include_file_cxx("errno.h" HAVE_ERRNO_H)
-check_include_file_cxx("exception" HAVE_EXCEPTION)
-check_include_file_cxx("fcntl.h" HAVE_FCNTL_H)
-check_include_file_cxx("fstream" HAVE_FSTREAM)
-check_include_file_cxx("iomanip" HAVE_IOMANIP)
-check_include_file_cxx("iostream" HAVE_IOSTREAM)
-check_include_file_cxx("libgen.h" HAVE_LIBGEN_H)
-check_include_file_cxx("limits.h" HAVE_LIMITS_H)
-check_include_file_cxx("map" HAVE_MAP)
-check_include_file_cxx("math.h" HAVE_MATH_H)
-check_include_file_cxx("pthread.h" HAVE_PTHREAD_H)
-check_include_file_cxx("regex.h" HAVE_REGEX_H)
-check_include_file_cxx("signal.h" HAVE_SIGNAL_H)
-check_include_file_cxx("sstream" HAVE_SSTREAM)
-check_include_file_cxx("stdarg.h" HAVE_STDARG_H) # In logging.
-check_include_file_cxx("stddef.h" HAVE_STDDEF_H)
-check_include_file_cxx("stdio.h" HAVE_STDIO_H)
-check_include_file_cxx("stdlib.h" HAVE_STDLIB_H)
-check_include_file_cxx("string" HAVE_STRING)
-check_include_file_cxx("string.h" HAVE_STRING_H)
-check_include_file_cxx("syslog.h" HAVE_SYSLOG_H)
-check_include_file_cxx("sys/mman.h" HAVE_SYS_MMAN_H)
-check_include_file_cxx("sys/stat.h" HAVE_SYS_STAT_H)
-check_include_file_cxx("sys/time.h" HAVE_SYS_TIME_H)
-check_include_file_cxx("sys/types.h" HAVE_SYS_TYPES_H)
-check_include_file_cxx("sys/wait.h" HAVE_SYS_WAIT_H)
-check_include_file_cxx("time.h" HAVE_TIME_H)
-check_include_file_cxx("unistd.h" HAVE_UNISTD_H)
-if (NOT HAVE_ALGORITHM
-    OR NOT HAVE_CTYPE_H
-    OR NOT HAVE_DIRENT_H
-    OR NOT HAVE_ERRNO_H
-    OR NOT HAVE_EXCEPTION
-    OR NOT HAVE_FCNTL_H
-    OR NOT HAVE_FSTREAM
-    OR NOT HAVE_IOMANIP
-    OR NOT HAVE_IOSTREAM
-    OR NOT HAVE_LIBGEN_H
-    OR NOT HAVE_LIMITS_H
-    OR NOT HAVE_MAP
-    OR NOT HAVE_MATH_H
-    OR NOT HAVE_PTHREAD_H
-    OR NOT HAVE_REGEX_H
-    OR NOT HAVE_SIGNAL_H
-    OR NOT HAVE_SSTREAM
-    OR NOT HAVE_STDARG_H
-    OR NOT HAVE_STDDEF_H
-    OR NOT HAVE_STDIO_H
-    OR NOT HAVE_STDLIB_H
-    OR NOT HAVE_STRING
-    OR NOT HAVE_STRING_H
-    OR NOT HAVE_SYSLOG_H
-    OR NOT HAVE_SYS_MMAN_H
-    OR NOT HAVE_SYS_STAT_H
-    OR NOT HAVE_SYS_TIME_H
-    OR NOT HAVE_SYS_TYPES_H
-    OR NOT HAVE_SYS_WAIT_H
-    OR NOT HAVE_TIME_H
-    OR NOT HAVE_UNISTD_H)
-  message(FATAL_ERROR "Could not find all mandatory headers.")
-endif ()
-
-# Check timezone informations.
-
 # Check functions.
+include(CheckIncludeFileCXX)
 include(CheckFunctionExists)
 include(CheckStructHasMember)
 

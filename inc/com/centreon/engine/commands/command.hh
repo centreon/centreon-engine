@@ -70,11 +70,7 @@ class command {
  protected:
   command(command const& right);
   command& operator=(command const& right);
-<<<<<<< HEAD
   static uint64_t get_uniq_id();
-=======
-  static unsigned long get_uniq_id();
->>>>>>> enh(commands): concurrency::mutex changed into std::mutex
 
   std::string _command_line;
   command_listener* _listener;
