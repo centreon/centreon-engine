@@ -18,7 +18,7 @@
 */
 
 #include <cstring>
-#include "com/centreon/concurrency/locker.hh"
+#include <mutex>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -58,9 +58,7 @@ broker::broker(broker const& right)
 /**
  *  Destructor.
  */
-broker::~broker() throw () {
-  close();
-}
+broker::~broker() noexcept { close(); }
 
 /**
  *  Assignment operator.
@@ -72,19 +70,19 @@ broker::~broker() throw () {
 broker& broker::operator=(broker const& right) {
   if (this != &right) {
     backend::operator=(right);
-    concurrency::locker lock1(&_lock);
-    concurrency::locker lock2(&right._lock);
+    std::lock_guard<std::mutex> lock1(_lock);
+    std::lock_guard<std::mutex> lock2(right._lock);
     _thread = right._thread;
     _enable = right._enable;
   }
-  return (*this);
+  return *this;
 }
 
 /**
  *  Close broker log.
  */
-void broker::close() throw () {
-  concurrency::locker lock(&_lock);
+void broker::close() noexcept {
+  std::lock_guard<std::mutex> lock(_lock);
   _enable = false;
 }
 
@@ -97,15 +95,15 @@ void broker::close() throw () {
  *  @param[in] size     Message length.
  */
 void broker::log(
-               unsigned long long types,
-               unsigned int verbose,
+               uint64_t types,
+               uint32_t verbose,
                char const* message,
-               unsigned int size) throw () {
+               uint32_t size) noexcept {
   (void)verbose;
+  std::lock_guard<std::mutex> lock(_lock);
 
   // Broker is only notified of non-debug log messages.
   if (message && _enable) {
-    concurrency::locker lock(&_lock);
     if (_thread != concurrency::thread::get_current_id()) {
       _thread = concurrency::thread::get_current_id();
 
@@ -127,14 +125,13 @@ void broker::log(
       memset(&_thread, 0, sizeof(_thread));
     }
   }
-  return;
 }
 
 /**
  *  Open broker log.
  */
 void broker::open() {
-  concurrency::locker lock(&_lock);
+  std::lock_guard<std::mutex> lock(_lock);
   _enable = true;
 }
 
@@ -142,7 +139,7 @@ void broker::open() {
  *  Open borker log.
  */
 void broker::reopen() {
-  concurrency::locker lock(&_lock);
+  std::lock_guard<std::mutex> lock(_lock);
   _enable = true;
 }
 

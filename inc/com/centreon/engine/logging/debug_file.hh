@@ -36,7 +36,7 @@ namespace        logging {
   public:
                  debug_file(
                    std::string const& path,
-                   long long max_size = 0);
+                   uint64_t max_size = 0);
                  ~debug_file() throw () override;
 
   private:

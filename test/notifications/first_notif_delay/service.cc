@@ -20,7 +20,7 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include "com/centreon/concurrency/thread.hh"
+#include <thread>
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/io/file_stream.hh"
@@ -52,12 +52,12 @@ static int check(std::string const& tmpfile, check_result& cr) {
     cr.finish_time.tv_sec = now;
     retval |= handle_async_service_check_result(service_list, &cr);
     retval |= io::file_stream::exists(tmpfile);
-    concurrency::thread::sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     now = time(NULL);
   }
 
   // FND is reached, process check result to send notification.
-  concurrency::thread::sleep(2);
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   cr.start_time.tv_sec = now;
   cr.finish_time.tv_sec = now;
   retval |= handle_async_service_check_result(service_list, &cr);
@@ -106,14 +106,14 @@ int main_test(int argc, char** argv) {
     retval |= check(tmpfile, cr);
 
     // Recovery.
-    concurrency::thread::sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     cr.return_code = 0;
     cr.start_time.tv_sec = time(NULL);
     cr.finish_time.tv_sec = cr.start_time.tv_sec;
     retval |= handle_async_service_check_result(service_list, &cr);
 
     // Check that FND was reset properly.
-    concurrency::thread::sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     cr.return_code = 2;
     retval |= check(tmpfile, cr);
   }

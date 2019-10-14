@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <atomic>
 #include <memory>
-#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
@@ -28,8 +28,7 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-static concurrency::mutex _lock_id;
-static unsigned long _id = 0;
+static std::atomic<uint64_t> _id{0};
 
 command_map commands::command::commands;
 
@@ -154,7 +153,6 @@ std::string commands::command::process_cmd(nagios_macros* macros) const {
  *
  *  @return The unique command id.
  */
-unsigned long commands::command::get_uniq_id() {
-  concurrency::locker locker(&_lock_id);
+uint64_t commands::command::get_uniq_id() {
   return ++_id;
 }

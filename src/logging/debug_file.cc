@@ -29,17 +29,13 @@ using namespace com::centreon::engine::logging;
  *  @param[in] path      Path to the debug file.
  *  @param[in] max_size  Maximum debug file size.
  */
-debug_file::debug_file(
-              std::string const& path,
-              long long max_size)
-  : com::centreon::logging::file(
-                              path,
-                              true,
-                              true,
-                              com::centreon::logging::second,
-                              false,
-                              max_size)
-  {}
+debug_file::debug_file(std::string const& path, uint64_t max_size)
+    : com::centreon::logging::file(path,
+                                   true,
+                                   true,
+                                   com::centreon::logging::second,
+                                   false,
+                                   max_size) {}
 
 /**
  *  Destructor.

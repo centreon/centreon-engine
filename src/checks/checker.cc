@@ -23,7 +23,6 @@
 #include <cstring>
 #include <sstream>
 #include <sys/time.h>
-#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/exceptions/interruption.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"

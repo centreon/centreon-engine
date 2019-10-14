@@ -56,7 +56,7 @@ class command {
   virtual std::string const& get_command_line() const noexcept;
   virtual std::string const& get_name() const noexcept;
   virtual std::string process_cmd(nagios_macros* macros) const;
-  virtual unsigned long run(std::string const& processed_cmd,
+  virtual uint64_t run(std::string const& processed_cmd,
                             nagios_macros& macors,
                             unsigned int timeout) = 0;
   virtual void run(std::string const& process_cmd,
@@ -70,7 +70,7 @@ class command {
  protected:
   command(command const& right);
   command& operator=(command const& right);
-  static unsigned long get_uniq_id();
+  static uint64_t get_uniq_id();
 
   std::string _command_line;
   command_listener* _listener;
