@@ -131,16 +131,21 @@ TEST_F(SimpleCommand, NewCommandAsync) {
 
 TEST_F(SimpleCommand, LongCommandAsync) {
   std::unique_ptr<my_listener> lstnr(new my_listener);
-  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/sleep 3")};
+  std::unique_ptr<commands::command> cmd{new commands::raw("test", "/bin/sleep 10")};
   cmd->set_listener(lstnr.get());
   nagios_macros mac;
   std::string cc(cmd->process_cmd(&mac));
-  ASSERT_EQ(cc, "/bin/sleep 3");
+  ASSERT_EQ(cc, "/bin/sleep 10");
+
+  // We force the time to be coherent with now because the function gettimeofday
+  // that is not simulated.
+  set_time(std::time(nullptr));
   cmd->run(cc, mac, 2);
   int timeout{0};
-  int max_timeout{10};
+  int max_timeout{15};
   while (timeout < max_timeout && lstnr->get_result().output == "") {
-    usleep(100000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    set_time(std::time(nullptr) + 1);
     ++timeout;
   }
   ASSERT_EQ(lstnr->get_result().output, "(Process Timeout)");
