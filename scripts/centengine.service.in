@@ -21,7 +21,6 @@ Description=Centreon Engine
 PartOf=centreon.service
 After=centreon.service
 ReloadPropagatedFrom=centreon.service
-Wants=cbd.service
 After=cbd.service
 
 [Service]
