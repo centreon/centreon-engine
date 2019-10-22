@@ -1,3 +1,17 @@
+=======================
+Centreon Engine 19.10.1
+=======================
+
+*********
+Bug fixes
+*********
+
+External commands on hosts could crash
+======================================
+
+In case of an external command about a host but specified by its ip address
+instead of its name, the external command finished with a segfault.
+
 =====================
 Centreon Engine 19.10
 =====================
