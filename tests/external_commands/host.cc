@@ -82,6 +82,31 @@ TEST_F(HostExternalCommand, AddHostDowntime) {
   ASSERT_NE(out.find("HOST ALERT"), std::string::npos);
 }
 
+TEST_F(HostExternalCommand, AddHostDowntimeByIpAddress) {
+  configuration::applier::host hst_aply;
+  configuration::host hst;
+
+  ASSERT_TRUE(hst.parse("host_name", "test_srv"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  std::string cmd{"127.0.0.1;1;|"};
+
+  testing::internal::CaptureStdout();
+  cmd_process_host_check_result(
+    CMD_PROCESS_HOST_CHECK_RESULT, now, const_cast<char *>(cmd.c_str()));
+  checks::checker::instance().reap();
+
+  std::string const& out{testing::internal::GetCapturedStdout()};
+
+  ASSERT_NE(out.find("PASSIVE HOST CHECK"), std::string::npos);
+  ASSERT_NE(out.find("HOST ALERT"), std::string::npos);
+}
+
 TEST_F(HostExternalCommand, AddHostComment) {
   configuration::applier::host hst_aply;
   configuration::host hst;

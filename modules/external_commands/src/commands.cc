@@ -570,13 +570,14 @@ int process_passive_service_check(
     real_host_name = host_name;
   else {
     for (host_map::iterator
-           it(host::hosts.begin()),
+           itt(host::hosts.begin()),
            end(host::hosts.end());
-         it != end;
-         ++it) {
-      if (it->second->get_address() == host_name) {
-        real_host_name = it->first.c_str();
-        break ;
+         itt != end;
+         ++itt) {
+      if (itt->second && itt->second->get_address() == host_name) {
+        real_host_name = itt->first.c_str();
+        it = itt;
+        break;
       }
     }
   }
@@ -710,12 +711,13 @@ int process_passive_host_check(
     real_host_name = host_name;
   else {
     for (host_map::iterator
-           it(host::hosts.begin()),
+           itt(host::hosts.begin()),
            end(host::hosts.end());
-         it != end;
-         ++it) {
-      if (it->second->get_address() == host_name) {
-        real_host_name = it->first.c_str();
+         itt != end;
+         ++itt) {
+      if (itt->second && itt->second->get_address() == host_name) {
+        real_host_name = itt->first.c_str();
+        it = itt;
         break;
       }
     }
