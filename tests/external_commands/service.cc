@@ -110,6 +110,56 @@ TEST_F(ServiceExternalCommand, AddServiceDowntime) {
   ASSERT_NE(out.find("PASSIVE SERVICE CHECK"), std::string::npos);
 }
 
+TEST_F(ServiceExternalCommand, AddServiceDowntimeByHostIpAddress) {
+  configuration::applier::host hst_aply;
+  configuration::applier::service svc_aply;
+  configuration::applier::command cmd_aply;
+  configuration::service svc;
+  configuration::host hst;
+  configuration::command cmd("cmd");
+
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.3"));
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+
+  ASSERT_TRUE(svc.parse("host", "test_host"));
+  ASSERT_TRUE(svc.parse("service_description", "test_description"));
+  ASSERT_TRUE(svc.parse("service_id", "3"));
+
+  cmd.parse("command_line", "/usr/bin/echo 1");
+  cmd_aply.add_object(cmd);
+
+  hst.parse("check_command", "cmd");
+  svc.parse("check_command", "cmd");
+
+  hst_aply.add_object(hst);
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(1);
+
+  svc_aply.add_object(svc);
+
+  hst_aply.expand_objects(*config);
+  svc_aply.expand_objects(*config);
+
+  hst_aply.resolve_object(hst);
+  svc_aply.resolve_object(svc);
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  std::string str{"127.0.0.3;test_description;1;|"};
+
+  testing::internal::CaptureStdout();
+  cmd_process_service_check_result(
+    CMD_PROCESS_SERVICE_CHECK_RESULT, now, const_cast<char *>(str.c_str()));
+  checks::checker::instance().reap();
+
+  std::string const& out{testing::internal::GetCapturedStdout()};
+
+  ASSERT_NE(out.find("PASSIVE SERVICE CHECK"), std::string::npos);
+}
+
 TEST_F(ServiceExternalCommand, AddServiceComment) {
   configuration::applier::host hst_aply;
   configuration::applier::service svc_aply;
