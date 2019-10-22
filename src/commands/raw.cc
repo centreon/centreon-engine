@@ -522,8 +522,8 @@ void raw::_build_macrosx_environment(
         grab_macrox_value_r(
           &macros,
           i,
-          nullptr,
-          nullptr,
+          "",
+          "",
           macros.x[i],
           &release_memory);
       }
