@@ -574,10 +574,10 @@ int process_passive_service_check(
            end(host::hosts.end());
          itt != end;
          ++itt) {
-      if (itt->second->get_address() == host_name) {
+      if (itt->second && itt->second->get_address() == host_name) {
         real_host_name = itt->first.c_str();
         it = itt;
-        break ;
+        break;
       }
     }
   }
@@ -715,7 +715,7 @@ int process_passive_host_check(
            end(host::hosts.end());
          itt != end;
          ++itt) {
-      if (itt->second->get_address() == host_name) {
+      if (itt->second && itt->second->get_address() == host_name) {
         real_host_name = itt->first.c_str();
         it = itt;
         break;
