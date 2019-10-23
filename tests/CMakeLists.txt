@@ -22,8 +22,18 @@ option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
   include(ExternalProject)
 
-  set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/3rdparty)
-
+  set(GOOGLE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+  if (BUILD_OFFLINE)
+  ExternalProject_Add( googletest
+                       SOURCE_DIR ${CMAKE_BINARY_DIR}/tests/googletest-prefix/src/googletest
+                       TIMEOUT 10
+                       UPDATE_COMMAND ""
+                       INSTALL_COMMAND ""
+                       LOG_DOWNLOAD ON
+                       LOG_CONFIGURE ON
+                       LOG_BUILD ON
+                       CMAKE_ARGS -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS})
+  else ()
   ExternalProject_Add( googletest
                        GIT_REPOSITORY https://github.com/google/googletest/
                        TIMEOUT 10
@@ -32,6 +42,7 @@ if (WITH_TESTING)
                        LOG_CONFIGURE ON
                        LOG_BUILD ON
                        CMAKE_ARGS -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS})
+  endif ()
 
   ExternalProject_Get_Property(googletest source_dir)
   ExternalProject_Get_Property(googletest binary_dir)

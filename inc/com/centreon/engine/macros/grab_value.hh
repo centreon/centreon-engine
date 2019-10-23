@@ -36,8 +36,8 @@ int grab_macro_value_r(
 int grab_macrox_value_r(
       nagios_macros* mac,
       int macro_type,
-      char const* arg1,
-      char const* arg2,
+      std::string const& arg1,
+      std::string const& arg2,
       std::string& output,
       int* free_macro);
 
