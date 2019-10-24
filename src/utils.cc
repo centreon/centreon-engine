@@ -78,7 +78,7 @@ int my_system_r(
 
   // if no command was passed, return with no error.
   if (cmd.empty()) {
-    return notifier::ok;
+    return service::state_ok;
   }
 
   logger(dbg_commands, more)
@@ -100,7 +100,7 @@ int my_system_r(
     *exectime,
     timeout,
     *early_timeout,
-    notifier::ok,
+    service::state_ok,
     const_cast<char *>(cmd.c_str()),
     nullptr,
     nullptr);
