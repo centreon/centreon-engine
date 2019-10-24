@@ -35,7 +35,6 @@ int process_macros_r(
       std::string const& input_buffer,
       std::string & output_buffer,
       int options) {
-  char* temp_buffer = nullptr;
   std::string selected_macro;
   std::string cleaned_macro;
   int clean_macro = false;
@@ -85,7 +84,8 @@ int process_macros_r(
             &clean_options,
             &free_macro);
           logger(dbg_macros, most)
-            << "  Processed '" << temp_buffer
+            << "  Processed '" << token.c_str()
+	    << "', To '" << token_resolved
             << "', Clean Options: " << clean_options
             << ", Free: " << free_macro;
 
@@ -93,7 +93,7 @@ int process_macros_r(
           if (result == ERROR) {
             logger(dbg_macros, basic)
               << " WARNING: An error occurred processing macro '"
-              << temp_buffer << "'!";
+              << token << "'!";
           }
 
           /* insert macro */
@@ -150,8 +150,9 @@ int process_macros_r(
               << output_buffer.length() << "): '"
               << output_buffer << "'";
           }
+
+          it += pos - where;
         }
-        it += pos - where;
       }
     } else {
       output_buffer += *it;
