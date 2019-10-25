@@ -59,6 +59,10 @@ if (WITH_TESTING)
   # Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
 
+  add_executable("bin_connector_test_run"
+      "${TESTS_DIR}/commands/bin_connector_test_run.cc")
+  target_link_libraries(bin_connector_test_run cce_core pthread)
+
   # Unit test executable.
   add_executable("ut"
     # Sources.
@@ -67,6 +71,7 @@ if (WITH_TESTING)
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/processing.cc"
     "${TESTS_DIR}/parse-check-output.cc"
     "${TESTS_DIR}/commands/simple-command.cc"
+    "${TESTS_DIR}/commands/connector.cc"
     "${TESTS_DIR}/configuration/applier/applier-command.cc"
     "${TESTS_DIR}/configuration/applier/applier-connector.cc"
     "${TESTS_DIR}/configuration/applier/applier-contact.cc"
