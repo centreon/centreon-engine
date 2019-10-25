@@ -529,7 +529,7 @@ bool host::parse(char const* key, char const* value) {
   if (key[0] == '_') {
     map_customvar::iterator it(_customvariables.find(key + 1));
     if (it == _customvariables.end())
-      _customvariables.insert({key + 1, customvariable(value)});
+      _customvariables[key + 1] = customvariable(value);
     else
       it->second.set_value(value);
 

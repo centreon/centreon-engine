@@ -301,8 +301,7 @@ int xsddefault_save_status_data() {
            it->second->get_scheduled_downtime_depth() << "\n";
 
     // custom variables
-    for (std::pair<std::string, customvariable> const& cv :
-      it->second->custom_variables) {
+    for (auto const& cv : it->second->custom_variables) {
       if (!cv.first.empty())
         stream << "\t_" << cv.first << "=" << cv.second.has_been_modified() << ";"
                << cv.second.get_value() << "\n";
@@ -376,7 +375,7 @@ int xsddefault_save_status_data() {
          "\tscheduled_downtime_depth=" << it->second->get_scheduled_downtime_depth() << "\n";
 
     // custom variables
-    for (std::pair<std::string, customvariable> const& cv : it->second->custom_variables) {
+    for (auto const& cv : it->second->custom_variables) {
       if (!cv.first.empty())
         stream << "\t_" << cv.first << "=" << cv.second.has_been_modified() << ";"
                << cv.second.get_value() << "\n";
@@ -404,7 +403,7 @@ int xsddefault_save_status_data() {
          "\thost_notifications_enabled=" << cntct->get_host_notifications_enabled() << "\n"
          "\tservice_notifications_enabled=" << cntct->get_service_notifications_enabled() << "\n";
     // custom variables
-    for (std::pair<std::string, customvariable> const& cv : cntct->get_custom_variables()) {
+    for (auto const& cv : cntct->get_custom_variables()) {
       if (!cv.first.empty())
         stream << "\t_" << cv.first << "=" << cv.second.has_been_modified() << ";"
                << cv.second.get_value() << "\n";

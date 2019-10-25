@@ -254,7 +254,7 @@ static int handle_service_macro(
       // servicegroup name and a delimiter...
       else {
         servicegroup_map::const_iterator sg_it{servicegroup::servicegroups.find(arg1)};
-        if (sg_it == servicegroup::servicegroups.end() || !found->second)
+        if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
           retval = ERROR;
         else {
           // Concatenate macro values for all servicegroup members.
@@ -1022,31 +1022,27 @@ extern "C" {
 /* this is the big one */
 int grab_macro_value_r(
       nagios_macros* mac,
-      char const* macro_buffer,
+      std::string const& macro_name,
       std::string& output,
       int* clean_options,
       int* free_macro) {
   char* buf = nullptr;
   char* ptr = nullptr;
-  char* macro_name = nullptr;
   char* arg[2] = { nullptr, nullptr };
   contact* temp_contact = nullptr;
   std::string temp_buffer;
   unsigned int x;
   int result = OK;
 
-  if (macro_buffer == nullptr || clean_options == nullptr
+  if (macro_name.empty() || clean_options == nullptr
       || free_macro == nullptr)
     return ERROR;
 
   /* work with a copy of the original buffer */
-  buf = string::dup(macro_buffer);
+  buf = string::dup(macro_name.c_str());
 
   /* BY DEFAULT, TELL CALLER TO FREE MACRO BUFFER WHEN DONE */
   *free_macro = true;
-
-  /* macro name is at start of buffer */
-  macro_name = buf;
 
   /* see if there's an argument - if so, this is most likely an on-demand macro */
   if ((ptr = strchr(buf, ':'))) {
@@ -1109,9 +1105,9 @@ int grab_macro_value_r(
   if (x < MACRO_X_COUNT)
     ;
   /***** ARGV MACROS *****/
-  else if (strstr(macro_name, "ARG") == macro_name) {
+  else if (macro_name.size() > 3 && strncmp(macro_name.c_str(), "ARG", 3) == 0) {
     /* which arg do we want? */
-    x = atoi(macro_name + 3);
+    x = atoi(macro_name.c_str() + 3);
 
     if (!x || x > MAX_COMMAND_ARGUMENTS) {
       delete[] buf;
@@ -1123,9 +1119,9 @@ int grab_macro_value_r(
     *free_macro = false;
   }
   /***** USER MACROS *****/
-  else if (strstr(macro_name, "USER") == macro_name) {
+  else if (macro_name.size() > 4 && strncmp(macro_name.c_str(), "USER", 4) == 0) {
     /* which macro do we want? */
-    x = atoi(macro_name + 4);
+    x = atoi(macro_name.c_str() + 4);
 
     if (!x || x > MAX_USER_MACROS) {
       delete[] buf;
@@ -1139,9 +1135,9 @@ int grab_macro_value_r(
 
   /***** CONTACT ADDRESS MACROS *****/
   /* NOTE: the code below should be broken out into a separate function */
-  else if (strstr(macro_name, "CONTACTADDRESS") == macro_name) {
+  else if (macro_name.size() > 14 && strncmp(macro_name.c_str(), "CONTACTADDRESS", 14) == 0) {
     /* which address do we want? */
-    x = atoi(macro_name + 14) - 1;
+    x = atoi(macro_name.c_str() + 14) - 1;
 
     /* regular macro */
     if (arg[0] == nullptr) {
@@ -1205,6 +1201,7 @@ int grab_macro_value_r(
   /***** CUSTOM VARIABLE MACROS *****/
   else if (macro_name[0] == '_') {
     /* get the macro value */
+
     result = grab_custom_macro_value_r(
                mac,
                macro_name,

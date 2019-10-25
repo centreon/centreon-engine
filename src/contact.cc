@@ -367,7 +367,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  service_notification_period_ptr:   " << svc_notif_str << "\n"
     "  contactgroups_ptr:                 " << cg_name << "\n"
     "  customvariables:                   ";
-  for (std::pair<std::string, customvariable> const& cv : obj.get_custom_variables())
+  for (auto const& cv : obj.get_custom_variables())
     os << cv.first << " ; ";
   os << "}\n";
   return os;

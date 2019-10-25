@@ -383,16 +383,16 @@ void raw::_build_custom_contact_macro_environment(
   // Build custom contact variable.
   contact* cntct(macros.contact_ptr);
   if (cntct) {
-    for (std::pair<std::string, customvariable> const& cv : cntct->get_custom_variables()) {
+    for (auto const& cv : cntct->get_custom_variables()) {
       if (!cv.first.empty()) {
         std::string name("_CONTACT");
         name.append(cv.first);
-        macros.custom_contact_vars.insert({name, cv.second});
+        macros.custom_contact_vars[name] =  cv.second;
       }
     }
   }
   // Set custom contact variable into the environement
-  for (std::pair<std::string, customvariable> const& cv : macros.custom_contact_vars) {
+  for (auto const& cv : macros.custom_contact_vars) {
     if (!cv.first.empty()) {
       std::string value(clean_macro_chars(
             cv.second.get_value(),
@@ -419,16 +419,16 @@ void raw::_build_custom_host_macro_environment(
   // Build custom host variable.
   host* hst(macros.host_ptr);
   if (hst) {
-    for (std::pair<std::string, customvariable> const& cv : hst->custom_variables) {
+    for (auto const& cv : hst->custom_variables) {
       if (!cv.first.empty()) {
         std::string name("_HOST");
         name.append(cv.first);
-        macros.custom_host_vars.insert({name, cv.second});
+        macros.custom_host_vars[name] = cv.second;
       }
     }
   }
   // Set custom host variable into the environement
-  for (std::pair<std::string, customvariable> const& cv : macros.custom_host_vars) {
+  for (auto const& cv : macros.custom_host_vars) {
     if (!cv.first.empty()) {
       std::string value(clean_macro_chars(
             cv.second.get_value(),
@@ -455,16 +455,16 @@ void raw::_build_custom_service_macro_environment(
   // Build custom service variable.
   service* svc(macros.service_ptr);
   if (svc) {
-    for (std::pair<std::string, customvariable> const& cv : svc->custom_variables) {
+    for (auto const& cv : svc->custom_variables) {
       if (!cv.first.empty()) {
         std::string name("_SERVICE");
         name.append(cv.first);
-        macros.custom_service_vars.insert({name, cv.second});
+        macros.custom_service_vars[name] = cv.second;
       }
     }
   }
   // Set custom service variable into the environement
-  for (std::pair<std::string, customvariable> const& cv : macros.custom_service_vars) {
+  for (auto const& cv : macros.custom_service_vars) {
     if (!cv.first.empty()) {
       std::string value(clean_macro_chars(
             cv.second.get_value(),

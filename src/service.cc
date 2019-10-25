@@ -17,12 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/checks/viability_failure.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
@@ -40,7 +38,6 @@
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/shared.hh"
-#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 #include "compatibility/xpddefault.h"
@@ -49,7 +46,6 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::downtimes;
-using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
@@ -516,7 +512,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  notification_period_ptr:              " << notif_period_str
      << "\n  servicegroups_ptr:                    " << svcgrp_str << "\n";
 
-  for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
+  for (auto const& cv : obj.custom_variables)
     os << cv.first << " ; ";
 
   os << "\n}\n";

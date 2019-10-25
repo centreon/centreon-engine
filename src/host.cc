@@ -1104,7 +1104,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
         "  hostgroups_ptr:                       "
      << (hg ? hg->get_group_name() : "") << "\n";
 
-  for (std::pair<std::string, customvariable> const& cv : obj.custom_variables)
+  for (auto const& cv : obj.custom_variables)
     os << cv.first << " ; ";
 
   os << "\n}\n";

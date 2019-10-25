@@ -135,7 +135,7 @@ std::ostream& dump::contacts(std::ostream& os) {
 std::ostream& dump::customvariables(
                 std::ostream& os,
                 map_customvar const& obj) {
-  for (std::pair<std::string, customvariable> const& cv : obj)
+  for (auto const& cv : obj)
     os << "_" << cv.first << "=" << cv.second.has_been_modified() << ","
        << cv.second.get_value() << "\n";
   return os;
