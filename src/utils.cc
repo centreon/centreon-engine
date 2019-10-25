@@ -157,7 +157,7 @@ char const* my_ctime(time_t const* t) {
 int get_raw_command_line_r(
       nagios_macros* mac,
       commands::command* cmd_ptr,
-      char const* cmd,
+      std::string const& cmd,
       std::string& full_command,
       int macro_options) {
   char temp_arg[MAX_COMMAND_BUFFER] = "";
@@ -185,7 +185,7 @@ int get_raw_command_line_r(
   full_command = cmd_ptr->get_command_line();
 
   /* get the command arguments */
-  if (cmd != nullptr) {
+  if (!cmd.empty()) {
     /* skip the command name (we're about to get the arguments)... */
     for (arg_index = 0;; arg_index++) {
       if (cmd[arg_index] == '!' || cmd[arg_index] == '\x0')

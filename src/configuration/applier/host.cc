@@ -158,8 +158,16 @@ void applier::host::add_object(
          it(obj.customvariables().begin()),
          end(obj.customvariables().end());
        it != end;
-       ++it)
-    h->custom_variables.insert({it->first, it->second});
+       ++it) {
+    h->custom_variables[it->first] = it->second;
+
+    if (it->second.is_sent()) {
+      timeval tv(get_broker_timestamp(nullptr));
+      broker_custom_variable(NEBTYPE_HOSTCUSTOMVARIABLE_ADD, NEBFLAG_NONE,
+                             NEBATTR_NONE, h.get(), it->first.c_str(),
+                             it->second.get_value().c_str(), &tv);
+    }
+  }
 
   // Parents.
   for (set_string::const_iterator
@@ -374,8 +382,31 @@ void applier::host::modify_object(
   }
 
   // Custom variables.
-  if (obj.customvariables() != obj_old.customvariables())
-    it_obj->second->custom_variables = obj.customvariables();
+  if (obj.customvariables() != obj_old.customvariables()) {
+    for (auto& c : it_obj->second->custom_variables) {
+
+      if (c.second.is_sent()) {
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_custom_variable(NEBTYPE_HOSTCUSTOMVARIABLE_DELETE, NEBFLAG_NONE,
+                               NEBATTR_NONE, it_obj->second.get(),
+                               c.first.c_str(), c.second.get_value().c_str(),
+                               &tv);
+      }
+      it_obj->second->custom_variables.erase(c.first);
+    }
+
+    for (auto& c: obj.customvariables()) {
+      it_obj->second->custom_variables[c.first] = c.second;
+
+      if (c.second.is_sent()) {
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_custom_variable(NEBTYPE_HOSTCUSTOMVARIABLE_ADD, NEBFLAG_NONE,
+                               NEBATTR_NONE, it_obj->second.get(),
+                               c.first.c_str(), c.second.get_value().c_str(),
+                               &tv);
+      }
+    }
+  }
 
   // Parents.
   if (obj.parents() != obj_old.parents()) {

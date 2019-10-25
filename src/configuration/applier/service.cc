@@ -218,8 +218,16 @@ void applier::service::add_object(
          it(obj.customvariables().begin()),
          end(obj.customvariables().end());
        it != end;
-       ++it)
-    svc->custom_variables.insert({it->first, it->second});
+       ++it) {
+    svc->custom_variables[it->first] =  it->second;
+
+    if (it->second.is_sent()) {
+      timeval tv(get_broker_timestamp(nullptr));
+      broker_custom_variable(NEBTYPE_SERVICECUSTOMVARIABLE_ADD, NEBFLAG_NONE,
+                             NEBATTR_NONE, svc, it->first.c_str(),
+                             it->second.get_value().c_str(), &tv);
+      }
+  }
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -470,8 +478,28 @@ void applier::service::modify_object(
   }
 
   // Custom variables.
-  if (obj.customvariables() != obj_old.customvariables())
-    s->custom_variables = obj.customvariables();
+  if (obj.customvariables() != obj_old.customvariables()) {
+    for (auto& c : s->custom_variables) {
+      if (c.second.is_sent()) {
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_custom_variable(
+            NEBTYPE_SERVICECUSTOMVARIABLE_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
+            s.get(), c.first.c_str(), c.second.get_value().c_str(), &tv);
+      }
+      s->custom_variables.erase(c.first);
+    }
+
+    for (auto& c: obj.customvariables()) {
+      s->custom_variables[c.first] =  c.second;
+
+      if (c.second.is_sent()) {
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_custom_variable(NEBTYPE_SERVICECUSTOMVARIABLE_ADD, NEBFLAG_NONE,
+                               NEBATTR_NONE, s.get(), c.first.c_str(),
+                               c.second.get_value().c_str(), &tv);
+      }
+    }
+  }
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));

@@ -50,7 +50,7 @@ char const* my_ctime(time_t const* t);
 int get_raw_command_line_r(
       nagios_macros* mac,
       com::centreon::engine::commands::command* cmd_ptr,
-      char const* cmd,
+      std::string const& cmd,
       std::string& full_command,
       int macro_options);
 // trap signals
