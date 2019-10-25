@@ -131,8 +131,6 @@ TEST_F(ApplierHost, HostRemoved) {
   ASSERT_EQ(get_host_id(h1->get_name()), 12u);
 }
 
-// Given host configuration without host_id
-// Then the applier add_object throws an exception.
 TEST_F(ApplierHost, HostParentChildUnreachable) {
   configuration::applier::host hst_aply;
   configuration::applier::command cmd_aply;

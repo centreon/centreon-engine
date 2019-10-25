@@ -58,8 +58,8 @@ namespace                commands {
                            std::string const& connector_line,
                            command_listener* listener = NULL);
                          connector(connector const& right);
-                         ~connector() throw() override;
-    connector&           operator=(connector const& right);
+                         ~connector() noexcept override;
+    connector&           operator=(connector const& right) = delete;
     commands::command*   clone() const override;
     unsigned long        run(
                            std::string const& processed_cmd,

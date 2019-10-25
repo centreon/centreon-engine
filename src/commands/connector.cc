@@ -81,23 +81,11 @@ connector::connector(connector const& right)
 /**
  *  Destructor.
  */
-connector::~connector() throw() {
+connector::~connector() noexcept {
   // Wait restart thread.
   _restart.wait();
   // Close connector properly.
   _connector_close();
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-connector& connector::operator=(connector const& right) {
-  _internal_copy(right);
-  return (*this);
 }
 
 /**
@@ -106,7 +94,7 @@ connector& connector::operator=(connector const& right) {
  *  @return Return a pointer on a copy object.
  */
 com::centreon::engine::commands::command* connector::clone() const {
-  return (new connector(*this));
+  return new connector(*this);
 }
 
 /**
@@ -176,7 +164,7 @@ unsigned long connector::run(
       << "connector::run: start command failed: id=" << command_id;
     throw;
   }
-  return (command_id);
+  return command_id;
 }
 
 /**
@@ -253,7 +241,6 @@ void connector::run(
     }
     _cv_query.wait(&_lock);
   }
-  return;
 }
 
 /**
@@ -352,7 +339,6 @@ void connector::data_is_available(process& p) throw () {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _name << "' error: " << e.what();
   }
-  return;
 }
 
 /**
@@ -362,7 +348,6 @@ void connector::data_is_available(process& p) throw () {
  */
 void connector::data_is_available_err(process& p) throw () {
   (void)p;
-  return;
 }
 
 /**
@@ -399,7 +384,6 @@ void connector::finished(process& p) throw () {
       << "Error: Connector '" << _name
       << "' termination routine failed: " << e.what();
   }
-  return;
 }
 
 /**
@@ -444,7 +428,6 @@ void connector::_connector_close() {
 
   // Waiting the end of the process.
   _process.wait();
-  return;
 }
 
 /**
@@ -511,7 +494,6 @@ void connector::_connector_start() {
         info->timeout);
     }
   }
-  return;
 }
 
 /**
@@ -530,7 +512,6 @@ void connector::_internal_copy(connector const& right) {
     _results.clear();
     _try_to_restart = true;
   }
-  return;
 }
 
 /**
@@ -540,7 +521,7 @@ void connector::_internal_copy(connector const& right) {
  */
 std::string const& connector::_query_ending() const throw () {
   static std::string ending(3, '\0');
-  return (ending);
+  return ending;
 }
 
 /**
@@ -582,7 +563,6 @@ void connector::_recv_query_error(char const* data) {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _name << "': " << e.what();
   }
-  return;
 }
 
 /**
@@ -686,7 +666,6 @@ void connector::_recv_query_execute(char const* data) {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _name << "': " << e.what();
   }
-  return;
 }
 
 /**
@@ -702,7 +681,6 @@ void connector::_recv_query_quit(char const* data) {
   concurrency::locker lock(&_lock);
   _query_quit_ok = true;
   _cv_query.wake_all();
-  return;
 }
 
 /**
@@ -746,7 +724,6 @@ void connector::_recv_query_version(char const* data) {
   concurrency::locker lock(&_lock);
   _query_version_ok = version_ok;
   _cv_query.wake_all();
-  return;
 }
 
 /**
@@ -777,7 +754,6 @@ void connector::_send_query_execute(
       << cmdline << '\0'
       << _query_ending();
   _process.write(oss.str());
-  return;
 }
 
 /**
@@ -789,7 +765,6 @@ void connector::_send_query_quit() {
 
   std::string query("4\0", 2);
   _process.write(query + _query_ending());
-  return;
 }
 
 /**
@@ -801,7 +776,6 @@ void connector::_send_query_version() {
 
   std::string query("0\0", 2);
   _process.write(query + _query_ending());
-  return;
 }
 
 /**
@@ -878,7 +852,6 @@ void connector::restart::_run() {
       }
     }
   }
-  return;
 }
 
 /**
@@ -894,5 +867,5 @@ std::ostream& operator<<(std::ostream& os, connector const& obj) {
     "  name:         " << obj.get_name() << "\n"
     "  command_line: " << obj.get_command_line() << "\n"
     "}\n";
-  return (os);
+  return os;
 }
