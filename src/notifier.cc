@@ -978,7 +978,7 @@ void notifier::set_is_being_freshened(bool freshened) {
 //    // Search all contactgroups of this host escalation.
 //    for (contactgroup_map_unsafe::const_iterator
 //             itt(e->contact_groups().begin()),
-//         end(e->contact_groups().begin());
+//         end(e->contact_groups().end());
 //         itt != end; ++itt)
 //      if (itt->second->get_members().find(cntct->get_name()) !=
 //          itt->second->get_members().end())

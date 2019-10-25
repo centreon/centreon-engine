@@ -109,7 +109,7 @@ int grab_custom_macro_value_r(
       /* concatenate macro values for all hostgroup members */
       for (host_map_unsafe::iterator
              it{it_hg->second->members.begin()},
-             end{it_hg->second->members.begin()};
+             end{it_hg->second->members.end()};
            it != end;
            ++it) {
 
@@ -412,7 +412,7 @@ int grab_standard_hostgroup_macro_r(
     /* now fill in the string with the member names */
       for (host_map_unsafe::const_iterator
              it{temp_hostgroup->members.begin()},
-             end{temp_hostgroup->members.begin()};
+             end{temp_hostgroup->members.end()};
            it != end;
            ++it) {
         if (it->first.empty())
