@@ -778,6 +778,7 @@ set(
 # Subdirectories with core features.
 add_subdirectory(src/broker)
 add_subdirectory(src/checks)
+add_subdirectory(conf)
 add_subdirectory(src/downtimes)
 add_subdirectory(src/configuration)
 add_subdirectory(src/commands)
@@ -835,7 +836,6 @@ install(TARGETS "centengine" "centenginestats"
 
 ## Create directories.
 if (CREATE_FILES)
-  add_subdirectory(conf)
   install(CODE "
   function(mkdir_chown user group path)
     if (APPLE OR (UNIX AND NOT CYGWIN))
