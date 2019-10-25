@@ -207,12 +207,7 @@ int xpddefault_update_service_performance_data(com::centreon::engine::service* s
       && config->service_perfdata_command().empty())
     return OK;
 
-  host* hst{nullptr};
-  host_map::const_iterator it(host::hosts.find(svc->get_hostname()));
-  if (it != host::hosts.end())
-    hst = it->second.get();
-
-  grab_host_macros_r(&mac, hst);
+  grab_host_macros_r(&mac, svc->get_host_ptr());
   grab_service_macros_r(&mac, svc);
 
   // run the performance data command.

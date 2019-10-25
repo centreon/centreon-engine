@@ -148,8 +148,16 @@ void applier::contact::add_object(configuration::contact const& obj) {
            it(obj.customvariables().begin()),
            end(obj.customvariables().end());
        it != end;
-       ++it)
-    c->get_custom_variables().insert({it->first, it->second});
+       ++it) {
+    c->get_custom_variables()[it->first] = it->second;
+
+    if (it->second.is_sent()) {
+      timeval tv(get_broker_timestamp(nullptr));
+      broker_custom_variable(NEBTYPE_CONTACTCUSTOMVARIABLE_ADD, NEBFLAG_NONE,
+                             NEBATTR_NONE, c.get(), it->first.c_str(),
+                             it->second.get_value().c_str(), &tv);
+    }
+  }
 }
 
 /**
@@ -336,8 +344,31 @@ void applier::contact::modify_object(configuration::contact const& obj) {
   }
 
   // Custom variables.
-  if (std::operator!=(obj.customvariables(), old_cfg.customvariables()))
-    c->get_custom_variables() = obj.customvariables();
+  if (std::operator!=(obj.customvariables(), old_cfg.customvariables())) {
+    for (auto& cus : c->get_custom_variables()) {
+
+      if (cus.second.is_sent()) {
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_custom_variable(NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE, NEBFLAG_NONE,
+                               NEBATTR_NONE, c,
+                               cus.first.c_str(), cus.second.get_value().c_str(),
+                               &tv);
+      }
+      c->get_custom_variables().erase(cus.first);
+    }
+
+    for (auto& cus: obj.customvariables()) {
+      c->get_custom_variables()[cus.first] = cus.second;
+
+      if (cus.second.is_sent()) {
+        timeval tv(get_broker_timestamp(nullptr));
+        broker_custom_variable(NEBTYPE_CONTACTCUSTOMVARIABLE_ADD, NEBFLAG_NONE,
+                               NEBATTR_NONE, c,
+                               cus.first.c_str(), cus.second.get_value().c_str(),
+                               &tv);
+      }
+    }
+  }
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
