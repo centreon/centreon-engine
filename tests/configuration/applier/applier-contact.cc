@@ -17,9 +17,7 @@
  *
  */
 
-#include <memory>
 #include <gtest/gtest.h>
-#include "../../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"

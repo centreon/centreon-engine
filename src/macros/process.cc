@@ -79,10 +79,11 @@ int process_macros_r(
           /* grab the macro value */
           result = grab_macro_value_r(
             mac,
-            token.c_str(),
+            token,
             token_resolved,
             &clean_options,
             &free_macro);
+
           logger(dbg_macros, most)
             << "  Processed '" << token.c_str()
 	    << "', To '" << token_resolved

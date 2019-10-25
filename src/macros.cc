@@ -696,7 +696,7 @@ int grab_custom_object_macro_r(
     return ERROR;
 
   /* get the custom variable */
-  for (std::pair<std::string, customvariable> const& cv : vars) {
+  for (auto const& cv : vars) {
 
     if (macro_name == cv.first) {
       output = cv.second.get_value();

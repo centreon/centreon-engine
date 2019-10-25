@@ -124,7 +124,7 @@ void applier::contact::_update(
 
     if (!state.customvariables().empty()
         && (obj->get_modified_attributes() & MODATTR_CUSTOM_VARIABLE)) {
-      for (std::pair<std::string, customvariable> const& cv : state.customvariables()) {
+      for (auto const& cv : state.customvariables()) {
         obj->get_custom_variables()[cv.first].update(cv.second.get_value());
       }
     }
@@ -136,7 +136,7 @@ void applier::contact::_update(
   // Adjust modified attributes if no custom variable has been changed.
   if (obj->get_modified_attributes() & MODATTR_CUSTOM_VARIABLE) {
     bool at_least_one_modified(false);
-    for (std::pair<std::string, customvariable> const& cv : obj->get_custom_variables())
+    for (auto const& cv : obj->get_custom_variables())
       if (cv.second.has_been_modified()) {
         at_least_one_modified = true;
         break;

@@ -22,11 +22,9 @@
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -346,7 +344,6 @@ void applier::contact::modify_object(configuration::contact const& obj) {
   // Custom variables.
   if (std::operator!=(obj.customvariables(), old_cfg.customvariables())) {
     for (auto& cus : c->get_custom_variables()) {
-
       if (cus.second.is_sent()) {
         timeval tv(get_broker_timestamp(nullptr));
         broker_custom_variable(NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE, NEBFLAG_NONE,

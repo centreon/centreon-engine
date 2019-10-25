@@ -2237,7 +2237,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
         return ERROR;
       map_customvar::iterator it(temp_host->custom_variables.find(varname));
       if (it == temp_host->custom_variables.end())
-        temp_host->custom_variables.insert({varname, customvariable(varvalue)});
+        temp_host->custom_variables[varname] = customvariable(varvalue);
       else
         it->second.update(varvalue);
 
@@ -2256,13 +2256,10 @@ int cmd_change_object_custom_var(int cmd, char* args) {
         return ERROR;
       map_customvar::iterator it(found->second->custom_variables.find(varname));
       if (it == found->second->custom_variables.end())
-        found->second->custom_variables.insert({varname, customvariable(varvalue)});
+        found->second->custom_variables[varname] = customvariable(varvalue);
       else
         it->second.update(varvalue);
 
-      /* set the modified attributes and update the status of the object */
-      found->second->custom_variables.insert(
-        {varname, customvariable(varvalue)});
       found->second->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
       found->second->update_status(false);
     }
@@ -2272,15 +2269,13 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       contact_map::iterator cnct_it = contact::contacts.find(name1);
       if (cnct_it == contact::contacts.end() || !cnct_it->second)
         return ERROR;
+
       map_customvar::iterator it(cnct_it->second->get_custom_variables().find(varname));
       if (it == cnct_it->second->get_custom_variables().end())
-        cnct_it->second->get_custom_variables().insert({varname, customvariable(varvalue)});
+        cnct_it->second->get_custom_variables()[varname] = customvariable(varvalue);
       else
         it->second.update(varvalue);
 
-      /* set the modified attributes and update the status of the object */
-      cnct_it->second->get_custom_variables().insert(
-          {varname, customvariable(varvalue)});
       cnct_it->second->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
       cnct_it->second->update_status_info(false);
     }
