@@ -412,7 +412,7 @@ void checker::run(host* hst,
                                  start_time,
                                  false,
                                  true,
-                                 notifier::ok,
+                                 service::state_ok,
                                  "");
 
   // Get command object.
@@ -486,7 +486,7 @@ void checker::run(host* hst,
       tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
       check_result_info.set_finish_time(tv);
       check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(notifier::unknown);
+      check_result_info.set_return_code(service::state_unknown);
       check_result_info.set_exited_ok(true);
       check_result_info.set_output("(Execute command failed)");
 
@@ -642,7 +642,7 @@ void checker::run(
                                  start_time,
                                  false,
                                  true,
-                                 notifier::ok,
+                                 service::state_ok,
                                  "");
 
   // Get command object.
@@ -716,7 +716,7 @@ void checker::run(
       check_result_info.set_finish_time(tv);
 
       check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(notifier::unknown);
+      check_result_info.set_return_code(service::state_unknown);
       check_result_info.set_exited_ok(true);
       check_result_info.set_output("(Execute command failed)");
 
@@ -826,7 +826,7 @@ void checker::run_sync(
     hst->set_last_hard_state(hst->get_current_state());
 
   // Save old plugin output for state stalking.
-  char* old_plugin_output(string::dup(hst->get_plugin_output().c_str()));
+  std::string old_plugin_output{hst->get_plugin_output()};
 
   // Set the checked flag.
   hst->set_has_been_checked(true);
@@ -878,9 +878,6 @@ void checker::run_sync(
     check_timestamp_horizon);
   if (check_result_code)
     *check_result_code = hst->get_current_state();
-
-  // Cleanup.
-  delete[] old_plugin_output;
 
   // Synchronous check is done.
   logger(dbg_checks, more)
@@ -982,7 +979,7 @@ void checker::finished(commands::result const& res) throw () {
  *
  *  @param[in] hst The host to check.
  *
- *  @result Return if the host is up ( notifier::state_up) or host down ( notifier::state_down).
+ *  @result Return if the host is up ( host::state_up) or host down ( host::state_down).
  */
 com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   logger(dbg_functions, basic)
@@ -1074,7 +1071,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
     0.0,
     config->host_check_timeout(),
     false,
-    notifier::ok,
+    service::state_ok,
     tmp_processed_cmd,
     const_cast<char*>(hst->get_plugin_output().c_str()),
     const_cast<char*>(hst->get_long_plugin_output().c_str()),
@@ -1124,7 +1121,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
     // Update check result.
     res.command_id = 0;
     res.end_time = timestamp::now();
-    res.exit_code = notifier::unknown;
+    res.exit_code = service::state_unknown;
     res.exit_status = process::normal;
     res.output = "(Execute command failed)";
     res.start_time = res.end_time;
@@ -1207,7 +1204,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   // A nullptr host check command means we should assume the host is UP.
   if (hst->get_check_command().empty()) {
     hst->set_plugin_output("(Host assumed to be UP)");
-    res.exit_code = notifier::ok;
+    res.exit_code = service::state_ok;
   }
 
   // Make sure we have some data.
@@ -1219,14 +1216,14 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   hst->set_plugin_output(ploutput);
 
   // If we're not doing aggressive host checking, let WARNING
-  // states indicate the host is up (fake the result to be notifier::ok).
+  // states indicate the host is up (fake the result to be UP = 0).
   if (!config->use_aggressive_host_checking()
-      && (res.exit_code == notifier::warning))
-    res.exit_code = notifier::ok;
+      && res.exit_code == service::state_warning)
+    res.exit_code = service::state_ok;
 
   // Get host state from plugin exit code.
   host::host_state return_result(
-        (res.exit_code == notifier::ok)
+        (res.exit_code == service::state_ok)
         ?  host::state_up
         :  host::state_down);
 

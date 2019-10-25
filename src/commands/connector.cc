@@ -80,23 +80,11 @@ connector::connector(connector const& right)
 /**
  *  Destructor.
  */
-connector::~connector() throw() {
+connector::~connector() noexcept {
   // Wait restart thread.
   _restart.wait();
   // Close connector properly.
   _connector_close();
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-connector& connector::operator=(connector const& right) {
-  _internal_copy(right);
-  return (*this);
 }
 
 /**
@@ -105,7 +93,7 @@ connector& connector::operator=(connector const& right) {
  *  @return Return a pointer on a copy object.
  */
 com::centreon::engine::commands::command* connector::clone() const {
-  return (new connector(*this));
+  return new connector(*this);
 }
 
 /**
@@ -532,7 +520,7 @@ void connector::_internal_copy(connector const& right) {
  */
 std::string const& connector::_query_ending() const noexcept {
   static std::string ending(3, '\0');
-  return (ending);
+  return ending;
 }
 
 /**
@@ -878,5 +866,5 @@ std::ostream& operator<<(std::ostream& os, connector const& obj) {
     "  name:         " << obj.get_name() << "\n"
     "  command_line: " << obj.get_command_line() << "\n"
     "}\n";
-  return (os);
+  return os;
 }

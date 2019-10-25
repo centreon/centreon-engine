@@ -565,7 +565,6 @@ add_subdirectory(src/broker)
 add_subdirectory(src/checks)
 add_subdirectory(conf)
 add_subdirectory(src/downtimes)
-add_subdirectory(conf)
 add_subdirectory(src/configuration)
 add_subdirectory(src/commands)
 add_subdirectory(src/compatibility)
@@ -620,7 +619,7 @@ install(TARGETS "centengine" "centenginestats"
   DESTINATION "${PREFIX_BIN}"
   COMPONENT "runtime")
 
-# Create directories.
+## Create directories.
 if (CREATE_FILES)
   install(CODE "
   function(mkdir_chown user group path)
