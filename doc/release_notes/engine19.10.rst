@@ -1,4 +1,29 @@
 =======================
+Centreon Engine 19.10.2
+=======================
+
+*********
+Bug fixes
+*********
+
+Custom variables not resolved
+==============================
+Some custom variables were not resolved.
+This results in bad or pending checks with wrong commands.
+
+Random host statuses
+====================
+Some hosts/services were changing status randomly.
+
+Send custom variables to broker
+===============================
+Some broker notifications about customvariables were dropped.
+
+Null string crash
+=================
+In some cases strings construction could lead to exceptions thrown.
+
+=======================
 Centreon Engine 19.10.1
 =======================
 
