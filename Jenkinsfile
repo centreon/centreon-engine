@@ -2,7 +2,7 @@
 ** Variables.
 */
 properties([buildDiscarder(logRotator(numToKeepStr: '50'))])
-def serie = '19.10'
+def serie = '20.04'
 def maintenanceBranch = "${serie}.x"
 if (env.BRANCH_NAME.startsWith('release-')) {
   env.BUILD = 'RELEASE'
@@ -57,20 +57,6 @@ try {
         }
       }
     },
-    'debian9': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian9"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
-    },
     'debian10': {
       node {
         sh 'setup_centreon_build.sh'
@@ -97,22 +83,16 @@ try {
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
       }
     },
-    'debian9': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian9"
-      }
-    },
-    'debian9-armhf': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian9-armhf"
-      }
-    },
     'debian10': {
       node {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
+      }
+    },
+    'debian10-armhf': {
+      node {
+        sh 'setup_centreon_build.sh'
+        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10-armhf"
       }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
