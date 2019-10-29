@@ -2962,31 +2962,6 @@ set_service& state::services() throw () {
  *  @return Iterator to the element if found, services().end()
  *          otherwise.
  */
-set_service::const_iterator state::services_find(
-                                   service::key_type const& k) const {
-  configuration::service below_searched;
-  below_searched.set_host_id(k.first);
-  below_searched.set_service_id(k.second);
-  set_service::const_iterator it{_services.upper_bound(below_searched)};
-  if (it != _services.end()
-      && it->host_id() == k.first
-      && it->service_id() == k.second)
-    return it;
-  else if (it != _services.begin()
-           && (--it)->host_id() == k.first
-           && it->service_id() == k.second)
-    return it;
-  return _services.end();
-}
-
-/**
- *  Get service by its key.
- *
- *  @param[in] k Service name.
- *
- *  @return Iterator to the element if found, services().end()
- *          otherwise.
- */
 set_service::iterator state::services_find(
                              service::key_type const& k) {
   configuration::service below_searched;
@@ -3006,19 +2981,12 @@ set_service::iterator state::services_find(
 
 set_service::const_iterator state::services_find(
     std::string const& host_name, std::string const& service_desc) const {
-  configuration::service below_searched;
-  below_searched.hosts().insert(host_name);
-  below_searched.service_description() = service_desc;
-  set_service::iterator
-    it(_services.upper_bound(below_searched));
-  if (it != _services.end()
-      && *it->hosts().begin() == host_name
-      && it->service_description() == service_desc)
-    return it;
-  else if (it != _services.begin()
-           && *(--it)->hosts().begin() == host_name
-           && it->service_description() == service_desc)
-    return it;
+  for (auto it = _services.begin(), end = _services.end();
+       it != end; ++it) {
+    if (it->service_description() == service_desc
+        && *it->hosts().begin() == host_name)
+      return it;
+  }
   return _services.end();
 }
 

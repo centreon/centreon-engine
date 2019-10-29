@@ -354,8 +354,6 @@ namespace               configuration {
                         servicegroups_find(servicegroup::key_type const& k);
     set_service const&  services() const throw ();
     set_service&        services() throw ();
-    set_service::const_iterator
-                        services_find(service::key_type const& k) const;
     set_service::iterator
                         services_find(service::key_type const& k);
     set_service::const_iterator
