@@ -105,7 +105,7 @@ com::centreon::engine::commands::command* connector::clone() const {
  *
  *  @return The command id.
  */
-unsigned long connector::run(
+uint64_t connector::run(
                            std::string const& processed_cmd,
                            nagios_macros& macros,
                            uint32_t timeout) {
@@ -116,7 +116,7 @@ unsigned long connector::run(
     << "', cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Set query informations.
-  unsigned long command_id(get_uniq_id());
+  uint64_t command_id(get_uniq_id());
   std::shared_ptr<query_info> info(new query_info);
   info->processed_cmd = processed_cmd;
   info->start_time = timestamp::now();
@@ -186,7 +186,7 @@ void connector::run(
     << "', cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Set query informations.
-  unsigned long command_id(get_uniq_id());
+  uint64_t command_id(get_uniq_id());
   std::shared_ptr<query_info> info(new query_info);
   info->processed_cmd = processed_cmd;
   info->start_time = timestamp::now();
@@ -231,7 +231,7 @@ void connector::run(
   // Waiting result.
   std::unique_lock<std::mutex> lock(_lock);
   while (true) {
-    std::unordered_map<unsigned long, result>::iterator
+    std::unordered_map<uint64_t, result>::iterator
       it(_results.find(command_id));
     if (it != _results.end()) {
       res = it->second;
@@ -480,11 +480,11 @@ void connector::_connector_start() {
       << _queries.size();
 
     // Resend commands.
-    for (std::unordered_map<unsigned long, std::shared_ptr<query_info> >::iterator
+    for (std::unordered_map<uint64_t, std::shared_ptr<query_info> >::iterator
            it(_queries.begin()), end(_queries.end());
          it != end;
          ++it) {
-      unsigned long command_id(it->first);
+      uint64_t command_id(it->first);
       std::shared_ptr<query_info> info(it->second);
       _send_query_execute(
         info->processed_cmd,
@@ -576,7 +576,7 @@ void connector::_recv_query_execute(char const* data) {
 
     // Get query informations.
     char* endptr(nullptr);
-    unsigned long command_id(strtol(data, &endptr, 10));
+    uint64_t command_id(strtol(data, &endptr, 10));
     if (data == endptr)
       throw (engine_error()
              << "Invalid execution result: Invalid command ID");
@@ -601,7 +601,7 @@ void connector::_recv_query_execute(char const* data) {
       std::lock_guard<std::mutex> lock(_lock);
 
       // Get query information with the command_id.
-      std::unordered_map<unsigned long, std::shared_ptr<query_info> >::iterator
+      std::unordered_map<uint64_t, std::shared_ptr<query_info> >::iterator
         it(_queries.find(command_id));
       if (it == _queries.end()) {
         logger(dbg_commands, basic)
@@ -804,7 +804,7 @@ void connector::restart::_run() {
     logger(log_runtime_warning, basic)
       << "Warning: Connector '" << _c->_name << "': " << e.what();
 
-    std::unordered_map<unsigned long, std::shared_ptr<query_info> > tmp_queries;
+    std::unordered_map<uint64_t, std::shared_ptr<query_info> > tmp_queries;
     {
       std::lock_guard<std::mutex> lock(_c->_lock);
       _c->_try_to_restart = false;
@@ -813,11 +813,11 @@ void connector::restart::_run() {
     }
 
     // Resend commands.
-    for (std::unordered_map<unsigned long, std::shared_ptr<query_info> >::iterator
+    for (std::unordered_map<uint64_t, std::shared_ptr<query_info> >::iterator
            it(tmp_queries.begin()), end(tmp_queries.end());
          it != end;
          ++it) {
-      unsigned long command_id(it->first);
+      uint64_t command_id(it->first);
       std::shared_ptr<query_info> info(it->second);
 
       result res;

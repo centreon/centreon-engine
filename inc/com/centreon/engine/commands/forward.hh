@@ -45,14 +45,14 @@ namespace              commands {
                        ~forward() throw() override;
     forward&           operator=(forward const& right);
     commands::command* clone() const override;
-    unsigned long      run(
+    uint64_t           run(
                          std::string const& processed_cmd,
                          nagios_macros& macros,
-                         unsigned int timeout) override;
+                         uint32_t timeout) override;
     void               run(
                          std::string const& processed_cmd,
                          nagios_macros& macros,
-                         unsigned int timeout,
+                         uint32_t timeout,
                          result& res) override;
 
   private:

@@ -103,10 +103,10 @@ com::centreon::engine::commands::command* forward::clone() const {
  *
  *  @return The command id.
  */
-unsigned long forward::run(
+uint64_t forward::run(
                          std::string const& processed_cmd,
                          nagios_macros& macros,
-                         unsigned int timeout) {
+                         uint32_t timeout) {
   return (_command->run(processed_cmd, macros, timeout));
 }
 
@@ -121,7 +121,7 @@ unsigned long forward::run(
 void forward::run(
                 std::string const& processed_cmd,
                 nagios_macros& macros,
-                unsigned int timeout,
+                uint32_t timeout,
                 result& res) {
   _command->run(processed_cmd, macros, timeout, res);
   return;

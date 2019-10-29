@@ -25,8 +25,8 @@
 using namespace com::centreon::engine::commands;
 
 // Default size.
-static unsigned int const EXTRA_SIZE_ENV = 128;
-static unsigned int const EXTRA_SIZE_BUFFER = 4096;
+static uint32_t const EXTRA_SIZE_ENV = 128;
+static uint32_t  const EXTRA_SIZE_BUFFER = 4096;
 
 /**
  *  Constructor.
@@ -39,7 +39,7 @@ environment::environment(char** env)
     _size_buffer(0),
     _size_env(0) {
   if (env)
-    for (unsigned int i(0); env[i]; ++i)
+    for (uint32_t  i(0); env[i]; ++i)
       add(env[i]);
 }
 
@@ -104,8 +104,8 @@ bool environment::operator!=(environment const& right) const throw () {
 void environment::add(char const* line) {
   if (!line)
     return;
-  unsigned int size(strlen(line));
-  unsigned int new_pos(_pos_buffer + size + 1);
+  uint32_t size(strlen(line));
+  uint32_t new_pos(_pos_buffer + size + 1);
   if (new_pos > _size_buffer) {
     if (new_pos < _size_buffer + EXTRA_SIZE_BUFFER)
       _realoc_buffer(_size_buffer + EXTRA_SIZE_BUFFER);
@@ -130,9 +130,9 @@ void environment::add(char const* line) {
 void environment::add(char const* name, char const* value) {
   if (!name || !value)
     return;
-  unsigned int size_name(strlen(name));
-  unsigned int size_value(strlen(value));
-  unsigned int new_pos(_pos_buffer + size_name + size_value + 2);
+  uint32_t size_name(strlen(name));
+  uint32_t size_value(strlen(value));
+  uint32_t new_pos(_pos_buffer + size_name + size_value + 2);
   if (new_pos > _size_buffer) {
     if (new_pos < _size_buffer + EXTRA_SIZE_BUFFER)
       _realoc_buffer(_size_buffer + EXTRA_SIZE_BUFFER);
@@ -158,7 +158,7 @@ void environment::add(char const* name, char const* value) {
 void environment::add(std::string const& line) {
   if (line.empty())
     return;
-  unsigned int new_pos(_pos_buffer + line.size() + 1);
+  uint32_t new_pos(_pos_buffer + line.size() + 1);
   if (new_pos > _size_buffer) {
     if (new_pos < _size_buffer + EXTRA_SIZE_BUFFER)
       _realoc_buffer(_size_buffer + EXTRA_SIZE_BUFFER);
@@ -185,7 +185,7 @@ void environment::add(
                     std::string const& value) {
   if (name.empty())
     return;
-  unsigned int new_pos(_pos_buffer + name.size() + value.size() + 2);
+  uint32_t new_pos(_pos_buffer + name.size() + value.size() + 2);
   if (new_pos > _size_buffer) {
     if (new_pos < _size_buffer + EXTRA_SIZE_BUFFER)
       _realoc_buffer(_size_buffer + EXTRA_SIZE_BUFFER);
@@ -239,7 +239,7 @@ void environment::_internal_copy(environment const& right) {
  *
  *  @param[in] size  New size.
  */
-void environment::_realoc_buffer(unsigned int size) {
+void environment::_realoc_buffer(uint32_t size) {
   if (_size_buffer >= size)
     throw (engine_error()
            << "Invalid size for command environment reallocation: "
@@ -259,7 +259,7 @@ void environment::_realoc_buffer(unsigned int size) {
  *
  *  @param[in] size  New size.
  */
-void environment::_realoc_env(unsigned int size) {
+void environment::_realoc_env(uint32_t size) {
   if (_size_env >= size)
     throw (engine_error()
            << "Invalid size for command environment reallocation: "
@@ -279,7 +279,7 @@ void environment::_realoc_env(unsigned int size) {
 void environment::_rebuild_env() {
   if (!_env)
     return;
-  for (unsigned int i(0), pos(0); i < _pos_env; ++i) {
+  for (uint32_t i(0), pos(0); i < _pos_env; ++i) {
     _env[i] = _buffer + pos;
     pos += strlen(_buffer + pos + 1) + 2;
   }

@@ -59,12 +59,12 @@ class connector : public command, public process_listener {
   ~connector() noexcept override;
   connector& operator=(connector const& right) = delete;
   commands::command* clone() const override;
-  unsigned long run(std::string const& processed_cmd,
+  uint64_t run(std::string const& processed_cmd,
                     nagios_macros& macros,
-                    unsigned int timeout) override;
+                    uint32_t timeout) override;
   void run(std::string const& processed_cmd,
            nagios_macros& macros,
-           unsigned int timeout,
+           uint32_t timeout,
            result& res) override;
   void set_command_line(std::string const& command_line) override;
 
@@ -87,7 +87,7 @@ class connector : public command, public process_listener {
   struct query_info {
     std::string processed_cmd;
     timestamp start_time;
-    unsigned int timeout;
+    uint32_t timeout;
     bool waiting_result;
   };
 
@@ -105,19 +105,19 @@ class connector : public command, public process_listener {
   void _send_query_execute(std::string const& cmdline,
                            uint64_t command_id,
                            timestamp const& start,
-                           unsigned int timeout);
+                           uint32_t timeout);
   void _send_query_quit();
   void _send_query_version();
 
   std::condition_variable _cv_query;
   std::string _data_available;
   bool _is_running;
-  std::unordered_map<unsigned long, std::shared_ptr<query_info> > _queries;
+  std::unordered_map<uint64_t , std::shared_ptr<query_info> > _queries;
   bool _query_quit_ok;
   bool _query_version_ok;
   mutable std::mutex _lock;
   process _process;
-  std::unordered_map<unsigned long, result> _results;
+  std::unordered_map<uint64_t , result> _results;
   restart _restart;
   bool _try_to_restart;
 };
