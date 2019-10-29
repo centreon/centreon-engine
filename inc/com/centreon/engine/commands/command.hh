@@ -58,10 +58,10 @@ class command {
   virtual std::string process_cmd(nagios_macros* macros) const;
   virtual uint64_t run(std::string const& processed_cmd,
                             nagios_macros& macors,
-                            unsigned int timeout) = 0;
+                            uint32_t timeout) = 0;
   virtual void run(std::string const& process_cmd,
                    nagios_macros& macros,
-                   unsigned int timeout,
+                   uint32_t timeout,
                    result& res) = 0;
   virtual void set_command_line(std::string const& command_line);
   void set_listener(command_listener* listener) noexcept;

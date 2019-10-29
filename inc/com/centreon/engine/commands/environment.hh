@@ -49,16 +49,16 @@ namespace        commands {
 
   private:
     void         _internal_copy(environment const& right);
-    void         _realoc_buffer(unsigned int size);
-    void         _realoc_env(unsigned int size);
+    void         _realoc_buffer(uint32_t size);
+    void         _realoc_env(uint32_t size);
     void         _rebuild_env();
 
     char*        _buffer;
     char**       _env;
-    unsigned int _pos_buffer;
-    unsigned int _pos_env;
-    unsigned int _size_buffer;
-    unsigned int _size_env;
+    uint32_t     _pos_buffer;
+    uint32_t     _pos_env;
+    uint32_t     _size_buffer;
+    uint32_t     _size_env;
   };
 }
 
