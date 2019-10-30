@@ -219,7 +219,6 @@ class                notifier : public checkable {
   void               set_retain_nonstatus_information(bool retain_non_status_informations);
   bool               get_is_being_freshened(void) const;
   void               set_is_being_freshened(bool freshened);
-  bool               should_notification_be_escalated() const;
   std::list<escalation*>&
                      get_escalations();
   std::list<escalation*> const&
