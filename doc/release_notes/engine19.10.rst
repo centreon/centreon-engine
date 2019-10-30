@@ -1,4 +1,16 @@
 =======================
+Centreon Engine 19.10.3
+=======================
+
+*********
+Bug fixes
+*********
+
+Service escalation not well resolved
+====================================
+Service configurations look up failed when service escalations were defined.
+
+=======================
 Centreon Engine 19.10.2
 =======================
 
