@@ -46,7 +46,9 @@ class TestEngine : public ::testing::Test {
       uint64_t svc_id = 13);
   configuration::hostescalation new_configuration_hostescalation(
       std::string const& hostname,
-      std::string const& contactgroup);
+      std::string const& contactgroup,
+      uint32_t first_notif = 2,
+      uint32_t last_notif = 11);
   configuration::hostdependency new_configuration_hostdependency(
       std::string const& hostname,
       std::string const& dep_hostname);

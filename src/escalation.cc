@@ -93,26 +93,23 @@ contactgroup_map_unsafe& escalation::get_contactgroups() {
  *  This method is called by a notifier to know if this escalation is touched
  *  by the notification to send.
  *
- * @param state The notifier state.
+ * @param state The current notifier state.
  * @param notification_number The current notifier notification number.
  *
  * @return A boolean.
  */
-bool escalation::is_viable(int state, uint32_t notification_number) const {
+bool escalation::is_viable(int state __attribute__((unused)),
+                           uint32_t notification_number) const {
   std::time_t current_time;
   std::time(&current_time);
-
-  /* In case of a recovery, we are interested by the last notification */
-  uint32_t number{state == 0 ?
-    notification_number - 1 : notification_number};
 
   /* Skip this escalation if current_time is outside its timeperiod */
   if (!get_escalation_period().empty() &&
       !check_time_against_period(current_time, escalation_period_ptr))
     return false;
 
-  if (number < _first_notification ||
-      (number > _last_notification && _last_notification != 0))
+  if (notification_number < _first_notification ||
+      (notification_number > _last_notification && _last_notification != 0))
     return false;
   return true;
 }

@@ -634,6 +634,36 @@ void applier::state::_check_serviceescalations() const {
       throw engine_error() << "This is a bug";
     }
   }
+
+  for (auto const& e : engine::serviceescalation::serviceescalations) {
+    engine::serviceescalation const* se{e.second.get()};
+    bool found = false;
+
+    for (auto const& p : engine::service::services) {
+      if (p.second.get() == se->notifier_ptr) {
+        found = true;
+        if (se->get_hostname() != p.second->get_hostname()) {
+          logger(log_config_error, basic)
+            << "Error on serviceescalation !!! The notifier seen by the escalation is wrong. "
+            << "Host name given by the escalation is " << se->get_hostname() << " whereas the hostname from the notifier is " << p.second->get_hostname() << ".";
+          throw engine_error() << "This is a bug";
+        }
+        if (se->get_description() != p.second->get_description()) {
+          logger(log_config_error, basic)
+            << "Error on serviceescalation !!! The notifier seen by the escalation is wrong. "
+            << "Service description given by the escalation is " << se->get_description() << " whereas the service description from the notifier is " << p.second->get_description() << ".";
+          throw engine_error() << "This is a bug";
+        }
+        break;
+      }
+    }
+    if (!found) {
+      logger(log_config_error, basic)
+        << "Error on serviceescalation !!! The notifier seen by the escalation is wrong "
+        << "The bug is detected on escalation concerning host " << se->get_hostname() << " and service " << se->get_description();
+      throw engine_error() << "This is a bug";
+    }
+  }
 }
 
 /**
@@ -648,7 +678,7 @@ void applier::state::_check_hostescalations() const {
 
     for (auto const& escalation : hst->get_escalations()) {
       bool found = false;
-      for (auto const& e : engine::serviceescalation::serviceescalations) {
+      for (auto const& e : engine::hostescalation::hostescalations) {
         if (e.second.get() == escalation) {
           found = true;
           break;
@@ -660,6 +690,35 @@ void applier::state::_check_hostescalations() const {
             << " contains a non existing host escalation";
         throw engine_error() << "This is a bug";
       }
+    }
+  }
+
+  for (auto const& e : engine::hostescalation::hostescalations) {
+    engine::hostescalation const* he{e.second.get()};
+    bool found = false;
+
+    for (auto const& p : engine::host::hosts) {
+      if (p.second.get() == he->notifier_ptr) {
+        found = true;
+        if (he->get_hostname() != p.second->get_name()) {
+          logger(log_config_error, basic)
+              << "Error on hostescalation !!! The notifier seen by the "
+                 "escalation is wrong. "
+              << "Host name given by the escalation is " << he->get_hostname()
+              << " whereas the hostname from the notifier is "
+              << p.second->get_name() << ".";
+          throw engine_error() << "This is a bug";
+        }
+        break;
+      }
+    }
+    if (!found) {
+      logger(log_config_error, basic)
+          << "Error on hostescalation !!! The notifier seen by the escalation "
+             "is wrong "
+          << "The bug is detected on escalation concerning host "
+          << he->get_hostname();
+      throw engine_error() << "This is a bug";
     }
   }
 }
