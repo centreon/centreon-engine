@@ -36,7 +36,7 @@ namespace             configuration {
      */
     class             globals {
     public:
-      void            apply(state& globals);
+      void            apply(configuration::state& globals);
       static globals& instance();
       static void     load();
       static void     unload();

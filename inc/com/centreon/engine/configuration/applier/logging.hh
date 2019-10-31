@@ -38,22 +38,22 @@ namespace                configuration {
      */
     class                logging {
     public:
-      void               apply(state& config);
+      void               apply(configuration::state& config);
       static logging&    instance();
       static void        load();
       static void        unload();
 
     private:
                          logging();
-                         logging(state& config);
+                         logging(configuration::state& config);
                          logging(logging const&);
                          ~logging() throw ();
       logging&           operator=(logging const&);
       void               _add_stdout();
       void               _add_stderr();
       void               _add_syslog();
-      void               _add_log_file(state const& config);
-      void               _add_debug(state const& config);
+      void               _add_log_file(configuration::state const& config);
+      void               _add_debug(configuration::state const& config);
       void               _del_syslog();
       void               _del_log_file();
       void               _del_debug();
