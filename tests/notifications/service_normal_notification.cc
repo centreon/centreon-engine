@@ -1059,4 +1059,3 @@ TEST_F(ServiceNotification, NoServiceNotificationWhenHostDown) {
       "admin;test_host;test_svc;CRITICAL;cmd;service down")};
   ASSERT_EQ(step, std::string::npos);
 }
-

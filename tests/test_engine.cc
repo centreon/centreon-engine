@@ -132,10 +132,12 @@ configuration::host TestEngine::new_configuration_host(
 
 configuration::hostescalation TestEngine::new_configuration_hostescalation(
     std::string const& hostname,
-    std::string const& contactgroup) {
+    std::string const& contactgroup,
+    uint32_t first_notif,
+    uint32_t last_notif) {
   configuration::hostescalation he;
-  he.parse("first_notification", "2");
-  he.parse("last_notification", "11");
+  he.parse("first_notification", std::to_string(first_notif).c_str());
+  he.parse("last_notification", std::to_string(last_notif).c_str());
   he.parse("notification_interval", "9");
   he.parse("escalation_options", "d,u,r");
   he.parse("host_name", hostname.c_str());
