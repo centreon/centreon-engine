@@ -485,8 +485,8 @@ void applier::service::modify_object(
             NEBTYPE_SERVICECUSTOMVARIABLE_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
             s.get(), c.first.c_str(), c.second.get_value().c_str(), &tv);
       }
-      s->custom_variables.erase(c.first);
     }
+    s->custom_variables.clear();
 
     for (auto& c: obj.customvariables()) {
       s->custom_variables[c.first] =  c.second;

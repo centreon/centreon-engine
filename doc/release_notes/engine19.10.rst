@@ -1,4 +1,24 @@
 =======================
+Centreon Engine 19.10.4
+=======================
+
+*********
+Bug fixes
+*********
+
+Custom variable update crash on reload
+======================================
+A bug was introduce in 19.10.2 with a reload on custom_variables
+services/contacts/hosts update.
+
+Recovery notification didn't work on escalation [1;0]
+=====================================================
+If an escalation was defined with a first notification at 1 and a
+last notification at 0, we want the escalation to start from the
+first notification, but only one time, the recovery notification
+was not sent.
+
+=======================
 Centreon Engine 19.10.3
 =======================
 
