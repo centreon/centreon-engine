@@ -392,8 +392,8 @@ void applier::host::modify_object(
                                c.first.c_str(), c.second.get_value().c_str(),
                                &tv);
       }
-      it_obj->second->custom_variables.erase(c.first);
     }
+    it_obj->second->custom_variables.clear();
 
     for (auto& c: obj.customvariables()) {
       it_obj->second->custom_variables[c.first] = c.second;

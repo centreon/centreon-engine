@@ -351,8 +351,8 @@ void applier::contact::modify_object(configuration::contact const& obj) {
                                cus.first.c_str(), cus.second.get_value().c_str(),
                                &tv);
       }
-      c->get_custom_variables().erase(cus.first);
     }
+    c->get_custom_variables().clear();
 
     for (auto& cus: obj.customvariables()) {
       c->get_custom_variables()[cus.first] = cus.second;
