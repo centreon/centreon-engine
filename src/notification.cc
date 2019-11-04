@@ -34,7 +34,8 @@ notification::notification(notifier* parent,
                            uint32_t options,
                            uint64_t notification_id,
                            uint32_t notification_number,
-                           uint32_t notification_interval)
+                           uint32_t notification_interval,
+                           bool escalated)
     : _parent{parent},
       _type{type},
       _author{author},
@@ -42,9 +43,8 @@ notification::notification(notifier* parent,
       _options{options},
       _id{notification_id},
       _number{notification_number},
-      _interval{notification_interval} {
-
-}
+      _escalated{escalated},
+      _interval{notification_interval} {}
 
 int notification::execute(std::unordered_set<contact*> const& to_notify) {
   uint32_t contacts_notified{0};
@@ -192,3 +192,29 @@ notifier::reason_type notification::get_reason() const {
 uint32_t notification::get_notification_interval() const {
   return _interval;
 }
+
+bool notification::is_escalated() const {
+  return _escalated;
+}
+
+void notification::set_escalated(bool escalated) {
+  _escalated = escalated;
+}
+
+namespace com::centreon::engine {
+/**
+ *  operator<< to dump a notification in a stream
+ *
+ * @param os The output stream
+ * @param obj The notification to dump.
+ *
+ * @return The output stream
+ */
+std::ostream& operator<<(std::ostream& os, notification const& obj) {
+  os << "type: " << obj._type << ", author: " << obj._author
+     << ", options: " << obj._options << ", escalated: " << obj._escalated
+     << ", id: " << obj._id << ", number: " << obj._number
+     << ", interval: " << obj._interval << "\n";
+  return os;
+}
+}  // namespace com::centreon::engine

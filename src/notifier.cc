@@ -1177,6 +1177,11 @@ std::array<int, MAX_STATE_HISTORY_ENTRIES>& notifier::get_state_history() {
   return _state_history;
 }
 
+std::array<std::shared_ptr<notification>, 6> const&
+notifier::get_current_notifications() const {
+  return _notification;
+}
+
 int notifier::get_pending_flex_downtime() const {
   return _pending_flex_downtime;
 }
@@ -1271,4 +1276,96 @@ int notifier::get_acknowledgement_timeout() const {
 
 void notifier::set_notification_period_ptr(timeperiod* tp) {
   _notification_period_ptr = tp;
+}
+
+/**
+ *  This method is called by the retention to restitute a notification.
+ *
+ * @param idx The index of the notification
+ * @param value The notification under the form of a string
+ */
+void notifier::set_notification(int32_t idx, std::string const& value) {
+  if (value.empty())
+    return;
+
+  char const* v = value.c_str();
+  if (strncmp(v, "type: ", 6)) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the line should start "
+           "with 'type: '";
+    return;
+  }
+
+  v += 6;
+  char* next;
+  reason_type type = static_cast<reason_type>(strtol(v, &next, 10));
+  if (next == v || *next != ',' || next[1] != ' ') {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the separator between "
+        << "two fields is ', '";
+    return;
+  }
+
+  v = next + 2;
+  if (strncmp(v, "author: ", 8)) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the expected field "
+           " after 'type' is 'author'";
+    return;
+  }
+
+  v += 8;
+  for (next = const_cast<char*>(v); *next && *next != ','; next++)
+    ;
+  std::string author(v, next - v);
+
+  v = next + 2;
+  if (strncmp(v, "options: ", 9))
+    return;
+
+  v += 9;
+  int options = strtol(v, &next, 10);
+  if (next == v || *next != ',' || next[1] != ' ')
+    return;
+
+  v = next + 2;
+  if (strncmp(v, "escalated: ", 11))
+    return;
+
+  v += 11;
+  bool escalated = static_cast<bool>(strtol(v, &next, 10));
+  if (next == v || *next != ',' || next[1] != ' ')
+    return;
+
+  v = next + 2;
+  if (strncmp(v, "id: ", 4))
+    return;
+
+  v += 4;
+  int id = strtol(v, &next, 10);
+  if (next == v || *next != ',' || next[1] != ' ')
+    return;
+
+  v = next + 2;
+  if (strncmp(v, "number: ", 8))
+    return;
+
+  v += 8;
+  int number = strtol(v, &next, 10);
+  if (next == v || *next != ',' || next[1] != ' ')
+    return;
+
+  v = next + 2;
+  if (strncmp(v, "interval: ", 10))
+    return;
+
+  v += 10;
+  int interval = strtol(v, &next, 10);
+  if (next == v)
+    return;
+
+  std::shared_ptr<notification> notif{std::make_shared<notification>(
+      this, type, author, "", options, id,
+      number, interval, escalated)};
+  _notification[idx] = notif;
 }
