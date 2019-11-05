@@ -740,8 +740,18 @@ int notifier::notify(notifier::reason_type type,
     /* The notification has been sent.
      * Should we increment the notification number? */
     if (cat != cat_normal) {
-      if (cat == cat_recovery)
-        _notification[cat_normal].reset();
+      switch (cat) {
+        case cat_recovery:
+          _notification[cat_normal].reset();
+          _notification[cat_recovery].reset();
+          break;
+        case cat_flapping:
+          if (type == flappingstop || type == flappingdisabled)
+            _notification[cat_flapping].reset();
+          break;
+        default:
+          _notification[cat].reset();
+      }
       _notification_number = 0;
     }
   }
