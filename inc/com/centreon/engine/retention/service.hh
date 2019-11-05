@@ -152,7 +152,7 @@ class service : public object {
 
   template <int N>
   bool _set_notification(std::string const& value) {
-    if (N < 6 && N > 0) {
+    if (N < 6 && N >= 0) {
       _notification[N] = value;
       return true;
     } else

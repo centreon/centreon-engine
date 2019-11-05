@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <fstream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/retention/parser.hh"
@@ -70,6 +71,8 @@ void parser::parse(std::string const& path, state& retention) {
       char const* key;
       char const* value;
       if (string::split(input, &key, &value, '='))
+        if (strcmp(key, "notification_0") == 0)
+          std::cout << "COOL\n";
         obj->set(key, value);
     }
     else {

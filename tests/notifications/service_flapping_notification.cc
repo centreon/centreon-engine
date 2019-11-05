@@ -25,6 +25,7 @@
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -34,9 +35,9 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
@@ -44,6 +45,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::retention;
 
 extern configuration::state* config;
 
@@ -436,19 +438,19 @@ TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
   }
 
   std::ostringstream oss;
-  oss << *_service;
+  dump::service(oss, *_service);
   std::string retention{oss.str()};
 
   std::size_t pos =
-      retention.find("notification_3: ") + strlen("notification_3: ");
+      retention.find("notification_3=") + strlen("notification_3=");
   std::size_t end = retention.find("\n", pos + 1);
   std::string notification0 = retention.substr(pos, end - pos);
   _service->set_notification(0, notification0);
   oss.str("");
 
-  oss << *_service;
+  dump::service(oss, *_service);
   retention = oss.str();
-  pos = retention.find("notification_3: ") + strlen("notification_3: ");
+  pos = retention.find("notification_3=") + strlen("notification_3=");
   end = retention.find("\n", pos + 1);
   std::string notification1 = retention.substr(pos, end - pos);
 
@@ -460,9 +462,9 @@ TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
   _service->set_notification(3, notification0);
   oss.str("");
 
-  oss << *_service;
+  dump::service(oss, *_service);
   retention = oss.str();
-  pos = retention.find("notification_3: ") + strlen("notification_3: ");
+  pos = retention.find("notification_3=") + strlen("notification_3=");
   end = retention.find("\n", pos + 1);
   notification1 = retention.substr(pos, end - pos);
 

@@ -40,6 +40,7 @@
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
@@ -49,6 +50,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::retention;
 
 extern configuration::state* config;
 
@@ -1079,18 +1081,18 @@ TEST_F(HostNotification, HostEscalationRetention) {
   checks::checker::instance().reap();
 
   oss.str("");
-  oss << *_host;
+  dump::host(oss, *_host);
   std::string retention{oss.str()};
 
-  std::size_t pos = retention.find("notification_0: ") + strlen("notification_0: ");
+  std::size_t pos = retention.find("notification_0=") + strlen("notification_0=");
   std::size_t end = retention.find("\n", pos + 1);
   std::string notification0 = retention.substr(pos, end - pos);
   _host->set_notification(0, notification0);
   oss.str("");
 
-  oss << *_host;
+  dump::host(oss, *_host);
   retention = oss.str();
-  pos = retention.find("notification_0: ") + strlen("notification_0: ");
+  pos = retention.find("notification_0=") + strlen("notification_0=");
   end = retention.find("\n", pos + 1);
   std::string notification1 = retention.substr(pos, end - pos);
 
@@ -1100,9 +1102,9 @@ TEST_F(HostNotification, HostEscalationRetention) {
   _host->set_notification(0, notification0);
   oss.str("");
 
-  oss << *_host;
+  dump::host(oss, *_host);
   retention = oss.str();
-  pos = retention.find("notification_0: ") + strlen("notification_0: ");
+  pos = retention.find("notification_0=") + strlen("notification_0=");
   end = retention.find("\n", pos + 1);
   notification1 = retention.substr(pos, end - pos);
 

@@ -52,9 +52,9 @@ class notification {
   std::string _author;
   std::string _message;
   uint32_t _options;
-  bool _escalated;
   uint64_t _id;
   uint32_t _number;
+  bool _escalated;
   uint32_t _interval;
 };
 

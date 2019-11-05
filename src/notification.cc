@@ -201,7 +201,9 @@ void notification::set_escalated(bool escalated) {
   _escalated = escalated;
 }
 
-namespace com::centreon::engine {
+namespace com {
+  namespace centreon {
+    namespace engine {
 /**
  *  operator<< to dump a notification in a stream
  *
@@ -218,3 +220,5 @@ std::ostream& operator<<(std::ostream& os, notification const& obj) {
   return os;
 }
 }  // namespace com::centreon::engine
+}
+}
