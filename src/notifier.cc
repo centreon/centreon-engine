@@ -511,7 +511,26 @@ bool notifier::_is_notification_viable_flapping(
     return false;
   }
 
-  /* Don't send a notification if is has already been sent */
+  /* Don't send a start notification if a flapping notification is already there
+   */
+  if (type == reason_flappingstart && _notification[cat_flapping]) {
+    logger(dbg_notifications, more)
+        << "A flapping notification is already running, we can not send "
+           "a start notification now.";
+    return false;
+    /* Don't send a stop/cancel notification if the previous flapping
+     * notification is not a start flapping */
+  } else if (type == reason_flappingstop || type == reason_flappingdisabled) {
+    if (!_notification[cat_flapping] ||
+        _notification[cat_flapping]->get_reason() != reason_flappingstart) {
+      logger(dbg_notifications, more)
+          << "A stop or cancellation flapping notification can only be sent "
+             "after a start flapping notification.";
+      return false;
+    }
+  }
+
+  /* Don't send a notification if the same has already been sent previously. */
   if (_notification[cat_flapping] &&
       _notification[cat_flapping]->get_reason() == type) {
     logger(dbg_notifications, more)
@@ -746,8 +765,12 @@ int notifier::notify(notifier::reason_type type,
           _notification[cat_recovery].reset();
           break;
         case cat_flapping:
-          if (type == flappingstop || type == flappingdisabled)
+          if (type == reason_flappingstop || type == reason_flappingdisabled)
             _notification[cat_flapping].reset();
+          break;
+        case cat_downtime:
+          if (type == reason_downtimeend || type == reason_downtimecancelled)
+            _notification[cat_downtime].reset();
           break;
         default:
           _notification[cat].reset();
@@ -1330,49 +1353,89 @@ void notifier::set_notification(int32_t idx, std::string const& value) {
   std::string author(v, next - v);
 
   v = next + 2;
-  if (strncmp(v, "options: ", 9))
+  if (strncmp(v, "options: ", 9)) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the expected field "
+           " after 'author' is 'options'";
     return;
+  }
 
   v += 9;
   int options = strtol(v, &next, 10);
-  if (next == v || *next != ',' || next[1] != ' ')
+  if (next == v || *next != ',' || next[1] != ' ') {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the separator between "
+        << "two fields is ', '";
     return;
+  }
 
   v = next + 2;
-  if (strncmp(v, "escalated: ", 11))
+  if (strncmp(v, "escalated: ", 11)) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the expected field "
+           " after 'options' is 'escalated'";
     return;
+  }
 
   v += 11;
   bool escalated = static_cast<bool>(strtol(v, &next, 10));
-  if (next == v || *next != ',' || next[1] != ' ')
+  if (next == v || *next != ',' || next[1] != ' ') {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the separator between "
+        << "two fields is ', '";
     return;
+  }
 
   v = next + 2;
-  if (strncmp(v, "id: ", 4))
+  if (strncmp(v, "id: ", 4)) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the expected field "
+           " after 'escalated' is 'id'";
     return;
+  }
 
   v += 4;
   int id = strtol(v, &next, 10);
-  if (next == v || *next != ',' || next[1] != ' ')
+  if (next == v || *next != ',' || next[1] != ' ') {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the separator between "
+        << "two fields is ', '";
     return;
+  }
 
   v = next + 2;
-  if (strncmp(v, "number: ", 8))
+  if (strncmp(v, "number: ", 8)) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the expected field "
+           " after 'id' is 'number'";
     return;
+  }
 
   v += 8;
   int number = strtol(v, &next, 10);
-  if (next == v || *next != ',' || next[1] != ' ')
+  if (next == v || *next != ',' || next[1] != ' ') {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the separator between "
+        << "two fields is ', '";
     return;
+  }
 
   v = next + 2;
-  if (strncmp(v, "interval: ", 10))
+  if (strncmp(v, "interval: ", 10)) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the expected field "
+           " after 'number' is 'interval'";
     return;
+  }
 
   v += 10;
   int interval = strtol(v, &next, 10);
-  if (next == v)
+  if (next == v) {
+    logger(log_config_error, basic)
+        << "Error: Bad format in the notification part, the 'interval' value "
+           "should be an integer";
     return;
+  }
 
   std::shared_ptr<notification> notif{std::make_shared<notification>(
       this, type, author, "", options, id,

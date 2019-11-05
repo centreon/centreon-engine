@@ -16,12 +16,12 @@
  * For more information : contact@centreon.com
  *
  */
+#include "com/centreon/engine/notification.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/defines.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/notification.hh"
 #include "com/centreon/engine/notifier.hh"
 
 using namespace com::centreon::engine;
@@ -52,7 +52,9 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
   struct timeval start_time;
   gettimeofday(&start_time, nullptr);
 
-  struct timeval end_time{0L, 0L};
+  struct timeval end_time {
+    0L, 0L
+  };
 
   /* send data to event broker */
   int neb_result{broker_notification_data(
@@ -193,17 +195,9 @@ uint32_t notification::get_notification_interval() const {
   return _interval;
 }
 
-bool notification::is_escalated() const {
-  return _escalated;
-}
-
-void notification::set_escalated(bool escalated) {
-  _escalated = escalated;
-}
-
 namespace com {
-  namespace centreon {
-    namespace engine {
+namespace centreon {
+namespace engine {
 /**
  *  operator<< to dump a notification in a stream
  *
@@ -219,6 +213,6 @@ std::ostream& operator<<(std::ostream& os, notification const& obj) {
      << ", interval: " << obj._interval << "\n";
   return os;
 }
-}  // namespace com::centreon::engine
-}
-}
+}  // namespace engine
+}  // namespace centreon
+}  // namespace com

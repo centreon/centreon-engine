@@ -41,8 +41,6 @@ class notification {
   int execute(std::unordered_set<contact*> const& to_notify);
   notifier::reason_type get_reason() const;
   uint32_t get_notification_interval() const;
-  bool is_escalated() const;
-  void set_escalated(bool escalated);
 
  private:
   friend std::ostream& operator<<(std::ostream& os, notification const& n);
@@ -61,7 +59,5 @@ class notification {
 std::ostream& operator<<(std::ostream& os, notification const& obj);
 
 CCE_END()
-
-
 
 #endif  // !CCE_NOTIFICATION_HH
