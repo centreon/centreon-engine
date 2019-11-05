@@ -25,6 +25,7 @@
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -34,9 +35,9 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
@@ -44,6 +45,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::retention;
 
 extern configuration::state* config;
 
@@ -259,7 +261,6 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlappingStopTwoTimes) {
   ASSERT_EQ(id + 2, _service->get_next_notification_id());
 }
 
-#include <iostream>
 TEST_F(ServiceFlappingNotification, CheckFlapping) {
   check_result r;
 
@@ -351,4 +352,121 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   size_t m5{out.find("SERVICE FLAPPING ALERT: test_host;test_description;STOPPED;", m4 + 1)};
   size_t m6{out.find("SERVICE NOTIFICATION: admin;test_host;test_description;FLAPPINGSTOP (CRITICAL);cmd;", m5 + 1)};
   ASSERT_NE(m6, std::string::npos);
+}
+
+TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
+  check_result r;
+
+  r.set_exited_ok(true);
+
+  config->enable_flap_detection(true);
+  _service->set_flap_detection_enabled(true);
+  _service->add_flap_detection_on(engine::service::ok);
+  _service->add_flap_detection_on(engine::service::down);
+  _service->set_notification_interval(1);
+  time_t now = 45000;
+  set_time(now);
+  _service->set_current_state(engine::service::state_ok);
+  _service->set_last_hard_state(engine::service::state_ok);
+  _service->set_last_hard_state_change(50000);
+  _service->set_state_type(checkable::hard);
+  _service->set_first_notification_delay(3);
+  _service->set_max_attempts(1);
+
+  // This loop is to store many UP in the state history.
+  for (int i = 1; i < 22; i++) {
+    // When i == 0, the state_critical is soft => no notification
+    // When i == 1, the state_critical is soft => no notification
+    // When i == 2, the state_critical is hard down => notification
+    now += 300;
+    std::cout << "NOW = " << now << std::endl;
+    set_time(now);
+    _service->set_last_state(_service->get_current_state());
+    if (notifier::hard == _service->get_state_type())
+      _service->set_last_hard_state(_service->get_current_state());
+
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;0;service "
+           "ok";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  for (int i = 1; i < 8; i++) {
+    // When i == 0, the state_critical is soft => no notification
+    // When i == 1, the state_critical is soft => no notification
+    // When i == 2, the state_critical is hard down => notification
+    now += 300;
+    std::cout << "NOW = " << now << std::endl;
+    set_time(now);
+    _service->set_last_state(_service->get_current_state());
+    if (notifier::hard == _service->get_state_type())
+      _service->set_last_hard_state(_service->get_current_state());
+
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;"
+        << ((i % 2 == 1) ? "2;service critical" : "0;service ok");
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  for (int i = 1; i < 18; i++) {
+    // When i == 0, the state_critical is soft => no notification
+    // When i == 1, the state_critical is soft => no notification
+    // When i == 2, the state_critical is hard down => notification
+    std::cout << "Step " << i << ":";
+    now += 300;
+    std::cout << "NOW = " << now << std::endl;
+    set_time(now);
+    _service->set_last_state(_service->get_current_state());
+    if (notifier::hard == _service->get_state_type())
+      _service->set_last_hard_state(_service->get_current_state());
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_description;2;service "
+           "critical";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  std::ostringstream oss;
+  dump::service(oss, *_service);
+  std::string retention{oss.str()};
+
+  std::size_t pos =
+      retention.find("notification_3=") + strlen("notification_3=");
+  std::size_t end = retention.find("\n", pos + 1);
+  std::string notification0 = retention.substr(pos, end - pos);
+  _service->set_notification(0, notification0);
+  oss.str("");
+
+  dump::service(oss, *_service);
+  retention = oss.str();
+  pos = retention.find("notification_3=") + strlen("notification_3=");
+  end = retention.find("\n", pos + 1);
+  std::string notification1 = retention.substr(pos, end - pos);
+
+  ASSERT_EQ(notification0, notification1);
+
+  notification0 =
+      "type: 4, author: admin, options: 3, escalated: 1, id: 9, number: 2, "
+      "interval: 3";
+  _service->set_notification(3, notification0);
+  oss.str("");
+
+  dump::service(oss, *_service);
+  retention = oss.str();
+  pos = retention.find("notification_3=") + strlen("notification_3=");
+  end = retention.find("\n", pos + 1);
+  notification1 = retention.substr(pos, end - pos);
+
+  ASSERT_EQ(notification0, notification1);
 }

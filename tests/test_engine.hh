@@ -1,5 +1,6 @@
 /*
- * Copyright 2019 Centreon (https://www.centreon.com/)
+ *,
+ uint32_t interval_notifCopyright 2019 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +49,8 @@ class TestEngine : public ::testing::Test {
       std::string const& hostname,
       std::string const& contactgroup,
       uint32_t first_notif = 2,
-      uint32_t last_notif = 11);
+      uint32_t last_notif = 11,
+      uint32_t interval_notif = 9);
   configuration::hostdependency new_configuration_hostdependency(
       std::string const& hostname,
       std::string const& dep_hostname);

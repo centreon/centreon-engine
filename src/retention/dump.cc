@@ -31,6 +31,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/retention/dump.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
@@ -138,6 +139,15 @@ std::ostream& dump::customvariables(
   for (auto const& cv : obj)
     os << "_" << cv.first << "=" << cv.second.has_been_modified() << ","
        << cv.second.get_value() << "\n";
+  return os;
+}
+
+std::ostream& dump::notifications(
+    std::ostream& os,
+    std::array<std::shared_ptr<notification>, 6> const& obj) {
+  for (int i = 0; i < 6; i++)
+    if (obj[i])
+      os << "notification_" << i << "=" << *obj[i];
   return os;
 }
 
@@ -251,6 +261,7 @@ std::ostream& dump::host(std::ostream& os, com::centreon::engine::host const& ob
     os << (x > 0 ? "," : "") << obj.get_state_history()[(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
   os << "\n";
 
+  dump::notifications(os, obj.get_current_notifications());
   dump::customvariables(os, obj.custom_variables);
   os << "}\n";
   return os;
@@ -448,6 +459,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     os << (x > 0 ? "," : "") << obj.get_state_history()[(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
   os << "\n";
 
+  dump::notifications(os, obj.get_current_notifications());
   dump::customvariables(os, obj.custom_variables);
   os << "}\n";
   return os;
