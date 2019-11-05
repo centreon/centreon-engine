@@ -40,6 +40,7 @@
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
@@ -49,6 +50,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::retention;
 
 extern configuration::state* config;
 
@@ -842,7 +844,7 @@ TEST_F(HostNotification, HostDependency) {
 
 // Given a host with a notification interval = 1, a
 // first_delay_notification = 0, an escalation from 1 to 0 with a contactgroup
-// and notification_interval = 4
+// and notification_interval = 9
 // When a normal notification is sent 1 time, and then a recovery notification
 // is sent 1 time
 // Then both are sent to contacts from the escalation.
@@ -930,4 +932,181 @@ TEST_F(HostNotification, HostEscalationOneTime) {
                "test_contact;test_host;UP;cmd;Host up",
                step3 + 1)};
   ASSERT_EQ(step4, std::string::npos);
+}
+
+// Given a host with a notification interval = 1, a
+// first_delay_notification = 0, an escalation from 1 to 0 with a contactgroup
+// and notification_interval = 0
+// When a normal notification is sent 1 time, and then a recovery notification
+// is sent 1 time
+// Then both are sent to contacts from the escalation.
+TEST_F(HostNotification, HostEscalationOneTimeNotifInter0) {
+  configuration::applier::contact ct_aply;
+  configuration::contact ctct{new_configuration_contact("test_contact", false)};
+  ct_aply.add_object(ctct);
+  ct_aply.expand_objects(*config);
+  ct_aply.resolve_object(ctct);
+
+  configuration::applier::contactgroup cg_aply;
+  configuration::contactgroup cg{
+      new_configuration_contactgroup("test_cg", "test_contact")};
+  cg_aply.add_object(cg);
+  cg_aply.expand_objects(*config);
+  cg_aply.resolve_object(cg);
+
+  configuration::applier::hostescalation he_aply;
+  configuration::hostescalation he{
+      new_configuration_hostescalation("test_host", "test_cg", 1, 0, 0)};
+  he_aply.add_object(he);
+  he_aply.expand_objects(*config);
+  he_aply.resolve_object(he);
+
+  int now{50000};
+  set_time(now);
+
+  _host->set_current_state(engine::host::state_up);
+  _host->set_notification_interval(1);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(now);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+
+  testing::internal::CaptureStdout();
+  now += 300;
+  std::cout << "NOW = " << now << std::endl;
+  set_time(now);
+  _host->set_last_state(_host->get_current_state());
+  if (notifier::hard == _host->get_state_type())
+    _host->set_last_hard_state(_host->get_current_state());
+
+  std::ostringstream oss;
+  //std::time_t now{std::time(nullptr)};
+  oss << '[' << now << ']'
+      << " PROCESS_HOST_CHECK_RESULT;test_host;1;Down host";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  // When i == 0, the state_ok is hard (return to up) => Recovery
+  // notification When i == 1, the state_ok is still here (no change) => no
+  // notification
+  for (int i = 0; i < 2; i++) {
+    now += 300;
+    set_time(now);
+    std::ostringstream oss;
+    oss << '[' << now << ']'
+        << " PROCESS_HOST_CHECK_RESULT;test_host;0;Host up";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t step1{out.find("NOW = 50300")};
+  ASSERT_NE(step1, std::string::npos);
+  size_t step2{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;DOWN;cmd;Down host",
+               step1 + 1)};
+  ASSERT_NE(step2, std::string::npos);
+  size_t step3{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;RECOVERY (UP);cmd;Host up",
+               step2 + 1)};
+  ASSERT_NE(step3, std::string::npos);
+  size_t step4{
+      out.find("HOST NOTIFICATION: "
+               "test_contact;test_host;UP;cmd;Host up",
+               step3 + 1)};
+  ASSERT_EQ(step4, std::string::npos);
+}
+
+// Given a host with a notification interval = 1, a
+// first_delay_notification = 0, an escalation from 1 to 0 with a contactgroup
+// and notification_interval = 0
+// When a normal notification is sent 1 time, and then a recovery notification
+// is sent 1 time
+// Then both are sent to contacts from the escalation.
+TEST_F(HostNotification, HostEscalationRetention) {
+  configuration::applier::contact ct_aply;
+  configuration::contact ctct{new_configuration_contact("test_contact", false)};
+  ct_aply.add_object(ctct);
+  ct_aply.expand_objects(*config);
+  ct_aply.resolve_object(ctct);
+
+  configuration::applier::contactgroup cg_aply;
+  configuration::contactgroup cg{
+      new_configuration_contactgroup("test_cg", "test_contact")};
+  cg_aply.add_object(cg);
+  cg_aply.expand_objects(*config);
+  cg_aply.resolve_object(cg);
+
+  configuration::applier::hostescalation he_aply;
+  configuration::hostescalation he{
+      new_configuration_hostescalation("test_host", "test_cg", 1, 0, 0)};
+  he_aply.add_object(he);
+  he_aply.expand_objects(*config);
+  he_aply.resolve_object(he);
+
+  int now{50000};
+  set_time(now);
+
+  _host->set_current_state(engine::host::state_up);
+  _host->set_notification_interval(1);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(now);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+
+  now += 300;
+  set_time(now);
+  _host->set_last_state(_host->get_current_state());
+  if (notifier::hard == _host->get_state_type())
+    _host->set_last_hard_state(_host->get_current_state());
+
+  std::ostringstream oss;
+  oss << '[' << now << ']'
+      << " PROCESS_HOST_CHECK_RESULT;test_host;1;Down host";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  oss.str("");
+  dump::host(oss, *_host);
+  std::string retention{oss.str()};
+
+  std::size_t pos = retention.find("notification_0=") + strlen("notification_0=");
+  std::size_t end = retention.find("\n", pos + 1);
+  std::string notification0 = retention.substr(pos, end - pos);
+  _host->set_notification(0, notification0);
+  oss.str("");
+
+  dump::host(oss, *_host);
+  retention = oss.str();
+  pos = retention.find("notification_0=") + strlen("notification_0=");
+  end = retention.find("\n", pos + 1);
+  std::string notification1 = retention.substr(pos, end - pos);
+
+  ASSERT_EQ(notification0, notification1);
+
+  notification0 = "type: 1, author: admin, options: 5, escalated: 1, id: 28, number: 2, interval: 3";
+  _host->set_notification(0, notification0);
+  oss.str("");
+
+  dump::host(oss, *_host);
+  retention = oss.str();
+  pos = retention.find("notification_0=") + strlen("notification_0=");
+  end = retention.find("\n", pos + 1);
+  notification1 = retention.substr(pos, end - pos);
+
+  ASSERT_EQ(notification0, notification1);
 }

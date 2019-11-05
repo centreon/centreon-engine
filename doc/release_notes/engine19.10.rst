@@ -1,4 +1,19 @@
 =======================
+Centreon Engine 19.10.5
+=======================
+
+*********
+Bug fixes
+*********
+
+Notifications retention
+=======================
+
+In case of engine restart, notifications already sent were lost. It may have
+impacts on normal notifications when it is time to send a recovery notification.
+After a restart, the recovery notification was never sent.
+
+=======================
 Centreon Engine 19.10.4
 =======================
 
@@ -8,11 +23,13 @@ Bug fixes
 
 Custom variable update crash on reload
 ======================================
+
 A bug was introduce in 19.10.2 with a reload on custom_variables
 services/contacts/hosts update.
 
 Recovery notification didn't work on escalation [1;0]
 =====================================================
+
 If an escalation was defined with a first notification at 1 and a
 last notification at 0, we want the escalation to start from the
 first notification, but only one time, the recovery notification
@@ -28,6 +45,7 @@ Bug fixes
 
 Service escalation not well resolved
 ====================================
+
 Service configurations look up failed when service escalations were defined.
 
 =======================
@@ -40,19 +58,23 @@ Bug fixes
 
 Custom variables not resolved
 ==============================
+
 Some custom variables were not resolved.
 This results in bad or pending checks with wrong commands.
 
 Random host statuses
 ====================
+
 Some hosts/services were changing status randomly.
 
 Send custom variables to broker
 ===============================
+
 Some broker notifications about customvariables were dropped.
 
 Null string crash
 =================
+
 In some cases strings construction could lead to exceptions thrown.
 
 =======================

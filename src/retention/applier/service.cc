@@ -157,6 +157,10 @@ void applier::service::_update(
       obj.set_percent_state_change(*state.percent_state_change());
     if (state.check_flapping_recovery_notification().is_set())
       obj.set_check_flapping_recovery_notification(*state.check_flapping_recovery_notification());
+    if (state.has_notifications()) {
+      for (int i = 0; i < 6; i++)
+        obj.set_notification(i, state.notifications()[i]);
+    }
     if (state.state_history().is_set()) {
       utils::set_state_history(
         *state.state_history(),

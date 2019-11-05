@@ -70,6 +70,12 @@ service::setters const service::_setters[] = {
   { "modified_attributes",                  SETTER(unsigned long, _set_modified_attributes) },
   { "next_check",                           SETTER(time_t, _set_next_check) },
   { "normal_check_interval",                SETTER(unsigned int, _set_normal_check_interval) },
+  { "notification_0",                       SETTER(std::string const&, _set_notification<0>) },
+  { "notification_1",                       SETTER(std::string const&, _set_notification<1>) },
+  { "notification_2",                       SETTER(std::string const&, _set_notification<2>) },
+  { "notification_3",                       SETTER(std::string const&, _set_notification<3>) },
+  { "notification_4",                       SETTER(std::string const&, _set_notification<4>) },
+  { "notification_5",                       SETTER(std::string const&, _set_notification<5>) },
   { "notification_period",                  SETTER(std::string const&, _set_notification_period) },
   { "notifications_enabled",                SETTER(bool, _set_notifications_enabled) },
   { "notified_on_critical",                 SETTER(bool, _set_notified_on_critical) },
@@ -1257,6 +1263,17 @@ bool service::_set_notification_period(std::string const& value) {
 bool service::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
   return true;
+}
+
+bool service::has_notifications() const {
+  for (auto const& n : _notification)
+    if (!n.empty())
+      return true;
+  return false;
+}
+
+std::array<std::string, 6> service::notifications() const noexcept{
+  return _notification;
 }
 
 /**

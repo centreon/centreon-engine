@@ -34,6 +34,7 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/engine/notification.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/service.hh"
@@ -291,6 +292,17 @@ std::ostream& operator<<(std::ostream& os,
     c_oss = oss.str();
   }
 
+  std::string notifications;
+  {
+    std::ostringstream oss;
+    for (int i = 0; i < 6; i++) {
+      std::shared_ptr<notification> s{obj.get_current_notifications()[i]};
+      if (s)
+        oss << "  notification_" << i << ": " << *s;
+    }
+    notifications = oss.str();
+  }
+
   os << "service {\n"
         "  host_name:                            "
      << obj.get_hostname()
@@ -375,8 +387,8 @@ std::ostream& operator<<(std::ostream& os,
      << "\n"
         "  notification_period:                  "
      << obj.get_notification_period()
-     << "\n"
-        "  check_period:                         "
+     << "\n" << notifications
+     << "  check_period:                         "
      << obj.get_check_period()
      << "\n"
         "  flap_detection_enabled:               "

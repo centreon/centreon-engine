@@ -145,6 +145,10 @@ void applier::host::_update(
       obj.set_notification_number(*state.current_notification_number());
     if (state.current_notification_id().is_set())
       obj.set_current_notification_id(*state.current_notification_id());
+    if (state.has_notifications()) {
+      for (int i = 0; i < 6; i++)
+        obj.set_notification(i, state.notifications()[i]);
+    }
     if (state.percent_state_change().is_set())
       obj.set_percent_state_change(*state.percent_state_change());
     if (state.state_history().is_set()) {

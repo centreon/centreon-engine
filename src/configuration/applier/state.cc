@@ -17,6 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include <unistd.h>
+#include <array>
 #include <cassert>
 #include <unordered_map>
 #include <unistd.h>
@@ -39,7 +42,6 @@
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/error.hh"
@@ -883,14 +885,38 @@ void applier::state::_check_services() const {
       throw engine_error() << "This is a bug";
     }
   }
-  if (engine::service::services_by_id.size() !=
-      engine::service::services.size()) {
-    logger(log_config_error, basic) << "Error on service !!! services_by_id "
-                                       "contains services that are not in "
-                                       "services. The first one size is "
-                                    << engine::service::services.size()
-                                    << " whereas the second size is "
-                                    << engine::service::services.size();
+
+  for (auto const& p : engine::service::services) {
+    std::array<commands::command*, 2> arr{
+        p.second->get_check_command_ptr(),
+        p.second->get_event_handler_ptr(),
+    };
+    for (auto cc : arr) {
+      if (cc) {
+        bool found = false;
+        for (auto& c : engine::commands::command::commands) {
+          if (c.second.get() == cc) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          logger(log_config_error, basic)
+              << "Error on service !!! The service " << p.first.first << '/'
+              << p.first.second
+              << " defined in services has a wrong check command";
+          throw engine_error() << "This is a bug";
+        }
+      }
+    }
+  }
+
+  if (engine::service::services_by_id.size() != engine::service::services.size()) {
+    logger(log_config_error, basic)
+        << "Error on service !!! services_by_id contains ices that are not in "
+           "services. The first one size is "
+        << engine::service::services.size() << "  the second size is "
+        << engine::service::services.size();
     throw engine_error() << "This is a bug";
   }
 }
@@ -920,8 +946,33 @@ void applier::state::_check_hosts() const {
       find_host_by_name(hst, "hostdependency");
   }
 
-  for (auto const& p : engine::host::hosts_by_id)
+  for (auto const& p : engine::host::hosts_by_id) {
     find_host_by_name(p.second.get(), "hosts_by_id");
+  }
+
+  for (auto const& p : engine::host::hosts) {
+    std::array<commands::command*, 2> arr{
+        p.second->get_check_command_ptr(),
+        p.second->get_event_handler_ptr(),
+    };
+    for (auto cc : arr) {
+      if (cc) {
+        bool found = false;
+        for (auto& c : engine::commands::command::commands) {
+          if (c.second.get() == cc) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          logger(log_config_error, basic)
+              << "Error on host !!! The host " << p.first
+              << " defined in hosts has a wrong check command";
+          throw engine_error() << "This is a bug";
+        }
+      }
+    }
+  }
 
   if (engine::host::hosts_by_id.size() != engine::host::hosts.size()) {
     logger(log_config_error, basic)

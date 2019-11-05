@@ -69,6 +69,12 @@ host::setters const host::_setters[] = {
   { "modified_attributes",                  SETTER(unsigned long, _set_modified_attributes) },
   { "next_check",                           SETTER(time_t, _set_next_check) },
   { "normal_check_interval",                SETTER(unsigned int, _set_normal_check_interval) },
+  { "notification_0",                       SETTER(std::string const&, _set_notification<0>) },
+  { "notification_1",                       SETTER(std::string const&, _set_notification<1>) },
+  { "notification_2",                       SETTER(std::string const&, _set_notification<2>) },
+  { "notification_3",                       SETTER(std::string const&, _set_notification<3>) },
+  { "notification_4",                       SETTER(std::string const&, _set_notification<4>) },
+  { "notification_5",                       SETTER(std::string const&, _set_notification<5>) },
   { "notification_period",                  SETTER(std::string const&, _set_notification_period) },
   { "notifications_enabled",                SETTER(bool, _set_notifications_enabled) },
   { "notified_on_down",                     SETTER(bool, _set_notified_on_down) },
@@ -169,6 +175,7 @@ host& host::operator=(host const& right) {
     _retry_check_interval = right._retry_check_interval;
     _state_history = right._state_history;
     _state_type = right._state_type;
+    _notification = right._notification;
   }
   return *this;
 }
@@ -235,7 +242,8 @@ bool host::operator==(host const& right) const throw () {
           && _process_performance_data == right._process_performance_data
           && _retry_check_interval == right._retry_check_interval
           && _state_history == right._state_history
-          && _state_type == right._state_type);
+          && _state_type == right._state_type
+          && _notification == right._notification);
 }
 
 /**
@@ -1177,6 +1185,17 @@ bool host::_set_notification_period(std::string const& value) {
 bool host::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
   return true;
+}
+
+bool host::has_notifications() const {
+  for (auto const& n : _notification)
+    if (!n.empty())
+      return true;
+  return false;
+}
+
+std::array<std::string, 6> host::notifications() const noexcept{
+  return _notification;
 }
 
 /**
