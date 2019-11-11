@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <mutex>
 #include <memory>
 #include <unistd.h>
 #include "com/centreon/engine/broker.hh"

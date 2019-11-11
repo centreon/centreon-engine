@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <array>
 #include <fstream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/retention/parser.hh"
