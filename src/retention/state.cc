@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <array>
 #include "com/centreon/engine/retention/state.hh"
 
 using namespace com::centreon::engine::retention;

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <array>
 #include <iomanip>
 #include "com/centreon/engine/daterange.hh"
 #include "com/centreon/engine/error.hh"

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <array>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/retention/service.hh"
 #include "com/centreon/engine/string.hh"
