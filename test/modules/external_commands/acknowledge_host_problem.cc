@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -40,23 +40,24 @@ static int check_acknowledge_host_problem(int argc, char** argv) {
   (void)argv;
 
   // Create target host.
-  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
-                     42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
-                     NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                     0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                     0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
+  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0,
+                     0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0,
+                     0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
+                     NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0,
+                     0));
   if (!hst)
-    throw (engine_error() << "host creation failed");
+    throw(engine_error() << "host creation failed");
   hst->current_state = HOST_DOWN;
   hst->problem_has_been_acknowledged = false;
 
   // Send external command.
-  char const* cmd("[1317196300] ACKNOWLEDGE_HOST_PROBLEM;name;1;1;1;user;comment");
+  char const* cmd(
+      "[1317196300] ACKNOWLEDGE_HOST_PROBLEM;name;1;1;1;user;comment");
   process_external_command(cmd);
 
   // Check.
   if (!hst->problem_has_been_acknowledged)
-    throw (engine_error() << "acknowledge_host_problem failed");
+    throw(engine_error() << "acknowledge_host_problem failed");
 
   // Cleanup.
   cleanup();

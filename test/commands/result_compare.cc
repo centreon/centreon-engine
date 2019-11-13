@@ -29,10 +29,10 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-#define DEFAULT_ID      42
-#define DEFAULT_OUTPUT  "output string test"
-#define DEFAULT_RETURN  0
-#define DEFAULT_STATUS  process::normal
+#define DEFAULT_ID 42
+#define DEFAULT_OUTPUT "output string test"
+#define DEFAULT_RETURN 0
+#define DEFAULT_STATUS process::normal
 
 /**
  *  Check the comparison operator.
@@ -58,9 +58,9 @@ int main_test(int argc, char** argv) {
 
   // Tests.
   if (!(res == res))
-    throw (engine_error() << "error: operator== failed");
+    throw(engine_error() << "error: operator== failed");
   if (res != res)
-    throw (engine_error() << "error: operator!= failed");
+    throw(engine_error() << "error: operator!= failed");
 
   return (EXIT_SUCCESS);
 }

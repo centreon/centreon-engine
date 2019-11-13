@@ -17,28 +17,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "test/broker/mod_load.hh"
 #include <cstring>
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/nebmods.hh"
-#include "test/broker/mod_load.hh"
 
 using namespace com::centreon::engine;
 
 /**************************************
-*                                     *
-*           Global Objects            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Global Objects            *
+ *                                     *
+ **************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 
 /**************************************
-*                                     *
-*         Exported Functions          *
-*                                     *
-**************************************/
+ *                                     *
+ *         Exported Functions          *
+ *                                     *
+ **************************************/
 
 /**
  *  @brief Module exit point.

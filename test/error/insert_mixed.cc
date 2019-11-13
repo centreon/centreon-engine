@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <string>
 #include <string.h>
+#include <string>
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine;

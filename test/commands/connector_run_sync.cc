@@ -35,21 +35,16 @@ using namespace com::centreon::engine::commands;
  */
 static bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
-  connector cmd_connector(
-              __func__,
-              "./bin_connector_test_run");
-  forward cmd_forward(
-            __func__,
-            "./bin_connector_test_run --timeout=off",
-            cmd_connector);
+  connector cmd_connector(__func__, "./bin_connector_test_run");
+  forward cmd_forward(__func__, "./bin_connector_test_run --timeout=off",
+                      cmd_connector);
 
   result res;
   cmd_forward.run(cmd_forward.get_command_line(), macros, 0, res);
 
-  if (res.command_id == 0
-      || res.exit_code != STATE_OK
-      || res.output != cmd_forward.get_command_line()
-      || res.exit_status != process::normal)
+  if (res.command_id == 0 || res.exit_code != STATE_OK ||
+      res.output != cmd_forward.get_command_line() ||
+      res.exit_status != process::normal)
     return (false);
   return (true);
 }
@@ -61,21 +56,15 @@ static bool run_without_timeout() {
  */
 static bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
-  connector cmd_connector(
-              __func__,
-              "./bin_connector_test_run");
-  forward cmd_forward(
-            __func__,
-            "./bin_connector_test_run --timeout=on",
-            cmd_connector);
+  connector cmd_connector(__func__, "./bin_connector_test_run");
+  forward cmd_forward(__func__, "./bin_connector_test_run --timeout=on",
+                      cmd_connector);
 
   result res;
   cmd_forward.run(cmd_forward.get_command_line(), macros, 1, res);
 
-  if (res.command_id == 0
-      || res.exit_code != STATE_UNKNOWN
-      || res.output != "(Process Timeout)"
-      || res.exit_status != process::timeout)
+  if (res.command_id == 0 || res.exit_code != STATE_UNKNOWN ||
+      res.output != "(Process Timeout)" || res.exit_status != process::timeout)
     return (false);
   return (true);
 }
@@ -90,10 +79,10 @@ int main_test(int argc, char** argv) {
   (void)argv;
 
   if (run_without_timeout() == false)
-    throw (engine_error() << "error: connector::run without timeout failed.");
+    throw(engine_error() << "error: connector::run without timeout failed.");
 
   if (run_with_timeout() == false)
-    throw (engine_error() << "error: connector::run with timeout failed.");
+    throw(engine_error() << "error: connector::run with timeout failed.");
 
   return (0);
 }

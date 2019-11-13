@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -40,33 +40,33 @@ static int check_schedule_host_downtime(int argc, char** argv) {
   (void)argv;
 
   // Create target hosts.
-  host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0,
-                            0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
-                            0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
-                            0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL,
-                            NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0,
-                            0.0, 0.0, 0, 0, 0, 0, 0));
-  host* hst_child(add_host("child", NULL, NULL, "localhost", NULL, 0,
-                           0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
-                           0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0,
-                           0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                           0.0, 0, 0, 0, 0, 0));
+  host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0,
+                            0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0,
+                            0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+                            NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
+  host* hst_child(add_host("child", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
+                           42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
+                           NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+                           0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0,
+                           0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
   if (!hst_parent || !hst_child)
-    throw (engine_error() << "hosts creation failed");
+    throw(engine_error() << "hosts creation failed");
 
   // Create links.
   add_parent_host_to_host(hst_child, "parent");
   add_child_link_to_host(hst_parent, hst_child);
 
   // Send external command.
-  char const*
-    cmd("[1317196300] SCHEDULE_HOST_DOWNTIME;parent;1317196300;2000000000;0;0;7200;user;comment");
+  char const* cmd(
+      "[1317196300] "
+      "SCHEDULE_HOST_DOWNTIME;parent;1317196300;2000000000;0;0;7200;user;"
+      "comment");
   process_external_command(cmd);
 
   // Check.
   if (!scheduled_downtime_list)
-    throw (engine_error() << "schedule_host_downtime failed");
+    throw(engine_error() << "schedule_host_downtime failed");
 
   // Cleanup.
   cleanup();

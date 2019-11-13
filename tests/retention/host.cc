@@ -67,7 +67,9 @@ class RetentionHostTest : public ::testing::Test {
     _ref.set("next_check", "1300009");
     _ref.set("normal_check_interval", "20");
     _ref.set("notification_period", "notification_period");
-    _ref.set("notification_0", "type: 0, author: admin, options: 0, escalated: 0, id: 1, number: 1, interval: 0");
+    _ref.set("notification_0",
+             "type: 0, author: admin, options: 0, escalated: 0, id: 1, number: "
+             "1, interval: 0");
     _ref.set("notifications_enabled", "1");
     _ref.set("notified_on_down", "1");
     _ref.set("notified_on_unreachable", "1");

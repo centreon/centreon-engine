@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,23 +33,24 @@ static int check_change_custom_host_var(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst =
+      add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0,
+               0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+               0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+               NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
-  customvariablesmember* member = add_custom_variable_to_host(hst, "_VAR", "TEST");
+  customvariablesmember* member =
+      add_custom_variable_to_host(hst, "_VAR", "TEST");
   if (!member)
-    throw (engine_error() << "create customvariablesmember failed.");
+    throw(engine_error() << "create customvariablesmember failed.");
 
   char const* cmd("[1317196300] CHANGE_CUSTOM_HOST_VAR;name;_VAR;VALUE");
   process_external_command(cmd);
 
   if (strcmp(member->variable_value, "VALUE"))
-    throw (engine_error() << "change_custom_host_var failed.");
+    throw(engine_error() << "change_custom_host_var failed.");
   return (0);
 }
 

@@ -1,21 +1,21 @@
 /*
-** Copyright 2011-2013,2015 Merethis
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2011-2013,2015,2019 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 
 #include "com/centreon/engine/commands/connector.hh"
 #include <cstdlib>
@@ -52,7 +52,7 @@ connector::connector(std::string const& connector_name,
       _query_quit_ok(false),
       _query_version_ok(false),
       _process(this),
-      _restart(this),
+      _restart(nullptr),
       _try_to_restart(true) {
   // Disable stderr.
   _process.enable_stream(process::err, false);
@@ -70,7 +70,7 @@ connector::connector(std::string const& connector_name,
  *  @param[in] right Object to copy.
  */
 connector::connector(connector const& right)
-    : command(right), process_listener(right), _restart(this) {
+    : command(right), process_listener(right), _restart(nullptr) {
   _internal_copy(right);
 }
 
@@ -79,7 +79,8 @@ connector::connector(connector const& right)
  */
 connector::~connector() noexcept {
   // Wait restart thread.
-  _restart.wait();
+  if (_restart && _restart->joinable())
+    _restart->join();
   // Close connector properly.
   _connector_close();
 }
@@ -128,12 +129,14 @@ uint64_t connector::run(std::string const& processed_cmd,
       // Start connector if is not running.
       if (!_is_running) {
         if (!_try_to_restart)
-          throw(engine_error()
-                << "Connector '" << _name << "' failed to restart");
+          throw engine_error()
+              << "Connector '" << _name << "' failed to restart";
         _queries[command_id] = info;
         try {
-          if (_restart.wait(0))
-            _restart.exec();
+          if (!_restart)
+            _restart = new std::thread(&connector::_run_restart, this);
+          // if (_restart.wait(0))
+          //  _restart.exec();
         } catch (std::exception const& e) {
           (void)e;
         }
@@ -232,7 +235,8 @@ void connector::run(std::string const& processed_cmd,
  */
 void connector::set_command_line(std::string const& command_line) {
   // Wait restart thread.
-  _restart.wait();
+  if (_restart && _restart->joinable())
+    _restart->join();
 
   // Change command line.
   {
@@ -344,8 +348,8 @@ void connector::finished(process& p) noexcept {
     // The connector is stop, restart it if necessary.
     if (_try_to_restart) {
       try {
-        if (_restart.wait(0))
-          _restart.exec();
+        if (!_restart)
+          _restart = new std::thread(&connector::_run_restart, this);
       } catch (std::exception const& e) {
         (void)e;
       }
@@ -749,37 +753,29 @@ void connector::_send_query_version() {
 }
 
 /**
- *  Constructor.
- *
- *  @param[in] c  The connector to restart.
- */
-connector::restart::restart(connector* c) : _c(c) {}
-
-/**
  *  Destructor.
  */
-connector::restart::~restart() noexcept {}
+// connector::restart::~restart() noexcept {
+//  wait();
+//  delete _thread;
+//}
 
 /**
  *  Execute restart.
  */
-void connector::restart::_run() {
-  // Check viability.
-  if (!_c)
-    return;
-
+void connector::_run_restart() {
   try {
-    _c->_connector_start();
+    _connector_start();
   } catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-        << "Warning: Connector '" << _c->_name << "': " << e.what();
+        << "Warning: Connector '" << _name << "': " << e.what();
 
     std::unordered_map<uint64_t, std::shared_ptr<query_info> > tmp_queries;
     {
-      std::lock_guard<std::mutex> lock(_c->_lock);
-      _c->_try_to_restart = false;
-      tmp_queries = _c->_queries;
-      _c->_queries.clear();
+      std::lock_guard<std::mutex> lock(_lock);
+      _try_to_restart = false;
+      tmp_queries = _queries;
+      _queries.clear();
     }
 
     // Resend commands.
@@ -796,8 +792,7 @@ void connector::restart::_run() {
       res.exit_code = service::state_unknown;
       res.exit_status = process::normal;
       res.start_time = info->start_time;
-      res.output =
-          "(Failed to execute command with connector '" + _c->_name + "')";
+      res.output = "(Failed to execute command with connector '" + _name + "')";
 
       logger(dbg_commands, basic) << "connector::_recv_query_execute: "
                                      "id="
@@ -820,17 +815,34 @@ void connector::restart::_run() {
 
       if (!info->waiting_result) {
         // Forward result to the listener.
-        if (_c->_listener)
-          (_c->_listener->finished)(res);
+        if (_listener)
+          (_listener->finished)(res);
       } else {
-        std::lock_guard<std::mutex> lock(_c->_lock);
+        std::lock_guard<std::mutex> lock(_lock);
         // Push result into list of results.
-        _c->_results[command_id] = res;
-        _c->_cv_query.notify_all();
+        _results[command_id] = res;
+        _cv_query.notify_all();
       }
     }
   }
 }
+
+/**
+ *  Just a shortcut to the join method of the internal thread.
+ */
+// void connector::restart::wait() {
+//  if (_thread->joinable())
+//    _thread->join();
+//}
+
+// bool connector::wait(uint32_t timeout) {
+//  struct timespec tt {
+//    .tv_sec = static_cast<long int>(timeout_ms / 1000),
+//    .tv_nsec = static_cast<long int>(timeout_ms % 1000) * 1000000
+//  };
+//  return pthread_timedjoin_np(_restart->native_handle(), nullptr, &tt) ==
+//  ETIMEDOUT ? false : true;
+//}
 
 /**
  *  Dump connector content into the stream.

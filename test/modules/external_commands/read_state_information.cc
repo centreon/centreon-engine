@@ -20,11 +20,11 @@
 #include <exception>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/logging/engine.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/nebstructs.hh"
 #include "com/centreon/io/file_stream.hh"
+#include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon;
@@ -42,8 +42,8 @@ static int broker_callback(int callback_type, void* data) {
   static int last_callback_type = -1;
   int ret = last_callback_type;
 
-  nebstruct_external_command_data* neb_data
-    = static_cast<nebstruct_external_command_data*>(data);
+  nebstruct_external_command_data* neb_data =
+      static_cast<nebstruct_external_command_data*>(data);
   if (callback_type != -1)
     last_callback_type = neb_data->type;
   else
@@ -60,7 +60,7 @@ static int check_read_state_information(int argc, char** argv) {
 
   char* path(io::file_stream::temp_path());
   if (!path)
-    throw (engine_error() << "temporary file name generation failure");
+    throw(engine_error() << "temporary file name generation failure");
   io::file_stream fs;
   fs.open(path, "w+");
   try {
@@ -70,22 +70,18 @@ static int check_read_state_information(int argc, char** argv) {
     // register broker callback to catch event.
     config->event_broker_options(BROKER_RETENTION_DATA);
     void* module_id = reinterpret_cast<void*>(0x4242);
-    neb_register_callback(
-      NEBCALLBACK_RETENTION_DATA,
-      module_id,
-      0,
-      &broker_callback);
+    neb_register_callback(NEBCALLBACK_RETENTION_DATA, module_id, 0,
+                          &broker_callback);
 
     char const* cmd("[1317196300] READ_STATE_INFORMATION");
     process_external_command(cmd);
 
     if (broker_callback(-1, NULL) != NEBTYPE_RETENTIONDATA_ENDLOAD)
-      throw (engine_error() << "read_state_information failed.");
+      throw(engine_error() << "read_state_information failed.");
 
     // release callback.
     neb_deregister_module_callbacks(module_id);
-  }
-  catch (...) {
+  } catch (...) {
     fs.close();
     io::file_stream::remove(path);
     throw;

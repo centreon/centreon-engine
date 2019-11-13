@@ -31,10 +31,10 @@
 using namespace com::centreon;
 
 /**************************************
-*                                     *
-*          Static Functions           *
-*                                     *
-**************************************/
+ *                                     *
+ *          Static Functions           *
+ *                                     *
+ **************************************/
 
 /**
  *  Check set_show_pid exception.
@@ -46,8 +46,7 @@ using namespace com::centreon;
 static bool check_show_pid(engine::logging::broker& obj) {
   try {
     obj.show_pid(true);
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     return (true);
   }
@@ -64,8 +63,7 @@ static bool check_show_pid(engine::logging::broker& obj) {
 static bool check_show_timestamp(engine::logging::broker& obj) {
   try {
     obj.show_thread_id(true);
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     return (true);
   }
@@ -82,8 +80,7 @@ static bool check_show_timestamp(engine::logging::broker& obj) {
 static bool check_show_thread_id(engine::logging::broker& obj) {
   try {
     obj.show_thread_id(true);
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     return (true);
   }
@@ -91,10 +88,10 @@ static bool check_show_thread_id(engine::logging::broker& obj) {
 }
 
 /**************************************
-*                                     *
-*         Exported Functions          *
-*                                     *
-**************************************/
+ *                                     *
+ *         Exported Functions          *
+ *                                     *
+ **************************************/
 
 /**
  *  Check the logging broker working.
@@ -105,11 +102,11 @@ int main_test(int argc, char** argv) {
 
   engine::logging::broker obj;
   if (!check_show_pid(obj))
-    throw (engine_error() << "check show pid failed");
+    throw(engine_error() << "check show pid failed");
   if (!check_show_timestamp(obj))
-    throw (engine_error() << "check show timestamp failed");
+    throw(engine_error() << "check show timestamp failed");
   if (!check_show_thread_id(obj))
-    throw (engine_error() << "check show thread id");
+    throw(engine_error() << "check show thread id");
   return (0);
 }
 

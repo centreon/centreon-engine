@@ -93,16 +93,14 @@ int main() {
 
       // test log contents.
       if (!test_log(log_content))
-        throw (engine_error() << "log with pid");
+        throw(engine_error() << "log with pid");
 
       // Success.
       retval = EXIT_SUCCESS;
     }
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     std::cout << e.what() << std::endl;
   }
-
 
   // Remove temporary files.
   ::remove(log_file.c_str());

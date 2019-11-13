@@ -28,11 +28,12 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-#define CMD_HOSTADDR  "localhost"
-#define CMD_USER1     "/usr/bin"
-#define CMD_ARG1      "default_arg"
-#define CMD_LINE      "$USER1$/test -w $ARG1$ -c $$ARG1$$ $HOSTADDRESS$ $EMPTY$"
-#define CMD_PROCESSED CMD_USER1 "/test -w " CMD_ARG1 " -c $ARG1$ " CMD_HOSTADDR " "
+#define CMD_HOSTADDR "localhost"
+#define CMD_USER1 "/usr/bin"
+#define CMD_ARG1 "default_arg"
+#define CMD_LINE "$USER1$/test -w $ARG1$ -c $$ARG1$$ $HOSTADDRESS$ $EMPTY$"
+#define CMD_PROCESSED \
+  CMD_USER1 "/test -w " CMD_ARG1 " -c $ARG1$ " CMD_HOSTADDR " "
 
 /**
  *  Check the process command line replacement macros.
@@ -62,13 +63,13 @@ int main_test(int argc, char** argv) {
   raw cmd(__func__, CMD_LINE);
   std::string cmd_processed(cmd.process_cmd(&macros));
 
-  delete [] hst.address;
+  delete[] hst.address;
   hst.address = NULL;
-  delete [] macros.argv[0];
+  delete[] macros.argv[0];
   macros.argv[0] = NULL;
 
   if (cmd_processed != CMD_PROCESSED)
-    throw (engine_error() << "command::process failed.");
+    throw(engine_error() << "command::process failed.");
 
   return (0);
 }

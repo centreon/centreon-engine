@@ -17,9 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include <cstring>
 #include <mutex>
-#include "com/centreon/engine/broker.hh"
+#include <thread>
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/exceptions/basic.hh"
@@ -29,17 +30,17 @@ using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Default constructor.
  */
 broker::broker()
-  : backend(false, false, com::centreon::logging::none, false),
-    _enable(false) {
+    : backend(false, false, com::centreon::logging::none, false),
+      _enable(false) {
   memset(&_thread, 0, sizeof(_thread));
   open();
 }
@@ -49,16 +50,16 @@ broker::broker()
  *
  *  @param[in] right Object to copy.
  */
-broker::broker(broker const& right)
-  : backend(right),
-    _enable(false) {
+broker::broker(broker const& right) : backend(right), _enable(false) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-broker::~broker() noexcept { close(); }
+broker::~broker() noexcept {
+  close();
+}
 
 /**
  *  Assignment operator.
@@ -94,32 +95,25 @@ void broker::close() noexcept {
  *  @param[in] message  Message to log.
  *  @param[in] size     Message length.
  */
-void broker::log(
-               uint64_t types,
-               uint32_t verbose,
-               char const* message,
-               uint32_t size) noexcept {
+void broker::log(uint64_t types,
+                 uint32_t verbose,
+                 char const* message,
+                 uint32_t size) noexcept {
   (void)verbose;
   std::lock_guard<std::mutex> lock(_lock);
 
   // Broker is only notified of non-debug log messages.
   if (message && _enable) {
-    if (_thread != concurrency::thread::get_current_id()) {
-      _thread = concurrency::thread::get_current_id();
+    if (_thread != std::this_thread::get_id()) {
+      _thread = std::this_thread::get_id();
 
       // Copy message because broker module might modify it.
       unique_array_ptr<char> copy(new char[size + 1]);
       strcpy(copy.get(), message);
 
       // Event broker callback.
-      broker_log_data(
-        NEBTYPE_LOG_DATA,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        copy.get(),
-        types,
-        time(NULL),
-        NULL);
+      broker_log_data(NEBTYPE_LOG_DATA, NEBFLAG_NONE, NEBATTR_NONE, copy.get(),
+                      types, time(NULL), NULL);
 
       // Reset thread.
       memset(&_thread, 0, sizeof(_thread));
@@ -142,4 +136,3 @@ void broker::reopen() {
   std::lock_guard<std::mutex> lock(_lock);
   _enable = true;
 }
-

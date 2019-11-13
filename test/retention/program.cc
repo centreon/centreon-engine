@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctime>
 #include "com/centreon/engine/retention/program.hh"
+#include <ctime>
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
 
@@ -60,13 +60,12 @@ int main_test(int argc, char* argv[]) {
   ref.set("passive_service_checks_enabled", "0");
   ref.set("process_performance_data", "1");
 
-
   // Check copy constructor.
   {
     retention::program copy(ref);
     if (!(copy == ref) || copy != ref)
-      throw (engine_error() << "copy constructor or operator "
-             "equal failed");
+      throw(engine_error() << "copy constructor or operator "
+                              "equal failed");
   }
 
   // Check copy operator.
@@ -74,15 +73,15 @@ int main_test(int argc, char* argv[]) {
     retention::program copy;
     copy = ref;
     if (!(copy == ref) || copy != ref)
-      throw (engine_error() << "copy operator or operator "
-             "equal failed");
+      throw(engine_error() << "copy operator or operator "
+                              "equal failed");
   }
 
   // Check operator equal and not equal.
   {
     retention::program empty;
     if (empty == ref || !(empty != ref))
-      throw (engine_error() << "operator equal failed");
+      throw(engine_error() << "operator equal failed");
   }
 
   // Check operator equal and not equal.
@@ -90,8 +89,8 @@ int main_test(int argc, char* argv[]) {
     retention::program diff(ref);
     diff.set("active_host_checks_enabled", "0");
     if (diff == ref || !(diff != ref))
-      throw (engine_error() << "copy operator or operator "
-             "equal failed");
+      throw(engine_error() << "copy operator or operator "
+                              "equal failed");
   }
   return (0);
 }

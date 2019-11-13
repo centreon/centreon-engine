@@ -33,72 +33,55 @@ using namespace com::centreon::engine;
  *  Init host and service.
  */
 void init_host_and_service(host*& hst, service*& svc) {
-  hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0,
+                 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0,
+                 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL,
+                 NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
-  svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  svc = add_service("name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0,
+                    0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command",
+                    0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0,
+                    NULL, NULL, NULL, NULL, NULL, 0, 0, 0);
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw(engine_error() << "create service failed.");
   svc->host_ptr = hst;
 
   timeperiod* tperiod = add_timeperiod("tperiod", "alias");
   if (!tperiod)
-    throw (engine_error() << "create timeperiod failed.");
+    throw(engine_error() << "create timeperiod failed.");
 
   for (int i = 0; i < 6; ++i)
     if (!add_timerange_to_timeperiod(tperiod, i, 0, 86400))
-      throw (engine_error() << "create timerange failed.");
+      throw(engine_error() << "create timerange failed.");
 }
 
 /**
  *  Check the host escalations.
  */
 void check_host_escalation(host* hst) {
-  hostescalation* host_escalation = add_host_escalation("name",
-                                                        0,
-                                                        1,
-                                                        1,
-                                                        "tperiod",
-                                                        true,
-                                                        true,
-                                                        true);
+  hostescalation* host_escalation =
+      add_host_escalation("name", 0, 1, 1, "tperiod", true, true, true);
   if (!host_escalation)
-    throw (engine_error() << "cannot create host escalation.");
+    throw(engine_error() << "cannot create host escalation.");
   if (host_notification(hst, NOTIFICATION_NORMAL, NULL, NULL,
                         NOTIFICATION_OPTION_FORCED) != OK)
-    throw (engine_error() << "host notification failed." );
+    throw(engine_error() << "host notification failed.");
 }
 
 /**
  *  Check the service escalations.
  */
 void check_service_escalation(service* svc) {
-  serviceescalation* service_escalation = add_service_escalation("name",
-                                                                 "description",
-                                                                 0,
-                                                                 1,
-                                                                 2,
-                                                                 "tperiod",
-                                                                 true,
-                                                                 true,
-                                                                 true,
-                                                                 true);
+  serviceescalation* service_escalation = add_service_escalation(
+      "name", "description", 0, 1, 2, "tperiod", true, true, true, true);
 
   if (!service_escalation)
-    throw (engine_error() << "cannot create service escalation");
+    throw(engine_error() << "cannot create service escalation");
   if (service_notification(svc, NOTIFICATION_NORMAL, NULL, NULL,
                            NOTIFICATION_OPTION_FORCED) != OK)
-    throw (engine_error() << "service notification failed.");
+    throw(engine_error() << "service notification failed.");
 }
 
 /**

@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,17 +33,17 @@ static int check_change_contact_modsattr(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0, 0,
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
-    throw (engine_error() << "create contact failed.");
+    throw(engine_error() << "create contact failed.");
 
   cntct->modified_service_attributes = 0;
   char const* cmd("[1317196300] CHANGE_CONTACT_MODSATTR;name;42");
   process_external_command(cmd);
 
   if (cntct->modified_service_attributes != 42)
-    throw (engine_error() << "change_contact_modsattr failed.");
+    throw(engine_error() << "change_contact_modsattr failed.");
   return (0);
 }
 

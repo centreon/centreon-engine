@@ -29,7 +29,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-#define DEFAULT_ID     42
+#define DEFAULT_ID 42
 #define DEFAULT_OUTPUT "output string test"
 #define DEFAULT_RETURN 0
 #define DEFAULT_STATUS process::normal
@@ -48,13 +48,10 @@ int main_test(int argc, char** argv) {
 
   // Default constructor.
   result res1;
-  if ((res1.command_id != 0)
-      || (res1.output != "")
-      || (res1.exit_code != 0)
-      || (res1.exit_status != process::normal)
-      || (res1.start_time != 0)
-      || (res1.end_time != 0))
-    throw (engine_error() << "error: default constructor failed");
+  if ((res1.command_id != 0) || (res1.output != "") || (res1.exit_code != 0) ||
+      (res1.exit_status != process::normal) || (res1.start_time != 0) ||
+      (res1.end_time != 0))
+    throw(engine_error() << "error: default constructor failed");
 
   // Constructor.
   com::centreon::timestamp now(com::centreon::timestamp::now());
@@ -65,24 +62,22 @@ int main_test(int argc, char** argv) {
   res2.end_time = now;
   res2.exit_code = DEFAULT_RETURN;
   res2.exit_status = DEFAULT_STATUS;
-  if ((res2.command_id != DEFAULT_ID)
-      || (res2.output != DEFAULT_OUTPUT)
-      || (res2.exit_code != DEFAULT_RETURN)
-      || (res2.exit_status != DEFAULT_STATUS)
-      || (res2.start_time != now)
-      || (res2.end_time != now))
-    throw (engine_error() << "error: constructor failed");
+  if ((res2.command_id != DEFAULT_ID) || (res2.output != DEFAULT_OUTPUT) ||
+      (res2.exit_code != DEFAULT_RETURN) ||
+      (res2.exit_status != DEFAULT_STATUS) || (res2.start_time != now) ||
+      (res2.end_time != now))
+    throw(engine_error() << "error: constructor failed");
 
   // Copy constructor.
   result res3(res2);
   if (res2 != res3)
-    throw (engine_error() << "error: copy constructor failed");
+    throw(engine_error() << "error: copy constructor failed");
 
   // Assignment operator.
   result res4;
   res4 = res3;
   if (res2 != res4)
-    throw (engine_error() << "error: assignment operator failed");
+    throw(engine_error() << "error: assignment operator failed");
 
   return (EXIT_SUCCESS);
 }

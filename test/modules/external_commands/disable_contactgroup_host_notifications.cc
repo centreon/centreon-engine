@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -29,22 +29,23 @@ using namespace com::centreon::engine;
 /**
  *  Run disable_contactgroup_host_notifications test.
  */
-static int check_disable_contactgroup_host_notifications(int argc, char** argv) {
+static int check_disable_contactgroup_host_notifications(int argc,
+                                                         char** argv) {
   (void)argc;
   (void)argv;
 
-  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0, 0,
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
-    throw (engine_error() << "create contact failed.");
+    throw(engine_error() << "create contact failed.");
 
   contactgroup* group = add_contactgroup("group", NULL);
   if (!group)
-    throw (engine_error() << "create contactgroup failed.");
+    throw(engine_error() << "create contactgroup failed.");
 
   contactsmember* member = add_contact_to_contactgroup(group, "name");
   if (!member)
-    throw (engine_error() << "create contactsmember failed.");
+    throw(engine_error() << "create contactsmember failed.");
 
   member->contact_ptr = cntct;
   cntct->host_notifications_enabled = true;
@@ -52,7 +53,7 @@ static int check_disable_contactgroup_host_notifications(int argc, char** argv) 
   process_external_command(cmd);
 
   if (cntct->host_notifications_enabled)
-    throw (engine_error() << "disable_contactgroup_host_notifications failed.");
+    throw(engine_error() << "disable_contactgroup_host_notifications failed.");
   return (0);
 }
 

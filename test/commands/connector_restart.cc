@@ -33,7 +33,7 @@ using namespace com::centreon::engine::commands;
 
 #define DEFAULT_CONNECTOR_NAME __func__
 #define DEFAULT_CONNECTOR_LINE "./bin_connector_test_run"
-#define DEFAULT_CMD_NAME       __FILE__
+#define DEFAULT_CMD_NAME __FILE__
 
 /**
  *  Check the restart of the connector when it stop.
@@ -48,23 +48,17 @@ static bool restart_with_segfault() {
     oss << "./bin_connector_test_run --kill=" << time(NULL);
     command_line = oss.str();
   }
-  connector cmd_connector(
-              DEFAULT_CONNECTOR_NAME,
-              DEFAULT_CONNECTOR_LINE);
-  forward cmd_forward(
-              DEFAULT_CMD_NAME,
-              command_line,
-              cmd_connector);
+  connector cmd_connector(DEFAULT_CONNECTOR_NAME, DEFAULT_CONNECTOR_LINE);
+  forward cmd_forward(DEFAULT_CMD_NAME, command_line, cmd_connector);
   wait_process wait_proc(&cmd_connector);
 
   unsigned long id(cmd_forward.run(cmd_forward.get_command_line(), macros, 0));
   wait_proc.wait();
 
   result const& res(wait_proc.get_result());
-  if (res.command_id != id
-      || res.exit_code != STATE_OK
-      || res.output != cmd_forward.get_command_line()
-      || res.exit_status == process::timeout)
+  if (res.command_id != id || res.exit_code != STATE_OK ||
+      res.output != cmd_forward.get_command_line() ||
+      res.exit_status == process::timeout)
     return (false);
   return (true);
 }
@@ -77,7 +71,7 @@ int main_test(int argc, char** argv) {
   (void)argv;
 
   if (restart_with_segfault() == false)
-    throw (engine_error() << "error: restart connector after segfault failed.");
+    throw(engine_error() << "error: restart connector after segfault failed.");
 
   return (0);
 }

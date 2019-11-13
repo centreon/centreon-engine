@@ -22,19 +22,19 @@
 #include "test/broker/mod_load.hh"
 
 /**************************************
-*                                     *
-*           Global Objects            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Global Objects            *
+ *                                     *
+ **************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 
 /**************************************
-*                                     *
-*         Exported Functions          *
-*                                     *
-**************************************/
+ *                                     *
+ *         Exported Functions          *
+ *                                     *
+ **************************************/
 
 /**
  *  @brief Module exit point.
@@ -78,24 +78,12 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
   }
 
   // Set module informations.
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_TITLE,
-		      MOD_TITLE);
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_AUTHOR,
-		      MOD_AUTHOR);
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_COPYRIGHT,
-		      MOD_COPYRIGHT);
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_VERSION,
-		      MOD_VERSION);
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_LICENSE,
-		      MOD_LICENSE);
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_DESC,
-		      MOD_DESCRIPTION);
+  neb_set_module_info(handle, NEBMODULE_MODINFO_TITLE, MOD_TITLE);
+  neb_set_module_info(handle, NEBMODULE_MODINFO_AUTHOR, MOD_AUTHOR);
+  neb_set_module_info(handle, NEBMODULE_MODINFO_COPYRIGHT, MOD_COPYRIGHT);
+  neb_set_module_info(handle, NEBMODULE_MODINFO_VERSION, MOD_VERSION);
+  neb_set_module_info(handle, NEBMODULE_MODINFO_LICENSE, MOD_LICENSE);
+  neb_set_module_info(handle, NEBMODULE_MODINFO_DESC, MOD_DESCRIPTION);
 
   return (0);
 }

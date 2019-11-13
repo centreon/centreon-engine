@@ -20,7 +20,7 @@
 #ifndef CCE_LOGGING_BROKER_HH
 #define CCE_LOGGING_BROKER_HH
 
-#include "com/centreon/concurrency/thread.hh"
+#include <thread>
 #include "com/centreon/engine/namespace.hh"
 #include "com/centreon/logging/backend.hh"
 
@@ -35,7 +35,7 @@ namespace logging {
  */
 class broker : public com::centreon::logging::backend {
   bool _enable;
-  concurrency::thread_id _thread;
+  std::thread::id _thread;
 
  public:
   broker();

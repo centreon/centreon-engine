@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -40,24 +40,23 @@ static int check_schedule_forced_host_check(int argc, char** argv) {
   (void)argv;
 
   // Create target host.
-  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
-                     42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
-                     NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                     0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                     0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
+  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0,
+                     0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0,
+                     0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
+                     NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0,
+                     0));
   if (!hst)
-    throw (engine_error() << "host creation failed");
+    throw(engine_error() << "host creation failed");
   hst->checks_enabled = true;
   hst->next_check = 0;
 
   // Send external command.
-  char const*
-    cmd("[1317196300] SCHEDULE_FORCED_HOST_CHECK;name;1317196300");
+  char const* cmd("[1317196300] SCHEDULE_FORCED_HOST_CHECK;name;1317196300");
   process_external_command(cmd);
 
   // Check.
   if (hst->next_check != 1317196300)
-    throw (engine_error() << "schedule_forced_host_check failed");
+    throw(engine_error() << "schedule_forced_host_check failed");
 
   // Cleanup.
   cleanup();

@@ -30,7 +30,9 @@ using namespace com::centreon::engine;
 int main() {
   // Insert char arrays.
   error e;
-  e << "foo " << "bar" << " baz";
+  e << "foo "
+    << "bar"
+    << " baz";
   e << " qux";
 
   // Check insertion.

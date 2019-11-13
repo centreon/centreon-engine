@@ -38,7 +38,7 @@ static int main_test(int argc, char** argv) {
   {
     environment env;
     if (env.data())
-      throw (engine_error() << "invalid default constructor");
+      throw(engine_error() << "invalid default constructor");
   }
 
   // Constructor with environ.
@@ -48,11 +48,11 @@ static int main_test(int argc, char** argv) {
     unsigned int i(0);
     while (environ[i] && new_env[i]) {
       if (strcmp(environ[i], new_env[i]))
-        throw (engine_error() << "invalid constructor with env");
+        throw(engine_error() << "invalid constructor with env");
       ++i;
     }
     if (environ[i] || new_env[i])
-      throw (engine_error() << "invalid constructor with env");
+      throw(engine_error() << "invalid constructor with env");
   }
 
   return (0);

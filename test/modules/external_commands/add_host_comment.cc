@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -40,13 +40,13 @@ static int check_add_host_comment(int argc, char** argv) {
   (void)argv;
 
   // Create target host.
-  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
-                     42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
-                     NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                     0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                     0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
+  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0,
+                     0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0,
+                     0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
+                     NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0,
+                     0));
   if (!hst)
-    throw (engine_error() << "host creation failed");
+    throw(engine_error() << "host creation failed");
 
   // Send external command.
   char const* cmd("[1317196300] ADD_HOST_COMMENT;name;1;user;comment");
@@ -54,7 +54,7 @@ static int check_add_host_comment(int argc, char** argv) {
 
   // Check.
   if (!comment_list)
-    throw (engine_error() << "add_host_comment failed");
+    throw(engine_error() << "add_host_comment failed");
 
   // Cleanup.
   cleanup();

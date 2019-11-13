@@ -66,7 +66,7 @@ static void add_by_key_value_char() {
     size += line.size();
   }
   if (!check_env(ref, env.data()))
-    throw (engine_error() << "add line char failed");
+    throw(engine_error() << "add line char failed");
 }
 
 /**
@@ -88,7 +88,7 @@ static void add_by_key_value_string() {
     size += line.size();
   }
   if (!check_env(ref, env.data()))
-    throw (engine_error() << "add line string failed");
+    throw(engine_error() << "add line string failed");
 }
 
 /**
@@ -100,13 +100,14 @@ static void add_by_lines_char() {
   environment env;
   for (unsigned int i(0); size < 1024 * 8; ++i) {
     std::ostringstream oss;
-    oss << "key_" << i << "=" << "value_" << i;
+    oss << "key_" << i << "="
+        << "value_" << i;
     ref.push_back(oss.str());
     env.add(oss.str().c_str());
     size += oss.str().size();
   }
   if (!check_env(ref, env.data()))
-    throw (engine_error() << "add line char failed");
+    throw(engine_error() << "add line char failed");
 }
 
 /**
@@ -118,13 +119,14 @@ static void add_by_lines_string() {
   environment env;
   for (unsigned int i(0); size < 1024 * 8; ++i) {
     std::ostringstream oss;
-    oss << "key_" << i << "=" << "value_" << i;
+    oss << "key_" << i << "="
+        << "value_" << i;
     ref.push_back(oss.str());
     env.add(oss.str());
     size += oss.str().size();
   }
   if (!check_env(ref, env.data()))
-    throw (engine_error() << "add line string failed");
+    throw(engine_error() << "add line string failed");
 }
 
 /**

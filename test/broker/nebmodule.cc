@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <exception>
 #include <climits>
+#include <exception>
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/nebmods.hh"
@@ -28,7 +28,7 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 
-static const char* MOD_LIB_NAME        = "./broker_mod_load.so";
+static const char* MOD_LIB_NAME = "./broker_mod_load.so";
 static const char* MOD_LIB_COMPAT_NAME = "./broker_mod_compatibility.so";
 
 bool mod_test_load_quit = false;
@@ -43,62 +43,56 @@ int main_test(int argc, char** argv) {
   loader& loader(loader::instance());
 
   if (neb_init_modules() != 0)
-    throw (engine_error() << "neb_init_modules failed.");
+    throw(engine_error() << "neb_init_modules failed.");
 
-  if (neb_add_module(MOD_LIB_NAME, MOD_LIB_NAME, true) != 0
-      || neb_add_module(
-           MOD_LIB_COMPAT_NAME,
-           MOD_LIB_COMPAT_NAME,
-           true) != 0)
-    throw (engine_error() << "neb_add_module failed.");
+  if (neb_add_module(MOD_LIB_NAME, MOD_LIB_NAME, true) != 0 ||
+      neb_add_module(MOD_LIB_COMPAT_NAME, MOD_LIB_COMPAT_NAME, true) != 0)
+    throw(engine_error() << "neb_add_module failed.");
 
   if (neb_load_all_modules() != 0)
-    throw (engine_error() << "neb_load_all_modules failed.");
+    throw(engine_error() << "neb_load_all_modules failed.");
 
-  std::list<std::shared_ptr<handle> >
-    modules(loader.get_modules());
+  std::list<std::shared_ptr<handle> > modules(loader.get_modules());
 
   if (modules.size() != 2)
-    throw (engine_error() << "invalid modules size.");
+    throw(engine_error() << "invalid modules size.");
 
-  for (std::list<std::shared_ptr<handle> >::const_iterator
-         it(modules.begin()),
-         end(modules.end());
-       it != end;
-       ++it) {
+  for (std::list<std::shared_ptr<handle> >::const_iterator it(modules.begin()),
+       end(modules.end());
+       it != end; ++it) {
     if ((*it)->get_name() != MOD_TITLE)
-      throw (engine_error() << "invalid name.");
+      throw(engine_error() << "invalid name.");
 
     if ((*it)->get_author() != MOD_AUTHOR)
-      throw (engine_error() << "invalide author.");
+      throw(engine_error() << "invalide author.");
 
     if ((*it)->get_copyright() != MOD_COPYRIGHT)
-      throw (engine_error() << "invalide copyright.");
+      throw(engine_error() << "invalide copyright.");
 
     if ((*it)->get_description() != MOD_DESCRIPTION)
-      throw (engine_error() << "invalide description.");
+      throw(engine_error() << "invalide description.");
 
     if ((*it)->get_name() != MOD_TITLE)
-      throw (engine_error() << "invalide name.");
+      throw(engine_error() << "invalide name.");
 
     if ((*it)->get_version() != MOD_VERSION)
-      throw (engine_error() << "invalide version.");
+      throw(engine_error() << "invalide version.");
 
     if ((*it)->get_license() != MOD_LICENSE)
-      throw (engine_error() << "invalide license.");
+      throw(engine_error() << "invalide license.");
   }
 
   if (neb_unload_all_modules(NEBMODULE_FORCE_UNLOAD, true) != 0)
-    throw (engine_error() << "neb_unload_all_modules failed.");
+    throw(engine_error() << "neb_unload_all_modules failed.");
 
   if (loader.get_modules().size() != 0)
-    throw (engine_error() << "invalid modules size.");
+    throw(engine_error() << "invalid modules size.");
 
   if (neb_free_module_list() != 0)
-    throw (engine_error() << "neb_free_module_list failed.");
+    throw(engine_error() << "neb_free_module_list failed.");
 
   if (neb_deinit_modules() != 0)
-    throw (engine_error() << "neb_deinit_modules failed.");
+    throw(engine_error() << "neb_deinit_modules failed.");
 
   return (0);
 }

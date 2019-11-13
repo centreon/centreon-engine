@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <exception>
 #include "com/centreon/engine/broker/handle.hh"
+#include <exception>
 #include "com/centreon/engine/error.hh"
 #include "test/broker/mod_load.hh"
 #include "test/unittest.hh"
@@ -26,8 +26,8 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 
-static const char* MOD_LIB_UNKNOW  = "./broker_mod_unknow.so";
-static const char* MOD_LIB_NAME    = "./broker_mod_load.so";
+static const char* MOD_LIB_UNKNOW = "./broker_mod_unknow.so";
+static const char* MOD_LIB_NAME = "./broker_mod_load.so";
 
 bool mod_test_load_quit = false;
 
@@ -38,12 +38,11 @@ void check_open_noexist_module() {
   try {
     handle hwd;
     hwd.open(MOD_LIB_UNKNOW, MOD_LIB_UNKNOW);
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     return;
   }
-  throw (engine_error() << __func__ << ": try to open noexist module.");
+  throw(engine_error() << __func__ << ": try to open noexist module.");
 }
 
 /**
@@ -53,36 +52,36 @@ void check_open_exist_module() {
   handle hwd;
   hwd.open(MOD_LIB_NAME, MOD_LIB_NAME);
   if (hwd.is_loaded() == false) {
-    throw (engine_error() << __func__ << ": open module failed.");
+    throw(engine_error() << __func__ << ": open module failed.");
   }
   if (hwd.get_handle() == NULL) {
-    throw (engine_error() << __func__ << ": invalide handle.");
+    throw(engine_error() << __func__ << ": invalide handle.");
   }
   if (hwd.get_author() != MOD_AUTHOR) {
-    throw (engine_error() << __func__ << ": invalide author.");
+    throw(engine_error() << __func__ << ": invalide author.");
   }
   if (hwd.get_copyright() != MOD_COPYRIGHT) {
-    throw (engine_error() << __func__ << ": invalide copyright.");
+    throw(engine_error() << __func__ << ": invalide copyright.");
   }
   if (hwd.get_description() != MOD_DESCRIPTION) {
-    throw (engine_error() << __func__ << ": invalide description.");
+    throw(engine_error() << __func__ << ": invalide description.");
   }
   if (hwd.get_name() != MOD_TITLE) {
-    throw (engine_error() << __func__ << ": invalide name.");
+    throw(engine_error() << __func__ << ": invalide name.");
   }
   if (hwd.get_version() != MOD_VERSION) {
-    throw (engine_error() << __func__ << ": invalide version.");
+    throw(engine_error() << __func__ << ": invalide version.");
   }
   if (hwd.get_license() != MOD_LICENSE) {
-    throw (engine_error() << __func__ << ": invalide license.");
+    throw(engine_error() << __func__ << ": invalide license.");
   }
   if (hwd.get_args() != MOD_LIB_NAME) {
-    throw (engine_error() << __func__ << ": invalide args.");
+    throw(engine_error() << __func__ << ": invalide args.");
   }
 
   hwd.close();
   if (mod_test_load_quit == false) {
-    throw (engine_error() << __func__ << ": close failed.");
+    throw(engine_error() << __func__ << ": close failed.");
   }
 }
 
@@ -95,16 +94,16 @@ void check_copy() {
   handle hwd_cpy(hwd);
 
   if ((hwd != hwd_cpy) || !(hwd == hwd_cpy))
-    throw (engine_error() << __func__ << ": hwd and hwd_cpy are different");
+    throw(engine_error() << __func__ << ": hwd and hwd_cpy are different");
 
   hwd_cpy.close();
   if (!mod_test_load_quit)
-    throw (engine_error() << __func__ << ": close failed");
+    throw(engine_error() << __func__ << ": close failed");
 
   if (hwd.is_loaded())
-    throw (engine_error() << __func__ << ": is_loaded is true");
+    throw(engine_error() << __func__ << ": is_loaded is true");
 
-  return ;
+  return;
 }
 
 /**
@@ -114,8 +113,8 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  //check_open_noexist_module();
-  //check_open_exist_module();
+  // check_open_noexist_module();
+  // check_open_exist_module();
   check_copy();
   return (0);
 }

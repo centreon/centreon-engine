@@ -850,10 +850,9 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << obj.get_notify_on(notifier::downtime)
      << "\n"
         "  notification_period:                  "
-     << obj.get_notification_period()
-     << "\n" << notifications
-     << "  check_period:                         "
-     << obj.get_check_period()
+     << obj.get_notification_period() << "\n"
+     << notifications
+     << "  check_period:                         " << obj.get_check_period()
      << "\n"
         "  flap_detection_enabled:               "
      << obj.get_flap_detection_enabled()

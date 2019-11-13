@@ -35,15 +35,13 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  connector cmd(
-              DEFAULT_CONNECTOR_NAME,
-              DEFAULT_CONNECTOR_LINE);
+  connector cmd(DEFAULT_CONNECTOR_NAME, DEFAULT_CONNECTOR_LINE);
 
   if (cmd.get_name() != DEFAULT_CONNECTOR_NAME)
-    throw (engine_error() << "error: name invalid value.");
+    throw(engine_error() << "error: name invalid value.");
 
   if (cmd.get_command_line() != DEFAULT_CONNECTOR_LINE)
-    throw (engine_error() << "error: command_line invalid value.");
+    throw(engine_error() << "error: command_line invalid value.");
 
   return (0);
 }

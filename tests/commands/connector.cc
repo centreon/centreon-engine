@@ -93,6 +93,18 @@ TEST_F(Connector, NewConnector) {
   ASSERT_THROW(new commands::connector("", "bar"), std::exception);
 }
 
+TEST_F(Connector, ForwardWithoutName) {
+  commands::connector c("test segfault",
+                        "tests/bin_connector_test_run --kill=2");
+  ASSERT_THROW(new commands::forward("", "bar", c), std::exception);
+}
+
+TEST_F(Connector, ForwardWithoutCmd) {
+  commands::connector c("test segfault",
+                        "tests/bin_connector_test_run --kill=2");
+  ASSERT_THROW(new commands::forward("foo", "", c), std::exception);
+}
+
 // Given an already existing command
 // When the add_command method is called with the same name
 // Then it returns a NULL pointer.

@@ -17,16 +17,16 @@
 */
 
 #ifndef CCE_FIRST_NOTIF_DELAY_COMMON_HH_
-#  define CCE_FIRST_NOTIF_DELAY_COMMON_HH_
+#define CCE_FIRST_NOTIF_DELAY_COMMON_HH_
 
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#include <string>
+#include "com/centreon/engine/namespace.hh"
 
-#  define FIRST_NOTIF_DELAY 3
+#define FIRST_NOTIF_DELAY 3
 
 CCE_BEGIN()
 
-int  first_notif_delay_default_setup(std::string const& path);
+int first_notif_delay_default_setup(std::string const& path);
 
 CCE_END()
 

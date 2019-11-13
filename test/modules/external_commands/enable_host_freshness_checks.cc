@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -40,7 +40,7 @@ static int check_enable_host_freshness_checks(int argc, char** argv) {
 
   // Check.
   if (!config->check_host_freshness())
-    throw (engine_error() << "enable_host_freshness_checks failed.");
+    throw(engine_error() << "enable_host_freshness_checks failed.");
 
   // Success.
   return (0);

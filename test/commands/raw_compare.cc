@@ -37,10 +37,10 @@ int main_test(int argc, char** argv) {
 
   raw cmd(CMD_NAME, CMD_LINE);
   if (!(cmd == cmd))
-    throw (engine_error() << "error: operator== failed.");
+    throw(engine_error() << "error: operator== failed.");
 
   if (cmd != cmd)
-    throw (engine_error() << "error: operator!= failed.");
+    throw(engine_error() << "error: operator!= failed.");
   return (0);
 }
 

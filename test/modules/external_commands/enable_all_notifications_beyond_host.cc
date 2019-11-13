@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,19 +33,19 @@ static int check_enable_all_notifications_beyond_host(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst_parent = add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                              0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                              0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                              NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                              0.0, 0, 0, 0, 0, 0);
-  host* hst_child = add_host("child", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                             0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                             0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                             NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                             0.0, 0, 0, 0, 0, 0);
+  host* hst_parent =
+      add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0,
+               0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0,
+               0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL,
+               NULL, NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
+  host* hst_child =
+      add_host("child", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0,
+               0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+               0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+               NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
 
   if (!hst_parent || !hst_child)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
   add_parent_host_to_host(hst_child, "parent");
   add_child_link_to_host(hst_parent, hst_child);
@@ -54,7 +54,7 @@ static int check_enable_all_notifications_beyond_host(int argc, char** argv) {
   process_external_command(cmd);
 
   if (!hst_child->notifications_enabled)
-    throw (engine_error() << "enable_all_notifications_beyond_host failed.");
+    throw(engine_error() << "enable_all_notifications_beyond_host failed.");
   return (0);
 }
 

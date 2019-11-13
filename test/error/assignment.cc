@@ -30,17 +30,18 @@ using namespace com::centreon::engine;
 int main() {
   // Base object.
   error e1;
-  e1 << "foo " << "bar" << 42u;
+  e1 << "foo "
+     << "bar" << 42u;
 
   // Copy object.
   error e2;
-  e2 << "baz" << " qux" << 21l;
+  e2 << "baz"
+     << " qux" << 21l;
   e2 = e1;
 
   // Change object object.
   e1 << 3612;
 
   // Check.
-  return (strcmp(e1.what(), "foo bar423612")
-          || strcmp(e2.what(), "foo bar42"));
+  return (strcmp(e1.what(), "foo bar423612") || strcmp(e2.what(), "foo bar42"));
 }

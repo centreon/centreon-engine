@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctime>
 #include "com/centreon/engine/retention/downtime.hh"
+#include <ctime>
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
 
@@ -53,8 +53,8 @@ int main_test(int argc, char* argv[]) {
   {
     retention::downtime copy(ref);
     if (!(copy == ref) || copy != ref)
-      throw (engine_error() << "copy constructor or operator "
-             "equal failed");
+      throw(engine_error() << "copy constructor or operator "
+                              "equal failed");
   }
 
   // Check copy operator.
@@ -62,15 +62,15 @@ int main_test(int argc, char* argv[]) {
     retention::downtime copy(retention::downtime::service);
     copy = ref;
     if (!(copy == ref) || copy != ref)
-      throw (engine_error() << "copy operator or operator "
-             "equal failed");
+      throw(engine_error() << "copy operator or operator "
+                              "equal failed");
   }
 
   // Check operator equal and not equal.
   {
     retention::downtime empty(retention::downtime::host);
     if (empty == ref || !(empty != ref))
-      throw (engine_error() << "operator equal failed");
+      throw(engine_error() << "operator equal failed");
   }
 
   // Check operator equal and not equal.
@@ -78,8 +78,8 @@ int main_test(int argc, char* argv[]) {
     retention::downtime diff(ref);
     diff.set("author", "new_author");
     if (diff == ref || !(diff != ref))
-      throw (engine_error() << "copy operator or operator "
-             "equal failed");
+      throw(engine_error() << "copy operator or operator "
+                              "equal failed");
   }
   return (0);
 }

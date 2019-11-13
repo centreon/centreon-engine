@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,21 +33,21 @@ static int check_disable_hostgroup_host_notifications(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst =
+      add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0,
+               0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+               0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+               NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
   hostgroup* group = add_hostgroup("group", NULL, NULL, NULL, NULL);
   if (!group)
-    throw (engine_error() << "create hostgroup failed.");
+    throw(engine_error() << "create hostgroup failed.");
 
   hostsmember* member = add_host_to_hostgroup(group, "name");
   if (!member)
-    throw (engine_error() << "host link to hostgroup.");
+    throw(engine_error() << "host link to hostgroup.");
 
   member->host_ptr = hst;
   hst->notifications_enabled = true;
@@ -55,7 +55,7 @@ static int check_disable_hostgroup_host_notifications(int argc, char** argv) {
   process_external_command(cmd);
 
   if (hst->notifications_enabled)
-    throw (engine_error() << "disable_hostgroup_host_notifications failed.");
+    throw(engine_error() << "disable_hostgroup_host_notifications failed.");
   return (0);
 }
 

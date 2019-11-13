@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/logging/debug_file.hh"
 #include <cassert>
 #include <cstdlib>
-#include "com/centreon/engine/logging/debug_file.hh"
 
 using namespace com::centreon::engine::logging;
 
@@ -40,13 +40,13 @@ debug_file::debug_file(std::string const& path, uint64_t max_size)
 /**
  *  Destructor.
  */
-debug_file::~debug_file() throw () {}
+debug_file::~debug_file() throw() {}
 
 /**
  *  Copy constructor.
  */
 debug_file::debug_file(debug_file const& other)
-  : com::centreon::logging::file("") {
+    : com::centreon::logging::file("") {
   (void)other;
   assert(!"debug file is not copyable");
   abort();

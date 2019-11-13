@@ -18,15 +18,15 @@
 */
 
 #ifndef TEST_BROKER_MOD_TEST_LOAD_HH
-# define TEST_BROKER_MOD_TEST_LOAD_HH
+#define TEST_BROKER_MOD_TEST_LOAD_HH
 
-static const char* MOD_TITLE       = "Module testing";
-static const char* MOD_AUTHOR      = "Merethis";
-static const char* MOD_COPYRIGHT   = "Copyright 2011-2013 Merethis";
-static const char* MOD_VERSION     = "1.0.0";
-static const char* MOD_LICENSE     = "GPL version 2";
+static const char* MOD_TITLE = "Module testing";
+static const char* MOD_AUTHOR = "Merethis";
+static const char* MOD_COPYRIGHT = "Copyright 2011-2013 Merethis";
+static const char* MOD_VERSION = "1.0.0";
+static const char* MOD_LICENSE = "GPL version 2";
 static const char* MOD_DESCRIPTION = "Test the module load system.";
 
 extern bool mod_test_load_quit;
 
-#endif // !TEST_BROKER_MOD_TEST_LOAD_HH
+#endif  // !TEST_BROKER_MOD_TEST_LOAD_HH

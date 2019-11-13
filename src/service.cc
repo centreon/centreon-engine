@@ -386,10 +386,9 @@ std::ostream& operator<<(std::ostream& os,
      << obj.get_is_volatile()
      << "\n"
         "  notification_period:                  "
-     << obj.get_notification_period()
-     << "\n" << notifications
-     << "  check_period:                         "
-     << obj.get_check_period()
+     << obj.get_notification_period() << "\n"
+     << notifications
+     << "  check_period:                         " << obj.get_check_period()
      << "\n"
         "  flap_detection_enabled:               "
      << obj.get_flap_detection_enabled()

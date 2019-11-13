@@ -48,8 +48,8 @@ static int broker_callback(int callback_type, void* data) {
   static int last_callback_type = -1;
   int ret = last_callback_type;
 
-  nebstruct_external_command_data* neb_data
-    = static_cast<nebstruct_external_command_data*>(data);
+  nebstruct_external_command_data* neb_data =
+      static_cast<nebstruct_external_command_data*>(data);
   if (callback_type != -1)
     last_callback_type = neb_data->type;
   else
@@ -78,7 +78,7 @@ static void check_event_service_check() {
 
   // check if handle_timed_event call _exec_event_service_check.
   if (svc.next_check == 0)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**
@@ -88,9 +88,7 @@ static void check_event_command_check() {
   // register broker callback to catch event.
   config->event_broker_options(BROKER_EXTERNALCOMMAND_DATA);
   void* module_id = reinterpret_cast<void*>(0x4242);
-  neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-                        module_id,
-                        0,
+  neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA, module_id, 0,
                         &broker_callback);
 
   // create fake event.
@@ -101,7 +99,7 @@ static void check_event_command_check() {
   handle_timed_event(&event);
 
   if (broker_callback(-1, NULL) != NEBTYPE_EXTERNALCOMMAND_CHECK)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 
   // release callback.
   neb_deregister_module_callbacks(module_id);
@@ -123,7 +121,7 @@ static void check_event_program_shutdown() {
 
   // check if handle_timed_event call _exec_event_program_shutdown.
   if (sigshutdown == false)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**
@@ -142,7 +140,7 @@ static void check_event_program_restart() {
 
   // check if handle_timed_event call _exec_event_program_restart.
   if (sigrestart != false)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**
@@ -177,9 +175,7 @@ static void check_event_retention_save() {
   config->event_broker_options(BROKER_RETENTION_DATA);
   config->retain_state_information(true);
   void* module_id = reinterpret_cast<void*>(0x4242);
-  neb_register_callback(NEBCALLBACK_RETENTION_DATA,
-                        module_id,
-                        0,
+  neb_register_callback(NEBCALLBACK_RETENTION_DATA, module_id, 0,
                         &broker_callback);
 
   // create fake event.
@@ -190,7 +186,7 @@ static void check_event_retention_save() {
   handle_timed_event(&event);
 
   if (broker_callback(-1, NULL) != NEBTYPE_RETENTIONDATA_ENDSAVE)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 
   // release callback.
   neb_deregister_module_callbacks(module_id);
@@ -204,9 +200,7 @@ static void check_event_status_save() {
   config->event_broker_options(BROKER_STATUS_DATA);
   config->retain_state_information(true);
   void* module_id = reinterpret_cast<void*>(0x4242);
-  neb_register_callback(NEBCALLBACK_AGGREGATED_STATUS_DATA,
-                        module_id,
-                        0,
+  neb_register_callback(NEBCALLBACK_AGGREGATED_STATUS_DATA, module_id, 0,
                         &broker_callback);
 
   // create fake event.
@@ -217,7 +211,7 @@ static void check_event_status_save() {
   handle_timed_event(&event);
 
   if (broker_callback(-1, NULL) != NEBTYPE_AGGREGATEDSTATUS_ENDDUMP)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 
   // release callback.
   neb_deregister_module_callbacks(module_id);
@@ -237,7 +231,7 @@ static void check_event_scheduled_downtime() {
 
   // check if handle_timed_event call _exec_event_scheduled_downtime.
   if (event.event_data != NULL)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**
@@ -258,17 +252,11 @@ static void check_event_sfreshness_check() {
 static void check_event_expire_downtime() {
   // create fake comment.
   unsigned long downtime_id(42);
-  if (add_host_downtime("name",
-                   0,
-                   const_cast<char*>("author"),
-                   const_cast<char*>("comment"),
-                   0,
-                   0,
-                   0,
-                   0,
-                   0,
-                   downtime_id) != OK || scheduled_downtime_list == NULL)
-    throw (engine_error() << "add_new comment failed.");
+  if (add_host_downtime("name", 0, const_cast<char*>("author"),
+                        const_cast<char*>("comment"), 0, 0, 0, 0, 0,
+                        downtime_id) != OK ||
+      scheduled_downtime_list == NULL)
+    throw(engine_error() << "add_new comment failed.");
 
   // create fake event.
   timed_event event;
@@ -279,7 +267,7 @@ static void check_event_expire_downtime() {
 
   // check if handle_timed_event call _exec_event_expire_downtime.
   if (scheduled_downtime_list != NULL)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**
@@ -301,7 +289,7 @@ static void check_event_host_check() {
 
   // check if handle_timed_event call _exec_event_host_check.
   if (hst.next_check == 0)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**
@@ -334,19 +322,11 @@ static void check_event_reschedule_checks() {
 static void check_event_expire_comment() {
   // create fake comment.
   unsigned long comment_id(42);
-  if (add_comment(HOST_COMMENT,
-                  0,
-                  "name",
-                  NULL,
-                  (time_t)0,
-                  "author",
-                  const_cast<char*>("comment"),
-                  comment_id,
-                  0,
-                  true,
-                  0,
-                  0) != OK || comment_list == NULL)
-    throw (engine_error() << "add_new comment failed.");
+  if (add_comment(HOST_COMMENT, 0, "name", NULL, (time_t)0, "author",
+                  const_cast<char*>("comment"), comment_id, 0, true, 0,
+                  0) != OK ||
+      comment_list == NULL)
+    throw(engine_error() << "add_new comment failed.");
 
   // create fake event.
   timed_event event;
@@ -358,7 +338,7 @@ static void check_event_expire_comment() {
 
   // check if handle_timed_event call _exec_event_expire_comment.
   if (comment_list != NULL)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**
@@ -381,7 +361,7 @@ static void check_event_user_function() {
   handle_timed_event(&event);
 
   if (event.event_args == &event)
-    throw (engine_error() << __func__);
+    throw(engine_error() << __func__);
 }
 
 /**

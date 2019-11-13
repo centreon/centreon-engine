@@ -52,13 +52,11 @@ int main() {
       char* ptr;
       ptr = io::file_stream::temp_path();
       if (!ptr)
-        throw (engine_error()
-               << "temporary file name generation failure");
+        throw(engine_error() << "temporary file name generation failure");
       conf_file = ptr;
       ptr = io::file_stream::temp_path();
       if (!ptr)
-        throw (engine_error()
-               << "temporary file name generation failure");
+        throw(engine_error() << "temporary file name generation failure");
       precache_file = ptr;
     }
 
@@ -110,8 +108,7 @@ int main() {
       std::string ref_content;
       io::file_stream precache_ref;
       precache_ref.open(
-        TEST_DIR "/running/etc/precache/objects.precache.expected",
-        "r");
+          TEST_DIR "/running/etc/precache/objects.precache.expected", "r");
       unsigned long bytes;
       char buffer[1024];
       while ((bytes = precache_ref.read(buffer, sizeof(buffer))) > 0)
@@ -131,13 +128,12 @@ int main() {
 
       // Compare contents.
       if (ref_content.compare(gen_content))
-        throw (engine_error() << "contents differ");
+        throw(engine_error() << "contents differ");
 
       // Success.
       retval = EXIT_SUCCESS;
     }
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     std::cout << e.what() << std::endl;
   }
 
