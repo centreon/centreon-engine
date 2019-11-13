@@ -16,8 +16,8 @@
  * For more information : contact@centreon.com
  *
  */
-#include <memory>
 #include <gtest/gtest.h>
+#include <memory>
 #include "../../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -58,7 +58,6 @@ class ApplierConnector : public ::testing::Test {
     delete config;
     config = nullptr;
   }
-
 };
 
 // Given a connector applier
@@ -72,7 +71,6 @@ TEST_F(ApplierConnector, UnusableConnectorFromConfig) {
   set_connector s(config->connectors());
   ASSERT_EQ(s.size(), 1u);
   ASSERT_EQ(commands::connector::connectors.size(), 1u);
-
 }
 
 // Given a connector applier already applied
@@ -89,7 +87,7 @@ TEST_F(ApplierConnector, ModifyConnector) {
   aply.modify_object(cnn);
 
   connector_map::iterator found_con{
-    commands::connector::connectors.find("connector")};
+      commands::connector::connectors.find("connector")};
   ASSERT_FALSE(found_con == commands::connector::connectors.end());
   ASSERT_FALSE(!found_con->second);
 

@@ -18,7 +18,7 @@
 */
 
 #ifndef CCE_OBJECTS_TIMERANGE_HH
-#  define CCE_OBJECTS_TIMERANGE_HH
+#define CCE_OBJECTS_TIMERANGE_HH
 
 #include <list>
 #include <memory>
@@ -29,29 +29,27 @@ class timerange;
 CCE_END()
 
 typedef std::list<std::shared_ptr<com::centreon::engine::timerange> >
-  timerange_list;
+    timerange_list;
 
 CCE_BEGIN()
-class                   timerange {
+class timerange {
  public:
-                        timerange(uint64_t start, uint64_t end);
-  uint64_t              get_range_start() const;
-  uint64_t              get_range_end() const;
-  //static timerange_list timeranges;
+  timerange(uint64_t start, uint64_t end);
+  uint64_t get_range_start() const;
+  uint64_t get_range_end() const;
+  // static timerange_list timeranges;
 
-  bool                  operator==(timerange const& obj) throw ();
-  bool                  operator!=(timerange const& obj) throw ();
+  bool operator==(timerange const& obj) throw();
+  bool operator!=(timerange const& obj) throw();
 
  private:
-  uint64_t              _range_start;
-  uint64_t              _range_end;
+  uint64_t _range_start;
+  uint64_t _range_end;
 };
 CCE_END()
 
-std::ostream&         operator<<(std::ostream& os,
-                                 com::centreon::engine::timerange const& obj);
-std::ostream&         operator<<(std::ostream& os, timerange_list const& obj);
+std::ostream& operator<<(std::ostream& os,
+                         com::centreon::engine::timerange const& obj);
+std::ostream& operator<<(std::ostream& os, timerange_list const& obj);
 
-#endif // !CCE_OBJECTS_TIMERANGE_HH
-
-
+#endif  // !CCE_OBJECTS_TIMERANGE_HH

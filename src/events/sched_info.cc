@@ -20,9 +20,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/events/sched_info.hh"
 #include <cmath>
 #include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -50,8 +50,7 @@ void adjust_check_scheduling() {
   host* hst(NULL);
   com::centreon::engine::service* svc(NULL);
 
-  logger(dbg_functions, basic)
-    << "adjust_check_scheduling()";
+  logger(dbg_functions, basic) << "adjust_check_scheduling()";
 
   /* TODO:
      - Track host check overhead on a per-host basis
@@ -61,14 +60,13 @@ void adjust_check_scheduling() {
   // determine our adjustment window.
   time_t current_time(time(NULL));
   time_t first_window_time(current_time);
-  time_t last_window_time(first_window_time + config->auto_rescheduling_window());
+  time_t last_window_time(first_window_time +
+                          config->auto_rescheduling_window());
 
   // get current scheduling data.
-  for (timed_event_list::iterator
-         it{timed_event::event_list_low.begin()},
-         end{timed_event::event_list_low.end()};
-       it != end;
-       ++it) {
+  for (timed_event_list::iterator it{timed_event::event_list_low.begin()},
+       end{timed_event::event_list_low.end()};
+       it != end; ++it) {
     // skip events outside of our current window.
     if ((*it)->run_time <= first_window_time)
       continue;
@@ -76,7 +74,6 @@ void adjust_check_scheduling() {
       break;
 
     if ((*it)->event_type == EVENT_HOST_CHECK) {
-
       if (!(hst = (host*)(*it)->event_data))
         continue;
 
@@ -116,8 +113,7 @@ void adjust_check_scheduling() {
       // account, as service checks are run in parallel.
       last_check_exec_time = projected_service_check_overhead;
       total_check_exec_time += last_check_exec_time;
-    }
-    else
+    } else
       continue;
 
     ++total_checks;
@@ -127,26 +123,23 @@ void adjust_check_scheduling() {
   if (total_checks == 0 || adjust_scheduling == false)
     return;
 
-  if ((unsigned long)total_check_exec_time > config->auto_rescheduling_window()) {
+  if ((unsigned long)total_check_exec_time >
+      config->auto_rescheduling_window()) {
     inter_check_delay = 0.0;
-    exec_time_factor
-      = (double)((double)config->auto_rescheduling_window()
-                 / total_check_exec_time);
-  }
-  else {
-    inter_check_delay
-      = (double)((((double)config->auto_rescheduling_window())
-                  - total_check_exec_time) / (double)(total_checks * 1.0));
+    exec_time_factor = (double)((double)config->auto_rescheduling_window() /
+                                total_check_exec_time);
+  } else {
+    inter_check_delay = (double)((((double)config->auto_rescheduling_window()) -
+                                  total_check_exec_time) /
+                                 (double)(total_checks * 1.0));
     exec_time_factor = 1.0;
   }
 
   // adjust check scheduling.
   double current_icd_offset(inter_check_delay / 2.0);
-  for (timed_event_list::iterator
-         it{timed_event::event_list_low.begin()},
-         end{timed_event::event_list_low.end()};
-       it != end;
-       ++it) {
+  for (timed_event_list::iterator it{timed_event::event_list_low.begin()},
+       end{timed_event::event_list_low.end()};
+       it != end; ++it) {
     // skip events outside of our current window.
     if ((*it)->run_time <= first_window_time)
       continue;
@@ -154,7 +147,6 @@ void adjust_check_scheduling() {
       break;
 
     if ((*it)->event_type == EVENT_HOST_CHECK) {
-
       if (!(hst = (host*)(*it)->event_data))
         continue;
 
@@ -162,12 +154,10 @@ void adjust_check_scheduling() {
       if (hst->get_check_options() & CHECK_OPTION_FORCE_EXECUTION)
         continue;
 
-      current_exec_time
-        = ((hst->get_execution_time()
-            + projected_host_check_overhead)
-           * exec_time_factor);
-    }
-    else if ((*it)->event_type == EVENT_SERVICE_CHECK) {
+      current_exec_time =
+          ((hst->get_execution_time() + projected_host_check_overhead) *
+           exec_time_factor);
+    } else if ((*it)->event_type == EVENT_SERVICE_CHECK) {
       if (!(svc = (com::centreon::engine::service*)(*it)->event_data))
         continue;
 
@@ -177,24 +167,20 @@ void adjust_check_scheduling() {
 
       // NOTE: service check execution time is not taken into
       // account, as service checks are run in parallel.
-      current_exec_time
-        = (projected_service_check_overhead * exec_time_factor);
-    }
-    else
+      current_exec_time = (projected_service_check_overhead * exec_time_factor);
+    } else
       continue;
 
     ++current_check;
     double new_run_time_offset(current_exec_time_offset + current_icd_offset);
     time_t new_run_time(
-             (time_t)(first_window_time
-                      + (unsigned long)new_run_time_offset));
+        (time_t)(first_window_time + (unsigned long)new_run_time_offset));
 
     if ((*it)->event_type == EVENT_HOST_CHECK) {
       (*it)->run_time = new_run_time;
       hst->set_next_check(new_run_time);
       hst->update_status(false);
-    }
-    else {
+    } else {
       (*it)->run_time = new_run_time;
       svc->set_next_check(new_run_time);
       svc->update_status(false);
@@ -216,103 +202,116 @@ void adjust_check_scheduling() {
 void display_scheduling_info() {
   // Notice.
   logger(log_info_message, basic)
-    << "\nProjected scheduling information for host and service checks\n"
-    << "is listed below.  This information assumes that you are going\n"
-    << "to start running Centreon Engine with your current config files.\n\n";
+      << "\nProjected scheduling information for host and service checks\n"
+      << "is listed below.  This information assumes that you are going\n"
+      << "to start running Centreon Engine with your current config files.\n\n";
 
   // Host scheduling information.
   logger(log_info_message, basic)
-    << "HOST SCHEDULING INFORMATION\n"
-    << "---------------------------\n"
-    << "Total hosts:                        " << scheduling_info.total_hosts << "\n"
-    << "Total scheduled hosts:              " << scheduling_info.total_scheduled_hosts << "\n";
-  if (config->host_inter_check_delay_method()
-      == configuration::state::icd_none)
+      << "HOST SCHEDULING INFORMATION\n"
+      << "---------------------------\n"
+      << "Total hosts:                        " << scheduling_info.total_hosts
+      << "\n"
+      << "Total scheduled hosts:              "
+      << scheduling_info.total_scheduled_hosts << "\n";
+  if (config->host_inter_check_delay_method() == configuration::state::icd_none)
     logger(log_info_message, basic)
-      << "Host inter-check delay method:      NONE\n";
-  else if (config->host_inter_check_delay_method()
-           == configuration::state::icd_dumb)
+        << "Host inter-check delay method:      NONE\n";
+  else if (config->host_inter_check_delay_method() ==
+           configuration::state::icd_dumb)
     logger(log_info_message, basic)
-      << "Host inter-check delay method:      DUMB\n";
-  else if (config->host_inter_check_delay_method()
-           == configuration::state::icd_smart)
+        << "Host inter-check delay method:      DUMB\n";
+  else if (config->host_inter_check_delay_method() ==
+           configuration::state::icd_smart)
     logger(log_info_message, basic)
-      << "Host inter-check delay method:      SMART\n"
-      << "Average host check interval:        " << scheduling_info.average_host_check_interval << " sec\n";
+        << "Host inter-check delay method:      SMART\n"
+        << "Average host check interval:        "
+        << scheduling_info.average_host_check_interval << " sec\n";
   else
     logger(log_info_message, basic)
-      << "Host inter-check delay method:      USER-SUPPLIED VALUE\n";
+        << "Host inter-check delay method:      USER-SUPPLIED VALUE\n";
   logger(log_info_message, basic)
-    << "Host inter-check delay:             " << scheduling_info.host_inter_check_delay << " sec\n"
-    << "Max host check spread:              " << scheduling_info.max_host_check_spread << " min\n"
-    << "First scheduled check:              "
-    << ((scheduling_info.total_scheduled_hosts == 0)
-        ? "N/A\n"
-        : ctime(&scheduling_info.first_host_check))
-    << "Last scheduled check:               "
-    << ((scheduling_info.total_scheduled_hosts == 0)
-        ? "N/A\n"
-        : ctime(&scheduling_info.last_host_check))
-    << "\n";
+      << "Host inter-check delay:             "
+      << scheduling_info.host_inter_check_delay << " sec\n"
+      << "Max host check spread:              "
+      << scheduling_info.max_host_check_spread << " min\n"
+      << "First scheduled check:              "
+      << ((scheduling_info.total_scheduled_hosts == 0)
+              ? "N/A\n"
+              : ctime(&scheduling_info.first_host_check))
+      << "Last scheduled check:               "
+      << ((scheduling_info.total_scheduled_hosts == 0)
+              ? "N/A\n"
+              : ctime(&scheduling_info.last_host_check))
+      << "\n";
 
   // Service scheduling information.
   logger(log_info_message, basic)
-    << "SERVICE SCHEDULING INFORMATION\n"
-    << "-------------------------------\n"
-    << "Total services:                     " << scheduling_info.total_services << "\n"
-    << "Total scheduled services:           " << scheduling_info.total_scheduled_services << "\n";
-  if (config->service_inter_check_delay_method()
-      == configuration::state::icd_none)
+      << "SERVICE SCHEDULING INFORMATION\n"
+      << "-------------------------------\n"
+      << "Total services:                     "
+      << scheduling_info.total_services << "\n"
+      << "Total scheduled services:           "
+      << scheduling_info.total_scheduled_services << "\n";
+  if (config->service_inter_check_delay_method() ==
+      configuration::state::icd_none)
     logger(log_info_message, basic)
-      << "Service inter-check delay method:   NONE\n";
-  else if (config->service_inter_check_delay_method()
-           == configuration::state::icd_dumb)
+        << "Service inter-check delay method:   NONE\n";
+  else if (config->service_inter_check_delay_method() ==
+           configuration::state::icd_dumb)
     logger(log_info_message, basic)
-      << "Service inter-check delay method:   DUMB\n";
-  else if (config->service_inter_check_delay_method()
-           == configuration::state::icd_smart) {
+        << "Service inter-check delay method:   DUMB\n";
+  else if (config->service_inter_check_delay_method() ==
+           configuration::state::icd_smart) {
     logger(log_info_message, basic)
-      << "Service inter-check delay method:   SMART\n"
-      << "Average service check interval:     " << scheduling_info.average_service_check_interval << " sec\n";
-  }
-  else
+        << "Service inter-check delay method:   SMART\n"
+        << "Average service check interval:     "
+        << scheduling_info.average_service_check_interval << " sec\n";
+  } else
     logger(log_info_message, basic)
-      << "Service inter-check delay method:   USER-SUPPLIED VALUE\n";
+        << "Service inter-check delay method:   USER-SUPPLIED VALUE\n";
   logger(log_info_message, basic)
-    << "Inter-check delay:                  " << scheduling_info.service_inter_check_delay << " sec\n"
-    << "Interleave factor method:           "
-    << ((config->service_interleave_factor_method()
-         == configuration::state::ilf_user)
-        ? "USER-SUPPLIED VALUE"
-        : "SMART") << "\n";
-  if (config->service_interleave_factor_method()
-      == configuration::state::ilf_smart)
+      << "Inter-check delay:                  "
+      << scheduling_info.service_inter_check_delay << " sec\n"
+      << "Interleave factor method:           "
+      << ((config->service_interleave_factor_method() ==
+           configuration::state::ilf_user)
+              ? "USER-SUPPLIED VALUE"
+              : "SMART")
+      << "\n";
+  if (config->service_interleave_factor_method() ==
+      configuration::state::ilf_smart)
     logger(log_info_message, basic)
-      << "Average services per host:          " << scheduling_info.average_services_per_host << "\n";
+        << "Average services per host:          "
+        << scheduling_info.average_services_per_host << "\n";
   logger(log_info_message, basic)
-    << "Service interleave factor:          " << scheduling_info.service_interleave_factor << "\n"
-    << "Max service check spread:           " << scheduling_info.max_service_check_spread << " min\n"
-    << "First scheduled check:              " << ctime(&scheduling_info.first_service_check)
-    << "Last scheduled check:               " << ctime(&scheduling_info.last_service_check)
-    << "\n";
+      << "Service interleave factor:          "
+      << scheduling_info.service_interleave_factor << "\n"
+      << "Max service check spread:           "
+      << scheduling_info.max_service_check_spread << " min\n"
+      << "First scheduled check:              "
+      << ctime(&scheduling_info.first_service_check)
+      << "Last scheduled check:               "
+      << ctime(&scheduling_info.last_service_check) << "\n";
 
   // Check processing information.
   logger(log_info_message, basic)
-    << "CHECK PROCESSING INFORMATION\n"
-    << "----------------------------\n"
-    << "Check result reaper interval:       " << config->check_reaper_interval() << " sec\n";
+      << "CHECK PROCESSING INFORMATION\n"
+      << "----------------------------\n"
+      << "Check result reaper interval:       "
+      << config->check_reaper_interval() << " sec\n";
   if (config->max_parallel_service_checks() == 0)
     logger(log_info_message, basic)
-      << "Max concurrent service checks:      Unlimited\n";
+        << "Max concurrent service checks:      Unlimited\n";
   else
     logger(log_info_message, basic)
-      << "Max concurrent service checks:      " << config->max_parallel_service_checks() << "\n";
+        << "Max concurrent service checks:      "
+        << config->max_parallel_service_checks() << "\n";
   logger(log_info_message, basic) << "\n";
 
   // Performance suggestions.
-  logger(log_info_message, basic)
-    << "PERFORMANCE SUGGESTIONS\n"
-    << "-----------------------\n";
+  logger(log_info_message, basic) << "PERFORMANCE SUGGESTIONS\n"
+                                  << "-----------------------\n";
   int suggestions(0);
 
   // MAX REAPER INTERVAL RECOMMENDATION.
@@ -320,21 +319,21 @@ void display_scheduling_info() {
   // Assume we want a max of 2k files in the result queue
   // at any given time.
   float max_reaper_interval(0.0);
-  max_reaper_interval
-    = floor(2000 * scheduling_info.service_inter_check_delay);
+  max_reaper_interval = floor(2000 * scheduling_info.service_inter_check_delay);
   if (max_reaper_interval < 2.0)
     max_reaper_interval = 2.0;
   if (max_reaper_interval > 30.0)
     max_reaper_interval = 30.0;
   if (max_reaper_interval < config->check_reaper_interval()) {
     logger(log_info_message, basic)
-      << "* Value for 'check_result_reaper_frequency' should be <= "
-      << static_cast<int>(max_reaper_interval) << " seconds\n";
+        << "* Value for 'check_result_reaper_frequency' should be <= "
+        << static_cast<int>(max_reaper_interval) << " seconds\n";
     ++suggestions;
   }
   if (config->check_reaper_interval() < 2) {
     logger(log_info_message, basic)
-      << "* Value for 'check_result_reaper_frequency' should be >= 2 seconds\n";
+        << "* Value for 'check_result_reaper_frequency' should be >= 2 "
+           "seconds\n";
     ++suggestions;
   }
 
@@ -345,37 +344,36 @@ void display_scheduling_info() {
   float minimum_concurrent_checks1(0.0);
   float minimum_concurrent_checks2(0.0);
   if (scheduling_info.service_inter_check_delay == 0.0)
-    minimum_concurrent_checks1
-      = ceil(config->check_reaper_interval() * 2.0);
+    minimum_concurrent_checks1 = ceil(config->check_reaper_interval() * 2.0);
   else
-    minimum_concurrent_checks1
-      = ceil((config->check_reaper_interval() * 2.0)
-             / scheduling_info.service_inter_check_delay);
+    minimum_concurrent_checks1 =
+        ceil((config->check_reaper_interval() * 2.0) /
+             scheduling_info.service_inter_check_delay);
   // Second method (new) - assume a 25% (1.25x) service check
   // burst for max concurrent checks.
-  minimum_concurrent_checks2
-    = ceil((((double)scheduling_info.total_scheduled_services)
-            / scheduling_info.average_service_check_interval) * 1.25
-           * config->check_reaper_interval()
-           * scheduling_info.average_service_execution_time);
+  minimum_concurrent_checks2 =
+      ceil((((double)scheduling_info.total_scheduled_services) /
+            scheduling_info.average_service_check_interval) *
+           1.25 * config->check_reaper_interval() *
+           scheduling_info.average_service_execution_time);
   // Use max of computed values.
   if (minimum_concurrent_checks1 > minimum_concurrent_checks2)
     minimum_concurrent_checks = minimum_concurrent_checks1;
   else
     minimum_concurrent_checks = minimum_concurrent_checks2;
   // Compare with configured value.
-  if ((minimum_concurrent_checks > config->max_parallel_service_checks())
-      && config->max_parallel_service_checks() != 0) {
+  if ((minimum_concurrent_checks > config->max_parallel_service_checks()) &&
+      config->max_parallel_service_checks() != 0) {
     logger(log_info_message, basic)
-      << "* Value for 'max_concurrent_checks' option should be >= "
-      << static_cast<int>(minimum_concurrent_checks) << "\n";
+        << "* Value for 'max_concurrent_checks' option should be >= "
+        << static_cast<int>(minimum_concurrent_checks) << "\n";
     ++suggestions;
   }
   if (suggestions == 0)
     logger(log_info_message, basic)
-      << "I have no suggestions - things look okay.\n";
+        << "I have no suggestions - things look okay.\n";
 
-  return ;
+  return;
 }
 
 /**
@@ -386,31 +384,35 @@ void display_scheduling_info() {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool operator==(
-       sched_info const& obj1,
-       sched_info const& obj2) throw () {
-  return (obj1.total_services == obj2.total_services
-          && obj1.total_scheduled_services == obj2.total_scheduled_services
-          && obj1.total_hosts == obj2.total_hosts
-          && obj1.total_scheduled_hosts == obj2.total_scheduled_hosts
-          && obj1.average_services_per_host == obj2.average_services_per_host
-          && obj1.average_scheduled_services_per_host == obj2.average_scheduled_services_per_host
-          && obj1.service_check_interval_total == obj2.service_check_interval_total
-          && obj1.host_check_interval_total == obj2.host_check_interval_total
-          && obj1.average_service_execution_time == obj2.average_service_execution_time
-          && obj1.average_service_check_interval == obj2.average_service_check_interval
-          && obj1.average_host_check_interval == obj2.average_host_check_interval
-          && obj1.average_service_inter_check_delay == obj2.average_service_inter_check_delay
-          && obj1.average_host_inter_check_delay == obj2.average_host_inter_check_delay
-          && obj1.service_inter_check_delay == obj2.service_inter_check_delay
-          && obj1.host_inter_check_delay == obj2.host_inter_check_delay
-          && obj1.service_interleave_factor == obj2.service_interleave_factor
-          && obj1.max_service_check_spread == obj2.max_service_check_spread
-          && obj1.max_host_check_spread == obj2.max_host_check_spread
-          && obj1.first_service_check == obj2.first_service_check
-          && obj1.last_service_check == obj2.last_service_check
-          && obj1.first_host_check == obj2.first_host_check
-          && obj1.last_host_check == obj2.last_host_check);
+bool operator==(sched_info const& obj1, sched_info const& obj2) throw() {
+  return (
+      obj1.total_services == obj2.total_services &&
+      obj1.total_scheduled_services == obj2.total_scheduled_services &&
+      obj1.total_hosts == obj2.total_hosts &&
+      obj1.total_scheduled_hosts == obj2.total_scheduled_hosts &&
+      obj1.average_services_per_host == obj2.average_services_per_host &&
+      obj1.average_scheduled_services_per_host ==
+          obj2.average_scheduled_services_per_host &&
+      obj1.service_check_interval_total == obj2.service_check_interval_total &&
+      obj1.host_check_interval_total == obj2.host_check_interval_total &&
+      obj1.average_service_execution_time ==
+          obj2.average_service_execution_time &&
+      obj1.average_service_check_interval ==
+          obj2.average_service_check_interval &&
+      obj1.average_host_check_interval == obj2.average_host_check_interval &&
+      obj1.average_service_inter_check_delay ==
+          obj2.average_service_inter_check_delay &&
+      obj1.average_host_inter_check_delay ==
+          obj2.average_host_inter_check_delay &&
+      obj1.service_inter_check_delay == obj2.service_inter_check_delay &&
+      obj1.host_inter_check_delay == obj2.host_inter_check_delay &&
+      obj1.service_interleave_factor == obj2.service_interleave_factor &&
+      obj1.max_service_check_spread == obj2.max_service_check_spread &&
+      obj1.max_host_check_spread == obj2.max_host_check_spread &&
+      obj1.first_service_check == obj2.first_service_check &&
+      obj1.last_service_check == obj2.last_service_check &&
+      obj1.first_host_check == obj2.first_host_check &&
+      obj1.last_host_check == obj2.last_host_check);
 }
 
 /**
@@ -421,9 +423,7 @@ bool operator==(
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool operator!=(
-       sched_info const& obj1,
-       sched_info const& obj2) throw () {
+bool operator!=(sched_info const& obj1, sched_info const& obj2) throw() {
   return (!operator==(obj1, obj2));
 }
 
@@ -437,28 +437,72 @@ bool operator!=(
  */
 std::ostream& operator<<(std::ostream& os, sched_info const& obj) {
   os << "scheduling_info {\n"
-    "  total_services:                      " << obj.total_services << "\n"
-    "  total_scheduled_services:            " << obj.total_scheduled_services << "\n"
-    "  total_hosts:                         " << obj.total_hosts << "\n"
-    "  total_scheduled_hosts:               " << obj.total_scheduled_hosts << "\n"
-    "  average_services_per_host:           " << obj.average_services_per_host << "\n"
-    "  average_scheduled_services_per_host: " << obj.average_scheduled_services_per_host << "\n"
-    "  service_check_interval_total:        " << obj.service_check_interval_total << "\n"
-    "  host_check_interval_total:           " << obj.host_check_interval_total << "\n"
-    "  average_service_execution_time:      " << obj.average_service_execution_time << "\n"
-    "  average_service_check_interval:      " << obj.average_service_check_interval << "\n"
-    "  average_host_check_interval:         " << obj.average_host_check_interval << "\n"
-    "  average_service_inter_check_delay:   " << obj.average_service_inter_check_delay << "\n"
-    "  average_host_inter_check_delay:      " << obj.average_host_inter_check_delay << "\n"
-    "  service_inter_check_delay:           " << obj.service_inter_check_delay << "\n"
-    "  host_inter_check_delay:              " << obj.host_inter_check_delay << "\n"
-    "  service_interleave_factor:           " << obj.service_interleave_factor << "\n"
-    "  max_service_check_spread:            " << obj.max_service_check_spread << "\n"
-    "  max_host_check_spread:               " << obj.max_host_check_spread << "\n"
-    "  first_service_check:                 " << string::ctime(obj.first_service_check) << "\n"
-    "  last_service_check:                  " << string::ctime(obj.last_service_check) << "\n"
-    "  first_host_check:                    " << string::ctime(obj.first_host_check) << "\n"
-    "  last_host_check:                     " << string::ctime(obj.last_host_check) << "\n"
-    "}\n";
+        "  total_services:                      "
+     << obj.total_services
+     << "\n"
+        "  total_scheduled_services:            "
+     << obj.total_scheduled_services
+     << "\n"
+        "  total_hosts:                         "
+     << obj.total_hosts
+     << "\n"
+        "  total_scheduled_hosts:               "
+     << obj.total_scheduled_hosts
+     << "\n"
+        "  average_services_per_host:           "
+     << obj.average_services_per_host
+     << "\n"
+        "  average_scheduled_services_per_host: "
+     << obj.average_scheduled_services_per_host
+     << "\n"
+        "  service_check_interval_total:        "
+     << obj.service_check_interval_total
+     << "\n"
+        "  host_check_interval_total:           "
+     << obj.host_check_interval_total
+     << "\n"
+        "  average_service_execution_time:      "
+     << obj.average_service_execution_time
+     << "\n"
+        "  average_service_check_interval:      "
+     << obj.average_service_check_interval
+     << "\n"
+        "  average_host_check_interval:         "
+     << obj.average_host_check_interval
+     << "\n"
+        "  average_service_inter_check_delay:   "
+     << obj.average_service_inter_check_delay
+     << "\n"
+        "  average_host_inter_check_delay:      "
+     << obj.average_host_inter_check_delay
+     << "\n"
+        "  service_inter_check_delay:           "
+     << obj.service_inter_check_delay
+     << "\n"
+        "  host_inter_check_delay:              "
+     << obj.host_inter_check_delay
+     << "\n"
+        "  service_interleave_factor:           "
+     << obj.service_interleave_factor
+     << "\n"
+        "  max_service_check_spread:            "
+     << obj.max_service_check_spread
+     << "\n"
+        "  max_host_check_spread:               "
+     << obj.max_host_check_spread
+     << "\n"
+        "  first_service_check:                 "
+     << string::ctime(obj.first_service_check)
+     << "\n"
+        "  last_service_check:                  "
+     << string::ctime(obj.last_service_check)
+     << "\n"
+        "  first_host_check:                    "
+     << string::ctime(obj.first_host_check)
+     << "\n"
+        "  last_host_check:                     "
+     << string::ctime(obj.last_host_check)
+     << "\n"
+        "}\n";
   return (os);
 }

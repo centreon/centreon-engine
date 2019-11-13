@@ -18,19 +18,19 @@
 */
 
 #ifndef CCE_MODULES_EXTERNAL_COMMANDS_INTERNAL_HH
-#  define CCE_MODULES_EXTERNAL_COMMANDS_INTERNAL_HH
+#define CCE_MODULES_EXTERNAL_COMMANDS_INTERNAL_HH
 
-#  include "com/centreon/engine/modules/external_commands/processing.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/modules/external_commands/processing.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace             modules {
-  namespace           external_commands {
-    extern processing gl_processor;
-  }
+namespace modules {
+namespace external_commands {
+extern processing gl_processor;
 }
+}  // namespace modules
 
 CCE_END()
 
-#endif // !CCE_MODULES_EXTERNAL_COMMANDS_INTERNAL_HH
+#endif  // !CCE_MODULES_EXTERNAL_COMMANDS_INTERNAL_HH

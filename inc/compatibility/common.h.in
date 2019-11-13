@@ -20,57 +20,56 @@
 */
 
 #ifndef CCE_COMPATIBILITY_COMMON_H
-#  define CCE_COMPATIBILITY_COMMON_H
+#define CCE_COMPATIBILITY_COMMON_H
 
-#  include "com/centreon/engine/common.hh"
-#  include "shared.h"
+#include "com/centreon/engine/common.hh"
+#include "shared.h"
 
-#  define PROGRAM_NAME "Centreon Engine"
-#  define PROGRAM_NAME_UC "CENTREON ENGINE"
-#  define PROGRAM_NAME_LC "centreon engine"
-#  define PROGRAM_VERSION "@CENTREON_ENGINE_VERSION@"
-#  define PROGRAM_MODIFICATION_DATE "01-01-1970"
+#define PROGRAM_NAME "Centreon Engine"
+#define PROGRAM_NAME_UC "CENTREON ENGINE"
+#define PROGRAM_NAME_LC "centreon engine"
+#define PROGRAM_VERSION "@CENTREON_ENGINE_VERSION@"
+#define PROGRAM_MODIFICATION_DATE "01-01-1970"
 
 /* Host config file reading options. */
-#  define READ_HOSTS                (1 << 0)
-#  define READ_HOSTGROUPS           (1 << 1)
-#  define READ_CONTACTS             (1 << 2)
-#  define READ_CONTACTGROUPS        (1 << 3)
-#  define READ_SERVICES             (1 << 4)
-#  define READ_COMMANDS             (1 << 5)
-#  define READ_TIMEPERIODS          (1 << 6)
-#  define READ_SERVICEESCALATIONS   (1 << 7)
-#  define READ_HOSTGROUPESCALATIONS (1 << 8)
-#  define READ_SERVICEDEPENDENCIES  (1 << 9)
-#  define READ_HOSTDEPENDENCIES     (1 << 10)
-#  define READ_HOSTESCALATIONS      (1 << 11)
-#  define READ_HOSTEXTINFO          (1 << 12)
-#  define READ_SERVICEEXTINFO       (1 << 13)
-#  define READ_SERVICEGROUPS        (1 << 14)
-#  define READ_CONNECTOR            (1 << 15)
-#  define READ_ALL_OBJECT_DATA      (~0)
+#define READ_HOSTS (1 << 0)
+#define READ_HOSTGROUPS (1 << 1)
+#define READ_CONTACTS (1 << 2)
+#define READ_CONTACTGROUPS (1 << 3)
+#define READ_SERVICES (1 << 4)
+#define READ_COMMANDS (1 << 5)
+#define READ_TIMEPERIODS (1 << 6)
+#define READ_SERVICEESCALATIONS (1 << 7)
+#define READ_HOSTGROUPESCALATIONS (1 << 8)
+#define READ_SERVICEDEPENDENCIES (1 << 9)
+#define READ_HOSTDEPENDENCIES (1 << 10)
+#define READ_HOSTESCALATIONS (1 << 11)
+#define READ_HOSTEXTINFO (1 << 12)
+#define READ_SERVICEEXTINFO (1 << 13)
+#define READ_SERVICEGROUPS (1 << 14)
+#define READ_CONNECTOR (1 << 15)
+#define READ_ALL_OBJECT_DATA (~0)
 
-
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 char const* get_program_modification_date();
 char const* get_program_version();
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#  ifndef my_free
-#    include <stdlib.h>
-#    define my_free(ptr)      \
-              do {            \
-                if (ptr) {    \
-                  free(ptr);  \
-                  ptr = NULL; \
-                }             \
-              } while (0)
-#  endif // !my_free
+#ifndef my_free
+#include <stdlib.h>
+#define my_free(ptr) \
+  do {               \
+    if (ptr) {       \
+      free(ptr);     \
+      ptr = NULL;    \
+    }                \
+  } while (0)
+#endif  // !my_free
 
-#endif // !CCE_COMPATIBILITY_COMMON_H
+#endif  // !CCE_COMPATIBILITY_COMMON_H

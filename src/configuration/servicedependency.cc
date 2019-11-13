@@ -32,53 +32,72 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<servicedependency, type, &servicedependency::method>::generic
 
-std::unordered_map<std::string, servicedependency::setter_func> const servicedependency::_setters{
-  { "servicegroup",                  SETTER(std::string const&, _set_servicegroups) },
-  { "servicegroups",                 SETTER(std::string const&, _set_servicegroups) },
-  { "servicegroup_name",             SETTER(std::string const&, _set_servicegroups) },
-  { "hostgroup",                     SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroups",                    SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",                SETTER(std::string const&, _set_hostgroups) },
-  { "host",                          SETTER(std::string const&, _set_hosts) },
-  { "host_name",                     SETTER(std::string const&, _set_hosts) },
-  { "master_host",                   SETTER(std::string const&, _set_hosts) },
-  { "master_host_name",              SETTER(std::string const&, _set_hosts) },
-  { "description",                   SETTER(std::string const&, _set_service_description) },
-  { "service_description",           SETTER(std::string const&, _set_service_description) },
-  { "master_description",            SETTER(std::string const&, _set_service_description) },
-  { "master_service_description",    SETTER(std::string const&, _set_service_description) },
-  { "dependent_servicegroup",        SETTER(std::string const&, _set_dependent_servicegroups) },
-  { "dependent_servicegroups",       SETTER(std::string const&, _set_dependent_servicegroups) },
-  { "dependent_servicegroup_name",   SETTER(std::string const&, _set_dependent_servicegroups) },
-  { "dependent_hostgroup",           SETTER(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_hostgroups",          SETTER(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_hostgroup_name",      SETTER(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_host",                SETTER(std::string const&, _set_dependent_hosts) },
-  { "dependent_host_name",           SETTER(std::string const&, _set_dependent_hosts) },
-  { "dependent_description",         SETTER(std::string const&, _set_dependent_service_description) },
-  { "dependent_service_description", SETTER(std::string const&, _set_dependent_service_description) },
-  { "dependency_period",             SETTER(std::string const&, _set_dependency_period) },
-  { "inherits_parent",               SETTER(bool, _set_inherits_parent) },
-  { "execution_failure_options",     SETTER(std::string const&, _set_execution_failure_options) },
-  { "execution_failure_criteria",    SETTER(std::string const&, _set_execution_failure_options) },
-  { "notification_failure_options",  SETTER(std::string const&, _set_notification_failure_options) },
-  { "notification_failure_criteria", SETTER(std::string const&, _set_notification_failure_options) }
-};
+std::unordered_map<std::string, servicedependency::setter_func> const
+    servicedependency::_setters{
+        {"servicegroup", SETTER(std::string const&, _set_servicegroups)},
+        {"servicegroups", SETTER(std::string const&, _set_servicegroups)},
+        {"servicegroup_name", SETTER(std::string const&, _set_servicegroups)},
+        {"hostgroup", SETTER(std::string const&, _set_hostgroups)},
+        {"hostgroups", SETTER(std::string const&, _set_hostgroups)},
+        {"hostgroup_name", SETTER(std::string const&, _set_hostgroups)},
+        {"host", SETTER(std::string const&, _set_hosts)},
+        {"host_name", SETTER(std::string const&, _set_hosts)},
+        {"master_host", SETTER(std::string const&, _set_hosts)},
+        {"master_host_name", SETTER(std::string const&, _set_hosts)},
+        {"description", SETTER(std::string const&, _set_service_description)},
+        {"service_description",
+         SETTER(std::string const&, _set_service_description)},
+        {"master_description",
+         SETTER(std::string const&, _set_service_description)},
+        {"master_service_description",
+         SETTER(std::string const&, _set_service_description)},
+        {"dependent_servicegroup",
+         SETTER(std::string const&, _set_dependent_servicegroups)},
+        {"dependent_servicegroups",
+         SETTER(std::string const&, _set_dependent_servicegroups)},
+        {"dependent_servicegroup_name",
+         SETTER(std::string const&, _set_dependent_servicegroups)},
+        {"dependent_hostgroup",
+         SETTER(std::string const&, _set_dependent_hostgroups)},
+        {"dependent_hostgroups",
+         SETTER(std::string const&, _set_dependent_hostgroups)},
+        {"dependent_hostgroup_name",
+         SETTER(std::string const&, _set_dependent_hostgroups)},
+        {"dependent_host", SETTER(std::string const&, _set_dependent_hosts)},
+        {"dependent_host_name",
+         SETTER(std::string const&, _set_dependent_hosts)},
+        {"dependent_description",
+         SETTER(std::string const&, _set_dependent_service_description)},
+        {"dependent_service_description",
+         SETTER(std::string const&, _set_dependent_service_description)},
+        {"dependency_period",
+         SETTER(std::string const&, _set_dependency_period)},
+        {"inherits_parent", SETTER(bool, _set_inherits_parent)},
+        {"execution_failure_options",
+         SETTER(std::string const&, _set_execution_failure_options)},
+        {"execution_failure_criteria",
+         SETTER(std::string const&, _set_execution_failure_options)},
+        {"notification_failure_options",
+         SETTER(std::string const&, _set_notification_failure_options)},
+        {"notification_failure_criteria",
+         SETTER(std::string const&, _set_notification_failure_options)}};
 
 // Default values.
-static unsigned short const default_execution_failure_options(servicedependency::none);
-static bool const           default_inherits_parent(false);
-static unsigned short const default_notification_failure_options(servicedependency::none);
+static unsigned short const default_execution_failure_options(
+    servicedependency::none);
+static bool const default_inherits_parent(false);
+static unsigned short const default_notification_failure_options(
+    servicedependency::none);
 
 /**
  *  Default constructor.
  */
 servicedependency::servicedependency()
-  : object(object::servicedependency),
-    _dependency_type(unknown_type),
-    _execution_failure_options(default_execution_failure_options),
-    _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options) {}
+    : object(object::servicedependency),
+      _dependency_type(unknown_type),
+      _execution_failure_options(default_execution_failure_options),
+      _inherits_parent(default_inherits_parent),
+      _notification_failure_options(default_notification_failure_options) {}
 
 /**
  *  Copy constructor.
@@ -86,14 +105,14 @@ servicedependency::servicedependency()
  *  @param[in] right The servicedependency to copy.
  */
 servicedependency::servicedependency(servicedependency const& right)
-  : object(right) {
+    : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-servicedependency::~servicedependency() throw () {}
+servicedependency::~servicedependency() throw() {}
 
 /**
  *  Copy constructor.
@@ -102,7 +121,8 @@ servicedependency::~servicedependency() throw () {}
  *
  *  @return This servicedependency.
  */
-servicedependency& servicedependency::operator=(servicedependency const& right) {
+servicedependency& servicedependency::operator=(
+    servicedependency const& right) {
   if (this != &right) {
     object::operator=(right);
     _dependency_period = right._dependency_period;
@@ -129,21 +149,22 @@ servicedependency& servicedependency::operator=(servicedependency const& right) 
  *
  *  @return True if is the same servicedependency, otherwise false.
  */
-bool servicedependency::operator==(servicedependency const& right) const throw () {
-  return (object::operator==(right)
-          && _dependency_period == right._dependency_period
-          && _dependency_type == right._dependency_type
-          && _dependent_hostgroups == right._dependent_hostgroups
-          && _dependent_hosts == right._dependent_hosts
-          && _dependent_servicegroups == right._dependent_servicegroups
-          && _dependent_service_description == right._dependent_service_description
-          && _execution_failure_options == right._execution_failure_options
-          && _inherits_parent == right._inherits_parent
-          && _hostgroups == right._hostgroups
-          && _hosts == right._hosts
-          && _notification_failure_options == right._notification_failure_options
-          && _servicegroups == right._servicegroups
-          && _service_description == right._service_description);
+bool servicedependency::operator==(servicedependency const& right) const
+    throw() {
+  return (
+      object::operator==(right) &&
+      _dependency_period == right._dependency_period &&
+      _dependency_type == right._dependency_type &&
+      _dependent_hostgroups == right._dependent_hostgroups &&
+      _dependent_hosts == right._dependent_hosts &&
+      _dependent_servicegroups == right._dependent_servicegroups &&
+      _dependent_service_description == right._dependent_service_description &&
+      _execution_failure_options == right._execution_failure_options &&
+      _inherits_parent == right._inherits_parent &&
+      _hostgroups == right._hostgroups && _hosts == right._hosts &&
+      _notification_failure_options == right._notification_failure_options &&
+      _servicegroups == right._servicegroups &&
+      _service_description == right._service_description);
 }
 
 /**
@@ -153,7 +174,8 @@ bool servicedependency::operator==(servicedependency const& right) const throw (
  *
  *  @return True if is not the same servicedependency, otherwise false.
  */
-bool servicedependency::operator!=(servicedependency const& right) const throw () {
+bool servicedependency::operator!=(servicedependency const& right) const
+    throw() {
   return !operator==(right);
 }
 
@@ -167,10 +189,10 @@ bool servicedependency::operator!=(servicedependency const& right) const throw (
 bool servicedependency::operator<(servicedependency const& right) const {
   if (_dependent_hosts != right._dependent_hosts)
     return _dependent_hosts < right._dependent_hosts;
-  else if (_dependent_service_description
-           != right._dependent_service_description)
-    return (_dependent_service_description
-            < right._dependent_service_description);
+  else if (_dependent_service_description !=
+           right._dependent_service_description)
+    return (_dependent_service_description <
+            right._dependent_service_description);
   else if (_hosts != right._hosts)
     return _hosts < right._hosts;
   else if (_service_description != right._service_description)
@@ -187,14 +209,11 @@ bool servicedependency::operator<(servicedependency const& right) const {
     return _dependency_type < right._dependency_type;
   else if (_dependency_period != right._dependency_period)
     return _dependency_period < right._dependency_period;
-  else if (_execution_failure_options
-           != right._execution_failure_options)
-    return (_execution_failure_options
-            < right._execution_failure_options);
+  else if (_execution_failure_options != right._execution_failure_options)
+    return (_execution_failure_options < right._execution_failure_options);
   else if (_inherits_parent != right._inherits_parent)
     return _inherits_parent < right._inherits_parent;
-  return (_notification_failure_options
-          < right._notification_failure_options);
+  return (_notification_failure_options < right._notification_failure_options);
 }
 
 /**
@@ -206,29 +225,31 @@ void servicedependency::check_validity() const {
   // Check base service(s).
   if (_servicegroups->empty()) {
     if (_service_description->empty())
-      throw (engine_error() << "Service dependency is not attached to "
-             << "any service or service group (properties "
-             << "'service_description' or 'servicegroup_name', "
-             << "respectively)");
+      throw(engine_error() << "Service dependency is not attached to "
+                           << "any service or service group (properties "
+                           << "'service_description' or 'servicegroup_name', "
+                           << "respectively)");
     else if (_hosts->empty() && _hostgroups->empty())
-      throw (engine_error() << "Service dependency is not attached to "
-             << "any host or host group (properties 'host_name' or "
-             << "'hostgroup_name', respectively)");
+      throw(
+          engine_error() << "Service dependency is not attached to "
+                         << "any host or host group (properties 'host_name' or "
+                         << "'hostgroup_name', respectively)");
   }
 
   // Check dependent service(s).
   if (_dependent_servicegroups->empty()) {
     if (_dependent_service_description->empty())
-      throw (engine_error() << "Service dependency is not attached to "
-             << "any dependent service or dependent service group "
-             << "(properties 'dependent_service_description' or "
-             << "'dependent_servicegroup_name', respectively)");
-    else if (_dependent_hosts->empty()
-             && _dependent_hostgroups->empty())
-      throw (engine_error() << "Service dependency is not attached to "
-             << "any dependent host or dependent host group (properties "
-             << "'dependent_host_name' or 'dependent_hostgroup_name', "
-             << "respectively)");
+      throw(
+          engine_error() << "Service dependency is not attached to "
+                         << "any dependent service or dependent service group "
+                         << "(properties 'dependent_service_description' or "
+                         << "'dependent_servicegroup_name', respectively)");
+    else if (_dependent_hosts->empty() && _dependent_hostgroups->empty())
+      throw(engine_error()
+            << "Service dependency is not attached to "
+            << "any dependent host or dependent host group (properties "
+            << "'dependent_host_name' or 'dependent_hostgroup_name', "
+            << "respectively)");
   }
 
   // With no execution or failure options this dependency is useless.
@@ -237,8 +258,7 @@ void servicedependency::check_validity() const {
     std::ostringstream msg;
     msg << "Warning: Ignoring lame service dependency of ";
     if (!_dependent_servicegroups->empty())
-      msg << "service group '" << _dependent_servicegroups->front()
-          << "'";
+      msg << "service group '" << _dependent_servicegroups->front() << "'";
     else {
       msg << "service '" << _dependent_service_description->front() << "' of ";
       if (!_dependent_hostgroups->empty())
@@ -259,7 +279,7 @@ void servicedependency::check_validity() const {
     logger(log_config_warning, basic) << msg.str();
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -267,7 +287,7 @@ void servicedependency::check_validity() const {
  *
  *  @return This object.
  */
-servicedependency::key_type const& servicedependency::key() const throw () {
+servicedependency::key_type const& servicedependency::key() const throw() {
   return *this;
 }
 
@@ -278,8 +298,8 @@ servicedependency::key_type const& servicedependency::key() const throw () {
  */
 void servicedependency::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "Cannot merge service dependency with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge service dependency with '"
+                         << obj.type() << "'");
   servicedependency const& tmpl(static_cast<servicedependency const&>(obj));
 
   MRG_DEFAULT(_dependency_period);
@@ -305,8 +325,9 @@ void servicedependency::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool servicedependency::parse(char const* key, char const* value) {
-  std::unordered_map<std::string, servicedependency::setter_func>::const_iterator
-    it{_setters.find(key)};
+  std::unordered_map<std::string,
+                     servicedependency::setter_func>::const_iterator it{
+      _setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -319,7 +340,7 @@ bool servicedependency::parse(char const* key, char const* value) {
  */
 void servicedependency::dependency_period(std::string const& period) {
   _dependency_period = period;
-  return ;
+  return;
 }
 
 /**
@@ -327,7 +348,7 @@ void servicedependency::dependency_period(std::string const& period) {
  *
  *  @return The dependency_period.
  */
-std::string const& servicedependency::dependency_period() const throw () {
+std::string const& servicedependency::dependency_period() const throw() {
   return _dependency_period;
 }
 
@@ -337,9 +358,9 @@ std::string const& servicedependency::dependency_period() const throw () {
  *  @param[in] type Dependency type.
  */
 void servicedependency::dependency_type(
-                          servicedependency::dependency_kind type) throw () {
+    servicedependency::dependency_kind type) throw() {
   _dependency_type = type;
-  return ;
+  return;
 }
 
 /**
@@ -347,7 +368,8 @@ void servicedependency::dependency_type(
  *
  *  @return Dependency type.
  */
-servicedependency::dependency_kind servicedependency::dependency_type() const throw () {
+servicedependency::dependency_kind servicedependency::dependency_type() const
+    throw() {
   return _dependency_type;
 }
 
@@ -356,7 +378,7 @@ servicedependency::dependency_kind servicedependency::dependency_type() const th
  *
  *  @return Dependent host groups.
  */
-list_string& servicedependency::dependent_hostgroups() throw () {
+list_string& servicedependency::dependent_hostgroups() throw() {
   return *_dependent_hostgroups;
 }
 
@@ -365,7 +387,7 @@ list_string& servicedependency::dependent_hostgroups() throw () {
  *
  *  @return The dependent_hostgroup.
  */
-list_string const& servicedependency::dependent_hostgroups() const throw () {
+list_string const& servicedependency::dependent_hostgroups() const throw() {
   return *_dependent_hostgroups;
 }
 
@@ -374,7 +396,7 @@ list_string const& servicedependency::dependent_hostgroups() const throw () {
  *
  *  @return Dependent hosts.
  */
-list_string& servicedependency::dependent_hosts() throw () {
+list_string& servicedependency::dependent_hosts() throw() {
   return *_dependent_hosts;
 }
 
@@ -383,7 +405,7 @@ list_string& servicedependency::dependent_hosts() throw () {
  *
  *  @return The dependent_hosts.
  */
-list_string const& servicedependency::dependent_hosts() const throw () {
+list_string const& servicedependency::dependent_hosts() const throw() {
   return *_dependent_hosts;
 }
 
@@ -392,7 +414,7 @@ list_string const& servicedependency::dependent_hosts() const throw () {
  *
  *  @return Dependent service groups.
  */
-list_string& servicedependency::dependent_servicegroups() throw () {
+list_string& servicedependency::dependent_servicegroups() throw() {
   return *_dependent_servicegroups;
 }
 
@@ -401,7 +423,7 @@ list_string& servicedependency::dependent_servicegroups() throw () {
  *
  *  @return The dependent_servicegroup.
  */
-list_string const& servicedependency::dependent_servicegroups() const throw () {
+list_string const& servicedependency::dependent_servicegroups() const throw() {
   return *_dependent_servicegroups;
 }
 
@@ -410,7 +432,7 @@ list_string const& servicedependency::dependent_servicegroups() const throw () {
  *
  *  @return Dependent service description.
  */
-list_string& servicedependency::dependent_service_description() throw () {
+list_string& servicedependency::dependent_service_description() throw() {
   return *_dependent_service_description;
 }
 
@@ -419,7 +441,8 @@ list_string& servicedependency::dependent_service_description() throw () {
  *
  *  @return The dependent_service_description.
  */
-list_string const& servicedependency::dependent_service_description() const throw () {
+list_string const& servicedependency::dependent_service_description() const
+    throw() {
   return *_dependent_service_description;
 }
 
@@ -429,9 +452,9 @@ list_string const& servicedependency::dependent_service_description() const thro
  *  @param[in] options New execution failure options.
  */
 void servicedependency::execution_failure_options(
-                          unsigned int options) throw () {
+    unsigned int options) throw() {
   _execution_failure_options = options;
-  return ;
+  return;
 }
 
 /**
@@ -439,7 +462,7 @@ void servicedependency::execution_failure_options(
  *
  *  @return The execution_failure_options.
  */
-unsigned int servicedependency::execution_failure_options() const throw () {
+unsigned int servicedependency::execution_failure_options() const throw() {
   return _execution_failure_options;
 }
 
@@ -448,9 +471,9 @@ unsigned int servicedependency::execution_failure_options() const throw () {
  *
  *  @param[in] inherit Parent inheritance.
  */
-void servicedependency::inherits_parent(bool inherit) throw () {
+void servicedependency::inherits_parent(bool inherit) throw() {
   _inherits_parent = inherit;
-  return ;
+  return;
 }
 
 /**
@@ -458,7 +481,7 @@ void servicedependency::inherits_parent(bool inherit) throw () {
  *
  *  @return The inherits_parent.
  */
-bool servicedependency::inherits_parent() const throw () {
+bool servicedependency::inherits_parent() const throw() {
   return _inherits_parent;
 }
 
@@ -467,7 +490,7 @@ bool servicedependency::inherits_parent() const throw () {
  *
  *  @return Host groups.
  */
-list_string& servicedependency::hostgroups() throw () {
+list_string& servicedependency::hostgroups() throw() {
   return *_hostgroups;
 }
 
@@ -476,7 +499,7 @@ list_string& servicedependency::hostgroups() throw () {
  *
  *  @return The hostgroup.
  */
-list_string const& servicedependency::hostgroups() const throw () {
+list_string const& servicedependency::hostgroups() const throw() {
   return *_hostgroups;
 }
 
@@ -485,7 +508,7 @@ list_string const& servicedependency::hostgroups() const throw () {
  *
  *  @return Hosts.
  */
-list_string& servicedependency::hosts() throw () {
+list_string& servicedependency::hosts() throw() {
   return *_hosts;
 }
 
@@ -494,7 +517,7 @@ list_string& servicedependency::hosts() throw () {
  *
  *  @return The hosts.
  */
-list_string const& servicedependency::hosts() const throw () {
+list_string const& servicedependency::hosts() const throw() {
   return *_hosts;
 }
 
@@ -504,9 +527,9 @@ list_string const& servicedependency::hosts() const throw () {
  *  @param[in] options New notification failure options.
  */
 void servicedependency::notification_failure_options(
-                          unsigned int options) throw () {
+    unsigned int options) throw() {
   _notification_failure_options = options;
-  return ;
+  return;
 }
 
 /**
@@ -514,7 +537,7 @@ void servicedependency::notification_failure_options(
  *
  *  @return The notification_failure_options.
  */
-unsigned int servicedependency::notification_failure_options() const throw () {
+unsigned int servicedependency::notification_failure_options() const throw() {
   return _notification_failure_options;
 }
 
@@ -523,7 +546,7 @@ unsigned int servicedependency::notification_failure_options() const throw () {
  *
  *  @return Service groups.
  */
-list_string& servicedependency::servicegroups() throw () {
+list_string& servicedependency::servicegroups() throw() {
   return *_servicegroups;
 }
 
@@ -532,7 +555,7 @@ list_string& servicedependency::servicegroups() throw () {
  *
  *  @return The servicegroup.
  */
-list_string const& servicedependency::servicegroups() const throw () {
+list_string const& servicedependency::servicegroups() const throw() {
   return *_servicegroups;
 }
 
@@ -541,7 +564,7 @@ list_string const& servicedependency::servicegroups() const throw () {
  *
  *  @return Service description.
  */
-list_string& servicedependency::service_description() throw () {
+list_string& servicedependency::service_description() throw() {
   return *_service_description;
 }
 
@@ -550,10 +573,9 @@ list_string& servicedependency::service_description() throw () {
  *
  *  @return The service_description.
  */
-list_string const& servicedependency::service_description() const throw () {
+list_string const& servicedependency::service_description() const throw() {
   return *_service_description;
 }
-
 
 /**
  *  Set dependency_period value.
@@ -610,7 +632,8 @@ bool servicedependency::_set_dependent_servicegroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool servicedependency::_set_dependent_service_description(std::string const& value) {
+bool servicedependency::_set_dependent_service_description(
+    std::string const& value) {
   _dependent_service_description = value;
   return true;
 }
@@ -622,14 +645,13 @@ bool servicedependency::_set_dependent_service_description(std::string const& va
  *
  *  @return True on success, otherwise false.
  */
-bool servicedependency::_set_execution_failure_options(std::string const& value) {
+bool servicedependency::_set_execution_failure_options(
+    std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::iterator it(values.begin()), end(values.end());
+       it != end; ++it) {
     string::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;
@@ -695,14 +717,13 @@ bool servicedependency::_set_hosts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool servicedependency::_set_notification_failure_options(std::string const& value) {
+bool servicedependency::_set_notification_failure_options(
+    std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::iterator it(values.begin()), end(values.end());
+       it != end; ++it) {
     string::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;

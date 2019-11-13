@@ -20,8 +20,8 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 
 extern int config_warnings;
@@ -31,91 +31,102 @@ using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
-#define SETTER(type, method) \
-  &object::setter<host, type, &host::method>::generic
+#define SETTER(type, method) &object::setter<host, type, &host::method>::generic
 
 std::unordered_map<std::string, host::setter_func> const host::_setters{
-  { "host_name",                    SETTER(std::string const&, _set_host_name) },
-  { "host_id",                      SETTER(uint64_t, _set_host_id)},
-  { "_HOST_ID",                     SETTER(uint64_t, _set_host_id)},
-  { "display_name",                 SETTER(std::string const&, _set_display_name) },
-  { "alias",                        SETTER(std::string const&, _set_alias) },
-  { "acknowledgement_timeout",      SETTER(int, set_acknowledgement_timeout) },
-  { "address",                      SETTER(std::string const&, _set_address) },
-  { "parents",                      SETTER(std::string const&, _set_parents) },
-  { "host_groups",                  SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
-  { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
-  { "contacts",                     SETTER(std::string const&, _set_contacts) },
-  { "notification_period",          SETTER(std::string const&, _set_notification_period) },
-  { "check_command",                SETTER(std::string const&, _set_check_command) },
-  { "check_period",                 SETTER(std::string const&, _set_check_period) },
-  { "event_handler",                SETTER(std::string const&, _set_event_handler) },
-  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
-  { "notes",                        SETTER(std::string const&, _set_notes) },
-  { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
-  { "action_url",                   SETTER(std::string const&, _set_action_url) },
-  { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
-  { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
-  { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) },
-  { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
-  { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
-  { "initial_state",                SETTER(std::string const&, _set_initial_state) },
-  { "check_interval",               SETTER(unsigned int, _set_check_interval) },
-  { "normal_check_interval",        SETTER(unsigned int, _set_check_interval) },
-  { "retry_interval",               SETTER(unsigned int, _set_retry_interval) },
-  { "retry_check_interval",         SETTER(unsigned int, _set_retry_interval) },
-  { "recovery_notification_delay",  SETTER(unsigned int, _set_recovery_notification_delay) },
-  { "max_check_attempts",           SETTER(unsigned int, _set_max_check_attempts) },
-  { "checks_enabled",               SETTER(bool, _set_checks_active) },
-  { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
-  { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
-  { "event_handler_enabled",        SETTER(bool, _set_event_handler_enabled) },
-  { "check_freshness",              SETTER(bool, _set_check_freshness) },
-  { "freshness_threshold",          SETTER(unsigned int, _set_freshness_threshold) },
-  { "low_flap_threshold",           SETTER(unsigned int, _set_low_flap_threshold) },
-  { "high_flap_threshold",          SETTER(unsigned int, _set_high_flap_threshold) },
-  { "flap_detection_enabled",       SETTER(bool, _set_flap_detection_enabled) },
-  { "flap_detection_options",       SETTER(std::string const&, _set_flap_detection_options) },
-  { "notification_options",         SETTER(std::string const&, _set_notification_options) },
-  { "notifications_enabled",        SETTER(bool, _set_notifications_enabled) },
-  { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
-  { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
-  { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
-  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
-  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
-  { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
-  { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
-  { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
-  { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
-  { "timezone",                     SETTER(std::string const&, _set_timezone) }
-};
+    {"host_name", SETTER(std::string const&, _set_host_name)},
+    {"host_id", SETTER(uint64_t, _set_host_id)},
+    {"_HOST_ID", SETTER(uint64_t, _set_host_id)},
+    {"display_name", SETTER(std::string const&, _set_display_name)},
+    {"alias", SETTER(std::string const&, _set_alias)},
+    {"acknowledgement_timeout", SETTER(int, set_acknowledgement_timeout)},
+    {"address", SETTER(std::string const&, _set_address)},
+    {"parents", SETTER(std::string const&, _set_parents)},
+    {"host_groups", SETTER(std::string const&, _set_hostgroups)},
+    {"hostgroups", SETTER(std::string const&, _set_hostgroups)},
+    {"contact_groups", SETTER(std::string const&, _set_contactgroups)},
+    {"contacts", SETTER(std::string const&, _set_contacts)},
+    {"notification_period",
+     SETTER(std::string const&, _set_notification_period)},
+    {"check_command", SETTER(std::string const&, _set_check_command)},
+    {"check_period", SETTER(std::string const&, _set_check_period)},
+    {"event_handler", SETTER(std::string const&, _set_event_handler)},
+    {"failure_prediction_options",
+     SETTER(std::string const&, _set_failure_prediction_options)},
+    {"notes", SETTER(std::string const&, _set_notes)},
+    {"notes_url", SETTER(std::string const&, _set_notes_url)},
+    {"action_url", SETTER(std::string const&, _set_action_url)},
+    {"icon_image", SETTER(std::string const&, _set_icon_image)},
+    {"icon_image_alt", SETTER(std::string const&, _set_icon_image_alt)},
+    {"vrml_image", SETTER(std::string const&, _set_vrml_image)},
+    {"gd2_image", SETTER(std::string const&, _set_statusmap_image)},
+    {"statusmap_image", SETTER(std::string const&, _set_statusmap_image)},
+    {"initial_state", SETTER(std::string const&, _set_initial_state)},
+    {"check_interval", SETTER(unsigned int, _set_check_interval)},
+    {"normal_check_interval", SETTER(unsigned int, _set_check_interval)},
+    {"retry_interval", SETTER(unsigned int, _set_retry_interval)},
+    {"retry_check_interval", SETTER(unsigned int, _set_retry_interval)},
+    {"recovery_notification_delay",
+     SETTER(unsigned int, _set_recovery_notification_delay)},
+    {"max_check_attempts", SETTER(unsigned int, _set_max_check_attempts)},
+    {"checks_enabled", SETTER(bool, _set_checks_active)},
+    {"active_checks_enabled", SETTER(bool, _set_checks_active)},
+    {"passive_checks_enabled", SETTER(bool, _set_checks_passive)},
+    {"event_handler_enabled", SETTER(bool, _set_event_handler_enabled)},
+    {"check_freshness", SETTER(bool, _set_check_freshness)},
+    {"freshness_threshold", SETTER(unsigned int, _set_freshness_threshold)},
+    {"low_flap_threshold", SETTER(unsigned int, _set_low_flap_threshold)},
+    {"high_flap_threshold", SETTER(unsigned int, _set_high_flap_threshold)},
+    {"flap_detection_enabled", SETTER(bool, _set_flap_detection_enabled)},
+    {"flap_detection_options",
+     SETTER(std::string const&, _set_flap_detection_options)},
+    {"notification_options",
+     SETTER(std::string const&, _set_notification_options)},
+    {"notifications_enabled", SETTER(bool, _set_notifications_enabled)},
+    {"notification_interval", SETTER(unsigned int, _set_notification_interval)},
+    {"first_notification_delay",
+     SETTER(unsigned int, _set_first_notification_delay)},
+    {"stalking_options", SETTER(std::string const&, _set_stalking_options)},
+    {"process_perf_data", SETTER(bool, _set_process_perf_data)},
+    {"failure_prediction_enabled",
+     SETTER(bool, _set_failure_prediction_enabled)},
+    {"2d_coords", SETTER(std::string const&, _set_coords_2d)},
+    {"3d_coords", SETTER(std::string const&, _set_coords_3d)},
+    {"obsess_over_host", SETTER(bool, _set_obsess_over_host)},
+    {"retain_status_information", SETTER(bool, _set_retain_status_information)},
+    {"retain_nonstatus_information",
+     SETTER(bool, _set_retain_nonstatus_information)},
+    {"timezone", SETTER(std::string const&, _set_timezone)}};
 
 // Default values.
-static bool const           default_checks_active(true);
-static bool const           default_checks_passive(true);
-static bool const           default_check_freshness(false);
-static unsigned int const   default_check_interval(5);
-static point_2d const       default_coords_2d;
-static point_3d const       default_coords_3d;
-static bool const           default_event_handler_enabled(true);
-static unsigned int const   default_first_notification_delay(0);
-static bool const           default_flap_detection_enabled(true);
-static unsigned short const default_flap_detection_options(host::up | host::down | host::unreachable);
-static unsigned int const   default_freshness_threshold(0);
-static unsigned int const   default_high_flap_threshold(0);
+static bool const default_checks_active(true);
+static bool const default_checks_passive(true);
+static bool const default_check_freshness(false);
+static unsigned int const default_check_interval(5);
+static point_2d const default_coords_2d;
+static point_3d const default_coords_3d;
+static bool const default_event_handler_enabled(true);
+static unsigned int const default_first_notification_delay(0);
+static bool const default_flap_detection_enabled(true);
+static unsigned short const default_flap_detection_options(host::up |
+                                                           host::down |
+                                                           host::unreachable);
+static unsigned int const default_freshness_threshold(0);
+static unsigned int const default_high_flap_threshold(0);
 static unsigned short const default_initial_state(engine::host::state_up);
-static unsigned int const   default_low_flap_threshold(0);
-static unsigned int const   default_max_check_attempts(3);
-static bool const           default_notifications_enabled(true);
-static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(host::up | host::down | host::unreachable | host::flapping | host::downtime);
-static bool const           default_obsess_over_host(true);
-static bool const           default_process_perf_data(true);
-static bool const           default_retain_nonstatus_information(true);
-static bool const           default_retain_status_information(true);
-static unsigned int const   default_retry_interval(1);
+static unsigned int const default_low_flap_threshold(0);
+static unsigned int const default_max_check_attempts(3);
+static bool const default_notifications_enabled(true);
+static unsigned int const default_notification_interval(30);
+static unsigned short const default_notification_options(host::up | host::down |
+                                                         host::unreachable |
+                                                         host::flapping |
+                                                         host::downtime);
+static bool const default_obsess_over_host(true);
+static bool const default_process_perf_data(true);
+static bool const default_retain_nonstatus_information(true);
+static bool const default_retain_status_information(true);
+static unsigned int const default_retry_interval(1);
 static unsigned short const default_stalking_options(host::none);
 
 /**
@@ -124,33 +135,33 @@ static unsigned short const default_stalking_options(host::none);
  *  @param[in] key The object key.
  */
 host::host(host::key_type const& key)
-  : object(object::host),
-    _acknowledgement_timeout(0),
-    _checks_active(default_checks_active),
-    _checks_passive(default_checks_passive),
-    _check_freshness(default_check_freshness),
-    _check_interval(default_check_interval),
-    _event_handler_enabled(default_event_handler_enabled),
-    _first_notification_delay(default_first_notification_delay),
-    _flap_detection_enabled(default_flap_detection_enabled),
-    _flap_detection_options(default_flap_detection_options),
-    _freshness_threshold(default_freshness_threshold),
-    _high_flap_threshold(default_high_flap_threshold),
-    _host_id(key),
-    _host_name(""),
-    _initial_state(default_initial_state),
-    _low_flap_threshold(default_low_flap_threshold),
-    _max_check_attempts(default_max_check_attempts),
-    _notifications_enabled(default_notifications_enabled),
-    _notification_interval(default_notification_interval),
-    _notification_options(default_notification_options),
-    _obsess_over_host(default_obsess_over_host),
-    _process_perf_data(default_process_perf_data),
-    _retain_nonstatus_information(default_retain_nonstatus_information),
-    _retain_status_information(default_retain_status_information),
-    _retry_interval(default_retry_interval),
-    _recovery_notification_delay(0),
-    _stalking_options(default_stalking_options) {}
+    : object(object::host),
+      _acknowledgement_timeout(0),
+      _checks_active(default_checks_active),
+      _checks_passive(default_checks_passive),
+      _check_freshness(default_check_freshness),
+      _check_interval(default_check_interval),
+      _event_handler_enabled(default_event_handler_enabled),
+      _first_notification_delay(default_first_notification_delay),
+      _flap_detection_enabled(default_flap_detection_enabled),
+      _flap_detection_options(default_flap_detection_options),
+      _freshness_threshold(default_freshness_threshold),
+      _high_flap_threshold(default_high_flap_threshold),
+      _host_id(key),
+      _host_name(""),
+      _initial_state(default_initial_state),
+      _low_flap_threshold(default_low_flap_threshold),
+      _max_check_attempts(default_max_check_attempts),
+      _notifications_enabled(default_notifications_enabled),
+      _notification_interval(default_notification_interval),
+      _notification_options(default_notification_options),
+      _obsess_over_host(default_obsess_over_host),
+      _process_perf_data(default_process_perf_data),
+      _retain_nonstatus_information(default_retain_nonstatus_information),
+      _retain_status_information(default_retain_status_information),
+      _retry_interval(default_retry_interval),
+      _recovery_notification_delay(0),
+      _stalking_options(default_stalking_options) {}
 
 /**
  *  Copy constructor.
@@ -164,7 +175,7 @@ host::host(host const& other) : object(other) {
 /**
  *  Destructor.
  */
-host::~host() throw () {}
+host::~host() throw() {}
 
 /**
  *  Assignment operator.
@@ -235,56 +246,49 @@ host& host::operator=(host const& other) {
  *
  *  @return True if this object and other object are equal.
  */
-bool host::operator==(host const& other) const throw () {
-  return (object::operator==(other)
-          && _acknowledgement_timeout == other._acknowledgement_timeout
-          && _action_url == other._action_url
-          && _address == other._address
-          && _alias == other._alias
-          && _checks_active == other._checks_active
-          && _checks_passive == other._checks_passive
-          && _check_command == other._check_command
-          && _check_freshness == other._check_freshness
-          && _check_interval == other._check_interval
-          && _check_period == other._check_period
-          && _contactgroups == other._contactgroups
-          && _contacts == other._contacts
-          && _coords_2d == other._coords_2d
-          && _coords_3d == other._coords_3d
-          && std::operator==(_customvariables, other._customvariables)
-          && _display_name == other._display_name
-          && _event_handler == other._event_handler
-          && _event_handler_enabled == other._event_handler_enabled
-          && _first_notification_delay == other._first_notification_delay
-          && _flap_detection_enabled == other._flap_detection_enabled
-          && _flap_detection_options == other._flap_detection_options
-          && _freshness_threshold == other._freshness_threshold
-          && _high_flap_threshold == other._high_flap_threshold
-          && _hostgroups == other._hostgroups
-          && _host_id == other._host_id
-          && _host_name == other._host_name
-          && _icon_image == other._icon_image
-          && _icon_image_alt == other._icon_image_alt
-          && _initial_state == other._initial_state
-          && _low_flap_threshold == other._low_flap_threshold
-          && _max_check_attempts == other._max_check_attempts
-          && _notes == other._notes
-          && _notes_url == other._notes_url
-          && _notifications_enabled == other._notifications_enabled
-          && _notification_interval == other._notification_interval
-          && _notification_options == other._notification_options
-          && _notification_period == other._notification_period
-          && _obsess_over_host == other._obsess_over_host
-          && _parents == other._parents
-          && _process_perf_data == other._process_perf_data
-          && _retain_nonstatus_information == other._retain_nonstatus_information
-          && _retain_status_information == other._retain_status_information
-          && _retry_interval == other._retry_interval
-          && _recovery_notification_delay == other._recovery_notification_delay
-          && _stalking_options == other._stalking_options
-          && _statusmap_image == other._statusmap_image
-          && _timezone == other._timezone
-          && _vrml_image == other._vrml_image);
+bool host::operator==(host const& other) const throw() {
+  return (
+      object::operator==(other) &&
+      _acknowledgement_timeout == other._acknowledgement_timeout &&
+      _action_url == other._action_url && _address == other._address &&
+      _alias == other._alias && _checks_active == other._checks_active &&
+      _checks_passive == other._checks_passive &&
+      _check_command == other._check_command &&
+      _check_freshness == other._check_freshness &&
+      _check_interval == other._check_interval &&
+      _check_period == other._check_period &&
+      _contactgroups == other._contactgroups && _contacts == other._contacts &&
+      _coords_2d == other._coords_2d && _coords_3d == other._coords_3d &&
+      std::operator==(_customvariables, other._customvariables) &&
+      _display_name == other._display_name &&
+      _event_handler == other._event_handler &&
+      _event_handler_enabled == other._event_handler_enabled &&
+      _first_notification_delay == other._first_notification_delay &&
+      _flap_detection_enabled == other._flap_detection_enabled &&
+      _flap_detection_options == other._flap_detection_options &&
+      _freshness_threshold == other._freshness_threshold &&
+      _high_flap_threshold == other._high_flap_threshold &&
+      _hostgroups == other._hostgroups && _host_id == other._host_id &&
+      _host_name == other._host_name && _icon_image == other._icon_image &&
+      _icon_image_alt == other._icon_image_alt &&
+      _initial_state == other._initial_state &&
+      _low_flap_threshold == other._low_flap_threshold &&
+      _max_check_attempts == other._max_check_attempts &&
+      _notes == other._notes && _notes_url == other._notes_url &&
+      _notifications_enabled == other._notifications_enabled &&
+      _notification_interval == other._notification_interval &&
+      _notification_options == other._notification_options &&
+      _notification_period == other._notification_period &&
+      _obsess_over_host == other._obsess_over_host &&
+      _parents == other._parents &&
+      _process_perf_data == other._process_perf_data &&
+      _retain_nonstatus_information == other._retain_nonstatus_information &&
+      _retain_status_information == other._retain_status_information &&
+      _retry_interval == other._retry_interval &&
+      _recovery_notification_delay == other._recovery_notification_delay &&
+      _stalking_options == other._stalking_options &&
+      _statusmap_image == other._statusmap_image &&
+      _timezone == other._timezone && _vrml_image == other._vrml_image);
 }
 
 /**
@@ -294,7 +298,7 @@ bool host::operator==(host const& other) const throw () {
  *
  *  @return True if is not the same host, otherwise false.
  */
-bool host::operator!=(host const& other) const throw () {
+bool host::operator!=(host const& other) const throw() {
   return !operator==(other);
 }
 
@@ -305,7 +309,7 @@ bool host::operator!=(host const& other) const throw () {
  *
  *  @return True if this object is less than right.
  */
-bool host::operator<(host const& other) const throw () {
+bool host::operator<(host const& other) const throw() {
   // host_id has to be first in this operator.
   // The configuration diff mechanism relies on this.
   if (_host_id != other._host_id)
@@ -348,10 +352,8 @@ bool host::operator<(host const& other) const throw () {
     return _event_handler < other._event_handler;
   else if (_event_handler_enabled != other._event_handler_enabled)
     return _event_handler_enabled < other._event_handler_enabled;
-  else if (_first_notification_delay
-           != other._first_notification_delay)
-    return (_first_notification_delay
-            < other._first_notification_delay);
+  else if (_first_notification_delay != other._first_notification_delay)
+    return (_first_notification_delay < other._first_notification_delay);
   else if (_flap_detection_enabled != other._flap_detection_enabled)
     return _flap_detection_enabled < other._flap_detection_enabled;
   else if (_flap_detection_options != other._flap_detection_options)
@@ -390,20 +392,15 @@ bool host::operator<(host const& other) const throw () {
     return _parents < other._parents;
   else if (_process_perf_data != other._process_perf_data)
     return _process_perf_data < other._process_perf_data;
-  else if (_retain_nonstatus_information
-           != other._retain_nonstatus_information)
-    return (_retain_nonstatus_information
-            < other._retain_nonstatus_information);
-  else if (_retain_status_information
-           != other._retain_status_information)
-    return (_retain_status_information
-            < other._retain_status_information);
+  else if (_retain_nonstatus_information != other._retain_nonstatus_information)
+    return (_retain_nonstatus_information <
+            other._retain_nonstatus_information);
+  else if (_retain_status_information != other._retain_status_information)
+    return (_retain_status_information < other._retain_status_information);
   else if (_retry_interval != other._retry_interval)
     return _retry_interval < other._retry_interval;
-  else if (_recovery_notification_delay
-           != other._recovery_notification_delay)
-    return (_recovery_notification_delay
-            < other._recovery_notification_delay);
+  else if (_recovery_notification_delay != other._recovery_notification_delay)
+    return (_recovery_notification_delay < other._recovery_notification_delay);
   else if (_stalking_options != other._stalking_options)
     return _stalking_options < other._stalking_options;
   else if (_statusmap_image != other._statusmap_image)
@@ -420,11 +417,11 @@ bool host::operator<(host const& other) const throw () {
  */
 void host::check_validity() const {
   if (_host_name.empty())
-    throw (engine_error() << "Host has no name (property 'host_name')");
+    throw(engine_error() << "Host has no name (property 'host_name')");
   if (_address.empty())
-    throw (engine_error() << "Host '" << _host_name
-           << "' has no address (property 'address')");
-  return ;
+    throw(engine_error() << "Host '" << _host_name
+                         << "' has no address (property 'address')");
+  return;
 }
 
 /**
@@ -432,7 +429,7 @@ void host::check_validity() const {
  *
  *  @return Host name.
  */
-host::key_type host::key() const throw () {
+host::key_type host::key() const throw() {
   return _host_id;
 }
 
@@ -460,8 +457,7 @@ void host::merge(configuration::hostextinfo const& tmpl) {
  */
 void host::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "Cannot merge host with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge host with '" << obj.type() << "'");
   host const& tmpl(static_cast<host const&>(obj));
 
   MRG_OPTION(_acknowledgement_timeout);
@@ -522,8 +518,8 @@ void host::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool host::parse(char const* key, char const* value) {
-  std::unordered_map<std::string, host::setter_func>::const_iterator
-    it{_setters.find(key)};
+  std::unordered_map<std::string, host::setter_func>::const_iterator it{
+      _setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   if (key[0] == '_') {
@@ -543,7 +539,7 @@ bool host::parse(char const* key, char const* value) {
  *
  *  @return The action_url.
  */
-std::string const& host::action_url() const throw () {
+std::string const& host::action_url() const throw() {
   return _action_url;
 }
 
@@ -552,7 +548,7 @@ std::string const& host::action_url() const throw () {
  *
  *  @return The address.
  */
-std::string const& host::address() const throw () {
+std::string const& host::address() const throw() {
   return _address;
 }
 
@@ -561,7 +557,7 @@ std::string const& host::address() const throw () {
  *
  *  @return The alias.
  */
-std::string const& host::alias() const throw () {
+std::string const& host::alias() const throw() {
   return _alias;
 }
 
@@ -570,7 +566,7 @@ std::string const& host::alias() const throw () {
  *
  *  @return The checks_active.
  */
-bool host::checks_active() const throw () {
+bool host::checks_active() const throw() {
   return _checks_active;
 }
 
@@ -579,7 +575,7 @@ bool host::checks_active() const throw () {
  *
  *  @return The checks_passive.
  */
-bool host::checks_passive() const throw () {
+bool host::checks_passive() const throw() {
   return _checks_passive;
 }
 
@@ -588,7 +584,7 @@ bool host::checks_passive() const throw () {
  *
  *  @return The check_command.
  */
-std::string const& host::check_command() const throw () {
+std::string const& host::check_command() const throw() {
   return _check_command;
 }
 
@@ -597,7 +593,7 @@ std::string const& host::check_command() const throw () {
  *
  *  @return The check_freshness.
  */
-bool host::check_freshness() const throw () {
+bool host::check_freshness() const throw() {
   return _check_freshness;
 }
 
@@ -606,7 +602,7 @@ bool host::check_freshness() const throw () {
  *
  *  @return The check_interval.
  */
-unsigned int host::check_interval() const throw () {
+unsigned int host::check_interval() const throw() {
   return _check_interval;
 }
 
@@ -615,7 +611,7 @@ unsigned int host::check_interval() const throw () {
  *
  *  @return The check_period.
  */
-std::string const& host::check_period() const throw () {
+std::string const& host::check_period() const throw() {
   return _check_period;
 }
 
@@ -624,7 +620,7 @@ std::string const& host::check_period() const throw () {
  *
  *  @return The contactgroups.
  */
-set_string const& host::contactgroups() const throw () {
+set_string const& host::contactgroups() const throw() {
   return *_contactgroups;
 }
 
@@ -633,7 +629,7 @@ set_string const& host::contactgroups() const throw () {
  *
  *  @return The contacts.
  */
-set_string const& host::contacts() const throw () {
+set_string const& host::contacts() const throw() {
   return *_contacts;
 }
 
@@ -642,7 +638,7 @@ set_string const& host::contacts() const throw () {
  *
  *  @return The coords_2d.
  */
-point_2d const& host::coords_2d() const throw () {
+point_2d const& host::coords_2d() const throw() {
   return _coords_2d.get();
 }
 
@@ -651,7 +647,7 @@ point_2d const& host::coords_2d() const throw () {
  *
  *  @return The coords_3d.
  */
-point_3d const& host::coords_3d() const throw () {
+point_3d const& host::coords_3d() const throw() {
   return _coords_3d.get();
 }
 
@@ -660,7 +656,7 @@ point_3d const& host::coords_3d() const throw () {
  *
  *  @return The customvariables.
  */
-engine::map_customvar const& host::customvariables() const throw () {
+engine::map_customvar const& host::customvariables() const throw() {
   return _customvariables;
 }
 
@@ -669,7 +665,7 @@ engine::map_customvar const& host::customvariables() const throw () {
  *
  *  @return The customvariables.
  */
-engine::map_customvar& host::customvariables() throw () {
+engine::map_customvar& host::customvariables() throw() {
   return _customvariables;
 }
 
@@ -678,7 +674,7 @@ engine::map_customvar& host::customvariables() throw () {
  *
  *  @return The display_name.
  */
-std::string const& host::display_name() const throw () {
+std::string const& host::display_name() const throw() {
   return _display_name;
 }
 
@@ -687,7 +683,7 @@ std::string const& host::display_name() const throw () {
  *
  *  @return The event_handler.
  */
-std::string const& host::event_handler() const throw () {
+std::string const& host::event_handler() const throw() {
   return _event_handler;
 }
 
@@ -696,7 +692,7 @@ std::string const& host::event_handler() const throw () {
  *
  *  @return The event_handler_enabled.
  */
-bool host::event_handler_enabled() const throw () {
+bool host::event_handler_enabled() const throw() {
   return _event_handler_enabled;
 }
 
@@ -705,7 +701,7 @@ bool host::event_handler_enabled() const throw () {
  *
  *  @return The first_notification_delay.
  */
-unsigned int host::first_notification_delay() const throw () {
+unsigned int host::first_notification_delay() const throw() {
   return _first_notification_delay;
 }
 
@@ -714,7 +710,7 @@ unsigned int host::first_notification_delay() const throw () {
  *
  *  @return The flap_detection_enabled.
  */
-bool host::flap_detection_enabled() const throw () {
+bool host::flap_detection_enabled() const throw() {
   return _flap_detection_enabled;
 }
 
@@ -723,7 +719,7 @@ bool host::flap_detection_enabled() const throw () {
  *
  *  @return The flap_detection_options.
  */
-unsigned int host::flap_detection_options() const throw () {
+unsigned int host::flap_detection_options() const throw() {
   return _flap_detection_options;
 }
 
@@ -732,7 +728,7 @@ unsigned int host::flap_detection_options() const throw () {
  *
  *  @return The freshness_threshold.
  */
-unsigned int host::freshness_threshold() const throw () {
+unsigned int host::freshness_threshold() const throw() {
   return _freshness_threshold;
 }
 
@@ -741,7 +737,7 @@ unsigned int host::freshness_threshold() const throw () {
  *
  *  @return True if coords 2d exist, otherwise false.
  */
-bool host::have_coords_2d() const throw () {
+bool host::have_coords_2d() const throw() {
   return _coords_2d.is_set();
 }
 
@@ -750,7 +746,7 @@ bool host::have_coords_2d() const throw () {
  *
  *  @return True if coords 3d exist, otherwise false.
  */
-bool host::have_coords_3d() const throw () {
+bool host::have_coords_3d() const throw() {
   return _coords_3d.is_set();
 }
 
@@ -759,7 +755,7 @@ bool host::have_coords_3d() const throw () {
  *
  *  @return The high_flap_threshold.
  */
-unsigned int host::high_flap_threshold() const throw () {
+unsigned int host::high_flap_threshold() const throw() {
   return _high_flap_threshold;
 }
 
@@ -768,7 +764,7 @@ unsigned int host::high_flap_threshold() const throw () {
  *
  *  @return The host groups.
  */
-set_string& host::hostgroups() throw () {
+set_string& host::hostgroups() throw() {
   return *_hostgroups;
 }
 
@@ -777,7 +773,7 @@ set_string& host::hostgroups() throw () {
  *
  *  @return The hostgroups.
  */
-set_string const& host::hostgroups() const throw () {
+set_string const& host::hostgroups() const throw() {
   return *_hostgroups;
 }
 
@@ -795,7 +791,7 @@ uint64_t host::host_id() const throw() {
  *
  *  @return The host_name.
  */
-std::string const& host::host_name() const throw () {
+std::string const& host::host_name() const throw() {
   return _host_name;
 }
 
@@ -804,7 +800,7 @@ std::string const& host::host_name() const throw () {
  *
  *  @return The icon_image.
  */
-std::string const& host::icon_image() const throw () {
+std::string const& host::icon_image() const throw() {
   return _icon_image;
 }
 
@@ -813,7 +809,7 @@ std::string const& host::icon_image() const throw () {
  *
  *  @return The icon_image_alt.
  */
-std::string const& host::icon_image_alt() const throw () {
+std::string const& host::icon_image_alt() const throw() {
   return _icon_image_alt;
 }
 
@@ -822,7 +818,7 @@ std::string const& host::icon_image_alt() const throw () {
  *
  *  @return The initial_state.
  */
-unsigned int host::initial_state() const throw () {
+unsigned int host::initial_state() const throw() {
   return _initial_state;
 }
 
@@ -831,7 +827,7 @@ unsigned int host::initial_state() const throw () {
  *
  *  @return The low_flap_threshold.
  */
-unsigned int host::low_flap_threshold() const throw () {
+unsigned int host::low_flap_threshold() const throw() {
   return _low_flap_threshold;
 }
 
@@ -840,7 +836,7 @@ unsigned int host::low_flap_threshold() const throw () {
  *
  *  @return The max_check_attempts.
  */
-unsigned int host::max_check_attempts() const throw () {
+unsigned int host::max_check_attempts() const throw() {
   return _max_check_attempts;
 }
 
@@ -849,7 +845,7 @@ unsigned int host::max_check_attempts() const throw () {
  *
  *  @return The notes.
  */
-std::string const& host::notes() const throw () {
+std::string const& host::notes() const throw() {
   return _notes;
 }
 
@@ -858,7 +854,7 @@ std::string const& host::notes() const throw () {
  *
  *  @return The notes_url.
  */
-std::string const& host::notes_url() const throw () {
+std::string const& host::notes_url() const throw() {
   return _notes_url;
 }
 
@@ -867,7 +863,7 @@ std::string const& host::notes_url() const throw () {
  *
  *  @return The notifications_enabled.
  */
-bool host::notifications_enabled() const throw () {
+bool host::notifications_enabled() const throw() {
   return _notifications_enabled;
 }
 
@@ -876,7 +872,7 @@ bool host::notifications_enabled() const throw () {
  *
  *  @return The notification_interval.
  */
-unsigned int host::notification_interval() const throw () {
+unsigned int host::notification_interval() const throw() {
   return _notification_interval;
 }
 
@@ -885,7 +881,7 @@ unsigned int host::notification_interval() const throw () {
  *
  *  @return The notification_options.
  */
-unsigned int host::notification_options() const throw () {
+unsigned int host::notification_options() const throw() {
   return _notification_options;
 }
 
@@ -894,7 +890,7 @@ unsigned int host::notification_options() const throw () {
  *
  *  @return The notification_period.
  */
-std::string const& host::notification_period() const throw () {
+std::string const& host::notification_period() const throw() {
   return _notification_period;
 }
 
@@ -903,7 +899,7 @@ std::string const& host::notification_period() const throw () {
  *
  *  @return The obsess_over_host.
  */
-bool host::obsess_over_host() const throw () {
+bool host::obsess_over_host() const throw() {
   return _obsess_over_host;
 }
 
@@ -912,7 +908,7 @@ bool host::obsess_over_host() const throw () {
  *
  *  @return The parents.
  */
-set_string& host::parents() throw () {
+set_string& host::parents() throw() {
   return *_parents;
 }
 
@@ -921,7 +917,7 @@ set_string& host::parents() throw () {
  *
  *  @return The parents.
  */
-set_string const& host::parents() const throw () {
+set_string const& host::parents() const throw() {
   return *_parents;
 }
 
@@ -930,7 +926,7 @@ set_string const& host::parents() const throw () {
  *
  *  @return The process_perf_data.
  */
-bool host::process_perf_data() const throw () {
+bool host::process_perf_data() const throw() {
   return _process_perf_data;
 }
 
@@ -939,7 +935,7 @@ bool host::process_perf_data() const throw () {
  *
  *  @return The retain_nonstatus_information.
  */
-bool host::retain_nonstatus_information() const throw () {
+bool host::retain_nonstatus_information() const throw() {
   return _retain_nonstatus_information;
 }
 
@@ -948,7 +944,7 @@ bool host::retain_nonstatus_information() const throw () {
  *
  *  @return The retain_status_information.
  */
-bool host::retain_status_information() const throw () {
+bool host::retain_status_information() const throw() {
   return _retain_status_information;
 }
 
@@ -957,7 +953,7 @@ bool host::retain_status_information() const throw () {
  *
  *  @return The retry_interval.
  */
-unsigned int host::retry_interval() const throw () {
+unsigned int host::retry_interval() const throw() {
   return _retry_interval;
 }
 
@@ -975,7 +971,7 @@ unsigned int host::recovery_notification_delay() const throw() {
  *
  *  @return The stalking_options.
  */
-unsigned int host::stalking_options() const throw () {
+unsigned int host::stalking_options() const throw() {
   return _stalking_options;
 }
 
@@ -984,7 +980,7 @@ unsigned int host::stalking_options() const throw () {
  *
  *  @return The statusmap_image.
  */
-std::string const& host::statusmap_image() const throw () {
+std::string const& host::statusmap_image() const throw() {
   return _statusmap_image;
 }
 
@@ -993,7 +989,7 @@ std::string const& host::statusmap_image() const throw () {
  *
  *  @return The timezone.
  */
-std::string const& host::timezone() const throw () {
+std::string const& host::timezone() const throw() {
   return _timezone;
 }
 
@@ -1002,7 +998,7 @@ std::string const& host::timezone() const throw () {
  *
  *  @return The vrml_image.
  */
-std::string const& host::vrml_image() const throw () {
+std::string const& host::vrml_image() const throw() {
   return _vrml_image;
 }
 
@@ -1011,7 +1007,7 @@ std::string const& host::vrml_image() const throw () {
  *
  *  @return Acknowledgement timeout.
  */
-int host::get_acknowledgement_timeout() const throw () {
+int host::get_acknowledgement_timeout() const throw() {
   return _acknowledgement_timeout;
 }
 
@@ -1264,8 +1260,8 @@ bool host::_set_event_handler_enabled(bool value) {
 bool host::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_verification_error, basic)
-    << "Warning: host failure_prediction_enabled is deprecated"
-    << " This option will not be supported in 20.04.";
+      << "Warning: host failure_prediction_enabled is deprecated"
+      << " This option will not be supported in 20.04.";
   ++config_warnings;
   return true;
 }
@@ -1277,12 +1273,11 @@ bool host::_set_failure_prediction_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_failure_prediction_options(
-       std::string const& value) {
+bool host::_set_failure_prediction_options(std::string const& value) {
   (void)value;
   logger(log_verification_error, basic)
-    << "Warning: service failure_prediction_options is deprecated"
-    << " This option will not be supported in 20.04.";
+      << "Warning: service failure_prediction_options is deprecated"
+      << " This option will not be supported in 20.04.";
   ++config_warnings;
   return (true);
 }
@@ -1294,8 +1289,7 @@ bool host::_set_failure_prediction_options(
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_first_notification_delay(
-       unsigned int value) {
+bool host::_set_first_notification_delay(unsigned int value) {
   _first_notification_delay = value;
   return true;
 }
@@ -1319,15 +1313,12 @@ bool host::_set_flap_detection_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_flap_detection_options(
-       std::string const& value) {
+bool host::_set_flap_detection_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::iterator it(values.begin()), end(values.end());
+       it != end; ++it) {
     string::trim(*it);
     if (*it == "o" || *it == "up")
       options |= up;
@@ -1441,11 +1432,11 @@ bool host::_set_initial_state(std::string const& value) {
   std::string data(value);
   string::trim(data);
   if (data == "o" || data == "up")
-    _initial_state =  engine::host::state_up;
+    _initial_state = engine::host::state_up;
   else if (data == "d" || data == "down")
-    _initial_state =  engine::host::state_down;
+    _initial_state = engine::host::state_down;
   else if (data == "u" || data == "unreachable")
-    _initial_state =  engine::host::state_unreachable;
+    _initial_state = engine::host::state_unreachable;
   else
     return false;
   return true;
@@ -1520,8 +1511,7 @@ bool host::_set_notifications_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notification_interval(
-       unsigned int value) {
+bool host::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
   return true;
 }
@@ -1533,15 +1523,12 @@ bool host::_set_notification_interval(
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notification_options(
-       std::string const& value) {
+bool host::_set_notification_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::iterator it(values.begin()), end(values.end());
+       it != end; ++it) {
     string::trim(*it);
     if (*it == "d" || *it == "down")
       options |= down;
@@ -1571,8 +1558,7 @@ bool host::_set_notification_options(
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notification_period(
-       std::string const& value) {
+bool host::_set_notification_period(std::string const& value) {
   _notification_period = value;
   return true;
 }
@@ -1620,8 +1606,7 @@ bool host::_set_process_perf_data(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_retain_nonstatus_information(
-       bool value) {
+bool host::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
   return true;
 }
@@ -1669,15 +1654,12 @@ bool host::_set_recovery_notification_delay(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_stalking_options(
-       std::string const& value) {
+bool host::_set_stalking_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::iterator it(values.begin()), end(values.end());
+       it != end; ++it) {
     string::trim(*it);
     if (*it == "o" || *it == "up")
       options |= up;
@@ -1703,8 +1685,7 @@ bool host::_set_stalking_options(
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_statusmap_image(
-       std::string const& value) {
+bool host::_set_statusmap_image(std::string const& value) {
   _statusmap_image = value;
   return true;
 }

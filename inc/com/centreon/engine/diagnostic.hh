@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_DIAGNOSTIC_HH
-#  define CCE_DIAGNOSTIC_HH
+#define CCE_DIAGNOSTIC_HH
 
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#include <string>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
@@ -32,28 +32,22 @@ CCE_BEGIN()
  *  Generate a diagnostic file that is useful for opening tickets
  *  against Merethis support center.
  */
-class         diagnostic {
-public:
-              diagnostic();
-              diagnostic(diagnostic const& right);
-              ~diagnostic();
+class diagnostic {
+ public:
+  diagnostic();
+  diagnostic(diagnostic const& right);
+  ~diagnostic();
   diagnostic& operator=(diagnostic const& right);
-  void        generate(
-                std::string const& cfg_file,
-                std::string const& out_file = "");
+  void generate(std::string const& cfg_file, std::string const& out_file = "");
 
-private:
-  std::string _build_target_path(
-                std::string const& base,
-                std::string const& file);
-  void        _exec_and_write_to_file(
-                std::string const& cmd,
-                std::string const& out_file);
-  void        _exec_cp(
-                std::string const& src,
-                std::string const& dst);
+ private:
+  std::string _build_target_path(std::string const& base,
+                                 std::string const& file);
+  void _exec_and_write_to_file(std::string const& cmd,
+                               std::string const& out_file);
+  void _exec_cp(std::string const& src, std::string const& dst);
 };
 
 CCE_END()
 
-#endif // !CCE_DIAGNOSTIC_HH
+#endif  // !CCE_DIAGNOSTIC_HH

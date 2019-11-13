@@ -27,21 +27,21 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostextinfo, type, &hostextinfo::method>::generic
 
-std::unordered_map<std::string, hostextinfo::setter_func> const hostextinfo::_setters{
-  { "host_name",       SETTER(std::string const&, _set_hosts) },
-  { "hostgroup",       SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",  SETTER(std::string const&, _set_hostgroups) },
-  { "notes",           SETTER(std::string const&, _set_notes) },
-  { "notes_url",       SETTER(std::string const&, _set_notes_url) },
-  { "action_url",      SETTER(std::string const&, _set_action_url) },
-  { "icon_image",      SETTER(std::string const&, _set_icon_image) },
-  { "icon_image_alt",  SETTER(std::string const&, _set_icon_image_alt) },
-  { "vrml_image",      SETTER(std::string const&, _set_vrml_image) },
-  { "gd2_image",       SETTER(std::string const&, _set_statusmap_image) },
-  { "statusmap_image", SETTER(std::string const&, _set_statusmap_image) },
-  { "2d_coords",       SETTER(std::string const&, _set_coords_2d) },
-  { "3d_coords",       SETTER(std::string const&, _set_coords_3d) }
-};
+std::unordered_map<std::string, hostextinfo::setter_func> const
+    hostextinfo::_setters{
+        {"host_name", SETTER(std::string const&, _set_hosts)},
+        {"hostgroup", SETTER(std::string const&, _set_hostgroups)},
+        {"hostgroup_name", SETTER(std::string const&, _set_hostgroups)},
+        {"notes", SETTER(std::string const&, _set_notes)},
+        {"notes_url", SETTER(std::string const&, _set_notes_url)},
+        {"action_url", SETTER(std::string const&, _set_action_url)},
+        {"icon_image", SETTER(std::string const&, _set_icon_image)},
+        {"icon_image_alt", SETTER(std::string const&, _set_icon_image_alt)},
+        {"vrml_image", SETTER(std::string const&, _set_vrml_image)},
+        {"gd2_image", SETTER(std::string const&, _set_statusmap_image)},
+        {"statusmap_image", SETTER(std::string const&, _set_statusmap_image)},
+        {"2d_coords", SETTER(std::string const&, _set_coords_2d)},
+        {"3d_coords", SETTER(std::string const&, _set_coords_3d)}};
 
 // Default values.
 static point_2d const default_coords_2d(-1, -1);
@@ -51,24 +51,23 @@ static point_3d const default_coords_3d(0.0, 0.0, 0.0);
  *  Default constructor.
  */
 hostextinfo::hostextinfo()
-  : object(object::hostextinfo),
-    _coords_2d(default_coords_2d),
-    _coords_3d(default_coords_3d) {}
+    : object(object::hostextinfo),
+      _coords_2d(default_coords_2d),
+      _coords_3d(default_coords_3d) {}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right The hostextinfo to copy.
  */
-hostextinfo::hostextinfo(hostextinfo const& right)
-  : object(right) {
+hostextinfo::hostextinfo(hostextinfo const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-hostextinfo::~hostextinfo() throw () {}
+hostextinfo::~hostextinfo() throw() {}
 
 /**
  *  Copy constructor.
@@ -102,19 +101,15 @@ hostextinfo& hostextinfo::operator=(hostextinfo const& right) {
  *
  *  @return True if is the same hostextinfo, otherwise false.
  */
-bool hostextinfo::operator==(hostextinfo const& right) const throw () {
-  return (object::operator==(right)
-          && _action_url == right._action_url
-          && _coords_2d == right._coords_2d
-          && _coords_3d == right._coords_3d
-          && _hostgroups == right._hostgroups
-          && _hosts == right._hosts
-          && _icon_image == right._icon_image
-          && _icon_image_alt == right._icon_image_alt
-          && _notes == right._notes
-          && _notes_url == right._notes_url
-          && _statusmap_image == right._statusmap_image
-          && _vrml_image == right._vrml_image);
+bool hostextinfo::operator==(hostextinfo const& right) const throw() {
+  return (object::operator==(right) && _action_url == right._action_url &&
+          _coords_2d == right._coords_2d && _coords_3d == right._coords_3d &&
+          _hostgroups == right._hostgroups && _hosts == right._hosts &&
+          _icon_image == right._icon_image &&
+          _icon_image_alt == right._icon_image_alt && _notes == right._notes &&
+          _notes_url == right._notes_url &&
+          _statusmap_image == right._statusmap_image &&
+          _vrml_image == right._vrml_image);
 }
 
 /**
@@ -124,7 +119,7 @@ bool hostextinfo::operator==(hostextinfo const& right) const throw () {
  *
  *  @return True if is not the same hostextinfo, otherwise false.
  */
-bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
+bool hostextinfo::operator!=(hostextinfo const& right) const throw() {
   return !operator==(right);
 }
 
@@ -135,10 +130,11 @@ bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
  */
 void hostextinfo::check_validity() const {
   if (_hostgroups->empty() && _hosts->empty())
-    throw (engine_error() << "Host extended information is not attached"
-           << " to any host or host group (properties 'host_name' or "
-           << "'hostgroup_name', respectively)");
-  return ;
+    throw(engine_error()
+          << "Host extended information is not attached"
+          << " to any host or host group (properties 'host_name' or "
+          << "'hostgroup_name', respectively)");
+  return;
 }
 
 /**
@@ -148,9 +144,8 @@ void hostextinfo::check_validity() const {
  */
 void hostextinfo::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error()
-           << "Cannot merge host extended information with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge host extended information with '"
+                         << obj.type() << "'");
   hostextinfo const& tmpl(static_cast<hostextinfo const&>(obj));
 
   MRG_DEFAULT(_action_url);
@@ -175,8 +170,8 @@ void hostextinfo::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool hostextinfo::parse(char const* key, char const* value) {
-  std::unordered_map<std::string, hostextinfo::setter_func>::const_iterator
-    it{_setters.find(key)};
+  std::unordered_map<std::string, hostextinfo::setter_func>::const_iterator it{
+      _setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -187,7 +182,7 @@ bool hostextinfo::parse(char const* key, char const* value) {
  *
  *  @return The action_url.
  */
-std::string const& hostextinfo::action_url() const throw () {
+std::string const& hostextinfo::action_url() const throw() {
   return _action_url;
 }
 
@@ -196,7 +191,7 @@ std::string const& hostextinfo::action_url() const throw () {
  *
  *  @return The coords_2d.
  */
-point_2d const& hostextinfo::coords_2d() const throw () {
+point_2d const& hostextinfo::coords_2d() const throw() {
   return _coords_2d.get();
 }
 
@@ -205,7 +200,7 @@ point_2d const& hostextinfo::coords_2d() const throw () {
  *
  *  @return The 3d_coords.
  */
-point_3d const& hostextinfo::coords_3d() const throw () {
+point_3d const& hostextinfo::coords_3d() const throw() {
   return _coords_3d.get();
 }
 
@@ -214,7 +209,7 @@ point_3d const& hostextinfo::coords_3d() const throw () {
  *
  *  @return The hostgroups.
  */
-set_string const& hostextinfo::hostgroups() const throw () {
+set_string const& hostextinfo::hostgroups() const throw() {
   return *_hostgroups;
 }
 
@@ -223,7 +218,7 @@ set_string const& hostextinfo::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-set_string const& hostextinfo::hosts() const throw () {
+set_string const& hostextinfo::hosts() const throw() {
   return *_hosts;
 }
 
@@ -232,7 +227,7 @@ set_string const& hostextinfo::hosts() const throw () {
  *
  *  @return The icon_image.
  */
-std::string const& hostextinfo::icon_image() const throw () {
+std::string const& hostextinfo::icon_image() const throw() {
   return _icon_image;
 }
 
@@ -241,7 +236,7 @@ std::string const& hostextinfo::icon_image() const throw () {
  *
  *  @return The icon_image_alt.
  */
-std::string const& hostextinfo::icon_image_alt() const throw () {
+std::string const& hostextinfo::icon_image_alt() const throw() {
   return _icon_image_alt;
 }
 
@@ -250,7 +245,7 @@ std::string const& hostextinfo::icon_image_alt() const throw () {
  *
  *  @return The notes.
  */
-std::string const& hostextinfo::notes() const throw () {
+std::string const& hostextinfo::notes() const throw() {
   return _notes;
 }
 
@@ -259,7 +254,7 @@ std::string const& hostextinfo::notes() const throw () {
  *
  *  @return The notes_url.
  */
-std::string const& hostextinfo::notes_url() const throw () {
+std::string const& hostextinfo::notes_url() const throw() {
   return _notes_url;
 }
 
@@ -268,7 +263,7 @@ std::string const& hostextinfo::notes_url() const throw () {
  *
  *  @return The statusmap_image.
  */
-std::string const& hostextinfo::statusmap_image() const throw () {
+std::string const& hostextinfo::statusmap_image() const throw() {
   return _statusmap_image;
 }
 
@@ -277,7 +272,7 @@ std::string const& hostextinfo::statusmap_image() const throw () {
  *
  *  @return The vrml_image.
  */
-std::string const& hostextinfo::vrml_image() const throw () {
+std::string const& hostextinfo::vrml_image() const throw() {
   return _vrml_image;
 }
 

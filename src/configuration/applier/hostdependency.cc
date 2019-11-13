@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -34,7 +34,7 @@ applier::hostdependency::hostdependency() {}
 /**
  *  Destructor.
  */
-applier::hostdependency::~hostdependency() throw () {}
+applier::hostdependency::~hostdependency() throw() {}
 
 /**
  *  Add new hostdependency.
@@ -119,44 +119,30 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
   // Browse all dependencies.
   configuration::set_hostdependency expanded;
   for (configuration::set_hostdependency::const_iterator
-         it_dep(s.hostdependencies().begin()),
-         end_dep(s.hostdependencies().end());
-       it_dep != end_dep;
-       ++it_dep) {
+           it_dep(s.hostdependencies().begin()),
+       end_dep(s.hostdependencies().end());
+       it_dep != end_dep; ++it_dep) {
     // Expand host dependency instances.
-    if ((it_dep->hosts().size() != 1)
-        || !it_dep->hostgroups().empty()
-        || (it_dep->dependent_hosts().size() != 1)
-        || !it_dep->dependent_hostgroups().empty()
-        || (it_dep->dependency_type()
-            == configuration::hostdependency::unknown)) {
+    if ((it_dep->hosts().size() != 1) || !it_dep->hostgroups().empty() ||
+        (it_dep->dependent_hosts().size() != 1) ||
+        !it_dep->dependent_hostgroups().empty() ||
+        (it_dep->dependency_type() == configuration::hostdependency::unknown)) {
       // Expanded depended hosts.
       set_string depended_hosts;
-      _expand_hosts(
-        it_dep->hosts(),
-        it_dep->hostgroups(),
-        s,
-        depended_hosts);
+      _expand_hosts(it_dep->hosts(), it_dep->hostgroups(), s, depended_hosts);
 
       // Expanded dependent hosts.
       std::set<std::string> dependent_hosts;
-      _expand_hosts(
-        it_dep->dependent_hosts(),
-        it_dep->dependent_hostgroups(),
-        s,
-        dependent_hosts);
+      _expand_hosts(it_dep->dependent_hosts(), it_dep->dependent_hostgroups(),
+                    s, dependent_hosts);
 
       // Browse all depended and dependent hosts.
-      for (std::set<std::string>::const_iterator
-             it1(depended_hosts.begin()),
-             end1(depended_hosts.end());
-           it1 != end1;
-           ++it1)
-        for (std::set<std::string>::const_iterator
-               it2(dependent_hosts.begin()),
-               end2(dependent_hosts.end());
-             it2 != end2;
-             ++it2)
+      for (std::set<std::string>::const_iterator it1(depended_hosts.begin()),
+           end1(depended_hosts.end());
+           it1 != end1; ++it1)
+        for (std::set<std::string>::const_iterator it2(dependent_hosts.begin()),
+             end2(dependent_hosts.end());
+             it2 != end2; ++it2)
           for (int i(0); i < 2; ++i) {
             // Create host dependency instance.
             configuration::hostdependency hdep(*it_dep);
@@ -167,9 +153,8 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
             hdep.dependent_hosts().clear();
             hdep.dependent_hosts().insert(*it2);
             hdep.dependency_type(
-              !i
-              ? configuration::hostdependency::execution_dependency
-              : configuration::hostdependency::notification_dependency);
+                !i ? configuration::hostdependency::execution_dependency
+                   : configuration::hostdependency::notification_dependency);
             if (i)
               hdep.execution_failure_options(0);
             else
@@ -198,12 +183,13 @@ void applier::hostdependency::expand_objects(configuration::state& s) {
  *  @param[in] obj  Unused.
  */
 void applier::hostdependency::modify_object(
-       configuration::hostdependency const& obj) {
+    configuration::hostdependency const& obj) {
   (void)obj;
-  throw engine_error() << "Could not modify a host dependency: "
-         << "Host dependency objects can only be added or removed, "
-         << "this is likely a software bug that you should report to "
-         << "Centreon Engine developers";
+  throw engine_error()
+      << "Could not modify a host dependency: "
+      << "Host dependency objects can only be added or removed, "
+      << "this is likely a software bug that you should report to "
+      << "Centreon Engine developers";
 }
 
 /**
@@ -213,25 +199,20 @@ void applier::hostdependency::modify_object(
  *                  engine.
  */
 void applier::hostdependency::remove_object(
-       configuration::hostdependency const& obj) {
+    configuration::hostdependency const& obj) {
   // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Removing a host dependency.";
+  logger(logging::dbg_config, logging::more) << "Removing a host dependency.";
 
   // Find host dependency.
-  hostdependency_mmap::iterator
-    it(engine::hostdependency::hostdependencies_find(obj.key()));
+  hostdependency_mmap::iterator it(
+      engine::hostdependency::hostdependencies_find(obj.key()));
   if (it != engine::hostdependency::hostdependencies.end()) {
     com::centreon::engine::hostdependency* dependency(it->second.get());
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
-    broker_adaptive_dependency_data(
-      NEBTYPE_HOSTDEPENDENCY_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      dependency,
-      &tv);
+    broker_adaptive_dependency_data(NEBTYPE_HOSTDEPENDENCY_DELETE, NEBFLAG_NONE,
+                                    NEBATTR_NONE, dependency, &tv);
 
     // Remove host dependency from its list.
     engine::hostdependency::hostdependencies.erase(it);
@@ -247,14 +228,13 @@ void applier::hostdependency::remove_object(
  *  @param[in] obj  Hostdependency object.
  */
 void applier::hostdependency::resolve_object(
-       configuration::hostdependency const& obj) {
+    configuration::hostdependency const& obj) {
   // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Resolving a host dependency.";
+  logger(logging::dbg_config, logging::more) << "Resolving a host dependency.";
 
   // Find host escalation
-  hostdependency_mmap::iterator
-    it{engine::hostdependency::hostdependencies_find(obj.key())};
+  hostdependency_mmap::iterator it{
+      engine::hostdependency::hostdependencies_find(obj.key())};
 
   if (engine::hostdependency::hostdependencies.end() == it)
     throw engine_error() << "Cannot resolve non-existing host escalation";

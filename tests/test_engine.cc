@@ -26,7 +26,9 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
 
-configuration::contact TestEngine::new_configuration_contact(std::string const& name, bool full) const {
+configuration::contact TestEngine::new_configuration_contact(
+    std::string const& name,
+    bool full) const {
   if (full) {
     // Add command.
     {
@@ -68,7 +70,8 @@ configuration::contact TestEngine::new_configuration_contact(std::string const& 
 }
 
 configuration::contactgroup TestEngine::new_configuration_contactgroup(
-    std::string const& name, std::string const& contactname) {
+    std::string const& name,
+    std::string const& contactname) {
   configuration::contactgroup cg;
   cg.parse("contactgroup_name", name.c_str());
   cg.parse("alias", name.c_str());
@@ -76,7 +79,8 @@ configuration::contactgroup TestEngine::new_configuration_contactgroup(
   return cg;
 }
 
-configuration::serviceescalation TestEngine::new_configuration_serviceescalation(
+configuration::serviceescalation
+TestEngine::new_configuration_serviceescalation(
     std::string const& hostname,
     std::string const& svc_desc,
     std::string const& contactgroup) {
@@ -103,7 +107,8 @@ configuration::hostdependency TestEngine::new_configuration_hostdependency(
   return hd;
 }
 
-configuration::servicedependency TestEngine::new_configuration_servicedependency(
+configuration::servicedependency
+TestEngine::new_configuration_servicedependency(
     std::string const& hostname,
     std::string const& service,
     std::string const& dep_hostname,

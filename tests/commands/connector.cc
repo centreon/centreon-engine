@@ -121,11 +121,10 @@ TEST_F(Connector, NewConnectorSync) {
 
 TEST_F(Connector, RunWithTimeout) {
   nagios_macros macros = nagios_macros();
-  connector cmd_connector(
-      "RunWithTimeout",
-      "tests/bin_connector_test_run");
+  connector cmd_connector("RunWithTimeout", "tests/bin_connector_test_run");
   forward cmd_forward("RunWithTimeout",
-      "tests/bin_connector_test_run --timeout=on", cmd_connector);
+                      "tests/bin_connector_test_run --timeout=on",
+                      cmd_connector);
 
   result res;
   cmd_forward.run(cmd_forward.get_command_line(), macros, 1, res);
@@ -138,13 +137,10 @@ TEST_F(Connector, RunWithTimeout) {
 
 TEST_F(Connector, RunWithoutTimeout) {
   nagios_macros macros = nagios_macros();
-  connector cmd_connector(
-              "RunWithoutTimeout",
-              "tests/bin_connector_test_run");
-  forward cmd_forward(
-            "RunWithoutTimeout",
-            "tests/bin_connector_test_run --timeout=off",
-            cmd_connector);
+  connector cmd_connector("RunWithoutTimeout", "tests/bin_connector_test_run");
+  forward cmd_forward("RunWithoutTimeout",
+                      "tests/bin_connector_test_run --timeout=off",
+                      cmd_connector);
 
   result res;
   cmd_forward.run(cmd_forward.get_command_line(), macros, 0, res);

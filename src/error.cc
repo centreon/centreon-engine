@@ -17,30 +17,30 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/error.hh"
 #include <cstdio>
 #include <cstring>
-#include "com/centreon/engine/error.hh"
 
 #undef error
 
 using namespace com::centreon::engine;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Default constructor.
  */
-error::error() throw () : _current(0) {}
+error::error() throw() : _current(0) {}
 
 /**
  *  Constructor with debugging informations.
  */
-error::error(char const* file, char const* function, int line) throw ()
-  : _current(0) {
+error::error(char const* file, char const* function, int line) throw()
+    : _current(0) {
   *this << "[" << file << ":" << line << "(" << function << ")] ";
 }
 
@@ -49,16 +49,14 @@ error::error(char const* file, char const* function, int line) throw ()
  *
  *  @param[in] e Object to copy.
  */
-error::error(error const& e) throw ()
-  : std::exception(e),
-    _current(e._current) {
+error::error(error const& e) throw() : std::exception(e), _current(e._current) {
   memcpy(_buffer, e._buffer, _current * sizeof(*_buffer));
 }
 
 /**
  *  Destructor.
  */
-error::~error() throw () {}
+error::~error() throw() {}
 
 /**
  *  Assignment operator.
@@ -67,7 +65,7 @@ error::~error() throw () {}
  *
  *  @return This object.
  */
-error& error::operator=(error const& e) throw () {
+error& error::operator=(error const& e) throw() {
   std::exception::operator=(e);
   _current = e._current;
   memcpy(_buffer, e._buffer, _current * sizeof(*_buffer));
@@ -81,7 +79,7 @@ error& error::operator=(error const& e) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(char c) throw () {
+error& error::operator<<(char c) throw() {
   char buffer[2];
   buffer[0] = c;
   buffer[1] = '\0';
@@ -95,7 +93,7 @@ error& error::operator<<(char c) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(char const* str) throw () {
+error& error::operator<<(char const* str) throw() {
   // Detect NULL string.
   if (!str)
     str = "(null)";
@@ -120,7 +118,7 @@ error& error::operator<<(char const* str) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(int i) throw () {
+error& error::operator<<(int i) throw() {
   _insert_with_snprintf(i, "%d%n");
   return *this;
 }
@@ -132,7 +130,7 @@ error& error::operator<<(int i) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(unsigned long u) throw () {
+error& error::operator<<(unsigned long u) throw() {
   _insert_with_snprintf(u, "%u%n");
   return *this;
 }
@@ -144,7 +142,7 @@ error& error::operator<<(unsigned long u) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(unsigned int u) throw () {
+error& error::operator<<(unsigned int u) throw() {
   _insert_with_snprintf(u, "%u%n");
   return *this;
 }
@@ -156,7 +154,7 @@ error& error::operator<<(unsigned int u) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(long l) throw () {
+error& error::operator<<(long l) throw() {
   _insert_with_snprintf(l, "%ld%n");
   return *this;
 }
@@ -168,7 +166,7 @@ error& error::operator<<(long l) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(long long ll) throw () {
+error& error::operator<<(long long ll) throw() {
   _insert_with_snprintf(ll, "%lld%n");
   return *this;
 }
@@ -180,7 +178,7 @@ error& error::operator<<(long long ll) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(unsigned long long ull) throw () {
+error& error::operator<<(unsigned long long ull) throw() {
   _insert_with_snprintf(ull, "%llu%n");
   return *this;
 }
@@ -192,7 +190,7 @@ error& error::operator<<(unsigned long long ull) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(double d) throw () {
+error& error::operator<<(double d) throw() {
   _insert_with_snprintf(d, "%lf%n");
   return *this;
 }
@@ -204,7 +202,7 @@ error& error::operator<<(double d) throw () {
  *
  *  @return This object.
  */
-error& error::operator<<(std::string const& str) throw () {
+error& error::operator<<(std::string const& str) throw() {
   return operator<<(str.c_str());
 }
 
@@ -213,16 +211,16 @@ error& error::operator<<(std::string const& str) throw () {
  *
  *  @return Error message.
  */
-char const* error::what() const throw () {
+char const* error::what() const throw() {
   _buffer[_current] = '\0';
   return _buffer;
 }
 
 /**************************************
-*                                     *
-*           Private Methods           *
-*                                     *
-**************************************/
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
 
 /**
  *  Insert data in buffer using snprintf.
@@ -234,12 +232,9 @@ char const* error::what() const throw () {
 template <typename T>
 void error::_insert_with_snprintf(T& t, char const* format) {
   int wc;
-  if (snprintf(
-        _buffer + _current,
-        sizeof(_buffer) / sizeof(*_buffer) - _current,
-        format,
-        t,
-        &wc) > 0)
+  if (snprintf(_buffer + _current,
+               sizeof(_buffer) / sizeof(*_buffer) - _current, format, t,
+               &wc) > 0)
     _current += wc;
   return;
 }

@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/hostescalation.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/hostescalation.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
@@ -54,7 +54,7 @@ hostescalation::hostescalation(std::string const& host_name,
                                uint32_t escalate_on,
                                Uuid const& uuid)
     : escalation{first_notification, last_notification, notification_interval,
-                 escalation_period, escalate_on, uuid},
+                 escalation_period,  escalate_on,       uuid},
       _hostname{host_name} {
   if (host_name.empty())
     throw engine_error() << "Could not create escalation "
@@ -77,22 +77,20 @@ std::string const& hostescalation::get_hostname() const {
  * @return A boolean.
  */
 bool hostescalation::is_viable(int state, uint32_t notification_number) const {
-  logger(dbg_functions, basic)
-    << "serviceescalation::is_viable()";
+  logger(dbg_functions, basic) << "serviceescalation::is_viable()";
 
   bool retval{escalation::is_viable(state, notification_number)};
   if (retval) {
     std::array<notifier::notification_flag, 3> nt = {
-      notifier::up,
-      notifier::down,
-      notifier::unreachable,
+        notifier::up,
+        notifier::down,
+        notifier::unreachable,
     };
 
     if (!get_escalate_on(nt[state]))
       return false;
     return true;
-  }
-  else
+  } else
     return retval;
 }
 

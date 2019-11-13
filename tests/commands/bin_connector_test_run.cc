@@ -17,31 +17,31 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <fstream>
+#include <unistd.h>
 #include <cctype>
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <fstream>
 #include <iterator>
 #include <list>
 #include <sstream>
 #include <string>
 #include <thread>
-#include <unistd.h>
 #include <vector>
 #include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/exceptions/basic.hh"
 #include "com/centreon/timestamp.hh"
 
-#define STATE_OK       0
-#define STATE_WARNING  1
+#define STATE_OK 0
+#define STATE_WARNING 1
 #define STATE_CRITICAL 2
-#define STATE_UNKNOWN  3
+#define STATE_UNKNOWN 3
 
-//using namespace com::centreon;
-//using namespace com::centreon::engine;
+// using namespace com::centreon;
+// using namespace com::centreon::engine;
 
 /**
  *  Simulate a execution process.
@@ -264,26 +264,28 @@ static int wait(std::string& query) {
 int main() {
   std::ofstream outfile;
   outfile.open("/tmp/test.txt", std::ios_base::app);
-  outfile << "************************************************************************\n";
+  outfile << "*****************************************************************"
+             "*******\n";
   outfile.close();
 
   typedef void (*send_query)(char const*);
   static send_query tab_send_query[] = {
-      &query_version, NULL, &query_execute, NULL, &query_quit, NULL, };
+      &query_version, NULL, &query_execute, NULL, &query_quit, NULL,
+  };
 
   try {
     while (true) {
       std::string query;
       int id(wait(query));
 
-      if (id == -1 || static_cast<uint32_t>(id) >=
-                          sizeof(tab_send_query) / sizeof(*tab_send_query) ||
+      if (id == -1 ||
+          static_cast<uint32_t>(id) >=
+              sizeof(tab_send_query) / sizeof(*tab_send_query) ||
           !tab_send_query[id])
         throw basic_error() << "reveive bad request id: id=" << id;
       (*tab_send_query[id])(query.c_str());
     }
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     return EXIT_FAILURE;
   }

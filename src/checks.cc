@@ -17,16 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdio>
-#include <cstdlib>
+#include "com/centreon/engine/checks.hh"
 #include <dirent.h>
 #include <fcntl.h>
 #include <mmap.h>
-#include <string>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <cstdio>
+#include <cstdlib>
+#include <string>
 #include <utility>
-#include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -36,18 +36,17 @@ using namespace com::centreon::engine;
 check_result_list check_result::results;
 
 check_result::check_result()
-  : _object_check_type{host_check},
-    _host_id{0UL},
-    _service_id{0UL},
-    _check_type(checkable::check_active),
-    _check_options{CHECK_OPTION_NONE},
-    _reschedule_check{false},
-    _latency{0.0},
-    _early_timeout{false},
-    _exited_ok{false},
-    _return_code{0},
-    _output{""}
-{
+    : _object_check_type{host_check},
+      _host_id{0UL},
+      _service_id{0UL},
+      _check_type(checkable::check_active),
+      _check_options{CHECK_OPTION_NONE},
+      _reschedule_check{false},
+      _latency{0.0},
+      _early_timeout{false},
+      _exited_ok{false},
+      _return_code{0},
+      _output{""} {
   timeval tv{0, 0};
   _start_time = tv;
   _finish_time = tv;
@@ -115,19 +114,19 @@ check_result::check_result(enum check_source object_check_type,
                            bool exited_ok,
                            int return_code,
                            std::string const& output)
-  : _object_check_type{object_check_type},
-    _host_id{host_id},
-    _service_id{service_id},
-    _check_type(check_type),
-    _check_options{check_options},
-    _reschedule_check{reschedule_check},
-    _latency{latency},
-    _start_time(start_time),
-    _finish_time(finish_time),
-    _early_timeout{early_timeout},
-    _exited_ok{exited_ok},
-    _return_code{return_code},
-    _output{output} {}
+    : _object_check_type{object_check_type},
+      _host_id{host_id},
+      _service_id{service_id},
+      _check_type(check_type),
+      _check_options{check_options},
+      _reschedule_check{reschedule_check},
+      _latency{latency},
+      _start_time(start_time),
+      _finish_time(finish_time),
+      _early_timeout{early_timeout},
+      _exited_ok{exited_ok},
+      _return_code{return_code},
+      _output{output} {}
 
 enum check_source check_result::get_object_check_type() const {
   return _object_check_type;
@@ -247,7 +246,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
 
   // Log message.
   logger(logging::dbg_checks, logging::more)
-    << "Processing check result file: '" << fname << "'";
+      << "Processing check result file: '" << fname << "'";
 
   // Open the file for reading.
   mmapfile* thefile(nullptr);
@@ -282,7 +281,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
     if (input[0] == '#')
       continue;
 
-      // Empty line indicates end of record.
+    // Empty line indicates end of record.
     else if (input[0] == '\n') {
       // We have something...
       if (new_cr) {
@@ -295,7 +294,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
           delete new_cr;
           new_cr = nullptr;
         }
-          // Discard partial input.
+        // Discard partial input.
         else {
           timeval tv{0, 0};
 
@@ -321,8 +320,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
       continue;
 
     // if file is too old, remove it.
-    if (!strcmp(var, "file_time")
-      && config->max_check_result_file_age() > 0) {
+    if (!strcmp(var, "file_time") && config->max_check_result_file_age() > 0) {
       unsigned long diff(current_time - strtoul(val, nullptr, 0));
       if (diff > config->max_check_result_file_age()) {
         delete new_cr;
@@ -342,17 +340,16 @@ bool check_result::process_check_result_file(std::string const& fname) {
       host_map::const_iterator it{host::hosts.find(hostname)};
       if (it != host::hosts.end())
         new_cr->set_host_id(it->second->get_host_id());
-    }
-    else if (!strcmp(var, "service_description")) {
+    } else if (!strcmp(var, "service_description")) {
       service_description = val;
       new_cr->set_object_check_type(service_check);
-    }
-    else if (!strcmp(var, "check_type"))
-      new_cr->set_check_type(static_cast<enum checkable::check_type>(strtol(val, nullptr, 0)));
+    } else if (!strcmp(var, "check_type"))
+      new_cr->set_check_type(
+          static_cast<enum checkable::check_type>(strtol(val, nullptr, 0)));
     else if (!strcmp(var, "check_options"))
       new_cr->set_check_options(strtol(val, nullptr, 0));
     else if (!strcmp(var, "scheduled_check"))
-      ;/*new_cr->set_scheduled_check(strtol(val, nullptr, 0));*/
+      ; /*new_cr->set_scheduled_check(strtol(val, nullptr, 0));*/
     else if (!strcmp(var, "reschedule_check"))
       new_cr->set_reschedule_check(strtol(val, nullptr, 0));
     else if (!strcmp(var, "latency"))
@@ -366,8 +363,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
       tv.tv_sec = strtoul(v1, nullptr, 0);
       tv.tv_usec = strtoul(v2, nullptr, 0);
       new_cr->set_start_time(tv);
-    }
-    else if (!strcmp(var, "finish_time")) {
+    } else if (!strcmp(var, "finish_time")) {
       if ((v1 = strtok(val, ".")) == nullptr)
         continue;
       if ((v2 = strtok(nullptr, "\n")) == nullptr)
@@ -376,8 +372,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
       tv.tv_sec = strtoul(v1, nullptr, 0);
       tv.tv_usec = strtoul(v2, nullptr, 0);
       new_cr->set_finish_time(tv);
-    }
-    else if (!strcmp(var, "early_timeout"))
+    } else if (!strcmp(var, "early_timeout"))
       new_cr->set_early_timeout(strtol(val, nullptr, 0));
     else if (!strcmp(var, "exited_ok"))
       new_cr->set_exited_ok(strtol(val, nullptr, 0));
@@ -390,7 +385,8 @@ bool check_result::process_check_result_file(std::string const& fname) {
   // We have something.
   if (new_cr) {
     if (!service_description.empty() && !hostname.empty()) {
-      service_map::const_iterator it{service::services.find({hostname, service_description})};
+      service_map::const_iterator it{
+          service::services.find({hostname, service_description})};
       if (it != service::services.end())
         new_cr->set_service_id(it->second->get_service_id());
     }
@@ -405,8 +401,8 @@ bool check_result::process_check_result_file(std::string const& fname) {
       new_cr = nullptr;
     }
 
-      // Discard partial input and free memory for current check result
-      // record.
+    // Discard partial input and free memory for current check result
+    // record.
     else
       delete new_cr;
   }
@@ -433,7 +429,7 @@ bool check_result::process_check_result_file(std::string const& fname) {
  *
  *  @return OK on success.
  */
- //
+//
 bool check_result::process_check_result_queue(std::string const& dirname) {
   // Function result.
   bool result(true);
@@ -441,7 +437,7 @@ bool check_result::process_check_result_queue(std::string const& dirname) {
   // Make sure we have what we need.
   if (dirname.empty()) {
     logger(logging::log_config_error, logging::basic)
-      << "Error: No check result queue directory specified.";
+        << "Error: No check result queue directory specified.";
     return false;
   }
 
@@ -449,14 +445,14 @@ bool check_result::process_check_result_queue(std::string const& dirname) {
   DIR* dirp(nullptr);
   if ((dirp = opendir(dirname.c_str())) == nullptr) {
     logger(logging::log_config_error, logging::basic)
-      << "Error: Could not open check result queue directory '"
-      << dirname << "' for reading.";
+        << "Error: Could not open check result queue directory '" << dirname
+        << "' for reading.";
     return false;
   }
 
   // Process all files in the directory...
   logger(logging::dbg_checks, logging::more)
-    << "Starting to read check result queue '" << dirname << "'...";
+      << "Starting to read check result queue '" << dirname << "'...";
   struct dirent* dirfile(nullptr);
   while ((dirfile = readdir(dirp)) != nullptr) {
     // Create /path/to/file.
@@ -471,8 +467,7 @@ bool check_result::process_check_result_queue(std::string const& dirname) {
     if (x == 7 && dirfile->d_name[0] == 'c') {
       if (stat(file.c_str(), &stat_buf) == -1) {
         logger(logging::log_runtime_warning, logging::basic)
-          << "Warning: Could not stat() check result file '"
-          << file << "'.";
+            << "Warning: Could not stat() check result file '" << file << "'.";
         continue;
       }
 

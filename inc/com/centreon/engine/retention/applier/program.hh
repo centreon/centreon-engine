@@ -18,32 +18,30 @@
 */
 
 #ifndef CCE_RETENTION_APPLIER_PROGRAM_HH
-#  define CCE_RETENTION_APPLIER_PROGRAM_HH
+#define CCE_RETENTION_APPLIER_PROGRAM_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/program.hh"
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/retention/program.hh"
 
 CCE_BEGIN()
 
 // Forward declaration.
 namespace configuration {
-  class   state;
+class state;
 }
 
-namespace   retention {
-  namespace applier {
-    class   program {
-  public:
-      void  apply(
-              configuration::state& config,
-              retention::program const& obj);
+namespace retention {
+namespace applier {
+class program {
+ public:
+  void apply(configuration::state& config, retention::program const& obj);
 
-    private:
-      bool  _find_command(std::string const& command_line);
-    };
-  }
-}
+ private:
+  bool _find_command(std::string const& command_line);
+};
+}  // namespace applier
+}  // namespace retention
 
 CCE_END()
 
-#endif // !CCE_RETENTION_APPLIER_PROGRAM_HH
+#endif  // !CCE_RETENTION_APPLIER_PROGRAM_HH

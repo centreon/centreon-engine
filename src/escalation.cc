@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/escalation.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/timeperiod.hh"
 
@@ -118,34 +118,32 @@ void escalation::resolve(int& w __attribute__((unused)), int& e) {
   int errors{0};
   // Find the timeperiod.
   if (!get_escalation_period().empty()) {
-    timeperiod_map::const_iterator
-      it{timeperiod::timeperiods.find(get_escalation_period())};
+    timeperiod_map::const_iterator it{
+        timeperiod::timeperiods.find(get_escalation_period())};
 
     if (it == timeperiod::timeperiods.end() || !it->second) {
       logger(log_verification_error, basic)
-        << "Error: Escalation period '" << get_escalation_period()
-        << "' specified in escalation is not defined anywhere!";
+          << "Error: Escalation period '" << get_escalation_period()
+          << "' specified in escalation is not defined anywhere!";
       errors++;
-    }
-    else
+    } else
       // Save the timeperiod pointer for later.
       escalation_period_ptr = it->second.get();
   }
 
   // Check all contact groups.
-  for (contactgroup_map_unsafe::iterator
-         it{_contact_groups.begin()},
-         end{_contact_groups.end()};
-       it != end;
-       ++it) {
+  for (contactgroup_map_unsafe::iterator it{_contact_groups.begin()},
+       end{_contact_groups.end()};
+       it != end; ++it) {
     // Find the contact group.
-    contactgroup_map::iterator it_cg{contactgroup::contactgroups.find(it->first)};
+    contactgroup_map::iterator it_cg{
+        contactgroup::contactgroups.find(it->first)};
 
     if (it_cg == contactgroup::contactgroups.end() || !it_cg->second) {
       logger(log_verification_error, basic)
-        << "Error: Contact group '"
-        << it->first
-        << "' specified in escalation for this notifier is not defined anywhere!";
+          << "Error: Contact group '" << it->first
+          << "' specified in escalation for this notifier is not defined "
+             "anywhere!";
       errors++;
     } else {
       // Save the contactgroup pointer for later.

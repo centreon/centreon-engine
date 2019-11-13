@@ -18,52 +18,49 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
-#  define CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
+#define CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
 
-#  include <list>
-#  include <set>
-#  include <string>
-#  include <vector>
-#  include "com/centreon/engine/timeperiod.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <list>
+#include <set>
+#include <string>
+#include <vector>
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/timeperiod.hh"
 
 // Forward declaration.
 CCE_BEGIN()
 
-namespace         configuration {
-  // Forward declarations.
-  class           daterange;
-  class           state;
-  class           timeperiod;
-  class           timerange;
+namespace configuration {
+// Forward declarations.
+class daterange;
+class state;
+class timeperiod;
+class timerange;
 
-  namespace       applier {
-    class         timeperiod {
-     public:
-                  timeperiod();
-                  timeperiod(timeperiod const& right);
-                  ~timeperiod() throw ();
-      timeperiod& operator=(timeperiod const& right);
-      void        add_object(configuration::timeperiod const& obj);
-      void        expand_objects(configuration::state& s);
-      void        modify_object(configuration::timeperiod const& obj);
-      void        remove_object(configuration::timeperiod const& obj);
-      void        resolve_object(configuration::timeperiod const& obj);
+namespace applier {
+class timeperiod {
+ public:
+  timeperiod();
+  timeperiod(timeperiod const& right);
+  ~timeperiod() throw();
+  timeperiod& operator=(timeperiod const& right);
+  void add_object(configuration::timeperiod const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::timeperiod const& obj);
+  void remove_object(configuration::timeperiod const& obj);
+  void resolve_object(configuration::timeperiod const& obj);
 
-     private:
-      void        _add_exclusions(
-                    std::set<std::string> const& exclusions,
-                    com::centreon::engine::timeperiod* tp);
-      void        _add_exceptions(
-                    std::vector<std::list<daterange> > const& exceptions,
-                    com::centreon::engine::timeperiod* tp);
-      void        _add_time_ranges(
-                    std::vector<std::list<timerange> > const& ranges,
-                    com::centreon::engine::timeperiod* tp);
-    };
-  }
-}
+ private:
+  void _add_exclusions(std::set<std::string> const& exclusions,
+                       com::centreon::engine::timeperiod* tp);
+  void _add_exceptions(std::vector<std::list<daterange> > const& exceptions,
+                       com::centreon::engine::timeperiod* tp);
+  void _add_time_ranges(std::vector<std::list<timerange> > const& ranges,
+                        com::centreon::engine::timeperiod* tp);
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH

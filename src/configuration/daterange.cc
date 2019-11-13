@@ -27,20 +27,18 @@ using namespace com::centreon::engine::configuration;
  *  @param[in] type The date range type.
  */
 daterange::daterange(type_range type)
- :_month_end(0),
-  _month_start(0),
-  _month_day_end(0),
-  _month_day_start(0),
-  _skip_interval(0),
-  _type(type),
-  _week_day_end(0),
-  _week_day_start(0),
-  _week_day_end_offset(0),
-  _week_day_start_offset(0),
-  _year_end(0),
-  _year_start(0) {
-
-}
+    : _month_end(0),
+      _month_start(0),
+      _month_day_end(0),
+      _month_day_start(0),
+      _skip_interval(0),
+      _type(type),
+      _week_day_end(0),
+      _week_day_start(0),
+      _week_day_end_offset(0),
+      _week_day_start_offset(0),
+      _year_end(0),
+      _year_start(0) {}
 
 /**
  *  Copy constructor.
@@ -54,9 +52,7 @@ daterange::daterange(daterange const& right) {
 /**
  *  Destructor.
  */
-daterange::~daterange() {
-
-}
+daterange::~daterange() {}
 
 /**
  *  Copy operator.
@@ -91,20 +87,18 @@ daterange& daterange::operator=(daterange const& right) {
  *
  *  @return True if object is the same, otherwise false.
  */
-bool daterange::operator==(daterange const& right) const throw () {
-  return (_month_end == right._month_end
-          && _month_start == right._month_start
-          && _month_day_end == right._month_day_end
-          && _month_day_start == right._month_day_start
-          && _skip_interval == right._skip_interval
-          && _timeranges == right._timeranges
-          && _type == right._type
-          && _week_day_end == right._week_day_end
-          && _week_day_start == right._week_day_start
-          && _week_day_end_offset == right._week_day_end_offset
-          && _week_day_start_offset == right._week_day_start_offset
-          && _year_end == right._year_end
-          && _year_start == right._year_start);
+bool daterange::operator==(daterange const& right) const throw() {
+  return (_month_end == right._month_end &&
+          _month_start == right._month_start &&
+          _month_day_end == right._month_day_end &&
+          _month_day_start == right._month_day_start &&
+          _skip_interval == right._skip_interval &&
+          _timeranges == right._timeranges && _type == right._type &&
+          _week_day_end == right._week_day_end &&
+          _week_day_start == right._week_day_start &&
+          _week_day_end_offset == right._week_day_end_offset &&
+          _week_day_start_offset == right._week_day_start_offset &&
+          _year_end == right._year_end && _year_start == right._year_start);
 }
 
 /**
@@ -114,7 +108,7 @@ bool daterange::operator==(daterange const& right) const throw () {
  *
  *  @return True if object is not the same, otherwise false.
  */
-bool daterange::operator!=(daterange const& right) const throw () {
+bool daterange::operator!=(daterange const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -125,7 +119,7 @@ bool daterange::operator!=(daterange const& right) const throw () {
  *
  *  @return True if this object is less than right.
  */
-bool daterange::operator<(daterange const& right) const throw () {
+bool daterange::operator<(daterange const& right) const throw() {
   if (_month_end != right._month_end)
     return (_month_end < right._month_end);
   else if (_month_start != right._month_start)
@@ -167,7 +161,7 @@ void daterange::month_end(unsigned int value) {
  *
  *  @return The month_end value.
  */
-unsigned int daterange::month_end() const throw () {
+unsigned int daterange::month_end() const throw() {
   return (_month_end);
 }
 
@@ -185,7 +179,7 @@ void daterange::month_start(unsigned int value) {
  *
  *  @return The month_start value.
  */
-unsigned int daterange::month_start() const throw () {
+unsigned int daterange::month_start() const throw() {
   return (_month_start);
 }
 
@@ -203,7 +197,7 @@ void daterange::month_day_end(int value) {
  *
  *  @return The month_day_end value.
  */
-int daterange::month_day_end() const throw () {
+int daterange::month_day_end() const throw() {
   return (_month_day_end);
 }
 
@@ -221,7 +215,7 @@ void daterange::month_day_start(int value) {
  *
  *  @return The month_day_start value.
  */
-int daterange::month_day_start() const throw () {
+int daterange::month_day_start() const throw() {
   return (_month_day_start);
 }
 
@@ -239,7 +233,7 @@ void daterange::skip_interval(unsigned int value) {
  *
  *  @return The skip_interval value.
  */
-unsigned int daterange::skip_interval() const throw () {
+unsigned int daterange::skip_interval() const throw() {
   return (_skip_interval);
 }
 
@@ -257,7 +251,7 @@ void daterange::timeranges(std::list<timerange> const& value) {
  *
  *  @param[in] value The new timeranges value.
  */
-std::list<timerange> const& daterange::timeranges() const throw () {
+std::list<timerange> const& daterange::timeranges() const throw() {
   return (_timeranges);
 }
 
@@ -275,7 +269,7 @@ void daterange::type(type_range value) {
  *
  *  @return The type value.
  */
-daterange::type_range daterange::type() const throw () {
+daterange::type_range daterange::type() const throw() {
   return (_type);
 }
 
@@ -293,7 +287,7 @@ void daterange::week_day_end(unsigned int value) {
  *
  *  @return The week_day_end value.
  */
-unsigned int daterange::week_day_end() const throw () {
+unsigned int daterange::week_day_end() const throw() {
   return (_week_day_end);
 }
 
@@ -311,7 +305,7 @@ void daterange::week_day_start(unsigned int value) {
  *
  *  @return The week_day_start value.
  */
-unsigned int daterange::week_day_start() const throw () {
+unsigned int daterange::week_day_start() const throw() {
   return (_week_day_start);
 }
 
@@ -329,7 +323,7 @@ void daterange::week_day_end_offset(int value) {
  *
  *  @return The week_day_end_offset value.
  */
-int daterange::week_day_end_offset() const throw () {
+int daterange::week_day_end_offset() const throw() {
   return (_week_day_end_offset);
 }
 
@@ -347,7 +341,7 @@ void daterange::week_day_start_offset(int value) {
  *
  *  @return The week_day_start_offset value.
  */
-int daterange::week_day_start_offset() const throw () {
+int daterange::week_day_start_offset() const throw() {
   return (_week_day_start_offset);
 }
 
@@ -365,7 +359,7 @@ void daterange::year_end(unsigned int value) {
  *
  *  @return The year_end value.
  */
-unsigned int daterange::year_end() const throw () {
+unsigned int daterange::year_end() const throw() {
   return (_year_end);
 }
 
@@ -383,6 +377,6 @@ void daterange::year_start(unsigned int value) {
  *
  *  @return The year_start value.
  */
-unsigned int daterange::year_start() const throw () {
+unsigned int daterange::year_start() const throw() {
   return (_year_start);
 }

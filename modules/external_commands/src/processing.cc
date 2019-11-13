@@ -17,13 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/modules/external_commands/processing.hh"
 #include <cstdlib>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
-#include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
@@ -167,19 +167,19 @@ processing::processing()
           {"ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST",
            command_info(CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST,
                         &_redirector_host<
-                             &_wrapper_enable_all_notifications_beyond_host>)},
+                            &_wrapper_enable_all_notifications_beyond_host>)},
           {"DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST",
            command_info(CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST,
                         &_redirector_host<
-                             &_wrapper_disable_all_notifications_beyond_host>)},
+                            &_wrapper_disable_all_notifications_beyond_host>)},
           {"ENABLE_HOST_AND_CHILD_NOTIFICATIONS",
            command_info(CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS,
                         &_redirector_host<
-                             &_wrapper_enable_host_and_child_notifications>)},
+                            &_wrapper_enable_host_and_child_notifications>)},
           {"DISABLE_HOST_AND_CHILD_NOTIFICATIONS",
            command_info(CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS,
                         &_redirector_host<
-                             &_wrapper_disable_host_and_child_notifications>)},
+                            &_wrapper_disable_host_and_child_notifications>)},
           {"ENABLE_HOST_SVC_NOTIFICATIONS",
            command_info(
                CMD_ENABLE_HOST_SVC_NOTIFICATIONS,
@@ -319,7 +319,7 @@ processing::processing()
           {"DISABLE_HOSTGROUP_SVC_NOTIFICATIONS",
            command_info(CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS,
                         &_redirector_hostgroup<
-                             &_wrapper_disable_service_notifications>)},
+                            &_wrapper_disable_service_notifications>)},
           {"ENABLE_HOSTGROUP_HOST_CHECKS",
            command_info(CMD_ENABLE_HOSTGROUP_HOST_CHECKS,
                         &_redirector_hostgroup<&enable_host_checks>)},
@@ -343,11 +343,11 @@ processing::processing()
           {"ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS",
            command_info(CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS,
                         &_redirector_hostgroup<
-                             &_wrapper_enable_passive_service_checks>)},
+                            &_wrapper_enable_passive_service_checks>)},
           {"DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS",
            command_info(CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS,
                         &_redirector_hostgroup<
-                             &_wrapper_disable_passive_service_checks>)},
+                            &_wrapper_disable_passive_service_checks>)},
           {"SCHEDULE_HOSTGROUP_HOST_DOWNTIME",
            command_info(CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME,
                         &_redirector<&cmd_schedule_downtime>)},
@@ -448,7 +448,7 @@ processing::processing()
           {"SET_SVC_NOTIFICATION_NUMBER",
            command_info(CMD_SET_SVC_NOTIFICATION_NUMBER,
                         &_redirector_service<
-                             &_wrapper_set_service_notification_number>)},
+                            &_wrapper_set_service_notification_number>)},
           {"CHANGE_SVC_CHECK_TIMEPERIOD",
            command_info(CMD_CHANGE_SVC_CHECK_TIMEPERIOD,
                         &_redirector<&cmd_change_object_char_var>)},
@@ -461,7 +461,7 @@ processing::processing()
           {"SEND_CUSTOM_SVC_NOTIFICATION",
            command_info(CMD_SEND_CUSTOM_SVC_NOTIFICATION,
                         &_redirector_service<
-                             &_wrapper_send_custom_service_notification>)},
+                            &_wrapper_send_custom_service_notification>)},
           {"CHANGE_SVC_NOTIFICATION_TIMEPERIOD",
            command_info(CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD,
                         &_redirector<&cmd_change_object_char_var>)},
@@ -558,11 +558,12 @@ processing::processing()
           {"ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS",
            command_info(CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS,
                         &_redirector_contactgroup<
-                             &enable_contact_service_notifications>)},
+                            &enable_contact_service_notifications>)},
           {"DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS",
            command_info(CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS,
                         &_redirector_contactgroup<
-                             &disable_contact_service_notifications>)}, } {
+                            &disable_contact_service_notifications>)},
+      } {
   // misc commands.
   _lst_command["PROCESS_FILE"] = command_info(
       CMD_PROCESS_FILE, &_redirector<&cmd_process_external_commands_from_file>);
@@ -632,42 +633,34 @@ bool processing::execute(std::string const& cmdstr) const {
       command_id == CMD_PROCESS_HOST_CHECK_RESULT) {
     // Passive checks are logged in checks.c.
     if (config->log_passive_checks())
-      logger(log_passive_check, basic) << "EXTERNAL COMMAND: " << command_name
-                                       << ';' << args;
+      logger(log_passive_check, basic)
+          << "EXTERNAL COMMAND: " << command_name << ';' << args;
   } else if (config->log_external_commands())
-    logger(log_external_command, basic) << "EXTERNAL COMMAND: " << command_name
-                                        << ';' << args;
+    logger(log_external_command, basic)
+        << "EXTERNAL COMMAND: " << command_name << ';' << args;
 
   logger(dbg_external_command, more) << "External command id: " << command_id
                                      << "\nCommand entry time: " << entry_time
                                      << "\nCommand arguments: " << args;
 
   // Send data to event broker.
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_START,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          command_id,
-                          entry_time,
+  broker_external_command(NEBTYPE_EXTERNALCOMMAND_START, NEBFLAG_NONE,
+                          NEBATTR_NONE, command_id, entry_time,
                           const_cast<char*>(command_name.c_str()),
-                          const_cast<char*>(args.c_str()),
-                          nullptr);
+                          const_cast<char*>(args.c_str()), nullptr);
 
   {
     std::lock_guard<std::mutex> lock(_mutex);
     if (it != _lst_command.end())
-      (*it->second.func)(
-          command_id, entry_time, const_cast<char*>(args.c_str()));
+      (*it->second.func)(command_id, entry_time,
+                         const_cast<char*>(args.c_str()));
   }
 
   // Send data to event broker.
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_END,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          command_id,
-                          entry_time,
+  broker_external_command(NEBTYPE_EXTERNALCOMMAND_END, NEBFLAG_NONE,
+                          NEBATTR_NONE, command_id, entry_time,
                           const_cast<char*>(command_name.c_str()),
-                          const_cast<char*>(args.c_str()),
-                          nullptr);
+                          const_cast<char*>(args.c_str()), nullptr);
   return true;
 }
 
@@ -694,10 +687,9 @@ void processing::_wrapper_read_state_information() {
     p.parse(config->state_retention_file(), state);
     retention::applier::state app_state;
     app_state.apply(*config, state);
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "Error: could not load retention file: "
-                                     << e.what();
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+        << "Error: could not load retention file: " << e.what();
   }
   return;
 }
@@ -725,8 +717,7 @@ void processing::_wrapper_disable_all_notifications_beyond_host(host* hst) {
 void processing::_wrapper_enable_host_svc_notifications(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       enable_service_notifications(it->second);
 }
@@ -734,8 +725,7 @@ void processing::_wrapper_enable_host_svc_notifications(host* hst) {
 void processing::_wrapper_disable_host_svc_notifications(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       disable_service_notifications(it->second);
 }
@@ -743,8 +733,7 @@ void processing::_wrapper_disable_host_svc_notifications(host* hst) {
 void processing::_wrapper_disable_host_svc_checks(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       disable_service_checks(it->second);
 }
@@ -752,8 +741,7 @@ void processing::_wrapper_disable_host_svc_checks(host* hst) {
 void processing::_wrapper_enable_host_svc_checks(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       enable_service_checks(it->second);
 }
@@ -767,9 +755,7 @@ void processing::_wrapper_send_custom_host_notification(host* hst, char* args) {
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&
       (buf[2] = my_strtok(NULL, ";"))) {
-    hst->notify(notifier::reason_custom,
-                buf[1],
-                buf[2],
+    hst->notify(notifier::reason_custom, buf[1], buf[2],
                 static_cast<notifier::notification_option>(atoi(buf[0])));
   }
 }
@@ -777,8 +763,7 @@ void processing::_wrapper_send_custom_host_notification(host* hst, char* args) {
 void processing::_wrapper_enable_service_notifications(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       enable_service_notifications(it->second);
 }
@@ -786,8 +771,7 @@ void processing::_wrapper_enable_service_notifications(host* hst) {
 void processing::_wrapper_disable_service_notifications(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       disable_service_notifications(it->second);
 }
@@ -795,8 +779,7 @@ void processing::_wrapper_disable_service_notifications(host* hst) {
 void processing::_wrapper_enable_service_checks(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       enable_service_checks(it->second);
 }
@@ -804,8 +787,7 @@ void processing::_wrapper_enable_service_checks(host* hst) {
 void processing::_wrapper_disable_service_checks(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       disable_service_checks(it->second);
 }
@@ -813,8 +795,7 @@ void processing::_wrapper_disable_service_checks(host* hst) {
 void processing::_wrapper_enable_passive_service_checks(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       enable_passive_service_checks(it->second);
 }
@@ -822,8 +803,7 @@ void processing::_wrapper_enable_passive_service_checks(host* hst) {
 void processing::_wrapper_disable_passive_service_checks(host* hst) {
   for (service_map_unsafe::iterator it(hst->services.begin()),
        end(hst->services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second)
       disable_passive_service_checks(it->second);
 }
@@ -840,9 +820,7 @@ void processing::_wrapper_send_custom_service_notification(service* svc,
   char* buf[3] = {NULL, NULL, NULL};
   if ((buf[0] = my_strtok(args, ";")) && (buf[1] = my_strtok(NULL, ";")) &&
       (buf[2] = my_strtok(NULL, ";"))) {
-    svc->notify(notifier::reason_custom,
-                buf[1],
-                buf[2],
+    svc->notify(notifier::reason_custom, buf[1], buf[2],
                 static_cast<notifier::notification_option>(atoi(buf[0])));
   }
 }

@@ -18,28 +18,29 @@
 */
 
 #ifndef CCE_TIMEZONE_LOCKER_HH
-#  define CCE_TIMEZONE_LOCKER_HH
+#define CCE_TIMEZONE_LOCKER_HH
 
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#include <string>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 /**
- *  @class timezone_locker timezone_locker.hh "com/centreon/engine/timezone_locker.hh"
+ *  @class timezone_locker timezone_locker.hh
+ * "com/centreon/engine/timezone_locker.hh"
  *  @brief Handle timezone changes, even in case of exception.
  *
  *  This class works on a timezone_manager to push a new timezone at
  *  construction and pop it when destructed.
  */
-class                 timezone_locker {
-public:
-                      timezone_locker(std::string const& tz);
-                      ~timezone_locker();
-                      timezone_locker(timezone_locker const& other) = delete;
-  timezone_locker&    operator=(timezone_locker const& other) = delete;
+class timezone_locker {
+ public:
+  timezone_locker(std::string const& tz);
+  ~timezone_locker();
+  timezone_locker(timezone_locker const& other) = delete;
+  timezone_locker& operator=(timezone_locker const& other) = delete;
 };
 
 CCE_END()
 
-#endif // !CCE_TIMEZONE_LOCKER_HH
+#endif  // !CCE_TIMEZONE_LOCKER_HH

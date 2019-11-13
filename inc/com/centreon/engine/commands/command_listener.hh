@@ -18,27 +18,27 @@
 */
 
 #ifndef CCE_COMMANDS_COMMAND_LISTENER_HH
-#  define CCE_COMMANDS_COMMAND_LISTENER_HH
+#define CCE_COMMANDS_COMMAND_LISTENER_HH
 
-#  include "com/centreon/engine/commands/result.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/commands/result.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace        commands {
-  /**
-   *  @class command_listener command_listener.hh
-   *  @brief Notify command events.
-   *
-   *  This class provide interface to notify command events.
-   */
-  class          command_listener {
-  public:
-    virtual      ~command_listener() throw () {}
-    virtual void finished(result const& res) throw () = 0;
-  };
-}
+namespace commands {
+/**
+ *  @class command_listener command_listener.hh
+ *  @brief Notify command events.
+ *
+ *  This class provide interface to notify command events.
+ */
+class command_listener {
+ public:
+  virtual ~command_listener() throw() {}
+  virtual void finished(result const& res) throw() = 0;
+};
+}  // namespace commands
 
 CCE_END()
 
-#endif // !CCE_COMMANDS_COMMAND_LISTENER_HH
+#endif  // !CCE_COMMANDS_COMMAND_LISTENER_HH

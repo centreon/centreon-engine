@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
 /******************************************************************/
@@ -38,20 +38,14 @@ int update_all_status_data() {
   int result = OK;
 
   /* send data to event broker */
-  broker_aggregated_status_data(
-    NEBTYPE_AGGREGATEDSTATUS_STARTDUMP,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    NULL);
+  broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_STARTDUMP,
+                                NEBFLAG_NONE, NEBATTR_NONE, NULL);
 
   result = xsddefault_save_status_data();
 
   /* send data to event broker */
-  broker_aggregated_status_data(
-    NEBTYPE_AGGREGATEDSTATUS_ENDDUMP,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    NULL);
+  broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_ENDDUMP, NEBFLAG_NONE,
+                                NEBATTR_NONE, NULL);
 
   if (result != OK)
     return ERROR;
@@ -67,11 +61,7 @@ int cleanup_status_data(int delete_status_data) {
 int update_program_status(int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
   if (aggregated_dump == false)
-    broker_program_status(
-      NEBTYPE_PROGRAMSTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      NULL);
+    broker_program_status(NEBTYPE_PROGRAMSTATUS_UPDATE, NEBFLAG_NONE,
+                          NEBATTR_NONE, NULL);
   return OK;
 }
-

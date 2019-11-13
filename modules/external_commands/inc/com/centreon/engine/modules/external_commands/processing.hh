@@ -27,10 +27,10 @@
 #include <unordered_map>
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/contact.hh"
-#include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/hostgroup.hh"
+#include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/service.hh"
 #include "com/centreon/engine/servicegroup.hh"
 
@@ -163,8 +163,7 @@ class processing {
 
     for (host_map_unsafe::iterator it(group->members.begin()),
          end(group->members.begin());
-         it != end;
-         ++it)
+         it != end; ++it)
       if (it->second)
         (*fptr)(it->second);
   }
@@ -213,8 +212,7 @@ class processing {
 
     for (service_map_unsafe::iterator it2(sg_it->second->members.begin()),
          end2(sg_it->second->members.end());
-         it2 != end2;
-         ++it2)
+         it2 != end2; ++it2)
       if (it2->second)
         (*fptr)(it2->second);
   }
@@ -233,8 +231,7 @@ class processing {
     host* last_host{nullptr};
     for (service_map_unsafe::iterator it2(sg_it->second->members.begin()),
          end2(sg_it->second->members.end());
-         it2 != end2;
-         ++it2) {
+         it2 != end2; ++it2) {
       host* hst{nullptr};
       host_map::const_iterator found(host::hosts.find(it2->first.first));
       if (found != host::hosts.end())
@@ -273,8 +270,7 @@ class processing {
     for (contact_map_unsafe::const_iterator
              it(it_cg->second->get_members().begin()),
          end(it_cg->second->get_members().end());
-         it != end;
-         ++it)
+         it != end; ++it)
       if (it->second)
         (*fptr)(it->second);
   }
@@ -282,8 +278,8 @@ class processing {
   std::unordered_map<std::string, command_info> _lst_command;
   mutable std::mutex _mutex;
 };
-}
-}
+}  // namespace external_commands
+}  // namespace modules
 
 CCE_END()
 

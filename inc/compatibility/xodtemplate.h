@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XODTEMPLATE_H
-#  define CCE_COMPATIBILITY_XODTEMPLATE_H
+#define CCE_COMPATIBILITY_XODTEMPLATE_H
 
-#  include "com/centreon/engine/xodtemplate.hh"
+#include "com/centreon/engine/xodtemplate.hh"
 
-#endif // !CCE_COMPATIBILITY_XODTEMPLATE_H
+#endif  // !CCE_COMPATIBILITY_XODTEMPLATE_H

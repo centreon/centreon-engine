@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/handle.hh"
+#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -28,10 +28,10 @@ using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Constructor.
@@ -40,7 +40,7 @@ using namespace com::centreon::engine::logging;
  *  @param[in] args     The module args.
  */
 handle::handle(std::string const& filename, std::string const& args)
-  : _args(args), _filename(filename), _name(filename) {
+    : _args(args), _filename(filename), _name(filename) {
   broker::compatibility::instance().create_module(this);
 }
 
@@ -57,7 +57,7 @@ handle::handle(handle const& right) {
 /**
  *  Destructor.
  */
-handle::~handle() throw () {
+handle::~handle() throw() {
   broker::compatibility::instance().destroy_module(this);
 }
 
@@ -81,16 +81,13 @@ handle& handle::operator=(handle const& right) {
  *
  *  @return true or false.
  */
-bool handle::operator==(handle const& right) const throw () {
-  return ((_args == right._args)
-          && (_author == right._author)
-          && (_copyright == right._copyright)
-          && (_description == right._description)
-          && (_filename == right._filename)
-          && (_license == right._license)
-          && (_name == right._name)
-          && (_version == right._version)
-          && (_handle.get() == right._handle.get()));
+bool handle::operator==(handle const& right) const throw() {
+  return ((_args == right._args) && (_author == right._author) &&
+          (_copyright == right._copyright) &&
+          (_description == right._description) &&
+          (_filename == right._filename) && (_license == right._license) &&
+          (_name == right._name) && (_version == right._version) &&
+          (_handle.get() == right._handle.get()));
 }
 
 /**
@@ -100,7 +97,7 @@ bool handle::operator==(handle const& right) const throw () {
  *
  *  @return true or false.
  */
-bool handle::operator!=(handle const& right) const throw () {
+bool handle::operator!=(handle const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -111,16 +108,15 @@ void handle::close() {
   if (_handle.get()) {
     if (_handle->is_loaded()) {
       typedef int (*func_deinit)(int, int);
-      func_deinit
-        deinit((func_deinit)_handle->resolve_proc("nebmodule_deinit"));
+      func_deinit deinit(
+          (func_deinit)_handle->resolve_proc("nebmodule_deinit"));
       if (!deinit)
         logger(log_info_message, basic)
-          << "Cannot resolve symbole 'nebmodule_deinit' in module '"
-          << _filename << "'.";
+            << "Cannot resolve symbole 'nebmodule_deinit' in module '"
+            << _filename << "'.";
       else
-        deinit(
-          NEBMODULE_FORCE_UNLOAD | NEBMODULE_ENGINE,
-          NEBMODULE_NEB_SHUTDOWN);
+        deinit(NEBMODULE_FORCE_UNLOAD | NEBMODULE_ENGINE,
+               NEBMODULE_NEB_SHUTDOWN);
       _handle->unload();
     }
     _handle.reset();
@@ -134,7 +130,7 @@ void handle::close() {
  *
  *  @return The arguments.
  */
-std::string const& handle::get_args() const throw () {
+std::string const& handle::get_args() const throw() {
   return (_args);
 }
 
@@ -143,7 +139,7 @@ std::string const& handle::get_args() const throw () {
  *
  *  @return The author name.
  */
-std::string const& handle::get_author() const throw () {
+std::string const& handle::get_author() const throw() {
   return (_author);
 }
 
@@ -152,7 +148,7 @@ std::string const& handle::get_author() const throw () {
  *
  *  @return The copyright.
  */
-std::string const& handle::get_copyright() const throw () {
+std::string const& handle::get_copyright() const throw() {
   return (_copyright);
 }
 
@@ -161,7 +157,7 @@ std::string const& handle::get_copyright() const throw () {
  *
  *  @return The description.
  */
-std::string const& handle::get_description() const throw () {
+std::string const& handle::get_description() const throw() {
   return (_description);
 }
 
@@ -170,7 +166,7 @@ std::string const& handle::get_description() const throw () {
  *
  *  @return The filename.
  */
-std::string const& handle::get_filename() const throw () {
+std::string const& handle::get_filename() const throw() {
   return (_filename);
 }
 
@@ -179,7 +175,7 @@ std::string const& handle::get_filename() const throw () {
  *
  *  @return pointer on a library.
  */
-com::centreon::library* handle::get_handle() const throw () {
+com::centreon::library* handle::get_handle() const throw() {
   return (_handle.get());
 }
 
@@ -188,7 +184,7 @@ com::centreon::library* handle::get_handle() const throw () {
  *
  *  @return The license.
  */
-std::string const& handle::get_license() const throw () {
+std::string const& handle::get_license() const throw() {
   return (_license);
 }
 
@@ -197,7 +193,7 @@ std::string const& handle::get_license() const throw () {
  *
  *  @return The name.
  */
-std::string const& handle::get_name() const throw () {
+std::string const& handle::get_name() const throw() {
   return (_name);
 }
 
@@ -206,7 +202,7 @@ std::string const& handle::get_name() const throw () {
  *
  *  @return The version.
  */
-std::string const& handle::get_version() const throw () {
+std::string const& handle::get_version() const throw() {
   return (_version);
 }
 
@@ -230,25 +226,21 @@ void handle::open() {
     _handle = std::shared_ptr<library>(new library(_filename));
     _handle->load();
 
-    int api_version(*static_cast<int*>(
-          _handle->resolve("__neb_api_version")));
+    int api_version(*static_cast<int*>(_handle->resolve("__neb_api_version")));
     if (api_version != CURRENT_NEB_API_VERSION)
-      throw (engine_error() << "Module is using an old or unspecified "
-             "version of the event broker API");
+      throw(engine_error() << "Module is using an old or unspecified "
+                              "version of the event broker API");
 
     typedef int (*func_init)(int, char const*, void*);
     func_init init((func_init)_handle->resolve_proc("nebmodule_init"));
 
-    if (init(
-          NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,
-          _args.c_str(),
-          this) != OK)
-      throw (engine_error() << "Function nebmodule_init "
-             "returned an error");
+    if (init(NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE, _args.c_str(), this) !=
+        OK)
+      throw(engine_error() << "Function nebmodule_init "
+                              "returned an error");
 
     broker::compatibility::instance().loaded_module(this);
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     close();
     throw;
@@ -262,11 +254,9 @@ void handle::open() {
  *  @param[in] filename The module filename.
  *  @param[in] args The module arguments.
  */
-void handle::open(
-               std::string const& filename,
-               std::string const& args) {
+void handle::open(std::string const& filename, std::string const& args) {
   if (is_loaded())
-    return ;
+    return;
 
   close();
   _filename = filename;
@@ -280,13 +270,12 @@ void handle::open(
  */
 void handle::reload() {
   if (!is_loaded())
-    return ;
+    return;
   typedef int (*func_reload)();
-  func_reload
-    routine((func_reload)_handle->resolve_proc("nebmodule_reload"));
+  func_reload routine((func_reload)_handle->resolve_proc("nebmodule_reload"));
   if (routine)
     routine();
-  return ;
+  return;
 }
 
 /**
@@ -356,10 +345,10 @@ void handle::set_version(std::string const& version) {
 }
 
 /**************************************
-*                                     *
-*           Private Methods           *
-*                                     *
-**************************************/
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
 
 /**
  *  Copy internal data members.

@@ -17,12 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "tests/timeperiod/utils.hh"
 #include <cstring>
 #include <ctime>
 #include <memory>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/timerange.hh"
-#include "tests/timeperiod/utils.hh"
 
 using namespace com::centreon::engine;
 // Global time.
@@ -49,7 +49,6 @@ timeperiod* timeperiod_creator::get_timeperiods() {
   return (_timeperiods.begin()->get());
 }
 
-
 std::shared_ptr<timeperiod> timeperiod_creator::get_timeperiods_shared() {
   return (*_timeperiods.begin());
 }
@@ -71,9 +70,8 @@ timeperiod* timeperiod_creator::new_timeperiod() {
  *  @param[in]  excluded  Excluded timeperiod.
  *  @param[out] target    Target timeperiod.
  */
-void timeperiod_creator::new_exclusion(
-                           std::shared_ptr<timeperiod> excluded,
-                           timeperiod* target) {
+void timeperiod_creator::new_exclusion(std::shared_ptr<timeperiod> excluded,
+                                       timeperiod* target) {
   if (!target)
     target = _timeperiods.begin()->get();
 
@@ -93,14 +91,13 @@ void timeperiod_creator::new_exclusion(
  *
  *  @return The newly created daterange.
  */
-daterange* timeperiod_creator::new_calendar_date(
-                                 int start_year,
-                                 int start_month,
-                                 int start_day,
-                                 int end_year,
-                                 int end_month,
-                                 int end_day,
-                                 timeperiod* target) {
+daterange* timeperiod_creator::new_calendar_date(int start_year,
+                                                 int start_month,
+                                                 int start_day,
+                                                 int end_year,
+                                                 int end_month,
+                                                 int end_day,
+                                                 timeperiod* target) {
   if (!target)
     target = _timeperiods.begin()->get();
 
@@ -123,29 +120,17 @@ daterange* timeperiod_creator::new_calendar_date(
  *
  *  @return The newly created daterange.
  */
-daterange* timeperiod_creator::new_specific_month_date(
-                                 int start_month,
-                                 int start_day,
-                                 int end_month,
-                                 int end_day,
-                                 timeperiod* target) {
+daterange* timeperiod_creator::new_specific_month_date(int start_month,
+                                                       int start_day,
+                                                       int end_month,
+                                                       int end_day,
+                                                       timeperiod* target) {
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{
-    new daterange(
-      DATERANGE_MONTH_DATE,
-      0,
-      start_month,
-      start_day,
-      0,
-      0,
-      0,
-      end_month,
-      end_day,
-      0,
-      0,
-      0)};
+  std::shared_ptr<daterange> dr{new daterange(DATERANGE_MONTH_DATE, 0,
+                                              start_month, start_day, 0, 0, 0,
+                                              end_month, end_day, 0, 0, 0)};
 
   target->exceptions[DATERANGE_MONTH_DATE].push_back(dr);
   return dr.get();
@@ -160,27 +145,14 @@ daterange* timeperiod_creator::new_specific_month_date(
  *
  *  @return The newly created daterange.
  */
-daterange* timeperiod_creator::new_generic_month_date(
-                                 int start_day,
-                                 int end_day,
-                                 timeperiod* target) {
+daterange* timeperiod_creator::new_generic_month_date(int start_day,
+                                                      int end_day,
+                                                      timeperiod* target) {
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{
-    new daterange(
-      DATERANGE_MONTH_DAY,
-      0,
-      0,
-      start_day,
-      0,
-      0,
-      0,
-      0,
-      end_day,
-      0,
-      0,
-      0)};
+  std::shared_ptr<daterange> dr{new daterange(
+      DATERANGE_MONTH_DAY, 0, 0, start_day, 0, 0, 0, 0, end_day, 0, 0, 0)};
 
   target->exceptions[DATERANGE_MONTH_DAY].push_back(dr);
   return dr.get();
@@ -200,30 +172,19 @@ daterange* timeperiod_creator::new_generic_month_date(
  *  @return The newly created daterange.
  */
 daterange* timeperiod_creator::new_offset_weekday_of_specific_month(
-                                 int start_month,
-                                 int start_wday,
-                                 int start_offset,
-                                 int end_month,
-                                 int end_wday,
-                                 int end_offset,
-                                 timeperiod* target) {
+    int start_month,
+    int start_wday,
+    int start_offset,
+    int end_month,
+    int end_wday,
+    int end_offset,
+    timeperiod* target) {
   if (!target)
     target = _timeperiods.begin()->get();
 
   std::shared_ptr<daterange> dr{
-    new daterange(
-      DATERANGE_MONTH_WEEK_DAY,
-      0,
-      start_month,
-      0,
-      start_wday,
-      start_offset,
-      0,
-      end_month,
-      0,
-      end_wday,
-      end_offset,
-      0)};
+      new daterange(DATERANGE_MONTH_WEEK_DAY, 0, start_month, 0, start_wday,
+                    start_offset, 0, end_month, 0, end_wday, end_offset, 0)};
 
   target->exceptions[DATERANGE_MONTH_WEEK_DAY].push_back(dr);
   return dr.get();
@@ -241,28 +202,17 @@ daterange* timeperiod_creator::new_offset_weekday_of_specific_month(
  *  @return The newly created daterange.
  */
 daterange* timeperiod_creator::new_offset_weekday_of_generic_month(
-                                 int start_wday,
-                                 int start_offset,
-                                 int end_wday,
-                                 int end_offset,
-                                 timeperiod* target) {
+    int start_wday,
+    int start_offset,
+    int end_wday,
+    int end_offset,
+    timeperiod* target) {
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{
-    new daterange(
-       DATERANGE_WEEK_DAY,
-       0,
-       0,
-       0,
-       start_wday,
-       start_offset,
-       0,
-       0,
-       0,
-       end_wday,
-       end_offset,
-       0)};
+  std::shared_ptr<daterange> dr{new daterange(DATERANGE_WEEK_DAY, 0, 0, 0,
+                                              start_wday, start_offset, 0, 0, 0,
+                                              end_wday, end_offset, 0)};
 
   target->exceptions[DATERANGE_WEEK_DAY].push_back(dr);
   return dr.get();
@@ -277,19 +227,16 @@ daterange* timeperiod_creator::new_offset_weekday_of_generic_month(
  *  @param[in]  end_minute    End minute.
  *  @param[out] target        Target daterange.
  */
-void timeperiod_creator::new_timerange(
-                           int start_hour,
-                           int start_minute,
-                           int end_hour,
-                           int end_minute,
-                           daterange* target) {
+void timeperiod_creator::new_timerange(int start_hour,
+                                       int start_minute,
+                                       int end_hour,
+                                       int end_minute,
+                                       daterange* target) {
   if (!target)
     return;
 
-  std::shared_ptr <timerange> tr{
-    new timerange(
-      hmtos(start_hour, start_minute),
-      hmtos(end_hour, end_minute))};
+  std::shared_ptr<timerange> tr{new timerange(hmtos(start_hour, start_minute),
+                                              hmtos(end_hour, end_minute))};
 
   target->times.push_back(tr);
 }
@@ -304,20 +251,17 @@ void timeperiod_creator::new_timerange(
  *  @param[in]  day           Day.
  *  @param[out] target        Target timeperiod.
  */
-void timeperiod_creator::new_timerange(
-                           int start_hour,
-                           int start_minute,
-                           int end_hour,
-                           int end_minute,
-                           int day,
-                           timeperiod* target) {
-  if(!target)
+void timeperiod_creator::new_timerange(int start_hour,
+                                       int start_minute,
+                                       int end_hour,
+                                       int end_minute,
+                                       int day,
+                                       timeperiod* target) {
+  if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr <timerange> tr{
-    new timerange(
-      hmtos(start_hour, start_minute),
-      hmtos(end_hour, end_minute))};
+  std::shared_ptr<timerange> tr{new timerange(hmtos(start_hour, start_minute),
+                                              hmtos(end_hour, end_minute))};
 
   target->days[day].push_back(tr);
 }
@@ -357,7 +301,7 @@ time_t strtotimet(std::string const& str) {
   tm t;
   memset(&t, 0, sizeof(t));
   if (!strptime(str.c_str(), "%Y-%m-%d %H:%M:%S", &t))
-    throw (engine_error() << "invalid date format");
+    throw(engine_error() << "invalid date format");
   t.tm_isdst = -1;
   return (mktime(&t));
 }
@@ -367,10 +311,10 @@ time_t strtotimet(std::string const& str) {
  */
 
 #ifndef __THROW
-#  define __THROW
-#endif // !__THROW
+#define __THROW
+#endif  // !__THROW
 
-extern "C" time_t time(time_t *t) __THROW {
+extern "C" time_t time(time_t* t) __THROW {
   if (t)
     *t = gl_now;
   return (gl_now);

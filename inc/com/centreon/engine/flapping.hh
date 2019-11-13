@@ -19,18 +19,18 @@
 */
 
 #ifndef CCE_FLAPPING_HH
-#  define CCE_FLAPPING_HH
+#define CCE_FLAPPING_HH
 
-#  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/service.hh"
+#include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/service.hh"
 
 // Flapping Types
-#  define HOST_FLAPPING    0
-#  define SERVICE_FLAPPING 1
+#define HOST_FLAPPING 0
+#define SERVICE_FLAPPING 1
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 // handles a service that is flapping
 // handles a host that is flapping
@@ -47,8 +47,8 @@ void enable_service_flap_detection(com::centreon::engine::service* svc);
 // disables flap detection for a particular service
 void disable_service_flap_detection(com::centreon::engine::service* svc);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_FLAPPING_HH
+#endif  // !CCE_FLAPPING_HH

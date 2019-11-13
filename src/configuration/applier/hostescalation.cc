@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -69,22 +69,21 @@ void applier::hostescalation::add_object(
                : notifier::none) |
           ((obj.escalation_options() & configuration::hostescalation::recovery)
                ? notifier::up
-               : notifier::none), obj.uuid())};
+               : notifier::none),
+      obj.uuid())};
 
   // Add new items to the configuration state.
-  engine::hostescalation::hostescalations.insert(
-      {he->get_hostname(), he});
+  engine::hostescalation::hostescalations.insert({he->get_hostname(), he});
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_escalation_data(
-      NEBTYPE_HOSTESCALATION_ADD, NEBFLAG_NONE, NEBATTR_NONE, he.get(), &tv);
+  broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_ADD, NEBFLAG_NONE,
+                                  NEBATTR_NONE, he.get(), &tv);
 
   // Add contact groups to host escalation.
   for (set_string::const_iterator it(obj.contactgroups().begin()),
        end(obj.contactgroups().end());
-       it != end;
-       ++it)
+       it != end; ++it)
     he->get_contactgroups().insert({*it, nullptr});
 }
 
@@ -99,8 +98,7 @@ void applier::hostescalation::expand_objects(configuration::state& s) {
   for (configuration::set_hostescalation::const_iterator
            it_esc(s.hostescalations().begin()),
        end_esc(s.hostescalations().end());
-       it_esc != end_esc;
-       ++it_esc) {
+       it_esc != end_esc; ++it_esc) {
     // Expanded hosts.
     std::set<std::string> expanded_hosts;
     _expand_hosts(it_esc->hosts(), it_esc->hostgroups(), s, expanded_hosts);
@@ -108,8 +106,7 @@ void applier::hostescalation::expand_objects(configuration::state& s) {
     // Browse all hosts.
     for (std::set<std::string>::const_iterator it(expanded_hosts.begin()),
          end(expanded_hosts.end());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       configuration::hostescalation hesc(*it_esc);
       hesc.hostgroups().clear();
       hesc.hosts().clear();
@@ -172,7 +169,8 @@ void applier::hostescalation::remove_object(
      * if the hostescalation is the good one. */
     if (it->second->get_first_notification() == obj.first_notification() &&
         it->second->get_last_notification() == obj.last_notification() &&
-        it->second->get_notification_interval() == obj.notification_interval() &&
+        it->second->get_notification_interval() ==
+            obj.notification_interval() &&
         it->second->get_escalation_period() == obj.escalation_period() &&
         it->second->get_escalate_on(notifier::down) ==
             static_cast<bool>(obj.escalation_options() &
@@ -188,7 +186,8 @@ void applier::hostescalation::remove_object(
       // Notify event broker.
       timeval tv(get_broker_timestamp(nullptr));
       broker_adaptive_escalation_data(NEBTYPE_HOSTESCALATION_DELETE,
-                                      NEBFLAG_NONE, NEBATTR_NONE, it->second.get(), &tv);
+                                      NEBFLAG_NONE, NEBATTR_NONE,
+                                      it->second.get(), &tv);
 
       /* We need also to remove the escalation from the host */
       for (std::list<engine::escalation*>::iterator heit{escalations.begin()},
@@ -261,8 +260,7 @@ void applier::hostescalation::_expand_hosts(
 
   // Browse host groups.
   for (set_string::const_iterator it(hostgroups.begin()), end(hostgroups.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     // Find host group.
     set_hostgroup::const_iterator it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
@@ -284,8 +282,7 @@ void applier::hostescalation::_inherits_special_vars(
     configuration::hostescalation& obj,
     configuration::state& s) {
   // Detect if any special variable has not been defined.
-  if (!obj.contactgroups_defined() ||
-      !obj.notification_interval_defined() ||
+  if (!obj.contactgroups_defined() || !obj.notification_interval_defined() ||
       !obj.escalation_period_defined()) {
     // Find host.
     configuration::set_host::const_iterator it(

@@ -18,28 +18,26 @@
 */
 
 #ifndef CCE_RETENTION_APPLIER_COMMENT_HH
-#  define CCE_RETENTION_APPLIER_COMMENT_HH
+#define CCE_RETENTION_APPLIER_COMMENT_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/comment.hh"
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/retention/comment.hh"
 
 CCE_BEGIN()
 
-namespace   retention {
-  namespace applier {
-    class   comment {
-    public:
-      void  apply(list_comment const& lst);
+namespace retention {
+namespace applier {
+class comment {
+ public:
+  void apply(list_comment const& lst);
 
-    private:
-      void  _add_host_comment(
-              retention::comment const& obj) throw ();
-      void  _add_service_comment(
-              retention::comment const& obj) throw ();
-    };
-  }
-}
+ private:
+  void _add_host_comment(retention::comment const& obj) throw();
+  void _add_service_comment(retention::comment const& obj) throw();
+};
+}  // namespace applier
+}  // namespace retention
 
 CCE_END()
 
-#endif // !CCE_RETENTION_APPLIER_COMMENT_HH
+#endif  // !CCE_RETENTION_APPLIER_COMMENT_HH

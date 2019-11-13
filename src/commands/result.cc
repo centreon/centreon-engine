@@ -24,20 +24,15 @@ using namespace com::centreon;
 using namespace com::centreon::engine::commands;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Constructor.
  */
-result::result()
-  : command_id(0),
-    exit_code(0),
-    exit_status(process::normal) {
-
-}
+result::result() : command_id(0), exit_code(0), exit_status(process::normal) {}
 
 /**
  *  Copy constructor.
@@ -51,7 +46,7 @@ result::result(result const& right) {
 /**
  *  Destructor.
  */
-result::~result() throw () {}
+result::~result() throw() {}
 
 /**
  *  Default copy operator.
@@ -73,13 +68,10 @@ result& result::operator=(result const& right) {
  *
  *  @return True if object have the same value.
  */
-bool result::operator==(result const& right) const throw () {
-  return (command_id == right.command_id
-          && exit_code == right.exit_code
-          && exit_status == right.exit_status
-          && end_time == right.end_time
-          && start_time == right.start_time
-          && output == right.output);
+bool result::operator==(result const& right) const throw() {
+  return (command_id == right.command_id && exit_code == right.exit_code &&
+          exit_status == right.exit_status && end_time == right.end_time &&
+          start_time == right.start_time && output == right.output);
 }
 
 /**
@@ -89,15 +81,15 @@ bool result::operator==(result const& right) const throw () {
  *
  *  @return True if object have the different value.
  */
-bool result::operator!=(result const& right) const throw () {
+bool result::operator!=(result const& right) const throw() {
   return (!operator==(right));
 }
 
 /**************************************
-*                                     *
-*           Private Methods           *
-*                                     *
-**************************************/
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
 
 /**
  *  Copy internal data members.

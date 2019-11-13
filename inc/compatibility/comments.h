@@ -19,12 +19,12 @@
 */
 
 #ifndef CCE_COMPATIBILITY_COMMENTS_H
-#  define CCE_COMPATIBILITY_COMMENTS_H
+#define CCE_COMPATIBILITY_COMMENTS_H
 
-#  include "com/centreon/engine/objects/comment.hh"
-#  include "common.h"
-#  include "config.h"
-#  include "objects.h"
+#include "com/centreon/engine/objects/comment.hh"
+#include "common.h"
+#include "config.h"
+#include "objects.h"
 
 /*
 ** If you are going to be adding a lot of comments in sequence,
@@ -33,4 +33,4 @@
 */
 extern int defer_comment_sorting;
 
-#endif // !CCE_COMPATIBILITY_COMMENTS_H
+#endif  // !CCE_COMPATIBILITY_COMMENTS_H

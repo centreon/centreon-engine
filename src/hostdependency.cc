@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <array>
 #include "com/centreon/engine/hostdependency.hh"
+#include <array>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
@@ -235,51 +235,46 @@ void hostdependency::resolve(int& w, int& e) {
   host_map::const_iterator it{host::hosts.find(_dependent_hostname)};
   if (it == host::hosts.end() || !it->second) {
     logger(log_verification_error, basic)
-      << "Error: Dependent host specified in host dependency for "
-         "host '" << _dependent_hostname
-      << "' is not defined anywhere!";
+        << "Error: Dependent host specified in host dependency for "
+           "host '"
+        << _dependent_hostname << "' is not defined anywhere!";
     errors++;
     dependent_host_ptr = nullptr;
-  }
-  else
+  } else
     dependent_host_ptr = it->second.get();
 
   // Find the host we're depending on.
   it = host::hosts.find(_hostname);
   if (it == host::hosts.end() || !it->second) {
     logger(log_verification_error, basic)
-      << "Error: Host specified in host dependency for host '"
-      << _dependent_hostname << "' is not defined anywhere!";
+        << "Error: Host specified in host dependency for host '"
+        << _dependent_hostname << "' is not defined anywhere!";
     errors++;
     master_host_ptr = nullptr;
-  }
-  else
+  } else
     master_host_ptr = it->second.get();
 
   // Make sure they're not the same host.
   if (dependent_host_ptr == master_host_ptr && dependent_host_ptr != nullptr) {
     logger(log_verification_error, basic)
-      << "Error: Host dependency definition for host '"
-      << _dependent_hostname
-      << "' is circular (it depends on itself)!";
+        << "Error: Host dependency definition for host '" << _dependent_hostname
+        << "' is circular (it depends on itself)!";
     errors++;
   }
 
   // Find the timeperiod.
   if (!_dependency_period.empty()) {
-    timeperiod_map::const_iterator
-      it{timeperiod::timeperiods.find(_dependency_period)};
+    timeperiod_map::const_iterator it{
+        timeperiod::timeperiods.find(_dependency_period)};
 
     if (it == timeperiod::timeperiods.end() || !it->second) {
       logger(log_verification_error, basic)
-        << "Error: Dependency period '" << this->get_dependency_period()
-        << "' specified in host dependency for host '"
-        << _dependent_hostname
-        << "' is not defined anywhere!";
+          << "Error: Dependency period '" << this->get_dependency_period()
+          << "' specified in host dependency for host '" << _dependent_hostname
+          << "' is not defined anywhere!";
       errors++;
       dependency_period_ptr = nullptr;
-    }
-    else
+    } else
       dependency_period_ptr = it->second.get();
   }
 
@@ -290,7 +285,6 @@ void hostdependency::resolve(int& w, int& e) {
   }
 }
 
-
 /**
  *  Find a service dependency from its key.
  *
@@ -300,7 +294,7 @@ void hostdependency::resolve(int& w, int& e) {
  *          servicedependencies().end() otherwise.
  */
 hostdependency_mmap::iterator hostdependency::hostdependencies_find(
-  const com::centreon::engine::configuration::hostdependency &k) {
+    const com::centreon::engine::configuration::hostdependency& k) {
   typedef hostdependency_mmap collection;
   std::pair<collection::iterator, collection::iterator> p;
 
@@ -308,32 +302,37 @@ hostdependency_mmap::iterator hostdependency::hostdependencies_find(
   while (p.first != p.second) {
     configuration::hostdependency current;
     current.configuration::object::operator=(k);
-    current.dependent_hosts().insert(
-      p.first->second->get_dependent_hostname());
+    current.dependent_hosts().insert(p.first->second->get_dependent_hostname());
     current.hosts().insert(p.first->second->get_hostname());
-    current.dependency_period((!p.first->second->get_dependency_period().empty()
-      ? p.first->second->get_dependency_period().c_str() : ""));
+    current.dependency_period(
+        (!p.first->second->get_dependency_period().empty()
+             ? p.first->second->get_dependency_period().c_str()
+             : ""));
     current.inherits_parent(p.first->second->get_inherits_parent());
-    unsigned int options(
-      (p.first->second->get_fail_on_up()
-        ? configuration::hostdependency::up : 0)
-          | (p.first->second->get_fail_on_down()
-            ? configuration::hostdependency::down : 0)
-               | (p.first->second->get_fail_on_unreachable()
-                 ? configuration::hostdependency::unreachable: 0)
-                   | (p.first->second->get_fail_on_pending()
-                     ? configuration::hostdependency::pending : 0));
-    if (p.first->second->get_dependency_type() == engine::hostdependency::notification) {
+    unsigned int options((p.first->second->get_fail_on_up()
+                              ? configuration::hostdependency::up
+                              : 0) |
+                         (p.first->second->get_fail_on_down()
+                              ? configuration::hostdependency::down
+                              : 0) |
+                         (p.first->second->get_fail_on_unreachable()
+                              ? configuration::hostdependency::unreachable
+                              : 0) |
+                         (p.first->second->get_fail_on_pending()
+                              ? configuration::hostdependency::pending
+                              : 0));
+    if (p.first->second->get_dependency_type() ==
+        engine::hostdependency::notification) {
       current.dependency_type(
-        configuration::hostdependency::notification_dependency);
+          configuration::hostdependency::notification_dependency);
       current.notification_failure_options(options);
     } else {
       current.dependency_type(
-        configuration::hostdependency::execution_dependency);
+          configuration::hostdependency::execution_dependency);
       current.execution_failure_options(options);
     }
     if (current == k)
-      break ;
+      break;
     ++p.first;
   }
   return (p.first == p.second) ? hostdependencies.end() : p.first;

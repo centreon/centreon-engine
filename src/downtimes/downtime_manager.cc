@@ -17,9 +17,9 @@
  *
  */
 
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/host_downtime.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
 #include "com/centreon/engine/error.hh"
@@ -70,11 +70,9 @@ int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
     return ERROR;
 
   /* remove scheduled entry from event queue */
-  for (timed_event_list::iterator
-         it(timed_event::event_list_high.begin()),
-         end(timed_event::event_list_high.end());
-       it != end;
-       ++it) {
+  for (timed_event_list::iterator it(timed_event::event_list_high.begin()),
+       end(timed_event::event_list_high.end());
+       it != end; ++it) {
     temp_event = *it;
     if ((*it)->event_type != EVENT_SCHEDULED_DOWNTIME)
       continue;
@@ -148,8 +146,9 @@ int downtime_manager::check_pending_flex_host_downtime(host* hst) {
       continue;
 
     /* this entry matches our host! */
-    host *temp_host(nullptr);
-    host_map::const_iterator it_hg(host::hosts.find(it->second->get_hostname()));
+    host* temp_host(nullptr);
+    host_map::const_iterator it_hg(
+        host::hosts.find(it->second->get_hostname()));
     if (it_hg != host::hosts.end())
       temp_host = it_hg->second.get();
 
@@ -196,17 +195,18 @@ int downtime_manager::check_pending_flex_service_downtime(service* svc) {
     service_downtime& dt(
         *std::static_pointer_cast<service_downtime>(it->second));
 
-    service_map::const_iterator
-      found(service::services.find({dt.get_hostname(), dt.get_service_description()}));
+    service_map::const_iterator found(service::services.find(
+        {dt.get_hostname(), dt.get_service_description()}));
 
-      /* this entry matches our service! */
+    /* this entry matches our service! */
     if (found != service::services.end() && found->second.get() == svc) {
       /* if the time boundaries are okay, start this scheduled downtime */
-      if (dt.get_start_time() <= current_time && current_time <= dt.get_end_time()) {
+      if (dt.get_start_time() <= current_time &&
+          current_time <= dt.get_end_time()) {
         logger(dbg_downtime, basic)
-            << "Flexible downtime (id=" << dt.get_downtime_id() << ") for service '"
-            << svc->get_description() << "' on host '" << svc->get_hostname()
-            << "' starting now...";
+            << "Flexible downtime (id=" << dt.get_downtime_id()
+            << ") for service '" << svc->get_description() << "' on host '"
+            << svc->get_hostname() << "' starting now...";
 
         dt.start_flex_downtime();
         dt.handle();
@@ -232,8 +232,9 @@ void downtime_manager::clear_scheduled_downtimes() {
 }
 
 void downtime_manager::add_downtime(downtime* dt) {
-  //std::shared_ptr<downtime> tmp{std::make_shared<downtime>(dt)};
-  _scheduled_downtimes.insert({dt->get_start_time(), std::shared_ptr<downtime>(dt)});
+  // std::shared_ptr<downtime> tmp{std::make_shared<downtime>(dt)};
+  _scheduled_downtimes.insert(
+      {dt->get_start_time(), std::shared_ptr<downtime>(dt)});
 }
 
 int downtime_manager::check_for_expired_downtime() {
@@ -325,8 +326,8 @@ int downtime_manager::
       }
     }
 
-    downtime_manager::instance().unschedule_downtime(it->second->get_type(),
-                                                     it->second->get_downtime_id());
+    downtime_manager::instance().unschedule_downtime(
+        it->second->get_type(), it->second->get_downtime_id());
     ++deleted;
   }
   return deleted;
@@ -382,8 +383,7 @@ int downtime_manager::xdddefault_validate_downtime_data() {
                 std::shared_ptr<com::centreon::engine::downtimes::downtime>>::
            iterator it{_scheduled_downtimes.begin()},
        end{_scheduled_downtimes.end()};
-       it != end;
-       ++it) {
+       it != end; ++it) {
     save = true;
     downtimes::downtime& temp_downtime(*it->second);
 
@@ -421,17 +421,16 @@ uint64_t downtime_manager::get_next_downtime_id() {
 }
 
 /* saves a host downtime entry */
-downtime* downtime_manager::add_new_host_downtime(
-    std::string const& host_name,
-    time_t entry_time,
-    char const* author,
-    char const* comment_data,
-    time_t start_time,
-    time_t end_time,
-    bool fixed,
-    uint64_t triggered_by,
-    unsigned long duration,
-    uint64_t* downtime_id) {
+downtime* downtime_manager::add_new_host_downtime(std::string const& host_name,
+                                                  time_t entry_time,
+                                                  char const* author,
+                                                  char const* comment_data,
+                                                  time_t start_time,
+                                                  time_t end_time,
+                                                  bool fixed,
+                                                  uint64_t triggered_by,
+                                                  unsigned long duration,
+                                                  uint64_t* downtime_id) {
   if (host_name.empty())
     throw engine_error()
         << "can not create a host downtime on host with empty name";
@@ -478,9 +477,9 @@ downtime* downtime_manager::add_new_service_downtime(
   uint64_t new_downtime_id{get_next_downtime_id()};
 
   /* add downtime to list in memory */
-  service_downtime* retval{new service_downtime(host_name, service_description, entry_time, author,
-                       comment_data, start_time, end_time, fixed, triggered_by,
-                       duration, new_downtime_id)};
+  service_downtime* retval{new service_downtime(
+      host_name, service_description, entry_time, author, comment_data,
+      start_time, end_time, fixed, triggered_by, duration, new_downtime_id)};
   retval->schedule();
 
   /* save downtime id */
@@ -491,8 +490,8 @@ downtime* downtime_manager::add_new_service_downtime(
   broker_downtime_data(NEBTYPE_DOWNTIME_ADD, NEBFLAG_NONE, NEBATTR_NONE,
                        SERVICE_DOWNTIME, host_name.c_str(),
                        service_description.c_str(), entry_time, author.c_str(),
-                       comment_data.c_str(), start_time, end_time, fixed, triggered_by,
-                       duration, new_downtime_id, nullptr);
+                       comment_data.c_str(), start_time, end_time, fixed,
+                       triggered_by, duration, new_downtime_id, nullptr);
 
   return retval;
 }
@@ -521,12 +520,12 @@ int downtime_manager::schedule_downtime(int type,
   /* add a new downtime entry */
   if (type == HOST_DOWNTIME)
     add_new_host_downtime(host_name, entry_time, author, comment_data,
-                               start_time, end_time, fixed, triggered_by,
-                               duration, &downtime_id);
+                          start_time, end_time, fixed, triggered_by, duration,
+                          &downtime_id);
   else
-    add_new_service_downtime(host_name, service_description, entry_time,
-                                  author, comment_data, start_time, end_time,
-                                  fixed, triggered_by, duration, &downtime_id);
+    add_new_service_downtime(host_name, service_description, entry_time, author,
+                             comment_data, start_time, end_time, fixed,
+                             triggered_by, duration, &downtime_id);
 
   /* register the scheduled downtime */
   register_downtime(type, downtime_id);

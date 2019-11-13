@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
 #include <gtest/gtest.h>
+#include <memory>
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/service.hh"
 
@@ -36,9 +36,10 @@ TEST(ConfigurationObjectResolveTemplateTest, NoInheritanceOverride) {
   obj.configuration::object::parse("use parent");
   configuration::service parent;
   parent.parse("contacts", "contact2");
-  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> >
+      templates;
   templates["parent"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent));
+      new configuration::service(parent));
   obj.resolve_template(templates);
   set_string result;
   result.insert("contact1");
@@ -55,9 +56,10 @@ TEST(ConfigurationObjectResolveTemplateTest, BasicInheritance) {
   obj.configuration::object::parse("use parent");
   configuration::service parent;
   parent.configuration::object::parse("contacts contact1");
-  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> >
+      templates;
   templates["parent"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent));
+      new configuration::service(parent));
   obj.resolve_template(templates);
   set_string result;
   result.insert("contact1");
@@ -76,9 +78,10 @@ TEST(ConfigurationObjectResolveTemplateTest, BasicAdditiveInheritance) {
   obj.configuration::object::parse("use parent");
   configuration::service parent;
   parent.configuration::object::parse("contacts contact2");
-  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> >
+      templates;
   templates["parent"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent));
+      new configuration::service(parent));
   obj.resolve_template(templates);
   set_string result;
   result.insert("contact1");
@@ -93,8 +96,7 @@ TEST(ConfigurationObjectResolveTemplateTest, BasicAdditiveInheritance) {
 // When resolve_template() is called
 // Then the configuration object has its property
 // And its first template's
-TEST(ConfigurationObjectResolveTemplateTest,
-    InheritanceFromFirstTemplateOnly) {
+TEST(ConfigurationObjectResolveTemplateTest, InheritanceFromFirstTemplateOnly) {
   configuration::service obj;
   obj.configuration::object::parse("contacts +contact1");
   obj.configuration::object::parse("use parent1,parent2");
@@ -102,11 +104,12 @@ TEST(ConfigurationObjectResolveTemplateTest,
   parent1.configuration::object::parse("contacts contact2");
   configuration::service parent2;
   parent2.configuration::object::parse("contacts contact3");
-  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> >
+      templates;
   templates["parent1"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent1));
+      new configuration::service(parent1));
   templates["parent2"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent2));
+      new configuration::service(parent2));
   obj.resolve_template(templates);
   set_string result;
   result.insert("contact1");
@@ -122,18 +125,19 @@ TEST(ConfigurationObjectResolveTemplateTest,
 // Then the configuration object has its property
 // And its first template's
 TEST(ConfigurationObjectResolveTemplateTest,
-    AdditiveInheritanceFromFirstTemplateOnly1) {
+     AdditiveInheritanceFromFirstTemplateOnly1) {
   configuration::service obj;
   obj.configuration::object::parse("use parent1,parent2");
   configuration::service parent1;
   parent1.configuration::object::parse("contacts +contact1");
   configuration::service parent2;
   parent2.configuration::object::parse("contacts +contact2");
-  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> >
+      templates;
   templates["parent1"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent1));
+      new configuration::service(parent1));
   templates["parent2"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent2));
+      new configuration::service(parent2));
   obj.resolve_template(templates);
   set_string result;
   result.insert("contact1");
@@ -148,7 +152,7 @@ TEST(ConfigurationObjectResolveTemplateTest,
 // Then the configuration object has its property
 // And its first template's
 TEST(ConfigurationObjectResolveTemplateTest,
-    AdditiveInheritanceFromFirstTemplateOnly2) {
+     AdditiveInheritanceFromFirstTemplateOnly2) {
   configuration::service obj;
   obj.configuration::object::parse("contacts +contact1");
   obj.configuration::object::parse("use parent1,parent2");
@@ -156,11 +160,12 @@ TEST(ConfigurationObjectResolveTemplateTest,
   parent1.configuration::object::parse("contacts +contact2");
   configuration::service parent2;
   parent2.configuration::object::parse("contacts +contact3");
-  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> >
+      templates;
   templates["parent1"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent1));
+      new configuration::service(parent1));
   templates["parent2"] = std::shared_ptr<configuration::object>(
-    new configuration::service(parent2));
+      new configuration::service(parent2));
   obj.resolve_template(templates);
   set_string result;
   result.insert("contact1");
@@ -200,12 +205,13 @@ TEST(ConfigurationObjectResolveTemplateTest, RecursiveAdditiveInheritance) {
     oss << "contacts +contact" << i + 2;
     parents[i].configuration::object::parse(oss.str());
   }
-  std::unordered_map<std::string, std::shared_ptr<configuration::object> > templates;
+  std::unordered_map<std::string, std::shared_ptr<configuration::object> >
+      templates;
   for (int i(0); i < 6; ++i) {
     std::ostringstream oss;
     oss << "parent" << i + 1;
     templates[oss.str()] = std::shared_ptr<configuration::object>(
-      new configuration::service(parents[i]));
+        new configuration::service(parents[i]));
   }
   obj.resolve_template(templates);
   set_string result;

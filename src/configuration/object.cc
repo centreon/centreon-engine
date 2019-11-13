@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
-#include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/contact.hh"
+#include "com/centreon/engine/configuration/contactgroup.hh"
+#include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
-#include "com/centreon/engine/configuration/host.hh"
-#include "com/centreon/engine/configuration/object.hh"
+#include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/configuration/servicegroup.hh"
-#include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
@@ -43,10 +43,9 @@ using namespace com::centreon::engine::configuration;
   &object::setter<object, type, &object::method>::generic
 
 object::setters const object::_setters[] = {
-  { "use",      SETTER(std::string const&, _set_templates) },
-  { "name",     SETTER(std::string const&, _set_name) },
-  { "register", SETTER(bool, _set_should_register) }
-};
+    {"use", SETTER(std::string const&, _set_templates)},
+    {"name", SETTER(std::string const&, _set_name)},
+    {"register", SETTER(bool, _set_should_register)}};
 
 /**
  *  Constructor.
@@ -54,7 +53,7 @@ object::setters const object::_setters[] = {
  *  @param[in] type      The object type.
  */
 object::object(object::object_type type)
-  : _is_resolve(false), _should_register(true), _type(type) {}
+    : _is_resolve(false), _should_register(true), _type(type) {}
 
 /**
  *  Copy constructor.
@@ -68,7 +67,7 @@ object::object(object const& right) {
 /**
  *  Destructor.
  */
-object::~object() throw () {}
+object::~object() throw() {}
 
 /**
  *  Copy constructor.
@@ -95,12 +94,11 @@ object& object::operator=(object const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool object::operator==(object const& right) const throw () {
-  return (_name == right._name
-          && _type == right._type
-          && _is_resolve == right._is_resolve
-          && _should_register == right._should_register
-          && _templates == right._templates);
+bool object::operator==(object const& right) const throw() {
+  return (_name == right._name && _type == right._type &&
+          _is_resolve == right._is_resolve &&
+          _should_register == right._should_register &&
+          _templates == right._templates);
 }
 
 /**
@@ -110,7 +108,7 @@ bool object::operator==(object const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool object::operator!=(object const& right) const throw () {
+bool object::operator!=(object const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -161,7 +159,7 @@ object_ptr object::create(std::string const& type_name) {
  *
  *  @return The object name.
  */
-std::string const& object::name() const throw () {
+std::string const& object::name() const throw() {
   return (_name);
 }
 
@@ -174,9 +172,7 @@ std::string const& object::name() const throw () {
  *  @return True on success, otherwise false.
  */
 bool object::parse(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
+  for (unsigned int i(0); i < sizeof(_setters) / sizeof(_setters[0]); ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
@@ -215,14 +211,12 @@ void object::resolve_template(map_object& templates) {
     return;
 
   _is_resolve = true;
-  for (std::list<std::string>::const_iterator
-         it(_templates.begin()), end(_templates.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::const_iterator it(_templates.begin()),
+       end(_templates.end());
+       it != end; ++it) {
     map_object::iterator tmpl(templates.find(*it));
     if (tmpl == templates.end())
-      throw (engine_error() << "Cannot merge object of type '"
-             << *it << "'");
+      throw(engine_error() << "Cannot merge object of type '" << *it << "'");
     tmpl->second->resolve_template(templates);
     merge(*tmpl->second);
   }
@@ -233,7 +227,7 @@ void object::resolve_template(map_object& templates) {
  *
  *  @return True if object should be registered, false otherwise.
  */
-bool object::should_register() const throw () {
+bool object::should_register() const throw() {
   return (_should_register);
 }
 
@@ -242,7 +236,7 @@ bool object::should_register() const throw () {
  *
  *  @return The object type.
  */
-object::object_type object::type() const throw () {
+object::object_type object::type() const throw() {
   return (_type);
 }
 
@@ -251,24 +245,22 @@ object::object_type object::type() const throw () {
  *
  *  @return The object type name.
  */
-std::string const& object::type_name() const throw () {
-  static std::string const tab[] = {
-    "command",
-    "connector",
-    "contact",
-    "contactgroup",
-    "host",
-    "hostdependency",
-    "hostescalation",
-    "hostextinfo",
-    "hostgroup",
-    "service",
-    "servicedependency",
-    "serviceescalation",
-    "serviceextinfo",
-    "servicegroup",
-    "timeperiod"
-  };
+std::string const& object::type_name() const throw() {
+  static std::string const tab[] = {"command",
+                                    "connector",
+                                    "contact",
+                                    "contactgroup",
+                                    "host",
+                                    "hostdependency",
+                                    "hostescalation",
+                                    "hostextinfo",
+                                    "hostgroup",
+                                    "service",
+                                    "servicedependency",
+                                    "serviceescalation",
+                                    "serviceextinfo",
+                                    "servicegroup",
+                                    "timeperiod"};
   return (tab[_type]);
 }
 

@@ -19,18 +19,15 @@
 */
 
 #ifndef CCE_CHECKS_HH
-#  define CCE_CHECKS_HH
+#define CCE_CHECKS_HH
 
-#  include <cstdio>
-#  include <sys/time.h>
-#  include "com/centreon/engine/checkable.hh"
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/notifier.hh"
+#include <sys/time.h>
+#include <cstdio>
+#include "com/centreon/engine/checkable.hh"
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/notifier.hh"
 
-enum check_source {
-  service_check,
-  host_check
-};
+enum check_source { service_check, host_check };
 CCE_BEGIN()
 class check_result;
 CCE_END()
@@ -108,4 +105,4 @@ class check_result {
 };
 CCE_END()
 
-#endif // !CCE_CHECKS_HH
+#endif  // !CCE_CHECKS_HH

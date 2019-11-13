@@ -20,45 +20,45 @@
 */
 
 #ifndef CCE_EVENTS_LOOP_HH
-#  define CCE_EVENTS_LOOP_HH
+#define CCE_EVENTS_LOOP_HH
 
-#  include <ctime>
-#  include "com/centreon/engine/events/timed_event.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <ctime>
+#include "com/centreon/engine/events/timed_event.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace             events {
-  /**
-   *  @class loop loop.hh
-   *  @brief Create Centreon Engine event loop on a new thread.
-   *
-   *  Events loop is a singleton to create a new thread
-   *  and dispatch the Centreon Engine events.
-   */
-  class               loop {
-  public:
-    static loop&      instance();
-    static void       load();
-    void              run();
-    static void       unload();
+namespace events {
+/**
+ *  @class loop loop.hh
+ *  @brief Create Centreon Engine event loop on a new thread.
+ *
+ *  Events loop is a singleton to create a new thread
+ *  and dispatch the Centreon Engine events.
+ */
+class loop {
+ public:
+  static loop& instance();
+  static void load();
+  void run();
+  static void unload();
 
-  private:
-                      loop();
-                      loop(loop const&);
-                      ~loop() throw ();
-    loop&             operator=(loop const&);
-    void              _dispatching();
+ private:
+  loop();
+  loop(loop const&);
+  ~loop() throw();
+  loop& operator=(loop const&);
+  void _dispatching();
 
-    time_t            _last_status_update;
-    time_t            _last_time;
-    unsigned int      _need_reload;
+  time_t _last_status_update;
+  time_t _last_time;
+  unsigned int _need_reload;
 
-    bool              _reload_running;
-    timed_event       _sleep_event;
-  };
-}
+  bool _reload_running;
+  timed_event _sleep_event;
+};
+}  // namespace events
 
 CCE_END()
 
-#endif // !CCE_EVENTS_LOOP_HH
+#endif  // !CCE_EVENTS_LOOP_HH

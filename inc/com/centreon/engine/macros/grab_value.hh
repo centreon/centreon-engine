@@ -19,30 +19,28 @@
 */
 
 #ifndef CCE_MACROS_GRAB_VALUE_HH
-#  define CCE_MACROS_GRAB_VALUE_HH
+#define CCE_MACROS_GRAB_VALUE_HH
 
-#  include "com/centreon/engine/macros/defines.hh"
+#include "com/centreon/engine/macros/defines.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
-int grab_macro_value_r(
-      nagios_macros* mac,
-      std::string const& macro_buffer,
-      std::string& output,
-      int* clean_options,
-      int* free_macro);
-int grab_macrox_value_r(
-      nagios_macros* mac,
-      int macro_type,
-      std::string const& arg1,
-      std::string const& arg2,
-      std::string& output,
-      int* free_macro);
+int grab_macro_value_r(nagios_macros* mac,
+                       std::string const& macro_buffer,
+                       std::string& output,
+                       int* clean_options,
+                       int* free_macro);
+int grab_macrox_value_r(nagios_macros* mac,
+                        int macro_type,
+                        std::string const& arg1,
+                        std::string const& arg2,
+                        std::string& output,
+                        int* free_macro);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_MACROS_GRAB_VALUE_HH
+#endif  // !CCE_MACROS_GRAB_VALUE_HH

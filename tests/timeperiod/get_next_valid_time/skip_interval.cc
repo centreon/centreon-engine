@@ -19,8 +19,8 @@
 
 #include <gtest/gtest.h>
 #include "com/centreon/clib.hh"
-#include "com/centreon/logging/engine.hh"
 #include "com/centreon/engine/timeperiod.hh"
+#include "com/centreon/logging/engine.hh"
 #include "tests/timeperiod/utils.hh"
 
 using namespace com::centreon;

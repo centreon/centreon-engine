@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
 #include "com/centreon/engine/configuration/group.hh"
+#include <algorithm>
 #include "com/centreon/engine/string.hh"
 
-using namespace  com::centreon::engine::configuration;
+using namespace com::centreon::engine::configuration;
 
 /**
  *  Constructor.
@@ -30,9 +30,7 @@ using namespace  com::centreon::engine::configuration;
  */
 template <typename T>
 group<T>::group(bool is_inherit)
-  : _is_inherit(is_inherit),
-    _is_null(false),
-    _is_set(false) {}
+    : _is_inherit(is_inherit), _is_null(false), _is_set(false) {}
 
 /**
  *  Copy constructor.
@@ -48,7 +46,7 @@ group<T>::group(group const& other) {
  *  Destructor.
  */
 template <typename T>
-group<T>::~group() throw () {}
+group<T>::~group() throw() {}
 
 /**
  *  Copy constructor.
@@ -82,8 +80,7 @@ group<T>& group<T>::operator=(std::string const& other) {
     if (other[0] == '+') {
       _is_inherit = true;
       string::split(other.substr(1), _data, ',');
-    }
-    else if (other == "null")
+    } else if (other == "null")
       _is_null = true;
     else {
       _is_inherit = false;
@@ -104,10 +101,8 @@ group<T>& group<T>::operator=(std::string const& other) {
 template <typename T>
 group<T>& group<T>::operator+=(group<T> const& other) {
   if (this != &other) {
-    std::copy(
-           other._data.begin(),
-           other._data.end(),
-           std::inserter(_data, _data.end()));
+    std::copy(other._data.begin(), other._data.end(),
+              std::inserter(_data, _data.end()));
     _is_set = true;
   }
   return *this;
@@ -121,7 +116,7 @@ group<T>& group<T>::operator+=(group<T> const& other) {
  *  @return True if is the same object, otherwise false.
  */
 template <typename T>
-bool group<T>::operator==(group const& other) const throw () {
+bool group<T>::operator==(group const& other) const throw() {
   return _data == other._data;
 }
 
@@ -133,7 +128,7 @@ bool group<T>::operator==(group const& other) const throw () {
  *  @return True if is not the same object, otherwise false.
  */
 template <typename T>
-bool group<T>::operator!=(group const& other) const throw () {
+bool group<T>::operator!=(group const& other) const throw() {
   return !operator==(other);
 }
 
@@ -145,7 +140,7 @@ bool group<T>::operator!=(group const& other) const throw () {
  *  @return True if this object is less than other.
  */
 template <typename T>
-bool group<T>::operator<(group const& other) const throw () {
+bool group<T>::operator<(group const& other) const throw() {
   return _data < other._data;
 }
 

@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker/loader.hh"
 #include <cassert>
 #include <cstdlib>
 #include <map>
-#include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/io/directory_entry.hh"
@@ -35,10 +35,10 @@ using namespace com::centreon::engine::logging;
 static loader* _instance = NULL;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Add a new module.
@@ -48,9 +48,8 @@ static loader* _instance = NULL;
  *
  *  @return The new object module.
  */
-std::shared_ptr<broker::handle> loader::add_module(
-                                     std::string const& filename,
-                                     std::string const& args) {
+std::shared_ptr<broker::handle> loader::add_module(std::string const& filename,
+                                                   std::string const& args) {
   std::shared_ptr<handle> module(new handle(filename, args));
   _modules.push_back(module);
   return (module);
@@ -62,10 +61,9 @@ std::shared_ptr<broker::handle> loader::add_module(
  *  @param[in] mod Module to remove.
  */
 void loader::del_module(std::shared_ptr<handle> const& module) {
-  for (std::list<std::shared_ptr<handle> >::iterator
-         it(_modules.begin()), end(_modules.end());
-       it != end;
-       ++it)
+  for (std::list<std::shared_ptr<handle> >::iterator it(_modules.begin()),
+       end(_modules.end());
+       it != end; ++it)
     if (it->get() == module.get()) {
       _modules.erase(it);
       break;
@@ -115,19 +113,17 @@ unsigned int loader::load_directory(std::string const& dir) {
 
   // Sort by file name.
   std::multimap<std::string, io::file_entry> sort_files;
-  for (std::list<io::file_entry>::const_iterator
-         it(files.begin()), end(files.end());
-       it != end;
-       ++it)
+  for (std::list<io::file_entry>::const_iterator it(files.begin()),
+       end(files.end());
+       it != end; ++it)
     sort_files.insert(std::make_pair(it->file_name(), *it));
-
 
   // Load modules.
   unsigned int loaded(0);
   for (std::multimap<std::string, io::file_entry>::const_iterator
-         it(sort_files.begin()), end(sort_files.end());
-       it != end;
-       ++it) {
+           it(sort_files.begin()),
+       end(sort_files.end());
+       it != end; ++it) {
     io::file_entry const& f(it->second);
     std::string config_file(dir + "/" + f.base_name() + ".cfg");
     if (io::file_stream::exists(config_file.c_str()) == false)
@@ -137,15 +133,13 @@ unsigned int loader::load_directory(std::string const& dir) {
       module = add_module(dir + "/" + f.file_name(), config_file);
       module->open();
       logger(log_info_message, basic)
-        << "Event broker module '" << f.file_name()
-        << "' initialized successfully.";
+          << "Event broker module '" << f.file_name()
+          << "' initialized successfully.";
       ++loaded;
-    }
-    catch (error const& e) {
+    } catch (error const& e) {
       del_module(module);
-      logger(log_runtime_error, basic)
-        << "Error: Could not load module '"
-        << f.file_name() << "' -> " << e.what();
+      logger(log_runtime_error, basic) << "Error: Could not load module '"
+                                       << f.file_name() << "' -> " << e.what();
     }
   }
   return (loaded);
@@ -164,40 +158,36 @@ void loader::unload() {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (std::list<std::shared_ptr<handle> >::iterator
-         it(_modules.begin()), end(_modules.end());
-       it != end;
-       ++it) {
+  for (std::list<std::shared_ptr<handle> >::iterator it(_modules.begin()),
+       end(_modules.end());
+       it != end; ++it) {
     try {
       (*it)->close();
+    } catch (...) {
     }
-    catch (...) {}
     logger(dbg_eventbroker, basic)
-      << "Module '" << (*it)->get_filename()
-      << "' unloaded successfully.";
+        << "Module '" << (*it)->get_filename() << "' unloaded successfully.";
   }
   _modules.clear();
 }
 
 /**************************************
-*                                     *
-*           Private Methods           *
-*                                     *
-**************************************/
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
 
 /**
  *  Default constructor.
  */
-loader::loader() {
-
-}
+loader::loader() {}
 
 /**
  *  Default destructor.
  */
-loader::~loader() throw () {
+loader::~loader() throw() {
   try {
     unload_modules();
+  } catch (...) {
   }
-  catch (...) {}
 }

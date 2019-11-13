@@ -30,10 +30,10 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Constructor.
@@ -42,15 +42,13 @@ using namespace com::centreon::engine::commands;
  *  @param[in] command_line The command line.
  *  @param[in] listener     The listener who catch events.
  */
-raw::raw(
-       std::string const& name,
-       std::string const& command_line,
-       command_listener* listener)
-  : command(name, command_line, listener), process_listener() {
+raw::raw(std::string const& name,
+         std::string const& command_line,
+         command_listener* listener)
+    : command(name, command_line, listener), process_listener() {
   if (_command_line.empty())
-    throw (engine_error()
-      << "Could not create '"
-      << _name << "' command: command line is empty");
+    throw(engine_error() << "Could not create '" << _name
+                         << "' command: command line is empty");
 }
 
 /**
@@ -73,13 +71,11 @@ raw::~raw() noexcept {
       lock.lock();
     }
     for (auto it = _processes_free.begin(), end = _processes_free.end();
-        it != end;
-        ++it)
+         it != end; ++it)
       delete *it;
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "Error: Raw command destructor failed: " << e.what();
+        << "Error: Raw command destructor failed: " << e.what();
   }
 }
 
@@ -118,7 +114,7 @@ uint64_t raw::run(std::string const& processed_cmd,
                   nagios_macros& macros,
                   uint32_t timeout) {
   logger(dbg_commands, basic)
-    << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
+      << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Get process and put into the busy list.
   process* p(nullptr);
@@ -130,7 +126,7 @@ uint64_t raw::run(std::string const& processed_cmd,
   }
 
   logger(dbg_commands, basic)
-    << "raw::run: id=" << command_id << ", process=" << p;
+      << "raw::run: id=" << command_id << ", process=" << p;
 
   // Setup environement macros if is necessary.
   environment env;
@@ -140,11 +136,10 @@ uint64_t raw::run(std::string const& processed_cmd,
     // Start process.
     p->exec(processed_cmd.c_str(), env.data(), timeout);
     logger(dbg_commands, basic)
-      << "raw::run: start process success: id=" << command_id;
-  }
-  catch (...) {
+        << "raw::run: start process success: id=" << command_id;
+  } catch (...) {
     logger(dbg_commands, basic)
-      << "raw::run: start process failed: id=" << command_id;
+        << "raw::run: start process failed: id=" << command_id;
 
     std::lock_guard<std::mutex> lock(_lock);
     _processes_busy.erase(p);
@@ -162,20 +157,19 @@ uint64_t raw::run(std::string const& processed_cmd,
  *  @param[in]  timeout The command timeout.
  *  @param[out] res     The result of the command.
  */
-void raw::run(
-            std::string const& processed_cmd,
-            nagios_macros& macros,
-            uint32_t timeout,
-            result& res) {
+void raw::run(std::string const& processed_cmd,
+              nagios_macros& macros,
+              uint32_t timeout,
+              result& res) {
   logger(dbg_commands, basic)
-    << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
+      << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Get process.
   process p;
   uint64_t command_id(get_uniq_id());
 
   logger(dbg_commands, basic)
-    << "raw::run: id=" << command_id << ", process=" << &p;
+      << "raw::run: id=" << command_id << ", process=" << &p;
 
   // Setup environement macros if is necessary.
   environment env;
@@ -185,11 +179,10 @@ void raw::run(
   try {
     p.exec(processed_cmd.c_str(), env.data(), timeout);
     logger(dbg_commands, basic)
-      << "raw::run: start process success: id=" << command_id;
-  }
-  catch (...) {
+        << "raw::run: start process success: id=" << command_id;
+  } catch (...) {
     logger(dbg_commands, basic)
-      << "raw::run: start process failed: id=" << command_id;
+        << "raw::run: start process failed: id=" << command_id;
     throw;
   }
 
@@ -209,27 +202,35 @@ void raw::run(
   if (res.exit_status == process::timeout) {
     res.exit_code = service::state_unknown;
     res.output = "(Process Timeout)";
-  }
-  else if ((res.exit_status == process::crash)
-           || (res.exit_code < -1)
-           || (res.exit_code > 3))
+  } else if ((res.exit_status == process::crash) || (res.exit_code < -1) ||
+             (res.exit_code > 3))
     res.exit_code = service::state_unknown;
 
-  logger(dbg_commands, basic)
-    << "raw::run: end process: "
-    "id=" << command_id << ", "
-    "start_time=" << res.start_time.to_mseconds() << ", "
-    "end_time=" << res.end_time.to_mseconds() << ", "
-    "exit_code=" << res.exit_code << ", "
-    "exit_status=" << res.exit_status << ", "
-    "output='" << res.output << "'";
+  logger(dbg_commands, basic) << "raw::run: end process: "
+                                 "id="
+                              << command_id
+                              << ", "
+                                 "start_time="
+                              << res.start_time.to_mseconds()
+                              << ", "
+                                 "end_time="
+                              << res.end_time.to_mseconds()
+                              << ", "
+                                 "exit_code="
+                              << res.exit_code
+                              << ", "
+                                 "exit_status="
+                              << res.exit_status
+                              << ", "
+                                 "output='"
+                              << res.output << "'";
 }
 
 /**************************************
-*                                     *
-*           Private Methods           *
-*                                     *
-**************************************/
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
 
 /**
  *  Provide by process_listener interface but not used.
@@ -257,32 +258,30 @@ void raw::data_is_available_err(process& p) noexcept {
  */
 void raw::finished(process& p) noexcept {
   try {
-    logger(dbg_commands, basic)
-      << "raw::finished: process=" << &p;
+    logger(dbg_commands, basic) << "raw::finished: process=" << &p;
 
     uint64_t command_id(0);
     {
       std::unique_lock<std::mutex> lock(_lock);
       // Find process from the busy list.
-      std::unordered_map<process*, uint64_t>::iterator
-        it = _processes_busy.find(&p);
+      std::unordered_map<process*, uint64_t>::iterator it =
+          _processes_busy.find(&p);
       if (it == _processes_busy.end()) {
         // Put the process into the free list.
         _processes_free.push_back(&p);
         lock.unlock();
 
         logger(log_runtime_warning, basic)
-          << "Warning: Invalid process pointer: "
-             "process not found into process busy list";
-        return ;
+            << "Warning: Invalid process pointer: "
+               "process not found into process busy list";
+        return;
       }
       // Get command_id and remove the process from the busy list.
       command_id = it->second;
       _processes_busy.erase(it);
     }
 
-    logger(dbg_commands, basic)
-      << "raw::finished: id=" << command_id;
+    logger(dbg_commands, basic) << "raw::finished: id=" << command_id;
 
     // Build check result.
     result res;
@@ -306,29 +305,35 @@ void raw::finished(process& p) noexcept {
     if (res.exit_status == process::timeout) {
       res.exit_code = service::state_unknown;
       res.output = "(Process Timeout)";
-    }
-    else if ((res.exit_status == process::crash)
-             || (res.exit_code < -1)
-             || (res.exit_code > 3))
+    } else if ((res.exit_status == process::crash) || (res.exit_code < -1) ||
+               (res.exit_code > 3))
       res.exit_code = service::state_unknown;
 
-    logger(dbg_commands, basic)
-      << "raw::finished: "
-      "id=" << command_id << ", "
-      "start_time=" << res.start_time.to_mseconds() << ", "
-      "end_time=" << res.end_time.to_mseconds() << ", "
-      "exit_code=" << res.exit_code << ", "
-      "exit_status=" << res.exit_status << ", "
-      "output='" << res.output << "'";
+    logger(dbg_commands, basic) << "raw::finished: "
+                                   "id="
+                                << command_id
+                                << ", "
+                                   "start_time="
+                                << res.start_time.to_mseconds()
+                                << ", "
+                                   "end_time="
+                                << res.end_time.to_mseconds()
+                                << ", "
+                                   "exit_code="
+                                << res.exit_code
+                                << ", "
+                                   "exit_status="
+                                << res.exit_status
+                                << ", "
+                                   "output='"
+                                << res.output << "'";
 
     // Forward result to the listener.
     if (_listener)
       _listener->finished(res);
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "Warning: Raw process termination routine failed: "
-      << e.what();
+        << "Warning: Raw process termination routine failed: " << e.what();
 
     // Release process, put into the free list.
     std::lock_guard<std::mutex> lock(_lock);
@@ -342,9 +347,8 @@ void raw::finished(process& p) noexcept {
  *  @param[in]  macros  The macros data struct.
  *  @param[out] env     The environment to fill.
  */
-void raw::_build_argv_macro_environment(
-            nagios_macros const& macros,
-            environment& env) {
+void raw::_build_argv_macro_environment(nagios_macros const& macros,
+                                        environment& env) {
   for (uint32_t i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
     std::ostringstream oss;
     oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << macros.argv[i];
@@ -358,11 +362,10 @@ void raw::_build_argv_macro_environment(
  *  @param[in]  macros  The macros data struct.
  *  @param[out] env     The environment to fill.
  */
-void raw::_build_contact_address_environment(
-            nagios_macros const& macros,
-            environment& env) {
+void raw::_build_contact_address_environment(nagios_macros const& macros,
+                                             environment& env) {
   if (!macros.contact_ptr)
-    return ;
+    return;
   std::vector<std::string> const& address(macros.contact_ptr->get_addresses());
   for (uint32_t i(0); i < address.size(); ++i) {
     std::ostringstream oss;
@@ -377,9 +380,8 @@ void raw::_build_contact_address_environment(
  *  @param[in,out] macros  The macros data struct.
  *  @param[out]    env     The environment to fill.
  */
-void raw::_build_custom_contact_macro_environment(
-            nagios_macros& macros,
-            environment& env) {
+void raw::_build_custom_contact_macro_environment(nagios_macros& macros,
+                                                  environment& env) {
   // Build custom contact variable.
   contact* cntct(macros.contact_ptr);
   if (cntct) {
@@ -387,16 +389,16 @@ void raw::_build_custom_contact_macro_environment(
       if (!cv.first.empty()) {
         std::string name("_CONTACT");
         name.append(cv.first);
-        macros.custom_contact_vars[name] =  cv.second;
+        macros.custom_contact_vars[name] = cv.second;
       }
     }
   }
   // Set custom contact variable into the environement
   for (auto const& cv : macros.custom_contact_vars) {
     if (!cv.first.empty()) {
-      std::string value(clean_macro_chars(
-            cv.second.get_value(),
-            STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
+      std::string value(
+          clean_macro_chars(cv.second.get_value(),
+                            STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
       std::string line;
       line.append(MACRO_ENV_VAR_PREFIX);
       line.append(cv.first);
@@ -413,9 +415,8 @@ void raw::_build_custom_contact_macro_environment(
  *  @param[in,out] macros  The macros data struct.
  *  @param[out]    env     The environment to fill.
  */
-void raw::_build_custom_host_macro_environment(
-            nagios_macros& macros,
-            environment& env) {
+void raw::_build_custom_host_macro_environment(nagios_macros& macros,
+                                               environment& env) {
   // Build custom host variable.
   host* hst(macros.host_ptr);
   if (hst) {
@@ -430,9 +431,9 @@ void raw::_build_custom_host_macro_environment(
   // Set custom host variable into the environement
   for (auto const& cv : macros.custom_host_vars) {
     if (!cv.first.empty()) {
-      std::string value(clean_macro_chars(
-            cv.second.get_value(),
-            STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
+      std::string value(
+          clean_macro_chars(cv.second.get_value(),
+                            STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
       std::string line;
       line.append(MACRO_ENV_VAR_PREFIX);
       line.append(cv.first);
@@ -449,9 +450,8 @@ void raw::_build_custom_host_macro_environment(
  *  @param[in,out] macros  The macros data struct.
  *  @param[out]    env     The environment to fill.
  */
-void raw::_build_custom_service_macro_environment(
-            nagios_macros& macros,
-            environment& env) {
+void raw::_build_custom_service_macro_environment(nagios_macros& macros,
+                                                  environment& env) {
   // Build custom service variable.
   service* svc(macros.service_ptr);
   if (svc) {
@@ -466,9 +466,9 @@ void raw::_build_custom_service_macro_environment(
   // Set custom service variable into the environement
   for (auto const& cv : macros.custom_service_vars) {
     if (!cv.first.empty()) {
-      std::string value(clean_macro_chars(
-            cv.second.get_value(),
-            STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
+      std::string value(
+          clean_macro_chars(cv.second.get_value(),
+                            STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
       std::string line;
       line.append(MACRO_ENV_VAR_PREFIX);
       line.append(cv.first);
@@ -485,9 +485,7 @@ void raw::_build_custom_service_macro_environment(
  *  @param[in,out] macros  The macros data struct.
  *  @param[out]    env     The environment to fill.
  */
-void raw::_build_environment_macros(
-            nagios_macros& macros,
-            environment& env) {
+void raw::_build_environment_macros(nagios_macros& macros, environment& env) {
   if (config->enable_environment_macros()) {
     _build_macrosx_environment(macros, env);
     _build_argv_macro_environment(macros, env);
@@ -504,25 +502,17 @@ void raw::_build_environment_macros(
  *  @param[in,out] macros  The macros data struct.
  *  @param[out]    env     The environment to fill.
  */
-void raw::_build_macrosx_environment(
-            nagios_macros& macros,
-            environment& env) {
+void raw::_build_macrosx_environment(nagios_macros& macros, environment& env) {
   for (uint32_t i(0); i < MACRO_X_COUNT; ++i) {
     int release_memory(0);
 
     // Need to grab macros?
     if (macros.x[i].empty()) {
       // Skip summary macro in lage instalation tweaks.
-      if ((i < MACRO_TOTALHOSTSUP)
-          || (i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
-          || !config->use_large_installation_tweaks()) {
-        grab_macrox_value_r(
-          &macros,
-          i,
-          "",
-          "",
-          macros.x[i],
-          &release_memory);
+      if ((i < MACRO_TOTALHOSTSUP) ||
+          (i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED) ||
+          !config->use_large_installation_tweaks()) {
+        grab_macrox_value_r(&macros, i, "", "", macros.x[i], &release_memory);
       }
     }
 

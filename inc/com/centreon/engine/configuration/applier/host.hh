@@ -18,37 +18,33 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_HOST_HH
-#  define CCE_CONFIGURATION_APPLIER_HOST_HH
+#define CCE_CONFIGURATION_APPLIER_HOST_HH
 
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace          configuration {
-  // Forward declarations.
-  class            host;
-  class            state;
+namespace configuration {
+// Forward declarations.
+class host;
+class state;
 
-  namespace        applier {
-    class          host {
-    public:
-                   host();
-                   host(host const& right) = delete;
-                   ~host() throw ();
-      host&        operator=(host const& right) = delete;
-      void         add_object(
-                     configuration::host const& obj);
-      void         expand_objects(configuration::state& s);
-      void         modify_object(
-                     configuration::host const& obj);
-      void         remove_object(
-                     configuration::host const& obj);
-      void         resolve_object(
-                     configuration::host const& obj);
-    };
-  }
-}
+namespace applier {
+class host {
+ public:
+  host();
+  host(host const& right) = delete;
+  ~host() throw();
+  host& operator=(host const& right) = delete;
+  void add_object(configuration::host const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::host const& obj);
+  void remove_object(configuration::host const& obj);
+  void resolve_object(configuration::host const& obj);
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_HOST_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_HOST_HH

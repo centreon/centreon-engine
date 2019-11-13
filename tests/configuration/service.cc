@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <gtest/gtest.h>
 #include "com/centreon/engine/configuration/service.hh"
+#include <gtest/gtest.h>
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine;

@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctime>
-#include <gtest/gtest.h>
-#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/service.hh"
+#include <gtest/gtest.h>
+#include <ctime>
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/retention/dump.hh"
 
 using namespace com::centreon::engine;
 

@@ -17,26 +17,26 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstddef>
-#include <exception>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstddef>
+#include <exception>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 #include "com/centreon/engine/nebmodules.hh"
 #include "com/centreon/engine/nebstructs.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
-#include "com/centreon/engine/modules/external_commands/utils.hh"
 
 using namespace com::centreon::engine::logging;
 
 /**************************************
-*                                     *
-*           Global Objects            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Global Objects            *
+ *                                     *
+ **************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
@@ -45,10 +45,10 @@ NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 static void* gl_mod_handle(NULL);
 
 /**************************************
-*                                     *
-*         Callback Function           *
-*                                     *
-**************************************/
+ *                                     *
+ *         Callback Function           *
+ *                                     *
+ **************************************/
 
 /**
  *  @brief Function that process external command.
@@ -64,21 +64,17 @@ static void* gl_mod_handle(NULL);
 int callback_external_command(int callback_type, void* data) {
   (void)callback_type;
 
-  nebstruct_external_command_data* neb_data
-    = static_cast<nebstruct_external_command_data*>(data);
-  if (neb_data->type != NEBTYPE_EXTERNALCOMMAND_CHECK
-      || neb_data->flags != NEBFLAG_NONE
-      || neb_data->attr != NEBATTR_NONE
-      || neb_data->command_type != CMD_NONE
-      || neb_data->command_string != NULL
-      || neb_data->command_args != NULL)
+  nebstruct_external_command_data* neb_data =
+      static_cast<nebstruct_external_command_data*>(data);
+  if (neb_data->type != NEBTYPE_EXTERNALCOMMAND_CHECK ||
+      neb_data->flags != NEBFLAG_NONE || neb_data->attr != NEBATTR_NONE ||
+      neb_data->command_type != CMD_NONE || neb_data->command_string != NULL ||
+      neb_data->command_args != NULL)
     return (0);
 
   try {
     check_for_external_commands();
-  }
-  catch (...) {
-
+  } catch (...) {
   }
   return (0);
 }
@@ -106,21 +102,18 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
   (void)reason;
 
   try {
-    neb_deregister_callback(
-      NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-      callback_external_command);
+    neb_deregister_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
+                            callback_external_command);
 
     // Close and delete the external command file FIFO.
     shutdown_command_file_worker_thread();
     close_command_file();
-  }
-  catch (std::exception const& e) {
-      logger(log_runtime_error, basic)
-	<< "external command runtime error `" << e.what() << "'.";
-  }
-  catch (...) {
-      logger(log_runtime_error, basic)
-	<< "external command runtime error `unknown'";
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+        << "external command runtime error `" << e.what() << "'.";
+  } catch (...) {
+    logger(log_runtime_error, basic)
+        << "external command runtime error `unknown'";
   }
   return (0);
 }
@@ -138,10 +131,7 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
  *
  *  @return 0 on success, any other value on failure.
  */
-extern "C" int nebmodule_init(
-                 int flags,
-                 char const* args,
-                 void* handle) {
+extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
   (void)args;
   (void)flags;
 
@@ -149,59 +139,40 @@ extern "C" int nebmodule_init(
   gl_mod_handle = handle;
 
   // Set module informations.
-  neb_set_module_info(
-    gl_mod_handle,
-    NEBMODULE_MODINFO_TITLE,
-    "Centreon-Engine's external command");
-  neb_set_module_info(
-    gl_mod_handle,
-    NEBMODULE_MODINFO_AUTHOR,
-    "Merethis");
-  neb_set_module_info(
-    gl_mod_handle,
-    NEBMODULE_MODINFO_COPYRIGHT,
-    "Copyright 2011 Merethis");
-  neb_set_module_info(
-    gl_mod_handle,
-    NEBMODULE_MODINFO_VERSION,
-    "1.0.0");
-  neb_set_module_info(
-    gl_mod_handle,
-    NEBMODULE_MODINFO_LICENSE,
-    "GPL version 2");
-  neb_set_module_info(
-    gl_mod_handle,
-    NEBMODULE_MODINFO_DESC,
-    "Centreon-Engine's external command provide system to "
-    "execute commands over a pipe.");
+  neb_set_module_info(gl_mod_handle, NEBMODULE_MODINFO_TITLE,
+                      "Centreon-Engine's external command");
+  neb_set_module_info(gl_mod_handle, NEBMODULE_MODINFO_AUTHOR, "Merethis");
+  neb_set_module_info(gl_mod_handle, NEBMODULE_MODINFO_COPYRIGHT,
+                      "Copyright 2011 Merethis");
+  neb_set_module_info(gl_mod_handle, NEBMODULE_MODINFO_VERSION, "1.0.0");
+  neb_set_module_info(gl_mod_handle, NEBMODULE_MODINFO_LICENSE,
+                      "GPL version 2");
+  neb_set_module_info(gl_mod_handle, NEBMODULE_MODINFO_DESC,
+                      "Centreon-Engine's external command provide system to "
+                      "execute commands over a pipe.");
 
   try {
     // Open the command file (named pipe) for reading.
     if (open_command_file() != OK) {
       logger(log_process_info | log_runtime_error, basic)
-	<< "Bailing out due to errors encountered while trying to "
-	<< "initialize the external command file ... "
-	<< "(PID=" << getpid() << ")";
+          << "Bailing out due to errors encountered while trying to "
+          << "initialize the external command file ... "
+          << "(PID=" << getpid() << ")";
       return (1);
     }
 
     // Register callbacks.
-    if (neb_register_callback(
-          NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-          gl_mod_handle,
-          0,
-          callback_external_command)) {
-      throw (engine_error() << "register callback failed");
+    if (neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA, gl_mod_handle,
+                              0, callback_external_command)) {
+      throw(engine_error() << "register callback failed");
     }
-  }
-  catch (std::exception const& e) {
-      logger(log_runtime_error, basic)
-	<< "external command runtime error `" << e.what() << "'.";
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+        << "external command runtime error `" << e.what() << "'.";
     return (1);
-  }
-  catch (...) {
-      logger(log_runtime_error, basic)
-	<< "external command runtime error `unknown'.";
+  } catch (...) {
+    logger(log_runtime_error, basic)
+        << "external command runtime error `unknown'.";
     return (1);
   }
 

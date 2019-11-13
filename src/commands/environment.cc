@@ -18,28 +18,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
 #include "com/centreon/engine/commands/environment.hh"
+#include <cstring>
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine::commands;
 
 // Default size.
 static uint32_t const EXTRA_SIZE_ENV = 128;
-static uint32_t  const EXTRA_SIZE_BUFFER = 4096;
+static uint32_t const EXTRA_SIZE_BUFFER = 4096;
 
 /**
  *  Constructor.
  */
 environment::environment(char** env)
-  : _buffer(nullptr),
-    _env(nullptr),
-    _pos_buffer(0),
-    _pos_env(0),
-    _size_buffer(0),
-    _size_env(0) {
+    : _buffer(nullptr),
+      _env(nullptr),
+      _pos_buffer(0),
+      _pos_env(0),
+      _size_buffer(0),
+      _size_env(0) {
   if (env)
-    for (uint32_t  i(0); env[i]; ++i)
+    for (uint32_t i(0); env[i]; ++i)
       add(env[i]);
 }
 
@@ -55,7 +55,7 @@ environment::environment(environment const& right) {
 /**
  *  Destructor.
  */
-environment::~environment() throw () {
+environment::~environment() throw() {
   delete[] _buffer;
   delete[] _env;
 }
@@ -79,10 +79,9 @@ environment& environment::operator=(environment const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool environment::operator==(environment const& right) const throw () {
-  return (_pos_buffer == right._pos_buffer
-          && _pos_env == right._pos_env
-          && !strncmp(_buffer, right._buffer, _pos_buffer));
+bool environment::operator==(environment const& right) const throw() {
+  return (_pos_buffer == right._pos_buffer && _pos_env == right._pos_env &&
+          !strncmp(_buffer, right._buffer, _pos_buffer));
 }
 
 /**
@@ -92,7 +91,7 @@ bool environment::operator==(environment const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool environment::operator!=(environment const& right) const throw () {
+bool environment::operator!=(environment const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -180,9 +179,7 @@ void environment::add(std::string const& line) {
  *  @param[in] name   The name of the environement variable.
  *  @param[in] value  The environement varaible value.
  */
-void environment::add(
-                    std::string const& name,
-                    std::string const& value) {
+void environment::add(std::string const& name, std::string const& value) {
   if (name.empty())
     return;
   uint32_t new_pos(_pos_buffer + name.size() + value.size() + 2);
@@ -194,10 +191,8 @@ void environment::add(
   }
   memcpy(_buffer + _pos_buffer, name.c_str(), name.size() + 1);
   _buffer[_pos_buffer + name.size()] = '=';
-  memcpy(
-    _buffer + _pos_buffer + name.size() + 1,
-    value.c_str(),
-    value.size() + 1);
+  memcpy(_buffer + _pos_buffer + name.size() + 1, value.c_str(),
+         value.size() + 1);
   if (_pos_env + 1 >= _size_env)
     _realoc_env(_size_env + EXTRA_SIZE_ENV);
   _env[_pos_env++] = _buffer + _pos_buffer;
@@ -209,7 +204,7 @@ void environment::add(
 /**
  *  Get environement.
  */
-char** environment::data() throw () {
+char** environment::data() throw() {
   return (_env);
 }
 
@@ -222,14 +217,14 @@ void environment::_internal_copy(environment const& right) {
   if (this != &right) {
     delete[] _buffer;
     delete[] _env;
-     _pos_buffer = right._pos_buffer;
-     _pos_env = right._pos_env;
-     _size_buffer = right._size_buffer;
-     _size_env = right._size_env;
-     _buffer = new char[_size_buffer];
-     _env = new char*[_size_env];
-     memcpy(_buffer, right._buffer, _pos_buffer);
-     _rebuild_env();
+    _pos_buffer = right._pos_buffer;
+    _pos_env = right._pos_env;
+    _size_buffer = right._size_buffer;
+    _size_env = right._size_env;
+    _buffer = new char[_size_buffer];
+    _env = new char*[_size_env];
+    memcpy(_buffer, right._buffer, _pos_buffer);
+    _rebuild_env();
   }
   return;
 }
@@ -241,9 +236,9 @@ void environment::_internal_copy(environment const& right) {
  */
 void environment::_realoc_buffer(uint32_t size) {
   if (_size_buffer >= size)
-    throw (engine_error()
-           << "Invalid size for command environment reallocation: "
-           << "Buffer size is greater than the requested size");
+    throw(
+        engine_error() << "Invalid size for command environment reallocation: "
+                       << "Buffer size is greater than the requested size");
   char* new_buffer(new char[size]);
   if (_buffer)
     memcpy(new_buffer, _buffer, _pos_buffer);
@@ -261,9 +256,9 @@ void environment::_realoc_buffer(uint32_t size) {
  */
 void environment::_realoc_env(uint32_t size) {
   if (_size_env >= size)
-    throw (engine_error()
-           << "Invalid size for command environment reallocation: "
-           << "Environment size is greater than the requested size");
+    throw(engine_error()
+          << "Invalid size for command environment reallocation: "
+          << "Environment size is greater than the requested size");
   char** new_env(new char*[size]);
   if (_env)
     memcpy(new_env, _env, sizeof(*new_env) * (_pos_env + 1));

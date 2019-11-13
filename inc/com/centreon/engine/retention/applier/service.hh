@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_RETENTION_APPLIER_SERVICE_HH
-#  define CCE_RETENTION_APPLIER_SERVICE_HH
+#define CCE_RETENTION_APPLIER_SERVICE_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/service.hh"
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/retention/service.hh"
 
 // Forward declaration.
 
@@ -30,28 +30,26 @@ class service;
 
 // Forward declaration.
 namespace configuration {
-  class   state;
+class state;
 }
 
-namespace   retention {
-  namespace applier {
-    class   service {
-    public:
-      void  apply(
-              configuration::state const& config,
-              list_service const& lst,
-              bool scheduling_info_is_ok);
+namespace retention {
+namespace applier {
+class service {
+ public:
+  void apply(configuration::state const& config,
+             list_service const& lst,
+             bool scheduling_info_is_ok);
 
-    private:
-      void  _update(
-              configuration::state const& config,
-              retention::service const& state,
-              com::centreon::engine::service& obj,
-              bool scheduling_info_is_ok);
-    };
-  }
-}
+ private:
+  void _update(configuration::state const& config,
+               retention::service const& state,
+               com::centreon::engine::service& obj,
+               bool scheduling_info_is_ok);
+};
+}  // namespace applier
+}  // namespace retention
 
 CCE_END()
 
-#endif // !CCE_RETENTION_APPLIER_SERVICE_HH
+#endif  // !CCE_RETENTION_APPLIER_SERVICE_HH

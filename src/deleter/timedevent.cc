@@ -28,11 +28,11 @@ using namespace com::centreon::engine;
  *
  *  @param[in] ptr The object to delete.
  */
-void deleter::timedevent(void* ptr) throw () {
+void deleter::timedevent(void* ptr) throw() {
   timed_event* obj(static_cast<timed_event*>(ptr));
-  if (obj->event_type == EVENT_SCHEDULED_DOWNTIME
-      || obj->event_type == EVENT_EXPIRE_COMMENT)
+  if (obj->event_type == EVENT_SCHEDULED_DOWNTIME ||
+      obj->event_type == EVENT_EXPIRE_COMMENT)
     delete static_cast<unsigned long*>(obj->event_data);
   delete obj;
-  return ;
+  return;
 }

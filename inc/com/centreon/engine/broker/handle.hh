@@ -76,7 +76,7 @@ class handle {
   void set_name(std::string const& name);
   void set_version(std::string const& version);
 };
-}
+}  // namespace broker
 
 CCE_END()
 

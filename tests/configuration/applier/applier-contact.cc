@@ -149,7 +149,8 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   ASSERT_TRUE(ctct.parse("service_notification_commands", "svc1,svc2"));
   ASSERT_TRUE(ctct.parse("_superVar", "superValue"));
   ASSERT_TRUE(ctct.customvariables().size() == 1);
-  ASSERT_TRUE(ctct.customvariables().at("superVar").get_value() == "superValue");
+  ASSERT_TRUE(ctct.customvariables().at("superVar").get_value() ==
+              "superValue");
 
   configuration::applier::command cmd_aply;
   configuration::applier::connector cnn_aply;
@@ -174,10 +175,13 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   contact_map::const_iterator ct_it{engine::contact::contacts.find("test")};
   ASSERT_TRUE(ct_it != engine::contact::contacts.end());
   ASSERT_EQ(ct_it->second->get_custom_variables().size(), 2u);
-  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar"].get_value() == "Super");
-  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar1"].get_value() == "Super1");
+  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar"].get_value() ==
+              "Super");
+  ASSERT_TRUE(ct_it->second->get_custom_variables()["superVar1"].get_value() ==
+              "Super1");
   ASSERT_TRUE(ct_it->second->get_alias() == "newAlias");
-  ASSERT_FALSE(ct_it->second->notify_on(notifier::service_notification, notifier::unknown));
+  ASSERT_FALSE(ct_it->second->notify_on(notifier::service_notification,
+                                        notifier::unknown));
 
   std::set<configuration::command>::iterator it{config->commands_find("cmd")};
   ASSERT_TRUE(it != config->commands().end());
@@ -189,8 +193,7 @@ TEST_F(ApplierContact, ModifyContactFromConfig) {
   aplyr.add_object(cmd);
   ASSERT_TRUE(ctct.parse("host_notification_commands", "cmd"));
   aply.modify_object(ctct);
-  command_map::iterator found{
-    commands::command::commands.find("cmd")};
+  command_map::iterator found{commands::command::commands.find("cmd")};
   ASSERT_TRUE(found != commands::command::commands.end());
   ASSERT_TRUE(found->second);
   ASSERT_TRUE(found->second->get_command_line() == "bar");
@@ -323,7 +326,7 @@ TEST_F(ApplierContact, ResolveNonExistingHostCommand) {
 // And the contact has multiple host notification commands
 // When the applier resolve_object() method is called
 // Then the contact has the multiple host notification commands
-//TEST_F(ApplierContact, ResolveContactWithMultipleHostNotificationCommand) {
+// TEST_F(ApplierContact, ResolveContactWithMultipleHostNotificationCommand) {
 //  // Given
 //  configuration::contact ctct(valid_contact_config());
 //
@@ -340,10 +343,9 @@ TEST_F(ApplierContact, ResolveNonExistingHostCommand) {
 //    }
 //    aplyr.expand_objects(*config);
 //  }
-//  ctct.parse("host_notification_commands", "command1!ARG1,command2,command3!ARG3");
-//  configuration::applier::contact aplyr;
-//  aplyr.add_object(ctct);
-//  aplyr.expand_objects(*config);
+//  ctct.parse("host_notification_commands",
+//  "command1!ARG1,command2,command3!ARG3"); configuration::applier::contact
+//  aplyr; aplyr.add_object(ctct); aplyr.expand_objects(*config);
 //
 //  // When
 //  aplyr.resolve_object(ctct);
@@ -403,4 +405,3 @@ TEST_F(ApplierContact, ContactWithOnlyServiceRecoveryNotification) {
   ASSERT_EQ(config_warnings, 1);
   ASSERT_EQ(config_errors, 0);
 }
-

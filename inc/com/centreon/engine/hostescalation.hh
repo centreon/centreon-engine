@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_HOSTESCALATION_HH
-#  define CCE_HOSTESCALATION_HH
-#  include <ostream>
-#  include "com/centreon/engine/escalation.hh"
+#define CCE_HOSTESCALATION_HH
+#include <ostream>
+#include "com/centreon/engine/escalation.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()
@@ -28,8 +28,10 @@ class host;
 class hostescalation;
 CCE_END()
 
-typedef std::unordered_multimap<std::string,
-std::shared_ptr<com::centreon::engine::hostescalation>> hostescalation_mmap;
+typedef std::unordered_multimap<
+    std::string,
+    std::shared_ptr<com::centreon::engine::hostescalation>>
+    hostescalation_mmap;
 
 CCE_BEGIN()
 class hostescalation : public escalation {

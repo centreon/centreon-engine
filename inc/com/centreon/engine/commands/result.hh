@@ -18,43 +18,43 @@
 */
 
 #ifndef CCE_COMMANDS_RESULT_HH
-#  define CCE_COMMANDS_RESULT_HH
+#define CCE_COMMANDS_RESULT_HH
 
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/process.hh"
-#  include "com/centreon/timestamp.hh"
+#include <string>
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/process.hh"
+#include "com/centreon/timestamp.hh"
 
 CCE_BEGIN()
 
-namespace              commands {
-  /**
-   *  @class result result.hh
-   *  @brief Result contain the result of execution process.
-   *
-   *  Result contain the result of execution process (output, retvalue,
-   *  execution time).
-   */
-  class                result {
-  public:
-                       result();
-                       result(result const& right);
-                       ~result() throw ();
-    result&            operator=(result const& right);
-    bool               operator==(result const& right) const throw ();
-    bool               operator!=(result const& right) const throw ();
-    uint64_t command_id;
-    timestamp          end_time;
-    int                exit_code;
-    process::status    exit_status;
-    timestamp          start_time;
-    std::string        output;
+namespace commands {
+/**
+ *  @class result result.hh
+ *  @brief Result contain the result of execution process.
+ *
+ *  Result contain the result of execution process (output, retvalue,
+ *  execution time).
+ */
+class result {
+ public:
+  result();
+  result(result const& right);
+  ~result() throw();
+  result& operator=(result const& right);
+  bool operator==(result const& right) const throw();
+  bool operator!=(result const& right) const throw();
+  uint64_t command_id;
+  timestamp end_time;
+  int exit_code;
+  process::status exit_status;
+  timestamp start_time;
+  std::string output;
 
-  private:
-    void               _internal_copy(result const& right);
-  };
-}
+ private:
+  void _internal_copy(result const& right);
+};
+}  // namespace commands
 
 CCE_END()
 
-#endif // !CCE_COMMANDS_RESULT_HH
+#endif  // !CCE_COMMANDS_RESULT_HH

@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
 #include <gtest/gtest.h>
+#include <cstring>
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/timeperiod.hh"
@@ -27,7 +27,7 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-class         GetNextValidTimeOffsetWeekdayOfGenericMonthTest : public ::testing::Test {
+class GetNextValidTimeOffsetWeekdayOfGenericMonthTest : public ::testing::Test {
  public:
   void SetUp() override {
     clib::load();
@@ -41,7 +41,7 @@ class         GetNextValidTimeOffsetWeekdayOfGenericMonthTest : public ::testing
     clib::unload();
   }
 
-  void        default_data_set() {
+  void default_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);
     // tuesday 4 october 10:45-14:25
@@ -53,7 +53,7 @@ class         GetNextValidTimeOffsetWeekdayOfGenericMonthTest : public ::testing
     _creator.new_timerange(18, 30, 21, 15, dr);
   }
 
-  void        negative_offset_data_set() {
+  void negative_offset_data_set() {
     _creator.new_timeperiod();
     daterange* dr(NULL);
     // tuesday -4 10:45-14:25
@@ -111,7 +111,8 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, WithinRange) {
 // Given a timeperiod configured with offset weekdays of generic month
 // And we are after these dates in the year
 // When get_next_valid_time() is called
-// Then the next valid time is the first month with offset weekdays in next month
+// Then the next valid time is the first month with offset weekdays in next
+// month
 TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, AfterRanges) {
   default_data_set();
   time_t now(strtotimet("2016-10-30 13:37:42"));
@@ -125,7 +126,8 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, AfterRanges) {
 // And we are earlier than these dates
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the next date's timerange
-TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, BeforeNegativeDateRanges) {
+TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest,
+       BeforeNegativeDateRanges) {
   negative_offset_data_set();
   time_t now(strtotimet("2016-10-03 12:00:00"));
   set_time(now);
@@ -138,7 +140,8 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, BeforeNegativeDateRanges
 // And we are between two offset weekdays ranges
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the next daterange's timerange
-TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, BetweenNegativeDateRanges) {
+TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest,
+       BetweenNegativeDateRanges) {
   negative_offset_data_set();
   time_t now(strtotimet("2016-10-08 12:00:00"));
   set_time(now);
@@ -163,7 +166,8 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, WithinNegativeRange) {
 // Given a timeperiod configured with negative offset weekdays of generic month
 // And we are after these dates in the year
 // When get_next_valid_time() is called
-// Then the next valid time is the first month with offset weekdays in next month
+// Then the next valid time is the first month with offset weekdays in next
+// month
 TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, AfterNegativeRanges) {
   negative_offset_data_set();
   time_t now(strtotimet("2016-10-30 13:37:42"));

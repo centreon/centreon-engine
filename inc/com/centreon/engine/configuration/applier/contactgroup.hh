@@ -18,47 +18,44 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
-#  define CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
+#define CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
 
-#  include <map>
-#  include "com/centreon/engine/configuration/contactgroup.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <map>
+#include "com/centreon/engine/configuration/contactgroup.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace           configuration {
-  // Forward declarations.
-  class             state;
+namespace configuration {
+// Forward declarations.
+class state;
 
-  namespace         applier {
-    class           contactgroup {
-     public:
-                    contactgroup();
-                    contactgroup(contactgroup const& right);
-                    ~contactgroup() throw ();
-      contactgroup& operator=(contactgroup const& right);
-      void          add_object(
-                      configuration::contactgroup const& obj);
-      void          expand_objects(configuration::state& s);
-      void          modify_object(
-                      configuration::contactgroup const& obj);
-      void          remove_object(
-                      configuration::contactgroup const& obj);
-      void          resolve_object(
-                      configuration::contactgroup const& obj);
+namespace applier {
+class contactgroup {
+ public:
+  contactgroup();
+  contactgroup(contactgroup const& right);
+  ~contactgroup() throw();
+  contactgroup& operator=(contactgroup const& right);
+  void add_object(configuration::contactgroup const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::contactgroup const& obj);
+  void remove_object(configuration::contactgroup const& obj);
+  void resolve_object(configuration::contactgroup const& obj);
 
-     private:
-      typedef std::map<configuration::contactgroup::key_type, configuration::contactgroup> resolved_set;
+ private:
+  typedef std::map<configuration::contactgroup::key_type,
+                   configuration::contactgroup>
+      resolved_set;
 
-      void          _resolve_members(
-                      configuration::state& s,
-                      configuration::contactgroup const& obj);
+  void _resolve_members(configuration::state& s,
+                        configuration::contactgroup const& obj);
 
-      resolved_set  _resolved;
-    };
-  }
-}
+  resolved_set _resolved;
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH

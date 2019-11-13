@@ -29,40 +29,44 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<serviceescalation, type, &serviceescalation::method>::generic
 
-std::unordered_map<std::string, serviceescalation::setter_func> const serviceescalation::_setters{
-  { "host",                  SETTER(std::string const&, _set_hosts) },
-  { "host_name",             SETTER(std::string const&, _set_hosts) },
-  { "description",           SETTER(std::string const&, _set_service_description) },
-  { "service_description",   SETTER(std::string const&, _set_service_description) },
-  { "servicegroup",          SETTER(std::string const&, _set_servicegroups) },
-  { "servicegroups",         SETTER(std::string const&, _set_servicegroups) },
-  { "servicegroup_name",     SETTER(std::string const&, _set_servicegroups) },
-  { "hostgroup",             SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
-  { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
-  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) },
-  { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
-  { "first_notification",    SETTER(unsigned int, _set_first_notification) },
-  { "last_notification",     SETTER(unsigned int, _set_last_notification) },
-  { "notification_interval", SETTER(unsigned int, _set_notification_interval) }
-};
+std::unordered_map<std::string, serviceescalation::setter_func> const
+    serviceescalation::_setters{
+        {"host", SETTER(std::string const&, _set_hosts)},
+        {"host_name", SETTER(std::string const&, _set_hosts)},
+        {"description", SETTER(std::string const&, _set_service_description)},
+        {"service_description",
+         SETTER(std::string const&, _set_service_description)},
+        {"servicegroup", SETTER(std::string const&, _set_servicegroups)},
+        {"servicegroups", SETTER(std::string const&, _set_servicegroups)},
+        {"servicegroup_name", SETTER(std::string const&, _set_servicegroups)},
+        {"hostgroup", SETTER(std::string const&, _set_hostgroups)},
+        {"hostgroups", SETTER(std::string const&, _set_hostgroups)},
+        {"hostgroup_name", SETTER(std::string const&, _set_hostgroups)},
+        {"contact_groups", SETTER(std::string const&, _set_contactgroups)},
+        {"escalation_options",
+         SETTER(std::string const&, _set_escalation_options)},
+        {"escalation_period",
+         SETTER(std::string const&, _set_escalation_period)},
+        {"first_notification", SETTER(unsigned int, _set_first_notification)},
+        {"last_notification", SETTER(unsigned int, _set_last_notification)},
+        {"notification_interval",
+         SETTER(unsigned int, _set_notification_interval)}};
 
 // Default values.
 static unsigned short const default_escalation_options(serviceescalation::none);
-static unsigned int const   default_first_notification(-2);
-static unsigned int const   default_last_notification(-2);
-static unsigned int const   default_notification_interval(0);
+static unsigned int const default_first_notification(-2);
+static unsigned int const default_last_notification(-2);
+static unsigned int const default_notification_interval(0);
 
 /**
  *  Default constructor.
  */
 serviceescalation::serviceescalation()
-  : object(object::serviceescalation),
-    _escalation_options(default_escalation_options),
-    _first_notification(default_first_notification),
-    _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {}
+    : object(object::serviceescalation),
+      _escalation_options(default_escalation_options),
+      _first_notification(default_first_notification),
+      _last_notification(default_last_notification),
+      _notification_interval(default_notification_interval) {}
 
 /**
  *  Copy constructor.
@@ -70,14 +74,14 @@ serviceescalation::serviceescalation()
  *  @param[in] right The serviceescalation to copy.
  */
 serviceescalation::serviceescalation(serviceescalation const& right)
-  : object(right) {
+    : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-serviceescalation::~serviceescalation() throw () {}
+serviceescalation::~serviceescalation() throw() {}
 
 /**
  *  Copy constructor.
@@ -86,7 +90,8 @@ serviceescalation::~serviceescalation() throw () {}
  *
  *  @return This serviceescalation.
  */
-serviceescalation& serviceescalation::operator=(serviceescalation const& right) {
+serviceescalation& serviceescalation::operator=(
+    serviceescalation const& right) {
   if (this != &right) {
     object::operator=(right);
     _contactgroups = right._contactgroups;
@@ -124,7 +129,7 @@ bool serviceescalation::operator==(serviceescalation const& right) const
   }
   if (_contactgroups != right._contactgroups) {
     logger(dbg_config, more) << "configuration::serviceescalation::"
-                                      "equality => contact groups don't match";
+                                "equality => contact groups don't match";
     return false;
   }
   if (_escalation_options != right._escalation_options) {
@@ -147,7 +152,7 @@ bool serviceescalation::operator==(serviceescalation const& right) const
   }
   if (_hostgroups != right._hostgroups) {
     logger(dbg_config, more) << "configuration::serviceescalation::"
-                                      "equality => host groups don't match";
+                                "equality => host groups don't match";
     return false;
   }
   if (_hosts != right._hosts) {
@@ -169,7 +174,7 @@ bool serviceescalation::operator==(serviceescalation const& right) const
   }
   if (_servicegroups != right._servicegroups) {
     logger(dbg_config, more) << "configuration::serviceescalation::"
-                                      "equality => service groups don't match";
+                                "equality => service groups don't match";
     return false;
   }
   if (_service_description != right._service_description) {
@@ -190,7 +195,8 @@ bool serviceescalation::operator==(serviceescalation const& right) const
  *
  *  @return True if is not the same serviceescalation, otherwise false.
  */
-bool serviceescalation::operator!=(serviceescalation const& right) const throw () {
+bool serviceescalation::operator!=(serviceescalation const& right) const
+    throw() {
   return !operator==(right);
 }
 
@@ -204,7 +210,7 @@ bool serviceescalation::operator!=(serviceescalation const& right) const throw (
 bool serviceescalation::operator<(serviceescalation const& right) const {
   if (_hosts != right._hosts)
     return _hosts < right._hosts;
-  else if (_hostgroups != right. _hostgroups)
+  else if (_hostgroups != right._hostgroups)
     return _hostgroups < right._hostgroups;
   else if (_service_description != right._service_description)
     return _service_description < right._service_description;
@@ -231,16 +237,17 @@ bool serviceescalation::operator<(serviceescalation const& right) const {
 void serviceescalation::check_validity() const {
   if (_servicegroups->empty()) {
     if (_service_description->empty())
-      throw (engine_error() << "Service escalation is not attached to "
-             << "any service or service group (properties "
-             << "'service_description' and 'servicegroup_name', "
-             << "respectively)");
+      throw(engine_error() << "Service escalation is not attached to "
+                           << "any service or service group (properties "
+                           << "'service_description' and 'servicegroup_name', "
+                           << "respectively)");
     else if (_hosts->empty() && _hostgroups->empty())
-      throw (engine_error() << "Service escalation is not attached to "
-             << "any host or host group (properties 'host_name' or "
-             << "'hostgroup_name', respectively)");
+      throw(
+          engine_error() << "Service escalation is not attached to "
+                         << "any host or host group (properties 'host_name' or "
+                         << "'hostgroup_name', respectively)");
   }
-  return ;
+  return;
 }
 
 /**
@@ -248,7 +255,7 @@ void serviceescalation::check_validity() const {
  *
  *  @return This object.
  */
-serviceescalation::key_type const& serviceescalation::key() const throw () {
+serviceescalation::key_type const& serviceescalation::key() const throw() {
   return *this;
 }
 
@@ -259,8 +266,8 @@ serviceescalation::key_type const& serviceescalation::key() const throw () {
  */
 void serviceescalation::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "Cannot merge service escalation with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge service escalation with '"
+                         << obj.type() << "'");
   serviceescalation const& tmpl(static_cast<serviceescalation const&>(obj));
 
   MRG_INHERIT(_contactgroups);
@@ -284,8 +291,9 @@ void serviceescalation::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool serviceescalation::parse(char const* key, char const* value) {
-  std::unordered_map<std::string, serviceescalation::setter_func>::const_iterator
-    it{_setters.find(key)};
+  std::unordered_map<std::string,
+                     serviceescalation::setter_func>::const_iterator it{
+      _setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -296,7 +304,7 @@ bool serviceescalation::parse(char const* key, char const* value) {
  *
  *  @return The contact groups.
  */
-set_string& serviceescalation::contactgroups() throw () {
+set_string& serviceescalation::contactgroups() throw() {
   return *_contactgroups;
 }
 
@@ -305,7 +313,7 @@ set_string& serviceescalation::contactgroups() throw () {
  *
  *  @return The contactgroups.
  */
-set_string const& serviceescalation::contactgroups() const throw () {
+set_string const& serviceescalation::contactgroups() const throw() {
   return *_contactgroups;
 }
 
@@ -314,7 +322,7 @@ set_string const& serviceescalation::contactgroups() const throw () {
  *
  *  @return True if contact groups were defined.
  */
-bool serviceescalation::contactgroups_defined() const throw () {
+bool serviceescalation::contactgroups_defined() const throw() {
   return _contactgroups.is_set();
 }
 
@@ -323,10 +331,9 @@ bool serviceescalation::contactgroups_defined() const throw () {
  *
  *  @param[in] options New escalation options.
  */
-void serviceescalation::escalation_options(
-                          unsigned int options) throw () {
+void serviceescalation::escalation_options(unsigned int options) throw() {
   _escalation_options = options;
-  return ;
+  return;
 }
 
 /**
@@ -334,7 +341,7 @@ void serviceescalation::escalation_options(
  *
  *  @return The escalation_options.
  */
-unsigned short serviceescalation::escalation_options() const throw () {
+unsigned short serviceescalation::escalation_options() const throw() {
   return _escalation_options;
 }
 
@@ -345,7 +352,7 @@ unsigned short serviceescalation::escalation_options() const throw () {
  */
 void serviceescalation::escalation_period(std::string const& period) {
   _escalation_period = period;
-  return ;
+  return;
 }
 
 /**
@@ -353,7 +360,7 @@ void serviceescalation::escalation_period(std::string const& period) {
  *
  *  @return The escalation_period.
  */
-std::string const& serviceescalation::escalation_period() const throw () {
+std::string const& serviceescalation::escalation_period() const throw() {
   return _escalation_period;
 }
 
@@ -362,7 +369,7 @@ std::string const& serviceescalation::escalation_period() const throw () {
  *
  *  @return True if the escalation period was defined.
  */
-bool serviceescalation::escalation_period_defined() const throw () {
+bool serviceescalation::escalation_period_defined() const throw() {
   return _escalation_period.is_set();
 }
 
@@ -371,9 +378,9 @@ bool serviceescalation::escalation_period_defined() const throw () {
  *
  *  @param[in] n First notification number.
  */
-void serviceescalation::first_notification(unsigned int n) throw () {
+void serviceescalation::first_notification(unsigned int n) throw() {
   _first_notification = n;
-  return ;
+  return;
 }
 
 /**
@@ -381,7 +388,7 @@ void serviceescalation::first_notification(unsigned int n) throw () {
  *
  *  @return The first_notification.
  */
-unsigned int serviceescalation::first_notification() const throw () {
+unsigned int serviceescalation::first_notification() const throw() {
   return _first_notification;
 }
 
@@ -390,7 +397,7 @@ unsigned int serviceescalation::first_notification() const throw () {
  *
  *  @return Host groups.
  */
-list_string& serviceescalation::hostgroups() throw () {
+list_string& serviceescalation::hostgroups() throw() {
   return *_hostgroups;
 }
 
@@ -399,7 +406,7 @@ list_string& serviceescalation::hostgroups() throw () {
  *
  *  @return The hostgroups.
  */
-list_string const& serviceescalation::hostgroups() const throw () {
+list_string const& serviceescalation::hostgroups() const throw() {
   return *_hostgroups;
 }
 
@@ -408,7 +415,7 @@ list_string const& serviceescalation::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-list_string& serviceescalation::hosts() throw () {
+list_string& serviceescalation::hosts() throw() {
   return *_hosts;
 }
 
@@ -417,7 +424,7 @@ list_string& serviceescalation::hosts() throw () {
  *
  *  @return The hosts.
  */
-list_string const& serviceescalation::hosts() const throw () {
+list_string const& serviceescalation::hosts() const throw() {
   return *_hosts;
 }
 
@@ -426,9 +433,9 @@ list_string const& serviceescalation::hosts() const throw () {
  *
  *  @param[in] n Last notification number.
  */
-void serviceescalation::last_notification(unsigned int n) throw () {
+void serviceescalation::last_notification(unsigned int n) throw() {
   _last_notification = n;
-  return ;
+  return;
 }
 
 /**
@@ -436,7 +443,7 @@ void serviceescalation::last_notification(unsigned int n) throw () {
  *
  *  @return The last_notification.
  */
-unsigned int serviceescalation::last_notification() const throw () {
+unsigned int serviceescalation::last_notification() const throw() {
   return _last_notification;
 }
 
@@ -445,10 +452,9 @@ unsigned int serviceescalation::last_notification() const throw () {
  *
  *  @param[in] interval New notification interval.
  */
-void serviceescalation::notification_interval(
-                          unsigned int interval) throw () {
+void serviceescalation::notification_interval(unsigned int interval) throw() {
   _notification_interval = interval;
-  return ;
+  return;
 }
 
 /**
@@ -456,7 +462,7 @@ void serviceescalation::notification_interval(
  *
  *  @return The notification_interval.
  */
-unsigned int serviceescalation::notification_interval() const throw () {
+unsigned int serviceescalation::notification_interval() const throw() {
   return _notification_interval;
 }
 
@@ -465,7 +471,7 @@ unsigned int serviceescalation::notification_interval() const throw () {
  *
  *  @return True if the notification interval was set.
  */
-bool serviceescalation::notification_interval_defined() const throw () {
+bool serviceescalation::notification_interval_defined() const throw() {
   return _notification_interval.is_set();
 }
 
@@ -474,7 +480,7 @@ bool serviceescalation::notification_interval_defined() const throw () {
  *
  *  @return The service groups.
  */
-list_string& serviceescalation::servicegroups() throw () {
+list_string& serviceescalation::servicegroups() throw() {
   return *_servicegroups;
 }
 
@@ -483,7 +489,7 @@ list_string& serviceescalation::servicegroups() throw () {
  *
  *  @return The servicegroups.
  */
-list_string const& serviceescalation::servicegroups() const throw () {
+list_string const& serviceescalation::servicegroups() const throw() {
   return *_servicegroups;
 }
 
@@ -492,7 +498,7 @@ list_string const& serviceescalation::servicegroups() const throw () {
  *
  *  @return Service description.
  */
-list_string& serviceescalation::service_description() throw () {
+list_string& serviceescalation::service_description() throw() {
   return *_service_description;
 }
 
@@ -501,10 +507,9 @@ list_string& serviceescalation::service_description() throw () {
  *
  *  @return The service_description.
  */
-list_string const& serviceescalation::service_description() const throw () {
+list_string const& serviceescalation::service_description() const throw() {
   return *_service_description;
 }
-
 
 /**
  *  Set contactgroups value.
@@ -529,10 +534,8 @@ bool serviceescalation::_set_escalation_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::iterator it(values.begin()), end(values.end());
+       it != end; ++it) {
     string::trim(*it);
     if (*it == "w" || *it == "warning")
       options |= warning;

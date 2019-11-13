@@ -18,18 +18,22 @@
 */
 
 #ifndef CCE_NAMESPACE_HH
-#  define CCE_NAMESPACE_HH
+#define CCE_NAMESPACE_HH
 
-#  ifdef CCE_BEGIN
-#    undef CCE_BEGIN
-#  endif // CCE_BEGIN
-#  define CCE_BEGIN() namespace com { \
-                        namespace centreon { \
-                          namespace engine {
+#ifdef CCE_BEGIN
+#undef CCE_BEGIN
+#endif  // CCE_BEGIN
+#define CCE_BEGIN()    \
+  namespace com {      \
+  namespace centreon { \
+  namespace engine {
 
-#  ifdef CCE_END
-#    undef CCE_END
-#  endif // CCE_END
-#  define CCE_END() } } }
+#ifdef CCE_END
+#undef CCE_END
+#endif  // CCE_END
+#define CCE_END() \
+  }               \
+  }               \
+  }
 
-#endif // !CCE_NAMESPACE_HH
+#endif  // !CCE_NAMESPACE_HH

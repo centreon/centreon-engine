@@ -23,25 +23,23 @@
 
 using namespace com::centreon::engine;
 
-#define SETTER(type, method) \
-  &retention::object::setter< \
-     retention::comment, \
-     type, \
-     &retention::comment::method>::generic
+#define SETTER(type, method)                           \
+  &retention::object::setter<retention::comment, type, \
+                             &retention::comment::method>::generic
 
 retention::comment::setters const retention::comment::_setters[] = {
-  { "author",              SETTER(std::string const&, _set_author) },
-  { "comment_data",        SETTER(std::string const&, _set_comment_data) },
-  { "comment_id",          SETTER(unsigned long, _set_comment_id) },
-  { "entry_time",          SETTER(time_t, _set_entry_time) },
-  { "entry_type",          SETTER(unsigned int, _set_entry_type) },
-  { "expire_time",         SETTER(time_t, _set_expire_time) },
-  { "expires",             SETTER(bool, _set_expires) },
-  { "host_name",           SETTER(std::string const&, _set_host_name) },
-  { "persistent",          SETTER(bool, _set_persistent) },
-  { "service_description", SETTER(std::string const&, _set_service_description) },
-  { "source",              SETTER(int, _set_source) }
-};
+    {"author", SETTER(std::string const&, _set_author)},
+    {"comment_data", SETTER(std::string const&, _set_comment_data)},
+    {"comment_id", SETTER(unsigned long, _set_comment_id)},
+    {"entry_time", SETTER(time_t, _set_entry_time)},
+    {"entry_type", SETTER(unsigned int, _set_entry_type)},
+    {"expire_time", SETTER(time_t, _set_expire_time)},
+    {"expires", SETTER(bool, _set_expires)},
+    {"host_name", SETTER(std::string const&, _set_host_name)},
+    {"persistent", SETTER(bool, _set_persistent)},
+    {"service_description",
+     SETTER(std::string const&, _set_service_description)},
+    {"source", SETTER(int, _set_source)}};
 
 /**
  *  Constructor.
@@ -49,29 +47,28 @@ retention::comment::setters const retention::comment::_setters[] = {
  *  @param[in] type This is a host or service comment.
  */
 retention::comment::comment(type_id comment_type)
-  : object(object::comment),
-    _comment_id(0),
-    _comment_type(comment_type),
-    _entry_type(com::centreon::engine::comment::user),
-    _expire_time(0),
-    _expires(false),
-    _persistent(false),
-    _source(com::centreon::engine::comment::internal) {}
+    : object(object::comment),
+      _comment_id(0),
+      _comment_type(comment_type),
+      _entry_type(com::centreon::engine::comment::user),
+      _expire_time(0),
+      _expires(false),
+      _persistent(false),
+      _source(com::centreon::engine::comment::internal) {}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right Object to copy.
  */
-retention::comment::comment(comment const& right)
-  : object(right) {
+retention::comment::comment(comment const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-retention::comment::~comment() throw () {}
+retention::comment::~comment() throw() {}
 
 /**
  *  Copy operator.
@@ -106,20 +103,17 @@ retention::comment& retention::comment::operator=(comment const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool retention::comment::operator==(comment const& right) const throw () {
-  return (object::operator==(right)
-          && _author == right._author
-          && _comment_data == right._comment_data
-          && _comment_id == right._comment_id
-          && _comment_type == right._comment_type
-          && _entry_time == right._entry_time
-          && _entry_type == right._entry_type
-          && _expire_time == right._expire_time
-          && _expires == right._expires
-          && _host_name == right._host_name
-          && _persistent == right._persistent
-          && _service_description == right._service_description
-          && _source == right._source);
+bool retention::comment::operator==(comment const& right) const throw() {
+  return (object::operator==(right) && _author == right._author &&
+          _comment_data == right._comment_data &&
+          _comment_id == right._comment_id &&
+          _comment_type == right._comment_type &&
+          _entry_time == right._entry_time &&
+          _entry_type == right._entry_type &&
+          _expire_time == right._expire_time && _expires == right._expires &&
+          _host_name == right._host_name && _persistent == right._persistent &&
+          _service_description == right._service_description &&
+          _source == right._source);
 }
 
 /**
@@ -129,7 +123,7 @@ bool retention::comment::operator==(comment const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool retention::comment::operator!=(comment const& right) const throw () {
+bool retention::comment::operator!=(comment const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -142,9 +136,7 @@ bool retention::comment::operator!=(comment const& right) const throw () {
  *  @return True on success, otherwise false.
  */
 bool retention::comment::set(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
+  for (unsigned int i(0); i < sizeof(_setters) / sizeof(_setters[0]); ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
@@ -155,7 +147,7 @@ bool retention::comment::set(char const* key, char const* value) {
  *
  *  @return The author.
  */
-std::string const& retention::comment::author() const throw () {
+std::string const& retention::comment::author() const throw() {
   return (_author);
 }
 
@@ -164,7 +156,7 @@ std::string const& retention::comment::author() const throw () {
  *
  *  @return The comment_data.
  */
-std::string const& retention::comment::comment_data() const throw () {
+std::string const& retention::comment::comment_data() const throw() {
   return (_comment_data);
 }
 
@@ -173,7 +165,7 @@ std::string const& retention::comment::comment_data() const throw () {
  *
  *  @return The comment_id.
  */
-unsigned long retention::comment::comment_id() const throw () {
+unsigned long retention::comment::comment_id() const throw() {
   return (_comment_id);
 }
 
@@ -182,7 +174,7 @@ unsigned long retention::comment::comment_id() const throw () {
  *
  *  @return The comment_type.
  */
-retention::comment::type_id retention::comment::comment_type() const throw () {
+retention::comment::type_id retention::comment::comment_type() const throw() {
   return (_comment_type);
 }
 
@@ -191,7 +183,7 @@ retention::comment::type_id retention::comment::comment_type() const throw () {
  *
  *  @return The entry_time.
  */
-time_t retention::comment::entry_time() const throw () {
+time_t retention::comment::entry_time() const throw() {
   return (_entry_time);
 }
 
@@ -200,7 +192,7 @@ time_t retention::comment::entry_time() const throw () {
  *
  *  @return The entry_type.
  */
-unsigned int retention::comment::entry_type() const throw () {
+unsigned int retention::comment::entry_type() const throw() {
   return (_entry_type);
 }
 
@@ -209,7 +201,7 @@ unsigned int retention::comment::entry_type() const throw () {
  *
  *  @return The expire_time.
  */
-time_t retention::comment::expire_time() const throw () {
+time_t retention::comment::expire_time() const throw() {
   return (_expire_time);
 }
 
@@ -218,7 +210,7 @@ time_t retention::comment::expire_time() const throw () {
  *
  *  @return The expires.
  */
-bool retention::comment::expires() const throw () {
+bool retention::comment::expires() const throw() {
   return (_expires);
 }
 
@@ -227,7 +219,7 @@ bool retention::comment::expires() const throw () {
  *
  *  @return The host_name.
  */
-std::string const& retention::comment::host_name() const throw () {
+std::string const& retention::comment::host_name() const throw() {
   return (_host_name);
 }
 
@@ -236,7 +228,7 @@ std::string const& retention::comment::host_name() const throw () {
  *
  *  @return The persistent.
  */
-bool retention::comment::persistent() const throw () {
+bool retention::comment::persistent() const throw() {
   return (_persistent);
 }
 
@@ -245,7 +237,7 @@ bool retention::comment::persistent() const throw () {
  *
  *  @return The service_description.
  */
-std::string const& retention::comment::service_description() const throw () {
+std::string const& retention::comment::service_description() const throw() {
   return (_service_description);
 }
 
@@ -254,7 +246,7 @@ std::string const& retention::comment::service_description() const throw () {
  *
  *  @return The source.
  */
-int retention::comment::source() const throw () {
+int retention::comment::source() const throw() {
   return (_source);
 }
 

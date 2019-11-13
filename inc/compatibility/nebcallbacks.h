@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NEBCALLBACKS_H
-#  define CCE_COMPATIBILITY_NEBCALLBACKS_H
+#define CCE_COMPATIBILITY_NEBCALLBACKS_H
 
-#  include "com/centreon/engine/nebcallbacks.hh"
-#  include "config.h"
-#  include "nebmodules.h"
+#include "com/centreon/engine/nebcallbacks.hh"
+#include "config.h"
+#include "nebmodules.h"
 
-#endif // !CCE_COMPATIBILITY_NEBCALLBACKS_H
+#endif  // !CCE_COMPATIBILITY_NEBCALLBACKS_H

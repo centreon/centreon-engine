@@ -33,11 +33,10 @@ viability_failure::viability_failure() {}
  *  @param[in] function  Source function.
  *  @param[in] line      Line at which exception is thrown.
  */
-viability_failure::viability_failure(
-                     char const* file,
-                     char const* function,
-                     int line)
-  : error(file, function, line) {}
+viability_failure::viability_failure(char const* file,
+                                     char const* function,
+                                     int line)
+    : error(file, function, line) {}
 
 /**
  *  Copy constructor.
@@ -45,12 +44,12 @@ viability_failure::viability_failure(
  *  @param[in] other  Object to copy.
  */
 viability_failure::viability_failure(viability_failure const& other)
-  : error(other) {}
+    : error(other) {}
 
 /**
  *  Destructor.
  */
-viability_failure::~viability_failure() throw () {}
+viability_failure::~viability_failure() throw() {}
 
 /**
  *  Assignment operator.
@@ -60,7 +59,7 @@ viability_failure::~viability_failure() throw () {}
  *  @return This object.
  */
 viability_failure& viability_failure::operator=(
-                                        viability_failure const& other) {
+    viability_failure const& other) {
   error::operator=(other);
   return (*this);
 }

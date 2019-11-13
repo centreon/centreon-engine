@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
@@ -37,7 +37,7 @@ applier::servicedependency::servicedependency() {}
 /**
  *  Destructor.
  */
-applier::servicedependency::~servicedependency() throw () {}
+applier::servicedependency::~servicedependency() throw() {}
 
 /**
  *  Add new service dependency.
@@ -72,11 +72,11 @@ void applier::servicedependency::add_object(
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new service dependency of service '"
-    << obj.dependent_service_description().front() << "' of host '"
-    << obj.dependent_hosts().front() << "' on service '"
-    << obj.service_description().front() << "' of host '"
-    << obj.hosts().front() << "'.";
+      << "Creating new service dependency of service '"
+      << obj.dependent_service_description().front() << "' of host '"
+      << obj.dependent_hosts().front() << "' on service '"
+      << obj.service_description().front() << "' of host '"
+      << obj.hosts().front() << "'.";
 
   // Add dependency to the global configuration set.
   config->servicedependencies().insert(obj);
@@ -123,16 +123,13 @@ void applier::servicedependency::add_object(
 
   // Add new items to the global list.
   engine::servicedependency::servicedependencies.insert(
-      {{sd->get_dependent_hostname(), sd->get_dependent_service_description()}, sd});
+      {{sd->get_dependent_hostname(), sd->get_dependent_service_description()},
+       sd});
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(nullptr));
-  broker_adaptive_dependency_data(
-    NEBTYPE_SERVICEDEPENDENCY_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    sd.get(),
-    &tv);
+  broker_adaptive_dependency_data(NEBTYPE_SERVICEDEPENDENCY_ADD, NEBFLAG_NONE,
+                                  NEBATTR_NONE, sd.get(), &tv);
 }
 
 /**
@@ -144,51 +141,41 @@ void applier::servicedependency::expand_objects(configuration::state& s) {
   // Browse all dependencies.
   configuration::set_servicedependency expanded;
   for (configuration::set_servicedependency::const_iterator
-         it_dep(s.servicedependencies().begin()),
-         end_dep(s.servicedependencies().end());
-       it_dep != end_dep;
-       ++it_dep) {
+           it_dep(s.servicedependencies().begin()),
+       end_dep(s.servicedependencies().end());
+       it_dep != end_dep; ++it_dep) {
     // Expand service dependency instances.
-    if (it_dep->hosts().size() != 1
-        || !it_dep->hostgroups().empty()
-        || it_dep->service_description().size() != 1
-        || !it_dep->servicegroups().empty()
-        || it_dep->dependent_hosts().size() != 1
-        || !it_dep->dependent_hostgroups().empty()
-        || it_dep->dependent_service_description().size() != 1
-        || !it_dep->dependent_servicegroups().empty()
-        || it_dep->dependency_type()
-            == configuration::servicedependency::unknown_type) {
+    if (it_dep->hosts().size() != 1 || !it_dep->hostgroups().empty() ||
+        it_dep->service_description().size() != 1 ||
+        !it_dep->servicegroups().empty() ||
+        it_dep->dependent_hosts().size() != 1 ||
+        !it_dep->dependent_hostgroups().empty() ||
+        it_dep->dependent_service_description().size() != 1 ||
+        !it_dep->dependent_servicegroups().empty() ||
+        it_dep->dependency_type() ==
+            configuration::servicedependency::unknown_type) {
       // Expand depended services.
       std::set<std::pair<std::string, std::string>> depended_services;
-      _expand_services(
-        it_dep->hosts(),
-        it_dep->hostgroups(),
-        it_dep->service_description(),
-        it_dep->servicegroups(),
-        s,
-        depended_services);
+      _expand_services(it_dep->hosts(), it_dep->hostgroups(),
+                       it_dep->service_description(), it_dep->servicegroups(),
+                       s, depended_services);
 
       // Expand dependent services.
       std::set<std::pair<std::string, std::string>> dependent_services;
       _expand_services(
-        it_dep->dependent_hosts(),
-        it_dep->dependent_hostgroups(),
-        it_dep->dependent_service_description(),
-        it_dep->dependent_servicegroups(),
-        s,
-        dependent_services);
+          it_dep->dependent_hosts(), it_dep->dependent_hostgroups(),
+          it_dep->dependent_service_description(),
+          it_dep->dependent_servicegroups(), s, dependent_services);
 
       // Browse all depended and dependent services.
       for (std::set<std::pair<std::string, std::string>>::const_iterator
                it1(depended_services.begin()),
            end1(depended_services.end());
            it1 != end1; ++it1)
-        for (std::set<std::pair<std::string, std::string> >::const_iterator
-               it2(dependent_services.begin()),
-               end2(dependent_services.end());
-             it2 != end2;
-             ++it2)
+        for (std::set<std::pair<std::string, std::string>>::const_iterator
+                 it2(dependent_services.begin()),
+             end2(dependent_services.end());
+             it2 != end2; ++it2)
           for (int i(0); i < 2; ++i) {
             // Create service dependency instance.
             configuration::servicedependency sdep(*it_dep);
@@ -208,8 +195,7 @@ void applier::servicedependency::expand_objects(configuration::state& s) {
               sdep.dependency_type(
                   configuration::servicedependency::execution_dependency);
               sdep.notification_failure_options(0);
-            }
-            else {
+            } else {
               sdep.dependency_type(
                   configuration::servicedependency::notification_dependency);
               sdep.execution_failure_options(0);
@@ -254,24 +240,20 @@ void applier::servicedependency::modify_object(
  *                  engine.
  */
 void applier::servicedependency::remove_object(
-       configuration::servicedependency const& obj) {
+    configuration::servicedependency const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing a service dependency.";
+      << "Removing a service dependency.";
 
   // Find service dependency.
-  servicedependency_mmap::iterator
-    it(engine::servicedependency::servicedependencies_find(obj.key()));
+  servicedependency_mmap::iterator it(
+      engine::servicedependency::servicedependencies_find(obj.key()));
   if (it != engine::servicedependency::servicedependencies.end()) {
-
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
-    broker_adaptive_dependency_data(
-      NEBTYPE_SERVICEDEPENDENCY_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      it->second.get(),
-      &tv);
+    broker_adaptive_dependency_data(NEBTYPE_SERVICEDEPENDENCY_DELETE,
+                                    NEBFLAG_NONE, NEBATTR_NONE,
+                                    it->second.get(), &tv);
 
     // Remove service dependency from its list.
     engine::servicedependency::servicedependencies.erase(it);
@@ -287,14 +269,14 @@ void applier::servicedependency::remove_object(
  *  @param[in] obj  Servicedependency object.
  */
 void applier::servicedependency::resolve_object(
-       configuration::servicedependency const& obj) {
+    configuration::servicedependency const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving a service dependency.";
+      << "Resolving a service dependency.";
 
   // Find service dependency.
-  servicedependency_mmap::iterator
-    it(engine::servicedependency::servicedependencies_find(obj.key()));
+  servicedependency_mmap::iterator it(
+      engine::servicedependency::servicedependencies_find(obj.key()));
   if (engine::servicedependency::servicedependencies.end() == it)
     throw engine_error() << "Cannot resolve non-existing service dependency";
 
@@ -313,12 +295,12 @@ void applier::servicedependency::resolve_object(
  *  @param[out]    expanded Expanded services.
  */
 void applier::servicedependency::_expand_services(
-       std::list<std::string> const& hst,
-       std::list<std::string> const& hg,
-       std::list<std::string> const& svc,
-       std::list<std::string> const& sg,
-       configuration::state& s,
-       std::set<std::pair<std::string, std::string> >& expanded) {
+    std::list<std::string> const& hst,
+    std::list<std::string> const& hg,
+    std::list<std::string> const& svc,
+    std::list<std::string> const& sg,
+    configuration::state& s,
+    std::set<std::pair<std::string, std::string>>& expanded) {
   // Expanded hosts.
   std::set<std::string> all_hosts;
 
@@ -326,56 +308,40 @@ void applier::servicedependency::_expand_services(
   all_hosts.insert(hst.begin(), hst.end());
 
   // Host groups.
-  for (std::list<std::string>::const_iterator
-         it(hg.begin()),
-         end(hg.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::const_iterator it(hg.begin()), end(hg.end());
+       it != end; ++it) {
     // Find host group.
-    configuration::set_hostgroup::iterator
-      it_group(s.hostgroups_find(*it));
+    configuration::set_hostgroup::iterator it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
-      throw engine_error() << "Could not resolve host group '"
-             << *it << "'";
+      throw engine_error() << "Could not resolve host group '" << *it << "'";
 
     // Add host group members.
-    all_hosts.insert(
-                it_group->members().begin(),
-                it_group->members().end());
+    all_hosts.insert(it_group->members().begin(), it_group->members().end());
   }
 
   // Hosts * services.
-  for (std::set<std::string>::const_iterator
-         it_host(all_hosts.begin()),
-         end_host(all_hosts.end());
-       it_host != end_host;
-       ++it_host)
-    for (std::list<std::string>::const_iterator
-           it_service(svc.begin()),
-           end_service(svc.end());
-         it_service != end_service;
-         ++it_service)
+  for (std::set<std::string>::const_iterator it_host(all_hosts.begin()),
+       end_host(all_hosts.end());
+       it_host != end_host; ++it_host)
+    for (std::list<std::string>::const_iterator it_service(svc.begin()),
+         end_service(svc.end());
+         it_service != end_service; ++it_service)
       expanded.insert({*it_host, *it_service});
 
   // Service groups.
-  for (std::list<std::string>::const_iterator
-         it(sg.begin()),
-         end(sg.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::const_iterator it(sg.begin()), end(sg.end());
+       it != end; ++it) {
     // Find service group.
-    configuration::set_servicegroup::iterator
-      it_group(s.servicegroups_find(*it));
+    configuration::set_servicegroup::iterator it_group(
+        s.servicegroups_find(*it));
     if (it_group == s.servicegroups().end())
-      throw (engine_error() << "Could not resolve service group '"
-             << *it << "'");
+      throw(engine_error() << "Could not resolve service group '" << *it
+                           << "'");
 
     // Add service group members.
-    for (set_pair_string::const_iterator
-           it_member(it_group->members().begin()),
-           end_member(it_group->members().end());
-         it_member != end_member;
-         ++it_member)
+    for (set_pair_string::const_iterator it_member(it_group->members().begin()),
+         end_member(it_group->members().end());
+         it_member != end_member; ++it_member)
       expanded.insert(*it_member);
   }
 }

@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NEBMODULES_H
-#  define CCE_COMPATIBILITY_NEBMODULES_H
+#define CCE_COMPATIBILITY_NEBMODULES_H
 
-#  include "com/centreon/engine/nebmodules.hh"
+#include "com/centreon/engine/nebmodules.hh"
 
-#endif // !CCE_COMPATIBILITY_NEBMODULES_H
+#endif  // !CCE_COMPATIBILITY_NEBMODULES_H

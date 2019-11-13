@@ -20,85 +20,81 @@
 */
 
 #ifndef CCE_GLOBALS_HH
-#  define CCE_GLOBALS_HH
+#define CCE_GLOBALS_HH
 
-#  include <map>
-#  include <string>
-#  include <stdio.h>
-#  include "com/centreon/engine/checks.hh"
-#  include "com/centreon/engine/circular_buffer.hh"
-#  include "com/centreon/engine/configuration/state.hh"
-#  include "com/centreon/engine/events/sched_info.hh"
-#  include "com/centreon/engine/events/timed_event.hh"
-#  include "com/centreon/engine/nebmods.hh"
-#  include "com/centreon/engine/downtimes/downtime.hh"
-#  include "com/centreon/engine/utils.hh"
+#include <stdio.h>
+#include <map>
+#include <string>
+#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/circular_buffer.hh"
+#include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/downtimes/downtime.hh"
+#include "com/centreon/engine/events/sched_info.hh"
+#include "com/centreon/engine/events/timed_event.hh"
+#include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/engine/utils.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif /* C++ */
+#endif /* C++ */
 
-extern int                       config_errors;
-extern int                       config_warnings;
+extern int config_errors;
+extern int config_warnings;
 
-extern char*                     check_result_path;
+extern char* check_result_path;
 
 extern com::centreon::engine::configuration::state* config;
-extern char*                     config_file;
+extern char* config_file;
 
+extern com::centreon::engine::commands::command* global_host_event_handler_ptr;
 extern com::centreon::engine::commands::command*
-                                 global_host_event_handler_ptr;
-extern com::centreon::engine::commands::command*
-                                 global_service_event_handler_ptr;
+    global_service_event_handler_ptr;
 
-extern com::centreon::engine::commands::command*
-                                 ocsp_command_ptr;
-extern com::centreon::engine::commands::command*
-                                 ochp_command_ptr;
+extern com::centreon::engine::commands::command* ocsp_command_ptr;
+extern com::centreon::engine::commands::command* ochp_command_ptr;
 
-extern unsigned long             logging_options;
+extern unsigned long logging_options;
 
+extern time_t last_command_check;
+extern time_t last_command_status_update;
+extern time_t last_log_rotation;
 
-extern time_t                    last_command_check;
-extern time_t                    last_command_status_update;
-extern time_t                    last_log_rotation;
+extern unsigned long modified_host_process_attributes;
+extern unsigned long modified_service_process_attributes;
 
-extern unsigned long             modified_host_process_attributes;
-extern unsigned long             modified_service_process_attributes;
-
-extern unsigned long             next_event_id;
-extern unsigned long             next_problem_id;
-extern unsigned long             next_notification_id;
+extern unsigned long next_event_id;
+extern unsigned long next_problem_id;
+extern unsigned long next_notification_id;
 
 extern bool sighup;
-extern int                       sigshutdown;
-extern int                       sigrestart;
+extern int sigshutdown;
+extern int sigrestart;
 
-extern char const*               sigs[35];
+extern char const* sigs[35];
 
-extern int                       sig_id;
+extern int sig_id;
 
-extern int                       verify_config;
-extern int                       verify_circular_paths;
-extern int                       test_scheduling;
+extern int verify_config;
+extern int verify_circular_paths;
+extern int test_scheduling;
 
-extern unsigned int              currently_running_service_checks;
-extern unsigned int              currently_running_host_checks;
+extern unsigned int currently_running_service_checks;
+extern unsigned int currently_running_host_checks;
 
-extern time_t                    program_start;
-extern time_t                    event_start;
+extern time_t program_start;
+extern time_t event_start;
 
-extern circular_buffer           external_command_buffer;
-extern pthread_t                 worker_threads[];
+extern circular_buffer external_command_buffer;
+extern pthread_t worker_threads[];
 
-extern check_stats               check_statistics[];
+extern check_stats check_statistics[];
 
-extern sched_info                scheduling_info;
+extern sched_info scheduling_info;
 
-extern std::string               macro_x_names[];
-extern std::string               macro_user[];
+extern std::string macro_x_names[];
+extern std::string macro_user[];
 
-extern nebcallback*              neb_callback_list[];
+extern nebcallback* neb_callback_list[];
 
 extern char* log_file;
 extern char* debug_file;
@@ -135,8 +131,8 @@ extern char* illegal_object_chars;
 extern char* illegal_output_chars;
 extern unsigned int use_large_installation_tweaks;
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif /* C++ */
+#endif /* C++ */
 
 #endif /* !CCE_GLOBALS_HH */

@@ -38,7 +38,8 @@ CCE_END()
 
 typedef std::unordered_map<
     std::string,
-    std::shared_ptr<com::centreon::engine::commands::connector> > connector_map;
+    std::shared_ptr<com::centreon::engine::commands::connector> >
+    connector_map;
 
 CCE_BEGIN()
 
@@ -60,8 +61,8 @@ class connector : public command, public process_listener {
   connector& operator=(connector const& right) = delete;
   commands::command* clone() const override;
   uint64_t run(std::string const& processed_cmd,
-                    nagios_macros& macros,
-                    uint32_t timeout) override;
+               nagios_macros& macros,
+               uint32_t timeout) override;
   void run(std::string const& processed_cmd,
            nagios_macros& macros,
            uint32_t timeout,
@@ -112,16 +113,16 @@ class connector : public command, public process_listener {
   std::condition_variable _cv_query;
   std::string _data_available;
   bool _is_running;
-  std::unordered_map<uint64_t , std::shared_ptr<query_info> > _queries;
+  std::unordered_map<uint64_t, std::shared_ptr<query_info> > _queries;
   bool _query_quit_ok;
   bool _query_version_ok;
   mutable std::mutex _lock;
   process _process;
-  std::unordered_map<uint64_t , result> _results;
+  std::unordered_map<uint64_t, result> _results;
   restart _restart;
   bool _try_to_restart;
 };
-}
+}  // namespace commands
 
 CCE_END()
 

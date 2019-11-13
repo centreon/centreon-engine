@@ -27,50 +27,49 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostescalation, type, &hostescalation::method>::generic
 
-std::unordered_map<std::string, hostescalation::setter_func> const hostescalation::_setters{
-  { "hostgroup",             SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
-  { "host",                  SETTER(std::string const&, _set_hosts) },
-  { "host_name",             SETTER(std::string const&, _set_hosts) },
-  { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
-  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) },
-  { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
-  { "first_notification",    SETTER(uint32_t, _set_first_notification) },
-  { "last_notification",     SETTER(uint32_t, _set_last_notification) },
-  { "notification_interval", SETTER(uint32_t, _set_notification_interval) }
-};
+std::unordered_map<std::string,
+                   hostescalation::setter_func> const hostescalation::_setters{
+    {"hostgroup", SETTER(std::string const&, _set_hostgroups)},
+    {"hostgroups", SETTER(std::string const&, _set_hostgroups)},
+    {"hostgroup_name", SETTER(std::string const&, _set_hostgroups)},
+    {"host", SETTER(std::string const&, _set_hosts)},
+    {"host_name", SETTER(std::string const&, _set_hosts)},
+    {"contact_groups", SETTER(std::string const&, _set_contactgroups)},
+    {"escalation_options", SETTER(std::string const&, _set_escalation_options)},
+    {"escalation_period", SETTER(std::string const&, _set_escalation_period)},
+    {"first_notification", SETTER(uint32_t, _set_first_notification)},
+    {"last_notification", SETTER(uint32_t, _set_last_notification)},
+    {"notification_interval", SETTER(uint32_t, _set_notification_interval)}};
 
 // Default values.
 static unsigned short const default_escalation_options(hostescalation::none);
-static unsigned int const   default_first_notification(-2);
-static unsigned int const   default_last_notification(-2);
-static unsigned int const   default_notification_interval(0);
+static unsigned int const default_first_notification(-2);
+static unsigned int const default_last_notification(-2);
+static unsigned int const default_notification_interval(0);
 
 /**
  *  Default constructor.
  */
 hostescalation::hostescalation()
-  : object(object::hostescalation),
-    _escalation_options(default_escalation_options),
-    _first_notification(default_first_notification),
-    _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {}
+    : object(object::hostescalation),
+      _escalation_options(default_escalation_options),
+      _first_notification(default_first_notification),
+      _last_notification(default_last_notification),
+      _notification_interval(default_notification_interval) {}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right The hostescalation to copy.
  */
-hostescalation::hostescalation(hostescalation const& right)
-  : object(right) {
+hostescalation::hostescalation(hostescalation const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-hostescalation::~hostescalation() throw () {}
+hostescalation::~hostescalation() throw() {}
 
 /**
  *  Copy constructor.
@@ -119,7 +118,7 @@ bool hostescalation::operator==(hostescalation const& right) const throw() {
  *
  *  @return True if is not the same hostescalation, otherwise false.
  */
-bool hostescalation::operator!=(hostescalation const& right) const throw () {
+bool hostescalation::operator!=(hostescalation const& right) const throw() {
   return !operator==(right);
 }
 
@@ -155,9 +154,9 @@ bool hostescalation::operator<(hostescalation const& right) const {
  */
 void hostescalation::check_validity() const {
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "Host escalation is not attached to any "
-           << "host or host group (properties 'host_name' or "
-           << "'hostgroup_name', respectively)");
+    throw(engine_error() << "Host escalation is not attached to any "
+                         << "host or host group (properties 'host_name' or "
+                         << "'hostgroup_name', respectively)");
 }
 
 /**
@@ -165,7 +164,7 @@ void hostescalation::check_validity() const {
  *
  *  @return This object.
  */
-hostescalation::key_type const& hostescalation::key() const throw () {
+hostescalation::key_type const& hostescalation::key() const throw() {
   return *this;
 }
 
@@ -176,8 +175,8 @@ hostescalation::key_type const& hostescalation::key() const throw () {
  */
 void hostescalation::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "Cannot merge host escalation with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge host escalation with '" << obj.type()
+                         << "'");
   hostescalation const& tmpl(static_cast<hostescalation const&>(obj));
 
   MRG_INHERIT(_contactgroups);
@@ -200,7 +199,7 @@ void hostescalation::merge(object const& obj) {
  */
 bool hostescalation::parse(char const* key, char const* value) {
   std::unordered_map<std::string, hostescalation::setter_func>::const_iterator
-    it{_setters.find(key)};
+      it{_setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -211,7 +210,7 @@ bool hostescalation::parse(char const* key, char const* value) {
  *
  *  @return The contact groups.
  */
-set_string& hostescalation::contactgroups() throw () {
+set_string& hostescalation::contactgroups() throw() {
   return *_contactgroups;
 }
 
@@ -220,7 +219,7 @@ set_string& hostescalation::contactgroups() throw () {
  *
  *  @return The contactgroups.
  */
-set_string const& hostescalation::contactgroups() const throw () {
+set_string const& hostescalation::contactgroups() const throw() {
   return *_contactgroups;
 }
 
@@ -229,7 +228,7 @@ set_string const& hostescalation::contactgroups() const throw () {
  *
  *  @return True if contact groups were defined.
  */
-bool hostescalation::contactgroups_defined() const throw () {
+bool hostescalation::contactgroups_defined() const throw() {
   return _contactgroups.is_set();
 }
 
@@ -238,10 +237,9 @@ bool hostescalation::contactgroups_defined() const throw () {
  *
  *  @param[in] options New escalation options.
  */
-void hostescalation::escalation_options(
-                       unsigned short options) throw () {
+void hostescalation::escalation_options(unsigned short options) throw() {
   _escalation_options = options;
-  return ;
+  return;
 }
 
 /**
@@ -249,7 +247,7 @@ void hostescalation::escalation_options(
  *
  *  @return The escalation_options.
  */
-unsigned short hostescalation::escalation_options() const throw () {
+unsigned short hostescalation::escalation_options() const throw() {
   return _escalation_options;
 }
 
@@ -260,7 +258,7 @@ unsigned short hostescalation::escalation_options() const throw () {
  */
 void hostescalation::escalation_period(std::string const& period) {
   _escalation_period = period;
-  return ;
+  return;
 }
 
 /**
@@ -268,7 +266,7 @@ void hostescalation::escalation_period(std::string const& period) {
  *
  *  @return The escalation_period.
  */
-std::string const& hostescalation::escalation_period() const throw () {
+std::string const& hostescalation::escalation_period() const throw() {
   return _escalation_period;
 }
 
@@ -277,7 +275,7 @@ std::string const& hostescalation::escalation_period() const throw () {
  *
  *  @return True if escalation period was defined.
  */
-bool hostescalation::escalation_period_defined() const throw () {
+bool hostescalation::escalation_period_defined() const throw() {
   return _escalation_period.is_set();
 }
 
@@ -286,9 +284,9 @@ bool hostescalation::escalation_period_defined() const throw () {
  *
  *  @param[in] n New first notification number.
  */
-void hostescalation::first_notification(unsigned int n) throw () {
+void hostescalation::first_notification(unsigned int n) throw() {
   _first_notification = n;
-  return ;
+  return;
 }
 
 /**
@@ -296,7 +294,7 @@ void hostescalation::first_notification(unsigned int n) throw () {
  *
  *  @return The first_notification.
  */
-unsigned int hostescalation::first_notification() const throw () {
+unsigned int hostescalation::first_notification() const throw() {
   return _first_notification;
 }
 
@@ -305,7 +303,7 @@ unsigned int hostescalation::first_notification() const throw () {
  *
  *  @return The host groups.
  */
-set_string& hostescalation::hostgroups() throw () {
+set_string& hostescalation::hostgroups() throw() {
   return *_hostgroups;
 }
 
@@ -314,7 +312,7 @@ set_string& hostescalation::hostgroups() throw () {
  *
  *  @return The hostgroups.
  */
-set_string const& hostescalation::hostgroups() const throw () {
+set_string const& hostescalation::hostgroups() const throw() {
   return *_hostgroups;
 }
 
@@ -323,7 +321,7 @@ set_string const& hostescalation::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-set_string& hostescalation::hosts() throw () {
+set_string& hostescalation::hosts() throw() {
   return *_hosts;
 }
 
@@ -332,7 +330,7 @@ set_string& hostescalation::hosts() throw () {
  *
  *  @return The hosts.
  */
-set_string const& hostescalation::hosts() const throw () {
+set_string const& hostescalation::hosts() const throw() {
   return *_hosts;
 }
 
@@ -341,9 +339,9 @@ set_string const& hostescalation::hosts() const throw () {
  *
  *  @param[in] n New last notification number.
  */
-void hostescalation::last_notification(unsigned int n) throw () {
+void hostescalation::last_notification(unsigned int n) throw() {
   _last_notification = n;
-  return ;
+  return;
 }
 
 /**
@@ -351,7 +349,7 @@ void hostescalation::last_notification(unsigned int n) throw () {
  *
  *  @return The last_notification.
  */
-unsigned int hostescalation::last_notification() const throw () {
+unsigned int hostescalation::last_notification() const throw() {
   return _last_notification;
 }
 
@@ -362,7 +360,7 @@ unsigned int hostescalation::last_notification() const throw () {
  */
 void hostescalation::notification_interval(unsigned int interval) {
   _notification_interval = interval;
-  return ;
+  return;
 }
 
 /**
@@ -370,7 +368,7 @@ void hostescalation::notification_interval(unsigned int interval) {
  *
  *  @return The notification_interval.
  */
-unsigned int hostescalation::notification_interval() const throw () {
+unsigned int hostescalation::notification_interval() const throw() {
   return _notification_interval;
 }
 
@@ -379,7 +377,7 @@ unsigned int hostescalation::notification_interval() const throw () {
  *
  *  @return True if the notification interval was defined.
  */
-bool hostescalation::notification_interval_defined() const throw () {
+bool hostescalation::notification_interval_defined() const throw() {
   return _notification_interval.is_set();
 }
 
@@ -406,10 +404,8 @@ bool hostescalation::_set_escalation_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::iterator it(values.begin()), end(values.end());
+       it != end; ++it) {
     string::trim(*it);
     if (*it == "d" || *it == "down")
       options |= down;

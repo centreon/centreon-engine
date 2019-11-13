@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/retention/applier/comment.hh"
 #include "com/centreon/engine/retention/applier/contact.hh"
 #include "com/centreon/engine/retention/applier/downtime.hh"
@@ -36,24 +36,20 @@ using namespace com::centreon::engine::retention;
  *  @param[in, out] config The global configuration to update.
  *  @param[in]      state  The retention informations.
  */
-void applier::state::apply(
-       configuration::state& config,
-       retention::state const& state) {
+void applier::state::apply(configuration::state& config,
+                           retention::state const& state) {
   if (!config.retain_state_information())
     return;
 
   // send data to event broker.
-  broker_retention_data(
-    NEBTYPE_RETENTIONDATA_STARTLOAD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    NULL);
+  broker_retention_data(NEBTYPE_RETENTIONDATA_STARTLOAD, NEBFLAG_NONE,
+                        NEBATTR_NONE, NULL);
 
   try {
     time_t current_time(time(NULL));
     bool scheduling_info_is_ok(false);
-    if ((current_time - state.informations().created())
-        < static_cast<time_t>(config.retention_scheduling_horizon()))
+    if ((current_time - state.informations().created()) <
+        static_cast<time_t>(config.retention_scheduling_horizon()))
       scheduling_info_is_ok = true;
 
     applier::program app_program;
@@ -73,21 +69,14 @@ void applier::state::apply(
 
     applier::service app_services;
     app_services.apply(config, state.services(), scheduling_info_is_ok);
-  }
-  catch (...) {
+  } catch (...) {
     // send data to event broker.
-    broker_retention_data(
-      NEBTYPE_RETENTIONDATA_ENDLOAD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      NULL);
+    broker_retention_data(NEBTYPE_RETENTIONDATA_ENDLOAD, NEBFLAG_NONE,
+                          NEBATTR_NONE, NULL);
     throw;
   }
 
   // send data to event broker.
-  broker_retention_data(
-    NEBTYPE_RETENTIONDATA_ENDLOAD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    NULL);
+  broker_retention_data(NEBTYPE_RETENTIONDATA_ENDLOAD, NEBFLAG_NONE,
+                        NEBATTR_NONE, NULL);
 }

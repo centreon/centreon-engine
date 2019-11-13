@@ -19,10 +19,10 @@
 */
 
 #ifndef CCE_COMPATIBILITY_DOWNTIME_H
-#  define CCE_COMPATIBILITY_DOWNTIME_H
+#define CCE_COMPATIBILITY_DOWNTIME_H
 
-#  include "com/centreon/engine/events/defines.hh"
-#  include "com/centreon/engine/events/sched_info.hh"
-#  include "com/centreon/engine/events/timed_event.hh"
+#include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/sched_info.hh"
+#include "com/centreon/engine/events/timed_event.hh"
 
-#endif // !CCE_COMPATIBILITY_DOWNTIME_H
+#endif  // !CCE_COMPATIBILITY_DOWNTIME_H

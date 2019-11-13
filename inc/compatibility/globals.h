@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_COMPATIBILITY_GLOBALS_H
-#  define CCE_COMPATIBILITY_GLOBALS_H
+#define CCE_COMPATIBILITY_GLOBALS_H
 
-#  include "com/centreon/engine/checks.hh"
-#  include "com/centreon/engine/circular_buffer.hh"
+#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/circular_buffer.hh"
 
 // Log.
 extern char const* log_archive_path;
@@ -69,4 +69,4 @@ extern char const* temp_path;
 extern int precache_objects;
 extern int use_precached_objects;
 
-#endif // !CCE_COMPATIBILITY_GLOBALS_H
+#endif  // !CCE_COMPATIBILITY_GLOBALS_H

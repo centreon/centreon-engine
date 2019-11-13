@@ -18,57 +18,54 @@
 */
 
 #ifndef CCE_CONFIGURATION_COMMAND_HH
-#  define CCE_CONFIGURATION_COMMAND_HH
+#define CCE_CONFIGURATION_COMMAND_HH
 
-#  include <memory>
-#  include <set>
-#  include <string>
-#  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <memory>
+#include <set>
+#include <string>
+#include "com/centreon/engine/configuration/object.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                  configuration {
-  class                    command : public object {
-   public:
-    typedef std::string    key_type;
+namespace configuration {
+class command : public object {
+ public:
+  typedef std::string key_type;
 
-                           command(key_type const& key = "");
-                           command(command const& right);
-                           ~command() throw () override;
-    command&               operator=(command const& right);
-    bool                   operator==(
-                             command const& right) const throw ();
-    bool                   operator!=(
-                             command const& right) const throw ();
-    bool                   operator<(
-                             command const& right) const throw ();
-    void                   check_validity() const override;
-    key_type const&        key() const throw ();
-    void                   merge(object const& obj) override;
-    bool                   parse(char const* key, char const* value) override;
+  command(key_type const& key = "");
+  command(command const& right);
+  ~command() throw() override;
+  command& operator=(command const& right);
+  bool operator==(command const& right) const throw();
+  bool operator!=(command const& right) const throw();
+  bool operator<(command const& right) const throw();
+  void check_validity() const override;
+  key_type const& key() const throw();
+  void merge(object const& obj) override;
+  bool parse(char const* key, char const* value) override;
 
-    std::string const&     command_line() const throw ();
-    std::string const&     command_name() const throw ();
-    std::string const&     connector() const throw ();
+  std::string const& command_line() const throw();
+  std::string const& command_name() const throw();
+  std::string const& connector() const throw();
 
-   private:
-    typedef bool (*setter_func)(command&, char const*);
+ private:
+  typedef bool (*setter_func)(command&, char const*);
 
-    bool                   _set_command_line(std::string const& value);
-    bool                   _set_command_name(std::string const& value);
-    bool                   _set_connector(std::string const& value);
+  bool _set_command_line(std::string const& value);
+  bool _set_command_name(std::string const& value);
+  bool _set_connector(std::string const& value);
 
-    std::string            _command_line;
-    std::string            _command_name;
-    std::string            _connector;
-    static std::unordered_map<std::string, setter_func> const _setters;
-  };
+  std::string _command_line;
+  std::string _command_name;
+  std::string _connector;
+  static std::unordered_map<std::string, setter_func> const _setters;
+};
 
-  typedef std::shared_ptr<command> command_ptr;
-  typedef std::set<command>        set_command;
-}
+typedef std::shared_ptr<command> command_ptr;
+typedef std::set<command> set_command;
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_COMMAND_HH
+#endif  // !CCE_CONFIGURATION_COMMAND_HH

@@ -17,20 +17,19 @@
  *
  */
 
-
-#include <iostream>
+#include "com/centreon/engine/configuration/applier/service.hh"
 #include <gtest/gtest.h>
+#include <com/centreon/engine/configuration/applier/macros.hh>
+#include <iostream>
 #include "../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
-#include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/timezone_manager.hh"
-#include <com/centreon/engine/configuration/applier/macros.hh>
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -101,8 +100,8 @@ TEST_F(ServiceExternalCommand, AddServiceDowntime) {
   std::string str{"test_host;test_description;1;|"};
 
   testing::internal::CaptureStdout();
-  cmd_process_service_check_result(
-    CMD_PROCESS_SERVICE_CHECK_RESULT, now, const_cast<char *>(str.c_str()));
+  cmd_process_service_check_result(CMD_PROCESS_SERVICE_CHECK_RESULT, now,
+                                   const_cast<char*>(str.c_str()));
   checks::checker::instance().reap();
 
   std::string const& out{testing::internal::GetCapturedStdout()};
@@ -151,8 +150,8 @@ TEST_F(ServiceExternalCommand, AddServiceDowntimeByHostIpAddress) {
   std::string str{"127.0.0.3;test_description;1;|"};
 
   testing::internal::CaptureStdout();
-  cmd_process_service_check_result(
-    CMD_PROCESS_SERVICE_CHECK_RESULT, now, const_cast<char *>(str.c_str()));
+  cmd_process_service_check_result(CMD_PROCESS_SERVICE_CHECK_RESULT, now,
+                                   const_cast<char*>(str.c_str()));
   checks::checker::instance().reap();
 
   std::string const& out{testing::internal::GetCapturedStdout()};
@@ -195,10 +194,14 @@ TEST_F(ServiceExternalCommand, AddServiceComment) {
   hst_aply.resolve_object(hst);
   svc_aply.resolve_object(svc);
 
-  std::string cmd_com1{"test_host;test_description;1;user;this is a first comment"};
-  std::string cmd_com2{"test_host;test_description;1;user;this is a second comment"};
-  std::string cmd_com3{"test_host;test_description;1;user;this is a third comment"};
-  std::string cmd_com4{"test_host;test_description;1;user;this is a fourth comment"};
+  std::string cmd_com1{
+      "test_host;test_description;1;user;this is a first comment"};
+  std::string cmd_com2{
+      "test_host;test_description;1;user;this is a second comment"};
+  std::string cmd_com3{
+      "test_host;test_description;1;user;this is a third comment"};
+  std::string cmd_com4{
+      "test_host;test_description;1;user;this is a fourth comment"};
   std::string cmd_del{"1"};
   std::string cmd_del_last{"5"};
   std::string cmd_del_all{"test_host;test_description"};
@@ -206,17 +209,21 @@ TEST_F(ServiceExternalCommand, AddServiceComment) {
   set_time(20000);
   time_t now = time(nullptr);
 
-
-  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com1.c_str()));
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now,
+                  const_cast<char*>(cmd_com1.c_str()));
   ASSERT_EQ(comment::comments.size(), 1u);
-  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com2.c_str()));
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now,
+                  const_cast<char*>(cmd_com2.c_str()));
   ASSERT_EQ(comment::comments.size(), 2u);
-  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com3.c_str()));
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now,
+                  const_cast<char*>(cmd_com3.c_str()));
   ASSERT_EQ(comment::comments.size(), 3u);
-  cmd_add_comment(CMD_ADD_SVC_COMMENT, now, const_cast<char *>(cmd_com4.c_str()));
+  cmd_add_comment(CMD_ADD_SVC_COMMENT, now,
+                  const_cast<char*>(cmd_com4.c_str()));
   ASSERT_EQ(comment::comments.size(), 4u);
-  cmd_delete_comment(CMD_ADD_SVC_COMMENT, const_cast<char *>(cmd_del.c_str()));
+  cmd_delete_comment(CMD_ADD_SVC_COMMENT, const_cast<char*>(cmd_del.c_str()));
   ASSERT_EQ(comment::comments.size(), 3u);
-  cmd_delete_all_comments(CMD_DEL_ALL_SVC_COMMENTS, const_cast<char *>(cmd_del_all.c_str()));
+  cmd_delete_all_comments(CMD_DEL_ALL_SVC_COMMENTS,
+                          const_cast<char*>(cmd_del_all.c_str()));
   ASSERT_EQ(comment::comments.size(), 0u);
 }

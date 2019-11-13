@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_COMPATIBILITY_BROKER_H
-#  define CCE_COMPATIBILITY_BROKER_H
+#define CCE_COMPATIBILITY_BROKER_H
 
-#  include "com/centreon/engine/broker.hh"
-#  include "config.h"
-#  include "nagios.h"
+#include "com/centreon/engine/broker.hh"
+#include "config.h"
+#include "nagios.h"
 
-#endif // !CCE_COMPATIBILITY_BROKER_H
+#endif  // !CCE_COMPATIBILITY_BROKER_H

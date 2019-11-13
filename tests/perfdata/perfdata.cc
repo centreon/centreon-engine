@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "com/centreon/engine/xpddefault.hh"
+#include "gtest/gtest.h"
 
 TEST(preprocess_file_templates, WithAntislash_n) {
   char test[] = "This is\\na multiline\\n\\text.\\n";

@@ -18,13 +18,13 @@
 */
 
 #ifndef CCE_DOWNTIMES_DOWNTIME_FINDER_HH
-#  define CCE_DOWNTIMES_DOWNTIME_FINDER_HH
+#define CCE_DOWNTIMES_DOWNTIME_FINDER_HH
 
-#  include <map>
-#  include <memory>
-#  include <string>
-#  include <vector>
-#  include "com/centreon/engine/namespace.hh"
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
@@ -42,30 +42,25 @@ class service_downtime;
  */
 class downtime_finder {
  public:
-  typedef std::pair<std::string, std::string>  criteria;
-  typedef std::vector<criteria>                criteria_set;
-  typedef std::vector<unsigned long>           result_set;
+  typedef std::pair<std::string, std::string> criteria;
+  typedef std::vector<criteria> criteria_set;
+  typedef std::vector<unsigned long> result_set;
 
-                      downtime_finder(
-                        std::multimap<time_t, std::shared_ptr<downtime>> const& map);
-                      downtime_finder(downtime_finder const& other) = default;
-                      downtime_finder(downtime_finder&& other) = default;
-  downtime_finder&    operator=(downtime_finder const& other);
-                      ~downtime_finder();
-  result_set          find_matching_all(criteria_set const& criterias);
+  downtime_finder(std::multimap<time_t, std::shared_ptr<downtime>> const& map);
+  downtime_finder(downtime_finder const& other) = default;
+  downtime_finder(downtime_finder&& other) = default;
+  downtime_finder& operator=(downtime_finder const& other);
+  ~downtime_finder();
+  result_set find_matching_all(criteria_set const& criterias);
 
  private:
-  bool                _match_criteria(
-                        host_downtime const& dt,
-                        criteria const& crit);
-  bool                _match_criteria(
-                        service_downtime const& dt,
-                        criteria const& crit);
+  bool _match_criteria(host_downtime const& dt, criteria const& crit);
+  bool _match_criteria(service_downtime const& dt, criteria const& crit);
 
   std::multimap<time_t, std::shared_ptr<downtime>> const* _map;
 };
-} // namespace downtimes
+}  // namespace downtimes
 
 CCE_END()
 
-#endif // !CCE_DOWNTIMES_DOWNTIME_FINDER_HH
+#endif  // !CCE_DOWNTIMES_DOWNTIME_FINDER_HH

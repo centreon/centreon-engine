@@ -27,7 +27,7 @@ using namespace com::centreon::engine;
  *
  *  @param[in] ptr The hostsmember to delete.
  */
-void deleter::hostsmember(void* ptr) throw () {
+void deleter::hostsmember(void* ptr) throw() {
   if (!ptr)
     return;
 

@@ -19,18 +19,18 @@
 */
 
 #ifndef CCE_MACROS_MISC_HH
-#  define CCE_MACROS_MISC_HH
+#define CCE_MACROS_MISC_HH
 
-#  include "com/centreon/engine/macros/defines.hh"
+#include "com/centreon/engine/macros/defines.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 nagios_macros* get_global_macros();
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
 #endif /* !CCE_MACROS_MISC_HH_ */

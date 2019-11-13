@@ -18,41 +18,39 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_GLOBALS_HH
-#  define CCE_CONFIGURATION_APPLIER_GLOBALS_HH
+#define CCE_CONFIGURATION_APPLIER_GLOBALS_HH
 
-#  include <string>
-#  include "com/centreon/engine/configuration/state.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <string>
+#include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace             configuration {
-  namespace           applier {
-    /**
-     *  @class globals globals.hh
-     *  @brief Simple configuration applier for globals class.
-     *
-     *  Simple configuration applier for globals class.
-     */
-    class             globals {
-    public:
-      void            apply(configuration::state& globals);
-      static globals& instance();
-      static void     load();
-      static void     unload();
+namespace configuration {
+namespace applier {
+/**
+ *  @class globals globals.hh
+ *  @brief Simple configuration applier for globals class.
+ *
+ *  Simple configuration applier for globals class.
+ */
+class globals {
+ public:
+  void apply(configuration::state& globals);
+  static globals& instance();
+  static void load();
+  static void unload();
 
-    private:
-                      globals();
-                      globals(globals const&);
-                      ~globals() throw ();
-      globals&        operator=(globals const&);
-      void            _set_global(
-                        char*& property,
-                        std::string const& value);
-    };
-  }
-}
+ private:
+  globals();
+  globals(globals const&);
+  ~globals() throw();
+  globals& operator=(globals const&);
+  void _set_global(char*& property, std::string const& value);
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_GLOBALS_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_GLOBALS_HH

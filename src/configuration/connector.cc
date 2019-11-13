@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/connector.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon;
@@ -27,10 +27,10 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<connector, type, &connector::method>::generic
 
-std::unordered_map<std::string, connector::setter_func> const connector::_setters{
-  { "connector_line", SETTER(std::string const&, _set_connector_line) },
-  { "connector_name", SETTER(std::string const&, _set_connector_name) }
-};
+std::unordered_map<std::string, connector::setter_func> const
+    connector::_setters{
+        {"connector_line", SETTER(std::string const&, _set_connector_line)},
+        {"connector_name", SETTER(std::string const&, _set_connector_name)}};
 
 /**
  *  Constructor.
@@ -38,23 +38,21 @@ std::unordered_map<std::string, connector::setter_func> const connector::_setter
  *  @param[in] key The object key.
  */
 connector::connector(key_type const& key)
-  : object(object::connector),
-    _connector_name(key) {}
+    : object(object::connector), _connector_name(key) {}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right The connector to copy.
  */
-connector::connector(connector const& right)
-  : object(right) {
+connector::connector(connector const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-connector::~connector() throw () {}
+connector::~connector() throw() {}
 
 /**
  *  Copy constructor.
@@ -79,10 +77,10 @@ connector& connector::operator=(connector const& right) {
  *
  *  @return True if is the same connector, otherwise false.
  */
-bool connector::operator==(connector const& right) const throw () {
-  return (object::operator==(right)
-          && _connector_line == right._connector_line
-          && _connector_name == right._connector_name);
+bool connector::operator==(connector const& right) const throw() {
+  return (object::operator==(right) &&
+          _connector_line == right._connector_line &&
+          _connector_name == right._connector_name);
 }
 
 /**
@@ -92,7 +90,7 @@ bool connector::operator==(connector const& right) const throw () {
  *
  *  @return True if is not the same connector, otherwise false.
  */
-bool connector::operator!=(connector const& right) const throw () {
+bool connector::operator!=(connector const& right) const throw() {
   return !operator==(right);
 }
 
@@ -103,7 +101,7 @@ bool connector::operator!=(connector const& right) const throw () {
  *
  *  @return True if this object is strictly less than right.
  */
-bool connector::operator<(connector const& right) const throw () {
+bool connector::operator<(connector const& right) const throw() {
   if (_connector_name != right._connector_name)
     return _connector_name < right._connector_name;
   return _connector_line < right._connector_line;
@@ -116,12 +114,13 @@ bool connector::operator<(connector const& right) const throw () {
  */
 void connector::check_validity() const {
   if (_connector_name.empty())
-    throw (engine_error()
-           << "Connector has no name (property 'connector_name')");
+    throw(
+        engine_error() << "Connector has no name (property 'connector_name')");
   if (_connector_line.empty())
-    throw (engine_error() << "Connector '" << _connector_name
-           << "' has no command line (property 'connector_line')");
-  return ;
+    throw(
+        engine_error() << "Connector '" << _connector_name
+                       << "' has no command line (property 'connector_line')");
+  return;
 }
 
 /**
@@ -129,7 +128,7 @@ void connector::check_validity() const {
  *
  *  @return The connector name.
  */
-connector::key_type const& connector::key() const throw () {
+connector::key_type const& connector::key() const throw() {
   return _connector_name;
 }
 
@@ -140,8 +139,8 @@ connector::key_type const& connector::key() const throw () {
  */
 void connector::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "Cannot merge connector with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge connector with '" << obj.type()
+                         << "'");
   connector const& tmpl(static_cast<connector const&>(obj));
 
   MRG_DEFAULT(_connector_line);
@@ -156,8 +155,8 @@ void connector::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool connector::parse(char const* key, char const* value) {
-  std::unordered_map<std::string, connector::setter_func>::const_iterator
-    it{_setters.find(key)};
+  std::unordered_map<std::string, connector::setter_func>::const_iterator it{
+      _setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -168,7 +167,7 @@ bool connector::parse(char const* key, char const* value) {
  *
  *  @return The connector_line.
  */
-std::string const& connector::connector_line() const throw () {
+std::string const& connector::connector_line() const throw() {
   return _connector_line;
 }
 
@@ -177,7 +176,7 @@ std::string const& connector::connector_line() const throw () {
  *
  *  @return The connector_name.
  */
-std::string const& connector::connector_name() const throw () {
+std::string const& connector::connector_name() const throw() {
   return _connector_name;
 }
 

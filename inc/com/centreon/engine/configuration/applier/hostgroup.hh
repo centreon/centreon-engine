@@ -18,47 +18,43 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
-#  define CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
+#define CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 
-#  include <map>
-#  include "com/centreon/engine/configuration/hostgroup.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <map>
+#include "com/centreon/engine/configuration/hostgroup.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace               configuration {
-  // Forward declarations.
-  class                 state;
+namespace configuration {
+// Forward declarations.
+class state;
 
-  namespace             applier {
-    class               hostgroup {
-     public:
-                        hostgroup();
-                        hostgroup(hostgroup const& right);
-                        ~hostgroup() throw ();
-      hostgroup&        operator=(hostgroup const& right) = delete;
-      void              add_object(
-                          configuration::hostgroup const& obj);
-      void              expand_objects(configuration::state& s);
-      void              modify_object(
-                          configuration::hostgroup const& obj);
-      void              remove_object(
-                          configuration::hostgroup const& obj);
-      void              resolve_object(
-                          configuration::hostgroup const& obj);
+namespace applier {
+class hostgroup {
+ public:
+  hostgroup();
+  hostgroup(hostgroup const& right);
+  ~hostgroup() throw();
+  hostgroup& operator=(hostgroup const& right) = delete;
+  void add_object(configuration::hostgroup const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::hostgroup const& obj);
+  void remove_object(configuration::hostgroup const& obj);
+  void resolve_object(configuration::hostgroup const& obj);
 
-     private:
-      typedef std::map<configuration::hostgroup::key_type, configuration::hostgroup> resolved_set;
+ private:
+  typedef std::map<configuration::hostgroup::key_type, configuration::hostgroup>
+      resolved_set;
 
-      void              _resolve_members(
-                          configuration::state& s,
-                          configuration::hostgroup const& obj);
+  void _resolve_members(configuration::state& s,
+                        configuration::hostgroup const& obj);
 
-      resolved_set      _resolved;
-    };
-  }
-}
+  resolved_set _resolved;
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH

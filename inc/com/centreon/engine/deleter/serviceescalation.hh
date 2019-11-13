@@ -18,16 +18,16 @@
 */
 
 #ifndef CCE_DELETER_SERVICEESCALATION_HH
-#  define CCE_DELETER_SERVICEESCALATION_HH
+#define CCE_DELETER_SERVICEESCALATION_HH
 
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace deleter {
-  void serviceescalation(void* ptr) throw ();
+void serviceescalation(void* ptr) throw();
 }
 
 CCE_END()
 
-#endif // !CCE_DELETER_SERVICEESCALATION_HH
+#endif  // !CCE_DELETER_SERVICEESCALATION_HH

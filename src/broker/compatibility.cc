@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker/compatibility.hh"
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
-#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/nebmodules.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -33,14 +33,14 @@ static compatibility* _instance = NULL;
 
 // NEB module list maintained for compatibility.
 extern "C" {
-  nebmodule* neb_module_list = NULL;
+nebmodule* neb_module_list = NULL;
 }
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Get instance of compatibility singleton.
@@ -89,7 +89,8 @@ void compatibility::copyright_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        string::setstr(tmp->info[NEBMODULE_MODINFO_COPYRIGHT], mod->get_copyright());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_COPYRIGHT],
+                       mod->get_copyright());
   }
   return;
 }
@@ -115,18 +116,16 @@ void compatibility::create_module(broker::handle* mod) {
     new_module->thread_id = 0;
 
     // Module information.
-    new_module->info[NEBMODULE_MODINFO_AUTHOR]
-      = string::dup(mod->get_author());
-    new_module->info[NEBMODULE_MODINFO_COPYRIGHT]
-      = string::dup(mod->get_copyright());
-    new_module->info[NEBMODULE_MODINFO_DESC]
-      = string::dup(mod->get_description());
-    new_module->info[NEBMODULE_MODINFO_LICENSE]
-      = string::dup(mod->get_license());
-    new_module->info[NEBMODULE_MODINFO_TITLE]
-      = string::dup(mod->get_name());
-    new_module->info[NEBMODULE_MODINFO_VERSION]
-      = string::dup(mod->get_version());
+    new_module->info[NEBMODULE_MODINFO_AUTHOR] = string::dup(mod->get_author());
+    new_module->info[NEBMODULE_MODINFO_COPYRIGHT] =
+        string::dup(mod->get_copyright());
+    new_module->info[NEBMODULE_MODINFO_DESC] =
+        string::dup(mod->get_description());
+    new_module->info[NEBMODULE_MODINFO_LICENSE] =
+        string::dup(mod->get_license());
+    new_module->info[NEBMODULE_MODINFO_TITLE] = string::dup(mod->get_name());
+    new_module->info[NEBMODULE_MODINFO_VERSION] =
+        string::dup(mod->get_version());
 
     // Add module to head of list.
     new_module->next = neb_module_list;
@@ -144,7 +143,8 @@ void compatibility::description_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        string::setstr(tmp->info[NEBMODULE_MODINFO_DESC], mod->get_description());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_DESC],
+                       mod->get_description());
   }
   return;
 }
@@ -171,8 +171,7 @@ void compatibility::destroy_module(broker::handle* mod) {
           last->next = tmp;
         else
           neb_module_list = tmp;
-      }
-      else {
+      } else {
         last = tmp;
         tmp = tmp->next;
       }
@@ -190,7 +189,8 @@ void compatibility::license_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        string::setstr(tmp->info[NEBMODULE_MODINFO_LICENSE], mod->get_license());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_LICENSE],
+                       mod->get_license());
   }
   return;
 }
@@ -246,7 +246,8 @@ void compatibility::version_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        string::setstr(tmp->info[NEBMODULE_MODINFO_VERSION], mod->get_version());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_VERSION],
+                       mod->get_version());
   }
   return;
 }
@@ -260,18 +261,16 @@ void compatibility::version_module(broker::handle* mod) {
 /**
  *  Default constructor.
  */
-compatibility::compatibility() {
-
-}
+compatibility::compatibility() {}
 
 /**
  *  Destructor.
  */
-compatibility::~compatibility() throw () {
+compatibility::~compatibility() throw() {
   try {
     while (neb_module_list)
       destroy_module(
-        static_cast<broker::handle*>(neb_module_list->module_handle));
+          static_cast<broker::handle*>(neb_module_list->module_handle));
+  } catch (...) {
   }
-  catch (...) {}
 }

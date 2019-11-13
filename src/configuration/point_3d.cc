@@ -28,10 +28,7 @@ using namespace com::centreon::engine::configuration;
  *  @param[in] y The y coordinates.
  *  @param[in] z The z coordinates.
  */
-point_3d::point_3d(double x, double y, double z)
-  : _x(x),
-    _y(y),
-    _z(z){}
+point_3d::point_3d(double x, double y, double z) : _x(x), _y(y), _z(z) {}
 
 /**
  *  Copy constructor.
@@ -45,7 +42,7 @@ point_3d::point_3d(point_3d const& right) {
 /**
  *  Destructor.
  */
-point_3d::~point_3d() throw () {}
+point_3d::~point_3d() throw() {}
 
 /**
  *  Copy operator.
@@ -70,7 +67,7 @@ point_3d& point_3d::operator=(point_3d const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool point_3d::operator==(point_3d const& right) const throw () {
+bool point_3d::operator==(point_3d const& right) const throw() {
   return (_x == right._x && _y == right._y && _z == right._z);
 }
 
@@ -81,7 +78,7 @@ bool point_3d::operator==(point_3d const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool point_3d::operator!=(point_3d const& right) const throw () {
+bool point_3d::operator!=(point_3d const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -92,7 +89,7 @@ bool point_3d::operator!=(point_3d const& right) const throw () {
  *
  *  @return True if this object is less than right.
  */
-bool point_3d::operator<(point_3d const& right) const throw () {
+bool point_3d::operator<(point_3d const& right) const throw() {
   if (_x != right._x)
     return (_x < right._x);
   else if (_y != right._y)
@@ -105,7 +102,7 @@ bool point_3d::operator<(point_3d const& right) const throw () {
  *
  *  @return The x coordinates.
  */
-double point_3d::x() const throw () {
+double point_3d::x() const throw() {
   return (_x);
 }
 
@@ -114,7 +111,7 @@ double point_3d::x() const throw () {
  *
  *  @return The y coordinates.
  */
-double point_3d::y() const throw () {
+double point_3d::y() const throw() {
   return (_y);
 }
 
@@ -123,6 +120,6 @@ double point_3d::y() const throw () {
  *
  *  @return The z coordinates.
  */
-double point_3d::z() const throw () {
+double point_3d::z() const throw() {
   return (_z);
 }

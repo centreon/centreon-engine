@@ -18,55 +18,54 @@
 */
 
 #ifndef CCE_TIMEZONE_MANAGER_HH
-#  define CCE_TIMEZONE_MANAGER_HH
+#define CCE_TIMEZONE_MANAGER_HH
 
-#  include <stack>
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#include <stack>
+#include <string>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 /**
- *  @class timezone_manager timezone_manager.hh "com/centreon/engine/timezone_manager.hh"
+ *  @class timezone_manager timezone_manager.hh
+ * "com/centreon/engine/timezone_manager.hh"
  *  @brief Manage timezone changes.
  *
  *  This class handle timezone change. This can either be setting a new
  *  timezone or restoring a previous one.
  */
-class                      timezone_manager {
-public:
-  static void              load();
-  void                     pop_timezone();
-  void                     push_timezone(std::string const& tz);
-  static void              unload();
+class timezone_manager {
+ public:
+  static void load();
+  void pop_timezone();
+  void push_timezone(std::string const& tz);
+  static void unload();
 
   /**
    *  Get class instance.
    *
    *  @return Class instance.
    */
-  static timezone_manager& instance() {
-    return (*_instance);
-  }
+  static timezone_manager& instance() { return (*_instance); }
 
-private:
-  struct                   tz_info {
-    bool                   is_set;
-    std::string            tz_name;
+ private:
+  struct tz_info {
+    bool is_set;
+    std::string tz_name;
   };
 
-                           timezone_manager();
-                           timezone_manager(timezone_manager const& other);
-                           ~timezone_manager();
-  timezone_manager&        operator=(timezone_manager const& other);
-  void                     _backup_timezone(tz_info* info);
-  void                     _set_timezone(std::string const& tz);
+  timezone_manager();
+  timezone_manager(timezone_manager const& other);
+  ~timezone_manager();
+  timezone_manager& operator=(timezone_manager const& other);
+  void _backup_timezone(tz_info* info);
+  void _set_timezone(std::string const& tz);
 
-  tz_info                  _base;
+  tz_info _base;
   static timezone_manager* _instance;
-  std::stack<tz_info>      _tz;
+  std::stack<tz_info> _tz;
 };
 
 CCE_END()
 
-#endif // !CCE_TIMEZONE_MANAGER_HH
+#endif  // !CCE_TIMEZONE_MANAGER_HH

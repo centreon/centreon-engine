@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_EPN_NAGIOS_H
-#  define CCE_COMPATIBILITY_EPN_NAGIOS_H
+#define CCE_COMPATIBILITY_EPN_NAGIOS_H
 
 // Nothing, cause Centreon Engine does not support Embedded Perl
 // directly anymore. See Centreon Connector Perl instead.
 
-#endif // !CCE_COMPATIBILITY_EPN_NAGIOS_H
+#endif  // !CCE_COMPATIBILITY_EPN_NAGIOS_H

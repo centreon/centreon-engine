@@ -32,7 +32,8 @@ CCE_END()
 
 typedef std::unordered_map<
     std::string,
-    std::shared_ptr<com::centreon::engine::commands::command> > command_map;
+    std::shared_ptr<com::centreon::engine::commands::command> >
+    command_map;
 
 CCE_BEGIN()
 
@@ -57,8 +58,8 @@ class command {
   virtual std::string const& get_name() const noexcept;
   virtual std::string process_cmd(nagios_macros* macros) const;
   virtual uint64_t run(std::string const& processed_cmd,
-                            nagios_macros& macors,
-                            uint32_t timeout) = 0;
+                       nagios_macros& macors,
+                       uint32_t timeout) = 0;
   virtual void run(std::string const& process_cmd,
                    nagios_macros& macros,
                    uint32_t timeout,
@@ -76,7 +77,7 @@ class command {
   command_listener* _listener;
   std::string _name;
 };
-}
+}  // namespace commands
 
 CCE_END()
 

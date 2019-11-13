@@ -19,9 +19,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_STATUSDATA_H
-#  define CCE_COMPATIBILITY_STATUSDATA_H
+#define CCE_COMPATIBILITY_STATUSDATA_H
 
-#  include "com/centreon/engine/statusdata.hh"
-#  include "objects.h"
+#include "com/centreon/engine/statusdata.hh"
+#include "objects.h"
 
-#endif // !CCE_COMPATIBILITY_STATUSDATA_H
+#endif  // !CCE_COMPATIBILITY_STATUSDATA_H

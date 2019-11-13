@@ -18,45 +18,45 @@
 */
 
 #ifndef CCE_BROKER_COMPATIBILITY_HH
-#  define CCE_BROKER_COMPATIBILITY_HH
+#define CCE_BROKER_COMPATIBILITY_HH
 
-#  include "com/centreon/engine/broker/handle.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/broker/handle.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                 broker {
-  /**
-   *  @class compatibility compatibility.hh
-   *  @brief Simple compatibility class.
-   *
-   *  Use to keep compatibility with old module system API.
-   */
-  class                   compatibility {
-  public:
-    static compatibility& instance();
-    static void           load();
-    static void           unload();
+namespace broker {
+/**
+ *  @class compatibility compatibility.hh
+ *  @brief Simple compatibility class.
+ *
+ *  Use to keep compatibility with old module system API.
+ */
+class compatibility {
+ public:
+  static compatibility& instance();
+  static void load();
+  static void unload();
 
-    void                  author_module(broker::handle* mod);
-    void                  copyright_module(broker::handle* mod);
-    void                  create_module(broker::handle* mod);
-    void                  description_module(broker::handle* mod);
-    void                  destroy_module(broker::handle* mod);
-    void                  license_module(broker::handle* mod);
-    void                  loaded_module(broker::handle* mod);
-    void                  name_module(broker::handle* mod);
-    void                  unloaded_module(broker::handle* mod);
-    void                  version_module(broker::handle* mod);
+  void author_module(broker::handle* mod);
+  void copyright_module(broker::handle* mod);
+  void create_module(broker::handle* mod);
+  void description_module(broker::handle* mod);
+  void destroy_module(broker::handle* mod);
+  void license_module(broker::handle* mod);
+  void loaded_module(broker::handle* mod);
+  void name_module(broker::handle* mod);
+  void unloaded_module(broker::handle* mod);
+  void version_module(broker::handle* mod);
 
-  private:
-                          compatibility();
-                          compatibility(compatibility const& right);
-    virtual               ~compatibility() throw ();
-    compatibility&        operator=(compatibility const& right);
-  };
-}
+ private:
+  compatibility();
+  compatibility(compatibility const& right);
+  virtual ~compatibility() throw();
+  compatibility& operator=(compatibility const& right);
+};
+}  // namespace broker
 
 CCE_END()
 
-#endif // !CCE_BROKER_COMPATIBILITY_HH
+#endif  // !CCE_BROKER_COMPATIBILITY_HH

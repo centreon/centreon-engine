@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -34,7 +34,7 @@ applier::serviceescalation::serviceescalation() {}
 /**
  *  Destructor.
  */
-applier::serviceescalation::~serviceescalation() throw () {}
+applier::serviceescalation::~serviceescalation() throw() {}
 
 /**
  *  Add new service escalation.
@@ -78,7 +78,8 @@ void applier::serviceescalation::add_object(
           ((obj.escalation_options() &
             configuration::serviceescalation::recovery)
                ? notifier::ok
-               : notifier::none), obj.uuid())};
+               : notifier::none),
+      obj.uuid())};
 
   // Add new items to the global list.
   engine::serviceescalation::serviceescalations.insert(
@@ -103,31 +104,24 @@ void applier::serviceescalation::add_object(
  */
 void applier::serviceescalation::expand_objects(configuration::state& s) {
   // Browse all escalations.
-  logger(logging::dbg_config, logging::more)
-      << "Expanding service escalations";
+  logger(logging::dbg_config, logging::more) << "Expanding service escalations";
 
   configuration::set_serviceescalation expanded;
   for (configuration::set_serviceescalation::const_iterator
-         it_esc(s.serviceescalations().begin()),
-         end_esc(s.serviceescalations().end());
-       it_esc != end_esc;
-       ++it_esc) {
+           it_esc(s.serviceescalations().begin()),
+       end_esc(s.serviceescalations().end());
+       it_esc != end_esc; ++it_esc) {
     // Expanded services.
     std::set<std::pair<std::string, std::string>> expanded_services;
-    _expand_services(
-      it_esc->hosts(),
-      it_esc->hostgroups(),
-      it_esc->service_description(),
-      it_esc->servicegroups(),
-      s,
-      expanded_services);
+    _expand_services(it_esc->hosts(), it_esc->hostgroups(),
+                     it_esc->service_description(), it_esc->servicegroups(), s,
+                     expanded_services);
 
     // Browse all services.
-    for (std::set<std::pair<std::string, std::string> >::const_iterator
-           it(expanded_services.begin()),
-           end(expanded_services.end());
-         it != end;
-         ++it) {
+    for (std::set<std::pair<std::string, std::string>>::const_iterator
+             it(expanded_services.begin()),
+         end(expanded_services.end());
+         it != end; ++it) {
       configuration::serviceescalation sesc(*it_esc);
       sesc.hostgroups().clear();
       sesc.hosts().clear();
@@ -187,8 +181,8 @@ void applier::serviceescalation::remove_object(
   service_map::iterator sit{
       engine::service::services.find({host_name, description})};
   if (sit == engine::service::services.end())
-    throw engine_error() << "Cannot find service '"
-                         << host_name << "/" << description << "'";
+    throw engine_error() << "Cannot find service '" << host_name << "/"
+                         << description << "'";
 
   /* ... and its escalations */
   std::list<escalation*>& srv_escalations(sit->second->get_escalations());
@@ -246,8 +240,7 @@ void applier::serviceescalation::resolve_object(
     throw engine_error() << "Cannot find service escalations "
                          << "concerning host '" << hostname << "' and service '"
                          << desc << "'";
-  for (serviceescalation_mmap::iterator
-         it{p.first}; it != p.second; ++it) {
+  for (serviceescalation_mmap::iterator it{p.first}; it != p.second; ++it) {
     if (it->second->get_uuid() == obj.uuid()) {
       found = true;
       // Resolve service escalation.
@@ -283,56 +276,39 @@ void applier::serviceescalation::_expand_services(
   all_hosts.insert(hst.begin(), hst.end());
 
   // Host groups.
-  for (std::list<std::string>::const_iterator
-         it(hg.begin()),
-         end(hg.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::const_iterator it(hg.begin()), end(hg.end());
+       it != end; ++it) {
     // Find host group.
-    configuration::set_hostgroup::iterator
-      it_group(s.hostgroups_find(*it));
+    configuration::set_hostgroup::iterator it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
-      throw engine_error() << "Could not resolve host group '"
-             << *it << "'";
+      throw engine_error() << "Could not resolve host group '" << *it << "'";
 
     // Add host group members.
-    all_hosts.insert(
-                it_group->members().begin(),
-                it_group->members().end());
+    all_hosts.insert(it_group->members().begin(), it_group->members().end());
   }
 
   // Hosts * services.
-  for (std::set<std::string>::const_iterator
-         it_host(all_hosts.begin()),
-         end_host(all_hosts.end());
-       it_host != end_host;
-       ++it_host)
-    for (std::list<std::string>::const_iterator
-           it_service(svc.begin()),
-           end_service(svc.end());
-         it_service != end_service;
-         ++it_service)
+  for (std::set<std::string>::const_iterator it_host(all_hosts.begin()),
+       end_host(all_hosts.end());
+       it_host != end_host; ++it_host)
+    for (std::list<std::string>::const_iterator it_service(svc.begin()),
+         end_service(svc.end());
+         it_service != end_service; ++it_service)
       expanded.insert({*it_host, *it_service});
 
   // Service groups.
-  for (std::list<std::string>::const_iterator
-         it(sg.begin()),
-         end(sg.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::const_iterator it(sg.begin()), end(sg.end());
+       it != end; ++it) {
     // Find service group.
-    configuration::set_servicegroup::iterator
-      it_group(s.servicegroups_find(*it));
+    configuration::set_servicegroup::iterator it_group(
+        s.servicegroups_find(*it));
     if (it_group == s.servicegroups().end())
-      throw engine_error() << "Could not resolve service group '"
-             << *it << "'";
+      throw engine_error() << "Could not resolve service group '" << *it << "'";
 
     // Add service group members.
-    for (set_pair_string::const_iterator
-           it_member(it_group->members().begin()),
-           end_member(it_group->members().end());
-         it_member != end_member;
-         ++it_member)
+    for (set_pair_string::const_iterator it_member(it_group->members().begin()),
+         end_member(it_group->members().end());
+         it_member != end_member; ++it_member)
       expanded.insert(*it_member);
   }
 }
@@ -347,8 +323,7 @@ void applier::serviceescalation::_inherits_special_vars(
     configuration::serviceescalation& obj,
     configuration::state const& s) {
   // Detect if any special variables has not been defined.
-  if (!obj.contactgroups_defined() ||
-      !obj.notification_interval_defined() ||
+  if (!obj.contactgroups_defined() || !obj.notification_interval_defined() ||
       !obj.escalation_period_defined()) {
     // Find service.
     configuration::set_service::const_iterator it{s.services_find(

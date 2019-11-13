@@ -18,9 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NETUTILS_H
-#  define CCE_COMPATIBILITY_NETUTILS_H
+#define CCE_COMPATIBILITY_NETUTILS_H
 
-#  include "com/centreon/engine/netutils.hh"
+#include "com/centreon/engine/netutils.hh"
 
-#endif // !CCE_COMPATIBILITY_NETUTILS_H
-
+#endif  // !CCE_COMPATIBILITY_NETUTILS_H

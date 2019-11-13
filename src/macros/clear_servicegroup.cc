@@ -33,16 +33,10 @@ extern "C" {
  */
 int clear_servicegroup_macros_r(nagios_macros* mac) {
   static unsigned int const to_free[] = {
-    MACRO_SERVICEGROUPNAME,
-    MACRO_SERVICEGROUPALIAS,
-    MACRO_SERVICEGROUPMEMBERS,
-    MACRO_SERVICEGROUPACTIONURL,
-    MACRO_SERVICEGROUPNOTESURL,
-    MACRO_SERVICEGROUPNOTES
-  };
-  for (unsigned int i = 0;
-       i < sizeof(to_free) / sizeof(*to_free);
-       ++i) {
+      MACRO_SERVICEGROUPNAME,     MACRO_SERVICEGROUPALIAS,
+      MACRO_SERVICEGROUPMEMBERS,  MACRO_SERVICEGROUPACTIONURL,
+      MACRO_SERVICEGROUPNOTESURL, MACRO_SERVICEGROUPNOTES};
+  for (unsigned int i = 0; i < sizeof(to_free) / sizeof(*to_free); ++i) {
     mac->x[i] = "";
   }
 
@@ -51,5 +45,4 @@ int clear_servicegroup_macros_r(nagios_macros* mac) {
 
   return (OK);
 }
-
 }

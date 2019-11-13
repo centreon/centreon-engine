@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XRDDEFAULT_H
-#  define CCE_COMPATIBILITY_XRDDEFAULT_H
+#define CCE_COMPATIBILITY_XRDDEFAULT_H
 
-#  include "com/centreon/engine/xrddefault.hh"
+#include "com/centreon/engine/xrddefault.hh"
 
-#endif // !CCE_COMPATIBILITY_XRDDEFAULT_H
+#endif  // !CCE_COMPATIBILITY_XRDDEFAULT_H

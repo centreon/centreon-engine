@@ -17,8 +17,8 @@
  *
  */
 
-#include <memory>
 #include <gtest/gtest.h>
+#include <memory>
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/contactgroup.hh"
@@ -34,7 +34,7 @@ extern configuration::state* config;
 class SimpleContactgroup : public ::testing::Test {
  public:
   void SetUp() override {
-//    set_time(20);
+    //    set_time(20);
     if (config == NULL)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
@@ -45,13 +45,12 @@ class SimpleContactgroup : public ::testing::Test {
     delete config;
     config = NULL;
   }
-
 };
 
 // Given an empty name
 // When the add_contactgroup function is called with it as argument,
 // Then it returns a NULL pointer.
-//TEST_F(SimpleContactgroup, NewContactgroupWithNoName) {
+// TEST_F(SimpleContactgroup, NewContactgroupWithNoName) {
 //  ASSERT_TRUE(engine::contactgroup::add_contactgroup("") == NULL);
 //}
 
@@ -59,7 +58,7 @@ class SimpleContactgroup : public ::testing::Test {
 // When the add_contactgroup function is called with it as argument,
 // Then a contactgroup is created and the method returns a pointer to it
 // And since alias is empty, it is replaced by the name.
-//TEST_F(SimpleContactgroup, NewContactgroupWithName) {
+// TEST_F(SimpleContactgroup, NewContactgroupWithName) {
 //  engine::contactgroup* c(engine::contactgroup::add_contactgroup("test"));
 //  ASSERT_EQ(c->get_name(), "test");
 //  ASSERT_EQ(c->get_alias(), "test");
@@ -68,7 +67,7 @@ class SimpleContactgroup : public ::testing::Test {
 // Given a non empty name
 // When the add_contactgroup function is called with it as argument two times,
 // Then the contactgroup is well created but just one time.
-//TEST_F(SimpleContactgroup, NewContactgroupRepeatedTwoTimes) {
+// TEST_F(SimpleContactgroup, NewContactgroupRepeatedTwoTimes) {
 //  engine::contactgroup* c(engine::contactgroup::add_contactgroup("test"));
 //  ASSERT_EQ(c->get_name(), "test");
 //  ASSERT_TRUE(engine::contactgroup::add_contactgroup("test") == NULL);
@@ -77,7 +76,7 @@ class SimpleContactgroup : public ::testing::Test {
 // Given a non empty name and a non empty alias
 // When the add_contactgroup function is called with them as argument,
 // Then the contactgroup is created with the given name and alias.
-//TEST_F(SimpleContactgroup, NewContactgroupWithNonEmptyAlias) {
+// TEST_F(SimpleContactgroup, NewContactgroupWithNonEmptyAlias) {
 //  engine::contactgroup* c(engine::contactgroup::add_contactgroup(
 //                       "test",
 //                       "alias_test"));
@@ -88,7 +87,7 @@ class SimpleContactgroup : public ::testing::Test {
 // When the check method is executed
 // Then no warning, nor error are given.
 // And the method returns true (errors count == 0)
-//TEST_F(SimpleContactgroup, TestContactgroupCheck) {
+// TEST_F(SimpleContactgroup, TestContactgroupCheck) {
 //  engine::contactgroup* c(engine::contactgroup::add_contactgroup("test"));
 //  int w = 0, e = 0;
 //  ASSERT_TRUE(c->check(&w, &e));
@@ -97,7 +96,7 @@ class SimpleContactgroup : public ::testing::Test {
 // Given a contactgroup
 // When the add_contact method is called with an empty name
 // Then an exception is thrown.
-//TEST_F(SimpleContactgroup, TestContactgroupCheckWithBadContact) {
+// TEST_F(SimpleContactgroup, TestContactgroupCheckWithBadContact) {
 //  engine::contactgroup* c(engine::contactgroup::add_contactgroup("test"));
 //  ASSERT_THROW(c->add_contact(""), std::exception);
 //}
@@ -107,7 +106,7 @@ class SimpleContactgroup : public ::testing::Test {
 // corresponding to a non existing contact
 // Then an error is given
 // And the method returns false.
-//TEST_F(SimpleContactgroup, TestContactgroupCheckWithOneInexistentContact) {
+// TEST_F(SimpleContactgroup, TestContactgroupCheckWithOneInexistentContact) {
 //  engine::contactgroup* c(engine::contactgroup::add_contactgroup("test"));
 //  c->add_contact("centreon");
 //  int w(0), e(0);
@@ -124,7 +123,7 @@ class SimpleContactgroup : public ::testing::Test {
 //// Then the contact group contains only the add user.
 //// When the clear_members() is executed, the contact group contains no more
 //// member.
-//TEST_F(SimpleContactgroup, TestContactgroupCheckWithOneContact) {
+// TEST_F(SimpleContactgroup, TestContactgroupCheckWithOneContact) {
 //  engine::contactgroup* c(engine::contactgroup::add_contactgroup("test"));
 //  c->add_contact("centreon");
 //  shared_ptr<engine::contact> user(new engine::contact("centreon"));

@@ -19,30 +19,29 @@
 */
 
 #ifndef CCE_NEBMODS_HH
-#  define CCE_NEBMODS_HH
+#define CCE_NEBMODS_HH
 
-#  include "com/centreon/engine/nebcallbacks.hh"
-#  include "com/centreon/engine/nebmodules.hh"
+#include "com/centreon/engine/nebcallbacks.hh"
+#include "com/centreon/engine/nebmodules.hh"
 
 // Module Structures
-typedef struct               nebcallback_struct {
-  void*                      callback_func;
-  void*                      module_handle;
-  int                        priority;
+typedef struct nebcallback_struct {
+  void* callback_func;
+  void* module_handle;
+  int priority;
   struct nebcallback_struct* next;
-}                            nebcallback;
+} nebcallback;
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 // Module Functions
 int neb_init_modules();
 int neb_deinit_modules();
-int neb_add_module(
-      char const* filename,
-      char const* args,
-      int should_be_loaded);
+int neb_add_module(char const* filename,
+                   char const* args,
+                   int should_be_loaded);
 int neb_free_module_list();
 int neb_load_all_modules();
 int neb_load_module(void* mod);
@@ -56,8 +55,8 @@ int neb_make_callbacks(int callback_type, void* data);
 int neb_init_callback_list();
 int neb_free_callback_list();
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_NEBMODS_HH
+#endif  // !CCE_NEBMODS_HH

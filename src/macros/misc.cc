@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/macros/defines.hh"
 #include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/engine/macros/defines.hh"
 
 // Scoped to this file to prevent (unintentional) mischief.
 static nagios_macros global_macros;
@@ -34,5 +34,4 @@ extern "C" {
 nagios_macros* get_global_macros() {
   return (&global_macros);
 }
-
 }

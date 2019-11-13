@@ -18,16 +18,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
-#include <cstddef>
+#include "mmap.h"
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstddef>
+#include <cstring>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/string.hh"
-#include "mmap.h"
 
 using namespace com::centreon::engine;
 
@@ -54,14 +54,10 @@ mmapfile* mmap_fopen(char const* filename) {
 
   /* only mmap() if we have a file greater than 0 bytes */
   if (file_size > 0) {
-    /* mmap() the file - allocate one extra byte for processing zero-byte files */
-    if ((mmap_buf = (void*)mmap(
-                             0,
-                             file_size,
-                             PROT_READ,
-                             MAP_PRIVATE,
-                             fd,
-                             0)) == MAP_FAILED) {
+    /* mmap() the file - allocate one extra byte for processing zero-byte files
+     */
+    if ((mmap_buf = (void*)mmap(0, file_size, PROT_READ, MAP_PRIVATE, fd, 0)) ==
+        MAP_FAILED) {
       close(fd);
       return (NULL);
     }
@@ -100,16 +96,13 @@ int mmap_fclose(mmapfile* temp_mmapfile) {
 
 /* gets one line of input from an mmap()'ed file */
 char* mmap_fgets(mmapfile* temp_mmapfile) {
-  if (!temp_mmapfile
-      || !temp_mmapfile->file_size
-      || temp_mmapfile->current_position >= temp_mmapfile->file_size)
+  if (!temp_mmapfile || !temp_mmapfile->file_size ||
+      temp_mmapfile->current_position >= temp_mmapfile->file_size)
     return (NULL);
 
   /* find the end of the string (or buffer) */
   unsigned long x(0L);
-  for (x = temp_mmapfile->current_position;
-       x < temp_mmapfile->file_size;
-       ++x) {
+  for (x = temp_mmapfile->current_position; x < temp_mmapfile->file_size; ++x) {
     if (*((char*)(temp_mmapfile->mmap_buf) + x) == '\n') {
       ++x;
       break;
@@ -123,10 +116,9 @@ char* mmap_fgets(mmapfile* temp_mmapfile) {
   char* buf(new char[len + 1]);
 
   /* copy string to newly allocated memory and terminate the string */
-  memcpy(
-    buf,
-    ((char*)(temp_mmapfile->mmap_buf) + temp_mmapfile->current_position),
-    len);
+  memcpy(buf,
+         ((char*)(temp_mmapfile->mmap_buf) + temp_mmapfile->current_position),
+         len);
   buf[len] = '\x0';
 
   /* update the current position */
@@ -137,7 +129,8 @@ char* mmap_fgets(mmapfile* temp_mmapfile) {
   return (buf);
 }
 
-/* gets one line of input from an mmap()'ed file (may be contained on more than one line in the source file) */
+/* gets one line of input from an mmap()'ed file (may be contained on more than
+ * one line in the source file) */
 char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
   if (!temp_mmapfile)
     return nullptr;
@@ -161,8 +154,7 @@ char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
       buf = new char[len + 1];
       memcpy(buf, tempbuf, len);
       buf[len] = '\x0';
-    }
-    else {
+    } else {
       /* strip leading white space from continuation lines */
       stripped = tempbuf;
       while (*stripped == ' ' || *stripped == '\t')

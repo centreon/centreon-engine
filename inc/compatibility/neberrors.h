@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NEBERRORS_H
-#  define CCE_COMPATIBILITY_NEBERRORS_H
+#define CCE_COMPATIBILITY_NEBERRORS_H
 
-#  include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/engine/neberrors.hh"
 
-#endif // !CCE_COMPATIBILITY_NEBERRORS_H
+#endif  // !CCE_COMPATIBILITY_NEBERRORS_H

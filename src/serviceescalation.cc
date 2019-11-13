@@ -17,12 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/serviceescalation.hh"
 
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
@@ -39,7 +39,7 @@ serviceescalation::serviceescalation(std::string const& hostname,
                                      uint32_t escalate_on,
                                      Uuid const& uuid)
     : escalation{first_notification, last_notification, notification_interval,
-                 escalation_period, escalate_on, uuid},
+                 escalation_period,  escalate_on,       uuid},
       _hostname{hostname},
       _description{description} {
   if (hostname.empty())
@@ -94,26 +94,25 @@ void serviceescalation::resolve(int& w, int& e) {
   int errors{0};
 
   // Find the service.
-  service_map::const_iterator found{service::services.find(
-    {get_hostname(), get_description()})};
+  service_map::const_iterator found{
+      service::services.find({get_hostname(), get_description()})};
   if (found == service::services.end() || !found->second) {
-    logger(log_verification_error, basic) << "Error: Service '"
-        << get_description() << "' on host '" << get_hostname()
+    logger(log_verification_error, basic)
+        << "Error: Service '" << get_description() << "' on host '"
+        << get_hostname()
         << "' specified in service escalation is not defined anywhere!";
     errors++;
     notifier_ptr = nullptr;
-  }
-  else {
+  } else {
     notifier_ptr = found->second.get();
     notifier_ptr->get_escalations().push_back(this);
   }
 
   try {
     escalation::resolve(w, errors);
-  }
-  catch (std::exception const& ee) {
+  } catch (std::exception const& ee) {
     logger(log_verification_error, basic)
-      << "Error: Notifier escalation error: " << ee.what();
+        << "Error: Notifier escalation error: " << ee.what();
   }
 
   // Add errors.

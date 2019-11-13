@@ -33,16 +33,9 @@ extern "C" {
  */
 int clear_hostgroup_macros_r(nagios_macros* mac) {
   static unsigned int const to_free[] = {
-    MACRO_HOSTGROUPNAME,
-    MACRO_HOSTGROUPALIAS,
-    MACRO_HOSTGROUPMEMBERS,
-    MACRO_HOSTGROUPACTIONURL,
-    MACRO_HOSTGROUPNOTESURL,
-    MACRO_HOSTGROUPNOTES
-  };
-  for (unsigned int i = 0;
-       i < sizeof(to_free) / sizeof(*to_free);
-       ++i) {
+      MACRO_HOSTGROUPNAME,      MACRO_HOSTGROUPALIAS,    MACRO_HOSTGROUPMEMBERS,
+      MACRO_HOSTGROUPACTIONURL, MACRO_HOSTGROUPNOTESURL, MACRO_HOSTGROUPNOTES};
+  for (unsigned int i = 0; i < sizeof(to_free) / sizeof(*to_free); ++i) {
     mac->x[i] = "";
   }
 
@@ -51,6 +44,4 @@ int clear_hostgroup_macros_r(nagios_macros* mac) {
 
   return (OK);
 }
-
-
 }

@@ -41,7 +41,7 @@ point_2d::point_2d(point_2d const& right) {
 /**
  *  Destructor.
  */
-point_2d::~point_2d() throw () {}
+point_2d::~point_2d() throw() {}
 
 /**
  *  Copy operator.
@@ -65,7 +65,7 @@ point_2d& point_2d::operator=(point_2d const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool point_2d::operator==(point_2d const& right) const throw () {
+bool point_2d::operator==(point_2d const& right) const throw() {
   return (_x == right._x && _y == right._y);
 }
 
@@ -76,7 +76,7 @@ bool point_2d::operator==(point_2d const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool point_2d::operator!=(point_2d const& right) const throw () {
+bool point_2d::operator!=(point_2d const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -87,7 +87,7 @@ bool point_2d::operator!=(point_2d const& right) const throw () {
  *
  *  @return True if this object is less than right.
  */
-bool point_2d::operator<(point_2d const& right) const throw () {
+bool point_2d::operator<(point_2d const& right) const throw() {
   if (_x != right._x)
     return (_x < right._x);
   return (_y < right._y);
@@ -98,7 +98,7 @@ bool point_2d::operator<(point_2d const& right) const throw () {
  *
  *  @return The x coordinates.
  */
-int point_2d::x() const throw () {
+int point_2d::x() const throw() {
   return (_x);
 }
 
@@ -107,6 +107,6 @@ int point_2d::x() const throw () {
  *
  *  @return The y coordinates.
  */
-int point_2d::y() const throw () {
+int point_2d::y() const throw() {
   return (_y);
 }

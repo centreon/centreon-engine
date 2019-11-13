@@ -19,10 +19,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <mutex>
-#include <memory>
-#include <unistd.h>
 #include "com/centreon/engine/broker.hh"
+#include <unistd.h>
+#include <memory>
+#include <mutex>
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebmods.hh"
@@ -48,18 +48,17 @@ extern "C" {
  *  @param[in] notify_contacts      Should we notify contacts.
  *  @param[in] timestamp            Timestamp.
  */
-void broker_acknowledgement_data(
-       int type,
-       int flags,
-       int attr,
-       int acknowledgement_type,
-       void* data,
-       char* ack_author,
-       char* ack_data,
-       int subtype,
-       int notify_contacts,
-       int persistent_comment,
-       struct timeval const* timestamp) {
+void broker_acknowledgement_data(int type,
+                                 int flags,
+                                 int attr,
+                                 int acknowledgement_type,
+                                 void* data,
+                                 char* ack_author,
+                                 char* ack_data,
+                                 int subtype,
+                                 int notify_contacts,
+                                 int persistent_comment,
+                                 struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ACKNOWLEDGEMENT_DATA))
     return;
@@ -75,13 +74,13 @@ void broker_acknowledgement_data(
   ds.acknowledgement_type = acknowledgement_type;
   if (acknowledgement_type == SERVICE_ACKNOWLEDGEMENT) {
     temp_service = (com::centreon::engine::service*)data;
-    ds.host_name = const_cast<char *>(temp_service->get_hostname().c_str());
-    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
+    ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
+    ds.service_description =
+        const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->get_current_state();
-  }
-  else {
+  } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
+    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
     ds.service_description = NULL;
     ds.state = temp_host->get_current_state();
   }
@@ -113,19 +112,18 @@ void broker_acknowledgement_data(
  *  @param[in] modsattrs    Target contact modified service attributes.
  *  @param[in] timestamp    Timestamp.
  */
-void broker_adaptive_contact_data(
-       int type,
-       int flags,
-       int attr,
-       contact* cntct,
-       int command_type,
-       unsigned long modattr,
-       unsigned long modattrs,
-       unsigned long modhattr,
-       unsigned long modhattrs,
-       unsigned long modsattr,
-       unsigned long modsattrs,
-       struct timeval const* timestamp) {
+void broker_adaptive_contact_data(int type,
+                                  int flags,
+                                  int attr,
+                                  contact* cntct,
+                                  int command_type,
+                                  unsigned long modattr,
+                                  unsigned long modattrs,
+                                  unsigned long modhattr,
+                                  unsigned long modhattrs,
+                                  unsigned long modsattr,
+                                  unsigned long modsattrs,
+                                  struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
@@ -159,12 +157,11 @@ void broker_adaptive_contact_data(
  *  @param[in] data      Target dependency.
  *  @param[in] timestamp Timestamp.
  */
-void broker_adaptive_dependency_data(
-       int type,
-       int flags,
-       int attr,
-       void* data,
-       struct timeval const* timestamp) {
+void broker_adaptive_dependency_data(int type,
+                                     int flags,
+                                     int attr,
+                                     void* data,
+                                     struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
@@ -191,12 +188,11 @@ void broker_adaptive_dependency_data(
  *  @param[in] data      Target escalation.
  *  @param[in] timestamp Timestamp.
  */
-void broker_adaptive_escalation_data(
-       int type,
-       int flags,
-       int attr,
-       void* data,
-       struct timeval const* timestamp) {
+void broker_adaptive_escalation_data(int type,
+                                     int flags,
+                                     int attr,
+                                     void* data,
+                                     struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
@@ -226,15 +222,14 @@ void broker_adaptive_escalation_data(
  *  @param[in] modattrs     Target host modified attributes.
  *  @param[in] timestamp    Timestamp.
  */
-void broker_adaptive_host_data(
-       int type,
-       int flags,
-       int attr,
-       host* hst,
-       int command_type,
-       unsigned long modattr,
-       unsigned long modattrs,
-       struct timeval const* timestamp) {
+void broker_adaptive_host_data(int type,
+                               int flags,
+                               int attr,
+                               host* hst,
+                               int command_type,
+                               unsigned long modattr,
+                               unsigned long modattrs,
+                               struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
@@ -268,16 +263,15 @@ void broker_adaptive_host_data(
  *  @param[in] modsattrs    Specific service modified attributes.
  *  @param[in] timestamp    Timestamp.
  */
-void broker_adaptive_program_data(
-       int type,
-       int flags,
-       int attr,
-       int command_type,
-       unsigned long modhattr,
-       unsigned long modhattrs,
-       unsigned long modsattr,
-       unsigned long modsattrs,
-       struct timeval const* timestamp) {
+void broker_adaptive_program_data(int type,
+                                  int flags,
+                                  int attr,
+                                  int command_type,
+                                  unsigned long modhattr,
+                                  unsigned long modhattrs,
+                                  unsigned long modsattr,
+                                  unsigned long modsattrs,
+                                  struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
@@ -311,15 +305,14 @@ void broker_adaptive_program_data(
  *  @param[in] modattrs     Target service modified attributes.
  *  @param[in] timestamp    Timestamp.
  */
-void broker_adaptive_service_data(
-       int type,
-       int flags,
-       int attr,
-       com::centreon::engine::service* svc,
-       int command_type,
-       unsigned long modattr,
-       unsigned long modattrs,
-       struct timeval const* timestamp) {
+void broker_adaptive_service_data(int type,
+                                  int flags,
+                                  int attr,
+                                  com::centreon::engine::service* svc,
+                                  int command_type,
+                                  unsigned long modattr,
+                                  unsigned long modattrs,
+                                  struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
@@ -350,13 +343,12 @@ void broker_adaptive_service_data(
  *  @param[in] command_type Command type.
  *  @param[in] timestamp    Timestamp.
  */
-void broker_adaptive_timeperiod_data(
-       int type,
-       int flags,
-       int attr,
-       timeperiod* tp,
-       int command_type,
-       struct timeval const* timestamp) {
+void broker_adaptive_timeperiod_data(int type,
+                                     int flags,
+                                     int attr,
+                                     timeperiod* tp,
+                                     int command_type,
+                                     struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
@@ -383,11 +375,10 @@ void broker_adaptive_timeperiod_data(
  *  @param[in] attr      Attributes
  *  @param[in] timestamp Timestamp.
  */
-void broker_aggregated_status_data(
-       int type,
-       int flags,
-       int attr,
-       struct timeval const* timestamp) {
+void broker_aggregated_status_data(int type,
+                                   int flags,
+                                   int attr,
+                                   struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
@@ -414,12 +405,11 @@ void broker_aggregated_status_data(
  *  @param[in] cmd       The command.
  *  @param[in] timestamp Timestamp.
  */
-void broker_command_data(
-       int type,
-       int flags,
-       int attr,
-       commands::command* cmd,
-       struct timeval const* timestamp) {
+void broker_command_data(int type,
+                         int flags,
+                         int attr,
+                         commands::command* cmd,
+                         struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_COMMAND_DATA))
     return;
@@ -455,23 +445,22 @@ void broker_command_data(
  *  @param[in] comment_id      Comment ID.
  *  @param[in] timestamp       Timestamp.
  */
-void broker_comment_data(
-       int type,
-       int flags,
-       int attr,
-       int comment_type,
-       int entry_type,
-       char const* host_name,
-       char const* svc_description,
-       time_t entry_time,
-       char const* author_name,
-       char const* comment_data,
-       int persistent,
-       int source,
-       int expires,
-       time_t expire_time,
-       unsigned long comment_id,
-       struct timeval const* timestamp) {
+void broker_comment_data(int type,
+                         int flags,
+                         int attr,
+                         int comment_type,
+                         int entry_type,
+                         char const* host_name,
+                         char const* svc_description,
+                         time_t entry_time,
+                         char const* author_name,
+                         char const* comment_data,
+                         int persistent,
+                         int source,
+                         int expires,
+                         time_t expire_time,
+                         unsigned long comment_id,
+                         struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_COMMENT_DATA))
     return;
@@ -486,7 +475,7 @@ void broker_comment_data(
   ds.entry_type = entry_type;
   ds.host_name = host_name;
   ds.service_description = svc_description;
-  ds.object_ptr = NULL; // Not implemented yet.
+  ds.object_ptr = NULL;  // Not implemented yet.
   ds.entry_time = entry_time;
   ds.author_name = author_name;
   ds.comment_data = comment_data;
@@ -518,20 +507,19 @@ void broker_comment_data(
  *  @param[in] escalated         Escalated ?
  *  @param[in] timestamp         Timestamp.
  */
-int broker_contact_notification_data(
-      int type,
-      int flags,
-      int attr,
-      unsigned int notification_type,
-      int reason_type,
-      struct timeval start_time,
-      struct timeval end_time,
-      void* data,
-      contact* cntct,
-      char const* ack_author,
-      char const* ack_data,
-      int escalated,
-      struct timeval const* timestamp) {
+int broker_contact_notification_data(int type,
+                                     int flags,
+                                     int attr,
+                                     unsigned int notification_type,
+                                     int reason_type,
+                                     struct timeval start_time,
+                                     struct timeval end_time,
+                                     void* data,
+                                     contact* cntct,
+                                     char const* ack_author,
+                                     char const* ack_data,
+                                     int escalated,
+                                     struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
     return (OK);
@@ -552,16 +540,16 @@ int broker_contact_notification_data(
   if (notification_type == notifier::service_notification) {
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
+    ds.service_description =
+        const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->get_current_state();
     ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
-  }
-  else {
+  } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
+    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
     ds.service_description = NULL;
     ds.state = temp_host->get_current_state();
-    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
+    ds.output = const_cast<char*>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
@@ -570,9 +558,7 @@ int broker_contact_notification_data(
   ds.escalated = escalated;
 
   // Make callbacks.
-  return (neb_make_callbacks(
-            NEBCALLBACK_CONTACT_NOTIFICATION_DATA,
-            &ds));
+  return (neb_make_callbacks(NEBCALLBACK_CONTACT_NOTIFICATION_DATA, &ds));
 }
 
 /**
@@ -595,21 +581,20 @@ int broker_contact_notification_data(
  *
  *  @return Return value can override notification.
  */
-int broker_contact_notification_method_data(
-      int type,
-      int flags,
-      int attr,
-      unsigned int notification_type,
-      int reason_type,
-      struct timeval start_time,
-      struct timeval end_time,
-      void* data,
-      contact* cntct,
-      char const* cmd,
-      char const* ack_author,
-      char const* ack_data,
-      int escalated,
-      struct timeval const* timestamp) {
+int broker_contact_notification_method_data(int type,
+                                            int flags,
+                                            int attr,
+                                            unsigned int notification_type,
+                                            int reason_type,
+                                            struct timeval start_time,
+                                            struct timeval end_time,
+                                            void* data,
+                                            contact* cntct,
+                                            char const* cmd,
+                                            char const* ack_author,
+                                            char const* ack_data,
+                                            int escalated,
+                                            struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
     return (OK);
@@ -642,16 +627,16 @@ int broker_contact_notification_method_data(
   if (notification_type == notifier::service_notification) {
     temp_service = static_cast<service*>(data);
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
+    ds.service_description =
+        const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->get_current_state();
     ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
-  }
-  else {
+  } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
+    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
     ds.service_description = NULL;
     ds.state = temp_host->get_current_state();
-    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
+    ds.output = const_cast<char*>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
@@ -661,9 +646,8 @@ int broker_contact_notification_method_data(
 
   // Make callbacks.
   int return_code;
-  return_code = neb_make_callbacks(
-                  NEBCALLBACK_CONTACT_NOTIFICATION_METHOD_DATA,
-                  &ds);
+  return_code =
+      neb_make_callbacks(NEBCALLBACK_CONTACT_NOTIFICATION_METHOD_DATA, &ds);
 
   // Free memory.
   delete[] command_buf;
@@ -680,12 +664,11 @@ int broker_contact_notification_method_data(
  *  @param[in] cntct     Target contact.
  *  @param[in] timestamp Timestamp.
  */
-void broker_contact_status(
-       int type,
-       int flags,
-       int attr,
-       contact* cntct,
-       struct timeval const* timestamp) {
+void broker_contact_status(int type,
+                           int flags,
+                           int attr,
+                           contact* cntct,
+                           struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
@@ -714,14 +697,13 @@ void broker_contact_status(
  *  @param[in] varvalue  Variable value.
  *  @param[in] timestamp Timestamp.
  */
-void broker_custom_variable(
-       int type,
-       int flags,
-       int attr,
-       void* data,
-       char const* varname,
-       char const* varvalue,
-       struct timeval const* timestamp) {
+void broker_custom_variable(int type,
+                            int flags,
+                            int attr,
+                            void* data,
+                            char const* varname,
+                            char const* varvalue,
+                            struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_CUSTOMVARIABLE_DATA))
     return;
@@ -762,23 +744,22 @@ void broker_custom_variable(
  *  @param[in] downtime_id     Downtime ID.
  *  @param[in] timestamp       Timestamp.
  */
-void broker_downtime_data(
-       int type,
-       int flags,
-       int attr,
-       int downtime_type,
-       char const* host_name,
-       char const* svc_description,
-       time_t entry_time,
-       char const* author_name,
-       char const* comment_data,
-       time_t start_time,
-       time_t end_time,
-       int fixed,
-       unsigned long triggered_by,
-       unsigned long duration,
-       unsigned long downtime_id,
-       struct timeval const* timestamp) {
+void broker_downtime_data(int type,
+                          int flags,
+                          int attr,
+                          int downtime_type,
+                          char const* host_name,
+                          char const* svc_description,
+                          time_t entry_time,
+                          char const* author_name,
+                          char const* comment_data,
+                          time_t start_time,
+                          time_t end_time,
+                          int fixed,
+                          unsigned long triggered_by,
+                          unsigned long duration,
+                          unsigned long downtime_id,
+                          struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_DOWNTIME_DATA))
     return;
@@ -792,7 +773,7 @@ void broker_downtime_data(
   ds.downtime_type = downtime_type;
   ds.host_name = host_name;
   ds.service_description = svc_description;
-  ds.object_ptr = NULL; // Not implemented yet.
+  ds.object_ptr = NULL;  // Not implemented yet.
   ds.entry_time = entry_time;
   ds.author_name = author_name;
   ds.comment_data = comment_data;
@@ -831,24 +812,23 @@ void broker_downtime_data(
  *
  *  @return Return value can override event handler execution.
  */
-int broker_event_handler(
-      int type,
-      int flags,
-      int attr,
-      unsigned int eventhandler_type,
-      void* data,
-      int state,
-      int state_type,
-      struct timeval start_time,
-      struct timeval end_time,
-      double exectime,
-      int timeout,
-      int early_timeout,
-      int retcode,
-      char const* cmd,
-      char* cmdline,
-      char* output,
-      struct timeval const* timestamp) {
+int broker_event_handler(int type,
+                         int flags,
+                         int attr,
+                         unsigned int eventhandler_type,
+                         void* data,
+                         int state,
+                         int state_type,
+                         struct timeval start_time,
+                         struct timeval end_time,
+                         double exectime,
+                         int timeout,
+                         int early_timeout,
+                         int retcode,
+                         char const* cmd,
+                         char* cmdline,
+                         char* output,
+                         struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_EVENT_HANDLERS))
     return (OK);
@@ -874,15 +854,15 @@ int broker_event_handler(
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.eventhandler_type = eventhandler_type;
-  if ((eventhandler_type == SERVICE_EVENTHANDLER)
-      || (eventhandler_type == GLOBAL_SERVICE_EVENTHANDLER)) {
+  if ((eventhandler_type == SERVICE_EVENTHANDLER) ||
+      (eventhandler_type == GLOBAL_SERVICE_EVENTHANDLER)) {
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
-  }
-  else {
+    ds.service_description =
+        const_cast<char*>(temp_service->get_description().c_str());
+  } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
+    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
     ds.service_description = NULL;
   }
   ds.object_ptr = data;
@@ -920,15 +900,14 @@ int broker_event_handler(
  *  @param[in] command_args   Command args.
  *  @param[in] timestamp      Timestamp.
  */
-void broker_external_command(
-       int type,
-       int flags,
-       int attr,
-       int command_type,
-       time_t entry_time,
-       char* command_string,
-       char* command_args,
-       struct timeval const* timestamp) {
+void broker_external_command(int type,
+                             int flags,
+                             int attr,
+                             int command_type,
+                             time_t entry_time,
+                             char* command_string,
+                             char* command_args,
+                             struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_EXTERNALCOMMAND_DATA))
     return;
@@ -963,16 +942,15 @@ void broker_external_command(
  *  @param[in] low_threshold  Low threshold.
  *  @param[in] timestamp      Timestamp.
  */
-void broker_flapping_data(
-       int type,
-       int flags,
-       int attr,
-       unsigned int flapping_type,
-       void* data,
-       double percent_change,
-       double high_threshold,
-       double low_threshold,
-       struct timeval const* timestamp) {
+void broker_flapping_data(int type,
+                          int flags,
+                          int attr,
+                          unsigned int flapping_type,
+                          void* data,
+                          double percent_change,
+                          double high_threshold,
+                          double low_threshold,
+                          struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_FLAPPING_DATA))
     return;
@@ -991,12 +969,12 @@ void broker_flapping_data(
   if (flapping_type == SERVICE_FLAPPING) {
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
+    ds.service_description =
+        const_cast<char*>(temp_service->get_description().c_str());
     ds.comment_id = temp_service->get_flapping_comment_id();
-  }
-  else {
+  } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
+    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
     ds.service_description = NULL;
     ds.comment_id = temp_host->get_flapping_comment_id();
   }
@@ -1019,12 +997,11 @@ void broker_flapping_data(
  *  @param[in] data      Host group or service group.
  *  @param[in] timestamp Timestamp.
  */
-void broker_group(
-       int type,
-       int flags,
-       int attr,
-       void* data,
-       struct timeval const* timestamp) {
+void broker_group(int type,
+                  int flags,
+                  int attr,
+                  void* data,
+                  struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_GROUP_DATA))
     return;
@@ -1053,13 +1030,12 @@ void broker_group(
  *  @param[in] group     Group (host or service).
  *  @param[in] timestamp Timestamp.
  */
-void broker_group_member(
-       int type,
-       int flags,
-       int attr,
-       void* object,
-       void* group,
-       struct timeval const* timestamp) {
+void broker_group_member(int type,
+                         int flags,
+                         int attr,
+                         void* object,
+                         void* group,
+                         struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_GROUP_MEMBER_DATA))
     return;
@@ -1105,27 +1081,26 @@ void broker_group_member(
  *
  *  @return Return value can override host check.
  */
-int broker_host_check(
-      int type,
-      int flags,
-      int attr,
-      host* hst,
-      int check_type,
-      int state,
-      int state_type,
-      struct timeval start_time,
-      struct timeval end_time,
-      char const* cmd,
-      double latency,
-      double exectime,
-      int timeout,
-      int early_timeout,
-      int retcode,
-      char* cmdline,
-      char* output,
-      char* long_output,
-      char* perfdata,
-      struct timeval const* timestamp) {
+int broker_host_check(int type,
+                      int flags,
+                      int attr,
+                      host* hst,
+                      int check_type,
+                      int state,
+                      int state_type,
+                      struct timeval start_time,
+                      struct timeval end_time,
+                      char const* cmd,
+                      double latency,
+                      double exectime,
+                      int timeout,
+                      int early_timeout,
+                      int retcode,
+                      char* cmdline,
+                      char* output,
+                      char* long_output,
+                      char* perfdata,
+                      struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_HOST_CHECKS))
     return (OK);
@@ -1148,7 +1123,7 @@ int broker_host_check(
   ds.flags = flags;
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
-  ds.host_name = const_cast<char *>(hst->get_name().c_str());
+  ds.host_name = const_cast<char*>(hst->get_name().c_str());
   ds.object_ptr = hst;
   ds.check_type = check_type;
   ds.current_attempt = hst->get_current_attempt();
@@ -1187,12 +1162,11 @@ int broker_host_check(
  *  @param[in] hst       Host.
  *  @param[in] timestamp Timestamp.
  */
-void broker_host_status(
-       int type,
-       int flags,
-       int attr,
-       host* hst,
-       struct timeval const* timestamp) {
+void broker_host_status(int type,
+                        int flags,
+                        int attr,
+                        host* hst,
+                        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
@@ -1221,14 +1195,13 @@ void broker_host_status(
  *  @param[in] entry_time Entry time.
  *  @param[in] timestamp  Timestamp.
  */
-void broker_log_data(
-       int type,
-       int flags,
-       int attr,
-       char* data,
-       unsigned long data_type,
-       time_t entry_time,
-       struct timeval const* timestamp) {
+void broker_log_data(int type,
+                     int flags,
+                     int attr,
+                     char* data,
+                     unsigned long data_type,
+                     time_t entry_time,
+                     struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_LOGGED_DATA))
     return;
@@ -1258,13 +1231,12 @@ void broker_log_data(
  *  @param[in] args      Module arguments.
  *  @param[in] timestamp Timestamp.
  */
-void broker_module_data(
-       int type,
-       int flags,
-       int attr,
-       char const* module,
-       char const* args,
-       struct timeval const* timestamp) {
+void broker_module_data(int type,
+                        int flags,
+                        int attr,
+                        char const* module,
+                        char const* args,
+                        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_MODULE_DATA))
     return;
@@ -1306,20 +1278,19 @@ void broker_module_data(
  *
  *  @return Return value can override notification.
  */
-int broker_notification_data(
-      int type,
-      int flags,
-      int attr,
-      unsigned int notification_type,
-      int reason_type,
-      struct timeval start_time,
-      struct timeval end_time,
-      void* data,
-      char const* ack_author,
-      char const* ack_data,
-      int escalated,
-      int contacts_notified,
-      struct timeval const* timestamp) {
+int broker_notification_data(int type,
+                             int flags,
+                             int attr,
+                             unsigned int notification_type,
+                             int reason_type,
+                             struct timeval start_time,
+                             struct timeval end_time,
+                             void* data,
+                             char const* ack_author,
+                             char const* ack_data,
+                             int escalated,
+                             int contacts_notified,
+                             struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
     return (OK);
@@ -1339,16 +1310,16 @@ int broker_notification_data(
   if (notification_type == notifier::service_notification) {
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
+    ds.service_description =
+        const_cast<char*>(temp_service->get_description().c_str());
     ds.state = temp_service->get_current_state();
     ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
-  }
-  else {
+  } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
+    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
     ds.service_description = NULL;
     ds.state = temp_host->get_current_state();
-    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
+    ds.output = const_cast<char*>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.ack_author = const_cast<char*>(ack_author);
@@ -1368,11 +1339,10 @@ int broker_notification_data(
  *  @param[in] attr      Attributes.
  *  @param[in] timestamp Timestamp.
  */
-void broker_program_state(
-       int type,
-       int flags,
-       int attr,
-       struct timeval const* timestamp) {
+void broker_program_state(int type,
+                          int flags,
+                          int attr,
+                          struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_PROGRAM_STATE))
     return;
@@ -1397,11 +1367,10 @@ void broker_program_state(
  *  @param[in] attr      Attributes.
  *  @param[in] timestamp Timestamp.
  */
-void broker_program_status(
-       int type,
-       int flags,
-       int attr,
-       struct timeval const* timestamp) {
+void broker_program_status(int type,
+                           int flags,
+                           int attr,
+                           struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
@@ -1414,17 +1383,14 @@ void broker_program_status(
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.program_start = program_start;
   ds.pid = getpid();
-  ds.daemon_mode=0;
+  ds.daemon_mode = 0;
   ds.last_command_check = last_command_check;
   ds.last_log_rotation = last_log_rotation;
   ds.notifications_enabled = config->enable_notifications();
-  ds.active_service_checks_enabled
-    = config->execute_service_checks();
-  ds.passive_service_checks_enabled
-    = config->accept_passive_service_checks();
+  ds.active_service_checks_enabled = config->execute_service_checks();
+  ds.passive_service_checks_enabled = config->accept_passive_service_checks();
   ds.active_host_checks_enabled = config->execute_host_checks();
-  ds.passive_host_checks_enabled
-    = config->accept_passive_host_checks();
+  ds.passive_host_checks_enabled = config->accept_passive_host_checks();
   ds.event_handlers_enabled = config->enable_event_handlers();
   ds.flap_detection_enabled = config->enable_flap_detection();
   ds.failure_prediction_enabled = false;
@@ -1433,10 +1399,10 @@ void broker_program_status(
   ds.obsess_over_services = config->obsess_over_services();
   ds.modified_host_attributes = modified_host_process_attributes;
   ds.modified_service_attributes = modified_service_process_attributes;
-  ds.global_host_event_handler
-    = string::dup(config->global_host_event_handler());
-  ds.global_service_event_handler
-    = string::dup(config->global_service_event_handler());
+  ds.global_host_event_handler =
+      string::dup(config->global_host_event_handler());
+  ds.global_service_event_handler =
+      string::dup(config->global_service_event_handler());
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, &ds);
@@ -1459,15 +1425,14 @@ void broker_program_status(
  *  @param[in] dep_svc   Dependant service object (might be null).
  *  @param[in] timestamp Timestamp.
  */
-void broker_relation_data(
-       int type,
-       int flags,
-       int attr,
-       host* hst,
-       com::centreon::engine::service* svc,
-       host* dep_hst,
-       com::centreon::engine::service* dep_svc,
-       struct timeval const* timestamp) {
+void broker_relation_data(int type,
+                          int flags,
+                          int attr,
+                          host* hst,
+                          com::centreon::engine::service* svc,
+                          host* dep_hst,
+                          com::centreon::engine::service* dep_svc,
+                          struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_RELATION_DATA))
     return;
@@ -1498,11 +1463,10 @@ void broker_relation_data(
  *  @param[in] attr      Attributes.
  *  @param[in] timestamp Timestamp.
  */
-void broker_retention_data(
-       int type,
-       int flags,
-       int attr,
-       struct timeval const* timestamp) {
+void broker_retention_data(int type,
+                           int flags,
+                           int attr,
+                           struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_RETENTION_DATA))
     return;
@@ -1540,22 +1504,21 @@ void broker_retention_data(
  *
  *  @return Return value can override service check.
  */
-int broker_service_check(
-      int type,
-      int flags,
-      int attr,
-      com::centreon::engine::service* svc,
-      int check_type,
-      struct timeval start_time,
-      struct timeval end_time,
-      char const* cmd,
-      double latency,
-      double exectime,
-      int timeout,
-      int early_timeout,
-      int retcode,
-      char* cmdline,
-      struct timeval const* timestamp) {
+int broker_service_check(int type,
+                         int flags,
+                         int attr,
+                         com::centreon::engine::service* svc,
+                         int check_type,
+                         struct timeval start_time,
+                         struct timeval end_time,
+                         char const* cmd,
+                         double latency,
+                         double exectime,
+                         int timeout,
+                         int early_timeout,
+                         int retcode,
+                         char* cmdline,
+                         struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_SERVICE_CHECKS))
     return (OK);
@@ -1602,9 +1565,7 @@ int broker_service_check(
 
   // Make callbacks.
   int return_code;
-  return_code = neb_make_callbacks(
-                  NEBCALLBACK_SERVICE_CHECK_DATA,
-                  &ds);
+  return_code = neb_make_callbacks(NEBCALLBACK_SERVICE_CHECK_DATA, &ds);
 
   // Free data.
   delete[] command_buf;
@@ -1620,12 +1581,11 @@ int broker_service_check(
  *  @param[in] svc       Target service.
  *  @param[in] timestamp Timestamp.
  */
-void broker_service_status(
-       int type,
-       int flags,
-       int attr,
-       com::centreon::engine::service* svc,
-       struct timeval const* timestamp) {
+void broker_service_status(int type,
+                           int flags,
+                           int attr,
+                           com::centreon::engine::service* svc,
+                           struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
@@ -1657,17 +1617,16 @@ void broker_service_status(
  *  @param[in] max_attempts     Max attempts.
  *  @param[in] timestamp        Timestamp.
  */
-void broker_statechange_data(
-       int type,
-       int flags,
-       int attr,
-       int statechange_type,
-       void* data,
-       int state,
-       int state_type,
-       int current_attempt,
-       int max_attempts,
-       struct timeval const* timestamp) {
+void broker_statechange_data(int type,
+                             int flags,
+                             int attr,
+                             int statechange_type,
+                             void* data,
+                             int state,
+                             int state_type,
+                             int current_attempt,
+                             int max_attempts,
+                             struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_STATECHANGE_DATA))
     return;
@@ -1684,14 +1643,14 @@ void broker_statechange_data(
   if (statechange_type == SERVICE_STATECHANGE) {
     temp_service = (com::centreon::engine::service*)data;
     ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description = const_cast<char*>(temp_service->get_description().c_str());
+    ds.service_description =
+        const_cast<char*>(temp_service->get_description().c_str());
     ds.output = const_cast<char*>(temp_service->get_plugin_output().c_str());
-  }
-  else {
+  } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char *>(temp_host->get_name().c_str());
+    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
     ds.service_description = NULL;
-    ds.output = const_cast<char *>(temp_host->get_plugin_output().c_str());
+    ds.output = const_cast<char*>(temp_host->get_plugin_output().c_str());
   }
   ds.object_ptr = data;
   ds.state = state;
@@ -1720,19 +1679,18 @@ void broker_statechange_data(
  *  @param[in] output        Output.
  *  @param[in] timestamp     Timestamp.
  */
-void broker_system_command(
-       int type,
-       int flags,
-       int attr,
-       struct timeval start_time,
-       struct timeval end_time,
-       double exectime,
-       int timeout,
-       int early_timeout,
-       int retcode,
-       char* cmd,
-       char* output,
-       struct timeval const* timestamp) {
+void broker_system_command(int type,
+                           int flags,
+                           int attr,
+                           struct timeval start_time,
+                           struct timeval end_time,
+                           double exectime,
+                           int timeout,
+                           int early_timeout,
+                           int retcode,
+                           char* cmd,
+                           char* output,
+                           struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_SYSTEM_COMMANDS))
     return;
@@ -1768,12 +1726,11 @@ void broker_system_command(
  *  @param[in] event     Target event.
  *  @param[in] timestamp Timestamp.
  */
-void broker_timed_event(
-       int type,
-       int flags,
-       int attr,
-       com::centreon::engine::timed_event* event,
-       struct timeval const* timestamp) {
+void broker_timed_event(int type,
+                        int flags,
+                        int attr,
+                        com::centreon::engine::timed_event* event,
+                        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_TIMED_EVENTS))
     return;
@@ -1810,5 +1767,4 @@ struct timeval get_broker_timestamp(struct timeval const* timestamp) {
     tv = *timestamp;
   return (tv);
 }
-
 }

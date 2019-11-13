@@ -17,55 +17,55 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "common.h"
 #include "embedded_perl.h"
+#include "common.h"
 
 extern "C" {
-  /**
-   *  @brief Deinitialize Embedded Perl.
-   *
-   *  @warning This function is obsolete.
-   *
-   *  Centreon Engine does not support Embedded Perl anymore. It instead
-   *  relies on Centreon Connector Perl.
-   *
-   *  @return ERROR.
-   */
-  int deinit_embedded_perl() {
-    return (ERROR);
-  }
+/**
+ *  @brief Deinitialize Embedded Perl.
+ *
+ *  @warning This function is obsolete.
+ *
+ *  Centreon Engine does not support Embedded Perl anymore. It instead
+ *  relies on Centreon Connector Perl.
+ *
+ *  @return ERROR.
+ */
+int deinit_embedded_perl() {
+  return (ERROR);
+}
 
-  /**
-   *  @brief Embedded Perl related function.
-   *
-   *  @warning This function is obsolete.
-   *
-   *  Centreon Engine does not support Embedded Perl anymore. It instead
-   *  relies on Centreon Connector Perl.
-   *
-   *  @param[in] param Unused.
-   *
-   *  @return ERROR.
-   */
-  int file_uses_embedded_perl(void const* param) {
-    (void)param;
-    return (ERROR);
-  }
+/**
+ *  @brief Embedded Perl related function.
+ *
+ *  @warning This function is obsolete.
+ *
+ *  Centreon Engine does not support Embedded Perl anymore. It instead
+ *  relies on Centreon Connector Perl.
+ *
+ *  @param[in] param Unused.
+ *
+ *  @return ERROR.
+ */
+int file_uses_embedded_perl(void const* param) {
+  (void)param;
+  return (ERROR);
+}
 
-  /**
-   *  @brief Initialize Embedded Perl.
-   *
-   *  @warning This function is obsolete.
-   *
-   *  Centreon Engine does not support Embedded Perl anymore. It instead
-   *  relies on Centreon Connector Perl.
-   *
-   *  @param[in] param Unused.
-   *
-   *  @return ERROR.
-   */
-  int init_embedded_perl(void const* param) {
-    (void)param;
-    return (ERROR);
-  }
+/**
+ *  @brief Initialize Embedded Perl.
+ *
+ *  @warning This function is obsolete.
+ *
+ *  Centreon Engine does not support Embedded Perl anymore. It instead
+ *  relies on Centreon Connector Perl.
+ *
+ *  @param[in] param Unused.
+ *
+ *  @return ERROR.
+ */
+int init_embedded_perl(void const* param) {
+  (void)param;
+  return (ERROR);
+}
 }

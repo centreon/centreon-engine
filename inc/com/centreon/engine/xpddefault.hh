@@ -19,35 +19,36 @@
 */
 
 #ifndef CCE_XPDDEFAULT_HH
-#  define CCE_XPDDEFAULT_HH
+#define CCE_XPDDEFAULT_HH
 
-#  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/macros/defines.hh"
-#  include "com/centreon/engine/service.hh"
+#include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/macros/defines.hh"
+#include "com/centreon/engine/service.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 int xpddefault_initialize_performance_data();
 int xpddefault_cleanup_performance_data();
 
-int xpddefault_update_service_performance_data(com::centreon::engine::service* svc);
+int xpddefault_update_service_performance_data(
+    com::centreon::engine::service* svc);
 int xpddefault_update_host_performance_data(com::centreon::engine::host* hst);
 
 int xpddefault_run_service_performance_data_command(
-      nagios_macros* mac,
-      com::centreon::engine::service* svc);
+    nagios_macros* mac,
+    com::centreon::engine::service* svc);
 int xpddefault_run_host_performance_data_command(
-      nagios_macros* mac,
-      com::centreon::engine::host* hst);
+    nagios_macros* mac,
+    com::centreon::engine::host* hst);
 
 int xpddefault_update_service_performance_data_file(
-      nagios_macros* mac,
-      com::centreon::engine::service* svc);
+    nagios_macros* mac,
+    com::centreon::engine::service* svc);
 int xpddefault_update_host_performance_data_file(
-      nagios_macros* mac,
-      com::centreon::engine::host* hst);
+    nagios_macros* mac,
+    com::centreon::engine::host* hst);
 
 void xpddefault_preprocess_file_templates(char* tmpl);
 
@@ -59,8 +60,8 @@ int xpddefault_close_service_perfdata_file();
 int xpddefault_process_host_perfdata_file();
 int xpddefault_process_service_perfdata_file();
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_XPDDEFAULT_HH
+#endif  // !CCE_XPDDEFAULT_HH

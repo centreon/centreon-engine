@@ -102,7 +102,8 @@ TEST_F(GetNextValidTimePrecedenceTest, CalendarDatePrecedence) {
 // Given a timeperiod configured with specific month dates
 // And other overlapping date ranges of lower precedence
 // When get_next_valid_time() is called
-// Then the next valid time is on the specific month dates' timeranges for the overlapping days
+// Then the next valid time is on the specific month dates' timeranges for the
+// overlapping days
 TEST_F(GetNextValidTimePrecedenceTest, SpecificMonthDatePrecedence) {
   specific_month_date_and_lower();
   time_t computed((time_t)-1);
@@ -113,7 +114,8 @@ TEST_F(GetNextValidTimePrecedenceTest, SpecificMonthDatePrecedence) {
 // Given a timeperiod configured with generic month dates
 // And other overlapping date ranges of lower precedence
 // When get_next_valid_time() is called
-// Then the next valid time is on the generic month date' timeranges for the overlapping days
+// Then the next valid time is on the generic month date' timeranges for the
+// overlapping days
 TEST_F(GetNextValidTimePrecedenceTest, GenericMonthDatePrecedence) {
   generic_month_date_and_lower();
   time_t computed((time_t)-1);
@@ -124,7 +126,8 @@ TEST_F(GetNextValidTimePrecedenceTest, GenericMonthDatePrecedence) {
 // Given a timeperiod configured with offset weekdays of specific month
 // And other overlapping date ranges of lower precedence
 // When get_next_valid_time() is called
-// Then the next valid time is on the offset weekdays of specific month' timeranges for the overlapping days
+// Then the next valid time is on the offset weekdays of specific month'
+// timeranges for the overlapping days
 TEST_F(GetNextValidTimePrecedenceTest, OffsetWeekdayOfSpecificMonthPrecedence) {
   offset_weekday_of_specific_month_and_lower();
   time_t computed((time_t)-1);
@@ -135,7 +138,8 @@ TEST_F(GetNextValidTimePrecedenceTest, OffsetWeekdayOfSpecificMonthPrecedence) {
 // Given a timeperiod configured with offset weekdays of generic month
 // And other overlapping date ranges of lower precedence
 // When get_next_valid_time() is called
-// Then the next valid time is on the offset weekdays of generic month' timeranges for the overlapping days
+// Then the next valid time is on the offset weekdays of generic month'
+// timeranges for the overlapping days
 TEST_F(GetNextValidTimePrecedenceTest, OffsetWeekdayOfGenericMonthPrecedence) {
   offset_weekday_of_generic_month_and_lower();
   time_t computed((time_t)-1);

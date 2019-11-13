@@ -18,35 +18,33 @@
 */
 
 #ifndef CCE_CONFIGURATION_TIMERANGE_HH
-#  define CCE_CONFIGURATION_TIMERANGE_HH
+#define CCE_CONFIGURATION_TIMERANGE_HH
 
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace         configuration {
-  class           timerange {
-  public:
-                  timerange(
-                    unsigned long start = 0,
-                    unsigned long end = 0);
-                  timerange(timerange const& right);
-                  ~timerange() throw ();
-    timerange&    operator=(timerange const& right);
-    bool          operator==(timerange const& right) const throw ();
-    bool          operator!=(timerange const& right) const throw ();
-    bool          operator<(timerange const& right) const throw ();
-    unsigned long end() const throw ();
-    void          end(unsigned long value);
-    unsigned long start() const throw ();
-    void          start(unsigned long value);
+namespace configuration {
+class timerange {
+ public:
+  timerange(unsigned long start = 0, unsigned long end = 0);
+  timerange(timerange const& right);
+  ~timerange() throw();
+  timerange& operator=(timerange const& right);
+  bool operator==(timerange const& right) const throw();
+  bool operator!=(timerange const& right) const throw();
+  bool operator<(timerange const& right) const throw();
+  unsigned long end() const throw();
+  void end(unsigned long value);
+  unsigned long start() const throw();
+  void start(unsigned long value);
 
-  private:
-    unsigned long _end;
-    unsigned long _start;
-  };
-}
+ private:
+  unsigned long _end;
+  unsigned long _start;
+};
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_TIMERANGE_HH
+#endif  // !CCE_CONFIGURATION_TIMERANGE_HH

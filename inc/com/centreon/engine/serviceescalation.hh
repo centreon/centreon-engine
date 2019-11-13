@@ -29,7 +29,8 @@ CCE_END()
 
 typedef std::unordered_multimap<
     std::pair<std::string, std::string>,
-    std::shared_ptr<com::centreon::engine::serviceescalation>, pair_hash>
+    std::shared_ptr<com::centreon::engine::serviceescalation>,
+    pair_hash>
     serviceescalation_mmap;
 
 CCE_BEGIN()

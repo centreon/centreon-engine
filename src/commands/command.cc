@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/commands/command.hh"
 #include <atomic>
 #include <memory>
-#include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -116,7 +116,9 @@ void commands::command::set_listener(
  *
  *  @param[in] right The copy class.
  */
-commands::command::command(commands::command const& right) { operator=(right); }
+commands::command::command(commands::command const& right) {
+  operator=(right);
+}
 
 /**
  *  Default copy operatro.

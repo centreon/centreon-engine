@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XPDDEFAULT_H
-#  define CCE_COMPATIBILITY_XPDDEFAULT_H
+#define CCE_COMPATIBILITY_XPDDEFAULT_H
 
-#  include "com/centreon/engine/xpddefault.hh"
-#  include "objects.h"
+#include "com/centreon/engine/xpddefault.hh"
+#include "objects.h"
 
-#endif // !CCE_COMPATIBILITY_XPDDEFAULT_H
+#endif  // !CCE_COMPATIBILITY_XPDDEFAULT_H

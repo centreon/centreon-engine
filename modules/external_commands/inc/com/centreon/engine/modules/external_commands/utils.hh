@@ -18,24 +18,26 @@
 */
 
 #ifndef CCE_MOD_EXTCMD_UTILS_HH
-#  define CCE_MOD_EXTCMD_UTILS_HH
+#define CCE_MOD_EXTCMD_UTILS_HH
 
-#  include <time.h>
+#include <time.h>
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
-int open_command_file();  // creates the external command file as a named pipe (FIFO) and opens it for reading
-int close_command_file(); // closes and deletes the external command file (FIFO)
+int open_command_file();   // creates the external command file as a named pipe
+                           // (FIFO) and opens it for reading
+int close_command_file();  // closes and deletes the external command file
+                           // (FIFO)
 int init_command_file_worker_thread(void);
 int shutdown_command_file_worker_thread(void);
 void cleanup_command_file_worker_thread(void* arg);
 void* command_file_worker_thread(void* arg);
 int submit_external_command(char const* cmd, int* buffer_items);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_MOD_EXTCMD_UTILS_HH
+#endif  // !CCE_MOD_EXTCMD_UTILS_HH

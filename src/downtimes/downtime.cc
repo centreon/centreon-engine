@@ -64,9 +64,9 @@ downtime::downtime(int type,
       _comment_id{0},
       _start_flex_downtime{0},
       _incremented_pending_downtime{false} {
-
   /* don't add triggered downtimes that don't have a valid parent */
-  if (triggered_by > 0 && !downtime_manager::instance().find_downtime(ANY_DOWNTIME, triggered_by))
+  if (triggered_by > 0 &&
+      !downtime_manager::instance().find_downtime(ANY_DOWNTIME, triggered_by))
     throw engine_error()
         << "can not add triggered host downtime without a valid parent";
 

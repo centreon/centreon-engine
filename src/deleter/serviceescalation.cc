@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/serviceescalation.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
-#include "com/centreon/engine/deleter/serviceescalation.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
 
 using namespace com::centreon::engine;
@@ -29,7 +29,7 @@ using namespace com::centreon::engine;
  *
  *  @param[in] ptr The serviceescalation to delete.
  */
-void deleter::serviceescalation(void* ptr) throw () {
+void deleter::serviceescalation(void* ptr) throw() {
   if (!ptr)
     return;
 

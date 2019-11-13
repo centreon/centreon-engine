@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "com/centreon/engine/macros.hh"
+#include "gtest/gtest.h"
 
 TEST(TestMacros, UrlEncode) {
   std::string ret{url_encode("This is a simple line")};
@@ -8,7 +8,8 @@ TEST(TestMacros, UrlEncode) {
 
 TEST(TestMacros, UrlEncodeAccents) {
   std::string ret{url_encode("La leçon du château de l'araignée")};
-  ASSERT_EQ(std::string{ret}, "La%20le%C3%A7on%20du%20ch%C3%A2teau%20de%20l%27araign%C3%A9e");
+  ASSERT_EQ(std::string{ret},
+            "La%20le%C3%A7on%20du%20ch%C3%A2teau%20de%20l%27araign%C3%A9e");
 }
 
 TEST(TestMacros, UrlEncodeSymbols) {

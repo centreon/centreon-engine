@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/retention/applier/utils.hh"
+#include "com/centreon/engine/common.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::retention::applier;
@@ -47,8 +47,8 @@ bool utils::is_command_exist(std::string const& command_line) {
  *  @param[out] state_history The array to fill.
  */
 void utils::set_state_history(
-       std::vector<int> const& values,
-       std::array<int, MAX_STATE_HISTORY_ENTRIES>& state_history) {
+    std::vector<int> const& values,
+    std::array<int, MAX_STATE_HISTORY_ENTRIES>& state_history) {
   size_t end{MAX_STATE_HISTORY_ENTRIES};
   if (end > values.size())
     end = values.size();

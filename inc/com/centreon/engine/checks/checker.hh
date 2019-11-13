@@ -82,7 +82,7 @@ class checker : public commands::command_listener {
   std::queue<check_result> _to_reap;
   std::unordered_map<uint64_t, check_result> _to_reap_partial;
 };
-}
+}  // namespace checks
 
 CCE_END()
 

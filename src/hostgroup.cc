@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/hostgroup.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/hostgroup.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
@@ -50,28 +50,24 @@ hostgroup::hostgroup(uint64_t id,
                      std::string const& notes,
                      std::string const& notes_url,
                      std::string const& action_url)
-  : _id{id},
-    _group_name{name},
-    _alias{alias},
-    _notes{notes},
-    _notes_url{notes_url},
-    _action_url{action_url} {
-
-// Make sure we have the data we need.
+    : _id{id},
+      _group_name{name},
+      _alias{alias},
+      _notes{notes},
+      _notes_url{notes_url},
+      _action_url{action_url} {
+  // Make sure we have the data we need.
   if (name.empty()) {
-    logger(log_config_error, basic)
-      << "Error: Hostgroup name is NULL";
-    throw (engine_error() << "Could not register host group '"
-                          << name << "'");
+    logger(log_config_error, basic) << "Error: Hostgroup name is NULL";
+    throw(engine_error() << "Could not register host group '" << name << "'");
   }
 
   // Check if the host group already exist.
   hostgroup_map::const_iterator found(hostgroup::hostgroups.find(name));
   if (found != hostgroup::hostgroups.end()) {
     logger(log_config_error, basic)
-      << "Error: Hostgroup '" << name << "' has already been defined";
-    throw (engine_error() << "Could not register host group '"
-                          << name << "'");
+        << "Error: Hostgroup '" << name << "' has already been defined";
+    throw(engine_error() << "Could not register host group '" << name << "'");
   }
 }
 
@@ -79,8 +75,7 @@ uint64_t hostgroup::get_id() const {
   return _id;
 }
 
-void hostgroup::set_id(uint64_t id)
-{
+void hostgroup::set_id(uint64_t id) {
   _id = id;
 }
 
@@ -133,15 +128,27 @@ void hostgroup::set_action_url(std::string const& action_url) {
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os,
-  com::centreon::engine::hostgroup const& obj) {
+                         com::centreon::engine::hostgroup const& obj) {
   os << "hostgroup {\n"
-    "  group_name: " << obj.get_group_name() << "\n"
-    "  alias:      " << obj.get_alias() << "\n"
-    "  members:    " << obj.members << "\n"
-    "  notes:      " << obj.get_notes() << "\n"
-    "  notes_url:  " << obj.get_notes_url() << "\n"
-    "  action_url: " << obj.get_action_url() << "\n"
-    "}\n";
+        "  group_name: "
+     << obj.get_group_name()
+     << "\n"
+        "  alias:      "
+     << obj.get_alias()
+     << "\n"
+        "  members:    "
+     << obj.members
+     << "\n"
+        "  notes:      "
+     << obj.get_notes()
+     << "\n"
+        "  notes_url:  "
+     << obj.get_notes_url()
+     << "\n"
+        "  action_url: "
+     << obj.get_action_url()
+     << "\n"
+        "}\n";
   return (os);
 }
 
@@ -150,8 +157,7 @@ void hostgroup::resolve(int& w, int& e) {
   int errors{0};
 
   // Check all group members.
-  for (host_map_unsafe::iterator it{members.begin()},
-       end{members.end()};
+  for (host_map_unsafe::iterator it{members.begin()}, end{members.end()};
        it != end; ++it) {
     host_map::const_iterator it_host{host::hosts.find(it->first)};
     if (it_host == host::hosts.end() || !it_host->second) {
@@ -164,17 +170,12 @@ void hostgroup::resolve(int& w, int& e) {
     // Save a pointer to this hostgroup for faster host/group
     // membership lookups later.
     else {
-      //Update or add of group for name
+      // Update or add of group for name
       if (it_host->second.get() != it->second) {
         // Notify event broker.
         timeval tv = get_broker_timestamp(nullptr);
-        broker_group_member(
-          NEBTYPE_HOSTGROUPMEMBER_ADD,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          it_host->second.get(),
-          this,
-          &tv);
+        broker_group_member(NEBTYPE_HOSTGROUPMEMBER_ADD, NEBFLAG_NONE,
+                            NEBATTR_NONE, it_host->second.get(), this, &tv);
       }
       it_host->second->get_parent_groups().push_back(this);
       // Save host pointer for later.
@@ -192,6 +193,7 @@ void hostgroup::resolve(int& w, int& e) {
 
   if (errors) {
     e += errors;
-    throw engine_error() << "Cannot resolve host group '" << get_group_name() << "'";
+    throw engine_error() << "Cannot resolve host group '" << get_group_name()
+                         << "'";
   }
 }

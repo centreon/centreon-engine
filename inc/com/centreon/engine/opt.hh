@@ -18,62 +18,60 @@
 */
 
 #ifndef CCE_OPT_HH
-#  define CCE_OPT_HH
+#define CCE_OPT_HH
 
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-template<typename T>
-class      opt {
-public:
-           opt() : _is_set(false) {}
-           opt(T const& right) : _data(right), _is_set(false) {}
-           opt(opt const& right)
-    : _data(right._data), _is_set(right._is_set) {}
-           ~opt() throw () {}
+template <typename T>
+class opt {
+ public:
+  opt() : _is_set(false) {}
+  opt(T const& right) : _data(right), _is_set(false) {}
+  opt(opt const& right) : _data(right._data), _is_set(right._is_set) {}
+  ~opt() throw() {}
   T const& operator=(T const& right) {
     set(right);
     return (_data);
   }
-  opt&     operator=(opt const& right) {
+  opt& operator=(opt const& right) {
     _data = right._data;
     _is_set = right._is_set;
     return (*this);
   }
-  bool     operator==(opt const& right) const throw () {
+  bool operator==(opt const& right) const throw() {
     return (_data == right._data);
   }
-  bool     operator!=(opt const& right) const throw () {
+  bool operator!=(opt const& right) const throw() {
     return (!operator==(right));
   }
-  bool     operator<(opt const& right) const throw () {
+  bool operator<(opt const& right) const throw() {
     return (_data < right._data);
   }
-  operator T const& () const throw () { return (_data); }
-  T&       operator*() throw () { return (_data); }
-  T const& operator*() const throw () { return (_data); }
-  T*       operator->() throw () { return (&_data); }
-  T const* operator->() const throw () { return (&_data); }
-  T&       get() throw () { return (_data); }
-  T const& get() const throw () { return (_data); }
-  bool     is_set() const throw () { return (_is_set); }
-  void     reset() throw () { _is_set = false; }
-  void     set(T const& right) {
+  operator T const&() const throw() { return (_data); }
+  T& operator*() throw() { return (_data); }
+  T const& operator*() const throw() { return (_data); }
+  T* operator->() throw() { return (&_data); }
+  T const* operator->() const throw() { return (&_data); }
+  T& get() throw() { return (_data); }
+  T const& get() const throw() { return (_data); }
+  bool is_set() const throw() { return (_is_set); }
+  void reset() throw() { _is_set = false; }
+  void set(T const& right) {
     _data = right;
     _is_set = true;
   }
-  void     set(opt<T> const& right) {
+  void set(opt<T> const& right) {
     _data = right._data;
     _is_set = right._is_set;
   }
 
-private:
-  T        _data;
-  bool     _is_set;
+ private:
+  T _data;
+  bool _is_set;
 };
 
 CCE_END()
 
-#endif // !CCE_OPT_HH
-
+#endif  // !CCE_OPT_HH

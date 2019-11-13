@@ -18,44 +18,43 @@
  */
 
 #ifndef CCE_DOWNTIMES_SERVICE_DOWTIME_HH
-#  define CCE_DOWNTIMES_SERVICE_DOWTIME_HH
+#define CCE_DOWNTIMES_SERVICE_DOWTIME_HH
 
-#  include "com/centreon/engine/downtimes/downtime.hh"
+#include "com/centreon/engine/downtimes/downtime.hh"
 
 CCE_BEGIN()
 
-namespace                           downtimes {
-class                               service_downtime : public downtime {
+namespace downtimes {
+class service_downtime : public downtime {
  public:
-                                    service_downtime(
-                                      std::string const& hostname,
-                                      std::string const& service_desc,
-                                      time_t entry_time,
-                                      std::string const& author,
-                                      std::string const& comment,
-                                      time_t start_time,
-                                      time_t end_time,
-                                      bool fixed,
-                                      uint64_t triggered_by,
-                                      int32_t duration,
-                                      uint64_t downtime_id);
-                                    service_downtime(downtime const& other);
-                                    service_downtime(downtime&& other);
-  virtual                           ~service_downtime();
-  std::string const&                get_service_description() const;
-  virtual bool                      is_stale() const override;
-  virtual void                      schedule() override;
-  virtual int                       unschedule() override;
-  virtual int                       subscribe() override;
-  virtual int                       handle() override;
-  virtual void                      print(std::ostream& os) const override;
-  virtual void                      retention(std::ostream& os) const override;
+  service_downtime(std::string const& hostname,
+                   std::string const& service_desc,
+                   time_t entry_time,
+                   std::string const& author,
+                   std::string const& comment,
+                   time_t start_time,
+                   time_t end_time,
+                   bool fixed,
+                   uint64_t triggered_by,
+                   int32_t duration,
+                   uint64_t downtime_id);
+  service_downtime(downtime const& other);
+  service_downtime(downtime&& other);
+  virtual ~service_downtime();
+  std::string const& get_service_description() const;
+  virtual bool is_stale() const override;
+  virtual void schedule() override;
+  virtual int unschedule() override;
+  virtual int subscribe() override;
+  virtual int handle() override;
+  virtual void print(std::ostream& os) const override;
+  virtual void retention(std::ostream& os) const override;
 
  private:
-  std::string                       _service_description;
+  std::string _service_description;
 };
-}
+}  // namespace downtimes
 
 CCE_END()
 
-#endif // !CCE_DOWNTIMES_SERVICE_DOWTIME_HH
+#endif  // !CCE_DOWNTIMES_SERVICE_DOWTIME_HH

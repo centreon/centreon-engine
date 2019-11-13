@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdint>
+#include "globals.h"
 #include <climits>
 #include <cstddef>
-#include "globals.h"
+#include <cstdint>
 
 // Log.
 char const* log_archive_path("");

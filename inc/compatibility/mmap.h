@@ -18,30 +18,30 @@
 */
 
 #ifndef CCE_COMPATIBILITY_MMAP_H
-#  define CCE_COMPATIBILITY_MMAP_H
+#define CCE_COMPATIBILITY_MMAP_H
 
 /* mmapfile structure - used for reading files via mmap() */
-typedef struct  mmapfile_struct {
-  char*         path;
-  int           mode;
-  int           fd;
+typedef struct mmapfile_struct {
+  char* path;
+  int mode;
+  int fd;
   unsigned long file_size;
   unsigned long current_position;
   unsigned long current_line;
-  void*         mmap_buf;
-}               mmapfile;
+  void* mmap_buf;
+} mmapfile;
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif /* C++ */
+#endif /* C++ */
 
 mmapfile* mmap_fopen(char const* filename);
-int       mmap_fclose(mmapfile* temp_mmapfile);
-char*     mmap_fgets(mmapfile* temp_mmapfile);
-char*     mmap_fgets_multiline(mmapfile* temp_mmapfile);
+int mmap_fclose(mmapfile* temp_mmapfile);
+char* mmap_fgets(mmapfile* temp_mmapfile);
+char* mmap_fgets_multiline(mmapfile* temp_mmapfile);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif /* C++ */
+#endif /* C++ */
 
-#endif // !CCE_COMPATIBILITY_MMAP_H
+#endif  // !CCE_COMPATIBILITY_MMAP_H

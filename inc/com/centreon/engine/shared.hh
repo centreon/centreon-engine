@@ -19,15 +19,13 @@
 */
 
 #ifndef CCE_SHARED_HH
-#  define CCE_SHARED_HH
+#define CCE_SHARED_HH
 
-#  include <string>
-#  include <sys/time.h>
-#  include <sys/types.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <string>
 
-struct uuid {
-
-};
+struct uuid {};
 
 class Uuid {
  public:
@@ -40,41 +38,37 @@ class Uuid {
   std::string to_string() const;
 
  private:
-  uint32_t	_time_low;
-  uint16_t	_time_mid;
-  uint16_t	_time_hi_and_version;
-  uint8_t		_clock_seq_hi_and_reserved;
-  uint8_t		_clock_seq_low;
-  uint8_t		_node[6];
+  uint32_t _time_low;
+  uint16_t _time_mid;
+  uint16_t _time_hi_and_version;
+  uint8_t _clock_seq_hi_and_reserved;
+  uint8_t _clock_seq_low;
+  uint8_t _node[6];
 };
 
-
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 char* my_strtok(char const* buffer, char const* tokens);
 void strip(char* buffer);
-int compare_hashdata(
-      char const* val1a,
-      char const* val1b,
-      char const* val2a,
-      const char* val2b);
-void get_datetime_string(
-       time_t const* raw_time,
-       char* buffer,
-       int buffer_length,
-       int type);
-void get_time_breakdown(
-       unsigned long raw_time,
-       int* days,
-       int* hours,
-       int* minutes,
-       int* seconds);
+int compare_hashdata(char const* val1a,
+                     char const* val1b,
+                     char const* val2a,
+                     const char* val2b);
+void get_datetime_string(time_t const* raw_time,
+                         char* buffer,
+                         int buffer_length,
+                         int type);
+void get_time_breakdown(unsigned long raw_time,
+                        int* days,
+                        int* hours,
+                        int* minutes,
+                        int* seconds);
 char* resize_string(char* str, size_t size);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_SHARED_HH
+#endif  // !CCE_SHARED_HH

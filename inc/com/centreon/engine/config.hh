@@ -19,21 +19,21 @@
 */
 
 #ifndef CCE_CONFIG_HH
-#  define CCE_CONFIG_HH
+#define CCE_CONFIG_HH
 
-#  include "com/centreon/engine/objects.hh"
-#  include "com/centreon/engine/servicegroup.hh"
-#  include "com/centreon/engine/timeperiod.hh"
+#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/servicegroup.hh"
+#include "com/centreon/engine/timeperiod.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 // Detects circular dependencies and paths.
 int pre_flight_circular_check(int* w, int* e);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_CONFIG_HH
+#endif  // !CCE_CONFIG_HH

@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NEBSTRUCTS_H
-#  define CCE_COMPATIBILITY_NEBSTRUCTS_H
+#define CCE_COMPATIBILITY_NEBSTRUCTS_H
 
-#  include "com/centreon/engine/nebstructs.hh"
-#  include "config.h"
-#  include "objects.h"
-#  include "nagios.h"
+#include "com/centreon/engine/nebstructs.hh"
+#include "config.h"
+#include "nagios.h"
+#include "objects.h"
 
-#endif // !CCE_COMPATIBILITY_NEBSTRUCTS_H
+#endif  // !CCE_COMPATIBILITY_NEBSTRUCTS_H

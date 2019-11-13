@@ -18,11 +18,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/flapping.hh"
 #include <iomanip>
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/comment.hh"
-#include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -38,8 +38,7 @@ using namespace com::centreon::engine::logging;
 void enable_flap_detection_routines() {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  logger(dbg_functions, basic)
-    << "enable_flap_detection_routines()";
+  logger(dbg_functions, basic) << "enable_flap_detection_routines()";
 
   /* bail out if we're already set */
   if (config->enable_flap_detection())
@@ -53,31 +52,22 @@ void enable_flap_detection_routines() {
   config->enable_flap_detection(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE, NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, NULL);
 
   /* update program status */
   update_program_status(false);
 
   /* check for flapping */
-  for (host_map::iterator
-         it(com::centreon::engine::host::hosts.begin()),
-         end(com::centreon::engine::host::hosts.end());
-       it != end;
-       ++it)
+  for (host_map::iterator it(com::centreon::engine::host::hosts.begin()),
+       end(com::centreon::engine::host::hosts.end());
+       it != end; ++it)
     it->second->check_for_flapping(false, false, true);
-  for (service_map::iterator
-         it(service::services.begin()),
-         end(service::services.end());
-       it != end;
-       ++it)
+  for (service_map::iterator it(service::services.begin()),
+       end(service::services.end());
+       it != end; ++it)
     it->second->check_for_flapping(false, true);
 }
 
@@ -85,8 +75,7 @@ void enable_flap_detection_routines() {
 void disable_flap_detection_routines() {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  logger(dbg_functions, basic)
-    << "disable_flap_detection_routines()";
+  logger(dbg_functions, basic) << "disable_flap_detection_routines()";
 
   /* bail out if we're already set */
   if (!config->enable_flap_detection())
@@ -100,31 +89,22 @@ void disable_flap_detection_routines() {
   config->enable_flap_detection(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE, NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, NULL);
 
   /* update program status */
   update_program_status(false);
 
   /* handle the details... */
-  for (host_map::iterator
-         it(com::centreon::engine::host::hosts.begin()),
-         end(com::centreon::engine::host::hosts.end());
-       it != end;
-       ++it)
+  for (host_map::iterator it(com::centreon::engine::host::hosts.begin()),
+       end(com::centreon::engine::host::hosts.end());
+       it != end; ++it)
     it->second->handle_flap_detection_disabled();
-  for (service_map::iterator
-         it(service::services.begin()),
-         end(service::services.end());
-       it != end;
-       ++it)
+  for (service_map::iterator it(service::services.begin()),
+       end(service::services.end());
+       it != end; ++it)
     it->second->handle_flap_detection_disabled();
 }
 

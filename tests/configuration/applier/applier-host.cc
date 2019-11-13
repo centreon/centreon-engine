@@ -17,10 +17,10 @@
  *
  */
 
+#include <gtest/gtest.h>
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -66,7 +66,6 @@ class ApplierHost : public ::testing::Test {
     com::centreon::logging::engine::unload();
     clib::unload();
   }
-
 };
 
 // Given host configuration without host_id
@@ -92,8 +91,7 @@ TEST_F(ApplierHost, HostRenamed) {
   ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
   ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
   hst_aply.add_object(hst);
-  host_map const &
-    hm(engine::host::hosts);
+  host_map const& hm(engine::host::hosts);
   ASSERT_EQ(hm.size(), 1u);
   std::shared_ptr<com::centreon::engine::host> h1(hm.begin()->second);
   ASSERT_TRUE(h1->get_name() == "test_host");
@@ -113,8 +111,7 @@ TEST_F(ApplierHost, HostRemoved) {
   ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
   ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
   hst_aply.add_object(hst);
-  host_map const&
-    hm(engine::host::hosts);
+  host_map const& hm(engine::host::hosts);
   ASSERT_EQ(hm.size(), 1u);
   std::shared_ptr<com::centreon::engine::host> h1(hm.begin()->second);
   ASSERT_TRUE(h1->get_name() == "test_host");
@@ -138,7 +135,9 @@ TEST_F(ApplierHost, HostParentChildUnreachable) {
   configuration::host hst_parent;
 
   configuration::command cmd("base_centreon_ping");
-  cmd.parse("command_line", "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w $_HOSTWARNING$ -c $_HOSTCRITICAL$");
+  cmd.parse("command_line",
+            "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w "
+            "$_HOSTWARNING$ -c $_HOSTCRITICAL$");
   cmd_aply.add_object(cmd);
 
   ASSERT_TRUE(hst_child.parse("host_name", "child_host"));

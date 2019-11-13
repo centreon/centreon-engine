@@ -18,49 +18,43 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
-#  define CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
+#define CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
 
-#  include <set>
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#include <set>
+#include <string>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace             configuration {
-  // Forward declarations.
-  class               hostescalation;
-  class               state;
+namespace configuration {
+// Forward declarations.
+class hostescalation;
+class state;
 
-  namespace           applier {
-    class             hostescalation {
-     public:
-      hostescalation();
-      hostescalation(hostescalation const& right) = delete;
-      ~hostescalation() throw();
-      hostescalation& operator=(hostescalation const& right) = delete;
-      void            add_object(
-                        configuration::hostescalation const& obj);
-      void            expand_objects(configuration::state& s);
-      void            modify_object(
-                        configuration::hostescalation const& obj);
-      void            remove_object(
-                        configuration::hostescalation const& obj);
-      void            resolve_object(
-                        configuration::hostescalation const& obj);
+namespace applier {
+class hostescalation {
+ public:
+  hostescalation();
+  hostescalation(hostescalation const& right) = delete;
+  ~hostescalation() throw();
+  hostescalation& operator=(hostescalation const& right) = delete;
+  void add_object(configuration::hostescalation const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::hostescalation const& obj);
+  void remove_object(configuration::hostescalation const& obj);
+  void resolve_object(configuration::hostescalation const& obj);
 
-     private:
-      void            _expand_hosts(
-                        std::set<std::string> const& h,
-                        std::set<std::string> const& hg,
-                        configuration::state const& s,
-                        std::set<std::string>& expanded);
-      void            _inherits_special_vars(
-                        configuration::hostescalation& obj,
-                        configuration::state& s);
-    };
-  }
-}
+ private:
+  void _expand_hosts(std::set<std::string> const& h,
+                     std::set<std::string> const& hg,
+                     configuration::state const& s,
+                     std::set<std::string>& expanded);
+  void _inherits_special_vars(configuration::hostescalation& obj,
+                              configuration::state& s);
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH

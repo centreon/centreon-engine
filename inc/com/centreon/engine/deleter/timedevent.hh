@@ -18,16 +18,16 @@
 */
 
 #ifndef CCE_DELETER_TIMEDEVENT_HH
-#  define CCE_DELETER_TIMEDEVENT_HH
+#define CCE_DELETER_TIMEDEVENT_HH
 
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace deleter {
-  void    timedevent(void* ptr) throw ();
+void timedevent(void* ptr) throw();
 }
 
 CCE_END()
 
-#endif // !CCE_DELETER_TIMEDEVENT_HH
+#endif  // !CCE_DELETER_TIMEDEVENT_HH

@@ -17,12 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdlib>
-#include <unistd.h>
-#include "common.h"
 #include "sighandlers.h"
-#include <com/centreon/engine/objects.hh>
+#include <unistd.h>
 #include <com/centreon/engine/notifier.hh>
+#include <com/centreon/engine/objects.hh>
+#include <cstdlib>
+#include "common.h"
 
 #define HOST_TIMEOUT_OUTPUT "(Host Check Timed Out)\n"
 #define SERVICE_TIMEOUT_OUTPUT "(Service Check Timed Out)\n"
@@ -36,10 +36,7 @@ using namespace com::centreon::engine;
  *  @param[in] size Size of msg.
  *  @param[in] ret  Exit code.
  */
-static void sighandler_helper(
-              char const* msg,
-              unsigned int size,
-              int ret) {
+static void sighandler_helper(char const* msg, unsigned int size, int ret) {
   // Write output.
   ssize_t wb(42);
   while ((wb > 0) && size) {
@@ -54,42 +51,38 @@ static void sighandler_helper(
 }
 
 extern "C" {
-  /**
-   *  Handle timeouts when executing host checks.
-   *
-   *  @param[in] sig Signal number.
-   */
-  void host_check_sighandler(int sig) {
-    (void)sig;
-    sighandler_helper(
-      HOST_TIMEOUT_OUTPUT,
-      sizeof(HOST_TIMEOUT_OUTPUT) - 1,
-      service::state_unknown);
-    return;
-  }
+/**
+ *  Handle timeouts when executing host checks.
+ *
+ *  @param[in] sig Signal number.
+ */
+void host_check_sighandler(int sig) {
+  (void)sig;
+  sighandler_helper(HOST_TIMEOUT_OUTPUT, sizeof(HOST_TIMEOUT_OUTPUT) - 1,
+                    service::state_unknown);
+  return;
+}
 
-  /**
-   *  Handle timeouts when executing commands via my_system_r().
-   *
-   *  @param[in] sig Signal number.
-   */
-  void my_system_sighandler(int sig) {
-    (void)sig;
-    sighandler_helper(NULL, 0, service::state_unknown);
-    return;
-  }
+/**
+ *  Handle timeouts when executing commands via my_system_r().
+ *
+ *  @param[in] sig Signal number.
+ */
+void my_system_sighandler(int sig) {
+  (void)sig;
+  sighandler_helper(NULL, 0, service::state_unknown);
+  return;
+}
 
-  /**
-   *  Handle timeouts when executing service checks.
-   *
-   *  @param[in] sig Signal number.
-   */
-  void service_check_sighandler(int sig) {
-    (void)sig;
-    sighandler_helper(
-      SERVICE_TIMEOUT_OUTPUT,
-      sizeof(SERVICE_TIMEOUT_OUTPUT) - 1,
-      service::state_unknown);
-    return;
-  }
+/**
+ *  Handle timeouts when executing service checks.
+ *
+ *  @param[in] sig Signal number.
+ */
+void service_check_sighandler(int sig) {
+  (void)sig;
+  sighandler_helper(SERVICE_TIMEOUT_OUTPUT, sizeof(SERVICE_TIMEOUT_OUTPUT) - 1,
+                    service::state_unknown);
+  return;
+}
 }

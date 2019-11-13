@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/timerange.hh"
 #include <array>
 #include <iomanip>
 #include "com/centreon/engine/daterange.hh"
@@ -24,30 +25,23 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timeperiod.hh"
-#include "com/centreon/engine/timerange.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
-
-timerange::timerange(uint64_t start, uint64_t end)
-{
+timerange::timerange(uint64_t start, uint64_t end) {
   // Make sure we have the data we need.
   if (start > 86400) {
     logger(log_config_error, basic)
-      << "Error: Start time " << start
-      << " is not valid for timeperiod";
-    throw (engine_error() << "Could not create timerange "
-                          << "start'" << start
-                          << "' end '" << end << "'");
+        << "Error: Start time " << start << " is not valid for timeperiod";
+    throw(engine_error() << "Could not create timerange "
+                         << "start'" << start << "' end '" << end << "'");
   }
   if (end > 86400) {
     logger(log_config_error, basic)
-      << "Error: End time " << end
-      << " is not value for timeperiod";
-    throw (engine_error() << "Could not create timerange "
-                          << "start'" << start
-                          << "' end '" << end << "'");
+        << "Error: End time " << end << " is not value for timeperiod";
+    throw(engine_error() << "Could not create timerange "
+                         << "start'" << start << "' end '" << end << "'");
   }
 
   _range_start = start;
@@ -70,9 +64,9 @@ uint64_t timerange::get_range_end() const {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool timerange::operator==(timerange const& obj) throw () {
-  if (_range_start == obj.get_range_start()
-      && _range_end == obj.get_range_end()) {
+bool timerange::operator==(timerange const& obj) throw() {
+  if (_range_start == obj.get_range_start() &&
+      _range_end == obj.get_range_end()) {
     return true;
   }
   return false;
@@ -86,7 +80,7 @@ bool timerange::operator==(timerange const& obj) throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool timerange::operator!=(timerange const& obj) throw () {
+bool timerange::operator!=(timerange const& obj) throw() {
   return !(*this == obj);
 }
 
@@ -119,7 +113,8 @@ std::ostream& operator<<(std::ostream& os, timerange const& obj) {
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, timerange_list const& obj) {
-  for (timerange_list::const_iterator it(obj.begin()), end(obj.end()); it != end; ++it)
+  for (timerange_list::const_iterator it(obj.begin()), end(obj.end());
+       it != end; ++it)
     os << **it << ((next(it) == obj.end()) ? "" : ", ");
   return os;
 }

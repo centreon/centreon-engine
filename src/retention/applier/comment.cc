@@ -33,8 +33,7 @@ using namespace com::centreon::engine;
 void applier::comment::apply(list_comment const& lst) {
   // Big speedup when reading retention.dat in bulk.
 
-  for (list_comment::const_iterator it(lst.begin()), end(lst.end());
-       it != end;
+  for (list_comment::const_iterator it(lst.begin()), end(lst.end()); it != end;
        ++it) {
     if ((*it)->comment_type() == retention::comment::host)
       _add_host_comment(**it);
@@ -49,26 +48,18 @@ void applier::comment::apply(list_comment const& lst) {
  *  @param[in] obj The comment to add into the host.
  */
 void applier::comment::_add_host_comment(
-       retention::comment const& obj) throw () {
+    retention::comment const& obj) throw() {
   host_map::const_iterator it(host::hosts.find(obj.host_name()));
   if (it == host::hosts.end() || !it->second)
     return;
 
   // add the comment.
-  std::shared_ptr<engine::comment> com{
-    new engine::comment(
+  std::shared_ptr<engine::comment> com{new engine::comment(
       engine::comment::host,
-      static_cast<engine::comment::e_type>(obj.entry_type()),
-      obj.host_name(),
-      "",
-      obj.entry_time(),
-      obj.author(),
-      obj.comment_data(),
-      obj.persistent(),
-      static_cast<engine::comment::src>(obj.source()),
-      obj.expires(),
-      obj.expire_time(),
-      obj.comment_id())};
+      static_cast<engine::comment::e_type>(obj.entry_type()), obj.host_name(),
+      "", obj.entry_time(), obj.author(), obj.comment_data(), obj.persistent(),
+      static_cast<engine::comment::src>(obj.source()), obj.expires(),
+      obj.expire_time(), obj.comment_id())};
 
   engine::comment::comments.insert({com->get_comment_id(), com});
 
@@ -86,41 +77,35 @@ void applier::comment::_add_host_comment(
 
 /**
  *  Add serivce comment.
-*
+ *
  *  @param[in] obj The comment to add into the service.
  */
 void applier::comment::_add_service_comment(
-       retention::comment const& obj) throw () {
+    retention::comment const& obj) throw() {
   if (!is_host_exist(get_host_id(obj.host_name().c_str())))
     return;
 
   service_map::const_iterator it_svc(service::services.find(
-    {obj.host_name().c_str(), obj.service_description().c_str()}));
+      {obj.host_name().c_str(), obj.service_description().c_str()}));
   if (it_svc == service::services.end() || !it_svc->second)
     return;
 
   // add the comment.
-  std::shared_ptr<engine::comment> com{
-    new engine::comment(
+  std::shared_ptr<engine::comment> com{new engine::comment(
       engine::comment::service,
-      static_cast<engine::comment::e_type>(obj.entry_type()),
-      obj.host_name(),
-      obj.service_description(),
-      obj.entry_time(),
-      obj.author(),
-      obj.comment_data(),
-      obj.persistent(),
-      static_cast<engine::comment::src>(obj.source()),
-      obj.expires(),
-      obj.expire_time(),
-      obj.comment_id())};
+      static_cast<engine::comment::e_type>(obj.entry_type()), obj.host_name(),
+      obj.service_description(), obj.entry_time(), obj.author(),
+      obj.comment_data(), obj.persistent(),
+      static_cast<engine::comment::src>(obj.source()), obj.expires(),
+      obj.expire_time(), obj.comment_id())};
 
   engine::comment::comments.insert({com->get_comment_id(), com});
 
   // acknowledgement comments get deleted if they're not persistent
   // and the original problem is no longer acknowledged.
   if (obj.entry_type() == com::centreon::engine::comment::acknowledgment) {
-    if (!it_svc->second->get_problem_has_been_acknowledged() && !obj.persistent())
+    if (!it_svc->second->get_problem_has_been_acknowledged() &&
+        !obj.persistent())
       engine::comment::delete_comment(obj.comment_id());
   }
   // non-persistent comments don't last past restarts UNLESS

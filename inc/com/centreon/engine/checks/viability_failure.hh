@@ -18,46 +18,45 @@
 */
 
 #ifndef CCE_CHECKS_VIABILITY_FAILURE_HH
-#  define CCE_CHECKS_VIABILITY_FAILURE_HH
+#define CCE_CHECKS_VIABILITY_FAILURE_HH
 
-#  include "com/centreon/engine/error.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace              checks {
-  /**
-   *  @class viability_failure viability_failure.hh "com/centreon/engine/checks/viability_failure.hh"
-   *  @brief Exception thrown on check viability failure.
-   *
-   *  If a check cannot be run because of a viability check (last
-   *  execution time, dependencies, ...) this exception is thrown.
-   */
-  class                viability_failure : public error {
-  public:
-                       viability_failure();
-                       viability_failure(
-                         char const* file,
-                         char const* function,
-                         int line);
-                       viability_failure(
-                         viability_failure const& other);
-                       ~viability_failure() throw () override;
-    viability_failure& operator=(viability_failure const& other);
-    template <typename T>
-    viability_failure& operator<<(T const& t) {
-      error::operator<<(t);
-      return (*this);
-    }
-  };
-}
+namespace checks {
+/**
+ *  @class viability_failure viability_failure.hh
+ * "com/centreon/engine/checks/viability_failure.hh"
+ *  @brief Exception thrown on check viability failure.
+ *
+ *  If a check cannot be run because of a viability check (last
+ *  execution time, dependencies, ...) this exception is thrown.
+ */
+class viability_failure : public error {
+ public:
+  viability_failure();
+  viability_failure(char const* file, char const* function, int line);
+  viability_failure(viability_failure const& other);
+  ~viability_failure() throw() override;
+  viability_failure& operator=(viability_failure const& other);
+  template <typename T>
+  viability_failure& operator<<(T const& t) {
+    error::operator<<(t);
+    return (*this);
+  }
+};
+}  // namespace checks
 
 CCE_END()
 
-#  ifdef NDEBUG
-#    define checks_viability_failure() com::centreon::engine::checks::viability_failure()
-#  else
-#    define checks_viability_failure() com::centreon::engine::checks::viability_failure(__FILE__, __func__, __LINE__)
-#   endif // !NDEBUG
+#ifdef NDEBUG
+#define checks_viability_failure() \
+  com::centreon::engine::checks::viability_failure()
+#else
+#define checks_viability_failure() \
+  com::centreon::engine::checks::viability_failure(__FILE__, __func__, __LINE__)
+#endif  // !NDEBUG
 
-#endif // !CCE_CHECKS_VIABILITY_FAILURE_HH
+#endif  // !CCE_CHECKS_VIABILITY_FAILURE_HH

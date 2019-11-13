@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <libgen.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <iostream>
 
 static int const STATUS_OK(0);
 static int const STATUS_WARNING(1);
@@ -29,16 +29,15 @@ static int const STATUS_CRITICAL(2);
 static int const STATUS_UNKNOWN(3);
 
 static void usage(char const* appname) {
-  std::cout << appname
-            << " [-h] [-s status] [-t timeout] [text]"
-            << std::endl;
+  std::cout << appname << " [-h] [-s status] [-t timeout] [text]" << std::endl;
   std::cout << " -h: This help." << std::endl
-            << " -s: The status return at the end of the execution." << std::endl
+            << " -s: The status return at the end of the execution."
+            << std::endl
             << " -t: The plugin timeout." << std::endl;
   exit(STATUS_UNKNOWN);
 }
 
-int main (int argc, char **argv) {
+int main(int argc, char** argv) {
   char* appname(basename(argv[0]));
   int status(-1);
   int timeout(-1);
@@ -47,23 +46,23 @@ int main (int argc, char **argv) {
   int opt;
   while ((opt = getopt(argc, argv, "s:t:l:")) != -1) {
     switch (opt) {
-    case 's':
-      status = atoi(optarg);
-      break;
+      case 's':
+        status = atoi(optarg);
+        break;
 
-    case 't':
-      timeout = atoi(optarg);
-      break;
+      case 't':
+        timeout = atoi(optarg);
+        break;
 
-    case 'l':
-      last_state = atoi(optarg);
-      if (last_state > STATUS_UNKNOWN || last_state < STATUS_OK)
-	last_state = STATUS_UNKNOWN;
-      break;
+      case 'l':
+        last_state = atoi(optarg);
+        if (last_state > STATUS_UNKNOWN || last_state < STATUS_OK)
+          last_state = STATUS_UNKNOWN;
+        break;
 
-    default:
-      usage(appname);
-      break;
+      default:
+        usage(appname);
+        break;
     }
   }
 
@@ -75,13 +74,13 @@ int main (int argc, char **argv) {
     else {
       int randomval(rand() % 100);
       if (randomval < 2)
-	status = STATUS_UNKNOWN;
+        status = STATUS_UNKNOWN;
       else if (randomval < 4)
-	status = STATUS_WARNING;
+        status = STATUS_WARNING;
       else if (randomval < 6)
-	status = STATUS_CRITICAL;
+        status = STATUS_CRITICAL;
       else
-	status = STATUS_OK;
+        status = STATUS_OK;
     }
   }
   if (timeout == -1)
@@ -91,21 +90,21 @@ int main (int argc, char **argv) {
     sleep(timeout);
 
   switch (status) {
-  case STATUS_OK:
-    std::cout << "OK";
-    break;
+    case STATUS_OK:
+      std::cout << "OK";
+      break;
 
-  case STATUS_WARNING:
-    std::cout << "WARNING";
-    break;
+    case STATUS_WARNING:
+      std::cout << "WARNING";
+      break;
 
-  case STATUS_CRITICAL:
-    std::cout << "CRITICAL";
-    break;
+    case STATUS_CRITICAL:
+      std::cout << "CRITICAL";
+      break;
 
-  default:
-    std::cout << "UNKNOWN";
-    break;
+    default:
+      std::cout << "UNKNOWN";
+      break;
   }
 
   std::cout << ": timeout=" << timeout << ", status=" << status;

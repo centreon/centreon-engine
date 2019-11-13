@@ -18,49 +18,45 @@
 */
 
 #ifndef CCE_MODULES_LOADER_HH
-#  define CCE_MODULES_LOADER_HH
+#define CCE_MODULES_LOADER_HH
 
-#  include <list>
-#  include <memory>
-#  include <string>
-#  include "com/centreon/engine/broker/handle.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <list>
+#include <memory>
+#include <string>
+#include "com/centreon/engine/broker/handle.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                  broker {
-  /**
-   *  @class loader loader.hh
-   *  @brief Modules loader.
-   *
-   *  Loader manage all modules.
-   */
-  class                    loader {
-  public:
-    std::shared_ptr<handle>     add_module(
-                             std::string const& filename = "",
-                             std::string const& args = "");
-    void                   del_module(
-                             std::shared_ptr<handle> const& mod);
-    std::list<std::shared_ptr<handle> > const&
-                           get_modules() const;
-    static loader&         instance();
-    static void            load();
-    unsigned int           load_directory(std::string const& dir);
-    static void            unload();
-    void                   unload_modules();
+namespace broker {
+/**
+ *  @class loader loader.hh
+ *  @brief Modules loader.
+ *
+ *  Loader manage all modules.
+ */
+class loader {
+ public:
+  std::shared_ptr<handle> add_module(std::string const& filename = "",
+                                     std::string const& args = "");
+  void del_module(std::shared_ptr<handle> const& mod);
+  std::list<std::shared_ptr<handle> > const& get_modules() const;
+  static loader& instance();
+  static void load();
+  unsigned int load_directory(std::string const& dir);
+  static void unload();
+  void unload_modules();
 
-  private:
-                           loader();
-                           loader(loader const& right);
-    virtual                ~loader() throw ();
-    loader&                operator=(loader const& right);
+ private:
+  loader();
+  loader(loader const& right);
+  virtual ~loader() throw();
+  loader& operator=(loader const& right);
 
-    std::list<std::shared_ptr<handle> >
-                           _modules;
-  };
-}
+  std::list<std::shared_ptr<handle> > _modules;
+};
+}  // namespace broker
 
 CCE_END()
 
-#endif // !CCE_MODULES_LOADER_HH
+#endif  // !CCE_MODULES_LOADER_HH

@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_ERROR_HH
-#  define CCE_ERROR_HH
+#define CCE_ERROR_HH
 
-#  include <exception>
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#include <exception>
+#include <string>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
@@ -34,31 +34,28 @@ CCE_BEGIN()
  *  determine if the error that generated the exception was either fatal
  *  or not.
  */
-class          error : public std::exception {
-public:
-               error() throw ();
-               error(
-                 char const* file,
-                 char const* function,
-                 int line) throw ();
-               error(error const& e) throw ();
-               ~error() throw () override;
-  error&       operator=(error const& e) throw ();
-  error&       operator<<(char c) throw ();
-  error&       operator<<(char const* str) throw ();
-  error&       operator<<(int i) throw ();
-  error&       operator<<(unsigned long u) throw ();
-  error&       operator<<(unsigned int u) throw ();
-  error&       operator<<(long l) throw ();
-  error&       operator<<(long long ll) throw ();
-  error&       operator<<(unsigned long long ull) throw ();
-  error&       operator<<(double d) throw ();
-  error&       operator<<(std::string const& str) throw ();
-  char const*  what() const throw () override;
+class error : public std::exception {
+ public:
+  error() throw();
+  error(char const* file, char const* function, int line) throw();
+  error(error const& e) throw();
+  ~error() throw() override;
+  error& operator=(error const& e) throw();
+  error& operator<<(char c) throw();
+  error& operator<<(char const* str) throw();
+  error& operator<<(int i) throw();
+  error& operator<<(unsigned long u) throw();
+  error& operator<<(unsigned int u) throw();
+  error& operator<<(long l) throw();
+  error& operator<<(long long ll) throw();
+  error& operator<<(unsigned long long ull) throw();
+  error& operator<<(double d) throw();
+  error& operator<<(std::string const& str) throw();
+  char const* what() const throw() override;
 
-private:
-  template     <typename T>
-  void         _insert_with_snprintf(T& t, char const* format);
+ private:
+  template <typename T>
+  void _insert_with_snprintf(T& t, char const* format);
 
   mutable char _buffer[4096];
   unsigned int _current;
@@ -66,10 +63,11 @@ private:
 
 CCE_END()
 
-#  ifdef NDEBUG
-#    define engine_error() com::centreon::engine::error()
-#  else
-#    define engine_error() com::centreon::engine::error(__FILE__, __func__, __LINE__)
-#   endif // !NDEBUG
+#ifdef NDEBUG
+#define engine_error() com::centreon::engine::error()
+#else
+#define engine_error() \
+  com::centreon::engine::error(__FILE__, __func__, __LINE__)
+#endif  // !NDEBUG
 
-#endif // !CCE_ERROR_HH
+#endif  // !CCE_ERROR_HH

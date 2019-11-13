@@ -26,17 +26,18 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<serviceextinfo, type, &serviceextinfo::method>::generic
 
-std::unordered_map<std::string, serviceextinfo::setter_func> const serviceextinfo::_setters{
-  { "host_name",           SETTER(std::string const&, _set_hosts) },
-  { "hostgroup",           SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",      SETTER(std::string const&, _set_hostgroups) },
-  { "service_description", SETTER(std::string const&, _set_service_description) },
-  { "notes",               SETTER(std::string const&, _set_notes) },
-  { "notes_url",           SETTER(std::string const&, _set_notes_url) },
-  { "action_url",          SETTER(std::string const&, _set_action_url) },
-  { "icon_image",          SETTER(std::string const&, _set_icon_image) },
-  { "icon_image_alt",      SETTER(std::string const&, _set_icon_image_alt) }
-};
+std::unordered_map<std::string, serviceextinfo::setter_func> const
+    serviceextinfo::_setters{
+        {"host_name", SETTER(std::string const&, _set_hosts)},
+        {"hostgroup", SETTER(std::string const&, _set_hostgroups)},
+        {"hostgroup_name", SETTER(std::string const&, _set_hostgroups)},
+        {"service_description",
+         SETTER(std::string const&, _set_service_description)},
+        {"notes", SETTER(std::string const&, _set_notes)},
+        {"notes_url", SETTER(std::string const&, _set_notes_url)},
+        {"action_url", SETTER(std::string const&, _set_action_url)},
+        {"icon_image", SETTER(std::string const&, _set_icon_image)},
+        {"icon_image_alt", SETTER(std::string const&, _set_icon_image_alt)}};
 
 /**
  *  Default constructor.
@@ -48,15 +49,14 @@ serviceextinfo::serviceextinfo() : object(object::serviceextinfo) {}
  *
  *  @param[in] right The serviceextinfo to copy.
  */
-serviceextinfo::serviceextinfo(serviceextinfo const& right)
-  : object(right) {
+serviceextinfo::serviceextinfo(serviceextinfo const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-serviceextinfo::~serviceextinfo() throw () {}
+serviceextinfo::~serviceextinfo() throw() {}
 
 /**
  *  Copy constructor.
@@ -87,16 +87,13 @@ serviceextinfo& serviceextinfo::operator=(serviceextinfo const& right) {
  *
  *  @return True if is the same serviceextinfo, otherwise false.
  */
-bool serviceextinfo::operator==(serviceextinfo const& right) const throw () {
-  return (object::operator==(right)
-          && _action_url == right._action_url
-          && _icon_image == right._icon_image
-          && _icon_image_alt == right._icon_image_alt
-          && _hosts == right._hosts
-          && _hostgroups == right._hostgroups
-          && _notes == right._notes
-          && _notes_url == right._notes_url
-          && _service_description == right._service_description);
+bool serviceextinfo::operator==(serviceextinfo const& right) const throw() {
+  return (object::operator==(right) && _action_url == right._action_url &&
+          _icon_image == right._icon_image &&
+          _icon_image_alt == right._icon_image_alt && _hosts == right._hosts &&
+          _hostgroups == right._hostgroups && _notes == right._notes &&
+          _notes_url == right._notes_url &&
+          _service_description == right._service_description);
 }
 
 /**
@@ -106,7 +103,7 @@ bool serviceextinfo::operator==(serviceextinfo const& right) const throw () {
  *
  *  @return True if is not the same serviceextinfo, otherwise false.
  */
-bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
+bool serviceextinfo::operator!=(serviceextinfo const& right) const throw() {
   return !operator==(right);
 }
 
@@ -117,26 +114,27 @@ bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
  */
 void serviceextinfo::check_validity() const {
   if (_service_description.empty())
-    throw (engine_error() << "Service extended information is not "
-           << "attached to a service (property 'service_description')");
+    throw(engine_error()
+          << "Service extended information is not "
+          << "attached to a service (property 'service_description')");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "Service extended information of service '"
-           << _service_description << "' is not attached to any host or"
-           << " host group (properties 'host_name' or 'hostgroup_name'"
-           << ", respectively)");
-  return ;
+    throw(engine_error()
+          << "Service extended information of service '" << _service_description
+          << "' is not attached to any host or"
+          << " host group (properties 'host_name' or 'hostgroup_name'"
+          << ", respectively)");
+  return;
 }
 
 /**
  *  Merge object.
  *
-  *  @param[in] obj The object to merge.
+ *  @param[in] obj The object to merge.
  */
 void serviceextinfo::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error()
-           << "Cannot merge service extended information with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge service extended information with '"
+                         << obj.type() << "'");
   serviceextinfo const& tmpl(static_cast<serviceextinfo const&>(obj));
 
   MRG_DEFAULT(_action_url);
@@ -159,7 +157,7 @@ void serviceextinfo::merge(object const& obj) {
  */
 bool serviceextinfo::parse(char const* key, char const* value) {
   std::unordered_map<std::string, serviceextinfo::setter_func>::const_iterator
-    it{_setters.find(key)};
+      it{_setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -170,7 +168,7 @@ bool serviceextinfo::parse(char const* key, char const* value) {
  *
  *  @return The action_url.
  */
-std::string const& serviceextinfo::action_url() const throw () {
+std::string const& serviceextinfo::action_url() const throw() {
   return _action_url;
 }
 
@@ -179,7 +177,7 @@ std::string const& serviceextinfo::action_url() const throw () {
  *
  *  @return The icon_image.
  */
-std::string const& serviceextinfo::icon_image() const throw () {
+std::string const& serviceextinfo::icon_image() const throw() {
   return _icon_image;
 }
 
@@ -188,7 +186,7 @@ std::string const& serviceextinfo::icon_image() const throw () {
  *
  *  @return The icon_image_alt.
  */
-std::string const& serviceextinfo::icon_image_alt() const throw () {
+std::string const& serviceextinfo::icon_image_alt() const throw() {
   return _icon_image_alt;
 }
 
@@ -197,7 +195,7 @@ std::string const& serviceextinfo::icon_image_alt() const throw () {
  *
  *  @return The hostgroups.
  */
-set_string const& serviceextinfo::hostgroups() const throw () {
+set_string const& serviceextinfo::hostgroups() const throw() {
   return *_hostgroups;
 }
 
@@ -206,7 +204,7 @@ set_string const& serviceextinfo::hostgroups() const throw () {
  *
  *  @return The hosts.
  */
-set_string const& serviceextinfo::hosts() const throw () {
+set_string const& serviceextinfo::hosts() const throw() {
   return *_hosts;
 }
 
@@ -215,7 +213,7 @@ set_string const& serviceextinfo::hosts() const throw () {
  *
  *  @return The notes.
  */
-std::string const& serviceextinfo::notes() const throw () {
+std::string const& serviceextinfo::notes() const throw() {
   return _notes;
 }
 
@@ -224,7 +222,7 @@ std::string const& serviceextinfo::notes() const throw () {
  *
  *  @return The notes_url.
  */
-std::string const& serviceextinfo::notes_url() const throw () {
+std::string const& serviceextinfo::notes_url() const throw() {
   return _notes_url;
 }
 
@@ -233,7 +231,7 @@ std::string const& serviceextinfo::notes_url() const throw () {
  *
  *  @return The service_description.
  */
-std::string const& serviceextinfo::service_description() const throw () {
+std::string const& serviceextinfo::service_description() const throw() {
   return _service_description;
 }
 

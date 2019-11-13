@@ -19,26 +19,26 @@
 */
 
 #ifndef CCE_STATUSDATA_HH
-#  define CCE_STATUSDATA_HH
+#define CCE_STATUSDATA_HH
 
-#  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/service.hh"
+#include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/service.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 // initializes status data at program start
 int initialize_status_data();
 // updates all status data
 int update_all_status_data();
- // cleans up status data at program termination
+// cleans up status data at program termination
 int cleanup_status_data(int delete_status_data);
 // updates program status data
 int update_program_status(int aggregated_dump);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_STATUSDATA_HH
+#endif  // !CCE_STATUSDATA_HH

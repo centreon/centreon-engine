@@ -18,49 +18,45 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_MACROS_HH
-#  define CCE_CONFIGURATION_APPLIER_MACROS_HH
+#define CCE_CONFIGURATION_APPLIER_MACROS_HH
 
-#  include <string>
-#  include "com/centreon/engine/configuration/state.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <string>
+#include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
 class nagios_macros;
 
 CCE_BEGIN()
 
-namespace            configuration {
-  namespace          applier {
-    /**
-     *  @class macros macros.hh
-     *  @brief Simple configuration applier for macros class.
-     *
-     *  Simple configuration applier for macros class.
-     */
-    class            macros {
-    public:
-      void           apply(configuration::state& config);
-      static macros& instance();
-      static void    load();
-      static void    unload();
+namespace configuration {
+namespace applier {
+/**
+ *  @class macros macros.hh
+ *  @brief Simple configuration applier for macros class.
+ *
+ *  Simple configuration applier for macros class.
+ */
+class macros {
+ public:
+  void apply(configuration::state& config);
+  static macros& instance();
+  static void load();
+  static void unload();
 
-    private:
-                     macros();
-                     macros(macros const&);
-                     ~macros() throw ();
-      macros&        operator=(macros const&);
-      void           _set_macro(
-                       unsigned int type,
-                       std::string const& value);
-      void           _set_macros_user(
-                       unsigned int idx,
-                       std::string const& value);
+ private:
+  macros();
+  macros(macros const&);
+  ~macros() throw();
+  macros& operator=(macros const&);
+  void _set_macro(unsigned int type, std::string const& value);
+  void _set_macros_user(unsigned int idx, std::string const& value);
 
-      nagios_macros* _mac;
-    };
-  }
-}
+  nagios_macros* _mac;
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_MACROS_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_MACROS_HH

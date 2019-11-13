@@ -18,34 +18,33 @@
 */
 
 #ifndef CCE_CONFIGURATION_POINT_3D_HH
-#  define CCE_CONFIGURATION_POINT_3D_HH
+#define CCE_CONFIGURATION_POINT_3D_HH
 
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace     configuration {
-  class       point_3d {
-  public:
-              point_3d(double x = 0.0, double y = 0.0, double z = 0.0);
-              point_3d(point_3d const& right);
-              ~point_3d() throw ();
-    point_3d& operator=(point_3d const& right);
-    bool      operator==(point_3d const& right) const throw ();
-    bool      operator!=(point_3d const& right) const throw ();
-    bool      operator<(point_3d const& right) const throw ();
-    double    x() const throw ();
-    double    y() const throw ();
-    double    z() const throw ();
+namespace configuration {
+class point_3d {
+ public:
+  point_3d(double x = 0.0, double y = 0.0, double z = 0.0);
+  point_3d(point_3d const& right);
+  ~point_3d() throw();
+  point_3d& operator=(point_3d const& right);
+  bool operator==(point_3d const& right) const throw();
+  bool operator!=(point_3d const& right) const throw();
+  bool operator<(point_3d const& right) const throw();
+  double x() const throw();
+  double y() const throw();
+  double z() const throw();
 
-  private:
-    double    _x;
-    double    _y;
-    double    _z;
-  };
-}
+ private:
+  double _x;
+  double _y;
+  double _z;
+};
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_POINT_3D_HH
-
+#endif  // !CCE_CONFIGURATION_POINT_3D_HH

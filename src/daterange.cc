@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/daterange.hh"
 #include <array>
 #include <iomanip>
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/daterange.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/timerange.hh"
@@ -56,18 +56,18 @@ daterange::daterange(int type,
                      int ewday,
                      int ewday_offset,
                      int skip_interval)
-  : _type{type},
-    _syear{syear},
-    _smon{smon},
-    _smday{smday},
-    _swday{swday},
-    _swday_offset{swday_offset},
-    _eyear{eyear},
-    _emon{emon},
-    _emday{emday},
-    _ewday{ewday},
-    _ewday_offset{ewday_offset},
-    _skip_interval{skip_interval} {}
+    : _type{type},
+      _syear{syear},
+      _smon{smon},
+      _smday{smday},
+      _swday{swday},
+      _swday_offset{swday_offset},
+      _eyear{eyear},
+      _emon{emon},
+      _emday{emday},
+      _ewday{ewday},
+      _ewday_offset{ewday_offset},
+      _skip_interval{skip_interval} {}
 
 int daterange::get_type() const {
   return _type;
@@ -173,20 +173,14 @@ void daterange::set_skip_interval(int skip_interval) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool daterange::operator==(daterange const& obj) throw () {
-  return _type == obj.get_type()
-      && _syear == obj.get_syear()
-      && _smon == obj.get_smon()
-      && _smday == obj.get_smday()
-      && _swday == obj.get_swday()
-      && _swday_offset == obj.get_swday_offset()
-      && _eyear == obj.get_eyear()
-      && _emon == obj.get_emon()
-      && _emday == obj.get_emday()
-      && _ewday == obj.get_ewday()
-      && _ewday_offset == obj.get_ewday_offset()
-      && _skip_interval == obj.get_skip_interval()
-      && times == obj.times;
+bool daterange::operator==(daterange const& obj) throw() {
+  return _type == obj.get_type() && _syear == obj.get_syear() &&
+         _smon == obj.get_smon() && _smday == obj.get_smday() &&
+         _swday == obj.get_swday() && _swday_offset == obj.get_swday_offset() &&
+         _eyear == obj.get_eyear() && _emon == obj.get_emon() &&
+         _emday == obj.get_emday() && _ewday == obj.get_ewday() &&
+         _ewday_offset == obj.get_ewday_offset() &&
+         _skip_interval == obj.get_skip_interval() && times == obj.times;
 }
 
 /**
@@ -197,7 +191,7 @@ bool daterange::operator==(daterange const& obj) throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool daterange::operator!=(daterange const& obj) throw () {
+bool daterange::operator!=(daterange const& obj) throw() {
   return !(*this == obj);
 }
 
@@ -209,15 +203,14 @@ bool daterange::operator!=(daterange const& obj) throw () {
  *
  *  @return The output stream.
  */
-static std::ostream& _dump_calendar_date(std::ostream& os, daterange const& obj) {
+static std::ostream& _dump_calendar_date(std::ostream& os,
+                                         daterange const& obj) {
   os << std::setfill('0') << std::setw(2) << obj.get_syear() << "-"
      << std::setfill('0') << std::setw(2) << obj.get_smon() + 1 << "-"
      << std::setfill('0') << std::setw(2) << obj.get_smday();
-  if (obj.get_syear() != obj.get_eyear()
-      || obj.get_smon() != obj.get_emon()
-      || obj.get_smday() != obj.get_emday())
-    os << " - "
-       << std::setfill('0') << std::setw(2) << obj.get_eyear() << "-"
+  if (obj.get_syear() != obj.get_eyear() || obj.get_smon() != obj.get_emon() ||
+      obj.get_smday() != obj.get_emday())
+    os << " - " << std::setfill('0') << std::setw(2) << obj.get_eyear() << "-"
        << std::setfill('0') << std::setw(2) << obj.get_emon() + 1 << "-"
        << std::setfill('0') << std::setw(2) << obj.get_emday();
   if (obj.get_skip_interval())
@@ -272,14 +265,17 @@ static std::ostream& _dump_month_day(std::ostream& os, daterange const& obj) {
  *
  *  @return The output stream.
  */
-static std::ostream& _dump_month_week_day(std::ostream& os, daterange const& obj) {
-  os << daterange::get_weekday_name(obj.get_swday()) << " " << obj.get_swday_offset() << " "
+static std::ostream& _dump_month_week_day(std::ostream& os,
+                                          daterange const& obj) {
+  os << daterange::get_weekday_name(obj.get_swday()) << " "
+     << obj.get_swday_offset() << " "
      << daterange::get_month_name(obj.get_smon());
-  if (obj.get_swday() != obj.get_ewday()
-      || obj.get_swday_offset() != obj.get_ewday_offset()
-      || obj.get_smon() != obj.get_emon())
-    os << " - " << daterange::get_weekday_name(obj.get_ewday())
-       << " " << obj.get_ewday_offset() << " " << daterange::get_month_name(obj.get_emon());
+  if (obj.get_swday() != obj.get_ewday() ||
+      obj.get_swday_offset() != obj.get_ewday_offset() ||
+      obj.get_smon() != obj.get_emon())
+    os << " - " << daterange::get_weekday_name(obj.get_ewday()) << " "
+       << obj.get_ewday_offset() << " "
+       << daterange::get_month_name(obj.get_emon());
   if (obj.get_skip_interval())
     os << " / " << obj.get_skip_interval();
   return (os);
@@ -294,9 +290,12 @@ static std::ostream& _dump_month_week_day(std::ostream& os, daterange const& obj
  *  @return The output stream.
  */
 static std::ostream& _dump_week_day(std::ostream& os, daterange const& obj) {
-  os << daterange::get_weekday_name(obj.get_swday()) << " " << obj.get_swday_offset();
-  if (obj.get_swday() != obj.get_ewday() || obj.get_swday_offset() != obj.get_ewday_offset())
-    os << " - " << daterange::get_weekday_name(obj.get_ewday()) << " " << obj.get_ewday_offset();
+  os << daterange::get_weekday_name(obj.get_swday()) << " "
+     << obj.get_swday_offset();
+  if (obj.get_swday() != obj.get_ewday() ||
+      obj.get_swday_offset() != obj.get_ewday_offset())
+    os << " - " << daterange::get_weekday_name(obj.get_ewday()) << " "
+       << obj.get_ewday_offset();
   if (obj.get_skip_interval())
     os << " / " << obj.get_skip_interval();
   return (os);
@@ -313,11 +312,8 @@ static std::ostream& _dump_week_day(std::ostream& os, daterange const& obj) {
 std::ostream& operator<<(std::ostream& os, daterange const& obj) {
   typedef std::ostream& (*func)(std::ostream&, daterange const&);
   static func tab[] = {
-    &_dump_calendar_date,
-    &_dump_month_date,
-    &_dump_month_day,
-    &_dump_month_week_day,
-    &_dump_week_day,
+      &_dump_calendar_date,  &_dump_month_date, &_dump_month_day,
+      &_dump_month_week_day, &_dump_week_day,
   };
 
   if (obj.get_type() < 0 || obj.get_type() >= DATERANGE_TYPES)
@@ -339,19 +335,8 @@ std::ostream& operator<<(std::ostream& os, daterange const& obj) {
 std::string const& daterange::get_month_name(unsigned int index) {
   static std::string const unknown("unknown");
   static std::string const month[] = {
-    "january",
-    "february",
-    "march",
-    "april",
-    "may",
-    "june",
-    "july",
-    "august",
-    "september",
-    "october",
-    "november",
-    "december"
-  };
+      "january", "february", "march",     "april",   "may",      "june",
+      "july",    "august",   "september", "october", "november", "december"};
   if (index >= sizeof(month) / sizeof(*month))
     return (unknown);
   return (month[index]);
@@ -366,15 +351,9 @@ std::string const& daterange::get_month_name(unsigned int index) {
  */
 std::string const& daterange::get_weekday_name(unsigned int index) {
   static std::string const unknown("unknown");
-  static std::string const days[] = {
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday"
-  };
+  static std::string const days[] = {"sunday",    "monday",   "tuesday",
+                                     "wednesday", "thursday", "friday",
+                                     "saturday"};
   if (index >= sizeof(days) / sizeof(*days))
     return (unknown);
   return (days[index]);

@@ -17,10 +17,10 @@
  *
  */
 
+#include <time.h>
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <time.h>
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
@@ -127,8 +127,10 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntime) {
   ASSERT_EQ(id + 2, _host->get_next_notification_id());
 
   std::string out{testing::internal::GetCapturedStdout()};
-  size_t step1{out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMESTART (UP);cmd;")};
-  size_t step2{out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMEEND (UP);cmd;")};
+  size_t step1{
+      out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMESTART (UP);cmd;")};
+  size_t step2{
+      out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMEEND (UP);cmd;")};
   ASSERT_NE(step1, std::string::npos);
   ASSERT_NE(step2, std::string::npos);
   ASSERT_LE(step1, step2);
@@ -139,7 +141,8 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntime) {
 // Then it can throw a downtimestart notification received by the contact
 // When it is no more in downtime, it can throw a downtimeend notification
 // also received by the contact.
-TEST_F(HostDowntimeNotification, SimpleHostDowntimeWithContactNotReceivingNotif) {
+TEST_F(HostDowntimeNotification,
+       SimpleHostDowntimeWithContactNotReceivingNotif) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
    */
@@ -147,8 +150,7 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntimeWithContactNotReceivingNotif)
   _host->set_last_hard_state_change(43000);
   contact_map::iterator it{engine::contact::contacts.find("admin")};
   engine::contact* ctct{it->second.get()};
-  ctct->set_notify_on(notifier::host_notification,
-                      notifier::none);
+  ctct->set_notify_on(notifier::host_notification, notifier::none);
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   for (size_t i = 0; i < tperiod->days.size(); ++i)
@@ -173,8 +175,10 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntimeWithContactNotReceivingNotif)
             OK);
   ASSERT_EQ(id + 2, _host->get_next_notification_id());
   std::string out{testing::internal::GetCapturedStdout()};
-  size_t step1{out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMESTART (UP);cmd;")};
-  size_t step2{out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMEEND (UP);cmd;")};
+  size_t step1{
+      out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMESTART (UP);cmd;")};
+  size_t step2{
+      out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMEEND (UP);cmd;")};
   ASSERT_EQ(step1, std::string::npos);
   ASSERT_EQ(step2, std::string::npos);
 }
@@ -185,9 +189,11 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntimeWithContactNotReceivingNotif)
 //// notification.
 //// When a second flappingstart notification is sent
 //// Then no notification is sent (because already sent).
-//TEST_F(HostDowntimeNotification, SimpleHostDowntimeStartTwoTimes) {
-//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be called.
+// TEST_F(HostDowntimeNotification, SimpleHostDowntimeStartTwoTimes) {
+//  /* We are using a local time() function defined in
+//  tests/timeperiod/utils.cc.
+//   * If we call time(), it is not the glibc time() function that will be
+//   called.
 //   */
 //  set_time(43000);
 //  _host->set_notification_interval(2);
@@ -224,9 +230,11 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntimeWithContactNotReceivingNotif)
 //// Then it is sent.
 //// When a second flappingstop notification is sent
 //// Then nothing is sent.
-//TEST_F(HostDowntimeNotification, SimpleHostDowntimeStopTwoTimes) {
-//  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be called.
+// TEST_F(HostDowntimeNotification, SimpleHostDowntimeStopTwoTimes) {
+//  /* We are using a local time() function defined in
+//  tests/timeperiod/utils.cc.
+//   * If we call time(), it is not the glibc time() function that will be
+//   called.
 //   */
 //  set_time(43000);
 //  _host->set_notification_interval(2);

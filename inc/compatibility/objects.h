@@ -18,25 +18,25 @@
 */
 
 #ifndef CCE_COMPATIBILITY_OBJECTS_H
-#  define CCE_COMPATIBILITY_OBJECTS_H
+#define CCE_COMPATIBILITY_OBJECTS_H
 
-#  include <time.h>
-#  include "com/centreon/engine/commands/command.hh"
-#  include "com/centreon/engine/common.hh"
-#  include "com/centreon/engine/contact.hh"
-#  include "com/centreon/engine/contactgroup.hh"
-#  include "com/centreon/engine/daterange.hh"
-#  include "com/centreon/engine/host.hh"
-#  include "com/centreon/engine/hostdependency.hh"
-#  include "com/centreon/engine/hostescalation.hh"
-#  include "com/centreon/engine/hostgroup.hh"
-#  include "com/centreon/engine/servicegroup.hh"
-#  include "com/centreon/engine/service.hh"
-#  include "com/centreon/engine/servicedependency.hh"
-#  include "com/centreon/engine/serviceescalation.hh"
-#  include "com/centreon/engine/timeperiod.hh"
-#  include "com/centreon/engine/timerange.hh"
-#  include "common.h"
-#  include "config.h"
+#include <time.h>
+#include "com/centreon/engine/commands/command.hh"
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/contact.hh"
+#include "com/centreon/engine/contactgroup.hh"
+#include "com/centreon/engine/daterange.hh"
+#include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/hostdependency.hh"
+#include "com/centreon/engine/hostescalation.hh"
+#include "com/centreon/engine/hostgroup.hh"
+#include "com/centreon/engine/service.hh"
+#include "com/centreon/engine/servicedependency.hh"
+#include "com/centreon/engine/serviceescalation.hh"
+#include "com/centreon/engine/servicegroup.hh"
+#include "com/centreon/engine/timeperiod.hh"
+#include "com/centreon/engine/timerange.hh"
+#include "common.h"
+#include "config.h"
 
-#endif // !CCE_COMPATIBILITY_OBJECTS_H
+#endif  // !CCE_COMPATIBILITY_OBJECTS_H

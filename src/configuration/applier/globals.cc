@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include "com/centreon/engine/configuration/applier/globals.hh"
+#include <cassert>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -36,7 +36,8 @@ void applier::globals::apply(state& config) {
   _set_global(::check_result_path, config.check_result_path());
   _set_global(::debug_file, config.debug_file());
   _set_global(::global_host_event_handler, config.global_host_event_handler());
-  _set_global(::global_service_event_handler, config.global_service_event_handler());
+  _set_global(::global_service_event_handler,
+              config.global_service_event_handler());
   _set_global(::illegal_object_chars, config.illegal_object_chars());
   _set_global(::illegal_output_chars, config.illegal_output_chars());
   _set_global(::log_file, config.log_file());
@@ -100,9 +101,7 @@ void applier::globals::unload() {
 /**
  *  Default constructor.
  */
-applier::globals::globals() {
-
-}
+applier::globals::globals() {}
 
 /**
  *  Destructor.
@@ -131,9 +130,7 @@ applier::globals::~globals() throw() {
   ::use_timezone = NULL;
 }
 
-void applier::globals::_set_global(
-       char*& property,
-       std::string const& value) {
+void applier::globals::_set_global(char*& property, std::string const& value) {
   if (!property || strcmp(property, value.c_str()))
     property = string::dup(value);
 }

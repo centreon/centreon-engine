@@ -18,44 +18,41 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_COMMAND_HH
-#  define CCE_CONFIGURATION_APPLIER_COMMAND_HH
+#define CCE_CONFIGURATION_APPLIER_COMMAND_HH
 
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#include <string>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 // Forward declarations.
 namespace commands {
-  class command;
+class command;
 }
 
-namespace             configuration {
-  // Forward declarations.
-  class               command;
-  class               state;
+namespace configuration {
+// Forward declarations.
+class command;
+class state;
 
-  namespace           applier {
-    class             command {
-     public:
-                      command();
-                      ~command() throw ();
-      void            add_object(configuration::command const& obj);
-      void            expand_objects(configuration::state& s);
-      void            modify_object(
-                        configuration::command const& obj);
-      void            remove_object(
-                        configuration::command const& obj);
-      void            resolve_object(
-                        configuration::command const& obj);
+namespace applier {
+class command {
+ public:
+  command();
+  ~command() throw();
+  void add_object(configuration::command const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::command const& obj);
+  void remove_object(configuration::command const& obj);
+  void resolve_object(configuration::command const& obj);
 
-     private:
-                      command(command const& right);
-      command&        operator=(command const& right);
-    };
-  }
-}
+ private:
+  command(command const& right);
+  command& operator=(command const& right);
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_COMMAND_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_COMMAND_HH

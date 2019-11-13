@@ -22,17 +22,15 @@
 
 using namespace com::centreon::engine::retention;
 
-#define SETTER(type, method) \
-  &object::setter<info, type, &info::method>::generic
+#define SETTER(type, method) &object::setter<info, type, &info::method>::generic
 
 info::setters const info::_setters[] = {
-  { "created",          SETTER(time_t, _set_created) },
-  { "version",          SETTER(std::string const&, _set_unused) },
-  { "update_available", SETTER(std::string const&, _set_unused) },
-  { "update_uid",       SETTER(std::string const&, _set_unused) },
-  { "last_version",     SETTER(std::string const&, _set_unused) },
-  { "new_version",      SETTER(std::string const&, _set_unused) }
-};
+    {"created", SETTER(time_t, _set_created)},
+    {"version", SETTER(std::string const&, _set_unused)},
+    {"update_available", SETTER(std::string const&, _set_unused)},
+    {"update_uid", SETTER(std::string const&, _set_unused)},
+    {"last_version", SETTER(std::string const&, _set_unused)},
+    {"new_version", SETTER(std::string const&, _set_unused)}};
 
 /**
  *  Constructor.
@@ -44,15 +42,14 @@ info::info() : object(object::info), _created(0) {}
  *
  *  @param[in] right The object to copy.
  */
-info::info(info const& right)
- : object(right) {
+info::info(info const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-info::~info() throw () {}
+info::~info() throw() {}
 
 /**
  *  Copy operator.
@@ -76,9 +73,8 @@ info& info::operator=(info const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool info::operator==(info const& right) const throw () {
-  return (object::operator==(right)
-          && _created == right._created);
+bool info::operator==(info const& right) const throw() {
+  return (object::operator==(right) && _created == right._created);
 }
 
 /**
@@ -88,7 +84,7 @@ bool info::operator==(info const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool info::operator!=(info const& right) const throw () {
+bool info::operator!=(info const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -101,9 +97,7 @@ bool info::operator!=(info const& right) const throw () {
  *  @return True on success, otherwise false.
  */
 bool info::set(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
+  for (unsigned int i(0); i < sizeof(_setters) / sizeof(_setters[0]); ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
@@ -114,7 +108,7 @@ bool info::set(char const* key, char const* value) {
  *
  *  @return The created time.
  */
-time_t info::created() const throw () {
+time_t info::created() const throw() {
   return (_created);
 }
 

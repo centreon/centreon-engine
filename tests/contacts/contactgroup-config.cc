@@ -17,8 +17,8 @@
  *
  */
 
-#include <memory>
 #include <gtest/gtest.h>
+#include <memory>
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -45,13 +45,12 @@ class ContactgroupConfig : public ::testing::Test {
     delete config;
     config = NULL;
   }
-
 };
 
 // Given an empty name
 // When a contactgroup is created with it as argument,
 // Then it throws an exception.
-//TEST_F(ContactgroupConfig, NewContactgroupWithNoName) {
+// TEST_F(ContactgroupConfig, NewContactgroupWithNoName) {
 //  configuration::contactgroup ctg("");
 //  ASSERT_THROW(new engine::contactgroup(ctg), std::exception);
 //}
@@ -60,7 +59,7 @@ class ContactgroupConfig : public ::testing::Test {
 // When a contactgroup is created with it as argument,
 // Then a contactgroup is created and the method returns a pointer to it
 // And since alias is empty, it is replaced by the name.
-//TEST_F(ContactgroupConfig, NewContactgroupWithName) {
+// TEST_F(ContactgroupConfig, NewContactgroupWithName) {
 //  configuration::contactgroup ctg("test");
 //  std::auto_ptr<engine::contactgroup> c(new engine::contactgroup(ctg));
 //  ASSERT_EQ(c->get_name(), "test");
@@ -70,7 +69,7 @@ class ContactgroupConfig : public ::testing::Test {
 // Given a non empty name and a non empty alias
 // When a contactgroup is created with them as argument,
 // Then the contactgroup is created with the given name and alias.
-//TEST_F(ContactgroupConfig, NewContactgroupWithNonEmptyAlias) {
+// TEST_F(ContactgroupConfig, NewContactgroupWithNonEmptyAlias) {
 //  configuration::contactgroup ctg("test");
 //  ctg.parse("alias", "alias_test");
 //  std::auto_ptr<engine::contactgroup> c(new engine::contactgroup(ctg));

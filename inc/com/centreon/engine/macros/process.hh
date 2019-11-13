@@ -19,22 +19,21 @@
 */
 
 #ifndef CCE_MACROS_PROCESS_HH
-#  define CCE_MACROS_PROCESS_HH
+#define CCE_MACROS_PROCESS_HH
 
-#  include "com/centreon/engine/macros/defines.hh"
+#include "com/centreon/engine/macros/defines.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
-int process_macros_r(
-      nagios_macros* mac,
-      std::string const& input_buffer,
-      std::string & output_buffer,
-      int options);
+int process_macros_r(nagios_macros* mac,
+                     std::string const& input_buffer,
+                     std::string& output_buffer,
+                     int options);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_MACROS_PROCESS_HH
+#endif  // !CCE_MACROS_PROCESS_HH

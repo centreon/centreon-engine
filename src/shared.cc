@@ -18,23 +18,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/shared.hh"
 #include <random>
-#include "com/centreon/unique_array_ptr.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
+#include "com/centreon/unique_array_ptr.hh"
 
 using namespace com::centreon::engine;
 
 #ifdef HAVE_TZNAME
-#  ifdef CYGWIN
+#ifdef CYGWIN
 extern char* _tzname[2] __declspec(dllimport);
-#  else
+#else
 extern char* tzname[2];
-#  endif // Cygwin
-#endif // HAVE_TZNAME
+#endif  // Cygwin
+#endif  // HAVE_TZNAME
 
 /*
  * This file holds random utility functions shared by cgi's and
@@ -46,8 +46,7 @@ char* my_strtok(char const* buffer, char const* tokens) {
   char* token_position = NULL;
   char* sequence_head = NULL;
   static char* my_strtok_buffer = NULL;
-  static com::centreon::unique_array_ptr<char>
-    original_my_strtok_buffer;
+  static com::centreon::unique_array_ptr<char> original_my_strtok_buffer;
 
   if (buffer != NULL) {
     original_my_strtok_buffer.reset(string::dup(buffer));
@@ -71,7 +70,8 @@ char* my_strtok(char const* buffer, char const* tokens) {
   return sequence_head;
 }
 
-/* strip newline, carriage return, and tab characters from beginning and end of a string */
+/* strip newline, carriage return, and tab characters from beginning and end of
+ * a string */
 void strip(char* buffer) {
   int x, z;
   int len;
@@ -83,12 +83,12 @@ void strip(char* buffer) {
   len = (int)strlen(buffer);
   for (x = len - 1; x >= 0; x--) {
     switch (buffer[x]) {
-    case ' ':
-    case '\n':
-    case '\r':
-    case '\t':
-      buffer[x] = '\x0';
-    continue;
+      case ' ':
+      case '\n':
+      case '\r':
+      case '\t':
+        buffer[x] = '\x0';
+        continue;
     }
     break;
   }
@@ -104,11 +104,11 @@ void strip(char* buffer) {
   /* NOTE: this is very expensive to do, so avoid it whenever possible */
   for (x = 0;; x++) {
     switch (buffer[x]) {
-    case ' ':
-    case '\n':
-    case '\r':
-    case '\t':
-      continue;
+      case ' ':
+      case '\n':
+      case '\r':
+      case '\t':
+        continue;
     }
     break;
   }
@@ -129,14 +129,14 @@ void strip(char* buffer) {
  *************** HASH FUNCTIONS *******************
  **************************************************/
 /* dual hash data comparison */
-int compare_hashdata(
-      char const* val1a,
-      char const* val1b,
-      char const* val2a,
-      char const* val2b) {
+int compare_hashdata(char const* val1a,
+                     char const* val1b,
+                     char const* val2a,
+                     char const* val2b) {
   int result = 0;
 
-  /* NOTE: If hash calculation changes, update the compare_strings() function! */
+  /* NOTE: If hash calculation changes, update the compare_strings() function!
+   */
 
   /* check first name */
   if (val1a == NULL && val2a == NULL)
@@ -167,13 +167,14 @@ int compare_hashdata(
  * given a date/time in time_t format, produce a corresponding
  * date/time string, including timezone
  */
-void get_datetime_string(
-       time_t const* raw_time,
-       char* buffer,
-       int buffer_length,
-       int type) {
-  static char const* weekdays[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-  static char const* months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
+void get_datetime_string(time_t const* raw_time,
+                         char* buffer,
+                         int buffer_length,
+                         int type) {
+  static char const* weekdays[7] = {"Sun", "Mon", "Tue", "Wed",
+                                    "Thu", "Fri", "Sat"};
+  static char const* months[12] = {"Jan", "Feb", "Mar",  "Apr", "May", "Jun",
+                                   "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"};
 
   time_t t(raw_time ? *raw_time : time(NULL));
   tm tm_s;
@@ -197,122 +198,59 @@ void get_datetime_string(
 
   /* ctime() style date/time */
   if (type == LONG_DATE_TIME)
-    snprintf(
-      buffer,
-      buffer_length,
-      "%s %s %d %02d:%02d:%02d %s %d",
-      weekdays[tm_s.tm_wday],
-      months[tm_s.tm_mon],
-      day,
-      hour,
-      minute,
-      second,
-      tzone,
-      year);
+    snprintf(buffer, buffer_length, "%s %s %d %02d:%02d:%02d %s %d",
+             weekdays[tm_s.tm_wday], months[tm_s.tm_mon], day, hour, minute,
+             second, tzone, year);
 
   /* short date/time */
   else if (type == SHORT_DATE_TIME) {
     if (config->date_format() == DATE_FORMAT_EURO)
+      snprintf(buffer, buffer_length, "%02d-%02d-%04d %02d:%02d:%02d", day,
+               month, year, hour, minute, second);
+    else if (config->date_format() == DATE_FORMAT_ISO8601 ||
+             config->date_format() == DATE_FORMAT_STRICT_ISO8601)
       snprintf(
-        buffer,
-        buffer_length,
-        "%02d-%02d-%04d %02d:%02d:%02d",
-        day,
-        month,
-        year,
-        hour,
-        minute,
-        second);
-    else if (config->date_format() == DATE_FORMAT_ISO8601
-             || config->date_format() == DATE_FORMAT_STRICT_ISO8601)
-      snprintf(
-        buffer,
-        buffer_length,
-        "%04d-%02d-%02d%c%02d:%02d:%02d",
-        year,
-        month,
-        day,
-        (config->date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
-        hour,
-        minute,
-        second);
+          buffer, buffer_length, "%04d-%02d-%02d%c%02d:%02d:%02d", year, month,
+          day,
+          (config->date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
+          hour, minute, second);
     else
-      snprintf(
-        buffer,
-        buffer_length,
-        "%02d-%02d-%04d %02d:%02d:%02d",
-        month,
-        day,
-        year,
-        hour,
-        minute,
-        second);
+      snprintf(buffer, buffer_length, "%02d-%02d-%04d %02d:%02d:%02d", month,
+               day, year, hour, minute, second);
   }
 
   /* short date */
   else if (type == SHORT_DATE) {
     if (config->date_format() == DATE_FORMAT_EURO)
-      snprintf(
-        buffer,
-        buffer_length,
-        "%02d-%02d-%04d",
-        day,
-        month,
-        year);
-    else if (config->date_format() == DATE_FORMAT_ISO8601
-             || config->date_format() == DATE_FORMAT_STRICT_ISO8601)
-      snprintf(
-        buffer,
-        buffer_length,
-        "%04d-%02d-%02d",
-        year,
-        month,
-        day);
+      snprintf(buffer, buffer_length, "%02d-%02d-%04d", day, month, year);
+    else if (config->date_format() == DATE_FORMAT_ISO8601 ||
+             config->date_format() == DATE_FORMAT_STRICT_ISO8601)
+      snprintf(buffer, buffer_length, "%04d-%02d-%02d", year, month, day);
     else
-      snprintf(
-        buffer,
-        buffer_length,
-        "%02d-%02d-%04d",
-        month,
-        day,
-        year);
+      snprintf(buffer, buffer_length, "%02d-%02d-%04d", month, day, year);
   }
 
   /* expiration date/time for HTTP headers */
   else if (type == HTTP_DATE_TIME)
-    snprintf(
-      buffer,
-      buffer_length,
-      "%s, %02d %s %d %02d:%02d:%02d GMT",
-      weekdays[tm_s.tm_wday],
-      day,
-      months[tm_s.tm_mon],
-      year,
-      hour,
-      minute,
-      second);
+    snprintf(buffer, buffer_length, "%s, %02d %s %d %02d:%02d:%02d GMT",
+             weekdays[tm_s.tm_wday], day, months[tm_s.tm_mon], year, hour,
+             minute, second);
 
   /* short time */
   else
-    snprintf(
-      buffer,
-      buffer_length,
-      "%02d:%02d:%02d",
-      hour,
-      minute,
-      second);
+    snprintf(buffer, buffer_length, "%02d:%02d:%02d", hour, minute, second);
 
   buffer[buffer_length - 1] = '\x0';
   return;
 }
 
-/* get days, hours, minutes, and seconds from a raw time_t format or total seconds */
-void get_time_breakdown(
-       unsigned long raw_time,
-       int* days,
-       int* hours,
-       int* minutes,
-       int* seconds) {
+/* get days, hours, minutes, and seconds from a raw time_t format or total
+ * seconds */
+void get_time_breakdown(unsigned long raw_time,
+                        int* days,
+                        int* hours,
+                        int* minutes,
+                        int* seconds) {
   unsigned long temp_time;
   int temp_days;
   int temp_hours;
@@ -356,7 +294,6 @@ Uuid::Uuid() {
   std::uniform_int_distribution<uint16_t> dist16(0, UINT16_MAX);
   std::uniform_int_distribution<uint8_t> dist8(0, UINT8_MAX);
 
-
   _time_low = dist32(rd);
   _time_mid = dist16(rd);
   _time_hi_and_version = dist16(rd);
@@ -389,10 +326,11 @@ Uuid const& Uuid::operator=(Uuid const& uuid) {
   return *this;
 }
 
-#define DIFF_RETURN(a, b, field)	do {  \
-	if ((a).field != (b).field)		        \
-		return false;	                      \
-} while (0)
+#define DIFF_RETURN(a, b, field) \
+  do {                           \
+    if ((a).field != (b).field)  \
+      return false;              \
+  } while (0)
 
 bool Uuid::operator==(Uuid const& uuid) const {
   int res;
@@ -417,8 +355,8 @@ std::string Uuid::to_string() const {
 
   c = snprintf(&uuid[0], 37, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
                _time_low, _time_mid, _time_hi_and_version,
-               _clock_seq_hi_and_reserved, _clock_seq_low, _node[0],
-               _node[1], _node[2], _node[3], _node[4], _node[5]);
+               _clock_seq_hi_and_reserved, _clock_seq_low, _node[0], _node[1],
+               _node[2], _node[3], _node[4], _node[5]);
 
   if (c < 0)
     return std::string();

@@ -72,14 +72,14 @@ class raw : public command, public process_listener {
   raw& operator=(raw const& right);
   command* clone() const override;
   uint64_t run(std::string const& process_cmd,
-                    nagios_macros& macros,
-                    uint32_t timeout) override;
+               nagios_macros& macros,
+               uint32_t timeout) override;
   void run(std::string const& process_cmd,
            nagios_macros& macros,
            uint32_t timeout,
            result& res) override;
 };
-}
+}  // namespace commands
 
 CCE_END()
 

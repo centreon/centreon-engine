@@ -18,18 +18,18 @@
 */
 
 #ifndef CCE_COMPATIBILITY_EMBEDDED_PERL_H
-#  define CCE_COMPATIBILITY_EMBEDDED_PERL_H
+#define CCE_COMPATIBILITY_EMBEDDED_PERL_H
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 int deinit_embedded_perl();
 int init_embedded_perl(void const* param);
 int file_uses_embedded_perl(void const* param);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_COMPATIBILITY_EMBEDDED_PERL_H
+#endif  // !CCE_COMPATIBILITY_EMBEDDED_PERL_H

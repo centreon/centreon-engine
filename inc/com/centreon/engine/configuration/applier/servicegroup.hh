@@ -18,47 +18,44 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
-#  define CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
+#define CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
 
-#  include <map>
-#  include "com/centreon/engine/configuration/servicegroup.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <map>
+#include "com/centreon/engine/configuration/servicegroup.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                  configuration {
-  // Forward declarations.
-  class                    state;
+namespace configuration {
+// Forward declarations.
+class state;
 
-  namespace                applier {
-    class                  servicegroup {
-     public:
-                           servicegroup();
-                           servicegroup(servicegroup const& right);
-                           ~servicegroup() throw ();
-      servicegroup&        operator=(servicegroup const& right);
-      void                 add_object(
-                             configuration::servicegroup const& obj);
-      void                 expand_objects(configuration::state& s);
-      void                 modify_object(
-                             configuration::servicegroup const& obj);
-      void                 remove_object(
-                             configuration::servicegroup const& obj);
-      void                 resolve_object(
-                             configuration::servicegroup const& obj);
+namespace applier {
+class servicegroup {
+ public:
+  servicegroup();
+  servicegroup(servicegroup const& right);
+  ~servicegroup() throw();
+  servicegroup& operator=(servicegroup const& right);
+  void add_object(configuration::servicegroup const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::servicegroup const& obj);
+  void remove_object(configuration::servicegroup const& obj);
+  void resolve_object(configuration::servicegroup const& obj);
 
-     private:
-      typedef std::map<configuration::servicegroup::key_type, configuration::servicegroup> resolved_set;
+ private:
+  typedef std::map<configuration::servicegroup::key_type,
+                   configuration::servicegroup>
+      resolved_set;
 
-      void                 _resolve_members(
-                             configuration::servicegroup const& obj,
-                             configuration::state const& s);
+  void _resolve_members(configuration::servicegroup const& obj,
+                        configuration::state const& s);
 
-      resolved_set         _resolved;
-    };
-  }
-}
+  resolved_set _resolved;
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH

@@ -50,7 +50,7 @@ class broker : public com::centreon::logging::backend {
   void open() override;
   void reopen() override;
 };
-}
+}  // namespace logging
 
 CCE_END()
 

@@ -41,11 +41,10 @@ int received_passive_checks(0);
  */
 int service_check_callback(int type, void* arg) {
   (void)type;
-  nebstruct_service_check_data*
-    scd(static_cast<nebstruct_service_check_data*>(arg));
-  if (scd
-      && (scd->type == NEBTYPE_SERVICECHECK_PROCESSED)
-      && (scd->check_type == 1)) {
+  nebstruct_service_check_data* scd(
+      static_cast<nebstruct_service_check_data*>(arg));
+  if (scd && (scd->type == NEBTYPE_SERVICECHECK_PROCESSED) &&
+      (scd->check_type == 1)) {
     ++received_passive_checks;
     if (received_passive_checks == expected_passive_checks)
       exit(0);
@@ -54,38 +53,35 @@ int service_check_callback(int type, void* arg) {
 }
 
 extern "C" {
-  /**
-   *  Module entry point.
-   *
-   *  @param[in] flags   Unused.
-   *  @param[in] args    This should be the number of expected passive
-   *                     service checks.
-   *  @param[in] handle  Module handle.
-   *
-   *  @return 0.
-   */
-  int nebmodule_init(int flags, char const* args, void* handle) {
-    (void)flags;
-    expected_passive_checks = strtol(args, NULL, 0);
-    neb_register_callback(
-      NEBCALLBACK_SERVICE_CHECK_DATA,
-      handle,
-      0,
-      &service_check_callback);
-    return (0);
-  }
+/**
+ *  Module entry point.
+ *
+ *  @param[in] flags   Unused.
+ *  @param[in] args    This should be the number of expected passive
+ *                     service checks.
+ *  @param[in] handle  Module handle.
+ *
+ *  @return 0.
+ */
+int nebmodule_init(int flags, char const* args, void* handle) {
+  (void)flags;
+  expected_passive_checks = strtol(args, NULL, 0);
+  neb_register_callback(NEBCALLBACK_SERVICE_CHECK_DATA, handle, 0,
+                        &service_check_callback);
+  return (0);
+}
 
-  /**
-   *  Module exit point.
-   *
-   *  @param[in] flags   Unused.
-   *  @param[in] reason  Unused.
-   *
-   *  @return 0.
-   */
-  int nebmodule_deinit(int flags, int reason) {
-    (void)flags;
-    (void)reason;
-    return (0);
-  }
+/**
+ *  Module exit point.
+ *
+ *  @param[in] flags   Unused.
+ *  @param[in] reason  Unused.
+ *
+ *  @return 0.
+ */
+int nebmodule_deinit(int flags, int reason) {
+  (void)flags;
+  (void)reason;
+  return (0);
+}
 }

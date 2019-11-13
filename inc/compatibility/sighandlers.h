@@ -18,18 +18,18 @@
 */
 
 #ifndef CCE_COMPATIBILITY_SIGHANDLERS_H
-#  define CCE_COMPATIBILITY_SIGHANDLERS_H
+#define CCE_COMPATIBILITY_SIGHANDLERS_H
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 void host_check_sighandler(int sig);
 void my_system_sighandler(int sig);
 void service_check_sighandler(int sig);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_COMPATIBILITY_SIGHANDLERS_H
+#endif  // !CCE_COMPATIBILITY_SIGHANDLERS_H

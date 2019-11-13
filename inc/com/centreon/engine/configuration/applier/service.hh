@@ -18,45 +18,39 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICE_HH
-#  define CCE_CONFIGURATION_APPLIER_SERVICE_HH
+#define CCE_CONFIGURATION_APPLIER_SERVICE_HH
 
-#  include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace             configuration {
-  // Forward declarations.
-  class               service;
-  class               state;
+namespace configuration {
+// Forward declarations.
+class service;
+class state;
 
-  namespace           applier {
-    class             service {
-     public:
-                      service();
-                      service(service const& right);
-                      ~service();
-      service&        operator=(service const& right);
-      void            add_object(
-                        configuration::service const& obj);
-      void            expand_objects(configuration::state& s);
-      void            modify_object(
-                        configuration::service const& obj);
-      void            remove_object(
-                        configuration::service const& obj);
-      void            resolve_object(
-                        configuration::service const& obj);
+namespace applier {
+class service {
+ public:
+  service();
+  service(service const& right);
+  ~service();
+  service& operator=(service const& right);
+  void add_object(configuration::service const& obj);
+  void expand_objects(configuration::state& s);
+  void modify_object(configuration::service const& obj);
+  void remove_object(configuration::service const& obj);
+  void resolve_object(configuration::service const& obj);
 
-     private:
-      void            _expand_service_memberships(
-                        configuration::service& obj,
-                        configuration::state& s);
-      void            _inherits_special_vars(
-                        configuration::service& obj,
-                        configuration::state const& s);
-    };
-  }
-}
+ private:
+  void _expand_service_memberships(configuration::service& obj,
+                                   configuration::state& s);
+  void _inherits_special_vars(configuration::service& obj,
+                              configuration::state const& s);
+};
+}  // namespace applier
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_APPLIER_SERVICE_HH
+#endif  // !CCE_CONFIGURATION_APPLIER_SERVICE_HH

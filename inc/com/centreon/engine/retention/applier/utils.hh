@@ -18,26 +18,26 @@
 */
 
 #ifndef CCE_RETENTION_APPLIER_UTILS_HH
-#  define CCE_RETENTION_APPLIER_UTILS_HH
+#define CCE_RETENTION_APPLIER_UTILS_HH
 
-#  include <array>
-#  include <string>
-#  include <vector>
-#  include "com/centreon/engine/namespace.hh"
+#include <array>
+#include <string>
+#include <vector>
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace     retention {
-  namespace   applier {
-    namespace utils {
-      bool    is_command_exist(std::string const& command_line);
-      void    set_state_history(
-                std::vector<int> const& values,
-                std::array<int, MAX_STATE_HISTORY_ENTRIES>& state_history);
-    }
-  }
-}
+namespace retention {
+namespace applier {
+namespace utils {
+bool is_command_exist(std::string const& command_line);
+void set_state_history(
+    std::vector<int> const& values,
+    std::array<int, MAX_STATE_HISTORY_ENTRIES>& state_history);
+}  // namespace utils
+}  // namespace applier
+}  // namespace retention
 
 CCE_END()
 
-#endif // !CCE_RETENTION_APPLIER_UTILS_HH
+#endif  // !CCE_RETENTION_APPLIER_UTILS_HH

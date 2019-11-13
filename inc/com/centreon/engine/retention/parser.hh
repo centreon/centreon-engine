@@ -18,35 +18,35 @@
 */
 
 #ifndef CCE_RETENTION_PARSER_HH
-#  define CCE_RETENTION_PARSER_HH
+#define CCE_RETENTION_PARSER_HH
 
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/object.hh"
+#include <string>
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/retention/object.hh"
 
 CCE_BEGIN()
 
-namespace        retention {
-  class          state;
+namespace retention {
+class state;
 
-  class          parser {
-  public:
-                 parser();
-                 ~parser() throw ();
-    void         parse(std::string const& path, state& retention);
+class parser {
+ public:
+  parser();
+  ~parser() throw();
+  void parse(std::string const& path, state& retention);
 
-  private:
-    typedef void (parser::*store)(state&, object_ptr obj);
+ private:
+  typedef void (parser::*store)(state&, object_ptr obj);
 
-    template<typename T, typename T2, T& (state::*ptr)() throw ()>
-    void         _store_into_list(state& retention, object_ptr obj);
-    template<typename T, T& (state::*ptr)() throw ()>
-    void         _store_object(state& retention, object_ptr obj);
+  template <typename T, typename T2, T& (state::*ptr)() throw()>
+  void _store_into_list(state& retention, object_ptr obj);
+  template <typename T, T& (state::*ptr)() throw()>
+  void _store_object(state& retention, object_ptr obj);
 
-    static store _store[];
-  };
-}
+  static store _store[];
+};
+}  // namespace retention
 
 CCE_END()
 
-#endif // !CCE_RETENTION_PARSER_HH
+#endif  // !CCE_RETENTION_PARSER_HH

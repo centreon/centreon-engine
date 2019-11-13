@@ -18,44 +18,44 @@
 */
 
 #ifndef CCE_RETENTION_INFO_HH
-#  define CCE_RETENTION_INFO_HH
+#define CCE_RETENTION_INFO_HH
 
-#  include <ctime>
-#  include <string>
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/object.hh"
+#include <ctime>
+#include <string>
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/retention/object.hh"
 
 CCE_BEGIN()
 
-namespace                retention {
-  class                  info : public object {
-  public:
-                         info();
-                         info(info const& right);
-                         ~info() throw () override;
-    info&                operator=(info const& right);
-    bool                 operator==(info const& right) const throw ();
-    bool                 operator!=(info const& right) const throw ();
-    bool                 set(char const* key, char const* value) override;
+namespace retention {
+class info : public object {
+ public:
+  info();
+  info(info const& right);
+  ~info() throw() override;
+  info& operator=(info const& right);
+  bool operator==(info const& right) const throw();
+  bool operator!=(info const& right) const throw();
+  bool set(char const* key, char const* value) override;
 
-    time_t               created() const throw ();
+  time_t created() const throw();
 
-  private:
-    struct               setters {
-      char const*        name;
-      bool               (*func)(info&, char const*);
-    };
-
-    bool                 _set_created(time_t value);
-    bool                 _set_unused(std::string const& value);
-
-    time_t               _created;
-    static setters const _setters[];
+ private:
+  struct setters {
+    char const* name;
+    bool (*func)(info&, char const*);
   };
 
-  typedef std::shared_ptr<info> info_ptr;
-}
+  bool _set_created(time_t value);
+  bool _set_unused(std::string const& value);
+
+  time_t _created;
+  static setters const _setters[];
+};
+
+typedef std::shared_ptr<info> info_ptr;
+}  // namespace retention
 
 CCE_END()
 
-#endif // !CCE_RETENTION_INFO_HH
+#endif  // !CCE_RETENTION_INFO_HH

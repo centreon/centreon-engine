@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_SRETENTION_H
-#  define CCE_COMPATIBILITY_SRETENTION_H
+#define CCE_COMPATIBILITY_SRETENTION_H
 
-#  include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/sretention.hh"
 
-#endif // !CCE_COMPATIBILITY_SRETENTION_H
+#endif  // !CCE_COMPATIBILITY_SRETENTION_H

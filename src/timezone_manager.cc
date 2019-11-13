@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/timezone_manager.hh"
 #include <cstdlib>
 #include <ctime>
-#include "com/centreon/engine/timezone_manager.hh"
 
 using namespace com::centreon::engine;
 
@@ -91,7 +91,7 @@ timezone_manager::timezone_manager() {
  *  @param[in] other  Object to copy.
  */
 timezone_manager::timezone_manager(timezone_manager const& other)
-  : _tz{other._tz} {}
+    : _tz{other._tz} {}
 
 /**
  *  Destructor.
@@ -105,8 +105,7 @@ timezone_manager::~timezone_manager() {}
  *
  *  @return This object.
  */
-timezone_manager& timezone_manager::operator=(
-                                      timezone_manager const& other) {
+timezone_manager& timezone_manager::operator=(timezone_manager const& other) {
   if (this != &other)
     _tz = other._tz;
   return *this;
@@ -117,14 +116,12 @@ timezone_manager& timezone_manager::operator=(
  *
  *  @param[out] info  Timezone information.
  */
-void timezone_manager::_backup_timezone(
-                         timezone_manager::tz_info* info) {
+void timezone_manager::_backup_timezone(timezone_manager::tz_info* info) {
   char* old_tz(getenv("TZ"));
   if (old_tz) {
     info->is_set = true;
     info->tz_name = old_tz;
-  }
-  else
+  } else
     info->is_set = false;
 }
 

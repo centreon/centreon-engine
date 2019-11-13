@@ -28,10 +28,7 @@ using namespace com::centreon::engine::configuration;
  *  @param[in] end   The end time.
  */
 timerange::timerange(unsigned long start, unsigned long end)
-  : _end(end),
-    _start(start) {
-
-}
+    : _end(end), _start(start) {}
 
 /**
  *  Copy constructor.
@@ -45,9 +42,7 @@ timerange::timerange(timerange const& right) {
 /**
  *  Destructor.
  */
-timerange::~timerange() throw () {
-
-}
+timerange::~timerange() throw() {}
 
 /**
  *  Copy constructor.
@@ -71,7 +66,7 @@ timerange& timerange::operator=(timerange const& right) {
  *
  *  @return True if the object are the same, otherwise false.
  */
-bool timerange::operator==(timerange const& right) const throw () {
+bool timerange::operator==(timerange const& right) const throw() {
   return (_start == right._start && _end == right._end);
 }
 
@@ -82,7 +77,7 @@ bool timerange::operator==(timerange const& right) const throw () {
  *
  *  @return True if the object are not the same, otherwise false.
  */
-bool timerange::operator!=(timerange const& right) const throw () {
+bool timerange::operator!=(timerange const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -93,7 +88,7 @@ bool timerange::operator!=(timerange const& right) const throw () {
  *
  *  @return True if this object is less than right.
  */
-bool timerange::operator<(timerange const& right) const throw () {
+bool timerange::operator<(timerange const& right) const throw() {
   if (_start != right._start)
     return (_start < right._start);
   return (_end < right._end);
@@ -104,7 +99,7 @@ bool timerange::operator<(timerange const& right) const throw () {
  *
  *  @return The end time.
  */
-unsigned long timerange::end() const throw () {
+unsigned long timerange::end() const throw() {
   return (_end);
 }
 
@@ -122,7 +117,7 @@ void timerange::end(unsigned long value) {
  *
  *  @return The start time.
  */
-unsigned long timerange::start() const throw () {
+unsigned long timerange::start() const throw() {
   return (_start);
 }
 

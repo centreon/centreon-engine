@@ -17,25 +17,24 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/retention/parser.hh"
 #include <array>
 #include <iostream>
 #include <fstream>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine::retention;
 
 parser::store parser::_store[] = {
-  &parser::_store_into_list<list_comment, comment, &state::comments>,
-  &parser::_store_into_list<list_contact, contact, &state::contacts>,
-  &parser::_store_into_list<list_downtime, downtime, &state::downtimes>,
-  &parser::_store_into_list<list_host, host, &state::hosts>,
-  &parser::_store_object<info, &state::informations>,
-  &parser::_store_object<program, &state::globals>,
-  &parser::_store_into_list<list_service, service, &state::services>
-};
+    &parser::_store_into_list<list_comment, comment, &state::comments>,
+    &parser::_store_into_list<list_contact, contact, &state::contacts>,
+    &parser::_store_into_list<list_downtime, downtime, &state::downtimes>,
+    &parser::_store_into_list<list_host, host, &state::hosts>,
+    &parser::_store_object<info, &state::informations>,
+    &parser::_store_object<program, &state::globals>,
+    &parser::_store_into_list<list_service, service, &state::services>};
 
 /**
  *  Default constructor.
@@ -45,7 +44,7 @@ parser::parser() {}
 /**
  *  Destructor.
  */
-parser::~parser() throw () {}
+parser::~parser() throw() {}
 
 /**
  *  Parse configuration file.
@@ -55,8 +54,9 @@ parser::~parser() throw () {}
 void parser::parse(std::string const& path, state& retention) {
   std::ifstream stream(path.c_str(), std::ios::binary);
   if (!stream.is_open())
-    throw (engine_error() << "Parsing of retention file failed: "
-           "Can't open file '" << path << "'");
+    throw(engine_error() << "Parsing of retention file failed: "
+                            "Can't open file '"
+                         << path << "'");
 
   std::shared_ptr<object> obj;
   std::string input;
@@ -67,16 +67,14 @@ void parser::parse(std::string const& path, state& retention) {
       if (pos == std::string::npos)
         continue;
       obj = object::create(input.substr(0, pos));
-    }
-    else if (input != "}") {
+    } else if (input != "}") {
       char const* key;
       char const* value;
       if (string::split(input, &key, &value, '='))
         if (strcmp(key, "notification_0") == 0)
           std::cout << "COOL\n";
         obj->set(key, value);
-    }
-    else {
+    } else {
       (this->*_store[obj->type()])(retention, obj);
       obj.reset();
     }
@@ -89,7 +87,7 @@ void parser::parse(std::string const& path, state& retention) {
  *  @param[in] retention The state to fill.
  *  @param[in] obj       The object to store.
  */
-template<typename T, typename T2, T& (state::*ptr)() throw ()>
+template <typename T, typename T2, T& (state::*ptr)() throw()>
 void parser::_store_into_list(state& retention, object_ptr obj) {
   (retention.*ptr)().push_back(std::static_pointer_cast<T2>(obj));
 }
@@ -100,7 +98,7 @@ void parser::_store_into_list(state& retention, object_ptr obj) {
  *  @param[in] retention The state to fill.
  *  @param[in] obj       The object to store.
  */
-template<typename T, T& (state::*ptr)() throw ()>
+template <typename T, T& (state::*ptr)() throw()>
 void parser::_store_object(state& retention, object_ptr obj) {
   (retention.*ptr)() = *std::static_pointer_cast<T>(obj);
 }

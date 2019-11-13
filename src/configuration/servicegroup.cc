@@ -26,17 +26,17 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<servicegroup, type, &servicegroup::method>::generic
 
-std::unordered_map<std::string, servicegroup::setter_func> const servicegroup::_setters{
-  { "servicegroup_id",      SETTER(unsigned int, _set_servicegroup_id) },
-  { "servicegroup_name",    SETTER(std::string const&, _set_servicegroup_name) },
-  { "alias",                SETTER(std::string const&, _set_alias) },
-  { "members",              SETTER(std::string const&, _set_members) },
-  { "servicegroup_members", SETTER(std::string const&, _set_servicegroup_members) },
-  { "notes",                SETTER(std::string const&, _set_notes) },
-  { "notes_url",            SETTER(std::string const&, _set_notes_url) },
-  { "action_url",           SETTER(std::string const&, _set_action_url) }
-};
-
+std::unordered_map<std::string,
+                   servicegroup::setter_func> const servicegroup::_setters{
+    {"servicegroup_id", SETTER(unsigned int, _set_servicegroup_id)},
+    {"servicegroup_name", SETTER(std::string const&, _set_servicegroup_name)},
+    {"alias", SETTER(std::string const&, _set_alias)},
+    {"members", SETTER(std::string const&, _set_members)},
+    {"servicegroup_members",
+     SETTER(std::string const&, _set_servicegroup_members)},
+    {"notes", SETTER(std::string const&, _set_notes)},
+    {"notes_url", SETTER(std::string const&, _set_notes_url)},
+    {"action_url", SETTER(std::string const&, _set_action_url)}};
 
 /**
  *  Constructor.
@@ -44,24 +44,23 @@ std::unordered_map<std::string, servicegroup::setter_func> const servicegroup::_
  *  @param[in] key The object key.
  */
 servicegroup::servicegroup(key_type const& key)
-  : object(object::servicegroup),
-    _servicegroup_id(0),
-    _servicegroup_name(key) {}
+    : object(object::servicegroup),
+      _servicegroup_id(0),
+      _servicegroup_name(key) {}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right The servicegroup to copy.
  */
-servicegroup::servicegroup(servicegroup const& right)
-  : object(right) {
+servicegroup::servicegroup(servicegroup const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-servicegroup::~servicegroup() throw () {}
+servicegroup::~servicegroup() throw() {}
 
 /**
  *  Copy constructor.
@@ -92,16 +91,13 @@ servicegroup& servicegroup::operator=(servicegroup const& right) {
  *
  *  @return True if is the same servicegroup, otherwise false.
  */
-bool servicegroup::operator==(servicegroup const& right) const throw () {
-  return (object::operator==(right)
-          && _action_url == right._action_url
-          && _alias == right._alias
-          && _members == right._members
-          && _notes == right._notes
-          && _notes_url == right._notes_url
-          && _servicegroup_id == right._servicegroup_id
-          && _servicegroup_members == right._servicegroup_members
-          && _servicegroup_name == right._servicegroup_name);
+bool servicegroup::operator==(servicegroup const& right) const throw() {
+  return (object::operator==(right) && _action_url == right._action_url &&
+          _alias == right._alias && _members == right._members &&
+          _notes == right._notes && _notes_url == right._notes_url &&
+          _servicegroup_id == right._servicegroup_id &&
+          _servicegroup_members == right._servicegroup_members &&
+          _servicegroup_name == right._servicegroup_name);
 }
 
 /**
@@ -111,7 +107,7 @@ bool servicegroup::operator==(servicegroup const& right) const throw () {
  *
  *  @return True if is not the same servicegroup, otherwise false.
  */
-bool servicegroup::operator!=(servicegroup const& right) const throw () {
+bool servicegroup::operator!=(servicegroup const& right) const throw() {
   return !operator==(right);
 }
 
@@ -122,7 +118,7 @@ bool servicegroup::operator!=(servicegroup const& right) const throw () {
  *
  *  @return True if this object is less than right.
  */
-bool servicegroup::operator<(servicegroup const& right) const throw () {
+bool servicegroup::operator<(servicegroup const& right) const throw() {
   // servicegroup_name has to be first in this operator.
   // The configuration diff mechanism relies on this.
   if (_servicegroup_name != right._servicegroup_name)
@@ -147,9 +143,9 @@ bool servicegroup::operator<(servicegroup const& right) const throw () {
  */
 void servicegroup::check_validity() const {
   if (_servicegroup_name.empty())
-    throw (engine_error() << "Service group has no name "
-           "(property 'servicegroup_name')");
-  return ;
+    throw(engine_error() << "Service group has no name "
+                            "(property 'servicegroup_name')");
+  return;
 }
 
 /**
@@ -157,7 +153,7 @@ void servicegroup::check_validity() const {
  *
  *  @return The service group name.
  */
-servicegroup::key_type const& servicegroup::key() const throw () {
+servicegroup::key_type const& servicegroup::key() const throw() {
   return _servicegroup_name;
 }
 
@@ -168,8 +164,8 @@ servicegroup::key_type const& servicegroup::key() const throw () {
  */
 void servicegroup::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "Cannot merge service group with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge service group with '" << obj.type()
+                         << "'");
   servicegroup const& tmpl(static_cast<servicegroup const&>(obj));
 
   MRG_DEFAULT(_action_url);
@@ -190,8 +186,8 @@ void servicegroup::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool servicegroup::parse(char const* key, char const* value) {
-  std::unordered_map<std::string, servicegroup::setter_func>::const_iterator
-    it{_setters.find(key)};
+  std::unordered_map<std::string, servicegroup::setter_func>::const_iterator it{
+      _setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -202,7 +198,7 @@ bool servicegroup::parse(char const* key, char const* value) {
  *
  *  @return The action_url.
  */
-std::string const& servicegroup::action_url() const throw () {
+std::string const& servicegroup::action_url() const throw() {
   return _action_url;
 }
 
@@ -211,7 +207,7 @@ std::string const& servicegroup::action_url() const throw () {
  *
  *  @return The alias.
  */
-std::string const& servicegroup::alias() const throw () {
+std::string const& servicegroup::alias() const throw() {
   return _alias;
 }
 
@@ -220,7 +216,7 @@ std::string const& servicegroup::alias() const throw () {
  *
  *  @return The members.
  */
-set_pair_string& servicegroup::members() throw () {
+set_pair_string& servicegroup::members() throw() {
   return *_members;
 }
 
@@ -229,7 +225,7 @@ set_pair_string& servicegroup::members() throw () {
  *
  *  @return The members.
  */
-set_pair_string const& servicegroup::members() const throw () {
+set_pair_string const& servicegroup::members() const throw() {
   return *_members;
 }
 
@@ -238,7 +234,7 @@ set_pair_string const& servicegroup::members() const throw () {
  *
  *  @return The notes.
  */
-std::string const& servicegroup::notes() const throw () {
+std::string const& servicegroup::notes() const throw() {
   return _notes;
 }
 
@@ -247,7 +243,7 @@ std::string const& servicegroup::notes() const throw () {
  *
  *  @return The notes_url.
  */
-std::string const& servicegroup::notes_url() const throw () {
+std::string const& servicegroup::notes_url() const throw() {
   return _notes_url;
 }
 
@@ -265,7 +261,7 @@ unsigned int servicegroup::servicegroup_id() const throw() {
  *
  *  @return The servicegroup_members.
  */
-set_string& servicegroup::servicegroup_members() throw () {
+set_string& servicegroup::servicegroup_members() throw() {
   return *_servicegroup_members;
 }
 
@@ -274,7 +270,7 @@ set_string& servicegroup::servicegroup_members() throw () {
  *
  *  @return The servicegroup_members.
  */
-set_string const& servicegroup::servicegroup_members() const throw () {
+set_string const& servicegroup::servicegroup_members() const throw() {
   return *_servicegroup_members;
 }
 
@@ -283,7 +279,7 @@ set_string const& servicegroup::servicegroup_members() const throw () {
  *
  *  @return The servicegroup_name.
  */
-std::string const& servicegroup::servicegroup_name() const throw () {
+std::string const& servicegroup::servicegroup_name() const throw() {
   return _servicegroup_name;
 }
 

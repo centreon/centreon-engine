@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XCDDEFAULT_H
-#  define CCE_COMPATIBILITY_XCDDEFAULT_H
+#define CCE_COMPATIBILITY_XCDDEFAULT_H
 
-#  include "com/centreon/engine/xcddefault.hh"
+#include "com/centreon/engine/xcddefault.hh"
 
-#endif // !CCE_COMPATIBILITY_XCDDEFAULT_H
+#endif  // !CCE_COMPATIBILITY_XCDDEFAULT_H

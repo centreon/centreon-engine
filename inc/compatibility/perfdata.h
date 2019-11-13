@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_PERFDATA_H
-#  define CCE_COMPATIBILITY_PERFDATA_H
+#define CCE_COMPATIBILITY_PERFDATA_H
 
-#  include "com/centreon/engine/perfdata.hh"
-#  include "objects.h"
+#include "com/centreon/engine/perfdata.hh"
+#include "objects.h"
 
-#endif // !CCE_COMPATIBILITY_PERFDATA_H
+#endif  // !CCE_COMPATIBILITY_PERFDATA_H

@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/servicedependency.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/servicedependency.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -289,20 +289,18 @@ void servicedependency::resolve(int& w, int& e) {
 
   // Find the dependent service.
   service_map::const_iterator found{service::services.find(
-    {get_dependent_hostname(), get_dependent_service_description()})};
+      {get_dependent_hostname(), get_dependent_service_description()})};
 
   if (found == service::services.end() || !found->second) {
     logger(log_verification_error, basic)
-      << "Error: Dependent service '"
-      << get_dependent_service_description() << "' on host '"
-      << get_dependent_hostname()
-      << "' specified in service dependency for service '"
-      << get_service_description() << "' on host '"
-      << get_hostname() << "' is not defined anywhere!";
+        << "Error: Dependent service '" << get_dependent_service_description()
+        << "' on host '" << get_dependent_hostname()
+        << "' specified in service dependency for service '"
+        << get_service_description() << "' on host '" << get_hostname()
+        << "' is not defined anywhere!";
     errors++;
     dependent_service_ptr = nullptr;
-  }
-  else
+  } else
     dependent_service_ptr = found->second.get();
 
   // Save pointer for later.
@@ -311,43 +309,40 @@ void servicedependency::resolve(int& w, int& e) {
   // Find the service we're depending on.
   if (found == service::services.end() || !found->second) {
     logger(log_verification_error, basic)
-      << "Error: Service '" << get_service_description() << "' on host '"
-      << get_hostname()
-      << "' specified in service dependency for service '"
-      << get_dependent_service_description() << "' on host '"
-      << get_dependent_hostname() << "' is not defined anywhere!";
+        << "Error: Service '" << get_service_description() << "' on host '"
+        << get_hostname() << "' specified in service dependency for service '"
+        << get_dependent_service_description() << "' on host '"
+        << get_dependent_hostname() << "' is not defined anywhere!";
     errors++;
     master_service_ptr = nullptr;
-  }
-  else
+  } else
     // Save pointer for later.
     master_service_ptr = found->second.get();
 
   // Make sure they're not the same service.
-  if (dependent_service_ptr == master_service_ptr && dependent_service_ptr != nullptr) {
+  if (dependent_service_ptr == master_service_ptr &&
+      dependent_service_ptr != nullptr) {
     logger(log_verification_error, basic)
-      << "Error: Service dependency definition for service '"
-      << get_dependent_service_description() << "' on host '"
-      << get_dependent_hostname()
-      << "' is circular (it depends on itself)!";
+        << "Error: Service dependency definition for service '"
+        << get_dependent_service_description() << "' on host '"
+        << get_dependent_hostname() << "' is circular (it depends on itself)!";
     errors++;
   }
 
   // Find the timeperiod.
   if (!get_dependency_period().empty()) {
-    timeperiod_map::const_iterator
-      it{timeperiod::timeperiods.find(get_dependency_period())};
+    timeperiod_map::const_iterator it{
+        timeperiod::timeperiods.find(get_dependency_period())};
 
     if (it == timeperiod::timeperiods.end() || !it->second) {
       logger(log_verification_error, basic)
-        << "Error: Dependency period '" << get_dependency_period()
-        << "' specified in service dependency for service '"
-        << get_dependent_service_description() << "' on host '"
-        << get_dependent_hostname() << "' is not defined anywhere!";
+          << "Error: Dependency period '" << get_dependency_period()
+          << "' specified in service dependency for service '"
+          << get_dependent_service_description() << "' on host '"
+          << get_dependent_hostname() << "' is not defined anywhere!";
       errors++;
       dependency_period_ptr = nullptr;
-    }
-    else
+    } else
       // Save the timeperiod pointer for later.
       dependency_period_ptr = it->second.get();
   }
@@ -416,4 +411,3 @@ servicedependency_mmap::iterator servicedependency::servicedependencies_find(
   }
   return (p.first == p.second) ? servicedependencies.end() : p.first;
 }
-

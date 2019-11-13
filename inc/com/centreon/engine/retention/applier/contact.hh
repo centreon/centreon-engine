@@ -18,39 +18,34 @@
 */
 
 #ifndef CCE_RETENTION_APPLIER_CONTACT_HH
-#  define CCE_RETENTION_APPLIER_CONTACT_HH
+#define CCE_RETENTION_APPLIER_CONTACT_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/contact.hh"
+#include "com/centreon/engine/namespace.hh"
+#include "com/centreon/engine/retention/contact.hh"
 
 CCE_BEGIN()
 // Forward declaration.
 class contact;
 
-
 // Forward declaration.
 namespace configuration {
-  class   state;
+class state;
 }
 
-namespace   retention {
-  namespace applier {
-    class   contact {
-    public:
-      void  apply(
-              configuration::state const& config,
-              list_contact const& lst);
+namespace retention {
+namespace applier {
+class contact {
+ public:
+  void apply(configuration::state const& config, list_contact const& lst);
 
-    private:
-      void  _update(
-              configuration::state const& config,
-              retention::contact const& state,
-              com::centreon::engine::contact* obj);
-
-    };
-  }
-}
+ private:
+  void _update(configuration::state const& config,
+               retention::contact const& state,
+               com::centreon::engine::contact* obj);
+};
+}  // namespace applier
+}  // namespace retention
 
 CCE_END()
 
-#endif // !CCE_RETENTION_APPLIER_CONTACT_HH
+#endif  // !CCE_RETENTION_APPLIER_CONTACT_HH

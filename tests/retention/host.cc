@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctime>
-#include <gtest/gtest.h>
 #include "com/centreon/engine/retention/host.hh"
+#include <gtest/gtest.h>
+#include <ctime>
 #include "com/centreon/engine/error.hh"
 //#include "test/unittest.hh"
 

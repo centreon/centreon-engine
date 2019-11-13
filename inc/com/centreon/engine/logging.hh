@@ -19,38 +19,38 @@
 */
 
 #ifndef CCE_LOGGING_HH
-#  define CCE_LOGGING_HH
+#define CCE_LOGGING_HH
 
-#  include <time.h>
-#  include "com/centreon/engine/namespace.hh"
+#include <time.h>
+#include "com/centreon/engine/namespace.hh"
 
 // State Logging Types
-#  define INITIAL_STATES             1
+#define INITIAL_STATES 1
 
-#  define NSLOG_HOST_UP              1024
-#  define NSLOG_HOST_DOWN            2048
-#  define NSLOG_HOST_UNREACHABLE     4096
+#define NSLOG_HOST_UP 1024
+#define NSLOG_HOST_DOWN 2048
+#define NSLOG_HOST_UNREACHABLE 4096
 
-#  define NSLOG_SERVICE_OK           8192
-#  define NSLOG_SERVICE_UNKNOWN      16384
-#  define NSLOG_SERVICE_WARNING      32768
-#  define NSLOG_SERVICE_CRITICAL     65536
+#define NSLOG_SERVICE_OK 8192
+#define NSLOG_SERVICE_UNKNOWN 16384
+#define NSLOG_SERVICE_WARNING 32768
+#define NSLOG_SERVICE_CRITICAL 65536
 
 CCE_BEGIN()
-  class host;
-  class service;
+class host;
+class service;
 CCE_END()
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 void log_host_state(unsigned int type, com::centreon::engine::host* hst);
 // logs initial/current service states
 void log_service_state(unsigned int type, com::centreon::engine::service* svc);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_LOGGING_HH
+#endif  // !CCE_LOGGING_HH

@@ -21,18 +21,18 @@
 */
 
 #ifndef CCE_COMPATIBILITY_CIRCULAR_BUFFER_HH
-#  define CCE_COMPATIBILITY_CIRCULAR_BUFFER_HH
+#define CCE_COMPATIBILITY_CIRCULAR_BUFFER_HH
 
-#  include <pthread.h>
+#include <pthread.h>
 
-typedef struct    circular_buffer_struct {
-  void**          buffer;
-  int             tail;
-  int             head;
-  int             items;
-  int             high;
-  unsigned long   overflow;
+typedef struct circular_buffer_struct {
+  void** buffer;
+  int tail;
+  int head;
+  int items;
+  int high;
+  unsigned long overflow;
   pthread_mutex_t buffer_lock;
-}                 circular_buffer;
+} circular_buffer;
 
-#endif // !CCE_COMPATIBILITY_CIRCULAR_BUFFER_HH
+#endif  // !CCE_COMPATIBILITY_CIRCULAR_BUFFER_HH

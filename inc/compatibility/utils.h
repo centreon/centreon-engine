@@ -20,18 +20,18 @@
 */
 
 #ifndef CCE_COMPATIBILITY_UTILS_H
-#  define CCE_COMPATIBILITY_UTILS_H
+#define CCE_COMPATIBILITY_UTILS_H
 
-#  include "com/centreon/engine/utils.hh"
+#include "com/centreon/engine/utils.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 time_t get_next_log_rotation_time(void);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_COMPATIBILITY_UTILS_H
+#endif  // !CCE_COMPATIBILITY_UTILS_H

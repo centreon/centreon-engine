@@ -18,55 +18,52 @@
 */
 
 #ifndef CCE_CONFIGURATION_CONNECTOR_HH
-#  define CCE_CONFIGURATION_CONNECTOR_HH
+#define CCE_CONFIGURATION_CONNECTOR_HH
 
-#  include <memory>
-#  include <set>
-#  include <string>
-#  include "com/centreon/engine/commands/connector.hh"
-#  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/namespace.hh"
+#include <memory>
+#include <set>
+#include <string>
+#include "com/centreon/engine/commands/connector.hh"
+#include "com/centreon/engine/configuration/object.hh"
+#include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                  configuration {
-  class                    connector : public object {
-   public:
-    typedef std::string    key_type;
+namespace configuration {
+class connector : public object {
+ public:
+  typedef std::string key_type;
 
-                           connector(key_type const& key = "");
-                           connector(connector const& right);
-                           ~connector() throw () override;
-    connector&             operator=(connector const& right);
-    bool                   operator==(
-                             connector const& right) const throw ();
-    bool                   operator!=(
-                             connector const& right) const throw ();
-    bool                   operator<(
-                             connector const& right) const throw ();
-    void                   check_validity() const override;
-    key_type const&        key() const throw ();
-    void                   merge(object const& obj) override;
-    bool                   parse(char const* key, char const* value) override;
+  connector(key_type const& key = "");
+  connector(connector const& right);
+  ~connector() throw() override;
+  connector& operator=(connector const& right);
+  bool operator==(connector const& right) const throw();
+  bool operator!=(connector const& right) const throw();
+  bool operator<(connector const& right) const throw();
+  void check_validity() const override;
+  key_type const& key() const throw();
+  void merge(object const& obj) override;
+  bool parse(char const* key, char const* value) override;
 
-    std::string const&     connector_line() const throw ();
-    std::string const&     connector_name() const throw ();
+  std::string const& connector_line() const throw();
+  std::string const& connector_name() const throw();
 
-   private:
-    typedef bool (*setter_func)(connector&, char const*);
+ private:
+  typedef bool (*setter_func)(connector&, char const*);
 
-    bool                   _set_connector_line(std::string const& value);
-    bool                   _set_connector_name(std::string const& value);
+  bool _set_connector_line(std::string const& value);
+  bool _set_connector_name(std::string const& value);
 
-    std::string            _connector_line;
-    std::string            _connector_name;
-    static std::unordered_map<std::string, setter_func> const _setters;
-  };
+  std::string _connector_line;
+  std::string _connector_name;
+  static std::unordered_map<std::string, setter_func> const _setters;
+};
 
-  typedef std::shared_ptr<connector> connector_ptr;
-  typedef std::set<connector>        set_connector;
-}
+typedef std::shared_ptr<connector> connector_ptr;
+typedef std::set<connector> set_connector;
+}  // namespace configuration
 
 CCE_END()
 
-#endif // !CCE_CONFIGURATION_CONNECTOR_HH
+#endif  // !CCE_CONFIGURATION_CONNECTOR_HH

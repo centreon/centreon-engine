@@ -24,4 +24,3 @@
 time_t get_next_log_rotation_time() {
   return (0);
 }
-

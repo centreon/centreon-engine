@@ -19,8 +19,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XSDDEFAULT_H
-#  define CCE_COMPATIBILITY_XSDDEFAULT_H
+#define CCE_COMPATIBILITY_XSDDEFAULT_H
 
-#  include "com/centreon/engine/xsddefault.hh"
+#include "com/centreon/engine/xsddefault.hh"
 
-#endif // !CCE_COMPATIBILITY_XSDDEFAULT_H
+#endif  // !CCE_COMPATIBILITY_XSDDEFAULT_H

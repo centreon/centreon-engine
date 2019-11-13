@@ -17,12 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/servicegroup.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/servicegroup.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -124,13 +124,25 @@ void servicegroup::set_action_url(std::string const& action_url) {
  */
 std::ostream& operator<<(std::ostream& os, servicegroup const& obj) {
   os << "servicegroup {\n"
-    "  group_name: " << obj.get_group_name() << "\n"
-    "  alias:      " << obj.get_alias() << "\n"
-    "  members:    " << obj.members << "\n"
-    "  notes:      " << obj.get_notes() << "\n"
-    "  notes_url:  " << obj.get_notes_url() << "\n"
-    "  action_url: " << obj.get_action_url() << "\n"
-    "}\n";
+        "  group_name: "
+     << obj.get_group_name()
+     << "\n"
+        "  alias:      "
+     << obj.get_alias()
+     << "\n"
+        "  members:    "
+     << obj.members
+     << "\n"
+        "  notes:      "
+     << obj.get_notes()
+     << "\n"
+        "  notes_url:  "
+     << obj.get_notes_url()
+     << "\n"
+        "  action_url: "
+     << obj.get_action_url()
+     << "\n"
+        "}\n";
   return os;
 }
 
@@ -141,9 +153,8 @@ std::ostream& operator<<(std::ostream& os, servicegroup const& obj) {
  *
  *  @return True if the servicegroup is found, otherwise false.
  */
-bool engine::is_servicegroup_exist(std::string const& name) throw () {
-  servicegroup_map::const_iterator
-    it{servicegroup::servicegroups.find(name)};
+bool engine::is_servicegroup_exist(std::string const& name) throw() {
+  servicegroup_map::const_iterator it{servicegroup::servicegroups.find(name)};
   return it != servicegroup::servicegroups.end();
 }
 
@@ -152,8 +163,7 @@ void servicegroup::resolve(int& w, int& e) {
   int errors{0};
 
   // Check all group members.
-  for (service_map_unsafe::iterator it(members.begin()),
-       end(members.end());
+  for (service_map_unsafe::iterator it(members.begin()), end(members.end());
        it != end; ++it) {
     service_map::const_iterator found(service::services.find(it->first));
 
@@ -167,17 +177,12 @@ void servicegroup::resolve(int& w, int& e) {
     // Save a pointer to this servicegroup for faster service/group
     // membership lookups later.
     else {
-      //Update or add of group for name
+      // Update or add of group for name
       if (found->second.get() != it->second) {
         // Notify event broker.
         timeval tv = get_broker_timestamp(NULL);
-        broker_group_member(
-          NEBTYPE_SERVICEGROUPMEMBER_ADD,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          found->second.get(),
-          this,
-          &tv);
+        broker_group_member(NEBTYPE_SERVICEGROUPMEMBER_ADD, NEBFLAG_NONE,
+                            NEBATTR_NONE, found->second.get(), this, &tv);
       }
       found->second->get_parent_groups().push_back(this);
       // Save service pointer for later.
@@ -188,8 +193,8 @@ void servicegroup::resolve(int& w, int& e) {
   // Check for illegal characters in servicegroup name.
   if (contains_illegal_object_chars(_group_name.c_str())) {
     logger(log_verification_error, basic)
-      << "Error: The name of servicegroup '" << _group_name
-      << "' contains one or more illegal characters.";
+        << "Error: The name of servicegroup '" << _group_name
+        << "' contains one or more illegal characters.";
     errors++;
   }
 

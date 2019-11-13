@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_SHARED_H
-#  define CCE_COMPATIBILITY_SHARED_H
+#define CCE_COMPATIBILITY_SHARED_H
 
-#  include "com/centreon/engine/shared.hh"
-#  include "mmap.h"
+#include "com/centreon/engine/shared.hh"
+#include "mmap.h"
 
-#endif // !CCE_COMPATIBILITY_SHARED_H
+#endif  // !CCE_COMPATIBILITY_SHARED_H

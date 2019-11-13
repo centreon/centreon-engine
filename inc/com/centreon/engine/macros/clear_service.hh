@@ -18,18 +18,18 @@
 */
 
 #ifndef CCE_MACROS_CLEAR_SERVICE_HH
-#  define CCE_MACROS_CLEAR_SERVICE_HH
+#define CCE_MACROS_CLEAR_SERVICE_HH
 
-#  include "com/centreon/engine/macros/defines.hh"
+#include "com/centreon/engine/macros/defines.hh"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 int clear_service_macros_r(nagios_macros* mac);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_MACROS_CLEAR_SERVICE_HH
+#endif  // !CCE_MACROS_CLEAR_SERVICE_HH

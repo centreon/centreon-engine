@@ -17,13 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/retention/object.hh"
 #include <array>
 #include "com/centreon/engine/retention/comment.hh"
 #include "com/centreon/engine/retention/contact.hh"
 #include "com/centreon/engine/retention/downtime.hh"
 #include "com/centreon/engine/retention/host.hh"
 #include "com/centreon/engine/retention/info.hh"
-#include "com/centreon/engine/retention/object.hh"
 #include "com/centreon/engine/retention/program.hh"
 #include "com/centreon/engine/retention/service.hh"
 
@@ -48,7 +48,7 @@ retention::object::object(object const& right) {
 /**
  *  Destructor.
  */
-retention::object::~object() throw () {}
+retention::object::~object() throw() {}
 
 /**
  *  Copy constructor.
@@ -71,7 +71,7 @@ retention::object& retention::object::operator=(object const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool retention::object::operator==(object const& right) const throw () {
+bool retention::object::operator==(object const& right) const throw() {
   return _type == right._type;
 }
 
@@ -82,7 +82,7 @@ bool retention::object::operator==(object const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool retention::object::operator!=(object const& right) const throw () {
+bool retention::object::operator!=(object const& right) const throw() {
   return !operator==(right);
 }
 
@@ -119,7 +119,7 @@ retention::object_ptr retention::object::create(std::string const& type_name) {
  *
  *  @return The object type.
  */
-retention::object::type_id retention::object::type() const throw () {
+retention::object::type_id retention::object::type() const throw() {
   return _type;
 }
 
@@ -128,15 +128,8 @@ retention::object::type_id retention::object::type() const throw () {
  *
  *  @return The object type name.
  */
-std::string const& retention::object::type_name() const throw () {
-  static std::string const tab[] = {
-    "comment",
-    "contact",
-    "downtime",
-    "host",
-    "info",
-    "program",
-    "service"
-  };
+std::string const& retention::object::type_name() const throw() {
+  static std::string const tab[] = {"comment", "contact", "downtime", "host",
+                                    "info",    "program", "service"};
   return tab[_type];
 }

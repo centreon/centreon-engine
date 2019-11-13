@@ -26,7 +26,7 @@
 
 CCE_BEGIN()
 namespace commands {
-  class command;
+class command;
 }
 class timeperiod;
 
@@ -37,10 +37,7 @@ class checkable {
     check_passive, /* 1: Check result submitted by an external source. */
   };
 
-  enum state_type {
-    soft,
-    hard
-  };
+  enum state_type { soft, hard };
 
   checkable(std::string const& display_name,
             std::string const& check_command,
@@ -158,7 +155,7 @@ class checkable {
   bool get_is_executing() const;
   void set_is_executing(bool is_executing);
 
-  timeperiod *check_period_ptr;
+  timeperiod* check_period_ptr;
 
  private:
   std::string _display_name;
@@ -201,8 +198,8 @@ class checkable {
   std::time_t _last_hard_state_change;
   enum state_type _state_type;
   double _percent_state_change;
-  commands::command*  _event_handler_ptr;
-  commands::command*  _check_command_ptr;
+  commands::command* _event_handler_ptr;
+  commands::command* _check_command_ptr;
   bool _is_executing;
 };
 

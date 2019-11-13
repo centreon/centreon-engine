@@ -19,18 +19,18 @@
 */
 
 #ifndef CCE_XSDDEFAULT_HH
-#  define CCE_XSDDEFAULT_HH
+#define CCE_XSDDEFAULT_HH
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#endif  // C++
 
 int xsddefault_initialize_status_data();
 int xsddefault_cleanup_status_data(int delete_status_data);
 int xsddefault_save_status_data();
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif // C++
+#endif  // C++
 
-#endif // !CCE_XSDDEFAULT_HH
+#endif  // !CCE_XSDDEFAULT_HH

@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NEBMODS_H
-#  define CCE_COMPATIBILITY_NEBMODS_H
+#define CCE_COMPATIBILITY_NEBMODS_H
 
-#  include "com/centreon/engine/nebmods.hh"
-#  include "config.h"
-#  include "nebcallbacks.h"
-#  include "nebmodules.h"
+#include "com/centreon/engine/nebmods.hh"
+#include "config.h"
+#include "nebcallbacks.h"
+#include "nebmodules.h"
 
-#endif // !CCE_COMPATIBILITY_NEBMODS_H
+#endif  // !CCE_COMPATIBILITY_NEBMODS_H

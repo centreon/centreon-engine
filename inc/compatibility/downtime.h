@@ -19,12 +19,12 @@
 */
 
 #ifndef CCE_COMPATIBILITY_DOWNTIME_H
-#  define CCE_COMPATIBILITY_DOWNTIME_H
+#define CCE_COMPATIBILITY_DOWNTIME_H
 
-#  include "com/centreon/engine/objects/downtime.hh"
-#  include "common.h"
-#  include "config.h"
-#  include "objects.h"
+#include "com/centreon/engine/objects/downtime.hh"
+#include "common.h"
+#include "config.h"
+#include "objects.h"
 
 /*
 ** If you are going to be adding a lot of downtime in sequence,
@@ -33,4 +33,4 @@
 */
 extern int defer_downtime_sorting;
 
-#endif // !CCE_COMPATIBILITY_DOWNTIME_H
+#endif  // !CCE_COMPATIBILITY_DOWNTIME_H

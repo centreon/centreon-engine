@@ -17,10 +17,10 @@
  *
  */
 
+#include <gtest/gtest.h>
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <gtest/gtest.h>
 #include "../../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -67,7 +67,6 @@ class ApplierHostGroup : public ::testing::Test {
     com::centreon::logging::engine::unload();
     clib::unload();
   }
-
 };
 
 // Given host configuration without host_id

@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/events/loop.hh"
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -30,7 +31,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -43,10 +43,10 @@ using namespace com::centreon::engine::logging;
 static loop* _instance = nullptr;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Get instance of the events loop singleton.
@@ -71,11 +71,10 @@ void loop::load() {
  */
 void loop::run() {
   // Debug message.
-  logger(dbg_functions, basic)
-    << "events::loop::run()";
+  logger(dbg_functions, basic) << "events::loop::run()";
 
   logger(log_info_message, basic)
-     << "Configuration loaded, main loop starting.";
+      << "Configuration loaded, main loop starting.";
 
   // Initialize some time members.
   time(&_last_time);
@@ -104,26 +103,23 @@ void loop::unload() {
 }
 
 /**************************************
-*                                     *
-*           Private Methods           *
-*                                     *
-**************************************/
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
 
 /**
  *  Default constructor.
  */
-loop::loop()
-  : _need_reload(0),
-    _reload_running(false) {}
+loop::loop() : _need_reload(0), _reload_running(false) {}
 
 /**
  *  Destructor.
  */
-loop::~loop() throw () {}
+loop::~loop() throw() {}
 
 static void apply_conf(std::atomic<bool>* reloading) {
-  logger(log_info_message, more)
-    << "Starting to reload configuration.";
+  logger(log_info_message, more) << "Starting to reload configuration.";
   try {
     configuration::state config;
     {
@@ -133,15 +129,12 @@ static void apply_conf(std::atomic<bool>* reloading) {
     }
     configuration::applier::state::instance().apply(config);
     logger(log_info_message, basic)
-      << "Configuration reloaded, main loop continuing.";
-  }
-  catch (std::exception const& e) {
-    logger(log_config_error, most)
-      << "Error: " << e.what();
+        << "Configuration reloaded, main loop continuing.";
+  } catch (std::exception const& e) {
+    logger(log_config_error, most) << "Error: " << e.what();
   }
   *reloading = false;
-  logger(log_info_message, more)
-    << "Reload configuration finished.";
+  logger(log_info_message, more) << "Reload configuration finished.";
 }
 
 /**
@@ -155,10 +148,11 @@ void loop::_dispatching() {
       break;
 
     // If we don't have any events to handle, exit.
-    if (timed_event::event_list_high.empty() && timed_event::event_list_low.empty()) {
+    if (timed_event::event_list_high.empty() &&
+        timed_event::event_list_low.empty()) {
       logger(log_runtime_error, basic)
-        << "There aren't any events that need to be handled! "
-        << "Exiting...";
+          << "There aren't any events that need to be handled! "
+          << "Exiting...";
       break;
     }
 
@@ -170,17 +164,13 @@ void loop::_dispatching() {
 
     // Start reload configuration.
     if (_need_reload) {
-      logger(log_info_message, most)
-        << "Need reload.";
+      logger(log_info_message, most) << "Need reload.";
       if (!reloading) {
-        logger(log_info_message, most)
-          << "Reloading...";
+        logger(log_info_message, most) << "Reloading...";
         reloading = true;
         std::async(std::launch::async, apply_conf, &reloading);
-      }
-      else
-        logger(log_info_message, most)
-          << "Already reloading...";
+      } else
+        logger(log_info_message, most) << "Already reloading...";
 
       _need_reload = 0;
     }
@@ -194,40 +184,36 @@ void loop::_dispatching() {
     // Hey, wait a second...  we traveled back in time!
     if (current_time < _last_time)
       compensate_for_system_time_change(
-        static_cast<unsigned long>(_last_time),
-        static_cast<unsigned long>(current_time));
+          static_cast<unsigned long>(_last_time),
+          static_cast<unsigned long>(current_time));
     // Else if the time advanced over the specified threshold,
     // try and compensate...
-    else if ((current_time - _last_time)
-             >= static_cast<time_t>(config->time_change_threshold()))
+    else if ((current_time - _last_time) >=
+             static_cast<time_t>(config->time_change_threshold()))
       compensate_for_system_time_change(
-        static_cast<unsigned long>(_last_time),
-        static_cast<unsigned long>(current_time));
+          static_cast<unsigned long>(_last_time),
+          static_cast<unsigned long>(current_time));
 
     // Keep track of the last time.
     _last_time = current_time;
 
     // Log messages about event lists.
-    logger(dbg_events, more)
-      << "** Event Check Loop";
+    logger(dbg_events, more) << "** Event Check Loop";
     if (!timed_event::event_list_high.empty())
       logger(dbg_events, more)
-        << "Next High Priority Event Time: "
-        << my_ctime(&(*timed_event::event_list_high.begin())->run_time);
+          << "Next High Priority Event Time: "
+          << my_ctime(&(*timed_event::event_list_high.begin())->run_time);
     else
-      logger(dbg_events, more)
-        << "No high priority events are scheduled...";
+      logger(dbg_events, more) << "No high priority events are scheduled...";
     if (!timed_event::event_list_low.empty())
       logger(dbg_events, more)
-        << "Next Low Priority Event Time:  "
-        << my_ctime(&(*timed_event::event_list_low.begin())->run_time);
+          << "Next Low Priority Event Time:  "
+          << my_ctime(&(*timed_event::event_list_low.begin())->run_time);
     else
-      logger(dbg_events, more)
-        << "No low priority events are scheduled...";
+      logger(dbg_events, more) << "No low priority events are scheduled...";
     logger(dbg_events, more)
-      << "Current/Max Service Checks: "
-      << currently_running_service_checks << '/'
-      << config->max_parallel_service_checks();
+        << "Current/Max Service Checks: " << currently_running_service_checks
+        << '/' << config->max_parallel_service_checks();
 
     // Update status information occassionally - NagVis watches the
     // NDOUtils DB to see if Engine is alive.
@@ -238,8 +224,8 @@ void loop::_dispatching() {
 
     // Handle high priority events.
     bool run_event(true);
-    if (!timed_event::event_list_high.empty()
-        && (current_time >= (*timed_event::event_list_high.begin())->run_time)) {
+    if (!timed_event::event_list_high.empty() &&
+        (current_time >= (*timed_event::event_list_high.begin())->run_time)) {
       // Remove the first event from the timing loop.
       timed_event* temp_event(*timed_event::event_list_high.begin());
 
@@ -257,49 +243,49 @@ void loop::_dispatching() {
         delete temp_event;
     }
     // Handle low priority events.
-    else if (!timed_event::event_list_low.empty()
-             && (current_time >= (*timed_event::event_list_low.begin())->run_time)) {
+    else if (!timed_event::event_list_low.empty() &&
+             (current_time >=
+              (*timed_event::event_list_low.begin())->run_time)) {
       // Default action is to execute the event.
       run_event = true;
 
       // Run a few checks before executing a service check...
-      if ((*timed_event::event_list_low.begin())->event_type == EVENT_SERVICE_CHECK) {
+      if ((*timed_event::event_list_low.begin())->event_type ==
+          EVENT_SERVICE_CHECK) {
         int nudge_seconds(0);
-        service* temp_service(
-                   static_cast<service*>((*timed_event::event_list_low.begin())->event_data));
+        service* temp_service(static_cast<service*>(
+            (*timed_event::event_list_low.begin())->event_data));
 
         // Don't run a service check if we're already maxed out on the
         // number of parallel service checks...
-        if (config->max_parallel_service_checks() != 0
-            && (currently_running_service_checks
-                >= config->max_parallel_service_checks())) {
+        if (config->max_parallel_service_checks() != 0 &&
+            (currently_running_service_checks >=
+             config->max_parallel_service_checks())) {
           // Move it at least 5 seconds (to overcome the current peak),
           // with a random 10 seconds (to spread the load).
           nudge_seconds = 5 + (rand() % 10);
           logger(dbg_events | dbg_checks, basic)
-            << "**WARNING** Max concurrent service checks ("
-            << currently_running_service_checks << "/"
-            << config->max_parallel_service_checks()
-            << ") has been reached!  Nudging "
-            << temp_service->get_hostname() << ":"
-            << temp_service->get_description() << " by "
-            << nudge_seconds << " seconds...";
+              << "**WARNING** Max concurrent service checks ("
+              << currently_running_service_checks << "/"
+              << config->max_parallel_service_checks()
+              << ") has been reached!  Nudging " << temp_service->get_hostname()
+              << ":" << temp_service->get_description() << " by "
+              << nudge_seconds << " seconds...";
           logger(log_runtime_warning, basic)
-            << "\tMax concurrent service checks ("
-            << currently_running_service_checks << "/"
-            << config->max_parallel_service_checks()
-            << ") has been reached.  Nudging "
-            << temp_service->get_hostname() << ":"
-            << temp_service->get_description() << " by "
-            << nudge_seconds << " seconds...";
+              << "\tMax concurrent service checks ("
+              << currently_running_service_checks << "/"
+              << config->max_parallel_service_checks()
+              << ") has been reached.  Nudging " << temp_service->get_hostname()
+              << ":" << temp_service->get_description() << " by "
+              << nudge_seconds << " seconds...";
           run_event = false;
         }
 
         // Don't run a service check if active checks are disabled.
         if (!config->execute_service_checks()) {
           logger(dbg_events | dbg_checks, more)
-            << "We're not executing service checks right now, "
-            << "so we'll skip this event.";
+              << "We're not executing service checks right now, "
+              << "so we'll skip this event.";
           run_event = false;
         }
 
@@ -320,7 +306,7 @@ void loop::_dispatching() {
           // due to too many concurrent service checks.
           if (nudge_seconds)
             temp_service->set_next_check(
-              (time_t)(temp_service->get_next_check() + nudge_seconds));
+                (time_t)(temp_service->get_next_check() + nudge_seconds));
           // Otherwise reschedule (TODO: This should be smarter as it
           // doesn't consider its timeperiod).
           else {
@@ -343,16 +329,18 @@ void loop::_dispatching() {
         }
       }
       // Run a few checks before executing a host check...
-      else if (EVENT_HOST_CHECK == (*timed_event::event_list_low.begin())->event_type) {
+      else if (EVENT_HOST_CHECK ==
+               (*timed_event::event_list_low.begin())->event_type) {
         // Default action is to execute the event.
         run_event = true;
-        host* temp_host(static_cast<host*>((*timed_event::event_list_low.begin())->event_data));
+        host* temp_host(static_cast<host*>(
+            (*timed_event::event_list_low.begin())->event_data));
 
         // Don't run a host check if active checks are disabled.
         if (!config->execute_host_checks()) {
           logger(dbg_events | dbg_checks, more)
-            << "We're not executing host checks right now, "
-            << "so we'll skip this event.";
+              << "We're not executing host checks right now, "
+              << "so we'll skip this event.";
           run_event = false;
         }
 
@@ -370,17 +358,15 @@ void loop::_dispatching() {
           remove_event(temp_event, timed_event::low);
 
           // Reschedule.
-          if ((notifier::soft == temp_host->get_state_type())
-              && (temp_host->get_current_state() != host::state_up))
-            temp_host->set_next_check(
-              (time_t)(temp_host->get_next_check()
-                         + (temp_host->get_retry_interval()
-                            * config->interval_length())));
+          if ((notifier::soft == temp_host->get_state_type()) &&
+              (temp_host->get_current_state() != host::state_up))
+            temp_host->set_next_check((time_t)(
+                temp_host->get_next_check() +
+                (temp_host->get_retry_interval() * config->interval_length())));
           else
-            temp_host->set_next_check(
-              (time_t)(temp_host->get_next_check()
-                         + (temp_host->get_check_interval()
-                            * config->interval_length())));
+            temp_host->set_next_check((time_t)(
+                temp_host->get_next_check() +
+                (temp_host->get_check_interval() * config->interval_length())));
           temp_event->run_time = temp_host->get_next_check();
           reschedule_event(temp_event, timed_event::low);
           temp_host->update_status(false);
@@ -396,8 +382,7 @@ void loop::_dispatching() {
         // We may have just removed the only item from the list.
 
         // Handle the event.
-        logger(dbg_events, more)
-          << "Running event...";
+        logger(dbg_events, more) << "Running event...";
         handle_timed_event(temp_event);
 
         // Reschedule the event if necessary.
@@ -410,7 +395,7 @@ void loop::_dispatching() {
       // Wait a while so we don't hog the CPU...
       else {
         logger(dbg_events, most)
-          << "Did not execute scheduled event. Idling for a bit...";
+            << "Did not execute scheduled event. Idling for a bit...";
         uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
         std::this_thread::sleep_for(std::chrono::nanoseconds(d));
       }
@@ -418,10 +403,10 @@ void loop::_dispatching() {
     // We don't have anything to do at this moment in time...
     else if ((timed_event::event_list_high.empty() ||
               current_time <
-               (*timed_event::event_list_high.begin())->run_time) &&
+                  (*timed_event::event_list_high.begin())->run_time) &&
              (timed_event::event_list_low.empty() ||
               current_time <
-               (*timed_event::event_list_low.begin())->run_time)) {
+                  (*timed_event::event_list_low.begin())->run_time)) {
       logger(dbg_events, most)
           << "No events to execute at the moment. Idling for a bit...";
 

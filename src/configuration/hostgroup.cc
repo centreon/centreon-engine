@@ -28,15 +28,15 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<hostgroup, type, &hostgroup::method>::generic
 
-std::unordered_map<std::string, hostgroup::setter_func> const hostgroup::_setters{
-  { "hostgroup_id",      SETTER(unsigned int, _set_hostgroup_id) },
-  { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_name) },
-  { "alias",             SETTER(std::string const&, _set_alias) },
-  { "members",           SETTER(std::string const&, _set_members) },
-  { "notes",             SETTER(std::string const&, _set_notes) },
-  { "notes_url",         SETTER(std::string const&, _set_notes_url) },
-  { "action_url",        SETTER(std::string const&, _set_action_url) }
-};
+std::unordered_map<std::string, hostgroup::setter_func> const
+    hostgroup::_setters{
+        {"hostgroup_id", SETTER(unsigned int, _set_hostgroup_id)},
+        {"hostgroup_name", SETTER(std::string const&, _set_hostgroup_name)},
+        {"alias", SETTER(std::string const&, _set_alias)},
+        {"members", SETTER(std::string const&, _set_members)},
+        {"notes", SETTER(std::string const&, _set_notes)},
+        {"notes_url", SETTER(std::string const&, _set_notes_url)},
+        {"action_url", SETTER(std::string const&, _set_action_url)}};
 
 /**
  *  Constructor.
@@ -44,24 +44,21 @@ std::unordered_map<std::string, hostgroup::setter_func> const hostgroup::_setter
  *  @param[in] key The object key.
  */
 hostgroup::hostgroup(key_type const& key)
-  : object(object::hostgroup),
-    _hostgroup_id(0),
-    _hostgroup_name(key) {}
+    : object(object::hostgroup), _hostgroup_id(0), _hostgroup_name(key) {}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right The hostgroup to copy.
  */
-hostgroup::hostgroup(hostgroup const& right)
-  : object(right) {
+hostgroup::hostgroup(hostgroup const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-hostgroup::~hostgroup() throw () {}
+hostgroup::~hostgroup() throw() {}
 
 /**
  *  Copy constructor.
@@ -91,45 +88,45 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
  *
  *  @return True if is the same hostgroup, otherwise false.
  */
-bool hostgroup::operator==(hostgroup const& right) const throw () {
+bool hostgroup::operator==(hostgroup const& right) const throw() {
   if (!object::operator==(right)) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => object don't match";
+        << "configuration::hostgroup::equality => object don't match";
     return false;
   }
   if (_action_url != right._action_url) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => action url don't match";
+        << "configuration::hostgroup::equality => action url don't match";
     return false;
   }
   if (_alias != right._alias) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => alias don't match";
+        << "configuration::hostgroup::equality => alias don't match";
     return false;
   }
   if (_hostgroup_id != right._hostgroup_id) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => hostgroup id don't match";
+        << "configuration::hostgroup::equality => hostgroup id don't match";
     return false;
   }
   if (_hostgroup_name != right._hostgroup_name) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => hostgroup name don't match";
+        << "configuration::hostgroup::equality => hostgroup name don't match";
     return false;
   }
   if (_members != right._members) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => members don't match";
+        << "configuration::hostgroup::equality => members don't match";
     return false;
   }
   if (_notes != right._notes) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => notes don't match";
+        << "configuration::hostgroup::equality => notes don't match";
     return false;
   }
   if (_notes_url != right._notes_url) {
     logger(dbg_config, more)
-      << "configuration::hostgroup::equality => notes url don't match";
+        << "configuration::hostgroup::equality => notes url don't match";
     return false;
   }
   return true;
@@ -142,7 +139,7 @@ bool hostgroup::operator==(hostgroup const& right) const throw () {
  *
  *  @return True if is not the same hostgroup, otherwise false.
  */
-bool hostgroup::operator!=(hostgroup const& right) const throw () {
+bool hostgroup::operator!=(hostgroup const& right) const throw() {
   return !operator==(right);
 }
 
@@ -153,7 +150,7 @@ bool hostgroup::operator!=(hostgroup const& right) const throw () {
  *
  *  @return True if this object is less than right.
  */
-bool hostgroup::operator<(hostgroup const& right) const throw () {
+bool hostgroup::operator<(hostgroup const& right) const throw() {
   // hostgroup_name has to be first in this operator.
   // The configuration diff mechanism relies on this.
   if (_hostgroup_name != right._hostgroup_name)
@@ -178,9 +175,9 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
  */
 void hostgroup::check_validity() const {
   if (_hostgroup_name.empty())
-    throw (engine_error() << "Host group has no name "
-           "(property 'hostgroup_name')");
-  return ;
+    throw(engine_error() << "Host group has no name "
+                            "(property 'hostgroup_name')");
+  return;
 }
 
 /**
@@ -188,7 +185,7 @@ void hostgroup::check_validity() const {
  *
  *  @return The host group name.
  */
-hostgroup::key_type const& hostgroup::key() const throw () {
+hostgroup::key_type const& hostgroup::key() const throw() {
   return _hostgroup_name;
 }
 
@@ -199,8 +196,8 @@ hostgroup::key_type const& hostgroup::key() const throw () {
  */
 void hostgroup::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "Cannot merge host group with '"
-           << obj.type() << "'");
+    throw(engine_error() << "Cannot merge host group with '" << obj.type()
+                         << "'");
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
   MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_alias);
@@ -219,8 +216,8 @@ void hostgroup::merge(object const& obj) {
  *  @return True on success, otherwise false.
  */
 bool hostgroup::parse(char const* key, char const* value) {
-  std::unordered_map<std::string, hostgroup::setter_func>::const_iterator
-    it{_setters.find(key)};
+  std::unordered_map<std::string, hostgroup::setter_func>::const_iterator it{
+      _setters.find(key)};
   if (it != _setters.end())
     return (it->second)(*this, value);
   return false;
@@ -231,7 +228,7 @@ bool hostgroup::parse(char const* key, char const* value) {
  *
  *  @return The action_url.
  */
-std::string const& hostgroup::action_url() const throw () {
+std::string const& hostgroup::action_url() const throw() {
   return _action_url;
 }
 
@@ -240,7 +237,7 @@ std::string const& hostgroup::action_url() const throw () {
  *
  *  @return The alias.
  */
-std::string const& hostgroup::alias() const throw () {
+std::string const& hostgroup::alias() const throw() {
   return _alias;
 }
 
@@ -258,7 +255,7 @@ unsigned int hostgroup::hostgroup_id() const throw() {
  *
  *  @return The hostgroup_name.
  */
-std::string const& hostgroup::hostgroup_name() const throw () {
+std::string const& hostgroup::hostgroup_name() const throw() {
   return _hostgroup_name;
 }
 
@@ -267,7 +264,7 @@ std::string const& hostgroup::hostgroup_name() const throw () {
  *
  *  @return The members.
  */
-set_string& hostgroup::members() throw () {
+set_string& hostgroup::members() throw() {
   return *_members;
 }
 
@@ -276,7 +273,7 @@ set_string& hostgroup::members() throw () {
  *
  *  @return The members.
  */
-set_string const& hostgroup::members() const throw () {
+set_string const& hostgroup::members() const throw() {
   return *_members;
 }
 
@@ -285,7 +282,7 @@ set_string const& hostgroup::members() const throw () {
  *
  *  @return The notes.
  */
-std::string const& hostgroup::notes() const throw () {
+std::string const& hostgroup::notes() const throw() {
   return _notes;
 }
 
@@ -294,7 +291,7 @@ std::string const& hostgroup::notes() const throw () {
  *
  *  @return The notes_url.
  */
-std::string const& hostgroup::notes_url() const throw () {
+std::string const& hostgroup::notes_url() const throw() {
   return _notes_url;
 }
 

@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdlib>
 #include "com/centreon/engine/commands/forward.hh"
+#include <cstdlib>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -28,10 +28,10 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 /**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
 
 /**
  *  Constructor.
@@ -40,19 +40,15 @@ using namespace com::centreon::engine::commands;
  *  @param[in] command_line  The command command line.
  *  @param[in] command       The command to forward command.
  */
-forward::forward(
-             std::string const& command_name,
-             std::string const& command_line,
-             command& cmd)
-  : command(command_name, command_line, nullptr),
-    _command(&cmd) {
+forward::forward(std::string const& command_name,
+                 std::string const& command_line,
+                 command& cmd)
+    : command(command_name, command_line, nullptr), _command(&cmd) {
   if (_name.empty())
-    throw (engine_error()
-      << "Could not create a command with an empty name");
+    throw(engine_error() << "Could not create a command with an empty name");
   if (_command_line.empty())
-    throw (engine_error()
-      << "Could not create '"
-      << _name << "' command: command line is empty");
+    throw(engine_error() << "Could not create '" << _name
+                         << "' command: command line is empty");
 }
 
 /**
@@ -61,17 +57,14 @@ forward::forward(
  *  @param[in] right Object to copy.
  */
 forward::forward(forward const& right)
-  : command(right),
-    _command(right._command) {
+    : command(right), _command(right._command) {
   _internal_copy(right);
 }
 
 /**
  *  Destructor.
  */
-forward::~forward() throw() {
-
-}
+forward::~forward() throw() {}
 
 /**
  *  Assignment operator.
@@ -103,10 +96,9 @@ com::centreon::engine::commands::command* forward::clone() const {
  *
  *  @return The command id.
  */
-uint64_t forward::run(
-                         std::string const& processed_cmd,
-                         nagios_macros& macros,
-                         uint32_t timeout) {
+uint64_t forward::run(std::string const& processed_cmd,
+                      nagios_macros& macros,
+                      uint32_t timeout) {
   return (_command->run(processed_cmd, macros, timeout));
 }
 
@@ -118,11 +110,10 @@ uint64_t forward::run(
  *  @param[in]  timeout The command timeout.
  *  @param[out] res     The result of the command.
  */
-void forward::run(
-                std::string const& processed_cmd,
-                nagios_macros& macros,
-                uint32_t timeout,
-                result& res) {
+void forward::run(std::string const& processed_cmd,
+                  nagios_macros& macros,
+                  uint32_t timeout,
+                  result& res) {
   _command->run(processed_cmd, macros, timeout, res);
   return;
 }

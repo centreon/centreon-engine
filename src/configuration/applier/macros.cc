@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/macros.hh"
 #include <cassert>
 #include <cstring>
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
@@ -76,10 +76,9 @@ void applier::macros::apply(configuration::state& config) {
   applier::state::instance().user_macros() = users;
   // Save old style user macros into old style structures.
   for (std::unordered_map<std::string, std::string>::const_iterator
-         it = users.begin(),
-         end = users.end();
-       it != end;
-       ++it) {
+           it = users.begin(),
+           end = users.end();
+       it != end; ++it) {
     unsigned int val(1);
     if (is_old_style_user_macro(it->first, val))
       _set_macros_user(val - 1, it->second);
@@ -115,9 +114,7 @@ void applier::macros::unload() {
 /**
  *  Default constructor.
  */
-applier::macros::macros()
-  : _mac(get_global_macros()) {
-
+applier::macros::macros() : _mac(get_global_macros()) {
   init_macros();
 
   _set_macro(MACRO_TEMPFILE, "/tmp/centengine.tmp");
@@ -142,11 +139,9 @@ applier::macros::~macros() throw() {
  *  @param[in] type  The type of macros to set.
  *  @param[in] value The value of the macro.
  */
-void applier::macros::_set_macro(
-       unsigned int type,
-       std::string const& value) {
+void applier::macros::_set_macro(unsigned int type, std::string const& value) {
   if (type >= MACRO_X_COUNT)
-    throw (engine_error() << "Invalid type of global macro: " << type);
+    throw(engine_error() << "Invalid type of global macro: " << type);
   if (_mac->x[type] != value)
     _mac->x[type] = value;
 }
@@ -157,11 +152,10 @@ void applier::macros::_set_macro(
  *  @param[in] idx   The index of the user macro to set.
  *  @param[in] value The value of the macro.
  */
-void applier::macros::_set_macros_user(
-       unsigned int idx,
-       std::string const& value) {
+void applier::macros::_set_macros_user(unsigned int idx,
+                                       std::string const& value) {
   if (idx >= MAX_USER_MACROS)
-    throw (engine_error() << "Invalid index of user macro: " << idx);
+    throw(engine_error() << "Invalid index of user macro: " << idx);
   if (macro_user[idx] != value)
     macro_user[idx] = value;
 }

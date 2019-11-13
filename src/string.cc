@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine;
 
@@ -33,10 +33,9 @@ static char const* whitespaces(" \t\r\n");
  *
  *  @return True if data is available, false if no data.
  */
-bool string::get_next_line(
-       std::ifstream& stream,
-       std::string& line,
-       unsigned int& pos) {
+bool string::get_next_line(std::ifstream& stream,
+                           std::string& line,
+                           unsigned int& pos) {
   while (std::getline(stream, line, '\n')) {
     ++pos;
     string::trim(line);
@@ -57,11 +56,10 @@ bool string::get_next_line(
  *  @param[out]    value The value pointer.
  *  @param[in]     delim The delimiter.
  */
-bool string::split(
-               std::string& line,
-               char const** key,
-               char const** value,
-               char delim) {
+bool string::split(std::string& line,
+                   char const** key,
+                   char const** value,
+                   char delim) {
   std::size_t delim_pos(line.find_first_of(delim));
   if (delim_pos == std::string::npos)
     return (false);
@@ -99,11 +97,10 @@ bool string::split(
  *  @param[out] value The value to fill.
  *  @param[in]  delim The delimiter.
  */
-bool string::split(
-       std::string const& line,
-       std::string& key,
-       std::string& value,
-       char delim) {
+bool string::split(std::string const& line,
+                   std::string& key,
+                   std::string& value,
+                   char delim) {
   std::size_t delim_pos(line.find_first_of(delim));
   if (delim_pos == std::string::npos)
     return (false);
@@ -137,12 +134,11 @@ bool string::split(
  *  @param[out] out   The list to fill.
  *  @param[in]  delim The delimiter.
  */
-void string::split(
-               std::string const& data,
-               std::list<std::string>& out,
-               char delim) {
+void string::split(std::string const& data,
+                   std::list<std::string>& out,
+                   char delim) {
   if (data.empty())
-    return ;
+    return;
 
   std::size_t last(0);
   std::size_t current(0);
@@ -162,10 +158,9 @@ void string::split(
  *  @param[out] out    The set to fill.
  *  @param[in]  delim  The delimiter.
  */
-void string::split(
-               std::string const& data,
-               std::set<std::string>& out,
-               char delim) {
+void string::split(std::string const& data,
+                   std::set<std::string>& out,
+                   char delim) {
   std::list<std::string> elements;
   split(data, elements, delim);
   out.insert(elements.begin(), elements.end());
@@ -178,21 +173,17 @@ void string::split(
  *  @param[out] out    The set to fill.
  *  @param[in]  delim  The delimiter.
  */
-void string::split(
-               std::string const& data,
-               std::set<std::pair<std::string, std::string> >& out,
-               char delim) {
+void string::split(std::string const& data,
+                   std::set<std::pair<std::string, std::string> >& out,
+                   char delim) {
   std::list<std::string> elements;
   split(data, elements, delim);
-  for (std::list<std::string>::const_iterator
-         it(elements.begin()),
-         end(elements.end());
-       it != end;
-       ++it) {
+  for (std::list<std::string>::const_iterator it(elements.begin()),
+       end(elements.end());
+       it != end; ++it) {
     std::list<std::string>::const_iterator first(it++);
     if (it == end)
-      throw (engine_error()
-             << "Not enough elements in the line to make pairs");
+      throw(engine_error() << "Not enough elements in the line to make pairs");
     out.insert(std::make_pair(*first, *it));
   }
 }
@@ -204,7 +195,7 @@ void string::split(
  *
  *  @return The trimming stream.
  */
-std::string& string::trim(std::string& str) throw () {
+std::string& string::trim(std::string& str) throw() {
   // First, search backward for the last non-space character.
   size_t pos(str.find_last_not_of(whitespaces));
   if (pos == std::string::npos)
@@ -214,8 +205,7 @@ std::string& string::trim(std::string& str) throw () {
     // Search for comments.
     size_t comment(str.find_first_of(';'));
     if (comment != 0)
-      while ((comment != std::string::npos)
-             && (str[comment - 1] == '\\'))
+      while ((comment != std::string::npos) && (str[comment - 1] == '\\'))
         comment = str.find_first_of(';', comment + 1);
 
     if (comment != std::string::npos)
@@ -243,7 +233,7 @@ std::string& string::trim(std::string& str) throw () {
  *
  *  @return The trimming stream.
  */
-std::string& string::trim_left(std::string& str) throw () {
+std::string& string::trim_left(std::string& str) throw() {
   size_t pos(str.find_first_not_of(whitespaces));
   if (pos != std::string::npos)
     str.erase(0, pos);
@@ -257,7 +247,7 @@ std::string& string::trim_left(std::string& str) throw () {
  *
  *  @return The trimming stream.
  */
-std::string& string::trim_right(std::string& str) throw () {
+std::string& string::trim_right(std::string& str) throw() {
   size_t pos(str.find_last_not_of(whitespaces));
   if (pos == std::string::npos)
     str.clear();

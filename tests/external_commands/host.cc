@@ -17,17 +17,17 @@
  *
  */
 
-#include <iostream>
+#include "com/centreon/engine/configuration/applier/host.hh"
 #include <gtest/gtest.h>
+#include <com/centreon/engine/configuration/applier/macros.hh>
+#include <iostream>
 #include "../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/timezone_manager.hh"
-#include <com/centreon/engine/configuration/applier/macros.hh>
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -72,8 +72,8 @@ TEST_F(HostExternalCommand, AddHostDowntime) {
   std::string cmd{"test_srv;1;|"};
 
   testing::internal::CaptureStdout();
-  cmd_process_host_check_result(
-    CMD_PROCESS_HOST_CHECK_RESULT, now, const_cast<char *>(cmd.c_str()));
+  cmd_process_host_check_result(CMD_PROCESS_HOST_CHECK_RESULT, now,
+                                const_cast<char*>(cmd.c_str()));
   checks::checker::instance().reap();
 
   std::string const& out{testing::internal::GetCapturedStdout()};
@@ -97,8 +97,8 @@ TEST_F(HostExternalCommand, AddHostDowntimeByIpAddress) {
   std::string cmd{"127.0.0.1;1;|"};
 
   testing::internal::CaptureStdout();
-  cmd_process_host_check_result(
-    CMD_PROCESS_HOST_CHECK_RESULT, now, const_cast<char *>(cmd.c_str()));
+  cmd_process_host_check_result(CMD_PROCESS_HOST_CHECK_RESULT, now,
+                                const_cast<char*>(cmd.c_str()));
   checks::checker::instance().reap();
 
   std::string const& out{testing::internal::GetCapturedStdout()};
@@ -134,20 +134,27 @@ TEST_F(HostExternalCommand, AddHostComment) {
   std::string cmd_del_last{"5"};
   std::string cmd_del_all{"test_srv"};
 
-  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com1.c_str()));
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now,
+                  const_cast<char*>(cmd_com1.c_str()));
   ASSERT_EQ(comment::comments.size(), 1u);
-  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com2.c_str()));
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now,
+                  const_cast<char*>(cmd_com2.c_str()));
   ASSERT_EQ(comment::comments.size(), 2u);
-  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com3.c_str()));
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now,
+                  const_cast<char*>(cmd_com3.c_str()));
   ASSERT_EQ(comment::comments.size(), 3u);
-  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com4.c_str()));
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now,
+                  const_cast<char*>(cmd_com4.c_str()));
   ASSERT_EQ(comment::comments.size(), 4u);
-  cmd_add_comment(CMD_ADD_HOST_COMMENT, now, const_cast<char *>(cmd_com5.c_str()));
+  cmd_add_comment(CMD_ADD_HOST_COMMENT, now,
+                  const_cast<char*>(cmd_com5.c_str()));
   ASSERT_EQ(comment::comments.size(), 5u);
-  cmd_delete_comment(CMD_DEL_HOST_COMMENT, const_cast<char *>(cmd_del.c_str()));
+  cmd_delete_comment(CMD_DEL_HOST_COMMENT, const_cast<char*>(cmd_del.c_str()));
   ASSERT_EQ(comment::comments.size(), 4u);
-  cmd_delete_all_comments(CMD_DEL_ALL_HOST_COMMENTS, const_cast<char *>(cmd_del_all.c_str()));
+  cmd_delete_all_comments(CMD_DEL_ALL_HOST_COMMENTS,
+                          const_cast<char*>(cmd_del_all.c_str()));
   ASSERT_EQ(comment::comments.size(), 1u);
-  cmd_delete_comment(CMD_DEL_HOST_COMMENT, const_cast<char *>(cmd_del_last.c_str()));
+  cmd_delete_comment(CMD_DEL_HOST_COMMENT,
+                     const_cast<char*>(cmd_del_last.c_str()));
   ASSERT_EQ(comment::comments.size(), 0u);
 }

@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <array>
 #include "com/centreon/engine/retention/state.hh"
+#include <array>
 
 using namespace com::centreon::engine::retention;
 
@@ -39,7 +39,7 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw () {}
+state::~state() throw() {}
 
 /**
  *  Copy operator.
@@ -68,14 +68,11 @@ state& state::operator=(state const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool state::operator==(state const& right) const throw () {
-  return (_comments == right._comments
-          && _contacts == right._contacts
-          && _downtimes == right._downtimes
-          && _globals == right._globals
-          && _hosts == right._hosts
-          && _info == right._info
-          && _services == right._services);
+bool state::operator==(state const& right) const throw() {
+  return (_comments == right._comments && _contacts == right._contacts &&
+          _downtimes == right._downtimes && _globals == right._globals &&
+          _hosts == right._hosts && _info == right._info &&
+          _services == right._services);
 }
 
 /**
@@ -85,7 +82,7 @@ bool state::operator==(state const& right) const throw () {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool state::operator!=(state const& right) const throw () {
+bool state::operator!=(state const& right) const throw() {
   return (!operator==(right));
 }
 
@@ -94,7 +91,7 @@ bool state::operator!=(state const& right) const throw () {
  *
  *  @return The comment list.
  */
-list_comment& state::comments() throw () {
+list_comment& state::comments() throw() {
   return (_comments);
 }
 
@@ -103,7 +100,7 @@ list_comment& state::comments() throw () {
  *
  *  @return The comment list.
  */
-list_comment const& state::comments() const throw () {
+list_comment const& state::comments() const throw() {
   return (_comments);
 }
 
@@ -112,7 +109,7 @@ list_comment const& state::comments() const throw () {
  *
  *  @return The contact list.
  */
-list_contact& state::contacts() throw () {
+list_contact& state::contacts() throw() {
   return (_contacts);
 }
 
@@ -121,7 +118,7 @@ list_contact& state::contacts() throw () {
  *
  *  @return The contact list.
  */
-list_contact const& state::contacts() const throw () {
+list_contact const& state::contacts() const throw() {
   return (_contacts);
 }
 
@@ -130,7 +127,7 @@ list_contact const& state::contacts() const throw () {
  *
  *  @return The downtime list.
  */
-list_downtime& state::downtimes() throw () {
+list_downtime& state::downtimes() throw() {
   return (_downtimes);
 }
 
@@ -139,7 +136,7 @@ list_downtime& state::downtimes() throw () {
  *
  *  @return The downtime list.
  */
-list_downtime const& state::downtimes() const throw () {
+list_downtime const& state::downtimes() const throw() {
   return (_downtimes);
 }
 
@@ -148,7 +145,7 @@ list_downtime const& state::downtimes() const throw () {
  *
  *  @return The globals.
  */
-program& state::globals() throw () {
+program& state::globals() throw() {
   return (_globals);
 }
 
@@ -157,7 +154,7 @@ program& state::globals() throw () {
  *
  *  @return The globals.
  */
-program const& state::globals() const throw () {
+program const& state::globals() const throw() {
   return (_globals);
 }
 
@@ -166,7 +163,7 @@ program const& state::globals() const throw () {
  *
  *  @return The host list.
  */
-list_host& state::hosts() throw () {
+list_host& state::hosts() throw() {
   return (_hosts);
 }
 
@@ -175,7 +172,7 @@ list_host& state::hosts() throw () {
  *
  *  @return The host list.
  */
-list_host const& state::hosts() const throw () {
+list_host const& state::hosts() const throw() {
   return (_hosts);
 }
 
@@ -184,7 +181,7 @@ list_host const& state::hosts() const throw () {
  *
  *  @return The informations.
  */
-info& state::informations() throw () {
+info& state::informations() throw() {
   return (_info);
 }
 
@@ -193,7 +190,7 @@ info& state::informations() throw () {
  *
  *  @return The informations.
  */
-info const& state::informations() const throw () {
+info const& state::informations() const throw() {
   return (_info);
 }
 
@@ -202,7 +199,7 @@ info const& state::informations() const throw () {
  *
  *  @return The service list.
  */
-list_service& state::services() throw () {
+list_service& state::services() throw() {
   return (_services);
 }
 
@@ -211,6 +208,6 @@ list_service& state::services() throw () {
  *
  *  @return The service list.
  */
-list_service const& state::services() const throw () {
+list_service const& state::services() const throw() {
   return (_services);
 }

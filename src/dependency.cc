@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <array>
 #include "com/centreon/engine/dependency.hh"
+#include <array>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
