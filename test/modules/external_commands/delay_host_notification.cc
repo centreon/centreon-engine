@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,20 +33,20 @@ static int check_delay_host_notification(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst =
+      add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0,
+               0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+               0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+               NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
   hst->next_host_notification = 0;
   char const* cmd("[1317196300] DELAY_HOST_NOTIFICATION;name;1234567890");
   process_external_command(cmd);
 
   if (hst->next_host_notification != 1234567890)
-    throw (engine_error() << "delay_host_notification failed.");
+    throw(engine_error() << "delay_host_notification failed.");
   return (0);
 }
 

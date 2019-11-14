@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/string.hh"
@@ -44,7 +44,7 @@ using namespace com::centreon::engine;
 #define OUTPUT my output
 #define LONG_OUTPUT my output can be much longer than this
 #define PERF_DATA this is absolutely not a perfdata string
-#define CHECK_COMMAND check this out!
+#define CHECK_COMMAND check this out !
 #define CHECK_TYPE PASSIVE
 #define STATE_TYPE SOFT
 #define STATE CRITICAL
@@ -70,11 +70,13 @@ using namespace com::centreon::engine;
 #define LAST_EVENT_ID 21384723
 #define PROBLEM_ID 123900
 #define LAST_PROBLEM_ID 927834
-#define ACTION_URL http://www.merethis.com
-#define NOTES_URL http://www.centreon.com
+#define ACTION_URL \
+  http:  // www.merethis.com
+#define NOTES_URL \
+  http:  // www.centreon.com
 #define NOTES Centreon Engine is wonderful !
 #define GROUP_NAMES STR(GROUP1) "," STR(GROUP2) "," STR(GROUP3)
-#define ACK_AUTHOR mkermagoret@merethis.com
+#define ACK_AUTHOR mkermagoret @merethis.com
 #define ACK_AUTHOR_NAME Matthieu Kermagoret
 #define ACK_AUTHOR_ALIAS mk
 #define ACK_COMMENT Acknowledgement comment
@@ -92,17 +94,17 @@ int main_test(int argc, char** argv) {
   test::minimal_setup();
 
   // Set service values.
-  delete [] service_list->description;
+  delete[] service_list->description;
   service_list->description = string::dup(STR(DESCRIPTION));
-  delete [] service_list->display_name;
+  delete[] service_list->display_name;
   service_list->display_name = string::dup(STR(DISPLAY_NAME));
-  delete [] service_list->plugin_output;
+  delete[] service_list->plugin_output;
   service_list->plugin_output = string::dup(STR(OUTPUT));
-  delete [] service_list->long_plugin_output;
+  delete[] service_list->long_plugin_output;
   service_list->long_plugin_output = string::dup(STR(LONG_OUTPUT));
-  delete [] service_list->perf_data;
+  delete[] service_list->perf_data;
   service_list->perf_data = string::dup(STR(PERF_DATA));
-  delete [] service_list->service_check_command;
+  delete[] service_list->service_check_command;
   service_list->service_check_command = string::dup(STR(CHECK_COMMAND));
   service_list->check_type = SERVICE_CHECK_PASSIVE;
   service_list->state_type = SOFT_STATE;
@@ -127,38 +129,26 @@ int main_test(int argc, char** argv) {
   service_list->last_event_id = LAST_EVENT_ID;
   service_list->current_problem_id = PROBLEM_ID;
   service_list->last_problem_id = LAST_PROBLEM_ID;
-  delete [] service_list->action_url;
+  delete[] service_list->action_url;
   service_list->action_url = string::dup(STR(ACTION_URL));
-  delete [] service_list->notes_url;
+  delete[] service_list->notes_url;
   service_list->notes_url = string::dup(STR(NOTES_URL));
-  delete [] service_list->notes;
+  delete[] service_list->notes;
   service_list->notes = string::dup(STR(NOTES));
 
   // Add service groups and link them to service.
-  servicegroup* sg1(add_servicegroup(const_cast<char*>(STR(GROUP1)),
-    NULL,
-    NULL,
-    NULL,
-    NULL));
-  servicegroup* sg2(add_servicegroup(const_cast<char*>(STR(GROUP2)),
-    NULL,
-    NULL,
-    NULL,
-    NULL));
-  servicegroup* sg3(add_servicegroup(const_cast<char*>(STR(GROUP3)),
-    NULL,
-    NULL,
-    NULL,
-    NULL));
-  add_service_to_servicegroup(sg1,
-    service_list->host_ptr->name,
-    service_list->description);
-  add_service_to_servicegroup(sg2,
-    service_list->host_ptr->name,
-    service_list->description);
-  add_service_to_servicegroup(sg3,
-    service_list->host_ptr->name,
-    service_list->description);
+  servicegroup* sg1(
+      add_servicegroup(const_cast<char*>(STR(GROUP1)), NULL, NULL, NULL, NULL));
+  servicegroup* sg2(
+      add_servicegroup(const_cast<char*>(STR(GROUP2)), NULL, NULL, NULL, NULL));
+  servicegroup* sg3(
+      add_servicegroup(const_cast<char*>(STR(GROUP3)), NULL, NULL, NULL, NULL));
+  add_service_to_servicegroup(sg1, service_list->host_ptr->name,
+                              service_list->description);
+  add_service_to_servicegroup(sg2, service_list->host_ptr->name,
+                              service_list->description);
+  add_service_to_servicegroup(sg3, service_list->host_ptr->name,
+                              service_list->description);
   add_object_to_objectlist(&service_list->servicegroups_ptr, sg3);
   add_object_to_objectlist(&service_list->servicegroups_ptr, sg2);
   add_object_to_objectlist(&service_list->servicegroups_ptr, sg1);
@@ -173,92 +163,83 @@ int main_test(int argc, char** argv) {
   // Macro values table.
   struct {
     unsigned int macro_id;
-    char const*  expected_value;
-    bool         is_double;
+    char const* expected_value;
+    bool is_double;
   } static const macro_values[] = {
-    { MACRO_SERVICEDESC, STR(DESCRIPTION), false },
-    { MACRO_SERVICEDISPLAYNAME, STR(DISPLAY_NAME), false },
-    { MACRO_SERVICEOUTPUT, STR(OUTPUT), false },
-    { MACRO_LONGSERVICEOUTPUT, STR(LONG_OUTPUT), false },
-    { MACRO_SERVICEPERFDATA, STR(PERF_DATA), false },
-    { MACRO_SERVICECHECKCOMMAND, STR(CHECK_COMMAND), false },
-    { MACRO_SERVICECHECKTYPE, STR(CHECK_TYPE), false },
-    { MACRO_SERVICESTATETYPE, STR(STATE_TYPE), false },
-    { MACRO_SERVICESTATE, STR(STATE), false },
-    { MACRO_SERVICESTATEID, STR(STATE_ID), false },
-    { MACRO_LASTSERVICESTATE, STR(LAST_STATE), false },
-    { MACRO_LASTSERVICESTATEID, STR(LAST_STATE_ID), false },
-    { MACRO_SERVICEISVOLATILE, STR(IS_VOLATILE), false },
-    { MACRO_SERVICEATTEMPT, STR(ATTEMPT), false },
-    { MACRO_MAXSERVICEATTEMPTS, STR(MAX_ATTEMPTS), false },
-    { MACRO_SERVICEEXECUTIONTIME, STR(EXECUTION_TIME), true },
-    { MACRO_SERVICELATENCY, STR(LATENCY), true },
-    { MACRO_LASTSERVICECHECK, STR(LAST_CHECK), false },
-    { MACRO_LASTSERVICESTATECHANGE, STR(LAST_STATE_CHANGE), false },
-    { MACRO_LASTSERVICEOK, STR(LAST_OK), false },
-    { MACRO_LASTSERVICEWARNING, STR(LAST_WARNING), false },
-    { MACRO_LASTSERVICEUNKNOWN, STR(LAST_UNKNOWN), false },
-    { MACRO_LASTSERVICECRITICAL, STR(LAST_CRITICAL), false },
-    { MACRO_SERVICEDOWNTIME, STR(DOWNTIME), false },
-    { MACRO_SERVICEPERCENTCHANGE, STR(PERCENT_CHANGE), true },
-    { MACRO_SERVICENOTIFICATIONNUMBER, STR(NOTIFICATION_NUMBER), false },
-    { MACRO_SERVICENOTIFICATIONID, STR(NOTIFICATION_ID), false },
-    { MACRO_SERVICEEVENTID, STR(EVENT_ID), false },
-    { MACRO_LASTSERVICEEVENTID, STR(LAST_EVENT_ID), false },
-    { MACRO_SERVICEPROBLEMID, STR(PROBLEM_ID), false },
-    { MACRO_LASTSERVICEPROBLEMID, STR(LAST_PROBLEM_ID), false },
-    { MACRO_SERVICEACTIONURL, STR(ACTION_URL), false },
-    { MACRO_SERVICENOTESURL, STR(NOTES_URL), false },
-    { MACRO_SERVICENOTES, STR(NOTES), false },
-    { MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false },
-    { MACRO_SERVICEACKAUTHOR, STR(ACK_AUTHOR), false },
-    { MACRO_SERVICEACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false },
-    { MACRO_SERVICEACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false },
-    { MACRO_SERVICEACKCOMMENT, STR(ACK_COMMENT), false }
-  };
+      {MACRO_SERVICEDESC, STR(DESCRIPTION), false},
+      {MACRO_SERVICEDISPLAYNAME, STR(DISPLAY_NAME), false},
+      {MACRO_SERVICEOUTPUT, STR(OUTPUT), false},
+      {MACRO_LONGSERVICEOUTPUT, STR(LONG_OUTPUT), false},
+      {MACRO_SERVICEPERFDATA, STR(PERF_DATA), false},
+      {MACRO_SERVICECHECKCOMMAND, STR(CHECK_COMMAND), false},
+      {MACRO_SERVICECHECKTYPE, STR(CHECK_TYPE), false},
+      {MACRO_SERVICESTATETYPE, STR(STATE_TYPE), false},
+      {MACRO_SERVICESTATE, STR(STATE), false},
+      {MACRO_SERVICESTATEID, STR(STATE_ID), false},
+      {MACRO_LASTSERVICESTATE, STR(LAST_STATE), false},
+      {MACRO_LASTSERVICESTATEID, STR(LAST_STATE_ID), false},
+      {MACRO_SERVICEISVOLATILE, STR(IS_VOLATILE), false},
+      {MACRO_SERVICEATTEMPT, STR(ATTEMPT), false},
+      {MACRO_MAXSERVICEATTEMPTS, STR(MAX_ATTEMPTS), false},
+      {MACRO_SERVICEEXECUTIONTIME, STR(EXECUTION_TIME), true},
+      {MACRO_SERVICELATENCY, STR(LATENCY), true},
+      {MACRO_LASTSERVICECHECK, STR(LAST_CHECK), false},
+      {MACRO_LASTSERVICESTATECHANGE, STR(LAST_STATE_CHANGE), false},
+      {MACRO_LASTSERVICEOK, STR(LAST_OK), false},
+      {MACRO_LASTSERVICEWARNING, STR(LAST_WARNING), false},
+      {MACRO_LASTSERVICEUNKNOWN, STR(LAST_UNKNOWN), false},
+      {MACRO_LASTSERVICECRITICAL, STR(LAST_CRITICAL), false},
+      {MACRO_SERVICEDOWNTIME, STR(DOWNTIME), false},
+      {MACRO_SERVICEPERCENTCHANGE, STR(PERCENT_CHANGE), true},
+      {MACRO_SERVICENOTIFICATIONNUMBER, STR(NOTIFICATION_NUMBER), false},
+      {MACRO_SERVICENOTIFICATIONID, STR(NOTIFICATION_ID), false},
+      {MACRO_SERVICEEVENTID, STR(EVENT_ID), false},
+      {MACRO_LASTSERVICEEVENTID, STR(LAST_EVENT_ID), false},
+      {MACRO_SERVICEPROBLEMID, STR(PROBLEM_ID), false},
+      {MACRO_LASTSERVICEPROBLEMID, STR(LAST_PROBLEM_ID), false},
+      {MACRO_SERVICEACTIONURL, STR(ACTION_URL), false},
+      {MACRO_SERVICENOTESURL, STR(NOTES_URL), false},
+      {MACRO_SERVICENOTES, STR(NOTES), false},
+      {MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false},
+      {MACRO_SERVICEACKAUTHOR, STR(ACK_AUTHOR), false},
+      {MACRO_SERVICEACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false},
+      {MACRO_SERVICEACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false},
+      {MACRO_SERVICEACKCOMMENT, STR(ACK_COMMENT), false}};
 
   // Compare macros with expected values.
   int retval(0);
-  for (unsigned int i = 0;
-       i < sizeof(macro_values) / sizeof(*macro_values);
+  for (unsigned int i = 0; i < sizeof(macro_values) / sizeof(*macro_values);
        ++i) {
     char* output(NULL);
     int free_macro;
-    if (grab_standard_service_macro_r(&mac,
-                                      macro_values[i].macro_id,
-                                      service_list,
-                                      &output,
-                                      &free_macro)
-        != OK)
+    if (grab_standard_service_macro_r(&mac, macro_values[i].macro_id,
+                                      service_list, &output, &free_macro) != OK)
       retval |= 1;
     else {
       if (macro_values[i].is_double) {
-        if (fabs(strtod(macro_values[i].expected_value, NULL)
-                 - strtod(output, NULL))
-            > 0.1) {
+        if (fabs(strtod(macro_values[i].expected_value, NULL) -
+                 strtod(output, NULL)) > 0.1) {
           retval |= 1;
           std::cout << "failing macro: " << macro_values[i].macro_id
                     << std::endl;
         }
-      }
-      else if (strcmp(output, macro_values[i].expected_value)) {
+      } else if (strcmp(output, macro_values[i].expected_value)) {
         retval |= 1;
-        std::cout << "failing macro: " << macro_values[i].macro_id
-                  << " (" << output << " != "
-                  << macro_values[i].expected_value << ")"
+        std::cout << "failing macro: " << macro_values[i].macro_id << " ("
+                  << output << " != " << macro_values[i].expected_value << ")"
                   << std::endl;
       }
       if (free_macro)
-        delete [] output;
+        delete[] output;
       else
         std::cout << macro_values[i].macro_id << std::endl;
     }
   }
 
-  delete [] mac.x[MACRO_SERVICEACKAUTHOR];
-  delete [] mac.x[MACRO_SERVICEACKAUTHORNAME];
-  delete [] mac.x[MACRO_SERVICEACKAUTHORALIAS];
-  delete [] mac.x[MACRO_SERVICEACKCOMMENT];
+  delete[] mac.x[MACRO_SERVICEACKAUTHOR];
+  delete[] mac.x[MACRO_SERVICEACKAUTHORNAME];
+  delete[] mac.x[MACRO_SERVICEACKAUTHORALIAS];
+  delete[] mac.x[MACRO_SERVICEACKCOMMENT];
 
   return (retval);
 }

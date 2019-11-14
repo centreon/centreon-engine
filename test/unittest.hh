@@ -77,11 +77,9 @@ class unittest {
       return (ret);
     try {
       ret = (*_func)(_argc, _argv);
-    }
-    catch (std::exception const& e) {
+    } catch (std::exception const& e) {
       std::cerr << "error: " << e.what() << std::endl;
-    }
-    catch (...) {
+    } catch (...) {
       std::cerr << "error: unknown exception" << std::endl;
     }
     if (!_deinit())
@@ -119,8 +117,7 @@ class unittest {
     try {
       com::centreon::clib::load();
       com::centreon::logging::engine::instance().add(
-          &_log,
-          com::centreon::engine::logging::log_all,
+          &_log, com::centreon::engine::logging::log_all,
           com::centreon::engine::logging::most);
       config = new configuration::state;
       timezone_manager::load();
@@ -130,14 +127,13 @@ class unittest {
       events::loop::load();
       broker::loader::load();
       broker::compatibility::load();
-    }
-    catch (std::exception const& e) {
+    } catch (std::exception const& e) {
       std::cerr << "unit test init failed: " << e.what() << std::endl;
       return (false);
-    }
-    catch (...) {
+    } catch (...) {
       std::cerr << "unit test init failed: "
-                   "unknown exception" << std::endl;
+                   "unknown exception"
+                << std::endl;
       return (false);
     }
     return (true);
@@ -154,14 +150,13 @@ class unittest {
       delete config;
       config = NULL;
       com::centreon::clib::unload();
-    }
-    catch (std::exception const& e) {
+    } catch (std::exception const& e) {
       std::cerr << "unit test deinit failed: " << e.what() << std::endl;
       return (false);
-    }
-    catch (...) {
+    } catch (...) {
       std::cerr << "unit test deinit failed: "
-                   "unknown exception" << std::endl;
+                   "unknown exception"
+                << std::endl;
       return (false);
     }
     return (true);

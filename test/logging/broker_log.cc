@@ -31,20 +31,20 @@
 using namespace com::centreon;
 
 /**************************************
-*                                     *
-*           Global Objects            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Global Objects            *
+ *                                     *
+ **************************************/
 
-static unsigned int const NB_DBG_TYPE    = 18;
-static unsigned int const NB_LOG_TYPE    = 21;
-static char const         LOG_MESSAGE[]  = "~!@#$%^&*()_+09/qwerty \n";
+static unsigned int const NB_DBG_TYPE = 18;
+static unsigned int const NB_LOG_TYPE = 21;
+static char const LOG_MESSAGE[] = "~!@#$%^&*()_+09/qwerty \n";
 
 /**************************************
-*                                     *
-*         Exported Functions          *
-*                                     *
-**************************************/
+ *                                     *
+ *         Exported Functions          *
+ *                                     *
+ **************************************/
 
 /**
  *  Check the logging broker working.
@@ -60,7 +60,8 @@ int main_test(int argc, char** argv) {
   engine::broker::loader& loader(engine::broker::loader::instance());
 
   // Load dummy module.
-  std::shared_ptr<engine::broker::handle> mod(loader.add_module("./dummymod.so"));
+  std::shared_ptr<engine::broker::handle> mod(
+      loader.add_module("./dummymod.so"));
   mod->open();
 
   // Get instance of logging engine.
@@ -68,10 +69,7 @@ int main_test(int argc, char** argv) {
 
   // Add new object (broker) to log into engine.
   engine::logging::broker obj;
-  e.add(
-      &obj,
-      engine::logging::log_all,
-      engine::logging::most);
+  e.add(&obj, engine::logging::log_all, engine::logging::most);
 
   // Send message on all different logging type.
   for (unsigned int i(0); i < NB_LOG_TYPE; ++i)

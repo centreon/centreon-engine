@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -40,24 +40,23 @@ static int check_schedule_forced_svc_check(int argc, char** argv) {
   (void)argv;
 
   // Create target service.
-  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
-                           0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
-                           0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0));
+  service* svc(add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0));
   if (!svc)
-    throw (engine_error() << "service creation failed");
+    throw(engine_error() << "service creation failed");
   svc->checks_enabled = true;
   svc->next_check = 0;
 
   // Send external command.
-  char const*
-    cmd("[1317196300] SCHEDULE_FORCED_SVC_CHECK;name;description;1317196300");
+  char const* cmd(
+      "[1317196300] SCHEDULE_FORCED_SVC_CHECK;name;description;1317196300");
   process_external_command(cmd);
 
   // Check.
   if (svc->next_check != 1317196300)
-    throw (engine_error() << "schedule_forced_svc_check failed");
+    throw(engine_error() << "schedule_forced_svc_check failed");
 
   // Cleanup.
   cleanup();

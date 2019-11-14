@@ -56,7 +56,6 @@ static std::string write_resource_file() {
   return (filename);
 }
 
-
 /**
  *  Check if the configuration parser and applier works properly
  *  for the user macros.
@@ -85,18 +84,21 @@ int main_test(int argc, char** argv) {
     for (unsigned int i(0); i < MAX_USER_MACROS - 1; ++i) {
       std::string key = std::string("USER") + string::from(i + 1);
       if (!macro_user[i] || macro_user[i] != users[key])
-        throw (engine_error() << "apply configuration resources "
-               "failed: global macro_user[" << i << "] is not equal "
-               "to configuration::state::user[" << i << "]");
+        throw(engine_error() << "apply configuration resources "
+                                "failed: global macro_user["
+                             << i
+                             << "] is not equal "
+                                "to configuration::state::user["
+                             << i << "]");
       std::ostringstream oss;
       oss << "resource_" << (i + 1);
       if (users[key] != oss.str())
-        throw (engine_error() << "parse configuration resources "
-               "failed: invalid data into configuration::state::user["
-               << i << "]: value = '" << users[key] << "'");
+        throw(engine_error()
+              << "parse configuration resources "
+                 "failed: invalid data into configuration::state::user["
+              << i << "]: value = '" << users[key] << "'");
     }
-  }
-  catch (...) {
+  } catch (...) {
     io::file_stream::remove(config_file);
     io::file_stream::remove(resource_file);
     throw;

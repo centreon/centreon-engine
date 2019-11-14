@@ -74,8 +74,9 @@
 #define NEBTYPE_PROCESS_DAEMONIZE 101
 #define NEBTYPE_PROCESS_RESTART 102
 #define NEBTYPE_PROCESS_SHUTDOWN 103
-#define NEBTYPE_PROCESS_PRELAUNCH 104 /* Before objects are read or verified. \
-                                       */
+#define NEBTYPE_PROCESS_PRELAUNCH             \
+  104 /* Before objects are read or verified. \
+       */
 #define NEBTYPE_PROCESS_EVENTLOOPSTART 105
 #define NEBTYPE_PROCESS_EVENTLOOPEND 106
 
@@ -281,9 +282,10 @@
 ** Event flags.
 */
 #define NEBFLAG_NONE 0
-#define NEBFLAG_PROCESS_INITIATED 1 /* Event was initiated by Engine process. \
-                                     */
-#define NEBFLAG_USER_INITIATED 2    /* Event was initiated by a user request. */
+#define NEBFLAG_PROCESS_INITIATED                                          \
+  1                              /* Event was initiated by Engine process. \
+                                  */
+#define NEBFLAG_USER_INITIATED 2 /* Event was initiated by a user request. */
 #define NEBFLAG_MODULE_INITIATED \
   3 /* Event was initiated by an event broker module. */
 

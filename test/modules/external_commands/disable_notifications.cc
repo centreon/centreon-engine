@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -38,7 +38,7 @@ static int check_disable_notifications(int argc, char** argv) {
   process_external_command(cmd);
 
   if (config->enable_notifications())
-    throw (engine_error() << "disable_notifications failed.");
+    throw(engine_error() << "disable_notifications failed.");
 
   return (0);
 }

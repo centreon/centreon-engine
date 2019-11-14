@@ -34,12 +34,11 @@ using namespace com::centreon::engine;
 static void check_directory() {
   try {
     config->parse("./");
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     return;
   }
-  throw (engine_error() << "try to parse directory.");
+  throw(engine_error() << "try to parse directory.");
 }
 
 /**
@@ -48,12 +47,11 @@ static void check_directory() {
 static void check_noexist_file() {
   try {
     config->parse("./test_noexist_file.cfg");
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     (void)e;
     return;
   }
-  throw (engine_error() << "try to parse noexisting file.");
+  throw(engine_error() << "try to parse noexisting file.");
 }
 
 /**
@@ -62,17 +60,16 @@ static void check_noexist_file() {
 static void check_exist_file() {
   char const* tmp(io::file_stream::temp_path());
   if (!tmp)
-    throw (engine_error() << "generate temporary file failed");
+    throw(engine_error() << "generate temporary file failed");
   try {
     std::ofstream file(tmp, std::ios_base::out | std::ios_base::trunc);
     config->parse(tmp);
-  }
-  catch (...) {
+  } catch (...) {
     remove(tmp);
     throw;
   }
   remove(tmp);
-  return ;
+  return;
 }
 
 /**

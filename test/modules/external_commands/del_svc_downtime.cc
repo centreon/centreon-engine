@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,45 +33,34 @@ static int check_del_svc_downtime(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst =
+      add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0,
+               0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+               0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+               NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  service* svc = add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0);
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw(engine_error() << "create service failed.");
 
   next_downtime_id = 1;
   unsigned long downtime_id;
   scheduled_downtime_list = NULL;
-  if (add_new_service_downtime("name",
-                               "description",
-                               time(NULL),
-                               NULL,
-                               NULL,
-                               time(NULL),
-                               time(NULL),
-                               0,
-                               0,
-                               0,
+  if (add_new_service_downtime("name", "description", time(NULL), NULL, NULL,
+                               time(NULL), time(NULL), 0, 0, 0,
                                &downtime_id) != OK)
-    throw (engine_error() << "create downtime failed.");
-
+    throw(engine_error() << "create downtime failed.");
 
   char const* cmd("[1317196300] DEL_SVC_DOWNTIME;1");
   process_external_command(cmd);
 
   if (scheduled_downtime_list)
-    throw (engine_error() << "del_svc_downtime failed.");
+    throw(engine_error() << "del_svc_downtime failed.");
   return (0);
 }
 

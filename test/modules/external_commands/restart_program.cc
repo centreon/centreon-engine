@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -45,7 +45,7 @@ static int check_restart_program(int argc, char** argv) {
 
   // Send external command.
   if (!event_list_high)
-    throw (engine_error() << "restart_program failed");
+    throw(engine_error() << "restart_program failed");
 
   // Cleanup.
   cleanup();

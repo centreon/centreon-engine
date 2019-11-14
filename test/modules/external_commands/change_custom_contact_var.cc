@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,20 +33,21 @@ static int check_change_custom_contact_var(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0, 0,
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
-    throw (engine_error() << "create contact failed.");
+    throw(engine_error() << "create contact failed.");
 
-  customvariablesmember* member = add_custom_variable_to_contact(cntct, "_VAR", "TEST");
+  customvariablesmember* member =
+      add_custom_variable_to_contact(cntct, "_VAR", "TEST");
   if (!member)
-    throw (engine_error() << "create customvariablesmember failed.");
+    throw(engine_error() << "create customvariablesmember failed.");
 
   char const* cmd("[1317196300] CHANGE_CUSTOM_CONTACT_VAR;name;_VAR;VALUE");
   process_external_command(cmd);
 
   if (strcmp(member->variable_value, "VALUE"))
-    throw (engine_error() << "change_custom_contact_var failed.");
+    throw(engine_error() << "change_custom_contact_var failed.");
   return (0);
 }
 

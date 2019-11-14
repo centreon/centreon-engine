@@ -36,8 +36,7 @@ using namespace com::centreon::engine::commands;
 static bool command_exist(std::string const& name) {
   try {
     set::instance().get_command(name);
-  }
-  catch (...) {
+  } catch (...) {
     return (false);
   }
   return (true);
@@ -58,30 +57,25 @@ int main_test(int argc, char** argv) {
   cmd_set.add_command(raw1);
   std::shared_ptr<commands::command> pcmd2(raw1.clone());
   cmd_set.add_command(pcmd2);
-  std::shared_ptr<commands::command>
-    pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
+  std::shared_ptr<commands::command> pcmd3(
+      new raw("pcmd3", "pcmd3 argv1 argv2"));
   cmd_set.add_command(pcmd3);
 
   // Get commands.
   if (!command_exist("raw1"))
-    throw (engine_error()
-           << "error: get_command failed, 'raw1' not found");
+    throw(engine_error() << "error: get_command failed, 'raw1' not found");
   if (!command_exist("pcmd3"))
-    throw (engine_error()
-           << "error: get_command failed, 'pcmd3' not found");
+    throw(engine_error() << "error: get_command failed, 'pcmd3' not found");
   if (command_exist("undef"))
-    throw (engine_error()
-           << "error: get_command failed, 'undef' found");
+    throw(engine_error() << "error: get_command failed, 'undef' found");
 
   // Remove commands.
   cmd_set.remove_command("pcmd3");
   if (command_exist("pcmd3"))
-    throw (engine_error()
-           << "error: remove_command failed, 'pcmd3' found");
+    throw(engine_error() << "error: remove_command failed, 'pcmd3' found");
   cmd_set.remove_command("raw1");
   if (command_exist("raw1"))
-    throw (engine_error()
-           << "error: remove_command failed, 'raw1' found");
+    throw(engine_error() << "error: remove_command failed, 'raw1' found");
   cmd_set.remove_command("undef");
 
   return (0);

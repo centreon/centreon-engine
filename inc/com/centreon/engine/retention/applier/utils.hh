@@ -23,6 +23,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()

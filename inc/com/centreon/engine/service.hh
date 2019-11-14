@@ -32,7 +32,7 @@
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/customvariable.hh"
-#include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/hash.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/notifier.hh"
 
@@ -46,15 +46,6 @@ class service;
 class servicegroup;
 class serviceescalation;
 CCE_END()
-
-// Needed by service to use pair<string, string> as umap key.
-// TODO SGA : check why servicedependency does not need it...
-struct pair_hash {
-  template <class T1, class T2>
-  std::size_t operator()(const std::pair<T1, T2>& pair) const {
-    return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
-  }
-};
 
 typedef std::unordered_map<std::pair<std::string, std::string>,
                            std::shared_ptr<com::centreon::engine::service>,

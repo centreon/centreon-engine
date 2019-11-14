@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -35,45 +35,40 @@ using namespace com::centreon::engine;
  *
  *  @return EXIT_SUCCESS on success
  */
-static int check_schedule_servicegroup_svc_downtime(
-             int argc,
-             char** argv) {
+static int check_schedule_servicegroup_svc_downtime(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
   // Create target service.
-  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
-                           0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
-                           0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0));
+  service* svc(add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0));
   if (!svc)
-    throw (engine_error() << "service creation failed");
+    throw(engine_error() << "service creation failed");
 
   // Create target service group.
-  servicegroup*
-    group(add_servicegroup("group", NULL, NULL, NULL, NULL));
+  servicegroup* group(add_servicegroup("group", NULL, NULL, NULL, NULL));
   if (!group)
-    throw (engine_error() << "service group creation failed");
+    throw(engine_error() << "service group creation failed");
 
   // Create membership.
-  servicesmember* member(add_service_to_servicegroup(
-                           group,
-                           "name",
-                           "description"));
+  servicesmember* member(
+      add_service_to_servicegroup(group, "name", "description"));
   if (!member)
-    throw (engine_error()
-           << "service group membership creation failed");
+    throw(engine_error() << "service group membership creation failed");
   member->service_ptr = svc;
 
   // Send external command.
-  char const* cmd("[1317196300] SCHEDULE_SERVICEGROUP_SVC_DOWNTIME;group;1317196300;2000000000;0;0;7200;user;comment");
+  char const* cmd(
+      "[1317196300] "
+      "SCHEDULE_SERVICEGROUP_SVC_DOWNTIME;group;1317196300;2000000000;0;0;7200;"
+      "user;comment");
   process_external_command(cmd);
 
   // Check.
   if (!scheduled_downtime_list)
-    throw (engine_error()
-           << "schedule_servicegroup_svc_downtime failed");
+    throw(engine_error() << "schedule_servicegroup_svc_downtime failed");
 
   // Cleanup.
   cleanup();
@@ -90,9 +85,6 @@ static int check_schedule_servicegroup_svc_downtime(
  *  @return EXIT_SUCCESS on success.
  */
 int main(int argc, char** argv) {
-  unittest utest(
-             argc,
-             argv,
-             &check_schedule_servicegroup_svc_downtime);
+  unittest utest(argc, argv, &check_schedule_servicegroup_svc_downtime);
   return (utest.run());
 }

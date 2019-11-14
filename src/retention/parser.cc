@@ -19,8 +19,8 @@
 
 #include "com/centreon/engine/retention/parser.hh"
 #include <array>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
@@ -73,7 +73,7 @@ void parser::parse(std::string const& path, state& retention) {
       if (string::split(input, &key, &value, '='))
         if (strcmp(key, "notification_0") == 0)
           std::cout << "COOL\n";
-        obj->set(key, value);
+      obj->set(key, value);
     } else {
       (this->*_store[obj->type()])(retention, obj);
       obj.reset();

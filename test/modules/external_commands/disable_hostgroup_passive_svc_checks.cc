@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,44 +33,41 @@ static int check_disable_hostgroup_passive_svc_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst =
+      add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0,
+               0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+               0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+               NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  service* svc = add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0);
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw(engine_error() << "create service failed.");
 
   hostgroup* group = add_hostgroup("group", NULL, NULL, NULL, NULL);
   if (!group)
-    throw (engine_error() << "create hostgroup failed.");
+    throw(engine_error() << "create hostgroup failed.");
 
   hostsmember* hmember = add_host_to_hostgroup(group, "name");
   if (!hmember)
-    throw (engine_error() << "host link to hostgroup.");
+    throw(engine_error() << "host link to hostgroup.");
   hmember->host_ptr = hst;
 
   servicesmember* smember = add_service_link_to_host(hst, svc);
   if (!smember)
-    throw (engine_error() << "service link to servicegroup.");
+    throw(engine_error() << "service link to servicegroup.");
   smember->service_ptr = svc;
-
 
   svc->accept_passive_service_checks = true;
   char const* cmd("[1317196300] DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS;group");
   process_external_command(cmd);
 
   if (svc->accept_passive_service_checks)
-    throw (engine_error() << "disable_hostgroup_passive_svc_checks failed.");
+    throw(engine_error() << "disable_hostgroup_passive_svc_checks failed.");
   return (0);
 }
 

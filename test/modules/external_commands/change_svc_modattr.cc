@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,21 +33,19 @@ static int check_change_svc_modattr(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  service* svc = add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0);
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw(engine_error() << "create service failed.");
 
   svc->modified_attributes = 0;
   char const* cmd("[1317196300] CHANGE_SVC_MODATTR;name;description;42");
   process_external_command(cmd);
 
   if (svc->modified_attributes != 42)
-    throw (engine_error() << "change_svc_modattr failed.");
+    throw(engine_error() << "change_svc_modattr failed.");
   return (0);
 }
 

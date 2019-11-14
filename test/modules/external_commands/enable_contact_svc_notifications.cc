@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,17 +33,17 @@ static int check_enable_contact_svc_notifications(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0, 0,
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
-    throw (engine_error() << "create contact failed.");
+    throw(engine_error() << "create contact failed.");
 
   cntct->service_notifications_enabled = false;
   char const* cmd("[1317196300] ENABLE_CONTACT_SVC_NOTIFICATIONS;name");
   process_external_command(cmd);
 
   if (!cntct->service_notifications_enabled)
-    throw (engine_error() << "enable_contact_svc_notifications failed.");
+    throw(engine_error() << "enable_contact_svc_notifications failed.");
   return (0);
 }
 

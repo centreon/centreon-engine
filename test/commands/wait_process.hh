@@ -115,9 +115,8 @@ class wait_process : public command_listener {
   mutable std::mutex _mtx;
   result _res;
 };
-}
+}  // namespace commands
 
 CCE_END()
 
 #endif  // !TEST_COMMANDS_WAIT_PROCESS_HH
-

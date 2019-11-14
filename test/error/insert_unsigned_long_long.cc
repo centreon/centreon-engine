@@ -18,8 +18,8 @@
 */
 
 #include <limits.h>
-#include <sstream>
 #include <string.h>
+#include <sstream>
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine;
@@ -36,7 +36,7 @@ int main() {
 
 #ifdef ULLONG_MAX
   e << ULLONG_MAX - 789 << ULLONG_MAX << 0ull;
-#endif // !ULLONG_MAX
+#endif  // !ULLONG_MAX
 
   // Conversion reference.
   std::ostringstream oss;
@@ -44,7 +44,7 @@ int main() {
 
 #ifdef ULLONG_MAX
   oss << ULLONG_MAX - 789 << ULLONG_MAX << 0ull;
-#endif // !ULLONG_MAX
+#endif  // !ULLONG_MAX
 
   // Check.
   return (strcmp(oss.str().c_str(), e.what()));

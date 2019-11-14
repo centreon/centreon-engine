@@ -70,20 +70,13 @@ int nebmodule_deinit(unsigned int flags, unsigned int reason) {
  *
  *  @return 0 on success.
  */
-int nebmodule_init(
-      unsigned int flags,
-      char const* args,
-      void* handle) {
+int nebmodule_init(unsigned int flags, char const* args, void* handle) {
   (void)flags;
   (void)args;
 
   // Register callback.
-  if (neb_register_callback(
-        NEBCALLBACK_LOG_DATA,
-        handle,
-        0,
-        &log_callback))
-    throw (engine_error() << "cannot register log callback");
+  if (neb_register_callback(NEBCALLBACK_LOG_DATA, handle, 0, &log_callback))
+    throw(engine_error() << "cannot register log callback");
 
   return (0);
 }

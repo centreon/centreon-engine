@@ -50,10 +50,9 @@ static bool run_without_timeout() {
 
   // Check result.
   result const& res = wait_proc.get_result();
-  return (!((res.command_id != id)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != cmd->get_command_line())));
+  return (!((res.command_id != id) || (res.exit_code != STATE_OK) ||
+            (res.exit_status != process::normal) ||
+            (res.output != cmd->get_command_line())));
 }
 
 /**
@@ -74,10 +73,9 @@ static bool run_with_timeout() {
 
   // Check result.
   result const& res = wait_proc.get_result();
-  return (!((res.command_id != id)
-            || (res.exit_code != STATE_UNKNOWN)
-            || (res.exit_status != process::timeout)
-            || (res.output != "(Process Timeout)")));
+  return (!((res.command_id != id) || (res.exit_code != STATE_UNKNOWN) ||
+            (res.exit_status != process::timeout) ||
+            (res.output != "(Process Timeout)")));
 }
 
 /**
@@ -103,14 +101,13 @@ static bool run_with_environment_macros() {
   // Run command and wait for it to exit.
   unsigned long id(cmd->run(cmd->get_command_line(), mac, 0));
   wait_proc.wait();
-  delete [] mac.argv[0];
+  delete[] mac.argv[0];
 
   // Check result.
   result const& res = wait_proc.get_result();
-  return (!((res.command_id != id)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != cmd->get_command_line())));
+  return (!((res.command_id != id) || (res.exit_code != STATE_OK) ||
+            (res.exit_status != process::normal) ||
+            (res.output != cmd->get_command_line())));
 }
 
 /**
@@ -120,7 +117,8 @@ static bool run_with_environment_macros() {
  */
 static bool run_with_single_quotes() {
   // Raw command object and its waiter.
-  std::shared_ptr<raw> cmd(new raw(__func__, "'./bin_test_run' '--timeout'='off'"));
+  std::shared_ptr<raw> cmd(
+      new raw(__func__, "'./bin_test_run' '--timeout'='off'"));
   wait_process wait_proc(cmd.get());
   set::instance().add_command(cmd);
 
@@ -131,10 +129,9 @@ static bool run_with_single_quotes() {
 
   // Check result.
   result const& res = wait_proc.get_result();
-  return !((res.command_id != id)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != "./bin_test_run --timeout=off"));
+  return !((res.command_id != id) || (res.exit_code != STATE_OK) ||
+           (res.exit_status != process::normal) ||
+           (res.output != "./bin_test_run --timeout=off"));
 }
 
 /**
@@ -144,7 +141,8 @@ static bool run_with_single_quotes() {
  */
 static bool run_with_double_quotes() {
   // Raw command object and its waiter.
-  std::shared_ptr<raw> cmd(new raw(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\""));
+  std::shared_ptr<raw> cmd(
+      new raw(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\""));
   wait_process wait_proc(cmd.get());
   set::instance().add_command(cmd);
 
@@ -155,10 +153,9 @@ static bool run_with_double_quotes() {
 
   // Check result.
   result const& res = wait_proc.get_result();
-  return (!((res.command_id != id)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != "./bin_test_run --timeout=off")));
+  return (!((res.command_id != id) || (res.exit_code != STATE_OK) ||
+            (res.exit_status != process::normal) ||
+            (res.output != "./bin_test_run --timeout=off")));
 }
 
 /**
@@ -173,15 +170,15 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
   if (!run_without_timeout())
-    throw (engine_error() << "raw::run without timeout failed");
+    throw(engine_error() << "raw::run without timeout failed");
   if (!run_with_timeout())
-    throw (engine_error() << "raw::run with timeout failed");
+    throw(engine_error() << "raw::run with timeout failed");
   if (!run_with_environment_macros())
-    throw (engine_error() << "raw::run with macros failed");
+    throw(engine_error() << "raw::run with macros failed");
   if (!run_with_single_quotes())
-    throw (engine_error() << "raw::run with single quotes failed");
+    throw(engine_error() << "raw::run with single quotes failed");
   if (!run_with_double_quotes())
-    throw (engine_error() << "raw::run with double quotes failed");
+    throw(engine_error() << "raw::run with double quotes failed");
   return (EXIT_SUCCESS);
 }
 

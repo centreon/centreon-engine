@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,24 +33,24 @@ static int check_change_custom_svc_var(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  service* svc = add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0);
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw(engine_error() << "create service failed.");
 
-  customvariablesmember* member = add_custom_variable_to_service(svc, "_VAR", "TEST");
+  customvariablesmember* member =
+      add_custom_variable_to_service(svc, "_VAR", "TEST");
   if (!member)
-    throw (engine_error() << "create customvariablesmember failed.");
+    throw(engine_error() << "create customvariablesmember failed.");
 
-  char const* cmd("[1317196300] CHANGE_CUSTOM_SVC_VAR;name;description;_VAR;VALUE");
+  char const* cmd(
+      "[1317196300] CHANGE_CUSTOM_SVC_VAR;name;description;_VAR;VALUE");
   process_external_command(cmd);
 
   if (strcmp(member->variable_value, "VALUE"))
-    throw (engine_error() << "change_custom_svc_var failed.");
+    throw(engine_error() << "change_custom_svc_var failed.");
   return (0);
 }
 

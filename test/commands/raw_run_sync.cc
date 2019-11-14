@@ -45,10 +45,9 @@ static bool run_without_timeout() {
   cmd.run(cmd.get_command_line(), mac, 0, res);
 
   // Check result.
-  return (!((res.command_id == 0)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != cmd.get_command_line())));
+  return (!((res.command_id == 0) || (res.exit_code != STATE_OK) ||
+            (res.exit_status != process::normal) ||
+            (res.output != cmd.get_command_line())));
 }
 
 /**
@@ -66,10 +65,9 @@ static bool run_with_timeout() {
   cmd.run(cmd.get_command_line(), mac, 1, res);
 
   // Check result.
-  return (!((res.command_id == 0)
-            || (res.exit_code != STATE_UNKNOWN)
-            || (res.exit_status != process::timeout)
-            || (res.output != "(Process Timeout)")));
+  return (!((res.command_id == 0) || (res.exit_code != STATE_UNKNOWN) ||
+            (res.exit_status != process::timeout) ||
+            (res.output != "(Process Timeout)")));
 }
 
 /**
@@ -93,13 +91,12 @@ static bool run_with_environment_macros() {
   // Run command.
   result res;
   cmd.run(cmd.get_command_line(), mac, 0, res);
-  delete [] mac.argv[0];
+  delete[] mac.argv[0];
 
   // Check result.
-  return (!((res.command_id == 0)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != cmd.get_command_line())));
+  return (!((res.command_id == 0) || (res.exit_code != STATE_OK) ||
+            (res.exit_status != process::normal) ||
+            (res.output != cmd.get_command_line())));
 }
 
 /**
@@ -117,10 +114,9 @@ static bool run_with_single_quotes() {
   cmd.run(cmd.get_command_line(), mac, 0, res);
 
   // Check result.
-  return (!((res.command_id == 0)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != "./bin_test_run --timeout=off")));
+  return (!((res.command_id == 0) || (res.exit_code != STATE_OK) ||
+            (res.exit_status != process::normal) ||
+            (res.output != "./bin_test_run --timeout=off")));
 }
 
 /**
@@ -138,10 +134,9 @@ static bool run_with_double_quotes() {
   cmd.run(cmd.get_command_line(), mac, 0, res);
 
   // Check result.
-  return (!((res.command_id == 0)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != "./bin_test_run --timeout=off")));
+  return (!((res.command_id == 0) || (res.exit_code != STATE_OK) ||
+            (res.exit_status != process::normal) ||
+            (res.output != "./bin_test_run --timeout=off")));
 }
 
 /**
@@ -156,15 +151,15 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
   if (!run_without_timeout())
-    throw (engine_error() << "raw::run without timeout failed");
+    throw(engine_error() << "raw::run without timeout failed");
   if (!run_with_timeout())
-    throw (engine_error() << "raw::run with timeout failed");
+    throw(engine_error() << "raw::run with timeout failed");
   if (!run_with_environment_macros())
-    throw (engine_error() << "raw::run with macros failed");
+    throw(engine_error() << "raw::run with macros failed");
   if (!run_with_single_quotes())
-    throw (engine_error() << "raw::run with single quotes failed");
+    throw(engine_error() << "raw::run with single quotes failed");
   if (!run_with_double_quotes())
-    throw (engine_error() << "raw::run with double quotes failed");
+    throw(engine_error() << "raw::run with double quotes failed");
   return (EXIT_SUCCESS);
 }
 

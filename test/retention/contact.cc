@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctime>
 #include "com/centreon/engine/retention/contact.hh"
+#include <ctime>
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
 
@@ -52,8 +52,8 @@ int main_test(int argc, char* argv[]) {
   {
     retention::contact copy(ref);
     if (!(copy == ref) || copy != ref)
-      throw (engine_error() << "copy constructor or operator "
-             "equal failed");
+      throw(engine_error() << "copy constructor or operator "
+                              "equal failed");
   }
 
   // Check copy operator.
@@ -61,15 +61,15 @@ int main_test(int argc, char* argv[]) {
     retention::contact copy;
     copy = ref;
     if (!(copy == ref) || copy != ref)
-      throw (engine_error() << "copy operator or operator "
-             "equal failed");
+      throw(engine_error() << "copy operator or operator "
+                              "equal failed");
   }
 
   // Check operator equal and not equal.
   {
     retention::contact empty;
     if (empty == ref || !(empty != ref))
-      throw (engine_error() << "operator equal failed");
+      throw(engine_error() << "operator equal failed");
   }
 
   // Check operator equal and not equal.
@@ -77,8 +77,8 @@ int main_test(int argc, char* argv[]) {
     retention::contact diff(ref);
     diff.set("contact_name", "new_contact_name");
     if (diff == ref || !(diff != ref))
-      throw (engine_error() << "copy operator or operator "
-             "equal failed");
+      throw(engine_error() << "copy operator or operator "
+                              "equal failed");
   }
   return (0);
 }

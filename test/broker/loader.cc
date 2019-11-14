@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker/loader.hh"
 #include <climits>
 #include <exception>
 #include <list>
-#include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
 
@@ -46,7 +46,7 @@ void check_load() {
 
   std::list<std::shared_ptr<handle> > modules(loader.get_modules());
   if (modules.size() != 2)
-    throw (engine_error() << __func__ << ": load modules failed");
+    throw(engine_error() << __func__ << ": load modules failed");
 }
 
 /**
@@ -57,7 +57,7 @@ void check_unload() {
   loader.unload_modules();
   std::list<std::shared_ptr<handle> > modules(loader.get_modules());
   if ((false == mod_test_load_quit) || (modules.size() != 0))
-    throw (engine_error() << __func__ << ": unload modules failed");
+    throw(engine_error() << __func__ << ": unload modules failed");
 }
 
 /**
@@ -66,10 +66,9 @@ void check_unload() {
 void check_change_name() {
   // Load module with initial name.
   loader& loader(loader::instance());
-  std::shared_ptr<handle>
-    module(loader.add_module(MOD_LIB_NAME, MOD_LIB_NAME));
+  std::shared_ptr<handle> module(loader.add_module(MOD_LIB_NAME, MOD_LIB_NAME));
   if (loader.get_modules().size() != 1)
-    throw (engine_error() << __func__ << ": add module failed");
+    throw(engine_error() << __func__ << ": add module failed");
 
   // Change name.
   std::string new_name("New Name");
@@ -78,9 +77,9 @@ void check_change_name() {
   // Check content.
   std::list<std::shared_ptr<handle> > modules(loader.get_modules());
   if (modules.size() != 1)
-    throw (engine_error() << __func__ << ": set name failed");
+    throw(engine_error() << __func__ << ": set name failed");
   if ((*modules.begin())->get_name() != new_name)
-    throw (engine_error() << __func__ << ": set name failed");
+    throw(engine_error() << __func__ << ": set name failed");
   loader.del_module(module);
 }
 

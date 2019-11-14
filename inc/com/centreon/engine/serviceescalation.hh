@@ -21,6 +21,7 @@
 #define CCE_SERVICEESCALATION_HH
 
 #include "com/centreon/engine/escalation.hh"
+#include "com/centreon/engine/hash.hh"
 
 /* Forward declaration. */
 CCE_BEGIN()

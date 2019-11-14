@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -34,25 +34,16 @@ static int check_del_svc_comment(int argc, char** argv) {
   (void)argv;
 
   next_comment_id = 1;
-  if (add_new_comment(SERVICE_COMMENT,
-                      USER_COMMENT,
-                      "name",
-                      "description",
-                      time(NULL),
-                      "user",
-                      "data",
-                      true,
-                      COMMENTSOURCE_EXTERNAL,
-                      false,
-                      0,
-                      NULL) == ERROR)
-    throw (engine_error() << "create new comment failed.");
+  if (add_new_comment(SERVICE_COMMENT, USER_COMMENT, "name", "description",
+                      time(NULL), "user", "data", true, COMMENTSOURCE_EXTERNAL,
+                      false, 0, NULL) == ERROR)
+    throw(engine_error() << "create new comment failed.");
 
   char const* cmd("[1317196300] DEL_SVC_COMMENT;1");
   process_external_command(cmd);
 
   if (comment_list)
-    throw (engine_error() << "del_svc_comment failed.");
+    throw(engine_error() << "del_svc_comment failed.");
   return (0);
 }
 

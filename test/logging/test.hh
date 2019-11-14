@@ -57,7 +57,7 @@ class test : public com::centreon::logging::backend {
   uint64_t _type;
   uint32_t _verbosity;
 };
-}
+}  // namespace logging
 
 CCE_END()
 

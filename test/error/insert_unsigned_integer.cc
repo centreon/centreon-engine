@@ -18,8 +18,8 @@
 */
 
 #include <limits.h>
-#include <sstream>
 #include <string.h>
+#include <sstream>
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine;

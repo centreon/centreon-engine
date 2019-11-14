@@ -37,14 +37,14 @@ static int main_test(int argc, char** argv) {
   environment env1(environ);
   environment env2(environ);
   if (!(env1 == env2))
-    throw (engine_error() << "invalid equal operator");
+    throw(engine_error() << "invalid equal operator");
   if (env1 != env2)
-    throw (engine_error() << "invalid not equal operator");
+    throw(engine_error() << "invalid not equal operator");
   environment env3;
   if (env1 == env3)
-    throw (engine_error() << "invalid equal operator");
+    throw(engine_error() << "invalid equal operator");
   if (!(env1 != env3))
-    throw (engine_error() << "invalid not equal operator");
+    throw(engine_error() << "invalid not equal operator");
   return (0);
 }
 

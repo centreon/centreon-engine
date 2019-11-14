@@ -43,8 +43,7 @@ int main(int argc, char* argv[]) {
 
     // Check arguments.
     if (argc < 2)
-      throw (engine_error() << "USAGE: "
-             << argv[0] << " <config> [timeout]");
+      throw(engine_error() << "USAGE: " << argv[0] << " <config> [timeout]");
     time_t timeout;
     if (argc >= 3)
       timeout = strtoul(argv[2], NULL, 0);
@@ -65,7 +64,7 @@ int main(int argc, char* argv[]) {
     centengined.exec(cmd);
     bool reached_timeout(!centengined.wait(timeout * 1000));
     if (!reached_timeout)
-      throw (engine_error() << "timeout has not been reached");
+      throw(engine_error() << "timeout has not been reached");
 
     // Terminate process gracefully.
     centengined.terminate();
@@ -73,16 +72,13 @@ int main(int argc, char* argv[]) {
       centengined.kill();
 
     // Reaching here means success.
-    retval = (((centengined.exit_status()
-                == com::centreon::process::normal)
-               && (centengined.exit_code() == EXIT_SUCCESS))
-              ? EXIT_SUCCESS
-              : EXIT_FAILURE);
-  }
-  catch (std::exception const& e) {
+    retval = (((centengined.exit_status() == com::centreon::process::normal) &&
+               (centengined.exit_code() == EXIT_SUCCESS))
+                  ? EXIT_SUCCESS
+                  : EXIT_FAILURE);
+  } catch (std::exception const& e) {
     std::cerr << e.what() << std::endl;
-  }
-  catch (...) {
+  } catch (...) {
     std::cerr << "unknown error" << std::endl;
   }
 

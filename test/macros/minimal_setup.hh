@@ -18,16 +18,16 @@
 */
 
 #ifndef CCE_TEST_MINIMAL_SETUP_HH_
-# define CCE_TEST_MINIMAL_SETUP_HH_
+#define CCE_TEST_MINIMAL_SETUP_HH_
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace test {
-        void    minimal_setup();
-      }
-    }
-  }
+namespace com {
+namespace centreon {
+namespace engine {
+namespace test {
+void minimal_setup();
 }
+}  // namespace engine
+}  // namespace centreon
+}  // namespace com
 
 #endif /* !CCE_TEST_MINIMAL_SETUP_HH_ */

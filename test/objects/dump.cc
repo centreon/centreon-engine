@@ -18,8 +18,8 @@
 */
 
 #include <sstream>
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/objects.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -34,7 +34,7 @@ using namespace com::centreon::engine;
  */
 int main_test(int argc, char* argv[]) {
   if (argc != 2)
-    throw (engine_error() << "usage: " << argv[0] << " object_name");
+    throw(engine_error() << "usage: " << argv[0] << " object_name");
 
   std::ostringstream oss;
   std::string const type(argv[1]);
@@ -43,113 +43,91 @@ int main_test(int argc, char* argv[]) {
     command obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "commandsmember") {
+  } else if (type == "commandsmember") {
     commandsmember obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "comment") {
+  } else if (type == "comment") {
     comment obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "contactgroup") {
+  } else if (type == "contactgroup") {
     contactgroup obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "contactgroupsmember") {
+  } else if (type == "contactgroupsmember") {
     contactgroupsmember obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "contact") {
+  } else if (type == "contact") {
     contact obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "contactsmember") {
+  } else if (type == "contactsmember") {
     contactsmember obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "customvariablesmember") {
+  } else if (type == "customvariablesmember") {
     customvariablesmember obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "daterange") {
+  } else if (type == "daterange") {
     daterange obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "downtime") {
+  } else if (type == "downtime") {
     scheduled_downtime obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "hostdependency") {
+  } else if (type == "hostdependency") {
     hostdependency obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "hostescalation") {
+  } else if (type == "hostescalation") {
     hostescalation obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "hostgroup") {
+  } else if (type == "hostgroup") {
     hostgroup obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "host") {
+  } else if (type == "host") {
     host obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "hostsmember") {
+  } else if (type == "hostsmember") {
     hostsmember obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "servicedependency") {
+  } else if (type == "servicedependency") {
     servicedependency obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "serviceescalation") {
+  } else if (type == "serviceescalation") {
     serviceescalation obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "servicegroup") {
+  } else if (type == "servicegroup") {
     servicegroup obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "service") {
+  } else if (type == "service") {
     service obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "servicesmember") {
+  } else if (type == "servicesmember") {
     servicesmember obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "timeperiod") {
+  } else if (type == "timeperiod") {
     timeperiod obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "timeperiodexclusion") {
+  } else if (type == "timeperiodexclusion") {
     timeperiodexclusion obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
-  }
-  else if (type == "timerange") {
+  } else if (type == "timerange") {
     timerange obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;

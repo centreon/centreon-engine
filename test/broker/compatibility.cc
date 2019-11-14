@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker/compatibility.hh"
 #include <climits>
 #include <exception>
-#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/nebmodules.hh"
@@ -44,29 +44,28 @@ int main_test(int argc, char** argv) {
   loader.add_module(MOD_LIB_COMPT_NAME, MOD_LIB_COMPT_NAME)->open();
 
   if (loader.get_modules().size() != 1) {
-    throw (engine_error() << __func__ << ": broker loader failed.");
+    throw(engine_error() << __func__ << ": broker loader failed.");
   }
 
   for (nebmodule* tmp = neb_module_list; tmp != NULL; tmp = tmp->next) {
     if (tmp->module_handle != NULL) {
-
       if (strcmp(tmp->info[NEBMODULE_MODINFO_TITLE], MOD_TITLE)) {
-	throw (engine_error() << __func__ << ": invalid name.");
+        throw(engine_error() << __func__ << ": invalid name.");
       }
       if (strcmp(tmp->info[NEBMODULE_MODINFO_AUTHOR], MOD_AUTHOR)) {
-	throw (engine_error() << __func__ << ": invalide author.");
+        throw(engine_error() << __func__ << ": invalide author.");
       }
       if (strcmp(tmp->info[NEBMODULE_MODINFO_COPYRIGHT], MOD_COPYRIGHT)) {
-	throw (engine_error() << __func__ << ": invalide copyright.");
+        throw(engine_error() << __func__ << ": invalide copyright.");
       }
       if (strcmp(tmp->info[NEBMODULE_MODINFO_DESC], MOD_DESCRIPTION)) {
-	throw (engine_error() << __func__ << ": invalide description.");
+        throw(engine_error() << __func__ << ": invalide description.");
       }
       if (strcmp(tmp->info[NEBMODULE_MODINFO_VERSION], MOD_VERSION)) {
-	throw (engine_error() << __func__ << ": invalide version.");
+        throw(engine_error() << __func__ << ": invalide version.");
       }
       if (strcmp(tmp->info[NEBMODULE_MODINFO_LICENSE], MOD_LICENSE)) {
-	throw (engine_error() << __func__ << ": invalide license.");
+        throw(engine_error() << __func__ << ": invalide license.");
       }
     }
   }

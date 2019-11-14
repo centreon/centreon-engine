@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,21 +33,19 @@ static int check_enable_svc_flap_detection(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  service* svc = add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0);
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw(engine_error() << "create service failed.");
 
   svc->flap_detection_enabled = false;
   char const* cmd("[1317196300] ENABLE_SVC_FLAP_DETECTION;name;description");
   process_external_command(cmd);
 
   if (!svc->flap_detection_enabled)
-    throw (engine_error() << "enable_svc_flap_detection failed.");
+    throw(engine_error() << "enable_svc_flap_detection failed.");
   return (0);
 }
 

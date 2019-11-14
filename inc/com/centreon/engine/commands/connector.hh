@@ -24,7 +24,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include "com/centreon/concurrency/thread.hh"
+#include <thread>
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/namespace.hh"
 #include "com/centreon/process.hh"
@@ -72,18 +72,23 @@ class connector : public command, public process_listener {
   static connector_map connectors;
 
  private:
-  class restart : public concurrency::thread {
-   public:
-    restart(connector* c);
-    ~restart() noexcept override;
-
-   private:
-    restart(restart const& right);
-    restart& operator=(restart const& right);
-    void _run() override;
-
-    connector* _c;
-  };
+  //  class restart {
+  //   public:
+  //    restart(connector* c) : _c{c} {
+  //      _thread = new std::thread(&restart::_run, this);
+  //    }
+  //    restart(restart const& right) = delete;
+  //    restart& operator=(restart const& right) = delete;
+  //    ~restart() noexcept;
+  //    void wait();
+  //    bool wait(uint32_t timeout);
+  //
+  //   private:
+  //    void _run();
+  //
+  //    std::thread* _thread;
+  //    connector* _c;
+  //  };
 
   struct query_info {
     std::string processed_cmd;
@@ -109,6 +114,7 @@ class connector : public command, public process_listener {
                            uint32_t timeout);
   void _send_query_quit();
   void _send_query_version();
+  void _run_restart();
 
   std::condition_variable _cv_query;
   std::string _data_available;
@@ -119,7 +125,7 @@ class connector : public command, public process_listener {
   mutable std::mutex _lock;
   process _process;
   std::unordered_map<uint64_t, result> _results;
-  restart _restart;
+  std::thread* _restart;
   bool _try_to_restart;
 };
 }  // namespace commands

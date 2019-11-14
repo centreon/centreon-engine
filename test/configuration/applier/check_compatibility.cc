@@ -18,6 +18,7 @@
 */
 
 #include <string>
+#include "chkdiff.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
@@ -34,7 +35,6 @@
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
 #include "compatibility/locations.h"
-#include "chkdiff.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
 #include "xrddefault.hh"
@@ -42,158 +42,151 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-struct                global {
-  command*            commands;
-  comment*            comments;
-  contact*            contacts;
-  contactgroup*       contactgroups;
+struct global {
+  command* commands;
+  comment* comments;
+  contact* contacts;
+  contactgroup* contactgroups;
   scheduled_downtime* downtimes;
-  host*               hosts;
-  hostdependency*     hostdependencies;
-  hostescalation*     hostescalations;
-  hostgroup*          hostgroups;
-  service*            services;
-  servicedependency*  servicedependencies;
-  serviceescalation*  serviceescalations;
-  servicegroup*       servicegroups;
-  timeperiod*         timeperiods;
+  host* hosts;
+  hostdependency* hostdependencies;
+  hostescalation* hostescalations;
+  hostgroup* hostgroups;
+  service* services;
+  servicedependency* servicedependencies;
+  serviceescalation* serviceescalations;
+  servicegroup* servicegroups;
+  timeperiod* timeperiods;
 
-  umap<std::string, std::shared_ptr<command> >
-                      save_commands;
-  umap<std::string, std::shared_ptr<commands::connector> >
-                      save_connectors;
-  umap<std::string, std::shared_ptr<contact> >
-                      save_contacts;
-  umap<std::string, std::shared_ptr<contactgroup> >
-                      save_contactgroups;
-  umap<std::string, std::shared_ptr<host> >
-                      save_hosts;
+  umap<std::string, std::shared_ptr<command> > save_commands;
+  umap<std::string, std::shared_ptr<commands::connector> > save_connectors;
+  umap<std::string, std::shared_ptr<contact> > save_contacts;
+  umap<std::string, std::shared_ptr<contactgroup> > save_contactgroups;
+  umap<std::string, std::shared_ptr<host> > save_hosts;
   umultimap<std::string, std::shared_ptr<hostdependency> >
-                      save_hostdependencies;
-  umultimap<std::string, std::shared_ptr<hostescalation> >
-                      save_hostescalations;
-  umap<std::string, std::shared_ptr<hostgroup> >
-                      save_hostgroups;
+      save_hostdependencies;
+  umultimap<std::string, std::shared_ptr<hostescalation> > save_hostescalations;
+  umap<std::string, std::shared_ptr<hostgroup> > save_hostgroups;
   umap<std::pair<std::string, std::string>, std::shared_ptr<service> >
-                      save_services;
+      save_services;
   umultimap<std::pair<std::string, std::string>,
-    std::shared_ptr<servicedependency> >
-                      save_servicedependencies;
+            std::shared_ptr<servicedependency> >
+      save_servicedependencies;
   umultimap<std::pair<std::string, std::string>,
-    std::shared_ptr<serviceescalation> >
-                      save_serviceescalations;
-  umap<std::string, std::shared_ptr<servicegroup> >
-                      save_servicegroups;
-  umap<std::string, std::shared_ptr<timeperiod> >
-                      save_timeperiods;
+            std::shared_ptr<serviceescalation> >
+      save_serviceescalations;
+  umap<std::string, std::shared_ptr<servicegroup> > save_servicegroups;
+  umap<std::string, std::shared_ptr<timeperiod> > save_timeperiods;
 
-  bool                accept_passive_host_checks;
-  bool                accept_passive_service_checks;
-  int                 additional_freshness_latency;
-  std::string         admin_email;
-  std::string         admin_pager;
-  bool                allow_empty_hostgroup_assignment;
-  bool                auto_reschedule_checks;
-  unsigned int        auto_rescheduling_interval;
-  unsigned int        auto_rescheduling_window;
-  unsigned long       cached_host_check_horizon;
-  unsigned long       cached_service_check_horizon;
-  bool                check_external_commands;
-  bool                check_host_freshness;
-  bool                check_orphaned_hosts;
-  bool                check_orphaned_services;
-  unsigned int        check_reaper_interval;
-  std::string         check_result_path;
-  bool                check_service_freshness;
-  int                 command_check_interval;
-  std::string         command_file;
-  int                 date_format;
-  std::string         debug_file;
+  bool accept_passive_host_checks;
+  bool accept_passive_service_checks;
+  int additional_freshness_latency;
+  std::string admin_email;
+  std::string admin_pager;
+  bool allow_empty_hostgroup_assignment;
+  bool auto_reschedule_checks;
+  unsigned int auto_rescheduling_interval;
+  unsigned int auto_rescheduling_window;
+  unsigned long cached_host_check_horizon;
+  unsigned long cached_service_check_horizon;
+  bool check_external_commands;
+  bool check_host_freshness;
+  bool check_orphaned_hosts;
+  bool check_orphaned_services;
+  unsigned int check_reaper_interval;
+  std::string check_result_path;
+  bool check_service_freshness;
+  int command_check_interval;
+  std::string command_file;
+  int date_format;
+  std::string debug_file;
   // unsigned long       debug_level;
-  unsigned int        debug_verbosity;
-  bool                enable_environment_macros;
-  bool                enable_event_handlers;
-  bool                enable_failure_prediction;
-  bool                enable_flap_detection;
-  bool                enable_notifications;
-  bool                enable_predictive_host_dependency_checks;
-  bool                enable_predictive_service_dependency_checks;
-  unsigned long       event_broker_options;
-  unsigned int        event_handler_timeout;
-  bool                execute_host_checks;
-  bool                execute_service_checks;
-  int                 external_command_buffer_slots;
-  std::string         global_host_event_handler;
-  std::string         global_service_event_handler;
-  float               high_host_flap_threshold;
-  float               high_service_flap_threshold;
-  unsigned int        host_check_timeout;
-  unsigned int        host_freshness_check_interval;
-  int                 host_inter_check_delay_method;
-  std::string         illegal_object_chars;
-  std::string         illegal_output_chars;
-  unsigned int        interval_length;
-  bool                log_event_handlers;
-  bool                log_external_commands;
+  unsigned int debug_verbosity;
+  bool enable_environment_macros;
+  bool enable_event_handlers;
+  bool enable_failure_prediction;
+  bool enable_flap_detection;
+  bool enable_notifications;
+  bool enable_predictive_host_dependency_checks;
+  bool enable_predictive_service_dependency_checks;
+  unsigned long event_broker_options;
+  unsigned int event_handler_timeout;
+  bool execute_host_checks;
+  bool execute_service_checks;
+  int external_command_buffer_slots;
+  std::string global_host_event_handler;
+  std::string global_service_event_handler;
+  float high_host_flap_threshold;
+  float high_service_flap_threshold;
+  unsigned int host_check_timeout;
+  unsigned int host_freshness_check_interval;
+  int host_inter_check_delay_method;
+  std::string illegal_object_chars;
+  std::string illegal_output_chars;
+  unsigned int interval_length;
+  bool log_event_handlers;
+  bool log_external_commands;
   //  std::string         log_file;
-  bool                log_host_retries;
-  bool                log_initial_states;
-  bool                log_notifications;
-  bool                log_passive_checks;
-  bool                log_service_retries;
-  float               low_host_flap_threshold;
-  float               low_service_flap_threshold;
-  unsigned int        max_check_reaper_time;
-  unsigned long       max_check_result_file_age;
-  unsigned long       max_debug_file_size;
-  unsigned int        max_host_check_spread;
-  unsigned int        max_parallel_service_checks;
-  unsigned int        max_service_check_spread;
-  unsigned int        notification_timeout;
-  bool                obsess_over_hosts;
-  bool                obsess_over_services;
-  std::string         ochp_command;
-  unsigned int        ochp_timeout;
-  std::string         ocsp_command;
-  unsigned int        ocsp_timeout;
-  bool                passive_host_checks_are_soft;
-  bool                process_performance_data;
-  unsigned long       retained_contact_host_attribute_mask;
-  unsigned long       retained_contact_service_attribute_mask;
-  unsigned long       retained_host_attribute_mask;
-  unsigned long       retained_process_host_attribute_mask;
-  bool                retain_state_information;
-  unsigned int        retention_scheduling_horizon;
-  unsigned int        retention_update_interval;
-  unsigned int        service_check_timeout;
-  unsigned int        service_freshness_check_interval;
-  int                 service_inter_check_delay_method;
-  int                 service_interleave_factor_method;
-  float               sleep_time;
-  bool                soft_state_dependencies;
-  unsigned int        status_update_interval;
-  unsigned int        time_change_threshold;
-  bool                translate_passive_host_checks;
-  bool                use_aggressive_host_checking;
-  bool                use_large_installation_tweaks;
-  bool                use_regexp_matches;
-  bool                use_retained_program_state;
-  bool                use_retained_scheduling_info;
-  bool                use_syslog;
-  std::string         use_timezone;
-  bool                use_true_regexp_matching;
+  bool log_host_retries;
+  bool log_initial_states;
+  bool log_notifications;
+  bool log_passive_checks;
+  bool log_service_retries;
+  float low_host_flap_threshold;
+  float low_service_flap_threshold;
+  unsigned int max_check_reaper_time;
+  unsigned long max_check_result_file_age;
+  unsigned long max_debug_file_size;
+  unsigned int max_host_check_spread;
+  unsigned int max_parallel_service_checks;
+  unsigned int max_service_check_spread;
+  unsigned int notification_timeout;
+  bool obsess_over_hosts;
+  bool obsess_over_services;
+  std::string ochp_command;
+  unsigned int ochp_timeout;
+  std::string ocsp_command;
+  unsigned int ocsp_timeout;
+  bool passive_host_checks_are_soft;
+  bool process_performance_data;
+  unsigned long retained_contact_host_attribute_mask;
+  unsigned long retained_contact_service_attribute_mask;
+  unsigned long retained_host_attribute_mask;
+  unsigned long retained_process_host_attribute_mask;
+  bool retain_state_information;
+  unsigned int retention_scheduling_horizon;
+  unsigned int retention_update_interval;
+  unsigned int service_check_timeout;
+  unsigned int service_freshness_check_interval;
+  int service_inter_check_delay_method;
+  int service_interleave_factor_method;
+  float sleep_time;
+  bool soft_state_dependencies;
+  unsigned int status_update_interval;
+  unsigned int time_change_threshold;
+  bool translate_passive_host_checks;
+  bool use_aggressive_host_checking;
+  bool use_large_installation_tweaks;
+  bool use_regexp_matches;
+  bool use_retained_program_state;
+  bool use_retained_scheduling_info;
+  bool use_syslog;
+  std::string use_timezone;
+  bool use_true_regexp_matching;
 };
 
-#define check_value(id) \
-  if (g1.id != g2.id) { \
-    std::cerr << #id << " is different (" \
-      << g1.id << ", " << g2.id << ")" << std::endl; \
-    ret = false; \
+#define check_value(id)                                                    \
+  if (g1.id != g2.id) {                                                    \
+    std::cerr << #id << " is different (" << g1.id << ", " << g2.id << ")" \
+              << std::endl;                                                \
+    ret = false;                                                           \
   }
 
-static std::string to_str(char const* str) { return (str ? str : ""); }
+static std::string to_str(char const* str) {
+  return (str ? str : "");
+}
 
-template<typename T>
+template <typename T>
 static void reset_next_check(T* lst) {
   for (T* obj(lst); obj; obj = obj->next) {
     obj->next_check = 0;
@@ -219,7 +212,7 @@ static void sort_it(T*& l) {
     new_root = &((*new_root)->next);
     *new_root = NULL;
   }
-  return ;
+  return;
 }
 
 /**
@@ -240,7 +233,7 @@ static void sort_it_rev(T*& l) {
     new_root = &((*new_root)->next);
     *new_root = NULL;
   }
-  return ;
+  return;
 }
 
 /**
@@ -252,15 +245,11 @@ static void sort_it(servicesmember*& l) {
   *new_root = NULL;
   while (remaining) {
     servicesmember** min(&remaining);
-    for (servicesmember** cur(&((*min)->next));
-         *cur;
-         cur = &((*cur)->next)) {
+    for (servicesmember** cur(&((*min)->next)); *cur; cur = &((*cur)->next)) {
       int host_less_than(strcmp((*cur)->host_name, (*min)->host_name));
-      if ((host_less_than < 0)
-          || (!host_less_than
-              && (strcmp(
-                    (*cur)->service_description,
-                    (*min)->service_description) < 0)))
+      if ((host_less_than < 0) ||
+          (!host_less_than && (strcmp((*cur)->service_description,
+                                      (*min)->service_description) < 0)))
         min = cur;
     }
     *new_root = *min;
@@ -268,7 +257,7 @@ static void sort_it(servicesmember*& l) {
     new_root = &((*new_root)->next);
     *new_root = NULL;
   }
-  return ;
+  return;
 }
 
 /**
@@ -282,7 +271,7 @@ static void remove_duplicates(T* l) {
         l->next = m->next;
     l = l->next;
   }
-  return ;
+  return;
 }
 
 /**
@@ -410,13 +399,9 @@ bool chkdiff(global& g1, global& g2) {
     ret = false;
   if (!chkdiff(g1.contacts, g2.contacts))
     ret = false;
-  for (contactgroup_struct* cg1(g1.contactgroups);
-       cg1;
-       cg1 = cg1->next)
+  for (contactgroup_struct* cg1(g1.contactgroups); cg1; cg1 = cg1->next)
     sort_it(cg1->members);
-  for (contactgroup_struct* cg2(g2.contactgroups);
-       cg2;
-       cg2 = cg2->next)
+  for (contactgroup_struct* cg2(g2.contactgroups); cg2; cg2 = cg2->next)
     sort_it(cg2->members);
   if (!chkdiff(g1.contactgroups, g2.contactgroups))
     ret = false;
@@ -430,17 +415,13 @@ bool chkdiff(global& g1, global& g2) {
   remove_duplicates(g2.hostdependencies);
   if (!chkdiff(g1.hostdependencies, g2.hostdependencies))
     ret = false;
-  for (hostescalation_struct* he1(g1.hostescalations);
-       he1;
-       he1 = he1->next) {
+  for (hostescalation_struct* he1(g1.hostescalations); he1; he1 = he1->next) {
     sort_it(he1->contacts);
     sort_it(he1->contact_groups);
   }
   sort_it(g1.hostescalations);
   remove_duplicates(g1.hostescalations);
-  for (hostescalation_struct* he2(g2.hostescalations);
-       he2;
-       he2 = he2->next) {
+  for (hostescalation_struct* he2(g2.hostescalations); he2; he2 = he2->next) {
     sort_it(he2->contacts);
     sort_it(he2->contact_groups);
   }
@@ -462,16 +443,14 @@ bool chkdiff(global& g1, global& g2) {
   remove_duplicates(g2.servicedependencies);
   if (!chkdiff(g1.servicedependencies, g2.servicedependencies))
     ret = false;
-  for (serviceescalation_struct* se1(g1.serviceescalations);
-       se1;
+  for (serviceescalation_struct* se1(g1.serviceescalations); se1;
        se1 = se1->next) {
     sort_it(se1->contacts);
     sort_it(se1->contact_groups);
   }
   sort_it(g1.serviceescalations);
   remove_duplicates(g1.serviceescalations);
-  for (serviceescalation_struct* se2(g2.serviceescalations);
-       se2;
+  for (serviceescalation_struct* se2(g2.serviceescalations); se2;
        se2 = se2->next) {
     sort_it(se2->contacts);
     sort_it(se2->contact_groups);
@@ -480,13 +459,9 @@ bool chkdiff(global& g1, global& g2) {
   remove_duplicates(g2.serviceescalations);
   if (!chkdiff(g1.serviceescalations, g2.serviceescalations))
     ret = false;
-  for (servicegroup_struct* sg1(g1.servicegroups);
-       sg1;
-       sg1 = sg1->next)
+  for (servicegroup_struct* sg1(g1.servicegroups); sg1; sg1 = sg1->next)
     sort_it(sg1->members);
-  for (servicegroup_struct* sg2(g2.servicegroups);
-       sg2;
-       sg2 = sg2->next)
+  for (servicegroup_struct* sg2(g2.servicegroups); sg2; sg2 = sg2->next)
     sort_it(sg2->members);
   if (!chkdiff(g1.servicegroups, g2.servicegroups))
     ret = false;
@@ -531,8 +506,8 @@ static global get_globals() {
   g.timeperiods = timeperiod_list;
   timeperiod_list = NULL;
 
-  configuration::applier::state&
-    app_state(configuration::applier::state::instance());
+  configuration::applier::state& app_state(
+      configuration::applier::state::instance());
   g.save_commands = app_state.commands();
   app_state.commands().clear();
   g.save_connectors = app_state.connectors();
@@ -589,8 +564,10 @@ static global get_globals() {
   g.enable_failure_prediction = enable_failure_prediction;
   g.enable_flap_detection = enable_flap_detection;
   g.enable_notifications = enable_notifications;
-  g.enable_predictive_host_dependency_checks = enable_predictive_host_dependency_checks;
-  g.enable_predictive_service_dependency_checks = enable_predictive_service_dependency_checks;
+  g.enable_predictive_host_dependency_checks =
+      enable_predictive_host_dependency_checks;
+  g.enable_predictive_service_dependency_checks =
+      enable_predictive_service_dependency_checks;
   g.event_broker_options = event_broker_options;
   g.event_handler_timeout = event_handler_timeout;
   g.execute_host_checks = execute_host_checks;
@@ -632,7 +609,8 @@ static global get_globals() {
   g.passive_host_checks_are_soft = passive_host_checks_are_soft;
   g.process_performance_data = process_performance_data;
   g.retained_contact_host_attribute_mask = retained_contact_host_attribute_mask;
-  g.retained_contact_service_attribute_mask = retained_contact_service_attribute_mask;
+  g.retained_contact_service_attribute_mask =
+      retained_contact_service_attribute_mask;
   g.retained_host_attribute_mask = retained_host_attribute_mask;
   g.retained_process_host_attribute_mask = retained_process_host_attribute_mask;
   g.retain_state_information = retain_state_information;
@@ -664,9 +642,8 @@ static global get_globals() {
  *  @param[in] lst The object list to check.
  *  @param[in] obj The object to check.
  */
-static bool member_is_already_in_list(
-              contactsmember const* lst,
-              contactsmember const* obj) {
+static bool member_is_already_in_list(contactsmember const* lst,
+                                      contactsmember const* obj) {
   for (contactsmember const* m(lst); m && m != obj; m = m->next)
     if (!strcmp(m->contact_name, obj->contact_name))
       return (true);
@@ -679,9 +656,8 @@ static bool member_is_already_in_list(
  *  @param[in] lst The object list to check.
  *  @param[in] obj The object to check.
  */
-static bool member_is_already_in_list(
-              hostsmember const* lst,
-              hostsmember const* obj) {
+static bool member_is_already_in_list(hostsmember const* lst,
+                                      hostsmember const* obj) {
   for (hostsmember const* m(lst); m && m != obj; m = m->next)
     if (!strcmp(m->host_name, obj->host_name))
       return (true);
@@ -694,12 +670,11 @@ static bool member_is_already_in_list(
  *  @param[in] lst The object list to check.
  *  @param[in] obj The object to check.
  */
-static bool member_is_already_in_list(
-              servicesmember const* lst,
-              servicesmember const* obj) {
+static bool member_is_already_in_list(servicesmember const* lst,
+                                      servicesmember const* obj) {
   for (servicesmember const* m(lst); m && m != obj; m = m->next)
-    if (!strcmp(m->host_name, obj->host_name)
-        && !strcmp(m->service_description, obj->service_description))
+    if (!strcmp(m->host_name, obj->host_name) &&
+        !strcmp(m->service_description, obj->service_description))
       return (true);
   return (false);
 }
@@ -710,10 +685,8 @@ static bool member_is_already_in_list(
  *  @param[in] lst     The object list to check.
  *  @param[in] deleter The deleter to delete duplicate members.
  */
-template<typename T>
-static void remove_duplicate_members(
-              T* lst,
-              void (*deleter)(void*)) {
+template <typename T>
+static void remove_duplicate_members(T* lst, void (*deleter)(void*)) {
   T* last(lst);
   for (T* m(lst); m; m = m->next) {
     if (member_is_already_in_list(lst, m)) {
@@ -732,10 +705,9 @@ static void remove_duplicate_members(
  *  @param[in] lst     The object list to check.
  *  @param[in] deleter The deleter to delete duplicate members.
  */
-template<typename T>
-static void remove_duplicate_members_for_object(
-              T const* lst,
-              void (*deleter)(void*)) {
+template <typename T>
+static void remove_duplicate_members_for_object(T const* lst,
+                                                void (*deleter)(void*)) {
   for (T const* obj(lst); obj; obj = obj->next)
     remove_duplicate_members(obj->members, deleter);
 }
@@ -749,10 +721,9 @@ static void remove_duplicate_members_for_object(
  *
  *  @return True on succes, otherwise false.
  */
-static bool newparser_read_config(
-              global& g,
-              std::string const& filename,
-              unsigned int options) {
+static bool newparser_read_config(global& g,
+                                  std::string const& filename,
+                                  unsigned int options) {
   bool ret(false);
   try {
     init_macros();
@@ -772,8 +743,7 @@ static bool newparser_read_config(
     try {
       retention::parser p;
       p.parse(config.state_retention_file(), state);
-    }
-    catch (...) {
+    } catch (...) {
     }
 
     configuration::applier::state::instance().apply(config, state);
@@ -782,8 +752,7 @@ static bool newparser_read_config(
     clear_volatile_macros_r(get_global_macros());
     free_macrox_names();
     ret = true;
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     std::cerr << e.what() << std::endl;
   }
   return (ret);
@@ -798,10 +767,9 @@ static bool newparser_read_config(
  *
  *  @return True on succes, otherwise false.
  */
-static bool oldparser_read_config(
-              global& g,
-              std::string const& filename,
-              unsigned int options) {
+static bool oldparser_read_config(global& g,
+                                  std::string const& filename,
+                                  unsigned int options) {
   xrddefault_initialize_retention_data(filename.c_str());
   clear_volatile_macros_r(get_global_macros());
   free_macrox_names();
@@ -809,11 +777,7 @@ static bool oldparser_read_config(
   init_macros();
   int ret(read_main_config_file(filename.c_str()));
   if (ret == OK)
-    ret = xodtemplate_read_config_data(
-            filename.c_str(),
-            options,
-            false,
-            false);
+    ret = xodtemplate_read_config_data(filename.c_str(), options, false, false);
   if (ret == OK)
     ret = pre_flight_check();
   if (!check_result_path)
@@ -825,15 +789,11 @@ static bool oldparser_read_config(
   if (!illegal_output_chars)
     illegal_output_chars = string::dup("`~$&|'\"<>");
   if (ret == OK) {
-    remove_duplicate_members_for_object(
-      contactgroup_list,
-      &deleter::contactsmember);
-    remove_duplicate_members_for_object(
-      hostgroup_list,
-      &deleter::hostsmember);
-    remove_duplicate_members_for_object(
-      servicegroup_list,
-      &deleter::servicesmember);
+    remove_duplicate_members_for_object(contactgroup_list,
+                                        &deleter::contactsmember);
+    remove_duplicate_members_for_object(hostgroup_list, &deleter::hostsmember);
+    remove_duplicate_members_for_object(servicegroup_list,
+                                        &deleter::servicesmember);
 
     xrddefault_read_state_information();
     g = get_globals();
@@ -852,17 +812,17 @@ static bool oldparser_read_config(
  */
 int main_test(int argc, char** argv) {
   if (argc != 2)
-    throw (engine_error() << "usage: " << argv[0] << " file.cfg");
+    throw(engine_error() << "usage: " << argv[0] << " file.cfg");
 
   unsigned int options(configuration::parser::read_all);
 
   global oldcfg;
   if (!oldparser_read_config(oldcfg, argv[1], options))
-    throw (engine_error() << "old parser can't parse " << argv[1]);
+    throw(engine_error() << "old parser can't parse " << argv[1]);
 
   global newcfg;
   if (!newparser_read_config(newcfg, argv[1], options))
-    throw (engine_error() << "new parser can't parse " << argv[1]);
+    throw(engine_error() << "new parser can't parse " << argv[1]);
 
   bool ret(chkdiff(oldcfg, newcfg));
 

@@ -36,28 +36,26 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  connector cmd1(
-              DEFAULT_CONNECTOR_NAME,
-              DEFAULT_CONNECTOR_LINE);
+  connector cmd1(DEFAULT_CONNECTOR_NAME, DEFAULT_CONNECTOR_LINE);
 
-  if ((cmd1.get_name() != DEFAULT_CONNECTOR_NAME)
-      || (cmd1.get_command_line() != DEFAULT_CONNECTOR_LINE))
-    throw (engine_error() << "error: constructor failed");
+  if ((cmd1.get_name() != DEFAULT_CONNECTOR_NAME) ||
+      (cmd1.get_command_line() != DEFAULT_CONNECTOR_LINE))
+    throw(engine_error() << "error: constructor failed");
 
   connector cmd2(cmd1);
   if (cmd1 != cmd2)
-    throw (engine_error() << "error: copy constructor failed");
+    throw(engine_error() << "error: copy constructor failed");
 
   connector cmd3 = cmd2;
   if (cmd3 != cmd2)
-    throw (engine_error() << "error: assignment operator failed");
+    throw(engine_error() << "error: assignment operator failed");
 
   std::shared_ptr<commands::command> cmd4(cmd3.clone());
   if (!cmd4.get())
-    throw (engine_error() << "error: clone failed");
+    throw(engine_error() << "error: clone failed");
 
   if (*cmd4 != cmd3)
-    throw (engine_error() << "error: clone failed");
+    throw(engine_error() << "error: clone failed");
 
   return (0);
 }

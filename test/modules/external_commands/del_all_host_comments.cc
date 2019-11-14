@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -33,48 +33,30 @@ static int check_del_all_host_comments(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst =
+      add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0,
+               0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+               0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+               NULL, 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw(engine_error() << "create host failed.");
 
   next_comment_id = 1;
-  if (add_new_comment(HOST_COMMENT,
-                      USER_COMMENT,
-                      "name",
-                      NULL,
-                      time(NULL),
-                      "user",
-                      "data",
-                      true,
-                      COMMENTSOURCE_EXTERNAL,
-                      false,
-                      0,
+  if (add_new_comment(HOST_COMMENT, USER_COMMENT, "name", NULL, time(NULL),
+                      "user", "data", true, COMMENTSOURCE_EXTERNAL, false, 0,
                       NULL) == ERROR)
-    throw (engine_error() << "create new comment failed.");
+    throw(engine_error() << "create new comment failed.");
 
-  if (add_new_comment(HOST_COMMENT,
-                      USER_COMMENT,
-                      "name",
-                      NULL,
-                      time(NULL),
-                      "user",
-                      "data",
-                      true,
-                      COMMENTSOURCE_EXTERNAL,
-                      false,
-                      0,
+  if (add_new_comment(HOST_COMMENT, USER_COMMENT, "name", NULL, time(NULL),
+                      "user", "data", true, COMMENTSOURCE_EXTERNAL, false, 0,
                       NULL) == ERROR)
-    throw (engine_error() << "create new comment failed.");
+    throw(engine_error() << "create new comment failed.");
 
   char const* cmd("[1317196300] DEL_ALL_HOST_COMMENTS;name");
   process_external_command(cmd);
 
   if (comment_list)
-    throw (engine_error() << "del_host_comment failed.");
+    throw(engine_error() << "del_host_comment failed.");
   return (0);
 }
 

@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -45,7 +45,7 @@ static int check_shutdown_program(int argc, char** argv) {
 
   // Check.
   if (!event_list_high)
-    throw (engine_error() << "shutdown_program failed");
+    throw(engine_error() << "shutdown_program failed");
 
   // Cleanup.
   cleanup();

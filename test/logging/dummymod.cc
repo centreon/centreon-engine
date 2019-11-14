@@ -28,22 +28,22 @@
 using namespace com::centreon::engine;
 
 /**************************************
-*                                     *
-*           Global Objects            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Global Objects            *
+ *                                     *
+ **************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 
 // Test message.
-static const char* LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
+static const char* LOG_MESSAGE = "~!@#$%^&*()_+09/qwerty \n";
 
 /**************************************
-*                                     *
-*         Callback Function           *
-*                                     *
-**************************************/
+ *                                     *
+ *         Callback Function           *
+ *                                     *
+ **************************************/
 
 /**
  *  @brief Function that process log data.
@@ -60,14 +60,13 @@ int callback(int callback_type, void* data) {
   (void)callback_type;
 
   nebstruct_log_data* neb_log = static_cast<nebstruct_log_data*>(data);
-  if (neb_log->type != NEBTYPE_LOG_DATA
-      || neb_log->flags != NEBFLAG_NONE
-      || neb_log->attr != NEBATTR_NONE) {
+  if (neb_log->type != NEBTYPE_LOG_DATA || neb_log->flags != NEBFLAG_NONE ||
+      neb_log->attr != NEBATTR_NONE) {
     return (0);
   }
 
-  if (strcmp(neb_log->data, LOG_MESSAGE)
-      || (neb_log->data_type & logging::log_all) == 0) {
+  if (strcmp(neb_log->data, LOG_MESSAGE) ||
+      (neb_log->data_type & logging::log_all) == 0) {
     std::cerr << "error: bad value in module" << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -120,30 +119,16 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
   (void)args;
 
   // Set module informations.
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_TITLE,
-		      "Dummy module");
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_AUTHOR,
-		      "Merethis");
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_COPYRIGHT,
-		      "Copyright 2011 Merethis");
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_VERSION,
-		      "1.0.0");
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_LICENSE,
-		      "GPL version 2");
-  neb_set_module_info(handle,
-		      NEBMODULE_MODINFO_DESC,
-		      "Dummy module.");
+  neb_set_module_info(handle, NEBMODULE_MODINFO_TITLE, "Dummy module");
+  neb_set_module_info(handle, NEBMODULE_MODINFO_AUTHOR, "Merethis");
+  neb_set_module_info(handle, NEBMODULE_MODINFO_COPYRIGHT,
+                      "Copyright 2011 Merethis");
+  neb_set_module_info(handle, NEBMODULE_MODINFO_VERSION, "1.0.0");
+  neb_set_module_info(handle, NEBMODULE_MODINFO_LICENSE, "GPL version 2");
+  neb_set_module_info(handle, NEBMODULE_MODINFO_DESC, "Dummy module.");
 
   // Register callbacks.
-  if (neb_register_callback(NEBCALLBACK_LOG_DATA,
-			    handle,
-			    0,
-			    callback) != 0) {
+  if (neb_register_callback(NEBCALLBACK_LOG_DATA, handle, 0, callback) != 0) {
     std::cerr << "register callback failed" << std::endl;
     exit(EXIT_FAILURE);
   }

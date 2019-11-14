@@ -36,24 +36,23 @@ int main_test(int argc, char** argv) {
   (void)argv;
 
   raw cmd1(CMD_NAME, CMD_LINE);
-  if ((cmd1.get_name() != CMD_NAME)
-      || (cmd1.get_command_line() != CMD_LINE))
-    throw (engine_error() << "error: constructor failed");
+  if ((cmd1.get_name() != CMD_NAME) || (cmd1.get_command_line() != CMD_LINE))
+    throw(engine_error() << "error: constructor failed");
 
   raw cmd2(cmd1);
   if (cmd2 != cmd1)
-    throw (engine_error() << "error: copy constructor failed");
+    throw(engine_error() << "error: copy constructor failed");
 
   raw cmd3(cmd2);
   if (cmd3 != cmd2)
-    throw (engine_error() << "error: assignment operator failed");
+    throw(engine_error() << "error: assignment operator failed");
 
   std::shared_ptr<commands::command> cmd4(cmd3.clone());
   if (!cmd4.get())
-    throw (engine_error() << "error: clone failed");
+    throw(engine_error() << "error: clone failed");
 
   if (*cmd4 != cmd3)
-    throw (engine_error() << "error: clone failed");
+    throw(engine_error() << "error: clone failed");
 
   return (0);
 }

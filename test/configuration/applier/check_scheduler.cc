@@ -18,6 +18,7 @@
 */
 
 #include <cstring>
+#include "chkdiff.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
@@ -29,7 +30,6 @@
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
-#include "chkdiff.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
 
@@ -38,39 +38,30 @@ void init_timing_loop();
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-struct         global {
-  sched_info   scheduling_info;
+struct global {
+  sched_info scheduling_info;
   timed_event* events_high;
   timed_event* events_low;
 
-  umap<std::string, std::shared_ptr<command> >
-               save_commands;
-  umap<std::string, std::shared_ptr<commands::connector> >
-               save_connectors;
-  umap<std::string, std::shared_ptr<contact> >
-               save_contacts;
-  umap<std::string, std::shared_ptr<contactgroup> >
-               save_contactgroups;
-  umap<std::string, std::shared_ptr<host> >
-               save_hosts;
+  umap<std::string, std::shared_ptr<command> > save_commands;
+  umap<std::string, std::shared_ptr<commands::connector> > save_connectors;
+  umap<std::string, std::shared_ptr<contact> > save_contacts;
+  umap<std::string, std::shared_ptr<contactgroup> > save_contactgroups;
+  umap<std::string, std::shared_ptr<host> > save_hosts;
   umultimap<std::string, std::shared_ptr<hostdependency> >
-               save_hostdependencies;
-  umultimap<std::string, std::shared_ptr<hostescalation> >
-               save_hostescalations;
-  umap<std::string, std::shared_ptr<hostgroup> >
-               save_hostgroups;
+      save_hostdependencies;
+  umultimap<std::string, std::shared_ptr<hostescalation> > save_hostescalations;
+  umap<std::string, std::shared_ptr<hostgroup> > save_hostgroups;
   umap<std::pair<std::string, std::string>, std::shared_ptr<service> >
-               save_services;
+      save_services;
   umultimap<std::pair<std::string, std::string>,
-    std::shared_ptr<servicedependency> >
-               save_servicedependencies;
+            std::shared_ptr<servicedependency> >
+      save_servicedependencies;
   umultimap<std::pair<std::string, std::string>,
-    std::shared_ptr<serviceescalation> >
-               save_serviceescalations;
-  umap<std::string, std::shared_ptr<servicegroup> >
-               save_servicegroups;
-  umap<std::string, std::shared_ptr<timeperiod> >
-               save_timeperiods;
+            std::shared_ptr<serviceescalation> >
+      save_serviceescalations;
+  umap<std::string, std::shared_ptr<servicegroup> > save_servicegroups;
+  umap<std::string, std::shared_ptr<timeperiod> > save_timeperiods;
 };
 
 /**
@@ -90,8 +81,8 @@ static void clear(global& g) {
   servicegroup_list = NULL;
   timeperiod_list = NULL;
 
-  configuration::applier::state&
-    app_state(configuration::applier::state::instance());
+  configuration::applier::state& app_state(
+      configuration::applier::state::instance());
   g.save_commands = app_state.commands();
   app_state.commands().clear();
   g.save_connectors = app_state.connectors();
@@ -136,11 +127,14 @@ static void lise_run_time(timed_event* lst, time_t ref) {
  */
 static bool chkdiff(global& g1, global& g2) {
   bool ret(true);
-  if (g1.scheduling_info.first_service_check != g2.scheduling_info.first_service_check)
+  if (g1.scheduling_info.first_service_check !=
+      g2.scheduling_info.first_service_check)
     g1.scheduling_info.first_service_check += 1;
-  if (g1.scheduling_info.last_service_check != g2.scheduling_info.last_service_check)
+  if (g1.scheduling_info.last_service_check !=
+      g2.scheduling_info.last_service_check)
     g1.scheduling_info.last_service_check += 1;
-  if (g1.scheduling_info.first_host_check != g2.scheduling_info.first_host_check)
+  if (g1.scheduling_info.first_host_check !=
+      g2.scheduling_info.first_host_check)
     g1.scheduling_info.first_host_check += 1;
   if (g1.scheduling_info.last_host_check != g2.scheduling_info.last_host_check)
     g1.scheduling_info.last_host_check += 1;
@@ -173,10 +167,9 @@ static bool chkdiff(global& g1, global& g2) {
  *
  *  @return True on succes, otherwise false.
  */
-static bool newparser_read_config(
-              global& g,
-              std::string const& filename,
-              unsigned int options) {
+static bool newparser_read_config(global& g,
+                                  std::string const& filename,
+                                  unsigned int options) {
   bool ret(false);
   try {
     init_macros();
@@ -201,8 +194,7 @@ static bool newparser_read_config(
     clear_volatile_macros_r(get_global_macros());
     free_macrox_names();
     ret = true;
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     std::cerr << e.what() << std::endl;
   }
   return (ret);
@@ -217,21 +209,16 @@ static bool newparser_read_config(
  *
  *  @return True on succes, otherwise false.
  */
-static bool oldparser_read_config(
-              global& g,
-              std::string const& filename,
-              unsigned int options) {
+static bool oldparser_read_config(global& g,
+                                  std::string const& filename,
+                                  unsigned int options) {
   clear_volatile_macros_r(get_global_macros());
   free_macrox_names();
   init_object_skiplists();
   init_macros();
   int ret(read_main_config_file(filename.c_str()));
   if (ret == OK)
-    ret = xodtemplate_read_config_data(
-            filename.c_str(),
-            options,
-            false,
-            false);
+    ret = xodtemplate_read_config_data(filename.c_str(), options, false, false);
   if (ret == OK) {
     ret = pre_flight_check();
 
@@ -261,17 +248,17 @@ static bool oldparser_read_config(
  */
 int main_test(int argc, char* argv[]) {
   if (argc != 2)
-    throw (engine_error() << "usage: " << argv[0] << " file.cfg");
+    throw(engine_error() << "usage: " << argv[0] << " file.cfg");
 
   unsigned int options(configuration::parser::read_all);
 
   global oldcfg;
   if (!oldparser_read_config(oldcfg, argv[1], options))
-    throw (engine_error() << "old parser can't parse " << argv[1]);
+    throw(engine_error() << "old parser can't parse " << argv[1]);
 
   global newcfg;
   if (!newparser_read_config(newcfg, argv[1], options))
-    throw (engine_error() << "new parser can't parse " << argv[1]);
+    throw(engine_error() << "new parser can't parse " << argv[1]);
 
   bool ret(chkdiff(oldcfg, newcfg));
 

@@ -17,47 +17,46 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sys/types.h>
+#include <unistd.h>
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <sys/types.h>
-#include <unistd.h>
+#include "backup.hh"
 #include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/reload.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
-#include "backup.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**************************************
-*                                     *
-*           Global Objects            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Global Objects            *
+ *                                     *
+ **************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 static std::string gl_config_path;
 
 /**************************************
-*                                     *
-*               Class                 *
-*                                     *
-**************************************/
+ *                                     *
+ *               Class                 *
+ *                                     *
+ **************************************/
 
-class                   checkmodify {
-public:
-                        checkmodify(std::string const& cfg_path)
-    : _cfg_path(cfg_path) {}
-                        ~checkmodify() throw () {}
-  void                  load_configuration() {
+class checkmodify {
+ public:
+  checkmodify(std::string const& cfg_path) : _cfg_path(cfg_path) {}
+  ~checkmodify() throw() {}
+  void load_configuration() {
     backup::set_to_null();
     configuration::applier::state::unload();
     delete config;
@@ -66,7 +65,7 @@ public:
     ::config->cfg_main(_cfg_path);
     reload_configuration();
   }
-  static void           reload_configuration() {
+  static void reload_configuration() {
     configuration::reload reload_configuration;
     reload_configuration.start();
     while (true) {
@@ -76,26 +75,24 @@ public:
       reload_configuration.try_lock();
     }
   }
-  void                  save_current_configuration() {
-    _backup = backup(
-                *::config,
-                configuration::applier::state::instance());
+  void save_current_configuration() {
+    _backup = backup(*::config, configuration::applier::state::instance());
   }
-  void                  verify() {
+  void verify() {
     _backup.is_equal(*::config);
     _backup.is_equal(configuration::applier::state::instance());
   }
 
-private:
+ private:
   std::string _cfg_path;
-  backup      _backup;
+  backup _backup;
 };
 
 /**************************************
-*                                     *
-*         Callback Function           *
-*                                     *
-**************************************/
+ *                                     *
+ *         Callback Function           *
+ *                                     *
+ **************************************/
 
 /**
  *  @brief Function that process log data.
@@ -111,15 +108,14 @@ private:
 int callback_event_loop(int callback_type, void* neb_data) {
   try {
     if (!neb_data || callback_type != NEBCALLBACK_PROCESS_DATA)
-      throw (engine_error() << "bad arguments into callback_event_loop_end");
+      throw(engine_error() << "bad arguments into callback_event_loop_end");
 
-    nebstruct_process_data&
-      data(*static_cast<nebstruct_process_data*>(neb_data));
+    nebstruct_process_data& data(
+        *static_cast<nebstruct_process_data*>(neb_data));
     if (data.type == NEBTYPE_PROCESS_EVENTLOOPSTART) {
       ::config->cfg_main(gl_config_path);
       sigshutdown = true;
-    }
-    else if (data.type == NEBTYPE_PROCESS_EVENTLOOPEND) {
+    } else if (data.type == NEBTYPE_PROCESS_EVENTLOOPEND) {
       checkmodify::reload_configuration();
 
       checkmodify chkm(gl_config_path);
@@ -127,8 +123,7 @@ int callback_event_loop(int callback_type, void* neb_data) {
       chkm.load_configuration();
       chkm.verify();
     }
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     std::cerr << "error: " << e.what() << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -181,47 +176,28 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 
   try {
     if (!args)
-      throw (engine_error() << "can not load module checkmodify: "
-             "bad argument");
+      throw(engine_error() << "can not load module checkmodify: "
+                              "bad argument");
 
     gl_config_path = args;
 
     // Set module informations.
-    neb_set_module_info(
-      handle,
-      NEBMODULE_MODINFO_TITLE,
-      "Check modify configuration module");
-    neb_set_module_info(
-      handle,
-      NEBMODULE_MODINFO_AUTHOR,
-      "Merethis");
-    neb_set_module_info(
-      handle,
-      NEBMODULE_MODINFO_COPYRIGHT,
-      "Copyright 2013 Merethis");
-    neb_set_module_info(
-      handle,
-      NEBMODULE_MODINFO_VERSION,
-      "1.0.0");
-    neb_set_module_info(
-      handle,
-      NEBMODULE_MODINFO_LICENSE,
-      "GPL version 2");
-    neb_set_module_info(
-      handle,
-      NEBMODULE_MODINFO_DESC,
-      "Check modify configuration module.");
+    neb_set_module_info(handle, NEBMODULE_MODINFO_TITLE,
+                        "Check modify configuration module");
+    neb_set_module_info(handle, NEBMODULE_MODINFO_AUTHOR, "Merethis");
+    neb_set_module_info(handle, NEBMODULE_MODINFO_COPYRIGHT,
+                        "Copyright 2013 Merethis");
+    neb_set_module_info(handle, NEBMODULE_MODINFO_VERSION, "1.0.0");
+    neb_set_module_info(handle, NEBMODULE_MODINFO_LICENSE, "GPL version 2");
+    neb_set_module_info(handle, NEBMODULE_MODINFO_DESC,
+                        "Check modify configuration module.");
 
     // Register callbacks event loop.
-    if (neb_register_callback(
-          NEBCALLBACK_PROCESS_DATA,
-          handle,
-          0,
-          callback_event_loop))
-      throw (engine_error() << "can not load module checkmodify: "
-             "register callback failed");
-  }
-  catch (std::exception const& e) {
+    if (neb_register_callback(NEBCALLBACK_PROCESS_DATA, handle, 0,
+                              callback_event_loop))
+      throw(engine_error() << "can not load module checkmodify: "
+                              "register callback failed");
+  } catch (std::exception const& e) {
     std::cerr << "error: " << e.what() << std::endl;
     exit(EXIT_FAILURE);
   }

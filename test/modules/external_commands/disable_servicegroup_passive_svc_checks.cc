@@ -19,8 +19,8 @@
 
 #include <exception>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
@@ -29,26 +29,26 @@ using namespace com::centreon::engine;
 /**
  *  Run disable_servicegroup_passive_svc_checks test.
  */
-static int check_disable_servicegroup_passive_svc_checks(int argc, char** argv) {
+static int check_disable_servicegroup_passive_svc_checks(int argc,
+                                                         char** argv) {
   (void)argc;
   (void)argv;
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  service* svc = add_service(
+      "name", "description", NULL, NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+      0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, 0);
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw(engine_error() << "create service failed.");
 
   servicegroup* group = add_servicegroup("group", NULL, NULL, NULL, NULL);
   if (!group)
-    throw (engine_error() << "create servicegroup failed.");
+    throw(engine_error() << "create servicegroup failed.");
 
-  servicesmember* member = add_service_to_servicegroup(group, "name", "description");
+  servicesmember* member =
+      add_service_to_servicegroup(group, "name", "description");
   if (!member)
-    throw (engine_error() << "create servicemember failed.");
+    throw(engine_error() << "create servicemember failed.");
   member->service_ptr = svc;
 
   svc->accept_passive_service_checks = true;
@@ -56,7 +56,7 @@ static int check_disable_servicegroup_passive_svc_checks(int argc, char** argv) 
   process_external_command(cmd);
 
   if (svc->accept_passive_service_checks)
-    throw (engine_error() << "disable_servicegroup_passive_svc_checks failed.");
+    throw(engine_error() << "disable_servicegroup_passive_svc_checks failed.");
   return (0);
 }
 

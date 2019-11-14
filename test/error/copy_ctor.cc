@@ -39,6 +39,6 @@ int main() {
   e1 << 0;
 
   // Check.
-  return (strcmp(e1.what(), "foo42bar23459498498748 baz0")
-          || strcmp(e2.what(), "foo42bar23459498498748 baz"));
+  return (strcmp(e1.what(), "foo42bar23459498498748 baz0") ||
+          strcmp(e2.what(), "foo42bar23459498498748 baz"));
 }

@@ -20,8 +20,8 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/io/file_stream.hh"
 #include "test/notifications/first_notif_delay/common.hh"

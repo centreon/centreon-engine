@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <exception>
-#include <time.h>
-#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
+#include <time.h>
+#include <exception>
+#include "com/centreon/engine/error.hh"
 #include "test/logging/test.hh"
 #include "test/unittest.hh"
 
@@ -28,21 +28,21 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /**************************************
-*                                     *
-*           Global Objects            *
-*                                     *
-**************************************/
+ *                                     *
+ *           Global Objects            *
+ *                                     *
+ **************************************/
 
-static const unsigned int NB_LOG_TYPE  = 21;
+static const unsigned int NB_LOG_TYPE = 21;
 static const unsigned int NB_LOG_LEVEL = 3;
-static const unsigned int NB_DBG_TYPE  = 18;
-static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
+static const unsigned int NB_DBG_TYPE = 18;
+static const char* LOG_MESSAGE = "~!@#$%^&*()_+09/qwerty \n";
 
 /**************************************
-*                                     *
-*         Exported Functions          *
-*                                     *
-**************************************/
+ *                                     *
+ *         Exported Functions          *
+ *                                     *
+ **************************************/
 
 /**
  *  Check the engine working.
@@ -63,8 +63,7 @@ int main_test(int argc, char** argv) {
       if (i == 8)
         continue;
       unsigned long long type(1ull << i);
-      std::shared_ptr<object>
-        obj(new test(LOG_MESSAGE, type, j, j + 1));
+      std::shared_ptr<object> obj(new test(LOG_MESSAGE, type, j, j + 1));
       engine::obj_info info(obj, type, j);
       id[i + j * NB_LOG_TYPE] = engine.add_object(info);
     }
@@ -74,8 +73,7 @@ int main_test(int argc, char** argv) {
   // One object by debug logging type.
   for (unsigned int i(0); i < NB_DBG_TYPE; ++i) {
     unsigned long long type(1ull << (i + 32));
-    std::shared_ptr<object>
-      obj(new test(LOG_MESSAGE, type, 0, 1));
+    std::shared_ptr<object> obj(new test(LOG_MESSAGE, type, 0, 1));
     engine::obj_info info(obj, type, 0);
     id[NB_LOG_TYPE * NB_LOG_LEVEL + i] = engine.add_object(info);
   }
@@ -90,14 +88,12 @@ int main_test(int argc, char** argv) {
       engine.log(LOG_MESSAGE, 1ull << i, j);
 
   // Remove object (broker).
-  for (unsigned int i(0);
-       i < NB_LOG_TYPE * NB_LOG_LEVEL + NB_DBG_TYPE;
-       ++i)
+  for (unsigned int i(0); i < NB_LOG_TYPE * NB_LOG_LEVEL + NB_DBG_TYPE; ++i)
     engine.remove_object(id[i]);
 
   // Check if all object was remove.
   if (test::get_nb_instance() != 0)
-    throw (engine_error() << "remove_object failed");
+    throw(engine_error() << "remove_object failed");
 
   return (0);
 }

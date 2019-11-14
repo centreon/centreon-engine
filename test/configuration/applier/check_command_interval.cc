@@ -42,9 +42,8 @@ using namespace com::centreon::engine;
  *
  *  @return True on succes, otherwise false.
  */
-static bool newparser_read_config(
-              std::string const& filename,
-              unsigned int options) {
+static bool newparser_read_config(std::string const& filename,
+                                  unsigned int options) {
   bool ret(false);
   try {
     init_macros();
@@ -64,14 +63,12 @@ static bool newparser_read_config(
     try {
       retention::parser p;
       p.parse(config.state_retention_file(), state);
-    }
-    catch (...) {
+    } catch (...) {
     }
 
     configuration::applier::state::instance().apply(config, state);
     ret = true;
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     std::cerr << e.what() << std::endl;
   }
   return (ret);
@@ -84,16 +81,18 @@ static bool newparser_read_config(
  */
 int main_test(int argc, char** argv) {
   if (argc != 3)
-    throw (engine_error() << "usage: " << argv[0] << " file.cfg" << " expected_value");
+    throw(engine_error() << "usage: " << argv[0] << " file.cfg"
+                         << " expected_value");
 
   unsigned int options(configuration::parser::read_all);
   int expected_value = atoi(argv[2]);
 
   if (!newparser_read_config(argv[1], options))
-    throw (engine_error() << "new parser can't parse " << argv[1]);
+    throw(engine_error() << "new parser can't parse " << argv[1]);
 
   if (::command_check_interval != expected_value)
-    throw (engine_error() << "value found " << ::command_check_interval << "was not the expected value");
+    throw(engine_error() << "value found " << ::command_check_interval
+                         << "was not the expected value");
 
   return (0);
 }
