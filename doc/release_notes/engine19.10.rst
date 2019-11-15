@@ -1,4 +1,19 @@
 =======================
+Centreon Engine 19.10.6
+=======================
+
+*********
+Bug fixes
+*********
+
+Escalations
+===========
+
+When a host or a service linked to an escalation was deleted, there was an
+attempt to remove the host or the service twice. This behaviour led to a
+cancellation of the new configuration during a reload.
+
+=======================
 Centreon Engine 19.10.5
 =======================
 
