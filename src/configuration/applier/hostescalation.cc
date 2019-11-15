@@ -155,13 +155,18 @@ void applier::hostescalation::remove_object(
   std::string const& host_name{*obj.hosts().begin()};
   std::pair<hostescalation_mmap::iterator, hostescalation_mmap::iterator> range{
       engine::hostescalation::hostescalations.equal_range(host_name)};
+  bool host_exists;
 
   /* Let's get the host... */
   host_map::iterator hit{engine::host::hosts.find(host_name)};
   /* ... and its escalations */
-  if (hit == engine::host::hosts.end())
-    throw engine_error() << "Cannot find host '" << host_name << "'";
-  std::list<escalation*>& escalations(hit->second->get_escalations());
+  if (hit == engine::host::hosts.end()) {
+    logger(logging::dbg_config, logging::more)
+      << "Cannot find host '" << host_name << "' - already removed.";
+    host_exists = false;
+  }
+  else
+    host_exists = true;
 
   for (hostescalation_mmap::iterator it{range.first}, end{range.second};
        it != end; ++it) {
@@ -189,16 +194,20 @@ void applier::hostescalation::remove_object(
                                       NEBFLAG_NONE, NEBATTR_NONE,
                                       it->second.get(), &tv);
 
-      /* We need also to remove the escalation from the host */
-      for (std::list<engine::escalation*>::iterator heit{escalations.begin()},
-           heend{escalations.end()};
-           heit != heend; ++heit) {
-        if (*heit == it->second.get()) {
-          escalations.erase(heit);
-          break;
+      if (host_exists) {
+        logger(logging::dbg_config, logging::more)
+          << "Host '" << host_name << "' found - removing escalation from it.";
+        std::list<escalation*>& escalations(hit->second->get_escalations());
+        /* We need also to remove the escalation from the host */
+        for (std::list<engine::escalation*>::iterator heit{escalations.begin()},
+             heend{escalations.end()};
+             heit != heend; ++heit) {
+          if (*heit == it->second.get()) {
+            escalations.erase(heit);
+            break;
+          }
         }
       }
-
       // Remove host escalation from the global configuration set.
       engine::hostescalation::hostescalations.erase(it);
       break;

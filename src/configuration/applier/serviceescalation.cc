@@ -177,15 +177,20 @@ void applier::serviceescalation::remove_object(
   std::pair<serviceescalation_mmap::iterator, serviceescalation_mmap::iterator>
       range{engine::serviceescalation::serviceescalations.equal_range(
           {host_name, description})};
+  bool service_exists;
+
   /* Let's get the service... */
   service_map::iterator sit{
       engine::service::services.find({host_name, description})};
-  if (sit == engine::service::services.end())
-    throw engine_error() << "Cannot find service '" << host_name << "/"
-                         << description << "'";
-
   /* ... and its escalations */
-  std::list<escalation*>& srv_escalations(sit->second->get_escalations());
+  if (sit == engine::service::services.end()) {
+    logger(logging::dbg_config, logging::more)
+      << "Cannot find service '" << host_name << "/" << description
+      << "' - already removed.";
+    service_exists = false;
+  }
+  else
+    service_exists = true;
 
   for (serviceescalation_mmap::iterator it{range.first}, end{range.second};
        it != end; ++it) {
@@ -198,14 +203,20 @@ void applier::serviceescalation::remove_object(
                                       NEBFLAG_NONE, NEBATTR_NONE,
                                       it->second.get(), &tv);
 
-      /* We need also to remove the escalation from the service */
-      for (std::list<engine::escalation*>::iterator
-               eit{srv_escalations.begin()},
-           eend{srv_escalations.end()};
-           eit != eend; ++eit) {
-        if (*eit == it->second.get()) {
-          srv_escalations.erase(eit);
-          break;
+      if (service_exists) {
+        logger(logging::dbg_config, logging::more)
+          << "Service '" << host_name << "/" << description
+          << "' found - removing escalation from it.";
+        std::list<escalation*>& srv_escalations(sit->second->get_escalations());
+        /* We need also to remove the escalation from the service */
+        for (std::list<engine::escalation*>::iterator
+                 eit{srv_escalations.begin()},
+             eend{srv_escalations.end()};
+             eit != eend; ++eit) {
+          if (*eit == it->second.get()) {
+            srv_escalations.erase(eit);
+            break;
+          }
         }
       }
 
