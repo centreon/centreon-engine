@@ -171,6 +171,7 @@ std::unordered_map<std::string, state::setter_func> const state::_setters{
     {"passive_host_checks_are_soft",
      SETTER(bool, passive_host_checks_are_soft)},
     {"perfdata_timeout", SETTER(int, perfdata_timeout)},
+    { "poller_name", SETTER(std::string const&, poller_name)},
     {"precached_object_file",
      SETTER(std::string const&, _set_precached_object_file)},
     {"process_performance_data", SETTER(bool, process_performance_data)},
@@ -447,6 +448,7 @@ state::state()
       _ocsp_timeout(default_ocsp_timeout),
       _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
       _perfdata_timeout(default_perfdata_timeout),
+      _poller_name{"unknown"},
       _process_performance_data(default_process_performance_data),
       _retained_contact_host_attribute_mask(
           default_retained_contact_host_attribute_mask),
@@ -499,7 +501,7 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw() {}
+state::~state() noexcept {}
 
 /**
  *  Copy operator.
@@ -604,6 +606,7 @@ state& state::operator=(state const& right) {
     _ocsp_timeout = right._ocsp_timeout;
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
     _perfdata_timeout = right._perfdata_timeout;
+    _poller_name = right._poller_name;
     _process_performance_data = right._process_performance_data;
     _retained_contact_host_attribute_mask =
         right._retained_contact_host_attribute_mask;
@@ -661,7 +664,7 @@ state& state::operator=(state const& right) {
  *
  *  @return True if object is the same object, otherwise false.
  */
-bool state::operator==(state const& right) const throw() {
+bool state::operator==(state const& right) const noexcept {
   return (
       _accept_passive_host_checks == right._accept_passive_host_checks &&
       _accept_passive_service_checks == right._accept_passive_service_checks &&
@@ -755,6 +758,7 @@ bool state::operator==(state const& right) const throw() {
       _ocsp_timeout == right._ocsp_timeout &&
       _passive_host_checks_are_soft == right._passive_host_checks_are_soft &&
       _perfdata_timeout == right._perfdata_timeout &&
+      _poller_name == right._poller_name &&
       _process_performance_data == right._process_performance_data &&
       _retained_contact_host_attribute_mask ==
           right._retained_contact_host_attribute_mask &&
@@ -812,7 +816,7 @@ bool state::operator==(state const& right) const throw() {
  *
  *  @return True if object is not the same object, otherwise false.
  */
-bool state::operator!=(state const& right) const throw() {
+bool state::operator!=(state const& right) const noexcept {
   return !operator==(right);
 }
 
@@ -821,7 +825,7 @@ bool state::operator!=(state const& right) const throw() {
  *
  *  @return The accept_passive_host_checks value.
  */
-bool state::accept_passive_host_checks() const throw() {
+bool state::accept_passive_host_checks() const noexcept {
   return _accept_passive_host_checks;
 }
 
@@ -839,7 +843,7 @@ void state::accept_passive_host_checks(bool value) {
  *
  *  @return The accept_passive_service_checks value.
  */
-bool state::accept_passive_service_checks() const throw() {
+bool state::accept_passive_service_checks() const noexcept {
   return _accept_passive_service_checks;
 }
 
@@ -857,7 +861,7 @@ void state::accept_passive_service_checks(bool value) {
  *
  *  @return The additional_freshness_latency value.
  */
-int state::additional_freshness_latency() const throw() {
+int state::additional_freshness_latency() const noexcept {
   return _additional_freshness_latency;
 }
 
@@ -875,7 +879,7 @@ void state::additional_freshness_latency(int value) {
  *
  *  @return The admin_email value.
  */
-std::string const& state::admin_email() const throw() {
+std::string const& state::admin_email() const noexcept {
   return _admin_email;
 }
 
@@ -893,7 +897,7 @@ void state::admin_email(std::string const& value) {
  *
  *  @return The admin_pager value.
  */
-std::string const& state::admin_pager() const throw() {
+std::string const& state::admin_pager() const noexcept {
   return _admin_pager;
 }
 
@@ -911,7 +915,7 @@ void state::admin_pager(std::string const& value) {
  *
  *  @return The allow_empty_hostgroup_assignment value.
  */
-bool state::allow_empty_hostgroup_assignment() const throw() {
+bool state::allow_empty_hostgroup_assignment() const noexcept {
   return _allow_empty_hostgroup_assignment;
 }
 
@@ -929,7 +933,7 @@ void state::allow_empty_hostgroup_assignment(bool value) {
  *
  *  @return The auto_reschedule_checks value.
  */
-bool state::auto_reschedule_checks() const throw() {
+bool state::auto_reschedule_checks() const noexcept {
   return _auto_reschedule_checks;
 }
 
@@ -947,7 +951,7 @@ void state::auto_reschedule_checks(bool value) {
  *
  *  @return The auto_rescheduling_interval value.
  */
-unsigned int state::auto_rescheduling_interval() const throw() {
+unsigned int state::auto_rescheduling_interval() const noexcept {
   return _auto_rescheduling_interval;
 }
 
@@ -967,7 +971,7 @@ void state::auto_rescheduling_interval(unsigned int value) {
  *
  *  @return The auto_rescheduling_window value.
  */
-unsigned int state::auto_rescheduling_window() const throw() {
+unsigned int state::auto_rescheduling_window() const noexcept {
   return _auto_rescheduling_window;
 }
 
@@ -987,7 +991,7 @@ void state::auto_rescheduling_window(unsigned int value) {
  *
  *  @return The auto_rescheduling_window value.
  */
-std::list<std::string> const& state::broker_module() const throw() {
+std::list<std::string> const& state::broker_module() const noexcept {
   return _broker_module;
 }
 
@@ -1005,7 +1009,7 @@ void state::broker_module(std::list<std::string> const& value) {
  *
  *  @return The broker_module_directory value.
  */
-std::string const& state::broker_module_directory() const throw() {
+std::string const& state::broker_module_directory() const noexcept {
   return _broker_module_directory;
 }
 
@@ -1029,7 +1033,7 @@ void state::broker_module_directory(std::string const& value) {
  *
  *  @return The cached_host_check_horizon value.
  */
-unsigned long state::cached_host_check_horizon() const throw() {
+unsigned long state::cached_host_check_horizon() const noexcept {
   return _cached_host_check_horizon;
 }
 
@@ -1047,7 +1051,7 @@ void state::cached_host_check_horizon(unsigned long value) {
  *
  *  @return The cached_service_check_horizon value.
  */
-unsigned long state::cached_service_check_horizon() const throw() {
+unsigned long state::cached_service_check_horizon() const noexcept {
   return _cached_service_check_horizon;
 }
 
@@ -1065,7 +1069,7 @@ void state::cached_service_check_horizon(unsigned long value) {
  *
  *  @return The cfg_dir value.
  */
-std::list<std::string> const& state::cfg_dir() const throw() {
+std::list<std::string> const& state::cfg_dir() const noexcept {
   return _cfg_dir;
 }
 
@@ -1074,7 +1078,7 @@ std::list<std::string> const& state::cfg_dir() const throw() {
  *
  *  @return The cfg_file value.
  */
-std::list<std::string> const& state::cfg_file() const throw() {
+std::list<std::string> const& state::cfg_file() const noexcept {
   return _cfg_file;
 }
 
@@ -1083,7 +1087,7 @@ std::list<std::string> const& state::cfg_file() const throw() {
  *
  *  @return The check_external_commands value.
  */
-bool state::check_external_commands() const throw() {
+bool state::check_external_commands() const noexcept {
   return _check_external_commands;
 }
 
@@ -1101,7 +1105,7 @@ void state::cfg_main(std::string const& value) {
  *
  *  @return The cfg_main value.
  */
-std::string const& state::cfg_main() const throw() {
+std::string const& state::cfg_main() const noexcept {
   return _cfg_main;
 }
 
@@ -1119,7 +1123,7 @@ void state::check_external_commands(bool value) {
  *
  *  @return The check_host_freshness value.
  */
-bool state::check_host_freshness() const throw() {
+bool state::check_host_freshness() const noexcept {
   return _check_host_freshness;
 }
 
@@ -1137,7 +1141,7 @@ void state::check_host_freshness(bool value) {
  *
  *  @return The check_orphaned_hosts value.
  */
-bool state::check_orphaned_hosts() const throw() {
+bool state::check_orphaned_hosts() const noexcept {
   return _check_orphaned_hosts;
 }
 
@@ -1164,7 +1168,7 @@ void state::check_orphaned_services(bool value) {
  *
  *  @return The check_orphaned_services value.
  */
-bool state::check_orphaned_services() const throw() {
+bool state::check_orphaned_services() const noexcept {
   return _check_orphaned_services;
 }
 
@@ -1173,7 +1177,7 @@ bool state::check_orphaned_services() const throw() {
  *
  *  @return The check_reaper_interval value.
  */
-unsigned int state::check_reaper_interval() const throw() {
+unsigned int state::check_reaper_interval() const noexcept {
   return _check_reaper_interval;
 }
 
@@ -1193,7 +1197,7 @@ void state::check_reaper_interval(unsigned int value) {
  *
  *  @return The check_result_path value.
  */
-std::string const& state::check_result_path() const throw() {
+std::string const& state::check_result_path() const noexcept {
   return _check_result_path;
 }
 
@@ -1214,7 +1218,7 @@ void state::check_result_path(std::string const& value) {
  *
  *  @return The check_service_freshness value.
  */
-bool state::check_service_freshness() const throw() {
+bool state::check_service_freshness() const noexcept {
   return _check_service_freshness;
 }
 
@@ -1232,7 +1236,7 @@ void state::check_service_freshness(bool value) {
  *
  *  @return All engine commands.
  */
-set_command const& state::commands() const throw() {
+set_command const& state::commands() const noexcept {
   return _commands;
 }
 
@@ -1241,7 +1245,7 @@ set_command const& state::commands() const throw() {
  *
  *  @return All engine commands.
  */
-set_command& state::commands() throw() {
+set_command& state::commands() noexcept {
   return _commands;
 }
 
@@ -1287,7 +1291,7 @@ set_command::iterator state::commands_find(command::key_type const& k) {
  *
  *  @return The command_check_interval value.
  */
-int state::command_check_interval() const throw() {
+int state::command_check_interval() const noexcept {
   return _command_check_interval;
 }
 
@@ -1325,7 +1329,7 @@ void state::command_check_interval(int value, bool is_second) {
  *
  *  @return true if the check interval is in seconds.
  */
-bool state::command_check_interval_is_seconds() const throw() {
+bool state::command_check_interval_is_seconds() const noexcept {
   return _command_check_interval_is_seconds;
 }
 
@@ -1334,7 +1338,7 @@ bool state::command_check_interval_is_seconds() const throw() {
  *
  *  @return The command_file value.
  */
-std::string const& state::command_file() const throw() {
+std::string const& state::command_file() const noexcept {
   return _command_file;
 }
 
@@ -1352,7 +1356,7 @@ void state::command_file(std::string const& value) {
  *
  *  @return All engine connectors.
  */
-set_connector const& state::connectors() const throw() {
+set_connector const& state::connectors() const noexcept {
   return _connectors;
 }
 
@@ -1361,7 +1365,7 @@ set_connector const& state::connectors() const throw() {
  *
  *  @return All engine connectors.
  */
-set_connector& state::connectors() throw() {
+set_connector& state::connectors() noexcept {
   return _connectors;
 }
 
@@ -1407,7 +1411,7 @@ set_connector::iterator state::connectors_find(connector::key_type const& k) {
  *
  *  @return All engine contacts.
  */
-set_contact const& state::contacts() const throw() {
+set_contact const& state::contacts() const noexcept {
   return _contacts;
 }
 
@@ -1416,7 +1420,7 @@ set_contact const& state::contacts() const throw() {
  *
  *  @return All engine contacts.
  */
-set_contact& state::contacts() throw() {
+set_contact& state::contacts() noexcept {
   return _contacts;
 }
 
@@ -1501,7 +1505,7 @@ set_contactgroup::iterator state::contactgroups_find(
  *
  *  @return All engine contactgroups.
  */
-set_contactgroup& state::contactgroups() throw() {
+set_contactgroup& state::contactgroups() noexcept {
   return _contactgroups;
 }
 
@@ -1510,7 +1514,7 @@ set_contactgroup& state::contactgroups() throw() {
  *
  *  @return All engine contactgroups.
  */
-set_contactgroup const& state::contactgroups() const throw() {
+set_contactgroup const& state::contactgroups() const noexcept {
   return _contactgroups;
 }
 
@@ -1519,7 +1523,7 @@ set_contactgroup const& state::contactgroups() const throw() {
  *
  *  @return The date_format value.
  */
-state::date_type state::date_format() const throw() {
+state::date_type state::date_format() const noexcept {
   return _date_format;
 }
 
@@ -1537,7 +1541,7 @@ void state::date_format(date_type value) {
  *
  *  @return The debug_file value.
  */
-std::string const& state::debug_file() const throw() {
+std::string const& state::debug_file() const noexcept {
   return _debug_file;
 }
 
@@ -1555,7 +1559,7 @@ void state::debug_file(std::string const& value) {
  *
  *  @return The debug_level value.
  */
-unsigned long long state::debug_level() const throw() {
+unsigned long long state::debug_level() const noexcept {
   return _debug_level;
 }
 
@@ -1576,7 +1580,7 @@ void state::debug_level(unsigned long long value) {
  *
  *  @return The debug_verbosity value.
  */
-unsigned int state::debug_verbosity() const throw() {
+unsigned int state::debug_verbosity() const noexcept {
   return _debug_verbosity;
 }
 
@@ -1597,7 +1601,7 @@ void state::debug_verbosity(unsigned int value) {
  *
  *  @return The enable_environment_macros value.
  */
-bool state::enable_environment_macros() const throw() {
+bool state::enable_environment_macros() const noexcept {
   return _enable_environment_macros;
 }
 
@@ -1615,7 +1619,7 @@ void state::enable_environment_macros(bool value) {
  *
  *  @return The enable_event_handlers value.
  */
-bool state::enable_event_handlers() const throw() {
+bool state::enable_event_handlers() const noexcept {
   return _enable_event_handlers;
 }
 
@@ -1633,7 +1637,7 @@ void state::enable_event_handlers(bool value) {
  *
  *  @return The enable_flap_detection value.
  */
-bool state::enable_flap_detection() const throw() {
+bool state::enable_flap_detection() const noexcept {
   return _enable_flap_detection;
 }
 
@@ -1651,7 +1655,7 @@ void state::enable_flap_detection(bool value) {
  *
  *  @return The enable_notifications value.
  */
-bool state::enable_notifications() const throw() {
+bool state::enable_notifications() const noexcept {
   return _enable_notifications;
 }
 
@@ -1669,7 +1673,7 @@ void state::enable_notifications(bool value) {
  *
  *  @return The enable_predictive_host_dependency_checks value.
  */
-bool state::enable_predictive_host_dependency_checks() const throw() {
+bool state::enable_predictive_host_dependency_checks() const noexcept {
   return _enable_predictive_host_dependency_checks;
 }
 
@@ -1687,7 +1691,7 @@ void state::enable_predictive_host_dependency_checks(bool value) {
  *
  *  @return The enable_predictive_service_dependency_checks value.
  */
-bool state::enable_predictive_service_dependency_checks() const throw() {
+bool state::enable_predictive_service_dependency_checks() const noexcept {
   return _enable_predictive_service_dependency_checks;
 }
 
@@ -1705,7 +1709,7 @@ void state::enable_predictive_service_dependency_checks(bool value) {
  *
  *  @return The event_broker_options value.
  */
-unsigned long state::event_broker_options() const throw() {
+unsigned long state::event_broker_options() const noexcept {
   return _event_broker_options;
 }
 
@@ -1723,7 +1727,7 @@ void state::event_broker_options(unsigned long value) {
  *
  *  @return The event_handler_timeout value.
  */
-unsigned int state::event_handler_timeout() const throw() {
+unsigned int state::event_handler_timeout() const noexcept {
   return _event_handler_timeout;
 }
 
@@ -1743,7 +1747,7 @@ void state::event_handler_timeout(unsigned int value) {
  *
  *  @return The execute_host_checks value.
  */
-bool state::execute_host_checks() const throw() {
+bool state::execute_host_checks() const noexcept {
   return _execute_host_checks;
 }
 
@@ -1761,7 +1765,7 @@ void state::execute_host_checks(bool value) {
  *
  *  @return The execute_service_checks value.
  */
-bool state::execute_service_checks() const throw() {
+bool state::execute_service_checks() const noexcept {
   return _execute_service_checks;
 }
 
@@ -1779,7 +1783,7 @@ void state::execute_service_checks(bool value) {
  *
  *  @return The external_command_buffer_slots value.
  */
-int state::external_command_buffer_slots() const throw() {
+int state::external_command_buffer_slots() const noexcept {
   return _external_command_buffer_slots;
 }
 
@@ -1797,7 +1801,7 @@ void state::external_command_buffer_slots(int value) {
  *
  *  @return The global_host_event_handler value.
  */
-std::string const& state::global_host_event_handler() const throw() {
+std::string const& state::global_host_event_handler() const noexcept {
   return _global_host_event_handler;
 }
 
@@ -1815,7 +1819,7 @@ void state::global_host_event_handler(std::string const& value) {
  *
  *  @return The global_service_event_handler value.
  */
-std::string const& state::global_service_event_handler() const throw() {
+std::string const& state::global_service_event_handler() const noexcept {
   return _global_service_event_handler;
 }
 
@@ -1833,7 +1837,7 @@ void state::global_service_event_handler(std::string const& value) {
  *
  *  @return The high_host_flap_threshold value.
  */
-float state::high_host_flap_threshold() const throw() {
+float state::high_host_flap_threshold() const noexcept {
   return _high_host_flap_threshold;
 }
 
@@ -1854,7 +1858,7 @@ void state::high_host_flap_threshold(float value) {
  *
  *  @return The high_service_flap_threshold value.
  */
-float state::high_service_flap_threshold() const throw() {
+float state::high_service_flap_threshold() const noexcept {
   return _high_service_flap_threshold;
 }
 
@@ -1875,7 +1879,7 @@ void state::high_service_flap_threshold(float value) {
  *
  *  @return All engine hostdependencies.
  */
-set_hostdependency const& state::hostdependencies() const throw() {
+set_hostdependency const& state::hostdependencies() const noexcept {
   return _hostdependencies;
 }
 
@@ -1884,7 +1888,7 @@ set_hostdependency const& state::hostdependencies() const throw() {
  *
  *  @return All engine hostdependencies.
  */
-set_hostdependency& state::hostdependencies() throw() {
+set_hostdependency& state::hostdependencies() noexcept {
   return _hostdependencies;
 }
 
@@ -1893,7 +1897,7 @@ set_hostdependency& state::hostdependencies() throw() {
  *
  *  @return All engine hostescalations.
  */
-set_hostescalation const& state::hostescalations() const throw() {
+set_hostescalation const& state::hostescalations() const noexcept {
   return _hostescalations;
 }
 
@@ -1902,7 +1906,7 @@ set_hostescalation const& state::hostescalations() const throw() {
  *
  *  @return All engine hostescalations.
  */
-set_hostescalation& state::hostescalations() throw() {
+set_hostescalation& state::hostescalations() noexcept {
   return _hostescalations;
 }
 
@@ -1911,7 +1915,7 @@ set_hostescalation& state::hostescalations() throw() {
  *
  *  @return All engine hostgroups.
  */
-set_hostgroup const& state::hostgroups() const throw() {
+set_hostgroup const& state::hostgroups() const noexcept {
   return _hostgroups;
 }
 
@@ -1920,7 +1924,7 @@ set_hostgroup const& state::hostgroups() const throw() {
  *
  *  @return All engine hostgroups.
  */
-set_hostgroup& state::hostgroups() throw() {
+set_hostgroup& state::hostgroups() noexcept {
   return _hostgroups;
 }
 
@@ -1966,7 +1970,7 @@ set_hostgroup::iterator state::hostgroups_find(hostgroup::key_type const& k) {
  *
  *  @return All engine hosts.
  */
-set_host const& state::hosts() const throw() {
+set_host const& state::hosts() const noexcept {
   return _hosts;
 }
 
@@ -1975,7 +1979,7 @@ set_host const& state::hosts() const throw() {
  *
  *  @return All engine hosts.
  */
-set_host& state::hosts() throw() {
+set_host& state::hosts() noexcept {
   return _hosts;
 }
 
@@ -2027,7 +2031,7 @@ set_host::iterator state::hosts_find(host::key_type const& k) {
  *
  *  @return The host_check_timeout value.
  */
-unsigned int state::host_check_timeout() const throw() {
+unsigned int state::host_check_timeout() const noexcept {
   return _host_check_timeout;
 }
 
@@ -2047,7 +2051,7 @@ void state::host_check_timeout(unsigned int value) {
  *
  *  @return The host_freshness_check_interval value.
  */
-unsigned int state::host_freshness_check_interval() const throw() {
+unsigned int state::host_freshness_check_interval() const noexcept {
   return _host_freshness_check_interval;
 }
 
@@ -2065,7 +2069,7 @@ void state::host_freshness_check_interval(unsigned int value) {
  *
  *  @return The host_inter_check_delay_method value.
  */
-state::inter_check_delay state::host_inter_check_delay_method() const throw() {
+state::inter_check_delay state::host_inter_check_delay_method() const noexcept {
   return _host_inter_check_delay_method;
 }
 
@@ -2083,7 +2087,7 @@ void state::host_inter_check_delay_method(inter_check_delay value) {
  *
  *  @return The host_perfdata_command value.
  */
-std::string const& state::host_perfdata_command() const throw() {
+std::string const& state::host_perfdata_command() const noexcept {
   return _host_perfdata_command;
 }
 
@@ -2101,7 +2105,7 @@ void state::host_perfdata_command(std::string const& value) {
  *
  *  @return The host_perfdata_file value.
  */
-std::string const& state::host_perfdata_file() const throw() {
+std::string const& state::host_perfdata_file() const noexcept {
   return _host_perfdata_file;
 }
 
@@ -2119,7 +2123,7 @@ void state::host_perfdata_file(std::string const& value) {
  *
  *  @return The host_perfdata_file_mode value.
  */
-state::perfdata_file_mode state::host_perfdata_file_mode() const throw() {
+state::perfdata_file_mode state::host_perfdata_file_mode() const noexcept {
   return _host_perfdata_file_mode;
 }
 
@@ -2138,7 +2142,7 @@ void state::host_perfdata_file_mode(perfdata_file_mode value) {
  *  @return The host_perfdata_file_processing_command value.
  */
 std::string const& state::host_perfdata_file_processing_command() const
-    throw() {
+    noexcept {
   return _host_perfdata_file_processing_command;
 }
 
@@ -2156,7 +2160,7 @@ void state::host_perfdata_file_processing_command(std::string const& value) {
  *
  *  @return The host_perfdata_file_processing_interval value.
  */
-unsigned int state::host_perfdata_file_processing_interval() const throw() {
+unsigned int state::host_perfdata_file_processing_interval() const noexcept {
   return _host_perfdata_file_processing_interval;
 }
 
@@ -2174,7 +2178,7 @@ void state::host_perfdata_file_processing_interval(unsigned int value) {
  *
  *  @return The host_perfdata_file_template value.
  */
-std::string const& state::host_perfdata_file_template() const throw() {
+std::string const& state::host_perfdata_file_template() const noexcept {
   return _host_perfdata_file_template;
 }
 
@@ -2192,7 +2196,7 @@ void state::host_perfdata_file_template(std::string const& value) {
  *
  *  @return The illegal_object_chars value.
  */
-std::string const& state::illegal_object_chars() const throw() {
+std::string const& state::illegal_object_chars() const noexcept {
   return _illegal_object_chars;
 }
 
@@ -2210,7 +2214,7 @@ void state::illegal_object_chars(std::string const& value) {
  *
  *  @return The illegal_output_chars value.
  */
-std::string const& state::illegal_output_chars() const throw() {
+std::string const& state::illegal_output_chars() const noexcept {
   return _illegal_output_chars;
 }
 
@@ -2228,7 +2232,7 @@ void state::illegal_output_chars(std::string const& value) {
  *
  *  @return The interval_length value.
  */
-unsigned int state::interval_length() const throw() {
+unsigned int state::interval_length() const noexcept {
   return _interval_length;
 }
 
@@ -2254,7 +2258,7 @@ void state::interval_length(unsigned int value) {
  *
  *  @return The log_event_handlers value.
  */
-bool state::log_event_handlers() const throw() {
+bool state::log_event_handlers() const noexcept {
   return _log_event_handlers;
 }
 
@@ -2272,7 +2276,7 @@ void state::log_event_handlers(bool value) {
  *
  *  @return The log_external_commands value.
  */
-bool state::log_external_commands() const throw() {
+bool state::log_external_commands() const noexcept {
   return _log_external_commands;
 }
 
@@ -2290,7 +2294,7 @@ void state::log_external_commands(bool value) {
  *
  *  @return The log_file value.
  */
-std::string const& state::log_file() const throw() {
+std::string const& state::log_file() const noexcept {
   return _log_file;
 }
 
@@ -2308,7 +2312,7 @@ void state::log_file(std::string const& value) {
  *
  *  @return The log_host_retries value.
  */
-bool state::log_host_retries() const throw() {
+bool state::log_host_retries() const noexcept {
   return _log_host_retries;
 }
 
@@ -2326,7 +2330,7 @@ void state::log_host_retries(bool value) {
  *
  *  @return The log_notifications value.
  */
-bool state::log_notifications() const throw() {
+bool state::log_notifications() const noexcept {
   return _log_notifications;
 }
 
@@ -2344,7 +2348,7 @@ void state::log_notifications(bool value) {
  *
  *  @return The log_passive_checks value.
  */
-bool state::log_passive_checks() const throw() {
+bool state::log_passive_checks() const noexcept {
   return _log_passive_checks;
 }
 
@@ -2362,7 +2366,7 @@ void state::log_passive_checks(bool value) {
  *
  *  @return  Log pid value.
  */
-bool state::log_pid() const throw() {
+bool state::log_pid() const noexcept {
   return _log_pid;
 }
 
@@ -2380,7 +2384,7 @@ void state::log_pid(bool value) {
  *
  *  @return The log_service_retries value.
  */
-bool state::log_service_retries() const throw() {
+bool state::log_service_retries() const noexcept {
   return _log_service_retries;
 }
 
@@ -2398,7 +2402,7 @@ void state::log_service_retries(bool value) {
  *
  *  @return The low_host_flap_threshold value.
  */
-float state::low_host_flap_threshold() const throw() {
+float state::low_host_flap_threshold() const noexcept {
   return _low_host_flap_threshold;
 }
 
@@ -2419,7 +2423,7 @@ void state::low_host_flap_threshold(float value) {
  *
  *  @return The low_service_flap_threshold value.
  */
-float state::low_service_flap_threshold() const throw() {
+float state::low_service_flap_threshold() const noexcept {
   return _low_service_flap_threshold;
 }
 
@@ -2440,7 +2444,7 @@ void state::low_service_flap_threshold(float value) {
  *
  *  @return The max_check_reaper_time value.
  */
-unsigned int state::max_check_reaper_time() const throw() {
+unsigned int state::max_check_reaper_time() const noexcept {
   return _max_check_reaper_time;
 }
 
@@ -2460,7 +2464,7 @@ void state::max_check_reaper_time(unsigned int value) {
  *
  *  @return The max_check_result_file_age value.
  */
-unsigned long state::max_check_result_file_age() const throw() {
+unsigned long state::max_check_result_file_age() const noexcept {
   return _max_check_result_file_age;
 }
 
@@ -2481,7 +2485,7 @@ void state::max_check_result_file_age(unsigned long value) {
  *
  *  @return The max_debug_file_size value.
  */
-unsigned long state::max_debug_file_size() const throw() {
+unsigned long state::max_debug_file_size() const noexcept {
   return _max_debug_file_size;
 }
 
@@ -2499,7 +2503,7 @@ void state::max_debug_file_size(unsigned long value) {
  *
  *  @return The max_host_check_spread value.
  */
-unsigned int state::max_host_check_spread() const throw() {
+unsigned int state::max_host_check_spread() const noexcept {
   return _max_host_check_spread;
 }
 
@@ -2519,7 +2523,7 @@ void state::max_host_check_spread(unsigned int value) {
  *
  *  @return The max_log_file_size value.
  */
-unsigned long state::max_log_file_size() const throw() {
+unsigned long state::max_log_file_size() const noexcept {
   return _max_log_file_size;
 }
 
@@ -2537,7 +2541,7 @@ void state::max_log_file_size(unsigned long value) {
  *
  *  @return The max_parallel_service_checks value.
  */
-unsigned int state::max_parallel_service_checks() const throw() {
+unsigned int state::max_parallel_service_checks() const noexcept {
   return _max_parallel_service_checks;
 }
 
@@ -2555,7 +2559,7 @@ void state::max_parallel_service_checks(unsigned int value) {
  *
  *  @return The max_service_check_spread value.
  */
-unsigned int state::max_service_check_spread() const throw() {
+unsigned int state::max_service_check_spread() const noexcept {
   return _max_service_check_spread;
 }
 
@@ -2575,7 +2579,7 @@ void state::max_service_check_spread(unsigned int value) {
  *
  *  @return The notification_timeout value.
  */
-unsigned int state::notification_timeout() const throw() {
+unsigned int state::notification_timeout() const noexcept {
   return _notification_timeout;
 }
 
@@ -2595,7 +2599,7 @@ void state::notification_timeout(unsigned int value) {
  *
  *  @return The obsess_over_hosts value.
  */
-bool state::obsess_over_hosts() const throw() {
+bool state::obsess_over_hosts() const noexcept {
   return _obsess_over_hosts;
 }
 
@@ -2613,7 +2617,7 @@ void state::obsess_over_hosts(bool value) {
  *
  *  @return The obsess_over_services value.
  */
-bool state::obsess_over_services() const throw() {
+bool state::obsess_over_services() const noexcept {
   return _obsess_over_services;
 }
 
@@ -2631,7 +2635,7 @@ void state::obsess_over_services(bool value) {
  *
  *  @return The ochp_command value.
  */
-std::string const& state::ochp_command() const throw() {
+std::string const& state::ochp_command() const noexcept {
   return _ochp_command;
 }
 
@@ -2649,7 +2653,7 @@ void state::ochp_command(std::string const& value) {
  *
  *  @return The ochp_timeout value.
  */
-unsigned int state::ochp_timeout() const throw() {
+unsigned int state::ochp_timeout() const noexcept {
   return _ochp_timeout;
 }
 
@@ -2669,7 +2673,7 @@ void state::ochp_timeout(unsigned int value) {
  *
  *  @return The ocsp_command value.
  */
-std::string const& state::ocsp_command() const throw() {
+std::string const& state::ocsp_command() const noexcept {
   return _ocsp_command;
 }
 
@@ -2687,7 +2691,7 @@ void state::ocsp_command(std::string const& value) {
  *
  *  @return The ocsp_timeout value.
  */
-unsigned int state::ocsp_timeout() const throw() {
+unsigned int state::ocsp_timeout() const noexcept {
   return _ocsp_timeout;
 }
 
@@ -2707,7 +2711,7 @@ void state::ocsp_timeout(unsigned int value) {
  *
  *  @return The passive_host_checks_are_soft value.
  */
-bool state::passive_host_checks_are_soft() const throw() {
+bool state::passive_host_checks_are_soft() const noexcept {
   return _passive_host_checks_are_soft;
 }
 
@@ -2725,7 +2729,7 @@ void state::passive_host_checks_are_soft(bool value) {
  *
  *  @return The perfdata_timeout value.
  */
-int state::perfdata_timeout() const throw() {
+int state::perfdata_timeout() const noexcept {
   return _perfdata_timeout;
 }
 
@@ -2739,11 +2743,30 @@ void state::perfdata_timeout(int value) {
 }
 
 /**
+ *  Get poller_name value.
+ *
+ *  @return The poller_name value.
+ */
+std::string const& state::poller_name() const noexcept {
+  return _poller_name;
+}
+
+/**
+ *  Set perfdata_timeout value.
+ *
+ *  @param[in] value The new perfdata_timeout value.
+ */
+void state::poller_name(std::string const& value) noexcept {
+  _poller_name = value;
+}
+
+
+/**
  *  Get process_performance_data value.
  *
  *  @return The process_performance_data value.
  */
-bool state::process_performance_data() const throw() {
+bool state::process_performance_data() const noexcept {
   return _process_performance_data;
 }
 
@@ -2761,7 +2784,7 @@ void state::process_performance_data(bool value) {
  *
  *  @return The resource_file value.
  */
-std::list<std::string> const& state::resource_file() const throw() {
+std::list<std::string> const& state::resource_file() const noexcept {
   return _resource_file;
 }
 
@@ -2779,7 +2802,7 @@ void state::resource_file(std::list<std::string> const& value) {
  *
  *  @return The retained_contact_host_attribute_mask value.
  */
-unsigned long state::retained_contact_host_attribute_mask() const throw() {
+unsigned long state::retained_contact_host_attribute_mask() const noexcept {
   return _retained_contact_host_attribute_mask;
 }
 
@@ -2797,7 +2820,7 @@ void state::retained_contact_host_attribute_mask(unsigned long value) {
  *
  *  @return The retained_contact_service_attribute_mask value.
  */
-unsigned long state::retained_contact_service_attribute_mask() const throw() {
+unsigned long state::retained_contact_service_attribute_mask() const noexcept {
   return _retained_contact_service_attribute_mask;
 }
 
@@ -2815,7 +2838,7 @@ void state::retained_contact_service_attribute_mask(unsigned long value) {
  *
  *  @return The retained_host_attribute_mask value.
  */
-unsigned long state::retained_host_attribute_mask() const throw() {
+unsigned long state::retained_host_attribute_mask() const noexcept {
   return _retained_host_attribute_mask;
 }
 
@@ -2833,7 +2856,7 @@ void state::retained_host_attribute_mask(unsigned long value) {
  *
  *  @return The retained_process_host_attribute_mask value.
  */
-unsigned long state::retained_process_host_attribute_mask() const throw() {
+unsigned long state::retained_process_host_attribute_mask() const noexcept {
   return _retained_process_host_attribute_mask;
 }
 
@@ -2851,7 +2874,7 @@ void state::retained_process_host_attribute_mask(unsigned long value) {
  *
  *  @return The retain_state_information value.
  */
-bool state::retain_state_information() const throw() {
+bool state::retain_state_information() const noexcept {
   return _retain_state_information;
 }
 
@@ -2869,7 +2892,7 @@ void state::retain_state_information(bool value) {
  *
  *  @return The retention_scheduling_horizon value.
  */
-unsigned int state::retention_scheduling_horizon() const throw() {
+unsigned int state::retention_scheduling_horizon() const noexcept {
   return _retention_scheduling_horizon;
 }
 
@@ -2889,7 +2912,7 @@ void state::retention_scheduling_horizon(unsigned int value) {
  *
  *  @return The retention_update_interval value.
  */
-unsigned int state::retention_update_interval() const throw() {
+unsigned int state::retention_update_interval() const noexcept {
   return _retention_update_interval;
 }
 
@@ -2909,7 +2932,7 @@ void state::retention_update_interval(unsigned int value) {
  *
  *  @return All engine servicedependencies.
  */
-set_servicedependency const& state::servicedependencies() const throw() {
+set_servicedependency const& state::servicedependencies() const noexcept {
   return _servicedependencies;
 }
 
@@ -2918,7 +2941,7 @@ set_servicedependency const& state::servicedependencies() const throw() {
  *
  *  @return All engine servicedependencies.
  */
-set_servicedependency& state::servicedependencies() throw() {
+set_servicedependency& state::servicedependencies() noexcept {
   return _servicedependencies;
 }
 
@@ -2927,7 +2950,7 @@ set_servicedependency& state::servicedependencies() throw() {
  *
  *  @return All engine serviceescalations.
  */
-set_serviceescalation const& state::serviceescalations() const throw() {
+set_serviceescalation const& state::serviceescalations() const noexcept {
   return _serviceescalations;
 }
 
@@ -2936,7 +2959,7 @@ set_serviceescalation const& state::serviceescalations() const throw() {
  *
  *  @return All engine serviceescalations.
  */
-set_serviceescalation& state::serviceescalations() throw() {
+set_serviceescalation& state::serviceescalations() noexcept {
   return _serviceescalations;
 }
 
@@ -2945,7 +2968,7 @@ set_serviceescalation& state::serviceescalations() throw() {
  *
  *  @return All engine servicegroups.
  */
-set_servicegroup const& state::servicegroups() const throw() {
+set_servicegroup const& state::servicegroups() const noexcept {
   return _servicegroups;
 }
 
@@ -2954,7 +2977,7 @@ set_servicegroup const& state::servicegroups() const throw() {
  *
  *  @return All engine servicegroups.
  */
-set_servicegroup& state::servicegroups() throw() {
+set_servicegroup& state::servicegroups() noexcept {
   return _servicegroups;
 }
 
@@ -3002,7 +3025,7 @@ set_servicegroup::iterator state::servicegroups_find(
  *
  *  @return All engine services.
  */
-set_service const& state::services() const throw() {
+set_service const& state::services() const noexcept {
   return _services;
 }
 
@@ -3011,7 +3034,7 @@ set_service const& state::services() const throw() {
  *
  *  @return All engine services.
  */
-set_service& state::services() throw() {
+set_service& state::services() noexcept {
   return _services;
 }
 
@@ -3053,7 +3076,7 @@ set_service::const_iterator state::services_find(
  *
  *  @return The service_check_timeout value.
  */
-unsigned int state::service_check_timeout() const throw() {
+unsigned int state::service_check_timeout() const noexcept {
   return _service_check_timeout;
 }
 
@@ -3073,7 +3096,7 @@ void state::service_check_timeout(unsigned int value) {
  *
  *  @return The service_freshness_check_interval value.
  */
-unsigned int state::service_freshness_check_interval() const throw() {
+unsigned int state::service_freshness_check_interval() const noexcept {
   return _service_freshness_check_interval;
 }
 
@@ -3094,7 +3117,7 @@ void state::service_freshness_check_interval(unsigned int value) {
  *  @return The service_inter_check_delay_method value.
  */
 state::inter_check_delay state::service_inter_check_delay_method() const
-    throw() {
+    noexcept {
   return _service_inter_check_delay_method;
 }
 
@@ -3113,7 +3136,7 @@ void state::service_inter_check_delay_method(inter_check_delay value) {
  *  @return The service_interleave_factor_method value.
  */
 state::interleave_factor state::service_interleave_factor_method() const
-    throw() {
+    noexcept {
   return _service_interleave_factor_method;
 }
 
@@ -3131,7 +3154,7 @@ void state::service_interleave_factor_method(interleave_factor value) {
  *
  *  @return The service_perfdata_command value.
  */
-std::string const& state::service_perfdata_command() const throw() {
+std::string const& state::service_perfdata_command() const noexcept {
   return _service_perfdata_command;
 }
 
@@ -3149,7 +3172,7 @@ void state::service_perfdata_command(std::string const& value) {
  *
  *  @return The service_perfdata_file value.
  */
-std::string const& state::service_perfdata_file() const throw() {
+std::string const& state::service_perfdata_file() const noexcept {
   return _service_perfdata_file;
 }
 
@@ -3167,7 +3190,7 @@ void state::service_perfdata_file(std::string const& value) {
  *
  *  @return The service_perfdata_file_mode value.
  */
-state::perfdata_file_mode state::service_perfdata_file_mode() const throw() {
+state::perfdata_file_mode state::service_perfdata_file_mode() const noexcept {
   return _service_perfdata_file_mode;
 }
 
@@ -3186,7 +3209,7 @@ void state::service_perfdata_file_mode(perfdata_file_mode value) {
  *  @return The service_perfdata_file_processing_command value.
  */
 std::string const& state::service_perfdata_file_processing_command() const
-    throw() {
+    noexcept {
   return _service_perfdata_file_processing_command;
 }
 
@@ -3204,7 +3227,7 @@ void state::service_perfdata_file_processing_command(std::string const& value) {
  *
  *  @return The service_perfdata_file_processing_interval value.
  */
-unsigned int state::service_perfdata_file_processing_interval() const throw() {
+unsigned int state::service_perfdata_file_processing_interval() const noexcept {
   return _service_perfdata_file_processing_interval;
 }
 
@@ -3222,7 +3245,7 @@ void state::service_perfdata_file_processing_interval(unsigned int value) {
  *
  *  @return The service_perfdata_file_template value.
  */
-std::string const& state::service_perfdata_file_template() const throw() {
+std::string const& state::service_perfdata_file_template() const noexcept {
   return _service_perfdata_file_template;
 }
 
@@ -3240,7 +3263,7 @@ void state::service_perfdata_file_template(std::string const& value) {
  *
  *  @return The sleep_time value.
  */
-float state::sleep_time() const throw() {
+float state::sleep_time() const noexcept {
   return _sleep_time;
 }
 
@@ -3261,7 +3284,7 @@ void state::sleep_time(float value) {
  *
  *  @return The soft_state_dependencies value.
  */
-bool state::soft_state_dependencies() const throw() {
+bool state::soft_state_dependencies() const noexcept {
   return _soft_state_dependencies;
 }
 
@@ -3279,7 +3302,7 @@ void state::soft_state_dependencies(bool value) {
  *
  *  @return The state_retention_file value.
  */
-std::string const& state::state_retention_file() const throw() {
+std::string const& state::state_retention_file() const noexcept {
   return _state_retention_file;
 }
 
@@ -3303,7 +3326,7 @@ void state::state_retention_file(std::string const& value) {
  *
  *  @return The status_file value.
  */
-std::string const& state::status_file() const throw() {
+std::string const& state::status_file() const noexcept {
   return _status_file;
 }
 
@@ -3321,7 +3344,7 @@ void state::status_file(std::string const& value) {
  *
  *  @return The status_update_interval value.
  */
-unsigned int state::status_update_interval() const throw() {
+unsigned int state::status_update_interval() const noexcept {
   return _status_update_interval;
 }
 
@@ -3363,7 +3386,7 @@ bool state::set(char const* key, char const* value) {
  *
  *  @return All engine timeperiods.
  */
-set_timeperiod const& state::timeperiods() const throw() {
+set_timeperiod const& state::timeperiods() const noexcept {
   return _timeperiods;
 }
 
@@ -3372,7 +3395,7 @@ set_timeperiod const& state::timeperiods() const throw() {
  *
  *  @return All engine timeperiods.
  */
-set_timeperiod& state::timeperiods() throw() {
+set_timeperiod& state::timeperiods() noexcept {
   return _timeperiods;
 }
 
@@ -3419,7 +3442,7 @@ set_timeperiod::iterator state::timeperiods_find(
  *
  *  @return The time_change_threshold value.
  */
-unsigned int state::time_change_threshold() const throw() {
+unsigned int state::time_change_threshold() const noexcept {
   return _time_change_threshold;
 }
 
@@ -3440,7 +3463,7 @@ void state::time_change_threshold(unsigned int value) {
  *
  *  @return The translate_passive_host_checks value.
  */
-bool state::translate_passive_host_checks() const throw() {
+bool state::translate_passive_host_checks() const noexcept {
   return _translate_passive_host_checks;
 }
 
@@ -3459,7 +3482,7 @@ void state::translate_passive_host_checks(bool value) {
  *  @return The users resources list.
  */
 std::unordered_map<std::string, std::string> const& state::user() const
-    throw() {
+    noexcept {
   return _users;
 }
 
@@ -3502,7 +3525,7 @@ void state::user(unsigned int key, std::string const& value) {
  *
  *  @return The use_aggressive_host_checking value.
  */
-bool state::use_aggressive_host_checking() const throw() {
+bool state::use_aggressive_host_checking() const noexcept {
   return _use_aggressive_host_checking;
 }
 
@@ -3520,7 +3543,7 @@ void state::use_aggressive_host_checking(bool value) {
  *
  *  @return The use_check_result_path value.
  */
-bool state::use_check_result_path() const throw() {
+bool state::use_check_result_path() const noexcept {
   return _use_check_result_path;
 }
 
@@ -3538,7 +3561,7 @@ void state::use_check_result_path(bool value) {
  *
  *  @return The use_large_installation_tweaks value.
  */
-bool state::use_large_installation_tweaks() const throw() {
+bool state::use_large_installation_tweaks() const noexcept {
   return _use_large_installation_tweaks;
 }
 
@@ -3556,7 +3579,7 @@ void state::use_large_installation_tweaks(bool value) {
  *
  *  @return The use_regexp_matches value.
  */
-bool state::use_regexp_matches() const throw() {
+bool state::use_regexp_matches() const noexcept {
   return _use_regexp_matches;
 }
 
@@ -3574,7 +3597,7 @@ void state::use_regexp_matches(bool value) {
  *
  *  @return The use_retained_program_state value.
  */
-bool state::use_retained_program_state() const throw() {
+bool state::use_retained_program_state() const noexcept {
   return _use_retained_program_state;
 }
 
@@ -3592,7 +3615,7 @@ void state::use_retained_program_state(bool value) {
  *
  *  @return The use_retained_scheduling_info value.
  */
-bool state::use_retained_scheduling_info() const throw() {
+bool state::use_retained_scheduling_info() const noexcept {
   return _use_retained_scheduling_info;
 }
 
@@ -3610,7 +3633,7 @@ void state::use_retained_scheduling_info(bool value) {
  *
  *  @return The use_setpgid value.
  */
-bool state::use_setpgid() const throw() {
+bool state::use_setpgid() const noexcept {
   return _use_setpgid;
 }
 
@@ -3628,7 +3651,7 @@ void state::use_setpgid(bool value) {
  *
  *  @return The use_syslog value.
  */
-bool state::use_syslog() const throw() {
+bool state::use_syslog() const noexcept {
   return _use_syslog;
 }
 
@@ -3646,7 +3669,7 @@ void state::use_syslog(bool value) {
  *
  *  @return The use_timezone value.
  */
-std::string const& state::use_timezone() const throw() {
+std::string const& state::use_timezone() const noexcept {
   return _use_timezone;
 }
 
@@ -3664,7 +3687,7 @@ void state::use_timezone(std::string const& value) {
  *
  *  @return The use_true_regexp_matching value.
  */
-bool state::use_true_regexp_matching() const throw() {
+bool state::use_true_regexp_matching() const noexcept {
   return _use_true_regexp_matching;
 }
 
@@ -4198,7 +4221,7 @@ std::set<std::string> const& state::macros_filter() const {
  *
  *  @return The enable_macros_filter value.
  */
-bool state::enable_macros_filter() const throw() {
+bool state::enable_macros_filter() const noexcept {
   return _enable_macros_filter;
 }
 

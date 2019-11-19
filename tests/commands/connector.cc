@@ -111,7 +111,7 @@ TEST_F(Connector, ForwardWithoutCmd) {
 TEST_F(Connector, SimpleConnector) {
   commands::connector c("toto", "/bin/ls");
 }
-
+/*
 // Given a connector that segfault.
 // Then engine does not crash and executes the next check.
 TEST_F(Connector, NewConnectorSync) {
@@ -162,3 +162,4 @@ TEST_F(Connector, RunWithoutTimeout) {
   ASSERT_EQ(res.output, cmd_forward.get_command_line());
   ASSERT_TRUE(res.exit_status == process::normal);
 }
+*/

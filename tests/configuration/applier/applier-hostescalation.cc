@@ -28,7 +28,6 @@
 #include <com/centreon/engine/hostescalation.hh>
 #include <com/centreon/engine/timezone_manager.hh>
 #include <com/centreon/logging/engine.hh>
-#include <com/centreon/logging/logger.hh>
 
 using namespace com::centreon;
 using namespace com::centreon::engine;

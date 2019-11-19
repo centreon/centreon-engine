@@ -860,7 +860,7 @@ struct grab_value_redirection {
         MACRO_RESOURCEFILE,      MACRO_COMMANDFILE,
         MACRO_HOSTPERFDATAFILE,  MACRO_SERVICEPERFDATAFILE,
         MACRO_PROCESSSTARTTIME,  MACRO_TEMPPATH,
-        MACRO_EVENTSTARTTIME};
+        MACRO_EVENTSTARTTIME,    MACRO_POLLERNAME};
     for (unsigned int i = 0; i < sizeof(static_ids) / sizeof(*static_ids); ++i)
       routines[static_ids[i]] = &handle_static_macro;
 

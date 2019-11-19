@@ -300,6 +300,7 @@ Macro Name          Service Checks Service Notifications Host Checks Host Notifi
 `ADMINPAGER`_       **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `ARGn`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `USERn`_            **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
+`POLLERNAME`_       **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 =================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
 Macro Descriptions
@@ -694,6 +695,7 @@ _`ARGn`             The nth argument passed to the command (notification, event 
                     macros ($ARG1$ through $ARG32$).
 _`USERn`            The nth user-definable macro. User macros can be defined in one or more :ref:`resource files <main_cfg_opt_resource_file>`.
                     Centreon Engine supports up to 256 user macros ($USER1$ through $USER256$).
+_`POLLERNAME`       The poller_name macro. Retrieve the name of the poller (poller_name field in engine config file).
 =================== =====================================================================================================================================
 
 Notes

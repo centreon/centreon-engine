@@ -71,6 +71,7 @@ void applier::macros::apply(configuration::state& config) {
   _set_macro(MACRO_STATUSDATAFILE, config.status_file());
   _set_macro(MACRO_HOSTPERFDATAFILE, config.host_perfdata_file());
   _set_macro(MACRO_SERVICEPERFDATAFILE, config.service_perfdata_file());
+  _set_macro(MACRO_POLLERNAME, config.poller_name());
 
   std::unordered_map<std::string, std::string> const& users(config.user());
   applier::state::instance().user_macros() = users;
