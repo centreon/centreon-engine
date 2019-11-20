@@ -21,6 +21,7 @@
 #ifndef CCE_DOWNTIMES_DOWTIME_HH
 #  define CCE_DOWNTIMES_DOWTIME_HH
 
+#  include <mutex>
 #  include <sstream>
 #  include "com/centreon/engine/host.hh"
 #  include "com/centreon/engine/service.hh"
@@ -66,9 +67,16 @@ class                          downtime {
   int32_t                      get_duration() const;
   bool                         is_in_effect() const;
   void                         start_flex_downtime();
+  bool follows(downtime const* other) const noexcept;
+  void extend_with(downtime const* other) noexcept;
 
  private:
   int                          _type;
+
+  // This mutex is useful when we extend a downtime (case encountered with
+  // recurrent downtimes.
+  // It is needed for _start_time, _end_time, _duration, _comment_id, _comment
+  mutable std::mutex _extend_m;
 
  protected:
   void                         _set_in_effect(bool in_effect);

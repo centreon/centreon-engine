@@ -39,6 +39,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/config.hh"
@@ -50,6 +51,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::retention;
 
 extern configuration::state* config;
@@ -87,6 +89,7 @@ class HostNotification : public TestEngine {
 
   void TearDown() override {
     configuration::applier::state::unload();
+    downtime_manager::instance().clear_scheduled_downtimes();
     checks::checker::unload();
     delete config;
     config = nullptr;
@@ -1109,4 +1112,69 @@ TEST_F(HostNotification, HostEscalationRetention) {
   notification1 = retention.substr(pos, end - pos);
 
   ASSERT_EQ(notification0, notification1);
+}
+
+TEST_F(HostNotification, NoNotificationDuringDoubleDowntime) {
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  std::ostringstream s;
+  s << "test_host;" << 20000 << ";" << 21000 << ";1;0;1000;admin;host";
+  ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now,
+                                  const_cast<char *>(s.str().c_str())), OK);
+  auto sd = downtime_manager::instance().get_scheduled_downtimes();
+  ASSERT_EQ(sd.size(), 1u);
+  downtime* dt1 = sd.begin()->second.get();
+  dt1->handle();
+
+  s.str("");
+  s << "test_host;" << 21000 << ";" << 22000 << ";1;0;1000;admin;host";
+  ASSERT_EQ(cmd_schedule_downtime(CMD_SCHEDULE_HOST_DOWNTIME, now,
+                                  const_cast<char *>(s.str().c_str())), OK);
+  sd = downtime_manager::instance().get_scheduled_downtimes();
+  ASSERT_EQ(sd.size(), 1u);
+  ASSERT_EQ(dt1->get_start_time(), 20000);
+  ASSERT_EQ(dt1->get_end_time(), 22000);
+
+  _host->set_current_state(engine::host::state_down);
+  _host->set_last_hard_state(engine::host::state_down);
+  _host->set_last_hard_state_change(20000);
+  _host->set_state_type(checkable::hard);
+
+  set_time(20500);
+  // Just forcing the scheduling in the downtime_manager.
+  downtime_manager::instance().check_for_expired_downtime();
+  ASSERT_EQ(_host->get_scheduled_downtime_depth(), 1);
+
+  _host->set_last_state(_host->get_current_state());
+  if (notifier::hard == _host->get_state_type())
+    _host->set_last_hard_state(_host->get_current_state());
+
+  // The host is in downtime => no critical notification
+  _host->process_check_result_3x(engine::host::state_down,
+      "The host is down",
+      CHECK_OPTION_NONE,
+      0,
+      true,
+      0);
+
+  set_time(22000);
+  // Just forcing the scheduling in the downtime_manager.
+  dt1->unschedule();
+  downtime_manager::instance().check_pending_flex_host_downtime(_host.get());
+  downtime_manager::instance().check_for_expired_downtime();
+  ASSERT_EQ(_host->get_scheduled_downtime_depth(), 0);
+
+  testing::internal::CaptureStdout();
+  // The host is in downtime => critical notification
+  _host->process_check_result_3x(engine::host::state_down,
+      "The host is down",
+      CHECK_OPTION_NONE,
+      0,
+      true,
+      0);
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t step1{out.find("HOST NOTIFICATION: admin;test_host;DOWN;cmd;")};
+  ASSERT_NE(step1, std::string::npos);
 }

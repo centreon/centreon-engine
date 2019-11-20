@@ -129,8 +129,8 @@ class checkable {
   void set_has_been_checked(bool has_been_checked);
   int get_scheduled_downtime_depth() const;
   void set_scheduled_downtime_depth(int scheduled_downtime_depth);
-  void dec_scheduled_downtime_depth();
-  void inc_scheduled_downtime_depth();
+  void dec_scheduled_downtime_depth() noexcept;
+  void inc_scheduled_downtime_depth() noexcept;
   double get_execution_time() const;
   void set_execution_time(double execution_time);
   int get_freshness_threshold() const;

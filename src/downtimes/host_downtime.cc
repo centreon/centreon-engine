@@ -134,7 +134,7 @@ int host_downtime::unschedule() {
 
   /* decrement pending flex downtime if necessary ... */
   if (!is_fixed() && _incremented_pending_downtime)
-    it->second->set_pending_flex_downtime(it->second->get_pending_flex_downtime() - 1);
+    it->second->dec_pending_flex_downtime();
 
   /* decrement the downtime depth variable and update status data if necessary
    */
@@ -159,7 +159,7 @@ int host_downtime::unschedule() {
       get_downtime_id(),
       nullptr);
 
-    it->second->set_scheduled_downtime_depth(it->second->get_scheduled_downtime_depth() - 1);
+    it->second->dec_scheduled_downtime_depth();
     it->second->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
@@ -308,7 +308,7 @@ int host_downtime::handle() {
       if (it_hst->second->get_current_state() == host::state_up) {
 
         /* increment pending flex downtime counter */
-        it_hst->second->set_pending_flex_downtime(it_hst->second->get_pending_flex_downtime() + 1);
+        it_hst->second->inc_pending_flex_downtime();
         _incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
@@ -353,8 +353,7 @@ int host_downtime::handle() {
       NULL);
 
     /* decrement the downtime depth variable */
-    it_hst->second->set_scheduled_downtime_depth(
-      it_hst->second->get_scheduled_downtime_depth() - 1);
+    it_hst->second->dec_scheduled_downtime_depth();
 
       if (it_hst->second->get_scheduled_downtime_depth() == 0) {
 
@@ -384,8 +383,7 @@ int host_downtime::handle() {
     if (!is_fixed()
         && _incremented_pending_downtime) {
         if (it_hst->second->get_pending_flex_downtime() > 0)
-          it_hst->second->set_pending_flex_downtime(
-            it_hst->second->get_pending_flex_downtime() - 1);
+          it_hst->second->dec_pending_flex_downtime();
     }
 
     /* handle (stop) downtime that is triggered by this one */
@@ -462,8 +460,7 @@ int host_downtime::handle() {
     }
 
     /* increment the downtime depth variable */
-    it_hst->second->set_scheduled_downtime_depth(
-      it_hst->second->get_scheduled_downtime_depth() + 1);
+    it_hst->second->inc_scheduled_downtime_depth();
 
     /* set the in effect flag */
     _set_in_effect(true);

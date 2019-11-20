@@ -131,6 +131,7 @@ std::ostream& operator<<(std::ostream& os, downtime const& dt) {
  * @return A reference to the downtime comment.
  */
 std::string const& downtime::get_comment() const {
+  std::lock_guard<std::mutex> lock(_extend_m);
   return _comment;
 }
 
@@ -194,6 +195,7 @@ time_t downtime::get_start_time() const {
  * @return A time_t representing the end time of this downtime.
  */
 time_t downtime::get_end_time() const {
+  std::lock_guard<std::mutex> lock(_extend_m);
   return _end_time;
 }
 
@@ -203,6 +205,7 @@ time_t downtime::get_end_time() const {
  * @return The duration is an uint64_t.
  */
 int32_t downtime::get_duration() const {
+  std::lock_guard<std::mutex> lock(_extend_m);
   return _duration;
 }
 
@@ -215,9 +218,58 @@ void downtime::_set_in_effect(bool in_effect) {
 }
 
 uint64_t downtime::_get_comment_id() const {
+  std::lock_guard<std::mutex> lock(_extend_m);
   return _comment_id;
 }
 
 void downtime::start_flex_downtime() {
   _start_flex_downtime = true;
+}
+
+/**
+ * This function indicates whether this downtime and the one given in parameter
+ * are fixed, for the same notifier, and in continuity with each other.
+ *
+ * Its interest is to be able to extend the first with the second.
+ *
+ * @param other A downtime reference.
+ *
+ * @return A boolean.
+ */
+bool downtime::follows(downtime const* other) const noexcept {
+  // Non sense to speak about continuity between flexible downtimes.
+  if (is_fixed()) {
+    std::lock_guard<std::mutex> lock(_extend_m);
+    if (other->_end_time == _start_time && _type == other->_type &&
+        _hostname == other->_hostname && _author == other->_author &&
+        _triggered_by == other->_triggered_by) {
+      if (_type == SERVICE_DOWNTIME) {
+        service_downtime const* s = static_cast<service_downtime const*>(this);
+        service_downtime const* os =
+            static_cast<service_downtime const*>(other);
+        return s->get_service_description() == os->get_service_description();
+      } else
+        return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * @brief Extends this downtime with the one given in parameter.
+ *
+ * @param other A downtime that is starting just after this one.
+ *
+ * Updated attributes are:
+ *  * the comment which will contain the new one
+ *  * the comment_id that will contain the id of the new comment
+ *  * the end time that will be the new end time
+ *  * the duration that will be the addition of the two concerned
+ */
+void downtime::extend_with(downtime const* other) noexcept {
+  std::lock_guard<std::mutex> lock(_extend_m);
+  _end_time = other->_end_time;
+  _comment = other->_comment;
+  _comment_id = other->_comment_id;
+  _duration += other->_duration;
 }
