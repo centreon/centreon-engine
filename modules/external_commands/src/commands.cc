@@ -480,17 +480,17 @@ void cmd_signal_process(int cmd, char* args) {
     scheduled_time = strtoul(temp_ptr, nullptr, 10);
 
   /* add a scheduled program shutdown or restart to the event list */
-  schedule_new_event(
+  timed_event* evt = new timed_event(
     (cmd == CMD_SHUTDOWN_PROCESS) ? EVENT_PROGRAM_SHUTDOWN : EVENT_PROGRAM_RESTART,
-    true,
     scheduled_time,
     false,
     0,
-    nullptr,
     false,
     nullptr,
     nullptr,
+    nullptr,
     0);
+  events::schedule(evt, true);
 }
 
 /**

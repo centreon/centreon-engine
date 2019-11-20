@@ -797,17 +797,18 @@ timed_event* applier::scheduler::_create_misc_event(
                time_t start,
                unsigned long interval,
                void* data) {
-  return (events::schedule(
+  timed_event* evt = new timed_event(
             type,
-            true,
             start,
             true,
             interval,
-            NULL,
             true,
+            nullptr,
             data,
-            NULL,
-            0));
+            nullptr,
+            0);
+  events::schedule(evt, true);
+  return evt;
 }
 
 /**
@@ -988,17 +989,17 @@ void applier::scheduler::_schedule_host_events(
     com::centreon::engine::host& hst(*it->second);
 
     // Schedule a new host check event.
-    events::schedule(
+    timed_event* evt = new timed_event(
               EVENT_HOST_CHECK,
-              false,
               hst.get_next_check(),
               false,
               0,
-              NULL,
               true,
+              nullptr,
               (void*)&hst,
-              NULL,
+              nullptr,
               hst.get_check_options());
+    events::schedule(evt, false);
   }
 
   // Schedule acknowledgement expirations.
@@ -1110,17 +1111,17 @@ void applier::scheduler::_schedule_service_events(
        ++it) {
     engine::service& svc(*it->second);
     // Create a new service check event.
-    events::schedule(
+    timed_event* evt = new timed_event(
               EVENT_SERVICE_CHECK,
-              false,
               svc.get_next_check(),
               false,
               0,
-              NULL,
               true,
+              nullptr,
               (void*)&svc,
-              NULL,
+              nullptr,
               svc.get_check_options());
+    events::schedule(evt, false);
   }
 
   // Schedule acknowledgement expirations.

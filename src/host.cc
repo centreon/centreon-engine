@@ -1146,9 +1146,10 @@ uint64_t engine::get_host_id(std::string const& name) {
  */
 void host::schedule_acknowledgement_expiration() {
   if (get_acknowledgement_timeout() > 0 && get_last_acknowledgement() != (time_t)0) {
-    schedule_new_event(EVENT_EXPIRE_HOST_ACK, false,
+    timed_event* evt = new timed_event(EVENT_EXPIRE_HOST_ACK,
                        get_last_acknowledgement() + get_acknowledgement_timeout(), false,
-                       0, nullptr, true, this, nullptr, 0);
+                       0, true, nullptr, this, nullptr, 0);
+    events::schedule(evt, false);
   }
 }
 

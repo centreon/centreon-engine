@@ -42,17 +42,52 @@ using namespace com::centreon::engine;
 timed_event_list timed_event::event_list_high;
 timed_event_list timed_event::event_list_low;
 
+/**
+ * Defaut constructor
+ */
 timed_event::timed_event() :
   event_type{0},
   run_time{0},
   recurring{0},
   event_interval{0},
-  compensate_for_time_change{0},
+  compensate_for_time_change{false},
   timing_func{nullptr},
   event_data{nullptr},
   event_args{nullptr},
   event_options{0}
   {}
+
+  /**
+   * Constructor with arguments
+   *
+   * @param event_type
+   * @param run_time
+   * @param recurring
+   * @param event_interval
+   * @param compensate_for_time_change
+   * @param timing_func
+   * @param event_data
+   * @param event_args
+   * @param event_options
+   */
+timed_event::timed_event(uint32_t event_type,
+    time_t run_time,
+    bool recurring,
+    unsigned long event_interval,
+    bool compensate_for_time_change,
+    void* timing_func,
+    void* event_data,
+    void* event_args,
+    int32_t event_options) :
+  event_type{event_type},
+  run_time{run_time},
+  recurring{recurring},
+  event_interval{event_interval},
+  compensate_for_time_change{compensate_for_time_change},
+  timing_func{timing_func},
+  event_data{event_data},
+  event_args{event_args},
+  event_options{event_options} {}
 
 /**
  *  Execute service check.
@@ -903,90 +938,20 @@ void resort_event_list(timed_event::priority priority) {
 }
 
 /**
- *  Create and chedule a new timed event.
+ * Schedule a timed event.
  *
- *  @param[in] event_type                 Event type id.
- *  @param[in] high_priority              Priority list.
- *  @param[in] run_time                   The run time event.
- *  @param[in] recurring                  If the event is recurring.
- *  @param[in] event_interval             The event interval.
- *  @param[in] timing_func                Function to call.
- *  @param[in] compensate_for_time_change If we need to compensate.
- *  @param[in] event_data                 The event data.
- *  @param[in] event_args                 The event args.
- *  @param[in] event_options              The event options.
+ * @param evt the timed event to schedule.
+ * @param high_priority Is it a prior event or not.
  */
-void schedule_new_event(
-       int event_type,
-       int high_priority,
-       time_t run_time,
-       int recurring,
-       unsigned long event_interval,
-       void* timing_func,
-       int compensate_for_time_change,
-       void* event_data,
-       void* event_args,
-       int event_options) {
-  schedule(
-    event_type,
-    high_priority,
-    run_time,
-    recurring,
-    event_interval,
-    timing_func,
-    compensate_for_time_change,
-    event_data,
-    event_args,
-    event_options);
-}
-
-/**
- *  Create and schedule a new timed event.
- *
- *  @param[in] event_type                 Event type id.
- *  @param[in] high_priority              Priority list.
- *  @param[in] run_time                   The run time event.
- *  @param[in] recurring                  If the event is recurring.
- *  @param[in] event_interval             The event interval.
- *  @param[in] timing_func                Function to call.
- *  @param[in] compensate_for_time_change If we need to compensate.
- *  @param[in] event_data                 The event data.
- *  @param[in] event_args                 The event args.
- *  @param[in] event_options              The event options.
- *
- *  @return The new timed event.
- */
-timed_event* events::schedule(
-               int event_type,
-               int high_priority,
-               time_t run_time,
-               int recurring,
-               unsigned long event_interval,
-               void* timing_func,
-               int compensate_for_time_change,
-               void* event_data,
-               void* event_args,
-               int event_options) {
+void events::schedule(timed_event* evt, bool high_priority) {
   logger(dbg_functions, basic)
     << "schedule_new_event()";
-
-  timed_event* evt(new timed_event);
-  evt->event_type = event_type;
-  evt->event_data = event_data;
-  evt->event_args = event_args;
-  evt->event_options = event_options;
-  evt->run_time = run_time;
-  evt->recurring = recurring;
-  evt->event_interval = event_interval;
-  evt->timing_func = timing_func;
-  evt->compensate_for_time_change = compensate_for_time_change;
 
   // add the event to the event list.
   if (high_priority)
     add_event(evt, timed_event::high);
   else
     add_event(evt, timed_event::low);
-  return evt;
 }
 
 /**
