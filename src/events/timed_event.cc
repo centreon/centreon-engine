@@ -895,11 +895,7 @@ void reschedule_event(
 
 static bool compare_event(timed_event* const& first, timed_event* const& second)
 {
-  if (first->run_time == second->run_time)
-    return first->event_type < second->event_type;
-  if (first->run_time < second->run_time)
-    return true;
-  return false;
+  return first->run_time < second->run_time;
 }
 
 /**
