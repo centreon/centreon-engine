@@ -810,23 +810,18 @@ void remove_event(
   if (!event)
     return;
 
-  if (priority == timed_event::low) {
-    for (auto it = timed_event::event_list_low.begin(),
-              end = timed_event::event_list_low.end(); it != end; ++it) {
+  auto eraser = [](timed_event_list& l, timed_event* event) {
+    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
       if (*it == event) {
-        timed_event::event_list_low.erase(it);
+        l.erase(it);
         break;
       }
     }
-  } else {
-    for (auto it = timed_event::event_list_high.begin(),
-              end = timed_event::event_list_high.end(); it != end; ++it) {
-      if (*it == event) {
-        timed_event::event_list_low.erase(it);
-        break;
-      }
-    }
-  }
+  };
+  if (priority == timed_event::low)
+    eraser(timed_event::event_list_low, event);
+  else
+    eraser(timed_event::event_list_high, event);
 }
 
 timed_event* timed_event::find_event(timed_event::priority priority, uint32_t event_type, void *data)
