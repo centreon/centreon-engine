@@ -549,19 +549,19 @@ int downtime_manager::register_downtime(int type, uint64_t downtime_id) {
  * @param dt The downtime to add.
  */
 void downtime_manager::add_downtime(downtime* dt) noexcept {
-  if (dt->is_fixed()) {
-    time_t start = dt->get_start_time();
-    // Are we extend an already running downtime?
-    for (auto it = _scheduled_downtimes.begin(),
-              end = _scheduled_downtimes.end();
-         it != end && it->first < start; ++it) {
-      downtime* d = it->second.get();
-      if (dt->follows(d)) {
-        d->extend_with(dt);
-        return;
-      }
-    }
-  }
+//  if (dt->is_fixed()) {
+//    time_t start = dt->get_start_time();
+//    // Are we extend an already running downtime?
+//    for (auto it = _scheduled_downtimes.begin(),
+//              end = _scheduled_downtimes.end();
+//         it != end && it->first < start; ++it) {
+//      downtime* d = it->second.get();
+//      if (dt->follows(d)) {
+//        d->extend_with(dt);
+//        return;
+//      }
+//    }
+//  }
   _scheduled_downtimes.insert(
       {dt->get_start_time(), std::shared_ptr<downtime>(dt)});
 }

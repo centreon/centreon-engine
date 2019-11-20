@@ -20,6 +20,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
@@ -775,9 +776,21 @@ void remove_event(
     return;
 
   if (priority == timed_event::low) {
-    timed_event::event_list_low.remove(event);
+    for (auto it = timed_event::event_list_low.begin(),
+              end = timed_event::event_list_low.end(); it != end; ++it) {
+      if (*it == event) {
+        timed_event::event_list_low.erase(it);
+        break;
+      }
+    }
   } else {
-    timed_event::event_list_high.remove(event);
+    for (auto it = timed_event::event_list_high.begin(),
+              end = timed_event::event_list_high.end(); it != end; ++it) {
+      if (*it == event) {
+        timed_event::event_list_low.erase(it);
+        break;
+      }
+    }
   }
 }
 
@@ -847,6 +860,8 @@ void reschedule_event(
 
 static bool compare_event(timed_event* const& first, timed_event* const& second)
 {
+  if (first->run_time == second->run_time)
+    return first->event_type < second->event_type;
   if (first->run_time < second->run_time)
     return true;
   return false;
@@ -871,7 +886,7 @@ void resort_event_list(timed_event::priority priority) {
   } else {
     list = &timed_event::event_list_high;
   }
-  list->sort(compare_event);
+  std::sort(list->begin(), list->end(), compare_event);
 
   // send event data to broker.
   for (timed_event_list::iterator
