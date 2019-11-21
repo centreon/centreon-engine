@@ -255,31 +255,18 @@ applier::scheduler::scheduler()
  *  Default destructor.
  */
 applier::scheduler::~scheduler() throw() {
-  timed_event* evt;
-
-  for (timed_event_list::iterator it{timed_event::event_list_low.begin()},
-       end{timed_event::event_list_low.end()};
-       it != end;) {
-    if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>((*it)->event_data);
-      (*it)->event_data = nullptr;
+  auto eraser = [](timed_event_list& l) {
+    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
+      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+        delete static_cast<unsigned long*>((*it)->event_data);
+        (*it)->event_data = nullptr;
+      }
+      delete *it;
     }
-    evt = (*it);
-    it = timed_event::event_list_low.erase(it);
-    delete evt;
-  }
-
-  for (timed_event_list::iterator it{timed_event::event_list_high.begin()},
-       end{timed_event::event_list_high.end()};
-       it != end; ++it) {
-    if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>((*it)->event_data);
-      (*it)->event_data = nullptr;
-    }
-    evt = (*it);
-    it = timed_event::event_list_high.erase(it);
-    delete evt;
-  }
+    l.clear();
+  };
+  eraser(timed_event::event_list_low);
+  eraser(timed_event::event_list_high);
 }
 
 /**
@@ -732,8 +719,10 @@ timed_event* applier::scheduler::_create_misc_event(int type,
                                                     time_t start,
                                                     unsigned long interval,
                                                     void* data) {
-  return (events::schedule(type, true, start, true, interval, NULL, true, data,
-                           NULL, 0));
+  timed_event* evt(new timed_event(type, start, true, interval, nullptr, true,
+                                   data, NULL, 0));
+  evt->schedule(true);
+  return evt;
 }
 
 /**
@@ -898,8 +887,10 @@ void applier::scheduler::_schedule_host_events(
     com::centreon::engine::host& hst(*it->second);
 
     // Schedule a new host check event.
-    events::schedule(EVENT_HOST_CHECK, false, hst.get_next_check(), false, 0,
-                     NULL, true, (void*)&hst, NULL, hst.get_check_options());
+    timed_event* evt = new timed_event(EVENT_HOST_CHECK, hst.get_next_check(),
+                                       false, 0, nullptr, true, (void*)&hst,
+                                       NULL, hst.get_check_options());
+    evt->schedule(false);
   }
 
   // Schedule acknowledgement expirations.
@@ -1002,8 +993,10 @@ void applier::scheduler::_schedule_service_events(
        it != end; ++it) {
     engine::service& svc(*it->second);
     // Create a new service check event.
-    events::schedule(EVENT_SERVICE_CHECK, false, svc.get_next_check(), false, 0,
-                     NULL, true, (void*)&svc, NULL, svc.get_check_options());
+    timed_event* evt(new timed_event(EVENT_SERVICE_CHECK, svc.get_next_check(),
+                                     false, 0, nullptr, true, (void*)&svc,
+                                     nullptr, svc.get_check_options()));
+    evt->schedule(false);
   }
 
   // Schedule acknowledgement expirations.

@@ -215,6 +215,7 @@ int downtime_manager::check_pending_flex_service_downtime(service* svc) {
   }
   return OK;
 }
+
 std::multimap<time_t, std::shared_ptr<downtime>> const&
 downtime_manager::get_scheduled_downtimes() const {
   return _scheduled_downtimes;
@@ -231,8 +232,7 @@ void downtime_manager::clear_scheduled_downtimes() {
   _scheduled_downtimes.clear();
 }
 
-void downtime_manager::add_downtime(downtime* dt) {
-  // std::shared_ptr<downtime> tmp{std::make_shared<downtime>(dt)};
+void downtime_manager::add_downtime(downtime* dt) noexcept {
   _scheduled_downtimes.insert(
       {dt->get_start_time(), std::shared_ptr<downtime>(dt)});
 }
@@ -245,11 +245,8 @@ int downtime_manager::check_for_expired_downtime() {
   time(&current_time);
 
   /* check all downtime entries... */
-  std::map<time_t, std::shared_ptr<downtime>>::iterator next_it{
-      downtime_manager::instance()._scheduled_downtimes.begin()};
-  for (std::map<time_t, std::shared_ptr<downtime>>::iterator
-           it{_scheduled_downtimes.begin()},
-       end{_scheduled_downtimes.end()};
+  auto next_it = downtime_manager::instance()._scheduled_downtimes.begin();
+  for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
        it != end; it = next_it) {
     downtime& dt(*it->second);
     ++next_it;

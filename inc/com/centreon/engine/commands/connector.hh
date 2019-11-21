@@ -72,23 +72,6 @@ class connector : public command, public process_listener {
   static connector_map connectors;
 
  private:
-  //  class restart {
-  //   public:
-  //    restart(connector* c) : _c{c} {
-  //      _thread = new std::thread(&restart::_run, this);
-  //    }
-  //    restart(restart const& right) = delete;
-  //    restart& operator=(restart const& right) = delete;
-  //    ~restart() noexcept;
-  //    void wait();
-  //    bool wait(uint32_t timeout);
-  //
-  //   private:
-  //    void _run();
-  //
-  //    std::thread* _thread;
-  //    connector* _c;
-  //  };
 
   struct query_info {
     std::string processed_cmd;

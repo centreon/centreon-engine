@@ -121,7 +121,6 @@ void run() {
             << "neb_set_module_info: " << (void (*)())neb_set_module_info
             << "\n"
             << "remove_event: " << (void (*)())remove_event << "\n"
-            << "schedule_new_event: " << (void (*)())schedule_new_event << "\n"
             << "service_list: " << service_list << "\n"
             << "servicedependency_list: " << servicedependency_list << "\n"
             << "servicegroup_list: " << servicegroup_list << "\n"
@@ -158,7 +157,6 @@ void run() {
             << "neb_register_callback: " << (void (*)())neb_register_callback
             << "\n"
             << "process_macros: " << (void (*)())process_macros << "\n"
-            << "schedule_new_event: " << (void (*)())schedule_new_event << "\n"
             << "scheduling_info: " << scheduling_info << "\n"
             << "service_list: " << service_list << "\n"
             << "servicedependency_list: " << servicedependency_list << "\n"
@@ -244,7 +242,6 @@ void run() {
             << "neb_set_module_info: " << (void (*)())neb_set_module_info
             << "\n"
             << "process_performance_data: " << process_performance_data << "\n"
-            << "schedule_new_event: " << (void (*)())schedule_new_event << "\n"
             << "strip: " << (void (*)())strip << "\n"
             << "write_to_all_logs: " << (void (*)())write_to_all_logs << "\n"
             << std::endl;

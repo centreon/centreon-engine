@@ -57,7 +57,7 @@ handle::handle(handle const& right) {
 /**
  *  Destructor.
  */
-handle::~handle() throw() {
+handle::~handle() noexcept {
   broker::compatibility::instance().destroy_module(this);
 }
 
@@ -71,7 +71,7 @@ handle::~handle() throw() {
 handle& handle::operator=(handle const& right) {
   if (this != &right)
     _internal_copy(right);
-  return (*this);
+  return *this;
 }
 
 /**
@@ -81,7 +81,7 @@ handle& handle::operator=(handle const& right) {
  *
  *  @return true or false.
  */
-bool handle::operator==(handle const& right) const throw() {
+bool handle::operator==(handle const& right) const noexcept {
   return ((_args == right._args) && (_author == right._author) &&
           (_copyright == right._copyright) &&
           (_description == right._description) &&
@@ -97,8 +97,8 @@ bool handle::operator==(handle const& right) const throw() {
  *
  *  @return true or false.
  */
-bool handle::operator!=(handle const& right) const throw() {
-  return (!operator==(right));
+bool handle::operator!=(handle const& right) const noexcept {
+  return !operator==(right);
 }
 
 /**
@@ -130,8 +130,8 @@ void handle::close() {
  *
  *  @return The arguments.
  */
-std::string const& handle::get_args() const throw() {
-  return (_args);
+std::string const& handle::get_args() const noexcept {
+  return _args;
 }
 
 /**
@@ -139,8 +139,8 @@ std::string const& handle::get_args() const throw() {
  *
  *  @return The author name.
  */
-std::string const& handle::get_author() const throw() {
-  return (_author);
+std::string const& handle::get_author() const noexcept {
+  return _author;
 }
 
 /**
@@ -148,8 +148,8 @@ std::string const& handle::get_author() const throw() {
  *
  *  @return The copyright.
  */
-std::string const& handle::get_copyright() const throw() {
-  return (_copyright);
+std::string const& handle::get_copyright() const noexcept {
+  return _copyright;
 }
 
 /**
@@ -157,8 +157,8 @@ std::string const& handle::get_copyright() const throw() {
  *
  *  @return The description.
  */
-std::string const& handle::get_description() const throw() {
-  return (_description);
+std::string const& handle::get_description() const noexcept {
+  return _description;
 }
 
 /**
@@ -166,8 +166,8 @@ std::string const& handle::get_description() const throw() {
  *
  *  @return The filename.
  */
-std::string const& handle::get_filename() const throw() {
-  return (_filename);
+std::string const& handle::get_filename() const noexcept {
+  return _filename;
 }
 
 /**
@@ -175,8 +175,8 @@ std::string const& handle::get_filename() const throw() {
  *
  *  @return pointer on a library.
  */
-com::centreon::library* handle::get_handle() const throw() {
-  return (_handle.get());
+com::centreon::library* handle::get_handle() const noexcept {
+  return _handle.get();
 }
 
 /**
@@ -184,8 +184,8 @@ com::centreon::library* handle::get_handle() const throw() {
  *
  *  @return The license.
  */
-std::string const& handle::get_license() const throw() {
-  return (_license);
+std::string const& handle::get_license() const noexcept {
+  return _license;
 }
 
 /**
@@ -193,8 +193,8 @@ std::string const& handle::get_license() const throw() {
  *
  *  @return The name.
  */
-std::string const& handle::get_name() const throw() {
-  return (_name);
+std::string const& handle::get_name() const noexcept {
+  return _name;
 }
 
 /**
@@ -202,8 +202,8 @@ std::string const& handle::get_name() const throw() {
  *
  *  @return The version.
  */
-std::string const& handle::get_version() const throw() {
-  return (_version);
+std::string const& handle::get_version() const noexcept {
+  return _version;
 }
 
 /**
@@ -212,7 +212,7 @@ std::string const& handle::get_version() const throw() {
  *  @return true if the module is loaded, false otherwise.
  */
 bool handle::is_loaded() {
-  return (_handle.get() && _handle->is_loaded());
+  return _handle.get() && _handle->is_loaded();
 }
 
 /**

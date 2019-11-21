@@ -1244,8 +1244,12 @@ int notifier::get_pending_flex_downtime() const {
   return _pending_flex_downtime;
 }
 
-void notifier::set_pending_flex_downtime(int pending_flex_downtime) {
-  _pending_flex_downtime = pending_flex_downtime;
+void notifier::inc_pending_flex_downtime() noexcept {
+  ++_pending_flex_downtime;
+}
+
+void notifier::dec_pending_flex_downtime() noexcept {
+  --_pending_flex_downtime;
 }
 
 /**
