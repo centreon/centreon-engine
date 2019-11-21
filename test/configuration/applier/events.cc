@@ -29,8 +29,8 @@ using namespace com::centreon::engine::logging;
 
 /* initialize the event timing loop before we start monitoring */
 void init_timing_loop() {
-  host* temp_host = NULL;
-  service* temp_service = NULL;
+  host* temp_host = nullptr;
+  service* temp_service = nullptr;
   time_t current_time = 0L;
   unsigned long interval_to_use = 0L;
   int total_interleave_blocks = 0;
@@ -65,11 +65,11 @@ void init_timing_loop() {
   scheduling_info.average_host_inter_check_delay = 0.0;
 
   if (test_scheduling == true)
-    gettimeofday(&tv[0], NULL);
+    gettimeofday(&tv[0], nullptr);
 
   /* get info on service checks to be scheduled */
   for (temp_service = service_list;
-       temp_service != NULL;
+       temp_service != nullptr;
        temp_service = temp_service->next) {
 
     schedule_check = true;
@@ -122,11 +122,11 @@ void init_timing_loop() {
   }
 
   if (test_scheduling == true)
-    gettimeofday(&tv[1], NULL);
+    gettimeofday(&tv[1], nullptr);
 
   /* get info on host checks to be scheduled */
   for (temp_host = host_list;
-       temp_host != NULL;
+       temp_host != nullptr;
        temp_host = temp_host->next) {
 
     schedule_check = true;
@@ -170,7 +170,7 @@ void init_timing_loop() {
   }
 
   if (test_scheduling == true)
-    gettimeofday(&tv[2], NULL);
+    gettimeofday(&tv[2], nullptr);
 
   if (scheduling_info.total_hosts == 0) {
     scheduling_info.average_services_per_host = 0;
@@ -312,7 +312,7 @@ void init_timing_loop() {
     << scheduling_info.service_inter_check_delay;
 
   if (test_scheduling == true)
-    gettimeofday(&tv[3], NULL);
+    gettimeofday(&tv[3], nullptr);
 
   /******** SCHEDULE SERVICE CHECKS  ********/
 
@@ -322,7 +322,7 @@ void init_timing_loop() {
   /* determine check times for service checks (with interleaving to minimize remote load) */
   current_interleave_block = 0;
   for (temp_service = service_list;
-       temp_service != NULL
+       temp_service != nullptr
          && scheduling_info.service_interleave_factor > 0;
        ) {
 
@@ -331,7 +331,7 @@ void init_timing_loop() {
 
     for (interleave_block_index = 0;
          interleave_block_index < scheduling_info.service_interleave_factor
-           && temp_service != NULL;
+           && temp_service != nullptr;
 	 temp_service = temp_service->next) {
 
       logger(dbg_events, most)
@@ -412,11 +412,11 @@ void init_timing_loop() {
   }
 
   if (test_scheduling == true)
-    gettimeofday(&tv[4], NULL);
+    gettimeofday(&tv[4], nullptr);
 
   /* add scheduled service checks to event queue */
   for (temp_service = service_list;
-       temp_service != NULL;
+       temp_service != nullptr;
        temp_service = temp_service->next) {
 
     /* Nagios XI/NDOUtils MOD */
@@ -439,16 +439,16 @@ void init_timing_loop() {
       temp_service->next_check,
       false,
       0,
-      NULL,
+      nullptr,
       true,
       (void*)temp_service,
-      NULL,
+      nullptr,
       temp_service->check_options);
     evt->schedule(false);
   }
 
   if (test_scheduling == true)
-    gettimeofday(&tv[5], NULL);
+    gettimeofday(&tv[5], nullptr);
 
   /******** DETERMINE HOST SCHEDULING PARAMS  ********/
 
@@ -529,7 +529,7 @@ void init_timing_loop() {
   }
 
   if (test_scheduling == true)
-    gettimeofday(&tv[6], NULL);
+    gettimeofday(&tv[6], nullptr);
 
   /******** SCHEDULE HOST CHECKS  ********/
 
@@ -539,7 +539,7 @@ void init_timing_loop() {
   /* determine check times for host checks */
   mult_factor = 0;
   for (temp_host = host_list;
-       temp_host != NULL;
+       temp_host != nullptr;
        temp_host = temp_host->next) {
 
     logger(dbg_events, most)
@@ -596,11 +596,11 @@ void init_timing_loop() {
   }
 
   if (test_scheduling == true)
-    gettimeofday(&tv[7], NULL);
+    gettimeofday(&tv[7], nullptr);
 
   /* add scheduled host checks to event queue */
   for (temp_host = host_list;
-       temp_host != NULL;
+       temp_host != nullptr;
        temp_host = temp_host->next) {
     /* Nagios XI/NDOUtils Mod */
     /* update status of all hosts (scheduled or not) */
@@ -622,16 +622,16 @@ void init_timing_loop() {
       temp_host->next_check,
       false,
       0,
-      NULL,
+      nullptr,
       true,
       (void*)temp_host,
-      NULL,
+      nullptr,
       temp_host->check_options);
     evt->schedule(false);
   }
 
   if (test_scheduling == true)
-    gettimeofday(&tv[8], NULL);
+    gettimeofday(&tv[8], nullptr);
 
   /******** SCHEDULE MISC EVENTS ********/
 
@@ -641,10 +641,10 @@ void init_timing_loop() {
     current_time + ::check_reaper_interval,
     true,
     ::check_reaper_interval,
-    NULL,
+    nullptr,
     true,
-    NULL,
-    NULL,
+    nullptr,
+    nullptr,
     0);
   evt->schedule(true);
 
@@ -659,10 +659,10 @@ void init_timing_loop() {
       current_time + interval_to_use,
       true,
       interval_to_use,
-      NULL,
+      nullptr,
       true,
-      NULL,
-      NULL,
+      nullptr,
+      nullptr,
       0);
     evt->schedule(true);
   }
@@ -674,10 +674,10 @@ void init_timing_loop() {
       current_time + ::host_freshness_check_interval,
       true,
       ::host_freshness_check_interval,
-      NULL,
+      nullptr,
       true,
-      NULL,
-      NULL,
+      nullptr,
+      nullptr,
       0);
     evt->schedule(true);
   }
@@ -690,10 +690,10 @@ void init_timing_loop() {
       current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
       true,
       DEFAULT_ORPHAN_CHECK_INTERVAL,
-      NULL,
+      nullptr,
       true,
-      NULL,
-      NULL,
+      nullptr,
+      nullptr,
       0);
     evt->schedule(true);
   }
@@ -705,10 +705,10 @@ void init_timing_loop() {
       current_time + ::auto_rescheduling_interval,
       true,
       ::auto_rescheduling_interval,
-      NULL,
+      nullptr,
       true,
-      NULL,
-      NULL,
+      nullptr,
+      nullptr,
       0);
     evt->schedule(true);
   }
@@ -721,10 +721,10 @@ void init_timing_loop() {
       current_time + (::retention_update_interval * 60),
       true,
       (::retention_update_interval * 60),
-      NULL,
+      nullptr,
       true,
-      NULL,
-      NULL,
+      nullptr,
+      nullptr,
       0);
     evt->schedule(true);
   }
@@ -736,10 +736,10 @@ void init_timing_loop() {
       current_time + ::service_freshness_check_interval,
       true,
       ::service_freshness_check_interval,
-      NULL,
+      nullptr,
       true,
-      NULL,
-      NULL,
+      nullptr,
+      nullptr,
       0);
     evt->schedule(true);
   }
@@ -750,10 +750,10 @@ void init_timing_loop() {
     current_time + ::status_update_interval,
     true,
     ::status_update_interval,
-    NULL,
+    nullptr,
     true,
-    NULL,
-    NULL,
+    nullptr,
+    nullptr,
     0);
   evt->schedule(true);
 

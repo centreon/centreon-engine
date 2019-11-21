@@ -41,18 +41,34 @@ using namespace com::centreon::engine;
 timed_event_list timed_event::event_list_high;
 timed_event_list timed_event::event_list_low;
 
+/**
+ * Defaut constructor
+ */
 timed_event::timed_event() :
   event_type{0},
   run_time{0},
   recurring{0},
   event_interval{0},
-  compensate_for_time_change{0},
+  compensate_for_time_change{false},
   timing_func{nullptr},
   event_data{nullptr},
   event_args{nullptr},
   event_options{0}
   {}
 
+  /**
+   * Constructor with arguments
+   *
+   * @param event_type
+   * @param run_time
+   * @param recurring
+   * @param event_interval
+   * @param compensate_for_time_change
+   * @param timing_func
+   * @param event_data
+   * @param event_args
+   * @param event_options
+   */
 timed_event::timed_event(
                uint32_t event_type,
                time_t run_time,
@@ -867,9 +883,7 @@ void reschedule_event(
 
 static bool compare_event(timed_event* const& first, timed_event* const& second)
 {
-  if (first->run_time < second->run_time)
-    return true;
-  return false;
+  return first->run_time < second->run_time;
 }
 
 /**

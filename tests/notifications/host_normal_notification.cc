@@ -39,6 +39,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/service.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/config.hh"
@@ -50,6 +51,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::retention;
 
 extern configuration::state* config;
@@ -87,6 +89,7 @@ class HostNotification : public TestEngine {
 
   void TearDown() override {
     configuration::applier::state::unload();
+    downtime_manager::instance().clear_scheduled_downtimes();
     checks::checker::unload();
     delete config;
     config = nullptr;
