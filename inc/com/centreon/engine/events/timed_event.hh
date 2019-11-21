@@ -23,7 +23,7 @@
 #ifndef CCE_EVENTS_TIMED_EVENT_HH
 #  define CCE_EVENTS_TIMED_EVENT_HH
 
-#  include <list>
+#  include <deque>
 #  include <stdint.h>
 #  include <time.h>
 #  include "com/centreon/engine/namespace.hh"
@@ -32,7 +32,7 @@ CCE_BEGIN()
 class timed_event;
 CCE_END()
 
-typedef std::list<com::centreon::engine::timed_event*> timed_event_list;
+typedef std::deque<com::centreon::engine::timed_event*> timed_event_list;
 
 CCE_BEGIN()
 class                        timed_event{

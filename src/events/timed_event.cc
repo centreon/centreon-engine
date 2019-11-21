@@ -20,6 +20,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
@@ -810,11 +811,18 @@ void remove_event(
   if (!event)
     return;
 
-  if (priority == timed_event::low) {
-    timed_event::event_list_low.remove(event);
-  } else {
-    timed_event::event_list_high.remove(event);
-  }
+  auto eraser = [](timed_event_list& l, timed_event* event) {
+    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
+      if (*it == event) {
+        l.erase(it);
+        break;
+      }
+    }
+  };
+  if (priority == timed_event::low)
+    eraser(timed_event::event_list_low, event);
+  else
+    eraser(timed_event::event_list_high, event);
 }
 
 timed_event* timed_event::find_event(timed_event::priority priority, uint32_t event_type, void *data)
@@ -905,7 +913,7 @@ void resort_event_list(timed_event::priority priority) {
   } else {
     list = &timed_event::event_list_high;
   }
-  list->sort(compare_event);
+  std::sort(list->begin(), list->end(), compare_event);
 
   // send event data to broker.
   for (timed_event_list::iterator
