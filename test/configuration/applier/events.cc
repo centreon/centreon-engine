@@ -434,9 +434,8 @@ void init_timing_loop() {
     }
 
     /* create a new service check event */
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_SERVICE_CHECK,
-      false,
       temp_service->next_check,
       false,
       0,
@@ -445,6 +444,7 @@ void init_timing_loop() {
       (void*)temp_service,
       NULL,
       temp_service->check_options);
+    events::schedule(false);
   }
 
   if (test_scheduling == true)
@@ -617,9 +617,8 @@ void init_timing_loop() {
     }
 
     /* schedule a new host check event */
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_HOST_CHECK,
-      false,
       temp_host->next_check,
       false,
       0,
@@ -628,6 +627,7 @@ void init_timing_loop() {
       (void*)temp_host,
       NULL,
       temp_host->check_options);
+    events::schedule(evt, false);
   }
 
   if (test_scheduling == true)
@@ -636,9 +636,8 @@ void init_timing_loop() {
   /******** SCHEDULE MISC EVENTS ********/
 
   /* add a check result reaper event */
-  schedule_new_event(
+  timed_event* evt = new timed_event(
     EVENT_CHECK_REAPER,
-    true,
     current_time + ::check_reaper_interval,
     true,
     ::check_reaper_interval,
@@ -647,6 +646,7 @@ void init_timing_loop() {
     NULL,
     NULL,
     0);
+  events::schedule(evt, true);
 
   /* add an external command check event if needed */
   if (::check_external_commands == true) {
@@ -654,9 +654,8 @@ void init_timing_loop() {
       interval_to_use = (unsigned long)5;
     else
       interval_to_use = (unsigned long)::command_check_interval;
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_COMMAND_CHECK,
-      true,
       current_time + interval_to_use,
       true,
       interval_to_use,
@@ -665,13 +664,13 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
+    events::schedule(evt, true);
   }
 
   /* add a host result "freshness" check event */
-  if (::check_host_freshness == true)
-    schedule_new_event(
+  if (::check_host_freshness) {
+    timed_event* evt = new timed_event(
       EVENT_HFRESHNESS_CHECK,
-      true,
       current_time + ::host_freshness_check_interval,
       true,
       ::host_freshness_check_interval,
@@ -680,13 +679,14 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
+    events::schedule(evt, true);
+  }
 
   /* add an orphaned check event */
-  if (::check_orphaned_services == true
-      || ::check_orphaned_hosts == true)
-    schedule_new_event(
+  if (::check_orphaned_services
+      || ::check_orphaned_hosts) {
+    timed_event* evt = new timed_event(
       EVENT_ORPHAN_CHECK,
-      true,
       current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
       true,
       DEFAULT_ORPHAN_CHECK_INTERVAL,
@@ -695,12 +695,13 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
+    events::schedule(evt, true);
+  }
 
   /* add a host and service check rescheduling event */
-  if (::auto_reschedule_checks == true)
-    schedule_new_event(
+  if (::auto_reschedule_checks) {
+    timed_event* evt = new timed_event(
       EVENT_RESCHEDULE_CHECKS,
-      true,
       current_time + ::auto_rescheduling_interval,
       true,
       ::auto_rescheduling_interval,
@@ -709,13 +710,14 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
+    events::schedule(evt, true);
+  }
 
   /* add a retention data save event if needed */
-  if (::retain_state_information == true
-      && ::retention_update_interval > 0)
-    schedule_new_event(
+  if (::retain_state_information
+      && ::retention_update_interval > 0) {
+    timed_event* evt = new timed_event(
       EVENT_RETENTION_SAVE,
-      true,
       current_time + (::retention_update_interval * 60),
       true,
       (::retention_update_interval * 60),
@@ -724,12 +726,13 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
+    events::schedule(evt, true);
+  }
 
   /* add a service result "freshness" check event */
-  if (::check_service_freshness == true)
-    schedule_new_event(
+  if (::check_service_freshness) {
+    timed_event* evt = new timed_event(
       EVENT_SFRESHNESS_CHECK,
-      true,
       current_time + ::service_freshness_check_interval,
       true,
       ::service_freshness_check_interval,
@@ -738,11 +741,12 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
+    events::schedule(evt, true);
+  }
 
   /* add a status save event */
-  schedule_new_event(
+  timed_event* evt = new timed_event(
     EVENT_STATUS_SAVE,
-    true,
     current_time + ::status_update_interval,
     true,
     ::status_update_interval,
@@ -751,8 +755,9 @@ void init_timing_loop() {
     NULL,
     NULL,
     0);
+  events::schedule(evt, true);
 
-  if (test_scheduling == true) {
+  if (test_scheduling) {
     runtime[0]
       = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
                  + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);

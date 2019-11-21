@@ -278,9 +278,8 @@ int service_downtime::subscribe() {
   /* only non-triggered downtime is scheduled... */
   if (get_triggered_by() == 0) {
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_SCHEDULED_DOWNTIME,
-      true,
       get_start_time(),
       false,
       0,
@@ -289,6 +288,7 @@ int service_downtime::subscribe() {
       (void*)new_downtime_id,
       nullptr,
       0);
+    events::schedule(evt, true);
   }
 
 #ifdef PROBABLY_NOT_NEEDED
@@ -333,9 +333,8 @@ int service_downtime::handle() {
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
 
-        schedule_new_event(
+        timed_event* evt = new timed_event(
           EVENT_EXPIRE_DOWNTIME,
-          true,
           get_end_time() + 1,
           false,
           0,
@@ -344,6 +343,7 @@ int service_downtime::handle() {
           nullptr,
           nullptr,
           0);
+        events::schedule(evt, true);
         return OK;
       }
     }
@@ -491,9 +491,8 @@ int service_downtime::handle() {
     else
       event_time = get_end_time();
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_SCHEDULED_DOWNTIME,
-      true,
       event_time,
       false,
       0,
@@ -502,6 +501,7 @@ int service_downtime::handle() {
       (void*)new_downtime_id,
       nullptr,
       0);
+    events::schedule(evt, true);
 
     /* handle (start) downtime that is triggered by this one */
     std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator it,
