@@ -1,4 +1,20 @@
 =======================
+Centreon Engine 19.10.7
+=======================
+
+*********
+Bug fixes
+*********
+
+Groups update with deleted object
+=================================
+
+On object deletion, the groups containing these objects were not updated.
+So on group update (conf reload, not restart) the group keeps in its
+members a deleted object and can use it.
+
+
+=======================
 Centreon Engine 19.10.6
 =======================
 
