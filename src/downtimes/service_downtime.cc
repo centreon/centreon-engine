@@ -489,7 +489,7 @@ int service_downtime::handle() {
       event_time
         = (time_t)((unsigned long)time(nullptr) + get_duration());
     else
-      event_time = get_end_time();
+      event_time = get_end_time() + 1;
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
     timed_event* evt = new timed_event(
       EVENT_SCHEDULED_DOWNTIME,
