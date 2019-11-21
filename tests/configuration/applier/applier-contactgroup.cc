@@ -198,3 +198,27 @@ TEST_F(ApplierContactgroup, SetContactgroupMembers) {
   // grp1 must be reload because the expand_objects reload them totally.
   ASSERT_TRUE(config->contactgroups_find("big_group")->members().size() == 1);
 }
+
+TEST_F(ApplierContactgroup, ContactRemove) {
+  configuration::applier::contact aply;
+  configuration::applier::contactgroup aply_grp;
+  configuration::contactgroup grp("test_group");
+
+  configuration::contact ctct("test");
+  aply.add_object(ctct);
+
+  configuration::contact ctct2("test2");
+  aply.add_object(ctct2);
+
+
+  grp.parse("members", "test, test2");
+  aply_grp.add_object(grp);
+  aply_grp.expand_objects(*config);
+  aply_grp.resolve_object(grp);
+  ASSERT_EQ(engine::contactgroup::contactgroups["test_group"]->get_members().size(), 2u);
+
+  aply.remove_object(ctct2);
+  ASSERT_EQ(engine::contactgroup::contactgroups["test_group"]->get_members().size(), 1u);
+  grp.parse("members", "test");
+  aply_grp.modify_object(grp);
+}
