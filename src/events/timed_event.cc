@@ -35,7 +35,6 @@
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine::downtimes;
-using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine;
 
@@ -825,7 +824,7 @@ void timed_event::schedule(bool high_priority) {
  *
  *  @return The event name.
  */
-std::string const& events::name(timed_event const& evt) {
+std::string const& timed_event::name() const noexcept {
   static std::string const event_unknown("\"unknown\"");
   static std::string const event_sleep("EVENT_SLEEP");
   static std::string const event_user_function("EVENT_USER_FUNCTION");
@@ -840,11 +839,11 @@ std::string const& events::name(timed_event const& evt) {
       "EVENT_RESCHEDULE_CHECKS", "EVENT_EXPIRE_COMMENT",
       "EVENT_EXPIRE_HOST_ACK",   "EVENT_EXPIRE_SERVICE_ACK"};
 
-  if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
-    return event_names[evt.event_type];
-  if (evt.event_type == EVENT_SLEEP)
+  if (this->event_type < sizeof(event_names) / sizeof(event_names[0]))
+    return event_names[this->event_type];
+  if (this->event_type == EVENT_SLEEP)
     return event_sleep;
-  if (evt.event_type == EVENT_USER_FUNCTION)
+  if (this->event_type == EVENT_USER_FUNCTION)
     return event_user_function;
   return event_unknown;
 }
@@ -917,7 +916,7 @@ bool operator!=(timed_event const& obj1, timed_event const& obj2) throw() {
 std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
   os << "timed_event {\n"
         "  event_type:                 "
-     << events::name(obj)
+     << obj.name()
      << "\n"
         "  run_time:                   "
      << string::ctime(obj.run_time)

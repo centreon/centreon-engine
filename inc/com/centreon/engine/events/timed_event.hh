@@ -1,8 +1,8 @@
 /*
-** Copyright 2007-2008 Ethan Galstad
-** Copyright 2007,2010 Andreas Ericsson
-** Copyright 2010      Max Schubert
-** Copyright 2011-2013 Merethis
+** Copyright 2007-2008      Ethan Galstad
+** Copyright 2007,2010      Andreas Ericsson
+** Copyright 2010           Max Schubert
+** Copyright 2011-2013,2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <deque>
+#include <string>
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -66,6 +67,7 @@ class timed_event {
                                  uint32_t event,
                                  void* data);
   void schedule(bool high_priority);
+  std::string const& name() const noexcept;
 };
 CCE_END()
 
@@ -96,14 +98,6 @@ void resort_event_list(com::centreon::engine::timed_event::priority priority);
 
 #include <ostream>
 #include "com/centreon/engine/namespace.hh"
-
-CCE_BEGIN()
-
-namespace events {
-std::string const& name(timed_event const& evt);
-}  // namespace events
-
-CCE_END()
 
 bool operator==(com::centreon::engine::timed_event const& obj1,
                 com::centreon::engine::timed_event const& obj2) throw();

@@ -45,7 +45,6 @@
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
