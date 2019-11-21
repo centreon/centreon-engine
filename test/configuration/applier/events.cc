@@ -444,7 +444,7 @@ void init_timing_loop() {
       (void*)temp_service,
       NULL,
       temp_service->check_options);
-    events::schedule(false);
+    evt->schedule(false);
   }
 
   if (test_scheduling == true)
@@ -627,7 +627,7 @@ void init_timing_loop() {
       (void*)temp_host,
       NULL,
       temp_host->check_options);
-    events::schedule(evt, false);
+    evt->schedule(false);
   }
 
   if (test_scheduling == true)
@@ -646,7 +646,7 @@ void init_timing_loop() {
     NULL,
     NULL,
     0);
-  events::schedule(evt, true);
+  evt->schedule(true);
 
   /* add an external command check event if needed */
   if (::check_external_commands == true) {
@@ -664,7 +664,7 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
   }
 
   /* add a host result "freshness" check event */
@@ -679,7 +679,7 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
   }
 
   /* add an orphaned check event */
@@ -695,7 +695,7 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
   }
 
   /* add a host and service check rescheduling event */
@@ -710,7 +710,7 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
   }
 
   /* add a retention data save event if needed */
@@ -726,7 +726,7 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
   }
 
   /* add a service result "freshness" check event */
@@ -741,7 +741,7 @@ void init_timing_loop() {
       NULL,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
   }
 
   /* add a status save event */
@@ -755,7 +755,7 @@ void init_timing_loop() {
     NULL,
     NULL,
     0);
-  events::schedule(evt, true);
+  evt->schedule(true);
 
   if (test_scheduling) {
     runtime[0]

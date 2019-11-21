@@ -856,7 +856,7 @@ void service::schedule_acknowledgement_expiration() {
     timed_event* evt = new timed_event(EVENT_EXPIRE_SERVICE_ACK,
                        get_last_acknowledgement() + get_acknowledgement_timeout(), false,
                        0, nullptr, true, this, nullptr, 0);
-    events::schedule(evt, false);
+    evt->schedule(false);
   }
 }
 

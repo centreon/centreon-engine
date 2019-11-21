@@ -269,7 +269,7 @@ int host_downtime::subscribe() {
       (void*)new_downtime_id,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
   }
 
 #ifdef PROBABLY_NOT_NEEDED
@@ -323,7 +323,7 @@ int host_downtime::handle() {
           NULL,
           NULL,
           0);
-        events::schedule(evt, true);
+        evt->schedule(true);
         return OK;
       }
     }
@@ -464,7 +464,7 @@ int host_downtime::handle() {
       (void*)new_downtime_id,
       NULL,
       0);
-    events::schedule(evt, true);
+    evt->schedule(true);
 
     /* handle (start) downtime that is triggered by this one */
     std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator it,

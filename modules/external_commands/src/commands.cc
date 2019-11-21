@@ -490,7 +490,7 @@ void cmd_signal_process(int cmd, char* args) {
     nullptr,
     nullptr,
     0);
-  events::schedule(evt, true);
+  evt->schedule(true);
 }
 
 /**

@@ -807,7 +807,7 @@ timed_event* applier::scheduler::_create_misc_event(
             data,
             NULL,
             0));
-  events::schedule(evt, true);
+  evt->schedule(true);
   return evt;
 }
 
@@ -999,7 +999,7 @@ void applier::scheduler::_schedule_host_events(
               (void*)&hst,
               NULL,
               hst.get_check_options());
-    events::schedule(evt, false);
+    evt->schedule(false);
   }
 
   // Schedule acknowledgement expirations.
@@ -1121,7 +1121,7 @@ void applier::scheduler::_schedule_service_events(
               (void*)&svc,
               NULL,
               svc.get_check_options()));
-    events::schedule(evt, false);
+    evt->schedule(false);
   }
 
   // Schedule acknowledgement expirations.

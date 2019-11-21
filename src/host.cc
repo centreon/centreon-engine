@@ -1288,7 +1288,7 @@ void host::schedule_acknowledgement_expiration() {
     timed_event* evt = new timed_event(EVENT_EXPIRE_HOST_ACK,
                        get_last_acknowledgement() + get_acknowledgement_timeout(), false,
                        0, nullptr, true, this, nullptr, 0);
-    schedule(evt, false);
+    evt->schedule(false);
   }
 }
 

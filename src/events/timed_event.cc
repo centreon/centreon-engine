@@ -908,49 +908,16 @@ void resort_event_list(timed_event::priority priority) {
 }
 
 /**
- *  Create and chedule a new timed event.
+ *  Schedule a timed event.
  *
- *  @param[in] event_type                 Event type id.
- *  @param[in] high_priority              Priority list.
- *  @param[in] run_time                   The run time event.
- *  @param[in] recurring                  If the event is recurring.
- *  @param[in] event_interval             The event interval.
- *  @param[in] timing_func                Function to call.
- *  @param[in] compensate_for_time_change If we need to compensate.
- *  @param[in] event_data                 The event data.
- *  @param[in] event_args                 The event args.
- *  @param[in] event_options              The event options.
+ * @param high_priority Priority list.
  */
-void schedule_new_event(
-       int event_type,
-       int high_priority,
-       time_t run_time,
-       int recurring,
-       unsigned long event_interval,
-       void* timing_func,
-       int compensate_for_time_change,
-       void* event_data,
-       void* event_args,
-       int event_options) {
-  timed_event* evt = new timed_event(
-    event_type,
-    run_time,
-    recurring,
-    event_interval,
-    timing_func,
-    compensate_for_time_change,
-    event_data,
-    event_args,
-    event_options);
-  schedule(evt, high_priority);
-}
-
-void events::schedule(timed_event* evt, bool high_priority) {
+void timed_event::schedule(bool high_priority) {
   // add the event to the event list.
   if (high_priority)
-    add_event(evt, timed_event::high);
+    add_event(this, timed_event::high);
   else
-    add_event(evt, timed_event::low);
+    add_event(this, timed_event::low);
 }
 
 /**
