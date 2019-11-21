@@ -231,7 +231,7 @@ void downtime_manager::clear_scheduled_downtimes() {
   _scheduled_downtimes.clear();
 }
 
-void downtime_manager::add_downtime(downtime* dt) {
+void downtime_manager::add_downtime(downtime* dt) noexcept {
   //std::shared_ptr<downtime> tmp{std::make_shared<downtime>(dt)};
   _scheduled_downtimes.insert({dt->get_start_time(), std::shared_ptr<downtime>(dt)});
 }

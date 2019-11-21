@@ -310,13 +310,18 @@ int checkable::get_scheduled_downtime_depth() const {
   return _scheduled_downtime_depth;
 }
 
-void checkable::set_scheduled_downtime_depth(int scheduled_downtime_depth) {
+void checkable::set_scheduled_downtime_depth(
+    int scheduled_downtime_depth) noexcept {
   _scheduled_downtime_depth = scheduled_downtime_depth;
 }
 
-void checkable::inc_scheduled_downtime_depth() { ++_scheduled_downtime_depth; }
+void checkable::inc_scheduled_downtime_depth() noexcept {
+  ++_scheduled_downtime_depth;
+}
 
-void checkable::dec_scheduled_downtime_depth() { --_scheduled_downtime_depth; }
+void checkable::dec_scheduled_downtime_depth() noexcept {
+  --_scheduled_downtime_depth;
+}
 
 double checkable::get_execution_time() const { return _execution_time; }
 

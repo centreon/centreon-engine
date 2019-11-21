@@ -151,8 +151,7 @@ int service_downtime::unschedule() {
 
   /* decrement pending flex downtime if necessary ... */
   if (!is_fixed() && _incremented_pending_downtime)
-    found->second->set_pending_flex_downtime(
-        found->second->get_pending_flex_downtime() - 1);
+    found->second->dec_pending_flex_downtime();
 
   /* decrement the downtime depth variable and update status data if necessary
    */
@@ -329,8 +328,7 @@ int service_downtime::handle() {
       if (found->second->get_current_state() == service::state_ok) {
 
         /* increment pending flex downtime counter */
-        found->second->set_pending_flex_downtime(
-            found->second->get_pending_flex_downtime() + 1);
+        found->second->inc_pending_flex_downtime();
         _incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
@@ -403,8 +401,7 @@ int service_downtime::handle() {
     if (!is_fixed()
         && _incremented_pending_downtime) {
       if (found->second->get_pending_flex_downtime() > 0)
-        found->second->set_pending_flex_downtime(
-            found->second->get_pending_flex_downtime() - 1);
+        found->second->dec_pending_flex_downtime();
     }
 
     /* handle (stop) downtime that is triggered by this one */
