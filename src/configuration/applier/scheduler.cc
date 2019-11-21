@@ -266,34 +266,18 @@ applier::scheduler::scheduler()
  *  Default destructor.
  */
 applier::scheduler::~scheduler() throw () {
-  timed_event *evt;
-
-  for (timed_event_list::iterator
-         it{timed_event::event_list_low.begin()},
-         end{timed_event::event_list_low.end()};
-       it != end;) {
-    if((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long *>((*it)->event_data);
-      (*it)->event_data = nullptr;
+  auto eraser = [](timed_event_list& l) {
+    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
+      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+        delete static_cast<unsigned long*>((*it)->event_data);
+        (*it)->event_data = nullptr;
+      }
+      delete *it;
     }
-    evt = (*it);
-    it = timed_event::event_list_low.erase(it);
-    delete evt;
-  }
-
-  for (timed_event_list::iterator
-         it{timed_event::event_list_high.begin()},
-         end{timed_event::event_list_high.end()};
-       it != end;
-       ++it) {
-    if((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long *>((*it)->event_data);
-      (*it)->event_data = nullptr;
-    }
-    evt = (*it);
-    it = timed_event::event_list_high.erase(it);
-    delete evt;
-  }
+    l.clear();
+  };
+  eraser(timed_event::event_list_low);
+  eraser(timed_event::event_list_high);
 }
 
 /**
