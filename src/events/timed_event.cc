@@ -53,6 +53,26 @@ timed_event::timed_event() :
   event_options{0}
   {}
 
+timed_event::timed_event(
+               uint32_t event_type,
+               time_t run_time,
+               bool recurring,
+               unsigned long event_interval,
+               void* timing_func,
+               bool compensate_for_time_change,
+               void* event_data,
+               void* event_args,
+               int32_t event_options)
+: event_type{event_type},
+  run_time{run_time},
+  recurring{recurring},
+  event_interval{event_interval},
+  compensate_for_time_change{compensate_for_time_change},
+  timing_func{timing_func},
+  event_data{event_data},
+  event_args{event_args},
+  event_options{event_options} {}
+
 /**
  *  Execute service check.
  *
@@ -912,9 +932,8 @@ void schedule_new_event(
        void* event_data,
        void* event_args,
        int event_options) {
-  schedule(
+  timed_event* evt = new timed_event(
     event_type,
-    high_priority,
     run_time,
     recurring,
     event_interval,
@@ -923,6 +942,7 @@ void schedule_new_event(
     event_data,
     event_args,
     event_options);
+  schedule(evt, high_priority);
 }
 
 /**
@@ -941,37 +961,38 @@ void schedule_new_event(
  *
  *  @return The new timed event.
  */
-timed_event* events::schedule(
-               int event_type,
-               int high_priority,
-               time_t run_time,
-               int recurring,
-               unsigned long event_interval,
-               void* timing_func,
-               int compensate_for_time_change,
-               void* event_data,
-               void* event_args,
-               int event_options) {
-  logger(dbg_functions, basic)
-    << "schedule_new_event()";
+//timed_event* events::schedule(
+//               int event_type,
+//               int high_priority,
+//               time_t run_time,
+//               int recurring,
+//               unsigned long event_interval,
+//               void* timing_func,
+//               int compensate_for_time_change,
+//               void* event_data,
+//               void* event_args,
+//               int event_options) {
+//  logger(dbg_functions, basic)
+//    << "schedule_new_event()";
+//
+//  timed_event* evt{new timed_event(
+//      event_type, run_time, recurring, event_interval, timing_func,
+//      compensate_for_time_change, event_data, event_args, event_options)};
+//
+//  // add the event to the event list.
+//  if (high_priority)
+//    add_event(evt, timed_event::high);
+//  else
+//    add_event(evt, timed_event::low);
+//  return evt;
+//}
 
-  timed_event* evt(new timed_event);
-  evt->event_type = event_type;
-  evt->event_data = event_data;
-  evt->event_args = event_args;
-  evt->event_options = event_options;
-  evt->run_time = run_time;
-  evt->recurring = recurring;
-  evt->event_interval = event_interval;
-  evt->timing_func = timing_func;
-  evt->compensate_for_time_change = compensate_for_time_change;
-
+void events::schedule(timed_event* evt, bool high_priority) {
   // add the event to the event list.
   if (high_priority)
     add_event(evt, timed_event::high);
   else
     add_event(evt, timed_event::low);
-  return evt;
 }
 
 /**
