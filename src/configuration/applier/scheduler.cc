@@ -786,7 +786,7 @@ timed_event* applier::scheduler::_create_misc_event(
             start,
             true,
             interval,
-            NULL,
+            nullptr,
             true,
             data,
             NULL,
@@ -978,7 +978,7 @@ void applier::scheduler::_schedule_host_events(
               hst.get_next_check(),
               false,
               0,
-              NULL,
+              nullptr,
               true,
               (void*)&hst,
               NULL,
@@ -1100,10 +1100,10 @@ void applier::scheduler::_schedule_service_events(
               svc.get_next_check(),
               false,
               0,
-              NULL,
+              nullptr,
               true,
               (void*)&svc,
-              NULL,
+              nullptr,
               svc.get_check_options()));
     evt->schedule(false);
   }
