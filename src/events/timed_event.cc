@@ -21,6 +21,7 @@
 */
 
 #include "com/centreon/engine/events/timed_event.hh"
+#include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
@@ -34,23 +35,57 @@
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine::downtimes;
-using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine;
 
 timed_event_list timed_event::event_list_high;
 timed_event_list timed_event::event_list_low;
 
+/**
+ * Defaut constructor
+ */
 timed_event::timed_event()
     : event_type{0},
       run_time{0},
       recurring{0},
       event_interval{0},
-      compensate_for_time_change{0},
+      compensate_for_time_change{false},
       timing_func{nullptr},
       event_data{nullptr},
       event_args{nullptr},
       event_options{0} {}
+
+/**
+ * Constructor with arguments
+ *
+ * @param event_type
+ * @param run_time
+ * @param recurring
+ * @param event_interval
+ * @param compensate_for_time_change
+ * @param timing_func
+ * @param event_data
+ * @param event_args
+ * @param event_options
+ */
+timed_event::timed_event(uint32_t event_type,
+                         time_t run_time,
+                         bool recurring,
+                         unsigned long event_interval,
+                         void* timing_func,
+                         bool compensate_for_time_change,
+                         void* event_data,
+                         void* event_args,
+                         int32_t event_options)
+    : event_type{event_type},
+      run_time{run_time},
+      recurring{recurring},
+      event_interval{event_interval},
+      compensate_for_time_change{compensate_for_time_change},
+      timing_func{timing_func},
+      event_data{event_data},
+      event_args{event_args},
+      event_options{event_options} {}
 
 /**
  *  Execute service check.
@@ -665,11 +700,18 @@ void remove_event(timed_event* event, timed_event::priority priority) {
   if (!event)
     return;
 
-  if (priority == timed_event::low) {
-    timed_event::event_list_low.remove(event);
-  } else {
-    timed_event::event_list_high.remove(event);
-  }
+  auto eraser = [](timed_event_list& l, timed_event* event) {
+    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
+      if (*it == event) {
+        l.erase(it);
+        break;
+      }
+    }
+  };
+  if (priority == timed_event::low)
+    eraser(timed_event::event_list_low, event);
+  else
+    eraser(timed_event::event_list_high, event);
 }
 
 timed_event* timed_event::find_event(timed_event::priority priority,
@@ -732,9 +774,7 @@ void reschedule_event(timed_event* event, timed_event::priority priority) {
 
 static bool compare_event(timed_event* const& first,
                           timed_event* const& second) {
-  if (first->run_time < second->run_time)
-    return true;
-  return false;
+  return first->run_time < second->run_time;
 }
 
 /**
@@ -755,7 +795,7 @@ void resort_event_list(timed_event::priority priority) {
   } else {
     list = &timed_event::event_list_high;
   }
-  list->sort(compare_event);
+  std::sort(list->begin(), list->end(), compare_event);
 
   // send event data to broker.
   for (timed_event_list::iterator it{list->begin()}, end{list->end()};
@@ -765,79 +805,16 @@ void resort_event_list(timed_event::priority priority) {
 }
 
 /**
- *  Create and chedule a new timed event.
+ *  Schedule a timed event.
  *
- *  @param[in] event_type                 Event type id.
- *  @param[in] high_priority              Priority list.
- *  @param[in] run_time                   The run time event.
- *  @param[in] recurring                  If the event is recurring.
- *  @param[in] event_interval             The event interval.
- *  @param[in] timing_func                Function to call.
- *  @param[in] compensate_for_time_change If we need to compensate.
- *  @param[in] event_data                 The event data.
- *  @param[in] event_args                 The event args.
- *  @param[in] event_options              The event options.
+ * @param high_priority Priority list.
  */
-void schedule_new_event(int event_type,
-                        int high_priority,
-                        time_t run_time,
-                        int recurring,
-                        unsigned long event_interval,
-                        void* timing_func,
-                        int compensate_for_time_change,
-                        void* event_data,
-                        void* event_args,
-                        int event_options) {
-  schedule(event_type, high_priority, run_time, recurring, event_interval,
-           timing_func, compensate_for_time_change, event_data, event_args,
-           event_options);
-}
-
-/**
- *  Create and schedule a new timed event.
- *
- *  @param[in] event_type                 Event type id.
- *  @param[in] high_priority              Priority list.
- *  @param[in] run_time                   The run time event.
- *  @param[in] recurring                  If the event is recurring.
- *  @param[in] event_interval             The event interval.
- *  @param[in] timing_func                Function to call.
- *  @param[in] compensate_for_time_change If we need to compensate.
- *  @param[in] event_data                 The event data.
- *  @param[in] event_args                 The event args.
- *  @param[in] event_options              The event options.
- *
- *  @return The new timed event.
- */
-timed_event* events::schedule(int event_type,
-                              int high_priority,
-                              time_t run_time,
-                              int recurring,
-                              unsigned long event_interval,
-                              void* timing_func,
-                              int compensate_for_time_change,
-                              void* event_data,
-                              void* event_args,
-                              int event_options) {
-  logger(dbg_functions, basic) << "schedule_new_event()";
-
-  timed_event* evt(new timed_event);
-  evt->event_type = event_type;
-  evt->event_data = event_data;
-  evt->event_args = event_args;
-  evt->event_options = event_options;
-  evt->run_time = run_time;
-  evt->recurring = recurring;
-  evt->event_interval = event_interval;
-  evt->timing_func = timing_func;
-  evt->compensate_for_time_change = compensate_for_time_change;
-
+void timed_event::schedule(bool high_priority) {
   // add the event to the event list.
   if (high_priority)
-    add_event(evt, timed_event::high);
+    add_event(this, timed_event::high);
   else
-    add_event(evt, timed_event::low);
-  return evt;
+    add_event(this, timed_event::low);
 }
 
 /**
@@ -847,7 +824,7 @@ timed_event* events::schedule(int event_type,
  *
  *  @return The event name.
  */
-std::string const& events::name(timed_event const& evt) {
+std::string const& timed_event::name() const noexcept {
   static std::string const event_unknown("\"unknown\"");
   static std::string const event_sleep("EVENT_SLEEP");
   static std::string const event_user_function("EVENT_USER_FUNCTION");
@@ -862,11 +839,11 @@ std::string const& events::name(timed_event const& evt) {
       "EVENT_RESCHEDULE_CHECKS", "EVENT_EXPIRE_COMMENT",
       "EVENT_EXPIRE_HOST_ACK",   "EVENT_EXPIRE_SERVICE_ACK"};
 
-  if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
-    return event_names[evt.event_type];
-  if (evt.event_type == EVENT_SLEEP)
+  if (this->event_type < sizeof(event_names) / sizeof(event_names[0]))
+    return event_names[this->event_type];
+  if (this->event_type == EVENT_SLEEP)
     return event_sleep;
-  if (evt.event_type == EVENT_USER_FUNCTION)
+  if (this->event_type == EVENT_USER_FUNCTION)
     return event_user_function;
   return event_unknown;
 }
@@ -939,7 +916,7 @@ bool operator!=(timed_event const& obj1, timed_event const& obj2) throw() {
 std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
   os << "timed_event {\n"
         "  event_type:                 "
-     << events::name(obj)
+     << obj.name()
      << "\n"
         "  run_time:                   "
      << string::ctime(obj.run_time)

@@ -45,7 +45,6 @@
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
@@ -867,11 +866,13 @@ uint64_t engine::get_service_id(std::string const& host,
  */
 void service::schedule_acknowledgement_expiration() {
   if (get_acknowledgement_timeout() > 0 &&
-      get_last_acknowledgement() != (time_t)0)
-    schedule_new_event(
-        EVENT_EXPIRE_SERVICE_ACK, false,
+      get_last_acknowledgement() != (time_t)0) {
+    timed_event* evt = new timed_event(
+        EVENT_EXPIRE_SERVICE_ACK,
         get_last_acknowledgement() + get_acknowledgement_timeout(), false, 0,
         nullptr, true, this, nullptr, 0);
+    evt->schedule(false);
+  }
 }
 
 void service::set_host_id(uint64_t host_id) {

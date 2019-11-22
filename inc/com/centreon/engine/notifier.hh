@@ -258,7 +258,8 @@ class notifier : public checkable {
   std::array<std::shared_ptr<notification>, 6> const&
   get_current_notifications() const;
   int get_pending_flex_downtime() const;
-  void set_pending_flex_downtime(int pending_flex_downtime);
+  void inc_pending_flex_downtime() noexcept;
+  void dec_pending_flex_downtime() noexcept;
   virtual bool get_is_volatile() const = 0;
   void set_flap_type(uint32_t type);
   timeperiod* get_notification_period_ptr() const;
