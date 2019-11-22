@@ -23,7 +23,7 @@
 #ifndef CCE_EVENTS_TIMED_EVENT_HH
 #  define CCE_EVENTS_TIMED_EVENT_HH
 
-#  include <list>
+#  include <deque>
 #  include <stdint.h>
 #  include <time.h>
 #  include "com/centreon/engine/namespace.hh"
@@ -32,7 +32,7 @@ CCE_BEGIN()
 class timed_event;
 CCE_END()
 
-typedef std::list<com::centreon::engine::timed_event*> timed_event_list;
+typedef std::deque<com::centreon::engine::timed_event*> timed_event_list;
 
 CCE_BEGIN()
 class                        timed_event{
@@ -43,21 +43,32 @@ class                        timed_event{
     priority_num
   };
                             timed_event();
+                            timed_event(
+                                uint32_t event_type,
+                                time_t run_time,
+                                bool recurring,
+                                unsigned long event_interval,
+                                void* timing_func,
+                                bool compensate_for_time_change,
+                                void* event_data,
+                                void* event_args,
+                                int32_t event_options);
 
   uint32_t                   event_type;
   time_t                     run_time;
-  int                        recurring;
+  bool                       recurring;
   unsigned long              event_interval;
-  int                        compensate_for_time_change;
+  bool                       compensate_for_time_change;
   void*                      timing_func;
   void*                      event_data;
   void*                      event_args;
-  int                        event_options;
+  int32_t                    event_options;
 
   static timed_event_list    event_list_high;
   static timed_event_list    event_list_low;
 
   static timed_event*        find_event(timed_event::priority, uint32_t event, void *data);
+  void schedule(bool high_priority);
 };
 CCE_END()
 
@@ -84,17 +95,6 @@ void reschedule_event(
   com::centreon::engine::timed_event* event,
   com::centreon::engine::timed_event::priority priority);
 void resort_event_list(com::centreon::engine::timed_event::priority priority);
-void schedule_new_event(
-       int event_type,
-       int high_priority,
-       time_t run_time,
-       int recurring,
-       unsigned long event_interval,
-       void* timing_func,
-       int compensate_for_time_change,
-       void* event_data,
-       void* event_args,
-       int event_options);
 
 #  ifdef __cplusplus
 }
@@ -108,17 +108,6 @@ void schedule_new_event(
 CCE_BEGIN()
 
 namespace            events {
-  timed_event*       schedule(
-                       int event_type,
-                       int high_priority,
-                       time_t run_time,
-                       int recurring,
-                       unsigned long event_interval,
-                       void* timing_func,
-                       int compensate_for_time_change,
-                       void* event_data,
-                       void* event_args,
-                       int event_options);
   std::string const& name(timed_event const& evt);
 }
 

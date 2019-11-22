@@ -151,8 +151,7 @@ int service_downtime::unschedule() {
 
   /* decrement pending flex downtime if necessary ... */
   if (!is_fixed() && _incremented_pending_downtime)
-    found->second->set_pending_flex_downtime(
-        found->second->get_pending_flex_downtime() - 1);
+    found->second->dec_pending_flex_downtime();
 
   /* decrement the downtime depth variable and update status data if necessary
    */
@@ -279,9 +278,8 @@ int service_downtime::subscribe() {
   /* only non-triggered downtime is scheduled... */
   if (get_triggered_by() == 0) {
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_SCHEDULED_DOWNTIME,
-      true,
       get_start_time(),
       false,
       0,
@@ -290,6 +288,7 @@ int service_downtime::subscribe() {
       (void*)new_downtime_id,
       nullptr,
       0);
+    evt->schedule(true);
   }
 
 #ifdef PROBABLY_NOT_NEEDED
@@ -329,15 +328,13 @@ int service_downtime::handle() {
       if (found->second->get_current_state() == service::state_ok) {
 
         /* increment pending flex downtime counter */
-        found->second->set_pending_flex_downtime(
-            found->second->get_pending_flex_downtime() + 1);
+        found->second->inc_pending_flex_downtime();
         _incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
 
-        schedule_new_event(
+        timed_event* evt = new timed_event(
           EVENT_EXPIRE_DOWNTIME,
-          true,
           get_end_time() + 1,
           false,
           0,
@@ -346,6 +343,7 @@ int service_downtime::handle() {
           nullptr,
           nullptr,
           0);
+        evt->schedule(true);
         return OK;
       }
     }
@@ -403,8 +401,7 @@ int service_downtime::handle() {
     if (!is_fixed()
         && _incremented_pending_downtime) {
       if (found->second->get_pending_flex_downtime() > 0)
-        found->second->set_pending_flex_downtime(
-            found->second->get_pending_flex_downtime() - 1);
+        found->second->dec_pending_flex_downtime();
     }
 
     /* handle (stop) downtime that is triggered by this one */
@@ -492,11 +489,10 @@ int service_downtime::handle() {
       event_time
         = (time_t)((unsigned long)time(nullptr) + get_duration());
     else
-      event_time = get_end_time();
+      event_time = get_end_time() + 1;
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_SCHEDULED_DOWNTIME,
-      true,
       event_time,
       false,
       0,
@@ -505,6 +501,7 @@ int service_downtime::handle() {
       (void*)new_downtime_id,
       nullptr,
       0);
+    evt->schedule(true);
 
     /* handle (start) downtime that is triggered by this one */
     std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator it,

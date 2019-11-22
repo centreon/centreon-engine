@@ -134,7 +134,7 @@ int host_downtime::unschedule() {
 
   /* decrement pending flex downtime if necessary ... */
   if (!is_fixed() && _incremented_pending_downtime)
-    it->second->set_pending_flex_downtime(it->second->get_pending_flex_downtime() - 1);
+    it->second->dec_pending_flex_downtime();
 
   /* decrement the downtime depth variable and update status data if necessary
    */
@@ -159,7 +159,7 @@ int host_downtime::unschedule() {
       get_downtime_id(),
       nullptr);
 
-    it->second->set_scheduled_downtime_depth(it->second->get_scheduled_downtime_depth() - 1);
+    it->second->dec_scheduled_downtime_depth();
     it->second->update_status(false);
 
     /* log a notice - this is parsed by the history CGI */
@@ -259,9 +259,8 @@ int host_downtime::subscribe() {
   /* only non-triggered downtime is scheduled... */
   if (get_triggered_by() == 0) {
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_SCHEDULED_DOWNTIME,
-      true,
       get_start_time(),
       false,
       0,
@@ -270,6 +269,7 @@ int host_downtime::subscribe() {
       (void*)new_downtime_id,
       NULL,
       0);
+    evt->schedule(true);
   }
 
 #ifdef PROBABLY_NOT_NEEDED
@@ -308,14 +308,13 @@ int host_downtime::handle() {
       if (it_hst->second->get_current_state() == host::state_up) {
 
         /* increment pending flex downtime counter */
-        it_hst->second->set_pending_flex_downtime(it_hst->second->get_pending_flex_downtime() + 1);
+        it_hst->second->inc_pending_flex_downtime();
         _incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
 
-        schedule_new_event(
+        timed_event* evt = new timed_event(
           EVENT_EXPIRE_DOWNTIME,
-          true,
           get_end_time() + 1,
           false,
           0,
@@ -324,6 +323,7 @@ int host_downtime::handle() {
           NULL,
           NULL,
           0);
+        evt->schedule(true);
         return OK;
       }
     }
@@ -331,76 +331,55 @@ int host_downtime::handle() {
 
   /* have we come to the end of the scheduled downtime? */
   if (is_in_effect()) {
-
     /* send data to event broker */
     attr = NEBATTR_DOWNTIME_STOP_NORMAL;
     broker_downtime_data(
-      NEBTYPE_DOWNTIME_STOP,
-      NEBFLAG_NONE,
-      attr,
-      get_type(),
-      get_hostname().c_str(),
-      nullptr,
-      _entry_time,
-      get_author().c_str(),
-      get_comment().c_str(),
-      get_start_time(),
-      get_end_time(),
-      is_fixed(),
-      get_triggered_by(),
-      get_duration(),
-      get_downtime_id(),
-      NULL);
+        NEBTYPE_DOWNTIME_STOP, NEBFLAG_NONE, attr, get_type(),
+        get_hostname().c_str(), nullptr, _entry_time, get_author().c_str(),
+        get_comment().c_str(), get_start_time(), get_end_time(), is_fixed(),
+        get_triggered_by(), get_duration(), get_downtime_id(), NULL);
 
     /* decrement the downtime depth variable */
-    it_hst->second->set_scheduled_downtime_depth(
-      it_hst->second->get_scheduled_downtime_depth() - 1);
+    it_hst->second->dec_scheduled_downtime_depth();
 
-      if (it_hst->second->get_scheduled_downtime_depth() == 0) {
-
+    if (it_hst->second->get_scheduled_downtime_depth() == 0) {
       logger(dbg_downtime, basic)
-        << "Host '" << it_hst->second->get_name()
-        << "' has exited from a period of scheduled downtime (id="
-        << get_downtime_id() << ").";
+          << "Host '" << it_hst->second->get_name()
+          << "' has exited from a period of scheduled downtime (id="
+          << get_downtime_id() << ").";
 
       /* log a notice - this one is parsed by the history CGI */
       logger(log_info_message, basic)
-        << "HOST DOWNTIME ALERT: " << it_hst->second->get_name()
-        << ";STOPPED; Host has exited from a period of scheduled "
-        "downtime";
+          << "HOST DOWNTIME ALERT: " << it_hst->second->get_name()
+          << ";STOPPED; Host has exited from a period of scheduled "
+             "downtime";
 
       /* send a notification */
-      it_hst->second->notify(
-        notifier::reason_downtimeend,
-        get_author(),
-        get_comment(),
-        notifier::notification_option_none);
-      }
+      it_hst->second->notify(notifier::reason_downtimeend, get_author(),
+                             get_comment(), notifier::notification_option_none);
+    }
 
     /* update the status data */
     it_hst->second->update_status(false);
 
     /* decrement pending flex downtime if necessary */
-    if (!is_fixed()
-        && _incremented_pending_downtime) {
-        if (it_hst->second->get_pending_flex_downtime() > 0)
-          it_hst->second->set_pending_flex_downtime(
-            it_hst->second->get_pending_flex_downtime() - 1);
+    if (!is_fixed() && _incremented_pending_downtime) {
+      if (it_hst->second->get_pending_flex_downtime() > 0)
+        it_hst->second->dec_pending_flex_downtime();
     }
 
     /* handle (stop) downtime that is triggered by this one */
     while (true) {
       std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator it;
       std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator end{
-        downtime_manager::instance().get_scheduled_downtimes().end()};
+          downtime_manager::instance().get_scheduled_downtimes().end()};
 
       /*
        * list contents might change by recursive calls, so we use this
        * inefficient method to prevent segfaults
        */
       for (it = downtime_manager::instance().get_scheduled_downtimes().begin();
-          it != end;
-          ++it) {
+           it != end; ++it) {
         if (it->second->get_triggered_by() == get_downtime_id()) {
           it->second->handle();
           break;
@@ -408,8 +387,7 @@ int host_downtime::handle() {
       }
 
       for (it = downtime_manager::instance().get_scheduled_downtimes().begin();
-          it != end;
-          ++it) {
+           it != end; ++it) {
         if (it->second->get_triggered_by() == get_downtime_id()) {
           it->second->handle();
           break;
@@ -425,7 +403,6 @@ int host_downtime::handle() {
   }
   /* else we are just starting the scheduled downtime */
   else {
-
     /* send data to event broker */
     broker_downtime_data(
       NEBTYPE_DOWNTIME_START,
@@ -462,8 +439,7 @@ int host_downtime::handle() {
     }
 
     /* increment the downtime depth variable */
-    it_hst->second->set_scheduled_downtime_depth(
-      it_hst->second->get_scheduled_downtime_depth() + 1);
+    it_hst->second->inc_scheduled_downtime_depth();
 
     /* set the in effect flag */
     _set_in_effect(true);
@@ -476,11 +452,10 @@ int host_downtime::handle() {
       event_time
         = (time_t)((uint64_t)time(NULL) + get_duration());
     else
-      event_time = get_end_time();
+      event_time = get_end_time() + 1;
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
-    schedule_new_event(
+    timed_event* evt = new timed_event(
       EVENT_SCHEDULED_DOWNTIME,
-      true,
       event_time,
       false,
       0,
@@ -489,6 +464,7 @@ int host_downtime::handle() {
       (void*)new_downtime_id,
       NULL,
       0);
+    evt->schedule(true);
 
     /* handle (start) downtime that is triggered by this one */
     std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator it,

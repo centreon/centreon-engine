@@ -1,4 +1,18 @@
 =======================
+Centreon Engine 19.10.8
+=======================
+
+*********
+Bug fixes
+*********
+
+Notifications and contiguous fixed downtimes
+============================================
+
+Between two contiguous downtimes, it was possible to receive notifications
+of devices that were in critical state whereas they had to be in downtime.
+
+=======================
 Centreon Engine 19.10.7
 =======================
 
