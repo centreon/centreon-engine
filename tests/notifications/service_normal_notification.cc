@@ -1092,3 +1092,87 @@ TEST_F(ServiceNotification, WarnCritServiceNotification) {
       OK);
   ASSERT_EQ(id + 2, _svc->get_next_notification_id());
 }
+
+// Given a service with a notification interval = 2 and a
+// first_delay_notification = 1
+// When a normal notification is sent and then it is recovered.
+// Then at the next problem, a new normal notification is sent after the
+// first notification delay.
+TEST_F(ServiceNotification, NormalRecoveryTwoTimesWithFirstNotifDelay) {
+  int now{50000};
+  set_time(now);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_notification_interval(0);
+  _svc->set_accept_passive_checks(true);
+  _svc->set_first_notification_delay(10);
+  _svc->set_notify_on(notifier::critical | notifier::warning);
+  testing::internal::CaptureStdout();
+
+  for (int j = 0; j < 2; j++) {
+    std::cout << "##########################################" << std::endl;
+    for (int i = 0; i < 5; i++) {
+      // When i == 0, the critical is soft => no notification
+      // When i == 1, the critical is soft => no notification
+      // When i == 2, the critical is hard down => two short for first delay
+      // When i == 3, the critical is hard down => two short for first delay
+      // When i == 4, the critical is hard down => Notification
+      now += 300;
+      set_time(now);
+      _svc->set_last_state(_svc->get_current_state());
+      if (notifier::hard == _svc->get_state_type())
+        _svc->set_last_hard_state(_svc->get_current_state());
+
+      std::ostringstream oss;
+      std::time_t now{std::time(nullptr)};
+      oss << '[' << now << ']'
+          << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
+             "critical";
+      std::string cmd{oss.str()};
+      process_external_command(cmd.c_str());
+      checks::checker::instance().reap();
+
+      std::cout << "now = " << now << " ; i = " << i << std::endl;
+      std::cout << "notification number = " << _svc->get_notification_number()
+                << std::endl;
+      std::cout << "state_type = " << _svc->get_state_type() << std::endl;
+    }
+
+    std::cout << "##########################################" << std::endl;
+    // The state_ok is hard (return to up) => Recovery
+    // But we don't notify on recovery in this test.
+    // Notification number should return to 0 even if there is no notification
+    now += 300;
+    set_time(now);
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+
+    std::cout << "now = " << now << std::endl;
+    std::cout << "notification number = " << _svc->get_notification_number()
+              << std::endl;
+    std::cout << "state_type = " << _svc->get_state_type() << std::endl;
+  }
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  size_t step = 0;
+  for (int j = 0; j < 2; j++) {
+    // No notification during 4 steps
+    for (int i = 0; i < 4; i++) {
+      step = out.find("notification number = 0", step + 1);
+      ASSERT_NE(step, std::string::npos);
+    }
+    // One critical notification during 1 step
+    step = out.find("notification number = 1", step + 1);
+    ASSERT_NE(step, std::string::npos);
+    // No recovery notification during 1 step
+    step = out.find("notification number = 0", step + 1);
+    ASSERT_NE(step, std::string::npos);
+  }
+}
