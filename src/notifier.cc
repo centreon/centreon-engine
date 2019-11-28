@@ -201,7 +201,7 @@ void notifier::set_notification_number(int num) {
 }
 
 bool notifier::_is_notification_viable_normal(
-    reason_type type,
+    reason_type type __attribute__((unused)),
     notification_option options) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
