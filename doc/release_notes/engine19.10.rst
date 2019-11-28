@@ -12,6 +12,12 @@ Notifications and contiguous fixed downtimes
 Between two contiguous downtimes, it was possible to receive notifications
 of devices that were in critical state whereas they had to be in downtime.
 
+Second notification with state change
+=====================================
+
+When a notification has been sent for a warning state. If the device changes to
+a critical state, no notification was sent. This is fixed in this version.
+
 =======================
 Centreon Engine 19.10.7
 =======================

@@ -201,7 +201,7 @@ void notifier::set_notification_number(int num) {
 }
 
 bool notifier::_is_notification_viable_normal(
-    reason_type type __attribute__((unused)),
+    reason_type type,
     notification_option options) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
@@ -290,7 +290,7 @@ bool notifier::_is_notification_viable_normal(
     return false;
   }
 
-  if (_first_notification_delay > 0 && _notification_number == 0 &&
+  if (_first_notification_delay > 0 && !_notification[cat_normal] &&
       get_last_hard_state_change() +
               _first_notification_delay * config->interval_length() >
           now) {
@@ -308,27 +308,37 @@ bool notifier::_is_notification_viable_normal(
     return false;
   }
 
-  if (_notification_number >= 1) {
-    uint32_t notification_interval{
-        !_notification[cat_normal]
-            ? _notification_interval
-            : _notification[cat_normal]->get_notification_interval()};
-    if (notification_interval == 0) {
-      logger(dbg_notifications, more)
-          << "This notifier problem has already been sent at "
-          << _last_notification
-          << " so, since the notification interval is 0, it won't be sent"
-          << " anymore";
-      return false;
-    }
-    else if (notification_interval > 0) {
-      if (_last_notification + notification_interval * config->interval_length()
-          > now) {
+  if (_notification[cat_normal]) {
+    /* In the case of a state change, we don't care of the notification interval
+     * and we notify as soon as we can */
+    if (get_last_hard_state_change() <= _last_notification) {
+
+      uint32_t notification_interval;
+
+      if (!_notification[cat_normal]) {
+        notification_interval = _notification_interval;
+      }
+      else {
+        notification_interval = _notification[cat_normal]->get_notification_interval();
+      }
+
+      if (notification_interval == 0) {
         logger(dbg_notifications, more)
-            << "This notifier problem has been sent at " << _last_notification
-            << " so it won't be sent until "
-            << (notification_interval * config->interval_length());
+            << "This notifier problem has already been sent at "
+            << _last_notification
+            << " so, since the notification interval is 0, it won't be sent"
+            << " anymore";
         return false;
+      }
+      else if (notification_interval > 0) {
+        if (_last_notification + notification_interval * config->interval_length()
+            > now) {
+          logger(dbg_notifications, more)
+              << "This notifier problem has been sent at " << _last_notification
+              << " so it won't be sent until "
+              << (notification_interval * config->interval_length());
+          return false;
+        }
       }
     }
   }
