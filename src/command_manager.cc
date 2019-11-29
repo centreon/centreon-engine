@@ -74,6 +74,10 @@ int command_manager::process_passive_service_check(time_t check_time,
   if (!config->accept_passive_service_checks())
     return ERROR;
 
+  /* make sure we have a reasonable return code */
+  if (return_code > 3)
+    return ERROR;
+
   /* find the host by its name or address */
   host_map::const_iterator it(host::hosts.find(host_name));
   if (it != host::hosts.end() && it->second)
@@ -140,3 +144,68 @@ int command_manager::process_passive_service_check(time_t check_time,
   return OK;
 }
 
+/* process passive host check result */
+int command_manager::process_passive_host_check(time_t check_time,
+                               const std::string& host_name,
+                               uint32_t return_code,
+                               const std::string& output) {
+  const std::string* real_host_name = nullptr;
+
+  /* skip this host check result if we aren't accepting passive host checks */
+  if (!config->accept_passive_service_checks())
+    return ERROR;
+
+  /* make sure we have a reasonable return code */
+  if (return_code > 2)
+    return ERROR;
+
+  /* find the host by its name or address */
+  host_map::const_iterator it(host::hosts.find(host_name));
+  if (it != host::hosts.end() && it->second)
+    real_host_name = &host_name;
+  else {
+    for (host_map::iterator itt(host::hosts.begin()), end(host::hosts.end());
+         itt != end; ++itt) {
+      if (itt->second && itt->second->get_address() == host_name) {
+        real_host_name = &itt->first;
+        it = itt;
+        break;
+      }
+    }
+  }
+
+  /* we couldn't find the host */
+  if (real_host_name == nullptr) {
+    logger(log_runtime_warning, basic)
+        << "Warning:  Passive check result was received for host '" << host_name
+        << "', but the host could not be found!";
+    return ERROR;
+  }
+
+  /* skip this is we aren't accepting passive checks for this host */
+  if (!it->second->get_accept_passive_checks())
+    return ERROR;
+
+  timeval tv;
+  gettimeofday(&tv, nullptr);
+  timeval tv_start;
+  tv_start.tv_sec = check_time;
+  tv_start.tv_usec = 0;
+
+  check_result result(host_check, it->second->get_host_id(), 0UL,
+                      checkable::check_passive, CHECK_OPTION_NONE, false,
+                      (double)((double)(tv.tv_sec - check_time) +
+                               (double)(tv.tv_usec / 1000.0) / 1000.0),
+                      tv_start, tv_start, false, true, return_code, output);
+
+  /* make sure the return code is within bounds */
+  if (result.get_return_code() < 0 || result.get_return_code() > 3)
+    result.set_return_code(service::state_unknown);
+
+  if (result.get_latency() < 0.0)
+    result.set_latency(0.0);
+
+  checks::checker::instance().push_check_result(std::move(result));
+
+  return OK;
+}

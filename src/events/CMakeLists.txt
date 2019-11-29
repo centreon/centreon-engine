@@ -32,7 +32,6 @@ set(
   "${SRC_DIR}/timed_event.cc"
 
   # Headers.
-  "${INC_DIR}/defines.hh"
   "${INC_DIR}/loop.hh"
   "${INC_DIR}/sched_info.hh"
   "${INC_DIR}/timed_event.hh"

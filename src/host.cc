@@ -26,7 +26,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
@@ -1148,10 +1148,10 @@ void host::schedule_acknowledgement_expiration() {
   if (get_acknowledgement_timeout() > 0 &&
       get_last_acknowledgement() != (time_t)0) {
     timed_event* evt = new timed_event(
-        EVENT_EXPIRE_HOST_ACK,
+        timed_event::EVENT_EXPIRE_HOST_ACK,
         get_last_acknowledgement() + get_acknowledgement_timeout(), false, 0,
         nullptr, true, this, nullptr, 0);
-    evt->schedule(false);
+    events::loop::instance().schedule(evt, false);
   }
 }
 
@@ -1500,7 +1500,7 @@ int host::run_scheduled_check(int check_options, double latency) {
     /* only attempt to (re)schedule checks that should get checked... */
     if (get_should_be_scheduled()) {
       /* get current time */
-      current_time = time(nullptr);
+      time(&current_time);
 
       /* determine next time we should check the host if needed */
       /* if host has no check interval, schedule it again for 5 minutes from now
@@ -1589,7 +1589,6 @@ int host::run_async_check(int check_options,
 /* schedules an immediate or delayed host check */
 void host::schedule_check(time_t check_time, int options) {
   timed_event* temp_event = nullptr;
-  timed_event* new_event = nullptr;
   int use_original_event = true;
 
   logger(dbg_functions, basic) << "schedule_host_check()";
@@ -1605,8 +1604,6 @@ void host::schedule_check(time_t check_time, int options) {
     logger(dbg_checks, basic) << "Active checks are disabled for this host.";
     return;
   }
-  /* allocate memory for a new event item */
-  new_event = new timed_event;
 
   /* default is to use the new event */
   use_original_event = false;
@@ -1619,12 +1616,12 @@ void host::schedule_check(time_t check_time, int options) {
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
-  temp_event =
-      timed_event::find_event(timed_event::low, EVENT_HOST_CHECK, this);
+  temp_event = events::loop::instance().find_event(
+      events::loop::low, timed_event::EVENT_HOST_CHECK, this);
 
   /* we found another host check event for this host in the queue - what should
    * we do? */
-  if (temp_event != nullptr) {
+  if (temp_event) {
     logger(dbg_checks, most)
         << "Found another host check event for this host @ "
         << my_ctime(&temp_event->run_time);
@@ -1672,17 +1669,8 @@ void host::schedule_check(time_t check_time, int options) {
       }
     }
 
-    /* the originally queued event won the battle, so keep it */
-    if (use_original_event) {
-      remove_event(new_event, timed_event::low);
-      delete new_event;
-    }
-
-    /* else use the new event, so remove the old */
-    else {
-      remove_event(temp_event, timed_event::low);
-      delete temp_event;
-    }
+    if (!use_original_event)
+      events::loop::instance().remove_event(temp_event, events::loop::low);
   }
 
   /* save check options for retention purposes */
@@ -1696,16 +1684,17 @@ void host::schedule_check(time_t check_time, int options) {
     set_next_check(check_time);
 
     /* place the new event in the event queue */
-    new_event->event_type = EVENT_HOST_CHECK;
-    new_event->event_data = (void*)this;
-    new_event->event_args = (void*)nullptr;
-    new_event->event_options = options;
-    new_event->run_time = get_next_check();
-    new_event->recurring = false;
-    new_event->event_interval = 0L;
-    new_event->timing_func = nullptr;
-    new_event->compensate_for_time_change = true;
-    reschedule_event(new_event, timed_event::low);
+    timed_event* new_event = new timed_event(timed_event::EVENT_HOST_CHECK,
+                                             get_next_check(),
+                                             false,
+                                             0L,
+                                             nullptr,
+                                             true,
+                                             (void*)this,
+                                             nullptr,
+                                             options);
+
+    events::loop::instance().reschedule_event(new_event, events::loop::low);
   }
 
   else {
@@ -3260,13 +3249,6 @@ std::list<hostgroup*> const& host::get_parent_groups() const {
 
 std::list<hostgroup*>& host::get_parent_groups() {
   return _hostgroups;
-}
-
-/* execute a scheduled host check using either the 2.x or 3.x logic */
-int host::perform_scheduled_check(int check_options, double latency) {
-  logger(dbg_functions, basic) << "perform_scheduled_host_check()";
-  run_scheduled_check(check_options, latency);
-  return OK;
 }
 
 /**

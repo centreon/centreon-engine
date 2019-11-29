@@ -28,7 +28,6 @@
 #include "com/centreon/engine/circular_buffer.hh"
 #include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"

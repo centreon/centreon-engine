@@ -63,7 +63,7 @@ grpc::Status engine_impl::GetStats(grpc::ServerContext* /*context*/,
 
 grpc::Status engine_impl::ProcessServiceCheckResult(
     grpc::ServerContext* /*context*/,
-    const ServiceCheck* request,
+    const Check* request,
     CommandSuccess* /*response*/) {
   std::string const& host_name = request->host_name();
   if (host_name.empty())
@@ -78,6 +78,25 @@ grpc::Status engine_impl::ProcessServiceCheckResult(
                     google::protobuf::util::TimeUtil::TimestampToSeconds(request->check_time()),
                       host_name,
                       svc_desc,
+                      request->code(),
+                      request->output());
+  command_manager::instance().enqueue(std::move(fn));
+
+  return grpc::Status::OK;
+}
+
+grpc::Status engine_impl::ProcessHostCheckResult(
+    grpc::ServerContext* /*context*/,
+    const Check* request,
+    CommandSuccess* /*response*/) {
+  std::string const& host_name = request->host_name();
+  if (host_name.empty())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "host_name must not be empty");
+
+  auto fn = std::bind(&command_manager::process_passive_host_check,
+                      &command_manager::instance(),
+                    google::protobuf::util::TimeUtil::TimestampToSeconds(request->check_time()),
+                      host_name,
                       request->code(),
                       request->output());
   command_manager::instance().enqueue(std::move(fn));

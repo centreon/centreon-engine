@@ -21,26 +21,73 @@
 #include <cstdio>
 #include "enginerpc.hh"
 #include "com/centreon/clib.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/configuration/contact.hh"
+#include "com/centreon/engine/configuration/applier/contact.hh"
+#include "com/centreon/engine/configuration/applier/host.hh"
+#include "com/centreon/engine/configuration/applier/service.hh"
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/version.hh"
+#include "../test_engine.hh"
+#include "com/centreon/engine/timezone_manager.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
 extern configuration::state* config;
 
-class EngineRpc : public testing::Test {
+class EngineRpc : public TestEngine {
  public:
   void SetUp() override {
     clib::load();
     com::centreon::logging::engine::load();
     if (!config)
       config = new configuration::state;
+    timezone_manager::load();
+    configuration::applier::state::load();  // Needed to create a contact
+    // Do not unload this in the tear down function, it is done by the
+    // other unload function... :-(
+    checks::checker::load();
+    events::loop::load();
+
+    configuration::applier::contact ct_aply;
+    configuration::contact ctct{new_configuration_contact("admin", true)};
+    ct_aply.add_object(ctct);
+    ct_aply.expand_objects(*config);
+    ct_aply.resolve_object(ctct);
+
+    configuration::host hst{new_configuration_host("test_host", "admin")};
+    configuration::applier::host hst_aply;
+    hst_aply.add_object(hst);
+
+    configuration::service svc{
+        new_configuration_service("test_host", "test_svc", "admin")};
+    configuration::applier::service svc_aply;
+    svc_aply.add_object(svc);
+
+    hst_aply.resolve_object(hst);
+    svc_aply.resolve_object(svc);
+
+    host_map const& hm{engine::host::hosts};
+    _host = hm.begin()->second;
+    _host->set_current_state(engine::host::state_up);
+    _host->set_state_type(checkable::hard);
+    _host->set_problem_has_been_acknowledged(false);
+    _host->set_notify_on(static_cast<uint32_t>(-1));
+
+    service_map const& sm{engine::service::services};
+    _svc = sm.begin()->second;
   }
 
   void TearDown() override {
+    events::loop::unload();
+    configuration::applier::state::unload();
+    checks::checker::unload();
     delete config;
     config = nullptr;
+    timezone_manager::unload();
     com::centreon::logging::engine::unload();
     clib::unload();
   }
@@ -63,6 +110,9 @@ class EngineRpc : public testing::Test {
     return retval;
   }
 
+ protected:
+  std::shared_ptr<engine::host> _host;
+  std::shared_ptr<engine::service> _svc;
 };
 
 TEST_F(EngineRpc, StartStop) {
@@ -80,5 +130,45 @@ TEST_F(EngineRpc, GetVersion) {
   oss.str("");
   oss << "minor: " << CENTREON_ENGINE_VERSION_MINOR;
   ASSERT_EQ(output.back(), oss.str());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ProcessServiceCheckResult) {
+  enginerpc erpc("0.0.0.0", 50051);
+  auto output = execute("ProcessServiceCheckResult test_host test_svc 0");
+  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.front(), "ProcessServiceCheckResult: 0");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ProcessServiceCheckResultBadHost) {
+  enginerpc erpc("0.0.0.0", 50051);
+  auto output = execute("ProcessServiceCheckResult \"\" test_svc 0");
+  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ProcessServiceCheckResultBadService) {
+  enginerpc erpc("0.0.0.0", 50051);
+  auto output = execute("ProcessServiceCheckResult test_host \"\" 0");
+  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ProcessHostCheckResult) {
+  enginerpc erpc("0.0.0.0", 50051);
+  auto output = execute("ProcessHostCheckResult test_host 0");
+  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.front(), "ProcessHostCheckResult: 0");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ProcessHostCheckResultBadHost) {
+  enginerpc erpc("0.0.0.0", 50051);
+  auto output = execute("ProcessHostCheckResult '' 0");
+  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.front(), "ProcessHostCheckResult failed.");
   erpc.shutdown();
 }

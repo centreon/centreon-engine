@@ -8,14 +8,15 @@ service Engine {
   rpc GetVersion(google.protobuf.Empty) returns (Version) {}
   rpc GetStats(google.protobuf.Empty) returns (Stats) {}
 
-  rpc ProcessServiceCheckResult(ServiceCheck) returns (CommandSuccess) {}
+  rpc ProcessServiceCheckResult(Check) returns (CommandSuccess) {}
+  rpc ProcessHostCheckResult(Check) returns (CommandSuccess) {}
 }
 
 message CommandSuccess {
   bool value = 1;
 }
 
-message ServiceCheck {
+message Check {
   google.protobuf.Timestamp check_time = 1;
   string host_name = 2;
   string svc_desc = 3;

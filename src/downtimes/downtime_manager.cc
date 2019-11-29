@@ -17,14 +17,13 @@
  *
  */
 
-#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/host_downtime.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/timed_event.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
@@ -57,7 +56,6 @@ void downtime_manager::delete_downtime(int type, uint64_t downtime_id) {
 
 /* unschedules a host or service downtime */
 int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
-  timed_event* temp_event(nullptr);
   std::shared_ptr<downtime> temp_downtime{find_downtime(type, downtime_id)};
 
   logger(dbg_functions, basic) << "unschedule_downtime()";
@@ -70,17 +68,9 @@ int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
     return ERROR;
 
   /* remove scheduled entry from event queue */
-  for (timed_event_list::iterator it(timed_event::event_list_high.begin()),
-       end(timed_event::event_list_high.end());
-       it != end; ++it) {
-    temp_event = *it;
-    if ((*it)->event_type != EVENT_SCHEDULED_DOWNTIME)
-      continue;
-    if (((uint64_t)(*it)->event_data) == downtime_id)
-      break;
-  }
-  if (temp_event != nullptr)
-    remove_event(temp_event, timed_event::high);
+  events::loop::instance().remove_events(events::loop::high,
+                                         timed_event::EVENT_SCHEDULED_DOWNTIME,
+                                         (void*)downtime_id);
 
   /* delete downtime entry */
   if (temp_downtime->get_type() == HOST_DOWNTIME)

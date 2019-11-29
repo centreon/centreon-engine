@@ -26,12 +26,8 @@ set(
   FILES
   ${FILES}
 
-  # Sources.
-  "${SRC_DIR}/timedevent.cc"
-
   # Headers.
   "${INC_DIR}/listmember.hh"
-  "${INC_DIR}/timedevent.hh"
 
   PARENT_SCOPE
 )

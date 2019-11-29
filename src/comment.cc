@@ -20,7 +20,6 @@
 
 #include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/events/defines.hh"
 
 using namespace com::centreon::engine;
 

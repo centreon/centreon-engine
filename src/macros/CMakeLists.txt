@@ -38,7 +38,6 @@ set(
   "${SRC_DIR}/process.cc"
 
   # Headers.
-  "${INC_DIR}/defines.hh"
   "${INC_DIR}/clear_host.hh"
   "${INC_DIR}/clear_hostgroup.hh"
   "${INC_DIR}/clear_service.hh"

@@ -42,10 +42,10 @@ bool string::get_next_line(std::ifstream& stream,
     if (!line.empty()) {
       char c(line[0]);
       if (c != '#' && c != ';' && c != '\x0')
-        return (true);
+        return true;
     }
   }
-  return (false);
+  return false;
 }
 
 /**
@@ -62,7 +62,7 @@ bool string::split(std::string& line,
                    char delim) {
   std::size_t delim_pos(line.find_first_of(delim));
   if (delim_pos == std::string::npos)
-    return (false);
+    return false;
 
   std::size_t first_pos;
   std::size_t last_pos;
@@ -86,7 +86,7 @@ bool string::split(std::string& line,
     *value = line.data() + first_pos;
   }
 
-  return (true);
+  return true;
 }
 
 /**
@@ -103,7 +103,7 @@ bool string::split(std::string const& line,
                    char delim) {
   std::size_t delim_pos(line.find_first_of(delim));
   if (delim_pos == std::string::npos)
-    return (false);
+    return false;
 
   std::size_t first_pos;
   std::size_t last_pos;
@@ -124,7 +124,7 @@ bool string::split(std::string const& line,
     value.assign(line, first_pos, last_pos + 1 - first_pos);
   }
 
-  return (true);
+  return true;
 }
 
 /**
@@ -223,7 +223,7 @@ std::string& string::trim(std::string& str) throw() {
     else
       str.clear();
   }
-  return (str);
+  return str;
 }
 
 /**
@@ -237,7 +237,7 @@ std::string& string::trim_left(std::string& str) throw() {
   size_t pos(str.find_first_not_of(whitespaces));
   if (pos != std::string::npos)
     str.erase(0, pos);
-  return (str);
+  return str;
 }
 
 /**
@@ -253,5 +253,5 @@ std::string& string::trim_right(std::string& str) throw() {
     str.clear();
   else
     str.erase(pos + 1);
-  return (str);
+  return str;
 }

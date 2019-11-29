@@ -34,6 +34,7 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/host.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/timezone_manager.hh"
@@ -56,9 +57,11 @@ class ApplierHostGroup : public ::testing::Test {
     timezone_manager::load();
     configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
+    events::loop::load();
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;
