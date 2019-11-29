@@ -24,6 +24,12 @@ First notification delay if no recovery notification configured
 When a first notification delay but no recovery notification are configured,
 the first notification delay is not applied. This is fixed in this release.
 
+Double recovery notification sent on passive services/hosts
+===========================================================
+
+When a service come back to OK and is configured to send recovery notifications.
+It sends two of them instead of one.
+
 =======================
 Centreon Engine 19.10.7
 =======================
