@@ -722,7 +722,7 @@ int notifier::notify(notifier::reason_type type,
      * has been sent. */
     if (_notification[cat_normal] &&          // there is a notification
         type == reason_recovery &&            // It is time to recovery
-        _recovery_notification_delay ==0) {   // And there is no recovery delay
+        _recovery_notification_delay == 0) {   // And there is no recovery delay
       _notification_number = 0;
       _notification[cat_normal].reset();
     }
