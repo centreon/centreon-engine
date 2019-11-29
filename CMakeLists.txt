@@ -151,6 +151,8 @@ endif ()
 # Enable or disable the OFFLINE BUILD mode.
 option(BUILD_OFFLINE "Build offline" OFF)
 
+option(WITH_GRPC "Build the enginerpc module" OFF)
+
 # Enable or disable installation.
 option(WITH_CREATE_FILES "Create centreon-engine files." ON)
 set(CREATE_FILES "${WITH_CREATE_FILES}")
