@@ -2638,7 +2638,7 @@ void host::handle_flap_detection_disabled() {
       notifier::notification_option_none);
 
     /* Send a recovery notification if needed */
-    notify(reason_normal, "", "", notification_option_none);
+    notify(reason_recovery, "", "", notification_option_none);
   }
 
   /* update host status */
