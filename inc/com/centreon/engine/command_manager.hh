@@ -39,6 +39,10 @@ class command_manager {
                                     const std::string& svc_description,
                                     uint32_t return_code,
                                     const std::string& output);
+  int process_passive_host_check(time_t check_time,
+                                 const std::string& host_name,
+                                 uint32_t return_code,
+                                 const std::string& output);
   void execute();
 };
 

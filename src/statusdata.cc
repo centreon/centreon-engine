@@ -20,7 +20,6 @@
 
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/xsddefault.hh"
 

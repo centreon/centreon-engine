@@ -30,6 +30,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/events/loop.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -51,9 +52,11 @@ class ApplierServicegroup : public ::testing::Test {
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a service
     checks::checker::load();
+    events::loop::load();
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;

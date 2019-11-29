@@ -36,6 +36,7 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/hostescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
@@ -58,6 +59,7 @@ class HostFlappingNotification : public TestEngine {
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
     checks::checker::load();
+    events::loop::load();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -82,6 +84,7 @@ class HostFlappingNotification : public TestEngine {
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;

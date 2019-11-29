@@ -25,7 +25,6 @@
 
 #include <stdint.h>
 #include <time.h>
-#include <deque>
 #include <string>
 #include "com/centreon/engine/namespace.hh"
 
@@ -33,23 +32,30 @@ CCE_BEGIN()
 class timed_event;
 CCE_END()
 
-typedef std::deque<com::centreon::engine::timed_event*> timed_event_list;
-
 CCE_BEGIN()
 class timed_event {
- public:
-  enum priority { low = 0, high = 1, priority_num };
-  timed_event();
-  timed_event(uint32_t event_type,
-              time_t run_time,
-              bool recurring,
-              unsigned long event_interval,
-              void* timing_func,
-              bool compensate_for_time_change,
-              void* event_data,
-              void* event_args,
-              int32_t event_options);
+  void _exec_event_service_check();
+  void _exec_event_command_check();
+  void _exec_event_log_rotation();
+  void _exec_event_program_shutdown();
+  void _exec_event_program_restart();
+  void _exec_event_check_reaper();
+  void _exec_event_orphan_check();
+  void _exec_event_retention_save();
+  void _exec_event_status_save();
+  void _exec_event_scheduled_downtime();
+  void _exec_event_sfreshness_check();
+  void _exec_event_expire_downtime();
+  void _exec_event_host_check();
+  void _exec_event_hfreshness_check();
+  void _exec_event_reschedule_checks();
+  void _exec_event_expire_comment();
+  void _exec_event_expire_host_ack();
+  void _exec_event_expire_service_ack();
+  void _exec_event_enginerpc_check();
+  void _exec_event_user_function();
 
+ public:
   uint32_t event_type;
   time_t run_time;
   bool recurring;
@@ -60,13 +66,44 @@ class timed_event {
   void* event_args;
   int32_t event_options;
 
-  static timed_event_list event_list_high;
-  static timed_event_list event_list_low;
+  enum event_type {
+    EVENT_SERVICE_CHECK,       // active service check
+    EVENT_COMMAND_CHECK,       // external command check
+    EVENT_LOG_ROTATION,        // log file rotation
+    EVENT_PROGRAM_SHUTDOWN,    // program shutdown
+    EVENT_PROGRAM_RESTART,     // program restart
+    EVENT_CHECK_REAPER,        // reaps results from host and service checks
+    EVENT_ORPHAN_CHECK,        // checks for orphaned hosts and services
+    EVENT_RETENTION_SAVE,      // save (dump) retention data
+    EVENT_STATUS_SAVE,         // save (dump) status data
+    EVENT_SCHEDULED_DOWNTIME,  // scheduled host or service downtime
+    EVENT_SFRESHNESS_CHECK,    // checks service result "freshness"
+    EVENT_EXPIRE_DOWNTIME,     // checks for (and removes) expired scheduled
+                               // downtime
+    EVENT_HOST_CHECK,          // active host check
+    EVENT_HFRESHNESS_CHECK,    // checks host result "freshness"
+    EVENT_RESCHEDULE_CHECKS,   // adjust scheduling of host and service checks
+    EVENT_EXPIRE_COMMENT,      // removes expired comments
+    EVENT_EXPIRE_HOST_ACK,     // remove expired host acknowledgement
+    EVENT_EXPIRE_SERVICE_ACK,  // remove expired service acknowledgement
+    EVENT_ENGINERPC_CHECK,     // EngineRPC command check
+    EVENT_SLEEP = 98,          // asynchronous sleep event that occurs when
+                               // event queues are empty
+    EVENT_USER_FUNCTION = 99   // USER-defined function (modules)
+  };
+  timed_event();
+  timed_event(uint32_t event_type,
+              time_t run_time,
+              bool recurring,
+              unsigned long event_interval,
+              void* timing_func,
+              bool compensate_for_time_change,
+              void* event_data,
+              void* event_args,
+              int32_t event_options);
+  ~timed_event();
+  int handle_timed_event();
 
-  static timed_event* find_event(timed_event::priority,
-                                 uint32_t event,
-                                 void* data);
-  void schedule(bool high_priority);
   std::string const& name() const noexcept;
 };
 CCE_END()
@@ -75,20 +112,7 @@ CCE_END()
 extern "C" {
 #endif /* C++ */
 
-void add_event(com::centreon::engine::timed_event* event,
-               com::centreon::engine::timed_event::priority priority);
-time_t adjust_timestamp_for_time_change(time_t last_time,
-                                        time_t current_time,
-                                        uint64_t time_difference,
-                                        time_t ts);
-void compensate_for_system_time_change(unsigned long last_time,
-                                       unsigned long current_time);
-int handle_timed_event(com::centreon::engine::timed_event* event);
-void remove_event(com::centreon::engine::timed_event* event,
-                  com::centreon::engine::timed_event::priority priority);
-void reschedule_event(com::centreon::engine::timed_event* event,
-                      com::centreon::engine::timed_event::priority priority);
-void resort_event_list(com::centreon::engine::timed_event::priority priority);
+time_t adjust_timestamp_for_time_change(int64_t time_difference, time_t ts);
 
 #ifdef __cplusplus
 }
@@ -98,13 +122,6 @@ void resort_event_list(com::centreon::engine::timed_event::priority priority);
 
 #include <ostream>
 #include "com/centreon/engine/namespace.hh"
-
-bool operator==(com::centreon::engine::timed_event const& obj1,
-                com::centreon::engine::timed_event const& obj2) throw();
-bool operator!=(com::centreon::engine::timed_event const& obj1,
-                com::centreon::engine::timed_event const& obj2) throw();
-std::ostream& operator<<(std::ostream& os,
-                         com::centreon::engine::timed_event const& obj);
 
 #endif /* C++ */
 

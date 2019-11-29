@@ -33,6 +33,7 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/service.hh"
 
 using namespace com::centreon;
@@ -51,9 +52,11 @@ class ApplierService : public TestEngine {
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
+    events::loop::load();
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;

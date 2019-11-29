@@ -23,8 +23,11 @@
 #define CCE_EVENTS_LOOP_HH
 
 #include <ctime>
+#include <deque>
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/namespace.hh"
+
+typedef std::deque<com::centreon::engine::timed_event*> timed_event_list;
 
 CCE_BEGIN()
 
@@ -37,17 +40,10 @@ namespace events {
  *  and dispatch the Centreon Engine events.
  */
 class loop {
- public:
-  static loop& instance();
-  static void load();
-  void run();
-  static void unload();
-
- private:
   loop();
-  loop(loop const&);
-  ~loop() throw();
-  loop& operator=(loop const&);
+  loop(loop const&) = delete;
+  ~loop() = default;
+  loop& operator=(loop const&) = delete;
   void _dispatching();
 
   time_t _last_status_update;
@@ -56,6 +52,33 @@ class loop {
 
   bool _reload_running;
   timed_event _sleep_event;
+
+  timed_event_list _event_list_high;
+  timed_event_list _event_list_low;
+
+ public:
+  enum priority {
+    low = 0,
+    high = 1,
+    priority_num
+  };
+
+  static loop& instance();
+  static void load();
+  static void unload();
+  void run();
+  void adjust_check_scheduling();
+  void add_event(timed_event* event, priority priority);
+  void compensate_for_system_time_change(unsigned long last_time,
+                                         unsigned long current_time);
+  void remove_event(timed_event* event, priority priority);
+  void remove_events(priority, uint32_t event_type, void* data) noexcept;
+  timed_event* find_event(priority priority,
+                          uint32_t event_type,
+                          void* data);
+  void reschedule_event(timed_event* event, priority priority);
+  void resort_event_list(priority priority);
+  void schedule(timed_event* evt, bool high_priority);
 };
 }  // namespace events
 
