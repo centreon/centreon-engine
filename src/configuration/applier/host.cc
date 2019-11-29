@@ -426,6 +426,10 @@ void applier::host::remove_object(configuration::host const& obj) {
     // Remove events related to this host.
     applier::scheduler::instance().remove_host(obj);
 
+    //remove host from hostgroup->members
+    for (auto& it_h: it->second->get_parent_groups())
+      it_h->members.erase(it->second->get_name());
+
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
     broker_adaptive_host_data(NEBTYPE_HOST_DELETE, NEBFLAG_NONE, NEBATTR_NONE,

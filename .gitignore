@@ -13,6 +13,6 @@ scripts/centengine.sh
 src/simumod/neb.cc
 tags
 gtest.cbp
-CMakeFiles/*
+**/CMakeFiles/*
 cmake-build-debug/*
 modules/bench/passive/paths.hh

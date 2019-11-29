@@ -159,3 +159,43 @@ TEST_F(ApplierHostGroup, HostRenamed) {
   ASSERT_EQ(engine::hostgroup::hostgroups.begin()->second->get_group_name(),
             "temp_hg");
 }
+
+TEST_F(ApplierHostGroup, HostRemoved) {
+  configuration::applier::hostgroup hg_aply;
+  configuration::applier::host hst_aply;
+  configuration::hostgroup hg;
+  configuration::host hst_a;
+  configuration::host hst_c;
+
+  ASSERT_TRUE(hst_a.parse("host_name", "a"));
+  ASSERT_TRUE(hst_a.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst_a.parse("_HOST_ID", "1"));
+
+  ASSERT_TRUE(hst_c.parse("host_name", "c"));
+  ASSERT_TRUE(hst_c.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst_c.parse("_HOST_ID", "2"));
+
+  hst_aply.add_object(hst_a);
+  hst_aply.add_object(hst_c);
+
+  ASSERT_TRUE(hg.parse("hostgroup_name", "temphg"));
+  ASSERT_TRUE(hg.parse("members", "a,c"));
+  ASSERT_NO_THROW(hg_aply.add_object(hg));
+
+  ASSERT_NO_THROW(hst_aply.expand_objects(*config));
+  ASSERT_NO_THROW(hst_aply.expand_objects(*config));
+  ASSERT_NO_THROW(hg_aply.expand_objects(*config));
+
+  ASSERT_NO_THROW(hst_aply.resolve_object(hst_a));
+  ASSERT_NO_THROW(hst_aply.resolve_object(hst_c));
+  ASSERT_NO_THROW(hg_aply.resolve_object(hg));
+
+  engine::hostgroup *hg_obj{engine::hostgroup::hostgroups["temphg"].get()};
+  ASSERT_EQ(hg_obj->members.size(), 2u);
+  ASSERT_NO_THROW(hst_aply.remove_object(hst_a));
+  ASSERT_EQ(hg_obj->members.size(), 1u);
+
+  ASSERT_TRUE(hg.parse("members", "c"));
+  ASSERT_NO_THROW(hg_aply.modify_object(hg));
+
+}

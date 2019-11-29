@@ -1,4 +1,40 @@
 =======================
+Centreon Engine 19.10.8
+=======================
+
+*********
+Bug fixes
+*********
+
+Notifications and contiguous fixed downtimes
+============================================
+
+Between two contiguous downtimes, it was possible to receive notifications
+of devices that were in critical state whereas they had to be in downtime.
+
+Second notification with state change
+=====================================
+
+When a notification has been sent for a warning state. If the device changes to
+a critical state, no notification was sent. This is fixed in this version.
+
+=======================
+Centreon Engine 19.10.7
+=======================
+
+*********
+Bug fixes
+*********
+
+Groups update with deleted object
+=================================
+
+On object deletion, the groups containing these objects were not updated.
+So on group update (conf reload, not restart) the group keeps in its
+members a deleted object and can use it.
+
+
+=======================
 Centreon Engine 19.10.6
 =======================
 

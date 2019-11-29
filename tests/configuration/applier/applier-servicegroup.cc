@@ -262,3 +262,62 @@ TEST_F(ApplierServicegroup, RemoveServicegroupFromConfig) {
   aply_grp.remove_object(grp);
   ASSERT_EQ(engine::servicegroup::servicegroups.size(), 1u);
 }
+
+// Given a servicegroup applier
+// And a configuration servicegroup in configuration
+// When we remove the configuration
+// Then it is really removed
+TEST_F(ApplierServicegroup, RemoveServiceFromGroup) {
+  configuration::applier::host aply_hst;
+  configuration::applier::service aply_svc;
+  configuration::applier::command aply_cmd;
+  configuration::applier::servicegroup aply_grp;
+  configuration::servicegroup grp("test_group");
+
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  aply_cmd.add_object(cmd);
+
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
+  aply_hst.add_object(hst);
+
+  configuration::service svc;
+  ASSERT_TRUE(svc.parse("service_description", "test"));
+  ASSERT_TRUE(svc.parse("hosts", "test_host"));
+  ASSERT_TRUE(svc.parse("service_id", "18"));
+  svc.parse("check_command", "cmd");
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+  aply_svc.add_object(svc);
+  ASSERT_TRUE(svc.parse("servicegroups", "test_group"));
+
+  configuration::service svc2;
+  ASSERT_TRUE(svc.parse("service_description", "test2"));
+  ASSERT_TRUE(svc.parse("hosts", "test_host"));
+  ASSERT_TRUE(svc.parse("service_id", "19"));
+  svc.parse("check_command", "cmd");
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+  aply_svc.add_object(svc);
+  ASSERT_TRUE(svc.parse("servicegroups", "test_group"));
+
+
+  grp.parse("members", "test_host,test,test_host,test2");
+  aply_grp.add_object(grp);
+  aply_grp.expand_objects(*config);
+  aply_grp.resolve_object(grp);
+  ASSERT_TRUE(grp.members().size() == 2);
+
+  engine::servicegroup *sg{engine::servicegroup::servicegroups["test_group"].get()};
+  ASSERT_EQ(sg->members.size(), 2u);
+  aply_svc.remove_object(svc);
+  ASSERT_EQ(sg->members.size(), 1u);
+
+  grp.parse("members", "test_host,test,test_host,test2");
+  aply_grp.modify_object(grp);
+
+  ASSERT_EQ(engine::servicegroup::servicegroups.size(), 1u);
+}

@@ -1053,3 +1053,42 @@ TEST_F(ServiceNotification, NoServiceNotificationWhenHostDown) {
                "admin;test_host;test_svc;CRITICAL;cmd;service down")};
   ASSERT_EQ(step, std::string::npos);
 }
+
+TEST_F(ServiceNotification, WarnCritServiceNotification) {
+  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+   * If we call time(), it is not the glibc time() function that will be called.
+   */
+  ASSERT_EQ(_host->services.size(), 1u);
+  set_time(43200);
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::serviceescalation> service_escalation{
+      new engine::serviceescalation(
+          "test_host", "test_svc", 0, 1, 1.0, "tperiod", 7, Uuid())};
+  _svc->set_current_state(engine::service::state_critical);
+  _svc->set_last_state(engine::service::state_critical);
+  _svc->set_last_hard_state_change(43200);
+  _svc->set_state_type(checkable::hard);
+
+  ASSERT_TRUE(service_escalation);
+  uint64_t id{_svc->get_next_notification_id()};
+  _svc->set_notification_period_ptr(tperiod.get());
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
+
+  _svc->set_current_state(engine::service::state_warning);
+  _svc->set_last_state(engine::service::state_warning);
+  _svc->set_last_hard_state_change(43500);
+  _svc->set_state_type(checkable::hard);
+
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
+  ASSERT_EQ(id + 2, _svc->get_next_notification_id());
+}

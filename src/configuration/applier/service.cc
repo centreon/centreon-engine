@@ -509,6 +509,10 @@ void applier::service::remove_object(configuration::service const& obj) {
     // Remove events related to this service.
     applier::scheduler::instance().remove_service(obj);
 
+    //remove service from servicegroup->members
+    for (auto& it_s: it->second->get_parent_groups())
+      it_s->members.erase({host_name, service_description});
+
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
     broker_adaptive_service_data(NEBTYPE_SERVICE_DELETE, NEBFLAG_NONE,
