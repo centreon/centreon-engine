@@ -1429,7 +1429,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
-      notify(reason_normal, "", "", notification_option_none);
+      notify(reason_recovery, "", "", notification_option_none);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event();
