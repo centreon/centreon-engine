@@ -1,12 +1,20 @@
+<<<<<<< HEAD
 import time
 import grpc
 import engine_pb2
 import engine_pb2_grpc
 from google.protobuf import empty_pb2, timestamp_pb2
+=======
+import grpc
+import engine_pb2
+import engine_pb2_grpc
+from google.protobuf import empty_pb2
+>>>>>>> enh(grpc): First try to use gRPC with engine
 
 def run():
     with grpc.insecure_channel("10.0.2.15:50051") as channel:
         stub = engine_pb2_grpc.EngineStub(channel)
+<<<<<<< HEAD
         for i in range(10000):
           check = stub.ProcessServiceCheckResult(engine_pb2.ServiceCheck(
                 check_time=timestamp_pb2.Timestamp(seconds=int(time.time())),
@@ -14,4 +22,9 @@ def run():
                 svc_desc="Cpu",
                 output="Cpu with enginerpc",
                 code=1))
+=======
+        version = stub.GetVersion(empty_pb2.Empty())
+        print(version.major)
+
+>>>>>>> enh(grpc): First try to use gRPC with engine
 run()

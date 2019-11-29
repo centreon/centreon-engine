@@ -25,19 +25,25 @@
 #include <unistd.h>
 #include "com/centreon/engine/namespace.hh"
 
+<<<<<<< HEAD
 struct buffer_stats {
   uint32_t used;
   uint32_t high;
   uint32_t total;
 };
 
+=======
+>>>>>>> enh(grpc): First try to use gRPC with engine
 CCE_BEGIN()
 class statistics {
   statistics();
  public:
   static statistics& instance();
   pid_t get_pid() const noexcept;
+<<<<<<< HEAD
   bool get_external_command_buffer_stats(buffer_stats& retval) const noexcept;
+=======
+>>>>>>> enh(grpc): First try to use gRPC with engine
 };
 
 CCE_END()
