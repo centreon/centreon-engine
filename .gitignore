@@ -16,3 +16,4 @@ gtest.cbp
 **/CMakeFiles/*
 cmake-build-debug/*
 modules/bench/passive/paths.hh
+modules/enginerpc/third_party/*

@@ -21,5 +21,10 @@
 add_subdirectory("external_commands")
 set(EXTERNALCMD_MODULE "${EXTERNALCMD_MODULE}" PARENT_SCOPE)
 
+if (WITH_GRPC)
+  add_subdirectory("enginerpc")
+  set(ENGINERPC_MODULE "${ENGINERPC_MODULE}" PARENT_SCOPE)
+endif ()
+
 # Benchmark module.
 add_subdirectory("bench")
