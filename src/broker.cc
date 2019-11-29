@@ -522,7 +522,7 @@ int broker_contact_notification_data(int type,
                                      struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
-    return (OK);
+    return OK;
 
   // Fill struct with relevant data.
   nebstruct_contact_notification_data ds;
@@ -597,7 +597,7 @@ int broker_contact_notification_method_data(int type,
                                             struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
-    return (OK);
+    return OK;
 
   // Get command name/args.
   char* command_buf(NULL);
@@ -683,7 +683,6 @@ void broker_contact_status(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_CONTACT_STATUS_DATA, &ds);
-  return;
 }
 
 /**
@@ -831,9 +830,9 @@ int broker_event_handler(int type,
                          struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_EVENT_HANDLERS))
-    return (OK);
+    return OK;
   if (!data)
-    return (ERROR);
+    return ERROR;
 
   // Get command name/args.
   char* command_buf(NULL);
@@ -1103,9 +1102,9 @@ int broker_host_check(int type,
                       struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_HOST_CHECKS))
-    return (OK);
+    return OK;
   if (!hst)
-    return (ERROR);
+    return ERROR;
 
   // Get command name/args.
   char* command_buf(NULL);
@@ -1293,7 +1292,7 @@ int broker_notification_data(int type,
                              struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
-    return (OK);
+    return OK;
 
   // Fill struct with relevant data.
   nebstruct_notification_data ds;
@@ -1521,9 +1520,9 @@ int broker_service_check(int type,
                          struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_SERVICE_CHECKS))
-    return (OK);
+    return OK;
   if (!svc)
-    return (ERROR);
+    return ERROR;
 
   // Get command name/args.
   char* command_buf(NULL);

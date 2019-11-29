@@ -144,18 +144,17 @@ if (WITH_TESTING)
   endif ()
 
   add_dependencies(ut googletest)
-
-  target_link_libraries(ut gtest cce_core pthread gcov
-      ${ENGINERPC})
-
   add_test(NAME tests COMMAND ut)
 
   if (WITH_COVERAGE)
-  set(COVERAGE_EXCLUDES '${PROJECT_BINARY_DIR}/*' '${PROJECT_SOURCE_DIR}/tests/*' '/usr/include/* ')
+    set(COVERAGE_EXCLUDES '${PROJECT_BINARY_DIR}/*' '${PROJECT_SOURCE_DIR}/tests/*' '/usr/include/* ')
     SETUP_TARGET_FOR_COVERAGE(
         NAME test-coverage
         EXECUTABLE ut
         DEPENDENCIES ut
     )
+    set(GCOV gcov)
   endif ()
+  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV})
+
 endif ()

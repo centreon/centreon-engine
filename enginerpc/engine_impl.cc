@@ -1,7 +1,11 @@
+#include <sys/types.h>
+#include <unistd.h>
+#include <google/protobuf/util/time_util.h>
 #include "engine_impl.hh"
+#include "com/centreon/engine/statistics.hh"
 #include "com/centreon/engine/version.hh"
+#include "com/centreon/engine/globals.hh"
 
-using namespace grpc;
 using namespace com::centreon::engine;
 
 /**
@@ -13,11 +17,41 @@ using namespace com::centreon::engine;
  *
  * @return Status::OK
  */
-Status engine_impl::GetVersion(ServerContext* context,
+grpc::Status engine_impl::GetVersion(grpc::ServerContext* context,
                                const ::google::protobuf::Empty* /*request*/,
                                Version* response) {
   response->set_major(CENTREON_ENGINE_VERSION_MAJOR);
   response->set_minor(CENTREON_ENGINE_VERSION_MINOR);
   response->set_patch(CENTREON_ENGINE_VERSION_PATCH);
-  return Status::OK;
+  return grpc::Status::OK;
+}
+
+grpc::Status engine_impl::GetStats(grpc::ServerContext* context,
+    const ::google::protobuf::Empty* /*request*/,
+    Stats* response) {
+  response->mutable_status_file()->set_name(config->status_file());
+  time_t now = time(nullptr);
+  std::ifstream status_file;
+  status_file.open(config->status_file());
+  std::string line;
+  time_t created;
+  while (std::getline(status_file, line)) {
+    size_t r = line.find("created=");
+    if (r != std::string::npos) {
+      created = std::stol(line.c_str() + r + strlen("created="), NULL, 10);
+      break;
+    }
+  }
+  com::centreon::engine::statistics& s =
+      com::centreon::engine::statistics::instance();
+  *response->mutable_status_file()->mutable_age() =
+      google::protobuf::util::TimeUtil::SecondsToDuration(now - created);
+  *response->mutable_program_status()->mutable_running_time() =
+    google::protobuf::util::TimeUtil::SecondsToDuration(now - program_start);
+  response->mutable_program_status()->set_pid(s.get_pid());
+  //  //FIXME DBR
+//  response->mutable_buffer()->set_used(config->external_command_buffer_slots());
+//  response->mutable_buffer()->set_high(high_external_command_buffer_slots);
+//  response->mutable_buffer()->set_total(total_external_command_buffer_slots);
+  return grpc::Status::OK;
 }

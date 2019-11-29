@@ -6,7 +6,12 @@
 
 CCE_BEGIN()
 class engine_impl final : public Engine::Service {
-  grpc::Status GetVersion(grpc::ServerContext* context, const ::google::protobuf::Empty* /*request*/, Version* response) override;
+  grpc::Status GetVersion(grpc::ServerContext* context,
+                          const ::google::protobuf::Empty* /*request*/,
+                          Version* response) override;
+  grpc::Status GetStats(grpc::ServerContext* context,
+                        const ::google::protobuf::Empty* /*request*/,
+                        Stats* response) override;
 };
 
 CCE_END()

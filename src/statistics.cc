@@ -17,27 +17,30 @@
  *
  */
 
-#include <sstream>
-#include "com/centreon/engine/logging/logger.hh"
-#include <grpcpp/server_builder.h>
-#include "enginerpc.hh"
+#include "com/centreon/engine/statistics.hh"
 
 using namespace com::centreon::engine;
 
-enginerpc::enginerpc(const std::string& address, uint16_t port) {
-  engine_impl* service = new engine_impl;
-  std::ostringstream oss;
-  oss << address << ":" << port;
-  std::string server_address{oss.str()};
-  grpc::ServerBuilder builder;
-  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  builder.RegisterService(service);
-  _server = builder.BuildAndStart();
-  logger(logging::log_info_message, logging::basic)
-    << "EngineRPC server listening on " << server_address;
+/**
+ *  The default constructor
+ */
+statistics::statistics() {}
+
+/**
+ * @brief Just an accessor to the statistics instance.
+ *
+ * @return A reference to the instance.
+ */
+statistics& statistics::instance() {
+  static statistics instance;
+  return instance;
 }
 
-void enginerpc::shutdown() {
-  _server->Shutdown();
-  _server->Wait();
+/**
+ * @brief Returns the centengine pid.
+ *
+ * @return A pid_t
+  */
+pid_t statistics::get_pid() const noexcept {
+  return getpid();
 }
