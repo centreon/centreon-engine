@@ -18,6 +18,12 @@ Second notification with state change
 When a notification has been sent for a warning state. If the device changes to
 a critical state, no notification was sent. This is fixed in this version.
 
+First notification delay if no recovery notification configured
+===============================================================
+
+When a first notification delay but no recovery notification are configured,
+the first notification delay is not applied. This is fixed in this release.
+
 =======================
 Centreon Engine 19.10.7
 =======================
