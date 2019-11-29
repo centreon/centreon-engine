@@ -183,3 +183,36 @@ TEST_F(HostRecovery,
             OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
+
+TEST_F(HostRecovery,
+       SimpleRecoveryHostNotificationAfterDelay) {
+  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+   * If we call time(), it is not the glibc time() function that will be called.
+   */
+  _host->set_current_state(engine::host::state_down);
+  _host->set_state_type(engine::host::hard);
+  _host->set_last_hard_state_change(_current_time);
+  _host->set_recovery_notification_delay(5);
+  // Time too short. No notification will be sent.
+  _current_time += 100;
+  set_time(_current_time);
+  uint64_t id{_host->get_next_notification_id()};
+  _host->set_current_state(engine::host::state_up);
+  _host->set_last_hard_state_change(_current_time);
+
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
+                          "",
+                          "",
+                          notifier::notification_option_none),
+            OK);
+  ASSERT_EQ(id, _host->get_next_notification_id());
+  _current_time += 350;
+  set_time(_current_time);
+  ASSERT_EQ(_host->notify(notifier::reason_recovery,
+                          "",
+                          "",
+                          notifier::notification_option_none),
+            OK);
+
+  ASSERT_EQ(id + 1, _host->get_next_notification_id());
+}
