@@ -50,7 +50,7 @@ ExternalProject_Add(protobuf
       -Dprotobuf_BUILD_TESTS:BOOL=OFF
       -Dprotobuf_WITH_ZLIB:BOOL=OFF
       -Dprotobuf_MSVC_STATIC_RUNTIME:BOOL=OFF
-      -DCMAKE_INSTALL_PREFIX:PATH="${CMAKE_CURRENT_BINARY}/protobuf"
+      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/protobuf
 )
 
 ExternalProject_Add(zlib
@@ -72,7 +72,7 @@ ExternalProject_Add(grpc
         -DgRPC_BUILD_TESTS:BOOL=OFF
         -DgRPC_PROTOBUF_PROVIDER:STRING=package
         -DgRPC_PROTOBUF_PACKAGE_TYPE:STRING=CONFIG
-        -DProtobuf_DIR:PATH=${_FINDPACKAGE_PROTOBUF_CONFIG_DIR}
+        -DProtobuf_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/lib/cmake/protobuf
         -DgRPC_ZLIB_PROVIDER:STRING=package
         -DZLIB_ROOT:STRING=${CMAKE_CURRENT_BINARY_DIR}/zlib
         -DgRPC_CARES_PROVIDER:STRING=package
