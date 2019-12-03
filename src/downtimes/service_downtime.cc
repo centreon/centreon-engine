@@ -336,9 +336,17 @@ int service_downtime::handle() {
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY
          * OF EXPIRING UNUSED DOWNTIME... ***/
 
-        timed_event* evt =
-            new timed_event(EVENT_EXPIRE_DOWNTIME, get_end_time() + 1, false, 0,
-                            nullptr, false, nullptr, nullptr, 0);
+        /* Sometimes, get_end_time() == longlong::max(), if we add 1 to it, it becomes < 0 */
+        timed_event* evt = new timed_event(
+          EVENT_EXPIRE_DOWNTIME,
+          get_end_time() + 1 > 0 ? get_end_time() + 1 : get_end_time(),
+          false,
+          0,
+          nullptr,
+          false,
+          nullptr,
+          nullptr,
+          0);
         evt->schedule(true);
         return OK;
       }
@@ -460,8 +468,11 @@ int service_downtime::handle() {
     /* schedule an event */
     if (!is_fixed())
       event_time = (time_t)((unsigned long)time(nullptr) + get_duration());
-    else
-      event_time = get_end_time() + 1;
+    else {
+      /* Sometimes, get_end_time() == longlong::max(), if we add 1 to it, it becomes < 0 */
+      event_time = get_end_time() + 1 > 0 ? get_end_time() + 1 : get_end_time();
+    }
+
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
     timed_event* evt =
         new timed_event(EVENT_SCHEDULED_DOWNTIME, event_time, false, 0, nullptr,
