@@ -735,7 +735,8 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
       event_time
         = (time_t)((unsigned long)time(NULL) + temp_downtime->duration);
     else
-      event_time = temp_downtime->end_time + 1;
+      event_time = temp_downtime->end_time + 1 > 0 ? temp_downtime->end_time + 1
+                                                   : temp_downtime->end_time;
     new_downtime_id = new unsigned long;
     *new_downtime_id = temp_downtime->downtime_id;
     schedule_new_event(
