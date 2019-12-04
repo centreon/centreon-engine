@@ -23,7 +23,7 @@ set(SRC_DIR "${MODULE_DIR}/src")
 set(INC_DIR "${MODULE_DIR}/inc")
 
 # Include directories.
-include_directories("${INC_DIR}")
+include_directories(${INC_DIR} ${CMAKE_CURRENT_BINARY_DIR}/grpc/include ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf/src)
 
 include(ExternalProject)
 
@@ -83,6 +83,28 @@ ExternalProject_Add(grpc
   DEPENDS c-ares protobuf zlib
 )
 
+add_custom_command(
+    DEPENDS grpc ${SRC_DIR}/engine.proto
+    COMMENT "Generating interface files of the proto file (grpc)"
+    OUTPUT ${SRC_DIR}/engine.grpc.pb.cc ${SRC_DIR}/engine.grpc.pb.h
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
+    ARGS --plugin=protoc-gen-grpc=${CMAKE_CURRENT_BINARY_DIR}/grpc/bin/grpc_cpp_plugin --proto_path="${SRC_DIR}" --proto_path="${MODULE_DIR}/third_party/grpc/third_party/protobuf/src/." --grpc_out="${SRC_DIR}" ${SRC_DIR}/engine.proto
+    COMMENT "Renaming output header"
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -E rename ${SRC_DIR}/engine.grpc.pb.h ${INC_DIR}/engine.grpc.pb.h
+    OUTPUT ${INC_DIR}/engine.grpb.pb.h
+
+    DEPENDS grpc ${SRC_DIR}/engine.proto
+    COMMENT "Generating interface files of the proto file (protobuf)"
+    OUTPUT ${SRC_DIR}/engine.pb.cc ${SRC_DIR}/engine.pb.h
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
+    ARGS --proto_path="${SRC_DIR}" --proto_path="${MODULE_DIR}/third_party/grpc/third_party/protobuf/src/." --cpp_out="${SRC_DIR}" ${SRC_DIR}/engine.proto
+    COMMENT "Renaming output header"
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -E rename ${SRC_DIR}/engine.pb.h ${INC_DIR}/engine.pb.h
+    OUTPUT ${INC_DIR}/engine.pb.h
+    )
+
 # mod_enginerpc target.
 add_library(
   "enginerpc"
@@ -90,8 +112,10 @@ add_library(
 
   # Sources.
   "${SRC_DIR}/main.cc"
+  "${SRC_DIR}/engine.grpc.pb.cc"
 
   # Headers.
+  "${INC_DIR}/engine.pb.h"
 )
 
 add_dependencies(enginerpc protobuf grpc)
