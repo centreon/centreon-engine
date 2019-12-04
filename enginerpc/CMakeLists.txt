@@ -18,39 +18,41 @@
 ##
 
 # Set directories.
-set(MODULE_DIR "${PROJECT_SOURCE_DIR}/modules/enginerpc")
-set(SRC_DIR "${MODULE_DIR}/src")
-set(INC_DIR "${MODULE_DIR}/inc")
+set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc")
 
 # Include directories.
-include_directories(${INC_DIR} ${CMAKE_CURRENT_BINARY_DIR}/grpc/include ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf/src)
+include_directories(
+  ${ENGINERPC_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/grpc/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf/src
+)
 
 include(ExternalProject)
 
 ExternalProject_Add(c-ares
-    PREFIX c-ares
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/cares/cares"
-    GIT_REPOSITORY https://github.com/c-ares/c-ares.git
-    GIT_TAG cares-1_15_0
-    CMAKE_CACHE_ARGS
-      -DCARES_SHARED:BOOL=OFF
-      -DCARES_STATIC:BOOL=ON
-      -DCARES_STATIC_PIC:BOOL=ON
-      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/c-ares
+  PREFIX c-ares
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/cares/cares"
+  GIT_REPOSITORY https://github.com/c-ares/c-ares.git
+  GIT_TAG cares-1_15_0
+  CMAKE_CACHE_ARGS
+    -DCARES_SHARED:BOOL=OFF
+    -DCARES_STATIC:BOOL=ON
+    -DCARES_STATIC_PIC:BOOL=ON
+    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/c-ares
 )
 
 ExternalProject_Add(protobuf
-    PREFIX protobuf
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf"
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf/cmake
-    GIT_REPOSITORY https://github.com/protocolbuffers/protobuf.git
-    GIT_TAG v3.11.0
-    INSTALL_COMMAND make DESTDIR=./
-    CMAKE_CACHE_ARGS
-      -Dprotobuf_BUILD_TESTS:BOOL=OFF
-      -Dprotobuf_WITH_ZLIB:BOOL=OFF
-      -Dprotobuf_MSVC_STATIC_RUNTIME:BOOL=OFF
-      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/protobuf
+  PREFIX protobuf
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf"
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf/cmake
+  GIT_REPOSITORY https://github.com/protocolbuffers/protobuf.git
+  GIT_TAG v3.11.0
+  INSTALL_COMMAND make DESTDIR=./
+  CMAKE_CACHE_ARGS
+    -Dprotobuf_BUILD_TESTS:BOOL=OFF
+    -Dprotobuf_WITH_ZLIB:BOOL=OFF
+    -Dprotobuf_MSVC_STATIC_RUNTIME:BOOL=OFF
+    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/protobuf
 )
 
 ExternalProject_Add(zlib
@@ -84,38 +86,35 @@ ExternalProject_Add(grpc
 )
 
 add_custom_command(
-    DEPENDS grpc ${SRC_DIR}/engine.proto
-    COMMENT "Generating interface files of the proto file (grpc)"
-    OUTPUT ${SRC_DIR}/engine.grpc.pb.cc ${SRC_DIR}/engine.grpc.pb.h
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
-    ARGS --plugin=protoc-gen-grpc=${CMAKE_CURRENT_BINARY_DIR}/grpc/bin/grpc_cpp_plugin --proto_path="${SRC_DIR}" --proto_path="${MODULE_DIR}/third_party/grpc/third_party/protobuf/src/." --grpc_out="${SRC_DIR}" ${SRC_DIR}/engine.proto
-    COMMENT "Renaming output header"
-    COMMAND ${CMAKE_COMMAND}
-    ARGS -E rename ${SRC_DIR}/engine.grpc.pb.h ${INC_DIR}/engine.grpc.pb.h
-    OUTPUT ${INC_DIR}/engine.grpb.pb.h
+  DEPENDS grpc ${ENGINERPC_DIR}/engine.proto
+  COMMENT "Generating interface files of the proto file (grpc)"
+  OUTPUT ${ENGINERPC_DIR}/engine.grpc.pb.cc ${ENGINERPC_DIR}/engine.grpc.pb.h
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
+  ARGS --plugin=protoc-gen-grpc=${CMAKE_CURRENT_BINARY_DIR}/grpc/bin/grpc_cpp_plugin --proto_path="${ENGINERPC_DIR}" --proto_path="${ENGINERPC_DIR}/third_party/grpc/third_party/protobuf/src/." --grpc_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
 
-    DEPENDS grpc ${SRC_DIR}/engine.proto
-    COMMENT "Generating interface files of the proto file (protobuf)"
-    OUTPUT ${SRC_DIR}/engine.pb.cc ${SRC_DIR}/engine.pb.h
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
-    ARGS --proto_path="${SRC_DIR}" --proto_path="${MODULE_DIR}/third_party/grpc/third_party/protobuf/src/." --cpp_out="${SRC_DIR}" ${SRC_DIR}/engine.proto
-    COMMENT "Renaming output header"
-    COMMAND ${CMAKE_COMMAND}
-    ARGS -E rename ${SRC_DIR}/engine.pb.h ${INC_DIR}/engine.pb.h
-    OUTPUT ${INC_DIR}/engine.pb.h
-    )
+  DEPENDS grpc ${ENGINERPC_DIR}/engine.proto
+  COMMENT "Generating interface files of the proto file (protobuf)"
+  OUTPUT ${ENGINERPC_DIR}/engine.pb.cc ${ENGINERPC_DIR}/engine.pb.h
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
+  ARGS --proto_path="${ENGINERPC_DIR}" --proto_path="${ENGINERPC_DIR}/third_party/grpc/third_party/protobuf/src/." --cpp_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
+)
 
 # mod_enginerpc target.
 add_library(
-  "enginerpc"
+  enginerpc
   SHARED
 
   # Sources.
-  "${SRC_DIR}/main.cc"
-  "${SRC_DIR}/engine.grpc.pb.cc"
+  engine.grpc.pb.cc
+  engine.pb.cc
+  engine_impl.cc
+  enginerpc.cc
 
   # Headers.
-  "${INC_DIR}/engine.pb.h"
+  engine.grpc.pb.h
+  engine.pb.h
+  engine_impl.hh
+  enginerpc.hh
 )
 
 add_dependencies(enginerpc protobuf grpc)

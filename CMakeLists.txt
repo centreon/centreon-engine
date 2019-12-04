@@ -151,7 +151,7 @@ endif ()
 # Enable or disable the OFFLINE BUILD mode.
 option(BUILD_OFFLINE "Build offline" OFF)
 
-option(WITH_GRPC "Build the enginerpc module" OFF)
+option(WITH_GRPC "Build the enginerpc extension" OFF)
 
 # Enable or disable installation.
 option(WITH_CREATE_FILES "Create centreon-engine files." ON)
@@ -576,6 +576,9 @@ add_subdirectory(src/logging)
 add_subdirectory(src/macros)
 add_subdirectory(modules)
 add_subdirectory(src/retention)
+if (WITH_GRPC)
+  add_subdirectory(enginerpc)
+endif ()
 
 # Library engine target.
 add_library("cce_core" ${LIBRARY_TYPE} ${FILES})

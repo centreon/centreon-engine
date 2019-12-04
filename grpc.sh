@@ -1,1 +1,0 @@
-./build/modules/enginerpc/protobuf/src/protobuf-build/protoc --plugin=protoc-gen-grpc=build/modules/enginerpc/grpc/bin/grpc_cpp_plugin --proto_path="modules/enginerpc" --proto_path="modules/enginerpc/third_party/grpc/third_party/protobuf/src" --grpc_out=. modules/enginerpc/engine.proto
