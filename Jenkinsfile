@@ -77,7 +77,7 @@ try {
     }
 
     if (env.BUILD == 'REFERENCE') {
-      build job: 'centreon-web/master', wait: false
+      build job: 'centreon-web/19.04.x', wait: false
     }
   }
 }
