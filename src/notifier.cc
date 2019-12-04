@@ -188,13 +188,6 @@ bool notifier::_is_notification_viable_normal(reason_type type
                                               notification_option options) {
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
-  /* On volatile services notifications are always sent */
-  if (get_is_volatile()) {
-    logger(dbg_notifications, more)
-        << "This is a volatile service notification, so it is sent.";
-    return true;
-  }
-
   /* forced notifications bust through everything */
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -216,6 +209,13 @@ bool notifier::_is_notification_viable_normal(reason_type type
         << "Notifications are temporarily disabled for "
            "this notifier, so we won't send one out.";
     return false;
+  }
+
+  /* On volatile services notifications are always sent */
+  if (get_is_volatile()) {
+    logger(dbg_notifications, more)
+        << "This is a volatile service notification, so it is sent.";
+    return true;
   }
 
   timeperiod* tp{get_notification_timeperiod()};
