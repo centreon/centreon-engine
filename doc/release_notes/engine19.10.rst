@@ -1,4 +1,18 @@
 =======================
+Centreon Engine 19.10.9
+=======================
+
+*********
+Bug fixes
+*********
+
+Notifications on volatile services
+==================================
+
+On a volatile service, if notifications are disabled, it should not send
+notifications.
+
+=======================
 Centreon Engine 19.10.8
 =======================
 
