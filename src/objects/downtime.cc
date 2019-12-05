@@ -522,7 +522,8 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
         schedule_new_event(
           EVENT_EXPIRE_DOWNTIME,
           true,
-          temp_downtime->end_time + 1,
+          temp_downtime->end_time + 1 > 0 ? temp_downtime->end_time + 1
+                                          : temp_downtime->end_time,
           false,
           0,
           NULL,
