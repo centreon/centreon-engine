@@ -54,14 +54,26 @@ if (WITH_TESTING)
   # Add root inclusion direction.
   set(MODULE_DIR "${PROJECT_SOURCE_DIR}/modules/external_commands")
   set(INC_DIR "${MODULE_DIR}/inc/com/centreon/engine/modules/external_commands")
-  include_directories(${PROJECT_SOURCE_DIR} ${MODULE_DIR}/inc)
+  include_directories(${PROJECT_SOURCE_DIR} ${MODULE_DIR}/inc ${PROJECT_SOURCE_DIR}/enginerpc)
 
   # Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
+  if (WITH_GRPC)
+    add_definitions(-DENGINERPC_TESTS_PATH="${TESTS_DIR}/enginerpc")
+  endif ()
 
   add_executable("bin_connector_test_run"
       "${TESTS_DIR}/commands/bin_connector_test_run.cc")
   target_link_libraries(bin_connector_test_run cce_core pthread)
+
+#gRPC files generations
+add_custom_command(
+  DEPENDS ${ENGINERPC_DIR}/engine.proto
+  COMMENT "Generating python interface files of the proto file (grpc)"
+  OUTPUT ${TESTS_DIR}/enginerpc/engine_pb2_grpc.py ${TESTS_DIR}/enginerpc/engine_pb2.py
+  COMMAND /usr/bin/python3
+  ARGS -m grpc_tools.protoc -I${ENGINERPC_DIR} --python_out=${TESTS_DIR}/enginerpc --grpc_python_out=${TESTS_DIR}/enginerpc ${ENGINERPC_DIR}/engine.proto
+)
 
   # Unit test executable.
   add_executable("ut"
@@ -97,6 +109,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/external_commands/host.cc"
     "${TESTS_DIR}/external_commands/service.cc"
     "${TESTS_DIR}/main.cc"
+    "${TESTS_DIR}/enginerpc/enginerpc.cc"
     "${TESTS_DIR}/notifications/host_downtime_notification.cc"
     "${TESTS_DIR}/notifications/host_flapping_notification.cc"
     "${TESTS_DIR}/notifications/host_normal_notification.cc"
@@ -126,8 +139,10 @@ if (WITH_TESTING)
     "${TESTS_DIR}/timeperiod/utils.hh"
   )
 
-add_dependencies(ut googletest)
-  target_link_libraries(ut gtest cce_core pthread gcov)
+  add_custom_target(python-interface DEPENDS ${TESTS_DIR}/enginerpc/engine_pb2_grpc.py)
+  add_dependencies(ut googletest python-interface)
+
+  target_link_libraries(ut gtest cce_core pthread gcov enginerpc)
 
   add_test(NAME tests COMMAND ut)
 

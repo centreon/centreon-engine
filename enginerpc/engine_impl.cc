@@ -2,7 +2,7 @@
 #include "com/centreon/engine/version.hh"
 
 using namespace grpc;
-using namespace com::centreon::engine::enginerpc;
+using namespace com::centreon::engine;
 
 /**
  * @brief Return the Engine's version.
@@ -18,6 +18,6 @@ Status engine_impl::GetVersion(ServerContext* context,
                                Version* response) {
   response->set_major(CENTREON_ENGINE_VERSION_MAJOR);
   response->set_minor(CENTREON_ENGINE_VERSION_MINOR);
-  response->set_release(CENTREON_ENGINE_VERSION_PATCH);
+  response->set_patch(CENTREON_ENGINE_VERSION_PATCH);
   return Status::OK;
 }

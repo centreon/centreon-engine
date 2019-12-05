@@ -16,6 +16,7 @@ gtest.cbp
 **/CMakeFiles/*
 cmake-build-debug/*
 modules/bench/passive/paths.hh
-enginerpc/third_party/*
-enginerpc/src/engine.*pb.cc
-enginerpc/inc/engine.*pb.h
+enginerpc/engine.*pb.cc
+enginerpc/engine.*pb.h
+tests/enginerpc/engine_pb2.py
+tests/enginerpc/engine_pb2_grpc.py

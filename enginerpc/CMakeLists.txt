@@ -18,91 +18,35 @@
 ##
 
 # Set directories.
-set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc")
+set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc" PARENT_SCOPE)
 
 # Include directories.
 include_directories(
   ${ENGINERPC_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}/grpc/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf/src
 )
 
-include(ExternalProject)
-
-ExternalProject_Add(c-ares
-  PREFIX c-ares
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/cares/cares"
-  GIT_REPOSITORY https://github.com/c-ares/c-ares.git
-  GIT_TAG cares-1_15_0
-  CMAKE_CACHE_ARGS
-    -DCARES_SHARED:BOOL=OFF
-    -DCARES_STATIC:BOOL=ON
-    -DCARES_STATIC_PIC:BOOL=ON
-    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/c-ares
-)
-
-ExternalProject_Add(protobuf
-  PREFIX protobuf
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf"
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf/cmake
-  GIT_REPOSITORY https://github.com/protocolbuffers/protobuf.git
-  GIT_TAG v3.11.0
-  INSTALL_COMMAND make DESTDIR=./
-  CMAKE_CACHE_ARGS
-    -Dprotobuf_BUILD_TESTS:BOOL=OFF
-    -Dprotobuf_WITH_ZLIB:BOOL=OFF
-    -Dprotobuf_MSVC_STATIC_RUNTIME:BOOL=OFF
-    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/protobuf
-)
-
-ExternalProject_Add(zlib
-  PREFIX zlib
-  GIT_REPOSITORY https://github.com/madler/zlib.git
-  GIT_TAG v1.2.11
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/zlib"
-  CMAKE_CACHE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/zlib
-)
-
-ExternalProject_Add(grpc
-  PREFIX grpc
-  GIT_REPOSITORY https://github.com/grpc/grpc.git
-  GIT_TAG v1.25.0
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/grpc"
-  CMAKE_CACHE_ARGS
-        -DgRPC_INSTALL:BOOL=ON
-        -DgRPC_BUILD_TESTS:BOOL=OFF
-        -DgRPC_PROTOBUF_PROVIDER:STRING=package
-        -DgRPC_PROTOBUF_PACKAGE_TYPE:STRING=CONFIG
-        -DProtobuf_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/lib/cmake/protobuf
-        -DgRPC_ZLIB_PROVIDER:STRING=package
-        -DZLIB_ROOT:STRING=${CMAKE_CURRENT_BINARY_DIR}/zlib
-        -DgRPC_CARES_PROVIDER:STRING=package
-        -Dc-ares_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/c-ares/lib/cmake/c-ares
-        -DgRPC_SSL_PROVIDER:STRING=package
-        ${_CMAKE_ARGS_OPENSSL_ROOT_DIR}
-        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/grpc
-  DEPENDS c-ares protobuf zlib
-)
+include(FindPkgConfig)
+pkg_check_modules(PROTOBUF REQUIRED protobuf)
+pkg_check_modules(GRPC REQUIRED grpc++)
 
 add_custom_command(
-  DEPENDS grpc ${ENGINERPC_DIR}/engine.proto
+  DEPENDS ${ENGINERPC_DIR}/engine.proto
   COMMENT "Generating interface files of the proto file (grpc)"
   OUTPUT ${ENGINERPC_DIR}/engine.grpc.pb.cc ${ENGINERPC_DIR}/engine.grpc.pb.h
-  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
-  ARGS --plugin=protoc-gen-grpc=${CMAKE_CURRENT_BINARY_DIR}/grpc/bin/grpc_cpp_plugin --proto_path="${ENGINERPC_DIR}" --proto_path="${ENGINERPC_DIR}/third_party/grpc/third_party/protobuf/src/." --grpc_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
+  COMMAND ${PROTOBUF_PREFIX}/bin/protoc
+  ARGS --plugin=protoc-gen-grpc=${GRPC_PREFIX}/bin/grpc_cpp_plugin --proto_path=${ENGINERPC_DIR} --grpc_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
 
-  DEPENDS grpc ${ENGINERPC_DIR}/engine.proto
+  DEPENDS ${ENGINERPC_DIR}/engine.proto
   COMMENT "Generating interface files of the proto file (protobuf)"
   OUTPUT ${ENGINERPC_DIR}/engine.pb.cc ${ENGINERPC_DIR}/engine.pb.h
-  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf-build/protoc
-  ARGS --proto_path="${ENGINERPC_DIR}" --proto_path="${ENGINERPC_DIR}/third_party/grpc/third_party/protobuf/src/." --cpp_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
+  COMMAND ${PROTOBUF_PREFIX}/bin/protoc
+  ARGS --cpp_out="${ENGINERPC_DIR}" --proto_path=${ENGINERPC_DIR} ${ENGINERPC_DIR}/engine.proto
 )
 
 # mod_enginerpc target.
 add_library(
   enginerpc
-  SHARED
+  STATIC
 
   # Sources.
   engine.grpc.pb.cc
@@ -117,20 +61,12 @@ add_library(
   enginerpc.hh
 )
 
-add_dependencies(enginerpc protobuf grpc)
-
 # Prettier name.
-set_property(TARGET "enginerpc" PROPERTY PREFIX "")
-# Location.
-get_property(
-  ENGINERPC_MODULE
-  TARGET "enginerpc"
-  PROPERTY LOCATION)
-set(ENGINERPC_MODULE "${ENGINERPC_MODULE}" PARENT_SCOPE)
+set_property(TARGET "enginerpc" PROPERTY PREFIX "" PROPERTY POSITION_INDEPENDENT_CODE ON)
 # Link target with libraries.
-target_link_libraries("enginerpc" "${CLIB_LIBRARIES}")
+target_link_libraries(enginerpc "${GRPC_STATIC_LDFLAGS}")
 
 # Install rule.
-install(TARGETS "enginerpc"
+install(TARGETS enginerpc
   DESTINATION "${PREFIX_LIB}"
   COMPONENT "runtime")

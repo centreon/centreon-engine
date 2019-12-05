@@ -22,8 +22,7 @@
 #include <grpcpp/server_builder.h>
 #include "enginerpc.hh"
 
-using namespace com::centreon::engine::enginerpc;
-
+using namespace com::centreon::engine;
 enginerpc::enginerpc(const std::string& address, uint16_t port) {
   engine_impl* service = new engine_impl;
   std::ostringstream oss;
@@ -32,15 +31,12 @@ enginerpc::enginerpc(const std::string& address, uint16_t port) {
   grpc::ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
   builder.RegisterService(service);
-  _thread = std::thread([&] {
-    _server = builder.BuildAndStart();
-    logger(logging::log_info_message, logging::basic)
-        << "EngineRPC server listening on " << server_address;
-    _server->Wait();
-  });
+  _server = builder.BuildAndStart();
+  logger(logging::log_info_message, logging::basic)
+    << "EngineRPC server listening on " << server_address;
 }
 
-enginerpc::~enginerpc() {
+void enginerpc::shutdown() {
   _server->Shutdown();
-  _thread.join();
+  _server->Wait();
 }
