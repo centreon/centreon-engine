@@ -18,5 +18,3 @@ cmake-build-debug/*
 modules/bench/passive/paths.hh
 enginerpc/engine.*pb.cc
 enginerpc/engine.*pb.h
-tests/enginerpc/engine_pb2.py
-tests/enginerpc/engine_pb2_grpc.py
