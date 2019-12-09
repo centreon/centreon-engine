@@ -18,8 +18,11 @@
 ##
 
 # Set directories.
+set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc")
 set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc" PARENT_SCOPE)
 
+set(ENGINERPC enginerpc)
+set(ENGINERPC enginerpc PARENT_SCOPE)
 # Include directories.
 include_directories(
   ${ENGINERPC_DIR}
@@ -28,13 +31,14 @@ include_directories(
 include(FindPkgConfig)
 pkg_check_modules(PROTOBUF REQUIRED protobuf)
 pkg_check_modules(GRPC REQUIRED grpc++)
+set(GRPC_CPP_PLUGIN "${GRPC_PREFIX}/bin/grpc_cpp_plugin")
 
 add_custom_command(
   DEPENDS ${ENGINERPC_DIR}/engine.proto
   COMMENT "Generating interface files of the proto file (grpc)"
   OUTPUT ${ENGINERPC_DIR}/engine.grpc.pb.cc ${ENGINERPC_DIR}/engine.grpc.pb.h
   COMMAND ${PROTOBUF_PREFIX}/bin/protoc
-  ARGS --plugin=protoc-gen-grpc=${GRPC_PREFIX}/bin/grpc_cpp_plugin --proto_path=${ENGINERPC_DIR} --grpc_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
+  ARGS --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} --proto_path=${ENGINERPC_DIR} --grpc_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
 
   DEPENDS ${ENGINERPC_DIR}/engine.proto
   COMMENT "Generating interface files of the proto file (protobuf)"
@@ -43,20 +47,25 @@ add_custom_command(
   ARGS --cpp_out="${ENGINERPC_DIR}" --proto_path=${ENGINERPC_DIR} ${ENGINERPC_DIR}/engine.proto
 )
 
+add_library(
+    cerpc
+    STATIC
+
+  ${ENGINERPC_DIR}/engine.grpc.pb.cc
+  ${ENGINERPC_DIR}/engine.pb.cc
+  ${ENGINERPC_DIR}/engine.grpc.pb.h
+  ${ENGINERPC_DIR}/engine.pb.h)
+
 # mod_enginerpc target.
 add_library(
-  enginerpc
+  ${ENGINERPC}
   STATIC
 
   # Sources.
-  engine.grpc.pb.cc
-  engine.pb.cc
   engine_impl.cc
   enginerpc.cc
 
   # Headers.
-  engine.grpc.pb.h
-  engine.pb.h
   engine_impl.hh
   enginerpc.hh
 )
@@ -64,7 +73,7 @@ add_library(
 # Prettier name.
 set_property(TARGET "enginerpc" PROPERTY PREFIX "" PROPERTY POSITION_INDEPENDENT_CODE ON)
 # Link target with libraries.
-target_link_libraries(enginerpc "${GRPC_STATIC_LDFLAGS}")
+target_link_libraries(enginerpc "${GRPC_STATIC_LDFLAGS}" cerpc)
 
 # Install rule.
 install(TARGETS enginerpc

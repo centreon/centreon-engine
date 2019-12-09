@@ -49,7 +49,7 @@ class EngineRpc : public testing::Test {
     std::list<std::string> retval;
     char path[1024];
     std::ostringstream oss;
-    oss << "/usr/bin/python3 " << ENGINERPC_TESTS_PATH << "/client.py "
+    oss << "tests/rpc_client "
       << command;
 
     FILE* fp = popen(oss.str().c_str(), "r");
