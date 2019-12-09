@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <stdint.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/downtime.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
@@ -519,11 +520,15 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
 
+        time_t temp;
+        if (temp_downtime->end_time == INT64_MAX)
+          temp = temp_downtime->end_time;
+        else
+          temp = temp_downtime->end_time + 1;
         schedule_new_event(
           EVENT_EXPIRE_DOWNTIME,
           true,
-          temp_downtime->end_time + 1 > 0 ? temp_downtime->end_time + 1
-                                          : temp_downtime->end_time,
+          temp,
           false,
           0,
           NULL,
@@ -735,9 +740,12 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
     if (temp_downtime->fixed == false)
       event_time
         = (time_t)((unsigned long)time(NULL) + temp_downtime->duration);
-    else
-      event_time = temp_downtime->end_time + 1 > 0 ? temp_downtime->end_time + 1
-                                                   : temp_downtime->end_time;
+    else {
+      if (temp_downtime->end_time == INT64_MAX)
+        event_time = temp_downtime->end_time;
+      else
+        event_time = temp_downtime->end_time + 1;
+    }
     new_downtime_id = new unsigned long;
     *new_downtime_id = temp_downtime->downtime_id;
     schedule_new_event(
