@@ -145,7 +145,8 @@ if (WITH_TESTING)
 
   add_dependencies(ut googletest)
 
-  target_link_libraries(ut gtest cce_core pthread gcov ${ENGINERPC})
+  target_link_libraries(ut gtest cce_core pthread gcov
+      ${ENGINERPC})
 
   add_test(NAME tests COMMAND ut)
 

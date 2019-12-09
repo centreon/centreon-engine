@@ -55,6 +55,7 @@ add_library(
   ${ENGINERPC_DIR}/engine.pb.cc
   ${ENGINERPC_DIR}/engine.grpc.pb.h
   ${ENGINERPC_DIR}/engine.pb.h)
+target_link_libraries(cerpc "${GRPC_STATIC_LDFLAGS}")
 
 # mod_enginerpc target.
 add_library(
@@ -73,7 +74,7 @@ add_library(
 # Prettier name.
 set_property(TARGET "enginerpc" PROPERTY PREFIX "" PROPERTY POSITION_INDEPENDENT_CODE ON)
 # Link target with libraries.
-target_link_libraries(enginerpc "${GRPC_STATIC_LDFLAGS}" cerpc)
+target_link_libraries(enginerpc cerpc)
 
 # Install rule.
 install(TARGETS enginerpc
