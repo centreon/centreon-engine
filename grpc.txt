@@ -1,0 +1,5 @@
+Packages needed to work with grpc:
+
+https://cbs.centos.org/kojifiles/packages/grpc/1.20.1/1.el7/x86_64/grpc-1.20.1-1.el7.x86_64.rpm
+https://cbs.centos.org/kojifiles/packages/grpc/1.20.1/1.el7/x86_64/grpc-devel-1.20.1-1.el7.x86_64.rpm
+https://cbs.centos.org/kojifiles/packages/grpc/1.20.1/1.el7/x86_64/grpc-plugins-1.20.1-1.el7.x86_64.rpm
