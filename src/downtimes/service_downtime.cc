@@ -19,6 +19,7 @@
 
 #include <map>
 #include <sstream>
+#include <stdint.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -332,11 +333,15 @@ int service_downtime::handle() {
         _incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
-
+        time_t temp;
+        if (get_end_time() == INT64_MAX)
+          temp = get_end_time();
+        else
+          temp = get_end_time() + 1;
         /* Sometimes, get_end_time() == longlong::max(), if we add 1 to it, it becomes < 0 */
         timed_event* evt = new timed_event(
           EVENT_EXPIRE_DOWNTIME,
-          get_end_time() + 1 > 0 ? get_end_time() + 1 : get_end_time(),
+          temp,
           false,
           0,
           nullptr,
@@ -491,7 +496,10 @@ int service_downtime::handle() {
         = (time_t)((unsigned long)time(nullptr) + get_duration());
     else {
       /* Sometimes, get_end_time() == longlong::max(), if we add 1 to it, it becomes < 0 */
-      event_time = get_end_time() + 1 > 0 ? get_end_time() + 1 : get_end_time();
+      if (get_end_time() == INT64_MAX)
+        event_time = get_end_time();
+      else
+        event_time = get_end_time() + 1;
     }
 
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
