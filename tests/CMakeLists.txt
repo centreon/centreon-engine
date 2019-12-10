@@ -58,13 +58,21 @@ if (WITH_TESTING)
 
   # Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
+  if (WITH_GRPC)
+    include_directories(${PROJECT_SOURCE_DIR}/enginerpc)
+    add_definitions(-DENGINERPC_TESTS_PATH="${TESTS_DIR}/enginerpc")
+
+    add_executable(rpc_client
+        ${TESTS_DIR}/enginerpc/client.cc)
+
+    target_link_libraries(rpc_client "${GRPC_STATIC_LDFLAGS}" cerpc)
+  endif ()
 
   add_executable("bin_connector_test_run"
       "${TESTS_DIR}/commands/bin_connector_test_run.cc")
   target_link_libraries(bin_connector_test_run cce_core pthread)
 
-  # Unit test executable.
-  add_executable("ut"
+  set(ut_sources
     # Sources.
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/commands.cc"
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/internal.cc"
@@ -126,8 +134,19 @@ if (WITH_TESTING)
     "${TESTS_DIR}/timeperiod/utils.hh"
   )
 
-add_dependencies(ut googletest)
-  target_link_libraries(ut gtest cce_core pthread gcov)
+  # Unit test executable.
+
+  if (WITH_GRPC)
+    add_executable(ut ${ut_sources}
+    "${TESTS_DIR}/enginerpc/enginerpc.cc")
+  else ()
+    add_executable(ut ${ut_sources})
+  endif ()
+
+  add_dependencies(ut googletest)
+
+  target_link_libraries(ut gtest cce_core pthread gcov
+      ${ENGINERPC})
 
   add_test(NAME tests COMMAND ut)
 

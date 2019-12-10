@@ -151,6 +151,8 @@ endif ()
 # Enable or disable the OFFLINE BUILD mode.
 option(BUILD_OFFLINE "Build offline" OFF)
 
+option(WITH_GRPC "Build the enginerpc extension" OFF)
+
 # Enable or disable installation.
 option(WITH_CREATE_FILES "Create centreon-engine files." ON)
 set(CREATE_FILES "${WITH_CREATE_FILES}")
@@ -574,6 +576,9 @@ add_subdirectory(src/logging)
 add_subdirectory(src/macros)
 add_subdirectory(modules)
 add_subdirectory(src/retention)
+if (WITH_GRPC)
+  add_subdirectory(enginerpc)
+endif ()
 
 # Library engine target.
 add_library("cce_core" ${LIBRARY_TYPE} ${FILES})
@@ -600,7 +605,7 @@ set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
-target_link_libraries("centengine" "cce_core")
+target_link_libraries("centengine" cce_core ${ENGINERPC})
 
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
