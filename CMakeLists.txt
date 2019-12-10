@@ -578,6 +578,8 @@ add_subdirectory(modules)
 add_subdirectory(src/retention)
 if (WITH_GRPC)
   add_subdirectory(enginerpc)
+  include_directories(enginerpc)
+  add_definitions(-DGRPC)
 endif ()
 
 # Library engine target.

@@ -23,6 +23,7 @@
 #include "enginerpc.hh"
 
 using namespace com::centreon::engine;
+
 enginerpc::enginerpc(const std::string& address, uint16_t port) {
   engine_impl* service = new engine_impl;
   std::ostringstream oss;

@@ -25,19 +25,17 @@
 #include <grpcpp/create_channel.h>
 #include "engine.grpc.pb.h"
 
-using namespace grpc;
-
 class EngineRPCClient {
   std::unique_ptr<Engine::Stub> _stub;
 
  public:
-  EngineRPCClient(std::shared_ptr<Channel> channel)
+  EngineRPCClient(std::shared_ptr<grpc::Channel> channel)
       : _stub(Engine::NewStub(channel)) {}
 
   bool GetVersion(Version* version) {
     const ::google::protobuf::Empty e;
-    ClientContext context;
-    Status status = _stub->GetVersion(&context, e, version);
+    grpc::ClientContext context;
+    grpc::Status status = _stub->GetVersion(&context, e, version);
     if (!status.ok()) {
       std::cout << "GetVersion rpc failed." << std::endl;
       return false;
