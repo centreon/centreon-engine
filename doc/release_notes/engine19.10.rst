@@ -12,6 +12,12 @@ Notifications on volatile services
 On a volatile service, if notifications are disabled, it should not send
 notifications.
 
+Recovery notifications must be sent even after an acknowledgement
+=================================================================
+
+With the new notifications implementation, this behaviour had been changed.
+This new version reset this functionality as users expect it to work.
+
 =======================
 Centreon Engine 19.10.8
 =======================
