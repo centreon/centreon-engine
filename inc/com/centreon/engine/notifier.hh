@@ -136,37 +136,37 @@ class notifier : public checkable {
 
   void set_notification(int32_t idx, std::string const& value);
 
-  bool get_notify_on(notification_flag type) const;
-  uint32_t get_notify_on() const;
-  void set_notify_on(uint32_t type);
-  void add_notify_on(notification_flag type);
-  void remove_notify_on(notification_flag type);
+  bool get_notify_on(notification_flag type) const noexcept;
+  uint32_t get_notify_on() const noexcept;
+  void set_notify_on(uint32_t type) noexcept;
+  void add_notify_on(notification_flag type) noexcept;
+  void remove_notify_on(notification_flag type) noexcept;
   virtual bool get_notify_on_current_state() const = 0;
 
-  bool get_notified_on(notification_flag type) const;
-  uint32_t get_notified_on() const;
-  void set_notified_on(uint32_t type);
-  void add_notified_on(notification_flag type);
-  void remove_notified_on(notification_flag type);
+  bool get_notified_on(notification_flag type) const noexcept;
+  uint32_t get_notified_on() const noexcept;
+  void set_notified_on(uint32_t type) noexcept;
+  void add_notified_on(notification_flag type) noexcept;
+  void remove_notified_on(notification_flag type) noexcept;
 
-  bool get_stalk_on(notification_flag type) const;
-  uint32_t get_stalk_on() const;
-  void set_stalk_on(uint32_t type);
-  void add_stalk_on(notification_flag type);
+  bool get_stalk_on(notification_flag type) const noexcept;
+  uint32_t get_stalk_on() const noexcept;
+  void set_stalk_on(uint32_t type) noexcept;
+  void add_stalk_on(notification_flag type) noexcept;
 
-  bool get_flap_detection_on(notification_flag type) const;
-  uint32_t get_flap_detection_on() const;
-  void set_flap_detection_on(uint32_t type);
-  void add_flap_detection_on(notification_flag type);
+  bool get_flap_detection_on(notification_flag type) const noexcept;
+  uint32_t get_flap_detection_on() const noexcept;
+  void set_flap_detection_on(uint32_t type) noexcept;
+  void add_flap_detection_on(notification_flag type) noexcept;
 
   unsigned long get_current_event_id() const;
-  void set_current_event_id(unsigned long current_event_id);
-  unsigned long get_last_event_id() const;
-  void set_last_event_id(unsigned long last_event_id);
-  unsigned long get_current_problem_id() const;
-  void set_current_problem_id(unsigned long current_problem_id);
-  unsigned long get_last_problem_id() const;
-  void set_last_problem_id(unsigned long last_problem_id);
+  void set_current_event_id(unsigned long current_event_id) noexcept;
+  unsigned long get_last_event_id() const noexcept;
+  void set_last_event_id(unsigned long last_event_id) noexcept;
+  unsigned long get_current_problem_id() const noexcept;
+  void set_current_problem_id(unsigned long current_problem_id) noexcept;
+  unsigned long get_last_problem_id() const noexcept;
+  void set_last_problem_id(unsigned long last_problem_id) noexcept;
 
   virtual void update_status(bool aggregated_dump) = 0;
   int notify(reason_type type,
@@ -174,8 +174,8 @@ class notifier : public checkable {
              std::string const& not_data,
              notification_option options);
 
-  void set_current_notification_id(uint64_t id);
-  uint64_t get_current_notification_id() const;
+  void set_current_notification_id(uint64_t id) noexcept;
+  uint64_t get_current_notification_id() const noexcept;
   virtual void grab_macros_r(nagios_macros* mac) = 0;
   virtual int notify_contact(nagios_macros* mac,
                              contact* cntct,
@@ -184,60 +184,60 @@ class notifier : public checkable {
                              std::string const& not_data,
                              int options,
                              int escalated) = 0;
-  time_t get_next_notification() const;
-  void set_next_notification(time_t next_notification);
-  time_t get_last_notification() const;
-  void set_last_notification(time_t last_notification);
+  time_t get_next_notification() const noexcept;
+  void set_next_notification(time_t next_notification) noexcept;
+  time_t get_last_notification() const noexcept;
+  void set_last_notification(time_t last_notification) noexcept;
   virtual void update_notification_flags() = 0;
   time_t get_next_notification_time(time_t offset);
-  void set_initial_notif_time(time_t notif_time);
-  time_t get_initial_notif_time() const;
-  void set_acknowledgement_timeout(int timeout);
-  void set_last_acknowledgement(time_t ack);
-  time_t get_last_acknowledgement() const;
-  uint32_t get_notification_interval(void) const;
-  void set_notification_interval(uint32_t notification_interval);
-  std::string const& get_notification_period() const;
-  void set_notification_period(std::string const& notification_period);
+  void set_initial_notif_time(time_t notif_time) noexcept;
+  time_t get_initial_notif_time() const noexcept;
+  void set_acknowledgement_timeout(int timeout) noexcept;
+  void set_last_acknowledgement(time_t ack) noexcept;
+  time_t get_last_acknowledgement() const noexcept;
+  uint32_t get_notification_interval(void) const noexcept;
+  void set_notification_interval(uint32_t notification_interval) noexcept;
+  std::string const& get_notification_period() const noexcept;
+  void set_notification_period(std::string const& notification_period) noexcept;
 
-  uint32_t get_first_notification_delay(void) const;
-  void set_first_notification_delay(uint32_t notification_delay);
-  uint32_t get_recovery_notification_delay(void) const;
-  void set_recovery_notification_delay(uint32_t notification_delay);
-  bool get_notifications_enabled() const;
-  void set_notifications_enabled(bool notifications_enabled);
-  uint64_t get_flapping_comment_id(void) const;
-  void set_flapping_comment_id(uint64_t comment_id);
-  int get_check_options(void) const;
-  void set_check_options(int option);
-  int get_acknowledgement_type(void) const;
-  void set_acknowledgement_type(int acknowledge_type);
-  int get_retain_status_information(void) const;
-  void set_retain_status_information(bool retain_status_informations);
-  bool get_retain_nonstatus_information(void) const;
-  void set_retain_nonstatus_information(bool retain_non_status_informations);
-  bool get_is_being_freshened(void) const;
-  void set_is_being_freshened(bool freshened);
-  std::list<escalation*>& get_escalations();
-  std::list<escalation*> const& get_escalations() const;
+  uint32_t get_first_notification_delay(void) const noexcept;
+  void set_first_notification_delay(uint32_t notification_delay) noexcept;
+  uint32_t get_recovery_notification_delay(void) const noexcept;
+  void set_recovery_notification_delay(uint32_t notification_delay) noexcept;
+  bool get_notifications_enabled() const noexcept;
+  void set_notifications_enabled(bool notifications_enabled) noexcept;
+  uint64_t get_flapping_comment_id(void) const noexcept;
+  void set_flapping_comment_id(uint64_t comment_id) noexcept;
+  int get_check_options(void) const noexcept;
+  void set_check_options(int option) noexcept;
+  int get_acknowledgement_type(void) const noexcept;
+  void set_acknowledgement_type(int acknowledge_type) noexcept;
+  int get_retain_status_information(void) const noexcept;
+  void set_retain_status_information(bool retain_status_informations) noexcept;
+  bool get_retain_nonstatus_information(void) const noexcept;
+  void set_retain_nonstatus_information(bool retain_non_status_informations) noexcept;
+  bool get_is_being_freshened(void) const noexcept;
+  void set_is_being_freshened(bool freshened) noexcept;
+  std::list<escalation*>& get_escalations() noexcept;
+  std::list<escalation*> const& get_escalations() const noexcept;
   virtual bool is_valid_escalation_for_notification(escalation const* e,
                                                     int options) const = 0;
-  void add_modified_attributes(uint32_t attr);
-  uint32_t get_modified_attributes() const;
-  void set_modified_attributes(uint32_t modified_attributes);
-  bool get_problem_has_been_acknowledged() const;
-  void set_problem_has_been_acknowledged(bool problem_has_been_acknowledged);
+  void add_modified_attributes(uint32_t attr) noexcept;
+  uint32_t get_modified_attributes() const noexcept;
+  void set_modified_attributes(uint32_t modified_attributes) noexcept;
+  bool get_problem_has_been_acknowledged() const noexcept;
+  void set_problem_has_been_acknowledged(bool problem_has_been_acknowledged) noexcept;
   virtual bool recovered() const = 0;
   virtual int get_current_state_int() const = 0;
-  bool get_no_more_notifications() const;
-  void set_no_more_notifications(bool no_more_notifications);
+  bool get_no_more_notifications() const noexcept;
+  void set_no_more_notifications(bool no_more_notifications) noexcept;
   bool notifications_available(int options) const;
-  int get_notification_number() const;
+  int get_notification_number() const noexcept;
   void set_notification_number(int number);
 
   virtual bool authorized_by_dependencies(
       dependency::types dependency_type) const = 0;
-  uint64_t get_next_notification_id() const;
+  uint64_t get_next_notification_id() const noexcept;
   virtual timeperiod* get_notification_timeperiod() const = 0;
   notification_category get_category(reason_type type) const;
   bool is_notification_viable(notification_category cat,
@@ -247,11 +247,11 @@ class notifier : public checkable {
       notification_category cat,
       reason_type type,
       uint32_t& notification_interval);
-  notifier_type get_notifier_type() const;
-  std::unordered_map<std::string, contact*>& get_contacts();
-  std::unordered_map<std::string, contact*> const& get_contacts() const;
-  contactgroup_map_unsafe& get_contactgroups();
-  contactgroup_map_unsafe const& get_contactgroups() const;
+  notifier_type get_notifier_type() const noexcept;
+  std::unordered_map<std::string, contact*>& get_contacts() noexcept;
+  std::unordered_map<std::string, contact*> const& get_contacts() const noexcept;
+  contactgroup_map_unsafe& get_contactgroups() noexcept;
+  contactgroup_map_unsafe const& get_contactgroups() const noexcept;
   void resolve(int& w, int& e);
   std::array<int, MAX_STATE_HISTORY_ENTRIES> const& get_state_history() const;
   std::array<int, MAX_STATE_HISTORY_ENTRIES>& get_state_history();
@@ -261,10 +261,10 @@ class notifier : public checkable {
   void inc_pending_flex_downtime() noexcept;
   void dec_pending_flex_downtime() noexcept;
   virtual bool get_is_volatile() const = 0;
-  void set_flap_type(uint32_t type);
-  timeperiod* get_notification_period_ptr() const;
-  void set_notification_period_ptr(timeperiod* tp);
-  int get_acknowledgement_timeout() const;
+  void set_flap_type(uint32_t type) noexcept;
+  timeperiod* get_notification_period_ptr() const noexcept;
+  void set_notification_period_ptr(timeperiod* tp) noexcept;
+  int get_acknowledgement_timeout() const noexcept;
 
   map_customvar custom_variables;
 
