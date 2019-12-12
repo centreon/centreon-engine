@@ -1272,7 +1272,7 @@ bool host::_set_plugin_output(std::string const& value) {
  *
  *  @param[in] value The new problem_has_been_acknowledged.
  */
-bool host::_set_problem_has_been_acknowledged(bool value) {
+bool host::_set_problem_has_been_acknowledged(bool value) noexcept {
   _problem_has_been_acknowledged = value;
   return true;
 }
@@ -1282,7 +1282,7 @@ bool host::_set_problem_has_been_acknowledged(bool value) {
  *
  *  @param[in] value The new process_performance_data.
  */
-bool host::_set_process_performance_data(int value) {
+bool host::_set_process_performance_data(int value) noexcept {
   _process_performance_data = value;
   return true;
 }
@@ -1292,7 +1292,7 @@ bool host::_set_process_performance_data(int value) {
  *
  *  @param[in] value The new retry_check_interval.
  */
-bool host::_set_retry_check_interval(unsigned int value) {
+bool host::_set_retry_check_interval(unsigned int value) noexcept {
   _retry_check_interval = value;
   return true;
 }
@@ -1302,7 +1302,7 @@ bool host::_set_retry_check_interval(unsigned int value) {
  *
  *  @param[in] value The new state_history.
  */
-bool host::_set_state_history(std::string const& value) {
+bool host::_set_state_history(std::string const& value) noexcept {
   unsigned int x(0);
   std::list<std::string> lst_history;
   string::split(value, lst_history, ',');
