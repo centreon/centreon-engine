@@ -165,10 +165,10 @@ class host : public object {
   bool _set_percent_state_change(double value);
   bool _set_performance_data(std::string const& value);
   bool _set_plugin_output(std::string const& value);
-  bool _set_problem_has_been_acknowledged(bool value);
-  bool _set_process_performance_data(int value);
-  bool _set_retry_check_interval(unsigned int value);
-  bool _set_state_history(std::string const& value);
+  bool _set_problem_has_been_acknowledged(bool value) noexcept;
+  bool _set_process_performance_data(int value) noexcept;
+  bool _set_retry_check_interval(unsigned int value) noexcept;
+  bool _set_state_history(std::string const& value) noexcept;
   bool _set_state_type(int value);
 
   opt<int> _acknowledgement_type;

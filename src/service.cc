@@ -1297,14 +1297,14 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     if (ACKNOWLEDGEMENT_NORMAL == this->get_acknowledgement_type() &&
         (state_change || !hard_state_change)) {
       set_problem_has_been_acknowledged(false);
-      this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+      set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
       /* remove any non-persistant comments associated with the ack */
       comment::delete_service_acknowledgement_comments(this);
     } else if (this->get_acknowledgement_type() == ACKNOWLEDGEMENT_STICKY &&
                _current_state == service::state_ok) {
       set_problem_has_been_acknowledged(false);
-      this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+      set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
       /* remove any non-persistant comments associated with the ack */
       comment::delete_service_acknowledgement_comments(this);

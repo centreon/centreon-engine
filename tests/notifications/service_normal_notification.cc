@@ -1141,3 +1141,65 @@ TEST_F(ServiceNotification, SimpleNormalVolatileServiceNotification) {
             OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
+
+
+TEST_F(ServiceNotification, RecoveryNotifEvenIfServiceAcknowledged) {
+  /* We are using a local time() function defined in tests/timeperiod/utils.cc.
+   * If we call time(), it is not the glibc time() function that will be called.
+   */
+  ASSERT_EQ(_host->services.size(), 1u);
+  set_time(43200);
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::serviceescalation> service_escalation{
+      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0,
+                                    "tperiod", 7, Uuid())};
+  _svc->set_current_state(engine::service::state_critical);
+  _svc->set_last_state(engine::service::state_critical);
+  _svc->set_last_hard_state_change(43200);
+  _svc->set_state_type(checkable::hard);
+
+  /* Critical notification is sent */
+  uint64_t id{_svc->get_next_notification_id()};
+  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
+                         notifier::notification_option_none),
+            OK);
+  ASSERT_EQ(id + 1, _svc->get_next_notification_id());
+
+  set_time(43700);
+  /* The service is acknowledged */
+  _svc->set_problem_has_been_acknowledged(true);
+  _svc->set_acknowledgement_type(ACKNOWLEDGEMENT_NORMAL);
+  time_t now = time(nullptr);
+  _svc->set_last_acknowledgement(now);
+
+  id = _svc->get_next_notification_id();
+  ASSERT_EQ(_svc->notify(notifier::reason_acknowledgement, "", "",
+                         notifier::notification_option_none),
+            OK);
+  ASSERT_EQ(id + 1, _svc->get_next_notification_id());
+
+  set_time(44000);
+  /* The service is acknowledged => no more normal notification */
+  id = _svc->get_next_notification_id();
+  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
+                         notifier::notification_option_none),
+            OK);
+  ASSERT_EQ(id, _svc->get_next_notification_id());
+
+  set_time(44500);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(44500);
+  _svc->set_state_type(checkable::hard);
+
+  /* Critical notification is sent */
+  id = _svc->get_next_notification_id();
+  ASSERT_EQ(_svc->notify(notifier::reason_recovery, "", "",
+                         notifier::notification_option_none),
+            OK);
+  ASSERT_EQ(id + 1, _svc->get_next_notification_id());
+}

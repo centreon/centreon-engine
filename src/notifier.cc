@@ -142,31 +142,32 @@ unsigned long notifier::get_current_event_id() const {
   return _current_event_id;
 }
 
-void notifier::set_current_event_id(unsigned long current_event_id) {
+void notifier::set_current_event_id(unsigned long current_event_id) noexcept {
   _current_event_id = current_event_id;
 }
 
-unsigned long notifier::get_last_event_id() const {
+unsigned long notifier::get_last_event_id() const noexcept {
   return _last_event_id;
 }
 
-void notifier::set_last_event_id(unsigned long last_event_id) {
+void notifier::set_last_event_id(unsigned long last_event_id) noexcept {
   _last_event_id = last_event_id;
 }
 
-unsigned long notifier::get_current_problem_id() const {
+unsigned long notifier::get_current_problem_id() const noexcept {
   return _current_notification_id;
 }
 
-void notifier::set_current_problem_id(unsigned long current_problem_id) {
+void notifier::set_current_problem_id(
+    unsigned long current_problem_id) noexcept {
   _current_problem_id = current_problem_id;
 }
 
-unsigned long notifier::get_last_problem_id() const {
+unsigned long notifier::get_last_problem_id() const noexcept {
   return _last_problem_id;
 }
 
-void notifier::set_last_problem_id(unsigned long last_problem_id) {
+void notifier::set_last_problem_id(unsigned long last_problem_id) noexcept {
   _last_problem_id = last_problem_id;
 }
 
@@ -726,7 +727,7 @@ int notifier::notify(notifier::reason_type type,
      * has been sent. */
     if (_notification[cat_normal] &&          // there is a notification
         type == reason_recovery &&            // It is time to recovery
-        _recovery_notification_delay == 0) {   // And there is no recovery delay
+        _recovery_notification_delay == 0) {  // And there is no recovery delay
       _notification_number = 0;
       _notification[cat_normal].reset();
     }
@@ -778,279 +779,286 @@ int notifier::notify(notifier::reason_type type,
         default:
           _notification[cat].reset();
       }
-      _notification_number = 0;
+      /* In case of an acknowledgement, we must keep the _notification_number
+       * otherwise the recovery notification won't be sent when needed. */
+      if (cat != cat_acknowledgement)
+        _notification_number = 0;
     }
   }
 
   return retval;
 }
 
-void notifier::set_current_notification_id(uint64_t id) {
+void notifier::set_current_notification_id(uint64_t id) noexcept {
   _current_notification_id = id;
 }
 
-uint64_t notifier::get_current_notification_id() const {
+uint64_t notifier::get_current_notification_id() const noexcept {
   return _current_notification_id;
 }
 
-time_t notifier::get_next_notification() const {
+time_t notifier::get_next_notification() const noexcept {
   return _next_notification;
 }
 
-void notifier::set_next_notification(time_t next_notification) {
+void notifier::set_next_notification(time_t next_notification) noexcept {
   _next_notification = next_notification;
 }
 
-time_t notifier::get_last_notification() const {
+time_t notifier::get_last_notification() const noexcept {
   return _last_notification;
 }
 
-void notifier::set_last_notification(time_t last_notification) {
+void notifier::set_last_notification(time_t last_notification) noexcept {
   _last_notification = last_notification;
 }
 
-void notifier::set_initial_notif_time(time_t notif_time) {
+void notifier::set_initial_notif_time(time_t notif_time) noexcept {
   _initial_notif_time = notif_time;
 }
 
-time_t notifier::get_initial_notif_time() const {
+time_t notifier::get_initial_notif_time() const noexcept {
   return _initial_notif_time;
 }
 
-void notifier::set_acknowledgement_timeout(int timeout) {
+void notifier::set_acknowledgement_timeout(int timeout) noexcept {
   _acknowledgement_timeout = timeout;
 }
 
-void notifier::set_last_acknowledgement(time_t ack) {
+void notifier::set_last_acknowledgement(time_t ack) noexcept {
   _last_acknowledgement = ack;
 }
 
-time_t notifier::get_last_acknowledgement() const {
+time_t notifier::get_last_acknowledgement() const noexcept {
   return _last_acknowledgement;
 }
 
-uint32_t notifier::get_notification_interval(void) const {
+uint32_t notifier::get_notification_interval(void) const noexcept {
   return _notification_interval;
 }
 
-void notifier::set_notification_interval(uint32_t notification_interval) {
+void notifier::set_notification_interval(
+    uint32_t notification_interval) noexcept {
   _notification_interval = notification_interval;
 }
 
-std::string const& notifier::get_notification_period() const {
+std::string const& notifier::get_notification_period() const noexcept {
   return _notification_period;
 }
 
-void notifier::set_notification_period(std::string const& notification_period) {
+void notifier::set_notification_period(
+    std::string const& notification_period) noexcept {
   _notification_period = notification_period;
 }
 
-bool notifier::get_notify_on(notification_flag type) const {
+bool notifier::get_notify_on(notification_flag type) const noexcept {
   return _out_notification_type & type;
 }
 
-uint32_t notifier::get_notify_on() const {
+uint32_t notifier::get_notify_on() const noexcept {
   return _out_notification_type;
 }
 
-void notifier::add_notify_on(notification_flag type) {
+void notifier::add_notify_on(notification_flag type) noexcept {
   _out_notification_type |= type;
 }
 
-void notifier::set_notify_on(uint32_t type) {
+void notifier::set_notify_on(uint32_t type) noexcept {
   _out_notification_type = type;
 }
 
-void notifier::remove_notify_on(notification_flag type) {
+void notifier::remove_notify_on(notification_flag type) noexcept {
   _out_notification_type &= ~type;
 }
 
-uint32_t notifier::get_first_notification_delay(void) const {
+uint32_t notifier::get_first_notification_delay(void) const noexcept {
   return _first_notification_delay;
 }
 
-void notifier::set_first_notification_delay(uint32_t first_notification_delay) {
+void notifier::set_first_notification_delay(
+    uint32_t first_notification_delay) noexcept {
   _first_notification_delay = first_notification_delay;
 }
 
-uint32_t notifier::get_recovery_notification_delay(void) const {
+uint32_t notifier::get_recovery_notification_delay(void) const noexcept {
   return _recovery_notification_delay;
 }
 
 void notifier::set_recovery_notification_delay(
-    uint32_t recovery_notification_delay) {
+    uint32_t recovery_notification_delay) noexcept {
   _recovery_notification_delay = recovery_notification_delay;
 }
 
-bool notifier::get_notifications_enabled() const {
+bool notifier::get_notifications_enabled() const noexcept {
   return _notifications_enabled;
 }
 
-void notifier::set_notifications_enabled(bool notifications_enabled) {
+void notifier::set_notifications_enabled(bool notifications_enabled) noexcept {
   _notifications_enabled = notifications_enabled;
 }
 
-bool notifier::get_notified_on(notification_flag type) const {
+bool notifier::get_notified_on(notification_flag type) const noexcept {
   return _current_notifications & type;
 }
 
-uint32_t notifier::get_notified_on() const {
+uint32_t notifier::get_notified_on() const noexcept {
   return _current_notifications;
 }
 
-void notifier::add_notified_on(notification_flag type) {
+void notifier::add_notified_on(notification_flag type) noexcept {
   _current_notifications |= type;
 }
 
-void notifier::set_notified_on(uint32_t type) {
+void notifier::set_notified_on(uint32_t type) noexcept {
   _current_notifications = type;
 }
 
-void notifier::remove_notified_on(notification_flag type) {
+void notifier::remove_notified_on(notification_flag type) noexcept {
   _current_notifications &= ~type;
 }
 
-bool notifier::get_flap_detection_on(notification_flag type) const {
+bool notifier::get_flap_detection_on(notification_flag type) const noexcept {
   return _flap_type & type;
 }
 
-uint32_t notifier::get_flap_detection_on() const {
-  return _flap_type;
-}
+uint32_t notifier::get_flap_detection_on() const noexcept { return _flap_type; }
 
-void notifier::set_flap_detection_on(uint32_t type) {
+void notifier::set_flap_detection_on(uint32_t type) noexcept {
   _flap_type = type;
 }
 
-void notifier::add_flap_detection_on(notification_flag type) {
+void notifier::add_flap_detection_on(notification_flag type) noexcept {
   _flap_type |= type;
 }
 
-bool notifier::get_stalk_on(notification_flag type) const {
+bool notifier::get_stalk_on(notification_flag type) const noexcept {
   return _stalk_type & type;
 }
 
-uint32_t notifier::get_stalk_on() const {
-  return _stalk_type;
-}
+uint32_t notifier::get_stalk_on() const noexcept { return _stalk_type; }
 
-void notifier::set_stalk_on(uint32_t type) {
-  _stalk_type = type;
-}
+void notifier::set_stalk_on(uint32_t type) noexcept { _stalk_type = type; }
 
-void notifier::add_stalk_on(notification_flag type) {
+void notifier::add_stalk_on(notification_flag type) noexcept {
   _stalk_type |= type;
 }
 
-uint32_t notifier::get_modified_attributes() const {
+uint32_t notifier::get_modified_attributes() const noexcept {
   return _modified_attributes;
 }
 
-void notifier::set_modified_attributes(uint32_t modified_attributes) {
+void notifier::set_modified_attributes(uint32_t modified_attributes) noexcept {
   _modified_attributes = modified_attributes;
 }
 
-void notifier::add_modified_attributes(uint32_t attr) {
+void notifier::add_modified_attributes(uint32_t attr) noexcept {
   _modified_attributes |= attr;
 }
 
-std::list<escalation*>& notifier::get_escalations() { return _escalations; }
-
-std::list<escalation*> const& notifier::get_escalations() const {
+std::list<escalation*>& notifier::get_escalations() noexcept {
   return _escalations;
 }
 
-uint64_t notifier::get_flapping_comment_id(void) const {
+std::list<escalation*> const& notifier::get_escalations() const noexcept {
+  return _escalations;
+}
+
+uint64_t notifier::get_flapping_comment_id(void) const noexcept {
   return _flapping_comment_id;
 }
 
-void notifier::set_flapping_comment_id(uint64_t comment_id) {
+void notifier::set_flapping_comment_id(uint64_t comment_id) noexcept {
   _flapping_comment_id = comment_id;
 }
 
-int notifier::get_check_options(void) const { return _check_options; }
+int notifier::get_check_options(void) const noexcept { return _check_options; }
 
-void notifier::set_check_options(int option) { _check_options = option; }
+void notifier::set_check_options(int option) noexcept {
+  _check_options = option;
+}
 
-int notifier::get_acknowledgement_type(void) const {
+int notifier::get_acknowledgement_type(void) const noexcept {
   return _acknowledgement_type;
 }
 
-void notifier::set_acknowledgement_type(int acknowledge_type) {
+void notifier::set_acknowledgement_type(int acknowledge_type) noexcept {
   _acknowledgement_type = acknowledge_type;
 }
 
-int notifier::get_retain_status_information(void) const {
+int notifier::get_retain_status_information(void) const noexcept {
   return _retain_status_information;
 }
 
-void notifier::set_retain_status_information(bool retain_status_informations) {
+void notifier::set_retain_status_information(
+    bool retain_status_informations) noexcept {
   _retain_status_information = retain_status_informations;
 }
 
-bool notifier::get_retain_nonstatus_information(void) const {
+bool notifier::get_retain_nonstatus_information(void) const noexcept {
   return _retain_nonstatus_information;
 }
 
 void notifier::set_retain_nonstatus_information(
-    bool retain_non_status_informations) {
+    bool retain_non_status_informations) noexcept {
   _retain_nonstatus_information = retain_non_status_informations;
 }
 
-bool notifier::get_is_being_freshened(void) const {
+bool notifier::get_is_being_freshened(void) const noexcept {
   return _is_being_freshened;
 }
 
-void notifier::set_is_being_freshened(bool freshened) {
+void notifier::set_is_being_freshened(bool freshened) noexcept {
   _is_being_freshened = freshened;
 }
 
-bool notifier::get_problem_has_been_acknowledged() const {
+bool notifier::get_problem_has_been_acknowledged() const noexcept {
   return _problem_has_been_acknowledged;
 }
 
 void notifier::set_problem_has_been_acknowledged(
-    bool problem_has_been_acknowledged) {
+    bool problem_has_been_acknowledged) noexcept {
   _problem_has_been_acknowledged = problem_has_been_acknowledged;
 }
 
-bool notifier::get_no_more_notifications() const {
+bool notifier::get_no_more_notifications() const noexcept {
   return _no_more_notifications;
 }
 
-void notifier::set_no_more_notifications(bool no_more_notifications) {
+void notifier::set_no_more_notifications(bool no_more_notifications) noexcept {
   _no_more_notifications = no_more_notifications;
 }
 
-int notifier::get_notification_number() const { return _notification_number; }
+int notifier::get_notification_number() const noexcept {
+  return _notification_number;
+}
 
 /**
  *  Get the next notification id.
  *
  * @return a long unsigned integer.
  */
-uint64_t notifier::get_next_notification_id() const {
+uint64_t notifier::get_next_notification_id() const noexcept {
   return _next_notification_id;
 }
 
-notifier::notifier_type notifier::get_notifier_type() const {
+notifier::notifier_type notifier::get_notifier_type() const noexcept {
   return _notifier_type;
 }
 
-std::unordered_map<std::string, contact*>& notifier::get_contacts() {
+std::unordered_map<std::string, contact*>& notifier::get_contacts() noexcept {
   return _contacts;
 }
 
-std::unordered_map<std::string, contact*> const& notifier::get_contacts()
-    const {
+std::unordered_map<std::string, contact*> const& notifier::get_contacts() const
+    noexcept {
   return _contacts;
 }
 
-contactgroup_map_unsafe& notifier::get_contactgroups() {
+contactgroup_map_unsafe& notifier::get_contactgroups() noexcept {
   return _contact_groups;
 }
 
-contactgroup_map_unsafe const& notifier::get_contactgroups() const {
+contactgroup_map_unsafe const& notifier::get_contactgroups() const noexcept {
   return _contact_groups;
 }
 
@@ -1324,17 +1332,17 @@ time_t notifier::get_next_notification_time(time_t offset) {
   return next_notification;
 }
 
-void notifier::set_flap_type(uint32_t type) { _flap_type = type; }
+void notifier::set_flap_type(uint32_t type) noexcept { _flap_type = type; }
 
-timeperiod* notifier::get_notification_period_ptr() const {
+timeperiod* notifier::get_notification_period_ptr() const noexcept {
   return _notification_period_ptr;
 }
 
-int notifier::get_acknowledgement_timeout() const {
+int notifier::get_acknowledgement_timeout() const noexcept {
   return _acknowledgement_timeout;
 }
 
-void notifier::set_notification_period_ptr(timeperiod* tp) {
+void notifier::set_notification_period_ptr(timeperiod* tp) noexcept {
   _notification_period_ptr = tp;
 }
 
