@@ -41,6 +41,7 @@ command_manager& command_manager::instance() {
 }
 
 void command_manager::enqueue(std::function<int(void)>&& f) {
+<<<<<<< HEAD
   std::lock_guard<std::mutex> lock(_queue_m);
   _queue.push_back(f);
 }
@@ -61,6 +62,11 @@ void command_manager::execute() {
   }
 }
 
+=======
+  _queue.push_back(f);
+}
+
+>>>>>>> enh(command_manager): First attempt to send a command with grpc
 /* submits a passive service check result for later processing */
 int command_manager::process_passive_service_check(time_t check_time,
                                   const std::string& host_name,

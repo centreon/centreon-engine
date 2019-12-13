@@ -17,10 +17,7 @@
  *
  */
 
-<<<<<<< HEAD
 #include "com/centreon/engine/globals.hh"
-=======
->>>>>>> enh(grpc): First try to use gRPC with engine
 #include "com/centreon/engine/statistics.hh"
 
 using namespace com::centreon::engine;
@@ -48,7 +45,6 @@ statistics& statistics::instance() {
 pid_t statistics::get_pid() const noexcept {
   return getpid();
 }
-<<<<<<< HEAD
 
 /**
  * @brief This function gets informations on the external commands buffer if
@@ -70,5 +66,3 @@ bool statistics::get_external_command_buffer_stats(buffer_stats& retval) const
   } else
     return false;
 }
-=======
->>>>>>> enh(grpc): First try to use gRPC with engine
