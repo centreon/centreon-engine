@@ -379,13 +379,17 @@ bool notifier::_is_notification_viable_recovery(reason_type type
       send_later = true;
     }
     /* Recovery is sent on state OK or UP */
-    else if (get_current_state_int() != 0 ||
-             !(get_notify_on(up) || get_notify_on(ok))) {
+    else if (get_current_state_int() != 0) {
       logger(dbg_notifications, more)
-          << "This notifier state is not UP/OK are is not configured to send a "
-             "recovery notification";
+          << "This notifier state is not UP/OK to send a recovery notification";
       retval = false;
       send_later = true;
+    }
+    else if (!(get_notify_on(up) || get_notify_on(ok))) {
+      logger(dbg_notifications, more)
+          << "This notifier is not configured to send a recovery notification";
+      retval = false;
+      send_later = false;
     } else if (get_last_hard_state_change() +
                    _recovery_notification_delay * config->interval_length() >
                now) {
@@ -722,17 +726,8 @@ int notifier::notify(notifier::reason_type type,
   notification_category cat{get_category(type)};
 
   /* Has this notification got sense? */
-  if (!is_notification_viable(cat, type, options)) {
-    /* In case of a recovery, we have to remove the normal notification if is
-     * has been sent. */
-    if (_notification[cat_normal] &&          // there is a notification
-        type == reason_recovery &&            // It is time to recovery
-        _recovery_notification_delay == 0) {  // And there is no recovery delay
-      _notification_number = 0;
-      _notification[cat_normal].reset();
-    }
+  if (!is_notification_viable(cat, type, options))
     return OK;
-  }
 
   /* For a first notification, we store what type of notification we try to
    * send and we fix the notification number to 1. */
