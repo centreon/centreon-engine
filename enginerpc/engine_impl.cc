@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <google/protobuf/util/time_util.h>
 #include "engine_impl.hh"
+#include "com/centreon/engine/command_manager.hh"
 #include "com/centreon/engine/statistics.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/engine/globals.hh"
@@ -17,7 +18,7 @@ using namespace com::centreon::engine;
  *
  * @return Status::OK
  */
-grpc::Status engine_impl::GetVersion(grpc::ServerContext* context,
+grpc::Status engine_impl::GetVersion(grpc::ServerContext* /*context*/,
                                const ::google::protobuf::Empty* /*request*/,
                                Version* response) {
   response->set_major(CENTREON_ENGINE_VERSION_MAJOR);
@@ -26,7 +27,7 @@ grpc::Status engine_impl::GetVersion(grpc::ServerContext* context,
   return grpc::Status::OK;
 }
 
-grpc::Status engine_impl::GetStats(grpc::ServerContext* context,
+grpc::Status engine_impl::GetStats(grpc::ServerContext* /*context*/,
     const ::google::protobuf::Empty* /*request*/,
     Stats* response) {
   response->mutable_status_file()->set_name(config->status_file());
@@ -49,9 +50,36 @@ grpc::Status engine_impl::GetStats(grpc::ServerContext* context,
   *response->mutable_program_status()->mutable_running_time() =
     google::protobuf::util::TimeUtil::SecondsToDuration(now - program_start);
   response->mutable_program_status()->set_pid(s.get_pid());
-  //  //FIXME DBR
-//  response->mutable_buffer()->set_used(config->external_command_buffer_slots());
-//  response->mutable_buffer()->set_high(high_external_command_buffer_slots);
-//  response->mutable_buffer()->set_total(total_external_command_buffer_slots);
+
+  buffer_stats stats;
+  if (s.get_external_command_buffer_stats(stats)) {
+    response->mutable_buffer()->set_used(stats.used);
+    response->mutable_buffer()->set_high(stats.high);
+    response->mutable_buffer()->set_total(stats.total);
+  }
+  return grpc::Status::OK;
+}
+
+grpc::Status engine_impl::ProcessServiceCheckResult(
+    grpc::ServerContext* /*context*/,
+    const ServiceCheck* request,
+    CommandSuccess* response) {
+  std::string const& host_name = request->host_name();
+  if (host_name.empty())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "host_name must not be empty");
+
+  std::string const& svc_desc = request->svc_desc();
+  if (svc_desc.empty())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "svc_desc must not be empty");
+
+  std::function<int()> fn = std::bind(&command_manager::process_passive_service_check,
+                      &command_manager::instance(),
+                      request->check_time(),
+                      host_name,
+                      svc_desc,
+                      request->code(),
+                      request->output());
+  command_manager::instance().enqueue(std::move(fn));
+
   return grpc::Status::OK;
 }

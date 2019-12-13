@@ -17,28 +17,30 @@
  *
  */
 
-#ifndef CCE_STATISTICS_HH
-#define CCE_STATISTICS_HH
+#ifndef CCE_COMMAND_MANAGER_HH
+#define CCE_COMMAND_MANAGER_HH
 
-#include <atomic>
-#include <sys/types.h>
-#include <unistd.h>
+#include <mutex>
+#include <deque>
+#include <functional>
 #include "com/centreon/engine/namespace.hh"
 
-struct buffer_stats {
-  uint32_t used;
-  uint32_t high;
-  uint32_t total;
-};
-
 CCE_BEGIN()
-class statistics {
-  statistics();
+class command_manager {
+  std::mutex _queue_m;
+  std::deque<std::function<int()>> _queue;
+  command_manager();
  public:
-  static statistics& instance();
-  pid_t get_pid() const noexcept;
-  bool get_external_command_buffer_stats(buffer_stats& retval) const noexcept;
+  static command_manager& instance();
+  void enqueue(std::function<int(void)>&& f);
+
+  int process_passive_service_check(time_t check_time,
+                                    const std::string& host_name,
+                                    const std::string& svc_description,
+                                    uint32_t return_code,
+                                    const std::string& output);
 };
 
 CCE_END()
+
 #endif /* !CCE_STATISTICS_HH */

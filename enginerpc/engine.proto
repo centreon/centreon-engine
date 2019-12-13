@@ -2,10 +2,25 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 
 service Engine {
   rpc GetVersion(google.protobuf.Empty) returns (Version) {}
   rpc GetStats(google.protobuf.Empty) returns (Stats) {}
+
+  rpc ProcessServiceCheckResult(ServiceCheck) returns (CommandSuccess) {}
+}
+
+message CommandSuccess {
+  bool value = 1;
+}
+
+message ServiceCheck {
+  google.protobuf.Timestamp check_time = 1;
+  string host_name = 2;
+  string svc_desc = 3;
+  string output = 4;
+  uint32 code = 5;
 }
 
 message Version {

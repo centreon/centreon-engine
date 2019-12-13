@@ -12,6 +12,10 @@ class engine_impl final : public Engine::Service {
   grpc::Status GetStats(grpc::ServerContext* context,
                         const ::google::protobuf::Empty* /*request*/,
                         Stats* response) override;
+  grpc::Status ProcessServiceCheckResult(
+      grpc::ServerContext* context,
+      const ServiceCheck* request,
+      CommandSuccess* response) override;
 };
 
 CCE_END()
