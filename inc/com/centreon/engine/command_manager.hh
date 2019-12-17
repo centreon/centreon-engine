@@ -39,10 +39,7 @@ class command_manager {
                                     const std::string& svc_description,
                                     uint32_t return_code,
                                     const std::string& output);
-<<<<<<< HEAD
   void execute();
-=======
->>>>>>> enh(command_manager): First attempt to send a command with grpc
 };
 
 CCE_END()
