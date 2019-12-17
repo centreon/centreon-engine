@@ -473,10 +473,9 @@ void free_memory(nagios_macros* mac) {
 
   auto eraser = [](timed_event_list& l, uint32_t type) {
     for (auto it = l.begin(), end = l.end(); it != end; ++it) {
-      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME)
         delete static_cast<unsigned long*>((*it)->event_data);
-        l.erase(it);
-      }
+      l.erase(it);
     }
   };
   // Free memory for the high priority event list.
