@@ -1,3 +1,4 @@
+#include <functional>
 #include <sys/types.h>
 #include <unistd.h>
 #include <google/protobuf/util/time_util.h>
@@ -63,7 +64,7 @@ grpc::Status engine_impl::GetStats(grpc::ServerContext* /*context*/,
 grpc::Status engine_impl::ProcessServiceCheckResult(
     grpc::ServerContext* /*context*/,
     const ServiceCheck* request,
-    CommandSuccess* response) {
+    CommandSuccess* /*response*/) {
   std::string const& host_name = request->host_name();
   if (host_name.empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "host_name must not be empty");
@@ -72,9 +73,9 @@ grpc::Status engine_impl::ProcessServiceCheckResult(
   if (svc_desc.empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "svc_desc must not be empty");
 
-  std::function<int()> fn = std::bind(&command_manager::process_passive_service_check,
+  auto fn = std::bind(&command_manager::process_passive_service_check,
                       &command_manager::instance(),
-                      request->check_time(),
+                    google::protobuf::util::TimeUtil::TimestampToSeconds(request->check_time()),
                       host_name,
                       svc_desc,
                       request->code(),

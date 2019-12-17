@@ -33,8 +33,6 @@ enginerpc::enginerpc(const std::string& address, uint16_t port) {
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
   builder.RegisterService(service);
   _server = builder.BuildAndStart();
-  logger(logging::log_info_message, logging::basic)
-    << "EngineRPC server listening on " << server_address;
 }
 
 void enginerpc::shutdown() {

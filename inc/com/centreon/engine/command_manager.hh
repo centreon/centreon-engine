@@ -39,6 +39,7 @@ class command_manager {
                                     const std::string& svc_description,
                                     uint32_t return_code,
                                     const std::string& output);
+  void execute();
 };
 
 CCE_END()

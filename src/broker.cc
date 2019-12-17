@@ -93,7 +93,6 @@ void broker_acknowledgement_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ACKNOWLEDGEMENT_DATA, &ds);
-  return;
 }
 
 /**
@@ -145,7 +144,6 @@ void broker_adaptive_contact_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_CONTACT_DATA, &ds);
-  return;
 }
 
 /**
@@ -176,7 +174,6 @@ void broker_adaptive_dependency_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_DEPENDENCY_DATA, &ds);
-  return;
 }
 
 /**
@@ -207,7 +204,6 @@ void broker_adaptive_escalation_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_ESCALATION_DATA, &ds);
-  return;
 }
 
 /**
@@ -247,7 +243,6 @@ void broker_adaptive_host_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_HOST_DATA, &ds);
-  return;
 }
 
 /**
@@ -290,7 +285,6 @@ void broker_adaptive_program_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_PROGRAM_DATA, &ds);
-  return;
 }
 
 /**
@@ -330,7 +324,6 @@ void broker_adaptive_service_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_SERVICE_DATA, &ds);
-  return;
 }
 
 /**
@@ -364,7 +357,6 @@ void broker_adaptive_timeperiod_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_TIMEPERIOD_DATA, &ds);
-  return;
 }
 
 /**
@@ -393,7 +385,6 @@ void broker_aggregated_status_data(int type,
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_AGGREGATED_STATUS_DATA, &ds);
 
-  return;
 }
 
 /**
@@ -487,7 +478,6 @@ void broker_comment_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_COMMENT_DATA, &ds);
-  return;
 }
 
 /**
@@ -720,7 +710,6 @@ void broker_custom_variable(int type,
   // Make callback.
   neb_make_callbacks(NEBCALLBACK_CUSTOM_VARIABLE_DATA, &ds);
 
-  return;
 }
 
 /**
@@ -785,7 +774,6 @@ void broker_downtime_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_DOWNTIME_DATA, &ds);
-  return;
 }
 
 /**
@@ -925,7 +913,6 @@ void broker_external_command(int type,
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_EXTERNAL_COMMAND_DATA, &ds);
 
-  return;
 }
 
 /**
@@ -984,7 +971,6 @@ void broker_flapping_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_FLAPPING_DATA, &ds);
-  return;
 }
 
 /**
@@ -1016,7 +1002,6 @@ void broker_group(int type,
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_GROUP_DATA, &ds);
 
-  return;
 }
 
 /**
@@ -1051,7 +1036,6 @@ void broker_group_member(int type,
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_GROUP_MEMBER_DATA, &ds);
 
-  return;
 }
 
 /**
@@ -1180,7 +1164,6 @@ void broker_host_status(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_HOST_STATUS_DATA, &ds);
-  return;
 }
 
 /**
@@ -1217,7 +1200,6 @@ void broker_log_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_LOG_DATA, &ds);
-  return;
 }
 
 /**
@@ -1255,7 +1237,6 @@ void broker_module_data(int type,
   // Free memory.
   delete[] ds.module;
   delete[] ds.args;
-  return;
 }
 
 /**
@@ -1355,7 +1336,6 @@ void broker_program_state(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_PROCESS_DATA, &ds);
-  return;
 }
 
 /**
@@ -1409,7 +1389,6 @@ void broker_program_status(int type,
   // Free memory.
   delete[] ds.global_host_event_handler;
   delete[] ds.global_service_event_handler;
-  return;
 }
 
 /**
@@ -1451,7 +1430,6 @@ void broker_relation_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_RELATION_DATA, &ds);
-  return;
 }
 
 /**
@@ -1479,7 +1457,6 @@ void broker_retention_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_RETENTION_DATA, &ds);
-  return;
 }
 
 /**
@@ -1599,7 +1576,6 @@ void broker_service_status(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_SERVICE_STATUS_DATA, &ds);
-  return;
 }
 
 /**
@@ -1659,7 +1635,6 @@ void broker_statechange_data(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_STATE_CHANGE_DATA, &ds);
-  return;
 }
 
 /**
@@ -1713,7 +1688,6 @@ void broker_system_command(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_SYSTEM_COMMAND_DATA, &ds);
-  return;
 }
 
 /**
@@ -1750,7 +1724,6 @@ void broker_timed_event(int type,
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_TIMED_EVENT_DATA, &ds);
-  return;
 }
 
 /**

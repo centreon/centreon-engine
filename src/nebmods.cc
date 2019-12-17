@@ -496,7 +496,7 @@ int neb_make_callbacks(int callback_type, void* data) {
 int neb_init_callback_list() {
   /* initialize list pointers */
   for (int x = 0; x < NEBCALLBACK_NUMITEMS; x++)
-    neb_callback_list[x] = NULL;
+    neb_callback_list[x] = nullptr;
   return OK;
 }
 
@@ -506,13 +506,13 @@ int neb_free_callback_list() {
   nebcallback* next_callback = NULL;
 
   for (int x = 0; x < NEBCALLBACK_NUMITEMS; x++) {
-    for (temp_callback = neb_callback_list[x]; temp_callback != NULL;
+    for (temp_callback = neb_callback_list[x]; temp_callback != nullptr;
          temp_callback = next_callback) {
       next_callback = temp_callback->next;
       delete temp_callback;
     }
 
-    neb_callback_list[x] = NULL;
+    neb_callback_list[x] = nullptr;
   }
 
   return OK;

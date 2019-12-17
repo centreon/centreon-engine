@@ -35,6 +35,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/engine.hh"
+#ifdef GRPC
+#include "com/centreon/engine/command_manager.hh"
+#endif
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
@@ -418,6 +421,10 @@ void loop::_dispatching() {
                                 NEBATTR_NONE, CMD_NONE, time(nullptr), nullptr,
                                 nullptr, nullptr);
       }
+
+#ifdef GRPC
+      command_manager::instance().execute();
+#endif
 
       // Set time to sleep so we don't hog the CPU...
       timespec sleep_time;

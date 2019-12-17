@@ -2079,7 +2079,7 @@ int service::handle_service_event() {
                           get_max_attempts(), nullptr);
 
   /* bail out if we shouldn't be running event handlers */
-  if (config->enable_event_handlers() == false)
+  if (!config->enable_event_handlers())
     return OK;
   if (!get_event_handler_enabled())
     return OK;

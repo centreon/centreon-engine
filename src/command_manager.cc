@@ -41,7 +41,24 @@ command_manager& command_manager::instance() {
 }
 
 void command_manager::enqueue(std::function<int(void)>&& f) {
+  std::lock_guard<std::mutex> lock(_queue_m);
   _queue.push_back(f);
+}
+
+void command_manager::execute() {
+  std::unique_lock<std::mutex> lock(_queue_m);
+  if (_queue.empty())
+    return;
+  auto end = _queue.end();
+  lock.unlock();
+
+  auto it = _queue.begin();
+  while (it != end) {
+    auto fn = *it;
+    fn();
+    ++it;
+    _queue.pop_front();
+  }
 }
 
 /* submits a passive service check result for later processing */
