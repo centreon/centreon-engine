@@ -436,28 +436,18 @@ void free_memory(nagios_macros* mac) {
   // Free memory allocated to downtimes.
   downtimes::downtime_manager::instance().clear_scheduled_downtimes();
 
-  // Free memory for the high priority event list.
-  for (timed_event_list::iterator it(timed_event::event_list_high.begin()),
-       end(timed_event::event_list_high.end());
-       it != end;) {
-    // timed_event* next_event(this_event->next);
-    if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>((*it)->event_data);
-      (*it)->event_data = nullptr;
+  auto eraser = [](timed_event_list& l) {
+    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
+      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME)
+        delete static_cast<unsigned long*>((*it)->event_data);
+      l.erase(it);
     }
-    it = timed_event::event_list_high.erase(it);
-  }
+  };
+  // Free memory for the high priority event list.
+  eraser(timed_event::event_list_high);
 
   // Free memory for the low priority event list.
-  for (timed_event_list::iterator it(timed_event::event_list_low.begin()),
-       end(timed_event::event_list_low.end());
-       it != end;) {
-    if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>((*it)->event_data);
-      (*it)->event_data = nullptr;
-    }
-    it = timed_event::event_list_low.erase(it);
-  }
+  eraser(timed_event::event_list_low);
 
   /*
   ** Free memory associated with macros. It's ok to only free the
