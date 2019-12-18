@@ -62,10 +62,6 @@ class timed_event {
   void* event_args;
   int32_t event_options;
 
-  static timed_event* find_event(timed_event::priority,
-                                 uint32_t event,
-                                 void* data);
-  void schedule(bool high_priority);
   std::string const& name() const noexcept;
 };
 CCE_END()
@@ -78,14 +74,7 @@ time_t adjust_timestamp_for_time_change(time_t last_time,
                                         time_t current_time,
                                         uint64_t time_difference,
                                         time_t ts);
-void compensate_for_system_time_change(unsigned long last_time,
-                                       unsigned long current_time);
 int handle_timed_event(com::centreon::engine::timed_event* event);
-void remove_event(com::centreon::engine::timed_event* event,
-                  com::centreon::engine::timed_event::priority priority);
-void reschedule_event(com::centreon::engine::timed_event* event,
-                      com::centreon::engine::timed_event::priority priority);
-void resort_event_list(com::centreon::engine::timed_event::priority priority);
 
 #ifdef __cplusplus
 }

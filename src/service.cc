@@ -27,6 +27,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/hostdependency.hh"
@@ -2338,7 +2339,7 @@ void service::schedule_check(time_t check_time, int options) {
   // Default is to use the new event.
   bool use_original_event(false);
   timed_event* temp_event =
-      timed_event::find_event(timed_event::low, EVENT_SERVICE_CHECK, this);
+      events::loop::instance().find_event(timed_event::low, EVENT_SERVICE_CHECK, this);
 
   // We found another service check event for this service in
   // the queue - what should we do?
@@ -2395,7 +2396,7 @@ void service::schedule_check(time_t check_time, int options) {
   if (!use_original_event) {
     // We're using the new event, so remove the old one.
     if (temp_event) {
-      remove_event(temp_event, timed_event::low);
+      events::loop::instance().remove_event(temp_event, timed_event::low);
       delete temp_event;
       temp_event = nullptr;
     }
@@ -2404,25 +2405,24 @@ void service::schedule_check(time_t check_time, int options) {
 
     // Allocate memory for a new event item.
     try {
-      timed_event* new_event(new timed_event);
-
       // Set the next service check time.
       set_next_check(check_time);
 
       // Place the new event in the event queue.
-      new_event->event_type = EVENT_SERVICE_CHECK;
-      new_event->event_data = (void*)this;
-      new_event->event_args = (void*)nullptr;
-      new_event->event_options = options;
-      new_event->run_time = get_next_check();
-      new_event->recurring = false;
-      new_event->event_interval = 0L;
-      new_event->timing_func = nullptr;
-      new_event->compensate_for_time_change = true;
-      reschedule_event(new_event, timed_event::low);
+      timed_event* new_event = new timed_event(EVENT_SERVICE_CHECK,
+          get_next_check(),
+          false,
+          0L,
+          nullptr,
+          true,
+          this,
+          nullptr,
+          options);
+
+      events::loop::instance().reschedule_event(new_event, timed_event::low);
     } catch (...) {
       // Update the status log.
-      this->update_status(false);
+      update_status(false);
       throw;
     }
   } else {

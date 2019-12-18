@@ -1617,12 +1617,12 @@ void host::schedule_check(time_t check_time, int options) {
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
-  temp_event =
-      timed_event::find_event(timed_event::low, EVENT_HOST_CHECK, this);
+  temp_event = events::loop::instance().find_event(
+      timed_event::low, EVENT_HOST_CHECK, this);
 
   /* we found another host check event for this host in the queue - what should
    * we do? */
-  if (temp_event != nullptr) {
+  if (temp_event) {
     logger(dbg_checks, most)
         << "Found another host check event for this host @ "
         << my_ctime(&temp_event->run_time);
@@ -1671,7 +1671,7 @@ void host::schedule_check(time_t check_time, int options) {
     }
 
     if (!use_original_event) {
-      remove_event(temp_event, timed_event::low);
+      events::loop::instance().remove_event(temp_event, timed_event::low);
       delete temp_event;
     }
   }
@@ -1697,7 +1697,7 @@ void host::schedule_check(time_t check_time, int options) {
                                              nullptr,
                                              options);
 
-    reschedule_event(new_event, timed_event::low);
+    events::loop::instance().reschedule_event(new_event, timed_event::low);
   }
 
   else {

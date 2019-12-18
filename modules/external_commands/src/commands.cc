@@ -32,6 +32,7 @@
 #include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -459,7 +460,7 @@ void cmd_signal_process(int cmd, char* args) {
       (cmd == CMD_SHUTDOWN_PROCESS) ? EVENT_PROGRAM_SHUTDOWN
                                     : EVENT_PROGRAM_RESTART,
       scheduled_time, false, 0, nullptr, false, nullptr, nullptr, 0);
-  events::loop::instance()->schedule(evt, true);
+  events::loop::instance().schedule(evt, true);
 }
 
 /**

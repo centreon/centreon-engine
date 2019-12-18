@@ -17,14 +17,14 @@
  *
  */
 
-#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/host_downtime.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/timed_event.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
@@ -70,11 +70,11 @@ int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
     return ERROR;
 
   /* remove scheduled entry from event queue */
-  temp_event = timed_event::find_event(
+  temp_event = events::loop::instance().find_event(
       timed_event::high, EVENT_SCHEDULED_DOWNTIME, (void*)downtime_id);
 
-  if (temp_event != nullptr)
-    remove_event(temp_event, timed_event::high);
+  if (temp_event)
+    events::loop::instance().remove_event(temp_event, timed_event::high);
 
   /* delete downtime entry */
   if (temp_downtime->get_type() == HOST_DOWNTIME)

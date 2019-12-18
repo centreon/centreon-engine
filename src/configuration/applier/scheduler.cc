@@ -25,9 +25,10 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -196,7 +197,6 @@ void applier::scheduler::remove_host(configuration::host const& h) {
     hvec.push_back(hst->second.get());
     _unschedule_host_events(hvec);
   }
-  return;
 }
 
 /**
@@ -213,7 +213,6 @@ void applier::scheduler::remove_service(configuration::service const& s) {
     svec.push_back(svc->second.get());
     _unschedule_service_events(svec);
   }
-  return;
 }
 
 /**
@@ -545,7 +544,6 @@ void applier::scheduler::_calculate_host_scheduling_params() {
 
   _calculate_host_inter_check_delay(_config->host_inter_check_delay_method());
 
-  return;
 }
 
 /**
@@ -751,7 +749,6 @@ void applier::scheduler::_get_hosts(
     } else
       hst_obj.push_back(&*hst->second);
   }
-  return;
 }
 
 /**
@@ -782,7 +779,6 @@ void applier::scheduler::_get_services(set_service const& svc_cfg,
     } else
       svc_obj.push_back(&*svc->second);
   }
-  return;
 }
 
 /**
@@ -792,7 +788,7 @@ void applier::scheduler::_get_services(set_service const& svc_cfg,
  */
 void applier::scheduler::_remove_misc_event(timed_event*& evt) {
   if (evt) {
-    remove_event(evt, timed_event::high);
+    events::loop::instance().remove_event(evt, timed_event::high);
     delete evt;
     evt = NULL;
   }
@@ -1006,7 +1002,6 @@ void applier::scheduler::_schedule_service_events(
     if (services[i]->get_problem_has_been_acknowledged())
       services[i]->schedule_acknowledgement_expiration();
 
-  return;
 }
 
 /**
@@ -1023,16 +1018,15 @@ void applier::scheduler::_unschedule_host_events(
     timed_event* evt(NULL);
     while ((evt = events::loop::instance().find_event(timed_event::low, EVENT_HOST_CHECK,
                                           *it))) {
-      remove_event(evt, timed_event::low);
+      events::loop::instance().remove_event(evt, timed_event::low);
       delete evt;
     }
     while ((evt = events::loop::instance().find_event(timed_event::low,
                                           EVENT_EXPIRE_HOST_ACK, *it))) {
-      remove_event(evt, timed_event::low);
+      events::loop::instance().remove_event(evt, timed_event::low);
       delete evt;
     }
   }
-  return;
 }
 
 /**
@@ -1046,16 +1040,15 @@ void applier::scheduler::_unschedule_service_events(
        end(services.end());
        it != end; ++it) {
     timed_event* evt(NULL);
-    while ((evt = timed_event::find_event(timed_event::low, EVENT_SERVICE_CHECK,
+    while ((evt = events::loop::instance().find_event(timed_event::low, EVENT_SERVICE_CHECK,
                                           *it))) {
-      remove_event(evt, timed_event::low);
+      events::loop::instance().remove_event(evt, timed_event::low);
       delete evt;
     }
-    while ((evt = timed_event::find_event(timed_event::low,
+    while ((evt = events::loop::instance().find_event(timed_event::low,
                                           EVENT_EXPIRE_SERVICE_ACK, *it))) {
-      remove_event(evt, timed_event::low);
+      events::loop::instance().remove_event(evt, timed_event::low);
       delete evt;
     }
   }
-  return;
 }
