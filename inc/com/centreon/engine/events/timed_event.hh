@@ -25,7 +25,6 @@
 
 #include <stdint.h>
 #include <time.h>
-#include <deque>
 #include <string>
 #include "com/centreon/engine/namespace.hh"
 
@@ -33,12 +32,14 @@ CCE_BEGIN()
 class timed_event;
 CCE_END()
 
-typedef std::deque<com::centreon::engine::timed_event*> timed_event_list;
-
 CCE_BEGIN()
 class timed_event {
  public:
-  enum priority { low = 0, high = 1, priority_num };
+  enum priority {
+    low = 0,
+    high = 1,
+    priority_num
+  };
   timed_event();
   timed_event(uint32_t event_type,
               time_t run_time,
@@ -49,6 +50,7 @@ class timed_event {
               void* event_data,
               void* event_args,
               int32_t event_options);
+  ~timed_event();
 
   uint32_t event_type;
   time_t run_time;
@@ -59,9 +61,6 @@ class timed_event {
   void* event_data;
   void* event_args;
   int32_t event_options;
-
-  static timed_event_list event_list_high;
-  static timed_event_list event_list_low;
 
   static timed_event* find_event(timed_event::priority,
                                  uint32_t event,
@@ -75,8 +74,6 @@ CCE_END()
 extern "C" {
 #endif /* C++ */
 
-void add_event(com::centreon::engine::timed_event* event,
-               com::centreon::engine::timed_event::priority priority);
 time_t adjust_timestamp_for_time_change(time_t last_time,
                                         time_t current_time,
                                         uint64_t time_difference,

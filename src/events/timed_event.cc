@@ -20,13 +20,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/events/timed_event.hh"
 #include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
@@ -40,9 +41,6 @@
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine;
-
-timed_event_list timed_event::event_list_high;
-timed_event_list timed_event::event_list_low;
 
 /**
  * Defaut constructor
@@ -89,6 +87,11 @@ timed_event::timed_event(uint32_t event_type,
       event_data{event_data},
       event_args{event_args},
       event_options{event_options} {}
+
+timed_event::~timed_event() {
+  if (event_type == EVENT_SCHEDULED_DOWNTIME)
+    delete static_cast<unsigned long*>(event_data);
+}
 
 /**
  *  Execute service check.
@@ -340,7 +343,7 @@ static void _exec_event_reschedule_checks(timed_event* event) {
   logger(dbg_events, basic) << "** Reschedule Checks Event";
 
   // adjust scheduling of host and service checks.
-  adjust_check_scheduling();
+  events::loop::instance().adjust_check_scheduling();
 }
 
 /**
@@ -395,54 +398,6 @@ static void _exec_event_user_function(timed_event* event) {
 }
 
 /**
- *  Add an event to list ordered by execution time.
- *
- *  @param[in] event           The new event to add.
- *  @param[in] event_list      The head of the event list.
- *  @param[in] event_list_tail The tail of the event list.
- */
-void add_event(timed_event* event, timed_event::priority priority) {
-  logger(dbg_functions, basic) << "add_event()";
-
-  timed_event_list* list;
-
-  if (priority == timed_event::low) {
-    list = &timed_event::event_list_low;
-  } else {
-    list = &timed_event::event_list_high;
-  }
-
-  // add the event to the head of the list if there are
-  // no other events.
-  if (list->empty()) {
-    list->push_front(event);
-  }
-
-  // add event to head of the list if it should be executed first.
-  else if (event->run_time < (*list->begin())->run_time) {
-    list->push_front(event);
-  }
-
-  // else place the event according to next execution time.
-  else {
-    // start from the end of the list, as new events are likely to
-    // be executed in the future, rather than now...
-    for (timed_event_list::reverse_iterator it(list->rbegin()),
-         end(list->rend());
-         it != end; ++it) {
-      if (event->run_time >= (*it)->run_time) {
-        list->insert(it.base(), event);
-        break;
-      }
-    }
-  }
-
-  // send event data to broker.
-  broker_timed_event(NEBTYPE_TIMEDEVENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, event,
-                     nullptr);
-}
-
-/**
  *  Adjusts a timestamp variable in accordance with a system
  *  time change.
  *
@@ -474,184 +429,6 @@ time_t adjust_timestamp_for_time_change(time_t last_time,
   // we moved into the future...
   else
     return (time_t)(ts + time_difference);
-}
-
-/**
- *  Attempts to compensate for a change in the system time.
- *
- *  @param[in] last_time    The last time.
- *  @param[in] current_time The current time.
- */
-void compensate_for_system_time_change(unsigned long last_time,
-                                       unsigned long current_time) {
-  int days{0};
-  int hours{0};
-  int minutes{0};
-  int seconds{0};
-  unsigned long time_difference{0L};
-
-  logger(dbg_functions, basic) << "compensate_for_system_time_change()";
-
-  // we moved back in time...
-  if (last_time > current_time) {
-    time_difference = last_time - current_time;
-    get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
-    logger(dbg_events, basic)
-        << "Detected a backwards time change of " << days << "d " << hours
-        << "h " << minutes << "m " << seconds << "s.";
-  }
-  // we moved into the future...
-  else {
-    time_difference = current_time - last_time;
-    get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
-    logger(dbg_events, basic)
-        << "Detected a forwards time change of " << days << "d " << hours
-        << "h " << minutes << "m " << seconds << "s.";
-  }
-
-  // log the time change.
-  logger(log_process_info | log_runtime_warning, basic)
-      << "Warning: A system time change of " << days << "d " << hours << "h "
-      << minutes << "m " << seconds << "s ("
-      << (last_time > current_time ? "backwards" : "forwards")
-      << " in time) has been detected.  Compensating...";
-
-  // adjust the next run time for all high priority timed events.
-  for (timed_event_list::iterator it(timed_event::event_list_high.begin()),
-       end(timed_event::event_list_high.end());
-       it != end; ++it) {
-    // skip special events that occur at specific times...
-    if (!(*it)->compensate_for_time_change)
-      continue;
-
-    // use custom timing function.
-    if ((*it)->timing_func) {
-      union {
-        time_t (*func)(void);
-        void* data;
-      } timing;
-      timing.data = (*it)->timing_func;
-      (*it)->run_time = (*timing.func)();
-    }
-
-    // else use standard adjustment.
-    else
-      (*it)->run_time = adjust_timestamp_for_time_change(
-          last_time, current_time, time_difference, (*it)->run_time);
-  }
-
-  // resort event list (some events may be out of order at this point).
-  resort_event_list(timed_event::high);
-
-  // adjust the next run time for all low priority timed events.
-  for (timed_event_list::iterator it(timed_event::event_list_low.begin()),
-       end(timed_event::event_list_low.end());
-       it != end; ++it) {
-    // skip special events that occur at specific times...
-    if (!(*it)->compensate_for_time_change)
-      continue;
-
-    // use custom timing function.
-    if ((*it)->timing_func) {
-      union {
-        time_t (*func)(void);
-        void* data;
-      } timing;
-      timing.data = (*it)->timing_func;
-      (*it)->run_time = (*timing.func)();
-    }
-
-    // else use standard adjustment.
-    else
-      (*it)->run_time = adjust_timestamp_for_time_change(
-          last_time, current_time, time_difference, (*it)->run_time);
-  }
-
-  // resort event list (some events may be out of order at this point).
-  resort_event_list(timed_event::low);
-
-  // adjust service timestamps.
-  for (service_map::iterator it(service::services.begin()),
-       end(service::services.end());
-       it != end; ++it) {
-    it->second->set_last_notification(adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_notification()));
-    it->second->set_last_check(adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_check()));
-    it->second->set_next_check(adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_next_check()));
-    it->second->set_last_state_change(adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_state_change()));
-    it->second->set_last_hard_state_change(adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_hard_state_change()));
-
-    it->second->set_initial_notif_time(adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_initial_notif_time()));
-    it->second->set_last_acknowledgement(adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_acknowledgement()));
-
-    // recalculate next re-notification time.
-    it->second->set_next_notification(it->second->get_next_notification_time(
-        it->second->get_last_notification()));
-
-    // update the status data.
-    it->second->update_status(false);
-  }
-
-  // adjust host timestamps.
-  for (host_map::iterator it(com::centreon::engine::host::hosts.begin()),
-       end(com::centreon::engine::host::hosts.end());
-       it != end; ++it) {
-    time_t last_host_notif{adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_notification())};
-    time_t last_check{adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_check())};
-    time_t next_check{adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_next_check())};
-    time_t last_state_change{adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_state_change())};
-    time_t last_hard_state_change{adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_hard_state_change())};
-    time_t last_state_history_update{adjust_timestamp_for_time_change(
-        last_time, current_time, time_difference,
-        it->second->get_last_state_history_update())};
-
-    it->second->set_last_notification(last_host_notif);
-    it->second->set_last_check(last_check);
-    it->second->set_next_check(next_check);
-    it->second->set_last_state_change(last_state_change);
-    it->second->set_last_hard_state_change(last_hard_state_change);
-    it->second->set_last_state_history_update(last_state_history_update);
-    // recalculate next re-notification time.
-    it->second->set_next_notification(it->second->get_next_notification_time(
-        it->second->get_last_notification()));
-
-    // update the status data.
-    it->second->update_status(false);
-  }
-
-  // adjust program timestamps.
-  program_start = adjust_timestamp_for_time_change(
-      last_time, current_time, time_difference, program_start);
-  event_start = adjust_timestamp_for_time_change(last_time, current_time,
-                                                 time_difference, event_start);
-  last_command_check = adjust_timestamp_for_time_change(
-      last_time, current_time, time_difference, last_command_check);
-
-  // update the status data.
-  update_program_status(false);
 }
 
 /**
@@ -700,140 +477,6 @@ int handle_timed_event(timed_event* event) {
     _exec_event_user_function(event);
 
   return OK;
-}
-
-/**
- *  Remove an event from the queue.
- *
- *  @param[in]     event           The event to remove.
- *  @param[in,out] event_list      The head of the event list.
- *  @param[in,out] event_list_tail The tail of the event list.
- */
-void remove_event(timed_event* event, timed_event::priority priority) {
-  logger(dbg_functions, basic) << "remove_event()";
-
-  // send event data to broker.
-  broker_timed_event(NEBTYPE_TIMEDEVENT_REMOVE, NEBFLAG_NONE, NEBATTR_NONE,
-                     event, NULL);
-
-  if (!event)
-    return;
-
-  auto eraser = [](timed_event_list& l, timed_event* event) {
-    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
-      if (*it == event) {
-        l.erase(it);
-        break;
-      }
-    }
-  };
-  if (priority == timed_event::low)
-    eraser(timed_event::event_list_low, event);
-  else
-    eraser(timed_event::event_list_high, event);
-}
-
-timed_event* timed_event::find_event(timed_event::priority priority,
-                                     uint32_t event_type,
-                                     void* data) {
-  timed_event_list* list;
-
-  logger(dbg_functions, basic) << "resort_event_list()";
-
-  // move current event list to temp list.
-  if (priority == timed_event::low) {
-    list = &timed_event::event_list_low;
-  } else {
-    list = &timed_event::event_list_high;
-  }
-
-  for (timed_event_list::iterator it{list->begin()}, end{list->end()};
-       it != end; ++it)
-    if ((*it)->event_type == event_type && (*it)->event_data == data)
-      return *it;
-
-  return nullptr;
-}
-
-/**
- *  Reschedule an event in order of execution time.
- *
- *  @param[in]     event           The event to reschedule.
- *  @param[in,out] event_list      The head of the event list.
- *  @param[in,out] event_list_tail The tail of the event list.
- */
-void reschedule_event(timed_event* event, timed_event::priority priority) {
-  logger(dbg_functions, basic) << "reschedule_event()";
-
-  // reschedule recurring events...
-  if (event->recurring) {
-    // use custom timing function.
-    if (event->timing_func) {
-      union {
-        time_t (*func)(void);
-        void* data;
-      } timing;
-      timing.data = event->timing_func;
-      event->run_time = (*timing.func)();
-    }
-
-    // normal recurring events.
-    else {
-      time_t current_time(0L);
-      event->run_time = event->run_time + event->event_interval;
-      time(&current_time);
-      if (event->run_time < current_time)
-        event->run_time = current_time;
-    }
-  }
-
-  // add the event to the event list.
-  add_event(event, priority);
-}
-
-static bool compare_event(timed_event* const& first,
-                          timed_event* const& second) {
-  return first->run_time < second->run_time;
-}
-
-/**
- *  Resorts an event list by event execution time - needed when
- *  compensating for system time changes.
- *
- *  @param[in,out] event_list      The head of the event list.
- *  @param[in,out] event_list_tail The tail of the event list.
- */
-void resort_event_list(timed_event::priority priority) {
-  timed_event_list* list;
-
-  logger(dbg_functions, basic) << "resort_event_list()";
-
-  // move current event list to temp list.
-  if (priority == timed_event::low) {
-    list = &timed_event::event_list_low;
-  } else {
-    list = &timed_event::event_list_high;
-  }
-  std::sort(list->begin(), list->end(), compare_event);
-
-  // send event data to broker.
-  for (timed_event_list::iterator it{list->begin()}, end{list->end()};
-       it != end; ++it)
-    broker_timed_event(NEBTYPE_TIMEDEVENT_ADD, NEBFLAG_NONE, NEBATTR_NONE,
-                       (*it), nullptr);
-}
-
-/**
- *  Schedule a timed event.
- *
- * @param high_priority Priority list.
- */
-void timed_event::schedule(bool high_priority) {
-  // add the event to the event list.
-  if (high_priority)
-    add_event(this, timed_event::high);
-  else
-    add_event(this, timed_event::low);
 }
 
 /**

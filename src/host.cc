@@ -27,6 +27,7 @@
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
@@ -1151,7 +1152,7 @@ void host::schedule_acknowledgement_expiration() {
         EVENT_EXPIRE_HOST_ACK,
         get_last_acknowledgement() + get_acknowledgement_timeout(), false, 0,
         nullptr, true, this, nullptr, 0);
-    evt->schedule(false);
+    events::loop::instance().schedule(evt, false);
   }
 }
 

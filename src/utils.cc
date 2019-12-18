@@ -436,19 +436,6 @@ void free_memory(nagios_macros* mac) {
   // Free memory allocated to downtimes.
   downtimes::downtime_manager::instance().clear_scheduled_downtimes();
 
-  auto eraser = [](timed_event_list& l) {
-    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
-      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME)
-        delete static_cast<unsigned long*>((*it)->event_data);
-      l.erase(it);
-    }
-  };
-  // Free memory for the high priority event list.
-  eraser(timed_event::event_list_high);
-
-  // Free memory for the low priority event list.
-  eraser(timed_event::event_list_low);
-
   /*
   ** Free memory associated with macros. It's ok to only free the
   ** volatile ones, as the non-volatile are always free()'d before

@@ -26,7 +26,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/timed_event.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -293,7 +293,7 @@ int service_downtime::subscribe() {
     timed_event* evt =
         new timed_event(EVENT_SCHEDULED_DOWNTIME, get_start_time(), false, 0,
                         nullptr, false, (void*)new_downtime_id, nullptr, 0);
-    evt->schedule(true);
+    events::loop::instance().schedule(evt, true);
   }
 
 #ifdef PROBABLY_NOT_NEEDED
@@ -353,7 +353,7 @@ int service_downtime::handle() {
           nullptr,
           nullptr,
           0);
-        evt->schedule(true);
+        events::loop::instance().schedule(evt, true);
         return OK;
       }
     }
@@ -486,7 +486,7 @@ int service_downtime::handle() {
     timed_event* evt =
         new timed_event(EVENT_SCHEDULED_DOWNTIME, event_time, false, 0, nullptr,
                         false, (void*)new_downtime_id, nullptr, 0);
-    evt->schedule(true);
+    events::loop::instance().schedule(evt, true);
 
     /* handle (start) downtime that is triggered by this one */
     std::multimap<time_t, std::shared_ptr<downtime>>::const_iterator it,

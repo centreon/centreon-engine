@@ -25,7 +25,7 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/timedevent.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
@@ -75,8 +75,8 @@ void applier::scheduler::apply(configuration::state& config,
     host_map const& hosts{engine::host::hosts};
     host_map::const_iterator hst(hosts.find(it->host_name().c_str()));
     if (hst != hosts.end()) {
-      bool has_event(timed_event::find_event(timed_event::low, EVENT_HOST_CHECK,
-                                             hst->second.get()));
+      bool has_event(events::loop::instance().find_event(
+          timed_event::low, EVENT_HOST_CHECK, hst->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         hst_to_unschedule.insert(*it);
@@ -95,7 +95,7 @@ void applier::scheduler::apply(configuration::state& config,
     service_id_map::const_iterator svc(engine::service::services_by_id.find(
         {it->host_id(), it->service_id()}));
     if (svc != services.end()) {
-      bool has_event(timed_event::find_event(
+      bool has_event(events::loop::instance().find_event(
           timed_event::low, EVENT_SERVICE_CHECK, svc->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
@@ -254,19 +254,19 @@ applier::scheduler::scheduler()
 /**
  *  Default destructor.
  */
-applier::scheduler::~scheduler() throw() {
-  auto eraser = [](timed_event_list& l) {
-    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
-      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-        delete static_cast<unsigned long*>((*it)->event_data);
-        (*it)->event_data = nullptr;
-      }
-      delete *it;
-    }
-    l.clear();
-  };
-  eraser(timed_event::event_list_low);
-  eraser(timed_event::event_list_high);
+applier::scheduler::~scheduler() noexcept {
+//  auto eraser = [](timed_event_list& l) {
+//    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
+//      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
+//        delete static_cast<unsigned long*>((*it)->event_data);
+//        (*it)->event_data = nullptr;
+//      }
+//      delete *it;
+//    }
+//    l.clear();
+//  };
+//  eraser(timed_event::event_list_low);
+//  eraser(timed_event::event_list_high);
 }
 
 /**
@@ -721,7 +721,7 @@ timed_event* applier::scheduler::_create_misc_event(int type,
                                                     void* data) {
   timed_event* evt(new timed_event(type, start, true, interval, nullptr, true,
                                    data, NULL, 0));
-  evt->schedule(true);
+  events::loop::instance().schedule(evt, true);
   return evt;
 }
 
@@ -890,7 +890,7 @@ void applier::scheduler::_schedule_host_events(
     timed_event* evt = new timed_event(EVENT_HOST_CHECK, hst.get_next_check(),
                                        false, 0, nullptr, true, (void*)&hst,
                                        NULL, hst.get_check_options());
-    evt->schedule(false);
+    events::loop::instance().schedule(evt, false);
   }
 
   // Schedule acknowledgement expirations.
@@ -996,7 +996,7 @@ void applier::scheduler::_schedule_service_events(
     timed_event* evt(new timed_event(EVENT_SERVICE_CHECK, svc.get_next_check(),
                                      false, 0, nullptr, true, (void*)&svc,
                                      nullptr, svc.get_check_options()));
-    evt->schedule(false);
+    events::loop::instance().schedule(evt, false);
   }
 
   // Schedule acknowledgement expirations.
@@ -1021,12 +1021,12 @@ void applier::scheduler::_unschedule_host_events(
        end(hosts.end());
        it != end; ++it) {
     timed_event* evt(NULL);
-    while ((evt = timed_event::find_event(timed_event::low, EVENT_HOST_CHECK,
+    while ((evt = events::loop::instance().find_event(timed_event::low, EVENT_HOST_CHECK,
                                           *it))) {
       remove_event(evt, timed_event::low);
       delete evt;
     }
-    while ((evt = timed_event::find_event(timed_event::low,
+    while ((evt = events::loop::instance().find_event(timed_event::low,
                                           EVENT_EXPIRE_HOST_ACK, *it))) {
       remove_event(evt, timed_event::low);
       delete evt;
