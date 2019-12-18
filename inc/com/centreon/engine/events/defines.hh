@@ -42,6 +42,7 @@
 #define EVENT_EXPIRE_COMMENT 15  // removes expired comments
 #define EVENT_EXPIRE_HOST_ACK 16     // remove expired host acknowledgement
 #define EVENT_EXPIRE_SERVICE_ACK 17  // remove expired service acknowledgement
+#define EVENT_ENGINERPC_CHECK 18 // EngineRPC command check
 #define EVENT_SLEEP \
   98  // asynchronous sleep event that occurs when event queues are empty
 #define EVENT_USER_FUNCTION 99  // USER-defined function (modules)

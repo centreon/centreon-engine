@@ -64,6 +64,9 @@
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/logging/engine.hh"
+#if defined GRPC
+#include "enginerpc.hh"
+#endif
 
 using namespace com::centreon::engine;
 
@@ -112,6 +115,10 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::events::loop::load();
   com::centreon::engine::broker::loader::load();
   com::centreon::engine::broker::compatibility::load();
+
+#if defined GRPC
+  com::centreon::engine::enginerpc erpc("0.0.0.0", 50051);
+#endif
 
   logging::broker backend_broker_log;
 
@@ -443,6 +450,9 @@ int main(int argc, char* argv[]) {
     logger(logging::log_runtime_error, logging::basic) << "Error: " << e.what();
   }
 
+#if defined GRPC
+  erpc.shutdown();
+#endif
   // Unload singletons and global objects.
   com::centreon::engine::events::loop::unload();
   com::centreon::engine::broker::compatibility::unload();

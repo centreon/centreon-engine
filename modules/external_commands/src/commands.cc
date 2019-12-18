@@ -504,8 +504,8 @@ int cmd_process_service_check_result(int cmd, time_t check_time, char* args) {
   int return_code(strtol(delimiter, nullptr, 0));
 
   // Submit the passive check result.
-  return (process_passive_service_check(check_time, host_name, svc_description,
-                                        return_code, output));
+  return process_passive_service_check(check_time, host_name, svc_description,
+                                        return_code, output);
 }
 
 /* submits a passive service check result for later processing */

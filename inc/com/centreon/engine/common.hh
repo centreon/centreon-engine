@@ -249,10 +249,12 @@
 #define LOG_VERSION_2 "2.0"
 
 /* General definitions. */
-#define OK 0
-#define ERROR                                                                \
-  -2 /* Value was changed from -1 so as to not interfere with STATUS_UNKNOWN \
-        plugin result. */
+enum ret_val {
+  OK = 0,
+  ERROR = -2, /* Value was changed from -1 so as to not interfere with
+               * STATUS_UNKNOWN
+               * plugin result. */
+};
 
 #ifndef TRUE
 #define TRUE 1

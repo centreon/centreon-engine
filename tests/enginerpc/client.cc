@@ -23,23 +23,33 @@
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
+#include <google/protobuf/util/time_util.h>
 #include "engine.grpc.pb.h"
-
-using namespace grpc;
 
 class EngineRPCClient {
   std::unique_ptr<Engine::Stub> _stub;
 
  public:
-  EngineRPCClient(std::shared_ptr<Channel> channel)
+  EngineRPCClient(std::shared_ptr<grpc::Channel> channel)
       : _stub(Engine::NewStub(channel)) {}
 
   bool GetVersion(Version* version) {
     const ::google::protobuf::Empty e;
-    ClientContext context;
-    Status status = _stub->GetVersion(&context, e, version);
+    grpc::ClientContext context;
+    grpc::Status status = _stub->GetVersion(&context, e, version);
     if (!status.ok()) {
       std::cout << "GetVersion rpc failed." << std::endl;
+      return false;
+    }
+    return true;
+  }
+
+  bool GetStats(Stats* stats) {
+    const ::google::protobuf::Empty e;
+    grpc::ClientContext context;
+    grpc::Status status = _stub->GetStats(&context, e, stats);
+    if (!status.ok()) {
+      std::cout << "GetStats rpc failed." << std::endl;
       return false;
     }
     return true;
@@ -48,7 +58,7 @@ class EngineRPCClient {
 
 int main(int argc, char** argv) {
   EngineRPCClient client(grpc::CreateChannel(
-      "localhost:50051", grpc::InsecureChannelCredentials()));
+      "10.0.2.15:50051", grpc::InsecureChannelCredentials()));
 
   if (argc != 2) {
     std::cout << "ERROR: this client must be called with a command..."
@@ -59,8 +69,12 @@ int main(int argc, char** argv) {
   if (strcmp(argv[1], "GetVersion") == 0) {
     Version version;
     client.GetVersion(&version);
-    std::cout << "GetVersion: " << version.major() << " " << version.minor()
-              << " " << version.patch() << std::endl;
+    std::cout << "GetVersion: " << version.DebugString();
+  }
+  else if (strcmp(argv[1], "GetStats") == 0) {
+    Stats stats;
+    client.GetStats(&stats);
+    std::cout << "GetStats: " << stats.DebugString();
   }
   exit(0);
 }

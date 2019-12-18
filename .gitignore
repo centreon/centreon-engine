@@ -18,3 +18,5 @@ cmake-build-debug/*
 modules/bench/passive/paths.hh
 enginerpc/engine.*pb.cc
 enginerpc/engine.*pb.h
+**/__pycache__/*
+**/engine_pb2*.py

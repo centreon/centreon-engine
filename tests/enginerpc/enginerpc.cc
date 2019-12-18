@@ -72,11 +72,13 @@ TEST_F(EngineRpc, StartStop) {
 
 TEST_F(EngineRpc, GetVersion) {
   std::ostringstream oss;
-  oss << "GetVersion: " << CENTREON_ENGINE_VERSION_MAJOR << " "
-      << CENTREON_ENGINE_VERSION_MINOR << " " << CENTREON_ENGINE_VERSION_PATCH;
+  oss << "GetVersion: major: " << CENTREON_ENGINE_VERSION_MAJOR;
   enginerpc erpc("0.0.0.0", 50051);
   auto output = execute("GetVersion");
-  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), oss.str());
+  oss.str("");
+  oss << "minor: " << CENTREON_ENGINE_VERSION_MINOR;
+  ASSERT_EQ(output.back(), oss.str());
   erpc.shutdown();
 }

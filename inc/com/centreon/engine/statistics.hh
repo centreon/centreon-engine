@@ -17,25 +17,28 @@
  *
  */
 
-#include <sstream>
-#include "com/centreon/engine/logging/logger.hh"
-#include <grpcpp/server_builder.h>
-#include "enginerpc.hh"
+#ifndef CCE_STATISTICS_HH
+#define CCE_STATISTICS_HH
 
-using namespace com::centreon::engine;
+#include <atomic>
+#include <sys/types.h>
+#include <unistd.h>
+#include "com/centreon/engine/namespace.hh"
 
-enginerpc::enginerpc(const std::string& address, uint16_t port) {
-  engine_impl* service = new engine_impl;
-  std::ostringstream oss;
-  oss << address << ":" << port;
-  std::string server_address{oss.str()};
-  grpc::ServerBuilder builder;
-  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  builder.RegisterService(service);
-  _server = builder.BuildAndStart();
-}
+struct buffer_stats {
+  uint32_t used;
+  uint32_t high;
+  uint32_t total;
+};
 
-void enginerpc::shutdown() {
-  _server->Shutdown();
-  _server->Wait();
-}
+CCE_BEGIN()
+class statistics {
+  statistics();
+ public:
+  static statistics& instance();
+  pid_t get_pid() const noexcept;
+  bool get_external_command_buffer_stats(buffer_stats& retval) const noexcept;
+};
+
+CCE_END()
+#endif /* !CCE_STATISTICS_HH */

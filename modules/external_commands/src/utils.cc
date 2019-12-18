@@ -414,5 +414,5 @@ int submit_external_command(char const* cmd, int* buffer_items) {
   /* release lock on buffer */
   pthread_mutex_unlock(&external_command_buffer.buffer_lock);
 
-  return (result);
+  return result;
 }

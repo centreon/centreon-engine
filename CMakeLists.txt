@@ -475,6 +475,7 @@ set(
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checkable.cc"
   "${SRC_DIR}/checks.cc"
+  "${SRC_DIR}/command_manager.cc"
   "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/config.cc"
   "${SRC_DIR}/contact.cc"
@@ -501,6 +502,7 @@ set(
   "${SRC_DIR}/serviceescalation.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/shared.cc"
+  "${SRC_DIR}/statistics.cc"
   "${SRC_DIR}/statusdata.cc"
   "${SRC_DIR}/string.cc"
   "${SRC_DIR}/timeperiod.cc"
@@ -516,6 +518,7 @@ set(
   "${INC_DIR}/com/centreon/engine/checkable.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
   "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
+  "${INC_DIR}/com/centreon/engine/command_manager.hh"
   "${INC_DIR}/com/centreon/engine/comment.hh"
   "${INC_DIR}/com/centreon/engine/common.hh"
   "${INC_DIR}/com/centreon/engine/config.hh"
@@ -550,6 +553,7 @@ set(
   "${INC_DIR}/com/centreon/engine/serviceescalation.hh"
   "${INC_DIR}/com/centreon/engine/servicegroup.hh"
   "${INC_DIR}/com/centreon/engine/shared.hh"
+  "${INC_DIR}/com/centreon/engine/statistics.hh"
   "${INC_DIR}/com/centreon/engine/statusdata.hh"
   "${INC_DIR}/com/centreon/engine/string.hh"
   "${INC_DIR}/com/centreon/engine/timeperiod.hh"
@@ -578,13 +582,15 @@ add_subdirectory(modules)
 add_subdirectory(src/retention)
 if (WITH_GRPC)
   add_subdirectory(enginerpc)
+  include_directories(enginerpc)
+  add_definitions(-DGRPC)
 endif ()
 
 # Library engine target.
-add_library("cce_core" ${LIBRARY_TYPE} ${FILES})
+add_library(cce_core ${LIBRARY_TYPE} ${FILES})
 
 # Link target with required libraries.
-target_link_libraries("cce_core"
+target_link_libraries(cce_core
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
@@ -605,7 +611,7 @@ set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
-target_link_libraries("centengine" cce_core ${ENGINERPC})
+target_link_libraries(centengine cce_core ${ENGINERPC})
 
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")

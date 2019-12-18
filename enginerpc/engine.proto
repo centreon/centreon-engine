@@ -1,13 +1,52 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 
 service Engine {
   rpc GetVersion(google.protobuf.Empty) returns (Version) {}
+  rpc GetStats(google.protobuf.Empty) returns (Stats) {}
+
+  rpc ProcessServiceCheckResult(ServiceCheck) returns (CommandSuccess) {}
+}
+
+message CommandSuccess {
+  bool value = 1;
+}
+
+message ServiceCheck {
+  google.protobuf.Timestamp check_time = 1;
+  string host_name = 2;
+  string svc_desc = 3;
+  string output = 4;
+  uint32 code = 5;
 }
 
 message Version {
   int32 major = 1;
   int32 minor = 2;
   int32 patch = 3;
+}
+
+message StatusFile {
+  string name = 1;
+  google.protobuf.Duration age = 2;
+}
+
+message ProgramStatus {
+  google.protobuf.Duration running_time = 1;
+  uint32 pid = 2;
+}
+
+message ExtCmdBuffer {
+ uint32 used = 1;
+ uint32 high = 2;
+ uint32 total = 3;
+}
+
+message Stats {
+  StatusFile status_file = 1;
+  ProgramStatus program_status = 2;
+  ExtCmdBuffer buffer = 3;
 }
