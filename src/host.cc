@@ -1589,7 +1589,6 @@ int host::run_async_check(int check_options,
 /* schedules an immediate or delayed host check */
 void host::schedule_check(time_t check_time, int options) {
   timed_event* temp_event = nullptr;
-  timed_event* new_event = nullptr;
   int use_original_event = true;
 
   logger(dbg_functions, basic) << "schedule_host_check()";
@@ -1605,8 +1604,6 @@ void host::schedule_check(time_t check_time, int options) {
     logger(dbg_checks, basic) << "Active checks are disabled for this host.";
     return;
   }
-  /* allocate memory for a new event item */
-  new_event = new timed_event;
 
   /* default is to use the new event */
   use_original_event = false;
@@ -1672,14 +1669,7 @@ void host::schedule_check(time_t check_time, int options) {
       }
     }
 
-    /* the originally queued event won the battle, so keep it */
-    if (use_original_event) {
-      remove_event(new_event, timed_event::low);
-      delete new_event;
-    }
-
-    /* else use the new event, so remove the old */
-    else {
+    if (!use_original_event) {
       remove_event(temp_event, timed_event::low);
       delete temp_event;
     }
@@ -1696,15 +1686,16 @@ void host::schedule_check(time_t check_time, int options) {
     set_next_check(check_time);
 
     /* place the new event in the event queue */
-    new_event->event_type = EVENT_HOST_CHECK;
-    new_event->event_data = (void*)this;
-    new_event->event_args = (void*)nullptr;
-    new_event->event_options = options;
-    new_event->run_time = get_next_check();
-    new_event->recurring = false;
-    new_event->event_interval = 0L;
-    new_event->timing_func = nullptr;
-    new_event->compensate_for_time_change = true;
+    timed_event* new_event = new timed_event(EVENT_HOST_CHECK,
+                                             get_next_check(),
+                                             false,
+                                             0L,
+                                             nullptr,
+                                             true,
+                                             (void*)this,
+                                             nullptr,
+                                             options);
+
     reschedule_event(new_event, timed_event::low);
   }
 
