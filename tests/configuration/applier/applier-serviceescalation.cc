@@ -26,6 +26,7 @@
 #include <com/centreon/engine/configuration/applier/serviceescalation.hh>
 #include <com/centreon/engine/configuration/applier/state.hh>
 #include <com/centreon/engine/configuration/state.hh>
+#include <com/centreon/engine/events/loop.hh>
 #include <com/centreon/engine/host.hh>
 #include <com/centreon/engine/service.hh>
 #include <com/centreon/engine/serviceescalation.hh>
@@ -48,9 +49,11 @@ class ApplierServiceEscalation : public ::testing::Test {
     timezone_manager::load();
     configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
+    events::loop::load();
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;

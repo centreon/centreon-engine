@@ -29,6 +29,7 @@
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/host_downtime.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 
 using namespace com::centreon;
@@ -45,9 +46,11 @@ class DowntimeExternalCommand : public ::testing::Test {
     if (config == nullptr)
       config = new configuration::state;
     configuration::applier::state::load();  // Needed to create a contact
+    events::loop::load();
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     downtime_manager::instance().clear_scheduled_downtimes();
     delete config;

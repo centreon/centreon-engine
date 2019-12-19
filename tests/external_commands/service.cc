@@ -28,6 +28,7 @@
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 
@@ -46,9 +47,11 @@ class ServiceExternalCommand : public ::testing::Test {
     timezone_manager::load();
     configuration::applier::state::load();  // Needed to create a contact
     checks::checker::load();
+    events::loop::load();
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;

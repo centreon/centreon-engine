@@ -39,6 +39,7 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
@@ -62,6 +63,7 @@ class ServiceNotification : public TestEngine {
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
     checks::checker::load();
+    events::loop::load();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -97,6 +99,7 @@ class ServiceNotification : public TestEngine {
   }
 
   void TearDown() override {
+    events::loop::unload();
     configuration::applier::state::unload();
     checks::checker::unload();
     delete config;
