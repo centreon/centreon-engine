@@ -57,7 +57,6 @@ void downtime_manager::delete_downtime(int type, uint64_t downtime_id) {
 
 /* unschedules a host or service downtime */
 int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
-  timed_event* temp_event(nullptr);
   std::shared_ptr<downtime> temp_downtime{find_downtime(type, downtime_id)};
 
   logger(dbg_functions, basic) << "unschedule_downtime()";
@@ -70,11 +69,8 @@ int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
     return ERROR;
 
   /* remove scheduled entry from event queue */
-  temp_event = events::loop::instance().find_event(
+  events::loop::instance().remove_events(
       timed_event::high, EVENT_SCHEDULED_DOWNTIME, (void*)downtime_id);
-
-  if (temp_event)
-    events::loop::instance().remove_event(temp_event, timed_event::high);
 
   /* delete downtime entry */
   if (temp_downtime->get_type() == HOST_DOWNTIME)

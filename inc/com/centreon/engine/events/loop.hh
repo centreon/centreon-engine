@@ -66,6 +66,7 @@ class loop {
   void compensate_for_system_time_change(unsigned long last_time,
                                          unsigned long current_time);
   void remove_event(timed_event* event, timed_event::priority priority);
+  void remove_events(timed_event::priority, uint32_t event_type, void* data) noexcept;
   timed_event* find_event(timed_event::priority priority,
                           uint32_t event_type,
                           void* data);

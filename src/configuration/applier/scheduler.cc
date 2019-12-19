@@ -253,20 +253,7 @@ applier::scheduler::scheduler()
 /**
  *  Default destructor.
  */
-applier::scheduler::~scheduler() noexcept {
-//  auto eraser = [](timed_event_list& l) {
-//    for (auto it = l.begin(), end = l.end(); it != end; ++it) {
-//      if ((*it)->event_type == EVENT_SCHEDULED_DOWNTIME) {
-//        delete static_cast<unsigned long*>((*it)->event_data);
-//        (*it)->event_data = nullptr;
-//      }
-//      delete *it;
-//    }
-//    l.clear();
-//  };
-//  eraser(timed_event::event_list_low);
-//  eraser(timed_event::event_list_high);
-}
+applier::scheduler::~scheduler() noexcept {}
 
 /**
  *  Remove and create misc event if necessary.
@@ -789,7 +776,6 @@ void applier::scheduler::_get_services(set_service const& svc_cfg,
 void applier::scheduler::_remove_misc_event(timed_event*& evt) {
   if (evt) {
     events::loop::instance().remove_event(evt, timed_event::high);
-    delete evt;
     evt = NULL;
   }
 }
@@ -1011,21 +997,11 @@ void applier::scheduler::_schedule_service_events(
  */
 void applier::scheduler::_unschedule_host_events(
     std::vector<com::centreon::engine::host*> const& hosts) {
-  for (std::vector<com::centreon::engine::host*>::const_iterator
-           it(hosts.begin()),
-       end(hosts.end());
-       it != end; ++it) {
-    timed_event* evt(NULL);
-    while ((evt = events::loop::instance().find_event(timed_event::low, EVENT_HOST_CHECK,
-                                          *it))) {
-      events::loop::instance().remove_event(evt, timed_event::low);
-      delete evt;
-    }
-    while ((evt = events::loop::instance().find_event(timed_event::low,
-                                          EVENT_EXPIRE_HOST_ACK, *it))) {
-      events::loop::instance().remove_event(evt, timed_event::low);
-      delete evt;
-    }
+  for (auto& h : hosts) {
+    events::loop::instance().remove_events(
+        timed_event::low, EVENT_HOST_CHECK, h);
+    events::loop::instance().remove_events(
+        timed_event::low, EVENT_EXPIRE_HOST_ACK, h);
   }
 }
 
@@ -1036,19 +1012,10 @@ void applier::scheduler::_unschedule_host_events(
  */
 void applier::scheduler::_unschedule_service_events(
     std::vector<engine::service*> const& services) {
-  for (std::vector<engine::service*>::const_iterator it(services.begin()),
-       end(services.end());
-       it != end; ++it) {
-    timed_event* evt(NULL);
-    while ((evt = events::loop::instance().find_event(timed_event::low, EVENT_SERVICE_CHECK,
-                                          *it))) {
-      events::loop::instance().remove_event(evt, timed_event::low);
-      delete evt;
-    }
-    while ((evt = events::loop::instance().find_event(timed_event::low,
-                                          EVENT_EXPIRE_SERVICE_ACK, *it))) {
-      events::loop::instance().remove_event(evt, timed_event::low);
-      delete evt;
-    }
+  for (auto& s : services) {
+    events::loop::instance().remove_events(
+        timed_event::low, EVENT_SERVICE_CHECK, s);
+    events::loop::instance().remove_events(
+        timed_event::low, EVENT_EXPIRE_SERVICE_ACK, s);
   }
 }

@@ -2397,7 +2397,6 @@ void service::schedule_check(time_t check_time, int options) {
     // We're using the new event, so remove the old one.
     if (temp_event) {
       events::loop::instance().remove_event(temp_event, timed_event::low);
-      delete temp_event;
       temp_event = nullptr;
     }
 

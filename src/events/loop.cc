@@ -302,7 +302,7 @@ void loop::_dispatching() {
           // executed, it needs to be remove()'ed to maintain sync with
           // event broker modules.
           timed_event* temp_event{*event_list_low.begin()};
-          remove_event(temp_event, timed_event::low);
+          event_list_low.pop_front();
 
           // We nudge the next check time when it is
           // due to too many concurrent service checks.
@@ -357,7 +357,7 @@ void loop::_dispatching() {
           // to be remove()'ed to maintain sync with event broker
           // modules.
           timed_event* temp_event(*event_list_low.begin());
-          remove_event(temp_event, timed_event::low);
+          event_list_low.pop_front();
 
           // Reschedule.
           if ((notifier::soft == temp_host->get_state_type()) &&
@@ -854,6 +854,7 @@ void loop::remove_event(timed_event* event, timed_event::priority priority) {
   auto eraser = [](timed_event_list& l, timed_event* event) {
     for (auto it = l.begin(), end = l.end(); it != end; ++it) {
       if (*it == event) {
+        delete *it;
         l.erase(it);
         break;
       }
@@ -863,6 +864,22 @@ void loop::remove_event(timed_event* event, timed_event::priority priority) {
     eraser(event_list_low, event);
   else
     eraser(event_list_high, event);
+}
+
+void loop::remove_events(timed_event::priority priority,
+                         uint32_t event_type,
+                         void* data) noexcept {
+  timed_event_list* list;
+  if (priority == timed_event::low)
+    list = &event_list_low;
+  else
+    list = &event_list_high;
+
+  for (auto it = list->begin(), end = list->end(); it != end; ++it)
+    if ((*it)->event_type == event_type && (*it)->event_data == data) {
+      delete *it;
+      list->erase(it);
+    }
 }
 
 timed_event* loop::find_event(timed_event::priority priority,

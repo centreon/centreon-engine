@@ -1670,10 +1670,8 @@ void host::schedule_check(time_t check_time, int options) {
       }
     }
 
-    if (!use_original_event) {
+    if (!use_original_event)
       events::loop::instance().remove_event(temp_event, timed_event::low);
-      delete temp_event;
-    }
   }
 
   /* save check options for retention purposes */
