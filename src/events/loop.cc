@@ -151,7 +151,7 @@ void loop::_dispatching() {
       break;
 
     // If we don't have any events to handle, exit.
-    if (event_list_high.empty() && event_list_low.empty()) {
+    if (_event_list_high.empty() && _event_list_low.empty()) {
       logger(log_runtime_error, basic)
           << "There aren't any events that need to be handled! "
           << "Exiting...";
@@ -201,16 +201,16 @@ void loop::_dispatching() {
 
     // Log messages about event lists.
     logger(dbg_events, more) << "** Event Check Loop";
-    if (!event_list_high.empty())
+    if (!_event_list_high.empty())
       logger(dbg_events, more)
           << "Next High Priority Event Time: "
-          << my_ctime(&(*event_list_high.begin())->run_time);
+          << my_ctime(&(*_event_list_high.begin())->run_time);
     else
       logger(dbg_events, more) << "No high priority events are scheduled...";
-    if (!event_list_low.empty())
+    if (!_event_list_low.empty())
       logger(dbg_events, more)
           << "Next Low Priority Event Time:  "
-          << my_ctime(&(*event_list_low.begin())->run_time);
+          << my_ctime(&(*_event_list_low.begin())->run_time);
     else
       logger(dbg_events, more) << "No low priority events are scheduled...";
     logger(dbg_events, more)
@@ -226,12 +226,12 @@ void loop::_dispatching() {
 
     // Handle high priority events.
     bool run_event(true);
-    if (!event_list_high.empty() &&
-        (current_time >= (*event_list_high.begin())->run_time)) {
+    if (!_event_list_high.empty() &&
+        (current_time >= (*_event_list_high.begin())->run_time)) {
       // Remove the first event from the timing loop.
-      timed_event* temp_event(*event_list_high.begin());
+      timed_event* temp_event(*_event_list_high.begin());
 
-      event_list_high.pop_front();
+      _event_list_high.pop_front();
       // We may have just removed the only item from the list.
 
       // Handle the event.
@@ -239,24 +239,24 @@ void loop::_dispatching() {
 
       // Reschedule the event if necessary.
       if (temp_event->recurring)
-        reschedule_event(temp_event, timed_event::high);
+        reschedule_event(temp_event, events::loop::high);
       // Else free memory associated with the event.
       else
         delete temp_event;
     }
     // Handle low priority events.
-    else if (!event_list_low.empty() &&
+    else if (!_event_list_low.empty() &&
              (current_time >=
-              (*event_list_low.begin())->run_time)) {
+              (*_event_list_low.begin())->run_time)) {
       // Default action is to execute the event.
       run_event = true;
 
       // Run a few checks before executing a service check...
-      if ((*event_list_low.begin())->event_type ==
+      if ((*_event_list_low.begin())->event_type ==
           EVENT_SERVICE_CHECK) {
         int nudge_seconds(0);
         service* temp_service(static_cast<service*>(
-            (*event_list_low.begin())->event_data));
+            (*_event_list_low.begin())->event_data));
 
         // Don't run a service check if we're already maxed out on the
         // number of parallel service checks...
@@ -301,8 +301,8 @@ void loop::_dispatching() {
           // reschedule it for a later time. Since event was not
           // executed, it needs to be remove()'ed to maintain sync with
           // event broker modules.
-          timed_event* temp_event{*event_list_low.begin()};
-          event_list_low.pop_front();
+          timed_event* temp_event{*_event_list_low.begin()};
+          _event_list_low.pop_front();
 
           // We nudge the next check time when it is
           // due to too many concurrent service checks.
@@ -325,18 +325,18 @@ void loop::_dispatching() {
                             config->interval_length())));
           }
           temp_event->run_time = temp_service->get_next_check();
-          reschedule_event(temp_event, timed_event::low);
+          reschedule_event(temp_event, events::loop::low);
           temp_service->update_status(false);
           run_event = false;
         }
       }
       // Run a few checks before executing a host check...
       else if (EVENT_HOST_CHECK ==
-               (*event_list_low.begin())->event_type) {
+               (*_event_list_low.begin())->event_type) {
         // Default action is to execute the event.
         run_event = true;
         host* temp_host(static_cast<host*>(
-            (*event_list_low.begin())->event_data));
+            (*_event_list_low.begin())->event_data));
 
         // Don't run a host check if active checks are disabled.
         if (!config->execute_host_checks()) {
@@ -356,8 +356,8 @@ void loop::_dispatching() {
           // it for a later time. Since event was not executed, it needs
           // to be remove()'ed to maintain sync with event broker
           // modules.
-          timed_event* temp_event(*event_list_low.begin());
-          event_list_low.pop_front();
+          timed_event* temp_event(*_event_list_low.begin());
+          _event_list_low.pop_front();
 
           // Reschedule.
           if ((notifier::soft == temp_host->get_state_type()) &&
@@ -370,7 +370,7 @@ void loop::_dispatching() {
                 temp_host->get_next_check() +
                 (temp_host->get_check_interval() * config->interval_length())));
           temp_event->run_time = temp_host->get_next_check();
-          reschedule_event(temp_event, timed_event::low);
+          reschedule_event(temp_event, events::loop::low);
           temp_host->update_status(false);
           run_event = false;
         }
@@ -379,8 +379,8 @@ void loop::_dispatching() {
       // Run the event.
       if (run_event) {
         // Remove the first event from the timing loop.
-        timed_event* temp_event(*event_list_low.begin());
-        event_list_low.pop_front();
+        timed_event* temp_event(*_event_list_low.begin());
+        _event_list_low.pop_front();
         // We may have just removed the only item from the list.
 
         // Handle the event.
@@ -389,7 +389,7 @@ void loop::_dispatching() {
 
         // Reschedule the event if necessary.
         if (temp_event->recurring)
-          reschedule_event(temp_event, timed_event::low);
+          reschedule_event(temp_event, events::loop::low);
         // Else free memory associated with the event.
         else
           delete temp_event;
@@ -403,12 +403,12 @@ void loop::_dispatching() {
       }
     }
     // We don't have anything to do at this moment in time...
-    else if ((event_list_high.empty() ||
+    else if ((_event_list_high.empty() ||
               current_time <
-                  (*event_list_high.begin())->run_time) &&
-             (event_list_low.empty() ||
+                  (*_event_list_high.begin())->run_time) &&
+             (_event_list_low.empty() ||
               current_time <
-                  (*event_list_low.begin())->run_time)) {
+                  (*_event_list_low.begin())->run_time)) {
       logger(dbg_events, most)
           << "No events to execute at the moment. Idling for a bit...";
 
@@ -481,8 +481,8 @@ void loop::adjust_check_scheduling() {
                           config->auto_rescheduling_window());
 
   // get current scheduling data.
-  for (timed_event_list::iterator it{event_list_low.begin()},
-       end{event_list_low.end()};
+  for (timed_event_list::iterator it{_event_list_low.begin()},
+       end{_event_list_low.end()};
        it != end; ++it) {
     // skip events outside of our current window.
     if ((*it)->run_time <= first_window_time)
@@ -554,8 +554,8 @@ void loop::adjust_check_scheduling() {
 
   // adjust check scheduling.
   double current_icd_offset(inter_check_delay / 2.0);
-  for (timed_event_list::iterator it{event_list_low.begin()},
-       end{event_list_low.end()};
+  for (timed_event_list::iterator it{_event_list_low.begin()},
+       end{_event_list_low.end()};
        it != end; ++it) {
     // skip events outside of our current window.
     if ((*it)->run_time <= first_window_time)
@@ -609,7 +609,7 @@ void loop::adjust_check_scheduling() {
 
   // resort event list (some events may be out of order at
   // this point).
-  resort_event_list(timed_event::low);
+  resort_event_list(events::loop::low);
 }
 
 /**
@@ -653,7 +653,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
       << " in time) has been detected.  Compensating...";
 
   // adjust the next run time for all high priority timed events.
-  for (auto it = event_list_high.begin(), end = event_list_high.end();
+  for (auto it = _event_list_high.begin(), end = _event_list_high.end();
        it != end; ++it) {
     // skip special events that occur at specific times...
     if (!(*it)->compensate_for_time_change)
@@ -676,10 +676,10 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
   }
 
   // resort event list (some events may be out of order at this point).
-  resort_event_list(timed_event::high);
+  resort_event_list(events::loop::high);
 
   // adjust the next run time for all low priority timed events.
-  for (auto it = event_list_low.begin(), end = event_list_low.end(); it != end;
+  for (auto it = _event_list_low.begin(), end = _event_list_low.end(); it != end;
        ++it) {
     // skip special events that occur at specific times...
     if (!(*it)->compensate_for_time_change)
@@ -702,7 +702,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
   }
 
   // resort event list (some events may be out of order at this point).
-  resort_event_list(timed_event::low);
+  resort_event_list(events::loop::low);
 
   // adjust service timestamps.
   for (service_map::iterator it(service::services.begin()),
@@ -795,15 +795,15 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
  *  @param[in] event_list      The head of the event list.
  *  @param[in] event_list_tail The tail of the event list.
  */
-void loop::add_event(timed_event* event, timed_event::priority priority) {
+void loop::add_event(timed_event* event, loop::priority priority) {
   logger(dbg_functions, basic) << "add_event()";
 
   timed_event_list* list;
 
-  if (priority == timed_event::low) {
-    list = &event_list_low;
+  if (priority == loop::low) {
+    list = &_event_list_low;
   } else {
-    list = &event_list_high;
+    list = &_event_list_high;
   }
 
   // add the event to the head of the list if there are
@@ -841,7 +841,7 @@ void loop::add_event(timed_event* event, timed_event::priority priority) {
  *  @param[in,out] event_list      The head of the event list.
  *  @param[in,out] event_list_tail The tail of the event list.
  */
-void loop::remove_event(timed_event* event, timed_event::priority priority) {
+void loop::remove_event(timed_event* event, loop::priority priority) {
   logger(dbg_functions, basic) << "remove_event()";
 
   // send event data to broker.
@@ -860,20 +860,20 @@ void loop::remove_event(timed_event* event, timed_event::priority priority) {
       }
     }
   };
-  if (priority == timed_event::low)
-    eraser(event_list_low, event);
+  if (priority == loop::low)
+    eraser(_event_list_low, event);
   else
-    eraser(event_list_high, event);
+    eraser(_event_list_high, event);
 }
 
-void loop::remove_events(timed_event::priority priority,
+void loop::remove_events(loop::priority priority,
                          uint32_t event_type,
                          void* data) noexcept {
   timed_event_list* list;
-  if (priority == timed_event::low)
-    list = &event_list_low;
+  if (priority == loop::low)
+    list = &_event_list_low;
   else
-    list = &event_list_high;
+    list = &_event_list_high;
 
   for (auto it = list->begin(), end = list->end(); it != end; ++it)
     if ((*it)->event_type == event_type && (*it)->event_data == data) {
@@ -882,7 +882,7 @@ void loop::remove_events(timed_event::priority priority,
     }
 }
 
-timed_event* loop::find_event(timed_event::priority priority,
+timed_event* loop::find_event(loop::priority priority,
                               uint32_t event_type,
                               void* data) {
   timed_event_list* list;
@@ -890,10 +890,10 @@ timed_event* loop::find_event(timed_event::priority priority,
   logger(dbg_functions, basic) << "resort_event_list()";
 
   // move current event list to temp list.
-  if (priority == timed_event::low)
-    list = &event_list_low;
+  if (priority == loop::low)
+    list = &_event_list_low;
   else
-    list = &event_list_high;
+    list = &_event_list_high;
 
   for (auto it = list->begin(), end = list->end(); it != end; ++it)
     if ((*it)->event_type == event_type && (*it)->event_data == data)
@@ -909,7 +909,7 @@ timed_event* loop::find_event(timed_event::priority priority,
  *  @param[in,out] event_list      The head of the event list.
  *  @param[in,out] event_list_tail The tail of the event list.
  */
-void loop::reschedule_event(timed_event* event, timed_event::priority priority) {
+void loop::reschedule_event(timed_event* event, loop::priority priority) {
   logger(dbg_functions, basic) << "reschedule_event()";
 
   // reschedule recurring events...
@@ -945,16 +945,16 @@ void loop::reschedule_event(timed_event* event, timed_event::priority priority) 
  *  @param[in,out] event_list      The head of the event list.
  *  @param[in,out] event_list_tail The tail of the event list.
  */
-void loop::resort_event_list(timed_event::priority priority) {
+void loop::resort_event_list(loop::priority priority) {
   timed_event_list* list;
 
   logger(dbg_functions, basic) << "resort_event_list()";
 
   // move current event list to temp list.
-  if (priority == timed_event::low)
-    list = &event_list_low;
+  if (priority == loop::low)
+    list = &_event_list_low;
   else
-    list = &event_list_high;
+    list = &_event_list_high;
 
   std::sort(list->begin(),
             list->end(),
@@ -976,7 +976,7 @@ void loop::resort_event_list(timed_event::priority priority) {
 void loop::schedule(timed_event* evt, bool high_priority) {
   // add the event to the event list.
   if (high_priority)
-    add_event(evt, timed_event::high);
+    add_event(evt, loop::high);
   else
-    add_event(evt, timed_event::low);
+    add_event(evt, loop::low);
 }

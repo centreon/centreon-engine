@@ -2339,7 +2339,7 @@ void service::schedule_check(time_t check_time, int options) {
   // Default is to use the new event.
   bool use_original_event(false);
   timed_event* temp_event =
-      events::loop::instance().find_event(timed_event::low, EVENT_SERVICE_CHECK, this);
+      events::loop::instance().find_event(events::loop::low, EVENT_SERVICE_CHECK, this);
 
   // We found another service check event for this service in
   // the queue - what should we do?
@@ -2396,7 +2396,7 @@ void service::schedule_check(time_t check_time, int options) {
   if (!use_original_event) {
     // We're using the new event, so remove the old one.
     if (temp_event) {
-      events::loop::instance().remove_event(temp_event, timed_event::low);
+      events::loop::instance().remove_event(temp_event, events::loop::low);
       temp_event = nullptr;
     }
 
@@ -2418,7 +2418,7 @@ void service::schedule_check(time_t check_time, int options) {
           nullptr,
           options);
 
-      events::loop::instance().reschedule_event(new_event, timed_event::low);
+      events::loop::instance().reschedule_event(new_event, events::loop::low);
     } catch (...) {
       // Update the status log.
       update_status(false);

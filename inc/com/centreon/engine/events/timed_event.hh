@@ -35,11 +35,6 @@ CCE_END()
 CCE_BEGIN()
 class timed_event {
  public:
-  enum priority {
-    low = 0,
-    high = 1,
-    priority_num
-  };
   timed_event();
   timed_event(uint32_t event_type,
               time_t run_time,

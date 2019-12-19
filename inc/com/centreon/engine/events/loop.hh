@@ -53,25 +53,31 @@ class loop {
   bool _reload_running;
   timed_event _sleep_event;
 
-  timed_event_list event_list_high;
-  timed_event_list event_list_low;
+  timed_event_list _event_list_high;
+  timed_event_list _event_list_low;
 
  public:
+  enum priority {
+    low = 0,
+    high = 1,
+    priority_num
+  };
+
   static loop& instance();
   static void load();
   static void unload();
   void run();
   void adjust_check_scheduling();
-  void add_event(timed_event* event, timed_event::priority priority);
+  void add_event(timed_event* event, priority priority);
   void compensate_for_system_time_change(unsigned long last_time,
                                          unsigned long current_time);
-  void remove_event(timed_event* event, timed_event::priority priority);
-  void remove_events(timed_event::priority, uint32_t event_type, void* data) noexcept;
-  timed_event* find_event(timed_event::priority priority,
+  void remove_event(timed_event* event, priority priority);
+  void remove_events(priority, uint32_t event_type, void* data) noexcept;
+  timed_event* find_event(priority priority,
                           uint32_t event_type,
                           void* data);
-  void reschedule_event(timed_event* event, timed_event::priority priority);
-  void resort_event_list(timed_event::priority priority);
+  void reschedule_event(timed_event* event, priority priority);
+  void resort_event_list(priority priority);
   void schedule(timed_event* evt, bool high_priority);
 };
 }  // namespace events

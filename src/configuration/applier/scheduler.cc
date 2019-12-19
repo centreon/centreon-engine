@@ -77,7 +77,7 @@ void applier::scheduler::apply(configuration::state& config,
     host_map::const_iterator hst(hosts.find(it->host_name().c_str()));
     if (hst != hosts.end()) {
       bool has_event(events::loop::instance().find_event(
-          timed_event::low, EVENT_HOST_CHECK, hst->second.get()));
+          events::loop::low, EVENT_HOST_CHECK, hst->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         hst_to_unschedule.insert(*it);
@@ -97,7 +97,7 @@ void applier::scheduler::apply(configuration::state& config,
         {it->host_id(), it->service_id()}));
     if (svc != services.end()) {
       bool has_event(events::loop::instance().find_event(
-          timed_event::low, EVENT_SERVICE_CHECK, svc->second.get()));
+          events::loop::low, EVENT_SERVICE_CHECK, svc->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         svc_to_unschedule.insert(*it);
@@ -775,7 +775,7 @@ void applier::scheduler::_get_services(set_service const& svc_cfg,
  */
 void applier::scheduler::_remove_misc_event(timed_event*& evt) {
   if (evt) {
-    events::loop::instance().remove_event(evt, timed_event::high);
+    events::loop::instance().remove_event(evt, events::loop::high);
     evt = NULL;
   }
 }
@@ -999,9 +999,9 @@ void applier::scheduler::_unschedule_host_events(
     std::vector<com::centreon::engine::host*> const& hosts) {
   for (auto& h : hosts) {
     events::loop::instance().remove_events(
-        timed_event::low, EVENT_HOST_CHECK, h);
+        events::loop::low, EVENT_HOST_CHECK, h);
     events::loop::instance().remove_events(
-        timed_event::low, EVENT_EXPIRE_HOST_ACK, h);
+        events::loop::low, EVENT_EXPIRE_HOST_ACK, h);
   }
 }
 
@@ -1014,8 +1014,8 @@ void applier::scheduler::_unschedule_service_events(
     std::vector<engine::service*> const& services) {
   for (auto& s : services) {
     events::loop::instance().remove_events(
-        timed_event::low, EVENT_SERVICE_CHECK, s);
+        events::loop::low, EVENT_SERVICE_CHECK, s);
     events::loop::instance().remove_events(
-        timed_event::low, EVENT_EXPIRE_SERVICE_ACK, s);
+        events::loop::low, EVENT_EXPIRE_SERVICE_ACK, s);
   }
 }

@@ -70,7 +70,7 @@ int downtime_manager::unschedule_downtime(int type, uint64_t downtime_id) {
 
   /* remove scheduled entry from event queue */
   events::loop::instance().remove_events(
-      timed_event::high, EVENT_SCHEDULED_DOWNTIME, (void*)downtime_id);
+      events::loop::high, EVENT_SCHEDULED_DOWNTIME, (void*)downtime_id);
 
   /* delete downtime entry */
   if (temp_downtime->get_type() == HOST_DOWNTIME)
