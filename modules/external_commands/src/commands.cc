@@ -1953,12 +1953,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   args += pos + 1;
 
   /* get the custom variable value */
-  temp_ptr = index(args, ';');
-  std::string varvalue;
-  if (temp_ptr) {
-    pos = temp_ptr - args;
-    varvalue = std::string(args, pos);
-  }
+  std::string varvalue {args};
 
   std::transform(varname.begin(), varname.end(), varname.begin(), ::toupper);
 
