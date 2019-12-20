@@ -18,6 +18,13 @@ Recovery notifications must be sent even after an acknowledgement
 With the new notifications implementation, this behaviour had been changed.
 This new version reset this functionality as users expect it to work.
 
+External Command CHANGE_CUSTOM_X_VAR was not working
+====================================================
+
+A bug was introduced on 19.10 for the extcmd CHANGE_CUSTOM_X_VAR. When
+we were updating a custom variable with a command, the updated value
+was always empty string.
+
 =======================
 Centreon Engine 19.10.8
 =======================
