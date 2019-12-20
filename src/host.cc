@@ -26,7 +26,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -1149,7 +1148,7 @@ void host::schedule_acknowledgement_expiration() {
   if (get_acknowledgement_timeout() > 0 &&
       get_last_acknowledgement() != (time_t)0) {
     timed_event* evt = new timed_event(
-        EVENT_EXPIRE_HOST_ACK,
+        timed_event::EVENT_EXPIRE_HOST_ACK,
         get_last_acknowledgement() + get_acknowledgement_timeout(), false, 0,
         nullptr, true, this, nullptr, 0);
     events::loop::instance().schedule(evt, false);
@@ -1618,7 +1617,7 @@ void host::schedule_check(time_t check_time, int options) {
 
   /* see if there are any other scheduled checks of this host in the queue */
   temp_event = events::loop::instance().find_event(
-      events::loop::low, EVENT_HOST_CHECK, this);
+      events::loop::low, timed_event::EVENT_HOST_CHECK, this);
 
   /* we found another host check event for this host in the queue - what should
    * we do? */
@@ -1685,7 +1684,7 @@ void host::schedule_check(time_t check_time, int options) {
     set_next_check(check_time);
 
     /* place the new event in the event queue */
-    timed_event* new_event = new timed_event(EVENT_HOST_CHECK,
+    timed_event* new_event = new timed_event(timed_event::EVENT_HOST_CHECK,
                                              get_next_check(),
                                              false,
                                              0L,

@@ -106,6 +106,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/external_commands/host.cc"
     "${TESTS_DIR}/external_commands/service.cc"
     "${TESTS_DIR}/main.cc"
+    "${TESTS_DIR}/loop/loop.cc"
     "${TESTS_DIR}/notifications/host_downtime_notification.cc"
     "${TESTS_DIR}/notifications/host_flapping_notification.cc"
     "${TESTS_DIR}/notifications/host_normal_notification.cc"

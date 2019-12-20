@@ -21,13 +21,12 @@
 */
 
 #include <algorithm>
+#include <array>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
-#include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
@@ -89,42 +88,39 @@ timed_event::timed_event(uint32_t event_type,
       event_options{event_options} {}
 
 timed_event::~timed_event() {
-  if (event_type == EVENT_SCHEDULED_DOWNTIME)
+  if (event_type == timed_event::EVENT_SCHEDULED_DOWNTIME)
     delete static_cast<unsigned long*>(event_data);
 }
 
 /**
  *  Execute service check.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_service_check(timed_event* event) {
+void timed_event::_exec_event_service_check() {
   com::centreon::engine::service* svc(
-      reinterpret_cast<com::centreon::engine::service*>(event->event_data));
+      reinterpret_cast<com::centreon::engine::service*>(event_data));
 
   // get check latency.
   timeval tv;
   gettimeofday(&tv, NULL);
-  double latency = (double)((double)(tv.tv_sec - event->run_time) +
+  double latency = (double)((double)(tv.tv_sec - run_time) +
                             (double)(tv.tv_usec / 1000) / 1000.0);
 
   logger(dbg_events, basic)
       << "** Service Check Event ==> Host: '" << svc->get_hostname()
       << "', Service: '" << svc->get_description()
-      << "', Options: " << event->event_options << ", Latency: " << latency
+      << "', Options: " << event_options << ", Latency: " << latency
       << " sec";
 
   // run the service check.
-  svc->run_scheduled_check(event->event_options, latency);
+  svc->run_scheduled_check(event_options, latency);
 }
 
 /**
  *  Execute command check.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_command_check(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_command_check() {
   logger(dbg_events, basic) << "** External Command Check Event";
 
   // send data to event broker.
@@ -135,10 +131,8 @@ static void _exec_event_command_check(timed_event* event) {
 /**
  * @brief iExecute EngineRPC command check.
  *
- * @param event The event to execute.
  */
-static void _exec_event_enginerpc_check(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_enginerpc_check() {
 #ifdef GRPC
   logger(dbg_events, basic) << "** EngineRPC Command Check Event";
 
@@ -150,19 +144,14 @@ static void _exec_event_enginerpc_check(timed_event* event) {
 /**
  *  Execute log rotation.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_log_rotation(timed_event* event) {
-  (void)event;
-}
+void timed_event::_exec_event_log_rotation() {}
 
 /**
  *  Execute program shutdown.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_program_shutdown(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_program_shutdown() {
   logger(dbg_events, basic) << "** Program Shutdown Event";
 
   // set the shutdown flag.
@@ -176,10 +165,8 @@ static void _exec_event_program_shutdown(timed_event* event) {
 /**
  *  Execute program restart.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_program_restart(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_program_restart() {
   logger(dbg_events, basic) << "** Program Restart Event";
 
   // reload configuration.
@@ -203,10 +190,8 @@ static int reap_check_results() {
 /**
  *  Execute check reaper.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_check_reaper(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_check_reaper() {
   logger(dbg_events, basic) << "** Check Result Reaper";
 
   // reap host and service check results.
@@ -216,10 +201,8 @@ static void _exec_event_check_reaper(timed_event* event) {
 /**
  *  Execute orphan check.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_orphan_check(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_orphan_check() {
   logger(dbg_events, basic) << "** Orphaned Host and Service Check Event";
 
   // check for orphaned hosts and services.
@@ -232,10 +215,8 @@ static void _exec_event_orphan_check(timed_event* event) {
 /**
  *  Execute retention save.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_retention_save(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_retention_save() {
   logger(dbg_events, basic) << "** Retention Data Save Event";
 
   // save state retention data.
@@ -245,10 +226,8 @@ static void _exec_event_retention_save(timed_event* event) {
 /**
  *  Execute status save.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_status_save(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_status_save() {
   logger(dbg_events, basic) << "** Status Data Save Event";
 
   // save all status data (program, host, and service).
@@ -258,26 +237,23 @@ static void _exec_event_status_save(timed_event* event) {
 /**
  *  Execute scheduled downtime.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_scheduled_downtime(timed_event* event) {
+void timed_event::_exec_event_scheduled_downtime() {
   logger(dbg_events, basic) << "** Scheduled Downtime Event";
 
   // process scheduled downtime info.
-  if (event->event_data) {
-    handle_scheduled_downtime_by_id(*(uint64_t*)event->event_data);
-    delete static_cast<unsigned long*>(event->event_data);
-    event->event_data = nullptr;
+  if (event_data) {
+    handle_scheduled_downtime_by_id(*(uint64_t*)event_data);
+    delete static_cast<unsigned long*>(event_data);
+    event_data = nullptr;
   }
 }
 
 /**
  *  Execute sfreshness check.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_sfreshness_check(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_sfreshness_check() {
   logger(dbg_events, basic) << "** Service Result Freshness Check Event";
 
   // check service result freshness.
@@ -287,10 +263,8 @@ static void _exec_event_sfreshness_check(timed_event* event) {
 /**
  *  Execute expire downtime.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_expire_downtime(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_expire_downtime() {
   logger(dbg_events, basic) << "** Expire Downtime Event";
 
   // check for expired scheduled downtime entries.
@@ -300,33 +274,30 @@ static void _exec_event_expire_downtime(timed_event* event) {
 /**
  *  Execute host check.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_host_check(timed_event* event) {
-  host* hst(reinterpret_cast<host*>(event->event_data));
+void timed_event::_exec_event_host_check() {
+  host* hst(reinterpret_cast<host*>(event_data));
 
   // get check latency.
   timeval tv;
   gettimeofday(&tv, NULL);
-  double latency = (double)((double)(tv.tv_sec - event->run_time) +
+  double latency = (double)((double)(tv.tv_sec - run_time) +
                             (double)(tv.tv_usec / 1000) / 1000.0);
 
   logger(dbg_events, basic)
       << "** Host Check Event ==> Host: '" << hst->get_name()
-      << "', Options: " << event->event_options << ", Latency: " << latency
+      << "', Options: " << event_options << ", Latency: " << latency
       << " sec";
 
   // run the host check.
-  hst->perform_scheduled_check(event->event_options, latency);
+  hst->perform_scheduled_check(event_options, latency);
 }
 
 /**
  *  Execute hfreshness check.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_hfreshness_check(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_hfreshness_check() {
   logger(dbg_events, basic) << "** Host Result Freshness Check Event";
 
   // check host result freshness.
@@ -336,10 +307,8 @@ static void _exec_event_hfreshness_check(timed_event* event) {
 /**
  *  Execute rescheduled checks.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_reschedule_checks(timed_event* event) {
-  (void)event;
+void timed_event::_exec_event_reschedule_checks() {
   logger(dbg_events, basic) << "** Reschedule Checks Event";
 
   // adjust scheduling of host and service checks.
@@ -349,33 +318,30 @@ static void _exec_event_reschedule_checks(timed_event* event) {
 /**
  *  Execute expire comment.
  *
- *  @param[in] event The event to execute.
  */
-static void _exec_event_expire_comment(timed_event* event) {
+void timed_event::_exec_event_expire_comment() {
   logger(dbg_events, basic) << "** Expire Comment Event";
 
   // check for expired comment.
-  comment::remove_if_expired_comment((unsigned long)event->event_data);
+  comment::remove_if_expired_comment((unsigned long)event_data);
 }
 
 /**
  *  Check for expired host acknowledgement.
  *
- *  @param[in] event  Event to execute.
  */
-static void _exec_event_expire_host_ack(timed_event* event) {
+void timed_event::_exec_event_expire_host_ack() {
   logger(dbg_events, basic) << "** Expire Host Acknowledgement Event";
-  static_cast<host*>(event->event_data)->check_for_expired_acknowledgement();
+  static_cast<host*>(event_data)->check_for_expired_acknowledgement();
 }
 
 /**
  *  Check for expired service acknowledgement.
  *
- *  @param[in] event  Event to execute.
  */
-static void _exec_event_expire_service_ack(timed_event* event) {
+void timed_event::_exec_event_expire_service_ack() {
   logger(dbg_events, basic) << "** Expire Service Acknowledgement Event";
-  static_cast<service*>(event->event_data)->check_for_expired_acknowledgement();
+  static_cast<service*>(event_data)->check_for_expired_acknowledgement();
 }
 
 /**
@@ -383,17 +349,17 @@ static void _exec_event_expire_service_ack(timed_event* event) {
  *
  *  @param[in] event The event to execute.
  */
-static void _exec_event_user_function(timed_event* event) {
+void timed_event::_exec_event_user_function() {
   logger(dbg_events, basic) << "** User Function Event";
 
   // run a user-defined function.
-  if (event->event_data) {
+  if (event_data) {
     union {
       void (*func)(void*);
       void* data;
     } user;
-    user.data = event->event_data;
-    (*user.func)(event->event_args);
+    user.data = event_data;
+    (*user.func)(event_args);
   }
 }
 
@@ -438,43 +404,43 @@ time_t adjust_timestamp_for_time_change(time_t last_time,
  *
  *  @return OK.
  */
-int handle_timed_event(timed_event* event) {
-  typedef void (*exec_event)(timed_event*);
-  static exec_event tab_exec_event[] = {&_exec_event_service_check,
-                                        &_exec_event_command_check,
-                                        &_exec_event_log_rotation,
-                                        &_exec_event_program_shutdown,
-                                        &_exec_event_program_restart,
-                                        &_exec_event_check_reaper,
-                                        &_exec_event_orphan_check,
-                                        &_exec_event_retention_save,
-                                        &_exec_event_status_save,
-                                        &_exec_event_scheduled_downtime,
-                                        &_exec_event_sfreshness_check,
-                                        &_exec_event_expire_downtime,
-                                        &_exec_event_host_check,
-                                        &_exec_event_hfreshness_check,
-                                        &_exec_event_reschedule_checks,
-                                        &_exec_event_expire_comment,
-                                        &_exec_event_expire_host_ack,
-                                        &_exec_event_expire_service_ack,
-                                        &_exec_event_enginerpc_check,
-                                        NULL};
+int timed_event::handle_timed_event() {
+  typedef void (timed_event::*exec_event)();
+  static std::array<exec_event, 19> tab_exec_event{
+      &timed_event::_exec_event_service_check,
+      &timed_event::_exec_event_command_check,
+      &timed_event::_exec_event_log_rotation,
+      &timed_event::_exec_event_program_shutdown,
+      &timed_event::_exec_event_program_restart,
+      &timed_event::_exec_event_check_reaper,
+      &timed_event::_exec_event_orphan_check,
+      &timed_event::_exec_event_retention_save,
+      &timed_event::_exec_event_status_save,
+      &timed_event::_exec_event_scheduled_downtime,
+      &timed_event::_exec_event_sfreshness_check,
+      &timed_event::_exec_event_expire_downtime,
+      &timed_event::_exec_event_host_check,
+      &timed_event::_exec_event_hfreshness_check,
+      &timed_event::_exec_event_reschedule_checks,
+      &timed_event::_exec_event_expire_comment,
+      &timed_event::_exec_event_expire_host_ack,
+      &timed_event::_exec_event_expire_service_ack,
+      &timed_event::_exec_event_enginerpc_check};
 
   logger(dbg_functions, basic) << "handle_timed_event()";
 
   // send event data to broker.
   broker_timed_event(NEBTYPE_TIMEDEVENT_EXECUTE, NEBFLAG_NONE, NEBATTR_NONE,
-                     event, NULL);
+                     this, nullptr);
 
-  logger(dbg_events, basic) << "** Timed Event ** Type: " << event->event_type
-                            << ", Run Time: " << my_ctime(&event->run_time);
+  logger(dbg_events, basic) << "** Timed Event ** Type: " << event_type
+                            << ", Run Time: " << my_ctime(&run_time);
 
   // how should we handle the event?
-  if (event->event_type < sizeof(tab_exec_event) / sizeof(*tab_exec_event))
-    (tab_exec_event[event->event_type])(event);
-  else if (event->event_type == EVENT_USER_FUNCTION)
-    _exec_event_user_function(event);
+  if (event_type < tab_exec_event.size())
+    (this->*(tab_exec_event[event_type]))();
+  else if (event_type == timed_event::EVENT_USER_FUNCTION)
+    _exec_event_user_function();
 
   return OK;
 }
@@ -503,9 +469,9 @@ std::string const& timed_event::name() const noexcept {
 
   if (this->event_type < sizeof(event_names) / sizeof(event_names[0]))
     return event_names[this->event_type];
-  if (this->event_type == EVENT_SLEEP)
+  if (this->event_type == timed_event::EVENT_SLEEP)
     return event_sleep;
-  if (this->event_type == EVENT_USER_FUNCTION)
+  if (this->event_type == timed_event::EVENT_USER_FUNCTION)
     return event_user_function;
   return event_unknown;
 }
@@ -523,14 +489,14 @@ bool operator==(timed_event const& obj1, timed_event const& obj2) throw() {
     return false;
 
   bool is_not_null(obj1.event_data && obj2.event_data);
-  if (is_not_null && ((obj1.event_type == EVENT_HOST_CHECK) ||
-                      (obj1.event_type == EVENT_EXPIRE_HOST_ACK))) {
+  if (is_not_null && ((obj1.event_type == timed_event::EVENT_HOST_CHECK) ||
+                      (obj1.event_type == timed_event::EVENT_EXPIRE_HOST_ACK))) {
     host& hst1(*(host*)obj1.event_data);
     host& hst2(*(host*)obj2.event_data);
     if (hst1.get_name() != hst2.get_name())
       return false;
-  } else if (is_not_null && ((obj1.event_type == EVENT_SERVICE_CHECK) ||
-                             (obj1.event_type == EVENT_EXPIRE_SERVICE_ACK))) {
+  } else if (is_not_null && ((obj1.event_type == timed_event::EVENT_SERVICE_CHECK) ||
+                             (obj1.event_type == timed_event::EVENT_EXPIRE_SERVICE_ACK))) {
     com::centreon::engine::service& svc1(
         *(com::centreon::engine::service*)obj1.event_data);
     com::centreon::engine::service& svc2(
@@ -538,8 +504,8 @@ bool operator==(timed_event const& obj1, timed_event const& obj2) throw() {
     if (svc1.get_hostname() != svc2.get_hostname() ||
         svc1.get_description() != svc2.get_description())
       return false;
-  } else if (is_not_null && (obj1.event_type == EVENT_SCHEDULED_DOWNTIME ||
-                             obj1.event_type == EVENT_EXPIRE_COMMENT)) {
+  } else if (is_not_null && (obj1.event_type == timed_event::EVENT_SCHEDULED_DOWNTIME ||
+                             obj1.event_type == timed_event::EVENT_EXPIRE_COMMENT)) {
     unsigned long id1(*(unsigned long*)obj1.event_data);
     unsigned long id2(*(unsigned long*)obj2.event_data);
     if (id1 != id2)
@@ -597,18 +563,18 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
 
   if (!obj.event_data)
     os << "  event_data:                 \"NULL\"\n";
-  else if (obj.event_type == EVENT_HOST_CHECK ||
-           obj.event_type == EVENT_EXPIRE_HOST_ACK) {
+  else if (obj.event_type == timed_event::EVENT_HOST_CHECK ||
+           obj.event_type == timed_event::EVENT_EXPIRE_HOST_ACK) {
     host& hst(*(host*)obj.event_data);
     os << "  event_data:                 " << hst.get_name() << "\n";
-  } else if (obj.event_type == EVENT_SERVICE_CHECK ||
-             obj.event_type == EVENT_EXPIRE_SERVICE_ACK) {
+  } else if (obj.event_type == timed_event::EVENT_SERVICE_CHECK ||
+             obj.event_type == timed_event::EVENT_EXPIRE_SERVICE_ACK) {
     com::centreon::engine::service& svc(
         *(com::centreon::engine::service*)obj.event_data);
     os << "  event_data:                 " << svc.get_hostname() << ", "
        << svc.get_description() << "\n";
-  } else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME ||
-             obj.event_type == EVENT_EXPIRE_COMMENT) {
+  } else if (obj.event_type == timed_event::EVENT_SCHEDULED_DOWNTIME ||
+             obj.event_type == timed_event::EVENT_EXPIRE_COMMENT) {
     unsigned long id(*(unsigned long*)obj.event_data);
     os << "  event_data:                 " << id << "\n";
   } else

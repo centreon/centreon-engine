@@ -26,7 +26,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
@@ -77,7 +76,7 @@ void applier::scheduler::apply(configuration::state& config,
     host_map::const_iterator hst(hosts.find(it->host_name().c_str()));
     if (hst != hosts.end()) {
       bool has_event(events::loop::instance().find_event(
-          events::loop::low, EVENT_HOST_CHECK, hst->second.get()));
+          events::loop::low, timed_event::EVENT_HOST_CHECK, hst->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         hst_to_unschedule.insert(*it);
@@ -97,7 +96,7 @@ void applier::scheduler::apply(configuration::state& config,
         {it->host_id(), it->service_id()}));
     if (svc != services.end()) {
       bool has_event(events::loop::instance().find_event(
-          events::loop::low, EVENT_SERVICE_CHECK, svc->second.get()));
+          events::loop::low, timed_event::EVENT_SERVICE_CHECK, svc->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         svc_to_unschedule.insert(*it);
@@ -267,7 +266,7 @@ void applier::scheduler::_apply_misc_event() {
       (_old_check_reaper_interval != _config->check_reaper_interval())) {
     _remove_misc_event(_evt_check_reaper);
     _evt_check_reaper = _create_misc_event(
-        EVENT_CHECK_REAPER, now + _config->check_reaper_interval(),
+        timed_event::EVENT_CHECK_REAPER, now + _config->check_reaper_interval(),
         _config->check_reaper_interval());
     _old_check_reaper_interval = _config->check_reaper_interval();
   }
@@ -282,7 +281,7 @@ void applier::scheduler::_apply_misc_event() {
       if (_config->command_check_interval() != -1)
         interval = (unsigned long)_config->command_check_interval();
       _evt_command_check =
-          _create_misc_event(EVENT_COMMAND_CHECK, now + interval, interval);
+          _create_misc_event(timed_event::EVENT_COMMAND_CHECK, now + interval, interval);
     }
     _old_command_check_interval = _config->command_check_interval();
   }
@@ -295,7 +294,7 @@ void applier::scheduler::_apply_misc_event() {
     _remove_misc_event(_evt_hfreshness_check);
     if (_config->check_host_freshness())
       _evt_hfreshness_check =
-          _create_misc_event(EVENT_HFRESHNESS_CHECK,
+          _create_misc_event(timed_event::EVENT_HFRESHNESS_CHECK,
                              now + _config->host_freshness_check_interval(),
                              _config->host_freshness_check_interval());
     _old_host_freshness_check_interval =
@@ -310,7 +309,7 @@ void applier::scheduler::_apply_misc_event() {
     _remove_misc_event(_evt_orphan_check);
     if (_config->check_orphaned_services() || _config->check_orphaned_hosts())
       _evt_orphan_check = _create_misc_event(
-          EVENT_ORPHAN_CHECK, now + DEFAULT_ORPHAN_CHECK_INTERVAL,
+          timed_event::EVENT_ORPHAN_CHECK, now + DEFAULT_ORPHAN_CHECK_INTERVAL,
           DEFAULT_ORPHAN_CHECK_INTERVAL);
   }
 
@@ -322,7 +321,7 @@ void applier::scheduler::_apply_misc_event() {
     _remove_misc_event(_evt_reschedule_checks);
     if (_config->auto_reschedule_checks())
       _evt_reschedule_checks = _create_misc_event(
-          EVENT_RESCHEDULE_CHECKS, now + _config->auto_rescheduling_interval(),
+          timed_event::EVENT_RESCHEDULE_CHECKS, now + _config->auto_rescheduling_interval(),
           _config->auto_rescheduling_interval());
     _old_auto_rescheduling_interval = _config->auto_rescheduling_interval();
   }
@@ -337,7 +336,7 @@ void applier::scheduler::_apply_misc_event() {
         _config->retention_update_interval() > 0) {
       unsigned long interval(_config->retention_update_interval() * 60);
       _evt_retention_save =
-          _create_misc_event(EVENT_RETENTION_SAVE, now + interval, interval);
+          _create_misc_event(timed_event::EVENT_RETENTION_SAVE, now + interval, interval);
     }
     _old_retention_update_interval = _config->retention_update_interval();
   }
@@ -350,7 +349,7 @@ void applier::scheduler::_apply_misc_event() {
     _remove_misc_event(_evt_sfreshness_check);
     if (_config->check_service_freshness())
       _evt_sfreshness_check =
-          _create_misc_event(EVENT_SFRESHNESS_CHECK,
+          _create_misc_event(timed_event::EVENT_SFRESHNESS_CHECK,
                              now + _config->service_freshness_check_interval(),
                              _config->service_freshness_check_interval());
     _old_service_freshness_check_interval =
@@ -362,7 +361,7 @@ void applier::scheduler::_apply_misc_event() {
       (_old_status_update_interval != _config->status_update_interval())) {
     _remove_misc_event(_evt_status_save);
     _evt_status_save = _create_misc_event(
-        EVENT_STATUS_SAVE, now + _config->status_update_interval(),
+        timed_event::EVENT_STATUS_SAVE, now + _config->status_update_interval(),
         _config->status_update_interval());
     _old_status_update_interval = _config->status_update_interval();
   }
@@ -383,7 +382,7 @@ void applier::scheduler::_apply_misc_event() {
         !_config->host_perfdata_file_processing_command().empty()) {
       type.func = &xpddefault_process_host_perfdata_file;
       _evt_host_perfdata = _create_misc_event(
-          EVENT_USER_FUNCTION,
+          timed_event::EVENT_USER_FUNCTION,
           now + _config->host_perfdata_file_processing_interval(),
           _config->host_perfdata_file_processing_interval(), type.data);
     }
@@ -404,7 +403,7 @@ void applier::scheduler::_apply_misc_event() {
         !_config->service_perfdata_file_processing_command().empty()) {
       type.func = &xpddefault_process_service_perfdata_file;
       _evt_service_perfdata = _create_misc_event(
-          EVENT_USER_FUNCTION,
+          timed_event::EVENT_USER_FUNCTION,
           now + _config->service_perfdata_file_processing_interval(),
           _config->service_perfdata_file_processing_interval(), type.data);
     }
@@ -869,7 +868,7 @@ void applier::scheduler::_schedule_host_events(
     com::centreon::engine::host& hst(*it->second);
 
     // Schedule a new host check event.
-    timed_event* evt = new timed_event(EVENT_HOST_CHECK, hst.get_next_check(),
+    timed_event* evt = new timed_event(timed_event::EVENT_HOST_CHECK, hst.get_next_check(),
                                        false, 0, nullptr, true, (void*)&hst,
                                        NULL, hst.get_check_options());
     events::loop::instance().schedule(evt, false);
@@ -975,7 +974,7 @@ void applier::scheduler::_schedule_service_events(
        it != end; ++it) {
     engine::service& svc(*it->second);
     // Create a new service check event.
-    timed_event* evt(new timed_event(EVENT_SERVICE_CHECK, svc.get_next_check(),
+    timed_event* evt(new timed_event(timed_event::EVENT_SERVICE_CHECK, svc.get_next_check(),
                                      false, 0, nullptr, true, (void*)&svc,
                                      nullptr, svc.get_check_options()));
     events::loop::instance().schedule(evt, false);
@@ -999,9 +998,9 @@ void applier::scheduler::_unschedule_host_events(
     std::vector<com::centreon::engine::host*> const& hosts) {
   for (auto& h : hosts) {
     events::loop::instance().remove_events(
-        events::loop::low, EVENT_HOST_CHECK, h);
+        events::loop::low, timed_event::EVENT_HOST_CHECK, h);
     events::loop::instance().remove_events(
-        events::loop::low, EVENT_EXPIRE_HOST_ACK, h);
+        events::loop::low, timed_event::EVENT_EXPIRE_HOST_ACK, h);
   }
 }
 
@@ -1014,8 +1013,8 @@ void applier::scheduler::_unschedule_service_events(
     std::vector<engine::service*> const& services) {
   for (auto& s : services) {
     events::loop::instance().remove_events(
-        events::loop::low, EVENT_SERVICE_CHECK, s);
+        events::loop::low, timed_event::EVENT_SERVICE_CHECK, s);
     events::loop::instance().remove_events(
-        events::loop::low, EVENT_EXPIRE_SERVICE_ACK, s);
+        events::loop::low, timed_event::EVENT_EXPIRE_SERVICE_ACK, s);
   }
 }

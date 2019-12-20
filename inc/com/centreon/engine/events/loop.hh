@@ -42,7 +42,7 @@ namespace events {
 class loop {
   loop();
   loop(loop const&) = delete;
-  ~loop() noexcept;
+  ~loop() = default;
   loop& operator=(loop const&) = delete;
   void _dispatching();
 

@@ -25,8 +25,6 @@
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/events/defines.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -870,7 +868,7 @@ void service::schedule_acknowledgement_expiration() {
   if (get_acknowledgement_timeout() > 0 &&
       get_last_acknowledgement() != (time_t)0) {
     timed_event* evt = new timed_event(
-        EVENT_EXPIRE_SERVICE_ACK,
+        timed_event::EVENT_EXPIRE_SERVICE_ACK,
         get_last_acknowledgement() + get_acknowledgement_timeout(), false, 0,
         nullptr, true, this, nullptr, 0);
     events::loop::instance().schedule(evt, false);
@@ -2338,8 +2336,8 @@ void service::schedule_check(time_t check_time, int options) {
 
   // Default is to use the new event.
   bool use_original_event(false);
-  timed_event* temp_event =
-      events::loop::instance().find_event(events::loop::low, EVENT_SERVICE_CHECK, this);
+  timed_event* temp_event = events::loop::instance().find_event(
+      events::loop::low, timed_event::EVENT_SERVICE_CHECK, this);
 
   // We found another service check event for this service in
   // the queue - what should we do?
@@ -2408,7 +2406,7 @@ void service::schedule_check(time_t check_time, int options) {
       set_next_check(check_time);
 
       // Place the new event in the event queue.
-      timed_event* new_event = new timed_event(EVENT_SERVICE_CHECK,
+      timed_event* new_event = new timed_event(timed_event::EVENT_SERVICE_CHECK,
           get_next_check(),
           false,
           0L,

@@ -22,7 +22,6 @@
 #include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -267,7 +266,7 @@ int host_downtime::subscribe() {
   if (get_triggered_by() == 0) {
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
     timed_event* evt =
-        new timed_event(EVENT_SCHEDULED_DOWNTIME, get_start_time(), false, 0,
+        new timed_event(timed_event::EVENT_SCHEDULED_DOWNTIME, get_start_time(), false, 0,
                         NULL, false, (void*)new_downtime_id, NULL, 0);
     events::loop::instance().schedule(evt, true);
   }
@@ -319,7 +318,7 @@ int host_downtime::handle() {
         /*** Sometimes, get_end_time() == longlong::max(), if we add 1 to it,
          * it becomes < 0 ***/
         timed_event* evt = new timed_event(
-          EVENT_EXPIRE_DOWNTIME,
+          timed_event::EVENT_EXPIRE_DOWNTIME,
           temp,
           false,
           0,
@@ -453,7 +452,7 @@ int host_downtime::handle() {
 
     uint64_t* new_downtime_id{new uint64_t{get_downtime_id()}};
     timed_event* evt =
-        new timed_event(EVENT_SCHEDULED_DOWNTIME, event_time, false, 0, NULL,
+        new timed_event(timed_event::EVENT_SCHEDULED_DOWNTIME, event_time, false, 0, NULL,
                         false, (void*)new_downtime_id, NULL, 0);
     events::loop::instance().schedule(evt, true);
 

@@ -19,7 +19,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/events/loop.hh"
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -30,7 +29,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
-#include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -84,7 +83,7 @@ void loop::run() {
   _last_status_update = 0L;
 
   // Initialize fake "sleep" event.
-  _sleep_event.event_type = EVENT_SLEEP;
+  _sleep_event.event_type = timed_event::EVENT_SLEEP;
   _sleep_event.run_time = _last_time;
   _sleep_event.recurring = false;
   _sleep_event.event_interval = 0L;
@@ -115,11 +114,6 @@ void loop::unload() {
  *  Default constructor.
  */
 loop::loop() : _need_reload(0), _reload_running(false) {}
-
-/**
- *  Destructor.
- */
-loop::~loop() throw() {}
 
 static void apply_conf(std::atomic<bool>* reloading) {
   logger(log_info_message, more) << "Starting to reload configuration.";
@@ -235,7 +229,7 @@ void loop::_dispatching() {
       // We may have just removed the only item from the list.
 
       // Handle the event.
-      handle_timed_event(temp_event);
+      temp_event->handle_timed_event();
 
       // Reschedule the event if necessary.
       if (temp_event->recurring)
@@ -253,7 +247,7 @@ void loop::_dispatching() {
 
       // Run a few checks before executing a service check...
       if ((*_event_list_low.begin())->event_type ==
-          EVENT_SERVICE_CHECK) {
+          timed_event::EVENT_SERVICE_CHECK) {
         int nudge_seconds(0);
         service* temp_service(static_cast<service*>(
             (*_event_list_low.begin())->event_data));
@@ -331,7 +325,7 @@ void loop::_dispatching() {
         }
       }
       // Run a few checks before executing a host check...
-      else if (EVENT_HOST_CHECK ==
+      else if (timed_event::EVENT_HOST_CHECK ==
                (*_event_list_low.begin())->event_type) {
         // Default action is to execute the event.
         run_event = true;
@@ -385,7 +379,7 @@ void loop::_dispatching() {
 
         // Handle the event.
         logger(dbg_events, more) << "Running event...";
-        handle_timed_event(temp_event);
+        temp_event->handle_timed_event();
 
         // Reschedule the event if necessary.
         if (temp_event->recurring)
@@ -490,7 +484,7 @@ void loop::adjust_check_scheduling() {
     if ((*it)->run_time > last_window_time)
       break;
 
-    if ((*it)->event_type == EVENT_HOST_CHECK) {
+    if ((*it)->event_type == timed_event::EVENT_HOST_CHECK) {
       if (!(hst = (host*)(*it)->event_data))
         continue;
 
@@ -511,7 +505,7 @@ void loop::adjust_check_scheduling() {
       total_check_exec_time += last_check_exec_time;
     }
 
-    else if ((*it)->event_type == EVENT_SERVICE_CHECK) {
+    else if ((*it)->event_type == timed_event::EVENT_SERVICE_CHECK) {
       if (!(svc = (com::centreon::engine::service*)(*it)->event_data))
         continue;
 
@@ -563,7 +557,7 @@ void loop::adjust_check_scheduling() {
     if ((*it)->run_time > last_window_time)
       break;
 
-    if ((*it)->event_type == EVENT_HOST_CHECK) {
+    if ((*it)->event_type == timed_event::EVENT_HOST_CHECK) {
       if (!(hst = (host*)(*it)->event_data))
         continue;
 
@@ -574,7 +568,7 @@ void loop::adjust_check_scheduling() {
       current_exec_time =
           ((hst->get_execution_time() + projected_host_check_overhead) *
            exec_time_factor);
-    } else if ((*it)->event_type == EVENT_SERVICE_CHECK) {
+    } else if ((*it)->event_type == timed_event::EVENT_SERVICE_CHECK) {
       if (!(svc = (com::centreon::engine::service*)(*it)->event_data))
         continue;
 
@@ -593,7 +587,7 @@ void loop::adjust_check_scheduling() {
     time_t new_run_time(
         (time_t)(first_window_time + (unsigned long)new_run_time_offset));
 
-    if ((*it)->event_type == EVENT_HOST_CHECK) {
+    if ((*it)->event_type == timed_event::EVENT_HOST_CHECK) {
       (*it)->run_time = new_run_time;
       hst->set_next_check(new_run_time);
       hst->update_status(false);
