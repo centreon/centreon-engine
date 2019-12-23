@@ -88,8 +88,8 @@ timed_event::timed_event(uint32_t event_type,
       event_options{event_options} {}
 
 timed_event::~timed_event() {
-  if (event_type == timed_event::EVENT_SCHEDULED_DOWNTIME)
-    delete static_cast<unsigned long*>(event_data);
+  if (event_type == timed_event::EVENT_SCHEDULED_DOWNTIME && event_data)
+    delete static_cast<uint64_t*>(event_data);
 }
 
 /**
@@ -97,8 +97,7 @@ timed_event::~timed_event() {
  *
  */
 void timed_event::_exec_event_service_check() {
-  com::centreon::engine::service* svc(
-      reinterpret_cast<com::centreon::engine::service*>(event_data));
+  service* svc(reinterpret_cast<service*>(event_data));
 
   // get check latency.
   timeval tv;
@@ -290,7 +289,7 @@ void timed_event::_exec_event_host_check() {
       << " sec";
 
   // run the host check.
-  hst->perform_scheduled_check(event_options, latency);
+  hst->run_scheduled_check(event_options, latency);
 }
 
 /**
@@ -374,27 +373,17 @@ void timed_event::_exec_event_user_function() {
  *
  *  @return the adjusted time.
  */
-time_t adjust_timestamp_for_time_change(time_t last_time,
-                                        time_t current_time,
-                                        uint64_t time_difference,
-                                        time_t ts) {
+time_t adjust_timestamp_for_time_change(int64_t time_difference, time_t ts) {
   logger(dbg_functions, basic) << "adjust_timestamp_for_time_change()";
 
   // we shouldn't do anything with epoch or invalid values.
   if (ts == (time_t)0 || ts == (time_t)-1)
     return ts;
 
-  // we moved back in time...
-  if (last_time > current_time) {
-    // we can't precede the UNIX epoch.
-    if (time_difference > (uint32_t)ts)
-      return (time_t)0;
-    else
-      return (time_t)(ts - time_difference);
-  }
-  // we moved into the future...
-  else
-    return (time_t)(ts + time_difference);
+  time_t retval = ts + time_difference;
+  if (retval < 0)
+    retval = 0;
+  return retval;
 }
 
 /**
@@ -474,117 +463,4 @@ std::string const& timed_event::name() const noexcept {
   if (this->event_type == timed_event::EVENT_USER_FUNCTION)
     return event_user_function;
   return event_unknown;
-}
-
-/**
- *  Equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is the same object, otherwise false.
- */
-bool operator==(timed_event const& obj1, timed_event const& obj2) throw() {
-  if (obj1.event_type != obj2.event_type)
-    return false;
-
-  bool is_not_null(obj1.event_data && obj2.event_data);
-  if (is_not_null && ((obj1.event_type == timed_event::EVENT_HOST_CHECK) ||
-                      (obj1.event_type == timed_event::EVENT_EXPIRE_HOST_ACK))) {
-    host& hst1(*(host*)obj1.event_data);
-    host& hst2(*(host*)obj2.event_data);
-    if (hst1.get_name() != hst2.get_name())
-      return false;
-  } else if (is_not_null && ((obj1.event_type == timed_event::EVENT_SERVICE_CHECK) ||
-                             (obj1.event_type == timed_event::EVENT_EXPIRE_SERVICE_ACK))) {
-    com::centreon::engine::service& svc1(
-        *(com::centreon::engine::service*)obj1.event_data);
-    com::centreon::engine::service& svc2(
-        *(com::centreon::engine::service*)obj2.event_data);
-    if (svc1.get_hostname() != svc2.get_hostname() ||
-        svc1.get_description() != svc2.get_description())
-      return false;
-  } else if (is_not_null && (obj1.event_type == timed_event::EVENT_SCHEDULED_DOWNTIME ||
-                             obj1.event_type == timed_event::EVENT_EXPIRE_COMMENT)) {
-    unsigned long id1(*(unsigned long*)obj1.event_data);
-    unsigned long id2(*(unsigned long*)obj2.event_data);
-    if (id1 != id2)
-      return false;
-  } else if (obj1.event_data != obj2.event_data)
-    return false;
-
-  return obj1.run_time == obj2.run_time && obj1.recurring == obj2.recurring &&
-         obj1.event_interval == obj2.event_interval &&
-         obj1.compensate_for_time_change == obj2.compensate_for_time_change &&
-         obj1.timing_func == obj2.timing_func &&
-         obj1.event_args == obj2.event_args &&
-         obj1.event_options == obj2.event_options;
-}
-
-/**
- *  Not equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is not the same object, otherwise false.
- */
-bool operator!=(timed_event const& obj1, timed_event const& obj2) throw() {
-  return !operator==(obj1, obj2);
-}
-
-/**
- *  Dump command content into the stream.
- *
- *  @param[out] os  The output stream.
- *  @param[in]  obj The command to dump.
- *
- *  @return The output stream.
- */
-std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
-  os << "timed_event {\n"
-        "  event_type:                 "
-     << obj.name()
-     << "\n"
-        "  run_time:                   "
-     << string::ctime(obj.run_time)
-     << "\n"
-        "  recurring:                  "
-     << obj.recurring
-     << "\n"
-        "  event_interval:             "
-     << obj.event_interval
-     << "\n"
-        "  compensate_for_time_change: "
-     << obj.compensate_for_time_change
-     << "\n"
-        "  timing_func:                "
-     << obj.timing_func << "\n";
-
-  if (!obj.event_data)
-    os << "  event_data:                 \"NULL\"\n";
-  else if (obj.event_type == timed_event::EVENT_HOST_CHECK ||
-           obj.event_type == timed_event::EVENT_EXPIRE_HOST_ACK) {
-    host& hst(*(host*)obj.event_data);
-    os << "  event_data:                 " << hst.get_name() << "\n";
-  } else if (obj.event_type == timed_event::EVENT_SERVICE_CHECK ||
-             obj.event_type == timed_event::EVENT_EXPIRE_SERVICE_ACK) {
-    com::centreon::engine::service& svc(
-        *(com::centreon::engine::service*)obj.event_data);
-    os << "  event_data:                 " << svc.get_hostname() << ", "
-       << svc.get_description() << "\n";
-  } else if (obj.event_type == timed_event::EVENT_SCHEDULED_DOWNTIME ||
-             obj.event_type == timed_event::EVENT_EXPIRE_COMMENT) {
-    unsigned long id(*(unsigned long*)obj.event_data);
-    os << "  event_data:                 " << id << "\n";
-  } else
-    os << "  event_data:                 " << obj.event_data << "\n";
-
-  os << "  event_args:                 " << obj.event_args
-     << "\n"
-        "  event_options:              "
-     << obj.event_options
-     << "\n"
-        "}\n";
-  return os;
 }

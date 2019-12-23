@@ -170,7 +170,6 @@ class host : public notifier {
                               int reschedule_check,
                               int use_cached_result,
                               unsigned long check_timestamp_horizon);
-  int perform_scheduled_check(int check_options, double latency);
   void adjust_check_attempt(bool is_active);
   bool authorized_by_dependencies(
       dependency::types dependency_type) const override;

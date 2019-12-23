@@ -132,6 +132,13 @@ configuration::host TestEngine::new_configuration_host(
   hst.parse("address", "127.0.0.1");
   hst.parse("_HOST_ID", std::to_string(hst_id).c_str());
   hst.parse("contacts", contacts.c_str());
+
+  configuration::command cmd("hcmd");
+  cmd.parse("command_line", "echo 0");
+  hst.parse("check_command", "hcmd");
+  configuration::applier::command cmd_aply;
+  cmd_aply.add_object(cmd);
+
   return hst;
 }
 

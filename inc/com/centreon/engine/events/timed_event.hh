@@ -112,10 +112,7 @@ CCE_END()
 extern "C" {
 #endif /* C++ */
 
-time_t adjust_timestamp_for_time_change(time_t last_time,
-                                        time_t current_time,
-                                        uint64_t time_difference,
-                                        time_t ts);
+time_t adjust_timestamp_for_time_change(int64_t time_difference, time_t ts);
 
 #ifdef __cplusplus
 }
@@ -125,13 +122,6 @@ time_t adjust_timestamp_for_time_change(time_t last_time,
 
 #include <ostream>
 #include "com/centreon/engine/namespace.hh"
-
-bool operator==(com::centreon::engine::timed_event const& obj1,
-                com::centreon::engine::timed_event const& obj2) throw();
-bool operator!=(com::centreon::engine::timed_event const& obj1,
-                com::centreon::engine::timed_event const& obj2) throw();
-std::ostream& operator<<(std::ostream& os,
-                         com::centreon::engine::timed_event const& obj);
 
 #endif /* C++ */
 

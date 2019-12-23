@@ -1500,7 +1500,7 @@ int host::run_scheduled_check(int check_options, double latency) {
     /* only attempt to (re)schedule checks that should get checked... */
     if (get_should_be_scheduled()) {
       /* get current time */
-      current_time = time(nullptr);
+      time(&current_time);
 
       /* determine next time we should check the host if needed */
       /* if host has no check interval, schedule it again for 5 minutes from now
@@ -3249,13 +3249,6 @@ std::list<hostgroup*> const& host::get_parent_groups() const {
 
 std::list<hostgroup*>& host::get_parent_groups() {
   return _hostgroups;
-}
-
-/* execute a scheduled host check using either the 2.x or 3.x logic */
-int host::perform_scheduled_check(int check_options, double latency) {
-  logger(dbg_functions, basic) << "perform_scheduled_host_check()";
-  run_scheduled_check(check_options, latency);
-  return OK;
 }
 
 /**

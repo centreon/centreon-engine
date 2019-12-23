@@ -54,13 +54,36 @@ class EngineRPCClient {
     }
     return true;
   }
+
+  bool ProcessServiceCheckResult(Check const& sc) {
+    grpc::ClientContext context;
+    CommandSuccess response;
+    grpc::Status status = _stub->ProcessServiceCheckResult(&context, sc, &response);
+    if (!status.ok()) {
+      std::cout << "ProcessServiceCheckResult failed." << std::endl;
+      return false;
+    }
+    return true;
+  }
+
+  bool ProcessHostCheckResult(Check const& hc) {
+    grpc::ClientContext context;
+    CommandSuccess response;
+    grpc::Status status = _stub->ProcessHostCheckResult(&context, hc, &response);
+    if (!status.ok()) {
+      std::cout << "ProcessHostCheckResult failed." << std::endl;
+      return false;
+    }
+    return true;
+  }
 };
 
 int main(int argc, char** argv) {
+  int32_t status;
   EngineRPCClient client(grpc::CreateChannel(
       "10.0.2.15:50051", grpc::InsecureChannelCredentials()));
 
-  if (argc != 2) {
+  if (argc < 2) {
     std::cout << "ERROR: this client must be called with a command..."
               << std::endl;
     exit(1);
@@ -68,13 +91,30 @@ int main(int argc, char** argv) {
 
   if (strcmp(argv[1], "GetVersion") == 0) {
     Version version;
-    client.GetVersion(&version);
+    status = client.GetVersion(&version) ? 0 : 1;
     std::cout << "GetVersion: " << version.DebugString();
   }
   else if (strcmp(argv[1], "GetStats") == 0) {
     Stats stats;
-    client.GetStats(&stats);
+    status = client.GetStats(&stats) ? 0 : 2;
     std::cout << "GetStats: " << stats.DebugString();
   }
-  exit(0);
+  else if (strcmp(argv[1], "ProcessServiceCheckResult") == 0) {
+    Check sc;
+    sc.set_host_name(argv[2]);
+    sc.set_svc_desc(argv[3]);
+    sc.set_code(std::stol(argv[4]));
+    sc.set_output("Test external command");
+    status = client.ProcessServiceCheckResult(sc) ? 0 : 3;
+    std::cout << "ProcessServiceCheckResult: " << status << std::endl;
+  }
+  else if (strcmp(argv[1], "ProcessHostCheckResult") == 0) {
+    Check hc;
+    hc.set_host_name(argv[2]);
+    hc.set_code(std::stol(argv[3]));
+    hc.set_output("Test external command");
+    status = client.ProcessHostCheckResult(hc) ? 0 : 4;
+    std::cout << "ProcessHostCheckResult: " << status << std::endl;
+  }
+  exit(status);
 }
