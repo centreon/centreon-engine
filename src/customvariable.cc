@@ -29,7 +29,7 @@ using namespace com::centreon::engine;
  *  broker
  */
 customvariable::customvariable(std::string const& value, bool is_sent)
-    : _value{value}, _is_sent{is_sent}, _modified{true} {}
+    : _value{value}, _is_sent{is_sent}, _modified{false} {}
 
 /**
  *  Copy constructor
@@ -39,7 +39,7 @@ customvariable::customvariable(std::string const& value, bool is_sent)
 customvariable::customvariable(customvariable const& other)
     : _value{other._value},
       _is_sent{other._is_sent},
-      _modified{other._modified} {}
+      _modified{false} {}
 
 /**
  *  Affectation operator of customvariable
