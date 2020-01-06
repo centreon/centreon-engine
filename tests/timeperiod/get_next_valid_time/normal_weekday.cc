@@ -29,17 +29,6 @@ using namespace com::centreon::engine;
 
 class GetNextValidTimeNormalWeekdayTest : public ::testing::Test {
  public:
-  void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();
-  }
-
-  void TearDown() override {
-    configuration::applier::state::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
-  }
 
   void default_data_set() {
     _creator.new_timeperiod();

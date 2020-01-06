@@ -40,8 +40,6 @@ using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::logging;
 
-static applier::scheduler* _instance(NULL);
-
 /**
  *  Apply new configuration.
  *
@@ -171,16 +169,35 @@ void applier::scheduler::apply(configuration::state& config,
  *  @return Singleton instance.
  */
 applier::scheduler& applier::scheduler::instance() {
-  assert(_instance);
-  return (*_instance);
+  static applier::scheduler instance;
+  return instance;
 }
 
-/**
- *  Load scheduler applier singleton.
- */
-void applier::scheduler::load() {
-  if (!_instance)
-    _instance = new applier::scheduler;
+void applier::scheduler::clear() {
+  _config = nullptr;
+  _evt_check_reaper = nullptr;
+  _evt_command_check = nullptr;
+  _evt_hfreshness_check = nullptr;
+  _evt_host_perfdata = nullptr;
+  _evt_orphan_check = nullptr;
+  _evt_reschedule_checks = nullptr;
+  _evt_retention_save = nullptr;
+  _evt_sfreshness_check = nullptr;
+  _evt_service_perfdata = nullptr;
+  _evt_status_save = nullptr;
+  _old_auto_rescheduling_interval = 0;
+  _old_check_reaper_interval = 0;
+  _old_command_check_interval = 0;
+  _old_host_freshness_check_interval = 0;
+  _old_host_perfdata_file_processing_interval = 0;
+  _old_retention_update_interval = 0;
+  _old_service_freshness_check_interval = 0;
+  _old_service_perfdata_file_processing_interval = 0;
+  _old_status_update_interval = 0;
+  _old_host_perfdata_file_processing_command.clear();
+  _old_service_perfdata_file_processing_command.clear();
+
+  memset(&scheduling_info, 0, sizeof(scheduling_info));
 }
 
 /**
@@ -212,14 +229,6 @@ void applier::scheduler::remove_service(configuration::service const& s) {
     svec.push_back(svc->second.get());
     _unschedule_service_events(svec);
   }
-}
-
-/**
- *  Unload scheduler applier singleton.
- */
-void applier::scheduler::unload() {
-  delete _instance;
-  _instance = NULL;
 }
 
 /**

@@ -17,46 +17,25 @@
  *
  */
 #include <gtest/gtest.h>
-#include <memory>
 #include "../../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
-#include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/timezone_manager.hh"
-#include "com/centreon/engine/utils.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
 
-extern configuration::state* config;
-
 class ApplierConnector : public ::testing::Test {
  public:
   void SetUp() override {
-    if (config == NULL)
-      config = new configuration::state;
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();  // Needed to create a contact
-    timezone_manager::load();
-    checks::checker::load();
+    init_config_state();
   }
 
   void TearDown() override {
-    timezone_manager::unload();
-    configuration::applier::state::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
-    checks::checker::unload();
-    delete config;
-    config = nullptr;
+    deinit_config_state();
   }
 };
 

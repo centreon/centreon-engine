@@ -56,8 +56,7 @@ class state {
   void apply(configuration::state& new_cfg);
   void apply(configuration::state& new_cfg, retention::state& state);
   static state& instance();
-  static void load();
-  static void unload();
+  void clear();
 
   servicedependency_mmap const& servicedependencies() const throw();
   servicedependency_mmap& servicedependencies() throw();

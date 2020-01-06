@@ -25,8 +25,6 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
-static applier::globals* _instance = NULL;
-
 /**
  *  Apply new configuration.
  *
@@ -78,35 +76,11 @@ void applier::globals::apply(state& config) {
  *  @return Singleton instance.
  */
 applier::globals& applier::globals::instance() {
-  assert(_instance);
-  return (*_instance);
+  static applier::globals instance;
+  return instance;
 }
 
-/**
- *  Load globals applier singleton.
- */
-void applier::globals::load() {
-  if (!_instance)
-    _instance = new applier::globals;
-}
-
-/**
- *  Unload globals applier singleton.
- */
-void applier::globals::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
-/**
- *  Default constructor.
- */
-applier::globals::globals() {}
-
-/**
- *  Destructor.
- */
-applier::globals::~globals() throw() {
+void applier::globals::clear() {
   delete[] ::check_result_path;
   delete[] ::debug_file;
   delete[] ::global_host_event_handler;
@@ -128,6 +102,18 @@ applier::globals::~globals() throw() {
   ::ochp_command = NULL;
   ::ocsp_command = NULL;
   ::use_timezone = NULL;
+}
+
+/**
+ *  Default constructor.
+ */
+applier::globals::globals() {}
+
+/**
+ *  Destructor.
+ */
+applier::globals::~globals() throw() {
+  clear();
 }
 
 void applier::globals::_set_global(char*& property, std::string const& value) {

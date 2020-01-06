@@ -18,23 +18,18 @@
  */
 
 #include <gtest/gtest.h>
-#include <memory>
-#include "../../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/contact.hh"
-#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/contactgroup.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
 
-extern configuration::state* config;
 extern int config_errors;
 extern int config_warnings;
 
@@ -43,19 +38,11 @@ class ApplierContactgroup : public ::testing::Test {
   void SetUp() override {
     config_errors = 0;
     config_warnings = 0;
-    if (config == NULL)
-      config = new configuration::state;
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();  // Needed to create a contact
+    init_config_state();
   }
 
   void TearDown() override {
-    configuration::applier::state::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
-    delete config;
-    config = NULL;
+    deinit_config_state();
   }
 };
 

@@ -31,9 +31,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
-// Class instance.
-static loader* _instance = NULL;
-
 /**************************************
  *                                     *
  *           Public Methods            *
@@ -86,17 +83,8 @@ std::list<std::shared_ptr<broker::handle> > const& loader::get_modules() const {
  *  @return Class instance.
  */
 loader& loader::instance() {
-  assert(_instance);
-  return (*_instance);
-}
-
-/**
- *  Load class singleton.
- */
-void loader::load() {
-  if (!_instance)
-    _instance = new loader;
-  return;
+  static loader instance;
+  return instance;
 }
 
 /**
@@ -143,15 +131,6 @@ unsigned int loader::load_directory(std::string const& dir) {
     }
   }
   return (loaded);
-}
-
-/**
- *  Cleanup the loader singleton.
- */
-void loader::unload() {
-  delete _instance;
-  _instance = NULL;
-  return;
 }
 
 /**

@@ -41,8 +41,7 @@ class macros {
  public:
   void apply(configuration::state& config);
   static macros& instance();
-  static void load();
-  static void unload();
+  void clear();
 
  private:
   macros();

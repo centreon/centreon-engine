@@ -43,7 +43,7 @@ namespace checks {
 class checker : public commands::command_listener {
  public:
   static checker& instance();
-  static void load();
+  void clear();
   void push_check_result(check_result const* result);
   void push_check_result(check_result&& result);
   void reap();
@@ -67,7 +67,6 @@ class checker : public commands::command_listener {
                 int check_options,
                 int use_cached_result,
                 unsigned long check_timestamp_horizon);
-  static void unload();
 
  private:
   checker();

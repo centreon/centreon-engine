@@ -38,6 +38,7 @@
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"

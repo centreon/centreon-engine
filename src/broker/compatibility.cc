@@ -28,9 +28,6 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 
-// Class instance.
-static compatibility* _instance = NULL;
-
 // NEB module list maintained for compatibility.
 extern "C" {
 nebmodule* neb_module_list = NULL;
@@ -46,24 +43,8 @@ nebmodule* neb_module_list = NULL;
  *  Get instance of compatibility singleton.
  */
 compatibility& compatibility::instance() {
-  assert(_instance);
-  return *_instance;
-}
-
-/**
- *  Load singleton instance.
- */
-void compatibility::load() {
-  if (!_instance)
-    _instance = new compatibility;
-}
-
-/**
- *  Cleanup instance of compatibility singleton.
- */
-void compatibility::unload() {
-  delete _instance;
-  _instance = NULL;
+  static compatibility instance;
+  return instance;
 }
 
 /**

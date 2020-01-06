@@ -36,17 +36,15 @@ CCE_BEGIN()
  */
 class timezone_manager {
  public:
-  static void load();
   void pop_timezone();
   void push_timezone(std::string const& tz);
-  static void unload();
 
   /**
    *  Get class instance.
    *
    *  @return Class instance.
    */
-  static timezone_manager& instance() { return (*_instance); }
+  static timezone_manager& instance() { static timezone_manager instance; return instance; }
 
  private:
   struct tz_info {
@@ -62,7 +60,6 @@ class timezone_manager {
   void _set_timezone(std::string const& tz);
 
   tz_info _base;
-  static timezone_manager* _instance;
   std::stack<tz_info> _tz;
 };
 

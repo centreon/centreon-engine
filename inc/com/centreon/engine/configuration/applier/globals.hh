@@ -38,8 +38,7 @@ class globals {
  public:
   void apply(configuration::state& globals);
   static globals& instance();
-  static void load();
-  static void unload();
+  void clear();
 
  private:
   globals();

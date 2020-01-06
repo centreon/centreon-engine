@@ -42,9 +42,6 @@ using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::checks;
 
-// Class instance.
-static checker* _instance = nullptr;
-
 /**************************************
  *                                     *
  *           Public Methods            *
@@ -57,17 +54,21 @@ static checker* _instance = nullptr;
  *  @return This singleton.
  */
 checker& checker::instance() {
-  assert(_instance);
-  return *_instance;
+  static checker instance;
+  return instance;
 }
 
-/**
- *  Load singleton.
- */
-void checker::load() {
-  if (!_instance)
-    _instance = new checker;
+void checker::clear() {
+  try {
+    std::lock_guard<std::mutex> lock(_mut_reap);
+    std::queue<check_result> empty;
+    std::swap( _to_reap, empty );
+    _list_id.clear();
+    _to_reap_partial.clear();
+  } catch (...) {
+  }
 }
+
 
 /**
  *  Add into the queue a result to reap later.
@@ -753,14 +754,6 @@ void checker::run_sync(host* hst,
                     const_cast<char*>(hst->get_plugin_output().c_str()),
                     const_cast<char*>(hst->get_long_plugin_output().c_str()),
                     const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
-}
-
-/**
- *  Unload singleton.
- */
-void checker::unload() {
-  delete _instance;
-  _instance = nullptr;
 }
 
 /**************************************

@@ -21,48 +21,30 @@
 #include <memory>
 #include "../../test_engine.hh"
 #include "../../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
-#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/service.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
 
-extern configuration::state* config;
-
 class ApplierService : public TestEngine {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    if (config == nullptr)
-      config = new configuration::state;
-    configuration::applier::state::load();  // Needed to create a contact
-    checks::checker::load();
-    events::loop::load();
+    init_config_state();
   }
 
   void TearDown() override {
-    events::loop::unload();
-    configuration::applier::state::unload();
-    checks::checker::unload();
-    delete config;
-    config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    deinit_config_state();
   }
 };
 

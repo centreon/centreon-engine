@@ -52,15 +52,10 @@ extern configuration::state* config;
 class HostDependency : public TestEngine {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
     if (!config)
       config = new configuration::state;
-    timezone_manager::load();
-    configuration::applier::state::load();  // Needed to create a contact
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
-    checks::checker::load();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -84,13 +79,9 @@ class HostDependency : public TestEngine {
   }
 
   void TearDown() override {
-    configuration::applier::state::unload();
-    checks::checker::unload();
     delete config;
     config = nullptr;
-    timezone_manager::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    configuration::applier::state::instance().clear();
   }
 };
 

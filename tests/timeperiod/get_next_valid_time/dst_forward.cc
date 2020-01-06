@@ -29,17 +29,8 @@ using namespace com::centreon::engine;
 class GetNextValidTimeForwardDST : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();
     _creator.new_timeperiod();
     _computed = (time_t)-1;
-  }
-
-  void TearDown() override {
-    configuration::applier::state::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 
   //

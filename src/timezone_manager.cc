@@ -23,17 +23,6 @@
 
 using namespace com::centreon::engine;
 
-// Class instance.
-timezone_manager* timezone_manager::_instance(NULL);
-
-/**
- *  Load singleton.
- */
-void timezone_manager::load() {
-  if (!_instance)
-    _instance = new timezone_manager;
-}
-
 /**
  *  Restore timezone previously saved.
  */
@@ -68,14 +57,6 @@ void timezone_manager::push_timezone(std::string const& tz) {
     _set_timezone(_base.tz_name);
   else
     _set_timezone("");
-}
-
-/**
- *  Unload singleton.
- */
-void timezone_manager::unload() {
-  delete _instance;
-  _instance = NULL;
 }
 
 /**

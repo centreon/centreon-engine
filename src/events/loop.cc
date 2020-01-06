@@ -42,8 +42,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 
-static loop* _instance = nullptr;
-
 /**************************************
  *                                     *
  *           Public Methods            *
@@ -56,16 +54,16 @@ static loop* _instance = nullptr;
  *  @return The singleton.
  */
 loop& loop::instance() {
-  assert(_instance);
-  return *_instance;
+  static loop instance;
+  return instance;
 }
 
-/**
- *  Load singleton.
- */
-void loop::load() {
-  if (!_instance)
-    _instance = new loop;
+void loop::clear() {
+  _event_list_low.clear();
+  _event_list_high.clear();
+
+  _need_reload = 0;
+  _reload_running = false;
 }
 
 /**
@@ -94,14 +92,6 @@ void loop::run() {
   _sleep_event.event_options = 0;
 
   _dispatching();
-}
-
-/**
- *  Unload singleton.
- */
-void loop::unload() {
-  delete _instance;
-  _instance = nullptr;
 }
 
 /**************************************

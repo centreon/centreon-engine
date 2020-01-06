@@ -19,30 +19,22 @@
 
 #include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include <gtest/gtest.h>
-#include <cstring>
 #include <map>
 #include <memory>
 #include "com/centreon/clib.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
 
-extern configuration::state* config;
-
 class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    if (config == nullptr)
-      config = new configuration::state;
-    configuration::applier::state::load();  // Needed to create a contact
+    init_config_state();
     new_downtime(1, "first_host", "test_service", 123456789, 134567892, 1, 0,
                  42, "test_author", "other_comment");
     new_downtime(2, "test_host", "", 234567891, 134567892, 1, 0, 84,
@@ -59,12 +51,8 @@ class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
 
   void TearDown() override {
     _dtf.reset();
-    configuration::applier::state::unload();
     downtime_manager::instance().clear_scheduled_downtimes();
-    delete config;
-    config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    deinit_config_state();
   }
 
   downtime* new_downtime(unsigned long downtime_id,

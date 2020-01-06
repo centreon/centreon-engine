@@ -60,7 +60,6 @@ using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
 static bool has_already_been_loaded(false);
-static applier::state* _instance(nullptr);
 
 /**
  *  Apply new configuration.
@@ -129,35 +128,44 @@ void applier::state::apply(configuration::state& new_cfg,
  *  @return Singleton instance.
  */
 applier::state& applier::state::instance() {
-  assert(_instance);
-  return *_instance;
+  static applier::state instance;
+  return instance;
 }
 
-/**
- *  Load state applier singleton.
- */
-void applier::state::load() {
-  if (!_instance) {
-    _instance = new applier::state;
-  }
-}
+void applier::state::clear() {
+  engine::contact::contacts.clear();
+  engine::contactgroup::contactgroups.clear();
+  engine::servicegroup::servicegroups.clear();
+  engine::hostgroup::hostgroups.clear();
+  engine::commands::command::commands.clear();
+  engine::commands::connector::connectors.clear();
+  engine::service::services.clear();
+  engine::service::services_by_id.clear();
+  engine::servicedependency::servicedependencies.clear();
+  engine::serviceescalation::serviceescalations.clear();
+  engine::host::hosts.clear();
+  engine::host::hosts_by_id.clear();
+  engine::hostdependency::hostdependencies.clear();
+  engine::hostescalation::hostescalations.clear();
+  engine::timeperiod::timeperiods.clear();
+  engine::comment::comments.clear();
+  engine::comment::set_next_comment_id(1llu);
 
-/**
- *  Unload state applier singleton.
- */
-void applier::state::unload() {
-  delete _instance;
-  _instance = nullptr;
+  xpddefault_cleanup_performance_data();
+
+  applier::scheduler::instance().clear();
+  applier::macros::instance().clear();
+  applier::globals::instance().clear();
+  applier::logging::instance().clear();
+
+  _processing_state = state_ready;
+  _config = nullptr;
 }
 
 /**
  *  Default constructor.
  */
 applier::state::state() : _config(nullptr), _processing_state(state_ready) {
-  applier::logging::load();
-  applier::globals::load();
-  applier::macros::load();
-  applier::scheduler::load();
 }
 
 /**
@@ -183,10 +191,6 @@ applier::state::~state() throw() {
   engine::comment::set_next_comment_id(1llu);
 
   xpddefault_cleanup_performance_data();
-  applier::scheduler::unload();
-  applier::macros::unload();
-  applier::globals::unload();
-  applier::logging::unload();
 }
 
 /**
