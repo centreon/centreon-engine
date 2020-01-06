@@ -73,7 +73,6 @@ int neb_add_module(char const* filename,
 /* free memory allocated to module list */
 int neb_free_module_list() {
   try {
-    broker::loader::instance().unload();
     logger(dbg_eventbroker, basic) << "unload all modules success.";
   } catch (...) {
     logger(dbg_eventbroker, basic) << "unload all modules failed.";

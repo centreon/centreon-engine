@@ -64,8 +64,7 @@ class loop {
   };
 
   static loop& instance();
-  static void load();
-  static void unload();
+  void clear();
   void run();
   void adjust_check_scheduling();
   void add_event(timed_event* event, priority priority);

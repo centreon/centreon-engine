@@ -19,34 +19,22 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cerrno>
-#include <climits>
-#include <csignal>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #endif  // HAVE_GETOPT_H
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
-#include <memory>
 #include <string>
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/diagnostic.hh"
-#include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
@@ -59,7 +47,6 @@
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
@@ -106,15 +93,7 @@ int main(int argc, char* argv[]) {
 #endif  // HAVE_GETOPT_H
 
   // Load singletons and global variable.
-  com::centreon::clib::load();
-  com::centreon::logging::engine::load();
   config = new configuration::state;
-  com::centreon::engine::timezone_manager::load();
-  com::centreon::engine::configuration::applier::state::load();
-  com::centreon::engine::checks::checker::load();
-  com::centreon::engine::events::loop::load();
-  com::centreon::engine::broker::loader::load();
-  com::centreon::engine::broker::compatibility::load();
 
 #if defined GRPC
   com::centreon::engine::enginerpc erpc("0.0.0.0", 50051);
@@ -454,16 +433,8 @@ int main(int argc, char* argv[]) {
   erpc.shutdown();
 #endif
   // Unload singletons and global objects.
-  com::centreon::engine::events::loop::unload();
-  com::centreon::engine::broker::compatibility::unload();
-  com::centreon::engine::broker::loader::unload();
-  com::centreon::engine::configuration::applier::state::unload();
-  com::centreon::engine::checks::checker::unload();
   delete config;
   config = nullptr;
-  com::centreon::engine::timezone_manager::unload();
-  com::centreon::logging::engine::unload();
-  com::centreon::clib::unload();
 
   return retval;
 }

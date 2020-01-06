@@ -20,26 +20,20 @@
 #include "com/centreon/engine/retention/dump.hh"
 #include <gtest/gtest.h>
 #include <sstream>
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
+#include "helper.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::retention;
 
-extern configuration::state* config;
-
 class RetentionDumpTest : public ::testing::Test {
  public:
   void SetUp() {
-    if (config == NULL)
-      config = new configuration::state;
-    configuration::applier::state::load();  // Needed to create a contact
+    init_config_state();
   }
 
   void TearDown() {
-    configuration::applier::state::unload();
-    delete config;
-    config = NULL;
+    deinit_config_state();
   }
 };
 

@@ -42,9 +42,7 @@ class loader {
   void del_module(std::shared_ptr<handle> const& mod);
   std::list<std::shared_ptr<handle> > const& get_modules() const;
   static loader& instance();
-  static void load();
   unsigned int load_directory(std::string const& dir);
-  static void unload();
   void unload_modules();
 
  private:

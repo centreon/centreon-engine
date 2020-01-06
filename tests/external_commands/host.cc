@@ -19,44 +19,23 @@
 
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include <gtest/gtest.h>
-#include <com/centreon/engine/configuration/applier/macros.hh>
-#include <iostream>
 #include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/timezone_manager.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-extern configuration::state* config;
-
 class HostExternalCommand : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    if (config == nullptr)
-      config = new configuration::state;
-    configuration::applier::state::load();  // Needed to create a contact
-    timezone_manager::load();
-    checks::checker::load();
-    events::loop::load();
+    init_config_state();
   }
 
   void TearDown() override {
-    events::loop::unload();
-    timezone_manager::unload();
-    configuration::applier::state::unload();
-    checks::checker::unload();
-    delete config;
-    config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    deinit_config_state();
   }
 };
 

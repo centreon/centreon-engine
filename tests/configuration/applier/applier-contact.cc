@@ -18,25 +18,21 @@
  */
 
 #include <gtest/gtest.h>
-#include "com/centreon/clib.hh"
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/contact.hh"
-#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
 
-extern configuration::state* config;
 extern int config_errors;
 extern int config_warnings;
 
@@ -45,21 +41,11 @@ class ApplierContact : public ::testing::Test {
   void SetUp() override {
     config_errors = 0;
     config_warnings = 0;
-    if (config == nullptr)
-      config = new configuration::state;
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();  // Needed to create a contact
-    checks::checker::load();
+    init_config_state();
   }
 
   void TearDown() override {
-    configuration::applier::state::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
-    checks::checker::unload();
-    delete config;
-    config = nullptr;
+    deinit_config_state();
   }
 
   configuration::contact valid_contact_config() const {

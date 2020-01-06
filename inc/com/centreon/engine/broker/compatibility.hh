@@ -35,8 +35,6 @@ namespace broker {
 class compatibility {
  public:
   static compatibility& instance();
-  static void load();
-  static void unload();
 
   void author_module(broker::handle* mod);
   void copyright_module(broker::handle* mod);

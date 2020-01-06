@@ -20,52 +20,25 @@
  *
  */
 
-#include <gtest/gtest.h>
-#include <com/centreon/clib.hh>
-#include <com/centreon/engine/broker/loader.hh>
-#include <com/centreon/engine/checks/checker.hh>
-#include <com/centreon/engine/configuration/applier/host.hh>
 #include <com/centreon/engine/configuration/applier/hostescalation.hh>
 #include <com/centreon/engine/configuration/applier/state.hh>
 #include <com/centreon/engine/configuration/parser.hh>
-#include <com/centreon/engine/configuration/state.hh>
-#include <com/centreon/engine/events/loop.hh>
-#include <com/centreon/engine/host.hh>
 #include <com/centreon/engine/hostescalation.hh>
 #include <com/centreon/engine/macros/process.hh>
-#include <com/centreon/engine/timezone_manager.hh>
-#include <com/centreon/logging/engine.hh>
 #include <fstream>
+#include <helper.hh>
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-extern configuration::state* config;
-
 class Macro : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    com::centreon::engine::broker::loader::load();
-    if (config == NULL)
-      config = new configuration::state;
-    timezone_manager::load();
-    configuration::applier::state::load();  // Needed to create a contact
-    checks::checker::load();
-    events::loop::load();
+    init_config_state();
   }
 
   void TearDown() override {
-    events::loop::unload();
-    configuration::applier::state::unload();
-    checks::checker::unload();
-    delete config;
-    config = nullptr;
-    timezone_manager::unload();
-    com::centreon::engine::broker::loader::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    deinit_config_state();
   }
 };
 

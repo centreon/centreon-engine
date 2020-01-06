@@ -28,8 +28,6 @@
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
-static applier::logging* _instance = NULL;
-
 /**
  *  Apply new configuration.
  *
@@ -74,24 +72,27 @@ void applier::logging::apply(state& config) {
  *  @return Singleton instance.
  */
 applier::logging& applier::logging::instance() {
-  assert(_instance);
-  return (*_instance);
+  static applier::logging instance;
+  return instance;
 }
 
-/**
- *  Load logging applier singleton.
- */
-void applier::logging::load() {
-  if (!_instance)
-    _instance = new applier::logging;
-}
+void applier::logging::clear() {
+  _del_stdout();
+  _del_stderr();
+  _del_syslog();
+  _del_log_file();
+  _del_debug();
 
-/**
- *  Unload logging applier singleton.
- */
-void applier::logging::unload() {
-  delete _instance;
-  _instance = NULL;
+  _debug = nullptr;
+  _debug_level = 0;
+  _debug_max_size = 0;
+  _debug_verbosity = 0;
+  _log = nullptr;
+  _stderr = nullptr;
+  _stdout = nullptr;
+  _syslog = nullptr;
+  _add_stdout();
+  _add_stderr();
 }
 
 /**

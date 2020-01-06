@@ -29,19 +29,10 @@ using namespace com::centreon::engine;
 class GetNextValidTimeEarliestDaterangeFirstTest : public testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();
     // All dateranges are based on the same day : 2016-11-07.
     _creator.new_timeperiod();
     _now = strtotimet("2016-11-07 00:00:00");
     set_time(_now);
-  }
-
-  void TearDown() override {
-    configuration::applier::state::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 
   // monday 06:00-07:00

@@ -29,21 +29,12 @@ using namespace com::centreon::engine;
 class GetNextValidTimeExclusionTest : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();
     _computed = (time_t)-1;
     _tp = _creator.new_timeperiod();
     for (int i(0); i < 7; ++i)
       _creator.new_timerange(0, 0, 24, 0, i);
     _now = strtotimet("2016-11-24 08:00:00");
     set_time(_now);
-  }
-
-  void TearDown() override {
-    configuration::applier::state::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
   }
 
   void calendar_date_full_days_exclusion() {

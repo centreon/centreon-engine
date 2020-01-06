@@ -21,33 +21,21 @@
 #include <memory>
 #include <mutex>
 #include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-extern configuration::state* config;
-
 class SimpleCommand : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    configuration::applier::state::load();  // Needed to store commands
-                                            //    set_time(20);
-    if (config == NULL)
-      config = new configuration::state;
+    init_config_state();
   }
 
   void TearDown() override {
-    configuration::applier::state::unload();  // Needed to store commands
-    delete config;
-    config = NULL;
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    deinit_config_state();
   }
 };
 

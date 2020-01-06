@@ -19,51 +19,28 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
-#include <cstring>
-#include <iostream>
 #include <memory>
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
-#include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
-#include "com/centreon/engine/configuration/applier/servicedependency.hh"
-#include "com/centreon/engine/configuration/applier/serviceescalation.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
-#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/loop.hh"
-#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
-#include "com/centreon/engine/timezone_manager.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
-using namespace com::centreon::engine::configuration::applier;
-
-extern configuration::state* config;
 
 class LoopTest : public TestEngine {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    if (!config)
-      config = new configuration::state;
-    timezone_manager::load();
-    configuration::applier::state::load();  // Needed to create a contact
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
-    checks::checker::load();
-    events::loop::load();
+    init_config_state();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -99,14 +76,7 @@ class LoopTest : public TestEngine {
   }
 
   void TearDown() override {
-    events::loop::unload();
-    configuration::applier::state::unload();
-    checks::checker::unload();
-    delete config;
-    config = nullptr;
-    timezone_manager::unload();
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    deinit_config_state();
   }
 
  protected:

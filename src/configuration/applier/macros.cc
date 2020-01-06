@@ -30,8 +30,6 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
-static applier::macros* _instance = NULL;
-
 /**
  *  @brief Is the key of this user macro old-style?
  *
@@ -92,24 +90,23 @@ void applier::macros::apply(configuration::state& config) {
  *  @return Singleton instance.
  */
 applier::macros& applier::macros::instance() {
-  assert(_instance);
-  return *_instance;
+  static applier::macros instance;
+  return instance;
 }
 
-/**
- *  Load macros applier singleton.
- */
-void applier::macros::load() {
-  if (!_instance)
-    _instance = new applier::macros;
-}
+void applier::macros::clear() {
+  clear_volatile_macros_r(_mac);
+  free_macrox_names();
 
-/**
- *  Unload macros applier singleton.
- */
-void applier::macros::unload() {
-  delete _instance;
-  _instance = NULL;
+  for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
+    macro_user[i] = "";
+  }
+
+  _mac = get_global_macros();
+  init_macros();
+
+  _set_macro(MACRO_TEMPFILE, "/tmp/centengine.tmp");
+  _set_macro(MACRO_TEMPPATH, "/tmp");
 }
 
 /**

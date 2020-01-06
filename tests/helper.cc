@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2019 Centreon (https://www.centreon.com/)
+ * Copyright 2019 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,23 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <com/centreon/engine/configuration/applier/state.hh>
+#include <com/centreon/engine/checks/checker.hh>
 #include "helper.hh"
 
-using namespace com::centreon;
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::configuration;
 
-class SimpleContactgroup : public ::testing::Test {
- public:
-  void SetUp() override {
-    init_config_state();
-  }
+extern configuration::state* config;
 
-  void TearDown() override {
-    deinit_config_state();
-  }
-};
+void init_config_state(void) {
+  if (config == nullptr)
+    config = new configuration::state;
+}
+
+void deinit_config_state(void) {
+  delete config;
+  config = nullptr;
+
+  configuration::applier::state::instance().clear();
+  checks::checker::instance().clear();
+}

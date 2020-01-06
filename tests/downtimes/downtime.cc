@@ -17,46 +17,27 @@
  *
  */
 
-#include "com/centreon/engine/downtimes/downtime.hh"
 #include <gtest/gtest.h>
 #include <iostream>
 #include "../timeperiod/utils.hh"
-#include "com/centreon/clib.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/downtimes/downtime_finder.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/downtimes/host_downtime.hh"
-#include "com/centreon/engine/downtimes/service_downtime.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
 
-extern configuration::state* config;
-
 class DowntimeExternalCommand : public ::testing::Test {
  public:
   void SetUp() override {
-    clib::load();
-    com::centreon::logging::engine::load();
-    if (config == nullptr)
-      config = new configuration::state;
-    configuration::applier::state::load();  // Needed to create a contact
-    events::loop::load();
+    init_config_state();
   }
 
   void TearDown() override {
-    events::loop::unload();
-    configuration::applier::state::unload();
     downtime_manager::instance().clear_scheduled_downtimes();
-    delete config;
-    config = nullptr;
-    com::centreon::logging::engine::unload();
-    clib::unload();
+    deinit_config_state();
   }
 };
 

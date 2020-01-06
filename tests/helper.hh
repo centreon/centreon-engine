@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2019 Centreon (https://www.centreon.com/)
+ * Copyright 2019 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,14 @@
  * For more information : contact@centreon.com
  *
  */
+#ifndef CENTREON_ENGINE_TESTS_HELPER_HH_
+#define CENTREON_ENGINE_TESTS_HELPER_HH_
 
-#include <gtest/gtest.h>
-#include "helper.hh"
+#include <com/centreon/engine/configuration/state.hh>
 
-using namespace com::centreon;
-using namespace com::centreon::engine;
-using namespace com::centreon::engine::configuration;
+extern com::centreon::engine::configuration::state* config;
 
-class SimpleContactgroup : public ::testing::Test {
- public:
-  void SetUp() override {
-    init_config_state();
-  }
+void init_config_state(void);
+void deinit_config_state(void);
 
-  void TearDown() override {
-    deinit_config_state();
-  }
-};
+#endif  // CENTREON_ENGINE_TESTS_HELPER_HH_
