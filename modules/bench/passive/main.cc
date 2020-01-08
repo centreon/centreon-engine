@@ -27,7 +27,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "com/centreon/clib.hh"
 #include "com/centreon/process.hh"
 #include "engine_cfg.hh"
 
@@ -39,7 +38,6 @@
  */
 int main(int argc, char* argv[]) {
   // Initialization.
-  com::centreon::clib::load();
   srandom(getpid());
   signal(SIGPIPE, SIG_IGN);
 
@@ -269,9 +267,6 @@ int main(int argc, char* argv[]) {
         << "some count of external commands compatible with a configuration\n"
         << "file generated with the same parameters.\n";
   }
-
-  // Unload Clib.
-  com::centreon::clib::unload();
 
   return (EXIT_SUCCESS);
 }
