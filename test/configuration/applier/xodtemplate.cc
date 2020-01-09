@@ -15139,35 +15139,6 @@ int read_main_config_file(char const* main_config_file) {
       // macro_x[MACRO_TEMPPATH]=(char *)string::dup(temp_path);
     }
 
-    else if (!strcmp(variable, "check_result_path")) {
-      if (strlen(value) > MAX_FILENAME_LENGTH - 1) {
-        if (asprintf(&error_message, "Check result path is too long")) {
-        }
-        error = true;
-        break;
-      }
-
-      if ((tmpdir = opendir((char*)value)) == NULL) {
-        if (asprintf(&error_message,
-                     "Check result path is not a valid directory")) {
-        }
-        error = true;
-        break;
-      }
-      closedir(tmpdir);
-
-      delete[] check_result_path;
-      if ((check_result_path = (char*)string::dup(value))) {
-        strip(check_result_path);
-        /* make sure we don't have a trailing slash */
-        if (check_result_path[strlen(check_result_path) - 1] == '/')
-          check_result_path[strlen(check_result_path) - 1] = '\x0';
-      }
-    }
-
-    else if (!strcmp(variable, "max_check_result_file_age"))
-      max_check_result_file_age = strtoul(value, NULL, 0);
-
     else if (!strcmp(variable, "lock_file")) {
       // if(strlen(value)>MAX_FILENAME_LENGTH-1){
       //   if (asprintf(&error_message,"Lock file is too long")) {}

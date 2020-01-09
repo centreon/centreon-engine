@@ -102,11 +102,6 @@ void checker::reap() {
   time_t reaper_start_time;
   time(&reaper_start_time);
 
-  if (config->use_check_result_path()) {
-    std::string const& path(config->check_result_path());
-    check_result::process_check_result_queue(path);
-  }
-
   // Keep compatibility with old check result list.
   if (!check_result::results.empty()) {
     std::lock_guard<std::mutex> lock(_mut_reap);
