@@ -65,7 +65,7 @@ std::unordered_map<std::string, state::setter_func> const state::_setters{
     {"check_for_orphaned_services", SETTER(bool, check_orphaned_services)},
     {"check_for_updates", SETTER(std::string const&, _set_check_for_updates)},
     {"check_host_freshness", SETTER(bool, check_host_freshness)},
-     {"check_result_reaper_frequency",
+    {"check_result_reaper_frequency",
      SETTER(unsigned int, check_reaper_interval)},
     {"check_service_freshness", SETTER(bool, check_service_freshness)},
     {"child_processes_fork_twice",

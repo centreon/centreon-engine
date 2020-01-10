@@ -136,7 +136,7 @@ class state {
   bool check_orphaned_services() const noexcept;
   unsigned int check_reaper_interval() const noexcept;
   void check_reaper_interval(unsigned int value);
-    bool check_service_freshness() const noexcept;
+  bool check_service_freshness() const noexcept;
   void check_service_freshness(bool value);
   set_command const& commands() const noexcept;
   set_command& commands() noexcept;
@@ -588,7 +588,7 @@ class state {
   bool _translate_passive_host_checks;
   std::unordered_map<std::string, std::string> _users;
   bool _use_aggressive_host_checking;
-    bool _use_large_installation_tweaks;
+  bool _use_large_installation_tweaks;
   bool _use_regexp_matches;
   bool _use_retained_program_state;
   bool _use_retained_scheduling_info;

@@ -424,7 +424,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->translate_passive_host_checks(
       new_cfg.translate_passive_host_checks());
   config->use_aggressive_host_checking(new_cfg.use_aggressive_host_checking());
-    config->use_large_installation_tweaks(
+  config->use_large_installation_tweaks(
       new_cfg.use_large_installation_tweaks());
   config->use_regexp_matches(new_cfg.use_regexp_matches());
   config->use_retained_program_state(new_cfg.use_retained_program_state());
