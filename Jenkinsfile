@@ -57,6 +57,20 @@ try {
         }
       }
     },
+    'centos8': {
+      node {
+        sh 'setup_centreon_build.sh'
+        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh centos8"
+        step([
+          $class: 'XUnitBuilder',
+          thresholds: [
+            [$class: 'FailedThreshold', failureThreshold: '0'],
+            [$class: 'SkippedThreshold', failureThreshold: '0']
+          ],
+          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
+        ])
+      }
+    },
     'debian10': {
       node {
         sh 'setup_centreon_build.sh'
@@ -81,6 +95,12 @@ try {
       node {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
+      }
+    },
+    'centos8': {
+      node {
+        sh 'setup_centreon_build.sh'
+        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos8"
       }
     },
     'debian10': {
