@@ -753,12 +753,10 @@ com::centreon::engine::service* add_service(
     obj->set_retain_nonstatus_information(retain_nonstatus_information > 0);
     obj->set_retain_status_information(retain_status_information > 0);
     obj->set_should_be_scheduled(true);
-    uint32_t stalk_on;
-    stalk_on = none;
-    stalk_on |= (stalk_on_critical > 0 ? notifier::critical : 0);
-    stalk_on |= (stalk_on_ok > 0 ? notifier::ok : 0);
-    stalk_on |= (stalk_on_unknown > 0 ? notifier::warning : 0);
-    stalk_on |= (stalk_on_warning > 0 ? notifier::unknown : 0);
+    uint32_t stalk_on = (stalk_on_critical ? notifier::critical : 0) |
+                        (stalk_on_ok ? notifier::ok : 0) |
+                        (stalk_on_unknown ? notifier::unknown : 0) |
+                        (stalk_on_warning ? notifier::warning : 0);
     obj->set_stalk_on(stalk_on);
     obj->set_state_type(notifier::hard);
 
