@@ -20,6 +20,7 @@
 #include "com/centreon/engine/retention/parser.hh"
 #include <array>
 #include <fstream>
+#include <string>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
@@ -60,7 +61,26 @@ void parser::parse(std::string const& path, state& retention) {
   std::shared_ptr<object> obj;
   std::string input;
   unsigned int current_line(0);
-  while (string::get_next_line(stream, input, current_line)) {
+  auto next_line = [](
+      std::ifstream& stream, std::string& input, uint32_t& line) -> bool {
+    while (std::getline(stream, input, '\n')) {
+      ++line;
+      size_t sstart = input.find_first_not_of(" \t");
+      size_t send = input.find_last_not_of(" \t");
+      if (sstart)
+        input = input.substr(sstart, send - sstart + 1);
+      else
+        input.erase(send + 1);
+      if (!input.empty()) {
+        char c = input[0];
+        if (c != '#' && c != 0)
+          return true;
+      }
+    }
+    return false;
+  };
+
+  while (next_line(stream, input, current_line)) {
     if (obj == nullptr) {
       std::size_t pos(input.find_first_of(" \t"));
       if (pos == std::string::npos)
