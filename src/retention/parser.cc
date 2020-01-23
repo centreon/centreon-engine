@@ -61,7 +61,7 @@ void parser::parse(std::string const& path, state& retention) {
   std::string input;
   unsigned int current_line(0);
   auto next_line = [](
-      std::ifstream & stream, std::string & input, uint32_t & line)->bool {
+      std::ifstream& stream, std::string& input, uint32_t& line) -> bool {
     while (std::getline(stream, input, '\n')) {
       ++line;
       size_t sstart = input.find_first_not_of(" \t");
@@ -78,6 +78,7 @@ void parser::parse(std::string const& path, state& retention) {
     }
     return false;
   };
+
   while (next_line(stream, input, current_line)) {
     if (obj == nullptr) {
       std::size_t pos(input.find_first_of(" \t"));
