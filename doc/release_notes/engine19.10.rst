@@ -1,3 +1,17 @@
+========================
+Centreon Engine 19.10.10
+========================
+
+*********
+Bug fixes
+*********
+
+stalk options on services
+=========================
+
+Stalk options were changed on modified services when engine was reload or
+restarted.
+
 =======================
 Centreon Engine 19.10.9
 =======================

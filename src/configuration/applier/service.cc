@@ -405,13 +405,23 @@ void applier::service::modify_object(
            ? notifier::downtime
            : notifier::none));
 
-  s->set_notification_interval(static_cast<double>(obj.notification_interval()));
-  s->set_first_notification_delay(static_cast<double>(obj.first_notification_delay()));
+  s->set_notification_interval(
+      static_cast<double>(obj.notification_interval()));
+  s->set_first_notification_delay(
+      static_cast<double>(obj.first_notification_delay()));
 
-  s->add_stalk_on(obj.notification_options() & configuration::service::ok ? notifier::ok : notifier::none);
-  s->add_stalk_on(obj.notification_options() & configuration::service::warning ? notifier::warning : notifier::none);
-  s->add_stalk_on(obj.notification_options() & configuration::service::unknown ? notifier::unknown : notifier::none);
-  s->add_stalk_on(obj.notification_options() & configuration::service::critical ? notifier::critical : notifier::none);
+  s->add_stalk_on(obj.stalking_options() & configuration::service::ok
+                      ? notifier::ok
+                      : notifier::none);
+  s->add_stalk_on(obj.stalking_options() & configuration::service::warning
+                      ? notifier::warning
+                      : notifier::none);
+  s->add_stalk_on(obj.stalking_options() & configuration::service::unknown
+                      ? notifier::unknown
+                      : notifier::none);
+  s->add_stalk_on(obj.stalking_options() & configuration::service::critical
+                      ? notifier::critical
+                      : notifier::none);
 
   s->set_notification_period(obj.notification_period());
   s->set_check_period(obj.check_period());
