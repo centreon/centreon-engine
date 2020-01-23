@@ -425,3 +425,74 @@ TEST_F(ApplierService, ContactgroupResolution) {
 
   ASSERT_EQ(itt->second, it->second.get());
 }
+
+TEST_F(ApplierService, StalkingOptionsWhenServiceIsModified) {
+  configuration::applier::host hst_aply;
+  configuration::applier::service svc_aply;
+  configuration::service svc;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  // The host id is not given
+  ASSERT_THROW(hst_aply.add_object(hst), std::exception);
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_TRUE(svc.parse("host", "test_host"));
+  ASSERT_TRUE(svc.parse("service_description", "test description"));
+  ASSERT_TRUE(svc.parse("service_id", "3"));
+
+  configuration::applier::command cmd_aply;
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 1");
+  svc.parse("check_command", "cmd");
+  cmd_aply.add_object(cmd);
+  svc.parse("stalking_options", "");
+  svc.parse("notification_options", "a");
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(1);
+
+  svc_aply.add_object(svc);
+
+  service_id_map const& sm(engine::service::services_by_id);
+  std::shared_ptr<engine::service> serv = sm.begin()->second;
+
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::ok));
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::warning));
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::critical));
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::unknown));
+
+  ASSERT_TRUE(serv->get_notify_on(engine::service::ok));
+  ASSERT_TRUE(serv->get_notify_on(engine::service::warning));
+  ASSERT_TRUE(serv->get_notify_on(engine::service::critical));
+  ASSERT_TRUE(serv->get_notify_on(engine::service::unknown));
+
+  ASSERT_TRUE(svc.parse("service_description", "test description2"));
+  svc_aply.modify_object(svc);
+  svc_aply.expand_objects(*config);
+
+  ASSERT_EQ(sm.size(), 1u);
+  ASSERT_EQ(sm.begin()->first.first, 1u);
+  ASSERT_EQ(sm.begin()->first.second, 3u);
+
+  // Service is not resolved, host is null now.
+  serv = sm.begin()->second;
+
+  ASSERT_TRUE(!serv->get_host_ptr());
+  ASSERT_TRUE(serv->get_description() == "test description2");
+
+  std::string s{engine::service::services[{"test_host", "test description2"}]
+                    ->get_description()};
+  ASSERT_TRUE(s == "test description2");
+
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::ok));
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::warning));
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::critical));
+  ASSERT_FALSE(serv->get_stalk_on(engine::service::unknown));
+
+  ASSERT_TRUE(serv->get_notify_on(engine::service::ok));
+  ASSERT_TRUE(serv->get_notify_on(engine::service::warning));
+  ASSERT_TRUE(serv->get_notify_on(engine::service::critical));
+  ASSERT_TRUE(serv->get_notify_on(engine::service::unknown));
+}
+

@@ -360,16 +360,16 @@ void applier::service::modify_object(configuration::service const& obj) {
   s->set_first_notification_delay(
       static_cast<double>(obj.first_notification_delay()));
 
-  s->add_stalk_on(obj.notification_options() & configuration::service::ok
+  s->add_stalk_on(obj.stalking_options() & configuration::service::ok
                       ? notifier::ok
                       : notifier::none);
-  s->add_stalk_on(obj.notification_options() & configuration::service::warning
+  s->add_stalk_on(obj.stalking_options() & configuration::service::warning
                       ? notifier::warning
                       : notifier::none);
-  s->add_stalk_on(obj.notification_options() & configuration::service::unknown
+  s->add_stalk_on(obj.stalking_options() & configuration::service::unknown
                       ? notifier::unknown
                       : notifier::none);
-  s->add_stalk_on(obj.notification_options() & configuration::service::critical
+  s->add_stalk_on(obj.stalking_options() & configuration::service::critical
                       ? notifier::critical
                       : notifier::none);
 
