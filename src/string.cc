@@ -204,7 +204,7 @@ void string::split(
  *
  *  @return The trimming stream.
  */
-std::string& string::trim(std::string& str) throw () {
+std::string& string::trim(std::string& str) noexcept {
   // First, search backward for the last non-space character.
   size_t pos(str.find_last_not_of(whitespaces));
   if (pos == std::string::npos)

@@ -12,6 +12,12 @@ stalk options on services
 Stalk options were changed on modified services when engine was reload or
 restarted.
 
+Perfdata truncated when read from retention
+===========================================
+
+values containing a ';' character were truncated when read from the retention
+file. This new release fixes this issue.
+
 =======================
 Centreon Engine 19.10.9
 =======================
