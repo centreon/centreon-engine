@@ -1014,7 +1014,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   ** strtoul converts a nullptr value to 0 so if set to 0, bail out as a
   ** duration>0 is needed.
   */
-  if ((0 == fixed) && (0 == duration))
+  if (!fixed && !duration)
     return ERROR;
 
   /* duration should be auto-calculated, not user-specified */
