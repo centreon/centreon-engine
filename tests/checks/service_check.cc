@@ -284,3 +284,138 @@ TEST_F(ServiceCheck, SimpleCheck) {
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
 }
+
+/* The following test comes from this array (inherited from Nagios behaviour):
+ *
+ * | Time | Check # | State | State type | State change |
+ * ------------------------------------------------------
+ * | 0    | 1       | OK    | HARD       | No           |
+ * | 1    | 1       | CRTCL | SOFT       | Yes          |
+ * | 2    | 2       | CRTCL | SOFT       | No           |
+ * | 3    | 3       | CRTCL | HARD       | No           |
+ * ------------------------------------------------------
+ */
+TEST_F(ServiceCheck, OkCritical) {
+  std::ostringstream oss;
+  set_time(55000);
+
+  time_t now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+  std::string cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 1);
+
+  set_time(55500);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 1);
+
+  set_time(56000);
+
+  time_t previous = now;
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_state_change(), previous);
+  ASSERT_EQ(_svc->get_current_attempt(), 2);
+
+  set_time(56500);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+}
+
+/* The following test comes from this array (inherited from Nagios behaviour):
+ *
+ * | Time | Check # | State | State type | State change |
+ * ------------------------------------------------------
+ * | 0    | 2       | OK    | SOFT       | No           |
+ * | 1    | 1       | CRTCL | SOFT       | Yes          |
+ * | 2    | 2       | CRTCL | SOFT       | No           |
+ * | 3    | 3       | CRTCL | HARD       | No           |
+ * ------------------------------------------------------
+ */
+TEST_F(ServiceCheck, OkSoft_Critical) {
+  std::ostringstream oss;
+  set_time(55000);
+
+  time_t now = std::time(nullptr);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_state_change(55000);
+  _svc->set_current_attempt(2);
+  _svc->set_state_type(checkable::soft);
+  _svc->set_accept_passive_checks(true);
+
+  set_time(55500);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+  std::string cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 1);
+
+  set_time(56000);
+
+  time_t previous = now;
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_state_change(), previous);
+  ASSERT_EQ(_svc->get_current_attempt(), 2);
+
+  set_time(56500);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+}
