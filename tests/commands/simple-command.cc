@@ -34,6 +34,7 @@ extern configuration::state* config;
 class SimpleCommand : public ::testing::Test {
  public:
   void SetUp() override {
+    set_time(-1);
     clib::load();
     com::centreon::logging::engine::load();
     configuration::applier::state::load();  // Needed to store commands

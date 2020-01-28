@@ -1218,13 +1218,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     }
   }
 
-  /*
-   **** NOTE - THIS WAS MOVED UP FROM LINE 1049 BELOW TO FIX PROBLEMS ****
-   **** WHERE CURRENT ATTEMPT VALUE WAS ACTUALLY "LEADING" REAL VALUE ****
-   * increment the current attempt number if this is a soft state
-   * (service was rechecked)
-   */
-  if (get_state_type() == soft &&
+  if (_last_state == state_ok && _current_state != _last_state)
+    set_current_attempt(1);
+  else if (get_state_type() == soft &&
       get_current_attempt() < get_max_attempts())
     add_current_attempt(1);
 
@@ -1258,7 +1254,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * reached
    */
   if (get_current_attempt() >= get_max_attempts() &&
-      _current_state != _last_hard_state) {
+      (_current_state != _last_hard_state ||
+       get_last_state_change() > get_last_hard_state_change())) {
     logger(dbg_checks, most) << "Service had a HARD STATE CHANGE!!";
     hard_state_change = true;
   }
@@ -1400,6 +1397,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* set the state type macro */
       set_state_type(hard);
+      set_last_hard_state_change(get_last_check());
+      set_current_attempt(1);
 
       /* log the service recovery */
       log_event();
@@ -1426,6 +1425,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* this is a soft recovery */
       set_state_type(soft);
+      int attempt = get_max_attempts() - 1;
+      set_current_attempt(attempt < 1 ? 1 : attempt);
 
       /* log the soft recovery */
       log_event();
@@ -1448,13 +1449,12 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
     /* reset all service variables because its okay now... */
     _host_problem_at_last_check = false;
-    set_current_attempt(1);
-    set_state_type(hard);
+
     _last_hard_state = service::state_ok;
     set_last_notification(static_cast<time_t>(0));
     set_next_notification(static_cast<time_t>(0));
     set_problem_has_been_acknowledged(false);
-    this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+    set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
     set_no_more_notifications(false);
 
     if (reschedule_check)
