@@ -1,4 +1,18 @@
 ========================
+Centreon Engine 19.10.11
+========================
+
+*********
+Bug fixes
+*********
+
+TOTALHOST* TOTALSERVICES macros
+===============================
+
+Some global macros like TOTALHOST* and TOTALSERVICES were replaced
+by empty strings instead of numeric values.
+
+========================
 Centreon Engine 19.10.10
 ========================
 
