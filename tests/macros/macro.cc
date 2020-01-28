@@ -1,6 +1,3 @@
-#include "com/centreon/engine/macros.hh"
-#include "gtest/gtest.h"
-
 /*
  * Copyright 2019 Centreon (https://www.centreon.com/)
  *
@@ -20,13 +17,16 @@
  *
  */
 
-#include <com/centreon/engine/configuration/applier/hostescalation.hh>
+#include <com/centreon/engine/configuration/applier/host.hh>
 #include <com/centreon/engine/configuration/applier/state.hh>
 #include <com/centreon/engine/configuration/parser.hh>
 #include <com/centreon/engine/hostescalation.hh>
+#include <com/centreon/engine/macros/grab_host.hh>
 #include <com/centreon/engine/macros/process.hh>
+#include <com/centreon/engine/macros.hh>
 #include <fstream>
 #include <helper.hh>
+#include <gtest/gtest.h>
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -62,4 +62,34 @@ TEST_F(Macro, pollerName) {
   nagios_macros mac;
   process_macros_r(&mac, "$POLLERNAME$", out, 0);
   ASSERT_EQ(out, "poller-test");
+}
+
+// Given host configuration without host_id
+// Then the applier add_object throws an exception.
+TEST_F(Macro, TotalServicesOkZero) {
+  std::string out;
+  nagios_macros mac;
+  process_macros_r(&mac, "$TOTALSERVICESOK$", out, 0);
+  ASSERT_EQ(out, "0");
+}
+
+// Given host configuration without host_id
+// Then the applier add_object throws an exception.
+TEST_F(Macro, TotalHostOk) {
+  configuration::applier::host hst_aply;
+  configuration::service svc;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_EQ(1u, host::hosts.size());
+  init_macros();
+
+  nagios_macros mac;
+  std::string out;
+  host::hosts["test_host"]->set_current_state(host::state_up);
+  host::hosts["test_host"]->set_has_been_checked(true);
+  process_macros_r(&mac, "$TOTALHOSTSUP$", out, 1);
+  ASSERT_EQ(out, "1");
 }
