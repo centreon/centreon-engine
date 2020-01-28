@@ -52,9 +52,9 @@ class ServiceExternalCommand : public ::testing::Test {
   void TearDown() override {
     configuration::applier::state::unload();
     checks::checker::unload();
+    timezone_manager::unload();
     delete config;
     config = nullptr;
-    timezone_manager::unload();
     com::centreon::logging::engine::unload();
     clib::unload();
   }

@@ -93,6 +93,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/custom_vars/extcmd.cc"
     "${TESTS_DIR}/downtimes/downtime.cc"
     "${TESTS_DIR}/downtimes/downtime_finder.cc"
+    "${TESTS_DIR}/macros/macro.cc"
     "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/external_commands/host.cc"
     "${TESTS_DIR}/external_commands/service.cc"
