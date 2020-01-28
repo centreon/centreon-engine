@@ -1,4 +1,20 @@
 ========================
+Centreon Engine 19.10.11
+========================
+
+Downtime cancellation was buggy
+===============================
+
+The downtime cancellation is fixed now.
+
+Incoherence between hard and soft state types
+=============================================
+
+A service could be in a hard state and the duration was not filled. Sometimes,
+it could also be the reverse. This is fixed and now displayed informations
+about soft/hard should be coherent.
+
+========================
 Centreon Engine 19.10.10
 ========================
 
