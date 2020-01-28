@@ -1218,13 +1218,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     }
   }
 
-  /*
-   **** NOTE - THIS WAS MOVED UP FROM LINE 1049 BELOW TO FIX PROBLEMS ****
-   **** WHERE CURRENT ATTEMPT VALUE WAS ACTUALLY "LEADING" REAL VALUE ****
-   * increment the current attempt number if this is a soft state
-   * (service was rechecked)
-   */
-  if (get_state_type() == soft &&
+  if (_last_state == state_ok && _current_state != _last_state)
+    set_current_attempt(1);
+  else if (get_state_type() == soft &&
       get_current_attempt() < get_max_attempts())
     add_current_attempt(1);
 
