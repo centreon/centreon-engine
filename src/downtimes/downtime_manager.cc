@@ -41,18 +41,16 @@ using namespace com::centreon::engine::logging;
  *
  */
 void downtime_manager::delete_downtime(int type, uint64_t downtime_id) {
-  std::multimap<time_t, std::shared_ptr<downtime>>::iterator it;
-  std::multimap<time_t, std::shared_ptr<downtime>>::iterator end{
-      instance()._scheduled_downtimes.end()};
-
   /* find the downtime we should remove */
-  for (it = _scheduled_downtimes.begin(); it != end; ++it) {
+  for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
+       it != end;
+       ++it) {
     if (it->second->get_downtime_id() == downtime_id &&
-        it->second->get_type() == type)
+        it->second->get_type() == type) {
+      _scheduled_downtimes.erase(it);
       break;
+    }
   }
-
-  _scheduled_downtimes.erase(it);
 }
 
 /* unschedules a host or service downtime */
@@ -355,36 +353,32 @@ void downtime_manager::initialize_downtime_data() {
 
 /* removes invalid and old downtime entries from the downtime file */
 int downtime_manager::xdddefault_validate_downtime_data() {
-  int save = true;
+  bool save = true;
 
   /* remove stale downtimes */
-  for (std::map<time_t,
-                std::shared_ptr<com::centreon::engine::downtimes::downtime>>::
-           iterator it(_scheduled_downtimes.begin()),
-       end(_scheduled_downtimes.end());
+  for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
        it != end;) {
     std::shared_ptr<com::centreon::engine::downtimes::downtime> temp_downtime(
         it->second);
 
     /* delete downtimes with invalid host names, invalid service descriptions
      * or that have expired. */
-    if (temp_downtime->is_stale()) {
+    if (temp_downtime->is_stale())
       it = _scheduled_downtimes.erase(it);
-    } else
+    else
       ++it;
   }
 
   /* remove triggered downtimes without valid parents */
-  for (std::map<time_t,
-                std::shared_ptr<com::centreon::engine::downtimes::downtime>>::
-           iterator it{_scheduled_downtimes.begin()},
-       end{_scheduled_downtimes.end()};
-       it != end; ++it) {
+  for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
+       it != end; ) {
     save = true;
     downtimes::downtime& temp_downtime(*it->second);
 
-    if (!temp_downtime.get_triggered_by())
+    if (!temp_downtime.get_triggered_by()) {
+      ++it;
       continue;
+    }
 
     if (!find_downtime(ANY_DOWNTIME, temp_downtime.get_triggered_by()))
       save = false;
@@ -392,6 +386,8 @@ int downtime_manager::xdddefault_validate_downtime_data() {
     /* delete the downtime */
     if (!save)
       it = _scheduled_downtimes.erase(it);
+    else
+      ++it;
   }
 
   return OK;
@@ -404,11 +400,8 @@ int downtime_manager::xdddefault_validate_downtime_data() {
  */
 uint64_t downtime_manager::get_next_downtime_id() {
   if (_next_id == 0) {
-    for (std::pair<
-             time_t,
-             std::shared_ptr<com::centreon::engine::downtimes::downtime>> const&
-             dt : _scheduled_downtimes)
-      if (dt.second->get_downtime_id() >= _next_id)
+    for (auto const& dt : _scheduled_downtimes)
+      if (dt.second->get_downtime_id() > _next_id)
         _next_id = dt.second->get_downtime_id();
   }
 
