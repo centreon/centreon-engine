@@ -43,7 +43,7 @@ host_downtime::host_downtime(std::string const& host_name,
                              uint64_t triggered_by,
                              int32_t duration,
                              uint64_t downtime_id)
-    : downtime(HOST_DOWNTIME,
+    : downtime(downtime::host_downtime,
                host_name,
                entry_time,
                author,
@@ -59,7 +59,7 @@ host_downtime::~host_downtime() {
   comment::delete_comment(_get_comment_id());
   /* send data to event broker */
   broker_downtime_data(NEBTYPE_DOWNTIME_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
-                       HOST_DOWNTIME, _hostname.c_str(), nullptr, _entry_time,
+                       downtime::host_downtime, _hostname.c_str(), nullptr, _entry_time,
                        _author.c_str(), _comment.c_str(), get_start_time(),
                        get_end_time(), is_fixed(), get_triggered_by(),
                        get_duration(), get_downtime_id(), nullptr);
@@ -496,7 +496,7 @@ void host_downtime::schedule() {
 
   /* send data to event broker */
   broker_downtime_data(NEBTYPE_DOWNTIME_LOAD, NEBFLAG_NONE, NEBATTR_NONE,
-                       HOST_DOWNTIME, _hostname.c_str(), nullptr, _entry_time,
+                       downtime::host_downtime, _hostname.c_str(), nullptr, _entry_time,
                        _author.c_str(), _comment.c_str(), _start_time, _end_time, _fixed,
                        _triggered_by, _duration, _downtime_id, nullptr);
 }
