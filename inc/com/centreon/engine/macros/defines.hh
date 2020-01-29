@@ -199,7 +199,8 @@
 #define MACRO_SERVICETIMEZONE 158
 #define MACRO_CONTACTTIMEZONE 159
 #define MACRO_POLLERNAME 160
-#define MACRO_X_COUNT 161  // size of macro_x[] array
+#define MACRO_POLLERID 161
+#define MACRO_X_COUNT 162  // size of macro_x[] array
 
 // Macro Cleaning Options
 #define STRIP_ILLEGAL_MACRO_CHARS 1

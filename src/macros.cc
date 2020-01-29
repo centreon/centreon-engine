@@ -927,6 +927,7 @@ int init_macrox_names() {
   add_macrox_name(SERVICETIMEZONE);
   add_macrox_name(CONTACTTIMEZONE);
   add_macrox_name(POLLERNAME);
+  add_macrox_name(POLLERID);
 
   return OK;
 }
@@ -980,6 +981,7 @@ int clear_volatile_macros_r(nagios_macros* mac) {
       case MACRO_TEMPPATH:
       case MACRO_EVENTSTARTTIME:
       case MACRO_POLLERNAME:
+      case MACRO_POLLERID:
         /* these don't change during the course of monitoring, so no need to
          * free them */
         break;

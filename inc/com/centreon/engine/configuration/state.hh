@@ -23,6 +23,7 @@
 #include <list>
 #include <set>
 #include <string>
+#include <cstdint>
 #include <vector>
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
@@ -299,6 +300,8 @@ class state {
   void perfdata_timeout(int value);
   std::string const& poller_name() const noexcept;
   void poller_name(std::string const& value) noexcept;
+  uint32_t poller_id() const noexcept;
+  void poller_id(uint32_t value) noexcept;
   bool process_performance_data() const noexcept;
   void process_performance_data(bool value);
   std::list<std::string> const& resource_file() const noexcept;
@@ -563,6 +566,7 @@ class state {
   bool _passive_host_checks_are_soft;
   int _perfdata_timeout;
   std::string _poller_name;
+  uint32_t _poller_id;
   bool _process_performance_data;
   std::list<std::string> _resource_file;
   unsigned long _retained_contact_host_attribute_mask;
