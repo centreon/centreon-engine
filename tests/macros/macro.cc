@@ -64,6 +64,26 @@ TEST_F(Macro, pollerName) {
   ASSERT_EQ(out, "poller-test");
 }
 
+TEST_F(Macro, pollerId) {
+  configuration::parser parser;
+  configuration::state st;
+
+  std::remove("/tmp/test-config.cfg");
+
+  std::ofstream ofs("/tmp/test-config.cfg");
+  ofs << "poller_id=42" << std::endl;
+  ofs << "log_file=\"\"" << std::endl;
+  ofs.close();
+
+  parser.parse("/tmp/test-config.cfg", st);
+  configuration::applier::state::instance().apply(st);
+
+  std::string out;
+  nagios_macros mac;
+  process_macros_r(&mac, "$POLLERID$", out, 0);
+  ASSERT_EQ(out, "42");
+}
+
 // Given host configuration without host_id
 // Then the applier add_object throws an exception.
 TEST_F(Macro, TotalServicesOkZero) {

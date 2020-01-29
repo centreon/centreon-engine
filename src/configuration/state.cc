@@ -172,6 +172,7 @@ std::unordered_map<std::string, state::setter_func> const state::_setters{
      SETTER(bool, passive_host_checks_are_soft)},
     {"perfdata_timeout", SETTER(int, perfdata_timeout)},
     { "poller_name", SETTER(std::string const&, poller_name)},
+    { "poller_id", SETTER(uint32_t, poller_id)},
     {"precached_object_file",
      SETTER(std::string const&, _set_precached_object_file)},
     {"process_performance_data", SETTER(bool, process_performance_data)},
@@ -449,6 +450,7 @@ state::state()
       _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
       _perfdata_timeout(default_perfdata_timeout),
       _poller_name{"unknown"},
+      _poller_id{0},
       _process_performance_data(default_process_performance_data),
       _retained_contact_host_attribute_mask(
           default_retained_contact_host_attribute_mask),
@@ -607,6 +609,7 @@ state& state::operator=(state const& right) {
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
     _perfdata_timeout = right._perfdata_timeout;
     _poller_name = right._poller_name;
+    _poller_id = right._poller_id;
     _process_performance_data = right._process_performance_data;
     _retained_contact_host_attribute_mask =
         right._retained_contact_host_attribute_mask;
@@ -759,6 +762,7 @@ bool state::operator==(state const& right) const noexcept {
       _passive_host_checks_are_soft == right._passive_host_checks_are_soft &&
       _perfdata_timeout == right._perfdata_timeout &&
       _poller_name == right._poller_name &&
+      _poller_id == right._poller_id &&
       _process_performance_data == right._process_performance_data &&
       _retained_contact_host_attribute_mask ==
           right._retained_contact_host_attribute_mask &&
@@ -2752,14 +2756,31 @@ std::string const& state::poller_name() const noexcept {
 }
 
 /**
- *  Set perfdata_timeout value.
+ *  Set poller_name value.
  *
- *  @param[in] value The new perfdata_timeout value.
+ *  @param[in] value The new poller_name value.
  */
 void state::poller_name(std::string const& value) noexcept {
   _poller_name = value;
 }
 
+/**
+ *  Get poller_id value.
+ *
+ *  @return The poller_id value.
+ */
+uint32_t state::poller_id() const noexcept {
+  return _poller_id;
+}
+
+/**
+ *  Set poller_id value.
+ *
+ *  @param[in] value The new poller_id value.
+ */
+void state::poller_id(uint32_t value) noexcept {
+  _poller_id = value;
+}
 
 /**
  *  Get process_performance_data value.

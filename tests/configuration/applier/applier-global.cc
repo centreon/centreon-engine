@@ -57,3 +57,24 @@ TEST_F(ApplierGlobal, pollerName) {
 
   ASSERT_EQ(st.poller_name(), "poller-test");
 }
+
+
+// Given host configuration without host_id
+// Then the applier add_object throws an exception.
+TEST_F(ApplierGlobal, pollerId) {
+  configuration::parser parser;
+  configuration::state st;
+
+  ASSERT_EQ(st.poller_id(), 0);
+
+  std::remove("/tmp/test-config.cfg");
+
+  std::ofstream ofs("/tmp/test-config.cfg");
+  ofs << "poller_id=42" << std::endl;
+  ofs.close();
+
+  parser.parse("/tmp/test-config.cfg", st);
+  std::remove("/tmp/test-config.cfg");
+
+  ASSERT_EQ(st.poller_id(), 42);
+}
