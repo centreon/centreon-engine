@@ -68,7 +68,7 @@ int downtime_manager::unschedule_downtime(downtime::type type,
     return ERROR;
 
   /* remove scheduled entry from event queue */
-  remove_downtime(type, downtime_id);
+  remove_downtime(downtime_id);
 
   /* delete downtime entry */
   if (temp_downtime->get_type() == downtime::host_downtime)

@@ -791,10 +791,9 @@ int handle_timed_event(timed_event* event) {
  * remove from scheduled events, the downtime with the given downtime_id if
  * its type matches with the one provided.
  *
- * @param type The downtime type (ANY_DOWNTIME, HOST_DOWNTIME, SERVICE_DOWNTIME)
  * @param downtime_id
  */
-void remove_downtime(downtime::type type, uint64_t downtime_id) {
+void remove_downtime(uint64_t downtime_id) {
   logger(dbg_functions, basic)
     << "timed_event::remove_downtime()";
 

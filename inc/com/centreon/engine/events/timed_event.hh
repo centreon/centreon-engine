@@ -26,7 +26,6 @@
 #include <deque>
 #include <stdint.h>
 #include <time.h>
-#include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -87,8 +86,7 @@ time_t adjust_timestamp_for_time_change(time_t last_time,
 void compensate_for_system_time_change(unsigned long last_time,
                                        unsigned long current_time);
 int handle_timed_event(com::centreon::engine::timed_event* event);
-void remove_downtime(com::centreon::engine::downtimes::downtime::type type,
-                     uint64_t downtime_id);
+void remove_downtime(uint64_t downtime_id);
 void remove_event(com::centreon::engine::timed_event* event,
                   com::centreon::engine::timed_event::priority priority);
 void reschedule_event(com::centreon::engine::timed_event* event,
