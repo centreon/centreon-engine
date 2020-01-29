@@ -81,11 +81,11 @@ downtime_finder::result_set downtime_finder::find_matching_all(
          it != end;
          ++it) {
       switch (dt.second->get_type()) {
-        case HOST_DOWNTIME:
+        case downtime::host_downtime:
           if (!_match_criteria(*std::static_pointer_cast<host_downtime>(dt.second), *it))
             matched_all = false;
           break;
-        case SERVICE_DOWNTIME:
+        case downtime::service_downtime:
           if (!_match_criteria(*std::static_pointer_cast<service_downtime>(dt.second), *it))
             matched_all = false;
           break;

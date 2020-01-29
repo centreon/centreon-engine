@@ -63,7 +63,7 @@ void applier::downtime::_add_host_downtime(
     obj.duration(),
     obj.downtime_id())};
   dt->schedule();
-  downtimes::downtime_manager::instance().register_downtime(HOST_DOWNTIME, obj.downtime_id());
+  downtimes::downtime_manager::instance().register_downtime(downtimes::downtime::host_downtime, obj.downtime_id());
 }
 
 /**
@@ -86,5 +86,5 @@ void applier::downtime::_add_service_downtime(
     obj.duration(),
     obj.downtime_id())};
   dt->schedule();
-  downtimes::downtime_manager::instance().register_downtime(SERVICE_DOWNTIME, obj.downtime_id());
+  downtimes::downtime_manager::instance().register_downtime(downtimes::downtime::service_downtime, obj.downtime_id());
 }
