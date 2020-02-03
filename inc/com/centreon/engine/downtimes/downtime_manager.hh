@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Centreon (https://www.centreon.com/)
+ * Copyright 2019 - 2020 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ class downtime_manager {
   std::multimap<time_t, std::shared_ptr<downtime>> const&
   get_scheduled_downtimes() const;
 
-  void delete_downtime(int type, uint64_t downtime_id);
-  int unschedule_downtime(int type, uint64_t downtime_id);
-  std::shared_ptr<downtime> find_downtime(int type, uint64_t downtime_id);
+  void delete_downtime(downtime::type type, uint64_t downtime_id);
+  int unschedule_downtime(downtime::type type, uint64_t downtime_id);
+  std::shared_ptr<downtime> find_downtime(downtime::type type, uint64_t downtime_id);
   int check_pending_flex_host_downtime(host* hst);
   int check_pending_flex_service_downtime(service* svc);
   void add_downtime(downtime* dt) noexcept;
@@ -49,8 +49,6 @@ class downtime_manager {
       time_t start_time,
       std::string const& comment);
   void insert_downtime(std::shared_ptr<downtime> dt);
-  int delete_host_downtime(uint64_t downtime_id);
-  int delete_service_downtime(uint64_t downtime_id);
   void initialize_downtime_data();
   int xdddefault_validate_downtime_data();
   uint64_t get_next_downtime_id();
@@ -75,7 +73,7 @@ class downtime_manager {
                                      uint64_t triggered_by,
                                      unsigned long duration,
                                      uint64_t* downtime_id);
-  int schedule_downtime(int type,
+  int schedule_downtime(downtime::type type,
                         std::string const& host_name,
                         std::string const& service_description,
                         time_t entry_time,
@@ -87,7 +85,7 @@ class downtime_manager {
                         uint64_t triggered_by,
                         unsigned long duration,
                         uint64_t* new_downtime_id);
-  int register_downtime(int type, uint64_t downtime_id);
+  int register_downtime(downtime::type type, uint64_t downtime_id);
 
  private:
   downtime_manager() = default;

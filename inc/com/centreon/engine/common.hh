@@ -212,11 +212,6 @@
 #define CMD_DEL_SVC_DOWNTIME_FULL 502
 #define CMD_CUSTOM_COMMAND 999
 
-/* Scheduled downtime types. */
-#define SERVICE_DOWNTIME 1 /* Service downtime. */
-#define HOST_DOWNTIME 2    /* Host downtime. */
-#define ANY_DOWNTIME 3     /* Host or service downtime. */
-
 /* Acknowledgement types. */
 #define HOST_ACKNOWLEDGEMENT 0
 #define SERVICE_ACKNOWLEDGEMENT 1

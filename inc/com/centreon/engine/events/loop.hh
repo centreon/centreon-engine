@@ -70,6 +70,7 @@ class loop {
   void add_event(timed_event* event, priority priority);
   void compensate_for_system_time_change(unsigned long last_time,
                                          unsigned long current_time);
+  void remove_downtime(uint64_t downtime_id);
   void remove_event(timed_event* event, priority priority);
   void remove_events(priority, uint32_t event_type, void* data) noexcept;
   timed_event* find_event(priority priority,

@@ -30,7 +30,12 @@ CCE_BEGIN()
 namespace downtimes {
 class downtime {
  public:
-  downtime(int type,
+  enum type {
+    service_downtime = 1,
+    host_downtime = 2,
+    any_downtime = 3
+  };
+  downtime(type type,
            std::string const& host_name,
            time_t entry_time,
            std::string const& author,
@@ -41,11 +46,11 @@ class downtime {
            uint64_t triggered_by,
            int32_t duration,
            uint64_t downtime_id);
-  downtime(downtime const& other) = delete;
-  downtime(downtime&& other) = delete;
+  downtime(downtime const&) = delete;
+  downtime(downtime&&) = delete;
   virtual ~downtime();
 
-  int get_type() const;
+  type get_type() const;
   virtual bool is_stale() const = 0;
   virtual void schedule() = 0;
   virtual int unschedule() = 0;
@@ -67,7 +72,7 @@ class downtime {
   void start_flex_downtime();
 
  private:
-  int _type;
+  type _type;
 
  protected:
   void _set_in_effect(bool in_effect);

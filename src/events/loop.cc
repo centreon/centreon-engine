@@ -813,6 +813,25 @@ void loop::add_event(timed_event* event, loop::priority priority) {
       NEBTYPE_TIMEDEVENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, event, nullptr);
 }
 
+void loop::remove_downtime(uint64_t downtime_id) {
+  logger(dbg_functions, basic) << "loop::remove_downtime()";
+
+  for (auto it = _event_list_high.begin(),
+            end = _event_list_high.end();
+       it != end;
+       ++it) {
+    if ((*it)->event_type != timed_event::EVENT_SCHEDULED_DOWNTIME)
+      continue;
+    if (((uint64_t)(*it)->event_data) == downtime_id) {
+      // send event data to broker.
+      broker_timed_event(
+          NEBTYPE_TIMEDEVENT_REMOVE, NEBFLAG_NONE, NEBATTR_NONE, *it, nullptr);
+      _event_list_high.erase(it);
+      break;
+    }
+  }
+}
+
 /**
  *  Remove an event from the queue.
  *
@@ -821,7 +840,7 @@ void loop::add_event(timed_event* event, loop::priority priority) {
  *  @param[in,out] event_list_tail The tail of the event list.
  */
 void loop::remove_event(timed_event* event, loop::priority priority) {
-  logger(dbg_functions, basic) << "remove_event()";
+  logger(dbg_functions, basic) << "loop::remove_event()";
 
   // send event data to broker.
   broker_timed_event(
@@ -833,7 +852,6 @@ void loop::remove_event(timed_event* event, loop::priority priority) {
   auto eraser = [](timed_event_list& l, timed_event* event) {
     for (auto it = l.begin(), end = l.end(); it != end; ++it) {
       if (*it == event) {
-        delete *it;
         l.erase(it);
         break;
       }
