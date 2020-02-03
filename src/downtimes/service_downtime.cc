@@ -46,7 +46,7 @@ service_downtime::service_downtime(std::string const& host_name,
                                    uint64_t triggered_by,
                                    int32_t duration,
                                    uint64_t downtime_id)
-    : downtime{SERVICE_DOWNTIME, host_name,  entry_time, author,
+    : downtime{downtime::service_downtime, host_name,  entry_time, author,
                comment_data,     start_time, end_time,   fixed,
                triggered_by,     duration,   downtime_id},
       _service_description{service_desc} {}
@@ -54,7 +54,7 @@ service_downtime::service_downtime(std::string const& host_name,
 /* finds a specific service downtime entry */
 downtime* find_service_downtime(uint64_t downtime_id) {
   return downtime_manager::instance()
-      .find_downtime(SERVICE_DOWNTIME, downtime_id)
+      .find_downtime(downtime::service_downtime, downtime_id)
       .get();
 }
 
@@ -62,7 +62,7 @@ service_downtime::~service_downtime() {
   comment::delete_comment(_get_comment_id());
   /* send data to event broker */
   broker_downtime_data(
-      NEBTYPE_DOWNTIME_DELETE, NEBFLAG_NONE, NEBATTR_NONE, SERVICE_DOWNTIME,
+      NEBTYPE_DOWNTIME_DELETE, NEBFLAG_NONE, NEBATTR_NONE, downtime::service_downtime,
       get_hostname().c_str(), get_service_description().c_str(), _entry_time,
       get_author().c_str(), get_comment().c_str(), get_start_time(),
       get_end_time(), is_fixed(), get_triggered_by(), get_duration(),
@@ -435,7 +435,8 @@ int service_downtime::handle() {
     }
 
     /* delete downtime entry */
-    downtime_manager::instance().delete_service_downtime(get_downtime_id());
+    downtime_manager::instance().delete_downtime(downtime::service_downtime,
+                                                 get_downtime_id());
   }
   /* else we are just starting the scheduled downtime */
   else {
@@ -521,7 +522,7 @@ void service_downtime::schedule() {
 
   /* send data to event broker */
   broker_downtime_data(
-      NEBTYPE_DOWNTIME_LOAD, NEBFLAG_NONE, NEBATTR_NONE, SERVICE_DOWNTIME,
+      NEBTYPE_DOWNTIME_LOAD, NEBFLAG_NONE, NEBATTR_NONE, downtime::service_downtime,
       _hostname.c_str(), _service_description.c_str(), _entry_time,
       _author.c_str(), _comment.c_str(), _start_time, _end_time, _fixed,
       _triggered_by, _duration, _downtime_id, nullptr);

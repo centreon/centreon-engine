@@ -2,7 +2,7 @@
 ** Copyright 2007-2008      Ethan Galstad
 ** Copyright 2007,2010      Andreas Ericsson
 ** Copyright 2010           Max Schubert
-** Copyright 2011-2013,2019 Centreon
+** Copyright 2011-2020i     Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,9 +23,10 @@
 #ifndef CCE_EVENTS_TIMED_EVENT_HH
 #define CCE_EVENTS_TIMED_EVENT_HH
 
+#include <deque>
 #include <stdint.h>
 #include <time.h>
-#include <string>
+#include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()

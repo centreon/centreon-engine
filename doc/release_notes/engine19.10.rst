@@ -6,6 +6,11 @@ Centreon Engine 19.10.11
 Bug fixes
 *********
 
+Downtime cancellation was buggy
+===============================
+
+The downtime cancellation is fixed now.
+
 TOTALHOST* TOTALSERVICES macros
 ===============================
 
