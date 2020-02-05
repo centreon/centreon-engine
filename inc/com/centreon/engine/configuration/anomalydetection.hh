@@ -63,7 +63,6 @@ class anomalydetection : public object {
   bool parse(char const* key, char const* value) override;
 
   std::string const& action_url() const noexcept;
-  double consecutive_deviation() const noexcept;
   bool status_change() const noexcept;
   bool checks_active() const noexcept;
   bool checks_passive() const noexcept;
@@ -136,7 +135,6 @@ class anomalydetection : public object {
   bool _set_action_url(std::string const& value);
   bool _set_metric_name(std::string const& value);
   bool _set_thresholds_file(std::string const& value);
-  bool _set_consecutive_deviation(double value);
   bool _set_status_change(bool value);
   bool _set_checks_active(bool value);
   bool _set_checks_passive(bool value);
@@ -183,7 +181,6 @@ class anomalydetection : public object {
 
   opt<int> _acknowledgement_timeout;
   std::string _action_url;
-  opt<double> _consecutive_deviation;
   opt<bool> _status_change;
   opt<bool> _checks_active;
   opt<bool> _checks_passive;
