@@ -25,10 +25,13 @@
 CCE_BEGIN()
 
 class anomalydetection : public service {
+  std::string _metric_name;
+
  public:
   anomalydetection(std::string const& hostname,
                    std::string const& description,
                    std::string const& display_name,
+                   std::string const& metric_name,
                    bool checks_enabled,
                    bool accept_passive_checks,
                    enum service::service_state initial_state,
@@ -65,6 +68,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     std::string const& host_name,
     std::string const& description,
     std::string const& display_name,
+    std::string const& metric_name,
     std::string const& check_period,
     enum com::centreon::engine::service::service_state initial_state,
     int max_attempts,

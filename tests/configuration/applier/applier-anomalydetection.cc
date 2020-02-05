@@ -103,6 +103,69 @@ TEST_F(ApplierAnomalydetection, NewADFromConfig) {
   ASSERT_TRUE(sm.begin()->second->get_description() == "test description");
 }
 
+// Given service configuration without service_id
+// Then the applier add_object throws an exception
+TEST_F(ApplierAnomalydetection, NewADNoServiceId) {
+  configuration::applier::host hst_aply;
+  configuration::applier::anomalydetection ad_aply;
+  configuration::anomalydetection ad;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  // The host id is not given
+  ASSERT_THROW(hst_aply.add_object(hst), std::exception);
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_TRUE(ad.parse("service_description", "test description"));
+  ASSERT_TRUE(ad.parse("host_id", "1"));
+  ASSERT_TRUE(ad.parse("host_name", "test_host"));
+
+  // No need here to call ad_aply.expand_objects(*config) because the
+  // configuration service is not stored in configuration::state. We just have
+  // to set the host_id manually.
+  ASSERT_THROW(ad_aply.add_object(ad), std::exception);
+}
+
+// Given service configuration without host_id
+// Then the applier add_object throws an exception
+TEST_F(ApplierAnomalydetection, NewADNoHostId) {
+  configuration::applier::host hst_aply;
+  configuration::applier::anomalydetection ad_aply;
+  configuration::anomalydetection ad;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_TRUE(ad.parse("service_description", "test description"));
+  ASSERT_TRUE(ad.parse("service_id", "3"));
+  ASSERT_TRUE(ad.parse("host_name", "test_host"));
+
+  ASSERT_THROW(ad_aply.add_object(ad), std::exception);
+}
+
+// Given service configuration with bad host_id
+// Then the applier add_object throws an exception
+TEST_F(ApplierAnomalydetection, NewADBadHostId) {
+  configuration::applier::host hst_aply;
+  configuration::applier::anomalydetection ad_aply;
+  configuration::anomalydetection ad;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("host_id", "1"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_TRUE(ad.parse("service_description", "test description"));
+  ASSERT_TRUE(ad.parse("host_id", "2"));
+  ASSERT_TRUE(ad.parse("service_id", "3"));
+  ASSERT_TRUE(ad.parse("host_name", "test_host"));
+
+  // No need here to call ad_aply.expand_objects(*config) because the
+  // configuration service is not stored in configuration::state. We just have
+  // to set the host_id manually.
+  ASSERT_THROW(ad_aply.add_object(ad), std::exception);
+}
+
 //// Given service configuration with a host defined
 //// Then the applier add_object creates the service
 //TEST_F(ApplierService, RenameServiceFromConfig) {

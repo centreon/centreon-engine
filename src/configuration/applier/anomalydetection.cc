@@ -105,7 +105,8 @@ void applier::anomalydetection::add_object(configuration::anomalydetection const
   // Create anomalydetection.
   engine::anomalydetection* ad{add_anomalydetection(
       obj.host_id(), obj.service_id(), obj.host_name(),
-      obj.service_description(), obj.display_name(), obj.check_period(),
+      obj.service_description(), obj.display_name(), obj.metric_name(),
+      obj.check_period(),
       static_cast<engine::anomalydetection::service_state>(obj.initial_state()),
       obj.max_check_attempts(), obj.check_interval(), obj.retry_interval(),
       obj.notification_interval(), obj.first_notification_delay(),
@@ -123,9 +124,9 @@ void applier::anomalydetection::add_object(configuration::anomalydetection const
       static_cast<bool>(obj.notification_options() &
                         configuration::anomalydetection::downtime),
       obj.notifications_enabled(), obj.is_volatile(), obj.event_handler(),
-      obj.event_handler_enabled(), obj.checks_active(),
-      obj.checks_passive(), obj.flap_detection_enabled(),
-      obj.low_flap_threshold(), obj.high_flap_threshold(),
+      obj.event_handler_enabled(), obj.checks_active(), obj.checks_passive(),
+      obj.flap_detection_enabled(), obj.low_flap_threshold(),
+      obj.high_flap_threshold(),
       static_cast<bool>(obj.flap_detection_options() &
                         configuration::anomalydetection::ok),
       static_cast<bool>(obj.flap_detection_options() &
@@ -134,7 +135,8 @@ void applier::anomalydetection::add_object(configuration::anomalydetection const
                         configuration::anomalydetection::unknown),
       static_cast<bool>(obj.flap_detection_options() &
                         configuration::anomalydetection::critical),
-      static_cast<bool>(obj.stalking_options() & configuration::anomalydetection::ok),
+      static_cast<bool>(obj.stalking_options() &
+                        configuration::anomalydetection::ok),
       static_cast<bool>(obj.stalking_options() &
                         configuration::anomalydetection::warning),
       static_cast<bool>(obj.stalking_options() &

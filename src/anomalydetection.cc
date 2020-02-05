@@ -17,9 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/anomalydetection.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/anomalydetection.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -27,6 +28,7 @@ using namespace com::centreon::engine::logging;
 anomalydetection::anomalydetection(std::string const& hostname,
                                    std::string const& description,
                                    std::string const& display_name,
+                                   std::string const& metric_name,
                                    bool checks_enabled,
                                    bool accept_passive_checks,
                                    enum service::service_state initial_state,
@@ -54,22 +56,38 @@ anomalydetection::anomalydetection(std::string const& hostname,
                                    int freshness_threshold,
                                    bool obsess_over,
                                    std::string const& timezone)
-    : service{hostname,                    description,
-              display_name,                "",
-              checks_enabled,              accept_passive_checks,
-              initial_state,               check_interval,
-              retry_interval,              notification_interval,
-              max_attempts,                first_notification_delay,
-              recovery_notification_delay, notification_period,
-              notifications_enabled,       is_volatile,
-              check_period,                event_handler,
-              event_handler_enabled,       notes,
-              notes_url,                   action_url,
-              icon_image,                  icon_image_alt,
-              flap_detection_enabled,      low_flap_threshold,
-              high_flap_threshold,         check_freshness,
-              freshness_threshold,         obsess_over,
-              timezone} {}
+    : service{hostname,
+              description,
+              display_name,
+              "",
+              checks_enabled,
+              accept_passive_checks,
+              initial_state,
+              check_interval,
+              retry_interval,
+              notification_interval,
+              max_attempts,
+              first_notification_delay,
+              recovery_notification_delay,
+              notification_period,
+              notifications_enabled,
+              is_volatile,
+              check_period,
+              event_handler,
+              event_handler_enabled,
+              notes,
+              notes_url,
+              action_url,
+              icon_image,
+              icon_image_alt,
+              flap_detection_enabled,
+              low_flap_threshold,
+              high_flap_threshold,
+              check_freshness,
+              freshness_threshold,
+              obsess_over,
+              timezone},
+      _metric_name{metric_name} {}
 
 /**
  *  Add a new anomalydetection to the list in memory.
@@ -78,6 +96,7 @@ anomalydetection::anomalydetection(std::string const& hostname,
  *                                          service is running on.
  *  @param[in] description                  Service description.
  *  @param[in] display_name                 Display name.
+ *  @param[in] metric_name                  Metric to consider.
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
@@ -150,6 +169,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     std::string const& host_name,
     std::string const& description,
     std::string const& display_name,
+    std::string const& metric_name,
     std::string const& check_period,
     com::centreon::engine::service::service_state initial_state,
     int max_attempts,
@@ -200,20 +220,31 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
         << "Error: Service comes from a database, therefore its service id "
         << "must not be null";
     return nullptr;
-  } else if (description.empty()) {
-    logger(log_config_error, basic) << "Error: Service description is not set";
-    return nullptr;
-  } else if (host_name.empty()) {
-    logger(log_config_error, basic)
-        << "Error: Host name of service '" << description << "' is not set";
-    return nullptr;
-  }
-
-  if (!host_id) {
+  } else if (!host_id) {
     logger(log_config_error, basic)
         << "Error: The service '" << description
         << "' cannot be created because"
         << " host '" << host_name << "' does not exist (host_id is null)";
+    return nullptr;
+  } else if (description.empty()) {
+    logger(log_config_error, basic) << "Error: Service description is not set";
+    return nullptr;
+  } else if (!host_name.empty()) {
+    uint64_t hid = get_host_id(host_name);
+    if (hid != host_id) {
+      logger(log_config_error, basic)
+          << "Error: host id (" << host_id << ") of host ('" << host_name
+          << "') of anomaly detection service '" << description
+          << "' has a conflict between config does not match with the config "
+             "id ("
+          << hid << ")";
+      return nullptr;
+    }
+  } else if (metric_name.empty()) {
+    logger(log_config_error, basic)
+        << "Error: metric name must be provided for an anomaly detection "
+           "service (host_id:"
+        << host_id << ", service_id:" << service_id << ")";
     return nullptr;
   }
 
@@ -238,7 +269,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   // Allocate memory.
   std::shared_ptr<anomalydetection> obj{std::make_shared<anomalydetection>(
       host_name, description, display_name.empty() ? description : display_name,
-      checks_enabled, accept_passive_checks, initial_state,
+      metric_name, checks_enabled, accept_passive_checks, initial_state,
       check_interval, retry_interval, notification_interval, max_attempts,
       first_notification_delay, recovery_notification_delay,
       notification_period, notifications_enabled, is_volatile, check_period,
