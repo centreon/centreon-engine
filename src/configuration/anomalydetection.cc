@@ -41,6 +41,7 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
      SETTER(std::string const&, _set_service_description)},
     {"service_id", SETTER(uint64_t, set_service_id)},
     {"_SERVICE_ID", SETTER(uint64_t, set_service_id)},
+    {"dependent_service_id", SETTER(uint64_t, set_dependent_service_id)},
     {"acknowledgement_timeout", SETTER(int, set_acknowledgement_timeout)},
     {"description", SETTER(std::string const&, _set_service_description)},
     {"display_name", SETTER(std::string const&, _set_display_name)},
@@ -50,6 +51,7 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
     {"service_groups", SETTER(std::string const&, _set_servicegroups)},
     {"servicegroups", SETTER(std::string const&, _set_servicegroups)},
     {"metric", SETTER(std::string const&, _set_metric)},
+    {"thresholds_file", SETTER(std::string const&, _set_thresholds_file)},
     {"check_period", SETTER(std::string const&, _set_check_period)},
     {"event_handler", SETTER(std::string const&, _set_event_handler)},
     {"notification_period",
@@ -162,6 +164,7 @@ anomalydetection::anomalydetection()
       _recovery_notification_delay(0),
       _host_id(0),
       _service_id(0),
+      _dependent_service_id(0),
       _stalking_options(default_stalking_options) {}
 
 /**
@@ -176,6 +179,7 @@ anomalydetection::anomalydetection(anomalydetection const& other)
       _checks_active(other._checks_active),
       _checks_passive(other._checks_passive),
       _metric(other._metric),
+      _thresholds_file(other._thresholds_file),
       _check_freshness(other._check_freshness),
       _check_interval(other._check_interval),
       _check_period(other._check_period),
@@ -214,6 +218,7 @@ anomalydetection::anomalydetection(anomalydetection const& other)
       _service_description(other._service_description),
       _host_id(other._host_id),
       _service_id(other._service_id),
+      _dependent_service_id(other._dependent_service_id),
       _stalking_options(other._stalking_options),
       _timezone(other._timezone) {}
 
@@ -237,6 +242,7 @@ anomalydetection& anomalydetection::operator=(anomalydetection const& other) {
     _checks_active = other._checks_active;
     _checks_passive = other._checks_passive;
     _metric = other._metric;
+    _thresholds_file = other._thresholds_file;
     _check_freshness = other._check_freshness;
     _check_interval = other._check_interval;
     _check_period = other._check_period;
@@ -275,6 +281,7 @@ anomalydetection& anomalydetection::operator=(anomalydetection const& other) {
     _service_description = other._service_description;
     _host_id = other._host_id;
     _service_id = other._service_id;
+    _dependent_service_id = other._dependent_service_id;
     _stalking_options = other._stalking_options;
     _timezone = other._timezone;
   }
@@ -317,6 +324,11 @@ bool anomalydetection::operator==(anomalydetection const& other) const noexcept 
   if (_metric != other._metric) {
     logger(dbg_config, more)
         << "configuration::anomalydetection::equality => metric don't match";
+    return false;
+  }
+  if (_thresholds_file != other._thresholds_file) {
+    logger(dbg_config, more)
+        << "configuration::anomalydetection::equality => thresholds_file don't match";
     return false;
   }
   if (_check_freshness != other._check_freshness) {
@@ -509,6 +521,11 @@ bool anomalydetection::operator==(anomalydetection const& other) const noexcept 
         << "configuration::anomalydetection::equality => service_id don't match";
     return false;
   }
+  if (_dependent_service_id != other._dependent_service_id) {
+    logger(dbg_config, more)
+        << "configuration::anomalydetection::equality => dependent_service_id don't match";
+    return false;
+  }
   if (_stalking_options != other._stalking_options) {
     logger(dbg_config, more)
         << "configuration::anomalydetection::equality => stalking_options don't match";
@@ -548,6 +565,8 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
     return _host_id < other._host_id;
   else if (_service_id != other._service_id)
     return _service_id < other._service_id;
+  else if (_dependent_service_id != other._dependent_service_id)
+    return _dependent_service_id < other._dependent_service_id;
   else if (_host_name != other._host_name)
     return _host_name < other._host_name;
   else if (_service_description != other._service_description)
@@ -562,6 +581,8 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
     return _checks_passive < other._checks_passive;
   else if (_metric != other._metric)
     return _metric < other._metric;
+  else if (_thresholds_file != other._thresholds_file)
+    return _thresholds_file < other._thresholds_file;
   else if (_check_freshness != other._check_freshness)
     return _check_freshness < other._check_freshness;
   else if (_check_interval != other._check_interval)
@@ -652,6 +673,9 @@ void anomalydetection::check_validity() const {
   if (_metric.empty())
     throw engine_error() << "Service '" << _service_description
                          << "' has no metric specified (property 'metric')";
+  if (_thresholds_file.empty())
+    throw engine_error() << "Anomaly detection service '" << _service_description
+                         << "' has no thresholds file specified (property 'thresholds_file')";
 }
 
 /**
@@ -690,6 +714,7 @@ void anomalydetection::merge(object const& obj) {
   MRG_OPTION(_acknowledgement_timeout);
   MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_metric);
+  MRG_DEFAULT(_thresholds_file);
   MRG_OPTION(_checks_active);
   MRG_OPTION(_checks_passive);
   MRG_OPTION(_check_freshness);
@@ -792,6 +817,15 @@ bool anomalydetection::checks_passive() const noexcept {
  */
 const std::string& anomalydetection::metric() const noexcept {
   return _metric;
+}
+
+/**
+ *  Get thresholds file.
+ *
+ *  @return The thresholds file.
+ */
+const std::string& anomalydetection::thresholds_file() const noexcept {
+  return _thresholds_file;
 }
 
 /**
@@ -1239,12 +1273,21 @@ std::string const& anomalydetection::service_description() const noexcept {
 }
 
 /**
- *  Get the anomalydetection id.
+ *  Get the service id.
  *
  *  @return  The anomalydetection id.
  */
 uint64_t anomalydetection::service_id() const noexcept {
   return _service_id;
+}
+
+/**
+ *  Get the dependent service id.
+ *
+ *  @return  The dependent service id.
+ */
+uint64_t anomalydetection::dependent_service_id() const noexcept {
+  return _dependent_service_id;
 }
 
 /**
@@ -1330,6 +1373,20 @@ bool anomalydetection::_set_metric(std::string const& value) {
   if (value.empty())
     return false;
   _metric = value;
+  return true;
+}
+
+/**
+ *  Set thresholds_file value.
+ *
+ *  @param[in] value The thresholds_file value to check.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool anomalydetection::_set_thresholds_file(std::string const& value) {
+  if (value.empty())
+    return false;
+  _thresholds_file = value;
   return true;
 }
 
@@ -1895,6 +1952,18 @@ bool anomalydetection::_set_service_description(std::string const& value) {
  */
 bool anomalydetection::set_service_id(uint64_t value) {
   _service_id = value;
+  return true;
+}
+
+/**
+ *  Set dependent_service_id value.
+ *
+ *  @param[in] value The new dependent_service_id value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool anomalydetection::set_dependent_service_id(uint64_t value) {
+  _dependent_service_id = value;
   return true;
 }
 

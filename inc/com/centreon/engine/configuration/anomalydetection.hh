@@ -66,6 +66,7 @@ class anomalydetection : public object {
   bool checks_active() const noexcept;
   bool checks_passive() const noexcept;
   std::string const& metric() const noexcept;
+  std::string const& thresholds_file() const noexcept;
   bool check_freshness() const noexcept;
   unsigned int check_interval() const noexcept;
   std::string const& check_period() const noexcept;
@@ -118,6 +119,8 @@ class anomalydetection : public object {
   std::string const& service_description() const noexcept;
   uint64_t service_id() const noexcept;
   bool set_service_id(uint64_t value);
+  uint64_t dependent_service_id() const noexcept;
+  bool set_dependent_service_id(uint64_t value);
   unsigned short stalking_options() const noexcept;
   void timezone(std::string const& time_zone);
   std::string const& timezone() const noexcept;
@@ -130,6 +133,7 @@ class anomalydetection : public object {
 
   bool _set_action_url(std::string const& value);
   bool _set_metric(std::string const& value);
+  bool _set_thresholds_file(std::string const& value);
   bool _set_checks_active(bool value);
   bool _set_checks_passive(bool value);
   bool _set_check_freshness(bool value);
@@ -178,6 +182,7 @@ class anomalydetection : public object {
   opt<bool> _checks_active;
   opt<bool> _checks_passive;
   std::string _metric;
+  std::string _thresholds_file;
   opt<bool> _check_freshness;
   opt<unsigned int> _check_interval;
   std::string _check_period;
@@ -216,6 +221,7 @@ class anomalydetection : public object {
   std::string _service_description;
   uint64_t _host_id;
   uint64_t _service_id;
+  uint64_t _dependent_service_id;
   static std::unordered_map<std::string, setter_func> const _setters;
   opt<unsigned short> _stalking_options;
   opt<std::string> _timezone;
