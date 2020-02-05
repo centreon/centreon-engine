@@ -45,9 +45,6 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
     {"acknowledgement_timeout", SETTER(int, set_acknowledgement_timeout)},
     {"description", SETTER(std::string const&, _set_service_description)},
     {"display_name", SETTER(std::string const&, _set_display_name)},
-    {"hostgroup", SETTER(std::string const&, _set_hostgroups)},
-    {"hostgroups", SETTER(std::string const&, _set_hostgroups)},
-    {"hostgroup_name", SETTER(std::string const&, _set_hostgroups)},
     {"service_groups", SETTER(std::string const&, _set_servicegroups)},
     {"servicegroups", SETTER(std::string const&, _set_servicegroups)},
     {"metric_name", SETTER(std::string const&, _set_metric_name)},
@@ -198,7 +195,6 @@ anomalydetection::anomalydetection(anomalydetection const& other)
       _flap_detection_options(other._flap_detection_options),
       _freshness_threshold(other._freshness_threshold),
       _high_flap_threshold(other._high_flap_threshold),
-      _hostgroups(other._hostgroups),
       _host_name(other._host_name),
       _icon_image(other._icon_image),
       _icon_image_alt(other._icon_image_alt),
@@ -262,7 +258,6 @@ anomalydetection& anomalydetection::operator=(anomalydetection const& other) {
     _flap_detection_options = other._flap_detection_options;
     _freshness_threshold = other._freshness_threshold;
     _high_flap_threshold = other._high_flap_threshold;
-    _hostgroups = other._hostgroups;
     _host_name = other._host_name;
     _icon_image = other._icon_image;
     _icon_image_alt = other._icon_image_alt;
@@ -409,11 +404,6 @@ bool anomalydetection::operator==(anomalydetection const& other) const noexcept 
   if (_high_flap_threshold != other._high_flap_threshold) {
     logger(dbg_config, more) << "configuration::anomalydetection::equality => "
                                 "high_flap_threshold don't match";
-    return false;
-  }
-  if (_hostgroups != other._hostgroups) {
-    logger(dbg_config, more)
-        << "configuration::anomalydetection::equality => hostgroups don't match";
     return false;
   }
   if (_host_name != other._host_name) {
@@ -623,8 +613,6 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
     return _freshness_threshold < other._freshness_threshold;
   else if (_high_flap_threshold != other._high_flap_threshold)
     return _high_flap_threshold < other._high_flap_threshold;
-  else if (_hostgroups != other._hostgroups)
-    return _hostgroups < other._hostgroups;
   else if (_icon_image != other._icon_image)
     return _icon_image < other._icon_image;
   else if (_icon_image_alt != other._icon_image_alt)
@@ -677,17 +665,18 @@ void anomalydetection::check_validity() const {
   if (_service_description.empty())
     throw engine_error() << "Service has no description (property "
                          << "'service_description')";
-  if (_host_name.empty() && _hostgroups->empty())
-    throw engine_error()
-          << "Service '" << _service_description
-          << "' is not attached to any host or host group (properties "
-          << "'host_name' or 'hostgroup_name', respectively)";
-  if (_metric_name.empty())
+  if (_host_name.empty())
     throw engine_error() << "Service '" << _service_description
-                         << "' has no metric_name specified (property 'metric_name')";
+                         << "' is not attached to any host (property "
+                            "'host_name')";
+  if (_metric_name.empty())
+    throw engine_error()
+        << "Anomaly detection service '" << _service_description
+        << "' has no metric name specified (property 'metric_name')";
   if (_thresholds_file.empty())
-    throw engine_error() << "Anomaly detection service '" << _service_description
-                         << "' has no thresholds file specified (property 'thresholds_file')";
+    throw engine_error()
+        << "Anomaly detection service '" << _service_description
+        << "' has no thresholds file specified (property 'thresholds_file')";
 }
 
 /**
@@ -744,7 +733,6 @@ void anomalydetection::merge(object const& obj) {
   MRG_OPTION(_flap_detection_options);
   MRG_OPTION(_freshness_threshold);
   MRG_OPTION(_high_flap_threshold);
-  MRG_INHERIT(_hostgroups);
   MRG_DEFAULT(_host_name);
   MRG_DEFAULT(_icon_image);
   MRG_DEFAULT(_icon_image_alt);
@@ -936,8 +924,8 @@ bool anomalydetection::contacts_defined() const noexcept {
  *
  *  @return The customvariables.
  */
-com::centreon::engine::map_customvar const& anomalydetection::customvariables() const
-    noexcept {
+com::centreon::engine::map_customvar const& anomalydetection::customvariables()
+    const noexcept {
   return _customvariables;
 }
 
@@ -1023,21 +1011,12 @@ unsigned int anomalydetection::high_flap_threshold() const noexcept {
 }
 
 /**
- *  Get hostgroups.
+ *  Get host name.
  *
- *  @return The hostgroups.
+ *  @return The host name.
  */
-set_string& anomalydetection::hostgroups() noexcept {
-  return *_hostgroups;
-}
-
-/**
- *  Get hostgroups.
- *
- *  @return The hostgroups.
- */
-set_string const& anomalydetection::hostgroups() const noexcept {
-  return *_hostgroups;
+std::string& anomalydetection::host_name() noexcept {
+  return _host_name;
 }
 
 /**
@@ -1045,7 +1024,7 @@ set_string const& anomalydetection::hostgroups() const noexcept {
  *
  *  @return The host name.
  */
-const std::string& anomalydetection::host_name() noexcept {
+const std::string& anomalydetection::host_name() const noexcept {
   return _host_name;
 }
 
@@ -1658,21 +1637,9 @@ bool anomalydetection::_set_high_flap_threshold(unsigned int value) {
 }
 
 /**
- *  Set hostgroups value.
+ *  Set host_name value.
  *
- *  @param[in] value The new hostgroups value.
- *
- *  @return True on success, otherwise false.
- */
-bool anomalydetection::_set_hostgroups(std::string const& value) {
-  _hostgroups = value;
-  return true;
-}
-
-/**
- *  Set hosts value.
- *
- *  @param[in] value The new hosts value.
+ *  @param[in] value The new host_name value.
  *
  *  @return True on success, otherwise false.
  */

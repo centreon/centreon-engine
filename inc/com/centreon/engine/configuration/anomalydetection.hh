@@ -87,9 +87,8 @@ class anomalydetection : public object {
   unsigned short flap_detection_options() const noexcept;
   unsigned int freshness_threshold() const noexcept;
   unsigned int high_flap_threshold() const noexcept;
-  set_string& hostgroups() noexcept;
-  set_string const& hostgroups() const noexcept;
-  const std::string& host_name() noexcept;
+  std::string& host_name() noexcept;
+  const std::string& host_name() const noexcept;
   uint64_t host_id() const noexcept;
   void set_host_id(uint64_t id);
   std::string const& icon_image() const noexcept;
@@ -153,7 +152,6 @@ class anomalydetection : public object {
   bool _set_flap_detection_options(std::string const& value);
   bool _set_freshness_threshold(unsigned int value);
   bool _set_high_flap_threshold(unsigned int value);
-  bool _set_hostgroups(std::string const& value);
   bool _set_host_name(std::string const& value);
   bool _set_icon_image(std::string const& value);
   bool _set_icon_image_alt(std::string const& value);
@@ -200,7 +198,6 @@ class anomalydetection : public object {
   opt<unsigned short> _flap_detection_options;
   opt<unsigned int> _freshness_threshold;
   opt<unsigned int> _high_flap_threshold;
-  group<set_string> _hostgroups;
   std::string _host_name;
   std::string _icon_image;
   std::string _icon_image_alt;
