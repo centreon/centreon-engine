@@ -86,17 +86,12 @@ TEST_F(ApplierAnomalydetection, NewADFromConfig) {
   ASSERT_NO_THROW(hst_aply.add_object(hst));
   ASSERT_TRUE(ad.parse("service_description", "test description"));
   ASSERT_TRUE(ad.parse("service_id", "3"));
-
-  configuration::applier::command cmd_aply;
-  configuration::command cmd("cmd");
-  cmd.parse("command_line", "echo 1");
-  ad.parse("check_command", "cmd");
-  cmd_aply.add_object(cmd);
+  ASSERT_TRUE(ad.parse("host_id", "1"));
+  ASSERT_TRUE(ad.parse("host_name", "test_host"));
 
   // No need here to call ad_aply.expand_objects(*config) because the
   // configuration service is not stored in configuration::state. We just have
   // to set the host_id manually.
-  ad.set_host_id(1);
   ad_aply.add_object(ad);
   service_id_map const& sm(engine::service::services_by_id);
   ASSERT_EQ(sm.size(), 1u);

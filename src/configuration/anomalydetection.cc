@@ -39,6 +39,8 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
     {"host_name", SETTER(std::string const&, _set_host_name)},
     {"service_description",
      SETTER(std::string const&, _set_service_description)},
+    {"host_id", SETTER(uint64_t, set_host_id)},
+    {"_HOST_ID", SETTER(uint64_t, set_host_id)},
     {"service_id", SETTER(uint64_t, set_service_id)},
     {"_SERVICE_ID", SETTER(uint64_t, set_service_id)},
     {"dependent_service_id", SETTER(uint64_t, set_dependent_service_id)},
@@ -516,6 +518,11 @@ bool anomalydetection::operator==(anomalydetection const& other) const noexcept 
         << "configuration::anomalydetection::equality => host_id don't match";
     return false;
   }
+  if (_host_id != other._host_id) {
+    logger(dbg_config, more)
+        << "configuration::anomalydetection::equality => host_id don't match";
+    return false;
+  }
   if (_service_id != other._service_id) {
     logger(dbg_config, more)
         << "configuration::anomalydetection::equality => service_id don't match";
@@ -563,8 +570,8 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
   // The configuration diff mechanism relies on this.
   if (_host_id != other._host_id)
     return _host_id < other._host_id;
-  else if (_service_id != other._service_id)
-    return _service_id < other._service_id;
+  else if (_host_id != other._host_id)
+    return _host_id < other._host_id;
   else if (_dependent_service_id != other._dependent_service_id)
     return _dependent_service_id < other._dependent_service_id;
   else if (_host_name != other._host_name)
@@ -1029,15 +1036,6 @@ const std::string& anomalydetection::host_name() const noexcept {
 }
 
 /**
- *  Get host ID.
- *
- *  @return Service's host's ID.
- */
-uint64_t anomalydetection::host_id() const noexcept {
-  return _host_id;
-}
-
-/**
  *  Get icon_image.
  *
  *  @return The icon_image.
@@ -1271,6 +1269,15 @@ std::string& anomalydetection::service_description() noexcept {
  */
 std::string const& anomalydetection::service_description() const noexcept {
   return _service_description;
+}
+
+/**
+ *  Get the host id.
+ *
+ *  @return  The anomalydetection id.
+ */
+uint64_t anomalydetection::host_id() const noexcept {
+  return _host_id;
 }
 
 /**
@@ -2017,7 +2024,10 @@ bool anomalydetection::_set_timezone(std::string const& value) {
  *  Set the host id.
  *
  * @param value The host id.
+ *
+ * @return True on success, otherwise false.
  */
-void anomalydetection::set_host_id(uint64_t value) {
+bool anomalydetection::set_host_id(uint64_t value) {
   _host_id = value;
+  return true;
 }

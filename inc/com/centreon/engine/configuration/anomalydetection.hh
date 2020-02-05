@@ -90,7 +90,7 @@ class anomalydetection : public object {
   std::string& host_name() noexcept;
   const std::string& host_name() const noexcept;
   uint64_t host_id() const noexcept;
-  void set_host_id(uint64_t id);
+  bool set_host_id(uint64_t id);
   std::string const& icon_image() const noexcept;
   std::string const& icon_image_alt() const noexcept;
   unsigned int initial_state() const noexcept;
