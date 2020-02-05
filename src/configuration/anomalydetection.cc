@@ -73,6 +73,8 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
     {"retry_check_interval", SETTER(unsigned int, _set_retry_interval)},
     {"recovery_notification_delay",
      SETTER(unsigned int, _set_recovery_notification_delay)},
+    {"consecutive_deviation", SETTER(double, _set_consecutive_deviation)},
+    {"status_change", SETTER(bool, _set_status_change)},
     {"active_checks_enabled", SETTER(bool, _set_checks_active)},
     {"passive_checks_enabled", SETTER(bool, _set_checks_passive)},
     {"parallelize_check", SETTER(bool, _set_parallelize_check)},
@@ -103,6 +105,8 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
 
 // Default values.
 static int default_acknowledgement_timeout(0);
+static double const default_consecutive_deviation(0.0);
+static bool const default_status_change(false);
 static bool const default_checks_active(true);
 static bool const default_checks_passive(true);
 static bool const default_check_freshness(0);
@@ -139,6 +143,8 @@ static unsigned short const default_stalking_options(anomalydetection::none);
 anomalydetection::anomalydetection()
     : object(object::anomalydetection),
       _acknowledgement_timeout(default_acknowledgement_timeout),
+      _consecutive_deviation(default_consecutive_deviation),
+      _status_change(default_status_change),
       _checks_active(default_checks_active),
       _checks_passive(default_checks_passive),
       _check_freshness(default_check_freshness),
@@ -176,6 +182,8 @@ anomalydetection::anomalydetection(anomalydetection const& other)
     : object(other),
       _acknowledgement_timeout(other._acknowledgement_timeout),
       _action_url(other._action_url),
+      _consecutive_deviation(other._consecutive_deviation),
+      _status_change(other._status_change),
       _checks_active(other._checks_active),
       _checks_passive(other._checks_passive),
       _metric_name(other._metric_name),
@@ -239,6 +247,8 @@ anomalydetection& anomalydetection::operator=(anomalydetection const& other) {
     object::operator=(other);
     _acknowledgement_timeout = other._acknowledgement_timeout;
     _action_url = other._action_url;
+    _consecutive_deviation = other._consecutive_deviation;
+    _status_change = other._status_change;
     _checks_active = other._checks_active;
     _checks_passive = other._checks_passive;
     _metric_name = other._metric_name;
@@ -309,6 +319,16 @@ bool anomalydetection::operator==(anomalydetection const& other) const noexcept 
   if (_action_url != other._action_url) {
     logger(dbg_config, more)
         << "configuration::anomalydetection::equality => action_url don't match";
+    return false;
+  }
+  if (_consecutive_deviation != other._consecutive_deviation) {
+    logger(dbg_config, more)
+        << "configuration::anomalydetection::equality => consecutive_deviation don't match";
+    return false;
+  }
+  if (_status_change != other._status_change) {
+    logger(dbg_config, more)
+        << "configuration::anomalydetection::equality => status_change don't match";
     return false;
   }
   if (_checks_active != other._checks_active) {
@@ -575,6 +595,10 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
     return _acknowledgement_timeout < other._acknowledgement_timeout;
   else if (_action_url != other._action_url)
     return _action_url < other._action_url;
+  else if (_consecutive_deviation != other._consecutive_deviation)
+    return _consecutive_deviation < other._consecutive_deviation;
+  else if (_status_change != other._status_change)
+    return _status_change < other._status_change;
   else if (_checks_active != other._checks_active)
     return _checks_active < other._checks_active;
   else if (_checks_passive != other._checks_passive)
@@ -715,6 +739,8 @@ void anomalydetection::merge(object const& obj) {
   MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_metric_name);
   MRG_DEFAULT(_thresholds_file);
+  MRG_OPTION(_consecutive_deviation);
+  MRG_OPTION(_status_change);
   MRG_OPTION(_checks_active);
   MRG_OPTION(_checks_passive);
   MRG_OPTION(_check_freshness);
@@ -790,6 +816,24 @@ bool anomalydetection::parse(char const* key, char const* value) {
  */
 std::string const& anomalydetection::action_url() const noexcept {
   return _action_url;
+}
+
+/**
+ *  Get consecutive_deviation.
+ *
+ *  @return The consecutive_deviation.
+ */
+double anomalydetection::consecutive_deviation() const noexcept {
+  return _consecutive_deviation;
+}
+
+/**
+ *  Get status_change.
+ *
+ *  @return The status_change.
+ */
+bool anomalydetection::status_change() const noexcept {
+  return _status_change;
 }
 
 /**
@@ -1387,6 +1431,30 @@ bool anomalydetection::_set_thresholds_file(std::string const& value) {
   if (value.empty())
     return false;
   _thresholds_file = value;
+  return true;
+}
+
+/**
+ *  Set consecutive_deviation value.
+ *
+ *  @param[in] value The new consecutive_deviation value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool anomalydetection::_set_consecutive_deviation(double value) {
+  _consecutive_deviation = value;
+  return true;
+}
+
+/**
+ *  Set status_change value.
+ *
+ *  @param[in] value The new status_change value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool anomalydetection::_set_status_change(bool value) {
+  _status_change = value;
   return true;
 }
 
