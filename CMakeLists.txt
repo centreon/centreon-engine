@@ -499,6 +499,7 @@ set(
   FILES
 
   # Sources.
+  "${SRC_DIR}/anomalydetection.cc"
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checkable.cc"
   "${SRC_DIR}/checks.cc"
@@ -541,6 +542,7 @@ set(
   "${SRC_DIR}/xsddefault.cc"
 
   # Headers.
+  "${INC_DIR}/com/centreon/engine/anomalydetection.hh"
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checkable.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"

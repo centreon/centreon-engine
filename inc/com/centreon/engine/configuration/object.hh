@@ -53,26 +53,27 @@ class object {
     serviceescalation = 11,
     serviceextinfo = 12,
     servicegroup = 13,
-    timeperiod = 14
+    timeperiod = 14,
+    anomalydetection = 15,
   };
 
   object(object_type type);
   object(object const& right);
-  virtual ~object() throw();
+  virtual ~object() noexcept;
   object& operator=(object const& right);
-  bool operator==(object const& right) const throw();
-  bool operator!=(object const& right) const throw();
+  bool operator==(object const& right) const noexcept;
+  bool operator!=(object const& right) const noexcept;
   virtual void check_validity() const = 0;
   static std::shared_ptr<object> create(std::string const& type_name);
   virtual void merge(object const& obj) = 0;
-  std::string const& name() const throw();
+  std::string const& name() const noexcept;
   virtual bool parse(char const* key, char const* value);
   virtual bool parse(std::string const& line);
   void resolve_template(
       std::unordered_map<std::string, std::shared_ptr<object> >& templates);
-  bool should_register() const throw();
-  object_type type() const throw();
-  std::string const& type_name() const throw();
+  bool should_register() const noexcept;
+  object_type type() const noexcept;
+  std::string const& type_name() const noexcept;
 
  protected:
   struct setters {

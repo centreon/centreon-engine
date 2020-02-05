@@ -21,6 +21,7 @@
 #define CCE_CONFIGURATION_SERVICEEXTINFO_HH
 
 #include <list>
+#include <string>
 #include "com/centreon/engine/configuration/group.hh"
 #include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/namespace.hh"
@@ -33,6 +34,7 @@ class service;
 
 class serviceextinfo : public object {
   friend class service;
+  friend class anomalydetection;
 
  public:
   serviceextinfo();

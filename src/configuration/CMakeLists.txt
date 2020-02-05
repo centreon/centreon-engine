@@ -30,6 +30,7 @@ set(
   ${FILES}
 
   # Sources.
+  "${SRC_DIR}/anomalydetection.cc"
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/connector.cc"
   "${SRC_DIR}/contact.cc"
@@ -55,6 +56,7 @@ set(
   "${SRC_DIR}/timerange.cc"
 
   # Headers.
+  "${INC_DIR}/anomalydetection.hh"
   "${INC_DIR}/command.hh"
   "${INC_DIR}/connector.hh"
   "${INC_DIR}/contactgroup.hh"
