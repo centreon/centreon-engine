@@ -65,7 +65,7 @@ class anomalydetection : public object {
   std::string const& action_url() const noexcept;
   bool checks_active() const noexcept;
   bool checks_passive() const noexcept;
-  std::string const& metric() const noexcept;
+  std::string const& metric_name() const noexcept;
   std::string const& thresholds_file() const noexcept;
   bool check_freshness() const noexcept;
   unsigned int check_interval() const noexcept;
@@ -132,7 +132,7 @@ class anomalydetection : public object {
   typedef bool (*setter_func)(anomalydetection&, char const*);
 
   bool _set_action_url(std::string const& value);
-  bool _set_metric(std::string const& value);
+  bool _set_metric_name(std::string const& value);
   bool _set_thresholds_file(std::string const& value);
   bool _set_checks_active(bool value);
   bool _set_checks_passive(bool value);
@@ -181,7 +181,7 @@ class anomalydetection : public object {
   std::string _action_url;
   opt<bool> _checks_active;
   opt<bool> _checks_passive;
-  std::string _metric;
+  std::string _metric_name;
   std::string _thresholds_file;
   opt<bool> _check_freshness;
   opt<unsigned int> _check_interval;

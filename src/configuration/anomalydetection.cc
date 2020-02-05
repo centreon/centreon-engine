@@ -50,7 +50,7 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
     {"hostgroup_name", SETTER(std::string const&, _set_hostgroups)},
     {"service_groups", SETTER(std::string const&, _set_servicegroups)},
     {"servicegroups", SETTER(std::string const&, _set_servicegroups)},
-    {"metric", SETTER(std::string const&, _set_metric)},
+    {"metric_name", SETTER(std::string const&, _set_metric_name)},
     {"thresholds_file", SETTER(std::string const&, _set_thresholds_file)},
     {"check_period", SETTER(std::string const&, _set_check_period)},
     {"event_handler", SETTER(std::string const&, _set_event_handler)},
@@ -178,7 +178,7 @@ anomalydetection::anomalydetection(anomalydetection const& other)
       _action_url(other._action_url),
       _checks_active(other._checks_active),
       _checks_passive(other._checks_passive),
-      _metric(other._metric),
+      _metric_name(other._metric_name),
       _thresholds_file(other._thresholds_file),
       _check_freshness(other._check_freshness),
       _check_interval(other._check_interval),
@@ -241,7 +241,7 @@ anomalydetection& anomalydetection::operator=(anomalydetection const& other) {
     _action_url = other._action_url;
     _checks_active = other._checks_active;
     _checks_passive = other._checks_passive;
-    _metric = other._metric;
+    _metric_name = other._metric_name;
     _thresholds_file = other._thresholds_file;
     _check_freshness = other._check_freshness;
     _check_interval = other._check_interval;
@@ -321,9 +321,9 @@ bool anomalydetection::operator==(anomalydetection const& other) const noexcept 
         << "configuration::anomalydetection::equality => checks_passive don't match";
     return false;
   }
-  if (_metric != other._metric) {
+  if (_metric_name != other._metric_name) {
     logger(dbg_config, more)
-        << "configuration::anomalydetection::equality => metric don't match";
+        << "configuration::anomalydetection::equality => metric_name don't match";
     return false;
   }
   if (_thresholds_file != other._thresholds_file) {
@@ -579,8 +579,8 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
     return _checks_active < other._checks_active;
   else if (_checks_passive != other._checks_passive)
     return _checks_passive < other._checks_passive;
-  else if (_metric != other._metric)
-    return _metric < other._metric;
+  else if (_metric_name != other._metric_name)
+    return _metric_name < other._metric_name;
   else if (_thresholds_file != other._thresholds_file)
     return _thresholds_file < other._thresholds_file;
   else if (_check_freshness != other._check_freshness)
@@ -670,9 +670,9 @@ void anomalydetection::check_validity() const {
           << "Service '" << _service_description
           << "' is not attached to any host or host group (properties "
           << "'host_name' or 'hostgroup_name', respectively)";
-  if (_metric.empty())
+  if (_metric_name.empty())
     throw engine_error() << "Service '" << _service_description
-                         << "' has no metric specified (property 'metric')";
+                         << "' has no metric_name specified (property 'metric_name')";
   if (_thresholds_file.empty())
     throw engine_error() << "Anomaly detection service '" << _service_description
                          << "' has no thresholds file specified (property 'thresholds_file')";
@@ -713,7 +713,7 @@ void anomalydetection::merge(object const& obj) {
 
   MRG_OPTION(_acknowledgement_timeout);
   MRG_DEFAULT(_action_url);
-  MRG_DEFAULT(_metric);
+  MRG_DEFAULT(_metric_name);
   MRG_DEFAULT(_thresholds_file);
   MRG_OPTION(_checks_active);
   MRG_OPTION(_checks_passive);
@@ -811,12 +811,12 @@ bool anomalydetection::checks_passive() const noexcept {
 }
 
 /**
- *  Get metric.
+ *  Get metric_name.
  *
- *  @return The metric.
+ *  @return The metric_name.
  */
-const std::string& anomalydetection::metric() const noexcept {
-  return _metric;
+const std::string& anomalydetection::metric_name() const noexcept {
+  return _metric_name;
 }
 
 /**
@@ -1363,16 +1363,16 @@ bool anomalydetection::_set_action_url(std::string const& value) {
 }
 
 /**
- *  Set metric value.
+ *  Set metric_name value.
  *
- *  @param[in] value The metric value to check.
+ *  @param[in] value The metric_name value to check.
  *
  *  @return True on success, otherwise false.
  */
-bool anomalydetection::_set_metric(std::string const& value) {
+bool anomalydetection::_set_metric_name(std::string const& value) {
   if (value.empty())
     return false;
-  _metric = value;
+  _metric_name = value;
   return true;
 }
 
