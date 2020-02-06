@@ -436,7 +436,7 @@ void checker::run(host* hst,
 }
 
 /**
- *  Run an service check without waiting check result.
+ *  Run a service check without waiting check result.
  *
  *  @param[in] svc              Service to check.
  *  @param[in] check_options    Event options.
@@ -446,7 +446,7 @@ void checker::run(host* hst,
  *  @param[in] time_is_valid    Service check viable at this time.
  *  @param[in] preferred_time   The next preferred check time.
  *
- *  @return True is the check start correctly.
+ *  @return True if the check started correctly.
  */
 void checker::run(service* svc,
                   int check_options,
@@ -462,7 +462,7 @@ void checker::run(service* svc,
 
   // Preamble.
   if (!svc)
-    throw(engine_error() << "Attempt to run check on invalid service");
+    throw engine_error() << "Attempt to run check on invalid service";
   if (!svc->get_host_ptr())
     throw engine_error() << "Attempt to run check on service with invalid host";
   if (!svc->get_check_command_ptr())
@@ -550,8 +550,8 @@ void checker::run(service* svc,
   command_map::iterator found{commands::command::commands.find(
       svc->get_check_command_ptr()->get_name())};
   if (found == commands::command::commands.end() || !found->second)
-    throw(engine_error() << "unknow command "
-                         << svc->get_check_command_ptr()->get_name());
+    throw engine_error() << "unknow command "
+                         << svc->get_check_command_ptr()->get_name();
 
   std::string processed_cmd(found->second->process_cmd(&macros));
   char* processed_cmd_ptr(string::dup(processed_cmd));

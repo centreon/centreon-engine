@@ -70,9 +70,9 @@ raw::~raw() noexcept {
       p->wait();
       lock.lock();
     }
-    for (auto it = _processes_free.begin(), end = _processes_free.end();
-         it != end; ++it)
-      delete *it;
+    for (auto p : _processes_free)
+      delete p;
+
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
         << "Error: Raw command destructor failed: " << e.what();

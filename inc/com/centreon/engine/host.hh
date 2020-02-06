@@ -125,7 +125,7 @@ class host : public notifier {
                       int scheduled_check,
                       int reschedule_check,
                       bool* time_is_valid,
-                      time_t* preferred_time);
+                      time_t* preferred_time) noexcept;
   void schedule_check(time_t check_time, int options);
   void check_for_flapping(bool update,
                           bool actual_check,

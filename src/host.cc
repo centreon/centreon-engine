@@ -1570,7 +1570,7 @@ int host::run_async_check(int check_options,
                           int scheduled_check,
                           int reschedule_check,
                           bool* time_is_valid,
-                          time_t* preferred_time) {
+                          time_t* preferred_time) noexcept {
   try {
     checks::checker::instance().run(this, check_options, latency,
                                     scheduled_check, reschedule_check,

@@ -149,7 +149,7 @@ class service : public notifier {
                       int scheduled_check,
                       int reschedule_check,
                       bool* time_is_valid,
-                      time_t* preferred_time);
+                      time_t* preferred_time) noexcept;
   void schedule_check(time_t check_time, int options);
   void set_flap(double percent_change,
                 double high_threshold,

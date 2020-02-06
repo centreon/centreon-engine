@@ -56,8 +56,8 @@ void applier::command::add_object(configuration::command const& obj) {
   config->commands().insert(obj);
 
   if (obj.connector().empty()) {
-    std::shared_ptr<commands::raw> raw{new commands::raw(
-        obj.command_name(), obj.command_line(), &checks::checker::instance())};
+    std::shared_ptr<commands::raw> raw = std::make_shared<commands::raw>(
+        obj.command_name(), obj.command_line(), &checks::checker::instance());
     commands::command::commands[raw->get_name()] = raw;
   } else {
     connector_map::iterator found_con{

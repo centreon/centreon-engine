@@ -199,11 +199,5 @@ configuration::anomalydetection TestEngine::new_configuration_anomalydetection(
   // We fake here the expand_object on configuration::service
   ad.set_host_id(12);
 
-  configuration::command cmd("cmd");
-  cmd.parse("command_line", "echo 1");
-  ad.parse("check_command", "cmd");
-  configuration::applier::command cmd_aply;
-  cmd_aply.add_object(cmd);
-
   return ad;
 }
