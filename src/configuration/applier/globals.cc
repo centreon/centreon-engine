@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015,2018 Centreon
+** Copyright 2011-2013,2015,2018,2019 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -31,7 +31,6 @@ using namespace com::centreon::engine::configuration;
  *  @param[in] config The new configuration.
  */
 void applier::globals::apply(state& config) {
-  _set_global(::check_result_path, config.check_result_path());
   _set_global(::debug_file, config.debug_file());
   _set_global(::global_host_event_handler, config.global_host_event_handler());
   _set_global(::global_service_event_handler,
@@ -81,7 +80,6 @@ applier::globals& applier::globals::instance() {
 }
 
 void applier::globals::clear() {
-  delete[] ::check_result_path;
   delete[] ::debug_file;
   delete[] ::global_host_event_handler;
   delete[] ::global_service_event_handler;
@@ -92,7 +90,6 @@ void applier::globals::clear() {
   delete[] ::ocsp_command;
   delete[] ::use_timezone;
 
-  ::check_result_path = NULL;
   ::debug_file = NULL;
   ::global_host_event_handler = NULL;
   ::global_service_event_handler = NULL;

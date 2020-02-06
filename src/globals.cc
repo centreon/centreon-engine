@@ -36,7 +36,6 @@ char const* sigs[] = {"EXIT", "HUP",    "INT",    "QUIT",  "ILL",    "TRAP",
                       "XCPU", "XFSZ",   "VTALRM", "PROF",  "WINCH",  "IO",
                       "PWR",  "UNUSED", "ZERR",   "DEBUG", NULL};
 
-char* check_result_path(NULL);
 char* config_file(NULL);
 char* debug_file(NULL);
 char* global_host_event_handler(NULL);

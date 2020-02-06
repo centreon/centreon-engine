@@ -968,55 +968,6 @@ monitoring logic.
 **Example** max_check_result_reaper_time=30
 =========== ======================================
 
-Use Check Result Path
----------------------
-
-This option enable or disable compatibility mode to use check result
-path.
-
-=========== ===========================
-**Format**  use_check_result_path=<0/1>
-**Example** use_check_result_path=0
-=========== ===========================
-
-Check Result Path
------------------
-
-This options determines which directory Nagios will use to temporarily
-store host and service check results before they are processed. This
-directory should not be used to store any other files, as Nagios will
-periodically clean this directory of old file (see the
-max_check_result_file_age option for more information).
-
-=========== ========================
-**Format**  check_result_path=<path>
-**Example** check_result_path=/tmp
-=========== ========================
-
-.. note::
-   This options is deprecated.
-
-.. _main_cfg_max_check_result_file_age:
-
-Max Check Result File Age
--------------------------
-
-This options determines the maximum age in seconds that Nagios will
-consider check result files found in the check_result_path directory to
-be valid. Check result files that are older that this threshold will be
-deleted by Nagios and the check results they contain will not be
-processed. By using a value of zero (0) with this option, Nagios will
-process all check result files - even if they're older than your
-hardware :-).
-
-=========== ===================================
-**Format**  max_check_result_file_age=<seconds>
-**Example** max_check_result_file_age=3600
-=========== ===================================
-
-.. note::
-   This options is deprecated.
-
 .. _main_cfg_opt_host_inter_check_delay_method:
 
 Host Inter-Check Delay Method

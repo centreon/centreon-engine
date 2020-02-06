@@ -83,8 +83,6 @@ class check_result {
   int get_check_options() const;
   void set_check_options(int check_options);
 
-  static bool process_check_result_queue(std::string const& dirname);
-  static bool process_check_result_file(std::string const& fname);
   static check_result_list results;
 
  private:
