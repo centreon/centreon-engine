@@ -53,6 +53,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/parse-check-output.cc"
     "${TESTS_DIR}/checks/service_check.cc"
     "${TESTS_DIR}/checks/service_retention.cc"
+    "${TESTS_DIR}/checks/anomalydetection.cc"
     "${TESTS_DIR}/commands/simple-command.cc"
     "${TESTS_DIR}/commands/connector.cc"
     "${TESTS_DIR}/configuration/applier/applier-anomalydetection.cc"
