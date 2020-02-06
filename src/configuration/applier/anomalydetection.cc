@@ -106,7 +106,7 @@ void applier::anomalydetection::add_object(configuration::anomalydetection const
   engine::anomalydetection* ad{add_anomalydetection(
       obj.host_id(), obj.service_id(), obj.host_name(),
       obj.service_description(), obj.display_name(), obj.metric_name(),
-      obj.check_period(),
+      obj.thresholds_file(), obj.check_period(),
       static_cast<engine::anomalydetection::service_state>(obj.initial_state()),
       obj.max_check_attempts(), obj.check_interval(), obj.retry_interval(),
       obj.notification_interval(), obj.first_notification_delay(),
@@ -269,6 +269,8 @@ void applier::anomalydetection::modify_object(configuration::anomalydetection co
   s->set_hostname(obj.host_name());
   s->set_description(obj.service_description());
   s->set_display_name(obj.display_name());
+  s->set_metric_name(obj.metric_name());
+  s->set_thresholds_file(obj.thresholds_file());
   s->set_event_handler(obj.event_handler());
   s->set_event_handler_enabled(obj.event_handler_enabled());
   s->set_initial_state(

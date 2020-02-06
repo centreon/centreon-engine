@@ -25,10 +25,87 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
+/**
+ *  Anomaly detection constructor
+ *
+ *  @param[in] host_name                    Name of the host this
+ *                                          service is running on.
+ *  @param[in] description                  Service description.
+ *  @param[in] display_name                 Display name.
+ *  @param[in] metric_name                  Metric to consider.
+ *  @param[in] thresholds_file              Full path of the file containing
+ *                                          metric thresholds.
+ *  @param[in] check_period                 Check timeperiod name.
+ *  @param[in] initial_state                Initial service state.
+ *  @param[in] max_attempts                 Max check attempts.
+ *  @param[in] accept_passive_checks        Does this service accept
+ *                                          check result submission ?
+ *  @param[in] check_interval               Normal check interval.
+ *  @param[in] retry_interval               Retry check interval.
+ *  @param[in] notification_interval        Notification interval.
+ *  @param[in] first_notification_delay     First notification delay.
+ *  @param[in] recovery_notification_delay  Recovery notification delay.
+ *  @param[in] notification_period          Notification timeperiod
+ *                                          name.
+ *  @param[in] notify_recovery              Does this service notify
+ *                                          when recovering ?
+ *  @param[in] notify_unknown               Does this service notify in
+ *                                          unknown state ?
+ *  @param[in] notify_warning               Does this service notify in
+ *                                          warning state ?
+ *  @param[in] notify_critical              Does this service notify in
+ *                                          critical state ?
+ *  @param[in] notify_flapping              Does this service notify
+ *                                          when flapping ?
+ *  @param[in] notify_downtime              Does this service notify on
+ *                                          downtime ?
+ *  @param[in] notifications_enabled        Are notifications enabled
+ *                                          for this service ?
+ *  @param[in] is_volatile                  Is this service volatile ?
+ *  @param[in] event_handler                Event handler command name.
+ *  @param[in] event_handler_enabled        Whether or not event handler
+ *                                          is enabled.
+ *  @param[in] checks_enabled               Are active checks enabled ?
+ *  @param[in] flap_detection_enabled       Whether or not flap
+ *                                          detection is enabled.
+ *  @param[in] low_flap_threshold           Low flap threshold.
+ *  @param[in] high_flap_threshold          High flap threshold.
+ *  @param[in] flap_detection_on_ok         Is flap detection enabled
+ *                                          for ok state ?
+ *  @param[in] flap_detection_on_warning    Is flap detection enabled
+ *                                          for warning state ?
+ *  @param[in] flap_detection_on_unknown    Is flap detection enabled
+ *                                          for unknown state ?
+ *  @param[in] flap_detection_on_critical   Is flap detection enabled
+ *                                          for critical state ?
+ *  @param[in] stalk_on_ok                  Stalk on ok state ?
+ *  @param[in] stalk_on_warning             Stalk on warning state ?
+ *  @param[in] stalk_on_unknown             Stalk on unknown state ?
+ *  @param[in] stalk_on_critical            Stalk on critical state ?
+ *  @param[in] process_perfdata             Whether or not service
+ *                                          performance data should be
+ *                                          processed.
+ *  @param[in] check_freshness              Enable freshness check ?
+ *  @param[in] freshness_threshold          Freshness threshold.
+ *  @param[in] notes                        Notes.
+ *  @param[in] notes_url                    URL.
+ *  @param[in] action_url                   Action URL.
+ *  @param[in] icon_image                   Icon image.
+ *  @param[in] icon_image_alt               Alternative icon image.
+ *  @param[in] retain_status_information    Should Engine retain service
+ *                                          status information ?
+ *  @param[in] retain_nonstatus_information Should Engine retain service
+ *                                          non-status information ?
+ *  @param[in] obsess_over_service          Should we obsess over
+ *                                          service ?
+ *
+ *  @return New service.
+ */
 anomalydetection::anomalydetection(std::string const& hostname,
                                    std::string const& description,
                                    std::string const& display_name,
                                    std::string const& metric_name,
+                                   std::string const& thresholds_file,
                                    bool checks_enabled,
                                    bool accept_passive_checks,
                                    enum service::service_state initial_state,
@@ -87,7 +164,8 @@ anomalydetection::anomalydetection(std::string const& hostname,
               freshness_threshold,
               obsess_over,
               timezone},
-      _metric_name{metric_name} {}
+      _metric_name{metric_name},
+      _thresholds_file{thresholds_file} {}
 
 /**
  *  Add a new anomalydetection to the list in memory.
@@ -170,6 +248,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     std::string const& description,
     std::string const& display_name,
     std::string const& metric_name,
+    std::string const& thresholds_file,
     std::string const& check_period,
     com::centreon::engine::service::service_state initial_state,
     int max_attempts,
@@ -244,6 +323,14 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     return nullptr;
   }
 
+  if (thresholds_file.empty()) {
+    logger(log_config_error, basic)
+        << "Error: thresholds file must be provided for an anomaly detection "
+           "service (host_id:"
+        << host_id << ", service_id:" << service_id << ")";
+    return nullptr;
+  }
+
   // Check values.
   if (max_attempts <= 0 || check_interval < 0 || retry_interval <= 0 ||
       notification_interval < 0) {
@@ -265,9 +352,9 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   // Allocate memory.
   std::shared_ptr<anomalydetection> obj{std::make_shared<anomalydetection>(
       host_name, description, display_name.empty() ? description : display_name,
-      metric_name, checks_enabled, accept_passive_checks, initial_state,
-      check_interval, retry_interval, notification_interval, max_attempts,
-      first_notification_delay, recovery_notification_delay,
+      metric_name, thresholds_file, checks_enabled, accept_passive_checks,
+      initial_state, check_interval, retry_interval, notification_interval,
+      max_attempts, first_notification_delay, recovery_notification_delay,
       notification_period, notifications_enabled, is_volatile, check_period,
       event_handler, event_handler_enabled, notes, notes_url, action_url,
       icon_image, icon_image_alt, flap_detection_enabled, low_flap_threshold,
@@ -325,3 +412,10 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   return obj.get();
 }
 
+void anomalydetection::set_metric_name(std::string const& name) {
+  _metric_name = name;
+}
+
+void anomalydetection::set_thresholds_file(std::string const& file) {
+  _thresholds_file = file;
+}
