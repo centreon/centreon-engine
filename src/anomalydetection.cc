@@ -220,12 +220,6 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
         << "Error: Service comes from a database, therefore its service id "
         << "must not be null";
     return nullptr;
-  } else if (!host_id) {
-    logger(log_config_error, basic)
-        << "Error: The service '" << description
-        << "' cannot be created because"
-        << " host '" << host_name << "' does not exist (host_id is null)";
-    return nullptr;
   } else if (description.empty()) {
     logger(log_config_error, basic) << "Error: Service description is not set";
     return nullptr;
@@ -240,7 +234,9 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
           << hid << ")";
       return nullptr;
     }
-  } else if (metric_name.empty()) {
+  }
+
+  if (metric_name.empty()) {
     logger(log_config_error, basic)
         << "Error: metric name must be provided for an anomaly detection "
            "service (host_id:"
