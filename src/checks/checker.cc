@@ -490,9 +490,9 @@ void checker::run(service* svc,
     if (preferred_time != nullptr)
       *preferred_time += static_cast<time_t>(svc->get_check_interval() *
                                              config->interval_length());
-    throw(engine_error() << "Some broker module cancelled check of service '"
+    throw engine_error() << "Some broker module cancelled check of service '"
                          << svc->get_description() << "' on host '"
-                         << svc->get_hostname());
+                         << svc->get_hostname();
   }
   // Service check was override by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res) {

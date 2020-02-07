@@ -25,6 +25,7 @@
 CCE_BEGIN()
 
 class anomalydetection : public service {
+  service* _dependent_service;
   std::string _metric_name;
   std::string _thresholds_file;
 
@@ -32,6 +33,7 @@ class anomalydetection : public service {
   anomalydetection(std::string const& hostname,
                    std::string const& description,
                    std::string const& display_name,
+                   service* dependent_service,
                    std::string const& metric_name,
                    std::string const& thresholds_file,
                    bool checks_enabled,
@@ -61,6 +63,7 @@ class anomalydetection : public service {
                    int freshness_threshold,
                    bool obsess_over,
                    std::string const& timezone);
+  void set_dependent_service(service* svc);
   void set_metric_name(std::string const& name);
   void set_thresholds_file(std::string const& file);
 };
@@ -72,6 +75,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     std::string const& host_name,
     std::string const& description,
     std::string const& display_name,
+    uint64_t dependent_service_id,
     std::string const& metric_name,
     std::string const& thresholds_file,
     std::string const& check_period,

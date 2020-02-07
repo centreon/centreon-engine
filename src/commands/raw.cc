@@ -117,7 +117,7 @@ uint64_t raw::run(std::string const& processed_cmd,
       << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Get process and put into the busy list.
-  process* p(nullptr);
+  process* p;
   uint64_t command_id(get_uniq_id());
   {
     std::lock_guard<std::mutex> lock(_lock);

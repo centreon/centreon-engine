@@ -105,8 +105,8 @@ void applier::anomalydetection::add_object(configuration::anomalydetection const
   // Create anomalydetection.
   engine::anomalydetection* ad{add_anomalydetection(
       obj.host_id(), obj.service_id(), obj.host_name(),
-      obj.service_description(), obj.display_name(), obj.metric_name(),
-      obj.thresholds_file(), obj.check_period(),
+      obj.service_description(), obj.display_name(), obj.dependent_service_id(),
+      obj.metric_name(), obj.thresholds_file(), obj.check_period(),
       static_cast<engine::anomalydetection::service_state>(obj.initial_state()),
       obj.max_check_attempts(), obj.check_interval(), obj.retry_interval(),
       obj.notification_interval(), obj.first_notification_delay(),

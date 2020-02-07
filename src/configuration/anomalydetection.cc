@@ -570,8 +570,8 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
   // The configuration diff mechanism relies on this.
   if (_host_id != other._host_id)
     return _host_id < other._host_id;
-  else if (_host_id != other._host_id)
-    return _host_id < other._host_id;
+  else if (_service_id != other._service_id)
+    return _service_id < other._service_id;
   else if (_dependent_service_id != other._dependent_service_id)
     return _dependent_service_id < other._dependent_service_id;
   else if (_host_name != other._host_name)

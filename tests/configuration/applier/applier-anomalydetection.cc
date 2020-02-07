@@ -82,11 +82,30 @@ TEST_F(ApplierAnomalydetection, NewADFromConfig) {
   ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
   // The host id is not given
   ASSERT_THROW(hst_aply.add_object(hst), std::exception);
-  ASSERT_TRUE(hst.parse("host_id", "1"));
+  ASSERT_TRUE(hst.parse("host_id", "12"));
   ASSERT_NO_THROW(hst_aply.add_object(hst));
+
+  configuration::applier::service svc_aply;
+  configuration::service svc;
+  svc.parse("host_name", "test_host");
+  svc.parse("description", "test_description");
+  svc.parse("_HOST_ID", "12");
+  svc.parse("_SERVICE_ID", "13");
+
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+
+  configuration::command cmd("cmd");
+  cmd.parse("command_line", "echo 'output| metric=12;50;75'");
+  svc.parse("check_command", "cmd");
+  configuration::applier::command cmd_aply;
+  cmd_aply.add_object(cmd);
+  ASSERT_NO_THROW(svc_aply.add_object(svc));
+
   ASSERT_TRUE(ad.parse("service_description", "test description"));
-  ASSERT_TRUE(ad.parse("service_id", "3"));
-  ASSERT_TRUE(ad.parse("host_id", "1"));
+  ASSERT_TRUE(ad.parse("dependent_service_id", "13"));
+  ASSERT_TRUE(ad.parse("service_id", "4"));
+  ASSERT_TRUE(ad.parse("host_id", "12"));
   ASSERT_TRUE(ad.parse("host_name", "test_host"));
   ASSERT_TRUE(ad.parse("metric_name", "foo"));
   ASSERT_TRUE(ad.parse("thresholds_file", "/etc/centreon-broker/thresholds.json"));
@@ -96,9 +115,9 @@ TEST_F(ApplierAnomalydetection, NewADFromConfig) {
   // to set the host_id manually.
   ad_aply.add_object(ad);
   service_id_map const& sm(engine::service::services_by_id);
-  ASSERT_EQ(sm.size(), 1u);
-  ASSERT_EQ(sm.begin()->first.first, 1u);
-  ASSERT_EQ(sm.begin()->first.second, 3u);
+  ASSERT_EQ(sm.size(), 2u);
+  ASSERT_EQ(sm.begin()->first.first, 12u);
+  ASSERT_EQ(sm.begin()->first.second, 4u);
 
   // Service is not resolved, host is null now.
   ASSERT_TRUE(!sm.begin()->second->get_host_ptr());
@@ -140,7 +159,7 @@ TEST_F(ApplierAnomalydetection, NewADNoHostId) {
   ASSERT_TRUE(hst.parse("host_id", "1"));
   ASSERT_NO_THROW(hst_aply.add_object(hst));
   ASSERT_TRUE(ad.parse("service_description", "test description"));
-  ASSERT_TRUE(ad.parse("service_id", "3"));
+  ASSERT_TRUE(ad.parse("service_id", "4"));
   ASSERT_TRUE(ad.parse("host_name", "test_host"));
 
   ASSERT_THROW(ad_aply.add_object(ad), std::exception);
@@ -159,7 +178,8 @@ TEST_F(ApplierAnomalydetection, NewADBadHostId) {
   ASSERT_NO_THROW(hst_aply.add_object(hst));
   ASSERT_TRUE(ad.parse("service_description", "test description"));
   ASSERT_TRUE(ad.parse("host_id", "2"));
-  ASSERT_TRUE(ad.parse("service_id", "3"));
+  ASSERT_TRUE(ad.parse("service_id", "4"));
+  ASSERT_TRUE(ad.parse("dependent_service_id", "3"));
   ASSERT_TRUE(ad.parse("host_name", "test_host"));
 
   // No need here to call ad_aply.expand_objects(*config) because the
@@ -181,7 +201,8 @@ TEST_F(ApplierAnomalydetection, NewADNoMetric) {
   ASSERT_NO_THROW(hst_aply.add_object(hst));
   ASSERT_TRUE(ad.parse("service_description", "test description"));
   ASSERT_TRUE(ad.parse("host_id", "1"));
-  ASSERT_TRUE(ad.parse("service_id", "3"));
+  ASSERT_TRUE(ad.parse("service_id", "4"));
+  ASSERT_TRUE(ad.parse("dependent_service_id", "3"));
   ASSERT_TRUE(ad.parse("host_name", "test_host"));
 
   // No need here to call ad_aply.expand_objects(*config) because the
@@ -203,7 +224,8 @@ TEST_F(ApplierAnomalydetection, NewADNoThresholds) {
   ASSERT_NO_THROW(hst_aply.add_object(hst));
   ASSERT_TRUE(ad.parse("service_description", "test description"));
   ASSERT_TRUE(ad.parse("host_id", "1"));
-  ASSERT_TRUE(ad.parse("service_id", "3"));
+  ASSERT_TRUE(ad.parse("service_id", "4"));
+  ASSERT_TRUE(ad.parse("dependent_service_id", "3"));
   ASSERT_TRUE(ad.parse("host_name", "test_host"));
   ASSERT_TRUE(ad.parse("metric_name", "bar"));
 

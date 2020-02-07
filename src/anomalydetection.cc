@@ -32,6 +32,7 @@ using namespace com::centreon::engine::logging;
  *                                          service is running on.
  *  @param[in] description                  Service description.
  *  @param[in] display_name                 Display name.
+ *  @param[in] dependent_service            Dependent service
  *  @param[in] metric_name                  Metric to consider.
  *  @param[in] thresholds_file              Full path of the file containing
  *                                          metric thresholds.
@@ -104,6 +105,7 @@ using namespace com::centreon::engine::logging;
 anomalydetection::anomalydetection(std::string const& hostname,
                                    std::string const& description,
                                    std::string const& display_name,
+                                   service* dependent_service,
                                    std::string const& metric_name,
                                    std::string const& thresholds_file,
                                    bool checks_enabled,
@@ -164,6 +166,7 @@ anomalydetection::anomalydetection(std::string const& hostname,
               freshness_threshold,
               obsess_over,
               timezone},
+      _dependent_service{dependent_service},
       _metric_name{metric_name},
       _thresholds_file{thresholds_file} {}
 
@@ -174,6 +177,7 @@ anomalydetection::anomalydetection(std::string const& hostname,
  *                                          service is running on.
  *  @param[in] description                  Service description.
  *  @param[in] display_name                 Display name.
+ *  @param[in] dependent_service_id         Dependent service id.
  *  @param[in] metric_name                  Metric to consider.
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
@@ -247,6 +251,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     std::string const& host_name,
     std::string const& description,
     std::string const& display_name,
+    uint64_t dependent_service_id,
     std::string const& metric_name,
     std::string const& thresholds_file,
     std::string const& check_period,
@@ -315,6 +320,13 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     }
   }
 
+  auto it = service::services_by_id.find({host_id, dependent_service_id});
+  if (it == service::services_by_id.end()) {
+    logger(log_config_error, basic) << "Error: Dependent service does not exist";
+    return nullptr;
+  }
+  service* dependent_service = it->second.get();
+
   if (metric_name.empty()) {
     logger(log_config_error, basic)
         << "Error: metric name must be provided for an anomaly detection "
@@ -352,14 +364,14 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   // Allocate memory.
   std::shared_ptr<anomalydetection> obj{std::make_shared<anomalydetection>(
       host_name, description, display_name.empty() ? description : display_name,
-      metric_name, thresholds_file, checks_enabled, accept_passive_checks,
-      initial_state, check_interval, retry_interval, notification_interval,
-      max_attempts, first_notification_delay, recovery_notification_delay,
-      notification_period, notifications_enabled, is_volatile, check_period,
-      event_handler, event_handler_enabled, notes, notes_url, action_url,
-      icon_image, icon_image_alt, flap_detection_enabled, low_flap_threshold,
-      high_flap_threshold, check_freshness, freshness_threshold,
-      obsess_over_service, timezone)};
+      dependent_service, metric_name, thresholds_file, checks_enabled,
+      accept_passive_checks, initial_state, check_interval, retry_interval,
+      notification_interval, max_attempts, first_notification_delay,
+      recovery_notification_delay, notification_period, notifications_enabled,
+      is_volatile, check_period, event_handler, event_handler_enabled, notes,
+      notes_url, action_url, icon_image, icon_image_alt, flap_detection_enabled,
+      low_flap_threshold, high_flap_threshold, check_freshness,
+      freshness_threshold, obsess_over_service, timezone)};
   try {
     obj->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
     obj->set_check_options(CHECK_OPTION_NONE);
@@ -410,6 +422,10 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   }
 
   return obj.get();
+}
+
+void anomalydetection::set_dependent_service(service* svc) {
+  _dependent_service = svc;
 }
 
 void anomalydetection::set_metric_name(std::string const& name) {
