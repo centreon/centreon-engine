@@ -367,24 +367,16 @@ void checker::run(host* hst,
       true, service::state_ok, "");
 
   // Get command object.
-  command_map::iterator found{commands::command::commands.find(
-      hst->get_check_command_ptr()->get_name())};
-  if (found == commands::command::commands.end() || !found->second)
-    throw(engine_error() << "unknow command "
-                         << hst->get_check_command_ptr()->get_name());
-
-  std::string processed_cmd(found->second->process_cmd(&macros));
-  char* processed_cmd_ptr(string::dup(processed_cmd));
+  commands::command* cmd = hst->get_check_command_ptr();
+  std::string processed_cmd(cmd->process_cmd(&macros));
 
   // Send event broker.
   broker_host_check(NEBTYPE_HOSTCHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, hst,
                     checkable::check_active, hst->get_current_state(),
                     hst->get_state_type(), start_time, end_time,
                     hst->get_check_command().c_str(), hst->get_latency(), 0.0,
-                    config->host_check_timeout(), false, 0, processed_cmd_ptr,
-                    nullptr, nullptr, nullptr, nullptr);
-
-  delete[] processed_cmd_ptr;
+                    config->host_check_timeout(), false, 0,
+                    processed_cmd.c_str(), nullptr, nullptr, nullptr, nullptr);
 
   // Restore latency.
   hst->set_latency(old_latency);
@@ -402,7 +394,7 @@ void checker::run(host* hst,
     retry = false;
     try {
       // Run command.
-      uint64_t id(found->second->run(processed_cmd, macros,
+      uint64_t id(cmd->run(processed_cmd, macros,
                                      config->host_check_timeout()));
       if (id != 0)
         _list_id[id] = check_result_info;
@@ -478,9 +470,9 @@ void checker::run(service* svc,
   // Check if the service is viable now.
   if (svc->verify_check_viability(check_options, time_is_valid,
                                   preferred_time) == ERROR)
-    throw(checks_viability_failure()
+    throw checks_viability_failure()
           << "Check of service '" << svc->get_description() << "' on host '"
-          << svc->get_hostname() << "' is not viable");
+          << svc->get_hostname() << "' is not viable";
 
   // Send broker event.
   timeval start_time;
@@ -547,22 +539,15 @@ void checker::run(service* svc,
       start_time, start_time, false, true, service::state_ok, "");
 
   // Get command object.
-  command_map::iterator found{commands::command::commands.find(
-      svc->get_check_command_ptr()->get_name())};
-  if (found == commands::command::commands.end() || !found->second)
-    throw engine_error() << "unknow command "
-                         << svc->get_check_command_ptr()->get_name();
-
-  std::string processed_cmd(found->second->process_cmd(&macros));
-  char* processed_cmd_ptr(string::dup(processed_cmd));
+  commands::command* cmd = svc->get_check_command_ptr();
+  std::string processed_cmd = cmd->process_cmd(&macros);
 
   // Send event broker.
   res = broker_service_check(
       NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, svc,
       checkable::check_active, start_time, end_time,
       svc->get_check_command().c_str(), svc->get_latency(), 0.0,
-      config->service_check_timeout(), false, 0, processed_cmd_ptr, nullptr);
-  delete[] processed_cmd_ptr;
+      config->service_check_timeout(), false, 0, processed_cmd.c_str(), nullptr);
 
   // Restore latency.
   svc->set_latency(old_latency);
@@ -574,7 +559,7 @@ void checker::run(service* svc,
   }
 
   // Update statistics.
-  update_check_stats((scheduled_check == true)
+  update_check_stats(scheduled_check
                          ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
                          : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
                      start_time.tv_sec);
@@ -584,8 +569,8 @@ void checker::run(service* svc,
     retry = false;
     try {
       // Run command.
-      uint64_t id(found->second->run(processed_cmd, macros,
-                                     config->service_check_timeout()));
+      uint64_t id =
+          cmd->run(processed_cmd, macros, config->service_check_timeout());
       if (id != 0)
         _list_id[id] = check_result_info;
     } catch (com::centreon::exceptions::interruption const& e) {
@@ -854,21 +839,16 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   hst->set_last_check(start_time.tv_sec);
 
   // Get command object.
-  command_map::iterator found{commands::command::commands.find(
-      hst->get_check_command_ptr()->get_name())};
-  if (found == commands::command::commands.end() || !found->second)
-    throw(engine_error() << "unknow command "
-                         << hst->get_check_command_ptr()->get_name());
-
-  std::string processed_cmd(found->second->process_cmd(&macros));
-  char* tmp_processed_cmd(string::dup(processed_cmd));
+  commands::command* cmd = hst->get_check_command_ptr();
+  std::string processed_cmd(cmd->process_cmd(&macros));
+  const char* tmp_processed_cmd = processed_cmd.c_str();
 
   // Send broker event.
   broker_host_check(
       NEBTYPE_HOSTCHECK_RAW_START, NEBFLAG_NONE, NEBATTR_NONE, hst,
       checkable::check_active, host::state_up, hst->get_state_type(),
       start_time, end_time, hst->get_check_command().c_str(), 0.0, 0.0,
-      config->host_check_timeout(), false, service::state_ok, tmp_processed_cmd,
+      config->host_check_timeout(), false, service::state_ok, processed_cmd.c_str(),
       const_cast<char*>(hst->get_plugin_output().c_str()),
       const_cast<char*>(hst->get_long_plugin_output().c_str()),
       const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
@@ -898,8 +878,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   // Run command.
   commands::result res;
   try {
-    found->second->run(processed_cmd, macros, config->host_check_timeout(),
-                       res);
+    cmd->run(processed_cmd, macros, config->host_check_timeout(), res);
   } catch (std::exception const& e) {
     // Update check result.
     res.command_id = 0;
@@ -1005,7 +984,6 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
       const_cast<char*>(hst->get_plugin_output().c_str()),
       const_cast<char*>(hst->get_long_plugin_output().c_str()),
       const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
-  delete[] tmp_processed_cmd;
 
   // Termination.
   logger(dbg_checks, basic)

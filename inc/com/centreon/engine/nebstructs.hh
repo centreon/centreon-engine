@@ -367,7 +367,7 @@ typedef struct nebstruct_host_check_struct {
   int timeout;
   char* command_name;
   char* command_args;
-  char* command_line;
+  const char* command_line;
   struct timeval start_time;
   struct timeval end_time;
   int early_timeout;
@@ -512,7 +512,7 @@ typedef struct nebstruct_service_check_struct {
   int timeout;
   char* command_name;
   char* command_args;
-  char* command_line;
+  const char* command_line;
   struct timeval start_time;
   struct timeval end_time;
   int early_timeout;
@@ -565,7 +565,7 @@ typedef struct nebstruct_system_command_struct {
   struct timeval start_time;
   struct timeval end_time;
   int timeout;
-  char* command_line;
+  const char* command_line;
   int early_timeout;
   double execution_time;
   int return_code;

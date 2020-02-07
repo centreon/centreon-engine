@@ -309,23 +309,17 @@ void raw::finished(process& p) noexcept {
                (res.exit_code > 3))
       res.exit_code = service::state_unknown;
 
-    logger(dbg_commands, basic) << "raw::finished: "
-                                   "id="
+    logger(dbg_commands, basic) << "raw::finished: id="
                                 << command_id
-                                << ", "
-                                   "start_time="
+                                << ", start_time="
                                 << res.start_time.to_mseconds()
-                                << ", "
-                                   "end_time="
+                                << ", end_time="
                                 << res.end_time.to_mseconds()
-                                << ", "
-                                   "exit_code="
+                                << ", exit_code="
                                 << res.exit_code
-                                << ", "
-                                   "exit_status="
+                                << ", exit_status="
                                 << res.exit_status
-                                << ", "
-                                   "output='"
+                                << ", output='"
                                 << res.output << "'";
 
     // Forward result to the listener.
