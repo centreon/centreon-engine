@@ -174,7 +174,7 @@ configuration::service TestEngine::new_configuration_service(
   svc.set_host_id(12);
 
   configuration::command cmd("cmd");
-  cmd.parse("command_line", "echo 1");
+  cmd.parse("command_line", "echo 'output| metric=12;50;75'");
   svc.parse("check_command", "cmd");
   configuration::applier::command cmd_aply;
   cmd_aply.add_object(cmd);
