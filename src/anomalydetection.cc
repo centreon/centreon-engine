@@ -18,9 +18,18 @@
 */
 
 #include "com/centreon/engine/anomalydetection.hh"
+#include <cstring>
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/macros/grab_host.hh"
+#include "com/centreon/engine/macros/grab_service.hh"
+#include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/exceptions/interruption.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -424,6 +433,10 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   return obj.get();
 }
 
+service* anomalydetection::get_dependent_service() const {
+  return _dependent_service;
+}
+
 void anomalydetection::set_dependent_service(service* svc) {
   _dependent_service = svc;
 }
@@ -434,4 +447,177 @@ void anomalydetection::set_metric_name(std::string const& name) {
 
 void anomalydetection::set_thresholds_file(std::string const& file) {
   _thresholds_file = file;
+}
+
+/*
+ * forks a child process to run a service check, but does not wait for the
+ * service check result
+ */
+int anomalydetection::run_async_check(int check_options,
+                                      double latency,
+                                      bool scheduled_check,
+                                      bool reschedule_check,
+                                      bool* time_is_valid,
+                                      time_t* preferred_time) noexcept {
+  logger(dbg_functions, basic)
+      << "anomalydetection::run_async_check, check_options=" << check_options
+      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
+      << ", reschedule_check=" << reschedule_check;
+
+  // Preamble.
+  if (!_dependent_service) {
+    logger(log_runtime_error, basic)
+      << "Error: Attempt to run active check on anomaly detection service '"
+      << get_description() << "' on host '" << get_host_ptr()->get_name()
+      << "' with no dependent service";
+    return ERROR;
+  }
+  if (!get_check_command_ptr()) {
+    logger(log_runtime_error, basic)
+        << "Error: Attempt to run active check on anomaly detection service '"
+        << get_description() << "' on host '" << get_host_ptr()->get_name()
+        << "' with no check command";
+    return ERROR;
+  }
+
+  logger(dbg_checks, basic)
+      << "** Running async check of anomaly detection service '"
+      << get_description() << "' on host '" << get_hostname() << "'...";
+
+  // Check if the service is viable now.
+  if (verify_check_viability(check_options, time_is_valid, preferred_time) ==
+      ERROR)
+    return ERROR;
+
+  // Send broker event.
+  timeval start_time;
+  timeval end_time;
+  memset(&start_time, 0, sizeof(start_time));
+  memset(&end_time, 0, sizeof(end_time));
+  int res =
+      broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE,
+                           NEBATTR_NONE, this, checkable::check_active,
+                           start_time, end_time, get_check_command().c_str(),
+                           get_latency(), 0.0, 0, false, 0, nullptr, nullptr);
+
+  // Service check was cancel by NEB module. reschedule check later.
+  if (NEBERROR_CALLBACKCANCEL == res) {
+    if (preferred_time != nullptr)
+      *preferred_time += static_cast<time_t>(get_check_interval() *
+                                             config->interval_length());
+    logger(log_runtime_error, basic)
+        << "Error: Some broker module cancelled check of service '"
+        << get_description() << "' on host '" << get_hostname();
+    return ERROR;
+  }
+  // Service check was override by NEB module.
+  else if (NEBERROR_CALLBACKOVERRIDE == res) {
+    logger(dbg_functions, basic)
+        << "Some broker module overrode check of service '" << get_description()
+        << "' on host '" << get_hostname() << "' so we'll bail out";
+    return OK;
+  }
+
+  // Checking starts.
+  logger(dbg_checks, basic) << "Checking service '" << get_description()
+                            << "' on host '" << get_hostname() << "'...";
+
+  // Clear check options.
+  if (scheduled_check)
+    set_check_options(CHECK_OPTION_NONE);
+
+  // Update latency for event broker and macros.
+  double old_latency(get_latency());
+  set_latency(latency);
+
+  // Get current host and service macros.
+  nagios_macros macros;
+  grab_host_macros_r(&macros, get_host_ptr());
+  grab_service_macros_r(&macros, this);
+  std::string tmp;
+  get_raw_command_line_r(&macros, get_check_command_ptr(),
+                         get_check_command().c_str(), tmp, 0);
+
+  // Time to start command.
+  gettimeofday(&start_time, nullptr);
+
+  // Update the number of running service checks.
+  ++currently_running_service_checks;
+
+  // Set the execution flag.
+  set_is_executing(true);
+
+  // Init check result info.
+  check_result check_result_info(
+      service_check, get_host_id(), get_service_id(),
+      checkable::check_active, check_options, reschedule_check, latency,
+      start_time, start_time, false, true, service::state_ok, "");
+
+  // Get command object.
+  commands::command* cmd = get_check_command_ptr();
+  std::string processed_cmd(cmd->process_cmd(&macros));
+
+  // Send event broker.
+  res = broker_service_check(
+      NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, this,
+      checkable::check_active, start_time, end_time,
+      get_check_command().c_str(), get_latency(), 0.0,
+      config->service_check_timeout(), false, 0, processed_cmd.c_str(), nullptr);
+
+  // Restore latency.
+  set_latency(old_latency);
+
+  // Service check was override by neb_module.
+  if (NEBERROR_CALLBACKOVERRIDE == res) {
+    clear_volatile_macros_r(&macros);
+    return OK;
+  }
+
+  // Update statistics.
+  update_check_stats(scheduled_check
+                         ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
+                         : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
+                     start_time.tv_sec);
+
+  bool retry;
+  do {
+    retry = false;
+    try {
+      // Run command.
+      uint64_t id =
+          cmd->run(processed_cmd, macros, config->service_check_timeout());
+      if (id != 0)
+        checks::checker::instance().add_check_result(id, check_result_info);
+    } catch (com::centreon::exceptions::interruption const& e) {
+      (void)e;
+      retry = true;
+    } catch (std::exception const& e) {
+      timestamp now(timestamp::now());
+
+      // Update check result.
+      timeval tv;
+      tv.tv_sec = now.to_seconds();
+      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
+      check_result_info.set_finish_time(tv);
+
+      check_result_info.set_early_timeout(false);
+      check_result_info.set_return_code(service::state_unknown);
+      check_result_info.set_exited_ok(true);
+      check_result_info.set_output("(Execute command failed)");
+
+      // Queue check result.
+      checks::checker::instance().add_check_result_to_reap(check_result_info);
+
+      logger(log_runtime_warning, basic)
+          << "Error: Service check command execution failed: " << e.what();
+    }
+  } while (retry);
+
+  // Cleanup.
+  clear_volatile_macros_r(&macros);
+  return OK;
+}
+
+commands::command* anomalydetection::get_check_command_ptr() const {
+  return _dependent_service->get_check_command_ptr();
 }

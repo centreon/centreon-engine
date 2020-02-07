@@ -146,8 +146,8 @@ class service : public notifier {
   int run_scheduled_check(int check_options, double latency);
   int run_async_check(int check_options,
                       double latency,
-                      int scheduled_check,
-                      int reschedule_check,
+                      bool scheduled_check,
+                      bool reschedule_check,
                       bool* time_is_valid,
                       time_t* preferred_time) noexcept;
   void schedule_check(time_t check_time, int options);

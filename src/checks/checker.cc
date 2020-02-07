@@ -94,6 +94,7 @@ void checker::push_check_result(check_result const* result) {
 /**
  *  Reap and process all result received by execution process.
  */
+#include <iostream>
 void checker::reap() {
   logger(dbg_functions, basic) << "checker::reap";
   logger(dbg_checks, basic) << "Starting to reap check results.";
@@ -121,6 +122,7 @@ void checker::reap() {
 
     // Merge partial check results.
     while (!_to_reap_partial.empty()) {
+    std::cout << "reap 2\n";
       // Find the two parts.
       std::unordered_map<uint64_t, check_result>::iterator it_partial(
           _to_reap_partial.begin());
@@ -151,6 +153,7 @@ void checker::reap() {
 
     // Process check results.
     while (!_to_reap.empty()) {
+    std::cout << "reap 3\n";
       // Get result host or service check.
       logger(dbg_checks, basic)
           << "Found a check result (#" << ++reaped_checks << ") to handle...";
@@ -231,6 +234,7 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
       << "Finished reaping " << reaped_checks << " check results";
+    std::cout << "reap 4\n";
 }
 
 /**
@@ -241,366 +245,6 @@ void checker::reap() {
 bool checker::reaper_is_empty() {
   std::lock_guard<std::mutex> lock(_mut_reap);
   return _to_reap.empty();
-}
-
-/**
- *  Run an host check without waiting check result.
- *
- *  @param[in]  hst              Host to check.
- *  @param[in]  check_options    Event options.
- *  @param[in]  latency          Host latency.
- *  @param[in]  scheduled_check  If the check are schedule.
- *  @param[in]  reschedule_check If the check are reschedule.
- *  @param[out] time_is_valid    Host check viable at this time.
- *  @param[out] preferred_time   The next preferred check time.
- *
- *  @return True is the check start correctly.
- */
-void checker::run(host* hst,
-                  int check_options,
-                  double latency,
-                  bool scheduled_check,
-                  bool reschedule_check,
-                  bool* time_is_valid,
-                  time_t* preferred_time) {
-  logger(dbg_functions, basic)
-      << "checker::run: hst=" << hst << ", check_options=" << check_options
-      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
-      << ", reschedule_check=" << reschedule_check;
-
-  // Preamble.
-  if (!hst)
-    throw engine_error() << "Attempt to run check on invalid host";
-  if (!hst->get_check_command_ptr())
-    throw engine_error() << "Attempt to run active check on host '"
-                         << hst->get_name() << "' with no check command";
-
-  logger(dbg_checks, basic)
-      << "** Running async check of host '" << hst->get_name() << "'...";
-
-  // Check if the host is viable now.
-  if (hst->verify_check_viability(check_options, time_is_valid,
-                                  preferred_time) == ERROR)
-    throw checks_viability_failure()
-        << "Check of host '" << hst->get_name() << "' is not viable";
-
-  // If this check is a rescheduled check, propagate the rescheduled check flag
-  // to the host. This solves the problem when a new host check is
-  // bound to be rescheduled but would be discarded because a host check
-  // is already running.
-  if (reschedule_check)
-    host::hosts[hst->get_name()]->set_should_reschedule_current_check(true);
-
-  // Don't execute a new host check if one is already running.
-  if (hst->get_is_executing() &&
-      !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-    logger(dbg_checks, basic)
-        << "A check of this host (" << hst->get_name()
-        << ") is already being executed, so we'll pass for the moment...";
-    return;
-  }
-
-  // Send broker event.
-  timeval start_time;
-  timeval end_time;
-  memset(&start_time, 0, sizeof(start_time));
-  memset(&end_time, 0, sizeof(end_time));
-  int res{broker_host_check(
-      NEBTYPE_HOSTCHECK_ASYNC_PRECHECK, NEBFLAG_NONE, NEBATTR_NONE, hst,
-      checkable::check_active, hst->get_current_state(), hst->get_state_type(),
-      start_time, end_time, hst->get_check_command().c_str(),
-      hst->get_latency(), 0.0, config->host_check_timeout(), false, 0, nullptr,
-      nullptr, nullptr, nullptr, nullptr)};
-
-  // Host check was cancel by NEB module. Reschedule check later.
-  if (NEBERROR_CALLBACKCANCEL == res)
-    throw engine_error() << "Some broker module cancelled check of host '"
-                         << hst->get_name() << "'";
-  // Host check was overriden by NEB module.
-  else if (NEBERROR_CALLBACKOVERRIDE == res) {
-    logger(dbg_functions, basic)
-        << "Some broker module overrode check of host '" << hst->get_name()
-        << "' so we'll bail out";
-    return;
-  }
-
-  // Checking starts.
-  logger(dbg_functions, basic)
-      << "Checking host '" << hst->get_name() << "'...";
-
-  // Clear check options.
-  if (scheduled_check)
-    hst->set_check_options(CHECK_OPTION_NONE);
-
-  // Adjust check attempts.
-  hst->adjust_check_attempt(true);
-
-  // Update latency for event broker and macros.
-  double old_latency(hst->get_latency());
-  hst->set_latency(latency);
-
-  // Get current host macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, hst);
-  std::string tmp;
-  get_raw_command_line_r(&macros, hst->get_check_command_ptr(),
-                         hst->get_check_command().c_str(), tmp, 0);
-
-  // Time to start command.
-  gettimeofday(&start_time, nullptr);
-
-  // Set check time for on-demand checks, so they're
-  // not incorrectly detected as being orphaned.
-  if (!scheduled_check)
-    hst->set_next_check(start_time.tv_sec);
-
-  // Update the number of running host checks.
-  ++currently_running_host_checks;
-
-  // Set the execution flag.
-  hst->set_is_executing(true);
-
-  // Init check result info.
-  check_result check_result_info(
-      host_check, hst->get_host_id(), 0UL, checkable::check_active,
-      check_options, reschedule_check, latency, start_time, start_time, false,
-      true, service::state_ok, "");
-
-  // Get command object.
-  commands::command* cmd = hst->get_check_command_ptr();
-  std::string processed_cmd(cmd->process_cmd(&macros));
-
-  // Send event broker.
-  broker_host_check(NEBTYPE_HOSTCHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, hst,
-                    checkable::check_active, hst->get_current_state(),
-                    hst->get_state_type(), start_time, end_time,
-                    hst->get_check_command().c_str(), hst->get_latency(), 0.0,
-                    config->host_check_timeout(), false, 0,
-                    processed_cmd.c_str(), nullptr, nullptr, nullptr, nullptr);
-
-  // Restore latency.
-  hst->set_latency(old_latency);
-
-  // Update statistics.
-  update_check_stats((scheduled_check == true)
-                         ? ACTIVE_SCHEDULED_HOST_CHECK_STATS
-                         : ACTIVE_ONDEMAND_HOST_CHECK_STATS,
-                     start_time.tv_sec);
-  update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
-
-  // Run command.
-  bool retry;
-  do {
-    retry = false;
-    try {
-      // Run command.
-      uint64_t id(cmd->run(processed_cmd, macros,
-                                     config->host_check_timeout()));
-      if (id != 0)
-        _list_id[id] = check_result_info;
-    } catch (com::centreon::exceptions::interruption const& e) {
-      (void)e;
-      retry = true;
-    } catch (std::exception const& e) {
-      timestamp now(timestamp::now());
-
-      // Update check result.
-      struct timeval tv;
-      tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
-      check_result_info.set_finish_time(tv);
-      check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(service::state_unknown);
-      check_result_info.set_exited_ok(true);
-      check_result_info.set_output("(Execute command failed)");
-
-      // Queue check result.
-      std::lock_guard<std::mutex> lock(_mut_reap);
-      _to_reap.push(check_result_info);
-
-      logger(log_runtime_warning, basic)
-          << "Error: Host check command execution failed: " << e.what();
-    }
-  } while (retry);
-
-  // Cleanup.
-  clear_volatile_macros_r(&macros);
-}
-
-/**
- *  Run a service check without waiting check result.
- *
- *  @param[in] svc              Service to check.
- *  @param[in] check_options    Event options.
- *  @param[in] latency          Service latency.
- *  @param[in] scheduled_check  If the check are schedule.
- *  @param[in] reschedule_check If the check are reschedule.
- *  @param[in] time_is_valid    Service check viable at this time.
- *  @param[in] preferred_time   The next preferred check time.
- *
- *  @return True if the check started correctly.
- */
-void checker::run(service* svc,
-                  int check_options,
-                  double latency,
-                  bool scheduled_check,
-                  bool reschedule_check,
-                  bool* time_is_valid,
-                  time_t* preferred_time) {
-  logger(dbg_functions, basic)
-      << "checker::run: svc=" << svc << ", check_options=" << check_options
-      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
-      << ", reschedule_check=" << reschedule_check;
-
-  // Preamble.
-  if (!svc)
-    throw engine_error() << "Attempt to run check on invalid service";
-  if (!svc->get_host_ptr())
-    throw engine_error() << "Attempt to run check on service with invalid host";
-  if (!svc->get_check_command_ptr())
-    throw engine_error() << "Attempt to run active check on service '"
-                         << svc->get_description() << "' on host '"
-                         << svc->get_host_ptr()->get_name()
-                         << "' with no check command";
-
-  logger(dbg_checks, basic)
-      << "** Running async check of service '" << svc->get_description()
-      << "' on host '" << svc->get_hostname() << "'...";
-
-  // Check if the service is viable now.
-  if (svc->verify_check_viability(check_options, time_is_valid,
-                                  preferred_time) == ERROR)
-    throw checks_viability_failure()
-          << "Check of service '" << svc->get_description() << "' on host '"
-          << svc->get_hostname() << "' is not viable";
-
-  // Send broker event.
-  timeval start_time;
-  timeval end_time;
-  memset(&start_time, 0, sizeof(start_time));
-  memset(&end_time, 0, sizeof(end_time));
-  int res(broker_service_check(
-      NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE, NEBATTR_NONE, svc,
-      checkable::check_active, start_time, end_time,
-      svc->get_check_command().c_str(), svc->get_latency(), 0.0, 0, false, 0,
-      nullptr, nullptr));
-
-  // Service check was cancel by NEB module. reschedule check later.
-  if (NEBERROR_CALLBACKCANCEL == res) {
-    if (preferred_time != nullptr)
-      *preferred_time += static_cast<time_t>(svc->get_check_interval() *
-                                             config->interval_length());
-    throw engine_error() << "Some broker module cancelled check of service '"
-                         << svc->get_description() << "' on host '"
-                         << svc->get_hostname();
-  }
-  // Service check was override by NEB module.
-  else if (NEBERROR_CALLBACKOVERRIDE == res) {
-    logger(dbg_functions, basic)
-        << "Some broker module overrode check of service '"
-        << svc->get_description() << "' on host '" << svc->get_hostname()
-        << "' so we'll bail out";
-    return;
-  }
-
-  // Checking starts.
-  logger(dbg_checks, basic) << "Checking service '" << svc->get_description()
-                            << "' on host '" << svc->get_hostname() << "'...";
-
-  // Clear check options.
-  if (scheduled_check)
-    svc->set_check_options(CHECK_OPTION_NONE);
-
-  // Update latency for event broker and macros.
-  double old_latency(svc->get_latency());
-  svc->set_latency(latency);
-
-  // Get current host and service macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, svc->get_host_ptr());
-  grab_service_macros_r(&macros, svc);
-  std::string tmp;
-  get_raw_command_line_r(&macros, svc->get_check_command_ptr(),
-                         svc->get_check_command().c_str(), tmp, 0);
-
-  // Time to start command.
-  gettimeofday(&start_time, nullptr);
-
-  // Update the number of running service checks.
-  ++currently_running_service_checks;
-
-  // Set the execution flag.
-  svc->set_is_executing(true);
-
-  // Init check result info.
-  check_result check_result_info(
-      service_check, svc->get_host_id(), svc->get_service_id(),
-      checkable::check_active, check_options, reschedule_check, latency,
-      start_time, start_time, false, true, service::state_ok, "");
-
-  // Get command object.
-  commands::command* cmd = svc->get_check_command_ptr();
-  std::string processed_cmd = cmd->process_cmd(&macros);
-
-  // Send event broker.
-  res = broker_service_check(
-      NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, svc,
-      checkable::check_active, start_time, end_time,
-      svc->get_check_command().c_str(), svc->get_latency(), 0.0,
-      config->service_check_timeout(), false, 0, processed_cmd.c_str(), nullptr);
-
-  // Restore latency.
-  svc->set_latency(old_latency);
-
-  // Service check was override by neb_module.
-  if (NEBERROR_CALLBACKOVERRIDE == res) {
-    clear_volatile_macros_r(&macros);
-    return;
-  }
-
-  // Update statistics.
-  update_check_stats(scheduled_check
-                         ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
-                         : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
-                     start_time.tv_sec);
-
-  bool retry;
-  do {
-    retry = false;
-    try {
-      // Run command.
-      uint64_t id =
-          cmd->run(processed_cmd, macros, config->service_check_timeout());
-      if (id != 0)
-        _list_id[id] = check_result_info;
-    } catch (com::centreon::exceptions::interruption const& e) {
-      (void)e;
-      retry = true;
-    } catch (std::exception const& e) {
-      timestamp now(timestamp::now());
-
-      // Update check result.
-      timeval tv;
-      tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
-      check_result_info.set_finish_time(tv);
-
-      check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(service::state_unknown);
-      check_result_info.set_exited_ok(true);
-      check_result_info.set_output("(Execute command failed)");
-
-      // Queue check result.
-      std::lock_guard<std::mutex> lock(_mut_reap);
-      _to_reap.push(check_result_info);
-
-      logger(log_runtime_warning, basic)
-          << "Error: Service check command execution failed: " << e.what();
-    }
-  } while (retry);
-
-  // Cleanup.
-  clear_volatile_macros_r(&macros);
 }
 
 /**
@@ -750,7 +394,7 @@ checker::checker() : commands::command_listener() {}
 /**
  *  Default destructor.
  */
-checker::~checker() throw() {
+checker::~checker() noexcept {
   try {
     std::lock_guard<std::mutex> lock(_mut_reap);
     while (!_to_reap.empty()) {
@@ -765,7 +409,7 @@ checker::~checker() throw() {
  *
  *  @param[in] res The result of the execution.
  */
-void checker::finished(commands::result const& res) throw() {
+void checker::finished(commands::result const& res) noexcept {
   // Debug message.
   logger(dbg_functions, basic) << "checker::finished: res=" << &res;
 
@@ -989,4 +633,14 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   logger(dbg_checks, basic)
       << "** Sync host check done: state=" << return_result;
   return return_result;
+}
+
+void checker::add_check_result(uint64_t id,
+                               check_result& check_result) noexcept {
+  _list_id[id] = check_result;
+}
+
+void checker::add_check_result_to_reap(check_result& check_result) noexcept {
+  std::lock_guard<std::mutex> lock(_mut_reap);
+  _to_reap.push(check_result);
 }

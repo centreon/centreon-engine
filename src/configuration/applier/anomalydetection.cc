@@ -153,9 +153,11 @@ void applier::anomalydetection::add_object(configuration::anomalydetection const
                          << obj.service_description() << "' of host '"
                          << obj.host_name() << "'";
   ad->set_initial_notif_time(0);
-  engine::anomalydetection::services[{obj.host_name(), obj.service_description()}]
+  engine::anomalydetection::services[{obj.host_name(),
+                                      obj.service_description()}]
       ->set_host_id(obj.host_id());
-  engine::anomalydetection::services[{obj.host_name(), obj.service_description()}]
+  engine::anomalydetection::services[{obj.host_name(),
+                                      obj.service_description()}]
       ->set_service_id(obj.service_id());
   ad->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
                                    config->interval_length());

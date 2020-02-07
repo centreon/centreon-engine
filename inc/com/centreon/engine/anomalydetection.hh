@@ -63,9 +63,17 @@ class anomalydetection : public service {
                    int freshness_threshold,
                    bool obsess_over,
                    std::string const& timezone);
+  service* get_dependent_service() const;
   void set_dependent_service(service* svc);
   void set_metric_name(std::string const& name);
   void set_thresholds_file(std::string const& file);
+  int run_async_check(int check_options,
+                      double latency,
+                      bool scheduled_check,
+                      bool reschedule_check,
+                      bool* time_is_valid,
+                      time_t* preferred_time) noexcept;
+  commands::command* get_check_command_ptr() const;
 };
 CCE_END()
 

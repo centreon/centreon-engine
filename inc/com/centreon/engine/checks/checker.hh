@@ -22,6 +22,7 @@
 
 #include <mutex>
 #include <queue>
+#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/commands/command_listener.hh"
@@ -48,32 +49,20 @@ class checker : public commands::command_listener {
   void push_check_result(check_result&& result);
   void reap();
   bool reaper_is_empty();
-  void run(host* hst,
-           int check_options = CHECK_OPTION_NONE,
-           double latency = 0.0,
-           bool scheduled_check = false,
-           bool reschedule_check = false,
-           bool* time_is_valid = NULL,
-           time_t* preferred_time = NULL);
-  void run(service* svc,
-           int check_options = CHECK_OPTION_NONE,
-           double latency = 0.0,
-           bool scheduled_check = false,
-           bool reschedule_check = false,
-           bool* time_is_valid = NULL,
-           time_t* preferred_time = NULL);
   void run_sync(host* hst,
                 host::host_state* check_result_code,
                 int check_options,
                 int use_cached_result,
                 unsigned long check_timestamp_horizon);
+  void add_check_result(uint64_t id, check_result& check_result) noexcept;
+  void add_check_result_to_reap(check_result& result) noexcept;
 
  private:
   checker();
   checker(checker const& right);
-  ~checker() throw() override;
+  ~checker() noexcept override;
   checker& operator=(checker const& right);
-  void finished(commands::result const& res) throw() override;
+  void finished(commands::result const& res) noexcept override;
   host::host_state _execute_sync(host* hst);
 
   std::unordered_map<uint64_t, check_result> _list_id;
