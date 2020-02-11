@@ -17,6 +17,7 @@
  *
  */
 
+#include "com/centreon/engine/configuration/applier/anomalydetection.hh"
 #include <gtest/gtest.h>
 #include <time.h>
 #include <cstring>
@@ -24,23 +25,18 @@
 #include <memory>
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
+#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
-#include "com/centreon/engine/configuration/applier/serviceescalation.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
-#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
-#include "com/centreon/engine/serviceescalation.hh"
-#include "com/centreon/engine/timezone_manager.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "helper.hh"
 
 using namespace com::centreon;
@@ -48,15 +44,11 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
 
-extern configuration::state* config;
-
-class ServiceCheck : public TestEngine {
+class AnomalydetectionCheck : public TestEngine {
  public:
   void SetUp() override {
-    if (!config)
-      config = new configuration::state;
+    init_config_state();
 
-    config->contacts().clear();
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
@@ -68,12 +60,19 @@ class ServiceCheck : public TestEngine {
     hst_aply.add_object(hst);
 
     configuration::service svc{
-        new_configuration_service("test_host", "test_svc", "admin")};
+        new_configuration_service("test_host", "test_svc", "admin", 8)};
     configuration::applier::service svc_aply;
     svc_aply.add_object(svc);
 
     hst_aply.resolve_object(hst);
     svc_aply.resolve_object(svc);
+
+    configuration::anomalydetection ad{new_configuration_anomalydetection(
+        "test_host", "test_ad", "admin", 9, 8)};
+    configuration::applier::anomalydetection ad_aply;
+    ad_aply.add_object(ad);
+
+    ad_aply.resolve_object(ad);
 
     host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
@@ -83,24 +82,64 @@ class ServiceCheck : public TestEngine {
     _host->set_notify_on(static_cast<uint32_t>(-1));
 
     service_map const& sm{engine::service::services};
-    _svc = sm.begin()->second;
+    for (auto& p : sm) {
+      std::shared_ptr<engine::service> svc = p.second;
+      if (svc->get_service_id() == 8)
+        _svc = svc;
+      else
+        _ad = std::static_pointer_cast<engine::anomalydetection>(svc);
+    }
     _svc->set_current_state(engine::service::state_ok);
     _svc->set_state_type(checkable::hard);
     _svc->set_problem_has_been_acknowledged(false);
     _svc->set_notify_on(static_cast<uint32_t>(-1));
   }
 
-  void TearDown() override {
-    deinit_config_state();
-//    configuration::applier::state::instance().clear();
-//    delete config;
-//    config = nullptr;
-  }
+  void TearDown() override { deinit_config_state(); }
 
  protected:
   std::shared_ptr<engine::host> _host;
   std::shared_ptr<engine::service> _svc;
+  std::shared_ptr<engine::anomalydetection> _ad;
 };
+
+TEST_F(AnomalydetectionCheck, ServiceSimpleCheck) {
+  ASSERT_EQ(engine::commands::command::commands.size(), 2u);
+  set_time(50000);
+  int check_options = 0;
+  double latency = 0;
+  bool time_is_valid;
+  time_t preferred_time = 0;
+
+  /* Let's schedule a check for the service */
+  ASSERT_EQ(_svc->run_async_check(check_options, latency, true, true,
+                                  &time_is_valid, &preferred_time),
+            0);
+
+  /* Let's force checks to be done. */
+  sleep(1);
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_plugin_output(), "output");
+}
+
+TEST_F(AnomalydetectionCheck, SimpleCheck) {
+  ASSERT_EQ(engine::commands::command::commands.size(), 2u);
+  set_time(50000);
+  int check_options = 0;
+  double latency = 0;
+  bool time_is_valid;
+  time_t preferred_time = 0;
+
+  /* Let's schedule a check for the service */
+  ASSERT_EQ(_ad->run_async_check(check_options, latency, true, true,
+                                 &time_is_valid, &preferred_time),
+            0);
+
+  /* Let's force checks to be done. */
+  sleep(1);
+  checks::checker::instance().reap();
+  ASSERT_EQ(_svc->get_plugin_output(), "output");
+}
 
 /* The following test comes from this array (inherited from Nagios behaviour):
  *
@@ -119,7 +158,7 @@ class ServiceCheck : public TestEngine {
  * | 10   | 1       | OK    | HARD       | No           |
  * ------------------------------------------------------
  */
-TEST_F(ServiceCheck, SimpleCheck) {
+TEST_F(AnomalydetectionCheck, StatusChanges) {
   set_time(50000);
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_last_hard_state(engine::service::state_ok);
@@ -133,7 +172,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| metric=22;25;60";
   std::string cmd{oss.str()};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -141,13 +180,22 @@ TEST_F(ServiceCheck, SimpleCheck) {
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_svc->get_last_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
+  ASSERT_EQ(_svc->get_plugin_output(), "service critical");
+  ASSERT_EQ(_svc->get_perf_data(), "metric=22;25;60");
+  int check_options = 0;
+  int latency = 0;
+  bool time_is_valid;
+  time_t preferred_time;
+  _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
+                       &preferred_time);
+  ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
 
   set_time(51000);
 
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -175,7 +223,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -190,7 +238,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -205,7 +253,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -220,7 +268,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -235,7 +283,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -251,7 +299,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -276,137 +324,3 @@ TEST_F(ServiceCheck, SimpleCheck) {
   ASSERT_EQ(_svc->get_current_attempt(), 1);
 }
 
-/* The following test comes from this array (inherited from Nagios behaviour):
- *
- * | Time | Check # | State | State type | State change |
- * ------------------------------------------------------
- * | 0    | 1       | OK    | HARD       | No           |
- * | 1    | 1       | CRTCL | SOFT       | Yes          |
- * | 2    | 2       | CRTCL | SOFT       | No           |
- * | 3    | 3       | CRTCL | HARD       | No           |
- * ------------------------------------------------------
- */
-TEST_F(ServiceCheck, OkCritical) {
-  std::ostringstream oss;
-  set_time(55000);
-
-  time_t now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  std::string cmd = oss.str();
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
-  ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
-  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
-  ASSERT_EQ(_svc->get_current_attempt(), 1);
-
-  set_time(55500);
-
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
-  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
-  ASSERT_EQ(_svc->get_last_state_change(), now);
-  ASSERT_EQ(_svc->get_current_attempt(), 1);
-
-  set_time(56000);
-
-  time_t previous = now;
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
-  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
-  ASSERT_EQ(_svc->get_last_state_change(), previous);
-  ASSERT_EQ(_svc->get_current_attempt(), 2);
-
-  set_time(56500);
-
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
-  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
-  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
-  ASSERT_EQ(_svc->get_current_attempt(), 3);
-}
-
-/* The following test comes from this array (inherited from Nagios behaviour):
- *
- * | Time | Check # | State | State type | State change |
- * ------------------------------------------------------
- * | 0    | 2       | OK    | SOFT       | No           |
- * | 1    | 1       | CRTCL | SOFT       | Yes          |
- * | 2    | 2       | CRTCL | SOFT       | No           |
- * | 3    | 3       | CRTCL | HARD       | No           |
- * ------------------------------------------------------
- */
-TEST_F(ServiceCheck, OkSoft_Critical) {
-  std::ostringstream oss;
-  set_time(55000);
-
-  time_t now = std::time(nullptr);
-  _svc->set_current_state(engine::service::state_ok);
-  _svc->set_last_state_change(55000);
-  _svc->set_current_attempt(2);
-  _svc->set_state_type(checkable::soft);
-  _svc->set_accept_passive_checks(true);
-
-  set_time(55500);
-
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  std::string cmd = oss.str();
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
-  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
-  ASSERT_EQ(_svc->get_last_state_change(), now);
-  ASSERT_EQ(_svc->get_current_attempt(), 1);
-
-  set_time(56000);
-
-  time_t previous = now;
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  ASSERT_EQ(_svc->get_state_type(), checkable::soft);
-  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
-  ASSERT_EQ(_svc->get_last_state_change(), previous);
-  ASSERT_EQ(_svc->get_current_attempt(), 2);
-
-  set_time(56500);
-
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
-  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
-  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
-  ASSERT_EQ(_svc->get_current_attempt(), 3);
-}

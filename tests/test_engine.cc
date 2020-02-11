@@ -187,7 +187,8 @@ configuration::anomalydetection TestEngine::new_configuration_anomalydetection(
     std::string const& description,
     std::string const& contacts,
     uint64_t svc_id,
-    uint64_t dependent_svc_id) {
+    uint64_t dependent_svc_id,
+    std::string const& thresholds_file) {
   configuration::anomalydetection ad;
   ad.parse("host_name", hostname.c_str());
   ad.parse("description", description.c_str());
@@ -196,7 +197,7 @@ configuration::anomalydetection TestEngine::new_configuration_anomalydetection(
   ad.parse("_SERVICE_ID", std::to_string(svc_id).c_str());
   ad.parse("contacts", contacts.c_str());
   ad.parse("metric_name", "metric");
-  ad.parse("thresholds_file", "/tmp/thresholds");
+  ad.parse("thresholds_file", thresholds_file.c_str());
 
   // We fake here the expand_object on configuration::service
   ad.set_host_id(12);

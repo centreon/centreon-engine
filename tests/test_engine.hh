@@ -51,7 +51,8 @@ class TestEngine : public ::testing::Test {
       std::string const& description,
       std::string const& contacts,
       uint64_t svc_id = 14,
-      uint64_t dependent_svc_id = 13);
+      uint64_t dependent_svc_id = 13,
+      std::string const& thresholds_file = "/tmp/thresholds_file");
   configuration::hostescalation new_configuration_hostescalation(
       std::string const& hostname,
       std::string const& contactgroup,

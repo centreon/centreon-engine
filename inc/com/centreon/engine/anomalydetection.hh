@@ -20,6 +20,7 @@
 #ifndef CCE_ANOMALYDETECTION_HH
 #define CCE_ANOMALYDETECTION_HH
 
+#include <tuple>
 #include "com/centreon/engine/service.hh"
 
 CCE_BEGIN()
@@ -28,6 +29,7 @@ class anomalydetection : public service {
   service* _dependent_service;
   std::string _metric_name;
   std::string _thresholds_file;
+  bool _status_change;
 
  public:
   anomalydetection(std::string const& hostname,
@@ -36,6 +38,7 @@ class anomalydetection : public service {
                    service* dependent_service,
                    std::string const& metric_name,
                    std::string const& thresholds_file,
+                   bool status_change,
                    bool checks_enabled,
                    bool accept_passive_checks,
                    enum service::service_state initial_state,
@@ -74,6 +77,8 @@ class anomalydetection : public service {
                       bool* time_is_valid,
                       time_t* preferred_time) noexcept;
   commands::command* get_check_command_ptr() const;
+  std::tuple<service::service_state, double, double, double> parse_perfdata(
+      std::string const& perfdata);
 };
 CCE_END()
 
@@ -86,6 +91,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     uint64_t dependent_service_id,
     std::string const& metric_name,
     std::string const& thresholds_file,
+    bool status_change,
     std::string const& check_period,
     enum com::centreon::engine::service::service_state initial_state,
     int max_attempts,

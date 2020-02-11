@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/anomalydetection.hh"
+#include <cmath>
 #include <cstring>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -29,6 +30,7 @@
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/exceptions/interruption.hh"
 
 using namespace com::centreon::engine;
@@ -45,6 +47,8 @@ using namespace com::centreon::engine::logging;
  *  @param[in] metric_name                  Metric to consider.
  *  @param[in] thresholds_file              Full path of the file containing
  *                                          metric thresholds.
+ *  @param[in] status_change                Should we follow the thresholds file
+ *                                          to determine status.
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
@@ -117,6 +121,7 @@ anomalydetection::anomalydetection(std::string const& hostname,
                                    service* dependent_service,
                                    std::string const& metric_name,
                                    std::string const& thresholds_file,
+                                   bool status_change,
                                    bool checks_enabled,
                                    bool accept_passive_checks,
                                    enum service::service_state initial_state,
@@ -177,7 +182,8 @@ anomalydetection::anomalydetection(std::string const& hostname,
               timezone},
       _dependent_service{dependent_service},
       _metric_name{metric_name},
-      _thresholds_file{thresholds_file} {}
+      _thresholds_file{thresholds_file},
+      _status_change{status_change} {}
 
 /**
  *  Add a new anomalydetection to the list in memory.
@@ -188,6 +194,9 @@ anomalydetection::anomalydetection(std::string const& hostname,
  *  @param[in] display_name                 Display name.
  *  @param[in] dependent_service_id         Dependent service id.
  *  @param[in] metric_name                  Metric to consider.
+ *  @param[in] thresholds_file,             fullname to the thresholds file.
+ *  @param[in] status_change,               should we follow the thresholds file
+ *                                          to determine status.
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
@@ -263,6 +272,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     uint64_t dependent_service_id,
     std::string const& metric_name,
     std::string const& thresholds_file,
+    bool status_change,
     std::string const& check_period,
     com::centreon::engine::service::service_state initial_state,
     int max_attempts,
@@ -373,14 +383,15 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   // Allocate memory.
   std::shared_ptr<anomalydetection> obj{std::make_shared<anomalydetection>(
       host_name, description, display_name.empty() ? description : display_name,
-      dependent_service, metric_name, thresholds_file, checks_enabled,
-      accept_passive_checks, initial_state, check_interval, retry_interval,
-      notification_interval, max_attempts, first_notification_delay,
-      recovery_notification_delay, notification_period, notifications_enabled,
-      is_volatile, check_period, event_handler, event_handler_enabled, notes,
-      notes_url, action_url, icon_image, icon_image_alt, flap_detection_enabled,
-      low_flap_threshold, high_flap_threshold, check_freshness,
-      freshness_threshold, obsess_over_service, timezone)};
+      dependent_service, metric_name, thresholds_file, status_change,
+      checks_enabled, accept_passive_checks, initial_state, check_interval,
+      retry_interval, notification_interval, max_attempts,
+      first_notification_delay, recovery_notification_delay,
+      notification_period, notifications_enabled, is_volatile, check_period,
+      event_handler, event_handler_enabled, notes, notes_url, action_url,
+      icon_image, icon_image_alt, flap_detection_enabled, low_flap_threshold,
+      high_flap_threshold, check_freshness, freshness_threshold,
+      obsess_over_service, timezone)};
   try {
     obj->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
     obj->set_check_options(CHECK_OPTION_NONE);
@@ -464,25 +475,9 @@ int anomalydetection::run_async_check(int check_options,
       << ", latency=" << latency << ", scheduled_check=" << scheduled_check
       << ", reschedule_check=" << reschedule_check;
 
-  // Preamble.
-  if (!_dependent_service) {
-    logger(log_runtime_error, basic)
-      << "Error: Attempt to run active check on anomaly detection service '"
-      << get_description() << "' on host '" << get_host_ptr()->get_name()
-      << "' with no dependent service";
-    return ERROR;
-  }
-  if (!get_check_command_ptr()) {
-    logger(log_runtime_error, basic)
-        << "Error: Attempt to run active check on anomaly detection service '"
-        << get_description() << "' on host '" << get_host_ptr()->get_name()
-        << "' with no check command";
-    return ERROR;
-  }
-
   logger(dbg_checks, basic)
-      << "** Running async check of anomaly detection service '"
-      << get_description() << "' on host '" << get_hostname() << "'...";
+      << "** Running async check of service '" << get_description()
+      << "' on host '" << get_hostname() << "'...";
 
   // Check if the service is viable now.
   if (verify_check_viability(check_options, time_is_valid, preferred_time) ==
@@ -553,16 +548,14 @@ int anomalydetection::run_async_check(int check_options,
       checkable::check_active, check_options, reschedule_check, latency,
       start_time, start_time, false, true, service::state_ok, "");
 
-  // Get command object.
-  commands::command* cmd = get_check_command_ptr();
-  std::string processed_cmd(cmd->process_cmd(&macros));
-
+  std::ostringstream oss;
+  oss << "Anomaly detection on metric '" << _metric_name << "', from service '" << _dependent_service->get_description() << "' on host '" << get_hostname() << "'";
   // Send event broker.
   res = broker_service_check(
       NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, this,
       checkable::check_active, start_time, end_time,
       get_check_command().c_str(), get_latency(), 0.0,
-      config->service_check_timeout(), false, 0, processed_cmd.c_str(), nullptr);
+      config->service_check_timeout(), false, 0, oss.str().c_str(), nullptr);
 
   // Restore latency.
   set_latency(old_latency);
@@ -579,39 +572,29 @@ int anomalydetection::run_async_check(int check_options,
                          : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
                      start_time.tv_sec);
 
-  bool retry;
-  do {
-    retry = false;
-    try {
-      // Run command.
-      uint64_t id =
-          cmd->run(processed_cmd, macros, config->service_check_timeout());
-      if (id != 0)
-        checks::checker::instance().add_check_result(id, check_result_info);
-    } catch (com::centreon::exceptions::interruption const& e) {
-      (void)e;
-      retry = true;
-    } catch (std::exception const& e) {
-      timestamp now(timestamp::now());
+  std::string perfdata = string::extract_perfdata(
+      _dependent_service->get_perf_data(), _metric_name);
+  std::tuple<service::service_state, double, double, double> pd = parse_perfdata(perfdata);
 
-      // Update check result.
-      timeval tv;
-      tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
-      check_result_info.set_finish_time(tv);
+  oss.str("");
+  check_result_info.set_early_timeout(false);
+  if (std::get<0>(pd) == service::state_ok)
+    check_result_info.set_exited_ok(true);
 
-      check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(service::state_unknown);
-      check_result_info.set_exited_ok(true);
-      check_result_info.set_output("(Execute command failed)");
+  check_result_info.set_return_code(std::get<0>(pd));
+  oss << perfdata << ' ' << _metric_name << "_lower_thresholds=" << std::get<2>(pd)
+    << ' ' << _metric_name << "_upper_thresholds=" << std::get<3>(pd);
+  check_result_info.set_output(oss.str());
 
-      // Queue check result.
-      checks::checker::instance().add_check_result_to_reap(check_result_info);
+  timestamp now(timestamp::now());
 
-      logger(log_runtime_warning, basic)
-          << "Error: Service check command execution failed: " << e.what();
-    }
-  } while (retry);
+  // Update check result.
+  timeval tv;
+  tv.tv_sec = now.to_seconds();
+  tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
+  check_result_info.set_finish_time(tv);
+
+  handle_async_check_result(&check_result_info);
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
@@ -620,4 +603,22 @@ int anomalydetection::run_async_check(int check_options,
 
 commands::command* anomalydetection::get_check_command_ptr() const {
   return _dependent_service->get_check_command_ptr();
+}
+
+std::tuple<service::service_state, double, double, double>
+anomalydetection::parse_perfdata(std::string const& perfdata) {
+  size_t pos = perfdata.find_last_of("=");
+  if (pos == std::string::npos)
+    return std::tuple<service::service_state, double, double, double>(service::state_unknown, NAN, NAN, NAN);
+  pos++;
+  double value = std::strtod(perfdata.c_str(), nullptr);
+  service::service_state status;
+
+  if (!_status_change)
+    status = service::state_ok;
+  else {
+    //FIXME DBR We have to read thresholds...
+    status = service::state_ok;
+  }
+  return std::make_tuple(status, value, NAN, NAN);
 }
