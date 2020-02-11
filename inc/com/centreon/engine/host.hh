@@ -143,9 +143,9 @@ class host : public notifier {
   //                                                  int options) override;
   int handle_state();
   void update_performance_data();
-  int verify_check_viability(int check_options,
-                             bool* time_is_valid,
-                             time_t* new_time);
+  bool verify_check_viability(int check_options,
+                              bool* time_is_valid,
+                              time_t* new_time);
   void grab_macros_r(nagios_macros* mac) override;
   bool operator==(host const& other) = delete;  // throw ();
   bool operator!=(host const& other) = delete;  // throw ();

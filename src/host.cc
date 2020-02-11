@@ -1589,8 +1589,7 @@ int host::run_async_check(int check_options,
       << "** Running async check of host '" << get_name() << "'...";
 
   // Check if the host is viable now.
-  if (verify_check_viability(check_options, time_is_valid, preferred_time) ==
-      ERROR)
+  if (!verify_check_viability(check_options, time_is_valid, preferred_time))
     return ERROR;
 
   // If this check is a rescheduled check, propagate the rescheduled check
@@ -2262,10 +2261,10 @@ void host::update_performance_data() {
 }
 
 /* checks viability of performing a host check */
-int host::verify_check_viability(int check_options,
-                                 bool* time_is_valid,
-                                 time_t* new_time) {
-  int result = OK;
+bool host::verify_check_viability(int check_options,
+                                  bool* time_is_valid,
+                                  time_t* new_time) {
+  bool result = true;
   int perform_check = true;
   time_t current_time = 0L;
   time_t preferred_time = 0L;
@@ -2324,7 +2323,7 @@ int host::verify_check_viability(int check_options,
   if (new_time)
     *new_time = preferred_time;
 
-  result = (perform_check) ? OK : ERROR;
+  result = (perform_check) ? true : false;
   return result;
 }
 

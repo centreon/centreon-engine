@@ -162,9 +162,9 @@ class service : public notifier {
   void enable_flap_detection();
   void disable_flap_detection();
   void update_status(bool aggregated_dump) override;
-  int verify_check_viability(int check_options,
-                             bool* time_is_valid,
-                             time_t* new_time);
+  bool verify_check_viability(int check_options,
+                              bool* time_is_valid,
+                              time_t* new_time);
   void grab_macros_r(nagios_macros* mac) override;
   int notify_contact(nagios_macros* mac,
                      contact* cntct,

@@ -2326,8 +2326,7 @@ int service::run_async_check(int check_options,
       << "' on host '" << get_hostname() << "'...";
 
   // Check if the service is viable now.
-  if (verify_check_viability(check_options, time_is_valid, preferred_time) ==
-      ERROR)
+  if (!verify_check_viability(check_options, time_is_valid, preferred_time))
     return ERROR;
 
   // Send broker event.
@@ -2739,10 +2738,10 @@ void service::update_status(bool aggregated_dump) {
 }
 
 /* checks viability of performing a service check */
-int service::verify_check_viability(int check_options,
+bool service::verify_check_viability(int check_options,
                                     bool* time_is_valid,
                                     time_t* new_time) {
-  int perform_check = true;
+  bool perform_check = true;
   time_t current_time = 0L;
   time_t preferred_time = 0L;
   int check_interval = 0;
@@ -2804,7 +2803,7 @@ int service::verify_check_viability(int check_options,
   if (new_time)
     *new_time = preferred_time;
 
-  return (perform_check) ? OK : ERROR;
+  return perform_check;
 }
 
 void service::grab_macros_r(nagios_macros* mac) {

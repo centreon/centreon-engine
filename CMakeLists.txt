@@ -614,9 +614,10 @@ include_directories(enginerpc)
 
 # Library engine target.
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
+add_dependencies(cce_core json11_lib)
 
 # Link target with required libraries.
-target_link_libraries(cce_core
+target_link_libraries(cce_core json11
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}

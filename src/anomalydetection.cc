@@ -20,6 +20,7 @@
 #include "com/centreon/engine/anomalydetection.hh"
 #include <cmath>
 #include <cstring>
+#include <json11.hpp>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/globals.hh"
@@ -183,7 +184,10 @@ anomalydetection::anomalydetection(std::string const& hostname,
       _dependent_service{dependent_service},
       _metric_name{metric_name},
       _thresholds_file{thresholds_file},
-      _status_change{status_change} {}
+      _status_change{status_change},
+      _thresholds_file_viable{false} {
+  init_thresholds();
+}
 
 /**
  *  Add a new anomalydetection to the list in memory.
@@ -480,8 +484,7 @@ int anomalydetection::run_async_check(int check_options,
       << "' on host '" << get_hostname() << "'...";
 
   // Check if the service is viable now.
-  if (verify_check_viability(check_options, time_is_valid, preferred_time) ==
-      ERROR)
+  if (!verify_check_viability(check_options, time_is_valid, preferred_time))
     return ERROR;
 
   // Send broker event.
@@ -608,17 +611,116 @@ commands::command* anomalydetection::get_check_command_ptr() const {
 std::tuple<service::service_state, double, double, double>
 anomalydetection::parse_perfdata(std::string const& perfdata) {
   size_t pos = perfdata.find_last_of("=");
-  if (pos == std::string::npos)
-    return std::tuple<service::service_state, double, double, double>(service::state_unknown, NAN, NAN, NAN);
+  /* If the perfdata is wrong. */
+  if (pos == std::string::npos) {
+    logger(log_runtime_error, basic)
+      << "Error: Unable to parse perfdata '" << perfdata << "'";
+    return std::tuple<service::service_state, double, double, double>(
+        service::state_unknown, NAN, NAN, NAN);
+  }
+
+  /* If the perfdata is good. */
   pos++;
-  double value = std::strtod(perfdata.c_str(), nullptr);
+  double value = std::strtod(perfdata.c_str() + pos, nullptr);
   service::service_state status;
+
+  time_t check_time = get_last_check();
+  /* The check time is probably between two timestamps stored in _thresholds.
+   *
+   *   |                    d2 +
+   *   |            dc+
+   *   |   d1 +
+   *   |
+   *   +------+-------+--------+-->
+   *         t1       tc       t2
+   *
+   * For both lower bound and upper bound, we get values d1 and d2
+   * respectively corresponding to timestamp t1 and t2.
+   * We have a check_time tc between them, and we would like a value dc
+   * corresponding to this timestamp.
+   *
+   * The linear approximation gives the formula:
+   *                       dc = (d2-d1) * (tc-t1) / (t2-t1) + d1
+   */
+  auto it2 = _thresholds.lower_bound(check_time);
+  auto it1 = it2++;
+
+  /* Now it1.first <= check_time < it2.first */
+  double upper = (it2->second.second - it1->second.second) *
+                     (check_time - it1->first) / (it2->first - it1->first) +
+                 it1->second.second;
+  double lower = (it2->second.first - it1->second.first) *
+                     (check_time - it1->first) / (it2->first - it1->first) +
+                 it1->second.first;
 
   if (!_status_change)
     status = service::state_ok;
   else {
-    //FIXME DBR We have to read thresholds...
-    status = service::state_ok;
+    if (value >= lower && value <= upper)
+      status = service::state_ok;
+    else
+      status = service::state_critical;
   }
-  return std::make_tuple(status, value, NAN, NAN);
+
+  return std::make_tuple(status, value, lower, upper);
+}
+
+void anomalydetection::init_thresholds() {
+  logger(log_info_message, basic)
+    << "Reading thresholds file '" << _thresholds_file << "'...";
+  std::ifstream t(_thresholds_file);
+  std::stringstream buffer;
+  buffer << t.rdbuf();
+  std::string err;
+  auto json = json11::Json::parse(buffer.str(), err);
+  if (!err.empty()) {
+    logger(log_config_error, basic)
+        << "Error: the file '" << _thresholds_file
+        << "' contains errors: " << err;
+    return;
+  }
+  if (!json.is_array()) {
+    logger(log_config_error, basic)
+        << "Error: the file '" << _thresholds_file
+        << "' is not a thresholds file. Its global structure is not an array.";
+    return;
+  }
+
+  int count = 0;
+  for (auto& item : json.array_items()) {
+    if (item["host_id"].number_value() == get_host_id() &&
+        item["service_id"].number_value() == get_service_id() &&
+        item["metric_name"].string_value() == _metric_name) {
+      logger(log_info_message, basic)
+          << "Filling thresholds in anomaly detection (host_id: "
+          << get_host_id() << ", service_id: " << get_service_id()
+          << ", metric: " << _metric_name << ")";
+      auto predict = item["predict"];
+      _thresholds.clear();
+      for (auto& i : predict.array_items()) {
+        time_t timestamp = static_cast<time_t>(i["timestamp"].number_value());
+        double upper = i["upper"].number_value();
+        double lower = i["lower"].number_value();
+        _thresholds.emplace_hint(
+            _thresholds.end(), std::make_pair(timestamp, std::make_pair(lower, upper)));
+        count++;
+      }
+      break;
+    }
+  }
+  if (count > 1)
+    _thresholds_file_viable = true;
+}
+
+bool anomalydetection::verify_check_viability(int check_options,
+                                              bool* time_is_valid,
+                                              time_t* new_time) {
+  if (!_thresholds_file_viable)
+    return false;
+  return service::verify_check_viability(check_options, time_is_valid,
+                                         new_time);
+}
+
+void anomalydetection::set_status_change(bool status_change) {
+  _status_change = status_change;
 }

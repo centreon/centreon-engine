@@ -68,7 +68,7 @@ class AnomalydetectionCheck : public TestEngine {
     svc_aply.resolve_object(svc);
 
     configuration::anomalydetection ad{new_configuration_anomalydetection(
-        "test_host", "test_ad", "admin", 9, 8)};
+        "test_host", "test_ad", "admin", 9, 8, "/tmp/thresholds_status_change.json")};
     configuration::applier::anomalydetection ad_aply;
     ad_aply.add_object(ad);
 
@@ -96,6 +96,11 @@ class AnomalydetectionCheck : public TestEngine {
   }
 
   void TearDown() override { deinit_config_state(); }
+
+  void CreateFile(std::string const& filename, std::string const& content) {
+    std::ofstream oss(filename);
+    oss << content;
+  }
 
  protected:
   std::shared_ptr<engine::host> _host;
@@ -159,6 +164,19 @@ TEST_F(AnomalydetectionCheck, SimpleCheck) {
  * ------------------------------------------------------
  */
 TEST_F(AnomalydetectionCheck, StatusChanges) {
+  CreateFile(
+      "/tmp/thresholds_status_change.json",
+      "[{\n \"host_id\": 12,\n \"service_id\": 9,\n \"metric_name\": "
+      "\"metric\",\n \"predict\": [{\n \"timestamp\": 50000,\n \"upper\": "
+      "84,\n \"lower\": 74,\n \"fit\": 79\n }, {\n \"timestamp\": 100000,\n "
+      "\"upper\": 98,\n \"lower\": 5,\n \"fit\": 51.5\n }, {\n \"timestamp\": "
+      "150000,\n \"upper\": 100,\n \"lower\": 93,\n \"fit\": 96.5\n }, {\n "
+      "\"timestamp\": 200000,\n \"upper\": 100,\n \"lower\": 97,\n \"fit\": "
+      "98.5\n }, {\n \"timestamp\": 250000,\n \"upper\": 100,\n \"lower\": "
+      "21,\n \"fit\": 60.5\n }\n]}]");
+  _ad->init_thresholds();
+  _ad->set_status_change(true);
+
   set_time(50000);
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_last_hard_state(engine::service::state_ok);
@@ -166,13 +184,21 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   _svc->set_state_type(checkable::hard);
   _svc->set_accept_passive_checks(true);
   _svc->set_current_attempt(1);
+  _svc->set_last_check(50000);
 
+  _ad->set_current_state(engine::service::state_ok);
+  _ad->set_last_hard_state(engine::service::state_ok);
+  _ad->set_last_hard_state_change(50000);
+  _ad->set_state_type(checkable::hard);
+  _ad->set_current_attempt(1);
+  _ad->set_last_check(50000);
   set_time(50500);
 
   std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| metric=22;25;60";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| "
+         "metric=90;25;60";
   std::string cmd{oss.str()};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -181,7 +207,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_last_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   ASSERT_EQ(_svc->get_plugin_output(), "service critical");
-  ASSERT_EQ(_svc->get_perf_data(), "metric=22;25;60");
+  ASSERT_EQ(_svc->get_perf_data(), "metric=90;25;60");
   int check_options = 0;
   int latency = 0;
   bool time_is_valid;
@@ -322,5 +348,6 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
+  ::unlink("/tmp/thresholds_status_change.json");
 }
 

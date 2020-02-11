@@ -20,6 +20,7 @@
 #ifndef CCE_ANOMALYDETECTION_HH
 #define CCE_ANOMALYDETECTION_HH
 
+#include <map>
 #include <tuple>
 #include "com/centreon/engine/service.hh"
 
@@ -29,7 +30,9 @@ class anomalydetection : public service {
   service* _dependent_service;
   std::string _metric_name;
   std::string _thresholds_file;
+  bool _thresholds_file_viable;
   bool _status_change;
+  std::map<time_t, std::pair<double, double>> _thresholds;
 
  public:
   anomalydetection(std::string const& hostname,
@@ -79,6 +82,11 @@ class anomalydetection : public service {
   commands::command* get_check_command_ptr() const;
   std::tuple<service::service_state, double, double, double> parse_perfdata(
       std::string const& perfdata);
+  void init_thresholds();
+  bool verify_check_viability(int check_options,
+                              bool* time_is_valid,
+                              time_t* new_time);
+  void set_status_change(bool status_change);
 };
 CCE_END()
 

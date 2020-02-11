@@ -277,7 +277,7 @@ void checker::run_sync(host* hst,
       << "** Run sync check of host '" << hst->get_name() << "'...";
 
   // Check if the host is viable now.
-  if (hst->verify_check_viability(check_options, nullptr, nullptr) == ERROR) {
+  if (!hst->verify_check_viability(check_options, nullptr, nullptr)) {
     if (check_result_code)
       *check_result_code = hst->get_current_state();
     logger(dbg_checks, basic) << "Host check is not viable at this time";
