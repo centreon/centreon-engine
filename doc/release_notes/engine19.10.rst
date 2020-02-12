@@ -1,4 +1,19 @@
 ========================
+Centreon Engine 19.10.12
+========================
+
+*********
+Bug fixes
+*********
+
+XXX_SERVICEGROUP_XXX external commands
+======================================
+
+XXX_SERVICEGROUP_XXX external commands were buggy. They take one servicegroup
+name as argument, it was resolved as a service name and not as a service group
+name.
+
+========================
 Centreon Engine 19.10.11
 ========================
 
