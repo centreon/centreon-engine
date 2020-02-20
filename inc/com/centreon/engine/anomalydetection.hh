@@ -80,8 +80,8 @@ class anomalydetection : public service {
                       bool* time_is_valid,
                       time_t* preferred_time) noexcept;
   commands::command* get_check_command_ptr() const;
-  std::tuple<service::service_state, double, double, double> parse_perfdata(
-      std::string const& perfdata);
+  std::tuple<service::service_state, double, std::string, double, double>
+  parse_perfdata(std::string const& perfdata);
   void init_thresholds();
   bool verify_check_viability(int check_options,
                               bool* time_is_valid,

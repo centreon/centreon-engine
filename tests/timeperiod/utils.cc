@@ -319,3 +319,11 @@ extern "C" time_t time(time_t* t) __THROW {
     *t = gl_now;
   return (gl_now);
 }
+
+extern "C" int gettimeofday(struct timeval *tv, struct timezone *tz) __THROW {
+  if (tv) {
+    tv->tv_sec = gl_now;
+    tv->tv_usec = 0;
+  }
+  return 0;
+}

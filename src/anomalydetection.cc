@@ -577,16 +577,28 @@ int anomalydetection::run_async_check(int check_options,
 
   std::string perfdata = string::extract_perfdata(
       _dependent_service->get_perf_data(), _metric_name);
-  std::tuple<service::service_state, double, double, double> pd = parse_perfdata(perfdata);
+  std::tuple<service::service_state, double, std::string, double, double> pd =
+      parse_perfdata(perfdata);
 
   oss.str("");
   check_result_info.set_early_timeout(false);
-  if (std::get<0>(pd) == service::state_ok)
+  if (std::get<0>(pd) == service::state_ok) {
     check_result_info.set_exited_ok(true);
+    oss << "OK: Regular activity, " << _metric_name << '=' << std::get<1>(pd)
+        << std::get<2>(pd) << " |";
+  }
+  else {
+    check_result_info.set_exited_ok(false);
+    oss << "NON-OK: Unusual activity, the actual value of " << _metric_name
+        << " is " << std::get<1>(pd) << std::get<2>(pd)
+        << " which is outside the forecasting range [" << std::get<3>(pd)
+        << " ; " << std::get<4>(pd) << "] |";
+  }
 
   check_result_info.set_return_code(std::get<0>(pd));
-  oss << perfdata << ' ' << _metric_name << "_lower_thresholds=" << std::get<2>(pd)
-    << ' ' << _metric_name << "_upper_thresholds=" << std::get<3>(pd);
+  oss << perfdata << ' ' << _metric_name
+      << "_lower_thresholds=" << std::get<3>(pd) << ' ' << _metric_name
+      << "_upper_thresholds=" << std::get<4>(pd);
   check_result_info.set_output(oss.str());
 
   timestamp now(timestamp::now());
@@ -608,20 +620,39 @@ commands::command* anomalydetection::get_check_command_ptr() const {
   return _dependent_service->get_check_command_ptr();
 }
 
-std::tuple<service::service_state, double, double, double>
+/**
+ * @brief Parse the given perfdata. The only metric parsed is the one whose name
+ * is _metric_name.
+ *
+ * @param perfdata A string containing perfdata.
+ *
+ * @return A tuple containing the status, the value, its unit, the lower bound
+ * and the upper bound
+ */
+std::tuple<service::service_state, double, std::string, double, double>
 anomalydetection::parse_perfdata(std::string const& perfdata) {
   size_t pos = perfdata.find_last_of("=");
   /* If the perfdata is wrong. */
   if (pos == std::string::npos) {
     logger(log_runtime_error, basic)
       << "Error: Unable to parse perfdata '" << perfdata << "'";
-    return std::tuple<service::service_state, double, double, double>(
-        service::state_unknown, NAN, NAN, NAN);
+    return std::make_tuple(service::state_unknown, NAN, "", NAN, NAN);
+//    return std::tuple<service::service_state, double, double, double>(
+//        service::state_unknown, NAN, NAN, NAN);
   }
 
   /* If the perfdata is good. */
   pos++;
-  double value = std::strtod(perfdata.c_str() + pos, nullptr);
+  char* unit;
+
+  double value = std::strtod(perfdata.c_str() + pos, &unit);
+  char const* end = perfdata.c_str() + perfdata.size() - 1;
+  size_t l = 0;
+  /* If there is a unit, it starts at unit char* */
+  while (unit + l != end && unit[l] != ' ' && unit[l] != ';')
+    ++l;
+  std::string uom = std::string(unit, l - 1);
+
   service::service_state status;
 
   time_t check_time = get_last_check();
@@ -662,7 +693,7 @@ anomalydetection::parse_perfdata(std::string const& perfdata) {
       status = service::state_critical;
   }
 
-  return std::make_tuple(status, value, lower, upper);
+  return std::make_tuple(status, value, uom, lower, upper);
 }
 
 void anomalydetection::init_thresholds() {

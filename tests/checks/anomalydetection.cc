@@ -152,13 +152,13 @@ TEST_F(AnomalydetectionCheck, SimpleCheck) {
  * ------------------------------------------------------
  * | 0    | 1       | OK    | HARD       | No           |
  * | 1    | 1       | CRTCL | SOFT       | Yes          |
- * | 2    | 2       | WARN  | SOFT       | Yes          |
+ * | 2    | 2       | CRTCL | SOFT       | Yes          |
  * | 3    | 3       | CRTCL | HARD       | Yes          |
- * | 4    | 3       | WARN  | HARD       | Yes          |
- * | 5    | 3       | WARN  | HARD       | No           |
+ * | 4    | 3       | CRTCL | HARD       | Yes          |
+ * | 5    | 3       | CRTCL | HARD       | No           |
  * | 6    | 1       | OK    | HARD       | Yes          |
  * | 7    | 1       | OK    | HARD       | No           |
- * | 8    | 1       | UNKNWN| SOFT       | Yes          |
+ * | 8    | 1       | CRTCL | SOFT       | Yes          |
  * | 9    | 2       | OK    | SOFT       | Yes          |
  * | 10   | 1       | OK    | HARD       | No           |
  * ------------------------------------------------------
@@ -169,7 +169,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
       "[{\n \"host_id\": 12,\n \"service_id\": 9,\n \"metric_name\": "
       "\"metric\",\n \"predict\": [{\n \"timestamp\": 50000,\n \"upper\": "
       "84,\n \"lower\": 74,\n \"fit\": 79\n }, {\n \"timestamp\": 100000,\n "
-      "\"upper\": 98,\n \"lower\": 5,\n \"fit\": 51.5\n }, {\n \"timestamp\": "
+      "\"upper\": 10,\n \"lower\": 5,\n \"fit\": 51.5\n }, {\n \"timestamp\": "
       "150000,\n \"upper\": 100,\n \"lower\": 93,\n \"fit\": 96.5\n }, {\n "
       "\"timestamp\": 200000,\n \"upper\": 100,\n \"lower\": 97,\n \"fit\": "
       "98.5\n }, {\n \"timestamp\": 250000,\n \"upper\": 100,\n \"lower\": "
@@ -192,8 +192,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   _ad->set_state_type(checkable::hard);
   _ad->set_current_attempt(1);
   _ad->set_last_check(50000);
-  set_time(50500);
 
+  set_time(50500);
   std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
   oss << '[' << now << ']'
@@ -214,14 +214,19 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   time_t preferred_time;
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_ad->get_last_state_change(), now);
+  ASSERT_EQ(_ad->get_current_attempt(), 1);
+  ASSERT_EQ(_ad->get_plugin_output(), "service critical");
+  ASSERT_EQ(_ad->get_perf_data(), "metric=90;25;60");
 
   set_time(51000);
 
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| metric=50;25;60";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -229,13 +234,17 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_warning);
   ASSERT_EQ(_svc->get_last_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 2);
+  _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
+                       &preferred_time);
+  ASSERT_EQ(_ad->get_state_type(), checkable::soft);
+  ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
 
   set_time(51500);
 
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| metric=110;25;60";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -243,13 +252,18 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 3);
+  _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
+                       &preferred_time);
+  ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_ad->get_last_hard_state_change(), now);
+  ASSERT_EQ(_ad->get_state_type(), checkable::hard);
 
   set_time(52000);
 
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| metric=30;25;60";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -257,6 +271,11 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_warning);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 3);
+  _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
+                       &preferred_time);
+  ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_ad->get_last_hard_state_change(), now);
+
 
   set_time(52500);
 
