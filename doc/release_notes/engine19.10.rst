@@ -6,6 +6,11 @@ Centreon Engine 19.10.12
 Bug fixes
 *********
 
+Downtimes removal
+=================
+
+One dontime could be removed during the removal of an other downtime.
+
 XXX_SERVICEGROUP_XXX external commands
 ======================================
 

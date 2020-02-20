@@ -143,6 +143,7 @@ void service_downtime::print(std::ostream& os) const {
 }
 
 int service_downtime::unschedule() {
+  logger(dbg_functions, basic) << "service_downtime::unschedule()";
   service_map::const_iterator found(
     service::services.find({get_hostname(), get_service_description()}));
 
@@ -534,6 +535,7 @@ std::string const& service_downtime::get_service_description() const {
 }
 
 void service_downtime::schedule() {
+  logger(dbg_functions, basic) << "service_downtime::schedule()";
   downtime_manager::instance().add_downtime(this);
 
   /* send data to event broker */
