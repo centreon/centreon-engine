@@ -47,8 +47,8 @@ raw::raw(std::string const& name,
          command_listener* listener)
     : command(name, command_line, listener), process_listener() {
   if (_command_line.empty())
-    throw(engine_error() << "Could not create '" << _name
-                         << "' command: command line is empty");
+    throw engine_error() << "Could not create '" << _name
+                         << "' command: command line is empty";
 }
 
 /**
@@ -61,13 +61,10 @@ raw::raw(raw const& right) : command(right), process_listener(right) {}
 /**
  *  Destructor.
  */
-#include <iostream>
 raw::~raw() noexcept {
-  std::cout << "RAW DESTRUCTOR\n";
   try {
     std::unique_lock<std::mutex> lock(_lock);
     while (!_processes_busy.empty()) {
-      std::cout << "RAW DESTRUCTOR: COMMAND BUSY...\n";
       process* p{_processes_busy.begin()->first};
       lock.unlock();
       p->wait();
@@ -116,7 +113,6 @@ commands::command* raw::clone() const {
 uint64_t raw::run(std::string const& processed_cmd,
                   nagios_macros& macros,
                   uint32_t timeout) {
-  std::cout << "COMMAND RUN: " << processed_cmd << "\n";
   logger(dbg_commands, basic)
       << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
@@ -127,7 +123,6 @@ uint64_t raw::run(std::string const& processed_cmd,
     std::lock_guard<std::mutex> lock(_lock);
     p = _get_free_process();
     _processes_busy[p] = command_id;
-    std::cout << "COMMAND RUN BUSY: " << processed_cmd << "\n";
   }
 
   logger(dbg_commands, basic)
@@ -139,7 +134,6 @@ uint64_t raw::run(std::string const& processed_cmd,
 
   try {
     // Start process.
-    std::cout << "COMMAND RUN EXEC: " << processed_cmd << "\n";
     p->exec(processed_cmd.c_str(), env.data(), timeout);
     logger(dbg_commands, basic)
         << "raw::run: start process success: id=" << command_id;
@@ -262,9 +256,7 @@ void raw::data_is_available_err(process& p) noexcept {
  *
  *  @param[in] p  The process to finished.
  */
-#include <iostream>
 void raw::finished(process& p) noexcept {
-  std::cout << "raw finished 1\n";
   try {
     logger(dbg_commands, basic) << "raw::finished: process=" << &p;
 
@@ -317,18 +309,13 @@ void raw::finished(process& p) noexcept {
                (res.exit_code > 3))
       res.exit_code = service::state_unknown;
 
-    logger(dbg_commands, basic) << "raw::finished: id="
-                                << command_id
-                                << ", start_time="
-                                << res.start_time.to_mseconds()
-                                << ", end_time="
-                                << res.end_time.to_mseconds()
-                                << ", exit_code="
-                                << res.exit_code
-                                << ", exit_status="
-                                << res.exit_status
-                                << ", output='"
-                                << res.output << "'";
+    logger(dbg_commands, basic)
+        << "raw::finished: id=" << command_id
+        << ", start_time=" << res.start_time.to_mseconds()
+        << ", end_time=" << res.end_time.to_mseconds()
+        << ", exit_code=" << res.exit_code
+        << ", exit_status=" << res.exit_status << ", output='" << res.output
+        << "'";
 
     // Forward result to the listener.
     if (_listener)

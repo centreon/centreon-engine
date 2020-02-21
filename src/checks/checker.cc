@@ -62,13 +62,12 @@ void checker::clear() {
   try {
     std::lock_guard<std::mutex> lock(_mut_reap);
     std::queue<check_result> empty;
-    std::swap( _to_reap, empty );
+    std::swap(_to_reap, empty);
     _list_id.clear();
     _to_reap_partial.clear();
   } catch (...) {
   }
 }
-
 
 /**
  *  Add into the queue a result to reap later.
@@ -94,7 +93,6 @@ void checker::push_check_result(check_result const* result) {
 /**
  *  Reap and process all result received by execution process.
  */
-#include <iostream>
 void checker::reap() {
   logger(dbg_functions, basic) << "checker::reap";
   logger(dbg_checks, basic) << "Starting to reap check results.";
@@ -122,7 +120,6 @@ void checker::reap() {
 
     // Merge partial check results.
     while (!_to_reap_partial.empty()) {
-    std::cout << "reap 2\n";
       // Find the two parts.
       std::unordered_map<uint64_t, check_result>::iterator it_partial(
           _to_reap_partial.begin());
@@ -153,7 +150,6 @@ void checker::reap() {
 
     // Process check results.
     while (!_to_reap.empty()) {
-    std::cout << "reap 3\n";
       // Get result host or service check.
       logger(dbg_checks, basic)
           << "Found a check result (#" << ++reaped_checks << ") to handle...";
@@ -234,7 +230,6 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
       << "Finished reaping " << reaped_checks << " check results";
-    std::cout << "reap 4\n";
 }
 
 /**
@@ -268,10 +263,10 @@ void checker::run_sync(host* hst,
 
   // Preamble.
   if (!hst)
-    throw(engine_error() << "Attempt to run synchronous check on invalid host");
+    throw engine_error() << "Attempt to run synchronous check on invalid host";
   if (!hst->get_check_command_ptr())
-    throw(engine_error() << "Attempt to run synchronous active check on host '"
-                         << hst->get_name() << "' with no check command");
+    throw engine_error() << "Attempt to run synchronous active check on host '"
+                         << hst->get_name() << "' with no check command";
 
   logger(dbg_checks, basic)
       << "** Run sync check of host '" << hst->get_name() << "'...";
@@ -445,10 +440,10 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
 
   // Preamble.
   if (!hst)
-    throw(engine_error() << "Attempt to run synchronous check on invalid host");
+    throw engine_error() << "Attempt to run synchronous check on invalid host";
   if (!hst->get_check_command_ptr())
-    throw(engine_error() << "Attempt to run synchronous active check on host '"
-                         << hst->get_name() << "' with no check command");
+    throw engine_error() << "Attempt to run synchronous active check on host '"
+                         << hst->get_name() << "' with no check command";
 
   logger(dbg_checks, basic)
       << "** Executing sync check of host '" << hst->get_name() << "'...";
@@ -488,14 +483,15 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   const char* tmp_processed_cmd = processed_cmd.c_str();
 
   // Send broker event.
-  broker_host_check(
-      NEBTYPE_HOSTCHECK_RAW_START, NEBFLAG_NONE, NEBATTR_NONE, hst,
-      checkable::check_active, host::state_up, hst->get_state_type(),
-      start_time, end_time, hst->get_check_command().c_str(), 0.0, 0.0,
-      config->host_check_timeout(), false, service::state_ok, processed_cmd.c_str(),
-      const_cast<char*>(hst->get_plugin_output().c_str()),
-      const_cast<char*>(hst->get_long_plugin_output().c_str()),
-      const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
+  broker_host_check(NEBTYPE_HOSTCHECK_RAW_START, NEBFLAG_NONE, NEBATTR_NONE,
+                    hst, checkable::check_active, host::state_up,
+                    hst->get_state_type(), start_time, end_time,
+                    hst->get_check_command().c_str(), 0.0, 0.0,
+                    config->host_check_timeout(), false, service::state_ok,
+                    processed_cmd.c_str(),
+                    const_cast<char*>(hst->get_plugin_output().c_str()),
+                    const_cast<char*>(hst->get_long_plugin_output().c_str()),
+                    const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
 
   // Debug messages.
   logger(dbg_commands, more)

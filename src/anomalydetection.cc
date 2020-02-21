@@ -17,10 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/anomalydetection.hh"
 #include <cmath>
 #include <cstring>
 #include <json11.hpp>
+#include <limits>
+#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/globals.hh"
@@ -345,7 +346,8 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
 
   auto it = service::services_by_id.find({host_id, dependent_service_id});
   if (it == service::services_by_id.end()) {
-    logger(log_config_error, basic) << "Error: Dependent service does not exist";
+    logger(log_config_error, basic)
+        << "Error: Dependent service does not exist";
     return nullptr;
   }
   service* dependent_service = it->second.get();
@@ -501,8 +503,8 @@ int anomalydetection::run_async_check(int check_options,
   // Service check was cancel by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
     if (preferred_time != nullptr)
-      *preferred_time += static_cast<time_t>(get_check_interval() *
-                                             config->interval_length());
+      *preferred_time +=
+          static_cast<time_t>(get_check_interval() * config->interval_length());
     logger(log_runtime_error, basic)
         << "Error: Some broker module cancelled check of service '"
         << get_description() << "' on host '" << get_hostname();
@@ -537,7 +539,7 @@ int anomalydetection::run_async_check(int check_options,
                          get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
-  gettimeofday(&start_time, nullptr);
+  start_time.tv_sec = _dependent_service->get_last_check();
 
   // Update the number of running service checks.
   ++currently_running_service_checks;
@@ -547,12 +549,14 @@ int anomalydetection::run_async_check(int check_options,
 
   // Init check result info.
   check_result check_result_info(
-      service_check, get_host_id(), get_service_id(),
-      checkable::check_active, check_options, reschedule_check, latency,
-      start_time, start_time, false, true, service::state_ok, "");
+      service_check, get_host_id(), get_service_id(), checkable::check_active,
+      check_options, reschedule_check, latency, start_time, start_time, false,
+      true, service::state_ok, "");
 
   std::ostringstream oss;
-  oss << "Anomaly detection on metric '" << _metric_name << "', from service '" << _dependent_service->get_description() << "' on host '" << get_hostname() << "'";
+  oss << "Anomaly detection on metric '" << _metric_name << "', from service '"
+      << _dependent_service->get_description() << "' on host '"
+      << get_hostname() << "'";
   // Send event broker.
   res = broker_service_check(
       NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, this,
@@ -570,25 +574,27 @@ int anomalydetection::run_async_check(int check_options,
   }
 
   // Update statistics.
-  update_check_stats(scheduled_check
-                         ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
-                         : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
+  update_check_stats(scheduled_check ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
+                                     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
                      start_time.tv_sec);
 
   std::string perfdata = string::extract_perfdata(
       _dependent_service->get_perf_data(), _metric_name);
   std::tuple<service::service_state, double, std::string, double, double> pd =
-      parse_perfdata(perfdata);
+      parse_perfdata(perfdata, start_time.tv_sec);
 
   oss.str("");
+  oss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+  oss.precision(2);
   check_result_info.set_early_timeout(false);
-  if (std::get<0>(pd) == service::state_ok) {
-    check_result_info.set_exited_ok(true);
+  check_result_info.set_exited_ok(true);
+  if (std::get<0>(pd) == service::state_ok)
     oss << "OK: Regular activity, " << _metric_name << '=' << std::get<1>(pd)
         << std::get<2>(pd) << " |";
-  }
+  else if (std::get<0>(pd) == service::state_unknown)
+    oss << "UNKNOWN: Unknown activity, " << _metric_name
+        << " did not return any values| ";
   else {
-    check_result_info.set_exited_ok(false);
     oss << "NON-OK: Unusual activity, the actual value of " << _metric_name
         << " is " << std::get<1>(pd) << std::get<2>(pd)
         << " which is outside the forecasting range [" << std::get<3>(pd)
@@ -613,6 +619,10 @@ int anomalydetection::run_async_check(int check_options,
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
+
+  // Update the number of running service checks.
+  --currently_running_service_checks;
+
   return OK;
 }
 
@@ -630,15 +640,14 @@ commands::command* anomalydetection::get_check_command_ptr() const {
  * and the upper bound
  */
 std::tuple<service::service_state, double, std::string, double, double>
-anomalydetection::parse_perfdata(std::string const& perfdata) {
+anomalydetection::parse_perfdata(std::string const& perfdata,
+                                 time_t check_time) {
   size_t pos = perfdata.find_last_of("=");
   /* If the perfdata is wrong. */
   if (pos == std::string::npos) {
     logger(log_runtime_error, basic)
-      << "Error: Unable to parse perfdata '" << perfdata << "'";
+        << "Error: Unable to parse perfdata '" << perfdata << "'";
     return std::make_tuple(service::state_unknown, NAN, "", NAN, NAN);
-//    return std::tuple<service::service_state, double, double, double>(
-//        service::state_unknown, NAN, NAN, NAN);
   }
 
   /* If the perfdata is good. */
@@ -649,13 +658,13 @@ anomalydetection::parse_perfdata(std::string const& perfdata) {
   char const* end = perfdata.c_str() + perfdata.size() - 1;
   size_t l = 0;
   /* If there is a unit, it starts at unit char* */
-  while (unit + l != end && unit[l] != ' ' && unit[l] != ';')
+  while (unit + l <= end && unit[l] != ' ' && unit[l] != ';')
     ++l;
-  std::string uom = std::string(unit, l - 1);
+  std::string uom = std::string(unit, l);
 
   service::service_state status;
 
-  time_t check_time = get_last_check();
+
   /* The check time is probably between two timestamps stored in _thresholds.
    *
    *   |                    d2 +
@@ -673,8 +682,16 @@ anomalydetection::parse_perfdata(std::string const& perfdata) {
    * The linear approximation gives the formula:
    *                       dc = (d2-d1) * (tc-t1) / (t2-t1) + d1
    */
-  auto it2 = _thresholds.lower_bound(check_time);
-  auto it1 = it2++;
+  auto it2 = _thresholds.upper_bound(check_time);
+  auto it1 = it2;
+  if (it1 != _thresholds.begin())
+    --it1;
+  else {
+    logger(log_runtime_error, basic)
+        << "Error: timestamp " << check_time
+        << " too old compared with the thresholds file";
+    return std::make_tuple(service::state_unknown, NAN, "", NAN, NAN);
+  }
 
   /* Now it1.first <= check_time < it2.first */
   double upper = (it2->second.second - it1->second.second) *
@@ -687,7 +704,9 @@ anomalydetection::parse_perfdata(std::string const& perfdata) {
   if (!_status_change)
     status = service::state_ok;
   else {
-    if (value >= lower && value <= upper)
+    if (std::isnan(value))
+      status = service::state_unknown;
+    else if (value >= lower && value <= upper)
       status = service::state_ok;
     else
       status = service::state_critical;
@@ -698,16 +717,15 @@ anomalydetection::parse_perfdata(std::string const& perfdata) {
 
 void anomalydetection::init_thresholds() {
   logger(log_info_message, basic)
-    << "Reading thresholds file '" << _thresholds_file << "'...";
+      << "Reading thresholds file '" << _thresholds_file << "'...";
   std::ifstream t(_thresholds_file);
   std::stringstream buffer;
   buffer << t.rdbuf();
   std::string err;
   auto json = json11::Json::parse(buffer.str(), err);
   if (!err.empty()) {
-    logger(log_config_error, basic)
-        << "Error: the file '" << _thresholds_file
-        << "' contains errors: " << err;
+    logger(log_config_error, basic) << "Error: the file '" << _thresholds_file
+                                    << "' contains errors: " << err;
     return;
   }
   if (!json.is_array()) {
@@ -733,7 +751,8 @@ void anomalydetection::init_thresholds() {
         double upper = i["upper"].number_value();
         double lower = i["lower"].number_value();
         _thresholds.emplace_hint(
-            _thresholds.end(), std::make_pair(timestamp, std::make_pair(lower, upper)));
+            _thresholds.end(),
+            std::make_pair(timestamp, std::make_pair(lower, upper)));
         count++;
       }
       break;
