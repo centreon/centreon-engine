@@ -1246,6 +1246,9 @@ void applier::state::_processing(configuration::state& new_cfg,
     _resolve<configuration::servicegroup, applier::servicegroup>(
         config->servicegroups());
 
+    // Resolve anomalydetections
+    _resolve<configuration::anomalydetection, applier::anomalydetection>(config->anomalydetections());
+
     // Apply host dependencies.
     _apply<configuration::hostdependency, applier::hostdependency>(
         diff_hostdependencies);

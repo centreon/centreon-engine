@@ -117,7 +117,9 @@ using namespace com::centreon::engine::logging;
  *
  *  @return New service.
  */
-anomalydetection::anomalydetection(std::string const& hostname,
+anomalydetection::anomalydetection(uint64_t host_id,
+                                   uint64_t service_id,
+                                   std::string const& hostname,
                                    std::string const& description,
                                    std::string const& display_name,
                                    service* dependent_service,
@@ -151,42 +153,29 @@ anomalydetection::anomalydetection(std::string const& hostname,
                                    int freshness_threshold,
                                    bool obsess_over,
                                    std::string const& timezone)
-    : service{hostname,
-              description,
-              display_name,
-              "",
-              checks_enabled,
-              accept_passive_checks,
-              initial_state,
-              check_interval,
-              retry_interval,
-              notification_interval,
-              max_attempts,
-              first_notification_delay,
-              recovery_notification_delay,
-              notification_period,
-              notifications_enabled,
-              is_volatile,
-              check_period,
-              event_handler,
-              event_handler_enabled,
-              notes,
-              notes_url,
-              action_url,
-              icon_image,
-              icon_image_alt,
-              flap_detection_enabled,
-              low_flap_threshold,
-              high_flap_threshold,
-              check_freshness,
-              freshness_threshold,
-              obsess_over,
+    : service{hostname,                    description,
+              display_name,                "",
+              checks_enabled,              accept_passive_checks,
+              initial_state,               check_interval,
+              retry_interval,              notification_interval,
+              max_attempts,                first_notification_delay,
+              recovery_notification_delay, notification_period,
+              notifications_enabled,       is_volatile,
+              check_period,                event_handler,
+              event_handler_enabled,       notes,
+              notes_url,                   action_url,
+              icon_image,                  icon_image_alt,
+              flap_detection_enabled,      low_flap_threshold,
+              high_flap_threshold,         check_freshness,
+              freshness_threshold,         obsess_over,
               timezone},
       _dependent_service{dependent_service},
       _metric_name{metric_name},
       _thresholds_file{thresholds_file},
       _status_change{status_change},
       _thresholds_file_viable{false} {
+  set_host_id(host_id);
+  set_service_id(service_id);
   init_thresholds();
 }
 
@@ -388,16 +377,42 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
 
   // Allocate memory.
   std::shared_ptr<anomalydetection> obj{std::make_shared<anomalydetection>(
-      host_name, description, display_name.empty() ? description : display_name,
-      dependent_service, metric_name, thresholds_file, status_change,
-      checks_enabled, accept_passive_checks, initial_state, check_interval,
-      retry_interval, notification_interval, max_attempts,
-      first_notification_delay, recovery_notification_delay,
-      notification_period, notifications_enabled, is_volatile, check_period,
-      event_handler, event_handler_enabled, notes, notes_url, action_url,
-      icon_image, icon_image_alt, flap_detection_enabled, low_flap_threshold,
-      high_flap_threshold, check_freshness, freshness_threshold,
-      obsess_over_service, timezone)};
+      host_id,
+      service_id,
+      host_name,
+      description,
+      display_name.empty() ? description : display_name,
+      dependent_service,
+      metric_name,
+      thresholds_file,
+      status_change,
+      checks_enabled,
+      accept_passive_checks,
+      initial_state,
+      check_interval,
+      retry_interval,
+      notification_interval,
+      max_attempts,
+      first_notification_delay,
+      recovery_notification_delay,
+      notification_period,
+      notifications_enabled,
+      is_volatile,
+      check_period,
+      event_handler,
+      event_handler_enabled,
+      notes,
+      notes_url,
+      action_url,
+      icon_image,
+      icon_image_alt,
+      flap_detection_enabled,
+      low_flap_threshold,
+      high_flap_threshold,
+      check_freshness,
+      freshness_threshold,
+      obsess_over_service,
+      timezone)};
   try {
     obj->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
     obj->set_check_options(CHECK_OPTION_NONE);
@@ -543,6 +558,8 @@ int anomalydetection::run_async_check(int check_options,
 
   // Update the number of running service checks.
   ++currently_running_service_checks;
+  logger(dbg_checks, basic) << "Current running service checks: "
+                            << currently_running_service_checks;
 
   // Set the execution flag.
   set_is_executing(true);
@@ -621,7 +638,9 @@ int anomalydetection::run_async_check(int check_options,
   clear_volatile_macros_r(&macros);
 
   // Update the number of running service checks.
-  --currently_running_service_checks;
+  //--currently_running_service_checks;
+  //logger(dbg_checks, basic) << "Current running service checks: "
+  //                          << currently_running_service_checks;
 
   return OK;
 }
@@ -716,7 +735,7 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 }
 
 void anomalydetection::init_thresholds() {
-  logger(log_info_message, basic)
+  logger(log_info_message, most)
       << "Reading thresholds file '" << _thresholds_file << "'...";
   std::ifstream t(_thresholds_file);
   std::stringstream buffer;
@@ -758,8 +777,14 @@ void anomalydetection::init_thresholds() {
       break;
     }
   }
-  if (count > 1)
+  if (count > 1) {
+    logger(log_info_message, most)
+        << "Number of rows in memory: " << count;
     _thresholds_file_viable = true;
+  }
+  else
+    logger(log_info_message, most)
+        << "Nothing in memory";
 }
 
 bool anomalydetection::verify_check_viability(int check_options,

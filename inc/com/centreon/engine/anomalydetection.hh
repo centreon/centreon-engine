@@ -35,7 +35,9 @@ class anomalydetection : public service {
   std::map<time_t, std::pair<double, double>> _thresholds;
 
  public:
-  anomalydetection(std::string const& hostname,
+  anomalydetection(uint64_t host_id,
+                   uint64_t service_id,
+                   std::string const& hostname,
                    std::string const& description,
                    std::string const& display_name,
                    service* dependent_service,
@@ -73,12 +75,12 @@ class anomalydetection : public service {
   void set_dependent_service(service* svc);
   void set_metric_name(std::string const& name);
   void set_thresholds_file(std::string const& file);
-  int run_async_check(int check_options,
-                      double latency,
-                      bool scheduled_check,
-                      bool reschedule_check,
-                      bool* time_is_valid,
-                      time_t* preferred_time) noexcept;
+  virtual int run_async_check(int check_options,
+                              double latency,
+                              bool scheduled_check,
+                              bool reschedule_check,
+                              bool* time_is_valid,
+                              time_t* preferred_time) noexcept override;
   commands::command* get_check_command_ptr() const;
   std::tuple<service::service_state, double, std::string, double, double>
   parse_perfdata(std::string const& perfdata, time_t check_time);

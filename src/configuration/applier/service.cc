@@ -607,8 +607,6 @@ void applier::service::_expand_service_memberships(configuration::service& obj,
     // Reinsert service group.
     s.servicegroups().insert(backup);
   }
-
-  return;
 }
 
 /**

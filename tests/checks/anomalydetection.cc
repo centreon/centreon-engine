@@ -425,4 +425,3 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_ad->get_current_attempt(), 1);
   ::unlink("/tmp/thresholds_status_change.json");
 }
-

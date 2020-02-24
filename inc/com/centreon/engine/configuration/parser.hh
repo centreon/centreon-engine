@@ -21,6 +21,7 @@
 #define CCE_CONFIGURATION_PARSER_HH
 
 #include <fstream>
+#include <array>
 #include <string>
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
@@ -105,12 +106,12 @@ class parser {
   state* _config;
   unsigned int _current_line;
   std::string _current_path;
-  list_object _lst_objects[15];
-  map_object _map_objects[15];
+  std::array<list_object, 16> _lst_objects;
+  std::array<map_object, 16> _map_objects;
   std::unordered_map<object*, file_info> _objects_info;
   unsigned int _read_options;
   static store _store[];
-  map_object _templates[15];
+  std::array<map_object, 16> _templates;
 };
 }  // namespace configuration
 

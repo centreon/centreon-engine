@@ -144,12 +144,12 @@ class service : public notifier {
   int obsessive_compulsive_service_check_processor();
   int update_service_performance_data();
   int run_scheduled_check(int check_options, double latency);
-  int run_async_check(int check_options,
-                      double latency,
-                      bool scheduled_check,
-                      bool reschedule_check,
-                      bool* time_is_valid,
-                      time_t* preferred_time) noexcept;
+  virtual int run_async_check(int check_options,
+                              double latency,
+                              bool scheduled_check,
+                              bool reschedule_check,
+                              bool* time_is_valid,
+                              time_t* preferred_time) noexcept;
   void schedule_check(time_t check_time, int options);
   void set_flap(double percent_change,
                 double high_threshold,
