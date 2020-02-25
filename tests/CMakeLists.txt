@@ -36,7 +36,7 @@ if (WITH_TESTING)
   else ()
   ExternalProject_Add( googletest
                        GIT_REPOSITORY https://github.com/google/googletest/
-                       GIT_TAG 9ed99c6c837ae1cbfcabd36959fc802ebb5ae07f
+                       GIT_TAG release-1.10.0
                        TIMEOUT 10
                        INSTALL_COMMAND ""
                        LOG_DOWNLOAD ON
