@@ -36,6 +36,7 @@ if (WITH_TESTING)
   else ()
   ExternalProject_Add( googletest
                        GIT_REPOSITORY https://github.com/google/googletest/
+                       GIT_TAG release-1.10.0
                        TIMEOUT 10
                        INSTALL_COMMAND ""
                        LOG_DOWNLOAD ON
@@ -78,6 +79,8 @@ if (WITH_TESTING)
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/internal.cc"
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/processing.cc"
     "${TESTS_DIR}/parse-check-output.cc"
+    "${TESTS_DIR}/checks/service_check.cc"
+    "${TESTS_DIR}/checks/service_retention.cc"
     "${TESTS_DIR}/commands/simple-command.cc"
     "${TESTS_DIR}/commands/connector.cc"
     "${TESTS_DIR}/configuration/applier/applier-command.cc"

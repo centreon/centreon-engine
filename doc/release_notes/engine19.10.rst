@@ -6,6 +6,17 @@ Centreon Engine 19.10.12
 Bug fixes
 *********
 
+Service checks
+==============
+
+Multiline service check outputs were badly parsed and this lead to corruptions
+of status.dat/retention.dat files.
+
+Downtimes removal
+=================
+
+One downtime could be removed during the removal of an other downtime.
+
 XXX_SERVICEGROUP_XXX external commands
 ======================================
 

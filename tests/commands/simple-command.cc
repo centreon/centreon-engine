@@ -31,6 +31,7 @@ using namespace com::centreon::engine::commands;
 class SimpleCommand : public ::testing::Test {
  public:
   void SetUp() override {
+    set_time(-1);
     init_config_state();
   }
 
