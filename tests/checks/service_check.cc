@@ -30,6 +30,7 @@
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
+#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
@@ -142,7 +143,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   std::string cmd{oss.str()};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -156,7 +157,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -170,7 +171,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -184,7 +185,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -199,7 +200,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -214,7 +215,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -229,7 +230,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -244,7 +245,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -260,7 +261,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -275,7 +276,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -302,7 +303,7 @@ TEST_F(ServiceCheck, OkCritical) {
   time_t now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   std::string cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -316,7 +317,7 @@ TEST_F(ServiceCheck, OkCritical) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -331,7 +332,7 @@ TEST_F(ServiceCheck, OkCritical) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -345,7 +346,7 @@ TEST_F(ServiceCheck, OkCritical) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -381,7 +382,7 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   std::string cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -396,7 +397,7 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -410,7 +411,7 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
