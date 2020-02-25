@@ -1339,7 +1339,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   std::string long_plugin_output;
   std::string perf_data;
   parse_check_output(output, plugin_output, long_plugin_output, perf_data, true,
-                     true);
+                     false);
   set_plugin_output(plugin_output);
   set_long_plugin_output(long_plugin_output);
   set_perf_data(perf_data);
