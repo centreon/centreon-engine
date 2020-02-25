@@ -1196,7 +1196,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
     lpl_output,
     perfdata_output,
     true,
-    true);
+    false);
 
   hst->set_plugin_output(pl_output);
   hst->set_long_plugin_output(lpl_output);
