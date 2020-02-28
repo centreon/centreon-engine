@@ -27,7 +27,7 @@ include_directories("${MODULE_DIR}/inc")
 
 # mod_externalcmd target.
 add_library(
-  "externalcmd"
+  externalcmd
   SHARED
 
   # Sources.
@@ -52,7 +52,8 @@ get_property(
   PROPERTY LOCATION)
 set(EXTERNALCMD_MODULE "${EXTERNALCMD_MODULE}" PARENT_SCOPE)
 # Link target with libraries.
-target_link_libraries("externalcmd" "${CLIB_LIBRARIES}")
+target_link_libraries(externalcmd "${CLIB_LIBRARIES}")
+add_dependencies(externalcmd json11_lib)
 
 # Install rule.
 install(TARGETS "externalcmd"

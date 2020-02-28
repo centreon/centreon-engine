@@ -645,6 +645,7 @@ target_link_libraries(centengine cce_core ${CLIB_LIBRARIES} ${ENGINERPC} ${proto
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
 target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
+add_dependencies(centenginestats json11_lib)
 get_property(CENTENGINESTATS_BINARY TARGET "centenginestats" PROPERTY LOCATION)
 
 # Unit tests.
