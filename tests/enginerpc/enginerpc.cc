@@ -84,10 +84,10 @@ class EngineRpc : public TestEngine {
     service_map const& sm{engine::service::services};
     for (auto& p : sm) {
       std::shared_ptr<engine::service> svc = p.second;
-      if (svc->get_service_id() == 8)
-        _svc = svc;
-      else
+      if (svc->get_service_id() == 12)
         _ad = std::static_pointer_cast<engine::anomalydetection>(svc);
+      else
+        _svc = svc;
     }
   }
 

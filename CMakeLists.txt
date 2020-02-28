@@ -560,7 +560,6 @@ set(
   "${INC_DIR}/com/centreon/engine/dependency.hh"
   "${INC_DIR}/com/centreon/engine/diagnostic.hh"
   "${INC_DIR}/com/centreon/engine/exceptions/error.hh"
-  "${INC_DIR}/com/centreon/engine/exceptions/ad_exception.hh"
   "${INC_DIR}/com/centreon/engine/escalation.hh"
   "${INC_DIR}/com/centreon/engine/flapping.hh"
   "${INC_DIR}/com/centreon/engine/globals.hh"

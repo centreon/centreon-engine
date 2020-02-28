@@ -477,6 +477,7 @@ void anomalydetection::set_metric_name(std::string const& name) {
 }
 
 void anomalydetection::set_thresholds_file(std::string const& file) {
+  std::lock_guard<std::mutex> lock(_thresholds_m);
   _thresholds_file = file;
 }
 
