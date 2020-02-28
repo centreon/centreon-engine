@@ -21,13 +21,14 @@
 #include <cassert>
 #include <cstdlib>
 #include <map>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/io/file_stream.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::exceptions;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
@@ -49,7 +50,7 @@ std::shared_ptr<broker::handle> loader::add_module(std::string const& filename,
                                                    std::string const& args) {
   std::shared_ptr<handle> module(new handle(filename, args));
   _modules.push_back(module);
-  return (module);
+  return module;
 }
 
 /**
@@ -65,7 +66,6 @@ void loader::del_module(std::shared_ptr<handle> const& module) {
       _modules.erase(it);
       break;
     }
-  return;
 }
 
 /**
@@ -74,7 +74,7 @@ void loader::del_module(std::shared_ptr<handle> const& module) {
  *  @return All modules in a list.
  */
 std::list<std::shared_ptr<broker::handle> > const& loader::get_modules() const {
-  return (_modules);
+  return _modules;
 }
 
 /**
@@ -130,7 +130,7 @@ unsigned int loader::load_directory(std::string const& dir) {
                                        << f.file_name() << "' -> " << e.what();
     }
   }
-  return (loaded);
+  return loaded;
 }
 
 /**
@@ -164,7 +164,7 @@ loader::loader() {}
 /**
  *  Default destructor.
  */
-loader::~loader() throw() {
+loader::~loader() noexcept {
   try {
     unload_modules();
   } catch (...) {

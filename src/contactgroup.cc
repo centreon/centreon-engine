@@ -24,7 +24,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
@@ -56,7 +56,7 @@ contactgroup::contactgroup(configuration::contactgroup const& obj)
       _name(obj.contactgroup_name()) {
   // Make sure we have the data we need.
   if (_name.empty())
-    throw(engine_error() << "contactgroup: Contact group name is empty");
+    throw engine_error() << "contactgroup: Contact group name is empty";
 
   // Notify event broker.
   timeval tv(get_broker_timestamp(NULL));
@@ -80,37 +80,24 @@ contactgroup& contactgroup::operator=(contactgroup const& other) {
 /**
  * Destructor.
  */
-contactgroup::~contactgroup() {
-  _members.clear();
-}
+contactgroup::~contactgroup() { _members.clear(); }
 
-std::string const& contactgroup::get_name() const {
-  return _name;
-}
+std::string const& contactgroup::get_name() const { return _name; }
 
-void contactgroup::clear_members() {
-  _members.clear();
-}
+void contactgroup::clear_members() { _members.clear(); }
 
-contact_map_unsafe& contactgroup::get_members() {
-  return _members;
-}
+contact_map_unsafe& contactgroup::get_members() { return _members; }
 
-contact_map_unsafe const& contactgroup::get_members() const {
-  return _members;
-}
+contact_map_unsafe const& contactgroup::get_members() const { return _members; }
 
-std::string const& contactgroup::get_alias() const {
-  return _alias;
-}
+std::string const& contactgroup::get_alias() const { return _alias; }
 
-void contactgroup::set_alias(std::string const& alias) {
-  _alias = alias;
-}
+void contactgroup::set_alias(std::string const& alias) { _alias = alias; }
 
 std::ostream& operator<<(std::ostream& os, contactgroup_map_unsafe const& obj) {
   for (contactgroup_map_unsafe::const_iterator it{obj.begin()}, end{obj.end()};
-       it != end; ++it) {
+       it != end;
+       ++it) {
     os << it->first;
     if (next(it) != end)
       os << ", ";
@@ -124,7 +111,8 @@ void contactgroup::resolve(int& w __attribute__((unused)), int& e) {
   int errors{0};
 
   for (contact_map_unsafe::iterator it{_members.begin()}, end{_members.end()};
-       it != end; ++it) {
+       it != end;
+       ++it) {
     /* Check members */
     if (!it->second) {
       logger(log_verification_error, basic)

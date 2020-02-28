@@ -25,7 +25,7 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/timedevent.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/globals.hh"

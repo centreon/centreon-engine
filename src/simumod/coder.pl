@@ -103,7 +103,7 @@ print qq(/*
 #include <fstream>
 #include <iostream>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 #include "com/centreon/engine/nebmodules.hh"
@@ -115,15 +115,15 @@ using namespace com::centreon::engine::logging;
 std::ostream* fp(NULL);
 std::ofstream foutput;
 
-static std::string timeval_str(timeval const& t) {
-  struct tm* nowtm;
-  time_t nowtime = t.tv_sec;
-  char tmbuf[64], buf[64];
-  nowtm = localtime(&nowtime);
-  strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-  snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, t.tv_usec);
-  return std::string(buf);
-}
+//static std::string timeval_str(timeval const& t) {
+//  struct tm* nowtm;
+//  time_t nowtime = t.tv_sec;
+//  char tmbuf[64], buf[64];
+//  nowtm = localtime(&nowtime);
+//  strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
+//  snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, t.tv_usec);
+//  return std::string(buf);
+//}
 
 /**************************************
 *                                     *

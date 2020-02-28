@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostextinfo.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"

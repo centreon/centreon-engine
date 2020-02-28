@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 
 using namespace com::centreon::engine;
 

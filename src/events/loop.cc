@@ -128,7 +128,7 @@ static void apply_conf(std::atomic<bool>* reloading) {
  */
 void loop::_dispatching() {
   std::atomic<bool> reloading{false};
-  while (true) {
+  for (;;) {
     // See if we should exit or restart (a signal was encountered).
     if (sigshutdown)
       break;

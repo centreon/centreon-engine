@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/escalation.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/timeperiod.hh"
 

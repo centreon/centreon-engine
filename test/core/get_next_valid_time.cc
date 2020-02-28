@@ -25,7 +25,7 @@
 #include <iostream>
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"

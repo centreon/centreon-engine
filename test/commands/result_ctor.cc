@@ -21,7 +21,7 @@
 #include <ctime>
 #include <exception>
 #include "com/centreon/engine/commands/result.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/process.hh"
 #include "test/unittest.hh"
 

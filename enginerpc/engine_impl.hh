@@ -18,6 +18,9 @@ class engine_impl final : public Engine::Service {
   grpc::Status ProcessHostCheckResult(grpc::ServerContext* context,
                                       const Check* request,
                                       CommandSuccess* response) override;
+  grpc::Status NewThresholdsFile(grpc::ServerContext* context,
+                                 const ThresholdsFile* request,
+                                 CommandSuccess* response) override;
 };
 
 CCE_END()

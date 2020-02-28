@@ -23,7 +23,7 @@
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon;

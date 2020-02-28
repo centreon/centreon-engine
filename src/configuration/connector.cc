@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;

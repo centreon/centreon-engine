@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/checkable.hh"
 #include <sstream>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;

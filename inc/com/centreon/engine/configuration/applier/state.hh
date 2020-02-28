@@ -21,8 +21,8 @@
 #define CCE_CONFIGURATION_APPLIER_STATE_HH
 
 #include <memory>
-#include <mutex>
 #include <string>
+#include <mutex>
 #include <utility>
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/state.hh"

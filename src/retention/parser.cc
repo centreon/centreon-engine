@@ -21,7 +21,7 @@
 #include <array>
 #include <fstream>
 #include <string>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
 

@@ -18,7 +18,7 @@
 */
 
 #include <sstream>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/objects.hh"
 #include "test/unittest.hh"
 

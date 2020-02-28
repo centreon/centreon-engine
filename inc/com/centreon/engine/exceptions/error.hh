@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_ERROR_HH
-#define CCE_ERROR_HH
+#ifndef CCE_EXCEPTIONS_ERROR_HH
+#define CCE_EXCEPTIONS_ERROR_HH
 
 #include <exception>
 #include <string>
@@ -26,6 +26,7 @@
 
 CCE_BEGIN()
 
+namespace exceptions {
 /**
  *  @class error error.hh
  *  @brief Base exception class.
@@ -35,39 +36,40 @@ CCE_BEGIN()
  *  or not.
  */
 class error : public std::exception {
- public:
-  error() throw();
-  error(char const* file, char const* function, int line) throw();
-  error(error const& e) throw();
-  ~error() throw() override;
-  error& operator=(error const& e) throw();
-  error& operator<<(char c) throw();
-  error& operator<<(char const* str) throw();
-  error& operator<<(int i) throw();
-  error& operator<<(unsigned long u) throw();
-  error& operator<<(unsigned int u) throw();
-  error& operator<<(long l) throw();
-  error& operator<<(long long ll) throw();
-  error& operator<<(unsigned long long ull) throw();
-  error& operator<<(double d) throw();
-  error& operator<<(std::string const& str) throw();
-  char const* what() const throw() override;
-
- private:
   template <typename T>
   void _insert_with_snprintf(T& t, char const* format);
 
   mutable char _buffer[4096];
-  unsigned int _current;
+  uint32_t _current;
+
+ public:
+  error() noexcept;
+  error(char const* file, char const* function, int line) noexcept;
+  error(error const& e) noexcept;
+  ~error() throw() override;
+  error& operator=(error const& e) noexcept;
+  error& operator<<(char c) noexcept;
+  error& operator<<(char const* str) noexcept;
+  error& operator<<(int i) noexcept;
+  error& operator<<(unsigned long u) noexcept;
+  error& operator<<(unsigned int u) noexcept;
+  error& operator<<(long l) noexcept;
+  error& operator<<(long long ll) noexcept;
+  error& operator<<(unsigned long long ull) noexcept;
+  error& operator<<(double d) noexcept;
+  error& operator<<(std::string const& str) noexcept;
+  char const* what() const throw() override;
 };
+
+}
 
 CCE_END()
 
 #ifdef NDEBUG
-#define engine_error() com::centreon::engine::error()
+#define engine_error() com::centreon::engine::exceptions::error()
 #else
 #define engine_error() \
-  com::centreon::engine::error(__FILE__, __func__, __LINE__)
+  com::centreon::engine::exceptions::error(__FILE__, __func__, __LINE__)
 #endif  // !NDEBUG
 
-#endif  // !CCE_ERROR_HH
+#endif  // !CCE_EXCEPTIONS_ERROR_HH

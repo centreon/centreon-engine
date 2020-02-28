@@ -21,7 +21,7 @@
 #include <cstdio>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/configuration/timerange.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon;

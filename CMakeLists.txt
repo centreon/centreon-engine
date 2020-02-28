@@ -32,6 +32,8 @@ if (WITH_ASAN)
   set(CMAKE_BUILD_TYPE Debug)
   set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
   set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+  message(STATUS "cmake cxx flags debug => ${CMAKE_CXX_FLAGS_DEBUG}")
+  message(STATUS "cmake lnk flags debug => ${CMAKE_LINKER_FLAGS_DEBUG}")
 endif ()
 
 add_definitions("-D_GLIBCXX_USE_CXX11_ABI=0")
@@ -512,7 +514,7 @@ set(
   "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/dependency.cc"
   "${SRC_DIR}/diagnostic.cc"
-  "${SRC_DIR}/error.cc"
+  "${SRC_DIR}/exceptions/error.cc"
   "${SRC_DIR}/flapping.cc"
   "${SRC_DIR}/escalation.cc"
   "${SRC_DIR}/globals.cc"
@@ -557,7 +559,8 @@ set(
   "${INC_DIR}/com/centreon/engine/daterange.hh"
   "${INC_DIR}/com/centreon/engine/dependency.hh"
   "${INC_DIR}/com/centreon/engine/diagnostic.hh"
-  "${INC_DIR}/com/centreon/engine/error.hh"
+  "${INC_DIR}/com/centreon/engine/exceptions/error.hh"
+  "${INC_DIR}/com/centreon/engine/exceptions/ad_exception.hh"
   "${INC_DIR}/com/centreon/engine/escalation.hh"
   "${INC_DIR}/com/centreon/engine/flapping.hh"
   "${INC_DIR}/com/centreon/engine/globals.hh"

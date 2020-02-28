@@ -24,7 +24,7 @@
 #include <ctime>
 #include <fstream>
 #include <map>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/unittest.hh"

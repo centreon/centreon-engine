@@ -21,6 +21,8 @@
 #define CCE_ANOMALYDETECTION_HH
 
 #include <map>
+#include <json11.hpp>
+#include <mutex>
 #include <tuple>
 #include "com/centreon/engine/service.hh"
 
@@ -30,9 +32,10 @@ class anomalydetection : public service {
   service* _dependent_service;
   std::string _metric_name;
   std::string _thresholds_file;
-  bool _thresholds_file_viable;
   bool _status_change;
-  std::map<time_t, std::pair<double, double>> _thresholds;
+  bool _thresholds_file_viable;
+  std::map<time_t, std::pair<double, double> > _thresholds;
+  std::mutex _thresholds_m;
 
  public:
   anomalydetection(uint64_t host_id,
@@ -75,6 +78,10 @@ class anomalydetection : public service {
   void set_dependent_service(service* svc);
   void set_metric_name(std::string const& name);
   void set_thresholds_file(std::string const& file);
+  void set_thresholds(
+      const std::string& filename,
+      std::map<time_t, std::pair<double, double> >&& thresholds) noexcept;
+  static int update_thresholds(const std::string& filename);
   virtual int run_async_check(int check_options,
                               double latency,
                               bool scheduled_check,
@@ -83,12 +90,14 @@ class anomalydetection : public service {
                               time_t* preferred_time) noexcept override;
   commands::command* get_check_command_ptr() const;
   std::tuple<service::service_state, double, std::string, double, double>
-  parse_perfdata(std::string const& perfdata, time_t check_time);
+      parse_perfdata(std::string const& perfdata, time_t check_time);
   void init_thresholds();
   bool verify_check_viability(int check_options,
                               bool* time_is_valid,
                               time_t* new_time);
   void set_status_change(bool status_change);
+  const std::string& get_metric_name() const;
+  const std::string& get_thresholds_file() const;
 };
 CCE_END()
 

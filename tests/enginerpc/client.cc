@@ -76,6 +76,17 @@ class EngineRPCClient {
     }
     return true;
   }
+
+  bool NewThresholdsFile(const ThresholdsFile& tf) {
+    grpc::ClientContext context;
+    CommandSuccess response;
+    grpc::Status status = _stub->NewThresholdsFile(&context, tf, &response);
+    if (!status.ok()) {
+      std::cout << "NewThresholdsFile failed." << std::endl;
+      return false;
+    }
+    return true;
+  }
 };
 
 int main(int argc, char** argv) {
@@ -115,6 +126,12 @@ int main(int argc, char** argv) {
     hc.set_output("Test external command");
     status = client.ProcessHostCheckResult(hc) ? 0 : 4;
     std::cout << "ProcessHostCheckResult: " << status << std::endl;
+  }
+  else if (strcmp(argv[1], "NewThresholdsFile") == 0) {
+    ThresholdsFile tf;
+    tf.set_filename(argv[2]);
+    status = client.NewThresholdsFile(tf) ? 0 : 5;
+    std::cout << "NewThresholdsFile: " << status << std::endl;
   }
   exit(status);
 }

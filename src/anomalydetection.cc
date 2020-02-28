@@ -19,7 +19,6 @@
 
 #include <cmath>
 #include <cstring>
-#include <json11.hpp>
 #include <limits>
 #include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/broker.hh"
@@ -661,6 +660,7 @@ commands::command* anomalydetection::get_check_command_ptr() const {
 std::tuple<service::service_state, double, std::string, double, double>
 anomalydetection::parse_perfdata(std::string const& perfdata,
                                  time_t check_time) {
+  std::lock_guard<std::mutex> lock(_thresholds_m);
   size_t pos = perfdata.find_last_of("=");
   /* If the perfdata is wrong. */
   if (pos == std::string::npos) {
@@ -735,6 +735,8 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 }
 
 void anomalydetection::init_thresholds() {
+  std::lock_guard<std::mutex> lock(_thresholds_m);
+
   logger(log_info_message, most)
       << "Reading thresholds file '" << _thresholds_file << "'...";
   std::ifstream t(_thresholds_file);
@@ -787,6 +789,91 @@ void anomalydetection::init_thresholds() {
         << "Nothing in memory";
 }
 
+/**
+ * @brief Update all the anomaly detection services concerned by one thresholds
+ *        file. The file has already been parsed and is translated into json.
+ *
+ * @param filename The fullname of the file to parse.
+ */
+int anomalydetection::update_thresholds(const std::string& filename) {
+  logger(log_info_message, most)
+      << "Reading thresholds file '" << filename << "'.";
+  std::ifstream t(filename);
+  if (!t) {
+    logger(log_config_error, basic)
+      << "Error: Unable to read the thresholds file '" << filename << "'.";
+    return -1;
+  }
+
+  std::stringstream buffer;
+  buffer << t.rdbuf();
+  std::string err;
+  auto json = json11::Json::parse(buffer.str(), err);
+  if (!err.empty()) {
+    logger(log_config_error, basic) << "Error: The thresholds file '"
+                                    << filename << "' should be a json file.";
+    return -2;
+  }
+
+  if (!json.is_array()) {
+    logger(log_config_error, basic)
+        << "Error: the file '" << filename
+        << "' is not a thresholds file. Its global structure is not an array.";
+    return -3;
+  }
+
+  for (auto& item : json.array_items()) {
+    uint64_t host_id = item["host_id"].int_value();
+    uint64_t svc_id = item["service_id"].int_value();
+    auto found = service::services_by_id.find({host_id, svc_id});
+    if (found == service::services_by_id.end()) {
+      logger(log_config_error, basic)
+          << "Error: The thresholds file contains thresholds for the anomaly "
+             "detection service (host_id: " << host_id
+          << ", service_id: " << svc_id
+          << ") that does not exist";
+      continue;
+    }
+    std::shared_ptr<anomalydetection> ad =
+        std::static_pointer_cast<anomalydetection>(found->second);
+    const std::string& metric_name(item["metric_name"].string_value());
+    if (ad->get_metric_name() != metric_name) {
+      logger(log_config_error, basic)
+          << "Error: The thresholds file contains thresholds for the anomaly "
+             "detection service (host_id: " << ad->get_host_id()
+          << ", service_id: " << ad->get_service_id() << ") with metric_name='"
+          << metric_name << "' whereas the configured metric name is '"
+          << ad->get_metric_name() << "'";
+      continue;
+    }
+    logger(log_info_message, basic)
+        << "Filling thresholds in anomaly detection (host_id: "
+        << ad->get_host_id() << ", service_id: " << ad->get_service_id()
+        << ", metric: " << ad->get_metric_name() << ")";
+
+    auto predict = item["predict"];
+    std::map<time_t, std::pair<double, double>> thresholds;
+    for (auto& i : predict.array_items()) {
+      time_t timestamp = static_cast<time_t>(i["timestamp"].number_value());
+      double upper = i["upper"].number_value();
+      double lower = i["lower"].number_value();
+      thresholds.emplace_hint(
+          thresholds.end(),
+          std::make_pair(timestamp, std::make_pair(lower, upper)));
+    }
+    ad->set_thresholds(filename, std::move(thresholds));
+  }
+  return 0;
+}
+
+void anomalydetection::set_thresholds(
+    const std::string& filename,
+    std::map<time_t, std::pair<double, double> >&& thresholds) noexcept {
+  std::lock_guard<std::mutex> _lock(_thresholds_m);
+  _thresholds_file = filename,
+  _thresholds = thresholds;
+}
+
 bool anomalydetection::verify_check_viability(int check_options,
                                               bool* time_is_valid,
                                               time_t* new_time) {
@@ -798,4 +885,12 @@ bool anomalydetection::verify_check_viability(int check_options,
 
 void anomalydetection::set_status_change(bool status_change) {
   _status_change = status_change;
+}
+
+const std::string& anomalydetection::get_metric_name() const {
+  return _metric_name;
+}
+
+const std::string& anomalydetection::get_thresholds_file() const {
+  return _thresholds_file;
 }

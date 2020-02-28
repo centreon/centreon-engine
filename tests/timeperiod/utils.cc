@@ -21,7 +21,7 @@
 #include <cstring>
 #include <ctime>
 #include <memory>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/timerange.hh"
 
 using namespace com::centreon::engine;

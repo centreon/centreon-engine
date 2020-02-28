@@ -28,7 +28,7 @@
 #include <vector>
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/file_stream.hh"
@@ -65,7 +65,7 @@ diagnostic::~diagnostic() {}
  */
 diagnostic& diagnostic::operator=(diagnostic const& right) {
   (void)right;
-  return (*this);
+  return *this;
 }
 
 /**
@@ -276,8 +276,6 @@ void diagnostic::generate(std::string const& cfg_file,
   rmdir(tmp_log_dir.c_str());
   rmdir(tmp_cfg_dir.c_str());
   rmdir(tmp_dir.c_str());
-
-  return;
 }
 
 /**
@@ -297,7 +295,7 @@ std::string diagnostic::_build_target_path(std::string const& base,
     target_path.append(file.substr(pos + 1));
   else
     target_path.append(file);
-  return (target_path);
+  return target_path;
 }
 
 /**
@@ -321,7 +319,6 @@ void diagnostic::_exec_and_write_to_file(std::string const& cmd,
     unsigned long wb(fs.write(result.data(), result.size()));
     result.erase(0, wb);
   }
-  return;
 }
 
 /**

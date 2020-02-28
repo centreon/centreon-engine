@@ -10,6 +10,8 @@ service Engine {
 
   rpc ProcessServiceCheckResult(Check) returns (CommandSuccess) {}
   rpc ProcessHostCheckResult(Check) returns (CommandSuccess) {}
+
+  rpc NewThresholdsFile(ThresholdsFile) returns (CommandSuccess) {}
 }
 
 message CommandSuccess {
@@ -50,4 +52,8 @@ message Stats {
   StatusFile status_file = 1;
   ProgramStatus program_status = 2;
   ExtCmdBuffer buffer = 3;
+}
+
+message ThresholdsFile {
+  string filename = 1;
 }

@@ -20,7 +20,7 @@
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmodules.hh"
 
