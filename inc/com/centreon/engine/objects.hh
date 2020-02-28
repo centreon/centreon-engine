@@ -20,6 +20,7 @@
 
 #ifndef CCE_OBJECTS_HH
 #define CCE_OBJECTS_HH
+#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/daterange.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"

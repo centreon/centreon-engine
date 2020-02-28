@@ -158,7 +158,7 @@ int process_external_commands_from_file(char const* file, int delete_file) {
 }
 
 /* external command processor */
-void process_external_command(char const* cmd) {
+void process_external_command(const char* cmd) {
   modules::external_commands::gl_processor.execute(cmd);
 }
 
@@ -3415,4 +3415,8 @@ void set_host_notification_number(host* hst, int num) {
 
 void set_service_notification_number(service* svc, int num) {
   svc->set_notification_number(num);
+}
+
+void new_thresholds_file(char* filename) {
+  anomalydetection::update_thresholds(filename);
 }
