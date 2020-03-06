@@ -53,14 +53,14 @@ class checker : public commands::command_listener {
            double latency = 0.0,
            bool scheduled_check = false,
            bool reschedule_check = false,
-           int* time_is_valid = NULL,
+           bool* time_is_valid = NULL,
            time_t* preferred_time = NULL);
   void run(service* svc,
            int check_options = CHECK_OPTION_NONE,
            double latency = 0.0,
            bool scheduled_check = false,
            bool reschedule_check = false,
-           int* time_is_valid = NULL,
+           bool* time_is_valid = NULL,
            time_t* preferred_time = NULL);
   void run_sync(host* hst,
                 host::host_state* check_result_code,

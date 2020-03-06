@@ -261,7 +261,7 @@ void checker::run(host* hst,
                   double latency,
                   bool scheduled_check,
                   bool reschedule_check,
-                  int* time_is_valid,
+                  bool* time_is_valid,
                   time_t* preferred_time) {
   logger(dbg_functions, basic)
       << "checker::run: hst=" << hst << ", check_options=" << check_options
@@ -453,7 +453,7 @@ void checker::run(service* svc,
                   double latency,
                   bool scheduled_check,
                   bool reschedule_check,
-                  int* time_is_valid,
+                  bool* time_is_valid,
                   time_t* preferred_time) {
   logger(dbg_functions, basic)
       << "checker::run: svc=" << svc << ", check_options=" << check_options

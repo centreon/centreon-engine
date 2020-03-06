@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2019 Centreon
+** Copyright 2011-2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,10 +18,13 @@
 */
 
 #include "com/centreon/engine/configuration/applier/state.hh"
+
 #include <unistd.h>
+
 #include <array>
 #include <cassert>
 #include <unordered_map>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/config.hh"
@@ -165,8 +168,7 @@ void applier::state::clear() {
 /**
  *  Default constructor.
  */
-applier::state::state() : _config(nullptr), _processing_state(state_ready) {
-}
+applier::state::state() : _config(nullptr), _processing_state(state_ready) {}
 
 /**
  *  Destructor.

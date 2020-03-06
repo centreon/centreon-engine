@@ -685,7 +685,7 @@ com::centreon::engine::service* add_service(
     return nullptr;
   }
 
-  host_id = get_host_id(host_name);
+  uint64_t hid = get_host_id(host_name);
   if (!host_id) {
     logger(log_config_error, basic)
         << "Error: The service '" << description
@@ -693,10 +693,17 @@ com::centreon::engine::service* add_service(
         << " host '" << host_name << "' does not exist (host_id is null)";
     return nullptr;
   }
+  else if (host_id != hid) {
+    logger(log_config_error, basic)
+      << "Error: The service '" << description
+      << "' cannot be created because the host id corresponding to the host"
+      << " '" << host_name << "' is not the same as the one in configuration";
+    return nullptr;
+  }
 
   // Check values.
-  if ((max_attempts <= 0) || (check_interval < 0) || (retry_interval <= 0) ||
-      (notification_interval < 0)) {
+  if (max_attempts <= 0 || check_interval < 0 || retry_interval <= 0 ||
+      notification_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid max_attempts, check_interval, retry_interval"
            ", or notification_interval value for service '"
@@ -2205,7 +2212,7 @@ int service::run_scheduled_check(int check_options, double latency) {
   time_t current_time = 0L;
   time_t preferred_time = 0L;
   time_t next_valid_time = 0L;
-  int time_is_valid = true;
+  bool time_is_valid = true;
 
   logger(dbg_functions, basic) << "run_scheduled_service_check()";
   logger(dbg_checks, basic)
@@ -2293,7 +2300,7 @@ int service::run_async_check(int check_options,
                              double latency,
                              int scheduled_check,
                              int reschedule_check,
-                             int* time_is_valid,
+                             bool* time_is_valid,
                              time_t* preferred_time) {
   try {
     checks::checker::instance().run(this, check_options, latency,
@@ -2591,7 +2598,7 @@ void service::update_status(bool aggregated_dump) {
 
 /* checks viability of performing a service check */
 int service::verify_check_viability(int check_options,
-                                    int* time_is_valid,
+                                    bool* time_is_valid,
                                     time_t* new_time) {
   int perform_check = true;
   time_t current_time = 0L;

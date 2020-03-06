@@ -45,8 +45,8 @@ class scheduler {
              difference<set_service> const& diff_services);
   static scheduler& instance();
   void clear();
-  void remove_host(configuration::host const& h);
-  void remove_service(configuration::service const& s);
+  void remove_host(uint64_t host_id);
+  void remove_service(uint64_t host_id, uint64_t service_id);
 
  private:
   scheduler();

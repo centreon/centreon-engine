@@ -124,7 +124,7 @@ class host : public notifier {
                       double latency,
                       int scheduled_check,
                       int reschedule_check,
-                      int* time_is_valid,
+                      bool* time_is_valid,
                       time_t* preferred_time);
   void schedule_check(time_t check_time, int options);
   void check_for_flapping(bool update,
@@ -144,7 +144,7 @@ class host : public notifier {
   int handle_state();
   void update_performance_data();
   int verify_check_viability(int check_options,
-                             int* time_is_valid,
+                             bool* time_is_valid,
                              time_t* new_time);
   void grab_macros_r(nagios_macros* mac) override;
   bool operator==(host const& other) = delete;  // throw ();

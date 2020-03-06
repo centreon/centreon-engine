@@ -205,9 +205,9 @@ void applier::scheduler::clear() {
  *
  *  @param[in] h  Host configuration.
  */
-void applier::scheduler::remove_host(configuration::host const& h) {
-  host_map const& hosts(engine::host::hosts);
-  host_map::const_iterator hst(hosts.find(h.host_name()));
+void applier::scheduler::remove_host(uint64_t host_id) {
+  host_id_map const& hosts(engine::host::hosts_by_id);
+  host_id_map::const_iterator hst(hosts.find(host_id));
   if (hst != hosts.end()) {
     std::vector<com::centreon::engine::host*> hvec;
     hvec.push_back(hst->second.get());
@@ -220,10 +220,9 @@ void applier::scheduler::remove_host(configuration::host const& h) {
  *
  *  @param[in] s  Service configuration.
  */
-void applier::scheduler::remove_service(configuration::service const& s) {
+void applier::scheduler::remove_service(uint64_t host_id, uint64_t service_id) {
   service_id_map const& services(engine::service::services_by_id);
-  service_id_map::const_iterator svc(
-      services.find({s.host_id(), s.service_id()}));
+  service_id_map::const_iterator svc(services.find({host_id, service_id}));
   if (svc != services.end()) {
     std::vector<engine::service*> svec;
     svec.push_back(svc->second.get());

@@ -424,7 +424,7 @@ void applier::host::remove_object(configuration::host const& obj) {
             obj.host_name(), "", (time_t)0, "");
 
     // Remove events related to this host.
-    applier::scheduler::instance().remove_host(obj);
+    applier::scheduler::instance().remove_host(obj.key());
 
     //remove host from hostgroup->members
     for (auto& it_h: it->second->get_parent_groups())
