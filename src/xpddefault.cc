@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include "com/centreon/engine/xpddefault.hh"
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -76,11 +77,15 @@ int xpddefault_initialize_performance_data() {
       string::dup(config->host_perfdata_file_template());
   xpddefault_service_perfdata_file_template =
       string::dup(config->service_perfdata_file_template());
+  std::cout << "xpddefault_initialize_performance_data() :"
+    << config->service_perfdata_file_template() << "\n";
 
   // process special chars in templates.
   xpddefault_preprocess_file_templates(xpddefault_host_perfdata_file_template);
   xpddefault_preprocess_file_templates(
       xpddefault_service_perfdata_file_template);
+  std::cout << "process special chars in xpddefault_service_perfdata_file_template:"
+    << xpddefault_service_perfdata_file_template << "\n";
 
   // open the performance data files.
   xpddefault_open_host_perfdata_file();
@@ -181,6 +186,7 @@ int xpddefault_initialize_performance_data() {
 int xpddefault_cleanup_performance_data() {
   // free memory.
   delete[] xpddefault_host_perfdata_file_template;
+  std::cout << "cleanup xpddefault_service_perfdata_file_template\n";
   delete[] xpddefault_service_perfdata_file_template;
 
   xpddefault_host_perfdata_file_template = nullptr;
