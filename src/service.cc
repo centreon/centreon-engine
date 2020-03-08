@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include "com/centreon/engine/service.hh"
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
@@ -1059,7 +1058,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /* check latency is passed to us */
   set_latency(queued_check_result->get_latency());
-  assert(queued_check_result->get_latency() <= 1000);
 
   /* update the execution time for this check (millisecond resolution) */
   set_execution_time(
@@ -2371,7 +2369,6 @@ int service::run_async_check(int check_options,
   // Update latency for event broker and macros.
   double old_latency(get_latency());
   set_latency(latency);
-  assert(latency <= 1000);
 
   // Get current host and service macros.
   nagios_macros macros;
@@ -2409,7 +2406,6 @@ int service::run_async_check(int check_options,
 
   // Restore latency.
   set_latency(old_latency);
-  assert(old_latency <= 1000);
 
   // Service check was override by neb_module.
   if (NEBERROR_CALLBACKOVERRIDE == res) {

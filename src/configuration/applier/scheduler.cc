@@ -18,7 +18,6 @@
 */
 
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
-#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstring>
