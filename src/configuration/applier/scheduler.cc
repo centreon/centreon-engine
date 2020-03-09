@@ -205,9 +205,9 @@ void applier::scheduler::clear() {
  *
  *  @param[in] h  Host configuration.
  */
-void applier::scheduler::remove_host(configuration::host const& h) {
-  host_map const& hosts(engine::host::hosts);
-  host_map::const_iterator hst(hosts.find(h.host_name()));
+void applier::scheduler::remove_host(uint64_t host_id) {
+  host_id_map const& hosts(engine::host::hosts_by_id);
+  host_id_map::const_iterator hst(hosts.find(host_id));
   if (hst != hosts.end()) {
     std::vector<com::centreon::engine::host*> hvec;
     hvec.push_back(hst->second.get());
@@ -220,10 +220,9 @@ void applier::scheduler::remove_host(configuration::host const& h) {
  *
  *  @param[in] s  Service configuration.
  */
-void applier::scheduler::remove_service(configuration::service const& s) {
+void applier::scheduler::remove_service(uint64_t host_id, uint64_t service_id) {
   service_id_map const& services(engine::service::services_by_id);
-  service_id_map::const_iterator svc(
-      services.find({s.host_id(), s.service_id()}));
+  service_id_map::const_iterator svc(services.find({host_id, service_id}));
   if (svc != services.end()) {
     std::vector<engine::service*> svec;
     svec.push_back(svc->second.get());
@@ -235,17 +234,17 @@ void applier::scheduler::remove_service(configuration::service const& s) {
  *  Default constructor.
  */
 applier::scheduler::scheduler()
-    : _config(NULL),
-      _evt_check_reaper(NULL),
-      _evt_command_check(NULL),
-      _evt_hfreshness_check(NULL),
-      _evt_host_perfdata(NULL),
-      _evt_orphan_check(NULL),
-      _evt_reschedule_checks(NULL),
-      _evt_retention_save(NULL),
-      _evt_sfreshness_check(NULL),
-      _evt_service_perfdata(NULL),
-      _evt_status_save(NULL),
+    : _config(nullptr),
+      _evt_check_reaper(nullptr),
+      _evt_command_check(nullptr),
+      _evt_hfreshness_check(nullptr),
+      _evt_host_perfdata(nullptr),
+      _evt_orphan_check(nullptr),
+      _evt_reschedule_checks(nullptr),
+      _evt_retention_save(nullptr),
+      _evt_sfreshness_check(nullptr),
+      _evt_service_perfdata(nullptr),
+      _evt_status_save(nullptr),
       _old_auto_rescheduling_interval(0),
       _old_check_reaper_interval(0),
       _old_command_check_interval(0),
@@ -254,9 +253,7 @@ applier::scheduler::scheduler()
       _old_retention_update_interval(0),
       _old_service_freshness_check_interval(0),
       _old_service_perfdata_file_processing_interval(0),
-      _old_status_update_interval(0) {
-  memset(&scheduling_info, 0, sizeof(scheduling_info));
-}
+      _old_status_update_interval(0) {}
 
 /**
  *  Default destructor.

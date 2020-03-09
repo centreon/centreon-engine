@@ -2,7 +2,7 @@
 ** Copyright 2007-2008      Ethan Galstad
 ** Copyright 2007,2010      Andreas Ericsson
 ** Copyright 2010           Max Schubert
-** Copyright 2011-2020i     Centreon
+** Copyright 2011-2020      Centreon
 **
 ** This file is part of Centreon Engine.
 **

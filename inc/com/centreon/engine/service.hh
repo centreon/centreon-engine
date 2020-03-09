@@ -148,7 +148,7 @@ class service : public notifier {
                       double latency,
                       int scheduled_check,
                       int reschedule_check,
-                      int* time_is_valid,
+                      bool* time_is_valid,
                       time_t* preferred_time);
   void schedule_check(time_t check_time, int options);
   void set_flap(double percent_change,
@@ -163,7 +163,7 @@ class service : public notifier {
   void disable_flap_detection();
   void update_status(bool aggregated_dump) override;
   int verify_check_viability(int check_options,
-                             int* time_is_valid,
+                             bool* time_is_valid,
                              time_t* new_time);
   void grab_macros_r(nagios_macros* mac) override;
   int notify_contact(nagios_macros* mac,
@@ -230,10 +230,6 @@ class service : public notifier {
 };
 CCE_END()
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* C++ */
-
 com::centreon::engine::service* add_service(
     uint64_t host_id,
     uint64_t service_id,
@@ -286,9 +282,6 @@ com::centreon::engine::service* add_service(
     bool obsess_over,
     std::string const& timezone);
 
-#ifdef __cplusplus
-}
-
 std::ostream& operator<<(std::ostream& os,
                          com::centreon::engine::service const& obj);
 std::ostream& operator<<(std::ostream& os, service_map_unsafe const& obj);
@@ -303,7 +296,5 @@ std::pair<uint64_t, uint64_t> get_host_and_service_id(std::string const& host,
 uint64_t get_service_id(std::string const& host, std::string const& svc);
 
 CCE_END()
-
-#endif /* C++ */
 
 #endif  // !CCE_SERVICE_HH

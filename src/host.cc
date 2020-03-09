@@ -1480,7 +1480,7 @@ int host::run_scheduled_check(int check_options, double latency) {
   time_t current_time = 0L;
   time_t preferred_time = 0L;
   time_t next_valid_time = 0L;
-  int time_is_valid = true;
+  bool time_is_valid = true;
 
   logger(dbg_functions, basic) << "run_scheduled_host_check_3x()";
 
@@ -1569,7 +1569,7 @@ int host::run_async_check(int check_options,
                           double latency,
                           int scheduled_check,
                           int reschedule_check,
-                          int* time_is_valid,
+                          bool* time_is_valid,
                           time_t* preferred_time) {
   try {
     checks::checker::instance().run(this, check_options, latency,
@@ -2119,7 +2119,7 @@ void host::update_performance_data() {
 
 /* checks viability of performing a host check */
 int host::verify_check_viability(int check_options,
-                                 int* time_is_valid,
+                                 bool* time_is_valid,
                                  time_t* new_time) {
   int result = OK;
   int perform_check = true;

@@ -507,7 +507,8 @@ void applier::service::remove_object(configuration::service const& obj) {
             host_name, service_description, (time_t)0, "");
 
     // Remove events related to this service.
-    applier::scheduler::instance().remove_service(obj);
+    applier::scheduler::instance().remove_service(obj.host_id(),
+                                                  obj.service_id());
 
     //remove service from servicegroup->members
     for (auto& it_s: it->second->get_parent_groups())
