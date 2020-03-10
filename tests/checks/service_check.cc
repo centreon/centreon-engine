@@ -92,9 +92,6 @@ class ServiceCheck : public TestEngine {
 
   void TearDown() override {
     deinit_config_state();
-//    configuration::applier::state::instance().clear();
-//    delete config;
-//    config = nullptr;
   }
 
  protected:
