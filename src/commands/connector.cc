@@ -595,11 +595,10 @@ void connector::_recv_query_execute(char const* data) {
     res.exit_status = process::normal;
     res.start_time = info->start_time;
 
-    time_t execution_time((res.end_time - res.start_time).to_seconds());
+    uint32_t execution_time((res.end_time - res.start_time).to_mseconds());
 
     // Check if the check timeout.
-    if (info->timeout > 0 &&
-        static_cast<uint32_t>(execution_time) > info->timeout) {
+    if (info->timeout > 0 && execution_time > info->timeout * 1000) {
       res.exit_status = process::timeout;
       res.output = "(Process Timeout)";
     }
