@@ -1,4 +1,20 @@
 ========================
+Centreon Engine 19.10.13
+========================
+
+*********
+Bug fixes
+*********
+
+Centreon connectors timeout
+===========================
+
+The timeout applied on checks execute by connectors were shorter than the
+timeout passed as parameter (near of 1s of difference). To fix this, timeouts
+are checked as milliseconds values now (more accurate) and the good duration is
+considered by connectors.
+
+========================
 Centreon Engine 19.10.12
 ========================
 
