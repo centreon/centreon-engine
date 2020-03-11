@@ -92,9 +92,6 @@ class anomalydetection : public service {
   std::tuple<service::service_state, double, std::string, double, double>
       parse_perfdata(std::string const& perfdata, time_t check_time);
   void init_thresholds();
-  bool verify_check_viability(int check_options,
-                              bool* time_is_valid,
-                              time_t* new_time);
   void set_status_change(bool status_change);
   const std::string& get_metric_name() const;
   const std::string& get_thresholds_file() const;

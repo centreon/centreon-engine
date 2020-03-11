@@ -619,9 +619,13 @@ int anomalydetection::run_async_check(int check_options,
   }
 
   check_result_info.set_return_code(std::get<0>(pd));
-  oss << perfdata << ' ' << _metric_name
-      << "_lower_thresholds=" << std::get<3>(pd) << ' ' << _metric_name
-      << "_upper_thresholds=" << std::get<4>(pd);
+  oss << perfdata;
+  if (!isnan(std::get<3>(pd))) {
+    oss << ' ' << _metric_name << "_lower_thresholds=" << std::get<3>(pd);
+  }
+  if (!isnan(std::get<4>(pd))) {
+    oss << ' ' << _metric_name << "_upper_thresholds=" << std::get<4>(pd);
+  }
   check_result_info.set_output(oss.str());
 
   timestamp now(timestamp::now());
@@ -684,6 +688,11 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 
   service::service_state status;
 
+  if (!_thresholds_file_viable) {
+    logger(log_info_message, basic)
+      << "The thresholds file is not viable (not available or not readable).";
+    return std::make_tuple(service::state_ok, value, unit, NAN, NAN);
+  }
 
   /* The check time is probably between two timestamps stored in _thresholds.
    *
@@ -873,15 +882,6 @@ void anomalydetection::set_thresholds(
   std::lock_guard<std::mutex> _lock(_thresholds_m);
   _thresholds_file = filename,
   _thresholds = thresholds;
-}
-
-bool anomalydetection::verify_check_viability(int check_options,
-                                              bool* time_is_valid,
-                                              time_t* new_time) {
-  if (!_thresholds_file_viable)
-    return false;
-  return service::verify_check_viability(check_options, time_is_valid,
-                                         new_time);
 }
 
 void anomalydetection::set_status_change(bool status_change) {
