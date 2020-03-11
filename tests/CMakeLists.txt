@@ -20,36 +20,10 @@
 # Enable unit tests or not.
 option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
-  include(ExternalProject)
 
-  set(GOOGLE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-  if (BUILD_OFFLINE)
-  ExternalProject_Add( googletest
-                       SOURCE_DIR ${CMAKE_BINARY_DIR}/tests/googletest-prefix/src/googletest
-                       TIMEOUT 10
-                       UPDATE_COMMAND ""
-                       INSTALL_COMMAND ""
-                       LOG_DOWNLOAD ON
-                       LOG_CONFIGURE ON
-                       LOG_BUILD ON
-                       CMAKE_ARGS -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS})
-  else ()
-  ExternalProject_Add( googletest
-                       GIT_REPOSITORY https://github.com/google/googletest/
-                       GIT_TAG release-1.10.0
-                       TIMEOUT 10
-                       INSTALL_COMMAND ""
-                       LOG_DOWNLOAD ON
-                       LOG_CONFIGURE ON
-                       LOG_BUILD ON
-                       CMAKE_ARGS -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS})
-  endif ()
-
-  ExternalProject_Get_Property(googletest source_dir)
-  ExternalProject_Get_Property(googletest binary_dir)
-
-  link_directories(${binary_dir}/lib)
-  include_directories(${source_dir}/googletest/include)
+  find_package(gtest REQUIRED)
+  include_directories(${gtest_INCLUDE_DIRS})
+  link_directories(${gtest_LIB_DIRS})
 
 # Tests directory.
   # Add root inclusion direction.
@@ -59,15 +33,13 @@ if (WITH_TESTING)
 
   # Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
-  if (WITH_GRPC)
-    include_directories(${PROJECT_SOURCE_DIR}/enginerpc)
-    add_definitions(-DENGINERPC_TESTS_PATH="${TESTS_DIR}/enginerpc")
+  include_directories(${PROJECT_SOURCE_DIR}/enginerpc)
+  add_definitions(-DENGINERPC_TESTS_PATH="${TESTS_DIR}/enginerpc")
 
-    add_executable(rpc_client
-        ${TESTS_DIR}/enginerpc/client.cc)
+  add_executable(rpc_client
+      ${TESTS_DIR}/enginerpc/client.cc)
 
-    target_link_libraries(rpc_client "${GRPC_STATIC_LDFLAGS}" cerpc)
-  endif ()
+  target_link_libraries(rpc_client "${GRPC_STATIC_LDFLAGS}" cerpc ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
   add_executable("bin_connector_test_run"
       "${TESTS_DIR}/commands/bin_connector_test_run.cc")
@@ -104,6 +76,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/custom_vars/extcmd.cc"
     "${TESTS_DIR}/downtimes/downtime.cc"
     "${TESTS_DIR}/downtimes/downtime_finder.cc"
+    "${TESTS_DIR}/enginerpc/enginerpc.cc"
     "${TESTS_DIR}/helper.cc"
     "${TESTS_DIR}/macros/macro.cc"
     "${TESTS_DIR}/macros/url_encode.cc"
@@ -144,14 +117,8 @@ if (WITH_TESTING)
   # Unit test executable.
   include_directories(${TESTS_DIR})
 
-  if (WITH_GRPC)
-    add_executable(ut ${ut_sources}
-    "${TESTS_DIR}/enginerpc/enginerpc.cc")
-  else ()
-    add_executable(ut ${ut_sources})
-  endif ()
+  add_executable(ut ${ut_sources})
 
-  add_dependencies(ut googletest)
   add_test(NAME tests COMMAND ut)
 
   if (WITH_COVERAGE)
@@ -163,6 +130,6 @@ if (WITH_TESTING)
     )
     set(GCOV gcov)
   endif ()
-  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV})
+  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV} ${gtest_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
 endif ()
