@@ -28,17 +28,29 @@ include_directories(
   ${ENGINERPC_DIR}
 )
 
-include(FindPkgConfig)
-pkg_check_modules(PROTOBUF REQUIRED protobuf)
-pkg_check_modules(GRPC REQUIRED grpc++)
-set(GRPC_CPP_PLUGIN "${GRPC_PREFIX}/bin/grpc_cpp_plugin")
+
+set(protobuf_MODULE_COMPATIBLE True)
+find_package(protobuf REQUIRED)
+find_package(protoc_installer REQUIRED)
+find_package(grpc REQUIRED)
+
+include_directories(${grpc_INCLUDE_DIRS})
+include_directories(${protobuf_INCLUDE_DIRS})
+
+link_directories(${protobuf_LIB_DIRS})
+link_directories(${grpc_LIB_DIRS})
+
+message(STATUS "Using protobuf ${grpc_VERSION}")
+set(PROTOBUF_PREFIX "${protoc_installer_LIB_DIRS}/..")
+message(STATUS "${PROTOBUF_PREFIX}/bin/protoc")
+set(GRPC_PREFIX "${grpc_LIB_DIRS}/..")
 
 add_custom_command(
   DEPENDS ${ENGINERPC_DIR}/engine.proto
   COMMENT "Generating interface files of the proto file (grpc)"
   OUTPUT ${ENGINERPC_DIR}/engine.grpc.pb.cc ${ENGINERPC_DIR}/engine.grpc.pb.h
   COMMAND ${PROTOBUF_PREFIX}/bin/protoc
-  ARGS --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} --proto_path=${ENGINERPC_DIR} --grpc_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
+  ARGS --plugin=protoc-gen-grpc=${GRPC_PREFIX}/bin/grpc_cpp_plugin --proto_path=${ENGINERPC_DIR} --grpc_out="${ENGINERPC_DIR}" ${ENGINERPC_DIR}/engine.proto
 
   DEPENDS ${ENGINERPC_DIR}/engine.proto
   COMMENT "Generating interface files of the proto file (protobuf)"
@@ -55,7 +67,7 @@ add_library(
   ${ENGINERPC_DIR}/engine.pb.cc
   ${ENGINERPC_DIR}/engine.grpc.pb.h
   ${ENGINERPC_DIR}/engine.pb.h)
-target_link_libraries(cerpc "${GRPC_STATIC_LDFLAGS}")
+target_link_libraries(cerpc "${GRPC_STATIC_LDFLAGS}" ${protobuf_LIBS})
 
 # mod_enginerpc target.
 add_library(
@@ -80,3 +92,4 @@ target_link_libraries(${ENGINERPC} cerpc)
 install(TARGETS ${ENGINERPC}
   DESTINATION "${PREFIX_LIB}"
   COMPONENT "runtime")
+

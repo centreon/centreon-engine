@@ -40,6 +40,25 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 include_directories("${INC_DIR}")
 include_directories("${INC_DIR}/compatibility")
 
+include(${CMAKE_SOURCE_DIR}/conan_paths.cmake)
+
+set(protobuf_MODULE_COMPATIBLE True)
+find_package(protobuf REQUIRED)
+find_package(protoc_installer REQUIRED)
+find_package(grpc REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(c-ares REQUIRED)
+find_package(ZLIB REQUIRED)
+
+include_directories(${grpc_INCLUDE_DIRS})
+include_directories(${protobuf_INCLUDE_DIRS})
+
+link_directories(${protobuf_LIB_DIRS})
+link_directories(${grpc_LIB_DIRS})
+link_directories(${OpenSSL_LIB_DIRS})
+link_directories(${c-ares_LIB_DIRS})
+link_directories(${ZLIB_LIB_DIRS})
+
 # Version.
 set(CENTREON_ENGINE_MAJOR 20)
 set(CENTREON_ENGINE_MINOR 04)
@@ -159,8 +178,6 @@ endif ()
 
 # Enable or disable the OFFLINE BUILD mode.
 option(BUILD_OFFLINE "Build offline" OFF)
-
-option(WITH_GRPC "Build the enginerpc extension" OFF)
 
 # Enable or disable installation.
 option(WITH_CREATE_FILES "Create centreon-engine files." ON)
@@ -589,11 +606,9 @@ add_subdirectory(src/logging)
 add_subdirectory(src/macros)
 add_subdirectory(modules)
 add_subdirectory(src/retention)
-if (WITH_GRPC)
-  add_subdirectory(enginerpc)
-  include_directories(enginerpc)
-  add_definitions(-DGRPC)
-endif ()
+add_subdirectory(enginerpc)
+include_directories(enginerpc)
+add_definitions(-DGRPC)
 
 # Library engine target.
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
@@ -620,7 +635,7 @@ set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
-target_link_libraries(centengine cce_core ${ENGINERPC})
+target_link_libraries(centengine cce_core ${ENGINERPC} ${protobuf_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")

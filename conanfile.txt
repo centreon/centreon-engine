@@ -1,0 +1,7 @@
+[requires]
+gtest/1.8.1@bincrafters/stable
+grpc/1.25.0@inexorgame/stable
+
+[generators]
+cmake_paths
+cmake_find_package
