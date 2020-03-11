@@ -212,6 +212,15 @@ bool notifier::_is_notification_viable_normal(reason_type type
     return false;
   }
 
+  /* if this notifier is currently in a scheduled downtime period, don't send
+   * the notification */
+  if (is_in_downtime()) {
+    logger(dbg_notifications, more)
+        << "This notifier is currently in a scheduled downtime, so "
+           "we won't send notifications.";
+    return false;
+  }
+
   /* On volatile services notifications are always sent */
   if (get_is_volatile()) {
     logger(dbg_notifications, more)
@@ -228,15 +237,6 @@ bool notifier::_is_notification_viable_normal(reason_type type
     logger(dbg_notifications, more)
         << "This notifier shouldn't have notifications sent out "
            "at this time.";
-    return false;
-  }
-
-  /* if this notifier is currently in a scheduled downtime period, don't send
-   * the notification */
-  if (is_in_downtime()) {
-    logger(dbg_notifications, more)
-        << "This notifier is currently in a scheduled downtime, so "
-           "we won't send notifications.";
     return false;
   }
 
