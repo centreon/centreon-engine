@@ -14,6 +14,13 @@ timeout passed as parameter (near of 1s of difference). To fix this, timeouts
 are checked as milliseconds values now (more accurate) and the good duration is
 considered by connectors.
 
+Volatile services and notifications
+===================================
+
+This version of Engine fixes the following behabiour: if a service is volatile,
+configured to send normal notifications. It won't send anymore them if it is
+in downtime.
+
 ========================
 Centreon Engine 19.10.12
 ========================
