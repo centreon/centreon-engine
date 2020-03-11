@@ -34,6 +34,7 @@ if (WITH_ASAN)
   set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif ()
 
+add_definitions("-D_GLIBCXX_USE_CXX11_ABI=0")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
@@ -635,7 +636,7 @@ set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
-target_link_libraries(centengine cce_core ${ENGINERPC} ${protobuf_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
+target_link_libraries(centengine cce_core ${CLIB_LIBRARIES} ${ENGINERPC} ${protobuf_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
