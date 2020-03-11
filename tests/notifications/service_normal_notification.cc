@@ -1184,3 +1184,26 @@ TEST_F(ServiceNotification, RecoveryNotifEvenIfServiceAcknowledged) {
             OK);
   ASSERT_EQ(id + 1, _svc->get_next_notification_id());
 }
+
+TEST_F(ServiceNotification, SimpleVolatileServiceNotificationWithDowntime) {
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  set_time(20000);
+
+  _svc->set_scheduled_downtime_depth(30);
+  _svc->set_is_volatile(true);
+  uint64_t id{_svc->get_next_notification_id()};
+  for (int i = 0; i < 7; ++i)
+    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+
+  std::unique_ptr<engine::serviceescalation> service_escalation{
+      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7, Uuid())};
+  _svc->set_notification_period_ptr(tperiod.get());
+
+  ASSERT_TRUE(service_escalation);
+  ASSERT_EQ(
+      _svc->notify(
+          notifier::reason_normal, "", "", notifier::notification_option_none),
+      OK);
+  ASSERT_EQ(id, _svc->get_next_notification_id());
+}
