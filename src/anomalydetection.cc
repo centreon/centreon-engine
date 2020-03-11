@@ -620,10 +620,10 @@ int anomalydetection::run_async_check(int check_options,
 
   check_result_info.set_return_code(std::get<0>(pd));
   oss << perfdata;
-  if (!isnan(std::get<3>(pd))) {
+  if (!std::isnan(std::get<3>(pd))) {
     oss << ' ' << _metric_name << "_lower_thresholds=" << std::get<3>(pd);
   }
-  if (!isnan(std::get<4>(pd))) {
+  if (!std::isnan(std::get<4>(pd))) {
     oss << ' ' << _metric_name << "_upper_thresholds=" << std::get<4>(pd);
   }
   check_result_info.set_output(oss.str());
