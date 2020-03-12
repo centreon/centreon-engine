@@ -711,6 +711,11 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
    */
   auto it2 = _thresholds.upper_bound(check_time);
   auto it1 = it2;
+  if (it2 == _thresholds.end()) {
+    logger(log_runtime_error, basic)
+        << "Error: the thresholds file is too old compared to the check timestamp " << check_time;
+    return std::make_tuple(service::state_unknown, NAN, "", NAN, NAN);
+  }
   if (it1 != _thresholds.begin())
     --it1;
   else {
