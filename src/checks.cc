@@ -491,8 +491,10 @@ int handle_async_service_check_result(
 
   /**** NOTE - THIS WAS MOVED UP FROM LINE 1049 BELOW TO FIX PROBLEMS WHERE CURRENT ATTEMPT VALUE WAS ACTUALLY "LEADING" REAL VALUE ****/
   /* increment the current attempt number if this is a soft state (service was rechecked) */
-  if (temp_service->state_type == SOFT_STATE
-      && (temp_service->current_attempt < temp_service->max_attempts))
+  if (temp_service->last_state == STATE_OK && temp_service->current_state != temp_service->last_state)
+    temp_service->current_attempt = 1;
+  else if (temp_service->state_type == SOFT_STATE
+      && temp_service->current_attempt < temp_service->max_attempts)
     temp_service->current_attempt = temp_service->current_attempt + 1;
 
   logger(dbg_checks, most)
@@ -522,7 +524,8 @@ int handle_async_service_check_result(
 
   /* check for a "normal" hard state change where max check attempts is reached */
   if (temp_service->current_attempt >= temp_service->max_attempts
-      && temp_service->current_state != temp_service->last_hard_state) {
+      && (temp_service->current_state != temp_service->last_hard_state ||
+          temp_service->last_state_change > temp_service->last_hard_state_change)) {
     logger(dbg_checks, most)
       << "Service had a HARD STATE CHANGE!!";
     hard_state_change = true;
@@ -670,6 +673,8 @@ int handle_async_service_check_result(
 
       /* set the state type macro */
       temp_service->state_type = HARD_STATE;
+      temp_service->last_hard_state_change = temp_service->last_check;
+      temp_service->current_attempt = 1;
 
       /* log the service recovery */
       log_service_event(temp_service);
@@ -708,6 +713,8 @@ int handle_async_service_check_result(
 
       /* this is a soft recovery */
       temp_service->state_type = SOFT_STATE;
+      int attempt = temp_service->max_attempts - 1;
+      temp_service->current_attempt = attempt < 1 ? 1 : attempt;
 
       /* log the soft recovery */
       log_service_event(temp_service);
@@ -740,9 +747,8 @@ int handle_async_service_check_result(
 
     /* reset all service variables because its okay now... */
     temp_service->host_problem_at_last_check = false;
-    temp_service->current_attempt = 1;
-    temp_service->state_type = HARD_STATE;
     temp_service->last_hard_state = STATE_OK;
+
     temp_service->last_notification = (time_t)0;
     temp_service->next_notification = (time_t)0;
     if (service_other_props[std::make_pair(
