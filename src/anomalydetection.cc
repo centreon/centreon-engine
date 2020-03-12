@@ -505,10 +505,8 @@ int anomalydetection::run_async_check(int check_options,
     return ERROR;
 
   // Send broker event.
-  timeval start_time;
-  timeval end_time;
-  memset(&start_time, 0, sizeof(start_time));
-  memset(&end_time, 0, sizeof(end_time));
+  timeval start_time = { 0, 0 };
+  timeval end_time = { 0, 0 };
   int res =
       broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE,
                            NEBATTR_NONE, this, checkable::check_active,
@@ -554,7 +552,7 @@ int anomalydetection::run_async_check(int check_options,
                          get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
-  start_time.tv_sec = _dependent_service->get_last_check();
+  gettimeofday(&start_time, nullptr);
 
   // Update the number of running service checks.
   ++currently_running_service_checks;
@@ -750,6 +748,12 @@ void anomalydetection::init_thresholds() {
   logger(log_info_message, most)
       << "Reading thresholds file '" << _thresholds_file << "'...";
   std::ifstream t(_thresholds_file);
+  if (!t) {
+    logger(log_config_error, basic)
+      << "Error: Unable to read the thresholds file '" << _thresholds_file << "'.";
+    return;
+  }
+
   std::stringstream buffer;
   buffer << t.rdbuf();
   std::string err;
