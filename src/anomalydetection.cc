@@ -886,6 +886,7 @@ void anomalydetection::set_thresholds(
   std::lock_guard<std::mutex> _lock(_thresholds_m);
   _thresholds_file = filename,
   _thresholds = thresholds;
+  _thresholds_file_viable = _thresholds.size() > 0;
 }
 
 void anomalydetection::set_status_change(bool status_change) {
