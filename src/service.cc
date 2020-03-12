@@ -1060,15 +1060,15 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   set_latency(queued_check_result->get_latency());
 
   /* update the execution time for this check (millisecond resolution) */
-  set_execution_time(
-      (double)((double)(queued_check_result->get_finish_time().tv_sec -
-                        queued_check_result->get_start_time().tv_sec) +
-               (double)((queued_check_result->get_finish_time().tv_usec -
-                         queued_check_result->get_start_time().tv_usec) /
-                        1000.0) /
-                   1000.0));
-  if (get_execution_time() < 0.0)
-    set_execution_time(0.0);
+  double execution_time =
+      static_cast<double>(queued_check_result->get_finish_time().tv_sec -
+                          queued_check_result->get_start_time().tv_sec) +
+      static_cast<double>(queued_check_result->get_finish_time().tv_usec -
+                          queued_check_result->get_start_time().tv_usec) /
+          1000000.0;
+  if (execution_time < 0.0)
+    execution_time = 0.0;
+  set_execution_time(execution_time);
 
   /* get the last check time */
   set_last_check(queued_check_result->get_start_time().tv_sec);
@@ -2436,8 +2436,7 @@ int service::run_async_check(int check_options,
 
       // Update check result.
       timeval tv;
-      tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
+      gettimeofday(&tv, nullptr);
       check_result_info.set_finish_time(tv);
 
       check_result_info.set_early_timeout(false);

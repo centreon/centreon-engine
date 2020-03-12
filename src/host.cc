@@ -1189,7 +1189,6 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   std::string old_plugin_output;
   struct timeval start_time_hires;
   struct timeval end_time_hires;
-  double execution_time{0.0};
 
   logger(dbg_functions, basic) << "handle_async_host_check_result_3x()";
 
@@ -1199,13 +1198,12 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   time_t current_time{std::time(nullptr)};
 
-  execution_time =
-      (double)((double)(queued_check_result->get_finish_time().tv_sec -
-                        queued_check_result->get_start_time().tv_sec) +
-               (double)((queued_check_result->get_finish_time().tv_usec -
-                         queued_check_result->get_start_time().tv_usec) /
-                        1000.0) /
-                   1000.0);
+  double execution_time =
+      static_cast<double>(queued_check_result->get_finish_time().tv_sec -
+                          queued_check_result->get_start_time().tv_sec) +
+      static_cast<double>(queued_check_result->get_finish_time().tv_usec -
+                          queued_check_result->get_start_time().tv_usec) /
+          1000000.0;
   if (execution_time < 0.0)
     execution_time = 0.0;
 
@@ -1710,12 +1708,9 @@ int host::run_async_check(int check_options,
       (void)e;
       retry = true;
     } catch (std::exception const& e) {
-      timestamp now(timestamp::now());
-
       // Update check result.
       timeval tv;
-      tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
+      gettimeofday(&tv, nullptr);
       check_result_info.set_finish_time(tv);
       check_result_info.set_early_timeout(false);
       check_result_info.set_return_code(service::state_unknown);
