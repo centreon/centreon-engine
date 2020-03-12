@@ -326,8 +326,7 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
           << "Error: host id (" << host_id << ") of host ('" << host_name
           << "') of anomaly detection service '" << description
           << "' has a conflict between config does not match with the config "
-             "id ("
-          << hid << ")";
+             "id (" << hid << ")";
       return nullptr;
     }
   }
@@ -343,16 +342,16 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   if (metric_name.empty()) {
     logger(log_config_error, basic)
         << "Error: metric name must be provided for an anomaly detection "
-           "service (host_id:"
-        << host_id << ", service_id:" << service_id << ")";
+           "service (host_id:" << host_id << ", service_id:" << service_id
+        << ")";
     return nullptr;
   }
 
   if (thresholds_file.empty()) {
     logger(log_config_error, basic)
         << "Error: thresholds file must be provided for an anomaly detection "
-           "service (host_id:"
-        << host_id << ", service_id:" << service_id << ")";
+           "service (host_id:" << host_id << ", service_id:" << service_id
+        << ")";
     return nullptr;
   }
 
@@ -361,16 +360,16 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
       notification_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid max_attempts, check_interval, retry_interval"
-           ", or notification_interval value for service '"
-        << description << "' on host '" << host_name << "'";
+           ", or notification_interval value for service '" << description
+        << "' on host '" << host_name << "'";
     return nullptr;
   }
   // Check if the service is already exist.
   std::pair<uint64_t, uint64_t> id(std::make_pair(host_id, service_id));
   if (is_service_exist(id)) {
-    logger(log_config_error, basic)
-        << "Error: Service '" << description << "' on host '" << host_name
-        << "' has already been defined";
+    logger(log_config_error, basic) << "Error: Service '" << description
+                                    << "' on host '" << host_name
+                                    << "' has already been defined";
     return nullptr;
   }
 
@@ -457,7 +456,8 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     // Add new items to the list.
     service::services[{obj->get_hostname(), obj->get_description()}] = obj;
     service::services_by_id[{host_id, service_id}] = obj;
-  } catch (...) {
+  }
+  catch (...) {
     obj.reset();
   }
 
@@ -496,22 +496,32 @@ int anomalydetection::run_async_check(int check_options,
       << ", latency=" << latency << ", scheduled_check=" << scheduled_check
       << ", reschedule_check=" << reschedule_check;
 
-  logger(dbg_checks, basic)
-      << "** Running async check of service '" << get_description()
-      << "' on host '" << get_hostname() << "'...";
+  logger(dbg_checks, basic) << "** Running async check of service '"
+                            << get_description() << "' on host '"
+                            << get_hostname() << "'...";
 
   // Check if the service is viable now.
   if (!verify_check_viability(check_options, time_is_valid, preferred_time))
     return ERROR;
 
   // Send broker event.
-  timeval start_time = { 0, 0 };
-  timeval end_time = { 0, 0 };
-  int res =
-      broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE,
-                           NEBATTR_NONE, this, checkable::check_active,
-                           start_time, end_time, get_check_command().c_str(),
-                           get_latency(), 0.0, 0, false, 0, nullptr, nullptr);
+  timeval start_time = {0, 0};
+  timeval end_time = {0, 0};
+  int res = broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK,
+                                 NEBFLAG_NONE,
+                                 NEBATTR_NONE,
+                                 this,
+                                 checkable::check_active,
+                                 start_time,
+                                 end_time,
+                                 get_check_command().c_str(),
+                                 get_latency(),
+                                 0.0,
+                                 0,
+                                 false,
+                                 0,
+                                 nullptr,
+                                 nullptr);
 
   // Service check was cancel by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
@@ -548,8 +558,8 @@ int anomalydetection::run_async_check(int check_options,
   grab_host_macros_r(&macros, get_host_ptr());
   grab_service_macros_r(&macros, this);
   std::string tmp;
-  get_raw_command_line_r(&macros, get_check_command_ptr(),
-                         get_check_command().c_str(), tmp, 0);
+  get_raw_command_line_r(
+      &macros, get_check_command_ptr(), get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
   gettimeofday(&start_time, nullptr);
@@ -563,21 +573,40 @@ int anomalydetection::run_async_check(int check_options,
   set_is_executing(true);
 
   // Init check result info.
-  check_result check_result_info(
-      service_check, get_host_id(), get_service_id(), checkable::check_active,
-      check_options, reschedule_check, latency, start_time, start_time, false,
-      true, service::state_ok, "");
+  check_result check_result_info(service_check,
+                                 get_host_id(),
+                                 get_service_id(),
+                                 checkable::check_active,
+                                 check_options,
+                                 reschedule_check,
+                                 latency,
+                                 start_time,
+                                 start_time,
+                                 false,
+                                 true,
+                                 service::state_ok,
+                                 "");
 
   std::ostringstream oss;
   oss << "Anomaly detection on metric '" << _metric_name << "', from service '"
       << _dependent_service->get_description() << "' on host '"
       << get_hostname() << "'";
   // Send event broker.
-  res = broker_service_check(
-      NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, this,
-      checkable::check_active, start_time, end_time,
-      get_check_command().c_str(), get_latency(), 0.0,
-      config->service_check_timeout(), false, 0, oss.str().c_str(), nullptr);
+  res = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
+                             NEBFLAG_NONE,
+                             NEBATTR_NONE,
+                             this,
+                             checkable::check_active,
+                             start_time,
+                             end_time,
+                             get_check_command().c_str(),
+                             get_latency(),
+                             0.0,
+                             config->service_check_timeout(),
+                             false,
+                             0,
+                             oss.str().c_str(),
+                             nullptr);
 
   // Restore latency.
   set_latency(old_latency);
@@ -606,7 +635,8 @@ int anomalydetection::run_async_check(int check_options,
   if (std::get<0>(pd) == service::state_ok)
     oss << "OK: Regular activity, " << _metric_name << '=' << std::get<1>(pd)
         << std::get<2>(pd) << " |";
-  else if (std::get<0>(pd) == service::state_unknown && std::isnan(std::get<1>(pd)))
+  else if (std::get<0>(pd) == service::state_unknown &&
+           std::isnan(std::get<1>(pd)))
     oss << "UNKNOWN: Unknown activity, " << _metric_name
         << " did not return any values| ";
   else {
@@ -633,8 +663,7 @@ int anomalydetection::run_async_check(int check_options,
 
   // Update check result.
   timeval tv;
-  tv.tv_sec = now.to_seconds();
-  tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
+  gettimeofday(&tv, nullptr);
   check_result_info.set_finish_time(tv);
 
   handle_async_check_result(&check_result_info);
@@ -644,7 +673,7 @@ int anomalydetection::run_async_check(int check_options,
 
   // Update the number of running service checks.
   //--currently_running_service_checks;
-  //logger(dbg_checks, basic) << "Current running service checks: "
+  // logger(dbg_checks, basic) << "Current running service checks: "
   //                          << currently_running_service_checks;
 
   return OK;
@@ -670,8 +699,8 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
   size_t pos = perfdata.find_last_of("=");
   /* If the perfdata is wrong. */
   if (pos == std::string::npos) {
-    logger(log_runtime_error, basic)
-        << "Error: Unable to parse perfdata '" << perfdata << "'";
+    logger(log_runtime_error, basic) << "Error: Unable to parse perfdata '"
+                                     << perfdata << "'";
     return std::make_tuple(service::state_unknown, NAN, "", NAN, NAN);
   }
 
@@ -696,7 +725,7 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 
   if (!_thresholds_file_viable) {
     logger(log_info_message, basic)
-      << "The thresholds file is not viable (not available or not readable).";
+        << "The thresholds file is not viable (not available or not readable).";
     return std::make_tuple(service::state_ok, value, unit, NAN, NAN);
   }
 
@@ -720,8 +749,9 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
   auto it2 = _thresholds.upper_bound(check_time);
   auto it1 = it2;
   if (it2 == _thresholds.end()) {
-    logger(log_runtime_error, basic)
-        << "Error: the thresholds file is too old compared to the check timestamp " << check_time;
+    logger(log_runtime_error, basic) << "Error: the thresholds file is too old "
+                                        "compared to the check timestamp "
+                                     << check_time;
     return std::make_tuple(service::state_unknown, value, uom, NAN, NAN);
   }
   if (it1 != _thresholds.begin())
@@ -754,12 +784,13 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 void anomalydetection::init_thresholds() {
   std::lock_guard<std::mutex> lock(_thresholds_m);
 
-  logger(log_info_message, most)
-      << "Reading thresholds file '" << _thresholds_file << "'...";
+  logger(log_info_message, most) << "Reading thresholds file '"
+                                 << _thresholds_file << "'...";
   std::ifstream t(_thresholds_file);
   if (!t) {
     logger(log_config_error, basic)
-      << "Error: Unable to read the thresholds file '" << _thresholds_file << "'.";
+        << "Error: Unable to read the thresholds file '" << _thresholds_file
+        << "'.";
     return;
   }
 
@@ -803,13 +834,10 @@ void anomalydetection::init_thresholds() {
     }
   }
   if (count > 1) {
-    logger(log_info_message, most)
-        << "Number of rows in memory: " << count;
+    logger(log_info_message, most) << "Number of rows in memory: " << count;
     _thresholds_file_viable = true;
-  }
-  else
-    logger(log_info_message, most)
-        << "Nothing in memory";
+  } else
+    logger(log_info_message, most) << "Nothing in memory";
 }
 
 /**
@@ -819,12 +847,12 @@ void anomalydetection::init_thresholds() {
  * @param filename The fullname of the file to parse.
  */
 int anomalydetection::update_thresholds(const std::string& filename) {
-  logger(log_info_message, most)
-      << "Reading thresholds file '" << filename << "'.";
+  logger(log_info_message, most) << "Reading thresholds file '" << filename
+                                 << "'.";
   std::ifstream t(filename);
   if (!t) {
     logger(log_config_error, basic)
-      << "Error: Unable to read the thresholds file '" << filename << "'.";
+        << "Error: Unable to read the thresholds file '" << filename << "'.";
     return -1;
   }
 
@@ -853,8 +881,7 @@ int anomalydetection::update_thresholds(const std::string& filename) {
       logger(log_config_error, basic)
           << "Error: The thresholds file contains thresholds for the anomaly "
              "detection service (host_id: " << host_id
-          << ", service_id: " << svc_id
-          << ") that does not exist";
+          << ", service_id: " << svc_id << ") that does not exist";
       continue;
     }
     std::shared_ptr<anomalydetection> ad =
@@ -875,7 +902,7 @@ int anomalydetection::update_thresholds(const std::string& filename) {
         << ", metric: " << ad->get_metric_name() << ")";
 
     auto predict = item["predict"];
-    std::map<time_t, std::pair<double, double>> thresholds;
+    std::map<time_t, std::pair<double, double> > thresholds;
     for (auto& i : predict.array_items()) {
       time_t timestamp = static_cast<time_t>(i["timestamp"].number_value());
       double upper = i["upper"].number_value();
@@ -893,8 +920,7 @@ void anomalydetection::set_thresholds(
     const std::string& filename,
     std::map<time_t, std::pair<double, double> >&& thresholds) noexcept {
   std::lock_guard<std::mutex> _lock(_thresholds_m);
-  _thresholds_file = filename,
-  _thresholds = thresholds;
+  _thresholds_file = filename, _thresholds = thresholds;
   _thresholds_file_viable = _thresholds.size() > 0;
 }
 
