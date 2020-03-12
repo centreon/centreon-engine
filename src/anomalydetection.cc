@@ -606,14 +606,17 @@ int anomalydetection::run_async_check(int check_options,
   if (std::get<0>(pd) == service::state_ok)
     oss << "OK: Regular activity, " << _metric_name << '=' << std::get<1>(pd)
         << std::get<2>(pd) << " |";
-  else if (std::get<0>(pd) == service::state_unknown)
+  else if (std::get<0>(pd) == service::state_unknown && std::isnan(std::get<1>(pd)))
     oss << "UNKNOWN: Unknown activity, " << _metric_name
         << " did not return any values| ";
   else {
     oss << "NON-OK: Unusual activity, the actual value of " << _metric_name
-        << " is " << std::get<1>(pd) << std::get<2>(pd)
-        << " which is outside the forecasting range [" << std::get<3>(pd)
-        << " ; " << std::get<4>(pd) << "] |";
+        << " is " << std::get<1>(pd) << std::get<2>(pd);
+    if (!std::isnan(std::get<3>(pd)) && !std::isnan(std::get<4>(pd)))
+      oss << " which is outside the forecasting range [" << std::get<3>(pd)
+          << " ; " << std::get<4>(pd) << "] |";
+    else
+      oss << " and the forecasting range is unknown |";
   }
 
   check_result_info.set_return_code(std::get<0>(pd));
@@ -686,6 +689,11 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 
   service::service_state status;
 
+  if (!_status_change) {
+    status = service::state_ok;
+    return std::make_tuple(status, value, uom, NAN, NAN);
+  }
+
   if (!_thresholds_file_viable) {
     logger(log_info_message, basic)
       << "The thresholds file is not viable (not available or not readable).";
@@ -714,7 +722,7 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
   if (it2 == _thresholds.end()) {
     logger(log_runtime_error, basic)
         << "Error: the thresholds file is too old compared to the check timestamp " << check_time;
-    return std::make_tuple(service::state_unknown, NAN, "", NAN, NAN);
+    return std::make_tuple(service::state_unknown, value, uom, NAN, NAN);
   }
   if (it1 != _thresholds.begin())
     --it1;
@@ -722,7 +730,7 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
     logger(log_runtime_error, basic)
         << "Error: timestamp " << check_time
         << " too old compared with the thresholds file";
-    return std::make_tuple(service::state_unknown, NAN, "", NAN, NAN);
+    return std::make_tuple(service::state_unknown, value, uom, NAN, NAN);
   }
 
   /* Now it1.first <= check_time < it2.first */
@@ -733,16 +741,12 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
                      (check_time - it1->first) / (it2->first - it1->first) +
                  it1->second.first;
 
-  if (!_status_change)
+  if (std::isnan(value))
+    status = service::state_unknown;
+  else if (value >= lower && value <= upper)
     status = service::state_ok;
-  else {
-    if (std::isnan(value))
-      status = service::state_unknown;
-    else if (value >= lower && value <= upper)
-      status = service::state_ok;
-    else
-      status = service::state_critical;
-  }
+  else
+    status = service::state_critical;
 
   return std::make_tuple(status, value, uom, lower, upper);
 }
