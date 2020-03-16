@@ -87,9 +87,3 @@ add_library(
 set_property(TARGET ${ENGINERPC} PROPERTY PREFIX "" PROPERTY POSITION_INDEPENDENT_CODE ON)
 # Link target with libraries.
 target_link_libraries(${ENGINERPC} cerpc)
-
-# Install rule.
-install(TARGETS ${ENGINERPC}
-  DESTINATION "${PREFIX_LIB}"
-  COMPONENT "runtime")
-
