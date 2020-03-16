@@ -41,7 +41,7 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 include_directories("${INC_DIR}")
 include_directories("${INC_DIR}/compatibility")
 
-include(${CMAKE_SOURCE_DIR}/conan_paths.cmake)
+include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 set(protobuf_MODULE_COMPATIBLE True)
 find_package(protobuf REQUIRED)
