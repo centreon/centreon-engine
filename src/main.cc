@@ -51,9 +51,7 @@
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/logging/engine.hh"
-#if defined GRPC
 #include "enginerpc.hh"
-#endif
 
 using namespace com::centreon::engine;
 
@@ -94,10 +92,6 @@ int main(int argc, char* argv[]) {
 
   // Load singletons and global variable.
   config = new configuration::state;
-
-#if defined GRPC
-  com::centreon::engine::enginerpc erpc("0.0.0.0", 50051);
-#endif
 
   logging::broker backend_broker_log;
 
@@ -312,6 +306,7 @@ int main(int argc, char* argv[]) {
     // Else start to monitor things.
     else {
       try {
+        com::centreon::engine::enginerpc erpc("0.0.0.0", 50051);
         // Parse configuration.
         configuration::state config;
         {
@@ -409,6 +404,8 @@ int main(int argc, char* argv[]) {
               << "Successfully shutdown ... (PID=" << getpid() << ")";
 
         retval = EXIT_SUCCESS;
+
+        erpc.shutdown();
       } catch (std::exception const& e) {
         // Log.
         logger(logging::log_runtime_error, logging::basic)
@@ -429,9 +426,6 @@ int main(int argc, char* argv[]) {
     logger(logging::log_runtime_error, logging::basic) << "Error: " << e.what();
   }
 
-#if defined GRPC
-  erpc.shutdown();
-#endif
   // Unload singletons and global objects.
   delete config;
   config = nullptr;

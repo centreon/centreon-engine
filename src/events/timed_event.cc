@@ -33,9 +33,7 @@
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#ifdef GRPC
 #include "com/centreon/engine/command_manager.hh"
-#endif
 
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
@@ -132,12 +130,10 @@ void timed_event::_exec_event_command_check() {
  *
  */
 void timed_event::_exec_event_enginerpc_check() {
-#ifdef GRPC
   logger(dbg_events, basic) << "** EngineRPC Command Check Event";
 
   // send data to event broker.
   command_manager::instance().execute();
-#endif
 }
 
 /**

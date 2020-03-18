@@ -609,7 +609,6 @@ add_subdirectory(modules)
 add_subdirectory(src/retention)
 add_subdirectory(enginerpc)
 include_directories(enginerpc)
-add_definitions(-DGRPC)
 
 # Library engine target.
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
