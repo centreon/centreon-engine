@@ -257,7 +257,7 @@ class processing {
   }
 
   template <void (*fptr)(char*)>
-  static void _redirector_file(int id, time_t entry_time, char* args) {
+  static void _redirector_file(int id __attribute__((unused)), time_t entry_time __attribute__((unused)), char* args) {
     char* filename(my_strtok(args, ";"));
     (*fptr)(filename);
   }

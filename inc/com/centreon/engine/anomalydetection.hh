@@ -59,7 +59,6 @@ class anomalydetection : public service {
                    std::string const& notification_period,
                    bool notifications_enabled,
                    bool is_volatile,
-                   std::string const& check_period,
                    std::string const& event_handler,
                    bool event_handler_enabled,
                    std::string const& notes,
@@ -95,6 +94,7 @@ class anomalydetection : public service {
   void set_status_change(bool status_change);
   const std::string& get_metric_name() const;
   const std::string& get_thresholds_file() const;
+  void resolve(int& w, int& e);
 };
 CCE_END()
 
@@ -108,7 +108,6 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     std::string const& metric_name,
     std::string const& thresholds_file,
     bool status_change,
-    std::string const& check_period,
     enum com::centreon::engine::service::service_state initial_state,
     int max_attempts,
     double check_interval,

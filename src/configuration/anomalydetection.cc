@@ -51,7 +51,6 @@ std::unordered_map<std::string, anomalydetection::setter_func> const anomalydete
     {"servicegroups", SETTER(std::string const&, _set_servicegroups)},
     {"metric_name", SETTER(std::string const&, _set_metric_name)},
     {"thresholds_file", SETTER(std::string const&, _set_thresholds_file)},
-    {"check_period", SETTER(std::string const&, _set_check_period)},
     {"event_handler", SETTER(std::string const&, _set_event_handler)},
     {"notification_period",
      SETTER(std::string const&, _set_notification_period)},
@@ -185,7 +184,6 @@ anomalydetection::anomalydetection(anomalydetection const& other)
       _thresholds_file(other._thresholds_file),
       _check_freshness(other._check_freshness),
       _check_interval(other._check_interval),
-      _check_period(other._check_period),
       _contactgroups(other._contactgroups),
       _contacts(other._contacts),
       _customvariables(other._customvariables),
@@ -248,7 +246,6 @@ anomalydetection& anomalydetection::operator=(anomalydetection const& other) {
     _thresholds_file = other._thresholds_file;
     _check_freshness = other._check_freshness;
     _check_interval = other._check_interval;
-    _check_period = other._check_period;
     _contactgroups = other._contactgroups;
     _contacts = other._contacts;
     _customvariables = other._customvariables;
@@ -346,11 +343,6 @@ bool anomalydetection::operator==(anomalydetection const& other) const noexcept 
   if (_check_interval != other._check_interval) {
     logger(dbg_config, more)
         << "configuration::anomalydetection::equality => check_interval don't match";
-    return false;
-  }
-  if (_check_period != other._check_period) {
-    logger(dbg_config, more)
-        << "configuration::anomalydetection::equality => check_period don't match";
     return false;
   }
   if (_contactgroups != other._contactgroups) {
@@ -596,8 +588,6 @@ bool anomalydetection::operator<(anomalydetection const& other) const noexcept {
     return _check_freshness < other._check_freshness;
   else if (_check_interval != other._check_interval)
     return _check_interval < other._check_interval;
-  else if (_check_period != other._check_period)
-    return _check_period < other._check_period;
   else if (_contactgroups != other._contactgroups)
     return _contactgroups < other._contactgroups;
   else if (_contacts != other._contacts)
@@ -728,7 +718,6 @@ void anomalydetection::merge(object const& obj) {
   MRG_OPTION(_checks_passive);
   MRG_OPTION(_check_freshness);
   MRG_OPTION(_check_interval);
-  MRG_DEFAULT(_check_period);
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
   MRG_MAP(_customvariables);
@@ -861,15 +850,6 @@ bool anomalydetection::check_freshness() const noexcept {
  */
 unsigned int anomalydetection::check_interval() const noexcept {
   return _check_interval;
-}
-
-/**
- *  Get check_period.
- *
- *  @return The check_period.
- */
-std::string const& anomalydetection::check_period() const noexcept {
-  return _check_period;
 }
 
 /**
@@ -1455,18 +1435,6 @@ bool anomalydetection::_set_check_freshness(bool value) {
  */
 bool anomalydetection::_set_check_interval(unsigned int value) {
   _check_interval = value;
-  return true;
-}
-
-/**
- *  Set check_period value.
- *
- *  @param[in] value The new check_period value.
- *
- *  @return True on success, otherwise false.
- */
-bool anomalydetection::_set_check_period(std::string const& value) {
-  _check_period = value;
   return true;
 }
 

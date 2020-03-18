@@ -107,7 +107,7 @@ void applier::anomalydetection::add_object(
   engine::anomalydetection* ad{add_anomalydetection(
       obj.host_id(), obj.service_id(), obj.host_name(),
       obj.service_description(), obj.display_name(), obj.dependent_service_id(),
-      obj.metric_name(), obj.thresholds_file(), obj.status_change(), obj.check_period(),
+      obj.metric_name(), obj.thresholds_file(), obj.status_change(),
       static_cast<engine::anomalydetection::service_state>(obj.initial_state()),
       obj.max_check_attempts(), obj.check_interval(), obj.retry_interval(),
       obj.notification_interval(), obj.first_notification_delay(),
@@ -322,7 +322,6 @@ void applier::anomalydetection::modify_object(configuration::anomalydetection co
                       : notifier::none);
 
   s->set_notification_period(obj.notification_period());
-  s->set_check_period(obj.check_period());
   s->set_flap_detection_enabled(obj.flap_detection_enabled());
   s->set_low_flap_threshold(obj.low_flap_threshold());
   s->set_high_flap_threshold(obj.high_flap_threshold());

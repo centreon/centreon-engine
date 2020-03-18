@@ -50,7 +50,6 @@ using namespace com::centreon::engine::logging;
  *                                          metric thresholds.
  *  @param[in] status_change                Should we follow the thresholds file
  *                                          to determine status.
- *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
  *  @param[in] accept_passive_checks        Does this service accept
@@ -137,7 +136,6 @@ anomalydetection::anomalydetection(uint64_t host_id,
                                    std::string const& notification_period,
                                    bool notifications_enabled,
                                    bool is_volatile,
-                                   std::string const& check_period,
                                    std::string const& event_handler,
                                    bool event_handler_enabled,
                                    std::string const& notes,
@@ -160,7 +158,7 @@ anomalydetection::anomalydetection(uint64_t host_id,
               max_attempts,                first_notification_delay,
               recovery_notification_delay, notification_period,
               notifications_enabled,       is_volatile,
-              check_period,                event_handler,
+              dependent_service->get_check_period(), event_handler,
               event_handler_enabled,       notes,
               notes_url,                   action_url,
               icon_image,                  icon_image_alt,
@@ -190,7 +188,6 @@ anomalydetection::anomalydetection(uint64_t host_id,
  *  @param[in] thresholds_file,             fullname to the thresholds file.
  *  @param[in] status_change,               should we follow the thresholds file
  *                                          to determine status.
- *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
  *  @param[in] accept_passive_checks        Does this service accept
@@ -266,7 +263,6 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
     std::string const& metric_name,
     std::string const& thresholds_file,
     bool status_change,
-    std::string const& check_period,
     com::centreon::engine::service::service_state initial_state,
     int max_attempts,
     double check_interval,
@@ -396,7 +392,6 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
       notification_period,
       notifications_enabled,
       is_volatile,
-      check_period,
       event_handler,
       event_handler_enabled,
       notes,
@@ -934,4 +929,9 @@ const std::string& anomalydetection::get_metric_name() const {
 
 const std::string& anomalydetection::get_thresholds_file() const {
   return _thresholds_file;
+}
+
+void anomalydetection::resolve(int& w, int& e) {
+  set_check_period(_dependent_service->get_check_period());
+  service::resolve(w, e);
 }

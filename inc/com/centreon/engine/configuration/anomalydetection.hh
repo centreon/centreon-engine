@@ -70,7 +70,6 @@ class anomalydetection : public object {
   std::string const& thresholds_file() const noexcept;
   bool check_freshness() const noexcept;
   unsigned int check_interval() const noexcept;
-  std::string const& check_period() const noexcept;
   set_string& contactgroups() noexcept;
   set_string const& contactgroups() const noexcept;
   bool contactgroups_defined() const noexcept;
@@ -139,7 +138,6 @@ class anomalydetection : public object {
   bool _set_checks_passive(bool value);
   bool _set_check_freshness(bool value);
   bool _set_check_interval(unsigned int value);
-  bool _set_check_period(std::string const& value);
   bool _set_contactgroups(std::string const& value);
   bool _set_contacts(std::string const& value);
   bool _set_display_name(std::string const& value);
@@ -186,7 +184,6 @@ class anomalydetection : public object {
   std::string _thresholds_file;
   opt<bool> _check_freshness;
   opt<unsigned int> _check_interval;
-  std::string _check_period;
   group<set_string> _contactgroups;
   group<set_string> _contacts;
   map_customvar _customvariables;
