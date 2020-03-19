@@ -52,15 +52,18 @@ find_package(grpc REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(c-ares REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(json11 REQUIRED)
 
 include_directories(${grpc_INCLUDE_DIRS})
 include_directories(${protobuf_INCLUDE_DIRS})
+include_directories(${json11_INCLUDE_DIRS})
 
 link_directories(${protobuf_LIB_DIRS})
 link_directories(${grpc_LIB_DIRS})
 link_directories(${OpenSSL_LIB_DIRS})
 link_directories(${c-ares_LIB_DIRS})
 link_directories(${ZLIB_LIB_DIRS})
+link_directories(${json11_LIB_DIRS})
 
 # Version.
 set(CENTREON_ENGINE_MAJOR 20)
@@ -619,7 +622,7 @@ add_library(cce_core ${LIBRARY_TYPE} ${FILES})
 add_dependencies(cce_core json11_lib)
 
 # Link target with required libraries.
-target_link_libraries(cce_core json11
+target_link_libraries(cce_core ${json11_LIBS}
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
@@ -645,7 +648,6 @@ target_link_libraries(centengine cce_core ${CLIB_LIBRARIES} ${ENGINERPC} ${proto
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
 target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
-add_dependencies(centenginestats json11_lib)
 get_property(CENTENGINESTATS_BINARY TARGET "centenginestats" PROPERTY LOCATION)
 
 # Unit tests.

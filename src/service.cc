@@ -1074,9 +1074,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   set_last_check(queued_check_result->get_start_time().tv_sec);
 
   /* was this check passive or active? */
-  set_check_type((queued_check_result->get_check_type() == check_active)
-                     ? check_active
-                     : check_passive);
+  set_check_type(queued_check_result->get_check_type());
 
   /* update check statistics for passive checks */
   if (queued_check_result->get_check_type() == check_passive)
@@ -1107,7 +1105,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_plugin_output("(Service check did not exit properly)");
     _current_state = service::state_unknown;
   }
-
   /* make sure the return code is within bounds */
   else if (queued_check_result->get_return_code() < 0 ||
            queued_check_result->get_return_code() > 3) {
@@ -1135,7 +1132,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_plugin_output(oss.str());
     _current_state = service::state_unknown;
   }
-
   /* else the return code is okay... */
   else {
     /*
@@ -1373,7 +1369,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /* reset the acknowledgement flag (this should already have been done, but
      * just in case...) */
     set_problem_has_been_acknowledged(false);
-    this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+    set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
     /* verify the route to the host and send out host recovery notifications */
     if (hst->get_current_state() != host::state_up) {
