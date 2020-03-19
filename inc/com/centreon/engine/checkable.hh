@@ -117,8 +117,8 @@ class checkable {
   void set_last_hard_state_change(std::time_t last_hard_state_change);
   uint32_t get_state_history_index() const;
   void set_state_history_index(uint32_t state_history_index);
-  int get_check_type() const;
-  void set_check_type(int check_type);
+  enum checkable::check_type get_check_type() const;
+  void set_check_type(check_type check_type);
   int get_current_attempt() const;
   void set_current_attempt(int current_attempt);
   void add_current_attempt(int num);
@@ -183,7 +183,7 @@ class checkable {
   bool _accept_passive_checks;
   bool _check_freshness;
   int _freshness_threshold;
-  int _check_type;
+  check_type _check_type;
   int _current_attempt;
   bool _has_been_checked;
   int _scheduled_downtime_depth;

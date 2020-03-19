@@ -305,11 +305,11 @@ void checkable::set_check_freshness(bool check_freshness) {
   _check_freshness = check_freshness;
 }
 
-int checkable::get_check_type() const {
+enum checkable::check_type checkable::get_check_type() const {
   return _check_type;
 }
 
-void checkable::set_check_type(int check_type) {
+void checkable::set_check_type(checkable::check_type check_type) {
   _check_type = check_type;
 }
 

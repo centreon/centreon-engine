@@ -1193,10 +1193,11 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   logger(dbg_functions, basic) << "handle_async_host_check_result_3x()";
 
   /* make sure we have what we need */
-  if (queued_check_result == nullptr)
+  if (!queued_check_result)
     return ERROR;
 
-  time_t current_time{std::time(nullptr)};
+  /* get the current time */
+  time_t current_time = std::time(nullptr);
 
   double execution_time =
       static_cast<double>(queued_check_result->get_finish_time().tv_sec -
@@ -1209,7 +1210,6 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
 
   logger(dbg_checks, more) << "** Handling async check result for host '"
                            << get_name() << "'...";
-
   logger(dbg_checks, most)
       << "\tCheck Type:         "
       << (queued_check_result->get_check_type() == check_active ? "Active"
@@ -1220,7 +1220,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       << "\tReschedule Check?:  "
       << (queued_check_result->get_reschedule_check() ? "Yes" : "No") << "\n"
       << "\tShould Reschedule Current Host Check?:"
-      << host::hosts[get_name()]->get_should_reschedule_current_check()
+      << get_should_reschedule_current_check()
       << "\tExited OK?:         "
       << (queued_check_result->get_exited_ok() ? "Yes" : "No") << "\n"
       << com::centreon::logging::setprecision(3)
@@ -1235,7 +1235,8 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       currently_running_host_checks > 0)
     currently_running_host_checks--;
 
-  /* skip this host check results if its passive and we aren't accepting passive
+  /*
+   * skip this host check results if its passive and we aren't accepting passive
    * check results */
   if (queued_check_result->get_check_type() == check_passive) {
     if (!config->accept_passive_host_checks()) {
@@ -1252,7 +1253,8 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
     }
   }
 
-  /* clear the freshening flag (it would have been set if this host was
+  /*
+   * clear the freshening flag (it would have been set if this host was
    * determined to be stale) */
   if (queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK)
     set_is_being_freshened(false);
@@ -1293,12 +1295,12 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   // on the same host at the same time. The flag is then set in the host
   // and this check should be rescheduled regardless of what it was meant
   // to initially.
-  if (host::hosts[get_name()]->get_should_reschedule_current_check() &&
+  if (get_should_reschedule_current_check() &&
       !queued_check_result->get_reschedule_check())
     reschedule_check = true;
 
   // Clear the should reschedule flag.
-  host::hosts[get_name()]->set_should_reschedule_current_check(false);
+  set_should_reschedule_current_check(false);
 
   /* check latency is passed to us for both active and passive checks */
   set_latency(queued_check_result->get_latency());
@@ -2113,7 +2115,7 @@ void host::check_for_expired_acknowledgement() {
  * active/passive) */
 int host::handle_state() {
   bool state_change = false;
-  time_t current_time = 0L;
+  time_t current_time;
 
   logger(dbg_functions, basic) << "handle_host_state()";
 

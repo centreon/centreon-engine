@@ -968,7 +968,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   int hard_state_change = false;
   int first_host_check_initiated = false;
   host::host_state route_result = host::state_up;
-  time_t current_time = 0L;
   int state_was_logged = false;
   std::string old_plugin_output;
   std::list<service*> check_servicelist;
@@ -981,11 +980,21 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   logger(dbg_functions, basic) << "handle_async_service_check_result()";
 
   /* make sure we have what we need */
-  if (queued_check_result == nullptr)
+  if (!queued_check_result)
     return ERROR;
 
   /* get the current time */
-  time(&current_time);
+  time_t current_time = std::time(nullptr);
+
+  /* update the execution time for this check (millisecond resolution) */
+  double execution_time =
+      static_cast<double>(queued_check_result->get_finish_time().tv_sec -
+                          queued_check_result->get_start_time().tv_sec) +
+      static_cast<double>(queued_check_result->get_finish_time().tv_usec -
+                          queued_check_result->get_start_time().tv_usec) /
+          1000000.0;
+  if (execution_time < 0.0)
+    execution_time = 0.0;
 
   logger(dbg_checks, basic)
       << "** Handling check result for service '" << _description
@@ -1000,6 +1009,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       << (queued_check_result->get_reschedule_check() ? "Yes" : "No")
       << ", EXITED OK: "
       << (queued_check_result->get_exited_ok() ? "Yes" : "No")
+      << ", EXEC TIME: " << execution_time
       << ", return CODE: " << queued_check_result->get_return_code()
       << ", OUTPUT: " << queued_check_result->get_output();
 
@@ -1010,8 +1020,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /*
    * skip this service check results if its passive and we aren't accepting
-   * passive check results
-   */
+   * passive check results */
   if (queued_check_result->get_check_type() == check_passive) {
     if (!config->accept_passive_service_checks()) {
       logger(dbg_checks, basic)
@@ -1032,7 +1041,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * determined to be stale)
    */
   if (queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK)
-    this->set_is_being_freshened(false);
+    set_is_being_freshened(false);
 
   /* clear the execution flag if this was an active check */
   if (queued_check_result->get_check_type() == check_active)
@@ -1059,15 +1068,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* check latency is passed to us */
   set_latency(queued_check_result->get_latency());
 
-  /* update the execution time for this check (millisecond resolution) */
-  double execution_time =
-      static_cast<double>(queued_check_result->get_finish_time().tv_sec -
-                          queued_check_result->get_start_time().tv_sec) +
-      static_cast<double>(queued_check_result->get_finish_time().tv_usec -
-                          queued_check_result->get_start_time().tv_usec) /
-          1000000.0;
-  if (execution_time < 0.0)
-    execution_time = 0.0;
   set_execution_time(execution_time);
 
   /* get the last check time */
@@ -1881,11 +1881,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* run async checks of all services we added above */
   /* don't run a check if one is already executing or we can get by with a
    * cached state */
-  for (std::list<service*>::iterator it{check_servicelist.begin()},
-       end{check_servicelist.end()};
-       it != end; ++it) {
+  for (auto svc : check_servicelist) {
     run_async_check = true;
-    service* svc{*it};
 
     /* we can get by with a cached state, so don't check the service */
     if (static_cast<unsigned long>(current_time - svc->get_last_check()) <=
