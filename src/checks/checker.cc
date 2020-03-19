@@ -208,7 +208,7 @@ void checker::reap() {
       // Check if reaping has timed out.
       time_t current_time;
       time(&current_time);
-      if ((current_time - reaper_start_time) >
+      if (current_time - reaper_start_time >
           static_cast<time_t>(config->max_check_reaper_time())) {
         logger(dbg_checks, basic) << "Breaking out of check result reaper: "
                                   << "max reaper time exceeded";
