@@ -37,6 +37,7 @@
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -92,6 +93,9 @@ int main(int argc, char* argv[]) {
 
   // Load singletons and global variable.
   config = new configuration::state;
+
+  // Hack to instanciate the logger.
+  configuration::applier::logging::instance();
 
   logging::broker backend_broker_log;
 
