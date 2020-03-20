@@ -569,12 +569,21 @@ int process_passive_service_check(time_t check_time,
 
   timeval set_tv = {.tv_sec = check_time, .tv_usec = 0};
 
-  check_result* result = new check_result(service_check, found->second->get_host_id(),
-                      found->second->get_service_id(), checkable::check_passive,
-                      CHECK_OPTION_NONE, false,
-                      static_cast<double>(tv.tv_sec - check_time) +
-                      static_cast<double>(tv.tv_usec / 1000000.0),
-                      set_tv, set_tv, false, true, return_code, output);
+  check_result* result =
+      new check_result(service_check,
+                       found->second->get_host_id(),
+                       found->second->get_service_id(),
+                       checkable::check_passive,
+                       CHECK_OPTION_NONE,
+                       false,
+                       static_cast<double>(tv.tv_sec - check_time) +
+                           static_cast<double>(tv.tv_usec / 1000000.0),
+                       set_tv,
+                       set_tv,
+                       false,
+                       true,
+                       return_code,
+                       output);
 
   /* make sure the return code is within bounds */
   if (result->get_return_code() < 0 || result->get_return_code() > 3) {

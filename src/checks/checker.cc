@@ -155,6 +155,8 @@ void checker::reap() {
         }
       }
 
+      delete result;
+
       // Check if reaping has timed out.
       time_t current_time;
       time(&current_time);
