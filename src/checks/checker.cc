@@ -60,8 +60,12 @@ checker& checker::instance() {
 
 void checker::clear() {
   try {
-    // FIXME DBR: memory leak...
     std::lock_guard<std::mutex> lock(_mut_reap);
+    while (!_to_reap.empty()) {
+      check_result* result = _to_reap.front();
+      _to_reap.pop();
+      delete result;
+    }
     std::queue<check_result*> empty;
     std::swap(_to_reap, empty);
     auto it = _waiting_check_result.begin();
@@ -69,7 +73,6 @@ void checker::clear() {
       delete it->second;
       it = _waiting_check_result.erase(it);
     }
-    _to_reap_partial.clear();
   } catch (...) {
   }
 }
@@ -89,14 +92,14 @@ void checker::reap() {
   unsigned int reaped_checks(0);
   {  // Scope to release mutex in all termination cases.
     std::unique_lock<std::mutex> lock(_mut_reap);
-
-    // Merge partial check results.
-    auto it_partial = _to_reap_partial.begin();
-    while (it_partial != _to_reap_partial.end()) {
-      // Push back in reap list.
-      _to_reap.push(it_partial->second);
-      it_partial = _to_reap_partial.erase(it_partial);
-    }
+//
+//    // Merge partial check results.
+//    auto it_partial = _to_reap_partial.begin();
+//    while (it_partial != _to_reap_partial.end()) {
+//      // Push back in reap list.
+//      _to_reap.push(it_partial->second);
+//      it_partial = _to_reap_partial.erase(it_partial);
+//    }
 //    while (!_to_reap_partial.empty()) {
 //      // Find the two parts.
 //      auto it_partial = _to_reap_partial.begin();
@@ -410,7 +413,7 @@ void checker::finished(commands::result const& res) noexcept {
 
   // Queue check result.
   lock.lock();
-  _to_reap_partial[res.command_id] = result;
+  _to_reap.push(result);
 }
 
 /**
