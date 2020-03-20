@@ -64,7 +64,11 @@ void checker::clear() {
     std::lock_guard<std::mutex> lock(_mut_reap);
     std::queue<check_result*> empty;
     std::swap(_to_reap, empty);
-    _list_id.clear();
+    auto it = _waiting_check_result.begin();
+    while (it != _waiting_check_result.end()) {
+      delete it->second;
+      it = _waiting_check_result.erase(it);
+    }
     _to_reap_partial.clear();
   } catch (...) {
   }
@@ -81,50 +85,44 @@ void checker::reap() {
   time_t reaper_start_time;
   time(&reaper_start_time);
 
-//  // Keep compatibility with old check result list.
-//  if (!check_result::results.empty()) {
-//    std::lock_guard<std::mutex> lock(_mut_reap);
-//    check_result* cr(nullptr);
-//    for (check_result_list::iterator it(check_result::results.begin()),
-//         end(check_result::results.end());
-//         it != end; ++it) {
-//      _to_reap.push(*it);
-//      delete cr;
-//    }
-//  }
-
   // Reap check results.
   unsigned int reaped_checks(0);
   {  // Scope to release mutex in all termination cases.
     std::unique_lock<std::mutex> lock(_mut_reap);
 
     // Merge partial check results.
-    while (!_to_reap_partial.empty()) {
-      // Find the two parts.
-      auto it_partial = _to_reap_partial.begin();
-      auto it_id = _list_id.find(it_partial->first);
-      if (_list_id.end() == it_id) {
-        logger(log_runtime_warning, basic)
-            << "command ID '" << it_partial->first << "' not found";
-      } else {
-        // Extract base part.
-        logger(dbg_checks, basic)
-            << "command ID (" << it_partial->first << ") executed";
-        check_result* result = it_id->second;
-        _list_id.erase(it_id);
-
-        // Merge check result.
-        result->set_finish_time(it_partial->second->get_finish_time());
-        result->set_early_timeout(it_partial->second->get_early_timeout());
-        result->set_return_code(it_partial->second->get_return_code());
-        result->set_exited_ok(it_partial->second->get_exited_ok());
-        result->set_output(it_partial->second->get_output());
-
-        // Push back in reap list.
-        _to_reap.push(result);
-      }
-      _to_reap_partial.erase(it_partial);
+    auto it_partial = _to_reap_partial.begin();
+    while (it_partial != _to_reap_partial.end()) {
+      // Push back in reap list.
+      _to_reap.push(it_partial->second);
+      it_partial = _to_reap_partial.erase(it_partial);
     }
+//    while (!_to_reap_partial.empty()) {
+//      // Find the two parts.
+//      auto it_partial = _to_reap_partial.begin();
+//      auto it_id = _waiting_check_result.find(it_partial->first);
+//      if (_waiting_check_result.end() == it_id) {
+//        logger(log_runtime_warning, basic)
+//            << "command ID '" << it_partial->first << "' not found";
+//      } else {
+//        // Extract base part.
+//        logger(dbg_checks, basic)
+//            << "command ID (" << it_partial->first << ") executed";
+//        check_result* result = it_id->second;
+//        _waiting_check_result.erase(it_id);
+//
+//        // Merge check result.
+//        result->set_finish_time(it_partial->second->get_finish_time());
+//        result->set_early_timeout(it_partial->second->get_early_timeout());
+//        result->set_return_code(it_partial->second->get_return_code());
+//        result->set_exited_ok(it_partial->second->get_exited_ok());
+//        result->set_output(it_partial->second->get_output());
+//
+//        // Push back in reap list.
+//        _to_reap.push(result);
+//      }
+//      _to_reap_partial.erase(it_partial);
+//    }
 
     // Process check results.
     while (!_to_reap.empty()) {
@@ -386,22 +384,32 @@ void checker::finished(commands::result const& res) noexcept {
   // Debug message.
   logger(dbg_functions, basic) << "checker::finished: res=" << &res;
 
-  // Find check result.
-  check_result* result = new check_result;
+  std::unique_lock<std::mutex> lock(_mut_reap);
+  auto it_id = _waiting_check_result.find(res.command_id);
+  if (it_id == _waiting_check_result.end()) {
+    logger(log_runtime_warning, basic)
+      << "command ID '" << res.command_id << "' not found";
+    return;
+  }
 
-  struct timeval tv;
+  // Find check result.
+  check_result* result = it_id->second;
+  _waiting_check_result.erase(it_id);
+  lock.unlock();
+
   // Update check result.
-  tv.tv_sec = res.end_time.to_seconds();
-  tv.tv_usec = res.end_time.to_useconds() - tv.tv_sec * 1000000ull;
+  struct timeval tv = {.tv_sec = res.end_time.to_seconds(),
+                       .tv_usec = res.end_time.to_useconds() % 1000000ll};
+
   result->set_finish_time(tv);
   result->set_early_timeout(res.exit_status == process::timeout);
   result->set_return_code(res.exit_code);
-  result->set_exited_ok((res.exit_status == process::normal) ||
-                      (res.exit_status == process::timeout));
+  result->set_exited_ok(res.exit_status == process::normal ||
+                        res.exit_status == process::timeout);
   result->set_output(res.output);
 
   // Queue check result.
-  std::lock_guard<std::mutex> lock(_mut_reap);
+  lock.lock();
   _to_reap_partial[res.command_id] = result;
 }
 
@@ -620,7 +628,8 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
  */
 void checker::add_check_result(uint64_t id,
                                check_result* check_result) noexcept {
-  _list_id[id] = check_result;
+  std::lock_guard<std::mutex> lock(_mut_reap);
+  _waiting_check_result[id] = check_result;
 }
 
 /**
