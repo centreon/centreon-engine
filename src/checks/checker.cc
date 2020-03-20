@@ -58,16 +58,19 @@ checker& checker::instance() {
   return instance;
 }
 
-void checker::clear() {
+void checker::clear() noexcept {
   try {
     std::lock_guard<std::mutex> lock(_mut_reap);
+    while (!_to_reap_partial.empty()) {
+      check_result* result = _to_reap_partial.front();
+      _to_reap_partial.pop();
+      delete result;
+    }
     while (!_to_reap.empty()) {
       check_result* result = _to_reap.front();
       _to_reap.pop();
       delete result;
     }
-    std::queue<check_result*> empty;
-    std::swap(_to_reap, empty);
     auto it = _waiting_check_result.begin();
     while (it != _waiting_check_result.end()) {
       delete it->second;
@@ -91,41 +94,10 @@ void checker::reap() {
   // Reap check results.
   unsigned int reaped_checks(0);
   {  // Scope to release mutex in all termination cases.
-    std::unique_lock<std::mutex> lock(_mut_reap);
-//
-//    // Merge partial check results.
-//    auto it_partial = _to_reap_partial.begin();
-//    while (it_partial != _to_reap_partial.end()) {
-//      // Push back in reap list.
-//      _to_reap.push(it_partial->second);
-//      it_partial = _to_reap_partial.erase(it_partial);
-//    }
-//    while (!_to_reap_partial.empty()) {
-//      // Find the two parts.
-//      auto it_partial = _to_reap_partial.begin();
-//      auto it_id = _waiting_check_result.find(it_partial->first);
-//      if (_waiting_check_result.end() == it_id) {
-//        logger(log_runtime_warning, basic)
-//            << "command ID '" << it_partial->first << "' not found";
-//      } else {
-//        // Extract base part.
-//        logger(dbg_checks, basic)
-//            << "command ID (" << it_partial->first << ") executed";
-//        check_result* result = it_id->second;
-//        _waiting_check_result.erase(it_id);
-//
-//        // Merge check result.
-//        result->set_finish_time(it_partial->second->get_finish_time());
-//        result->set_early_timeout(it_partial->second->get_early_timeout());
-//        result->set_return_code(it_partial->second->get_return_code());
-//        result->set_exited_ok(it_partial->second->get_exited_ok());
-//        result->set_output(it_partial->second->get_output());
-//
-//        // Push back in reap list.
-//        _to_reap.push(result);
-//      }
-//      _to_reap_partial.erase(it_partial);
-//    }
+    {
+      std::lock_guard<std::mutex> lock(_mut_reap);
+      std::swap(_to_reap, _to_reap_partial);
+    }
 
     // Process check results.
     while (!_to_reap.empty()) {
@@ -134,7 +106,6 @@ void checker::reap() {
           << "Found a check result (#" << ++reaped_checks << ") to handle...";
       check_result* result = _to_reap.front();
       _to_reap.pop();
-      lock.unlock();
 
       // Service check result->
       if (service_check == result->get_object_check_type()) {
@@ -200,25 +171,12 @@ void checker::reap() {
             << "Breaking out of check result reaper: signal encountered";
         break;
       }
-
-      // Mutex needed to access list.
-      lock.lock();
     }
   }
 
   // Reaping finished.
   logger(dbg_checks, basic)
       << "Finished reaping " << reaped_checks << " check results";
-}
-
-/**
- *  Check if the reaper queue is empty.
- *
- *  @return True if the reper queue is empty, otherwise false.
- */
-bool checker::reaper_is_empty() {
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  return _to_reap.empty();
 }
 
 /**
@@ -369,13 +327,14 @@ checker::checker() : commands::command_listener() {}
  *  Default destructor.
  */
 checker::~checker() noexcept {
-  try {
-    std::lock_guard<std::mutex> lock(_mut_reap);
-    while (!_to_reap.empty()) {
-      _to_reap.pop();
-    }
-  } catch (...) {
-  }
+  clear();
+//  try {
+//    std::lock_guard<std::mutex> lock(_mut_reap);
+//    while (!_to_reap.empty()) {
+//      _to_reap.pop();
+//    }
+//  } catch (...) {
+//  }
 }
 
 /**
@@ -413,7 +372,7 @@ void checker::finished(commands::result const& res) noexcept {
 
   // Queue check result.
   lock.lock();
-  _to_reap.push(result);
+  _to_reap_partial.push(result);
 }
 
 /**
@@ -643,5 +602,5 @@ void checker::add_check_result(uint64_t id,
  */
 void checker::add_check_result_to_reap(check_result* check_result) noexcept {
   std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_reap.push(check_result);
+  _to_reap_partial.push(check_result);
 }
