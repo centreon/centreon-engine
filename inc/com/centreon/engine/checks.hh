@@ -32,7 +32,7 @@ CCE_BEGIN()
 class check_result;
 CCE_END()
 
-typedef std::list<com::centreon::engine::check_result> check_result_list;
+typedef std::list<com::centreon::engine::check_result*> check_result_list;
 
 // CHECK_RESULT structure
 CCE_BEGIN()

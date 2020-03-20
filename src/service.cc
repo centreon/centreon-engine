@@ -2300,10 +2300,10 @@ int service::run_async_check(int check_options,
                              bool reschedule_check,
                              bool* time_is_valid,
                              time_t* preferred_time) noexcept {
-  logger(dbg_functions, basic)
-      << "service::run_async_check, check_options=" << check_options
-      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
-      << ", reschedule_check=" << reschedule_check;
+  logger(dbg_functions, basic) << "service::run_async_check, check_options="
+                               << check_options << ", latency=" << latency
+                               << ", scheduled_check=" << scheduled_check
+                               << ", reschedule_check=" << reschedule_check;
 
   // Preamble.
   if (!get_check_command_ptr()) {
@@ -2314,9 +2314,9 @@ int service::run_async_check(int check_options,
     return ERROR;
   }
 
-  logger(dbg_checks, basic)
-      << "** Running async check of service '" << get_description()
-      << "' on host '" << get_hostname() << "'...";
+  logger(dbg_checks, basic) << "** Running async check of service '"
+                            << get_description() << "' on host '"
+                            << get_hostname() << "'...";
 
   // Check if the service is viable now.
   if (!verify_check_viability(check_options, time_is_valid, preferred_time))
@@ -2327,17 +2327,27 @@ int service::run_async_check(int check_options,
   timeval end_time;
   memset(&start_time, 0, sizeof(start_time));
   memset(&end_time, 0, sizeof(end_time));
-  int res =
-      broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE,
-                           NEBATTR_NONE, this, checkable::check_active,
-                           start_time, end_time, get_check_command().c_str(),
-                           get_latency(), 0.0, 0, false, 0, nullptr, nullptr);
+  int res = broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK,
+                                 NEBFLAG_NONE,
+                                 NEBATTR_NONE,
+                                 this,
+                                 checkable::check_active,
+                                 start_time,
+                                 end_time,
+                                 get_check_command().c_str(),
+                                 get_latency(),
+                                 0.0,
+                                 0,
+                                 false,
+                                 0,
+                                 nullptr,
+                                 nullptr);
 
   // Service check was cancel by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
     if (preferred_time != nullptr)
-      *preferred_time += static_cast<time_t>(get_check_interval() *
-                                             config->interval_length());
+      *preferred_time +=
+          static_cast<time_t>(get_check_interval() * config->interval_length());
     logger(log_runtime_error, basic)
         << "Error: Some broker module cancelled check of service '"
         << get_description() << "' on host '" << get_hostname();
@@ -2368,8 +2378,8 @@ int service::run_async_check(int check_options,
   grab_host_macros_r(&macros, get_host_ptr());
   grab_service_macros_r(&macros, this);
   std::string tmp;
-  get_raw_command_line_r(&macros, get_check_command_ptr(),
-                         get_check_command().c_str(), tmp, 0);
+  get_raw_command_line_r(
+      &macros, get_check_command_ptr(), get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
   gettimeofday(&start_time, nullptr);
@@ -2380,22 +2390,26 @@ int service::run_async_check(int check_options,
   // Set the execution flag.
   set_is_executing(true);
 
-  // Init check result info.
-  check_result check_result_info(
-      service_check, get_host_id(), get_service_id(),
-      checkable::check_active, check_options, reschedule_check, latency,
-      start_time, start_time, false, true, service::state_ok, "");
-
   // Get command object.
   commands::command* cmd = get_check_command_ptr();
   std::string processed_cmd(cmd->process_cmd(&macros));
 
   // Send event broker.
-  res = broker_service_check(
-      NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, this,
-      checkable::check_active, start_time, end_time,
-      get_check_command().c_str(), get_latency(), 0.0,
-      config->service_check_timeout(), false, 0, processed_cmd.c_str(), nullptr);
+  res = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
+                             NEBFLAG_NONE,
+                             NEBATTR_NONE,
+                             this,
+                             checkable::check_active,
+                             start_time,
+                             end_time,
+                             get_check_command().c_str(),
+                             get_latency(),
+                             0.0,
+                             config->service_check_timeout(),
+                             false,
+                             0,
+                             processed_cmd.c_str(),
+                             nullptr);
 
   // Restore latency.
   set_latency(old_latency);
@@ -2407,38 +2421,53 @@ int service::run_async_check(int check_options,
   }
 
   // Update statistics.
-  update_check_stats(scheduled_check
-                         ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
-                         : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
+  update_check_stats(scheduled_check ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
+                                     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
                      start_time.tv_sec);
 
   bool retry;
+  std::unique_ptr<check_result> check_result_info;
   do {
+    // Init check result info.
+    check_result_info.reset(new check_result(service_check,
+                                             get_host_id(),
+                                             get_service_id(),
+                                             checkable::check_active,
+                                             check_options,
+                                             reschedule_check,
+                                             latency,
+                                             start_time,
+                                             start_time,
+                                             false,
+                                             true,
+                                             service::state_ok,
+                                             ""));
+
     retry = false;
     try {
       // Run command.
       uint64_t id =
           cmd->run(processed_cmd, macros, config->service_check_timeout());
       if (id != 0)
-        checks::checker::instance().add_check_result(id, check_result_info);
-    } catch (com::centreon::exceptions::interruption const& e) {
-      (void)e;
+        checks::checker::instance().add_check_result(
+            id, check_result_info.release());
+    }
+    catch (com::centreon::exceptions::interruption const& e) {
       retry = true;
-    } catch (std::exception const& e) {
-      timestamp now(timestamp::now());
-
+    }
+    catch (std::exception const& e) {
       // Update check result.
       timeval tv;
       gettimeofday(&tv, nullptr);
-      check_result_info.set_finish_time(tv);
-
-      check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(service::state_unknown);
-      check_result_info.set_exited_ok(true);
-      check_result_info.set_output("(Execute command failed)");
+      check_result_info->set_finish_time(tv);
+      check_result_info->set_early_timeout(false);
+      check_result_info->set_return_code(service::state_unknown);
+      check_result_info->set_exited_ok(true);
+      check_result_info->set_output("(Execute command failed)");
 
       // Queue check result.
-      checks::checker::instance().add_check_result_to_reap(check_result_info);
+      checks::checker::instance().add_check_result_to_reap(
+          check_result_info.release());
 
       logger(log_runtime_warning, basic)
           << "Error: Service check command execution failed: " << e.what();

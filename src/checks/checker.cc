@@ -60,34 +60,14 @@ checker& checker::instance() {
 
 void checker::clear() {
   try {
+    // FIXME DBR: memory leak...
     std::lock_guard<std::mutex> lock(_mut_reap);
-    std::queue<check_result> empty;
+    std::queue<check_result*> empty;
     std::swap(_to_reap, empty);
     _list_id.clear();
     _to_reap_partial.clear();
   } catch (...) {
   }
-}
-
-/**
- *  Add into the queue a result to reap later.
- *
- *  @param[in] result The check_result to process later.
- */
-void checker::push_check_result(check_result&& result) {
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_reap.push(result);
-}
-
-/**
- *  Add into the queue a result to reap later.
- *
- *  @param[in] result The check_result to process later.
- */
-void checker::push_check_result(check_result const* result) {
-  check_result res{*result};
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_reap.push(res);
 }
 
 /**
@@ -121,10 +101,8 @@ void checker::reap() {
     // Merge partial check results.
     while (!_to_reap_partial.empty()) {
       // Find the two parts.
-      std::unordered_map<uint64_t, check_result>::iterator it_partial(
-          _to_reap_partial.begin());
-      std::unordered_map<uint64_t, check_result>::iterator it_id(
-          _list_id.find(it_partial->first));
+      auto it_partial = _to_reap_partial.begin();
+      auto it_id = _list_id.find(it_partial->first);
       if (_list_id.end() == it_id) {
         logger(log_runtime_warning, basic)
             << "command ID '" << it_partial->first << "' not found";
@@ -132,15 +110,15 @@ void checker::reap() {
         // Extract base part.
         logger(dbg_checks, basic)
             << "command ID (" << it_partial->first << ") executed";
-        check_result result{std::move(it_id->second)};
+        check_result* result = it_id->second;
         _list_id.erase(it_id);
 
         // Merge check result.
-        result.set_finish_time(it_partial->second.get_finish_time());
-        result.set_early_timeout(it_partial->second.get_early_timeout());
-        result.set_return_code(it_partial->second.get_return_code());
-        result.set_exited_ok(it_partial->second.get_exited_ok());
-        result.set_output(it_partial->second.get_output());
+        result->set_finish_time(it_partial->second->get_finish_time());
+        result->set_early_timeout(it_partial->second->get_early_timeout());
+        result->set_return_code(it_partial->second->get_return_code());
+        result->set_exited_ok(it_partial->second->get_exited_ok());
+        result->set_output(it_partial->second->get_output());
 
         // Push back in reap list.
         _to_reap.push(result);
@@ -153,54 +131,54 @@ void checker::reap() {
       // Get result host or service check.
       logger(dbg_checks, basic)
           << "Found a check result (#" << ++reaped_checks << ") to handle...";
-      check_result result(_to_reap.front());
+      check_result* result = _to_reap.front();
       _to_reap.pop();
       lock.unlock();
 
-      // Service check result.
-      if (service_check == result.get_object_check_type()) {
+      // Service check result->
+      if (service_check == result->get_object_check_type()) {
         service_id_map::iterator it = service::services_by_id.find(
-            {result.get_host_id(), result.get_service_id()});
+            {result->get_host_id(), result->get_service_id()});
         if (it == service::services_by_id.end()) {
           logger(log_runtime_error, basic)
               << "Warning: Check result queue contained results for service "
-              << result.get_host_id() << "/" << result.get_service_id()
+              << result->get_host_id() << "/" << result->get_service_id()
               << ", but the service could not be found! Perhaps you forgot to "
                  "define the service in your config files ?";
         } else {
           try {
             // Check if the service exists.
             logger(dbg_checks, more)
-                << "Handling check result for service " << result.get_host_id()
-                << "/" << result.get_service_id() << "...";
-            it->second->handle_async_check_result(&result);
+                << "Handling check result for service " << result->get_host_id()
+                << "/" << result->get_service_id() << "...";
+            it->second->handle_async_check_result(result);
           } catch (std::exception const& e) {
             logger(log_runtime_warning, basic)
                 << "Check result queue errors for service "
-                << result.get_host_id() << "/" << result.get_service_id()
+                << result->get_host_id() << "/" << result->get_service_id()
                 << " : " << e.what();
           }
         }
       }
-      // Host check result.
+      // Host check result->
       else {
-        host_id_map::iterator it = host::hosts_by_id.find(result.get_host_id());
+        host_id_map::iterator it = host::hosts_by_id.find(result->get_host_id());
         if (it == host::hosts_by_id.end())
           logger(log_runtime_warning, basic)
               << "Warning: Check result queue contained results for "
-              << "host " << result.get_host_id() << ", but the host could "
+              << "host " << result->get_host_id() << ", but the host could "
               << "not be found! Perhaps you forgot to define the host in "
               << "your config files ?";
         else {
           try {
-            // Process the check result.
+            // Process the check result->
             logger(dbg_checks, more) << "Handling check result for host "
-                                     << result.get_host_id() << "...";
-            it->second->handle_async_check_result_3x(&result);
+                                     << result->get_host_id() << "...";
+            it->second->handle_async_check_result_3x(result);
           } catch (std::exception const& e) {
             logger(log_runtime_error, basic)
                 << "Check result queue errors for "
-                << "host " << result.get_host_id() << " : " << e.what();
+                << "host " << result->get_host_id() << " : " << e.what();
           }
         }
       }
@@ -409,18 +387,18 @@ void checker::finished(commands::result const& res) noexcept {
   logger(dbg_functions, basic) << "checker::finished: res=" << &res;
 
   // Find check result.
-  check_result result;
+  check_result* result = new check_result;
 
   struct timeval tv;
   // Update check result.
   tv.tv_sec = res.end_time.to_seconds();
   tv.tv_usec = res.end_time.to_useconds() - tv.tv_sec * 1000000ull;
-  result.set_finish_time(tv);
-  result.set_early_timeout(res.exit_status == process::timeout);
-  result.set_return_code(res.exit_code);
-  result.set_exited_ok((res.exit_status == process::normal) ||
-                       (res.exit_status == process::timeout));
-  result.set_output(res.output);
+  result->set_finish_time(tv);
+  result->set_early_timeout(res.exit_status == process::timeout);
+  result->set_return_code(res.exit_code);
+  result->set_exited_ok((res.exit_status == process::normal) ||
+                      (res.exit_status == process::timeout));
+  result->set_output(res.output);
 
   // Queue check result.
   std::lock_guard<std::mutex> lock(_mut_reap);
@@ -631,12 +609,27 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   return return_result;
 }
 
+/**
+ * @brief This method stores a command id and the check_result at the origin of
+ *this command execution. The command is executed asynchronously. When the
+ *execution is finished, thanks to this command we will be able to find the
+ *check_result.
+ *
+ * @param id A command id
+ * @param check_result A check_result coming from a service or a host.
+ */
 void checker::add_check_result(uint64_t id,
-                               check_result& check_result) noexcept {
+                               check_result* check_result) noexcept {
   _list_id[id] = check_result;
 }
 
-void checker::add_check_result_to_reap(check_result& check_result) noexcept {
+/**
+ * @brief This method stores a check_result already finished in the _to_reap
+ *list. The goal of this list is to update services and hosts with check_result.
+ *
+ * @param check_result The check_result already finished.
+ */
+void checker::add_check_result_to_reap(check_result* check_result) noexcept {
   std::lock_guard<std::mutex> lock(_mut_reap);
   _to_reap.push(check_result);
 }
