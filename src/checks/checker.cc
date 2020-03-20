@@ -25,7 +25,7 @@
 #include <cstring>
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/exceptions/error.hh"
@@ -71,7 +71,7 @@ void checker::clear() {
 }
 
 /**
- *  Reap and process all result received by execution process.
+ *  Reap and process all results received by execution process.
  */
 void checker::reap() {
   logger(dbg_functions, basic) << "checker::reap";
@@ -81,17 +81,17 @@ void checker::reap() {
   time_t reaper_start_time;
   time(&reaper_start_time);
 
-  // Keep compatibility with old check result list.
-  if (!check_result::results.empty()) {
-    std::lock_guard<std::mutex> lock(_mut_reap);
-    check_result* cr(nullptr);
-    for (check_result_list::iterator it(check_result::results.begin()),
-         end(check_result::results.end());
-         it != end; ++it) {
-      _to_reap.push(*it);
-      delete cr;
-    }
-  }
+//  // Keep compatibility with old check result list.
+//  if (!check_result::results.empty()) {
+//    std::lock_guard<std::mutex> lock(_mut_reap);
+//    check_result* cr(nullptr);
+//    for (check_result_list::iterator it(check_result::results.begin()),
+//         end(check_result::results.end());
+//         it != end; ++it) {
+//      _to_reap.push(*it);
+//      delete cr;
+//    }
+//  }
 
   // Reap check results.
   unsigned int reaped_checks(0);

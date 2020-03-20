@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <map>
 #include <string>
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/circular_buffer.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtimes/downtime.hh"

@@ -23,7 +23,7 @@
 #include <mutex>
 #include <queue>
 #include "com/centreon/engine/anomalydetection.hh"
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/commands/command_listener.hh"
 #include "com/centreon/engine/commands/result.hh"
@@ -35,7 +35,7 @@ CCE_BEGIN()
 
 namespace checks {
 /**
- *  @class checks checks.hh
+ *  @class checks check_result.hh
  *  @brief Run object and reap the result.
  *
  *  Checker is a singleton to run host or service and reap the
