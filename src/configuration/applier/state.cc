@@ -1292,7 +1292,8 @@ void applier::state::_processing(configuration::state& new_cfg,
 
     // Apply scheduler.
     if (!verify_config)
-      applier::scheduler::instance().apply(new_cfg, diff_hosts, diff_services);
+      applier::scheduler::instance().apply(
+          new_cfg, diff_hosts, diff_services, diff_anomalydetections);
 
     // Apply new global on the current state.
     if (!verify_config)

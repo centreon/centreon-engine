@@ -2323,10 +2323,8 @@ int service::run_async_check(int check_options,
     return ERROR;
 
   // Send broker event.
-  timeval start_time;
-  timeval end_time;
-  memset(&start_time, 0, sizeof(start_time));
-  memset(&end_time, 0, sizeof(end_time));
+  timeval start_time = {0, 0};
+  timeval end_time = {0, 0};
   int res = broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK,
                                  NEBFLAG_NONE,
                                  NEBATTR_NONE,
@@ -2343,7 +2341,7 @@ int service::run_async_check(int check_options,
                                  nullptr,
                                  nullptr);
 
-  // Service check was cancel by NEB module. reschedule check later.
+  // Service check was cancelled by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
     if (preferred_time != nullptr)
       *preferred_time +=
@@ -2386,6 +2384,8 @@ int service::run_async_check(int check_options,
 
   // Update the number of running service checks.
   ++currently_running_service_checks;
+  logger(dbg_checks, basic) << "Current running service checks: "
+                            << currently_running_service_checks;
 
   // Set the execution flag.
   set_is_executing(true);

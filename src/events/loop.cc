@@ -57,6 +57,10 @@ loop& loop::instance() {
 }
 
 void loop::clear() {
+  for (timed_event* ev : _event_list_low)
+    delete ev;
+  for (timed_event* ev : _event_list_high)
+    delete ev;
   _event_list_low.clear();
   _event_list_high.clear();
 

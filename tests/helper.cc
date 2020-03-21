@@ -18,6 +18,7 @@
  */
 
 #include <com/centreon/engine/configuration/applier/state.hh>
+#include <com/centreon/engine/configuration/applier/logging.hh>
 #include <com/centreon/engine/checks/checker.hh>
 #include "helper.hh"
 
@@ -28,6 +29,9 @@ extern configuration::state* config;
 void init_config_state(void) {
   if (config == nullptr)
     config = new configuration::state;
+
+  // Hack to instanciate the logger.
+  configuration::applier::logging::instance();
 }
 
 void deinit_config_state(void) {

@@ -491,7 +491,7 @@ int anomalydetection::run_async_check(int check_options,
       << ", latency=" << latency << ", scheduled_check=" << scheduled_check
       << ", reschedule_check=" << reschedule_check;
 
-  logger(dbg_checks, basic) << "** Running async check of service '"
+  logger(dbg_checks, basic) << "** Running async check of anomalydetection '"
                             << get_description() << "' on host '"
                             << get_hostname() << "'...";
 
@@ -518,27 +518,29 @@ int anomalydetection::run_async_check(int check_options,
                                  nullptr,
                                  nullptr);
 
-  // Service check was cancel by NEB module. reschedule check later.
+  // Anomalydetection check was cancelled by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
     if (preferred_time != nullptr)
       *preferred_time +=
           static_cast<time_t>(get_check_interval() * config->interval_length());
     logger(log_runtime_error, basic)
-        << "Error: Some broker module cancelled check of service '"
+        << "Error: Some broker module cancelled check of anomalydetection '"
         << get_description() << "' on host '" << get_hostname();
     return ERROR;
   }
-  // Service check was override by NEB module.
+  // Anomalydetection check was override by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res) {
     logger(dbg_functions, basic)
-        << "Some broker module overrode check of service '" << get_description()
-        << "' on host '" << get_hostname() << "' so we'll bail out";
+        << "Some broker module overrode check of anomalydetection '"
+        << get_description() << "' on host '" << get_hostname()
+        << "' so we'll bail out";
     return OK;
   }
 
   // Checking starts.
-  logger(dbg_checks, basic) << "Checking service '" << get_description()
-                            << "' on host '" << get_hostname() << "'...";
+  logger(dbg_checks, basic) << "Checking anomalydetection '"
+                            << get_description() << "' on host '"
+                            << get_hostname() << "'...";
 
   // Clear check options.
   if (scheduled_check)
@@ -566,21 +568,6 @@ int anomalydetection::run_async_check(int check_options,
 
   // Set the execution flag.
   set_is_executing(true);
-
-  // Init check result info.
-  check_result check_result_info(service_check,
-                                 get_host_id(),
-                                 get_service_id(),
-                                 checkable::check_active,
-                                 check_options,
-                                 reschedule_check,
-                                 latency,
-                                 start_time,
-                                 start_time,
-                                 false,
-                                 true,
-                                 service::state_ok,
-                                 "");
 
   std::ostringstream oss;
   oss << "Anomaly detection on metric '" << _metric_name << "', from service '"
@@ -622,11 +609,27 @@ int anomalydetection::run_async_check(int check_options,
   std::tuple<service::service_state, double, std::string, double, double> pd =
       parse_perfdata(perfdata, start_time.tv_sec);
 
+  // Init check result info.
+  std::unique_ptr<check_result> check_result_info(
+      new check_result(service_check,
+                       get_host_id(),
+                       get_service_id(),
+                       checkable::check_active,
+                       check_options,
+                       reschedule_check,
+                       latency,
+                       start_time,
+                       start_time,
+                       false,
+                       true,
+                       service::state_ok,
+                       ""));
+
   oss.str("");
   oss.setf(std::ios_base::fixed, std::ios_base::floatfield);
   oss.precision(2);
-  check_result_info.set_early_timeout(false);
-  check_result_info.set_exited_ok(true);
+  check_result_info->set_early_timeout(false);
+  check_result_info->set_exited_ok(true);
   if (std::get<0>(pd) == service::state_ok)
     oss << "OK: Regular activity, " << _metric_name << '=' << std::get<1>(pd)
         << std::get<2>(pd) << " |";
@@ -644,7 +647,7 @@ int anomalydetection::run_async_check(int check_options,
       oss << " and the forecasting range is unknown |";
   }
 
-  check_result_info.set_return_code(std::get<0>(pd));
+  check_result_info->set_return_code(std::get<0>(pd));
   oss << perfdata;
   if (!std::isnan(std::get<3>(pd))) {
     oss << ' ' << _metric_name << "_lower_thresholds=" << std::get<3>(pd);
@@ -652,24 +655,22 @@ int anomalydetection::run_async_check(int check_options,
   if (!std::isnan(std::get<4>(pd))) {
     oss << ' ' << _metric_name << "_upper_thresholds=" << std::get<4>(pd);
   }
-  check_result_info.set_output(oss.str());
+  check_result_info->set_output(oss.str());
 
   timestamp now(timestamp::now());
 
   // Update check result.
   timeval tv;
   gettimeofday(&tv, nullptr);
-  check_result_info.set_finish_time(tv);
+  check_result_info->set_finish_time(tv);
 
-  handle_async_check_result(&check_result_info);
+  // Queue check result.
+  handle_async_check_result(check_result_info.get());
+  //checks::checker::instance().add_check_result_to_reap(
+  //    check_result_info.release());
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-
-  // Update the number of running service checks.
-  //--currently_running_service_checks;
-  // logger(dbg_checks, basic) << "Current running service checks: "
-  //                          << currently_running_service_checks;
 
   return OK;
 }
