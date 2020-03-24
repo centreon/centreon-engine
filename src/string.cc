@@ -298,3 +298,28 @@ std::string string::extract_perfdata(std::string const& perfdata, std::string co
   } while (pos < perfdata.size());
   return "";
 }
+
+std::string& string::remove_thresholds(std::string& perfdata) noexcept {
+  size_t pos1 = perfdata.find(";");
+
+  if (pos1 == std::string::npos)
+    // No ';' so no thresholds in this perfdata
+    return perfdata;
+
+  size_t pos2 = perfdata.find(";", pos1 + 1);
+  if (pos2 == std::string::npos) {
+    // No second threshold. We just have to remove the first one.
+    perfdata.resize(pos1);
+    return perfdata;
+  }
+
+  size_t pos3 = perfdata.find(";", pos2 + 1);
+  if (pos3 == std::string::npos) {
+    // No min/max. We just have to remove thresholds.
+    perfdata.resize(pos1);
+    return perfdata;
+  }
+  
+  perfdata.replace(pos1, pos3 - pos1, ";;");
+  return perfdata;
+}
