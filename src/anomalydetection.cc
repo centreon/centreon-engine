@@ -607,7 +607,7 @@ int anomalydetection::run_async_check(int check_options,
   std::string perfdata = string::extract_perfdata(
       _dependent_service->get_perf_data(), _metric_name);
   std::tuple<service::service_state, double, std::string, double, double> pd =
-      parse_perfdata(perfdata, start_time.tv_sec);
+      parse_perfdata(string::remove_thresholds(perfdata), start_time.tv_sec);
 
   // Init check result info.
   std::unique_ptr<check_result> check_result_info(
@@ -665,9 +665,9 @@ int anomalydetection::run_async_check(int check_options,
   check_result_info->set_finish_time(tv);
 
   // Queue check result.
-  handle_async_check_result(check_result_info.get());
-  //checks::checker::instance().add_check_result_to_reap(
-  //    check_result_info.release());
+  //handle_async_check_result(check_result_info.get());
+  checks::checker::instance().add_check_result_to_reap(
+      check_result_info.release());
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
