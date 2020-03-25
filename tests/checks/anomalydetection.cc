@@ -18,10 +18,13 @@
  */
 
 #include "com/centreon/engine/configuration/applier/anomalydetection.hh"
+
 #include <gtest/gtest.h>
 #include <time.h>
+
 #include <cstring>
 #include <memory>
+
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/anomalydetection.hh"
@@ -175,6 +178,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   time_t preferred_time;
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_last_state_change(), now);
@@ -183,7 +187,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
             "NON-OK: Unusual activity, the actual value of metric is 90.00 "
             "which is outside the forecasting range [73.31 : 83.26]");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=90;25;60 metric_lower_thresholds=73.31 "
+            "metric=90 metric_lower_thresholds=73.31 "
             "metric_upper_thresholds=83.26");
 
   set_time(51000);
@@ -202,13 +206,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 2);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_plugin_output(),
             "NON-OK: Unusual activity, the actual value of metric is 50.00 "
             "which is outside the forecasting range [72.62 : 82.52]");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=50;25;60 metric_lower_thresholds=72.62 "
+            "metric=50 metric_lower_thresholds=72.62 "
             "metric_upper_thresholds=82.52");
   ASSERT_EQ(_ad->get_current_attempt(), 2);
 
@@ -229,6 +234,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 3);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now);
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
@@ -236,7 +242,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
             "NON-OK: Unusual activity, the actual value of metric is 110.00foo "
             "which is outside the forecasting range [71.93 : 81.78]");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=110foo;25;60 metric_lower_thresholds=71.93 "
+            "metric=110foo metric_lower_thresholds=71.93 "
             "metric_upper_thresholds=81.78");
   ASSERT_EQ(_ad->get_current_attempt(), 3);
 
@@ -256,6 +262,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 3);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_last_hard_state_change(), previous);
@@ -263,7 +270,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
             "NON-OK: Unusual activity, the actual value of metric is 30.00% "
             "which is outside the forecasting range [71.24 : 81.04]");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=30%;25;60 metric_lower_thresholds=71.24 "
+            "metric=30% metric_lower_thresholds=71.24 "
             "metric_upper_thresholds=81.04");
   ASSERT_EQ(_ad->get_current_attempt(), 3);
 
@@ -286,13 +293,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_perf_data(), "metric=35%;25;60");
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_plugin_output(),
             "NON-OK: Unusual activity, the actual value of metric is 35.00% "
             "which is outside the forecasting range [70.55 : 80.30]");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=35%;25;60 metric_lower_thresholds=70.55 "
+            "metric=35% metric_lower_thresholds=70.55 "
             "metric_upper_thresholds=80.30");
   ASSERT_EQ(_ad->get_current_attempt(), 3);
 
@@ -313,12 +321,13 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now);
   ASSERT_EQ(_ad->get_plugin_output(), "OK: Regular activity, metric=70.00%");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=70%;80;90 metric_lower_thresholds=69.86 "
+            "metric=70% metric_lower_thresholds=69.86 "
             "metric_upper_thresholds=79.56");
   ASSERT_EQ(_ad->get_current_attempt(), 1);
 
@@ -339,12 +348,13 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_hard_state_change(), previous);
   ASSERT_EQ(_ad->get_plugin_output(), "OK: Regular activity, metric=71.00%");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=71%;80;90 metric_lower_thresholds=69.17 "
+            "metric=71% metric_lower_thresholds=69.17 "
             "metric_upper_thresholds=78.82");
   ASSERT_EQ(_ad->get_current_attempt(), 1);
 
@@ -365,6 +375,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_unknown);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now - 1000);
@@ -389,12 +400,13 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 2);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_state_change(), now);
   ASSERT_EQ(_ad->get_plugin_output(), "OK: Regular activity, metric=72.00%");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=72%;80;90 metric_lower_thresholds=67.79 "
+            "metric=72% metric_lower_thresholds=67.79 "
             "metric_upper_thresholds=77.34");
   ASSERT_EQ(_ad->get_current_attempt(), 2);
 
@@ -415,12 +427,13 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now);
   ASSERT_EQ(_ad->get_plugin_output(), "OK: Regular activity, metric=71.70%");
   ASSERT_EQ(_ad->get_perf_data(),
-            "metric=71.7%;80;90 metric_lower_thresholds=67.10 "
+            "metric=71.7% metric_lower_thresholds=67.10 "
             "metric_upper_thresholds=76.60");
   ASSERT_EQ(_ad->get_current_attempt(), 1);
   ::unlink("/tmp/thresholds_status_change.json");
@@ -477,6 +490,7 @@ TEST_F(AnomalydetectionCheck, MetricWithQuotes) {
   time_t preferred_time;
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
+  checks::checker::instance().reap();
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_last_state_change(), now);
@@ -485,6 +499,6 @@ TEST_F(AnomalydetectionCheck, MetricWithQuotes) {
             "NON-OK: Unusual activity, the actual value of metric is 90.00 "
             "which is outside the forecasting range [73.31 : 83.26]");
   ASSERT_EQ(_ad->get_perf_data(),
-            "'metric'=90;25;60 metric_lower_thresholds=73.31 "
+            "'metric'=90 metric_lower_thresholds=73.31 "
             "metric_upper_thresholds=83.26");
 }
