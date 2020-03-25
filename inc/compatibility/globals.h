@@ -20,7 +20,7 @@
 #ifndef CCE_COMPATIBILITY_GLOBALS_H
 #define CCE_COMPATIBILITY_GLOBALS_H
 
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/circular_buffer.hh"
 
 // Log.

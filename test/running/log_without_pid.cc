@@ -24,7 +24,7 @@
 #include <sstream>
 #include <string>
 #include "com/centreon/clib.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/io/file_stream.hh"
 #include "com/centreon/process.hh"
 #include "test/paths.hh"

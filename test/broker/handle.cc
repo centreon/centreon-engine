@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/broker/handle.hh"
 #include <exception>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "test/broker/mod_load.hh"
 #include "test/unittest.hh"
 

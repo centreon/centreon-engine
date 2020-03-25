@@ -39,10 +39,11 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -57,6 +58,7 @@ class ServiceRetention : public TestEngine {
     if (!config)
       config = new configuration::state;
 
+    config->contacts().clear();
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
@@ -91,8 +93,7 @@ class ServiceRetention : public TestEngine {
   }
 
   void TearDown() override {
-    delete config;
-    config = nullptr;
+    deinit_config_state();
   }
 
  protected:

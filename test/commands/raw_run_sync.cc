@@ -21,7 +21,7 @@
 #include <cstring>
 #include <exception>
 #include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/process.hh"
 #include "test/unittest.hh"

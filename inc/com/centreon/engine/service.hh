@@ -27,7 +27,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/contact.hh"
 #include "com/centreon/engine/contactgroup.hh"
@@ -144,12 +144,12 @@ class service : public notifier {
   int obsessive_compulsive_service_check_processor();
   int update_service_performance_data();
   int run_scheduled_check(int check_options, double latency);
-  int run_async_check(int check_options,
-                      double latency,
-                      int scheduled_check,
-                      int reschedule_check,
-                      bool* time_is_valid,
-                      time_t* preferred_time);
+  virtual int run_async_check(int check_options,
+                              double latency,
+                              bool scheduled_check,
+                              bool reschedule_check,
+                              bool* time_is_valid,
+                              time_t* preferred_time) noexcept;
   void schedule_check(time_t check_time, int options);
   void set_flap(double percent_change,
                 double high_threshold,
@@ -162,9 +162,9 @@ class service : public notifier {
   void enable_flap_detection();
   void disable_flap_detection();
   void update_status(bool aggregated_dump) override;
-  int verify_check_viability(int check_options,
-                             bool* time_is_valid,
-                             time_t* new_time);
+  bool verify_check_viability(int check_options,
+                              bool* time_is_valid,
+                              time_t* new_time);
   void grab_macros_r(nagios_macros* mac) override;
   int notify_contact(nagios_macros* mac,
                      contact* cntct,

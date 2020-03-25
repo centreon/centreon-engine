@@ -20,11 +20,12 @@
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include <algorithm>
 #include <cassert>
+#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon;
@@ -493,8 +494,18 @@ void applier::service::remove_object(configuration::service const& obj) {
       << "Removing service '" << service_description << "' of host '"
       << host_name << "'.";
 
+  // Find anomaly detections depending on this service
+  set_anomalydetection sad = config->anomalydetections();
+  for (auto cad : sad) {
+    if (cad.host_id() == obj.key().first &&
+        cad.dependent_service_id() == obj.key().second) {
+      auto ad = engine::service::services_by_id.find(cad.key());
+      std::static_pointer_cast<engine::anomalydetection>(ad->second)
+          ->set_dependent_service(nullptr);
+    }
+  }
   // Find service.
-  service_id_map::iterator it(engine::service::services_by_id.find(obj.key()));
+  auto it = engine::service::services_by_id.find(obj.key());
   if (it != engine::service::services_by_id.end()) {
     std::shared_ptr<engine::service> svc(it->second);
 
@@ -510,8 +521,8 @@ void applier::service::remove_object(configuration::service const& obj) {
     applier::scheduler::instance().remove_service(obj.host_id(),
                                                   obj.service_id());
 
-    //remove service from servicegroup->members
-    for (auto& it_s: it->second->get_parent_groups())
+    // remove service from servicegroup->members
+    for (auto& it_s : it->second->get_parent_groups())
       it_s->members.erase({host_name, service_description});
 
     // Notify event broker.
@@ -596,8 +607,6 @@ void applier::service::_expand_service_memberships(configuration::service& obj,
     // Reinsert service group.
     s.servicegroups().insert(backup);
   }
-
-  return;
 }
 
 /**

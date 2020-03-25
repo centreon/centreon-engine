@@ -22,7 +22,7 @@
 #include <sstream>
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/commands/forward.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/process.hh"
 #include "test/commands/wait_process.hh"
 #include "test/unittest.hh"

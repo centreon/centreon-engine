@@ -21,7 +21,7 @@
 #include <climits>
 #include <exception>
 #include <list>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon;

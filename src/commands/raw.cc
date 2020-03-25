@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/environment.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
@@ -47,8 +47,8 @@ raw::raw(std::string const& name,
          command_listener* listener)
     : command(name, command_line, listener), process_listener() {
   if (_command_line.empty())
-    throw(engine_error() << "Could not create '" << _name
-                         << "' command: command line is empty");
+    throw engine_error() << "Could not create '" << _name
+                         << "' command: command line is empty";
 }
 
 /**
@@ -70,9 +70,9 @@ raw::~raw() noexcept {
       p->wait();
       lock.lock();
     }
-    for (auto it = _processes_free.begin(), end = _processes_free.end();
-         it != end; ++it)
-      delete *it;
+    for (auto p : _processes_free)
+      delete p;
+
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
         << "Error: Raw command destructor failed: " << e.what();
@@ -117,7 +117,7 @@ uint64_t raw::run(std::string const& processed_cmd,
       << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
   // Get process and put into the busy list.
-  process* p(nullptr);
+  process* p;
   uint64_t command_id(get_uniq_id());
   {
     std::lock_guard<std::mutex> lock(_lock);
@@ -309,24 +309,13 @@ void raw::finished(process& p) noexcept {
                (res.exit_code > 3))
       res.exit_code = service::state_unknown;
 
-    logger(dbg_commands, basic) << "raw::finished: "
-                                   "id="
-                                << command_id
-                                << ", "
-                                   "start_time="
-                                << res.start_time.to_mseconds()
-                                << ", "
-                                   "end_time="
-                                << res.end_time.to_mseconds()
-                                << ", "
-                                   "exit_code="
-                                << res.exit_code
-                                << ", "
-                                   "exit_status="
-                                << res.exit_status
-                                << ", "
-                                   "output='"
-                                << res.output << "'";
+    logger(dbg_commands, basic)
+        << "raw::finished: id=" << command_id
+        << ", start_time=" << res.start_time.to_mseconds()
+        << ", end_time=" << res.end_time.to_mseconds()
+        << ", exit_code=" << res.exit_code
+        << ", exit_status=" << res.exit_status << ", output='" << res.output
+        << "'";
 
     // Forward result to the listener.
     if (_listener)

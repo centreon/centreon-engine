@@ -20,7 +20,7 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/customvariable.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
@@ -657,10 +657,10 @@ void service::check_validity() const {
     throw(engine_error() << "Service has no description (property "
                          << "'service_description')");
   if (_hosts->empty() && _hostgroups->empty())
-    throw(engine_error()
+    throw engine_error()
           << "Service '" << _service_description
           << "' is not attached to any host or host group (properties "
-          << "'host_name' or 'hostgroup_name', respectively)");
+          << "'host_name' or 'hostgroup_name', respectively)";
   if (_check_command.empty())
     throw engine_error() << "Service '" << _service_description
                          << "' has no check command (property 'check_command')";

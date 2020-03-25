@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2019 Centreon
+** Copyright 2011 - 2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,7 +25,7 @@
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -42,6 +42,7 @@
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/xpddefault.hh"
+#include "com/centreon/exceptions/interruption.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -1188,29 +1189,27 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   std::string old_plugin_output;
   struct timeval start_time_hires;
   struct timeval end_time_hires;
-  double execution_time{0.0};
 
   logger(dbg_functions, basic) << "handle_async_host_check_result_3x()";
 
   /* make sure we have what we need */
-  if (queued_check_result == nullptr)
+  if (!queued_check_result)
     return ERROR;
 
-  time_t current_time{std::time(nullptr)};
+  /* get the current time */
+  time_t current_time = std::time(nullptr);
 
-  execution_time =
-      (double)((double)(queued_check_result->get_finish_time().tv_sec -
-                        queued_check_result->get_start_time().tv_sec) +
-               (double)((queued_check_result->get_finish_time().tv_usec -
-                         queued_check_result->get_start_time().tv_usec) /
-                        1000.0) /
-                   1000.0);
+  double execution_time =
+      static_cast<double>(queued_check_result->get_finish_time().tv_sec -
+                          queued_check_result->get_start_time().tv_sec) +
+      static_cast<double>(queued_check_result->get_finish_time().tv_usec -
+                          queued_check_result->get_start_time().tv_usec) /
+          1000000.0;
   if (execution_time < 0.0)
     execution_time = 0.0;
 
   logger(dbg_checks, more) << "** Handling async check result for host '"
                            << get_name() << "'...";
-
   logger(dbg_checks, most)
       << "\tCheck Type:         "
       << (queued_check_result->get_check_type() == check_active ? "Active"
@@ -1221,7 +1220,7 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       << "\tReschedule Check?:  "
       << (queued_check_result->get_reschedule_check() ? "Yes" : "No") << "\n"
       << "\tShould Reschedule Current Host Check?:"
-      << host::hosts[get_name()]->get_should_reschedule_current_check()
+      << get_should_reschedule_current_check()
       << "\tExited OK?:         "
       << (queued_check_result->get_exited_ok() ? "Yes" : "No") << "\n"
       << com::centreon::logging::setprecision(3)
@@ -1236,7 +1235,8 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
       currently_running_host_checks > 0)
     currently_running_host_checks--;
 
-  /* skip this host check results if its passive and we aren't accepting passive
+  /*
+   * skip this host check results if its passive and we aren't accepting passive
    * check results */
   if (queued_check_result->get_check_type() == check_passive) {
     if (!config->accept_passive_host_checks()) {
@@ -1253,7 +1253,8 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
     }
   }
 
-  /* clear the freshening flag (it would have been set if this host was
+  /*
+   * clear the freshening flag (it would have been set if this host was
    * determined to be stale) */
   if (queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK)
     set_is_being_freshened(false);
@@ -1294,12 +1295,12 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   // on the same host at the same time. The flag is then set in the host
   // and this check should be rescheduled regardless of what it was meant
   // to initially.
-  if (host::hosts[get_name()]->get_should_reschedule_current_check() &&
+  if (get_should_reschedule_current_check() &&
       !queued_check_result->get_reschedule_check())
     reschedule_check = true;
 
   // Clear the should reschedule flag.
-  host::hosts[get_name()]->set_should_reschedule_current_check(false);
+  set_should_reschedule_current_check(false);
 
   /* check latency is passed to us for both active and passive checks */
   set_latency(queued_check_result->get_latency());
@@ -1567,22 +1568,208 @@ int host::run_scheduled_check(int check_options, double latency) {
  * on-demand checks... */
 int host::run_async_check(int check_options,
                           double latency,
-                          int scheduled_check,
-                          int reschedule_check,
+                          bool scheduled_check,
+                          bool reschedule_check,
                           bool* time_is_valid,
-                          time_t* preferred_time) {
-  try {
-    checks::checker::instance().run(this, check_options, latency,
-                                    scheduled_check, reschedule_check,
-                                    time_is_valid, preferred_time);
-  } catch (checks::viability_failure const& e) {
-    // Do not log viability failures.
-    (void)e;
-    return ERROR;
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "Error: " << e.what();
+                          time_t* preferred_time) noexcept {
+  logger(dbg_functions, basic) << "host::run_async_check, check_options="
+                               << check_options << ", latency=" << latency
+                               << ", scheduled_check=" << scheduled_check
+                               << ", reschedule_check=" << reschedule_check;
+
+  // Preamble.
+  if (!get_check_command_ptr()) {
+    logger(log_runtime_error, basic)
+        << "Error: Attempt to run active check on host '" << get_name()
+        << "' with no check command";
     return ERROR;
   }
+
+  logger(dbg_checks, basic) << "** Running async check of host '" << get_name()
+                            << "'...";
+
+  // Check if the host is viable now.
+  if (!verify_check_viability(check_options, time_is_valid, preferred_time))
+    return ERROR;
+
+  // If this check is a rescheduled check, propagate the rescheduled check
+  // flag to the host. This solves the problem when a new host check is bound
+  // to be rescheduled but would be discarded because a host check is already
+  // running.
+  if (reschedule_check)
+    set_should_reschedule_current_check(true);
+
+  // Don't execute a new host check if one is already running.
+  if (get_is_executing() && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
+    logger(dbg_checks, basic)
+        << "A check of this host (" << get_name()
+        << ") is already being executed, so we'll pass for the moment...";
+    return OK;
+  }
+
+  // Send broker event.
+  timeval start_time;
+  timeval end_time;
+  memset(&start_time, 0, sizeof(start_time));
+  memset(&end_time, 0, sizeof(end_time));
+  int res = broker_host_check(NEBTYPE_HOSTCHECK_ASYNC_PRECHECK,
+                              NEBFLAG_NONE,
+                              NEBATTR_NONE,
+                              this,
+                              checkable::check_active,
+                              get_current_state(),
+                              get_state_type(),
+                              start_time,
+                              end_time,
+                              get_check_command().c_str(),
+                              get_latency(),
+                              0.0,
+                              config->host_check_timeout(),
+                              false,
+                              0,
+                              nullptr,
+                              nullptr,
+                              nullptr,
+                              nullptr,
+                              nullptr);
+
+  // Host check was cancel by NEB module. Reschedule check later.
+  if (NEBERROR_CALLBACKCANCEL == res) {
+    logger(log_runtime_error, basic)
+        << "Error: Some broker module cancelled check of host '" << get_name()
+        << "'";
+    return ERROR;
+  }
+  // Host check was overriden by NEB module.
+  else if (NEBERROR_CALLBACKOVERRIDE == res) {
+    logger(dbg_functions, basic)
+        << "Some broker module overrode check of host '" << get_name()
+        << "' so we'll bail out";
+    return OK;
+  }
+
+  // Checking starts.
+  logger(dbg_functions, basic) << "Checking host '" << get_name() << "'...";
+
+  // Clear check options.
+  if (scheduled_check)
+    set_check_options(CHECK_OPTION_NONE);
+
+  // Adjust check attempts.
+  adjust_check_attempt(true);
+
+  // Update latency for event broker and macros.
+  double old_latency(get_latency());
+  set_latency(latency);
+
+  // Get current host macros.
+  nagios_macros macros;
+  grab_host_macros_r(&macros, this);
+  std::string tmp;
+  get_raw_command_line_r(
+      &macros, get_check_command_ptr(), get_check_command().c_str(), tmp, 0);
+
+  // Time to start command.
+  gettimeofday(&start_time, nullptr);
+
+  // Set check time for on-demand checks, so they're
+  // not incorrectly detected as being orphaned.
+  if (!scheduled_check)
+    set_next_check(start_time.tv_sec);
+
+  // Update the number of running host checks.
+  ++currently_running_host_checks;
+
+  // Set the execution flag.
+  set_is_executing(true);
+
+  // Get command object.
+  commands::command* cmd = get_check_command_ptr();
+  std::string processed_cmd(cmd->process_cmd(&macros));
+
+  // Send event broker.
+  broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,
+                    NEBFLAG_NONE,
+                    NEBATTR_NONE,
+                    this,
+                    checkable::check_active,
+                    get_current_state(),
+                    get_state_type(),
+                    start_time,
+                    end_time,
+                    get_check_command().c_str(),
+                    get_latency(),
+                    0.0,
+                    config->host_check_timeout(),
+                    false,
+                    0,
+                    processed_cmd.c_str(),
+                    nullptr,
+                    nullptr,
+                    nullptr,
+                    nullptr);
+
+  // Restore latency.
+  set_latency(old_latency);
+
+  // Update statistics.
+  update_check_stats(scheduled_check ? ACTIVE_SCHEDULED_HOST_CHECK_STATS
+                                     : ACTIVE_ONDEMAND_HOST_CHECK_STATS,
+                     start_time.tv_sec);
+  update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
+
+  // Run command.
+  bool retry;
+  std::unique_ptr<check_result> check_result_info;
+  do {
+    // Init check result info.
+    check_result_info.reset(new check_result(host_check,
+                                             get_host_id(),
+                                             0UL,
+                                             checkable::check_active,
+                                             check_options,
+                                             reschedule_check,
+                                             latency,
+                                             start_time,
+                                             start_time,
+                                             false,
+                                             true,
+                                             service::state_ok,
+                                             ""));
+
+    retry = false;
+    try {
+      // Run command.
+      uint64_t id =
+          cmd->run(processed_cmd, macros, config->host_check_timeout());
+      if (id != 0)
+        checks::checker::instance().add_check_result(
+            id, check_result_info.release());
+    }
+    catch (com::centreon::exceptions::interruption const& e) {
+      retry = true;
+    }
+    catch (std::exception const& e) {
+      // Update check result.
+      timeval tv;
+      gettimeofday(&tv, nullptr);
+      check_result_info->set_finish_time(tv);
+      check_result_info->set_early_timeout(false);
+      check_result_info->set_return_code(service::state_unknown);
+      check_result_info->set_exited_ok(true);
+      check_result_info->set_output("(Execute command failed)");
+
+      // Queue check result.
+      checks::checker::instance().add_check_result_to_reap(
+          check_result_info.release());
+
+      logger(log_runtime_warning, basic)
+          << "Error: Host check command execution failed: " << e.what();
+    }
+  } while (retry);
+
+  // Cleanup.
+  clear_volatile_macros_r(&macros);
   return OK;
 }
 
@@ -1684,15 +1871,9 @@ void host::schedule_check(time_t check_time, int options) {
     set_next_check(check_time);
 
     /* place the new event in the event queue */
-    timed_event* new_event = new timed_event(timed_event::EVENT_HOST_CHECK,
-                                             get_next_check(),
-                                             false,
-                                             0L,
-                                             nullptr,
-                                             true,
-                                             (void*)this,
-                                             nullptr,
-                                             options);
+    timed_event* new_event =
+        new timed_event(timed_event::EVENT_HOST_CHECK, get_next_check(), false,
+                        0L, nullptr, true, (void*)this, nullptr, options);
 
     events::loop::instance().reschedule_event(new_event, events::loop::low);
   }
@@ -1975,7 +2156,7 @@ void host::check_for_expired_acknowledgement() {
  * active/passive) */
 int host::handle_state() {
   bool state_change = false;
-  time_t current_time = 0L;
+  time_t current_time;
 
   logger(dbg_functions, basic) << "handle_host_state()";
 
@@ -2118,10 +2299,10 @@ void host::update_performance_data() {
 }
 
 /* checks viability of performing a host check */
-int host::verify_check_viability(int check_options,
-                                 bool* time_is_valid,
-                                 time_t* new_time) {
-  int result = OK;
+bool host::verify_check_viability(int check_options,
+                                  bool* time_is_valid,
+                                  time_t* new_time) {
+  bool result = true;
   int perform_check = true;
   time_t current_time = 0L;
   time_t preferred_time = 0L;
@@ -2180,7 +2361,7 @@ int host::verify_check_viability(int check_options,
   if (new_time)
     *new_time = preferred_time;
 
-  result = (perform_check) ? OK : ERROR;
+  result = (perform_check) ? true : false;
   return result;
 }
 

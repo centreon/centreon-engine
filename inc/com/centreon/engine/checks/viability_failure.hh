@@ -20,7 +20,7 @@
 #ifndef CCE_CHECKS_VIABILITY_FAILURE_HH
 #define CCE_CHECKS_VIABILITY_FAILURE_HH
 
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -34,17 +34,17 @@ namespace checks {
  *  If a check cannot be run because of a viability check (last
  *  execution time, dependencies, ...) this exception is thrown.
  */
-class viability_failure : public error {
+class viability_failure : public exceptions::error {
  public:
   viability_failure();
   viability_failure(char const* file, char const* function, int line);
   viability_failure(viability_failure const& other);
-  ~viability_failure() throw() override;
+  ~viability_failure() noexcept override;
   viability_failure& operator=(viability_failure const& other);
   template <typename T>
   viability_failure& operator<<(T const& t) {
-    error::operator<<(t);
-    return (*this);
+    exceptions::error::operator<<(t);
+    return *this;
   }
 };
 }  // namespace checks

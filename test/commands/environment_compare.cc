@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/commands/environment.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;

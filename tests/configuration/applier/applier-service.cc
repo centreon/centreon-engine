@@ -28,7 +28,7 @@
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/service.hh"
 #include "helper.hh"
 
@@ -272,18 +272,18 @@ TEST_F(ApplierService, ServicesCheckValidity) {
   configuration::service csvc;
 
   // No service description
-  ASSERT_THROW(csvc.check_validity(), engine::error);
+  ASSERT_THROW(csvc.check_validity(), engine::exceptions::error);
 
   ASSERT_TRUE(csvc.parse("service_description", "check description"));
   ASSERT_TRUE(csvc.parse("service_id", "53"));
 
   // No host attached to
-  ASSERT_THROW(csvc.check_validity(), engine::error);
+  ASSERT_THROW(csvc.check_validity(), engine::exceptions::error);
 
   ASSERT_TRUE(csvc.parse("hosts", "test_host"));
 
   // No check command attached to
-  ASSERT_THROW(csvc.check_validity(), engine::error);
+  ASSERT_THROW(csvc.check_validity(), engine::exceptions::error);
 
   configuration::applier::command cmd_aply;
   configuration::command cmd("cmd");

@@ -1,6 +1,7 @@
 [requires]
 gtest/1.8.1@bincrafters/stable
 grpc/1.25.0@inexorgame/stable
+json11/e2e3a11@centreon/stable
 
 [generators]
 cmake_paths

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2019 Centreon
+** Copyright 2011 - 2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,7 +24,7 @@
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -41,6 +41,7 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timezone_locker.hh"
+#include "com/centreon/exceptions/interruption.hh"
 #include "compatibility/xpddefault.h"
 
 using namespace com::centreon;
@@ -967,7 +968,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   int hard_state_change = false;
   int first_host_check_initiated = false;
   host::host_state route_result = host::state_up;
-  time_t current_time = 0L;
   int state_was_logged = false;
   std::string old_plugin_output;
   std::list<service*> check_servicelist;
@@ -980,11 +980,21 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   logger(dbg_functions, basic) << "handle_async_service_check_result()";
 
   /* make sure we have what we need */
-  if (queued_check_result == nullptr)
+  if (!queued_check_result)
     return ERROR;
 
   /* get the current time */
-  time(&current_time);
+  time_t current_time = std::time(nullptr);
+
+  /* update the execution time for this check (millisecond resolution) */
+  double execution_time =
+      static_cast<double>(queued_check_result->get_finish_time().tv_sec -
+                          queued_check_result->get_start_time().tv_sec) +
+      static_cast<double>(queued_check_result->get_finish_time().tv_usec -
+                          queued_check_result->get_start_time().tv_usec) /
+          1000000.0;
+  if (execution_time < 0.0)
+    execution_time = 0.0;
 
   logger(dbg_checks, basic)
       << "** Handling check result for service '" << _description
@@ -999,6 +1009,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       << (queued_check_result->get_reschedule_check() ? "Yes" : "No")
       << ", EXITED OK: "
       << (queued_check_result->get_exited_ok() ? "Yes" : "No")
+      << ", EXEC TIME: " << execution_time
       << ", return CODE: " << queued_check_result->get_return_code()
       << ", OUTPUT: " << queued_check_result->get_output();
 
@@ -1009,8 +1020,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
   /*
    * skip this service check results if its passive and we aren't accepting
-   * passive check results
-   */
+   * passive check results */
   if (queued_check_result->get_check_type() == check_passive) {
     if (!config->accept_passive_service_checks()) {
       logger(dbg_checks, basic)
@@ -1031,7 +1041,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * determined to be stale)
    */
   if (queued_check_result->get_check_options() & CHECK_OPTION_FRESHNESS_CHECK)
-    this->set_is_being_freshened(false);
+    set_is_being_freshened(false);
 
   /* clear the execution flag if this was an active check */
   if (queued_check_result->get_check_type() == check_active)
@@ -1058,24 +1068,13 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* check latency is passed to us */
   set_latency(queued_check_result->get_latency());
 
-  /* update the execution time for this check (millisecond resolution) */
-  set_execution_time(
-      (double)((double)(queued_check_result->get_finish_time().tv_sec -
-                        queued_check_result->get_start_time().tv_sec) +
-               (double)((queued_check_result->get_finish_time().tv_usec -
-                         queued_check_result->get_start_time().tv_usec) /
-                        1000.0) /
-                   1000.0));
-  if (get_execution_time() < 0.0)
-    set_execution_time(0.0);
+  set_execution_time(execution_time);
 
   /* get the last check time */
   set_last_check(queued_check_result->get_start_time().tv_sec);
 
   /* was this check passive or active? */
-  set_check_type((queued_check_result->get_check_type() == check_active)
-                     ? check_active
-                     : check_passive);
+  set_check_type(queued_check_result->get_check_type());
 
   /* update check statistics for passive checks */
   if (queued_check_result->get_check_type() == check_passive)
@@ -1106,7 +1105,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_plugin_output("(Service check did not exit properly)");
     _current_state = service::state_unknown;
   }
-
   /* make sure the return code is within bounds */
   else if (queued_check_result->get_return_code() < 0 ||
            queued_check_result->get_return_code() > 3) {
@@ -1134,7 +1132,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_plugin_output(oss.str());
     _current_state = service::state_unknown;
   }
-
   /* else the return code is okay... */
   else {
     /*
@@ -1372,7 +1369,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /* reset the acknowledgement flag (this should already have been done, but
      * just in case...) */
     set_problem_has_been_acknowledged(false);
-    this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+    set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
 
     /* verify the route to the host and send out host recovery notifications */
     if (hst->get_current_state() != host::state_up) {
@@ -1479,8 +1476,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_no_more_notifications(false);
 
     if (reschedule_check)
-      next_service_check = (time_t)(
-          get_last_check() + get_check_interval() * config->interval_length());
+      next_service_check =
+          (time_t)(get_last_check() +
+                   get_check_interval() * config->interval_length());
   }
 
   /*******************************************/
@@ -1492,7 +1490,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     logger(dbg_checks, more) << "Service is in a non-OK state!";
 
     /* check the route to the host if its up right now... */
-    if (hst->get_current_state() == host::state_up) {
+    if (hst->get_current_state() ==  host::state_up) {
       logger(dbg_checks, more)
           << "Host is currently UP, so we'll recheck its state to "
              "make sure...";
@@ -1501,19 +1499,21 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
       if (config->use_aggressive_host_checking())
-        hst->perform_on_demand_check(&route_result, CHECK_OPTION_NONE, true,
+        hst->perform_on_demand_check(&route_result,
+                                     CHECK_OPTION_NONE, true,
                                      config->cached_host_check_horizon());
       else {
         /* can we use the last cached host state? */
         /* only use cached host state if no service state change has occurred */
         if ((!state_change || state_changes_use_cached_state) &&
             hst->get_has_been_checked() &&
-            (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
+            (static_cast<unsigned long>(current_time -
+                                        hst->get_last_check()) <=
              config->cached_host_check_horizon())) {
           /* use current host state as route result */
           route_result = hst->get_current_state();
-          logger(dbg_checks, more)
-              << "* Using cached host state: " << hst->get_current_state();
+          logger(dbg_checks, more) << "* Using cached host state: "
+                                   << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
@@ -1524,16 +1524,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         else if (state_change) {
           /* use current host state as route result */
           route_result = hst->get_current_state();
-          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                               nullptr);
+          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+                                     nullptr, nullptr);
         }
 
         /* ADDED 02/15/08 */
         /* else assume same host state */
         else {
           route_result = hst->get_current_state();
-          logger(dbg_checks, more)
-              << "* Using last known host state: " << hst->get_current_state();
+          logger(dbg_checks, more) << "* Using last known host state: "
+                                   << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
@@ -1551,7 +1551,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         logger(dbg_checks, more)
             << "Aggressive host checking is enabled, so we'll recheck the "
                "host state...";
-        hst->perform_on_demand_check(&route_result, CHECK_OPTION_NONE, true,
+        hst->perform_on_demand_check(&route_result,
+                                     CHECK_OPTION_NONE, true,
                                      config->cached_host_check_horizon());
       }
 
@@ -1566,8 +1567,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* previous logic was to simply run a sync (serial) host check */
         /* use current host state as route result */
         route_result = hst->get_current_state();
-        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                             nullptr);
+        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
+                                   nullptr, nullptr);
         /*perform_on_demand_host_check(hst,&route_result,CHECK_OPTION_NONE,true,config->cached_host_check_horizon());
          */
       }
@@ -1876,11 +1877,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* run async checks of all services we added above */
   /* don't run a check if one is already executing or we can get by with a
    * cached state */
-  for (std::list<service*>::iterator it{check_servicelist.begin()},
-       end{check_servicelist.end()};
-       it != end; ++it) {
+  for (auto svc : check_servicelist) {
     run_async_check = true;
-    service* svc{*it};
 
     /* we can get by with a cached state, so don't check the service */
     if (static_cast<unsigned long>(current_time - svc->get_last_check()) <=
@@ -2298,22 +2296,186 @@ int service::run_scheduled_check(int check_options, double latency) {
  */
 int service::run_async_check(int check_options,
                              double latency,
-                             int scheduled_check,
-                             int reschedule_check,
+                             bool scheduled_check,
+                             bool reschedule_check,
                              bool* time_is_valid,
-                             time_t* preferred_time) {
-  try {
-    checks::checker::instance().run(this, check_options, latency,
-                                    scheduled_check, reschedule_check,
-                                    time_is_valid, preferred_time);
-  } catch (checks::viability_failure const& e) {
-    // Do not log viability failures.
-    (void)e;
-    return ERROR;
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "Error: " << e.what();
+                             time_t* preferred_time) noexcept {
+  logger(dbg_functions, basic) << "service::run_async_check, check_options="
+                               << check_options << ", latency=" << latency
+                               << ", scheduled_check=" << scheduled_check
+                               << ", reschedule_check=" << reschedule_check;
+
+  // Preamble.
+  if (!get_check_command_ptr()) {
+    logger(log_runtime_error, basic)
+        << "Error: Attempt to run active check on service '"
+        << get_description() << "' on host '" << get_host_ptr()->get_name()
+        << "' with no check command";
     return ERROR;
   }
+
+  logger(dbg_checks, basic) << "** Running async check of service '"
+                            << get_description() << "' on host '"
+                            << get_hostname() << "'...";
+
+  // Check if the service is viable now.
+  if (!verify_check_viability(check_options, time_is_valid, preferred_time))
+    return ERROR;
+
+  // Send broker event.
+  timeval start_time = {0, 0};
+  timeval end_time = {0, 0};
+  int res = broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK,
+                                 NEBFLAG_NONE,
+                                 NEBATTR_NONE,
+                                 this,
+                                 checkable::check_active,
+                                 start_time,
+                                 end_time,
+                                 get_check_command().c_str(),
+                                 get_latency(),
+                                 0.0,
+                                 0,
+                                 false,
+                                 0,
+                                 nullptr,
+                                 nullptr);
+
+  // Service check was cancelled by NEB module. reschedule check later.
+  if (NEBERROR_CALLBACKCANCEL == res) {
+    if (preferred_time != nullptr)
+      *preferred_time +=
+          static_cast<time_t>(get_check_interval() * config->interval_length());
+    logger(log_runtime_error, basic)
+        << "Error: Some broker module cancelled check of service '"
+        << get_description() << "' on host '" << get_hostname();
+    return ERROR;
+  }
+  // Service check was override by NEB module.
+  else if (NEBERROR_CALLBACKOVERRIDE == res) {
+    logger(dbg_functions, basic)
+        << "Some broker module overrode check of service '" << get_description()
+        << "' on host '" << get_hostname() << "' so we'll bail out";
+    return OK;
+  }
+
+  // Checking starts.
+  logger(dbg_checks, basic) << "Checking service '" << get_description()
+                            << "' on host '" << get_hostname() << "'...";
+
+  // Clear check options.
+  if (scheduled_check)
+    set_check_options(CHECK_OPTION_NONE);
+
+  // Update latency for event broker and macros.
+  double old_latency(get_latency());
+  set_latency(latency);
+
+  // Get current host and service macros.
+  nagios_macros macros;
+  grab_host_macros_r(&macros, get_host_ptr());
+  grab_service_macros_r(&macros, this);
+  std::string tmp;
+  get_raw_command_line_r(
+      &macros, get_check_command_ptr(), get_check_command().c_str(), tmp, 0);
+
+  // Time to start command.
+  gettimeofday(&start_time, nullptr);
+
+  // Update the number of running service checks.
+  ++currently_running_service_checks;
+  logger(dbg_checks, basic) << "Current running service checks: "
+                            << currently_running_service_checks;
+
+  // Set the execution flag.
+  set_is_executing(true);
+
+  // Get command object.
+  commands::command* cmd = get_check_command_ptr();
+  std::string processed_cmd(cmd->process_cmd(&macros));
+
+  // Send event broker.
+  res = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
+                             NEBFLAG_NONE,
+                             NEBATTR_NONE,
+                             this,
+                             checkable::check_active,
+                             start_time,
+                             end_time,
+                             get_check_command().c_str(),
+                             get_latency(),
+                             0.0,
+                             config->service_check_timeout(),
+                             false,
+                             0,
+                             processed_cmd.c_str(),
+                             nullptr);
+
+  // Restore latency.
+  set_latency(old_latency);
+
+  // Service check was override by neb_module.
+  if (NEBERROR_CALLBACKOVERRIDE == res) {
+    clear_volatile_macros_r(&macros);
+    return OK;
+  }
+
+  // Update statistics.
+  update_check_stats(scheduled_check ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
+                                     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
+                     start_time.tv_sec);
+
+  bool retry;
+  std::unique_ptr<check_result> check_result_info;
+  do {
+    // Init check result info.
+    check_result_info.reset(new check_result(service_check,
+                                             get_host_id(),
+                                             get_service_id(),
+                                             checkable::check_active,
+                                             check_options,
+                                             reschedule_check,
+                                             latency,
+                                             start_time,
+                                             start_time,
+                                             false,
+                                             true,
+                                             service::state_ok,
+                                             ""));
+
+    retry = false;
+    try {
+      // Run command.
+      uint64_t id =
+          cmd->run(processed_cmd, macros, config->service_check_timeout());
+      if (id != 0)
+        checks::checker::instance().add_check_result(
+            id, check_result_info.release());
+    }
+    catch (com::centreon::exceptions::interruption const& e) {
+      retry = true;
+    }
+    catch (std::exception const& e) {
+      // Update check result.
+      timeval tv;
+      gettimeofday(&tv, nullptr);
+      check_result_info->set_finish_time(tv);
+      check_result_info->set_early_timeout(false);
+      check_result_info->set_return_code(service::state_unknown);
+      check_result_info->set_exited_ok(true);
+      check_result_info->set_output("(Execute command failed)");
+
+      // Queue check result.
+      checks::checker::instance().add_check_result_to_reap(
+          check_result_info.release());
+
+      logger(log_runtime_warning, basic)
+          << "Error: Service check command execution failed: " << e.what();
+    }
+  } while (retry);
+
+  // Cleanup.
+  clear_volatile_macros_r(&macros);
   return OK;
 }
 
@@ -2597,10 +2759,10 @@ void service::update_status(bool aggregated_dump) {
 }
 
 /* checks viability of performing a service check */
-int service::verify_check_viability(int check_options,
+bool service::verify_check_viability(int check_options,
                                     bool* time_is_valid,
                                     time_t* new_time) {
-  int perform_check = true;
+  bool perform_check = true;
   time_t current_time = 0L;
   time_t preferred_time = 0L;
   int check_interval = 0;
@@ -2662,7 +2824,7 @@ int service::verify_check_viability(int check_options,
   if (new_time)
     *new_time = preferred_time;
 
-  return (perform_check) ? OK : ERROR;
+  return perform_check;
 }
 
 void service::grab_macros_r(nagios_macros* mac) {

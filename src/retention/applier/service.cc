@@ -82,7 +82,8 @@ void applier::service::_update(configuration::state const& config,
     if (state.check_latency().is_set())
       obj.set_latency(*state.check_latency());
     if (state.check_type().is_set())
-      obj.set_check_type(*state.check_type());
+      obj.set_check_type(
+          static_cast<checkable::check_type>(*state.check_type()));
     if (state.current_state().is_set())
       obj.set_current_state(
           static_cast<engine::service::service_state>(*state.current_state()));

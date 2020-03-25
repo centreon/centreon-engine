@@ -21,7 +21,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"

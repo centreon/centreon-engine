@@ -21,7 +21,7 @@
 #include <array>
 #include <iomanip>
 #include "com/centreon/engine/daterange.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timeperiod.hh"
@@ -34,14 +34,14 @@ timerange::timerange(uint64_t start, uint64_t end) {
   if (start > 86400) {
     logger(log_config_error, basic)
         << "Error: Start time " << start << " is not valid for timeperiod";
-    throw(engine_error() << "Could not create timerange "
-                         << "start'" << start << "' end '" << end << "'");
+    throw engine_error() << "Could not create timerange "
+                         << "start'" << start << "' end '" << end << "'";
   }
   if (end > 86400) {
     logger(log_config_error, basic)
         << "Error: End time " << end << " is not value for timeperiod";
-    throw(engine_error() << "Could not create timerange "
-                         << "start'" << start << "' end '" << end << "'");
+    throw engine_error() << "Could not create timerange "
+                         << "start'" << start << "' end '" << end << "'";
   }
 
   _range_start = start;
@@ -64,7 +64,7 @@ uint64_t timerange::get_range_end() const {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool timerange::operator==(timerange const& obj) throw() {
+bool timerange::operator==(timerange const& obj) noexcept {
   if (_range_start == obj.get_range_start() &&
       _range_end == obj.get_range_end()) {
     return true;
@@ -80,7 +80,7 @@ bool timerange::operator==(timerange const& obj) throw() {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool timerange::operator!=(timerange const& obj) throw() {
+bool timerange::operator!=(timerange const& obj) noexcept {
   return !(*this == obj);
 }
 

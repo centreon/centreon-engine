@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/retention/info.hh"
 #include <ctime>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;

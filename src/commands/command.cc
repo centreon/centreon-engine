@@ -21,7 +21,7 @@
 #include <atomic>
 #include <memory>
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/grab.hh"
 

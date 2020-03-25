@@ -20,7 +20,7 @@
 #include "test/broker/mod_load.hh"
 #include <cstring>
 #include "com/centreon/engine/broker/handle.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/nebmods.hh"
 
 using namespace com::centreon::engine;

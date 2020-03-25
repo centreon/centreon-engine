@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/dependency.hh"
 #include <array>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
@@ -42,9 +42,9 @@ dependency::dependency(std::string const& dependent_hostname,
   if (dependent_hostname.empty() || hostname.empty()) {
     logger(log_config_error, basic)
         << "Error: NULL host name in host dependency definition";
-    throw(engine_error() << "Could not create execution "
+    throw engine_error() << "Could not create execution "
                          << "dependency of '" << dependent_hostname << "' on '"
-                         << hostname << "'");
+                         << hostname << "'";
   }
 }
 
@@ -64,9 +64,7 @@ void dependency::set_dependent_hostname(std::string const& dependent_hostname) {
   _dependent_hostname = dependent_hostname;
 }
 
-std::string const& dependency::get_hostname() const {
-  return _hostname;
-}
+std::string const& dependency::get_hostname() const { return _hostname; }
 
 void dependency::set_hostname(std::string const& hostname) {
   _hostname = hostname;
@@ -80,17 +78,13 @@ void dependency::set_dependency_period(std::string const& dependency_period) {
   _dependency_period = dependency_period;
 }
 
-bool dependency::get_inherits_parent() const {
-  return _inherits_parent;
-}
+bool dependency::get_inherits_parent() const { return _inherits_parent; }
 
 void dependency::set_inherits_parent(bool inherits_parent) {
   _inherits_parent = inherits_parent;
 }
 
-bool dependency::get_fail_on_pending() const {
-  return _fail_on_pending;
-}
+bool dependency::get_fail_on_pending() const { return _fail_on_pending; }
 
 void dependency::set_fail_on_pending(bool fail_on_pending) {
   _fail_on_pending = fail_on_pending;
@@ -120,15 +114,15 @@ void dependency::set_contains_circular_path(bool contains_circular_path) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool dependency::operator==(dependency const& obj) throw() {
-  return (_dependency_type == obj.get_dependency_type() &&
-          _dependent_hostname == obj.get_dependent_hostname() &&
-          _hostname == obj.get_hostname() &&
-          _dependency_period == obj.get_dependency_period() &&
-          _inherits_parent == obj.get_inherits_parent() &&
-          _fail_on_pending == obj.get_fail_on_pending() &&
-          _circular_path_checked == obj.get_circular_path_checked() &&
-          _contains_circular_path == obj.get_contains_circular_path());
+bool dependency::operator==(dependency const& obj) noexcept {
+  return _dependency_type == obj.get_dependency_type() &&
+         _dependent_hostname == obj.get_dependent_hostname() &&
+         _hostname == obj.get_hostname() &&
+         _dependency_period == obj.get_dependency_period() &&
+         _inherits_parent == obj.get_inherits_parent() &&
+         _fail_on_pending == obj.get_fail_on_pending() &&
+         _circular_path_checked == obj.get_circular_path_checked() &&
+         _contains_circular_path == obj.get_contains_circular_path();
 }
 
 /**
@@ -139,7 +133,7 @@ bool dependency::operator==(dependency const& obj) throw() {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool dependency::operator!=(dependency const& obj) throw() {
+bool dependency::operator!=(dependency const& obj) noexcept {
   return !(*this == obj);
 }
 
@@ -151,7 +145,7 @@ bool dependency::operator!=(dependency const& obj) throw() {
  *
  *  @return True if the first object is strictly less than the second.
  */
-bool dependency::operator<(dependency const& obj) throw() {
+bool dependency::operator<(dependency const& obj) noexcept {
   if (_dependent_hostname != obj.get_dependent_hostname())
     return _dependent_hostname < obj.get_dependent_hostname();
   else if (_hostname != obj.get_hostname())

@@ -19,7 +19,7 @@
 
 #include <cstdlib>
 #include <cstring>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 #include "com/centreon/engine/nebmodules.hh"

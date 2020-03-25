@@ -27,13 +27,14 @@
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
+#include "com/centreon/engine/configuration/anomalydetection.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon;
@@ -67,7 +68,7 @@ object::object(object const& right) {
 /**
  *  Destructor.
  */
-object::~object() throw() {}
+object::~object() noexcept {}
 
 /**
  *  Copy constructor.
@@ -84,7 +85,7 @@ object& object::operator=(object const& right) {
     _templates = right._templates;
     _type = right._type;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -94,7 +95,7 @@ object& object::operator=(object const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool object::operator==(object const& right) const throw() {
+bool object::operator==(object const& right) const noexcept {
   return (_name == right._name && _type == right._type &&
           _is_resolve == right._is_resolve &&
           _should_register == right._should_register &&
@@ -108,8 +109,8 @@ bool object::operator==(object const& right) const throw() {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool object::operator!=(object const& right) const throw() {
-  return (!operator==(right));
+bool object::operator!=(object const& right) const noexcept {
+  return !operator==(right);
 }
 
 /**
@@ -151,6 +152,8 @@ object_ptr object::create(std::string const& type_name) {
     obj = object_ptr(new configuration::serviceextinfo());
   else if (type_name == "hostextinfo")
     obj = object_ptr(new configuration::hostextinfo());
+  else if (type_name == "anomalydetection")
+    obj = object_ptr(new configuration::anomalydetection());
   return obj;
 }
 
@@ -159,8 +162,8 @@ object_ptr object::create(std::string const& type_name) {
  *
  *  @return The object name.
  */
-std::string const& object::name() const throw() {
-  return (_name);
+std::string const& object::name() const noexcept {
+  return _name;
 }
 
 /**
@@ -174,8 +177,8 @@ std::string const& object::name() const throw() {
 bool object::parse(char const* key, char const* value) {
   for (unsigned int i(0); i < sizeof(_setters) / sizeof(_setters[0]); ++i)
     if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+      return (_setters[i].func)(*this, value);
+  return false;
 }
 
 /**
@@ -197,8 +200,8 @@ bool object::parse(std::string const& line) {
   }
   string::trim(value);
   if (!parse(key.c_str(), value.c_str()))
-    return (object::parse(key.c_str(), value.c_str()));
-  return (true);
+    return object::parse(key.c_str(), value.c_str());
+  return true;
 }
 
 /**
@@ -227,8 +230,8 @@ void object::resolve_template(map_object& templates) {
  *
  *  @return True if object should be registered, false otherwise.
  */
-bool object::should_register() const throw() {
-  return (_should_register);
+bool object::should_register() const noexcept {
+  return _should_register;
 }
 
 /**
@@ -236,8 +239,8 @@ bool object::should_register() const throw() {
  *
  *  @return The object type.
  */
-object::object_type object::type() const throw() {
-  return (_type);
+object::object_type object::type() const noexcept {
+  return _type;
 }
 
 /**
@@ -245,23 +248,15 @@ object::object_type object::type() const throw() {
  *
  *  @return The object type name.
  */
-std::string const& object::type_name() const throw() {
-  static std::string const tab[] = {"command",
-                                    "connector",
-                                    "contact",
-                                    "contactgroup",
-                                    "host",
-                                    "hostdependency",
-                                    "hostescalation",
-                                    "hostextinfo",
-                                    "hostgroup",
-                                    "service",
-                                    "servicedependency",
-                                    "serviceescalation",
-                                    "serviceextinfo",
-                                    "servicegroup",
-                                    "timeperiod"};
-  return (tab[_type]);
+std::string const& object::type_name() const noexcept {
+  static std::string const tab[] = {
+      "command",         "connector",         "contact",
+      "contactgroup",    "host",              "hostdependency",
+      "hostescalation",  "hostextinfo",       "hostgroup",
+      "service",         "servicedependency", "serviceescalation",
+      "serviceextinfo",  "servicegroup",      "timeperiod",
+      "anomalydetection"};
+  return tab[_type];
 }
 
 /**
@@ -273,7 +268,7 @@ std::string const& object::type_name() const throw() {
  */
 bool object::_set_name(std::string const& value) {
   _name = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -285,7 +280,7 @@ bool object::_set_name(std::string const& value) {
  */
 bool object::_set_should_register(bool value) {
   _should_register = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -298,5 +293,5 @@ bool object::_set_should_register(bool value) {
 bool object::_set_templates(std::string const& value) {
   _templates.clear();
   string::split(value, _templates, ',');
-  return (true);
+  return true;
 }

@@ -20,7 +20,7 @@
 #include <climits>
 #include <exception>
 #include "com/centreon/engine/broker/loader.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "test/broker/mod_load.hh"
 #include "test/unittest.hh"

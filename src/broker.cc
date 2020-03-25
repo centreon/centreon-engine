@@ -1079,7 +1079,7 @@ int broker_host_check(int type,
                       int timeout,
                       int early_timeout,
                       int retcode,
-                      char* cmdline,
+                      char const* cmdline,
                       char* output,
                       char* long_output,
                       char* perfdata,
@@ -1493,7 +1493,7 @@ int broker_service_check(int type,
                          int timeout,
                          int early_timeout,
                          int retcode,
-                         char* cmdline,
+                         const char* cmdline,
                          struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_SERVICE_CHECKS))
@@ -1662,7 +1662,7 @@ void broker_system_command(int type,
                            int timeout,
                            int early_timeout,
                            int retcode,
-                           char* cmd,
+                           const char* cmd,
                            char* output,
                            struct timeval const* timestamp) {
   // Config check.

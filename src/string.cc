@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 
 using namespace com::centreon::engine;
 
@@ -233,7 +233,7 @@ std::string& string::trim(std::string& str) noexcept {
  *
  *  @return The trimming stream.
  */
-std::string& string::trim_left(std::string& str) throw() {
+std::string& string::trim_left(std::string& str) noexcept {
   size_t pos(str.find_first_not_of(whitespaces));
   if (pos != std::string::npos)
     str.erase(0, pos);
@@ -247,11 +247,79 @@ std::string& string::trim_left(std::string& str) throw() {
  *
  *  @return The trimming stream.
  */
-std::string& string::trim_right(std::string& str) throw() {
+std::string& string::trim_right(std::string& str) noexcept {
   size_t pos(str.find_last_not_of(whitespaces));
   if (pos == std::string::npos)
     str.clear();
   else
     str.erase(pos + 1);
   return str;
+}
+
+std::string string::extract_perfdata(std::string const& perfdata, std::string const& metric) noexcept {
+  size_t pos, pos_start = 0;
+
+  do {
+    pos_start = perfdata.find(metric, pos_start);
+    pos = pos_start;
+
+    // Metric name not found
+    if (pos == std::string::npos)
+      return "";
+
+    while (pos > 0 && perfdata[pos - 1] != ' ')
+      pos--;
+
+    size_t end = pos + metric.size();
+    while (end < perfdata.size() && perfdata[end] != '=')
+      end++;
+
+    // Metric name should be from pos to end. We have to verify this
+
+    // Are there quotes?
+    size_t p = pos;
+    size_t e = end - 1;
+    if (perfdata[p] == '\'' && perfdata[e] == '\'') {
+      p++;
+      e--;
+    }
+
+    // Is the metric type specified?
+    char c1 = perfdata[p], c2 = perfdata[p + 1], e1 = perfdata[e];
+    if (c2 == '[' && e1 == ']' && (c1 == 'a' || c1 == 'd' || c1 == 'g')) {
+      p += 2;
+      e--;
+    }
+    if (e - p + 1 == metric.size()) {
+      size_t ee = perfdata.find_first_of(" \n\r", end);
+      return perfdata.substr(pos, ee - pos);
+    }
+    pos_start++;
+  } while (pos < perfdata.size());
+  return "";
+}
+
+std::string& string::remove_thresholds(std::string& perfdata) noexcept {
+  size_t pos1 = perfdata.find(";");
+
+  if (pos1 == std::string::npos)
+    // No ';' so no thresholds in this perfdata
+    return perfdata;
+
+  size_t pos2 = perfdata.find(";", pos1 + 1);
+  if (pos2 == std::string::npos) {
+    // No second threshold. We just have to remove the first one.
+    perfdata.resize(pos1);
+    return perfdata;
+  }
+
+  size_t pos3 = perfdata.find(";", pos2 + 1);
+  if (pos3 == std::string::npos) {
+    // No min/max. We just have to remove thresholds.
+    perfdata.resize(pos1);
+    return perfdata;
+  }
+  
+  perfdata.replace(pos1, pos3 - pos1, ";;");
+  return perfdata;
 }

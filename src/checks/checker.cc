@@ -25,10 +25,10 @@
 #include <cstring>
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/commands/command.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
@@ -58,41 +58,30 @@ checker& checker::instance() {
   return instance;
 }
 
-void checker::clear() {
+void checker::clear() noexcept {
   try {
     std::lock_guard<std::mutex> lock(_mut_reap);
-    std::queue<check_result> empty;
-    std::swap( _to_reap, empty );
-    _list_id.clear();
-    _to_reap_partial.clear();
+    while (!_to_reap_partial.empty()) {
+      check_result* result = _to_reap_partial.front();
+      _to_reap_partial.pop();
+      delete result;
+    }
+    while (!_to_reap.empty()) {
+      check_result* result = _to_reap.front();
+      _to_reap.pop();
+      delete result;
+    }
+    auto it = _waiting_check_result.begin();
+    while (it != _waiting_check_result.end()) {
+      delete it->second;
+      it = _waiting_check_result.erase(it);
+    }
   } catch (...) {
   }
 }
 
-
 /**
- *  Add into the queue a result to reap later.
- *
- *  @param[in] result The check_result to process later.
- */
-void checker::push_check_result(check_result&& result) {
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_reap.push(result);
-}
-
-/**
- *  Add into the queue a result to reap later.
- *
- *  @param[in] result The check_result to process later.
- */
-void checker::push_check_result(check_result const* result) {
-  check_result res{*result};
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_reap.push(res);
-}
-
-/**
- *  Reap and process all result received by execution process.
+ *  Reap and process all results received by execution process.
  */
 void checker::reap() {
   logger(dbg_functions, basic) << "checker::reap";
@@ -102,51 +91,12 @@ void checker::reap() {
   time_t reaper_start_time;
   time(&reaper_start_time);
 
-  // Keep compatibility with old check result list.
-  if (!check_result::results.empty()) {
-    std::lock_guard<std::mutex> lock(_mut_reap);
-    check_result* cr(nullptr);
-    for (check_result_list::iterator it(check_result::results.begin()),
-         end(check_result::results.end());
-         it != end; ++it) {
-      _to_reap.push(*it);
-      delete cr;
-    }
-  }
-
   // Reap check results.
   unsigned int reaped_checks(0);
   {  // Scope to release mutex in all termination cases.
-    std::unique_lock<std::mutex> lock(_mut_reap);
-
-    // Merge partial check results.
-    while (!_to_reap_partial.empty()) {
-      // Find the two parts.
-      std::unordered_map<uint64_t, check_result>::iterator it_partial(
-          _to_reap_partial.begin());
-      std::unordered_map<uint64_t, check_result>::iterator it_id(
-          _list_id.find(it_partial->first));
-      if (_list_id.end() == it_id) {
-        logger(log_runtime_warning, basic)
-            << "command ID '" << it_partial->first << "' not found";
-      } else {
-        // Extract base part.
-        logger(dbg_checks, basic)
-            << "command ID (" << it_partial->first << ") executed";
-        check_result result{std::move(it_id->second)};
-        _list_id.erase(it_id);
-
-        // Merge check result.
-        result.set_finish_time(it_partial->second.get_finish_time());
-        result.set_early_timeout(it_partial->second.get_early_timeout());
-        result.set_return_code(it_partial->second.get_return_code());
-        result.set_exited_ok(it_partial->second.get_exited_ok());
-        result.set_output(it_partial->second.get_output());
-
-        // Push back in reap list.
-        _to_reap.push(result);
-      }
-      _to_reap_partial.erase(it_partial);
+    {
+      std::lock_guard<std::mutex> lock(_mut_reap);
+      std::swap(_to_reap, _to_reap_partial);
     }
 
     // Process check results.
@@ -154,62 +104,63 @@ void checker::reap() {
       // Get result host or service check.
       logger(dbg_checks, basic)
           << "Found a check result (#" << ++reaped_checks << ") to handle...";
-      check_result result(_to_reap.front());
+      check_result* result = _to_reap.front();
       _to_reap.pop();
-      lock.unlock();
 
-      // Service check result.
-      if (service_check == result.get_object_check_type()) {
+      // Service check result->
+      if (service_check == result->get_object_check_type()) {
         service_id_map::iterator it = service::services_by_id.find(
-            {result.get_host_id(), result.get_service_id()});
+            {result->get_host_id(), result->get_service_id()});
         if (it == service::services_by_id.end()) {
           logger(log_runtime_error, basic)
               << "Warning: Check result queue contained results for service "
-              << result.get_host_id() << "/" << result.get_service_id()
+              << result->get_host_id() << "/" << result->get_service_id()
               << ", but the service could not be found! Perhaps you forgot to "
                  "define the service in your config files ?";
         } else {
           try {
             // Check if the service exists.
             logger(dbg_checks, more)
-                << "Handling check result for service " << result.get_host_id()
-                << "/" << result.get_service_id() << "...";
-            it->second->handle_async_check_result(&result);
+                << "Handling check result for service " << result->get_host_id()
+                << "/" << result->get_service_id() << "...";
+            it->second->handle_async_check_result(result);
           } catch (std::exception const& e) {
             logger(log_runtime_warning, basic)
                 << "Check result queue errors for service "
-                << result.get_host_id() << "/" << result.get_service_id()
+                << result->get_host_id() << "/" << result->get_service_id()
                 << " : " << e.what();
           }
         }
       }
-      // Host check result.
+      // Host check result->
       else {
-        host_id_map::iterator it = host::hosts_by_id.find(result.get_host_id());
+        host_id_map::iterator it = host::hosts_by_id.find(result->get_host_id());
         if (it == host::hosts_by_id.end())
           logger(log_runtime_warning, basic)
               << "Warning: Check result queue contained results for "
-              << "host " << result.get_host_id() << ", but the host could "
+              << "host " << result->get_host_id() << ", but the host could "
               << "not be found! Perhaps you forgot to define the host in "
               << "your config files ?";
         else {
           try {
-            // Process the check result.
+            // Process the check result->
             logger(dbg_checks, more) << "Handling check result for host "
-                                     << result.get_host_id() << "...";
-            it->second->handle_async_check_result_3x(&result);
+                                     << result->get_host_id() << "...";
+            it->second->handle_async_check_result_3x(result);
           } catch (std::exception const& e) {
             logger(log_runtime_error, basic)
                 << "Check result queue errors for "
-                << "host " << result.get_host_id() << " : " << e.what();
+                << "host " << result->get_host_id() << " : " << e.what();
           }
         }
       }
 
+      delete result;
+
       // Check if reaping has timed out.
       time_t current_time;
       time(&current_time);
-      if ((current_time - reaper_start_time) >
+      if (current_time - reaper_start_time >
           static_cast<time_t>(config->max_check_reaper_time())) {
         logger(dbg_checks, basic) << "Breaking out of check result reaper: "
                                   << "max reaper time exceeded";
@@ -222,400 +173,12 @@ void checker::reap() {
             << "Breaking out of check result reaper: signal encountered";
         break;
       }
-
-      // Mutex needed to access list.
-      lock.lock();
     }
   }
 
   // Reaping finished.
   logger(dbg_checks, basic)
       << "Finished reaping " << reaped_checks << " check results";
-}
-
-/**
- *  Check if the reaper queue is empty.
- *
- *  @return True if the reper queue is empty, otherwise false.
- */
-bool checker::reaper_is_empty() {
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  return _to_reap.empty();
-}
-
-/**
- *  Run an host check without waiting check result.
- *
- *  @param[in]  hst              Host to check.
- *  @param[in]  check_options    Event options.
- *  @param[in]  latency          Host latency.
- *  @param[in]  scheduled_check  If the check are schedule.
- *  @param[in]  reschedule_check If the check are reschedule.
- *  @param[out] time_is_valid    Host check viable at this time.
- *  @param[out] preferred_time   The next preferred check time.
- *
- *  @return True is the check start correctly.
- */
-void checker::run(host* hst,
-                  int check_options,
-                  double latency,
-                  bool scheduled_check,
-                  bool reschedule_check,
-                  bool* time_is_valid,
-                  time_t* preferred_time) {
-  logger(dbg_functions, basic)
-      << "checker::run: hst=" << hst << ", check_options=" << check_options
-      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
-      << ", reschedule_check=" << reschedule_check;
-
-  // Preamble.
-  if (!hst)
-    throw engine_error() << "Attempt to run check on invalid host";
-  if (!hst->get_check_command_ptr())
-    throw engine_error() << "Attempt to run active check on host '"
-                         << hst->get_name() << "' with no check command";
-
-  logger(dbg_checks, basic)
-      << "** Running async check of host '" << hst->get_name() << "'...";
-
-  // Check if the host is viable now.
-  if (hst->verify_check_viability(check_options, time_is_valid,
-                                  preferred_time) == ERROR)
-    throw checks_viability_failure()
-        << "Check of host '" << hst->get_name() << "' is not viable";
-
-  // If this check is a rescheduled check, propagate the rescheduled check flag
-  // to the host. This solves the problem when a new host check is
-  // bound to be rescheduled but would be discarded because a host check
-  // is already running.
-  if (reschedule_check)
-    host::hosts[hst->get_name()]->set_should_reschedule_current_check(true);
-
-  // Don't execute a new host check if one is already running.
-  if (hst->get_is_executing() &&
-      !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-    logger(dbg_checks, basic)
-        << "A check of this host (" << hst->get_name()
-        << ") is already being executed, so we'll pass for the moment...";
-    return;
-  }
-
-  // Send broker event.
-  timeval start_time;
-  timeval end_time;
-  memset(&start_time, 0, sizeof(start_time));
-  memset(&end_time, 0, sizeof(end_time));
-  int res{broker_host_check(
-      NEBTYPE_HOSTCHECK_ASYNC_PRECHECK, NEBFLAG_NONE, NEBATTR_NONE, hst,
-      checkable::check_active, hst->get_current_state(), hst->get_state_type(),
-      start_time, end_time, hst->get_check_command().c_str(),
-      hst->get_latency(), 0.0, config->host_check_timeout(), false, 0, nullptr,
-      nullptr, nullptr, nullptr, nullptr)};
-
-  // Host check was cancel by NEB module. Reschedule check later.
-  if (NEBERROR_CALLBACKCANCEL == res)
-    throw engine_error() << "Some broker module cancelled check of host '"
-                         << hst->get_name() << "'";
-  // Host check was overriden by NEB module.
-  else if (NEBERROR_CALLBACKOVERRIDE == res) {
-    logger(dbg_functions, basic)
-        << "Some broker module overrode check of host '" << hst->get_name()
-        << "' so we'll bail out";
-    return;
-  }
-
-  // Checking starts.
-  logger(dbg_functions, basic)
-      << "Checking host '" << hst->get_name() << "'...";
-
-  // Clear check options.
-  if (scheduled_check)
-    hst->set_check_options(CHECK_OPTION_NONE);
-
-  // Adjust check attempts.
-  hst->adjust_check_attempt(true);
-
-  // Update latency for event broker and macros.
-  double old_latency(hst->get_latency());
-  hst->set_latency(latency);
-
-  // Get current host macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, hst);
-  std::string tmp;
-  get_raw_command_line_r(&macros, hst->get_check_command_ptr(),
-                         hst->get_check_command().c_str(), tmp, 0);
-
-  // Time to start command.
-  gettimeofday(&start_time, nullptr);
-
-  // Set check time for on-demand checks, so they're
-  // not incorrectly detected as being orphaned.
-  if (!scheduled_check)
-    hst->set_next_check(start_time.tv_sec);
-
-  // Update the number of running host checks.
-  ++currently_running_host_checks;
-
-  // Set the execution flag.
-  hst->set_is_executing(true);
-
-  // Init check result info.
-  check_result check_result_info(
-      host_check, hst->get_host_id(), 0UL, checkable::check_active,
-      check_options, reschedule_check, latency, start_time, start_time, false,
-      true, service::state_ok, "");
-
-  // Get command object.
-  command_map::iterator found{commands::command::commands.find(
-      hst->get_check_command_ptr()->get_name())};
-  if (found == commands::command::commands.end() || !found->second)
-    throw(engine_error() << "unknow command "
-                         << hst->get_check_command_ptr()->get_name());
-
-  std::string processed_cmd(found->second->process_cmd(&macros));
-  char* processed_cmd_ptr(string::dup(processed_cmd));
-
-  // Send event broker.
-  broker_host_check(NEBTYPE_HOSTCHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, hst,
-                    checkable::check_active, hst->get_current_state(),
-                    hst->get_state_type(), start_time, end_time,
-                    hst->get_check_command().c_str(), hst->get_latency(), 0.0,
-                    config->host_check_timeout(), false, 0, processed_cmd_ptr,
-                    nullptr, nullptr, nullptr, nullptr);
-
-  delete[] processed_cmd_ptr;
-
-  // Restore latency.
-  hst->set_latency(old_latency);
-
-  // Update statistics.
-  update_check_stats((scheduled_check == true)
-                         ? ACTIVE_SCHEDULED_HOST_CHECK_STATS
-                         : ACTIVE_ONDEMAND_HOST_CHECK_STATS,
-                     start_time.tv_sec);
-  update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
-
-  // Run command.
-  bool retry;
-  do {
-    retry = false;
-    try {
-      // Run command.
-      uint64_t id(found->second->run(processed_cmd, macros,
-                                     config->host_check_timeout()));
-      if (id != 0)
-        _list_id[id] = check_result_info;
-    } catch (com::centreon::exceptions::interruption const& e) {
-      (void)e;
-      retry = true;
-    } catch (std::exception const& e) {
-      timestamp now(timestamp::now());
-
-      // Update check result.
-      struct timeval tv;
-      tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
-      check_result_info.set_finish_time(tv);
-      check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(service::state_unknown);
-      check_result_info.set_exited_ok(true);
-      check_result_info.set_output("(Execute command failed)");
-
-      // Queue check result.
-      std::lock_guard<std::mutex> lock(_mut_reap);
-      _to_reap.push(check_result_info);
-
-      logger(log_runtime_warning, basic)
-          << "Error: Host check command execution failed: " << e.what();
-    }
-  } while (retry);
-
-  // Cleanup.
-  clear_volatile_macros_r(&macros);
-}
-
-/**
- *  Run an service check without waiting check result.
- *
- *  @param[in] svc              Service to check.
- *  @param[in] check_options    Event options.
- *  @param[in] latency          Service latency.
- *  @param[in] scheduled_check  If the check are schedule.
- *  @param[in] reschedule_check If the check are reschedule.
- *  @param[in] time_is_valid    Service check viable at this time.
- *  @param[in] preferred_time   The next preferred check time.
- *
- *  @return True is the check start correctly.
- */
-void checker::run(service* svc,
-                  int check_options,
-                  double latency,
-                  bool scheduled_check,
-                  bool reschedule_check,
-                  bool* time_is_valid,
-                  time_t* preferred_time) {
-  logger(dbg_functions, basic)
-      << "checker::run: svc=" << svc << ", check_options=" << check_options
-      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
-      << ", reschedule_check=" << reschedule_check;
-
-  // Preamble.
-  if (!svc)
-    throw(engine_error() << "Attempt to run check on invalid service");
-  if (!svc->get_host_ptr())
-    throw engine_error() << "Attempt to run check on service with invalid host";
-  if (!svc->get_check_command_ptr())
-    throw engine_error() << "Attempt to run active check on service '"
-                         << svc->get_description() << "' on host '"
-                         << svc->get_host_ptr()->get_name()
-                         << "' with no check command";
-
-  logger(dbg_checks, basic)
-      << "** Running async check of service '" << svc->get_description()
-      << "' on host '" << svc->get_hostname() << "'...";
-
-  // Check if the service is viable now.
-  if (svc->verify_check_viability(check_options, time_is_valid,
-                                  preferred_time) == ERROR)
-    throw(checks_viability_failure()
-          << "Check of service '" << svc->get_description() << "' on host '"
-          << svc->get_hostname() << "' is not viable");
-
-  // Send broker event.
-  timeval start_time;
-  timeval end_time;
-  memset(&start_time, 0, sizeof(start_time));
-  memset(&end_time, 0, sizeof(end_time));
-  int res(broker_service_check(
-      NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE, NEBATTR_NONE, svc,
-      checkable::check_active, start_time, end_time,
-      svc->get_check_command().c_str(), svc->get_latency(), 0.0, 0, false, 0,
-      nullptr, nullptr));
-
-  // Service check was cancel by NEB module. reschedule check later.
-  if (NEBERROR_CALLBACKCANCEL == res) {
-    if (preferred_time != nullptr)
-      *preferred_time += static_cast<time_t>(svc->get_check_interval() *
-                                             config->interval_length());
-    throw(engine_error() << "Some broker module cancelled check of service '"
-                         << svc->get_description() << "' on host '"
-                         << svc->get_hostname());
-  }
-  // Service check was override by NEB module.
-  else if (NEBERROR_CALLBACKOVERRIDE == res) {
-    logger(dbg_functions, basic)
-        << "Some broker module overrode check of service '"
-        << svc->get_description() << "' on host '" << svc->get_hostname()
-        << "' so we'll bail out";
-    return;
-  }
-
-  // Checking starts.
-  logger(dbg_checks, basic) << "Checking service '" << svc->get_description()
-                            << "' on host '" << svc->get_hostname() << "'...";
-
-  // Clear check options.
-  if (scheduled_check)
-    svc->set_check_options(CHECK_OPTION_NONE);
-
-  // Update latency for event broker and macros.
-  double old_latency(svc->get_latency());
-  svc->set_latency(latency);
-
-  // Get current host and service macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, svc->get_host_ptr());
-  grab_service_macros_r(&macros, svc);
-  std::string tmp;
-  get_raw_command_line_r(&macros, svc->get_check_command_ptr(),
-                         svc->get_check_command().c_str(), tmp, 0);
-
-  // Time to start command.
-  gettimeofday(&start_time, nullptr);
-
-  // Update the number of running service checks.
-  ++currently_running_service_checks;
-
-  // Set the execution flag.
-  svc->set_is_executing(true);
-
-  // Init check result info.
-  check_result check_result_info(
-      service_check, svc->get_host_id(), svc->get_service_id(),
-      checkable::check_active, check_options, reschedule_check, latency,
-      start_time, start_time, false, true, service::state_ok, "");
-
-  // Get command object.
-  command_map::iterator found{commands::command::commands.find(
-      svc->get_check_command_ptr()->get_name())};
-  if (found == commands::command::commands.end() || !found->second)
-    throw(engine_error() << "unknow command "
-                         << svc->get_check_command_ptr()->get_name());
-
-  std::string processed_cmd(found->second->process_cmd(&macros));
-  char* processed_cmd_ptr(string::dup(processed_cmd));
-
-  // Send event broker.
-  res = broker_service_check(
-      NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE, svc,
-      checkable::check_active, start_time, end_time,
-      svc->get_check_command().c_str(), svc->get_latency(), 0.0,
-      config->service_check_timeout(), false, 0, processed_cmd_ptr, nullptr);
-  delete[] processed_cmd_ptr;
-
-  // Restore latency.
-  svc->set_latency(old_latency);
-
-  // Service check was override by neb_module.
-  if (NEBERROR_CALLBACKOVERRIDE == res) {
-    clear_volatile_macros_r(&macros);
-    return;
-  }
-
-  // Update statistics.
-  update_check_stats((scheduled_check == true)
-                         ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
-                         : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
-                     start_time.tv_sec);
-
-  bool retry;
-  do {
-    retry = false;
-    try {
-      // Run command.
-      uint64_t id(found->second->run(processed_cmd, macros,
-                                     config->service_check_timeout()));
-      if (id != 0)
-        _list_id[id] = check_result_info;
-    } catch (com::centreon::exceptions::interruption const& e) {
-      (void)e;
-      retry = true;
-    } catch (std::exception const& e) {
-      timestamp now(timestamp::now());
-
-      // Update check result.
-      timeval tv;
-      tv.tv_sec = now.to_seconds();
-      tv.tv_usec = now.to_useconds() - tv.tv_sec * 1000000ull;
-      check_result_info.set_finish_time(tv);
-
-      check_result_info.set_early_timeout(false);
-      check_result_info.set_return_code(service::state_unknown);
-      check_result_info.set_exited_ok(true);
-      check_result_info.set_output("(Execute command failed)");
-
-      // Queue check result.
-      std::lock_guard<std::mutex> lock(_mut_reap);
-      _to_reap.push(check_result_info);
-
-      logger(log_runtime_warning, basic)
-          << "Error: Service check command execution failed: " << e.what();
-    }
-  } while (retry);
-
-  // Cleanup.
-  clear_volatile_macros_r(&macros);
 }
 
 /**
@@ -639,16 +202,16 @@ void checker::run_sync(host* hst,
 
   // Preamble.
   if (!hst)
-    throw(engine_error() << "Attempt to run synchronous check on invalid host");
+    throw engine_error() << "Attempt to run synchronous check on invalid host";
   if (!hst->get_check_command_ptr())
-    throw(engine_error() << "Attempt to run synchronous active check on host '"
-                         << hst->get_name() << "' with no check command");
+    throw engine_error() << "Attempt to run synchronous active check on host '"
+                         << hst->get_name() << "' with no check command";
 
   logger(dbg_checks, basic)
       << "** Run sync check of host '" << hst->get_name() << "'...";
 
   // Check if the host is viable now.
-  if (hst->verify_check_viability(check_options, nullptr, nullptr) == ERROR) {
+  if (!hst->verify_check_viability(check_options, nullptr, nullptr)) {
     if (check_result_code)
       *check_result_code = hst->get_current_state();
     logger(dbg_checks, basic) << "Host check is not viable at this time";
@@ -765,14 +328,15 @@ checker::checker() : commands::command_listener() {}
 /**
  *  Default destructor.
  */
-checker::~checker() throw() {
-  try {
-    std::lock_guard<std::mutex> lock(_mut_reap);
-    while (!_to_reap.empty()) {
-      _to_reap.pop();
-    }
-  } catch (...) {
-  }
+checker::~checker() noexcept {
+  clear();
+//  try {
+//    std::lock_guard<std::mutex> lock(_mut_reap);
+//    while (!_to_reap.empty()) {
+//      _to_reap.pop();
+//    }
+//  } catch (...) {
+//  }
 }
 
 /**
@@ -780,27 +344,37 @@ checker::~checker() throw() {
  *
  *  @param[in] res The result of the execution.
  */
-void checker::finished(commands::result const& res) throw() {
+void checker::finished(commands::result const& res) noexcept {
   // Debug message.
   logger(dbg_functions, basic) << "checker::finished: res=" << &res;
 
-  // Find check result.
-  check_result result;
+  std::unique_lock<std::mutex> lock(_mut_reap);
+  auto it_id = _waiting_check_result.find(res.command_id);
+  if (it_id == _waiting_check_result.end()) {
+    logger(log_runtime_warning, basic)
+      << "command ID '" << res.command_id << "' not found";
+    return;
+  }
 
-  struct timeval tv;
+  // Find check result.
+  check_result* result = it_id->second;
+  _waiting_check_result.erase(it_id);
+  lock.unlock();
+
   // Update check result.
-  tv.tv_sec = res.end_time.to_seconds();
-  tv.tv_usec = res.end_time.to_useconds() - tv.tv_sec * 1000000ull;
-  result.set_finish_time(tv);
-  result.set_early_timeout(res.exit_status == process::timeout);
-  result.set_return_code(res.exit_code);
-  result.set_exited_ok((res.exit_status == process::normal) ||
-                       (res.exit_status == process::timeout));
-  result.set_output(res.output);
+  struct timeval tv = {.tv_sec = res.end_time.to_seconds(),
+                       .tv_usec = res.end_time.to_useconds() % 1000000ll};
+
+  result->set_finish_time(tv);
+  result->set_early_timeout(res.exit_status == process::timeout);
+  result->set_return_code(res.exit_code);
+  result->set_exited_ok(res.exit_status == process::normal ||
+                        res.exit_status == process::timeout);
+  result->set_output(res.output);
 
   // Queue check result.
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_reap_partial[res.command_id] = result;
+  lock.lock();
+  _to_reap_partial.push(result);
 }
 
 /**
@@ -816,10 +390,10 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
 
   // Preamble.
   if (!hst)
-    throw(engine_error() << "Attempt to run synchronous check on invalid host");
+    throw engine_error() << "Attempt to run synchronous check on invalid host";
   if (!hst->get_check_command_ptr())
-    throw(engine_error() << "Attempt to run synchronous active check on host '"
-                         << hst->get_name() << "' with no check command");
+    throw engine_error() << "Attempt to run synchronous active check on host '"
+                         << hst->get_name() << "' with no check command";
 
   logger(dbg_checks, basic)
       << "** Executing sync check of host '" << hst->get_name() << "'...";
@@ -854,24 +428,20 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   hst->set_last_check(start_time.tv_sec);
 
   // Get command object.
-  command_map::iterator found{commands::command::commands.find(
-      hst->get_check_command_ptr()->get_name())};
-  if (found == commands::command::commands.end() || !found->second)
-    throw(engine_error() << "unknow command "
-                         << hst->get_check_command_ptr()->get_name());
-
-  std::string processed_cmd(found->second->process_cmd(&macros));
-  char* tmp_processed_cmd(string::dup(processed_cmd));
+  commands::command* cmd = hst->get_check_command_ptr();
+  std::string processed_cmd(cmd->process_cmd(&macros));
+  const char* tmp_processed_cmd = processed_cmd.c_str();
 
   // Send broker event.
-  broker_host_check(
-      NEBTYPE_HOSTCHECK_RAW_START, NEBFLAG_NONE, NEBATTR_NONE, hst,
-      checkable::check_active, host::state_up, hst->get_state_type(),
-      start_time, end_time, hst->get_check_command().c_str(), 0.0, 0.0,
-      config->host_check_timeout(), false, service::state_ok, tmp_processed_cmd,
-      const_cast<char*>(hst->get_plugin_output().c_str()),
-      const_cast<char*>(hst->get_long_plugin_output().c_str()),
-      const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
+  broker_host_check(NEBTYPE_HOSTCHECK_RAW_START, NEBFLAG_NONE, NEBATTR_NONE,
+                    hst, checkable::check_active, host::state_up,
+                    hst->get_state_type(), start_time, end_time,
+                    hst->get_check_command().c_str(), 0.0, 0.0,
+                    config->host_check_timeout(), false, service::state_ok,
+                    processed_cmd.c_str(),
+                    const_cast<char*>(hst->get_plugin_output().c_str()),
+                    const_cast<char*>(hst->get_long_plugin_output().c_str()),
+                    const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
 
   // Debug messages.
   logger(dbg_commands, more)
@@ -898,8 +468,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   // Run command.
   commands::result res;
   try {
-    found->second->run(processed_cmd, macros, config->host_check_timeout(),
-                       res);
+    cmd->run(processed_cmd, macros, config->host_check_timeout(), res);
   } catch (std::exception const& e) {
     // Update check result.
     res.command_id = 0;
@@ -1005,10 +574,35 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
       const_cast<char*>(hst->get_plugin_output().c_str()),
       const_cast<char*>(hst->get_long_plugin_output().c_str()),
       const_cast<char*>(hst->get_perf_data().c_str()), nullptr);
-  delete[] tmp_processed_cmd;
 
   // Termination.
   logger(dbg_checks, basic)
       << "** Sync host check done: state=" << return_result;
   return return_result;
+}
+
+/**
+ * @brief This method stores a command id and the check_result at the origin of
+ *this command execution. The command is executed asynchronously. When the
+ *execution is finished, thanks to this command we will be able to find the
+ *check_result.
+ *
+ * @param id A command id
+ * @param check_result A check_result coming from a service or a host.
+ */
+void checker::add_check_result(uint64_t id,
+                               check_result* check_result) noexcept {
+  std::lock_guard<std::mutex> lock(_mut_reap);
+  _waiting_check_result[id] = check_result;
+}
+
+/**
+ * @brief This method stores a check_result already finished in the _to_reap
+ *list. The goal of this list is to update services and hosts with check_result.
+ *
+ * @param check_result The check_result already finished.
+ */
+void checker::add_check_result_to_reap(check_result* check_result) noexcept {
+  std::lock_guard<std::mutex> lock(_mut_reap);
+  _to_reap_partial.push(check_result);
 }

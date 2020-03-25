@@ -37,7 +37,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
@@ -92,9 +92,6 @@ class ServiceCheck : public TestEngine {
 
   void TearDown() override {
     deinit_config_state();
-//    configuration::applier::state::instance().clear();
-//    delete config;
-//    config = nullptr;
   }
 
  protected:
@@ -133,7 +130,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   std::string cmd{oss.str()};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -161,7 +158,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -266,7 +263,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -293,7 +290,7 @@ TEST_F(ServiceCheck, OkCritical) {
   time_t now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   std::string cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();

@@ -17,23 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/checks.hh"
-#include <dirent.h>
-#include <fcntl.h>
-#include <mmap.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <cstdio>
-#include <cstdlib>
+#include "com/centreon/engine/check_result.hh"
 #include <string>
-#include <utility>
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
 
-check_result_list check_result::results;
+//check_result_list check_result::results;
 
 check_result::check_result()
     : _object_check_type{host_check},
@@ -46,60 +38,9 @@ check_result::check_result()
       _early_timeout{false},
       _exited_ok{false},
       _return_code{0},
-      _output{""} {
-  timeval tv{0, 0};
-  _start_time = tv;
-  _finish_time = tv;
-}
-
-check_result::check_result(check_result const& other)
-    : _object_check_type{other._object_check_type},
-      _host_id{other._host_id},
-      _service_id{other._service_id},
-      _check_type{other._check_type},
-      _check_options{other._check_options},
-      _reschedule_check{other._reschedule_check},
-      _latency{other._latency},
-      _start_time(other._start_time),
-      _finish_time(other._finish_time),
-      _early_timeout{other._early_timeout},
-      _exited_ok{other._exited_ok},
-      _return_code{other._return_code},
-      _output{other._output} {}
-
-check_result& check_result::operator=(check_result const& other) {
-  if (this != &other) {
-    _object_check_type = other._object_check_type;
-    _host_id = other._host_id;
-    _service_id = other._service_id;
-    _check_type = other._check_type;
-    _check_options = other._check_options;
-    _reschedule_check = other._reschedule_check;
-    _latency = other._latency;
-    _start_time = other._start_time;
-    _finish_time = other._finish_time;
-    _early_timeout = other._early_timeout;
-    _exited_ok = other._exited_ok;
-    _return_code = other._return_code;
-    _output = other._output;
-  }
-  return *this;
-}
-
-check_result::check_result(check_result&& other)
-    : _object_check_type{other._object_check_type},
-      _host_id{other._host_id},
-      _service_id{other._service_id},
-      _check_type{other._check_type},
-      _check_options{other._check_options},
-      _reschedule_check{other._reschedule_check},
-      _latency{other._latency},
-      _start_time(other._start_time),
-      _finish_time(other._finish_time),
-      _early_timeout{other._early_timeout},
-      _exited_ok{other._exited_ok},
-      _return_code{other._return_code},
-      _output{std::move(other._output)} {}
+      _output{""},
+      _start_time{0, 0},
+      _finish_time{0, 0} {}
 
 check_result::check_result(enum check_source object_check_type,
                            uint64_t host_id,

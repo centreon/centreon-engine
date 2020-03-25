@@ -477,11 +477,13 @@ processing::processing()
                CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS,
                &_redirector_servicegroup<&disable_host_notifications>)},
           {"ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS",
-           command_info(CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
-                        &_redirector_servicegroup<&enable_service_notifications>)},
+           command_info(
+               CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
+               &_redirector_servicegroup<&enable_service_notifications>)},
           {"DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS",
-           command_info(CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
-                        &_redirector_servicegroup<&disable_service_notifications>)},
+           command_info(
+               CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
+               &_redirector_servicegroup<&disable_service_notifications>)},
           {"ENABLE_SERVICEGROUP_HOST_CHECKS",
            command_info(CMD_ENABLE_SERVICEGROUP_HOST_CHECKS,
                         &_redirector_servicegroup<&enable_host_checks>)},
@@ -503,11 +505,13 @@ processing::processing()
            command_info(CMD_DISABLE_SERVICEGROUP_SVC_CHECKS,
                         &_redirector_servicegroup<&disable_service_checks>)},
           {"ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",
-           command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
-                        &_redirector_servicegroup<&enable_passive_service_checks>)},
+           command_info(
+               CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
+               &_redirector_servicegroup<&enable_passive_service_checks>)},
           {"DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS",
-           command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
-                        &_redirector_servicegroup<&disable_passive_service_checks>)},
+           command_info(
+               CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
+               &_redirector_servicegroup<&disable_passive_service_checks>)},
           {"SCHEDULE_SERVICEGROUP_HOST_DOWNTIME",
            command_info(CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME,
                         &_redirector<&cmd_schedule_downtime>)},
@@ -563,6 +567,9 @@ processing::processing()
            command_info(CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS,
                         &_redirector_contactgroup<
                             &disable_contact_service_notifications>)},
+          {"NEW_THRESHOLDS_FILE",
+           command_info(CMD_NEW_THRESHOLDS_FILE,
+                        &_redirector_file<&new_thresholds_file>)},
       } {
   // misc commands.
   _lst_command["PROCESS_FILE"] = command_info(

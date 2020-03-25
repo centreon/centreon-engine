@@ -158,7 +158,7 @@ int process_external_commands_from_file(char const* file, int delete_file) {
 }
 
 /* external command processor */
-void process_external_command(char const* cmd) {
+void process_external_command(const char* cmd) {
   modules::external_commands::gl_processor.execute(cmd);
 }
 
@@ -230,7 +230,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
 }
 
 /* removes a host or service comment from the status log */
-int cmd_delete_comment(int cmd __attribute__((unused)), char* args) {
+int cmd_delete_comment(int cmd [[maybe_unused]], char* args) {
   uint64_t comment_id{0};
 
   /* get the comment id we should delete */
@@ -567,27 +567,34 @@ int process_passive_service_check(time_t check_time,
   timeval tv;
   gettimeofday(&tv, nullptr);
 
-  timeval set_tv;
-  set_tv.tv_sec = check_time;
-  set_tv.tv_usec = 0;
+  timeval set_tv = {.tv_sec = check_time, .tv_usec = 0};
 
-  check_result result(service_check, found->second->get_host_id(),
-                      found->second->get_service_id(), checkable::check_passive,
-                      CHECK_OPTION_NONE, false,
-                      (double)((double)(tv.tv_sec - check_time) +
-                               (double)(tv.tv_usec / 1000.0) / 1000.0),
-                      set_tv, set_tv, false, true, return_code, output);
+  check_result* result =
+      new check_result(service_check,
+                       found->second->get_host_id(),
+                       found->second->get_service_id(),
+                       checkable::check_passive,
+                       CHECK_OPTION_NONE,
+                       false,
+                       static_cast<double>(tv.tv_sec - check_time) +
+                           static_cast<double>(tv.tv_usec / 1000000.0),
+                       set_tv,
+                       set_tv,
+                       false,
+                       true,
+                       return_code,
+                       output);
 
   /* make sure the return code is within bounds */
-  if (result.get_return_code() < 0 || result.get_return_code() > 3) {
-    result.set_return_code(service::state_unknown);
+  if (result->get_return_code() < 0 || result->get_return_code() > 3) {
+    result->set_return_code(service::state_unknown);
   }
 
-  if (result.get_latency() < 0.0) {
-    result.set_latency(0.0);
+  if (result->get_latency() < 0.0) {
+    result->set_latency(0.0);
   }
 
-  checks::checker::instance().push_check_result(std::move(result));
+  checks::checker::instance().add_check_result_to_reap(result);
 
   return OK;
 }
@@ -676,24 +683,32 @@ int process_passive_host_check(time_t check_time,
 
   timeval tv;
   gettimeofday(&tv, nullptr);
-  timeval tv_start;
-  tv_start.tv_sec = check_time;
-  tv_start.tv_usec = 0;
+  timeval tv_start = {.tv_sec = check_time, .tv_usec = 0};
 
-  check_result result(host_check, it->second->get_host_id(), 0UL,
-                      checkable::check_passive, CHECK_OPTION_NONE, false,
-                      (double)((double)(tv.tv_sec - check_time) +
-                               (double)(tv.tv_usec / 1000.0) / 1000.0),
-                      tv_start, tv_start, false, true, return_code, output);
+  check_result* result =
+      new check_result(host_check,
+                       it->second->get_host_id(),
+                       0UL,
+                       checkable::check_passive,
+                       CHECK_OPTION_NONE,
+                       false,
+                       static_cast<double>(tv.tv_sec - check_time) +
+                           static_cast<double>(tv.tv_usec / 1000000.0),
+                       tv_start,
+                       tv_start,
+                       false,
+                       true,
+                       return_code,
+                       output);
 
   /* make sure the return code is within bounds */
-  if (result.get_return_code() < 0 || result.get_return_code() > 3)
-    result.set_return_code(service::state_unknown);
+  if (result->get_return_code() < 0 || result->get_return_code() > 3)
+    result->set_return_code(service::state_unknown);
 
-  if (result.get_latency() < 0.0)
-    result.set_latency(0.0);
+  if (result->get_latency() < 0.0)
+    result->set_latency(0.0);
 
-  checks::checker::instance().push_check_result(std::move(result));
+  checks::checker::instance().add_check_result_to_reap(result);
 
   return OK;
 }
@@ -3415,4 +3430,8 @@ void set_host_notification_number(host* hst, int num) {
 
 void set_service_notification_number(service* svc, int num) {
   svc->set_notification_number(num);
+}
+
+void new_thresholds_file(char* filename) {
+  anomalydetection::update_thresholds(filename);
 }

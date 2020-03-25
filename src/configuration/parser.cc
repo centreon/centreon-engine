@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/parser.hh"
 #include <memory>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/io/directory_entry.hh"
 
@@ -42,7 +42,8 @@ parser::store parser::_store[] = {
     &parser::_store_into_list,
     &parser::_store_into_list,
     &parser::_store_into_map<servicegroup, &servicegroup::servicegroup_name>,
-    &parser::_store_into_map<timeperiod, &timeperiod::timeperiod_name>};
+    &parser::_store_into_map<timeperiod, &timeperiod::timeperiod_name>,
+    &parser::_store_into_list};
 
 /**
  *  Default constructor.
@@ -98,12 +99,12 @@ void parser::parse(std::string const& path, state& config) {
   _insert(_lst_objects[object::serviceescalation], config.serviceescalations());
   _insert(_map_objects[object::servicegroup], config.servicegroups());
   _insert(_lst_objects[object::service], config.services());
+  _insert(_lst_objects[object::anomalydetection], config.anomalydetections());
   _insert(_map_objects[object::timeperiod], config.timeperiods());
 
   // cleanup.
   _objects_info.clear();
-  for (unsigned int i(0); i < sizeof(_lst_objects) / sizeof(_lst_objects[0]);
-       ++i) {
+  for (unsigned int i(0); i < _lst_objects.size(); ++i) {
     _lst_objects[i].clear();
     _map_objects[i].clear();
     _templates[i].clear();

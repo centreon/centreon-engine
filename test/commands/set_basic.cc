@@ -20,7 +20,7 @@
 #include <exception>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;

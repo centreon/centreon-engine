@@ -20,7 +20,7 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include <limits>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/io/file_entry.hh"
@@ -2982,6 +2982,24 @@ set_servicegroup::iterator state::servicegroups_find(
     return it;
   return _servicegroups.end();
 }
+//
+///**
+// *  Get all engine anomalydetections.
+// *
+// *  @return All engine anomalydetections.
+// */
+//set_anomalydetection const& state::anomalydetections() const noexcept {
+//  return _anomalydetections;
+//}
+
+/**
+ *  Get all engine anomalydetections.
+ *
+ *  @return All engine anomalydetections.
+ */
+set_anomalydetection& state::anomalydetections() noexcept {
+  return _anomalydetections;
+}
 
 /**
  *  Get all engine services.
@@ -3001,6 +3019,29 @@ set_service& state::services() noexcept {
   return _services;
 }
 
+/**
+ *  Get anomaly detection service by its key.
+ *
+ *  @param[in] k anomaly detection service name.
+ *
+ *  @return Iterator to the element if found, anomalydetections().end()
+ *          otherwise.
+ */
+set_anomalydetection::iterator state::anomalydetections_find(
+    anomalydetection::key_type const& k) {
+  configuration::anomalydetection below_searched;
+  below_searched.set_host_id(k.first);
+  below_searched.set_service_id(k.second);
+  set_anomalydetection::const_iterator it{
+      _anomalydetections.upper_bound(below_searched)};
+  if (it != _anomalydetections.end() && it->host_id() == k.first &&
+      it->service_id() == k.second)
+    return it;
+  else if (it != _anomalydetections.begin() && (--it)->host_id() == k.first &&
+           it->service_id() == k.second)
+    return it;
+  return _anomalydetections.end();
+}
 /**
  *  Get service by its key.
  *

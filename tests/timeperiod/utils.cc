@@ -21,7 +21,7 @@
 #include <cstring>
 #include <ctime>
 #include <memory>
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/timerange.hh"
 
 using namespace com::centreon::engine;
@@ -318,4 +318,12 @@ extern "C" time_t time(time_t* t) __THROW {
   if (t)
     *t = gl_now;
   return (gl_now);
+}
+
+extern "C" int gettimeofday(struct timeval* tv, struct timezone *tz) __THROW {
+  if (tv) {
+    tv->tv_sec = gl_now;
+    tv->tv_usec = 0;
+  }
+  return 0;
 }

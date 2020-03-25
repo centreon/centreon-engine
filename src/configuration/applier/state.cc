@@ -28,6 +28,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/applier/anomalydetection.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
@@ -46,7 +47,7 @@
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/command.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -75,7 +76,8 @@ void applier::state::apply(configuration::state& new_cfg) {
   try {
     _processing_state = state_ready;
     _processing(new_cfg);
-  } catch (std::exception const& e) {
+  }
+  catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
     // have a valid configuration to restore.
     if (!has_already_been_loaded)
@@ -106,15 +108,16 @@ void applier::state::apply(configuration::state& new_cfg,
   try {
     _processing_state = state_ready;
     _processing(new_cfg, &state);
-  } catch (std::exception const& e) {
+  }
+  catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
     // have a valid configuration to restore.
     if (!has_already_been_loaded)
       throw;
 
     // If is not the first time, we can restore the old one.
-    logger(log_config_error, basic)
-        << "Cannot apply new configuration: " << e.what();
+    logger(log_config_error, basic) << "Cannot apply new configuration: "
+                                    << e.what();
 
     // Check if we need to restore old configuration.
     if (_processing_state == state_error) {
@@ -220,17 +223,13 @@ applier::state::user_macros_find(std::string const& key) const {
  *  Lock state
  *
  */
-void applier::state::lock() {
-  _apply_lock.lock();
-}
+void applier::state::lock() { _apply_lock.lock(); }
 
 /**
  *  Unlock state
  *
  */
-void applier::state::unlock() {
-  _apply_lock.unlock();
-}
+void applier::state::unlock() { _apply_lock.unlock(); }
 
 /*
  *  Update all new globals.
@@ -547,13 +546,15 @@ void applier::state::_apply(
   // Erase objects.
   for (typename cfg_set::const_iterator it_delete(diff.deleted().begin()),
        end_delete(diff.deleted().end());
-       it_delete != end_delete; ++it_delete) {
+       it_delete != end_delete;
+       ++it_delete) {
     if (!verify_config)
       aplyr.remove_object(*it_delete);
     else {
       try {
         aplyr.remove_object(*it_delete);
-      } catch (std::exception const& e) {
+      }
+      catch (std::exception const& e) {
         ++config_errors;
         logger(log_info_message, basic) << e.what();
       }
@@ -563,13 +564,15 @@ void applier::state::_apply(
   // Add objects.
   for (typename cfg_set::const_iterator it_create(diff.added().begin()),
        end_create(diff.added().end());
-       it_create != end_create; ++it_create) {
+       it_create != end_create;
+       ++it_create) {
     if (!verify_config)
       aplyr.add_object(*it_create);
     else {
       try {
         aplyr.add_object(*it_create);
-      } catch (std::exception const& e) {
+      }
+      catch (std::exception const& e) {
         ++config_errors;
         logger(log_info_message, basic) << e.what();
       }
@@ -579,13 +582,15 @@ void applier::state::_apply(
   // Modify objects.
   for (typename cfg_set::const_iterator it_modify(diff.modified().begin()),
        end_modify(diff.modified().end());
-       it_modify != end_modify; ++it_modify) {
+       it_modify != end_modify;
+       ++it_modify) {
     if (!verify_config)
       aplyr.modify_object(*it_modify);
     else {
       try {
         aplyr.modify_object(*it_modify);
-      } catch (std::exception const& e) {
+      }
+      catch (std::exception const& e) {
         ++config_errors;
         logger(log_info_message, basic) << e.what();
       }
@@ -625,9 +630,8 @@ void applier::state::_check_serviceescalations() const {
     if (s.size() != srv->get_escalations().size()) {
       logger(log_config_error, basic)
           << "Error on serviceescalation !!! Some escalations are stored "
-             "several times in service "
-          << srv->get_hostname() << "/" << srv->get_description()
-          << "set size: " << s.size()
+             "several times in service " << srv->get_hostname() << "/"
+          << srv->get_description() << "set size: " << s.size()
           << " ; list size: " << srv->get_escalations().size();
       throw engine_error() << "This is a bug";
     }
@@ -743,10 +747,10 @@ void applier::state::_check_contacts() const {
       contact_map::iterator found{engine::contact::contacts.find(pp.first)};
       if (found == engine::contact::contacts.end() ||
           found->second.get() != pp.second) {
-        logger(log_config_error, basic)
-            << "Error on contact !!! The contact " << pp.first
-            << " used in contactgroup " << p.first
-            << " is not or badly defined";
+        logger(log_config_error, basic) << "Error on contact !!! The contact "
+                                        << pp.first << " used in contactgroup "
+                                        << p.first
+                                        << " is not or badly defined";
         throw engine_error() << "This is a bug";
       }
     }
@@ -757,10 +761,11 @@ void applier::state::_check_contacts() const {
       contact_map::iterator found{engine::contact::contacts.find(pp.first)};
       if (found == engine::contact::contacts.end() ||
           found->second.get() != pp.second) {
-        logger(log_config_error, basic)
-            << "Error on contact !!! The contact " << pp.first
-            << " used in service " << p.second->get_hostname() << '/'
-            << p.second->get_description() << " is not or badly defined";
+        logger(log_config_error, basic) << "Error on contact !!! The contact "
+                                        << pp.first << " used in service "
+                                        << p.second->get_hostname() << '/'
+                                        << p.second->get_description()
+                                        << " is not or badly defined";
         throw engine_error() << "This is a bug";
       }
     }
@@ -771,10 +776,10 @@ void applier::state::_check_contacts() const {
       contact_map::iterator found{engine::contact::contacts.find(pp.first)};
       if (found == engine::contact::contacts.end() ||
           found->second.get() != pp.second) {
-        logger(log_config_error, basic)
-            << "Error on contact !!! The contact " << pp.first
-            << " used in service " << p.second->get_name()
-            << " is not or badly defined";
+        logger(log_config_error, basic) << "Error on contact !!! The contact "
+                                        << pp.first << " used in service "
+                                        << p.second->get_name()
+                                        << " is not or badly defined";
         throw engine_error() << "This is a bug";
       }
     }
@@ -865,10 +870,13 @@ void applier::state::_check_services() const {
           {svc->get_host_id(), svc->get_service_id()})};
       if (found == engine::service::services_by_id.end() ||
           found->second.get() != svc) {
-        logger(log_config_error, basic)
-            << "Error on service !!! The service " << p.first.first << '/'
-            << p.first.second << " used in service dependency " << p.first.first
-            << '/' << p.first.second << " is not or badly defined";
+        logger(log_config_error, basic) << "Error on service !!! The service "
+                                        << p.first.first << '/'
+                                        << p.first.second
+                                        << " used in service dependency "
+                                        << p.first.first << '/'
+                                        << p.first.second
+                                        << " is not or badly defined";
         throw engine_error() << "This is a bug";
       }
     }
@@ -888,10 +896,8 @@ void applier::state::_check_services() const {
   }
 
   for (auto const& p : engine::service::services) {
-    std::array<commands::command*, 2> arr{
-        p.second->get_check_command_ptr(),
-        p.second->get_event_handler_ptr(),
-    };
+    std::array<commands::command*, 2> arr{p.second->get_check_command_ptr(),
+                                          p.second->get_event_handler_ptr(), };
     for (auto cc : arr) {
       if (cc) {
         bool found = false;
@@ -953,10 +959,8 @@ void applier::state::_check_hosts() const {
   }
 
   for (auto const& p : engine::host::hosts) {
-    std::array<commands::command*, 2> arr{
-        p.second->get_check_command_ptr(),
-        p.second->get_event_handler_ptr(),
-    };
+    std::array<commands::command*, 2> arr{p.second->get_check_command_ptr(),
+                                          p.second->get_event_handler_ptr(), };
     for (auto cc : arr) {
       if (cc) {
         bool found = false;
@@ -979,9 +983,8 @@ void applier::state::_check_hosts() const {
   if (engine::host::hosts_by_id.size() != engine::host::hosts.size()) {
     logger(log_config_error, basic)
         << "Error on host !!! hosts_by_id contains hosts that are not in "
-           "hosts. The first one size is "
-        << engine::service::services.size() << " whereas the second size is "
-        << engine::service::services.size();
+           "hosts. The first one size is " << engine::service::services.size()
+        << " whereas the second size is " << engine::service::services.size();
     throw engine_error() << "This is a bug";
   }
 
@@ -1005,7 +1008,8 @@ void applier::state::_apply(configuration::state& new_cfg,
   else {
     try {
       app_state.apply(new_cfg, state);
-    } catch (std::exception const& e) {
+    }
+    catch (std::exception const& e) {
       ++config_errors;
       logger(log_info_message, basic) << e.what();
     }
@@ -1023,7 +1027,8 @@ void applier::state::_expand(configuration::state& new_state) {
   ApplierType aplyr;
   try {
     aplyr.expand_objects(new_state);
-  } catch (std::exception const& e) {
+  }
+  catch (std::exception const& e) {
     if (verify_config) {
       ++config_errors;
       logger(log_info_message, basic) << e.what();
@@ -1045,8 +1050,8 @@ void applier::state::_processing(configuration::state& new_cfg,
 
   // Call prelauch broker event the first time to run applier state.
   if (!has_already_been_loaded)
-    broker_program_state(NEBTYPE_PROCESS_PRELAUNCH, NEBFLAG_NONE, NEBATTR_NONE,
-                         nullptr);
+    broker_program_state(
+        NEBTYPE_PROCESS_PRELAUNCH, NEBFLAG_NONE, NEBATTR_NONE, nullptr);
 
   //
   // Expand all objects.
@@ -1130,6 +1135,11 @@ void applier::state::_processing(configuration::state& new_cfg,
   difference<set_service> diff_services;
   diff_services.parse(config->services(), new_cfg.services());
 
+  // Build difference for anomalydetections.
+  difference<set_anomalydetection> diff_anomalydetections;
+  diff_anomalydetections.parse(config->anomalydetections(),
+                               new_cfg.anomalydetections());
+
   // Build difference for servicegroups.
   difference<set_servicegroup> diff_servicegroups;
   diff_servicegroups.parse(config->servicegroups(), new_cfg.servicegroups());
@@ -1175,15 +1185,16 @@ void applier::state::_processing(configuration::state& new_cfg,
     if (!has_already_been_loaded && !verify_config && !test_scheduling) {
       // This must be logged after we read config data,
       // as user may have changed location of main log file.
-      logger(log_process_info, basic)
-          << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING
-          << " starting ... (PID=" << getpid() << ")";
+      logger(log_process_info, basic) << "Centreon Engine "
+                                      << CENTREON_ENGINE_VERSION_STRING
+                                      << " starting ... (PID=" << getpid()
+                                      << ")";
 
       // Log the local time - may be different than clock
       // time due to timezone offset.
-      logger(log_process_info, basic)
-          << "Local time is " << string::ctime(program_start) << "\n"
-          << "LOG VERSION: " << LOG_VERSION_2;
+      logger(log_process_info, basic) << "Local time is "
+                                      << string::ctime(program_start) << "\n"
+                                      << "LOG VERSION: " << LOG_VERSION_2;
     }
 
     //
@@ -1216,8 +1227,14 @@ void applier::state::_processing(configuration::state& new_cfg,
     _apply<configuration::host, applier::host>(diff_hosts);
     _apply<configuration::hostgroup, applier::hostgroup>(diff_hostgroups);
 
-    // Apply services and servicegroups.
+    // Apply services.
     _apply<configuration::service, applier::service>(diff_services);
+
+    // Apply anomalydetections.
+    _apply<configuration::anomalydetection, applier::anomalydetection>(
+        diff_anomalydetections);
+
+    // Apply servicegroups.
     _apply<configuration::servicegroup, applier::servicegroup>(
         diff_servicegroups);
 
@@ -1228,6 +1245,9 @@ void applier::state::_processing(configuration::state& new_cfg,
     _resolve<configuration::service, applier::service>(config->services());
     _resolve<configuration::servicegroup, applier::servicegroup>(
         config->servicegroups());
+
+    // Resolve anomalydetections
+    _resolve<configuration::anomalydetection, applier::anomalydetection>(config->anomalydetections());
 
     // Apply host dependencies.
     _apply<configuration::hostdependency, applier::hostdependency>(
@@ -1272,7 +1292,8 @@ void applier::state::_processing(configuration::state& new_cfg,
 
     // Apply scheduler.
     if (!verify_config)
-      applier::scheduler::instance().apply(new_cfg, diff_hosts, diff_services);
+      applier::scheduler::instance().apply(
+          new_cfg, diff_hosts, diff_services, diff_anomalydetections);
 
     // Apply new global on the current state.
     if (!verify_config)
@@ -1280,7 +1301,8 @@ void applier::state::_processing(configuration::state& new_cfg,
     else {
       try {
         _apply(new_cfg);
-      } catch (std::exception const& e) {
+      }
+      catch (std::exception const& e) {
         ++config_errors;
         logger(log_info_message, basic) << e.what();
       }
@@ -1296,8 +1318,8 @@ void applier::state::_processing(configuration::state& new_cfg,
     if (!has_already_been_loaded) {
       neb_load_all_modules();
 
-      broker_program_state(NEBTYPE_PROCESS_START, NEBFLAG_NONE, NEBATTR_NONE,
-                           nullptr);
+      broker_program_state(
+          NEBTYPE_PROCESS_START, NEBFLAG_NONE, NEBATTR_NONE, nullptr);
     } else
       neb_reload_all_modules();
 
@@ -1305,7 +1327,8 @@ void applier::state::_processing(configuration::state& new_cfg,
     if (!verify_config && !test_scheduling) {
       for (set_host::iterator it(diff_hosts.added().begin()),
            end(diff_hosts.added().end());
-           it != end; ++it) {
+           it != end;
+           ++it) {
         host_id_map::const_iterator hst(
             engine::host::hosts_by_id.find(it->host_id()));
         if (hst != engine::host::hosts_by_id.end())
@@ -1313,7 +1336,8 @@ void applier::state::_processing(configuration::state& new_cfg,
       }
       for (set_service::iterator it(diff_services.added().begin()),
            end(diff_services.added().end());
-           it != end; ++it) {
+           it != end;
+           ++it) {
         service_id_map::const_iterator svc(engine::service::services_by_id.find(
             {it->host_id(), it->service_id()}));
         if (svc != engine::service::services_by_id.end())
@@ -1347,7 +1371,8 @@ void applier::state::_processing(configuration::state& new_cfg,
           << " sec  * = " << runtimes[3] << " sec ("
           << (runtimes[3] * 100.0 / runtimes[4]) << "%) estimated savings\n";
     }
-  } catch (...) {
+  }
+  catch (...) {
     _processing_state = state_error;
     throw;
   }
@@ -1366,10 +1391,12 @@ void applier::state::_resolve(std::set<ConfigurationType>& cfg) {
   ApplierType aplyr;
   for (typename std::set<ConfigurationType>::const_iterator it(cfg.begin()),
        end(cfg.end());
-       it != end; ++it) {
+       it != end;
+       ++it) {
     try {
       aplyr.resolve_object(*it);
-    } catch (std::exception const& e) {
+    }
+    catch (std::exception const& e) {
       if (verify_config) {
         ++config_errors;
         logger(log_info_message, basic) << e.what();

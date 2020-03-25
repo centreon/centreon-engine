@@ -20,12 +20,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include <algorithm>
 #include <array>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -83,7 +84,11 @@ timed_event::timed_event(uint32_t event_type,
       timing_func{timing_func},
       event_data{event_data},
       event_args{event_args},
-      event_options{event_options} {}
+      event_options{event_options} {
+  if (event_type == timed_event::EVENT_SERVICE_CHECK) {
+    assert(run_time > 1000);
+  }
+}
 
 timed_event::~timed_event() {
   if (event_type == timed_event::EVENT_SCHEDULED_DOWNTIME && event_data)

@@ -22,19 +22,15 @@
 #define CCE_CHECKS_HH
 
 #include <sys/time.h>
+
 #include <cstdio>
+
 #include "com/centreon/engine/checkable.hh"
 #include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/notifier.hh"
 
 enum check_source { service_check, host_check };
-CCE_BEGIN()
-class check_result;
-CCE_END()
 
-typedef std::list<com::centreon::engine::check_result> check_result_list;
-
-// CHECK_RESULT structure
 CCE_BEGIN()
 class check_result {
  public:
@@ -52,9 +48,9 @@ class check_result {
                bool exited_ok,
                int return_code,
                std::string const& output);
-  check_result(check_result const& other);
-  check_result(check_result&& other);
-  check_result& operator=(check_result const& other);
+  check_result(check_result const&) = delete;
+  check_result(check_result&&) = delete;
+  check_result& operator=(check_result const&) = delete;
 
   enum check_source get_object_check_type() const;
   void set_object_check_type(enum check_source object_check_type);
@@ -82,8 +78,6 @@ class check_result {
   void set_latency(double latency);
   int get_check_options() const;
   void set_check_options(int check_options);
-
-  static check_result_list results;
 
  private:
   enum check_source _object_check_type;  // is this a service or a host check?

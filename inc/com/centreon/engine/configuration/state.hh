@@ -25,6 +25,7 @@
 #include <string>
 #include <cstdint>
 #include <vector>
+#include "com/centreon/engine/configuration/anomalydetection.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/configuration/contact.hh"
@@ -326,8 +327,12 @@ class state {
       servicegroup::key_type const& k) const;
   set_servicegroup::iterator servicegroups_find(
       servicegroup::key_type const& k);
+  //const set_anomalydetection& anomalydetections() const noexcept;
+  set_anomalydetection& anomalydetections() noexcept;
   set_service const& services() const noexcept;
   set_service& services() noexcept;
+  set_anomalydetection::iterator anomalydetections_find(
+      anomalydetection::key_type const& k);
   set_service::iterator services_find(service::key_type const& k);
   set_service::const_iterator services_find(
       std::string const& host_name,
@@ -570,6 +575,7 @@ class state {
   set_servicedependency _servicedependencies;
   set_serviceescalation _serviceescalations;
   set_servicegroup _servicegroups;
+  set_anomalydetection _anomalydetections;
   set_service _services;
   unsigned int _service_check_timeout;
   unsigned int _service_freshness_check_interval;

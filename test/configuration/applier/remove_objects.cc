@@ -29,7 +29,7 @@
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/io/file_entry.hh"
 #include "find.hh"
 #include "test/unittest.hh"

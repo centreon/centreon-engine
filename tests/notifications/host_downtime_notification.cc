@@ -24,7 +24,7 @@
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/host.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/hostescalation.hh"
 #include "helper.hh"
 

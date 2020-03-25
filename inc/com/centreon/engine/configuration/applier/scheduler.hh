@@ -20,13 +20,15 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SCHEDULER_HH
 #define CCE_CONFIGURATION_APPLIER_SCHEDULER_HH
 
+#include <set>
 #include <vector>
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
 CCE_BEGIN()
+class host;
 class service;
 class timed_event;
 
@@ -42,7 +44,8 @@ class scheduler {
  public:
   void apply(configuration::state& config,
              difference<set_host> const& diff_hosts,
-             difference<set_service> const& diff_services);
+             difference<set_service> const& diff_services,
+             difference<set_anomalydetection> const& diff_anomalydetections);
   static scheduler& instance();
   void clear();
   void remove_host(uint64_t host_id);
@@ -50,9 +53,9 @@ class scheduler {
 
  private:
   scheduler();
-  scheduler(scheduler const&);
-  ~scheduler() throw();
-  scheduler& operator=(scheduler const&);
+  scheduler(scheduler const&) = delete;
+  ~scheduler() noexcept;
+  scheduler& operator=(scheduler const&) = delete;
   void _apply_misc_event();
   void _calculate_host_inter_check_delay(
       configuration::state::inter_check_delay method);
@@ -66,12 +69,16 @@ class scheduler {
                                   time_t start,
                                   unsigned long interval,
                                   void* data = NULL);
-  void _get_hosts(set_host const& hst_added,
-                  std::vector<com::centreon::engine::host*>& new_hosts,
-                  bool throw_if_not_found = true);
-  void _get_services(set_service const& svc_added,
-                     std::vector<engine::service*>& new_services,
-                     bool throw_if_not_found = true);
+  std::vector<com::centreon::engine::host*> _get_hosts(
+      set_host const& hst_added,
+      bool throw_if_not_found = true);
+  std::vector<com::centreon::engine::service*> _get_anomalydetections(
+      set_anomalydetection const& svc_cfg,
+      bool throw_if_not_found = true);
+  std::vector<com::centreon::engine::service*> _get_services(
+      set_service const& svc_cfg,
+      bool throw_if_not_found = true);
+
   void _remove_misc_event(timed_event*& evt);
   void _schedule_host_events(
       std::vector<com::centreon::engine::host*> const& hosts);

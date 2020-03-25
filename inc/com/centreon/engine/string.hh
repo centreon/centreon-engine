@@ -36,7 +36,7 @@ CCE_BEGIN()
 namespace string {
 bool get_next_line(std::ifstream& stream, std::string& line, unsigned int& pos);
 
-inline char const* chkstr(char const* str) throw() {
+inline char const* chkstr(char const* str) noexcept {
   return (str ? str : "\"NULL\"");
 }
 
@@ -197,9 +197,11 @@ inline bool to(char const* str, U& data) {
   data = static_cast<U>(tmp);
   return (true);
 }
-std::string& trim(std::string& str) throw();
-std::string& trim_left(std::string& str) throw();
-std::string& trim_right(std::string& str) throw();
+std::string& trim(std::string& str) noexcept;
+std::string& trim_left(std::string& str) noexcept;
+std::string& trim_right(std::string& str) noexcept;
+std::string extract_perfdata(std::string const& perfdata, std::string const& metric) noexcept;
+std::string& remove_thresholds(std::string& perfdata) noexcept;
 }  // namespace string
 
 CCE_END()

@@ -28,7 +28,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/reload.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"

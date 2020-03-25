@@ -22,7 +22,8 @@
 
 #include <mutex>
 #include <queue>
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/anomalydetection.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/commands/command_listener.hh"
 #include "com/centreon/engine/commands/result.hh"
@@ -34,7 +35,7 @@ CCE_BEGIN()
 
 namespace checks {
 /**
- *  @class checks checks.hh
+ *  @class checks check_result.hh
  *  @brief Run object and reap the result.
  *
  *  Checker is a singleton to run host or service and reap the
@@ -43,43 +44,39 @@ namespace checks {
 class checker : public commands::command_listener {
  public:
   static checker& instance();
-  void clear();
-  void push_check_result(check_result const* result);
-  void push_check_result(check_result&& result);
+  void clear() noexcept;
   void reap();
-  bool reaper_is_empty();
-  void run(host* hst,
-           int check_options = CHECK_OPTION_NONE,
-           double latency = 0.0,
-           bool scheduled_check = false,
-           bool reschedule_check = false,
-           bool* time_is_valid = NULL,
-           time_t* preferred_time = NULL);
-  void run(service* svc,
-           int check_options = CHECK_OPTION_NONE,
-           double latency = 0.0,
-           bool scheduled_check = false,
-           bool reschedule_check = false,
-           bool* time_is_valid = NULL,
-           time_t* preferred_time = NULL);
   void run_sync(host* hst,
                 host::host_state* check_result_code,
                 int check_options,
                 int use_cached_result,
                 unsigned long check_timestamp_horizon);
+  void add_check_result(uint64_t id, check_result* result) noexcept;
+  void add_check_result_to_reap(check_result* result) noexcept;
 
  private:
   checker();
   checker(checker const& right);
-  ~checker() throw() override;
+  ~checker() noexcept override;
   checker& operator=(checker const& right);
-  void finished(commands::result const& res) throw() override;
+  void finished(commands::result const& res) noexcept override;
   host::host_state _execute_sync(host* hst);
 
-  std::unordered_map<uint64_t, check_result> _list_id;
+  /* A mutex to protect access on _waiting_check_result and _to_reap_partial */
   std::mutex _mut_reap;
-  std::queue<check_result> _to_reap;
-  std::unordered_map<uint64_t, check_result> _to_reap_partial;
+  /*
+   * Here is the list of prepared check results but with a command being
+   * running. When the command will be finished, each check result is get back
+   * updated and moved to _to_reap_partial list. */
+  std::unordered_map<uint64_t, check_result*> _waiting_check_result;
+  /* This queue is filled during a cycle. When it is time to reap, its elements
+   * are passed to _to_reap. It can then be filled in parallel during the
+   * _to_reap treatment. */
+  std::queue<check_result*> _to_reap_partial;
+  /*
+   * The list of check_results to reap: they contain data that have to be
+   * translated to services/hosts. */
+  std::queue<check_result*> _to_reap;
 };
 }  // namespace checks
 

@@ -24,7 +24,7 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/deleter.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/comment.hh"

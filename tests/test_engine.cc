@@ -174,10 +174,33 @@ configuration::service TestEngine::new_configuration_service(
   svc.set_host_id(12);
 
   configuration::command cmd("cmd");
-  cmd.parse("command_line", "echo 1");
+  cmd.parse("command_line", "echo 'output| metric=12;50;75'");
   svc.parse("check_command", "cmd");
   configuration::applier::command cmd_aply;
   cmd_aply.add_object(cmd);
 
   return svc;
+}
+
+configuration::anomalydetection TestEngine::new_configuration_anomalydetection(
+    std::string const& hostname,
+    std::string const& description,
+    std::string const& contacts,
+    uint64_t svc_id,
+    uint64_t dependent_svc_id,
+    std::string const& thresholds_file) {
+  configuration::anomalydetection ad;
+  ad.parse("host_name", hostname.c_str());
+  ad.parse("description", description.c_str());
+  ad.parse("dependent_service_id", std::to_string(dependent_svc_id).c_str());
+  ad.parse("_HOST_ID", "12");
+  ad.parse("_SERVICE_ID", std::to_string(svc_id).c_str());
+  ad.parse("contacts", contacts.c_str());
+  ad.parse("metric_name", "metric");
+  ad.parse("thresholds_file", thresholds_file.c_str());
+
+  // We fake here the expand_object on configuration::service
+  ad.set_host_id(12);
+
+  return ad;
 }

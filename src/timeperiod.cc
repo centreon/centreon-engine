@@ -21,7 +21,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/daterange.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/shared.hh"
@@ -49,7 +49,7 @@ timeperiod::timeperiod(std::string const& name, std::string const& alias)
   if (name.empty() || alias.empty()) {
     logger(log_config_error, basic)
         << "Error: Name or alias for timeperiod is NULL";
-    throw(engine_error() << "Could not register time period '" << name << "'");
+    throw engine_error() << "Could not register time period '" << name << "'";
   }
 
   // Check if the timeperiod already exist.
@@ -85,7 +85,7 @@ void timeperiod::set_alias(std::string const& alias) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool timeperiod::operator==(timeperiod const& obj) throw() {
+bool timeperiod::operator==(timeperiod const& obj) noexcept {
   if (_name == obj._name && _alias == obj._alias &&
       (_exclusions.size() == obj._exclusions.size() &&
        std::equal(_exclusions.begin(), _exclusions.end(),
@@ -109,7 +109,7 @@ bool timeperiod::operator==(timeperiod const& obj) throw() {
  *
  *  @return True if is not the same object, otherwise false.
  */
-bool timeperiod::operator!=(timeperiod const& obj) throw() {
+bool timeperiod::operator!=(timeperiod const& obj) noexcept {
   return !(*this == obj);
 }
 

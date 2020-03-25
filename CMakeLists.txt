@@ -50,15 +50,18 @@ find_package(grpc REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(c-ares REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(json11 REQUIRED)
 
 include_directories(${grpc_INCLUDE_DIRS})
 include_directories(${protobuf_INCLUDE_DIRS})
+include_directories(${json11_INCLUDE_DIRS})
 
 link_directories(${protobuf_LIB_DIRS})
 link_directories(${grpc_LIB_DIRS})
 link_directories(${OpenSSL_LIB_DIRS})
 link_directories(${c-ares_LIB_DIRS})
 link_directories(${ZLIB_LIB_DIRS})
+link_directories(${json11_LIB_DIRS})
 
 # Version.
 set(CENTREON_ENGINE_MAJOR 20)
@@ -499,9 +502,10 @@ set(
   FILES
 
   # Sources.
+  "${SRC_DIR}/anomalydetection.cc"
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checkable.cc"
-  "${SRC_DIR}/checks.cc"
+  "${SRC_DIR}/check_result.cc"
   "${SRC_DIR}/command_manager.cc"
   "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/config.cc"
@@ -511,7 +515,7 @@ set(
   "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/dependency.cc"
   "${SRC_DIR}/diagnostic.cc"
-  "${SRC_DIR}/error.cc"
+  "${SRC_DIR}/exceptions/error.cc"
   "${SRC_DIR}/flapping.cc"
   "${SRC_DIR}/escalation.cc"
   "${SRC_DIR}/globals.cc"
@@ -541,9 +545,10 @@ set(
   "${SRC_DIR}/xsddefault.cc"
 
   # Headers.
+  "${INC_DIR}/com/centreon/engine/anomalydetection.hh"
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checkable.hh"
-  "${INC_DIR}/com/centreon/engine/checks.hh"
+  "${INC_DIR}/com/centreon/engine/check_result.hh"
   "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
   "${INC_DIR}/com/centreon/engine/command_manager.hh"
   "${INC_DIR}/com/centreon/engine/comment.hh"
@@ -555,7 +560,7 @@ set(
   "${INC_DIR}/com/centreon/engine/daterange.hh"
   "${INC_DIR}/com/centreon/engine/dependency.hh"
   "${INC_DIR}/com/centreon/engine/diagnostic.hh"
-  "${INC_DIR}/com/centreon/engine/error.hh"
+  "${INC_DIR}/com/centreon/engine/exceptions/error.hh"
   "${INC_DIR}/com/centreon/engine/escalation.hh"
   "${INC_DIR}/com/centreon/engine/flapping.hh"
   "${INC_DIR}/com/centreon/engine/globals.hh"
@@ -612,9 +617,10 @@ include_directories(enginerpc)
 
 # Library engine target.
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
+add_dependencies(cce_core json11_lib)
 
 # Link target with required libraries.
-target_link_libraries(cce_core
+target_link_libraries(cce_core ${json11_LIBS}
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}

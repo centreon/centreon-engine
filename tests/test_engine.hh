@@ -22,6 +22,7 @@
 #define TEST_ENGINE_HH
 
 #include <gtest/gtest.h>
+#include "com/centreon/engine/configuration/anomalydetection.hh"
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
@@ -45,6 +46,13 @@ class TestEngine : public ::testing::Test {
       std::string const& description,
       std::string const& contacts,
       uint64_t svc_id = 13);
+  configuration::anomalydetection new_configuration_anomalydetection(
+      std::string const& hostname,
+      std::string const& description,
+      std::string const& contacts,
+      uint64_t svc_id = 14,
+      uint64_t dependent_svc_id = 13,
+      std::string const& thresholds_file = "/tmp/thresholds_file");
   configuration::hostescalation new_configuration_hostescalation(
       std::string const& hostname,
       std::string const& contactgroup,

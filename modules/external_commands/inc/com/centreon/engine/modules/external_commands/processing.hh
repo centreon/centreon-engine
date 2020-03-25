@@ -256,6 +256,12 @@ class processing {
     (*fptr)(ct_it->second.get());
   }
 
+  template <void (*fptr)(char*)>
+  static void _redirector_file(int id __attribute__((unused)), time_t entry_time __attribute__((unused)), char* args) {
+    char* filename(my_strtok(args, ";"));
+    (*fptr)(filename);
+  }
+
   template <void (*fptr)(contact*)>
   static void _redirector_contactgroup(int id, time_t entry_time, char* args) {
     (void)id;

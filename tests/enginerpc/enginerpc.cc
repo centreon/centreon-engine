@@ -21,6 +21,8 @@
 #include <cstdio>
 #include "enginerpc.hh"
 #include "com/centreon/engine/configuration/contact.hh"
+#include "com/centreon/engine/anomalydetection.hh"
+#include "com/centreon/engine/configuration/applier/anomalydetection.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
@@ -29,6 +31,7 @@
 #include "com/centreon/engine/version.hh"
 #include "../test_engine.hh"
 #include "com/centreon/engine/timezone_manager.hh"
+#include "com/centreon/engine/command_manager.hh"
 #include "helper.hh"
 
 using namespace com::centreon;
@@ -59,6 +62,18 @@ class EngineRpc : public TestEngine {
     hst_aply.resolve_object(hst);
     svc_aply.resolve_object(svc);
 
+    configuration::anomalydetection ad{new_configuration_anomalydetection(
+        "test_host",
+        "test_ad",
+        "admin",
+        12, // service_id of the anomalydetection
+        13, // service_id of the dependent service
+        "/tmp/thresholds_status_change.json")};
+    configuration::applier::anomalydetection ad_aply;
+    ad_aply.add_object(ad);
+
+    ad_aply.resolve_object(ad);
+
     host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
     _host->set_current_state(engine::host::state_up);
@@ -67,19 +82,22 @@ class EngineRpc : public TestEngine {
     _host->set_notify_on(static_cast<uint32_t>(-1));
 
     service_map const& sm{engine::service::services};
-    _svc = sm.begin()->second;
+    for (auto& p : sm) {
+      std::shared_ptr<engine::service> svc = p.second;
+      if (svc->get_service_id() == 12)
+        _ad = std::static_pointer_cast<engine::anomalydetection>(svc);
+      else
+        _svc = svc;
+    }
   }
 
-  void TearDown() override {
-    deinit_config_state();
-  }
+  void TearDown() override { deinit_config_state(); }
 
   std::list<std::string> execute(const std::string& command) {
     std::list<std::string> retval;
     char path[1024];
     std::ostringstream oss;
-    oss << "tests/rpc_client "
-      << command;
+    oss << "tests/rpc_client " << command;
 
     FILE* fp = popen(oss.str().c_str(), "r");
     while (fgets(path, sizeof(path), fp) != nullptr) {
@@ -92,9 +110,15 @@ class EngineRpc : public TestEngine {
     return retval;
   }
 
+  void CreateFile(std::string const& filename, std::string const& content) {
+    std::ofstream oss(filename);
+    oss << content;
+  }
+
  protected:
   std::shared_ptr<engine::host> _host;
   std::shared_ptr<engine::service> _svc;
+  std::shared_ptr<engine::anomalydetection> _ad;
 };
 
 TEST_F(EngineRpc, StartStop) {
@@ -153,4 +177,23 @@ TEST_F(EngineRpc, ProcessHostCheckResultBadHost) {
   ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), "ProcessHostCheckResult failed.");
   erpc.shutdown();
+}
+
+TEST_F(EngineRpc, NewThresholdsFile) {
+  CreateFile(
+      "/tmp/thresholds_file.json",
+      "[{\n \"host_id\": 12,\n \"service_id\": 12,\n \"metric_name\": "
+      "\"metric\",\n \"predict\": [{\n \"timestamp\": 50000,\n \"upper\": "
+      "84,\n \"lower\": 74,\n \"fit\": 79\n }, {\n \"timestamp\": 100000,\n "
+      "\"upper\": 10,\n \"lower\": 5,\n \"fit\": 51.5\n }, {\n \"timestamp\": "
+      "150000,\n \"upper\": 100,\n \"lower\": 93,\n \"fit\": 96.5\n }, {\n "
+      "\"timestamp\": 200000,\n \"upper\": 100,\n \"lower\": 97,\n \"fit\": "
+      "98.5\n }, {\n \"timestamp\": 250000,\n \"upper\": 100,\n \"lower\": "
+      "21,\n \"fit\": 60.5\n }\n]}]");
+  enginerpc erpc("0.0.0.0", 50051);
+  auto output = execute("NewThresholdsFile /tmp/thresholds_file.json");
+  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.front(), "NewThresholdsFile: 0");
+  command_manager::instance().execute();
+  ASSERT_EQ(_ad->get_thresholds_file(), "/tmp/thresholds_file.json");
 }

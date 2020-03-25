@@ -27,7 +27,7 @@
 #endif  // HAVE_GETOPT_H
 #include <unistd.h>
 #include <iostream>
-#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/notifier.hh"
 #include "com/centreon/engine/objects.hh"

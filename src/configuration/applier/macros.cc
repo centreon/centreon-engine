@@ -21,7 +21,7 @@
 #include <cassert>
 #include <cstring>
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/misc.hh"
