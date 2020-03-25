@@ -578,7 +578,7 @@ processing::processing()
 
 processing::~processing() throw() {}
 
-bool processing::execute(const std::string& cmdstr) const {
+bool processing::execute(std::string const& cmdstr) const {
   logger(dbg_functions, basic) << "processing external command";
 
   char const* cmd{cmdstr.c_str()};

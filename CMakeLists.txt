@@ -32,8 +32,6 @@ if (WITH_ASAN)
   set(CMAKE_BUILD_TYPE Debug)
   set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
   set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-  message(STATUS "cmake cxx flags debug => ${CMAKE_CXX_FLAGS_DEBUG}")
-  message(STATUS "cmake lnk flags debug => ${CMAKE_LINKER_FLAGS_DEBUG}")
 endif ()
 
 add_definitions("-D_GLIBCXX_USE_CXX11_ABI=0")

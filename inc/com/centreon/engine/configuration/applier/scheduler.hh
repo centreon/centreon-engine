@@ -25,8 +25,6 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/configuration/state.hh"
-//#include "com/centreon/engine/host.hh"
-//#include "com/centreon/engine/service.hh"
 
 // Forward declaration.
 CCE_BEGIN()
