@@ -53,7 +53,6 @@ get_property(
 set(EXTERNALCMD_MODULE "${EXTERNALCMD_MODULE}" PARENT_SCOPE)
 # Link target with libraries.
 target_link_libraries(externalcmd "${CLIB_LIBRARIES}")
-add_dependencies(externalcmd json11_lib)
 
 # Install rule.
 install(TARGETS "externalcmd"

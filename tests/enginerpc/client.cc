@@ -23,8 +23,9 @@
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
-#include <google/protobuf/util/time_util.h>
 #include "engine.grpc.pb.h"
+
+using namespace com::centreon::engine;
 
 class EngineRPCClient {
   std::unique_ptr<Engine::Stub> _stub;

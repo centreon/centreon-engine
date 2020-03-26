@@ -617,7 +617,6 @@ include_directories(enginerpc)
 
 # Library engine target.
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
-add_dependencies(cce_core json11_lib)
 
 # Link target with required libraries.
 target_link_libraries(cce_core ${json11_LIBS}
@@ -629,19 +628,11 @@ target_link_libraries(cce_core ${json11_LIBS}
 
 # centengine target.
 add_executable("centengine" "${SRC_DIR}/main.cc")
-if (CMAKE_COMPILER_IS_GNUCXX)
-  if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    target_link_libraries("centengine" "-all_load")
-  else ()
-    target_link_libraries("centengine"
-      "-Wl,-whole-archive -lcce_core -L. -Wl,-no-whole-archive")
-  endif ()
-endif ()
 set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
-target_link_libraries(centengine cce_core ${CLIB_LIBRARIES} ${ENGINERPC} ${protobuf_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
+target_link_libraries(centengine ${CLIB_LIBRARIES} "-Wl,-whole-archive"  grpc++_reflection enginerpc cce_core  "-Wl,-no-whole-archive" ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")

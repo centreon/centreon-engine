@@ -67,7 +67,7 @@ add_library(
   ${ENGINERPC_DIR}/engine.pb.cc
   ${ENGINERPC_DIR}/engine.grpc.pb.h
   ${ENGINERPC_DIR}/engine.pb.h)
-target_link_libraries(cerpc "${GRPC_STATIC_LDFLAGS}" ${protobuf_LIBS})
+target_link_libraries(cerpc ${protobuf_LIBS})
 
 # mod_enginerpc target.
 add_library(
