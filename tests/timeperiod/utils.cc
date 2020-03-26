@@ -19,7 +19,6 @@
 
 #include "tests/timeperiod/utils.hh"
 #include <cstring>
-#include <ctime>
 #include <memory>
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/timerange.hh"

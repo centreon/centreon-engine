@@ -39,7 +39,7 @@ if (WITH_TESTING)
   add_executable(rpc_client
       ${TESTS_DIR}/enginerpc/client.cc)
 
-  target_link_libraries(rpc_client "${GRPC_STATIC_LDFLAGS}" cerpc ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
+  target_link_libraries(rpc_client cerpc ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
   add_executable("bin_connector_test_run"
       "${TESTS_DIR}/commands/bin_connector_test_run.cc")

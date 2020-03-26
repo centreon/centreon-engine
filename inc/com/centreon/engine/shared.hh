@@ -21,7 +21,6 @@
 #ifndef CCE_SHARED_HH
 #define CCE_SHARED_HH
 
-#include <sys/time.h>
 #include <sys/types.h>
 #include <string>
 
