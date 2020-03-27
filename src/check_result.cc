@@ -25,22 +25,6 @@
 
 using namespace com::centreon::engine;
 
-//check_result_list check_result::results;
-
-//check_result::check_result()
-//    : _object_check_type{host_check},
-//      _notifier{nullptr},
-//      _check_type(checkable::check_active),
-//      _check_options{CHECK_OPTION_NONE},
-//      _reschedule_check{false},
-//      _latency{0.0},
-//      _early_timeout{false},
-//      _exited_ok{false},
-//      _return_code{0},
-//      _start_time{0, 0},
-//      _finish_time{0, 0},
-//      _output{""} {}
-
 check_result::check_result(enum check_source object_check_type,
                            notifier* notifier,
                            enum checkable::check_type check_type,
