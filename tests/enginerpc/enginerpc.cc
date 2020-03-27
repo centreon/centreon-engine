@@ -122,14 +122,14 @@ class EngineRpc : public TestEngine {
 };
 
 TEST_F(EngineRpc, StartStop) {
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   ASSERT_NO_THROW(erpc.shutdown());
 }
 
 TEST_F(EngineRpc, GetVersion) {
   std::ostringstream oss;
   oss << "GetVersion: major: " << CENTREON_ENGINE_VERSION_MAJOR;
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("GetVersion");
   ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), oss.str());
@@ -140,7 +140,7 @@ TEST_F(EngineRpc, GetVersion) {
 }
 
 TEST_F(EngineRpc, ProcessServiceCheckResult) {
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult test_host test_svc 0");
   ASSERT_EQ(output.size(), 1);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult: 0");
@@ -148,7 +148,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResult) {
 }
 
 TEST_F(EngineRpc, ProcessServiceCheckResultBadHost) {
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult \"\" test_svc 0");
   ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
@@ -156,7 +156,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResultBadHost) {
 }
 
 TEST_F(EngineRpc, ProcessServiceCheckResultBadService) {
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult test_host \"\" 0");
   ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
@@ -164,7 +164,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResultBadService) {
 }
 
 TEST_F(EngineRpc, ProcessHostCheckResult) {
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessHostCheckResult test_host 0");
   ASSERT_EQ(output.size(), 1);
   ASSERT_EQ(output.front(), "ProcessHostCheckResult: 0");
@@ -172,7 +172,7 @@ TEST_F(EngineRpc, ProcessHostCheckResult) {
 }
 
 TEST_F(EngineRpc, ProcessHostCheckResultBadHost) {
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessHostCheckResult '' 0");
   ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), "ProcessHostCheckResult failed.");
@@ -190,7 +190,7 @@ TEST_F(EngineRpc, NewThresholdsFile) {
       "\"timestamp\": 200000,\n \"upper\": 100,\n \"lower\": 97,\n \"fit\": "
       "98.5\n }, {\n \"timestamp\": 250000,\n \"upper\": 100,\n \"lower\": "
       "21,\n \"fit\": 60.5\n }\n]}]");
-  enginerpc erpc("0.0.0.0", 50051);
+  enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("NewThresholdsFile /tmp/thresholds_file.json");
   ASSERT_EQ(output.size(), 1);
   ASSERT_EQ(output.front(), "NewThresholdsFile: 0");

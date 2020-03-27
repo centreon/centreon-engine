@@ -78,3 +78,23 @@ TEST_F(ApplierGlobal, pollerId) {
 
   ASSERT_EQ(st.poller_id(), 42);
 }
+
+// Given host configuration without host_id
+// Then the applier add_object throws an exception.
+TEST_F(ApplierGlobal, RpcPort) {
+  configuration::parser parser;
+  configuration::state st;
+
+  ASSERT_EQ(st.rpc_port(), 0);
+
+  std::remove("/tmp/test-config.cfg");
+
+  std::ofstream ofs("/tmp/test-config.cfg");
+  ofs << "rpc_port=42" << std::endl;
+  ofs.close();
+
+  parser.parse("/tmp/test-config.cfg", st);
+  std::remove("/tmp/test-config.cfg");
+
+  ASSERT_EQ(st.rpc_port(), 42);
+}

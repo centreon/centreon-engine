@@ -299,6 +299,8 @@ class state {
   void poller_name(std::string const& value) noexcept;
   uint32_t poller_id() const noexcept;
   void poller_id(uint32_t value) noexcept;
+  uint16_t rpc_port() const noexcept;
+  void rpc_port(uint16_t value) noexcept;
   bool process_performance_data() const noexcept;
   void process_performance_data(bool value);
   std::list<std::string> const& resource_file() const noexcept;
@@ -563,6 +565,7 @@ class state {
   int _perfdata_timeout;
   std::string _poller_name;
   uint32_t _poller_id;
+  uint16_t _rpc_port;
   bool _process_performance_data;
   std::list<std::string> _resource_file;
   unsigned long _retained_contact_host_attribute_mask;
