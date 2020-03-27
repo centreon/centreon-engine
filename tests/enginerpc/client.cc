@@ -93,7 +93,7 @@ class EngineRPCClient {
 int main(int argc, char** argv) {
   int32_t status;
   EngineRPCClient client(grpc::CreateChannel(
-      "127.0.0.1:50051", grpc::InsecureChannelCredentials()));
+      "127.0.0.1:40001", grpc::InsecureChannelCredentials()));
 
   if (argc < 2) {
     std::cout << "ERROR: this client must be called with a command..."

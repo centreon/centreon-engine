@@ -26,10 +26,14 @@
 #include <getopt.h>
 #endif  // HAVE_GETOPT_H
 #include <unistd.h>
+
+#include <random>
 #include <string>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -37,7 +41,6 @@
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -310,13 +313,28 @@ int main(int argc, char* argv[]) {
     // Else start to monitor things.
     else {
       try {
-        com::centreon::engine::enginerpc erpc("0.0.0.0", 50051);
         // Parse configuration.
         configuration::state config;
         {
           configuration::parser p;
           p.parse(config_file, config);
         }
+
+        uint16_t port = config.rpc_port();
+
+        if (!port) {
+          std::random_device
+              rd;  // Will be used to obtain a seed for the random number engine
+          std::mt19937 gen(
+              rd());  // Standard mersenne_twister_engine seeded with rd()
+          std::uniform_int_distribution<uint16_t> dis(50000, 50999);
+        }
+
+        std::unique_ptr<enginerpc, std::function<void(enginerpc*)>> rpc(
+            new enginerpc("0.0.0.0", port), [](enginerpc* rpc) {
+              rpc->shutdown();
+              delete rpc;
+            });
 
         // Parse retention.
         retention::state state;
@@ -409,7 +427,6 @@ int main(int argc, char* argv[]) {
 
         retval = EXIT_SUCCESS;
 
-        erpc.shutdown();
       } catch (std::exception const& e) {
         // Log.
         logger(logging::log_runtime_error, logging::basic)
