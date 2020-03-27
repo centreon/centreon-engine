@@ -46,6 +46,8 @@ using namespace com::centreon::logging;
  *                           new host configuration.
  *  @param[in] diff_services The difference between old and the
  *                           new service configuration.
+ *  @param[in] diff_anomalydetections The difference between old and the
+ *                           new cwanomalydetectionservice configuration.
  */
 void applier::scheduler::apply(
     configuration::state& config,
@@ -791,9 +793,10 @@ std::vector<com::centreon::engine::host*> applier::scheduler::_get_hosts(
  *                                  found.
  *  @return a vector of services.
  */
-std::vector<com::centreon::engine::service*> applier::scheduler::_get_services(set_service const& svc_cfg,
-                                       bool throw_if_not_found) {
-  std::vector<engine::service*> retval;
+std::vector<com::centreon::engine::service*> applier::scheduler::_get_services(
+    set_service const& svc_cfg,
+    bool throw_if_not_found) {
+  std::vector<com::centreon::engine::service*> retval;
   service_id_map const& services(engine::service::services_by_id);
   for (auto it = svc_cfg.rbegin(), end = svc_cfg.rend(); it != end; ++it) {
     uint64_t host_id(it->host_id());
@@ -803,11 +806,11 @@ std::vector<com::centreon::engine::service*> applier::scheduler::_get_services(s
     service_id_map::const_iterator svc(services.find({host_id, service_id}));
     if (svc == services.end()) {
       if (throw_if_not_found)
-        throw(engine_error()
+        throw engine_error()
               << "Cannot schedule non-existing service '" << service_description
-              << "' on host '" << host_name << "'");
+              << "' on host '" << host_name << "'";
     } else
-      retval.push_back(&*svc->second);
+      retval.push_back(svc->second.get());
   }
   return retval;
 }
@@ -821,11 +824,11 @@ std::vector<com::centreon::engine::service*> applier::scheduler::_get_services(s
  *  @return a vector of services.
  */
 std::vector<com::centreon::engine::service*>
-applier::scheduler::_get_anomalydetections(set_anomalydetection const& svc_cfg,
+applier::scheduler::_get_anomalydetections(set_anomalydetection const& ad_cfg,
                                            bool throw_if_not_found) {
   std::vector<engine::service*> retval;
   service_id_map const& services(engine::service::services_by_id);
-  for (auto it = svc_cfg.rbegin(), end = svc_cfg.rend(); it != end; ++it) {
+  for (auto it = ad_cfg.rbegin(), end = ad_cfg.rend(); it != end; ++it) {
     uint64_t host_id(it->host_id());
     uint64_t service_id(it->service_id());
     std::string const& host_name(it->host_name());
@@ -834,10 +837,10 @@ applier::scheduler::_get_anomalydetections(set_anomalydetection const& svc_cfg,
     if (svc == services.end()) {
       if (throw_if_not_found)
         throw engine_error()
-              << "Cannot schedule non-existing service '" << service_description
-              << "' on host '" << host_name << "'";
+            << "Cannot schedule non-existing anomalydetection '"
+            << service_description << "' on host '" << host_name << "'";
     } else
-      retval.push_back(&*svc->second);
+      retval.push_back(svc->second.get());
   }
   return retval;
 }
