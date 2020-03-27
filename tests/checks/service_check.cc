@@ -19,9 +19,11 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
+
 #include <cstring>
 #include <iostream>
 #include <memory>
+
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -53,8 +55,7 @@ extern configuration::state* config;
 class ServiceCheck : public TestEngine {
  public:
   void SetUp() override {
-    if (!config)
-      config = new configuration::state;
+    init_config_state();
 
     config->contacts().clear();
     configuration::applier::contact ct_aply;
@@ -88,11 +89,12 @@ class ServiceCheck : public TestEngine {
     _svc->set_state_type(checkable::hard);
     _svc->set_problem_has_been_acknowledged(false);
     _svc->set_notify_on(static_cast<uint32_t>(-1));
+
+    // This is to not be bothered by host checks during service checks
+    config->host_check_timeout(10000);
   }
 
-  void TearDown() override {
-    deinit_config_state();
-  }
+  void TearDown() override { deinit_config_state(); }
 
  protected:
   std::shared_ptr<engine::host> _host;
@@ -130,7 +132,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   std::string cmd{oss.str()};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -158,7 +160,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -263,7 +265,7 @@ TEST_F(ServiceCheck, SimpleCheck) {
   now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -290,7 +292,7 @@ TEST_F(ServiceCheck, OkCritical) {
   time_t now = std::time(nullptr);
   oss.str("");
   oss << '[' << now << ']'
-    << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
   std::string cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
