@@ -109,49 +109,32 @@ void checker::reap() {
 
       // Service check result->
       if (service_check == result->get_object_check_type()) {
-        service_id_map::iterator it = service::services_by_id.find(
-            {result->get_host_id(), result->get_service_id()});
-        if (it == service::services_by_id.end()) {
-          logger(log_runtime_error, basic)
-              << "Warning: Check result queue contained results for service "
-              << result->get_host_id() << "/" << result->get_service_id()
-              << ", but the service could not be found! Perhaps you forgot to "
-                 "define the service in your config files ?";
-        } else {
-          try {
-            // Check if the service exists.
-            logger(dbg_checks, more)
-                << "Handling check result for service " << result->get_host_id()
-                << "/" << result->get_service_id() << "...";
-            it->second->handle_async_check_result(result);
-          } catch (std::exception const& e) {
-            logger(log_runtime_warning, basic)
-                << "Check result queue errors for service "
-                << result->get_host_id() << "/" << result->get_service_id()
-                << " : " << e.what();
-          }
+        service* svc = static_cast<service*>(result->get_notifier());
+        try {
+          // Check if the service exists.
+          logger(dbg_checks, more)
+              << "Handling check result for service " << svc->get_host_id()
+              << "/" << svc->get_service_id() << "...";
+          svc->handle_async_check_result(result);
+        } catch (std::exception const& e) {
+          logger(log_runtime_warning, basic)
+              << "Check result queue errors for service "
+              << svc->get_host_id() << "/" << svc->get_service_id()
+              << " : " << e.what();
         }
       }
       // Host check result->
       else {
-        host_id_map::iterator it = host::hosts_by_id.find(result->get_host_id());
-        if (it == host::hosts_by_id.end())
-          logger(log_runtime_warning, basic)
-              << "Warning: Check result queue contained results for "
-              << "host " << result->get_host_id() << ", but the host could "
-              << "not be found! Perhaps you forgot to define the host in "
-              << "your config files ?";
-        else {
-          try {
-            // Process the check result->
-            logger(dbg_checks, more) << "Handling check result for host "
-                                     << result->get_host_id() << "...";
-            it->second->handle_async_check_result_3x(result);
-          } catch (std::exception const& e) {
-            logger(log_runtime_error, basic)
-                << "Check result queue errors for "
-                << "host " << result->get_host_id() << " : " << e.what();
-          }
+        host* hst = static_cast<host*>(result->get_notifier());
+        try {
+          // Process the check result->
+          logger(dbg_checks, more) << "Handling check result for host "
+                                   << hst->get_host_id() << "...";
+          hst->handle_async_check_result_3x(result);
+        } catch (std::exception const& e) {
+          logger(log_runtime_error, basic)
+              << "Check result queue errors for "
+              << "host " << hst->get_host_id() << " : " << e.what();
         }
       }
 

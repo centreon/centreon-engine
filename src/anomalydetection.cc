@@ -612,8 +612,7 @@ int anomalydetection::run_async_check(int check_options,
   // Init check result info.
   std::unique_ptr<check_result> check_result_info(
       new check_result(service_check,
-                       get_host_id(),
-                       get_service_id(),
+                       this,
                        checkable::check_active,
                        check_options,
                        reschedule_check,

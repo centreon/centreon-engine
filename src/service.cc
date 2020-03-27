@@ -2426,19 +2426,10 @@ int service::run_async_check(int check_options,
   std::unique_ptr<check_result> check_result_info;
   do {
     // Init check result info.
-    check_result_info.reset(new check_result(service_check,
-                                             get_host_id(),
-                                             get_service_id(),
-                                             checkable::check_active,
-                                             check_options,
-                                             reschedule_check,
-                                             latency,
-                                             start_time,
-                                             start_time,
-                                             false,
-                                             true,
-                                             service::state_ok,
-                                             ""));
+    check_result_info.reset(
+        new check_result(service_check, this, checkable::check_active,
+                         check_options, reschedule_check, latency, start_time,
+                         start_time, false, true, service::state_ok, ""));
 
     retry = false;
     try {
