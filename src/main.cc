@@ -328,6 +328,8 @@ int main(int argc, char* argv[]) {
           std::mt19937 gen(
               rd());  // Standard mersenne_twister_engine seeded with rd()
           std::uniform_int_distribution<uint16_t> dis(50000, 50999);
+
+          port = dis(gen);
         }
 
         std::unique_ptr<enginerpc, std::function<void(enginerpc*)>> rpc(
