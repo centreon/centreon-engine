@@ -1911,9 +1911,6 @@ int service::log_event() {
   if (get_state_type() == soft && !config->log_service_retries())
     return OK;
 
-  if (!_host_ptr)
-    return ERROR;
-
   uint32_t log_options{NSLOG_SERVICE_UNKNOWN};
   char const* state{"UNKNOWN"};
   if (_current_state >= 0 &&
