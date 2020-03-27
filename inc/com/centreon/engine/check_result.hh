@@ -34,7 +34,7 @@ enum check_source { service_check, host_check };
 CCE_BEGIN()
 class check_result {
  public:
-  check_result();
+  check_result() = delete;
   check_result(enum check_source object_check_type,
                notifier* notifier,
                enum checkable::check_type check_type,
