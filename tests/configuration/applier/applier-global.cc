@@ -58,9 +58,6 @@ TEST_F(ApplierGlobal, pollerName) {
   ASSERT_EQ(st.poller_name(), "poller-test");
 }
 
-
-// Given host configuration without host_id
-// Then the applier add_object throws an exception.
 TEST_F(ApplierGlobal, pollerId) {
   configuration::parser parser;
   configuration::state st;
@@ -79,8 +76,6 @@ TEST_F(ApplierGlobal, pollerId) {
   ASSERT_EQ(st.poller_id(), 42);
 }
 
-// Given host configuration without host_id
-// Then the applier add_object throws an exception.
 TEST_F(ApplierGlobal, RpcPort) {
   configuration::parser parser;
   configuration::state st;
