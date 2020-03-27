@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2019 Centreon
+** Copyright 2011-2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,26 +25,8 @@
 
 using namespace com::centreon::engine;
 
-//check_result_list check_result::results;
-
-check_result::check_result()
-    : _object_check_type{host_check},
-      _host_id{0UL},
-      _service_id{0UL},
-      _check_type(checkable::check_active),
-      _check_options{CHECK_OPTION_NONE},
-      _reschedule_check{false},
-      _latency{0.0},
-      _early_timeout{false},
-      _exited_ok{false},
-      _return_code{0},
-      _output{""},
-      _start_time{0, 0},
-      _finish_time{0, 0} {}
-
 check_result::check_result(enum check_source object_check_type,
-                           uint64_t host_id,
-                           uint64_t service_id,
+                           notifier* notifier,
                            enum checkable::check_type check_type,
                            int check_options,
                            bool reschedule_check,
@@ -56,8 +38,7 @@ check_result::check_result(enum check_source object_check_type,
                            int return_code,
                            std::string const& output)
     : _object_check_type{object_check_type},
-      _host_id{host_id},
-      _service_id{service_id},
+      _notifier{notifier},
       _check_type(check_type),
       _check_options{check_options},
       _reschedule_check{reschedule_check},
@@ -77,20 +58,12 @@ void check_result::set_object_check_type(enum check_source object_check_type) {
   _object_check_type = object_check_type;
 }
 
-uint64_t check_result::get_host_id() const {
-  return _host_id;
+notifier* check_result::get_notifier() {
+  return _notifier;
 }
 
-void check_result::set_host_id(uint64_t host_id) {
-  _host_id = host_id;
-}
-
-uint64_t check_result::get_service_id() const {
-  return _service_id;
-}
-
-void check_result::set_service_id(uint64_t service_id) {
-  _service_id = service_id;
+void check_result::set_notifier(notifier* notifier) {
+  _notifier = notifier;
 }
 
 struct timeval check_result::get_finish_time() const {

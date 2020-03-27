@@ -252,10 +252,6 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlappingStopTwoTimes) {
 }
 
 TEST_F(ServiceFlappingNotification, CheckFlapping) {
-  check_result r;
-
-  r.set_exited_ok(true);
-
   config->enable_flap_detection(true);
   _service->set_flap_detection_enabled(true);
   _service->add_flap_detection_on(engine::service::ok);
@@ -354,10 +350,6 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
 }
 
 TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
-  check_result r;
-
-  r.set_exited_ok(true);
-
   config->enable_flap_detection(true);
   _service->set_flap_detection_enabled(true);
   _service->add_flap_detection_on(engine::service::ok);

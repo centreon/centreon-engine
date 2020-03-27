@@ -124,8 +124,7 @@ int command_manager::process_passive_service_check(time_t check_time,
 
   check_result* result =
       new check_result(service_check,
-                       found->second->get_host_id(),
-                       found->second->get_service_id(),
+                       found->second.get(),
                        checkable::check_passive,
                        CHECK_OPTION_NONE,
                        false,
@@ -199,8 +198,7 @@ int command_manager::process_passive_host_check(time_t check_time,
 
   check_result* result =
       new check_result(host_check,
-                       it->second->get_host_id(),
-                       0UL,
+                       it->second.get(),
                        checkable::check_passive,
                        CHECK_OPTION_NONE,
                        false,

@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008           Ethan Galstad
-** Copyright 2011-2013,2015-2019 Centreon
+** Copyright 2011-2013,2015-2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,11 +19,14 @@
 */
 
 #include "com/centreon/engine/modules/external_commands/commands.hh"
+
 #include <sys/time.h>
+
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comment.hh"
@@ -505,7 +508,7 @@ int cmd_process_service_check_result(int cmd, time_t check_time, char* args) {
 
   // Submit the passive check result.
   return process_passive_service_check(check_time, host_name, svc_description,
-                                        return_code, output);
+                                       return_code, output);
 }
 
 /* submits a passive service check result for later processing */
@@ -570,20 +573,11 @@ int process_passive_service_check(time_t check_time,
   timeval set_tv = {.tv_sec = check_time, .tv_usec = 0};
 
   check_result* result =
-      new check_result(service_check,
-                       found->second->get_host_id(),
-                       found->second->get_service_id(),
-                       checkable::check_passive,
-                       CHECK_OPTION_NONE,
-                       false,
+      new check_result(service_check, found->second.get(),
+                       checkable::check_passive, CHECK_OPTION_NONE, false,
                        static_cast<double>(tv.tv_sec - check_time) +
                            static_cast<double>(tv.tv_usec / 1000000.0),
-                       set_tv,
-                       set_tv,
-                       false,
-                       true,
-                       return_code,
-                       output);
+                       set_tv, set_tv, false, true, return_code, output);
 
   /* make sure the return code is within bounds */
   if (result->get_return_code() < 0 || result->get_return_code() > 3) {
@@ -686,20 +680,11 @@ int process_passive_host_check(time_t check_time,
   timeval tv_start = {.tv_sec = check_time, .tv_usec = 0};
 
   check_result* result =
-      new check_result(host_check,
-                       it->second->get_host_id(),
-                       0UL,
-                       checkable::check_passive,
-                       CHECK_OPTION_NONE,
-                       false,
+      new check_result(host_check, it->second.get(), checkable::check_passive,
+                       CHECK_OPTION_NONE, false,
                        static_cast<double>(tv.tv_sec - check_time) +
                            static_cast<double>(tv.tv_usec / 1000000.0),
-                       tv_start,
-                       tv_start,
-                       false,
-                       true,
-                       return_code,
-                       output);
+                       tv_start, tv_start, false, true, return_code, output);
 
   /* make sure the return code is within bounds */
   if (result->get_return_code() < 0 || result->get_return_code() > 3)
@@ -949,15 +934,16 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   switch (cmd) {
     case CMD_SCHEDULE_HOST_DOWNTIME:
       downtime_manager::instance().schedule_downtime(
-          downtime::host_downtime, host_name, "", entry_time, author, comment_data,
-          start_time, end_time, fixed, triggered_by, duration, &downtime_id);
+          downtime::host_downtime, host_name, "", entry_time, author,
+          comment_data, start_time, end_time, fixed, triggered_by, duration,
+          &downtime_id);
       break;
 
     case CMD_SCHEDULE_SVC_DOWNTIME:
       downtime_manager::instance().schedule_downtime(
-          downtime::service_downtime, host_name, svc_description, entry_time, author,
-          comment_data, start_time, end_time, fixed, triggered_by, duration,
-          &downtime_id);
+          downtime::service_downtime, host_name, svc_description, entry_time,
+          author, comment_data, start_time, end_time, fixed, triggered_by,
+          duration, &downtime_id);
       break;
 
     case CMD_SCHEDULE_HOST_SVC_DOWNTIME:
@@ -967,9 +953,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         if (!it->second)
           continue;
         downtime_manager::instance().schedule_downtime(
-            downtime::service_downtime, host_name, it->second->get_description(),
-            entry_time, author, comment_data, start_time, end_time, fixed,
-            triggered_by, duration, &downtime_id);
+            downtime::service_downtime, host_name,
+            it->second->get_description(), entry_time, author, comment_data,
+            start_time, end_time, fixed, triggered_by, duration, &downtime_id);
       }
       break;
 
@@ -978,8 +964,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
            end(hg->members.end());
            it != end; ++it)
         downtime_manager::instance().schedule_downtime(
-            downtime::host_downtime, it->first, "", entry_time, author, comment_data,
-            start_time, end_time, fixed, triggered_by, duration, &downtime_id);
+            downtime::host_downtime, it->first, "", entry_time, author,
+            comment_data, start_time, end_time, fixed, triggered_by, duration,
+            &downtime_id);
       break;
 
     case CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME:
@@ -1027,16 +1014,17 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
            end(sg_it->second->members.end());
            it != end; ++it)
         downtime_manager::instance().schedule_downtime(
-            downtime::service_downtime, it->first.first, it->first.second, entry_time,
-            author, comment_data, start_time, end_time, fixed, triggered_by,
-            duration, &downtime_id);
+            downtime::service_downtime, it->first.first, it->first.second,
+            entry_time, author, comment_data, start_time, end_time, fixed,
+            triggered_by, duration, &downtime_id);
       break;
 
     case CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME:
       /* schedule downtime for "parent" host */
       downtime_manager::instance().schedule_downtime(
-          downtime::host_downtime, host_name, "", entry_time, author, comment_data,
-          start_time, end_time, fixed, triggered_by, duration, &downtime_id);
+          downtime::host_downtime, host_name, "", entry_time, author,
+          comment_data, start_time, end_time, fixed, triggered_by, duration,
+          &downtime_id);
 
       /* schedule (non-triggered) downtime for all child hosts */
       schedule_and_propagate_downtime(temp_host, entry_time, author,
@@ -1047,8 +1035,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     case CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME:
       /* schedule downtime for "parent" host */
       downtime_manager::instance().schedule_downtime(
-          downtime::host_downtime, host_name, "", entry_time, author, comment_data,
-          start_time, end_time, fixed, triggered_by, duration, &downtime_id);
+          downtime::host_downtime, host_name, "", entry_time, author,
+          comment_data, start_time, end_time, fixed, triggered_by, duration,
+          &downtime_id);
 
       /* schedule triggered downtime for all child hosts */
       schedule_and_propagate_downtime(temp_host, entry_time, author,
@@ -1968,7 +1957,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   args += pos + 1;
 
   /* get the custom variable value */
-  std::string varvalue {args};
+  std::string varvalue{args};
 
   std::transform(varname.begin(), varname.end(), varname.begin(), ::toupper);
 
@@ -2480,8 +2469,9 @@ void schedule_and_propagate_downtime(host* temp_host,
 
     /* schedule downtime for this host */
     downtime_manager::instance().schedule_downtime(
-        downtime::host_downtime, it->first, "", entry_time, author, comment_data,
-        start_time, end_time, fixed, triggered_by, duration, nullptr);
+        downtime::host_downtime, it->first, "", entry_time, author,
+        comment_data, start_time, end_time, fixed, triggered_by, duration,
+        nullptr);
   }
 }
 

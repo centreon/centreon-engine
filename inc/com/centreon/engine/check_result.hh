@@ -34,10 +34,9 @@ enum check_source { service_check, host_check };
 CCE_BEGIN()
 class check_result {
  public:
-  check_result();
+  check_result() = delete;
   check_result(enum check_source object_check_type,
-               uint64_t host_id,
-               uint64_t service_id,
+               notifier* notifier,
                enum checkable::check_type check_type,
                int check_options,
                bool reschedule_check,
@@ -54,10 +53,8 @@ class check_result {
 
   enum check_source get_object_check_type() const;
   void set_object_check_type(enum check_source object_check_type);
-  uint64_t get_host_id() const;
-  void set_host_id(uint64_t host_id);
-  uint64_t get_service_id() const;
-  void set_service_id(uint64_t service_id);
+  notifier* get_notifier();
+  void set_notifier(notifier* notifier);
   struct timeval get_finish_time() const;
   void set_finish_time(struct timeval finish_time);
   struct timeval get_start_time() const;
@@ -81,8 +78,7 @@ class check_result {
 
  private:
   enum check_source _object_check_type;  // is this a service or a host check?
-  uint64_t _host_id;
-  uint64_t _service_id;
+  notifier* _notifier;
   // was this an active or passive service check?
   enum checkable::check_type _check_type;
   int _check_options;
