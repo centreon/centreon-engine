@@ -156,7 +156,7 @@ void applier::scheduler::apply(
     _unschedule_service_events(old_anomalydetections);
   }
   // Check if we need to add or modify objects into the scheduler.
-  if (!hst_to_schedule.empty() || !svc_to_schedule.empty()) {
+  if (!hst_to_schedule.empty() || !svc_to_schedule.empty() || !ad_to_schedule.empty()) {
     // Reset scheduling info.
     // Keep data that has been set manually by the user
     // (service interleave and intercheck delays).
@@ -188,18 +188,16 @@ void applier::scheduler::apply(
       _schedule_host_events(new_hosts);
     }
 
-    // Get and schedule new services.
+    // Get and schedule new services and anomalydetections.
     {
       std::vector<engine::service*> new_services =
           _get_services(svc_to_schedule, true);
-      _schedule_service_events(new_services);
-    }
-
-    // Get and schedule new anomalydetections.
-    {
       std::vector<engine::service*> new_anomalydetections =
           _get_anomalydetections(ad_to_schedule, true);
-      _schedule_service_events(new_anomalydetections);
+      new_services.insert(new_services.end(),
+          std::make_move_iterator(new_anomalydetections.begin()),
+          std::make_move_iterator(new_anomalydetections.end()));
+      _schedule_service_events(new_services);
     }
   }
 }
