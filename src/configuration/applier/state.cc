@@ -1082,6 +1082,9 @@ void applier::state::_processing(configuration::state& new_cfg,
   // Expand services.
   _expand<configuration::service, applier::service>(new_cfg);
 
+  // Expand anomalydetections.
+  _expand<configuration::anomalydetection, applier::anomalydetection>(new_cfg);
+
   // Expand servicegroups.
   _expand<configuration::servicegroup, applier::servicegroup>(new_cfg);
 
@@ -1238,16 +1241,20 @@ void applier::state::_processing(configuration::state& new_cfg,
     _apply<configuration::servicegroup, applier::servicegroup>(
         diff_servicegroups);
 
-    // Resolve hosts, services, host groups and service groups.
+    // Resolve hosts, services, host groups.
     _resolve<configuration::host, applier::host>(config->hosts());
     _resolve<configuration::hostgroup, applier::hostgroup>(
         config->hostgroups());
+
+    // Resolve services.
     _resolve<configuration::service, applier::service>(config->services());
+
+    // Resolve anomalydetections.
+    _resolve<configuration::anomalydetection, applier::anomalydetection>(config->anomalydetections());
+
+    // Resolve service groups.
     _resolve<configuration::servicegroup, applier::servicegroup>(
         config->servicegroups());
-
-    // Resolve anomalydetections
-    _resolve<configuration::anomalydetection, applier::anomalydetection>(config->anomalydetections());
 
     // Apply host dependencies.
     _apply<configuration::hostdependency, applier::hostdependency>(
