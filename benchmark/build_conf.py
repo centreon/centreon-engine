@@ -1,4 +1,4 @@
-#!/usr/bin/python3.7
+#!/usr/bin/python3
 """
 ** Copyright 2020 Centreon
 **
@@ -24,37 +24,50 @@ from conf_builder import host_builder as hb
 from conf_builder import service_builder as sb
 from conf_builder import command_builder as cb
 from conf_builder import file_builder as fb
+from conf_builder import hostgroup_builder  as hgb
 
-conf_dir = "centreon-engine"
 
-hosts = [hb.create_template()]
-services = []
+def main():
+    conf_dir = "centreon-engine"
 
-# Conf directory creation
-if not os.path.exists(conf_dir):
-    os.mkdir(conf_dir)
+    hosts = [hb.create_template()]
+    services = []
+    hostgroups = []
 
-if len(sys.argv) != 2:
-    print("Error: this script needs a json configuration file.")
-    exit(1)
+    # Conf directory creation
+    if not os.path.exists(conf_dir):
+        os.mkdir(conf_dir)
 
-json_file = open(sys.argv[1])
-conf = json.load(json_file)
+    if len(sys.argv) != 2:
+        print("Error: this script needs a json configuration file.")
+        exit(1)
 
-for k, value in conf.items():
-    if k == 'hosts':
-        assert type(value) is list
-        for h in value:
+    json_file = open(sys.argv[1])
+    conf = json.load(json_file)
+
+    for hg in conf['hostgroups']:
+        for i in range(hg['count']):
+            hostgroups.append(hgb.create_hostgroup())
+
+        assert type(hg['hosts']) is list
+        for h in hg['hosts']:
             for i in range(h['count']):
                 new_host = hb.create_host()
                 hosts.append(new_host)
                 for j in range(h['services']):
                     services.append(sb.create_service(new_host['host_name']))
+                for hg in hostgroups:
+                    hg['members'].append(new_host['host_name'])
 
-commands = cb.create_templates()
+    commands = cb.create_templates()
+    fb.save_hosts(hosts)
+    fb.save_services(services)
+    fb.save_commands(commands)
+    fb.save_hostgroups(hostgroups)
+    fb.save_various()
+    fb.save_engine()
 
-fb.save_hosts(hosts)
-fb.save_services(services)
-fb.save_commands(commands)
-fb.save_various()
-fb.save_engine()
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()

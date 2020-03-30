@@ -1,8 +1,13 @@
 {
-  "hosts": [
+  "hostgroups": [
     {
-      "count": 10,
-      "services": 20
+      "count": 2,
+      "hosts": [
+        {
+          "count": 10,
+          "services": 20
+        }
+      ]
     }
   ]
 }

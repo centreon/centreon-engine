@@ -28,7 +28,10 @@ def _save(name: str, define_cmd: str, lst: list):
     for c in lst:
         f.write("define %s {\n" % define_cmd)
         for k, v in c.items():
-            f.write("    %s    %s\n" % (k, v))
+            if type(v) is list:
+                f.write("    %s    %s\n" % (k, ','.join(v)))
+            else:
+                f.write("    %s    %s\n" % (k, v))
         f.write("}\n\n")
     f.close()
 
@@ -43,6 +46,10 @@ def save_services(services: list):
 
 def save_hosts(hosts: list):
     _save("centreon-engine/hosts.cfg", "host", hosts)
+
+
+def save_hostgroups(hostgroups: list):
+    _save("centreon-engine/hostgroups.cfg", "hostgroup", hostgroups)
 
 
 def save_various():
