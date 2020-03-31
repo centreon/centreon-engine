@@ -353,7 +353,7 @@ int main(int argc, char* argv[]) {
         // done after we read config files, as user may have overridden
         // timezone offset.
         program_start = std::time(nullptr);
-        mac->x[MACRO_PROCESSSTARTTIME] = program_start;
+        mac->x[MACRO_PROCESSSTARTTIME] = std::to_string(program_start);
 
         // Load broker modules.
         for (std::list<std::string>::const_iterator
@@ -396,7 +396,7 @@ int main(int argc, char* argv[]) {
 
         // Get event start time and save as macro.
         event_start = time(NULL);
-        mac->x[MACRO_EVENTSTARTTIME] = event_start;
+        mac->x[MACRO_EVENTSTARTTIME] = std::to_string(event_start);
 
         logger(logging::log_info_message, logging::basic)
             << "Event loop start at " << string::ctime(event_start);
