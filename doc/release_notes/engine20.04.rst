@@ -28,3 +28,9 @@ Notifications between two fixed contiguous downtimes
 
 It was possible to have notifications sent between the two downtimes even if
 the space duration is 0.
+
+Macros replacements
+===================
+
+Host macros and several global macros containing numbers were badly replaced.
+It is fixed now.

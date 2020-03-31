@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2019 Centreon
+** Copyright 2011-2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
