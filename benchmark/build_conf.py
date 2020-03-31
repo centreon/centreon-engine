@@ -47,7 +47,8 @@ def main():
 
     for hg in conf['hostgroups']:
         for i in range(hg['count']):
-            hostgroups.append(hgb.create_hostgroup())
+            new_hostgroup = hgb.create_hostgroup()
+            hostgroups.append(new_hostgroup)
 
         assert type(hg['hosts']) is list
         for h in hg['hosts']:
@@ -56,9 +57,9 @@ def main():
                 hosts.append(new_host)
                 for j in range(h['services']):
                     services.append(sb.create_service(new_host['host_name']))
-                for hg in hostgroups:
-                    hg['members'].append(new_host['host_name'])
-
+                for j in range(h['anomalydetections']):
+                    services.append(sb.create_anomalydetection(new_host['host_name'], new_host['_HOST_ID']))
+                new_hostgroup['members'].append(new_host['host_name'])
     commands = cb.create_templates()
     fb.save_hosts(hosts)
     fb.save_services(services)

@@ -5,7 +5,8 @@
       "hosts": [
         {
           "count": 10,
-          "services": 20
+          "services": 20,
+          "anomalydetections": 5
         }
       ]
     }

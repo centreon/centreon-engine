@@ -17,8 +17,11 @@
 ** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 """
-service_id = 1
+from random import randint
 
+service_id = 1
+services = []
+ad = []
 
 def create_service(host_name: str):
     global service_id
@@ -37,5 +40,28 @@ def create_service(host_name: str):
         '_DUMMYOUTPUT': 'Check Dummy',
         '_SERVICE_ID': service_id,
     }
+    services.append(service_id)
+    service_id += 1
+    return retval
+
+
+def create_anomalydetection(host_name: str, host_id: int):
+    global service_id
+    dep_id = services[randint(0, len(services) - 1)]
+
+    retval = {
+        'host_name': host_name,
+        'service_description': "anomalydetection" + str(service_id),
+        'dependent_service_id': dep_id,
+        'metric_name': "metric",
+        'notification_interval': 10,
+        'notification_options': "c,r",
+        'thresholds_file': "/etc/centreon-engine/anomaly/anomalydetetion" + str(service_id) + ".json",
+        'status_change': 1,
+        'notifications_enabled': 0,
+        '_SERVICE_ID': service_id,
+        '_HOST_ID': host_id
+    }
+    ad.append(service_id)
     service_id += 1
     return retval
