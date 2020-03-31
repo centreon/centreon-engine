@@ -79,13 +79,15 @@ static void generate_host_total_services(host& hst, nagios_macros* mac) {
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
-    mac->x[MACRO_TOTALHOSTSERVICES] = total_host_services;
-    mac->x[MACRO_TOTALHOSTSERVICESOK] = total_host_services_ok;
-    mac->x[MACRO_TOTALHOSTSERVICESWARNING] = total_host_services_warning;
-    mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN] = total_host_services_unknown;
-    mac->x[MACRO_TOTALHOSTSERVICESCRITICAL] = total_host_services_critical;
+    mac->x[MACRO_TOTALHOSTSERVICES] = std::to_string(total_host_services);
+    mac->x[MACRO_TOTALHOSTSERVICESOK] = std::to_string(total_host_services_ok);
+    mac->x[MACRO_TOTALHOSTSERVICESWARNING] =
+        std::to_string(total_host_services_warning);
+    mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN] =
+        std::to_string(total_host_services_unknown);
+    mac->x[MACRO_TOTALHOSTSERVICESCRITICAL] =
+        std::to_string(total_host_services_critical);
   }
-  return;
 }
 
 /**

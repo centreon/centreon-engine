@@ -945,7 +945,7 @@ int grab_macro_value_r(nagios_macros* mac,
     if (macro_x_names[x].empty())
       continue;
 
-    if (macro_x_names[x] == macro_name) {
+    if (strcmp(macro_x_names[x].c_str(), buf) == 0) {
       logger(dbg_macros, most)
           << "  macros[" << x << "] (" << macro_x_names[x] << ") match.";
 
