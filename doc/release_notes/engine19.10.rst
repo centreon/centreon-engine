@@ -1,4 +1,18 @@
 ========================
+Centreon Engine 19.10.14
+========================
+
+*********
+Bug fixes
+*********
+
+Macros badly replaced
+=====================
+
+Host macros that contain numbers and several global macros were badly replaced.
+This version fixes those issues.
+
+========================
 Centreon Engine 19.10.13
 ========================
 
