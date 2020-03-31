@@ -713,15 +713,13 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 
   service::service_state status;
 
-  if (!_status_change) {
-    status = service::state_ok;
-    return std::make_tuple(status, value, uom, NAN, NAN);
-  }
-
   if (!_thresholds_file_viable) {
-    logger(log_info_message, basic)
-        << "The thresholds file is not viable (not available or not readable).";
-    return std::make_tuple(service::state_ok, value, unit, NAN, NAN);
+    status = service::state_ok;
+    if (_status_change) {
+      logger(log_info_message, basic)
+          << "The thresholds file is not viable (not available or not readable).";
+    }
+    return std::make_tuple(status, value, unit, NAN, NAN);
   }
 
   /* The check time is probably between two timestamps stored in _thresholds.
@@ -766,12 +764,16 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
                      (check_time - it1->first) / (it2->first - it1->first) +
                  it1->second.first;
 
-  if (std::isnan(value))
-    status = service::state_unknown;
-  else if (value >= lower && value <= upper)
+  if (!_status_change)
     status = service::state_ok;
-  else
-    status = service::state_critical;
+  else {
+    if (std::isnan(value))
+      status = service::state_unknown;
+    else if (value >= lower && value <= upper)
+      status = service::state_ok;
+    else
+      status = service::state_critical;
+  }
 
   return std::make_tuple(status, value, uom, lower, upper);
 }
@@ -807,8 +809,18 @@ void anomalydetection::init_thresholds() {
 
   int count = 0;
   for (auto& item : json.array_items()) {
-    if (item["host_id"].number_value() == get_host_id() &&
-        item["service_id"].number_value() == get_service_id() &&
+    uint64_t host_id, service_id;
+    try {
+      host_id = stoull(item["host_id"].string_value());
+      service_id = stoull(item["service_id"].string_value());
+    }
+    catch (std::exception const& e) {
+      logger(log_config_error, basic)
+          << "Error: host_id and service_id must be strings containing integers: "
+          << e.what();
+      return;
+    }
+    if (host_id == get_host_id() && service_id == get_service_id() &&
         item["metric_name"].string_value() == _metric_name) {
       logger(log_info_message, basic)
           << "Filling thresholds in anomaly detection (host_id: "
@@ -869,8 +881,17 @@ int anomalydetection::update_thresholds(const std::string& filename) {
   }
 
   for (auto& item : json.array_items()) {
-    uint64_t host_id = item["host_id"].int_value();
-    uint64_t svc_id = item["service_id"].int_value();
+    uint64_t host_id, svc_id;
+    try {
+      host_id = stoull(item["host_id"].string_value());
+      svc_id = stoull(item["service_id"].string_value());
+    }
+    catch (std::exception const& e) {
+      logger(log_config_error, basic)
+          << "Error: host_id and service_id must be strings containing integers: "
+          << e.what();
+      continue;
+    }
     auto found = service::services_by_id.find({host_id, svc_id});
     if (found == service::services_by_id.end()) {
       logger(log_config_error, basic)

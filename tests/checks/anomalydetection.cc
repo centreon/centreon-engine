@@ -130,7 +130,7 @@ class AnomalydetectionCheck : public TestEngine {
 TEST_F(AnomalydetectionCheck, StatusChanges) {
   CreateFile(
       "/tmp/thresholds_status_change.json",
-      "[{\n \"host_id\": 12,\n \"service_id\": 9,\n \"metric_name\": "
+      "[{\n \"host_id\": \"12\",\n \"service_id\": \"9\",\n \"metric_name\": "
       "\"metric\",\n \"predict\": [{\n \"timestamp\": 50000,\n \"upper\": "
       "84,\n \"lower\": 74,\n \"fit\": 79\n }, {\n \"timestamp\": 100000,\n "
       "\"upper\": 10,\n \"lower\": 5,\n \"fit\": 51.5\n }, {\n \"timestamp\": "
@@ -442,7 +442,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 TEST_F(AnomalydetectionCheck, MetricWithQuotes) {
   CreateFile(
       "/tmp/thresholds_status_change.json",
-      "[{\n \"host_id\": 12,\n \"service_id\": 9,\n \"metric_name\": "
+      "[{\n \"host_id\": \"12\",\n \"service_id\": \"9\",\n \"metric_name\": "
       "\"metric\",\n \"predict\": [{\n \"timestamp\": 50000,\n \"upper\": "
       "84,\n \"lower\": 74,\n \"fit\": 79\n }, {\n \"timestamp\": 100000,\n "
       "\"upper\": 10,\n \"lower\": 5,\n \"fit\": 51.5\n }, {\n \"timestamp\": "
