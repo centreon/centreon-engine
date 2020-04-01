@@ -49,7 +49,7 @@ conan=$(which conan)
 if [[ $? -ne 0 ]]; then
   if [[ -x $HOME/.local/bin/conan ]] ; then
     echo "conan installed in a local path"
-    conan="$HOME/.local/bin/conan"
+    conan="python3 $HOME/.local/bin/conan"
   else
     echo "Conan not installed"
     echo "You can install it with your package manager or with pip"
@@ -58,12 +58,12 @@ if [[ $? -ne 0 ]]; then
 fi
 
 cd build
-python3 "$conan" remote add centreon https://api.bintray.com/conan/centreon/centreon
+$conan remote add centreon https://api.bintray.com/conan/centreon/centreon
 
 if [[ -r /usr/share/centreon ]] ; then
-  python3 "$conan" install --remote centreon ../..
+  $conan install --remote centreon ../..
 else
-  python3 "$conan" install --build missing ../..
+  $conan install --build missing ../..
 fi
 
 if [[ $? -ne 0 ]] ; then
