@@ -2620,7 +2620,7 @@ void service::set_flap(double percent_change,
       << "stops, notifications will be re-enabled.";
 
   std::shared_ptr<comment> com{
-      new comment(comment::service, comment::flapping, _hostname, _description,
+      new comment(comment::service, comment::flapping, get_host_id(), _service_id,
                   time(nullptr), "(Centreon Engine Process)", oss.str(), false,
                   comment::internal, false, (time_t)0)};
 

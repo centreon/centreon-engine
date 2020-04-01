@@ -46,8 +46,8 @@ class comment {
 
   comment(comment::type comment_type,
           comment::e_type entry_type,
-          std::string const& host_name,
-          std::string const& service_description,
+          uint64_t host_id,
+          uint64_t service_id,
           time_t entry_time,
           std::string const& author,
           std::string const& comment_data,
@@ -65,8 +65,8 @@ class comment {
   time_t get_entry_time() const;
   bool get_expires() const;
   time_t get_expire_time() const;
-  std::string const& get_host_name() const;
-  std::string const& get_service_description() const;
+  uint64_t get_host_id() const;
+  uint64_t get_service_id() const;
   std::string const& get_author() const;
   std::string const& get_comment_data() const;
 
@@ -76,9 +76,8 @@ class comment {
   static uint64_t get_next_comment_id();
   static void set_next_comment_id(uint64_t comment_id);
   static void delete_comment(uint64_t comment_id);
-  static void delete_host_comments(std::string const& host_name);
-  static void delete_service_comments(std::string const& host_name,
-                                      const std::string& svc_description);
+  static void delete_host_comments(uint64_t host_id);
+  static void delete_service_comments(uint64_t host_id, uint64_t service_id);
   static void delete_host_acknowledgement_comments(engine::host* hst);
   static void delete_service_acknowledgement_comments(engine::service* svc);
   static void remove_if_expired_comment(uint64_t comment_id);
@@ -93,8 +92,8 @@ class comment {
   time_t _entry_time;
   bool _expires;
   time_t _expire_time;
-  std::string _host_name;
-  std::string _service_description;
+  uint64_t _host_id;
+  uint64_t _service_id;
   std::string _author;
   std::string _comment_data;
 

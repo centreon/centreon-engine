@@ -510,7 +510,7 @@ void applier::service::remove_object(configuration::service const& obj) {
     std::shared_ptr<engine::service> svc(it->second);
 
     // Remove service comments.
-    comment::delete_service_comments(host_name, service_description);
+    comment::delete_service_comments(obj.key().first, obj.key().second);
 
     // Remove service downtimes.
     downtime_manager::instance()

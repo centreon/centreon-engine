@@ -203,7 +203,7 @@ std::string& string::trim(std::string& str) noexcept {
     str.clear();
   else {
     // Search for comments.
-    size_t comment(str.find_first_of(';'));
+    size_t comment = str.find_first_of(';');
     if (comment != 0)
       while ((comment != std::string::npos) && (str[comment - 1] == '\\'))
         comment = str.find_first_of(';', comment + 1);

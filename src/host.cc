@@ -2058,8 +2058,8 @@ void host::set_flap(double percent_change,
       << "flapping stops, notifications will be re-enabled.";
 
   std::shared_ptr<comment> com{
-      new comment(comment::host, comment::flapping, _name, "", time(nullptr),
-                  "(Centreon Engine Process)", oss.str(), false,
+      new comment(comment::host, comment::flapping, get_host_id(), 0,
+                  time(nullptr), "(Centreon Engine Process)", oss.str(), false,
                   comment::internal, false, (time_t)0)};
 
   comment::comments.insert({com->get_comment_id(), com});

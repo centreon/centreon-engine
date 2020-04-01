@@ -499,4 +499,13 @@ TEST_F(ServiceRetention, RetentionWithMultilineOutput) {
   retention::dump::services(oss);
   std::string str(oss.str());
   ASSERT_NE(str.find("performance_data='time'=0.123s;0:3;0:5;0; 'size'=81439B;;;0;\n"), std::string::npos);
+
+  std::shared_ptr<comment> cmt = std::make_shared<comment>(comment::service, comment::flapping, _svc->get_host_id(), _svc->get_service_id(), time(nullptr), "test1", "test2", false, comment::internal, false, (time_t)0);
+
+  comment::comments.insert({cmt->get_comment_id(), cmt});
+
+  oss.str("");
+  retention::dump::comments(oss);
+  ASSERT_NE(str.find("host_name=test_host"), std::string::npos);
+  ASSERT_NE(str.find("service_description=test_svc"), std::string::npos);
 }

@@ -56,8 +56,9 @@ void applier::comment::_add_host_comment(
   // add the comment.
   std::shared_ptr<engine::comment> com{new engine::comment(
       engine::comment::host,
-      static_cast<engine::comment::e_type>(obj.entry_type()), obj.host_name(),
-      "", obj.entry_time(), obj.author(), obj.comment_data(), obj.persistent(),
+      static_cast<engine::comment::e_type>(obj.entry_type()),
+      it->second->get_host_id(), 0, obj.entry_time(), obj.author(),
+      obj.comment_data(), obj.persistent(),
       static_cast<engine::comment::src>(obj.source()), obj.expires(),
       obj.expire_time(), obj.comment_id())};
 
@@ -81,21 +82,18 @@ void applier::comment::_add_host_comment(
  *  @param[in] obj The comment to add into the service.
  */
 void applier::comment::_add_service_comment(
-    retention::comment const& obj) throw() {
-  if (!is_host_exist(get_host_id(obj.host_name().c_str())))
-    return;
-
+    retention::comment const& obj) noexcept {
   service_map::const_iterator it_svc(service::services.find(
-      {obj.host_name().c_str(), obj.service_description().c_str()}));
+      {obj.host_name(), obj.service_description()}));
   if (it_svc == service::services.end() || !it_svc->second)
     return;
 
   // add the comment.
   std::shared_ptr<engine::comment> com{new engine::comment(
       engine::comment::service,
-      static_cast<engine::comment::e_type>(obj.entry_type()), obj.host_name(),
-      obj.service_description(), obj.entry_time(), obj.author(),
-      obj.comment_data(), obj.persistent(),
+      static_cast<engine::comment::e_type>(obj.entry_type()),
+      it_svc->second->get_host_id(), it_svc->second->get_service_id(),
+      obj.entry_time(), obj.author(), obj.comment_data(), obj.persistent(),
       static_cast<engine::comment::src>(obj.source()), obj.expires(),
       obj.expire_time(), obj.comment_id())};
 

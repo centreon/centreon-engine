@@ -1,7 +1,7 @@
 /*
-** Copyright 2002-2010 Ethan Galstad
-** Copyright 2010      Nagios Core Development Team
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2010      Ethan Galstad
+** Copyright 2010           Nagios Core Development Team
+** Copyright 2011-2013,2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -440,8 +440,8 @@ void broker_comment_data(int type,
                          int attr,
                          int comment_type,
                          int entry_type,
-                         char const* host_name,
-                         char const* svc_description,
+                         uint64_t host_id,
+                         uint64_t service_id,
                          time_t entry_time,
                          char const* author_name,
                          char const* comment_data,
@@ -463,8 +463,8 @@ void broker_comment_data(int type,
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.comment_type = comment_type;
   ds.entry_type = entry_type;
-  ds.host_name = host_name;
-  ds.service_description = svc_description;
+  ds.host_id = host_id;
+  ds.service_id = service_id;
   ds.object_ptr = NULL;  // Not implemented yet.
   ds.entry_time = entry_time;
   ds.author_name = author_name;

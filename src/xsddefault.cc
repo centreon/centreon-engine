@@ -687,11 +687,11 @@ int xsddefault_save_status_data() {
       stream << "hostcomment {\n";
     else
       stream << "servicecomment {\n";
-    stream << "\thost_name=" << it->second->get_host_name() << "\n";
+    stream << "\thost_id=" << it->second->get_host_id() << "\n";
     if (it->second->get_comment_type() ==
         com::centreon::engine::comment::service)
-      stream << "\tservice_description="
-             << it->second->get_service_description() << "\n";
+      stream << "\tservice_id="
+             << it->second->get_service_id() << "\n";
     stream << "\tentry_type=" << it->second->get_entry_type()
            << "\n"
               "\tcomment_id="

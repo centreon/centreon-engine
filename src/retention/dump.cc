@@ -49,13 +49,27 @@ std::ostream& dump::comment(std::ostream& os,
                             com::centreon::engine::comment const& obj) {
   logger(dbg_functions, basic)
     << "dump::comment()";
-  if (obj.get_comment_type() == com::centreon::engine::comment::host)
+  char const* host_name;
+  char const* service_description;
+  if (obj.get_comment_type() == com::centreon::engine::comment::host) {
+    auto it = host::hosts_by_id.find(obj.get_host_id());
+    if (it == host::hosts_by_id.end())
+      return os;
+    host_name = it->second->get_name().c_str();
+    service_description = "";
     os << "hostcomment {\n";
-  else
+  }
+  else {
+    auto it = service::services_by_id.find({obj.get_host_id(), obj.get_service_id()});
+    if (it == service::services_by_id.end())
+      return os;
+    host_name = it->second->get_hostname().c_str();
+    service_description = it->second->get_description().c_str();
     os << "servicecomment {\n";
-  os << "host_name=" << obj.get_host_name() << "\n";
+  }
+  os << "host_name=" << host_name << "\n";
   if (obj.get_comment_type() == com::centreon::engine::comment::service)
-    os << "service_description=" << obj.get_service_description() << "\n";
+    os << "service_description=" << service_description << "\n";
   os << "author=" << obj.get_author()
      << "\n"
         "comment_data="

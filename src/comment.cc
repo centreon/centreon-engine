@@ -36,8 +36,8 @@ void comment::set_next_comment_id(uint64_t next_comment_id) {
 
 comment::comment(comment::type comment_type,
                  comment::e_type entry_type,
-                 std::string const& host_name,
-                 std::string const& service_description,
+                 uint64_t host_id,
+                 uint64_t service_id,
                  time_t entry_time,
                  std::string const& author,
                  std::string const& comment_data,
@@ -54,8 +54,8 @@ comment::comment(comment::type comment_type,
       _entry_time{entry_time},
       _expires{expires},
       _expire_time{expire_time},
-      _host_name{host_name},
-      _service_description{service_description},
+      _host_id{host_id},
+      _service_id{service_id},
       _author{author},
       _comment_data{comment_data} {
   bool is_added = true;
@@ -70,22 +70,20 @@ comment::comment(comment::type comment_type,
     is_added = false;
   }
 
-  broker_comment_data(
-      NEBTYPE_COMMENT_LOAD, NEBFLAG_NONE, NEBATTR_NONE, _comment_type,
-      _entry_type, _host_name.c_str(),
-      comment_type == comment::service ? _service_description.c_str() : nullptr,
-      _entry_time, _author.c_str(), _comment_data.c_str(), _persistent, _source,
-      _expires, _expire_time, _comment_id, nullptr);
+  broker_comment_data(NEBTYPE_COMMENT_LOAD, NEBFLAG_NONE, NEBATTR_NONE,
+                      _comment_type, _entry_type, _host_id, _service_id,
+                      _entry_time, _author.c_str(), _comment_data.c_str(),
+                      _persistent, _source, _expires, _expire_time, _comment_id,
+                      nullptr);
 
   /* send data to event broker */
-  if (is_added)
-    broker_comment_data(
-        NEBTYPE_COMMENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, _comment_type,
-        _entry_type, _host_name.c_str(),
-        comment_type == comment::service ? _service_description.c_str()
-                                         : nullptr,
-        _entry_time, _author.c_str(), _comment_data.c_str(), _persistent,
-        _source, _expires, _expire_time, _comment_id, nullptr);
+  if (is_added) {
+    broker_comment_data(NEBTYPE_COMMENT_ADD, NEBFLAG_NONE, NEBATTR_NONE,
+                        _comment_type, _entry_type, _host_id, _service_id,
+                        _entry_time, _author.c_str(), _comment_data.c_str(),
+                        _persistent, _source, _expires, _expire_time,
+                        _comment_id, nullptr);
+  }
 }
 
 /* deletes a host or service comment */
@@ -96,10 +94,8 @@ void comment::delete_comment(uint64_t comment_id) {
     broker_comment_data(
         NEBTYPE_COMMENT_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
         found->second->get_comment_type(), found->second->get_entry_type(),
-        found->second->get_host_name().c_str(),
-        found->second->get_comment_type() == comment::service
-            ? found->second->get_service_description().c_str()
-            : nullptr,
+        found->second->get_host_id(),
+        found->second->get_service_id(),
         found->second->get_entry_time(), found->second->get_author().c_str(),
         found->second->get_comment_data().c_str(),
         found->second->get_persistent(), found->second->get_source(),
@@ -109,16 +105,16 @@ void comment::delete_comment(uint64_t comment_id) {
   }
 }
 
-void comment::delete_host_comments(std::string const& host_name) {
+void comment::delete_host_comments(uint64_t host_id) {
   comment_map::iterator it(comments.begin());
 
   while (it != comments.end()) {
     if (it->second->get_comment_type() == comment::host &&
-        it->second->get_host_name() == host_name) {
+        it->second->get_host_id() == host_id) {
       broker_comment_data(
           NEBTYPE_COMMENT_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
           it->second->get_comment_type(), it->second->get_entry_type(),
-          host_name.c_str(), nullptr, it->second->get_entry_time(),
+          host_id, 0, it->second->get_entry_time(),
           it->second->get_author().c_str(),
           it->second->get_comment_data().c_str(), it->second->get_persistent(),
           it->second->get_source(), it->second->get_expires(),
@@ -129,18 +125,17 @@ void comment::delete_host_comments(std::string const& host_name) {
   }
 }
 
-void comment::delete_service_comments(std::string const& host_name,
-                                      std::string const& svc_description) {
+void comment::delete_service_comments(uint64_t host_id, uint64_t service_id) {
   comment_map::iterator it(comments.begin());
 
   while (it != comments.end()) {
     if (it->second->get_comment_type() == comment::service &&
-        it->second->get_host_name() == host_name &&
-        it->second->get_service_description() == svc_description) {
+        it->second->get_host_id() == host_id &&
+        it->second->get_service_id() == service_id) {
       broker_comment_data(
           NEBTYPE_COMMENT_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
           it->second->get_comment_type(), it->second->get_entry_type(),
-          host_name.c_str(), it->second->get_service_description().c_str(),
+          host_id, service_id,
           it->second->get_entry_time(), it->second->get_author().c_str(),
           it->second->get_comment_data().c_str(), it->second->get_persistent(),
           it->second->get_source(), it->second->get_expires(),
@@ -157,14 +152,14 @@ void comment::delete_host_acknowledgement_comments(engine::host* hst) {
 
   while (it != comments.end()) {
     if (it->second->get_comment_type() == comment::host &&
-        it->second->get_host_name() == hst->get_name() &&
+        it->second->get_host_id() == hst->get_host_id() &&
         it->second->get_entry_type() ==
             com::centreon::engine::comment::acknowledgment &&
         !it->second->get_persistent()) {
       broker_comment_data(
           NEBTYPE_COMMENT_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
           it->second->get_comment_type(), it->second->get_entry_type(),
-          it->second->get_host_name().c_str(), nullptr,
+          it->second->get_host_id(), 0,
           it->second->get_entry_time(), it->second->get_author().c_str(),
           it->second->get_comment_data().c_str(), it->second->get_persistent(),
           it->second->get_source(), it->second->get_expires(),
@@ -182,16 +177,16 @@ void comment::delete_service_acknowledgement_comments(::service* svc) {
 
   while (it != comments.end()) {
     if (it->second->get_comment_type() == comment::service &&
-        it->second->get_host_name() == svc->get_hostname() &&
-        it->second->get_service_description() == svc->get_description() &&
+        it->second->get_host_id() == svc->get_host_id() &&
+        it->second->get_service_id() == svc->get_service_id() &&
         it->second->get_entry_type() ==
             com::centreon::engine::comment::acknowledgment &&
         !it->second->get_persistent()) {
       broker_comment_data(
           NEBTYPE_COMMENT_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
           it->second->get_comment_type(), it->second->get_entry_type(),
-          it->second->get_host_name().c_str(),
-          it->second->get_service_description().c_str(),
+          it->second->get_host_id(),
+          it->second->get_service_id(),
           it->second->get_entry_time(), it->second->get_author().c_str(),
           it->second->get_comment_data().c_str(), it->second->get_persistent(),
           it->second->get_source(), it->second->get_expires(),
@@ -243,12 +238,12 @@ time_t comment::get_expire_time() const {
   return _expire_time;
 }
 
-std::string const& comment::get_host_name() const {
-  return _host_name;
+uint64_t comment::get_host_id() const {
+  return _host_id;
 }
 
-std::string const& comment::get_service_description() const {
-  return _service_description;
+uint64_t comment::get_service_id() const {
+  return _service_id;
 }
 
 std::string const& comment::get_author() const {
@@ -275,8 +270,8 @@ bool comment::operator==(comment const& obj) throw() {
       _persistent == obj.get_persistent() &&
       _entry_time == obj.get_entry_time() && _expires == obj.get_expires() &&
       _expire_time == obj.get_expire_time() &&
-      _host_name == obj.get_host_name() &&
-      _service_description == obj.get_service_description() &&
+      _host_id == obj.get_host_id() &&
+      _service_id == obj.get_service_id() &&
       _author == obj.get_author() && _comment_data == obj.get_comment_data());
 }
 
@@ -326,11 +321,11 @@ std::ostream& operator<<(std::ostream& os, comment const& obj) {
         "  expire_time:         "
      << obj.get_expire_time()
      << "\n"
-        "  host_name:           "
-     << obj.get_host_name()
+        "  host_id:           "
+     << obj.get_host_id()
      << "\n"
-        "  service_description: "
-     << obj.get_service_description()
+        "  service_id: "
+     << obj.get_service_id()
      << "\n"
         "  author:              "
      << obj.get_author()
