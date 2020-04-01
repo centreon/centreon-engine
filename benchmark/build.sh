@@ -3,6 +3,12 @@ RESET='\033[0m'
 RED='\033[0;31m'
 LGREEN='\033[0;32m'
 
+if [[ $1 == "-f" ]] ; then
+  force="rm"
+elif [[ $1 == "-n" ]] ; then
+  force="ignore"
+fi
+
 root_dir=$PWD
 if [[ $(basename $root_dir) != "benchmark" ]] ; then
   echo "This script must be executed from the benchmark directory"
@@ -21,6 +27,11 @@ mkdir -p lib/rw
 
 if [[ -d "build" ]] ; then
   a=""
+  if [[ $force == "rm" ]] ; then
+    a="y"
+  elif [[ $force == "ignore" ]] ; then
+    a="n"
+  fi
   while [[ $a != "y" && $a != "n" ]] ; do
     echo "Do you want to clean the build directory?"
     read a
