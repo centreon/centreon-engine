@@ -74,14 +74,13 @@ void broker_acknowledgement_data(int type,
   ds.acknowledgement_type = acknowledgement_type;
   if (acknowledgement_type == SERVICE_ACKNOWLEDGEMENT) {
     temp_service = (com::centreon::engine::service*)data;
-    ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description =
-        const_cast<char*>(temp_service->get_description().c_str());
+    ds.host_id = temp_service->get_host_id();
+    ds.service_id = temp_service->get_service_id();
     ds.state = temp_service->get_current_state();
   } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
-    ds.service_description = NULL;
+    ds.host_id = temp_host->get_host_id();
+    ds.service_id = 0;
     ds.state = temp_host->get_current_state();
   }
   ds.object_ptr = data;
@@ -1517,8 +1516,8 @@ int broker_service_check(int type,
   ds.flags = flags;
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
-  ds.host_name = const_cast<char*>(svc->get_hostname().c_str());
-  ds.service_description = const_cast<char*>(svc->get_description().c_str());
+  ds.host_id = svc->get_host_id();
+  ds.service_id = svc->get_service_id();
   ds.object_ptr = svc;
   ds.check_type = check_type;
   ds.current_attempt = svc->get_current_attempt();
