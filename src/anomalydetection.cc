@@ -330,7 +330,8 @@ com::centreon::engine::anomalydetection* add_anomalydetection(
   auto it = service::services_by_id.find({host_id, dependent_service_id});
   if (it == service::services_by_id.end()) {
     logger(log_config_error, basic)
-        << "Error: Dependent service does not exist";
+        << "Error: Dependent service " << dependent_service_id
+        << " does not exist (anomaly detection " << service_id << ")";
     return nullptr;
   }
   service* dependent_service = it->second.get();

@@ -44,6 +44,10 @@ def save_services(services: list):
     _save("centreon-engine/services.cfg", "service", services)
 
 
+def save_anomalydetections(ads: list):
+    _save("centreon-engine/anomalydetection.cfg", "anomalydetection", ads)
+
+
 def save_hosts(hosts: list):
     _save("centreon-engine/hosts.cfg", "host", hosts)
 
@@ -86,6 +90,7 @@ def save_engine():
     f.write(f"""# Centengine configuration
 cfg_file={conf_dir}/hosts.cfg
 cfg_file={conf_dir}/services.cfg
+cfg_file={conf_dir}/anomalydetection.cfg
 cfg_file={conf_dir}/commands.cfg
 cfg_file={conf_dir}/timeperiods.cfg
 broker_module={bin_dir}/modules/external_commands/externalcmd.so
