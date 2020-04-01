@@ -1,3 +1,4 @@
+#!/bin/bash
 
 RESET='\033[0m'
 RED='\033[0;31m'
@@ -44,11 +45,43 @@ else
   mkdir build
 fi
 
-cd build
-conan remote add centreon https://api.bintray.com/conan/centreon/centreon
-conan install --remote centreon ../..
+conan=$(which conan)
+if [[ $? -ne 0 ]]; then
+  if [[ -x $HOME/.local/bin/conan ]] ; then
+    echo "conan installed in a local path"
+    conan="$HOME/.local/bin/conan"
+  else
+    echo "Conan not installed"
+    echo "You can install it with your package manager or with pip"
+    exit 1
+  fi
+fi
 
-cmake -GNinja -DWITH_SIMU=On -DWITH_RW_DIR=$root_dir/lib -DWITH_VAR_DIR=$root_dir/log ../..
+cd build
+python3 "$conan" remote add centreon https://api.bintray.com/conan/centreon/centreon
+
+if [[ -r /usr/share/centreon ]] ; then
+  python3 "$conan" install --remote centreon ../..
+else
+  python3 "$conan" install --build missing ../..
+fi
+
+if [[ $? -ne 0 ]] ; then
+  echo "Error during conan packages installation..."
+  exit 1
+fi
+
+cmake=$(which cmake3)
+if [[ $? -ne 0 ]] ; then
+  cmake=$(which cmake)
+fi
+
+$cmake -GNinja -DWITH_SIMU=On -DWITH_RW_DIR=$root_dir/lib -DWITH_VAR_DIR=$root_dir/log ../..
+
+if [[ $? -ne 0 ]] ; then
+  echo "Error..."
+  exit 1
+fi
 
 echo -e "\n${LGREEN}Building Engine${RESET}"
 ninja
