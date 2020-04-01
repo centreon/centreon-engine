@@ -20,10 +20,13 @@
 from random import randint
 
 service_id = 1
-services = []
+services = {}
+
 ad = []
 
+
 def create_service(host_name: str):
+    global services
     global service_id
     retval = {
         'host_name': host_name,
@@ -40,14 +43,19 @@ def create_service(host_name: str):
         '_DUMMYOUTPUT': 'Check Dummy',
         '_SERVICE_ID': service_id,
     }
-    services.append(service_id)
+    services.setdefault(host_name, []).append(service_id)
     service_id += 1
     return retval
 
 
 def create_anomalydetection(host_name: str, host_id: int):
+    global services
     global service_id
-    dep_id = services[randint(0, len(services) - 1)]
+    choices = services.setdefault(host_name, [])
+    if len(choices) > 0:
+        dep_id = choices[randint(0, len(services) - 1)]
+    else:
+        assert(1==0)
 
     retval = {
         'host_name': host_name,

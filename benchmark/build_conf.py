@@ -33,6 +33,7 @@ def main():
     hosts = [hb.create_template()]
     services = []
     hostgroups = []
+    anomalydetections = []
 
     # Conf directory creation
     if not os.path.exists(conf_dir):
@@ -58,11 +59,12 @@ def main():
                 for j in range(h['services']):
                     services.append(sb.create_service(new_host['host_name']))
                 for j in range(h['anomalydetections']):
-                    services.append(sb.create_anomalydetection(new_host['host_name'], new_host['_HOST_ID']))
+                    anomalydetections.append(sb.create_anomalydetection(new_host['host_name'], new_host['_HOST_ID']))
                 new_hostgroup['members'].append(new_host['host_name'])
     commands = cb.create_templates()
     fb.save_hosts(hosts)
     fb.save_services(services)
+    fb.save_anomalydetections(anomalydetections)
     fb.save_commands(commands)
     fb.save_hostgroups(hostgroups)
     fb.save_various()

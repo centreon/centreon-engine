@@ -128,7 +128,7 @@ uint64_t raw::run(std::string const& processed_cmd,
   logger(dbg_commands, basic)
       << "raw::run: id=" << command_id << ", process=" << p;
 
-  // Setup environement macros if is necessary.
+  // Setup environnement macros if is necessary.
   environment env;
   _build_environment_macros(macros, env);
 
