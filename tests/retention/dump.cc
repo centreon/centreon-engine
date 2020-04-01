@@ -38,6 +38,9 @@ class RetentionDumpTest : public ::testing::Test {
 };
 
 TEST_F(RetentionDumpTest, DumpComment) {
+  comment cmt(comment::host, comment::flapping, 12, 0, time(nullptr),
+                        "Test comment", "test comment", false,
+                        comment::internal, false, 0);
   std::ostringstream oss;
   dump::comments(oss);
   std::string str(oss.str());

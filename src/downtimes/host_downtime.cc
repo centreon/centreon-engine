@@ -252,7 +252,7 @@ int host_downtime::subscribe() {
   /* add a non-persistent comment to the host or service regarding the scheduled
    * outage */
   std::shared_ptr<comment> com{
-      new comment(comment::host, comment::downtime, hst->get_name(), "",
+      new comment(comment::host, comment::downtime, hst->get_host_id(), 0,
                   time(NULL), "(Centreon Engine Process)", oss.str(), false,
                   comment::internal, false, (time_t)0)};
 

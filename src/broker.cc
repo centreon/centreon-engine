@@ -1,7 +1,7 @@
 /*
-** Copyright 2002-2010 Ethan Galstad
-** Copyright 2010      Nagios Core Development Team
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2010      Ethan Galstad
+** Copyright 2010           Nagios Core Development Team
+** Copyright 2011-2013,2020 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -74,14 +74,13 @@ void broker_acknowledgement_data(int type,
   ds.acknowledgement_type = acknowledgement_type;
   if (acknowledgement_type == SERVICE_ACKNOWLEDGEMENT) {
     temp_service = (com::centreon::engine::service*)data;
-    ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description =
-        const_cast<char*>(temp_service->get_description().c_str());
+    ds.host_id = temp_service->get_host_id();
+    ds.service_id = temp_service->get_service_id();
     ds.state = temp_service->get_current_state();
   } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
-    ds.service_description = NULL;
+    ds.host_id = temp_host->get_host_id();
+    ds.service_id = 0;
     ds.state = temp_host->get_current_state();
   }
   ds.object_ptr = data;
@@ -441,8 +440,8 @@ void broker_comment_data(int type,
                          int attr,
                          int comment_type,
                          int entry_type,
-                         char const* host_name,
-                         char const* svc_description,
+                         uint64_t host_id,
+                         uint64_t service_id,
                          time_t entry_time,
                          char const* author_name,
                          char const* comment_data,
@@ -464,8 +463,8 @@ void broker_comment_data(int type,
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.comment_type = comment_type;
   ds.entry_type = entry_type;
-  ds.host_name = host_name;
-  ds.service_description = svc_description;
+  ds.host_id = host_id;
+  ds.service_id = service_id;
   ds.object_ptr = NULL;  // Not implemented yet.
   ds.entry_time = entry_time;
   ds.author_name = author_name;
@@ -1517,8 +1516,8 @@ int broker_service_check(int type,
   ds.flags = flags;
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
-  ds.host_name = const_cast<char*>(svc->get_hostname().c_str());
-  ds.service_description = const_cast<char*>(svc->get_description().c_str());
+  ds.host_id = svc->get_host_id();
+  ds.service_id = svc->get_service_id();
   ds.object_ptr = svc;
   ds.check_type = check_type;
   ds.current_attempt = svc->get_current_attempt();

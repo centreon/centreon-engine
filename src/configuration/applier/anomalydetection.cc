@@ -447,7 +447,7 @@ void applier::anomalydetection::remove_object(configuration::anomalydetection co
         std::static_pointer_cast<engine::anomalydetection>(it->second));
 
     // Remove anomalydetection comments.
-    comment::delete_service_comments(host_name, service_description);
+    comment::delete_service_comments(obj.key().first, obj.key().second);
 
     // Remove anomalydetection downtimes.
     downtime_manager::instance()

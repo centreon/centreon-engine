@@ -173,11 +173,13 @@ void process_external_command(const char* cmd) {
 int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   char* temp_ptr(nullptr);
   host* temp_host(nullptr);
-  char* host_name(nullptr);
+  char* host_name;
   char* svc_description(nullptr);
   char* user(nullptr);
   char* comment_data(nullptr);
   int persistent(0);
+  uint64_t service_id = 0;
+  uint64_t host_id = 0;
 
   /* get the host name */
   if ((host_name = my_strtok(args, ";")) == nullptr)
@@ -194,6 +196,7 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
         service::services.find({host_name, svc_description}));
     if (found == service::services.end() || !found->second)
       return ERROR;
+    service_id = found->second->get_service_id();
   }
 
   /* else verify that the host is valid */
@@ -224,9 +227,8 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   /* add the comment */
   std::shared_ptr<comment> com{new comment(
       (cmd == CMD_ADD_HOST_COMMENT) ? comment::host : comment::service,
-      comment::user, host_name, svc_description ? svc_description : "",
-      entry_time, user, comment_data, persistent, comment::external, false,
-      (time_t)0)};
+      comment::user, temp_host->get_host_id(), service_id, entry_time, user,
+      comment_data, persistent, comment::external, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 
   return OK;
@@ -248,7 +250,6 @@ int cmd_delete_comment(int cmd [[maybe_unused]], char* args) {
 
 /* removes all comments associated with a host or service from the status log */
 int cmd_delete_all_comments(int cmd, char* args) {
-  host* temp_host(nullptr);
   char* host_name(nullptr);
   char* svc_description(nullptr);
 
@@ -256,6 +257,8 @@ int cmd_delete_all_comments(int cmd, char* args) {
   if ((host_name = my_strtok(args, ";")) == nullptr)
     return ERROR;
 
+  host* temp_host = nullptr;
+  service* temp_service = nullptr;
   /* if we're deleting service comments...  */
   if (cmd == CMD_DEL_ALL_SVC_COMMENTS) {
     /* get the service description */
@@ -265,23 +268,26 @@ int cmd_delete_all_comments(int cmd, char* args) {
     /* verify that the service is valid */
     service_map::const_iterator found(
         service::services.find({host_name, svc_description}));
-    if (found == service::services.end() || !found->second)
+    if (found != service::services.end())
+      temp_service = found->second.get();
+    if (temp_service == nullptr)
+      return ERROR;
+  }
+  else {
+    /* else verify that the host is valid */
+    host_map::const_iterator it(host::hosts.find(host_name));
+    if (it != host::hosts.end())
+      temp_host = it->second.get();
+    if (temp_host == nullptr)
       return ERROR;
   }
 
-  /* else verify that the host is valid */
-  temp_host = nullptr;
-  host_map::const_iterator it(host::hosts.find(host_name));
-  if (it != host::hosts.end())
-    temp_host = it->second.get();
-  if (temp_host == nullptr)
-    return ERROR;
-
   /* delete comments */
   if (cmd == CMD_DEL_ALL_HOST_COMMENTS)
-    comment::delete_host_comments(host_name);
+    comment::delete_host_comments(temp_host->get_host_id());
   else
-    comment::delete_service_comments(host_name, svc_description);
+    comment::delete_service_comments(temp_service->get_host_id(),
+                                     temp_service->get_service_id());
 
   return OK;
 }
@@ -2516,7 +2522,7 @@ void acknowledge_host_problem(host* hst,
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com{
       new comment(comment::host, comment::acknowledgment,
-                  hst->get_name().c_str(), "", current_time, ack_author,
+                  hst->get_host_id(), 0, current_time, ack_author,
                   ack_data, persistent, comment::internal, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 }
@@ -2561,8 +2567,8 @@ void acknowledge_service_problem(service* svc,
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com{new comment(
-      comment::service, comment::acknowledgment, svc->get_hostname(),
-      svc->get_description(), current_time, ack_author, ack_data, persistent,
+      comment::service, comment::acknowledgment, svc->get_host_id(),
+      svc->get_service_id(), current_time, ack_author, ack_data, persistent,
       comment::internal, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 }

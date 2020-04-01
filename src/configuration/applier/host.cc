@@ -416,7 +416,7 @@ void applier::host::remove_object(configuration::host const& obj) {
   host_id_map::iterator it(engine::host::hosts_by_id.find(obj.key()));
   if (it != engine::host::hosts_by_id.end()) {
     // Remove host comments.
-    comment::delete_host_comments(obj.host_name());
+    comment::delete_host_comments(obj.host_id());
 
     // Remove host downtimes.
     downtimes::downtime_manager::instance()

@@ -32,8 +32,8 @@ typedef struct nebstruct_acknowledgement_struct {
   struct timeval timestamp;
 
   int acknowledgement_type;
-  char* host_name;
-  char* service_description;
+  uint64_t host_id;
+  uint64_t service_id;
   int state;
   char* author_name;
   char* comment_data;
@@ -162,8 +162,8 @@ typedef struct nebstruct_comment_struct {
   struct timeval timestamp;
 
   int comment_type;
-  char const* host_name;
-  char const* service_description;
+  uint64_t host_id;
+  uint64_t service_id;
   time_t entry_time;
   char const* author_name;
   char const* comment_data;
@@ -502,8 +502,8 @@ typedef struct nebstruct_service_check_struct {
   int attr;
   struct timeval timestamp;
 
-  char* host_name;
-  char* service_description;
+  uint64_t host_id;
+  uint64_t service_id;
   int check_type;
   int current_attempt;
   int max_attempts;
