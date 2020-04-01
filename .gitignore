@@ -1,6 +1,7 @@
 *.swp
-.idea/*
-build/*
+**/.idea/*
+**/.vscode/*
+**/build/*
 conf/centengine.cfg
 conf/objects/*.cfg
 conf/resource.cfg
@@ -20,3 +21,6 @@ enginerpc/engine.*pb.cc
 enginerpc/engine.*pb.h
 **/__pycache__/*
 **/engine_pb2*.py
+benchmark/centreon-engine/*
+benchmark/log/*
+benchmark/lib/*

@@ -1,0 +1,14 @@
+{
+  "hostgroups": [
+    {
+      "count": 2,
+      "hosts": [
+        {
+          "count": 10,
+          "services": 20,
+          "anomalydetections": 5
+        }
+      ]
+    }
+  ]
+}

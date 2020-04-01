@@ -113,3 +113,46 @@ TEST_F(Macro, TotalHostOk) {
   process_macros_r(&mac, "$TOTALHOSTSUP$", out, 1);
   ASSERT_EQ(out, "1");
 }
+
+// Given host configuration without host_id
+// Then the applier add_object throws an exception.
+TEST_F(Macro, TotalHostServicesCritical) {
+  configuration::applier::host hst_aply;
+  configuration::service svc;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_EQ(1u, host::hosts.size());
+  init_macros();
+
+  nagios_macros mac;
+  std::string out;
+  host::hosts["test_host"]->set_current_state(host::state_up);
+  host::hosts["test_host"]->set_has_been_checked(true);
+  process_macros_r(&mac, "$TOTALHOSTSERVICESCRITICAL:test_host$", out, 1);
+  ASSERT_EQ(out, "0");
+}
+
+// Given host configuration without host_id
+// Then the applier add_object throws an exception.
+TEST_F(Macro, TotalHostServicesCriticalError) {
+  configuration::applier::host hst_aply;
+  configuration::service svc;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_EQ(1u, host::hosts.size());
+  init_macros();
+
+  nagios_macros mac;
+  std::string out;
+  host::hosts["test_host"]->set_current_state(host::state_up);
+  host::hosts["test_host"]->set_has_been_checked(true);
+  /* The call of this variable needs a host name */
+  process_macros_r(&mac, "$TOTALHOSTSERVICESCRITICAL$", out, 1);
+  ASSERT_EQ(out, "");
+}

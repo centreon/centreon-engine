@@ -1,9 +1,12 @@
 #!/usr/bin/perl
 
+use Cwd qw(cwd);
 use strict;
 use warnings;
 
-open F, "<../../inc/com/centreon/engine/nebstructs.hh";
+my $root_dir = cwd;
+$root_dir =~ s|(.*centreon-engine/).*$|$1|;
+open F, "<$root_dir/inc/com/centreon/engine/nebstructs.hh" or die;
 
 my @cb;
 my @reg;
@@ -23,6 +26,12 @@ while (<F>) {
     if ($instruct == 1) {
         if (m/^\s*struct timeval\s*([^\s]*);/) {
             $callback .= "\n      << \"  $1=\" << timeval_str(neb_data->$1) << std::endl";
+        }
+        elsif (m/^\s*char\s+const\*\s+([^\s]*);/) {
+            $callback .= "\n      << \"  $1=\" << (neb_data->$1 ? neb_data->$1 : \"NULL\") << std::endl";
+        }
+        elsif (m/^\s*const\s+char\*\s+([^\s]*);/) {
+            $callback .= "\n      << \"  $1=\" << (neb_data->$1 ? neb_data->$1 : \"NULL\") << std::endl";
         }
         elsif (m/^\s*char\*\s+([^\s]*);/) {
             $callback .= "\n      << \"  $1=\" << (neb_data->$1 ? neb_data->$1 : \"NULL\") << std::endl";
@@ -115,15 +124,15 @@ using namespace com::centreon::engine::logging;
 std::ostream* fp(NULL);
 std::ofstream foutput;
 
-//static std::string timeval_str(timeval const& t) {
-//  struct tm* nowtm;
-//  time_t nowtime = t.tv_sec;
-//  char tmbuf[64], buf[64];
-//  nowtm = localtime(&nowtime);
-//  strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-//  snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, t.tv_usec);
-//  return std::string(buf);
-//}
+static std::string timeval_str(timeval const& t) {
+  struct tm* nowtm;
+  time_t nowtime = t.tv_sec;
+  char tmbuf[64], buf[64];
+  nowtm = localtime(&nowtime);
+  strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
+  snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, t.tv_usec);
+  return std::string(buf);
+}
 
 /**************************************
 *                                     *
