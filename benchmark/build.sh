@@ -45,7 +45,7 @@ else
   mkdir build
 fi
 
-conan=$(which conan)
+conan=$(command -v conan)
 if [[ $? -ne 0 ]]; then
   if [[ -x $HOME/.local/bin/conan ]] ; then
     echo "conan installed in a local path"
@@ -57,7 +57,7 @@ if [[ $? -ne 0 ]]; then
   fi
 fi
 
-cd build
+cd build || exit
 $conan remote add centreon https://api.bintray.com/conan/centreon/centreon
 
 if [[ -r /usr/share/centreon ]] ; then
@@ -71,12 +71,12 @@ if [[ $? -ne 0 ]] ; then
   exit 1
 fi
 
-cmake=$(which cmake3)
+cmake=$(command -v cmake3)
 if [[ $? -ne 0 ]] ; then
-  cmake=$(which cmake)
+  cmake=$(command -v cmake)
 fi
 
-$cmake -GNinja -DWITH_SIMU=On -DWITH_RW_DIR=$root_dir/lib -DWITH_VAR_DIR=$root_dir/log ../..
+$cmake -GNinja -DWITH_SIMU=On -DWITH_RW_DIR=$root_dir/lib -DWITH_VAR_DIR=$root_dir/log -DWITH_DEBUG_CONFIG=On ../..
 
 if [[ $? -ne 0 ]] ; then
   echo "Error..."
@@ -86,9 +86,17 @@ fi
 echo -e "\n${LGREEN}Building Engine${RESET}"
 ninja
 
-cd $root_dir
+cd "$root_dir" || exit
 echo -e "\n${LGREEN}Building Config${RESET}"
 python3 ./build_conf.py conf.json
+
+echo -e "\n${LGREEN}Prepare Python grpc files${RESET}"
+if ! protoc --plugin=protoc-gen-grpc=/usr/bin/grpc_python_plugin --proto_path=.. --grpc_out=. ../enginerpc/engine.proto ; then
+  echo "Error: protoc for grpc failed..."
+fi
+if ! protoc -I=.. --python_out=. ../enginerpc/engine.proto ; then
+  echo "Error: protoc for protobuf failed..."
+fi
 
 echo -e "\n${LGREEN}Launching Engine${RESET}"
 #SIMUMOD=log/simumod.log build/centengine centreon-engine/centengine.cfg

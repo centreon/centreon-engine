@@ -3,7 +3,7 @@
 typ=$1
 state=$2
 
-now=`date +%s`
+now=$(date +%s)
 commandfile='/tmp/var/lib/centreon-engine/rw/centengine.cmd'
 
 if [[ $typ == "host" ]] ; then

@@ -21,8 +21,8 @@
 
 def create_templates():
     retval = [
-        create_command("App-Monitoring-Centreon-Host-Dummy", "$CENTREONPLUGINS$/active-check.sh host $HOSTNAME$"),
-        create_command("App-Monitoring-Centreon-Service-Dummy", "$CENTREONPLUGINS$/active-check.sh service $SERVICEDESC$"),
+        create_command("App-Monitoring-Centreon-Host-Dummy", "$CENTREONPLUGINS$/active-check.pl host $HOSTNAME$"),
+        create_command("App-Monitoring-Centreon-Service-Dummy", "$CENTREONPLUGINS$/active-check.pl service $SERVICEDESC$"),
     ]
     return retval
 

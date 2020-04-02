@@ -20,6 +20,16 @@
 
 import fileinput
 import datetime
+import grpc
+import enginerpc.engine_pb2
+import enginerpc.engine_pb2_grpc
+
+channel = grpc.insecure_channel("127.0.0.1:50126")
+stub = enginerpc.engine_pb2_grpc.EngineStub(channel)
+stats = stub.GetStats(enginerpc.engine_pb2.Stats())
+print(stats)
+
+exit(0)
 
 event = ''
 service_processed = False
