@@ -108,7 +108,7 @@ program& program::operator=(program const& right) {
     _passive_service_checks_enabled = right._passive_service_checks_enabled;
     _process_performance_data = right._process_performance_data;
   }
-  return (*this);
+  return *this;
 }
 
 /**
@@ -153,7 +153,7 @@ bool program::operator==(program const& right) const throw() {
  *  @return True if is not the same object, otherwise false.
  */
 bool program::operator!=(program const& right) const throw() {
-  return (!operator==(right));
+  return !operator==(right);
 }
 
 /**
@@ -167,8 +167,8 @@ bool program::operator!=(program const& right) const throw() {
 bool program::set(char const* key, char const* value) {
   for (unsigned int i(0); i < sizeof(_setters) / sizeof(_setters[0]); ++i)
     if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
+      return (_setters[i].func)(*this, value);
+  return false;
 }
 
 /**
@@ -177,7 +177,7 @@ bool program::set(char const* key, char const* value) {
  *  @return The active_host_checks_enabled.
  */
 opt<bool> const& program::active_host_checks_enabled() const throw() {
-  return (_active_host_checks_enabled);
+  return _active_host_checks_enabled;
 }
 
 /**
@@ -186,7 +186,7 @@ opt<bool> const& program::active_host_checks_enabled() const throw() {
  *  @return The active_service_checks_enabled.
  */
 opt<bool> const& program::active_service_checks_enabled() const throw() {
-  return (_active_service_checks_enabled);
+  return _active_service_checks_enabled;
 }
 
 /**
@@ -195,7 +195,7 @@ opt<bool> const& program::active_service_checks_enabled() const throw() {
  *  @return The check_host_freshness.
  */
 opt<bool> const& program::check_host_freshness() const throw() {
-  return (_check_host_freshness);
+  return _check_host_freshness;
 }
 
 /**
@@ -204,7 +204,7 @@ opt<bool> const& program::check_host_freshness() const throw() {
  *  @return The check_service_freshness.
  */
 opt<bool> const& program::check_service_freshness() const throw() {
-  return (_check_service_freshness);
+  return _check_service_freshness;
 }
 
 /**
@@ -213,7 +213,7 @@ opt<bool> const& program::check_service_freshness() const throw() {
  *  @return The enable_event_handlers.
  */
 opt<bool> const& program::enable_event_handlers() const throw() {
-  return (_enable_event_handlers);
+  return _enable_event_handlers;
 }
 
 /**
@@ -222,7 +222,7 @@ opt<bool> const& program::enable_event_handlers() const throw() {
  *  @return The enable_flap_detection.
  */
 opt<bool> const& program::enable_flap_detection() const throw() {
-  return (_enable_flap_detection);
+  return _enable_flap_detection;
 }
 
 /**
@@ -231,7 +231,7 @@ opt<bool> const& program::enable_flap_detection() const throw() {
  *  @return The enable_notifications.
  */
 opt<bool> const& program::enable_notifications() const throw() {
-  return (_enable_notifications);
+  return _enable_notifications;
 }
 
 /**
@@ -240,7 +240,7 @@ opt<bool> const& program::enable_notifications() const throw() {
  *  @return The global_host_event_handler.
  */
 opt<std::string> const& program::global_host_event_handler() const throw() {
-  return (_global_host_event_handler);
+  return _global_host_event_handler;
 }
 
 /**
@@ -249,7 +249,7 @@ opt<std::string> const& program::global_host_event_handler() const throw() {
  *  @return The global_service_event_handler.
  */
 opt<std::string> const& program::global_service_event_handler() const throw() {
-  return (_global_service_event_handler);
+  return _global_service_event_handler;
 }
 
 /**
@@ -258,7 +258,7 @@ opt<std::string> const& program::global_service_event_handler() const throw() {
  *  @return The modified_host_attributes.
  */
 opt<unsigned long> const& program::modified_host_attributes() const throw() {
-  return (_modified_host_attributes);
+  return _modified_host_attributes;
 }
 
 /**
@@ -267,7 +267,7 @@ opt<unsigned long> const& program::modified_host_attributes() const throw() {
  *  @return The modified_service_attributes.
  */
 opt<unsigned long> const& program::modified_service_attributes() const throw() {
-  return (_modified_service_attributes);
+  return _modified_service_attributes;
 }
 
 /**
@@ -276,7 +276,7 @@ opt<unsigned long> const& program::modified_service_attributes() const throw() {
  *  @return The next_comment_id.
  */
 opt<unsigned long> const& program::next_comment_id() const throw() {
-  return (_next_comment_id);
+  return _next_comment_id;
 }
 
 /**
@@ -285,7 +285,7 @@ opt<unsigned long> const& program::next_comment_id() const throw() {
  *  @return The next_downtime_id.
  */
 opt<unsigned long> const& program::next_downtime_id() const throw() {
-  return (_next_downtime_id);
+  return _next_downtime_id;
 }
 
 /**
@@ -294,7 +294,7 @@ opt<unsigned long> const& program::next_downtime_id() const throw() {
  *  @return The next_event_id.
  */
 opt<unsigned long> const& program::next_event_id() const throw() {
-  return (_next_event_id);
+  return _next_event_id;
 }
 
 /**
@@ -303,7 +303,7 @@ opt<unsigned long> const& program::next_event_id() const throw() {
  *  @return The next_notification_id.
  */
 opt<unsigned long> const& program::next_notification_id() const throw() {
-  return (_next_notification_id);
+  return _next_notification_id;
 }
 
 /**
@@ -312,7 +312,7 @@ opt<unsigned long> const& program::next_notification_id() const throw() {
  *  @return The next_problem_id.
  */
 opt<unsigned long> const& program::next_problem_id() const throw() {
-  return (_next_problem_id);
+  return _next_problem_id;
 }
 
 /**
@@ -321,7 +321,7 @@ opt<unsigned long> const& program::next_problem_id() const throw() {
  *  @return The obsess_over_hosts.
  */
 opt<bool> const& program::obsess_over_hosts() const throw() {
-  return (_obsess_over_hosts);
+  return _obsess_over_hosts;
 }
 
 /**
@@ -330,7 +330,7 @@ opt<bool> const& program::obsess_over_hosts() const throw() {
  *  @return The obsess_over_services.
  */
 opt<bool> const& program::obsess_over_services() const throw() {
-  return (_obsess_over_services);
+  return _obsess_over_services;
 }
 
 /**
@@ -339,7 +339,7 @@ opt<bool> const& program::obsess_over_services() const throw() {
  *  @return The passive_host_checks_enabled.
  */
 opt<bool> const& program::passive_host_checks_enabled() const throw() {
-  return (_passive_host_checks_enabled);
+  return _passive_host_checks_enabled;
 }
 
 /**
@@ -348,7 +348,7 @@ opt<bool> const& program::passive_host_checks_enabled() const throw() {
  *  @return The passive_service_checks_enabled.
  */
 opt<bool> const& program::passive_service_checks_enabled() const throw() {
-  return (_passive_service_checks_enabled);
+  return _passive_service_checks_enabled;
 }
 
 /**
@@ -357,7 +357,7 @@ opt<bool> const& program::passive_service_checks_enabled() const throw() {
  *  @return The process_performance_data.
  */
 opt<bool> const& program::process_performance_data() const throw() {
-  return (_process_performance_data);
+  return _process_performance_data;
 }
 
 /**
@@ -367,7 +367,7 @@ opt<bool> const& program::process_performance_data() const throw() {
  */
 bool program::_set_active_host_checks_enabled(bool value) {
   _active_host_checks_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -377,7 +377,7 @@ bool program::_set_active_host_checks_enabled(bool value) {
  */
 bool program::_set_active_service_checks_enabled(bool value) {
   _active_service_checks_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -387,7 +387,7 @@ bool program::_set_active_service_checks_enabled(bool value) {
  */
 bool program::_set_check_host_freshness(bool value) {
   _check_host_freshness = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -397,7 +397,7 @@ bool program::_set_check_host_freshness(bool value) {
  */
 bool program::_set_check_service_freshness(bool value) {
   _check_service_freshness = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -407,7 +407,7 @@ bool program::_set_check_service_freshness(bool value) {
  */
 bool program::_set_enable_event_handlers(bool value) {
   _enable_event_handlers = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -417,7 +417,7 @@ bool program::_set_enable_event_handlers(bool value) {
  */
 bool program::_set_enable_failure_prediction(bool value) {
   (void)value;
-  return (true);
+  return true;
 }
 
 /**
@@ -427,7 +427,7 @@ bool program::_set_enable_failure_prediction(bool value) {
  */
 bool program::_set_enable_flap_detection(bool value) {
   _enable_flap_detection = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -437,7 +437,7 @@ bool program::_set_enable_flap_detection(bool value) {
  */
 bool program::_set_enable_notifications(bool value) {
   _enable_notifications = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -447,7 +447,7 @@ bool program::_set_enable_notifications(bool value) {
  */
 bool program::_set_global_host_event_handler(std::string const& value) {
   _global_host_event_handler = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -457,7 +457,7 @@ bool program::_set_global_host_event_handler(std::string const& value) {
  */
 bool program::_set_global_service_event_handler(std::string const& value) {
   _global_service_event_handler = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -467,7 +467,7 @@ bool program::_set_global_service_event_handler(std::string const& value) {
  */
 bool program::_set_modified_host_attributes(unsigned long value) {
   _modified_host_attributes = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -477,7 +477,7 @@ bool program::_set_modified_host_attributes(unsigned long value) {
  */
 bool program::_set_modified_service_attributes(unsigned long value) {
   _modified_service_attributes = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -487,7 +487,7 @@ bool program::_set_modified_service_attributes(unsigned long value) {
  */
 bool program::_set_next_comment_id(unsigned long value) {
   _next_comment_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -497,7 +497,7 @@ bool program::_set_next_comment_id(unsigned long value) {
  */
 bool program::_set_next_downtime_id(unsigned long value) {
   _next_downtime_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -507,7 +507,7 @@ bool program::_set_next_downtime_id(unsigned long value) {
  */
 bool program::_set_next_event_id(unsigned long value) {
   _next_event_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -517,7 +517,7 @@ bool program::_set_next_event_id(unsigned long value) {
  */
 bool program::_set_next_notification_id(unsigned long value) {
   _next_notification_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -527,7 +527,7 @@ bool program::_set_next_notification_id(unsigned long value) {
  */
 bool program::_set_next_problem_id(unsigned long value) {
   _next_problem_id = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -537,7 +537,7 @@ bool program::_set_next_problem_id(unsigned long value) {
  */
 bool program::_set_obsess_over_hosts(bool value) {
   _obsess_over_hosts = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -547,7 +547,7 @@ bool program::_set_obsess_over_hosts(bool value) {
  */
 bool program::_set_obsess_over_services(bool value) {
   _obsess_over_services = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -557,7 +557,7 @@ bool program::_set_obsess_over_services(bool value) {
  */
 bool program::_set_passive_host_checks_enabled(bool value) {
   _passive_host_checks_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -567,7 +567,7 @@ bool program::_set_passive_host_checks_enabled(bool value) {
  */
 bool program::_set_passive_service_checks_enabled(bool value) {
   _passive_service_checks_enabled = value;
-  return (true);
+  return true;
 }
 
 /**
@@ -577,5 +577,5 @@ bool program::_set_passive_service_checks_enabled(bool value) {
  */
 bool program::_set_process_performance_data(bool value) {
   _process_performance_data = value;
-  return (true);
+  return true;
 }

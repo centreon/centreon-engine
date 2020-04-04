@@ -79,6 +79,7 @@ extern unsigned int currently_running_service_checks;
 extern unsigned int currently_running_host_checks;
 
 extern time_t program_start;
+extern uint16_t grpc_port;
 extern time_t event_start;
 
 extern circular_buffer external_command_buffer;

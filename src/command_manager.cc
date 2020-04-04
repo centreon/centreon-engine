@@ -17,10 +17,18 @@
  *
  */
 
-#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/command_manager.hh"
+
+#include <google/protobuf/util/time_util.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/notifier.hh"
+#include "enginerpc/engine.grpc.pb.h"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -40,9 +48,9 @@ command_manager& command_manager::instance() {
   return instance;
 }
 
-void command_manager::enqueue(std::function<int(void)>&& f) {
+void command_manager::enqueue(std::packaged_task<int(void)>&& f) {
   std::lock_guard<std::mutex> lock(_queue_m);
-  _queue.push_back(f);
+  _queue.emplace_back(std::move(f));
 }
 
 void command_manager::execute() {
@@ -54,19 +62,19 @@ void command_manager::execute() {
 
   auto it = _queue.begin();
   while (it != end) {
-    auto fn = *it;
-    fn();
+    (*it)();
     ++it;
     _queue.pop_front();
   }
 }
 
 /* submits a passive service check result for later processing */
-int command_manager::process_passive_service_check(time_t check_time,
-                                  const std::string& host_name,
-                                  const std::string& svc_description,
-                                  uint32_t return_code,
-                                  const std::string& output) {
+int command_manager::process_passive_service_check(
+    time_t check_time,
+    const std::string& host_name,
+    const std::string& svc_description,
+    uint32_t return_code,
+    const std::string& output) {
   const std::string* real_host_name = nullptr;
 
   /* skip this service check result if we aren't accepting passive service
@@ -123,19 +131,11 @@ int command_manager::process_passive_service_check(time_t check_time,
   timeval set_tv = {.tv_sec = check_time, .tv_usec = 0};
 
   check_result* result =
-      new check_result(service_check,
-                       found->second.get(),
-                       checkable::check_passive,
-                       CHECK_OPTION_NONE,
-                       false,
+      new check_result(service_check, found->second.get(),
+                       checkable::check_passive, CHECK_OPTION_NONE, false,
                        static_cast<double>(tv.tv_sec - check_time) +
                            static_cast<double>(tv.tv_usec) / 1000000.0,
-                       set_tv,
-                       set_tv,
-                       false,
-                       true,
-                       return_code,
-                       output);
+                       set_tv, set_tv, false, true, return_code, output);
 
   /* make sure the return code is within bounds */
   if (result->get_return_code() < 0 || result->get_return_code() > 3)
@@ -150,9 +150,9 @@ int command_manager::process_passive_service_check(time_t check_time,
 
 /* process passive host check result */
 int command_manager::process_passive_host_check(time_t check_time,
-                               const std::string& host_name,
-                               uint32_t return_code,
-                               const std::string& output) {
+                                                const std::string& host_name,
+                                                uint32_t return_code,
+                                                const std::string& output) {
   const std::string* real_host_name = nullptr;
 
   /* skip this host check result if we aren't accepting passive host checks */
@@ -197,19 +197,11 @@ int command_manager::process_passive_host_check(time_t check_time,
   tv_start.tv_usec = 0;
 
   check_result* result =
-      new check_result(host_check,
-                       it->second.get(),
-                       checkable::check_passive,
-                       CHECK_OPTION_NONE,
-                       false,
+      new check_result(host_check, it->second.get(), checkable::check_passive,
+                       CHECK_OPTION_NONE, false,
                        static_cast<double>(tv.tv_sec - check_time) +
                            static_cast<double>(tv.tv_usec) / 1000000.0,
-                       tv_start,
-                       tv_start,
-                       false,
-                       true,
-                       return_code,
-                       output);
+                       tv_start, tv_start, false, true, return_code, output);
 
   /* make sure the return code is within bounds */
   if (result->get_return_code() < 0 || result->get_return_code() > 3)
@@ -220,4 +212,136 @@ int command_manager::process_passive_host_check(time_t check_time,
 
   checks::checker::instance().add_check_result_to_reap(result);
   return OK;
+}
+
+int command_manager::get_stats(Stats* response) {
+  response->mutable_program_status()->set_modified_host_attributes(
+      modified_host_process_attributes);
+  response->mutable_program_status()->set_modified_service_attributes(
+      modified_service_process_attributes);
+  response->mutable_program_status()->set_pid(getpid());
+  *response->mutable_program_status()->mutable_program_start() =
+      google::protobuf::util::TimeUtil::SecondsToTimestamp(program_start);
+  *response->mutable_program_status()->mutable_last_command_check() =
+      google::protobuf::util::TimeUtil::SecondsToTimestamp(last_command_check);
+  *response->mutable_program_status()->mutable_last_log_rotation() =
+      google::protobuf::util::TimeUtil::SecondsToTimestamp(last_log_rotation);
+  response->mutable_program_status()->set_enable_notifications(
+      enable_notifications);
+  response->mutable_program_status()->set_active_service_checks_enabled(
+      execute_service_checks);
+  response->mutable_program_status()->set_passive_service_checks_enabled(
+      accept_passive_service_checks);
+  response->mutable_program_status()->set_active_host_checks_enabled(
+      execute_host_checks);
+  response->mutable_program_status()->set_passive_host_checks_enabled(
+      accept_passive_host_checks);
+  response->mutable_program_status()->set_enable_event_handlers(
+      enable_event_handlers);
+  response->mutable_program_status()->set_obsess_over_services(
+      obsess_over_services);
+  response->mutable_program_status()->set_obsess_over_hosts(obsess_over_hosts);
+  response->mutable_program_status()->set_check_service_freshness(
+      check_service_freshness);
+  response->mutable_program_status()->set_check_host_freshness(
+      check_host_freshness);
+  response->mutable_program_status()->set_enable_flap_detection(
+      enable_flap_detection);
+  response->mutable_program_status()->set_process_performance_data(
+      process_performance_data);
+  response->mutable_program_status()->set_global_host_event_handler(
+      global_host_event_handler);
+  response->mutable_program_status()->set_global_service_event_handler(
+      global_service_event_handler);
+  response->mutable_program_status()->set_next_comment_id(
+      comment::get_next_comment_id());
+  response->mutable_program_status()->set_next_event_id(next_event_id);
+  response->mutable_program_status()->set_next_problem_id(next_problem_id);
+  response->mutable_program_status()->set_next_notification_id(
+      notifier::get_next_notification_id());
+
+  uint32_t used_external_command_buffer_slots = 0;
+  uint32_t high_external_command_buffer_slots = 0;
+  // get number f items in the command buffer
+  if (config->check_external_commands()) {
+    pthread_mutex_lock(&external_command_buffer.buffer_lock);
+    used_external_command_buffer_slots = external_command_buffer.items;
+    high_external_command_buffer_slots = external_command_buffer.high;
+    pthread_mutex_unlock(&external_command_buffer.buffer_lock);
+  }
+  response->mutable_program_status()->set_total_external_command_buffer_slots(
+      config->external_command_buffer_slots());
+  response->mutable_program_status()->set_used_external_command_buffer_slots(
+      used_external_command_buffer_slots);
+  response->mutable_program_status()->set_high_external_command_buffer_slots(
+      high_external_command_buffer_slots);
+  response->mutable_program_status()->set_high_external_command_buffer_slots(
+      high_external_command_buffer_slots);
+  response->mutable_program_status()->add_active_scheduled_host_check_stats(
+      check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_active_scheduled_host_check_stats(
+      check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_active_scheduled_host_check_stats(
+      check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_active_ondemand_host_check_stats(
+      check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_active_ondemand_host_check_stats(
+      check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_active_ondemand_host_check_stats(
+      check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_passive_host_check_stats(
+      check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_passive_host_check_stats(
+      check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_passive_host_check_stats(
+      check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_active_scheduled_service_check_stats(
+      check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_active_scheduled_service_check_stats(
+      check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_active_scheduled_service_check_stats(
+      check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_active_ondemand_service_check_stats(
+      check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_active_ondemand_service_check_stats(
+      check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_active_ondemand_service_check_stats(
+      check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_passive_service_check_stats(
+      check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_passive_service_check_stats(
+      check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_passive_service_check_stats(
+      check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_cached_host_check_stats(
+      check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_cached_host_check_stats(
+      check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_cached_host_check_stats(
+      check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_cached_service_check_stats(
+      check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_cached_service_check_stats(
+      check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_cached_service_check_stats(
+      check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_external_command_stats(
+      check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_external_command_stats(
+      check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_external_command_stats(
+      check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_parallel_host_check_stats(
+      check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_parallel_host_check_stats(
+      check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_parallel_host_check_stats(
+      check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_status()->add_serial_host_check_stats(
+      check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[0]);
+  response->mutable_program_status()->add_serial_host_check_stats(
+      check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[1]);
+  response->mutable_program_status()->add_serial_host_check_stats(
+      check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[2]);
+  return 0;
 }

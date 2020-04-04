@@ -34,14 +34,45 @@ message Version {
   int32 patch = 3;
 }
 
-message StatusFile {
-  string name = 1;
-  google.protobuf.Duration age = 2;
-}
-
 message ProgramStatus {
-  google.protobuf.Duration running_time = 1;
-  uint32 pid = 2;
+  uint32 modified_host_attributes = 1;
+  uint32 modified_service_attributes = 2;
+  uint32 pid = 3;
+  google.protobuf.Timestamp program_start = 4;
+  google.protobuf.Timestamp last_command_check = 5;
+  google.protobuf.Timestamp last_log_rotation = 6;
+  bool enable_notifications = 7;
+  bool active_service_checks_enabled = 8;
+  bool passive_service_checks_enabled = 9;
+  bool active_host_checks_enabled = 10;
+  bool passive_host_checks_enabled = 11;
+  bool enable_event_handlers = 12;
+  bool obsess_over_services = 13;
+  bool obsess_over_hosts = 14;
+  bool check_service_freshness = 15;
+  bool check_host_freshness = 16;
+  bool enable_flap_detection = 17;
+  bool process_performance_data = 18;
+  string global_host_event_handler= 19;
+  string global_service_event_handler = 20;
+  uint64 next_comment_id = 21;
+  uint64 next_event_id = 22;
+  uint64 next_problem_id = 23;
+  uint64 next_notification_id = 24;
+  uint32 total_external_command_buffer_slots = 25;
+  uint32 used_external_command_buffer_slots = 26;
+  uint32 high_external_command_buffer_slots = 27;
+  repeated uint32 active_scheduled_host_check_stats = 28;
+  repeated uint32 active_ondemand_host_check_stats = 29;
+  repeated uint32 passive_host_check_stats = 30;
+  repeated uint32 active_scheduled_service_check_stats = 31;
+  repeated uint32 active_ondemand_service_check_stats = 32;
+  repeated uint32 passive_service_check_stats = 33;
+  repeated uint32 cached_host_check_stats = 34;
+  repeated uint32 cached_service_check_stats = 35;
+  repeated uint32 external_command_stats = 36;
+  repeated uint32 parallel_host_check_stats = 37;
+  repeated uint32 serial_host_check_stats = 38;
 }
 
 message ExtCmdBuffer {
@@ -51,9 +82,8 @@ message ExtCmdBuffer {
 }
 
 message Stats {
-  StatusFile status_file = 1;
-  ProgramStatus program_status = 2;
-  ExtCmdBuffer buffer = 3;
+  ProgramStatus program_status = 1;
+  ExtCmdBuffer buffer = 2;
 }
 
 message ThresholdsFile {

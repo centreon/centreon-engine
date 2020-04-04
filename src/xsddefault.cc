@@ -153,6 +153,9 @@ int xsddefault_save_status_data() {
          "\tprogram_start="
       << static_cast<long long>(program_start)
       << "\n"
+         "\tgrpc_port="
+      << grpc_port
+      << "\n"
          "\tlast_command_check="
       << static_cast<long long>(last_command_check)
       << "\n"
@@ -196,10 +199,10 @@ int xsddefault_save_status_data() {
       << config->process_performance_data()
       << "\n"
          "\tglobal_host_event_handler="
-      << config->global_host_event_handler().c_str()
+      << config->global_host_event_handler()
       << "\n"
          "\tglobal_service_event_handler="
-      << config->global_service_event_handler().c_str()
+      << config->global_service_event_handler()
       << "\n"
          "\tnext_comment_id="
       << comment::get_next_comment_id()

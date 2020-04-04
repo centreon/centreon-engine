@@ -21,8 +21,10 @@
 */
 
 #include "com/centreon/engine/checks/stats.hh"
+
 #include <cmath>
 #include <ctime>
+
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -35,12 +37,15 @@ extern "C" {
 int generate_check_stats() {
   // Do some sanity checks on the age of the stats data before we
   // start... and get the new current bucket number.
-  time_t current_time(time(NULL));
-  int minutes(0);
-  int new_current_bucket(0);
-  minutes = ((unsigned long)current_time - (unsigned long)program_start) / 60;
-  new_current_bucket = minutes % CHECK_STATS_BUCKETS;
-  for (unsigned int check_type(0); check_type < MAX_CHECK_STATS_TYPES;
+  time_t current_time = time(nullptr);
+  int32_t minutes = static_cast<int32_t>(current_time - program_start) / 60;
+  int32_t seconds = static_cast<int32_t>(current_time - program_start) % 60;
+  int32_t new_current_bucket = minutes % CHECK_STATS_BUCKETS;
+  // Determine weights to use for this/last buckets.
+  float this_bucket_weight = seconds / 60.0;
+  float last_bucket_weight = 1.0 - seconds;
+
+  for (uint32_t check_type = 0; check_type < MAX_CHECK_STATS_TYPES;
        ++check_type) {
     // Its been more than 15 minutes since
     // stats were updated, so clear the stats.
@@ -77,17 +82,12 @@ int generate_check_stats() {
     check_statistics[check_type].last_update = current_time;
   }
 
-  // Determine weights to use for this/last buckets.
-  int seconds(0);
-  seconds = ((unsigned long)current_time - (unsigned long)program_start) % 60;
-  float this_bucket_weight(seconds / 60.0);
-  float last_bucket_weight((60 - seconds) / 60.0);
 
   // Update statistics for all check types.
-  for (unsigned int check_type(0); check_type < MAX_CHECK_STATS_TYPES;
+  for (uint32_t check_type = 0; check_type < MAX_CHECK_STATS_TYPES;
        ++check_type) {
     // Clear the old statistics.
-    for (unsigned int x(0); x < 3; ++x)
+    for (uint32_t x = 0; x < 3; ++x)
       check_statistics[check_type].minute_stats[x] = 0;
 
     // Loop through each bucket.
@@ -180,9 +180,9 @@ int update_check_stats(int check_type, time_t check_time) {
 
   // Do some sanity checks on the age of the stats data before we
   // start... and get the new current bucket number.
-  unsigned long minutes =
-      ((unsigned long)check_time - (unsigned long)program_start) / 60;
-  int new_current_bucket(minutes % CHECK_STATS_BUCKETS);
+  int32_t minutes =
+      static_cast<uint32_t>(check_time - program_start) / 60;
+  int32_t new_current_bucket = minutes % CHECK_STATS_BUCKETS;
 
   // Its been more than 15 minutes since
   // stats were updated, so clear the stats.

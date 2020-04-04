@@ -238,7 +238,7 @@ class notifier : public checkable {
 
   virtual bool authorized_by_dependencies(
       dependency::types dependency_type) const = 0;
-  uint64_t get_next_notification_id() const noexcept;
+  static uint64_t get_next_notification_id() noexcept;
   virtual timeperiod* get_notification_timeperiod() const = 0;
   notification_category get_category(reason_type type) const;
   bool is_notification_viable(notification_category cat,

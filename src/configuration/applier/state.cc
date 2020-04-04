@@ -1171,7 +1171,7 @@ void applier::state::_processing(configuration::state& new_cfg,
   gettimeofday(tv + 1, nullptr);
 
   try {
-    std::lock_guard<std::mutex> locker(_apply_lock);
+    std::lock_guard<configuration::applier::state> locker(*this);
 
     // Apply logging configurations.
     applier::logging::instance().apply(new_cfg);

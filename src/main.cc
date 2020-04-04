@@ -56,7 +56,7 @@
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/logging/engine.hh"
-#include "enginerpc.hh"
+#include "enginerpc/enginerpc.hh"
 
 using namespace com::centreon::engine;
 
@@ -324,20 +324,20 @@ int main(int argc, char* argv[]) {
           p.parse(config_file, config);
         }
 
-        uint16_t port = config.rpc_port();
+        grpc_port = config.rpc_port();
 
-        if (!port) {
-          std::random_device rd;  // Will be used to obtain a seed for the
-                                  // random number engine
+        if (!grpc_port) {
+          std::random_device
+              rd;  // Will be used to obtain a seed for the random number engine
           std::mt19937 gen(
               rd());  // Standard mersenne_twister_engine seeded with rd()
           std::uniform_int_distribution<uint16_t> dis(50000, 50999);
 
-          port = dis(gen);
+          grpc_port = dis(gen);
         }
 
-        std::unique_ptr<enginerpc, std::function<void(enginerpc*)> > rpc(
-            new enginerpc("0.0.0.0", port), [](enginerpc* rpc) {
+        std::unique_ptr<enginerpc, std::function<void(enginerpc*)>> rpc(
+            new enginerpc("0.0.0.0", grpc_port), [](enginerpc* rpc) {
               rpc->shutdown();
               delete rpc;
             });

@@ -493,10 +493,10 @@ std::ostream& dump::program(std::ostream& os) {
      << config->enable_notifications()
      << "\n"
         "global_host_event_handler="
-     << config->global_host_event_handler().c_str()
+     << config->global_host_event_handler()
      << "\n"
         "global_service_event_handler="
-     << config->global_service_event_handler().c_str()
+     << config->global_service_event_handler()
      << "\n"
         "modified_host_attributes="
      << (modified_host_process_attributes &

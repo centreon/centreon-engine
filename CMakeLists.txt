@@ -40,7 +40,7 @@ set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 include_directories("${INC_DIR}")
 include_directories("${INC_DIR}/compatibility")
-
+include_directories(${PROJECT_SOURCE_DIR})
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 set(protobuf_MODULE_COMPATIBLE True)
@@ -533,7 +533,6 @@ set(
   "${SRC_DIR}/serviceescalation.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/shared.cc"
-  "${SRC_DIR}/statistics.cc"
   "${SRC_DIR}/statusdata.cc"
   "${SRC_DIR}/string.cc"
   "${SRC_DIR}/timeperiod.cc"
@@ -585,7 +584,6 @@ set(
   "${INC_DIR}/com/centreon/engine/serviceescalation.hh"
   "${INC_DIR}/com/centreon/engine/servicegroup.hh"
   "${INC_DIR}/com/centreon/engine/shared.hh"
-  "${INC_DIR}/com/centreon/engine/statistics.hh"
   "${INC_DIR}/com/centreon/engine/statusdata.hh"
   "${INC_DIR}/com/centreon/engine/string.hh"
   "${INC_DIR}/com/centreon/engine/timeperiod.hh"
@@ -613,7 +611,7 @@ add_subdirectory(src/macros)
 add_subdirectory(modules)
 add_subdirectory(src/retention)
 add_subdirectory(enginerpc)
-include_directories(enginerpc)
+add_subdirectory(centenginestats2)
 
 # Library engine target.
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})

@@ -5,8 +5,8 @@ use strict;
 use warnings;
 
 my $root_dir = cwd;
-$root_dir =~ s|(.*centreon-engine/).*$|$1|;
-open F, "<$root_dir/inc/com/centreon/engine/nebstructs.hh" or die;
+$root_dir =~ s|(.*centreon-engine[^/]*/).*$|$1|;
+open F, "<$root_dir/inc/com/centreon/engine/nebstructs.hh" or die "root_dir is $root_dir";
 
 my @cb;
 my @reg;

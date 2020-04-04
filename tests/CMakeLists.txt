@@ -51,6 +51,7 @@ if (WITH_TESTING)
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/internal.cc"
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/processing.cc"
     "${TESTS_DIR}/parse-check-output.cc"
+    "${TESTS_DIR}/centenginestats2/centenginestats2.cc"
     "${TESTS_DIR}/checks/service_check.cc"
     "${TESTS_DIR}/checks/service_retention.cc"
     "${TESTS_DIR}/checks/anomalydetection.cc"

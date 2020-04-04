@@ -1,4 +1,4 @@
-#!/usr/bin/python3.7
+#!/usr/bin/python3
 """
 ** Copyright 2020 Centreon
 **
@@ -18,13 +18,16 @@
 ** <http://www.gnu.org/licenses/>.
 """
 
+import sys
 import fileinput
 import datetime
 import grpc
 import enginerpc.engine_pb2
 import enginerpc.engine_pb2_grpc
 
-channel = grpc.insecure_channel("127.0.0.1:50126")
+port = sys.argv[1]
+
+channel = grpc.insecure_channel("127.0.0.1:" + port)
 stub = enginerpc.engine_pb2_grpc.EngineStub(channel)
 stats = stub.GetStats(enginerpc.engine_pb2.Stats())
 print(stats)
