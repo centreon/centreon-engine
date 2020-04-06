@@ -282,12 +282,11 @@ int grab_custom_macro_value_r(
 }
 
 /* calculates a date/time macro */
-int grab_datetime_macro_r(
-      nagios_macros* mac,
-      int macro_type,
-      std::string const& arg1,
-      std::string const& arg2,
-      std::string & output) {
+int grab_datetime_macro_r(nagios_macros* mac,
+                          int macro_type,
+                          std::string const& arg1,
+                          std::string const& arg2,
+                          std::string& output) {
   time_t current_time = 0L;
   timeperiod* temp_timeperiod = nullptr;
   time_t test_time = 0L;
@@ -302,87 +301,78 @@ int grab_datetime_macro_r(
 
   /* parse args, do prep work */
   switch (macro_type) {
-  case MACRO_ISVALIDTIME:
-  case MACRO_NEXTVALIDTIME:
-    /* find the timeperiod */
-    temp_timeperiod = nullptr;
-    it = timeperiod::timeperiods.find(arg1);
+    case MACRO_ISVALIDTIME:
+    case MACRO_NEXTVALIDTIME:
+      /* find the timeperiod */
+      temp_timeperiod = nullptr;
+      it = timeperiod::timeperiods.find(arg1);
 
-    if (it != timeperiod::timeperiods.end())
-      temp_timeperiod = it->second.get();
+      if (it != timeperiod::timeperiods.end())
+        temp_timeperiod = it->second.get();
 
-    if (temp_timeperiod == nullptr)
-      return ERROR;
+      if (temp_timeperiod == nullptr)
+        return ERROR;
 
-    /* what timestamp should we use? */
-    if (!arg2.empty())
-      test_time = (time_t)strtoul(arg2.c_str(), nullptr, 0);
-    else
-      test_time = current_time;
-    break;
+      /* what timestamp should we use? */
+      if (!arg2.empty())
+        test_time = (time_t)strtoul(arg2.c_str(), nullptr, 0);
+      else
+        test_time = current_time;
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   /* calculate the value */
   switch (macro_type) {
-  case MACRO_LONGDATETIME:
-    get_datetime_string(
-      &current_time,
-      tmp_date,
-      MAX_DATETIME_LENGTH,
-      LONG_DATE_TIME);
-    output = tmp_date;
-    break;
-
-  case MACRO_SHORTDATETIME:
-    get_datetime_string(
-      &current_time,
-      tmp_date,
-      MAX_DATETIME_LENGTH,
-      SHORT_DATE_TIME);
+    case MACRO_LONGDATETIME:
+      get_datetime_string(
+          &current_time, tmp_date, MAX_DATETIME_LENGTH, LONG_DATE_TIME);
       output = tmp_date;
-    break;
+      break;
 
-  case MACRO_DATE:
-    get_datetime_string(
-      &current_time,
-      tmp_date,
-      MAX_DATETIME_LENGTH,
-      SHORT_DATE);
+    case MACRO_SHORTDATETIME:
+      get_datetime_string(
+          &current_time, tmp_date, MAX_DATETIME_LENGTH, SHORT_DATE_TIME);
       output = tmp_date;
-    break;
+      break;
 
-  case MACRO_TIME:
-    get_datetime_string(
-      &current_time,
-      tmp_date,
-      MAX_DATETIME_LENGTH,
-      SHORT_TIME);
+    case MACRO_DATE:
+      get_datetime_string(
+          &current_time, tmp_date, MAX_DATETIME_LENGTH, SHORT_DATE);
       output = tmp_date;
-    break;
+      break;
 
-  case MACRO_TIMET:
-    output = current_time;
-    break;
+    case MACRO_TIME:
+      get_datetime_string(
+          &current_time, tmp_date, MAX_DATETIME_LENGTH, SHORT_TIME);
+      output = tmp_date;
+      break;
 
-  case MACRO_ISVALIDTIME:
-      output = !check_time_against_period(test_time, temp_timeperiod);
-    break;
+    case MACRO_TIMET:
+      get_datetime_string(
+          &current_time, tmp_date, MAX_DATETIME_LENGTH, SHORT_TIME);
+      output = tmp_date;
+      break;
 
-  case MACRO_NEXTVALIDTIME:
-    get_next_valid_time(test_time, &next_valid_time, temp_timeperiod);
-    if (next_valid_time == test_time
-        && !check_time_against_period(
-             test_time,
-             temp_timeperiod))
-      next_valid_time = (time_t)0L;
-    output = next_valid_time;
-    break;
+    case MACRO_ISVALIDTIME:
+      output = std::to_string(
+          !check_time_against_period(test_time, temp_timeperiod));
+      break;
 
-  default:
-    return ERROR;
+    case MACRO_NEXTVALIDTIME:
+      get_next_valid_time(test_time, &next_valid_time, temp_timeperiod);
+      if (next_valid_time == test_time &&
+          !check_time_against_period(test_time, temp_timeperiod))
+        next_valid_time = (time_t)0L;
+      get_datetime_string(
+          &next_valid_time, tmp_date, MAX_DATETIME_LENGTH, SHORT_TIME);
+      output = tmp_date;
+      break;
+
+    default:
+      return ERROR;
   }
   return OK;
 }
