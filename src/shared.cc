@@ -122,7 +122,6 @@ void strip(char* buffer) {
       buffer[z - x] = buffer[z];
     buffer[len - x] = '\x0';
   }
-  return;
 }
 
 /**************************************************
@@ -241,7 +240,6 @@ void get_datetime_string(time_t const* raw_time,
     snprintf(buffer, buffer_length, "%02d:%02d:%02d", hour, minute, second);
 
   buffer[buffer_length - 1] = '\x0';
-  return;
 }
 
 /* get days, hours, minutes, and seconds from a raw time_t format or total
