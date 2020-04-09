@@ -18,6 +18,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include <sstream>
 
 #define executable "centenginestats2/centenginestats2"
@@ -40,7 +41,7 @@ static std::string execute(const std::string& command) {
 TEST(stats2, Help) {
   ASSERT_EQ(execute(executable " -h"),
             "Usage: centenginestats2/centenginestats2 [options]Startup:  -V, "
-            "--version        display program version information and exit.  "
+            "--version        display centreon-engine version and exit.  "
             "-L, --license        display license information and exit.  -h, "
             "--help           display usage information and exit.Input "
             "options:  -c, --config=FILE    specifies location of main "

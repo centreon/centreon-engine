@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/checkable.hh"
+
 #include <sstream>
+
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
@@ -325,7 +327,7 @@ void checkable::add_current_attempt(int num) {
   _current_attempt += num;
 }
 
-bool checkable::get_has_been_checked() const {
+bool checkable::has_been_checked() const {
   return _has_been_checked;
 }
 

@@ -23,6 +23,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <limits>
+
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/globals.hh"
@@ -343,5 +345,223 @@ int command_manager::get_stats(Stats* response) {
       check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[1]);
   response->mutable_program_status()->add_serial_host_check_stats(
       check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[2]);
+  response->mutable_program_configuration()->set_hosts_count(
+      host::hosts.size());
+  get_services_stats(response->mutable_services_stats());
+  return 0;
+}
+
+int command_manager::get_services_stats(ServicesStats* sstats) {
+  time_t now;
+  time(&now);
+  uint32_t checked_services = 0;
+  uint32_t scheduled_services = 0;
+  uint32_t actively_checked = 0;
+  uint32_t passively_checked = 0;
+
+  double global_min_state_change = std::numeric_limits<double>::max(),
+         global_max_state_change = std::numeric_limits<double>::min(),
+         global_avg_state_change = 0;
+
+  double active_min_state_change = std::numeric_limits<double>::max(),
+         active_max_state_change = std::numeric_limits<double>::min(),
+         active_avg_state_change = 0;
+
+  double passive_min_state_change = std::numeric_limits<double>::max(),
+         passive_max_state_change = std::numeric_limits<double>::min(),
+         passive_avg_state_change = 0;
+
+  double active_min_latency = std::numeric_limits<double>::max(),
+         active_max_latency = std::numeric_limits<double>::min(),
+         active_avg_latency = 0;
+
+  double passive_min_latency = std::numeric_limits<double>::max(),
+         passive_max_latency = std::numeric_limits<double>::min(),
+         passive_avg_latency = 0;
+
+  double active_min_execution_time = std::numeric_limits<double>::max(),
+         active_max_execution_time = std::numeric_limits<double>::min(),
+         active_avg_execution_time = 0;
+
+  uint32_t active_checks_last_1min = 0, active_checks_last_5min = 0,
+           active_checks_last_15min = 0, active_checks_last_1hour = 0;
+
+  uint32_t passive_checks_last_1min = 0, passive_checks_last_5min = 0,
+           passive_checks_last_15min = 0, passive_checks_last_1hour = 0;
+
+  uint32_t ok = 0, warning = 0, critical = 0, unknown = 0;
+
+  uint32_t downtime = 0, flapping = 0;
+
+  auto min_max_sum = [](double v, double& min, double& max, double& sum) {
+    sum += v;
+    if (v < min)
+      min = v;
+    if (v > max)
+      max = v;
+  };
+
+  for (auto it = service::services_by_id.begin(),
+            end = service::services_by_id.end();
+       it != end; ++it) {
+    service* svc = it->second.get();
+
+    /******************************** GLOBAL **********************************/
+    min_max_sum(svc->get_percent_state_change(), global_min_state_change,
+                global_max_state_change, global_avg_state_change);
+
+    if (svc->has_been_checked())
+      ++checked_services;
+    if (svc->get_should_be_scheduled())
+      ++scheduled_services;
+
+    switch (svc->get_current_state()) {
+      case service::state_ok:
+        ++ok;
+        break;
+      case service::state_warning:
+        ++warning;
+        break;
+      case service::state_critical:
+        ++critical;
+        break;
+      case service::state_unknown:
+        ++unknown;
+        break;
+    }
+
+    if (svc->is_in_downtime())
+      ++downtime;
+    if (svc->get_is_flapping())
+      ++flapping;
+
+    if (svc->get_check_type() == checkable::check_active) {
+      /****************************** ACTIVE **********************************/
+      ++actively_checked;
+      min_max_sum(svc->get_latency(), active_min_latency, active_max_latency,
+                  active_avg_latency);
+
+      min_max_sum(svc->get_execution_time(), active_min_execution_time,
+                  active_max_execution_time, active_avg_execution_time);
+
+      min_max_sum(svc->get_percent_state_change(), active_min_state_change,
+                  active_max_state_change, active_avg_state_change);
+
+      uint32_t time_diff = now - svc->get_last_check();
+      if (time_diff <= 60)
+        ++active_checks_last_1min;
+      if (time_diff <= 300)
+        ++active_checks_last_5min;
+      if (time_diff <= 900)
+        ++active_checks_last_15min;
+      if (time_diff <= 900)
+        ++active_checks_last_1hour;
+
+    } else {
+      /****************************** PASSIVE *********************************/
+      ++passively_checked;
+      min_max_sum(svc->get_latency(), passive_min_latency, passive_max_latency,
+                  passive_avg_latency);
+
+      min_max_sum(svc->get_percent_state_change(), passive_min_state_change,
+                  passive_max_state_change, passive_avg_state_change);
+
+      uint32_t time_diff = now - svc->get_last_check();
+      if (time_diff <= 60)
+        ++passive_checks_last_1min;
+      if (time_diff <= 300)
+        ++passive_checks_last_5min;
+      if (time_diff <= 900)
+        ++passive_checks_last_15min;
+      if (time_diff <= 900)
+        ++passive_checks_last_1hour;
+    }
+  }
+
+  /********************************* SUMMARY **********************************/
+  size_t size = service::services.size();
+  if (size)
+    global_avg_state_change /= size;
+
+  if (actively_checked) {
+    active_avg_state_change /= actively_checked;
+    active_avg_latency /= actively_checked;
+    active_avg_execution_time /= actively_checked;
+  } else {
+    active_min_state_change = active_max_state_change = 0;
+    active_min_latency = active_max_latency = 0;
+  }
+
+  if (passively_checked) {
+    passive_avg_state_change /= passively_checked;
+    passive_avg_latency /= passively_checked;
+  } else {
+    passive_min_state_change = passive_max_state_change = 0;
+    passive_min_latency = passive_max_latency = 0;
+  }
+
+  sstats->set_services_count(size);
+  sstats->set_checked_services(checked_services);
+  sstats->set_scheduled_services(scheduled_services);
+  sstats->set_actively_checked(actively_checked);
+
+  sstats->set_min_state_change(global_min_state_change);
+  sstats->set_max_state_change(global_max_state_change);
+  sstats->set_average_state_change(global_avg_state_change);
+
+  sstats->mutable_active_services()->set_min_latency(active_min_latency);
+  sstats->mutable_active_services()->set_max_latency(active_max_latency);
+  sstats->mutable_active_services()->set_average_latency(active_avg_latency);
+
+  sstats->mutable_active_services()->set_min_execution_time(
+      active_min_execution_time);
+  sstats->mutable_active_services()->set_max_execution_time(
+      active_max_execution_time);
+  sstats->mutable_active_services()->set_average_execution_time(
+      active_avg_execution_time);
+
+  sstats->mutable_active_services()->set_min_state_change(
+      active_min_state_change);
+  sstats->mutable_active_services()->set_max_state_change(
+      active_max_state_change);
+  sstats->mutable_active_services()->set_average_state_change(
+      active_avg_state_change);
+
+  sstats->mutable_active_services()->set_checks_last_1min(
+      active_checks_last_1min);
+  sstats->mutable_active_services()->set_checks_last_5min(
+      active_checks_last_5min);
+  sstats->mutable_active_services()->set_checks_last_15min(
+      active_checks_last_15min);
+  sstats->mutable_active_services()->set_checks_last_1hour(
+      active_checks_last_1hour);
+
+  sstats->mutable_passive_services()->set_min_latency(passive_min_latency);
+  sstats->mutable_passive_services()->set_max_latency(passive_max_latency);
+  sstats->mutable_passive_services()->set_average_latency(passive_avg_latency);
+
+  sstats->mutable_passive_services()->set_min_state_change(
+      passive_min_state_change);
+  sstats->mutable_passive_services()->set_max_state_change(
+      passive_max_state_change);
+  sstats->mutable_passive_services()->set_average_state_change(
+      passive_avg_state_change);
+
+  sstats->mutable_passive_services()->set_checks_last_1min(
+      passive_checks_last_1min);
+  sstats->mutable_passive_services()->set_checks_last_5min(
+      passive_checks_last_5min);
+  sstats->mutable_passive_services()->set_checks_last_15min(
+      passive_checks_last_15min);
+  sstats->mutable_passive_services()->set_checks_last_1hour(
+      passive_checks_last_1hour);
+
+  sstats->set_ok(ok);
+  sstats->set_warning(warning);
+  sstats->set_critical(critical);
+  sstats->set_unknown(unknown);
+
+  sstats->set_flapping(flapping);
+  sstats->set_downtime(downtime);
   return 0;
 }

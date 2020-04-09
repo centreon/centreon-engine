@@ -906,7 +906,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
      << string::ctime(obj.get_last_time_unreachable())
      << "\n"
         "  has_been_checked:                     "
-     << obj.get_has_been_checked()
+     << obj.has_been_checked()
      << "\n"
         "  is_being_freshened:                   "
      << obj.get_is_being_freshened()
@@ -2665,7 +2665,7 @@ bool host::is_result_fresh(time_t current_time, int log_this) {
   /* CHANGED 11/10/05 EG - program start is only used in expiration time
    * calculation if > last check AND active checks are enabled, so active checks
    * can become stale immediately upon program startup */
-  if (!get_has_been_checked())
+  if (!has_been_checked())
     expiration_time = (time_t)(event_start + freshness_threshold);
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use
    * program start time over last check if no specific threshold has been set by
@@ -2681,7 +2681,7 @@ bool host::is_result_fresh(time_t current_time, int log_this) {
   else
     expiration_time = (time_t)(get_last_check() + freshness_threshold);
 
-  logger(dbg_checks, most) << "HBC: " << get_has_been_checked()
+  logger(dbg_checks, most) << "HBC: " << has_been_checked()
                            << ", PS: " << program_start
                            << ", ES: " << event_start
                            << ", LC: " << get_last_check()
@@ -3432,8 +3432,7 @@ bool host::authorized_by_dependencies(dependency::types dependency_type) const {
     if (dep->get_fail_on(state))
       return false;
 
-    if (state == host::state_up &&
-        !dep->master_host_ptr->get_has_been_checked() &&
+    if (state == host::state_up && !dep->master_host_ptr->has_been_checked() &&
         dep->get_fail_on_pending())
       return false;
 

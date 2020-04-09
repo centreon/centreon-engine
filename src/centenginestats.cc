@@ -26,7 +26,9 @@
 #include <getopt.h>
 #endif  // HAVE_GETOPT_H
 #include <unistd.h>
+
 #include <iostream>
+
 #include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/notifier.hh"
@@ -585,11 +587,11 @@ int read_status_file() {
   int check_type = checkable::check_active;
   int current_state = service::state_ok;
   double state_change = 0.0;
-  int is_flapping = false;
+  bool is_flapping = false;
   int downtime_depth = 0;
   time_t last_check = 0L;
-  int should_be_scheduled = true;
-  int has_been_checked = true;
+  bool should_be_scheduled;
+  bool has_been_checked = true;
 
   time(&current_time);
 
@@ -775,22 +777,22 @@ int read_status_file() {
             default:
               break;
           }
-          if (is_flapping == true)
+          if (is_flapping)
             hosts_flapping++;
           if (downtime_depth > 0)
             hosts_in_downtime++;
-          if (has_been_checked == true)
+          if (has_been_checked)
             hosts_checked++;
-          if (should_be_scheduled == true)
+          if (should_be_scheduled)
             hosts_scheduled++;
           break;
 
         case STATUS_SERVICE_DATA:
           average_service_state_change =
-              (((average_service_state_change *
-                 ((double)status_service_entries - 1.0)) +
-                state_change) /
-               (double)status_service_entries);
+              ((average_service_state_change *
+                ((double)status_service_entries - 1.0)) +
+               state_change) /
+              (double)status_service_entries;
           if (have_min_service_state_change == false ||
               min_service_state_change > state_change) {
             have_min_service_state_change = true;
@@ -919,13 +921,13 @@ int read_status_file() {
             default:
               break;
           }
-          if (is_flapping == true)
+          if (is_flapping)
             services_flapping++;
           if (downtime_depth > 0)
             services_in_downtime++;
-          if (has_been_checked == true)
+          if (has_been_checked)
             services_checked++;
-          if (should_be_scheduled == true)
+          if (should_be_scheduled)
             services_scheduled++;
           break;
 
@@ -1071,9 +1073,9 @@ int read_status_file() {
           else if (!strcmp(var, "last_check"))
             last_check = strtoul(val, NULL, 10);
           else if (!strcmp(var, "has_been_checked"))
-            has_been_checked = (atoi(val) > 0) ? true : false;
+            has_been_checked = (atoi(val) > 0);
           else if (!strcmp(var, "should_be_scheduled"))
-            should_be_scheduled = (atoi(val) > 0) ? true : false;
+            should_be_scheduled = (atoi(val) > 0);
           break;
 
         case STATUS_SERVICE_DATA:
@@ -1094,9 +1096,9 @@ int read_status_file() {
           else if (!strcmp(var, "last_check"))
             last_check = strtoul(val, NULL, 10);
           else if (!strcmp(var, "has_been_checked"))
-            has_been_checked = (atoi(val) > 0) ? true : false;
+            has_been_checked = (atoi(val) > 0);
           else if (!strcmp(var, "should_be_scheduled"))
-            should_be_scheduled = (atoi(val) > 0) ? true : false;
+            should_be_scheduled = (atoi(val) > 0);
           break;
 
         default:
@@ -1478,16 +1480,14 @@ void get_time_breakdown(unsigned long raw_time,
   temp_time = raw_time;
 
   temp_days = temp_time / 86400;
-  temp_time -= (temp_days * 86400);
+  temp_time %= 86400;
   temp_hours = temp_time / 3600;
-  temp_time -= (temp_hours * 3600);
+  temp_time %= 3600;
   temp_minutes = temp_time / 60;
-  temp_time -= (temp_minutes * 60);
-  temp_seconds = (int)temp_time;
+  temp_time %= temp_time % 60;
 
   *days = temp_days;
   *hours = temp_hours;
   *minutes = temp_minutes;
-  *seconds = temp_seconds;
-  return;
+  *seconds = temp_time;
 }

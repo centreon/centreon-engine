@@ -29,24 +29,23 @@
 using namespace com::centreon::engine;
 
 static void display_help(const char* program_name) {
-  std::cout << "Usage: " << program_name
-            << " [options]\n\n"
-               "Startup:\n"
-               "  -V, --version        display program version information and "
-               "exit.\n"
-               "  -L, --license        display license information and exit.\n"
-               "  -V, --version        display centreon-engine version.\n"
-               "  -h, --help           display usage information and exit.\n"
-               "\n"
-               "Input options:\n"
-               "  -c, --config=FILE    specifies location of main Centreon "
-               "Engine config file.\n"
-               "  -s, --statsfile=FILE specifies alternate location of file to "
-               "read Centreon\n"
-               "  -p, --port=NUMBER    specifies the port number of the engine "
-               "grpc server to connect to.\n"
-               "                       Engine performance data from.\n"
-            << std::endl;
+  std::cout
+      << "Usage: " << program_name
+      << " [options]\n\n"
+         "Startup:\n"
+         "  -V, --version        display centreon-engine version and exit.\n"
+         "  -L, --license        display license information and exit.\n"
+         "  -h, --help           display usage information and exit.\n"
+         "\n"
+         "Input options:\n"
+         "  -c, --config=FILE    specifies location of main Centreon "
+         "Engine config file.\n"
+         "  -s, --statsfile=FILE specifies alternate location of file to "
+         "read Centreon\n"
+         "  -p, --port=NUMBER    specifies the port number of the engine "
+         "grpc server to connect to.\n"
+         "                       Engine performance data from.\n"
+      << std::endl;
 }
 
 static void display_license() {
@@ -82,7 +81,7 @@ int main(int argc, char** argv) {
 
   bool error = false;
   bool get_version = false;
-  uint16_t grpc_port;
+  uint16_t grpc_port = 0;
   while (!error) {
     int c = getopt_long(argc, argv, "+hLc:s:p:V", long_options, nullptr);
     if (c == -1)
@@ -134,6 +133,8 @@ int main(int argc, char** argv) {
       std::cerr << e.what() << std::endl;
       return 3;
     }
+  } else {
+    client.get_stats();
   }
   return 0;
   //  if (strcmp(argv[1], "GetVersion") == 0) {
@@ -167,4 +168,3 @@ int main(int argc, char** argv) {
   //  }
   //  exit(status);
 }
-

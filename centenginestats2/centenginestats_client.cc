@@ -19,6 +19,7 @@
 
 #include "centenginestats_client.hh"
 
+#include <google/protobuf/util/time_util.h>
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
@@ -26,6 +27,7 @@
 #include <stdint.h>
 
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -34,6 +36,25 @@
 #include "enginerpc/engine.grpc.pb.h"
 
 using namespace com::centreon::engine;
+using namespace google::protobuf::util;
+
+static std::string duration_to_str(uint32_t diff) {
+  std::ostringstream oss;
+  uint32_t d = 0, h, m;
+  if (diff > 86400) {
+    d = diff / 86400;
+    diff %= 86400;
+    oss << d << "d ";
+  }
+  h = diff / 3600;
+  diff %= 3600;
+  oss << h << "h ";
+
+  m = diff / 60;
+  diff %= 60;
+  oss << m << "m " << diff << "s";
+  return oss.str();
+}
 
 centenginestats_client::centenginestats_client(uint16_t grpc_port,
                                                std::string const& config_file,
@@ -42,6 +63,10 @@ centenginestats_client::centenginestats_client(uint16_t grpc_port,
       _stats_file(stats_file),
       _status_creation_date(0),
       _grpc_port(grpc_port) {
+  // If no grpc port is given, we can get it from here.
+  if (!_stats_file.empty())
+    read_stats_file();
+
   if (!_grpc_port)
     std::cerr << "The GRPC port is not configured. Unable to get informations "
                  "from centreon-engine"
@@ -77,12 +102,13 @@ int centenginestats_client::read_stats_file() {
     count = 1;
   if (ifs) {
     while (count > 0 && std::getline(ifs, line)) {
-      if (strncmp(line.c_str(), "created", 7) == 0) {
-        _status_creation_date = strtoul(line.c_str() + 8, nullptr, 10);
+      size_t pos;
+      if ((pos = line.find("created=")) != std::string::npos) {
+        _status_creation_date = strtoul(line.c_str() + pos + 8, nullptr, 10);
         count--;
       } else if (_grpc_port == 0 &&
-                 strncmp(line.c_str(), "grpc_port", 9) == 0) {
-        _grpc_port = strtoul(line.c_str() + 10, nullptr, 10);
+                 (pos = line.find("grpc_port=")) != std::string::npos) {
+        _grpc_port = strtoul(line.c_str() + pos + 10, nullptr, 10);
         count--;
       }
     }
@@ -106,6 +132,100 @@ std::string centenginestats_client::get_version() {
     oss << version.major() << "." << version.minor() << "." << version.patch();
     return oss.str();
   }
+}
+
+void centenginestats_client::get_stats() {
+  time_t current_time;
+  time(&current_time);
+  uint32_t time_difference = current_time - _status_creation_date;
+  grpc::ClientContext context;
+  Stats stats;
+  const ::google::protobuf::Empty e;
+  grpc::Status status = _stub->GetStats(&context, e, &stats);
+  if (!status.ok())
+    throw std::invalid_argument(
+        "Failed to get the centengine statistics. It is probably not running.");
+
+  uint32_t program_start =
+      TimeUtil::TimestampToSeconds(stats.program_status().program_start());
+  uint32_t program_age = current_time - program_start;
+
+  std::cout
+      << "CURRENT STATUS DATA\n"
+         "---------------------------------------------------------------"
+         "-----------------\n"
+         "Status File:                            "
+      << _stats_file
+      << "\n"
+         "Status File Age:                        "
+      << duration_to_str(time_difference)
+      << "\n\n"
+         "Program Running Time:                   "
+      << duration_to_str(program_age)
+      << "\n"
+         "Centreon Engine PID:                    "
+      << stats.program_status().pid()
+      << "\n"
+         "Used/High/Total command Buffers:        "
+      << stats.program_status().used_external_command_buffer_slots() << " / "
+      << stats.program_status().high_external_command_buffer_slots() << " / "
+      << stats.program_status().total_external_command_buffer_slots()
+      << "\n\n"
+         "Total Services:                         "
+      << stats.services_stats().services_count()
+      << "\nServices Checked:                       "
+      << stats.services_stats().checked_services()
+      << "\nServices Scheduled:                     "
+      << stats.services_stats().scheduled_services()
+      << "\nServices Actively Checked:              "
+      << stats.services_stats().actively_checked()
+      << "\nServices Passively Checked:             "
+      << stats.services_stats().passively_checked()
+      << "\nTotal Service State Change:             " << std::fixed
+      << std::setprecision(3) << stats.services_stats().min_state_change()
+      << " / " << stats.services_stats().max_state_change() << " / "
+      << stats.services_stats().average_state_change() << " %"
+      << "\nActive Service Latency:                 "
+      << stats.services_stats().active_services().min_latency() << " / "
+      << stats.services_stats().active_services().max_latency() << " / "
+      << stats.services_stats().active_services().average_latency() << " sec\n"
+      << "\nActive Service Execution Time:          "
+      << stats.services_stats().active_services().min_execution_time() << " / "
+      << stats.services_stats().active_services().max_execution_time() << " / "
+      << stats.services_stats().active_services().average_execution_time()
+      << " sec"
+      << "\nActive Service State Change:            "
+      << stats.services_stats().active_services().min_state_change() << " / "
+      << stats.services_stats().active_services().max_state_change() << " / "
+      << stats.services_stats().active_services().average_state_change() << " %"
+      << "\nActive Services Last 1/5/15/60 min:     "
+      << stats.services_stats().active_services().checks_last_1min() << " / "
+      << stats.services_stats().active_services().checks_last_5min() << " / "
+      << stats.services_stats().active_services().checks_last_15min() << " / "
+      << stats.services_stats().active_services().checks_last_1hour()
+      << "\nPassive Service Latency:                 "
+      << stats.services_stats().passive_services().min_latency() << " / "
+      << stats.services_stats().passive_services().max_latency() << " / "
+      << stats.services_stats().passive_services().average_latency() << " sec\n"
+      << "\nPassive Service State Change:            "
+      << stats.services_stats().passive_services().min_state_change() << " / "
+      << stats.services_stats().passive_services().max_state_change() << " / "
+      << stats.services_stats().passive_services().average_state_change()
+      << " %"
+      << "\nPassive Services Last 1/5/15/60 min:     "
+      << stats.services_stats().passive_services().checks_last_1min() << " / "
+      << stats.services_stats().passive_services().checks_last_5min() << " / "
+      << stats.services_stats().passive_services().checks_last_15min() << " / "
+      << stats.services_stats().passive_services().checks_last_1hour()
+      << "\nServices OK/Warn/Unk/Crit:               "
+      << stats.services_stats().ok() << " / "
+      << stats.services_stats().warning() << " / "
+      << stats.services_stats().unknown() << " / "
+      << stats.services_stats().critical()
+      << "\nServices Flapping:                       "
+      << stats.services_stats().flapping()
+      << "\nServices In Downtime:                    "
+      << stats.services_stats().downtime() << std::endl;
 }
 
 bool centenginestats_client::GetStats(Stats* stats) {

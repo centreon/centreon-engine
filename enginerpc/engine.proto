@@ -34,6 +34,45 @@ message Version {
   int32 patch = 3;
 }
 
+message ServiceTypeStats {
+  double min_latency = 9;
+  double max_latency = 10;
+  double average_latency = 11;
+  double min_execution_time = 12;
+  double max_execution_time = 13;
+  double average_execution_time = 14;
+  double min_state_change = 15;
+  double max_state_change = 16;
+  double average_state_change = 17;
+  uint32 checks_last_1min = 18;
+  uint32 checks_last_5min = 19;
+  uint32 checks_last_15min = 20;
+  uint32 checks_last_1hour = 21;
+}
+
+message ServicesStats {
+  uint32 services_count = 1;
+  uint32 checked_services = 2;
+  uint32 scheduled_services = 3;
+  uint32 actively_checked = 4;
+  uint32 passively_checked = 5;
+  double min_state_change = 6;
+  double max_state_change = 7;
+  double average_state_change = 8;
+  ServiceTypeStats active_services = 9;
+  ServiceTypeStats passive_services = 10;
+  uint32 ok = 11;
+  uint32 warning = 12;
+  uint32 critical = 13;
+  uint32 unknown = 14;
+  uint32 flapping = 15;
+  uint32 downtime = 16;
+}
+
+message ProgramConfiguration {
+  uint32 hosts_count = 1;
+}
+
 message ProgramStatus {
   uint32 modified_host_attributes = 1;
   uint32 modified_service_attributes = 2;
@@ -53,7 +92,7 @@ message ProgramStatus {
   bool check_host_freshness = 16;
   bool enable_flap_detection = 17;
   bool process_performance_data = 18;
-  string global_host_event_handler= 19;
+  string global_host_event_handler = 19;
   string global_service_event_handler = 20;
   uint64 next_comment_id = 21;
   uint64 next_event_id = 22;
@@ -76,14 +115,16 @@ message ProgramStatus {
 }
 
 message ExtCmdBuffer {
- uint32 used = 1;
- uint32 high = 2;
- uint32 total = 3;
+  uint32 used = 1;
+  uint32 high = 2;
+  uint32 total = 3;
 }
 
 message Stats {
-  ProgramStatus program_status = 1;
-  ExtCmdBuffer buffer = 2;
+  ProgramConfiguration program_configuration = 1;
+  ProgramStatus program_status = 2;
+  ServicesStats services_stats = 3;
+  ExtCmdBuffer buffer = 4;
 }
 
 message ThresholdsFile {

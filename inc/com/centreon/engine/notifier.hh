@@ -312,7 +312,6 @@ class notifier : public checkable {
   bool _notifications_enabled;
   std::list<escalation*> _escalations;
   bool _problem_has_been_acknowledged;
-  bool _has_been_checked;
   bool _no_more_notifications;
   uint64_t _flapping_comment_id;
   int _check_options;

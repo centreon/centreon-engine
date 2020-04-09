@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/retention/applier/service.hh"
+
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -295,7 +296,7 @@ void applier::service::_update(configuration::state const& config,
         obj.get_next_notification_time(obj.get_last_notification()));
 
   // fix old vars.
-  if (!obj.get_has_been_checked() && obj.get_state_type() == notifier::soft)
+  if (!obj.has_been_checked() && obj.get_state_type() == notifier::soft)
     obj.set_state_type(notifier::hard);
 
   // ADDED 01/23/2009 adjust current check attempt if service is

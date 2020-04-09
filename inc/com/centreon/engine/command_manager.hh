@@ -20,9 +20,10 @@
 #ifndef CCE_COMMAND_MANAGER_HH
 #define CCE_COMMAND_MANAGER_HH
 
-#include <mutex>
 #include <deque>
 #include <future>
+#include <mutex>
+
 #include "com/centreon/engine/namespace.hh"
 #include "enginerpc/engine_impl.hh"
 
@@ -31,6 +32,7 @@ class command_manager {
   std::mutex _queue_m;
   std::deque<std::packaged_task<int()>> _queue;
   command_manager();
+
  public:
   static command_manager& instance();
   void enqueue(std::packaged_task<int(void)>&& f);
@@ -45,6 +47,7 @@ class command_manager {
                                  uint32_t return_code,
                                  const std::string& output);
   int get_stats(Stats* response);
+  int get_services_stats(ServicesStats* sstats);
   void execute();
 };
 

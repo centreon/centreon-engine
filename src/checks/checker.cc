@@ -240,7 +240,7 @@ void checker::run_sync(host* hst,
   // Can we use the last cached host state?
   if (use_cached_result && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
     // We can used the cached result, so return it and get out of here.
-    if (hst->get_has_been_checked() &&
+    if (hst->has_been_checked() &&
         (static_cast<unsigned long>(start_time.tv_sec -
                                     hst->get_last_check()) <=
          check_timestamp_horizon)) {
