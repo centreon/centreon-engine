@@ -35,19 +35,19 @@ message Version {
 }
 
 message ServiceTypeStats {
-  double min_latency = 9;
-  double max_latency = 10;
-  double average_latency = 11;
-  double min_execution_time = 12;
-  double max_execution_time = 13;
-  double average_execution_time = 14;
-  double min_state_change = 15;
-  double max_state_change = 16;
-  double average_state_change = 17;
-  uint32 checks_last_1min = 18;
-  uint32 checks_last_5min = 19;
-  uint32 checks_last_15min = 20;
-  uint32 checks_last_1hour = 21;
+  double min_latency = 1;
+  double max_latency = 2;
+  double average_latency = 3;
+  double min_execution_time = 4;
+  double max_execution_time = 5;
+  double average_execution_time = 6;
+  double min_state_change = 7;
+  double max_state_change = 8;
+  double average_state_change = 9;
+  uint32 checks_last_1min = 10;
+  uint32 checks_last_5min = 11;
+  uint32 checks_last_15min = 12;
+  uint32 checks_last_1hour = 13;
 }
 
 message ServicesStats {
@@ -67,6 +67,40 @@ message ServicesStats {
   uint32 unknown = 14;
   uint32 flapping = 15;
   uint32 downtime = 16;
+}
+
+message HostTypeStats {
+  double min_latency = 1;
+  double max_latency = 2;
+  double average_latency = 3;
+  double min_execution_time = 4;
+  double max_execution_time = 5;
+  double average_execution_time = 6;
+  double min_state_change = 7;
+  double max_state_change = 8;
+  double average_state_change = 9;
+  uint32 checks_last_1min = 10;
+  uint32 checks_last_5min = 11;
+  uint32 checks_last_15min = 12;
+  uint32 checks_last_1hour = 13;
+}
+
+message HostsStats {
+  uint32 hosts_count = 1;
+  uint32 checked_hosts = 2;
+  uint32 scheduled_hosts = 3;
+  uint32 actively_checked = 4;
+  uint32 passively_checked = 5;
+  double min_state_change = 6;
+  double max_state_change = 7;
+  double average_state_change = 8;
+  HostTypeStats active_hosts = 9;
+  HostTypeStats passive_hosts = 10;
+  uint32 up = 11;
+  uint32 down = 12;
+  uint32 unreachable = 13;
+  uint32 flapping = 14;
+  uint32 downtime = 15;
 }
 
 message ProgramConfiguration {
@@ -124,7 +158,8 @@ message Stats {
   ProgramConfiguration program_configuration = 1;
   ProgramStatus program_status = 2;
   ServicesStats services_stats = 3;
-  ExtCmdBuffer buffer = 4;
+  HostsStats hosts_stats = 4;
+  ExtCmdBuffer buffer = 5;
 }
 
 message ThresholdsFile {

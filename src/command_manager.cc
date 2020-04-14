@@ -348,6 +348,7 @@ int command_manager::get_stats(Stats* response) {
   response->mutable_program_configuration()->set_hosts_count(
       host::hosts.size());
   get_services_stats(response->mutable_services_stats());
+  get_hosts_stats(response->mutable_hosts_stats());
   return 0;
 }
 
@@ -563,5 +564,216 @@ int command_manager::get_services_stats(ServicesStats* sstats) {
 
   sstats->set_flapping(flapping);
   sstats->set_downtime(downtime);
+  return 0;
+}
+
+int command_manager::get_hosts_stats(HostsStats* hstats) {
+  time_t now;
+  time(&now);
+  uint32_t checked_hosts = 0;
+  uint32_t scheduled_hosts = 0;
+  uint32_t actively_checked = 0;
+  uint32_t passively_checked = 0;
+
+  double global_min_state_change = std::numeric_limits<double>::max(),
+         global_max_state_change = std::numeric_limits<double>::min(),
+         global_avg_state_change = 0;
+
+  double active_min_state_change = std::numeric_limits<double>::max(),
+         active_max_state_change = std::numeric_limits<double>::min(),
+         active_avg_state_change = 0;
+
+  double passive_min_state_change = std::numeric_limits<double>::max(),
+         passive_max_state_change = std::numeric_limits<double>::min(),
+         passive_avg_state_change = 0;
+
+  double active_min_latency = std::numeric_limits<double>::max(),
+         active_max_latency = std::numeric_limits<double>::min(),
+         active_avg_latency = 0;
+
+  double passive_min_latency = std::numeric_limits<double>::max(),
+         passive_max_latency = std::numeric_limits<double>::min(),
+         passive_avg_latency = 0;
+
+  double active_min_execution_time = std::numeric_limits<double>::max(),
+         active_max_execution_time = std::numeric_limits<double>::min(),
+         active_avg_execution_time = 0;
+
+  uint32_t active_checks_last_1min = 0, active_checks_last_5min = 0,
+           active_checks_last_15min = 0, active_checks_last_1hour = 0;
+
+  uint32_t passive_checks_last_1min = 0, passive_checks_last_5min = 0,
+           passive_checks_last_15min = 0, passive_checks_last_1hour = 0;
+
+  uint32_t up = 0, down = 0, unreachable = 0;
+
+  uint32_t downtime = 0, flapping = 0;
+
+  auto min_max_sum = [](double v, double& min, double& max, double& sum) {
+    sum += v;
+    if (v < min)
+      min = v;
+    if (v > max)
+      max = v;
+  };
+
+  for (auto it = host::hosts_by_id.begin(),
+            end = host::hosts_by_id.end();
+       it != end; ++it) {
+    host* hst = it->second.get();
+
+    /******************************** GLOBAL **********************************/
+    min_max_sum(hst->get_percent_state_change(), global_min_state_change,
+                global_max_state_change, global_avg_state_change);
+
+    if (hst->has_been_checked())
+      ++checked_hosts;
+    if (hst->get_should_be_scheduled())
+      ++scheduled_hosts;
+
+    switch (hst->get_current_state()) {
+      case host::state_up:
+        ++up;
+        break;
+      case host::state_down:
+        ++down;
+        break;
+      case host::state_unreachable:
+        ++unreachable;
+        break;
+    }
+
+    if (hst->is_in_downtime())
+      ++downtime;
+    if (hst->get_is_flapping())
+      ++flapping;
+
+    if (hst->get_check_type() == checkable::check_active) {
+      /****************************** ACTIVE **********************************/
+      ++actively_checked;
+      min_max_sum(hst->get_latency(), active_min_latency, active_max_latency,
+                  active_avg_latency);
+
+      min_max_sum(hst->get_execution_time(), active_min_execution_time,
+                  active_max_execution_time, active_avg_execution_time);
+
+      min_max_sum(hst->get_percent_state_change(), active_min_state_change,
+                  active_max_state_change, active_avg_state_change);
+
+      uint32_t time_diff = now - hst->get_last_check();
+      if (time_diff <= 60)
+        ++active_checks_last_1min;
+      if (time_diff <= 300)
+        ++active_checks_last_5min;
+      if (time_diff <= 900)
+        ++active_checks_last_15min;
+      if (time_diff <= 900)
+        ++active_checks_last_1hour;
+
+    } else {
+      /****************************** PASSIVE *********************************/
+      ++passively_checked;
+      min_max_sum(hst->get_latency(), passive_min_latency, passive_max_latency,
+                  passive_avg_latency);
+
+      min_max_sum(hst->get_percent_state_change(), passive_min_state_change,
+                  passive_max_state_change, passive_avg_state_change);
+
+      uint32_t time_diff = now - hst->get_last_check();
+      if (time_diff <= 60)
+        ++passive_checks_last_1min;
+      if (time_diff <= 300)
+        ++passive_checks_last_5min;
+      if (time_diff <= 900)
+        ++passive_checks_last_15min;
+      if (time_diff <= 900)
+        ++passive_checks_last_1hour;
+    }
+  }
+
+  /********************************* SUMMARY **********************************/
+  size_t size = host::hosts.size();
+  if (size)
+    global_avg_state_change /= size;
+
+  if (actively_checked) {
+    active_avg_state_change /= actively_checked;
+    active_avg_latency /= actively_checked;
+    active_avg_execution_time /= actively_checked;
+  } else {
+    active_min_state_change = active_max_state_change = 0;
+    active_min_latency = active_max_latency = 0;
+  }
+
+  if (passively_checked) {
+    passive_avg_state_change /= passively_checked;
+    passive_avg_latency /= passively_checked;
+  } else {
+    passive_min_state_change = passive_max_state_change = 0;
+    passive_min_latency = passive_max_latency = 0;
+  }
+
+  hstats->set_hosts_count(size);
+  hstats->set_checked_hosts(checked_hosts);
+  hstats->set_scheduled_hosts(scheduled_hosts);
+  hstats->set_actively_checked(actively_checked);
+
+  hstats->set_min_state_change(global_min_state_change);
+  hstats->set_max_state_change(global_max_state_change);
+  hstats->set_average_state_change(global_avg_state_change);
+
+  hstats->mutable_active_hosts()->set_min_latency(active_min_latency);
+  hstats->mutable_active_hosts()->set_max_latency(active_max_latency);
+  hstats->mutable_active_hosts()->set_average_latency(active_avg_latency);
+
+  hstats->mutable_active_hosts()->set_min_execution_time(
+      active_min_execution_time);
+  hstats->mutable_active_hosts()->set_max_execution_time(
+      active_max_execution_time);
+  hstats->mutable_active_hosts()->set_average_execution_time(
+      active_avg_execution_time);
+
+  hstats->mutable_active_hosts()->set_min_state_change(
+      active_min_state_change);
+  hstats->mutable_active_hosts()->set_max_state_change(
+      active_max_state_change);
+  hstats->mutable_active_hosts()->set_average_state_change(
+      active_avg_state_change);
+
+  hstats->mutable_active_hosts()->set_checks_last_1min(
+      active_checks_last_1min);
+  hstats->mutable_active_hosts()->set_checks_last_5min(
+      active_checks_last_5min);
+  hstats->mutable_active_hosts()->set_checks_last_15min(
+      active_checks_last_15min);
+  hstats->mutable_active_hosts()->set_checks_last_1hour(
+      active_checks_last_1hour);
+
+  hstats->mutable_passive_hosts()->set_min_latency(passive_min_latency);
+  hstats->mutable_passive_hosts()->set_max_latency(passive_max_latency);
+  hstats->mutable_passive_hosts()->set_average_latency(passive_avg_latency);
+
+  hstats->mutable_passive_hosts()->set_min_state_change(
+      passive_min_state_change);
+  hstats->mutable_passive_hosts()->set_max_state_change(
+      passive_max_state_change);
+  hstats->mutable_passive_hosts()->set_average_state_change(
+      passive_avg_state_change);
+
+  hstats->mutable_passive_hosts()->set_checks_last_1min(
+      passive_checks_last_1min);
+  hstats->mutable_passive_hosts()->set_checks_last_5min(
+      passive_checks_last_5min);
+  hstats->mutable_passive_hosts()->set_checks_last_15min(
+      passive_checks_last_15min);
+  hstats->mutable_passive_hosts()->set_checks_last_1hour(
+      passive_checks_last_1hour);
+
+  hstats->set_up(up);
+  hstats->set_down(down);
+  hstats->set_unreachable(unreachable);
+
+  hstats->set_flapping(flapping);
+  hstats->set_downtime(downtime);
   return 0;
 }

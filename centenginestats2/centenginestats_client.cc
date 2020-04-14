@@ -188,7 +188,7 @@ void centenginestats_client::get_stats() {
       << "\nActive Service Latency:                 "
       << stats.services_stats().active_services().min_latency() << " / "
       << stats.services_stats().active_services().max_latency() << " / "
-      << stats.services_stats().active_services().average_latency() << " sec\n"
+      << stats.services_stats().active_services().average_latency() << " sec"
       << "\nActive Service Execution Time:          "
       << stats.services_stats().active_services().min_execution_time() << " / "
       << stats.services_stats().active_services().max_execution_time() << " / "
@@ -203,72 +203,82 @@ void centenginestats_client::get_stats() {
       << stats.services_stats().active_services().checks_last_5min() << " / "
       << stats.services_stats().active_services().checks_last_15min() << " / "
       << stats.services_stats().active_services().checks_last_1hour()
-      << "\nPassive Service Latency:                 "
+      << "\nPassive Service Latency:                "
       << stats.services_stats().passive_services().min_latency() << " / "
       << stats.services_stats().passive_services().max_latency() << " / "
       << stats.services_stats().passive_services().average_latency() << " sec\n"
-      << "\nPassive Service State Change:            "
+      << "\nPassive Service State Change:           "
       << stats.services_stats().passive_services().min_state_change() << " / "
       << stats.services_stats().passive_services().max_state_change() << " / "
       << stats.services_stats().passive_services().average_state_change()
       << " %"
-      << "\nPassive Services Last 1/5/15/60 min:     "
+      << "\nPassive Services Last 1/5/15/60 min:    "
       << stats.services_stats().passive_services().checks_last_1min() << " / "
       << stats.services_stats().passive_services().checks_last_5min() << " / "
       << stats.services_stats().passive_services().checks_last_15min() << " / "
       << stats.services_stats().passive_services().checks_last_1hour()
-      << "\nServices OK/Warn/Unk/Crit:               "
+      << "\nServices OK/Warn/Unk/Crit:              "
       << stats.services_stats().ok() << " / "
       << stats.services_stats().warning() << " / "
       << stats.services_stats().unknown() << " / "
       << stats.services_stats().critical()
-      << "\nServices Flapping:                       "
+      << "\nServices Flapping:                      "
       << stats.services_stats().flapping()
-      << "\nServices In Downtime:                    "
-      << stats.services_stats().downtime() << std::endl;
-}
-
-bool centenginestats_client::GetStats(Stats* stats) {
-  const ::google::protobuf::Empty e;
-  grpc::ClientContext context;
-  grpc::Status status = _stub->GetStats(&context, e, stats);
-  if (!status.ok()) {
-    std::cout << "GetStats rpc failed." << std::endl;
-    return false;
-  }
-  return true;
-}
-
-bool centenginestats_client::ProcessServiceCheckResult(Check const& sc) {
-  grpc::ClientContext context;
-  CommandSuccess response;
-  grpc::Status status =
-      _stub->ProcessServiceCheckResult(&context, sc, &response);
-  if (!status.ok()) {
-    std::cout << "ProcessServiceCheckResult failed." << std::endl;
-    return false;
-  }
-  return true;
-}
-
-bool centenginestats_client::ProcessHostCheckResult(Check const& hc) {
-  grpc::ClientContext context;
-  CommandSuccess response;
-  grpc::Status status = _stub->ProcessHostCheckResult(&context, hc, &response);
-  if (!status.ok()) {
-    std::cout << "ProcessHostCheckResult failed." << std::endl;
-    return false;
-  }
-  return true;
-}
-
-bool centenginestats_client::NewThresholdsFile(const ThresholdsFile& tf) {
-  grpc::ClientContext context;
-  CommandSuccess response;
-  grpc::Status status = _stub->NewThresholdsFile(&context, tf, &response);
-  if (!status.ok()) {
-    std::cout << "NewThresholdsFile failed." << std::endl;
-    return false;
-  }
-  return true;
+      << "\nServices In Downtime:                   "
+      << stats.services_stats().downtime()
+      << "\n\n"
+         "Total Hosts:                            "
+      << stats.hosts_stats().hosts_count()
+      << "\nHosts Checked:                          "
+      << stats.hosts_stats().checked_hosts()
+      << "\nHosts Scheduled:                        "
+      << stats.hosts_stats().scheduled_hosts()
+      << "\nHosts Actively Checked:                 "
+      << stats.hosts_stats().actively_checked()
+      << "\nHosts Passively Checked:                "
+      << stats.hosts_stats().passively_checked()
+      << "\nTotal Host State Change:                " << std::fixed
+      << std::setprecision(3) << stats.hosts_stats().min_state_change()
+      << " / " << stats.hosts_stats().max_state_change() << " / "
+      << stats.hosts_stats().average_state_change() << " %"
+      << "\nActive Host Latency:                    "
+      << stats.hosts_stats().active_hosts().min_latency() << " / "
+      << stats.hosts_stats().active_hosts().max_latency() << " / "
+      << stats.hosts_stats().active_hosts().average_latency() << " sec"
+      << "\nActive Host Execution Time:             "
+      << stats.hosts_stats().active_hosts().min_execution_time() << " / "
+      << stats.hosts_stats().active_hosts().max_execution_time() << " / "
+      << stats.hosts_stats().active_hosts().average_execution_time()
+      << " sec"
+      << "\nActive Host State Change:               "
+      << stats.hosts_stats().active_hosts().min_state_change() << " / "
+      << stats.hosts_stats().active_hosts().max_state_change() << " / "
+      << stats.hosts_stats().active_hosts().average_state_change() << " %"
+      << "\nActive Hosts Last 1/5/15/60 min:        "
+      << stats.hosts_stats().active_hosts().checks_last_1min() << " / "
+      << stats.hosts_stats().active_hosts().checks_last_5min() << " / "
+      << stats.hosts_stats().active_hosts().checks_last_15min() << " / "
+      << stats.hosts_stats().active_hosts().checks_last_1hour()
+      << "\nPassive Host Latency:                   "
+      << stats.hosts_stats().passive_hosts().min_latency() << " / "
+      << stats.hosts_stats().passive_hosts().max_latency() << " / "
+      << stats.hosts_stats().passive_hosts().average_latency() << " sec\n"
+      << "\nPassive Host State Change:              "
+      << stats.hosts_stats().passive_hosts().min_state_change() << " / "
+      << stats.hosts_stats().passive_hosts().max_state_change() << " / "
+      << stats.hosts_stats().passive_hosts().average_state_change()
+      << " %"
+      << "\nPassive Hosts Last 1/5/15/60 min:       "
+      << stats.hosts_stats().passive_hosts().checks_last_1min() << " / "
+      << stats.hosts_stats().passive_hosts().checks_last_5min() << " / "
+      << stats.hosts_stats().passive_hosts().checks_last_15min() << " / "
+      << stats.hosts_stats().passive_hosts().checks_last_1hour()
+      << "\nHosts Up/Down/Unreach:                  "
+      << stats.hosts_stats().up() << " / "
+      << stats.hosts_stats().down() << " / "
+      << stats.hosts_stats().unreachable()
+      << "\nHosts Flapping:                         "
+      << stats.hosts_stats().flapping()
+      << "\nHosts In Downtime:                      "
+      << stats.hosts_stats().downtime() << std::endl;
 }

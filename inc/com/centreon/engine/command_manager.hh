@@ -48,6 +48,7 @@ class command_manager {
                                  const std::string& output);
   int get_stats(Stats* response);
   int get_services_stats(ServicesStats* sstats);
+  int get_hosts_stats(HostsStats* hstats);
   void execute();
 };
 
