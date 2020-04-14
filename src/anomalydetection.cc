@@ -607,8 +607,15 @@ int anomalydetection::run_async_check(int check_options,
 
   std::string perfdata = string::extract_perfdata(
       _dependent_service->get_perf_data(), _metric_name);
+
+  std::string without_thresholds(string::remove_thresholds(perfdata));
   std::tuple<service::service_state, double, std::string, double, double> pd =
-      parse_perfdata(string::remove_thresholds(perfdata), start_time.tv_sec);
+      parse_perfdata(without_thresholds, start_time.tv_sec);
+  size_t pos = without_thresholds.find(';');
+  if (pos != std::string::npos)
+    without_thresholds = without_thresholds.substr(pos);
+  else
+    without_thresholds = "";
 
   // Init check result info.
   std::unique_ptr<check_result> check_result_info(
@@ -650,10 +657,10 @@ int anomalydetection::run_async_check(int check_options,
   check_result_info->set_return_code(std::get<0>(pd));
   oss << perfdata;
   if (!std::isnan(std::get<3>(pd))) {
-    oss << ' ' << _metric_name << "_lower_thresholds=" << std::get<3>(pd);
+    oss << ' ' << _metric_name << "_lower_thresholds=" << std::get<3>(pd) << std::get<2>(pd) << without_thresholds;
   }
   if (!std::isnan(std::get<4>(pd))) {
-    oss << ' ' << _metric_name << "_upper_thresholds=" << std::get<4>(pd);
+    oss << ' ' << _metric_name << "_upper_thresholds=" << std::get<4>(pd) << std::get<2>(pd) << without_thresholds;
   }
   check_result_info->set_output(oss.str());
 

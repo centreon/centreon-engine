@@ -319,7 +319,7 @@ std::string& string::remove_thresholds(std::string& perfdata) noexcept {
     perfdata.resize(pos1);
     return perfdata;
   }
-  
+
   perfdata.replace(pos1, pos3 - pos1, ";;");
   return perfdata;
 }
