@@ -474,7 +474,7 @@ TEST_F(AnomalydetectionCheck, MetricWithQuotes) {
   std::time_t now{std::time(nullptr)};
   oss << '[' << now << ']'
       << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| "
-         "'metric'=90;25;60";
+         "'metric'=90;25;60;0;100";
   std::string cmd{oss.str()};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
@@ -483,7 +483,7 @@ TEST_F(AnomalydetectionCheck, MetricWithQuotes) {
   ASSERT_EQ(_svc->get_last_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   ASSERT_EQ(_svc->get_plugin_output(), "service critical");
-  ASSERT_EQ(_svc->get_perf_data(), "'metric'=90;25;60");
+  ASSERT_EQ(_svc->get_perf_data(), "'metric'=90;25;60;0;100");
   int check_options = 0;
   int latency = 0;
   bool time_is_valid;
@@ -499,6 +499,6 @@ TEST_F(AnomalydetectionCheck, MetricWithQuotes) {
             "NON-OK: Unusual activity, the actual value of metric is 90.00 "
             "which is outside the forecasting range [73.31 : 83.26]");
   ASSERT_EQ(_ad->get_perf_data(),
-            "'metric'=90 metric_lower_thresholds=73.31 "
-            "metric_upper_thresholds=83.26");
+            "'metric'=90;;;0;100 metric_lower_thresholds=73.31;;;0;100 "
+            "metric_upper_thresholds=83.26;;;0;100");
 }
