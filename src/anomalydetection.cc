@@ -789,15 +789,11 @@ anomalydetection::parse_perfdata(std::string const& perfdata,
 void anomalydetection::init_thresholds() {
   std::lock_guard<std::mutex> lock(_thresholds_m);
 
-  logger(log_info_message, most) << "Reading thresholds file '"
-                                 << _thresholds_file << "'...";
+  logger(log_info_message, basic) << "Trying to read thresholds file '"
+                                 << _thresholds_file << "'";
   std::ifstream t(_thresholds_file);
-  if (!t) {
-    logger(log_config_error, basic)
-        << "Error: Unable to read the thresholds file '" << _thresholds_file
-        << "'.";
+  if (!t)
     return;
-  }
 
   std::stringstream buffer;
   buffer << t.rdbuf();
