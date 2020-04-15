@@ -60,7 +60,24 @@ message RestartStats {
   google.protobuf.Duration apply_connectors = 6;
   google.protobuf.Duration apply_commands = 7;
   google.protobuf.Duration apply_contacts = 8;
-  google.protobuf.Timestamp apply_end = 9;
+
+  google.protobuf.Duration apply_hosts = 9;
+  google.protobuf.Duration apply_services = 10;
+  google.protobuf.Duration resolve_hosts = 11;
+  google.protobuf.Duration resolve_services = 12;
+  google.protobuf.Duration apply_host_dependencies = 13;
+  google.protobuf.Duration resolve_host_dependencies = 14;
+  google.protobuf.Duration apply_service_dependencies = 15;
+  google.protobuf.Duration resolve_service_dependencies = 16;
+  google.protobuf.Duration apply_host_escalations = 17;
+  google.protobuf.Duration resolve_host_escalations = 18;
+  google.protobuf.Duration apply_service_escalations = 19;
+  google.protobuf.Duration resolve_service_escalations = 20;
+  google.protobuf.Duration apply_new_config = 21;
+  google.protobuf.Duration apply_scheduler = 22;
+  google.protobuf.Duration check_circular_paths = 23;
+  google.protobuf.Duration reload_modules = 24;
+  google.protobuf.Timestamp apply_end = 25;
 }
 
 message ServicesStats {

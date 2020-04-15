@@ -779,7 +779,37 @@ int command_manager::get_hosts_stats(HostsStats* hstats) {
 }
 
 int command_manager::get_restart_stats(RestartStats* response) {
-  *response->mutable_apply_start() = ::google::protobuf::util::TimeUtil::TimeTToTimestamp(
-          std::chrono::system_clock::to_time_t(restart_apply_stats.apply_start));
+  *response->mutable_apply_start() =
+      ::google::protobuf::util::TimeUtil::TimeTToTimestamp(
+          std::chrono::system_clock::to_time_t(
+              restart_apply_stats.apply_start));
+  *response->mutable_objects_expansion() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.objects_expansion.count());
+  *response->mutable_objects_difference() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.objects_difference.count());
+  *response->mutable_apply_config() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_config.count());
+
+  *response->mutable_apply_timeperiods() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_timeperiods.count());
+  *response->mutable_apply_connectors() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_connectors.count());
+  *response->mutable_apply_commands() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_commands.count());
+  *response->mutable_apply_contacts() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_contacts.count());
+  *response->mutable_apply_hosts() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_hosts.count());
+  *response->mutable_apply_services() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_services.count());
+  *response->mutable_resolve_hosts() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_hosts.count());
+  *response->mutable_resolve_services() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_services.count());
+  *response->mutable_apply_host_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_host_dependencies.count());
+  *response->mutable_resolve_host_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_host_dependencies.count());
+  *response->mutable_apply_service_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_service_dependencies.count());
+  *response->mutable_resolve_service_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_service_dependencies.count());
+  *response->mutable_apply_host_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_host_escalations.count());
+  *response->mutable_resolve_host_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_host_escalations.count());
+  *response->mutable_apply_service_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_service_escalations.count());
+  *response->mutable_resolve_service_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_service_escalations.count());
+  *response->mutable_apply_new_config() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_new_config.count());
+  *response->mutable_apply_scheduler() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_scheduler.count());
+  *response->mutable_check_circular_paths() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.check_circular_paths.count());
+  *response->mutable_reload_modules() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.reload_modules.count());
+
+  *response->mutable_apply_end() =
+      ::google::protobuf::util::TimeUtil::TimeTToTimestamp(
+          std::chrono::system_clock::to_time_t(restart_apply_stats.apply_end));
   return 0;
 }
