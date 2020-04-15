@@ -1056,6 +1056,7 @@ void applier::state::_processing(configuration::state& new_cfg,
   //
   // Expand all objects.
   //
+  auto start = std::chrono::system_clock::now();
   gettimeofday(tv, nullptr);
 
   // Expand timeperiods.
@@ -1105,6 +1106,10 @@ void applier::state::_processing(configuration::state& new_cfg,
   //
   //  Build difference for all objects.
   //
+
+  auto end = std::chrono::system_clock::now();
+  config_apply_stats.objects_expansion = end - start;
+  start = end;
 
   // Build difference for timeperiods.
   difference<set_timeperiod> diff_timeperiods;
@@ -1173,6 +1178,10 @@ void applier::state::_processing(configuration::state& new_cfg,
   try {
     std::lock_guard<configuration::applier::state> locker(*this);
 
+    end = std::chrono::system_clock::now();
+    config_apply_stats.objects_difference = end - start;
+    start = end;
+
     // Apply logging configurations.
     applier::logging::instance().apply(new_cfg);
 
@@ -1181,6 +1190,10 @@ void applier::state::_processing(configuration::state& new_cfg,
 
     // Apply macros configurations.
     applier::macros::instance().apply(new_cfg);
+
+    end = std::chrono::system_clock::now();
+    config_apply_stats.apply_config = end - start;
+    start = end;
 
     // Timing.
     gettimeofday(tv + 2, nullptr);
@@ -1209,15 +1222,24 @@ void applier::state::_processing(configuration::state& new_cfg,
     _resolve<configuration::timeperiod, applier::timeperiod>(
         config->timeperiods());
 
+    end = std::chrono::system_clock::now();
+    config_apply_stats.apply_timeperiods = end - start;
+    start = end;
     // Apply connectors.
     _apply<configuration::connector, applier::connector>(diff_connectors);
     _resolve<configuration::connector, applier::connector>(
         config->connectors());
 
+    end = std::chrono::system_clock::now();
+    config_apply_stats.apply_connectors = end - start;
+    start = end;
     // Apply commands.
     _apply<configuration::command, applier::command>(diff_commands);
     _resolve<configuration::command, applier::command>(config->commands());
 
+    end = std::chrono::system_clock::now();
+    config_apply_stats.apply_commands = end - start;
+    start = end;
     // Apply contacts and contactgroups.
     _apply<configuration::contact, applier::contact>(diff_contacts);
     _apply<configuration::contactgroup, applier::contactgroup>(
@@ -1226,10 +1248,14 @@ void applier::state::_processing(configuration::state& new_cfg,
         config->contactgroups());
     _resolve<configuration::contact, applier::contact>(config->contacts());
 
+    end = std::chrono::system_clock::now();
+    config_apply_stats.apply_contacts = end - start;
+    start = end;
     // Apply hosts and hostgroups.
     _apply<configuration::host, applier::host>(diff_hosts);
     _apply<configuration::hostgroup, applier::hostgroup>(diff_hostgroups);
 
+    config_apply_stats.apply_processing_services_apply = std::chrono::system_clock::now();
     // Apply services.
     _apply<configuration::service, applier::service>(diff_services);
 
@@ -1241,11 +1267,13 @@ void applier::state::_processing(configuration::state& new_cfg,
     _apply<configuration::servicegroup, applier::servicegroup>(
         diff_servicegroups);
 
+    config_apply_stats.apply_processing_resolve_hosts_apply = std::chrono::system_clock::now();
     // Resolve hosts, services, host groups.
     _resolve<configuration::host, applier::host>(config->hosts());
     _resolve<configuration::hostgroup, applier::hostgroup>(
         config->hostgroups());
 
+    config_apply_stats.apply_processing_resolve_services_apply = std::chrono::system_clock::now();
     // Resolve services.
     _resolve<configuration::service, applier::service>(config->services());
 
@@ -1256,24 +1284,28 @@ void applier::state::_processing(configuration::state& new_cfg,
     _resolve<configuration::servicegroup, applier::servicegroup>(
         config->servicegroups());
 
+    config_apply_stats.apply_processing_hosts_dependencies_apply = std::chrono::system_clock::now();
     // Apply host dependencies.
     _apply<configuration::hostdependency, applier::hostdependency>(
         diff_hostdependencies);
     _resolve<configuration::hostdependency, applier::hostdependency>(
         config->hostdependencies());
 
+    config_apply_stats.apply_processing_services_dependencies_apply = std::chrono::system_clock::now();
     // Apply service dependencies.
     _apply<configuration::servicedependency, applier::servicedependency>(
         diff_servicedependencies);
     _resolve<configuration::servicedependency, applier::servicedependency>(
         config->servicedependencies());
 
+    config_apply_stats.apply_processing_hosts_escalations_apply = std::chrono::system_clock::now();
     // Apply host escalations.
     _apply<configuration::hostescalation, applier::hostescalation>(
         diff_hostescalations);
     _resolve<configuration::hostescalation, applier::hostescalation>(
         config->hostescalations());
 
+    config_apply_stats.apply_processing_services_escalations_apply = std::chrono::system_clock::now();
     // Apply service escalations.
     _apply<configuration::serviceescalation, applier::serviceescalation>(
         diff_serviceescalations);
@@ -1293,15 +1325,18 @@ void applier::state::_processing(configuration::state& new_cfg,
     _check_hosts();
 #endif
 
+    config_apply_stats.apply_loading_retention = std::chrono::system_clock::now();
     // Load retention.
     if (state)
       _apply(new_cfg, *state);
 
+    config_apply_stats.apply_scheduler = std::chrono::system_clock::now();
     // Apply scheduler.
     if (!verify_config)
       applier::scheduler::instance().apply(
           new_cfg, diff_hosts, diff_services, diff_anomalydetections);
 
+    config_apply_stats.apply_new_config = std::chrono::system_clock::now();
     // Apply new global on the current state.
     if (!verify_config)
       _apply(new_cfg);
@@ -1317,10 +1352,12 @@ void applier::state::_processing(configuration::state& new_cfg,
 
     // Timing.
     gettimeofday(tv + 3, nullptr);
+    config_apply_stats.check_hosts_circular_paths = std::chrono::system_clock::now();
 
     // Check for circular paths between hosts.
     pre_flight_circular_check(&config_warnings, &config_errors);
 
+    config_apply_stats.loading_modules = std::chrono::system_clock::now();
     // Call start broker event the first time to run applier state.
     if (!has_already_been_loaded) {
       neb_load_all_modules();
@@ -1330,6 +1367,7 @@ void applier::state::_processing(configuration::state& new_cfg,
     } else
       neb_reload_all_modules();
 
+    config_apply_stats.initial_states = std::chrono::system_clock::now();
     // Print initial states of new hosts and services.
     if (!verify_config && !test_scheduling) {
       for (set_host::iterator it(diff_hosts.added().begin()),
@@ -1353,6 +1391,7 @@ void applier::state::_processing(configuration::state& new_cfg,
     }
 
     // Timing.
+    config_apply_stats.test_scheduling = std::chrono::system_clock::now();
     gettimeofday(tv + 4, nullptr);
     if (test_scheduling) {
       double runtimes[5];

@@ -777,3 +777,9 @@ int command_manager::get_hosts_stats(HostsStats* hstats) {
   hstats->set_downtime(downtime);
   return 0;
 }
+
+int command_manager::get_restart_stats(RestartStats* response) {
+  *response->mutable_apply_start() = ::google::protobuf::util::TimeUtil::TimeTToTimestamp(
+          restart_apply_stats.apply_start);
+  return 0;
+}

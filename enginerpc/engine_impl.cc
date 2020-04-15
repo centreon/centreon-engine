@@ -49,6 +49,23 @@ grpc::Status engine_impl::GetStats(grpc::ServerContext* /*contect*/,
   }
 }
 
+grpc::Status engine_impl::GetRestartStats(grpc::ServerContext* /*contect*/,
+    const ::google::protobuf::Empty* /* request */,
+    RestartStats* response) {
+  auto fn = std::packaged_task<int(void)>(std::bind(&command_manager::get_restart_stats,
+      &command_manager::instance(),
+      response));
+  std::future<int> result = fn.get_future();
+  command_manager::instance().enqueue(std::move(fn));
+  int res = result.get();
+  switch (res) {
+    case 0:
+      return grpc::Status::OK;
+    default:
+      return grpc::Status(grpc::StatusCode::UNKNOWN, "Unknown error");
+  }
+}
+
 grpc::Status engine_impl::ProcessServiceCheckResult(
     grpc::ServerContext* /*context*/,
     const Check* request,

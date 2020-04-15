@@ -109,6 +109,7 @@ loop::loop() : _need_reload(0), _reload_running(false) {}
 
 static void apply_conf(std::atomic<bool>* reloading) {
   logger(log_info_message, more) << "Starting to reload configuration.";
+  config_apply_stats.apply_start = std::chrono::system_clock::now();
   try {
     configuration::state config;
     {
@@ -123,6 +124,7 @@ static void apply_conf(std::atomic<bool>* reloading) {
   catch (std::exception const& e) {
     logger(log_config_error, most) << "Error: " << e.what();
   }
+  config_apply_stats.apply_end = std::chrono::system_clock::now();
   *reloading = false;
   logger(log_info_message, more) << "Reload configuration finished.";
 }

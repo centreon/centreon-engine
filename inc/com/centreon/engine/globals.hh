@@ -32,6 +32,7 @@
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/utils.hh"
+#include "com/centreon/engine/restart_stats.hh"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +40,9 @@ extern "C" {
 
 extern int config_errors;
 extern int config_warnings;
+
+/* Start/Restart statistics */
+extern com::centreon::engine::restart_stats restart_apply_stats;
 
 extern com::centreon::engine::configuration::state* config;
 extern char* config_file;
