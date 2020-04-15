@@ -266,6 +266,64 @@ void centenginestats_client::get_stats() {
          stats.hosts_stats().unreachable());
   printf("Hosts Flapping:                         %ld\n",
          stats.hosts_stats().flapping());
-  printf("Hosts In Downtime:                      %ld\n",
+  printf("Hosts In Downtime:                      %ld\n\n",
          stats.hosts_stats().downtime());
+  printf("Active Host Checks Last 1/5/15 min:     %ld / %ld / %ld\n",
+         stats.program_status().active_scheduled_host_check_stats()[0] +
+             stats.program_status().active_ondemand_host_check_stats()[0],
+         stats.program_status().active_scheduled_host_check_stats()[1] +
+             stats.program_status().active_ondemand_host_check_stats()[1],
+         stats.program_status().active_scheduled_host_check_stats()[2] +
+             stats.program_status().active_ondemand_host_check_stats()[2]);
+  printf("   Scheduled:                           %ld / %ld / %ld\n",
+         stats.program_status().active_scheduled_host_check_stats()[0],
+         stats.program_status().active_scheduled_host_check_stats()[1],
+         stats.program_status().active_scheduled_host_check_stats()[2]);
+  printf("   On-demand:                           %ld / %ld / %ld\n",
+         stats.program_status().active_ondemand_host_check_stats()[0],
+         stats.program_status().active_ondemand_host_check_stats()[1],
+         stats.program_status().active_ondemand_host_check_stats()[2]);
+  printf("   Parallel:                            %ld / %ld / %ld\n",
+         stats.program_status().parallel_host_check_stats()[0],
+         stats.program_status().parallel_host_check_stats()[1],
+         stats.program_status().parallel_host_check_stats()[2]);
+  printf("   Serial:                              %ld / %ld / %ld\n",
+         stats.program_status().serial_host_check_stats()[0],
+         stats.program_status().serial_host_check_stats()[1],
+         stats.program_status().serial_host_check_stats()[2]);
+  printf("   Cached:                              %ld / %ld / %ld\n",
+         stats.program_status().cached_host_check_stats()[0],
+         stats.program_status().cached_host_check_stats()[1],
+         stats.program_status().cached_host_check_stats()[2]);
+  printf("Passive Host Checks Last 1/5/15 min:    %ld / %ld / %ld\n",
+         stats.program_status().passive_host_check_stats()[0],
+         stats.program_status().passive_host_check_stats()[1],
+         stats.program_status().passive_host_check_stats()[2]);
+  printf("Active Service Checks Last 1/5/15 min:  %ld / %ld / %ld\n",
+         stats.program_status().active_scheduled_service_check_stats()[0] +
+             stats.program_status().active_ondemand_service_check_stats()[0],
+         stats.program_status().active_scheduled_service_check_stats()[1] +
+             stats.program_status().active_ondemand_service_check_stats()[1],
+         stats.program_status().active_scheduled_service_check_stats()[2] +
+             stats.program_status().active_ondemand_service_check_stats()[2]);
+  printf("   Scheduled:                           %ld / %ld / %ld\n",
+         stats.program_status().active_scheduled_service_check_stats()[0],
+         stats.program_status().active_scheduled_service_check_stats()[1],
+         stats.program_status().active_scheduled_service_check_stats()[2]);
+  printf("   On-demand:                           %ld / %ld / %ld\n",
+         stats.program_status().active_ondemand_service_check_stats()[0],
+         stats.program_status().active_ondemand_service_check_stats()[1],
+         stats.program_status().active_ondemand_service_check_stats()[2]);
+  printf("   Cached:                              %ld / %ld / %ld\n",
+         stats.program_status().cached_service_check_stats()[0],
+         stats.program_status().cached_service_check_stats()[1],
+         stats.program_status().cached_service_check_stats()[2]);
+  printf("Passive Service Checks Last 1/5/15 min: %ld / %ld / %ld\n\n",
+         stats.program_status().passive_service_check_stats()[0],
+         stats.program_status().passive_service_check_stats()[1],
+         stats.program_status().passive_service_check_stats()[2]);
+  printf("External Commands Last 1/5/15 min:      %ld / %ld / %ld\n\n\n",
+         stats.program_status().external_command_stats()[0],
+         stats.program_status().external_command_stats()[1],
+         stats.program_status().external_command_stats()[2]);
 }
