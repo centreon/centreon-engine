@@ -780,6 +780,6 @@ int command_manager::get_hosts_stats(HostsStats* hstats) {
 
 int command_manager::get_restart_stats(RestartStats* response) {
   *response->mutable_apply_start() = ::google::protobuf::util::TimeUtil::TimeTToTimestamp(
-          restart_apply_stats.apply_start);
+          std::chrono::system_clock::to_time_t(restart_apply_stats.apply_start));
   return 0;
 }

@@ -22,15 +22,31 @@
 CCE_BEGIN()
 
 struct restart_stats {
-  std::time_t apply_start;
-  std::chrono::duration<uint32_t, std::milli> objects_expansion;
-  std::chrono::duration<uint32_t, std::milli> objects_difference;
-  std::chrono::duration<uint32_t, std::milli> apply_config;
-  std::chrono::duration<uint32_t, std::milli> apply_timeperiods;
-  std::chrono::duration<uint32_t, std::milli> apply_connectors;
-  std::chrono::duration<uint32_t, std::milli> apply_commands;
-  std::chrono::duration<uint32_t, std::milli> apply_contacts;
-  std::time_t apply_end;
+  std::chrono::system_clock::time_point apply_start;
+  std::chrono::duration<long, std::milli> objects_expansion;
+  std::chrono::duration<long, std::milli> objects_difference;
+  std::chrono::duration<long, std::milli> apply_config;
+  std::chrono::duration<long, std::milli> apply_timeperiods;
+  std::chrono::duration<long, std::milli> apply_connectors;
+  std::chrono::duration<long, std::milli> apply_commands;
+  std::chrono::duration<long, std::milli> apply_contacts;
+  std::chrono::duration<long, std::milli> apply_hosts;
+  std::chrono::duration<long, std::milli> apply_services;
+  std::chrono::duration<long, std::milli> resolve_hosts;
+  std::chrono::duration<long, std::milli> resolve_services;
+  std::chrono::duration<long, std::milli> apply_host_dependencies;
+  std::chrono::duration<long, std::milli> resolve_host_dependencies;
+  std::chrono::duration<long, std::milli> apply_service_dependencies;
+  std::chrono::duration<long, std::milli> resolve_service_dependencies;
+  std::chrono::duration<long, std::milli> apply_host_escalations;
+  std::chrono::duration<long, std::milli> resolve_host_escalations;
+  std::chrono::duration<long, std::milli> apply_service_escalations;
+  std::chrono::duration<long, std::milli> resolve_service_escalations;
+  std::chrono::duration<long, std::milli> apply_new_config;
+  std::chrono::duration<long, std::milli> apply_scheduler;
+  std::chrono::duration<long, std::milli> check_circular_paths;
+  std::chrono::duration<long, std::milli> reload_modules;
+  std::chrono::system_clock::time_point apply_end;
 };
 
 CCE_END()
