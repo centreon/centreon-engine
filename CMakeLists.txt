@@ -494,6 +494,7 @@ if (APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-undefined -Wl,dynamic_lookup")
 endif ()
 
+add_subdirectory(enginerpc)
 #
 # Targets.
 #
@@ -610,11 +611,11 @@ add_subdirectory(src/logging)
 add_subdirectory(src/macros)
 add_subdirectory(modules)
 add_subdirectory(src/retention)
-add_subdirectory(enginerpc)
 add_subdirectory(centenginestats2)
 
 # Library engine target.
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
+add_dependencies(cce_core enginerpc)
 
 # Link target with required libraries.
 target_link_libraries(cce_core ${json11_LIBS}
