@@ -28,11 +28,8 @@ class engine_impl final : public Engine::Service {
                           const ::google::protobuf::Empty* /*request*/,
                           Version* response) override;
   grpc::Status GetStats(grpc::ServerContext* context,
-                        const ::google::protobuf::Empty* /*request*/,
+                        const Object* request,
                         Stats* response) override;
-  grpc::Status GetRestartStats(grpc::ServerContext* context,
-                               const ::google::protobuf::Empty* /*request*/,
-                               RestartStats* response) override;
   grpc::Status ProcessServiceCheckResult(grpc::ServerContext* context,
                                          const Check* request,
                                          CommandSuccess* response) override;

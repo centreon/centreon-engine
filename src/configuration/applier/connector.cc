@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/commands/connector.hh"
+
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"

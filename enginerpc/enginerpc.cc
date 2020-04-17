@@ -17,10 +17,13 @@
  *
  */
 
-#include <sstream>
-#include "com/centreon/engine/logging/logger.hh"
-#include <grpcpp/server_builder.h>
 #include "enginerpc.hh"
+
+#include <grpcpp/server_builder.h>
+
+#include <sstream>
+
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
 

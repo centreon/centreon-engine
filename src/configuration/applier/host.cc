@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/configuration/applier/host.hh"
+
 #include <algorithm>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/config.hh"
@@ -426,8 +428,8 @@ void applier::host::remove_object(configuration::host const& obj) {
     // Remove events related to this host.
     applier::scheduler::instance().remove_host(obj.key());
 
-    //remove host from hostgroup->members
-    for (auto& it_h: it->second->get_parent_groups())
+    // remove host from hostgroup->members
+    for (auto& it_h : it->second->get_parent_groups())
       it_h->members.erase(it->second->get_name());
 
     // Notify event broker.

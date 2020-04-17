@@ -1,14 +1,17 @@
-#include <functional>
+#include "engine_impl.hh"
+
+#include <google/protobuf/util/time_util.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "engine_impl.hh"
-#include <google/protobuf/util/time_util.h>
+
+#include <functional>
+
+#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/command_manager.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/version.hh"
-#include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/anomalydetection.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -33,28 +36,11 @@ grpc::Status engine_impl::GetVersion(
 }
 
 grpc::Status engine_impl::GetStats(grpc::ServerContext* /*contect*/,
-    const ::google::protobuf::Empty* /* request */,
-    Stats* response) {
-  auto fn = std::packaged_task<int(void)>(std::bind(&command_manager::get_stats,
-      &command_manager::instance(),
-      response));
-  std::future<int> result = fn.get_future();
-  command_manager::instance().enqueue(std::move(fn));
-  int res = result.get();
-  switch (res) {
-    case 0:
-      return grpc::Status::OK;
-    default:
-      return grpc::Status(grpc::StatusCode::UNKNOWN, "Unknown error");
-  }
-}
-
-grpc::Status engine_impl::GetRestartStats(grpc::ServerContext* /*contect*/,
-    const ::google::protobuf::Empty* /* request */,
-    RestartStats* response) {
-  auto fn = std::packaged_task<int(void)>(std::bind(&command_manager::get_restart_stats,
-      &command_manager::instance(),
-      response));
+                                   const Object* request,
+                                   Stats* response) {
+  auto fn = std::packaged_task<int(void)>(
+      std::bind(&command_manager::get_stats, &command_manager::instance(),
+                request->name(), response));
   std::future<int> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
   int res = result.get();
@@ -80,14 +66,12 @@ grpc::Status engine_impl::ProcessServiceCheckResult(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "svc_desc must not be empty");
 
-  auto fn = std::packaged_task<int(void)>(std::bind(&command_manager::process_passive_service_check,
-                      &command_manager::instance(),
-                      google::protobuf::util::TimeUtil::TimestampToSeconds(
-                          request->check_time()),
-                      host_name,
-                      svc_desc,
-                      request->code(),
-                      request->output()));
+  auto fn = std::packaged_task<int(void)>(
+      std::bind(&command_manager::process_passive_service_check,
+                &command_manager::instance(),
+                google::protobuf::util::TimeUtil::TimestampToSeconds(
+                    request->check_time()),
+                host_name, svc_desc, request->code(), request->output()));
   command_manager::instance().enqueue(std::move(fn));
 
   return grpc::Status::OK;
@@ -102,13 +86,12 @@ grpc::Status engine_impl::ProcessHostCheckResult(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
 
-  auto fn = std::packaged_task<int(void)>(std::bind(&command_manager::process_passive_host_check,
-                      &command_manager::instance(),
-                      google::protobuf::util::TimeUtil::TimestampToSeconds(
-                          request->check_time()),
-                      host_name,
-                      request->code(),
-                      request->output()));
+  auto fn = std::packaged_task<int(void)>(
+      std::bind(&command_manager::process_passive_host_check,
+                &command_manager::instance(),
+                google::protobuf::util::TimeUtil::TimestampToSeconds(
+                    request->check_time()),
+                host_name, request->code(), request->output()));
   command_manager::instance().enqueue(std::move(fn));
 
   return grpc::Status::OK;
@@ -131,8 +114,8 @@ grpc::Status engine_impl::NewThresholdsFile(grpc::ServerContext* /*context*/,
                                             const ThresholdsFile* request,
                                             CommandSuccess* /*response*/) {
   const std::string& filename = request->filename();
-  auto fn =
-      std::packaged_task<int(void)>(std::bind(&anomalydetection::update_thresholds, filename));
+  auto fn = std::packaged_task<int(void)>(
+      std::bind(&anomalydetection::update_thresholds, filename));
   command_manager::instance().enqueue(std::move(fn));
   return grpc::Status::OK;
 }

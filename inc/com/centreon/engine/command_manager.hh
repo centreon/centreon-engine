@@ -46,7 +46,7 @@ class command_manager {
                                  const std::string& host_name,
                                  uint32_t return_code,
                                  const std::string& output);
-  int get_stats(Stats* response);
+  int get_stats(std::string const& request, Stats* response);
   int get_restart_stats(RestartStats* response);
   int get_services_stats(ServicesStats* sstats);
   int get_hosts_stats(HostsStats* hstats);

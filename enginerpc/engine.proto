@@ -8,8 +8,7 @@ package com.centreon.engine;
 
 service Engine {
   rpc GetVersion(google.protobuf.Empty) returns (Version) {}
-  rpc GetStats(google.protobuf.Empty) returns (Stats) {}
-  rpc GetRestartStats(google.protobuf.Empty) returns (RestartStats) {}
+  rpc GetStats(Object) returns (Stats) {}
 
   rpc ProcessServiceCheckResult(Check) returns (CommandSuccess) {}
   rpc ProcessHostCheckResult(Check) returns (CommandSuccess) {}
@@ -19,6 +18,10 @@ service Engine {
 
 message CommandSuccess {
   bool value = 1;
+}
+
+message Object {
+  string name = 1;
 }
 
 message Check {
@@ -60,7 +63,6 @@ message RestartStats {
   google.protobuf.Duration apply_connectors = 6;
   google.protobuf.Duration apply_commands = 7;
   google.protobuf.Duration apply_contacts = 8;
-
   google.protobuf.Duration apply_hosts = 9;
   google.protobuf.Duration apply_services = 10;
   google.protobuf.Duration resolve_hosts = 11;
@@ -190,6 +192,7 @@ message Stats {
   ServicesStats services_stats = 3;
   HostsStats hosts_stats = 4;
   ExtCmdBuffer buffer = 5;
+  RestartStats restart_status = 6;
 }
 
 message ThresholdsFile {

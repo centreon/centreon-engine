@@ -18,14 +18,16 @@
 */
 
 #include "com/centreon/engine/configuration/applier/anomalydetection.hh"
+
 #include <algorithm>
 #include <cassert>
+
+#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/exceptions/error.hh"
-#include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon;
@@ -60,7 +62,8 @@ applier::anomalydetection::anomalydetection() {}
  *
  *  @param[in] right Object to copy.
  */
-applier::anomalydetection::anomalydetection(applier::anomalydetection const& right) {
+applier::anomalydetection::anomalydetection(
+    applier::anomalydetection const& right) {
   (void)right;
 }
 
@@ -76,7 +79,8 @@ applier::anomalydetection::~anomalydetection() {}
  *
  *  @return This object.
  */
-applier::anomalydetection& applier::anomalydetection::operator=(applier::anomalydetection const& right) {
+applier::anomalydetection& applier::anomalydetection::operator=(
+    applier::anomalydetection const& right) {
   (void)right;
   return *this;
 }
@@ -161,7 +165,7 @@ void applier::anomalydetection::add_object(
                                       obj.service_description()}]
       ->set_service_id(obj.service_id());
   ad->set_acknowledgement_timeout(obj.get_acknowledgement_timeout() *
-                                   config->interval_length());
+                                  config->interval_length());
   ad->set_last_acknowledgement(0);
 
   // Add contacts.
@@ -206,14 +210,12 @@ void applier::anomalydetection::expand_objects(configuration::state& s) {
   for (configuration::set_anomalydetection::iterator
            it_ad = s.anomalydetections().begin(),
            end_ad = s.anomalydetections().end();
-       it_ad != end_ad;
-       ++it_ad) {
+       it_ad != end_ad; ++it_ad) {
     // Should custom variables be sent to broker ?
     for (map_customvar::iterator
              it = const_cast<map_customvar&>(it_ad->customvariables()).begin(),
              end = const_cast<map_customvar&>(it_ad->customvariables()).end();
-         it != end;
-         ++it) {
+         it != end; ++it) {
       if (!s.enable_macros_filter() ||
           s.macros_filter().find(it->first) != s.macros_filter().end()) {
         it->second.set_sent(true);
@@ -228,14 +230,15 @@ void applier::anomalydetection::expand_objects(configuration::state& s) {
  *  @param[in] obj  The new anomalydetection to modify into the monitoring
  *                  engine.
  */
-void applier::anomalydetection::modify_object(configuration::anomalydetection const& obj) {
+void applier::anomalydetection::modify_object(
+    configuration::anomalydetection const& obj) {
   std::string const& host_name(obj.host_name());
   std::string const& service_description(obj.service_description());
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-      << "Modifying new anomalydetection '" << service_description << "' of host '"
-      << host_name << "'.";
+      << "Modifying new anomalydetection '" << service_description
+      << "' of host '" << host_name << "'.";
 
   // Find the configuration object.
   set_anomalydetection::iterator it_cfg(
@@ -276,8 +279,8 @@ void applier::anomalydetection::modify_object(configuration::anomalydetection co
   s->set_thresholds_file(obj.thresholds_file());
   s->set_event_handler(obj.event_handler());
   s->set_event_handler_enabled(obj.event_handler_enabled());
-  s->set_initial_state(
-      static_cast<engine::anomalydetection::service_state>(obj.initial_state()));
+  s->set_initial_state(static_cast<engine::anomalydetection::service_state>(
+      obj.initial_state()));
   s->set_check_interval(obj.check_interval());
   s->set_retry_interval(obj.retry_interval());
   s->set_max_attempts(obj.max_check_attempts());
@@ -311,13 +314,16 @@ void applier::anomalydetection::modify_object(configuration::anomalydetection co
   s->add_stalk_on(obj.stalking_options() & configuration::anomalydetection::ok
                       ? notifier::ok
                       : notifier::none);
-  s->add_stalk_on(obj.stalking_options() & configuration::anomalydetection::warning
+  s->add_stalk_on(obj.stalking_options() &
+                          configuration::anomalydetection::warning
                       ? notifier::warning
                       : notifier::none);
-  s->add_stalk_on(obj.stalking_options() & configuration::anomalydetection::unknown
+  s->add_stalk_on(obj.stalking_options() &
+                          configuration::anomalydetection::unknown
                       ? notifier::unknown
                       : notifier::none);
-  s->add_stalk_on(obj.stalking_options() & configuration::anomalydetection::critical
+  s->add_stalk_on(obj.stalking_options() &
+                          configuration::anomalydetection::critical
                       ? notifier::critical
                       : notifier::none);
 
@@ -430,7 +436,8 @@ void applier::anomalydetection::modify_object(configuration::anomalydetection co
  *  @param[in] obj  The new anomalydetection to remove from the monitoring
  *                  engine.
  */
-void applier::anomalydetection::remove_object(configuration::anomalydetection const& obj) {
+void applier::anomalydetection::remove_object(
+    configuration::anomalydetection const& obj) {
   std::string const& host_name(obj.host_name());
   std::string const& service_description(obj.service_description());
 
@@ -455,10 +462,11 @@ void applier::anomalydetection::remove_object(configuration::anomalydetection co
             host_name, service_description, (time_t)0, "");
 
     // Remove events related to this anomalydetection.
-    applier::scheduler::instance().remove_service(obj.host_id(), obj.service_id());
+    applier::scheduler::instance().remove_service(obj.host_id(),
+                                                  obj.service_id());
 
-    //remove anomalydetection from servicegroup->members
-    for (auto& it_s: it->second->get_parent_groups())
+    // remove anomalydetection from servicegroup->members
+    for (auto& it_s : it->second->get_parent_groups())
       it_s->members.erase({host_name, service_description});
 
     // Notify event broker.
@@ -481,14 +489,16 @@ void applier::anomalydetection::remove_object(configuration::anomalydetection co
  *
  *  @param[in] obj  Service object.
  */
-void applier::anomalydetection::resolve_object(configuration::anomalydetection const& obj) {
+void applier::anomalydetection::resolve_object(
+    configuration::anomalydetection const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-      << "Resolving anomalydetection '" << obj.service_description() << "' of host '"
-      << obj.host_name() << "'.";
+      << "Resolving anomalydetection '" << obj.service_description()
+      << "' of host '" << obj.host_name() << "'.";
 
   // Find anomalydetection.
-  service_id_map::iterator it(engine::anomalydetection::services_by_id.find(obj.key()));
+  service_id_map::iterator it(
+      engine::anomalydetection::services_by_id.find(obj.key()));
   if (engine::anomalydetection::services_by_id.end() == it)
     throw engine_error() << "Cannot resolve non-existing anomalydetection '"
                          << obj.service_description() << "' of host '"
@@ -516,8 +526,9 @@ void applier::anomalydetection::resolve_object(configuration::anomalydetection c
  *  @param[in]  obj Target anomalydetection.
  *  @param[out] s   Configuration state.
  */
-void applier::anomalydetection::_expand_service_memberships(configuration::anomalydetection& obj,
-                                                   configuration::state& s) {
+void applier::anomalydetection::_expand_service_memberships(
+    configuration::anomalydetection& obj,
+    configuration::state& s) {
   // Browse anomalydetection groups.
   for (set_string::const_iterator it(obj.servicegroups().begin()),
        end(obj.servicegroups().end());
@@ -529,8 +540,8 @@ void applier::anomalydetection::_expand_service_memberships(configuration::anoma
       throw(engine_error() << "Could not add anomalydetection '"
                            << obj.service_description() << "' of host '"
                            << obj.host_name()
-                           << "' to non-existing anomalydetection group '" << *it
-                           << "'");
+                           << "' to non-existing anomalydetection group '"
+                           << *it << "'");
 
     // Remove anomalydetection group from state.
     configuration::servicegroup backup(*it_group);

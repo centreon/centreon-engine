@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/configuration/applier/command.hh"
+
 #include <cstring>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/connector.hh"

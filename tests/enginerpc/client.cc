@@ -46,9 +46,10 @@ class EngineRPCClient {
   }
 
   bool GetStats(Stats* stats) {
-    const ::google::protobuf::Empty e;
+    Object obj;
+    *obj.mutable_name() = "default";
     grpc::ClientContext context;
-    grpc::Status status = _stub->GetStats(&context, e, stats);
+    grpc::Status status = _stub->GetStats(&context, obj, stats);
     if (!status.ok()) {
       std::cout << "GetStats rpc failed." << std::endl;
       return false;

@@ -18,8 +18,10 @@
 */
 
 #include "com/centreon/engine/configuration/applier/macros.hh"
+
 #include <cassert>
 #include <cstring>
+
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"

@@ -18,8 +18,11 @@
 */
 
 #include "com/centreon/engine/configuration/applier/logging.hh"
+
 #include <syslog.h>
+
 #include <cassert>
+
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/debug_file.hh"
 #include "com/centreon/engine/logging/logger.hh"

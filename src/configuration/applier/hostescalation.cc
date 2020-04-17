@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/configuration/applier/hostescalation.hh"
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -162,10 +163,9 @@ void applier::hostescalation::remove_object(
   /* ... and its escalations */
   if (hit == engine::host::hosts.end()) {
     logger(logging::dbg_config, logging::more)
-      << "Cannot find host '" << host_name << "' - already removed.";
+        << "Cannot find host '" << host_name << "' - already removed.";
     host_exists = false;
-  }
-  else
+  } else
     host_exists = true;
 
   for (hostescalation_mmap::iterator it{range.first}, end{range.second};
@@ -196,7 +196,8 @@ void applier::hostescalation::remove_object(
 
       if (host_exists) {
         logger(logging::dbg_config, logging::more)
-          << "Host '" << host_name << "' found - removing escalation from it.";
+            << "Host '" << host_name
+            << "' found - removing escalation from it.";
         std::list<escalation*>& escalations(hit->second->get_escalations());
         /* We need also to remove the escalation from the host */
         for (std::list<engine::escalation*>::iterator heit{escalations.begin()},

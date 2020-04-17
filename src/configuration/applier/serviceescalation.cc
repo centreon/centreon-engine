@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -185,11 +186,10 @@ void applier::serviceescalation::remove_object(
   /* ... and its escalations */
   if (sit == engine::service::services.end()) {
     logger(logging::dbg_config, logging::more)
-      << "Cannot find service '" << host_name << "/" << description
-      << "' - already removed.";
+        << "Cannot find service '" << host_name << "/" << description
+        << "' - already removed.";
     service_exists = false;
-  }
-  else
+  } else
     service_exists = true;
 
   for (serviceescalation_mmap::iterator it{range.first}, end{range.second};
@@ -205,8 +205,8 @@ void applier::serviceescalation::remove_object(
 
       if (service_exists) {
         logger(logging::dbg_config, logging::more)
-          << "Service '" << host_name << "/" << description
-          << "' found - removing escalation from it.";
+            << "Service '" << host_name << "/" << description
+            << "' found - removing escalation from it.";
         std::list<escalation*>& srv_escalations(sit->second->get_escalations());
         /* We need also to remove the escalation from the service */
         for (std::list<engine::escalation*>::iterator

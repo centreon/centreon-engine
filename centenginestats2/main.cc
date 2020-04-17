@@ -29,23 +29,25 @@
 using namespace com::centreon::engine;
 
 static void display_help(const char* program_name) {
-  std::cout
-      << "Usage: " << program_name
-      << " [options]\n\n"
-         "Startup:\n"
-         "  -V, --version        display centreon-engine version and exit.\n"
-         "  -L, --license        display license information and exit.\n"
-         "  -h, --help           display usage information and exit.\n"
-         "\n"
-         "Input options:\n"
-         "  -c, --config=FILE    specifies location of main Centreon "
-         "Engine config file.\n"
-         "  -s, --statsfile=FILE specifies alternate location of file to "
-         "read Centreon\n"
-         "  -p, --port=NUMBER    specifies the port number of the engine "
-         "grpc server to connect to.\n"
-         "                       Engine performance data from.\n"
-      << std::endl;
+  printf(
+      "Usage: %s [options]\n\n"
+      "Startup:\n"
+      "  -V, --version        display centreon-engine version and exit.\n"
+      "  -L, --license        display license information and exit.\n"
+      "  -h, --help           display usage information and exit.\n"
+      "\n"
+      "Input options:\n"
+      "  -c, --config=FILE    specifies location of main Centreon "
+      "Engine config file.\n"
+      "  -s, --statsfile=FILE specifies alternate location of file to "
+      "read Centreon\n"
+      "  -p, --port=NUMBER    specifies the port number of the engine "
+      "grpc server to connect to.\n"
+      "  -o, --object=STRING  can contain be:\n"
+      "     * default         to get centengine stats.\n"
+      "     * start           to get durations during centengine start.\n\n"
+      "                       Engine performance data from.\n\n",
+      program_name);
 }
 
 static void display_license() {
@@ -69,6 +71,7 @@ static void display_license() {
 int main(int argc, char** argv) {
   std::string config_file("/etc/centreon-engine/centengine.cfg");
   std::string stats_file("/var/log/centreon-engine/status.dat");
+  std::string object("default");
 
   static struct option const long_options[] = {
       {"help", no_argument, 0, 'h'},
@@ -77,13 +80,14 @@ int main(int argc, char** argv) {
       {"statsfile", required_argument, 0, 's'},
       {"port", required_argument, 0, 'p'},
       {"version", no_argument, 0, 'V'},
+      {"object", required_argument, 0, 'o'},
       {0, 0, 0, 0}};
 
   bool error = false;
   bool get_version = false;
   uint16_t grpc_port = 0;
   while (!error) {
-    int c = getopt_long(argc, argv, "+hLc:s:p:V", long_options, nullptr);
+    int c = getopt_long(argc, argv, "+hLc:s:p:Vo:", long_options, nullptr);
     if (c == -1)
       break;
 
@@ -108,16 +112,18 @@ int main(int argc, char** argv) {
       case 'V':
         get_version = true;
         break;
+      case 'o':
+        object = std::string(optarg);
+        break;
       default:
         error = true;
     }
   }
 
-  std::cout
-      << "Centreon Engine Statistics Utility " CENTREON_ENGINE_VERSION_STRING
+  printf("Centreon Engine Statistics Utility " CENTREON_ENGINE_VERSION_STRING
          "\n\n"
          "Copyright 2020 Centreon\n"
-         "License: Apache v2.0\n\n";
+         "License: Apache v2.0\n\n");
 
   int32_t status;
   centenginestats_client client(grpc_port, config_file, stats_file);
@@ -133,38 +139,8 @@ int main(int argc, char** argv) {
       std::cerr << e.what() << std::endl;
       return 3;
     }
-  } else {
-    client.get_stats();
-  }
+  } else
+    client.get_stats(object);
+
   return 0;
-  //  if (strcmp(argv[1], "GetVersion") == 0) {
-  //    Version version;
-  //    status = client.GetVersion(&version) ? 0 : 1;
-  //    std::cout << "GetVersion: " << version.DebugString();
-  //  } else if (strcmp(argv[1], "GetStats") == 0) {
-  //    Stats stats;
-  //    status = client.GetStats(&stats) ? 0 : 2;
-  //    std::cout << "GetStats: " << stats.DebugString();
-  //  } else if (strcmp(argv[1], "ProcessServiceCheckResult") == 0) {
-  //    Check sc;
-  //    sc.set_host_name(argv[2]);
-  //    sc.set_svc_desc(argv[3]);
-  //    sc.set_code(std::stol(argv[4]));
-  //    sc.set_output("Test external command");
-  //    status = client.ProcessServiceCheckResult(sc) ? 0 : 3;
-  //    std::cout << "ProcessServiceCheckResult: " << status << std::endl;
-  //  } else if (strcmp(argv[1], "ProcessHostCheckResult") == 0) {
-  //    Check hc;
-  //    hc.set_host_name(argv[2]);
-  //    hc.set_code(std::stol(argv[3]));
-  //    hc.set_output("Test external command");
-  //    status = client.ProcessHostCheckResult(hc) ? 0 : 4;
-  //    std::cout << "ProcessHostCheckResult: " << status << std::endl;
-  //  } else if (strcmp(argv[1], "NewThresholdsFile") == 0) {
-  //    ThresholdsFile tf;
-  //    tf.set_filename(argv[2]);
-  //    status = client.NewThresholdsFile(tf) ? 0 : 5;
-  //    std::cout << "NewThresholdsFile: " << status << std::endl;
-  //  }
-  //  exit(status);
 }

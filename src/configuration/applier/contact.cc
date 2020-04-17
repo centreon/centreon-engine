@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/configuration/applier/contact.hh"
+
 #include <algorithm>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
@@ -360,7 +362,7 @@ void applier::contact::remove_object(configuration::contact const& obj) {
   if (it != engine::contact::contacts.end()) {
     engine::contact* cntct(it->second.get());
 
-    for (auto& it_c: it->second->get_parent_groups())
+    for (auto& it_c : it->second->get_parent_groups())
       it_c.second->get_members().erase(obj.contact_name());
 
     // Notify event broker.

@@ -216,139 +216,150 @@ int command_manager::process_passive_host_check(time_t check_time,
   return OK;
 }
 
-int command_manager::get_stats(Stats* response) {
-  response->mutable_program_status()->set_modified_host_attributes(
-      modified_host_process_attributes);
-  response->mutable_program_status()->set_modified_service_attributes(
-      modified_service_process_attributes);
-  response->mutable_program_status()->set_pid(getpid());
-  *response->mutable_program_status()->mutable_program_start() =
-      google::protobuf::util::TimeUtil::SecondsToTimestamp(program_start);
-  *response->mutable_program_status()->mutable_last_command_check() =
-      google::protobuf::util::TimeUtil::SecondsToTimestamp(last_command_check);
-  *response->mutable_program_status()->mutable_last_log_rotation() =
-      google::protobuf::util::TimeUtil::SecondsToTimestamp(last_log_rotation);
-  response->mutable_program_status()->set_enable_notifications(
-      enable_notifications);
-  response->mutable_program_status()->set_active_service_checks_enabled(
-      execute_service_checks);
-  response->mutable_program_status()->set_passive_service_checks_enabled(
-      accept_passive_service_checks);
-  response->mutable_program_status()->set_active_host_checks_enabled(
-      execute_host_checks);
-  response->mutable_program_status()->set_passive_host_checks_enabled(
-      accept_passive_host_checks);
-  response->mutable_program_status()->set_enable_event_handlers(
-      enable_event_handlers);
-  response->mutable_program_status()->set_obsess_over_services(
-      obsess_over_services);
-  response->mutable_program_status()->set_obsess_over_hosts(obsess_over_hosts);
-  response->mutable_program_status()->set_check_service_freshness(
-      check_service_freshness);
-  response->mutable_program_status()->set_check_host_freshness(
-      check_host_freshness);
-  response->mutable_program_status()->set_enable_flap_detection(
-      enable_flap_detection);
-  response->mutable_program_status()->set_process_performance_data(
-      process_performance_data);
-  response->mutable_program_status()->set_global_host_event_handler(
-      global_host_event_handler);
-  response->mutable_program_status()->set_global_service_event_handler(
-      global_service_event_handler);
-  response->mutable_program_status()->set_next_comment_id(
-      comment::get_next_comment_id());
-  response->mutable_program_status()->set_next_event_id(next_event_id);
-  response->mutable_program_status()->set_next_problem_id(next_problem_id);
-  response->mutable_program_status()->set_next_notification_id(
-      notifier::get_next_notification_id());
+int command_manager::get_stats(std::string const& request, Stats* response) {
+  if (request == "default") {
+    response->mutable_program_status()->set_modified_host_attributes(
+        modified_host_process_attributes);
+    response->mutable_program_status()->set_modified_service_attributes(
+        modified_service_process_attributes);
+    response->mutable_program_status()->set_pid(getpid());
+    *response->mutable_program_status()->mutable_program_start() =
+        google::protobuf::util::TimeUtil::SecondsToTimestamp(program_start);
+    *response->mutable_program_status()->mutable_last_command_check() =
+        google::protobuf::util::TimeUtil::SecondsToTimestamp(
+            last_command_check);
+    *response->mutable_program_status()->mutable_last_log_rotation() =
+        google::protobuf::util::TimeUtil::SecondsToTimestamp(last_log_rotation);
+    response->mutable_program_status()->set_enable_notifications(
+        enable_notifications);
+    response->mutable_program_status()->set_active_service_checks_enabled(
+        execute_service_checks);
+    response->mutable_program_status()->set_passive_service_checks_enabled(
+        accept_passive_service_checks);
+    response->mutable_program_status()->set_active_host_checks_enabled(
+        execute_host_checks);
+    response->mutable_program_status()->set_passive_host_checks_enabled(
+        accept_passive_host_checks);
+    response->mutable_program_status()->set_enable_event_handlers(
+        enable_event_handlers);
+    response->mutable_program_status()->set_obsess_over_services(
+        obsess_over_services);
+    response->mutable_program_status()->set_obsess_over_hosts(
+        obsess_over_hosts);
+    response->mutable_program_status()->set_check_service_freshness(
+        check_service_freshness);
+    response->mutable_program_status()->set_check_host_freshness(
+        check_host_freshness);
+    response->mutable_program_status()->set_enable_flap_detection(
+        enable_flap_detection);
+    response->mutable_program_status()->set_process_performance_data(
+        process_performance_data);
+    response->mutable_program_status()->set_global_host_event_handler(
+        global_host_event_handler);
+    response->mutable_program_status()->set_global_service_event_handler(
+        global_service_event_handler);
+    response->mutable_program_status()->set_next_comment_id(
+        comment::get_next_comment_id());
+    response->mutable_program_status()->set_next_event_id(next_event_id);
+    response->mutable_program_status()->set_next_problem_id(next_problem_id);
+    response->mutable_program_status()->set_next_notification_id(
+        notifier::get_next_notification_id());
 
-  uint32_t used_external_command_buffer_slots = 0;
-  uint32_t high_external_command_buffer_slots = 0;
-  // get number f items in the command buffer
-  if (config->check_external_commands()) {
-    pthread_mutex_lock(&external_command_buffer.buffer_lock);
-    used_external_command_buffer_slots = external_command_buffer.items;
-    high_external_command_buffer_slots = external_command_buffer.high;
-    pthread_mutex_unlock(&external_command_buffer.buffer_lock);
-  }
-  response->mutable_program_status()->set_total_external_command_buffer_slots(
-      config->external_command_buffer_slots());
-  response->mutable_program_status()->set_used_external_command_buffer_slots(
-      used_external_command_buffer_slots);
-  response->mutable_program_status()->set_high_external_command_buffer_slots(
-      high_external_command_buffer_slots);
-  response->mutable_program_status()->set_high_external_command_buffer_slots(
-      high_external_command_buffer_slots);
-  response->mutable_program_status()->add_active_scheduled_host_check_stats(
-      check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_active_scheduled_host_check_stats(
-      check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_active_scheduled_host_check_stats(
-      check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_active_ondemand_host_check_stats(
-      check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_active_ondemand_host_check_stats(
-      check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_active_ondemand_host_check_stats(
-      check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_passive_host_check_stats(
-      check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_passive_host_check_stats(
-      check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_passive_host_check_stats(
-      check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_active_scheduled_service_check_stats(
-      check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_active_scheduled_service_check_stats(
-      check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_active_scheduled_service_check_stats(
-      check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_active_ondemand_service_check_stats(
-      check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_active_ondemand_service_check_stats(
-      check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_active_ondemand_service_check_stats(
-      check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_passive_service_check_stats(
-      check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_passive_service_check_stats(
-      check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_passive_service_check_stats(
-      check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_cached_host_check_stats(
-      check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_cached_host_check_stats(
-      check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_cached_host_check_stats(
-      check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_cached_service_check_stats(
-      check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_cached_service_check_stats(
-      check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_cached_service_check_stats(
-      check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_external_command_stats(
-      check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_external_command_stats(
-      check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_external_command_stats(
-      check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_parallel_host_check_stats(
-      check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_parallel_host_check_stats(
-      check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_parallel_host_check_stats(
-      check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_status()->add_serial_host_check_stats(
-      check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[0]);
-  response->mutable_program_status()->add_serial_host_check_stats(
-      check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[1]);
-  response->mutable_program_status()->add_serial_host_check_stats(
-      check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[2]);
-  response->mutable_program_configuration()->set_hosts_count(
-      host::hosts.size());
-  get_services_stats(response->mutable_services_stats());
-  get_hosts_stats(response->mutable_hosts_stats());
+    uint32_t used_external_command_buffer_slots = 0;
+    uint32_t high_external_command_buffer_slots = 0;
+    // get number f items in the command buffer
+    if (config->check_external_commands()) {
+      pthread_mutex_lock(&external_command_buffer.buffer_lock);
+      used_external_command_buffer_slots = external_command_buffer.items;
+      high_external_command_buffer_slots = external_command_buffer.high;
+      pthread_mutex_unlock(&external_command_buffer.buffer_lock);
+    }
+    response->mutable_program_status()->set_total_external_command_buffer_slots(
+        config->external_command_buffer_slots());
+    response->mutable_program_status()->set_used_external_command_buffer_slots(
+        used_external_command_buffer_slots);
+    response->mutable_program_status()->set_high_external_command_buffer_slots(
+        high_external_command_buffer_slots);
+    response->mutable_program_status()->set_high_external_command_buffer_slots(
+        high_external_command_buffer_slots);
+    response->mutable_program_status()->add_active_scheduled_host_check_stats(
+        check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_active_scheduled_host_check_stats(
+        check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_active_scheduled_host_check_stats(
+        check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_active_ondemand_host_check_stats(
+        check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_active_ondemand_host_check_stats(
+        check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_active_ondemand_host_check_stats(
+        check_statistics[ACTIVE_ONDEMAND_HOST_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_passive_host_check_stats(
+        check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_passive_host_check_stats(
+        check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_passive_host_check_stats(
+        check_statistics[PASSIVE_HOST_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()
+        ->add_active_scheduled_service_check_stats(
+            check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS]
+                .minute_stats[0]);
+    response->mutable_program_status()
+        ->add_active_scheduled_service_check_stats(
+            check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS]
+                .minute_stats[1]);
+    response->mutable_program_status()
+        ->add_active_scheduled_service_check_stats(
+            check_statistics[ACTIVE_SCHEDULED_SERVICE_CHECK_STATS]
+                .minute_stats[2]);
+    response->mutable_program_status()->add_active_ondemand_service_check_stats(
+        check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_active_ondemand_service_check_stats(
+        check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_active_ondemand_service_check_stats(
+        check_statistics[ACTIVE_ONDEMAND_SERVICE_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_passive_service_check_stats(
+        check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_passive_service_check_stats(
+        check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_passive_service_check_stats(
+        check_statistics[PASSIVE_SERVICE_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_cached_host_check_stats(
+        check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_cached_host_check_stats(
+        check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_cached_host_check_stats(
+        check_statistics[ACTIVE_CACHED_HOST_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_cached_service_check_stats(
+        check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_cached_service_check_stats(
+        check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_cached_service_check_stats(
+        check_statistics[ACTIVE_CACHED_SERVICE_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_external_command_stats(
+        check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_external_command_stats(
+        check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_external_command_stats(
+        check_statistics[EXTERNAL_COMMAND_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_parallel_host_check_stats(
+        check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_parallel_host_check_stats(
+        check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_parallel_host_check_stats(
+        check_statistics[PARALLEL_HOST_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_status()->add_serial_host_check_stats(
+        check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[0]);
+    response->mutable_program_status()->add_serial_host_check_stats(
+        check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[1]);
+    response->mutable_program_status()->add_serial_host_check_stats(
+        check_statistics[SERIAL_HOST_CHECK_STATS].minute_stats[2]);
+    response->mutable_program_configuration()->set_hosts_count(
+        host::hosts.size());
+    get_services_stats(response->mutable_services_stats());
+    get_hosts_stats(response->mutable_hosts_stats());
+  } else if (request == "start")
+    return get_restart_stats(response->mutable_restart_status());
   return 0;
 }
 
@@ -617,8 +628,7 @@ int command_manager::get_hosts_stats(HostsStats* hstats) {
       max = v;
   };
 
-  for (auto it = host::hosts_by_id.begin(),
-            end = host::hosts_by_id.end();
+  for (auto it = host::hosts_by_id.begin(), end = host::hosts_by_id.end();
        it != end; ++it) {
     host* hst = it->second.get();
 
@@ -733,17 +743,13 @@ int command_manager::get_hosts_stats(HostsStats* hstats) {
   hstats->mutable_active_hosts()->set_average_execution_time(
       active_avg_execution_time);
 
-  hstats->mutable_active_hosts()->set_min_state_change(
-      active_min_state_change);
-  hstats->mutable_active_hosts()->set_max_state_change(
-      active_max_state_change);
+  hstats->mutable_active_hosts()->set_min_state_change(active_min_state_change);
+  hstats->mutable_active_hosts()->set_max_state_change(active_max_state_change);
   hstats->mutable_active_hosts()->set_average_state_change(
       active_avg_state_change);
 
-  hstats->mutable_active_hosts()->set_checks_last_1min(
-      active_checks_last_1min);
-  hstats->mutable_active_hosts()->set_checks_last_5min(
-      active_checks_last_5min);
+  hstats->mutable_active_hosts()->set_checks_last_1min(active_checks_last_1min);
+  hstats->mutable_active_hosts()->set_checks_last_5min(active_checks_last_5min);
   hstats->mutable_active_hosts()->set_checks_last_15min(
       active_checks_last_15min);
   hstats->mutable_active_hosts()->set_checks_last_1hour(
@@ -783,30 +789,76 @@ int command_manager::get_restart_stats(RestartStats* response) {
       ::google::protobuf::util::TimeUtil::TimeTToTimestamp(
           std::chrono::system_clock::to_time_t(
               restart_apply_stats.apply_start));
-  *response->mutable_objects_expansion() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.objects_expansion.count());
-  *response->mutable_objects_difference() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.objects_difference.count());
-  *response->mutable_apply_config() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_config.count());
+  *response->mutable_objects_expansion() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.objects_expansion.count());
+  *response->mutable_objects_difference() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.objects_difference.count());
+  *response->mutable_apply_config() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_config.count());
 
-  *response->mutable_apply_timeperiods() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_timeperiods.count());
-  *response->mutable_apply_connectors() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_connectors.count());
-  *response->mutable_apply_commands() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_commands.count());
-  *response->mutable_apply_contacts() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_contacts.count());
-  *response->mutable_apply_hosts() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_hosts.count());
-  *response->mutable_apply_services() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_services.count());
-  *response->mutable_resolve_hosts() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_hosts.count());
-  *response->mutable_resolve_services() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_services.count());
-  *response->mutable_apply_host_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_host_dependencies.count());
-  *response->mutable_resolve_host_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_host_dependencies.count());
-  *response->mutable_apply_service_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_service_dependencies.count());
-  *response->mutable_resolve_service_dependencies() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_service_dependencies.count());
-  *response->mutable_apply_host_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_host_escalations.count());
-  *response->mutable_resolve_host_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_host_escalations.count());
-  *response->mutable_apply_service_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_service_escalations.count());
-  *response->mutable_resolve_service_escalations() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.resolve_service_escalations.count());
-  *response->mutable_apply_new_config() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_new_config.count());
-  *response->mutable_apply_scheduler() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.apply_scheduler.count());
-  *response->mutable_check_circular_paths() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.check_circular_paths.count());
-  *response->mutable_reload_modules() = ::google::protobuf::util::TimeUtil::MillisecondsToDuration(restart_apply_stats.reload_modules.count());
+  *response->mutable_apply_timeperiods() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_timeperiods.count());
+  *response->mutable_apply_connectors() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_connectors.count());
+  *response->mutable_apply_commands() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_commands.count());
+  *response->mutable_apply_contacts() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_contacts.count());
+  *response->mutable_apply_hosts() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_hosts.count());
+  *response->mutable_apply_services() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_services.count());
+  *response->mutable_resolve_hosts() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.resolve_hosts.count());
+  *response->mutable_resolve_services() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.resolve_services.count());
+  *response->mutable_apply_host_dependencies() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_host_dependencies.count());
+  *response->mutable_resolve_host_dependencies() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.resolve_host_dependencies.count());
+  *response->mutable_apply_service_dependencies() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_service_dependencies.count());
+  *response->mutable_resolve_service_dependencies() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.resolve_service_dependencies.count());
+  *response->mutable_apply_host_escalations() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_host_escalations.count());
+  *response->mutable_resolve_host_escalations() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.resolve_host_escalations.count());
+  *response->mutable_apply_service_escalations() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_service_escalations.count());
+  *response->mutable_resolve_service_escalations() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.resolve_service_escalations.count());
+  *response->mutable_apply_new_config() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_new_config.count());
+  *response->mutable_apply_scheduler() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.apply_scheduler.count());
+  *response->mutable_check_circular_paths() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.check_circular_paths.count());
+  *response->mutable_reload_modules() =
+      ::google::protobuf::util::TimeUtil::MillisecondsToDuration(
+          restart_apply_stats.reload_modules.count());
 
   *response->mutable_apply_end() =
       ::google::protobuf::util::TimeUtil::TimeTToTimestamp(

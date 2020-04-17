@@ -18,8 +18,10 @@
 */
 
 #include "com/centreon/engine/configuration/applier/service.hh"
+
 #include <algorithm>
 #include <cassert>
+
 #include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"

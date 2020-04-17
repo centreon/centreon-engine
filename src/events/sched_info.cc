@@ -21,7 +21,9 @@
 */
 
 #include "com/centreon/engine/events/sched_info.hh"
+
 #include <cmath>
+
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -29,7 +31,6 @@
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
 
 /**
  *  Displays service check scheduling information.

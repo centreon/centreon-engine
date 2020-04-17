@@ -18,13 +18,14 @@
 */
 
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
+
 #include <cmath>
 #include <cstddef>
 #include <cstring>
+
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -101,7 +102,8 @@ void applier::scheduler::apply(
         {it->host_id(), it->service_id()}));
     if (svc != services.end()) {
       bool has_event(events::loop::instance().find_event(
-          events::loop::low, timed_event::EVENT_SERVICE_CHECK, svc->second.get()));
+          events::loop::low, timed_event::EVENT_SERVICE_CHECK,
+          svc->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         svc_to_unschedule.insert(*it);
@@ -114,7 +116,8 @@ void applier::scheduler::apply(
     }
   }
 
-  for (set_anomalydetection::iterator it(diff_anomalydetections.modified().begin()),
+  for (set_anomalydetection::iterator
+           it(diff_anomalydetections.modified().begin()),
        end(diff_anomalydetections.modified().end());
        it != end; ++it) {
     service_id_map const& services(engine::service::services_by_id);
@@ -122,7 +125,8 @@ void applier::scheduler::apply(
         {it->host_id(), it->service_id()}));
     if (svc != services.end()) {
       bool has_event(events::loop::instance().find_event(
-          events::loop::low, timed_event::EVENT_SERVICE_CHECK, svc->second.get()));
+          events::loop::low, timed_event::EVENT_SERVICE_CHECK,
+          svc->second.get()));
       bool should_schedule(it->checks_active() && (it->check_interval() > 0));
       if (has_event && should_schedule) {
         ad_to_unschedule.insert(*it);
@@ -156,7 +160,8 @@ void applier::scheduler::apply(
     _unschedule_service_events(old_anomalydetections);
   }
   // Check if we need to add or modify objects into the scheduler.
-  if (!hst_to_schedule.empty() || !svc_to_schedule.empty() || !ad_to_schedule.empty()) {
+  if (!hst_to_schedule.empty() || !svc_to_schedule.empty() ||
+      !ad_to_schedule.empty()) {
     // Reset scheduling info.
     // Keep data that has been set manually by the user
     // (service interleave and intercheck delays).
@@ -194,7 +199,8 @@ void applier::scheduler::apply(
           _get_services(svc_to_schedule, true);
       std::vector<engine::service*> new_anomalydetections =
           _get_anomalydetections(ad_to_schedule, true);
-      new_services.insert(new_services.end(),
+      new_services.insert(
+          new_services.end(),
           std::make_move_iterator(new_anomalydetections.begin()),
           std::make_move_iterator(new_anomalydetections.end()));
       _schedule_service_events(new_services);
@@ -325,8 +331,8 @@ void applier::scheduler::_apply_misc_event() {
       unsigned long interval(5);
       if (_config->command_check_interval() != -1)
         interval = (unsigned long)_config->command_check_interval();
-      _evt_command_check =
-          _create_misc_event(timed_event::EVENT_COMMAND_CHECK, now + interval, interval);
+      _evt_command_check = _create_misc_event(timed_event::EVENT_COMMAND_CHECK,
+                                              now + interval, interval);
     }
     _old_command_check_interval = _config->command_check_interval();
   }
@@ -365,9 +371,10 @@ void applier::scheduler::_apply_misc_event() {
        _config->auto_rescheduling_interval())) {
     _remove_misc_event(_evt_reschedule_checks);
     if (_config->auto_reschedule_checks())
-      _evt_reschedule_checks = _create_misc_event(
-          timed_event::EVENT_RESCHEDULE_CHECKS, now + _config->auto_rescheduling_interval(),
-          _config->auto_rescheduling_interval());
+      _evt_reschedule_checks =
+          _create_misc_event(timed_event::EVENT_RESCHEDULE_CHECKS,
+                             now + _config->auto_rescheduling_interval(),
+                             _config->auto_rescheduling_interval());
     _old_auto_rescheduling_interval = _config->auto_rescheduling_interval();
   }
 
@@ -380,8 +387,8 @@ void applier::scheduler::_apply_misc_event() {
     if (_config->retain_state_information() &&
         _config->retention_update_interval() > 0) {
       unsigned long interval(_config->retention_update_interval() * 60);
-      _evt_retention_save =
-          _create_misc_event(timed_event::EVENT_RETENTION_SAVE, now + interval, interval);
+      _evt_retention_save = _create_misc_event(
+          timed_event::EVENT_RETENTION_SAVE, now + interval, interval);
     }
     _old_retention_update_interval = _config->retention_update_interval();
   }
@@ -574,7 +581,6 @@ void applier::scheduler::_calculate_host_scheduling_params() {
       scheduling_info.host_check_interval_total * _config->interval_length();
 
   _calculate_host_inter_check_delay(_config->host_inter_check_delay_method());
-
 }
 
 /**
@@ -776,7 +782,7 @@ std::vector<com::centreon::engine::host*> applier::scheduler::_get_hosts(
     if (hst == hosts.end()) {
       if (throw_if_not_found)
         throw engine_error()
-              << "Could not schedule non-existing host '" << host_name << "'";
+            << "Could not schedule non-existing host '" << host_name << "'";
     } else
       retval.push_back(&*hst->second);
   }
@@ -805,8 +811,8 @@ std::vector<com::centreon::engine::service*> applier::scheduler::_get_services(
     if (svc == services.end()) {
       if (throw_if_not_found)
         throw engine_error()
-              << "Cannot schedule non-existing service '" << service_description
-              << "' on host '" << host_name << "'";
+            << "Cannot schedule non-existing service '" << service_description
+            << "' on host '" << host_name << "'";
     } else
       retval.push_back(svc->second.get());
   }
@@ -944,9 +950,9 @@ void applier::scheduler::_schedule_host_events(
     com::centreon::engine::host& hst(*it->second);
 
     // Schedule a new host check event.
-    timed_event* evt = new timed_event(timed_event::EVENT_HOST_CHECK, hst.get_next_check(),
-                                       false, 0, nullptr, true, (void*)&hst,
-                                       NULL, hst.get_check_options());
+    timed_event* evt = new timed_event(
+        timed_event::EVENT_HOST_CHECK, hst.get_next_check(), false, 0, nullptr,
+        true, (void*)&hst, NULL, hst.get_check_options());
     events::loop::instance().schedule(evt, false);
   }
 
@@ -1050,9 +1056,9 @@ void applier::scheduler::_schedule_service_events(
        it != end; ++it) {
     engine::service& svc(*it->second);
     // Create a new service check event.
-    timed_event* evt(new timed_event(timed_event::EVENT_SERVICE_CHECK, svc.get_next_check(),
-                                     false, 0, nullptr, true, (void*)&svc,
-                                     nullptr, svc.get_check_options()));
+    timed_event* evt(new timed_event(
+        timed_event::EVENT_SERVICE_CHECK, svc.get_next_check(), false, 0,
+        nullptr, true, (void*)&svc, nullptr, svc.get_check_options()));
     events::loop::instance().schedule(evt, false);
   }
 
@@ -1062,7 +1068,6 @@ void applier::scheduler::_schedule_service_events(
   for (int i(0), end(services.size()); i < end; ++i)
     if (services[i]->get_problem_has_been_acknowledged())
       services[i]->schedule_acknowledgement_expiration();
-
 }
 
 /**
@@ -1073,8 +1078,8 @@ void applier::scheduler::_schedule_service_events(
 void applier::scheduler::_unschedule_host_events(
     std::vector<com::centreon::engine::host*> const& hosts) {
   for (auto& h : hosts) {
-    events::loop::instance().remove_events(
-        events::loop::low, timed_event::EVENT_HOST_CHECK, h);
+    events::loop::instance().remove_events(events::loop::low,
+                                           timed_event::EVENT_HOST_CHECK, h);
     events::loop::instance().remove_events(
         events::loop::low, timed_event::EVENT_EXPIRE_HOST_ACK, h);
   }
@@ -1088,8 +1093,8 @@ void applier::scheduler::_unschedule_host_events(
 void applier::scheduler::_unschedule_service_events(
     std::vector<engine::service*> const& services) {
   for (auto& s : services) {
-    events::loop::instance().remove_events(
-        events::loop::low, timed_event::EVENT_SERVICE_CHECK, s);
+    events::loop::instance().remove_events(events::loop::low,
+                                           timed_event::EVENT_SERVICE_CHECK, s);
     events::loop::instance().remove_events(
         events::loop::low, timed_event::EVENT_EXPIRE_SERVICE_ACK, s);
   }
