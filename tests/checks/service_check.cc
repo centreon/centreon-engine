@@ -409,3 +409,29 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 3);
 }
+
+TEST_F(ServiceCheck, CheckRemoveCheck) {
+  set_time(50000);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  _svc->set_current_attempt(1);
+
+  set_time(50500);
+
+  std::ostringstream oss;
+  std::time_t now{std::time(nullptr)};
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+
+  /* We simulate a reload that destroyed the service */
+  engine::service::services.clear();
+  engine::service::services_by_id.clear();
+  _svc.reset();
+
+  checks::checker::instance().reap();
+}

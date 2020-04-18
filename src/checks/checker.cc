@@ -70,6 +70,7 @@ void checker::clear() noexcept {
       delete it->second;
       it = _waiting_check_result.erase(it);
     }
+    _to_forget.clear();
   } catch (...) {
   }
 }

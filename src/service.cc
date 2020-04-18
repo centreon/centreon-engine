@@ -141,8 +141,6 @@ service::service(std::string const& hostname,
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
 
-service::~service() {}
-
 time_t service::get_last_time_ok() const {
   return _last_time_ok;
 }

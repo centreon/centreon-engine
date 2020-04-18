@@ -73,6 +73,7 @@ class anomalydetection : public service {
                    int freshness_threshold,
                    bool obsess_over,
                    std::string const& timezone);
+  ~anomalydetection() = default;
   service* get_dependent_service() const;
   void set_dependent_service(service* svc);
   void set_metric_name(std::string const& name);
