@@ -19,18 +19,12 @@
 */
 
 #include "com/centreon/engine/checks/checker.hh"
-#include <sys/time.h>
-#include <cassert>
+
 #include <cstdlib>
-#include <cstring>
-#include <sstream>
+
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/check_result.hh"
-#include "com/centreon/engine/checks/viability_failure.hh"
-#include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/objects.hh"

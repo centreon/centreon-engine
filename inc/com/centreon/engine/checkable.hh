@@ -61,7 +61,7 @@ class checkable {
             int freshness_threshold,
             bool obsess_over,
             std::string const& timezone);
-  virtual ~checkable() {}
+  virtual ~checkable() = default;
 
   std::string const& get_display_name() const;
   void set_display_name(std::string const& name);

@@ -21,8 +21,6 @@
 #define CCE_NOTIFIER_HH
 
 #include <array>
-#include <list>
-#include <string>
 #include <unordered_set>
 #include "com/centreon/engine/checkable.hh"
 #include "com/centreon/engine/contactgroup.hh"

@@ -20,16 +20,9 @@
 #ifndef CCE_CHECKS_CHECKER_HH
 #define CCE_CHECKS_CHECKER_HH
 
-#include <mutex>
 #include <queue>
 #include "com/centreon/engine/anomalydetection.hh"
-#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/commands/command.hh"
-#include "com/centreon/engine/commands/command_listener.hh"
-#include "com/centreon/engine/commands/result.hh"
-#include "com/centreon/engine/host.hh"
-#include "com/centreon/engine/namespace.hh"
-#include "com/centreon/engine/service.hh"
 
 CCE_BEGIN()
 
