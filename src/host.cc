@@ -22,7 +22,6 @@
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/exceptions/error.hh"
@@ -2831,10 +2830,6 @@ int host::run_sync_check_3x(enum host::host_state* check_result_code,
     checks::checker::instance().run_sync(this, check_result_code, check_options,
                                          use_cached_result,
                                          check_timestamp_horizon);
-  } catch (checks::viability_failure const& e) {
-    // Do not log viability failures.
-    (void)e;
-    return ERROR;
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic) << "Error: " << e.what();
     return ERROR;

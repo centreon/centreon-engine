@@ -21,7 +21,6 @@
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/exceptions/error.hh"

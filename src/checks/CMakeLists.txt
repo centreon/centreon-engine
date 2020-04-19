@@ -29,12 +29,10 @@ set(
   # Sources.
   "${SRC_DIR}/checker.cc"
   "${SRC_DIR}/stats.cc"
-  "${SRC_DIR}/viability_failure.cc"
 
   # Headers.
   "${INC_DIR}/checker.hh"
   "${INC_DIR}/stats.hh"
-  "${INC_DIR}/viability_failure.hh"
 
   PARENT_SCOPE
 )
