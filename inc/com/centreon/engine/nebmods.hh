@@ -22,7 +22,6 @@
 #define CCE_NEBMODS_HH
 
 #include "com/centreon/engine/nebcallbacks.hh"
-#include "com/centreon/engine/nebmodules.hh"
 
 // Module Structures
 typedef struct nebcallback_struct {

@@ -20,16 +20,10 @@
 #ifndef CCE_CHECKS_CHECKER_HH
 #define CCE_CHECKS_CHECKER_HH
 
-#include <mutex>
 #include <queue>
+
 #include "com/centreon/engine/anomalydetection.hh"
-#include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/commands/command.hh"
-#include "com/centreon/engine/commands/command_listener.hh"
-#include "com/centreon/engine/commands/result.hh"
-#include "com/centreon/engine/host.hh"
-#include "com/centreon/engine/namespace.hh"
-#include "com/centreon/engine/service.hh"
 
 CCE_BEGIN()
 
@@ -53,6 +47,7 @@ class checker : public commands::command_listener {
                 unsigned long check_timestamp_horizon);
   void add_check_result(uint64_t id, check_result* result) noexcept;
   void add_check_result_to_reap(check_result* result) noexcept;
+  void forget(notifier* n) noexcept;
 
  private:
   checker();
@@ -72,11 +67,15 @@ class checker : public commands::command_listener {
   /* This queue is filled during a cycle. When it is time to reap, its elements
    * are passed to _to_reap. It can then be filled in parallel during the
    * _to_reap treatment. */
-  std::queue<check_result*> _to_reap_partial;
+  std::deque<check_result*> _to_reap_partial;
   /*
    * The list of check_results to reap: they contain data that have to be
    * translated to services/hosts. */
-  std::queue<check_result*> _to_reap;
+  std::deque<check_result*> _to_reap;
+
+  /* Due to reloads of centengine we have the following list with notifiers
+   * that should be forgotten if notifiers are removed. */
+  std::deque<notifier*> _to_forget;
 };
 }  // namespace checks
 

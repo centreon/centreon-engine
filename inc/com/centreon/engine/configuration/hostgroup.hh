@@ -20,10 +20,8 @@
 #ifndef CCE_CONFIGURATION_HOSTGROUP_HH
 #define CCE_CONFIGURATION_HOSTGROUP_HH
 
-#include <set>
 #include "com/centreon/engine/configuration/group.hh"
 #include "com/centreon/engine/configuration/object.hh"
-#include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/opt.hh"
 
 CCE_BEGIN()

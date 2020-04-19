@@ -21,9 +21,8 @@
 #define CCE_NOTIFIER_HH
 
 #include <array>
-#include <list>
-#include <string>
 #include <unordered_set>
+
 #include "com/centreon/engine/checkable.hh"
 #include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/customvariable.hh"
@@ -132,7 +131,7 @@ class notifier : public checkable {
            std::string const& timezone,
            bool retain_status_information,
            bool retain_nonstatus_information);
-  ~notifier() {}
+  ~notifier();
 
   void set_notification(int32_t idx, std::string const& value);
 
@@ -215,7 +214,8 @@ class notifier : public checkable {
   int get_retain_status_information(void) const noexcept;
   void set_retain_status_information(bool retain_status_informations) noexcept;
   bool get_retain_nonstatus_information(void) const noexcept;
-  void set_retain_nonstatus_information(bool retain_non_status_informations) noexcept;
+  void set_retain_nonstatus_information(
+      bool retain_non_status_informations) noexcept;
   bool get_is_being_freshened(void) const noexcept;
   void set_is_being_freshened(bool freshened) noexcept;
   std::list<escalation*>& get_escalations() noexcept;
@@ -226,7 +226,8 @@ class notifier : public checkable {
   uint32_t get_modified_attributes() const noexcept;
   void set_modified_attributes(uint32_t modified_attributes) noexcept;
   bool get_problem_has_been_acknowledged() const noexcept;
-  void set_problem_has_been_acknowledged(bool problem_has_been_acknowledged) noexcept;
+  void set_problem_has_been_acknowledged(
+      bool problem_has_been_acknowledged) noexcept;
   virtual bool recovered() const = 0;
   virtual int get_current_state_int() const = 0;
   bool get_no_more_notifications() const noexcept;
@@ -249,7 +250,8 @@ class notifier : public checkable {
       uint32_t& notification_interval);
   notifier_type get_notifier_type() const noexcept;
   std::unordered_map<std::string, contact*>& get_contacts() noexcept;
-  std::unordered_map<std::string, contact*> const& get_contacts() const noexcept;
+  std::unordered_map<std::string, contact*> const& get_contacts() const
+      noexcept;
   contactgroup_map_unsafe& get_contactgroups() noexcept;
   contactgroup_map_unsafe const& get_contactgroups() const noexcept;
   void resolve(int& w, int& e);

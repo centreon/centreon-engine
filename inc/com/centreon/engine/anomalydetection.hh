@@ -20,10 +20,11 @@
 #ifndef CCE_ANOMALYDETECTION_HH
 #define CCE_ANOMALYDETECTION_HH
 
-#include <map>
 #include <json11.hpp>
+#include <map>
 #include <mutex>
 #include <tuple>
+
 #include "com/centreon/engine/service.hh"
 
 CCE_BEGIN()
@@ -73,6 +74,7 @@ class anomalydetection : public service {
                    int freshness_threshold,
                    bool obsess_over,
                    std::string const& timezone);
+  ~anomalydetection() = default;
   service* get_dependent_service() const;
   void set_dependent_service(service* svc);
   void set_metric_name(std::string const& name);
@@ -89,7 +91,7 @@ class anomalydetection : public service {
                               time_t* preferred_time) noexcept override;
   commands::command* get_check_command_ptr() const;
   std::tuple<service::service_state, double, std::string, double, double>
-      parse_perfdata(std::string const& perfdata, time_t check_time);
+  parse_perfdata(std::string const& perfdata, time_t check_time);
   void init_thresholds();
   void set_status_change(bool status_change);
   const std::string& get_metric_name() const;

@@ -21,16 +21,16 @@
 #define CCE_SERVICE_HH
 
 #include <time.h>
+
 #include <array>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <unordered_map>
 #include <utility>
+
 #include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/contact.hh"
-#include "com/centreon/engine/contactgroup.hh"
 #include "com/centreon/engine/customvariable.hh"
 #include "com/centreon/engine/hash.hh"
 #include "com/centreon/engine/logging.hh"
@@ -38,6 +38,7 @@
 
 /* Forward declaration. */
 CCE_BEGIN()
+class contact;
 namespace commands {
 class command;
 }
@@ -100,7 +101,7 @@ class service : public notifier {
           int freshness_threshold,
           bool obsess_over,
           std::string const& timezone);
-  ~service();
+  ~service() = default;
   void set_host_id(uint64_t host_id);
   uint64_t get_host_id() const;
   void set_service_id(uint64_t service_id);

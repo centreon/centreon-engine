@@ -19,18 +19,12 @@
 */
 
 #include "com/centreon/engine/checks/checker.hh"
-#include <sys/time.h>
-#include <cassert>
+
 #include <cstdlib>
-#include <cstring>
-#include <sstream>
+
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/check_result.hh"
-#include "com/centreon/engine/checks/viability_failure.hh"
-#include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/objects.hh"
@@ -63,12 +57,12 @@ void checker::clear() noexcept {
     std::lock_guard<std::mutex> lock(_mut_reap);
     while (!_to_reap_partial.empty()) {
       check_result* result = _to_reap_partial.front();
-      _to_reap_partial.pop();
+      _to_reap_partial.pop_front();
       delete result;
     }
     while (!_to_reap.empty()) {
       check_result* result = _to_reap.front();
-      _to_reap.pop();
+      _to_reap.pop_front();
       delete result;
     }
     auto it = _waiting_check_result.begin();
@@ -76,6 +70,7 @@ void checker::clear() noexcept {
       delete it->second;
       it = _waiting_check_result.erase(it);
     }
+    _to_forget.clear();
   } catch (...) {
   }
 }
@@ -96,6 +91,27 @@ void checker::reap() {
   {  // Scope to release mutex in all termination cases.
     {
       std::lock_guard<std::mutex> lock(_mut_reap);
+      if (!_to_forget.empty()) {
+        for (notifier* n : _to_forget) {
+          for (auto it = _waiting_check_result.begin();
+               it != _waiting_check_result.end();) {
+            if (it->second->get_notifier() == n) {
+              delete it->second;
+              it = _waiting_check_result.erase(it);
+            } else
+              ++it;
+          }
+          for (auto it = _to_reap_partial.begin();
+               it != _to_reap_partial.end();) {
+            if ((*it)->get_notifier() == n) {
+              delete *it;
+              it = _to_reap_partial.erase(it);
+            } else
+              ++it;
+          }
+        }
+        _to_forget.clear();
+      }
       std::swap(_to_reap, _to_reap_partial);
     }
 
@@ -105,7 +121,7 @@ void checker::reap() {
       logger(dbg_checks, basic)
           << "Found a check result (#" << ++reaped_checks << ") to handle...";
       check_result* result = _to_reap.front();
-      _to_reap.pop();
+      _to_reap.pop_front();
 
       // Service check result->
       if (service_check == result->get_object_check_type()) {
@@ -118,9 +134,8 @@ void checker::reap() {
           svc->handle_async_check_result(result);
         } catch (std::exception const& e) {
           logger(log_runtime_warning, basic)
-              << "Check result queue errors for service "
-              << svc->get_host_id() << "/" << svc->get_service_id()
-              << " : " << e.what();
+              << "Check result queue errors for service " << svc->get_host_id()
+              << "/" << svc->get_service_id() << " : " << e.what();
         }
       }
       // Host check result->
@@ -313,13 +328,6 @@ checker::checker() : commands::command_listener() {}
  */
 checker::~checker() noexcept {
   clear();
-//  try {
-//    std::lock_guard<std::mutex> lock(_mut_reap);
-//    while (!_to_reap.empty()) {
-//      _to_reap.pop();
-//    }
-//  } catch (...) {
-//  }
 }
 
 /**
@@ -335,7 +343,7 @@ void checker::finished(commands::result const& res) noexcept {
   auto it_id = _waiting_check_result.find(res.command_id);
   if (it_id == _waiting_check_result.end()) {
     logger(log_runtime_warning, basic)
-      << "command ID '" << res.command_id << "' not found";
+        << "command ID '" << res.command_id << "' not found";
     return;
   }
 
@@ -357,7 +365,7 @@ void checker::finished(commands::result const& res) noexcept {
 
   // Queue check result.
   lock.lock();
-  _to_reap_partial.push(result);
+  _to_reap_partial.push_back(result);
 }
 
 /**
@@ -587,5 +595,17 @@ void checker::add_check_result(uint64_t id,
  */
 void checker::add_check_result_to_reap(check_result* check_result) noexcept {
   std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_reap_partial.push(check_result);
+  _to_reap_partial.push_back(check_result);
+}
+
+/**
+ * @brief Notifiers added here will be removed from current checks. This task
+ * is necessary because the user could remove a service or a host while a check
+ * is made on it.
+ *
+ * @param n The notifier to forget.
+ */
+void checker::forget(notifier* n) noexcept {
+  std::lock_guard<std::mutex> lock(_mut_reap);
+  _to_forget.push_back(n);
 }

@@ -23,12 +23,11 @@
 #define CCE_GLOBALS_HH
 
 #include <stdio.h>
+
 #include <map>
-#include <string>
-#include "com/centreon/engine/check_result.hh"
+
 #include "com/centreon/engine/circular_buffer.hh"
 #include "com/centreon/engine/configuration/state.hh"
-#include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/nebmods.hh"

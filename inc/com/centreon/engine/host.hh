@@ -21,11 +21,13 @@
 #define CCE_HOST_HH
 
 #include <time.h>
+
 #include <list>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <unordered_map>
+
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/namespace.hh"
@@ -112,7 +114,7 @@ class host : public notifier {
        bool retain_nonstatus_information,
        bool obsess_over_host,
        std::string const& timezone);
-  ~host() {}
+  ~host() = default;
   uint64_t get_host_id(void) const;
   void set_host_id(uint64_t id);
   void add_child_host(host* child);

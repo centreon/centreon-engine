@@ -18,14 +18,15 @@
 */
 
 #include "com/centreon/engine/service.hh"
+
 #include <iomanip>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/hostdependency.hh"
@@ -141,8 +142,6 @@ service::service(std::string const& hostname,
       _host_problem_at_last_check{false} {
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
-
-service::~service() {}
 
 time_t service::get_last_time_ok() const {
   return _last_time_ok;
@@ -693,12 +692,11 @@ com::centreon::engine::service* add_service(
         << "' cannot be created because"
         << " host '" << host_name << "' does not exist (host_id is null)";
     return nullptr;
-  }
-  else if (host_id != hid) {
+  } else if (host_id != hid) {
     logger(log_config_error, basic)
-      << "Error: The service '" << description
-      << "' cannot be created because the host id corresponding to the host"
-      << " '" << host_name << "' is not the same as the one in configuration";
+        << "Error: The service '" << description
+        << "' cannot be created because the host id corresponding to the host"
+        << " '" << host_name << "' is not the same as the one in configuration";
     return nullptr;
   }
 
@@ -1240,7 +1238,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   if (_last_state == state_ok && _current_state != _last_state)
     set_current_attempt(1);
   else if (get_state_type() == soft &&
-      get_current_attempt() < get_max_attempts())
+           get_current_attempt() < get_max_attempts())
     add_current_attempt(1);
 
   logger(dbg_checks, most) << "ST: "
@@ -1476,9 +1474,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_no_more_notifications(false);
 
     if (reschedule_check)
-      next_service_check =
-          (time_t)(get_last_check() +
-                   get_check_interval() * config->interval_length());
+      next_service_check = (time_t)(
+          get_last_check() + get_check_interval() * config->interval_length());
   }
 
   /*******************************************/
@@ -1490,7 +1487,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     logger(dbg_checks, more) << "Service is in a non-OK state!";
 
     /* check the route to the host if its up right now... */
-    if (hst->get_current_state() ==  host::state_up) {
+    if (hst->get_current_state() == host::state_up) {
       logger(dbg_checks, more)
           << "Host is currently UP, so we'll recheck its state to "
              "make sure...";
@@ -1499,21 +1496,19 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
       if (config->use_aggressive_host_checking())
-        hst->perform_on_demand_check(&route_result,
-                                     CHECK_OPTION_NONE, true,
+        hst->perform_on_demand_check(&route_result, CHECK_OPTION_NONE, true,
                                      config->cached_host_check_horizon());
       else {
         /* can we use the last cached host state? */
         /* only use cached host state if no service state change has occurred */
         if ((!state_change || state_changes_use_cached_state) &&
             hst->get_has_been_checked() &&
-            (static_cast<unsigned long>(current_time -
-                                        hst->get_last_check()) <=
+            (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
              config->cached_host_check_horizon())) {
           /* use current host state as route result */
           route_result = hst->get_current_state();
-          logger(dbg_checks, more) << "* Using cached host state: "
-                                   << hst->get_current_state();
+          logger(dbg_checks, more)
+              << "* Using cached host state: " << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
@@ -1524,16 +1519,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         else if (state_change) {
           /* use current host state as route result */
           route_result = hst->get_current_state();
-          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
-                                     nullptr, nullptr);
+          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                               nullptr);
         }
 
         /* ADDED 02/15/08 */
         /* else assume same host state */
         else {
           route_result = hst->get_current_state();
-          logger(dbg_checks, more) << "* Using last known host state: "
-                                   << hst->get_current_state();
+          logger(dbg_checks, more)
+              << "* Using last known host state: " << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
@@ -1551,8 +1546,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         logger(dbg_checks, more)
             << "Aggressive host checking is enabled, so we'll recheck the "
                "host state...";
-        hst->perform_on_demand_check(&route_result,
-                                     CHECK_OPTION_NONE, true,
+        hst->perform_on_demand_check(&route_result, CHECK_OPTION_NONE, true,
                                      config->cached_host_check_horizon());
       }
 
@@ -1567,8 +1561,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* previous logic was to simply run a sync (serial) host check */
         /* use current host state as route result */
         route_result = hst->get_current_state();
-        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false,
-                                   nullptr, nullptr);
+        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                             nullptr);
         /*perform_on_demand_host_check(hst,&route_result,CHECK_OPTION_NONE,true,config->cached_host_check_horizon());
          */
       }
@@ -2297,10 +2291,10 @@ int service::run_async_check(int check_options,
                              bool reschedule_check,
                              bool* time_is_valid,
                              time_t* preferred_time) noexcept {
-  logger(dbg_functions, basic) << "service::run_async_check, check_options="
-                               << check_options << ", latency=" << latency
-                               << ", scheduled_check=" << scheduled_check
-                               << ", reschedule_check=" << reschedule_check;
+  logger(dbg_functions, basic)
+      << "service::run_async_check, check_options=" << check_options
+      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
+      << ", reschedule_check=" << reschedule_check;
 
   // Preamble.
   if (!get_check_command_ptr()) {
@@ -2311,9 +2305,9 @@ int service::run_async_check(int check_options,
     return ERROR;
   }
 
-  logger(dbg_checks, basic) << "** Running async check of service '"
-                            << get_description() << "' on host '"
-                            << get_hostname() << "'...";
+  logger(dbg_checks, basic)
+      << "** Running async check of service '" << get_description()
+      << "' on host '" << get_hostname() << "'...";
 
   // Check if the service is viable now.
   if (!verify_check_viability(check_options, time_is_valid, preferred_time))
@@ -2322,21 +2316,11 @@ int service::run_async_check(int check_options,
   // Send broker event.
   timeval start_time = {0, 0};
   timeval end_time = {0, 0};
-  int res = broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK,
-                                 NEBFLAG_NONE,
-                                 NEBATTR_NONE,
-                                 this,
-                                 checkable::check_active,
-                                 start_time,
-                                 end_time,
-                                 get_check_command().c_str(),
-                                 get_latency(),
-                                 0.0,
-                                 0,
-                                 false,
-                                 0,
-                                 nullptr,
-                                 nullptr);
+  int res =
+      broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE,
+                           NEBATTR_NONE, this, checkable::check_active,
+                           start_time, end_time, get_check_command().c_str(),
+                           get_latency(), 0.0, 0, false, 0, nullptr, nullptr);
 
   // Service check was cancelled by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
@@ -2373,16 +2357,16 @@ int service::run_async_check(int check_options,
   grab_host_macros_r(&macros, get_host_ptr());
   grab_service_macros_r(&macros, this);
   std::string tmp;
-  get_raw_command_line_r(
-      &macros, get_check_command_ptr(), get_check_command().c_str(), tmp, 0);
+  get_raw_command_line_r(&macros, get_check_command_ptr(),
+                         get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
   gettimeofday(&start_time, nullptr);
 
   // Update the number of running service checks.
   ++currently_running_service_checks;
-  logger(dbg_checks, basic) << "Current running service checks: "
-                            << currently_running_service_checks;
+  logger(dbg_checks, basic)
+      << "Current running service checks: " << currently_running_service_checks;
 
   // Set the execution flag.
   set_is_executing(true);
@@ -2392,21 +2376,12 @@ int service::run_async_check(int check_options,
   std::string processed_cmd(cmd->process_cmd(&macros));
 
   // Send event broker.
-  res = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
-                             NEBFLAG_NONE,
-                             NEBATTR_NONE,
-                             this,
-                             checkable::check_active,
-                             start_time,
-                             end_time,
-                             get_check_command().c_str(),
-                             get_latency(),
-                             0.0,
-                             config->service_check_timeout(),
-                             false,
-                             0,
-                             processed_cmd.c_str(),
-                             nullptr);
+  res =
+      broker_service_check(NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE,
+                           NEBATTR_NONE, this, checkable::check_active,
+                           start_time, end_time, get_check_command().c_str(),
+                           get_latency(), 0.0, config->service_check_timeout(),
+                           false, 0, processed_cmd.c_str(), nullptr);
 
   // Restore latency.
   set_latency(old_latency);
@@ -2439,11 +2414,9 @@ int service::run_async_check(int check_options,
       if (id != 0)
         checks::checker::instance().add_check_result(
             id, check_result_info.release());
-    }
-    catch (com::centreon::exceptions::interruption const& e) {
+    } catch (com::centreon::exceptions::interruption const& e) {
       retry = true;
-    }
-    catch (std::exception const& e) {
+    } catch (std::exception const& e) {
       // Update check result.
       timeval tv;
       gettimeofday(&tv, nullptr);
@@ -2562,15 +2535,9 @@ void service::schedule_check(time_t check_time, int options) {
       set_next_check(check_time);
 
       // Place the new event in the event queue.
-      timed_event* new_event = new timed_event(timed_event::EVENT_SERVICE_CHECK,
-          get_next_check(),
-          false,
-          0L,
-          nullptr,
-          true,
-          this,
-          nullptr,
-          options);
+      timed_event* new_event =
+          new timed_event(timed_event::EVENT_SERVICE_CHECK, get_next_check(),
+                          false, 0L, nullptr, true, this, nullptr, options);
 
       events::loop::instance().reschedule_event(new_event, events::loop::low);
     } catch (...) {
@@ -2620,9 +2587,9 @@ void service::set_flap(double percent_change,
       << "stops, notifications will be re-enabled.";
 
   std::shared_ptr<comment> com{
-      new comment(comment::service, comment::flapping, get_host_id(), _service_id,
-                  time(nullptr), "(Centreon Engine Process)", oss.str(), false,
-                  comment::internal, false, (time_t)0)};
+      new comment(comment::service, comment::flapping, get_host_id(),
+                  _service_id, time(nullptr), "(Centreon Engine Process)",
+                  oss.str(), false, comment::internal, false, (time_t)0)};
 
   comment::comments.insert({com->get_comment_id(), com});
 
@@ -2748,8 +2715,8 @@ void service::update_status(bool aggregated_dump) {
 
 /* checks viability of performing a service check */
 bool service::verify_check_viability(int check_options,
-                                    bool* time_is_valid,
-                                    time_t* new_time) {
+                                     bool* time_is_valid,
+                                     time_t* new_time) {
   bool perform_check = true;
   time_t current_time = 0L;
   time_t preferred_time = 0L;

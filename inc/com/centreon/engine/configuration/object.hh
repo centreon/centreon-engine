@@ -21,13 +21,10 @@
 #define CCE_CONFIGURATION_OBJECT_HH
 
 #include <algorithm>
-#include <list>
 #include <map>
 #include <memory>
-#include <set>
-#include <string>
 #include <unordered_map>
-#include "com/centreon/engine/namespace.hh"
+
 #include "com/centreon/engine/string.hh"
 
 typedef std::list<std::string> list_string;

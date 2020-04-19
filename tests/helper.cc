@@ -17,10 +17,11 @@
  *
  */
 
-#include <com/centreon/engine/configuration/applier/state.hh>
-#include <com/centreon/engine/configuration/applier/logging.hh>
-#include <com/centreon/engine/checks/checker.hh>
 #include "helper.hh"
+
+#include <com/centreon/engine/checks/checker.hh>
+#include <com/centreon/engine/configuration/applier/logging.hh>
+#include <com/centreon/engine/configuration/applier/state.hh>
 
 using namespace com::centreon::engine;
 
@@ -32,6 +33,7 @@ void init_config_state(void) {
 
   // Hack to instanciate the logger.
   configuration::applier::logging::instance();
+  checks::checker::instance().clear();
 }
 
 void deinit_config_state(void) {
@@ -39,5 +41,4 @@ void deinit_config_state(void) {
   config = nullptr;
 
   configuration::applier::state::instance().clear();
-  checks::checker::instance().clear();
 }

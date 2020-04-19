@@ -23,15 +23,13 @@
 
 #include <sys/time.h>
 
-#include <cstdio>
-
 #include "com/centreon/engine/checkable.hh"
 #include "com/centreon/engine/namespace.hh"
-#include "com/centreon/engine/notifier.hh"
 
 enum check_source { service_check, host_check };
 
 CCE_BEGIN()
+class notifier;
 class check_result {
  public:
   check_result() = delete;

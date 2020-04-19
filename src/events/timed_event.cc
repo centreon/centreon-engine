@@ -20,21 +20,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <algorithm>
 #include <array>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/command_manager.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
-#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/command_manager.hh"
 
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
@@ -84,11 +84,7 @@ timed_event::timed_event(uint32_t event_type,
       timing_func{timing_func},
       event_data{event_data},
       event_args{event_args},
-      event_options{event_options} {
-  if (event_type == timed_event::EVENT_SERVICE_CHECK) {
-    assert(run_time > 1000);
-  }
-}
+      event_options{event_options} {}
 
 timed_event::~timed_event() {
   if (event_type == timed_event::EVENT_SCHEDULED_DOWNTIME && event_data)
@@ -111,8 +107,7 @@ void timed_event::_exec_event_service_check() {
   logger(dbg_events, basic)
       << "** Service Check Event ==> Host: '" << svc->get_hostname()
       << "', Service: '" << svc->get_description()
-      << "', Options: " << event_options << ", Latency: " << latency
-      << " sec";
+      << "', Options: " << event_options << ", Latency: " << latency << " sec";
 
   // run the service check.
   svc->run_scheduled_check(event_options, latency);
@@ -286,8 +281,7 @@ void timed_event::_exec_event_host_check() {
 
   logger(dbg_events, basic)
       << "** Host Check Event ==> Host: '" << hst->get_name()
-      << "', Options: " << event_options << ", Latency: " << latency
-      << " sec";
+      << "', Options: " << event_options << ", Latency: " << latency << " sec";
 
   // run the host check.
   hst->run_scheduled_check(event_options, latency);
