@@ -17,10 +17,11 @@
  *
  */
 
-#include <com/centreon/engine/configuration/applier/state.hh>
-#include <com/centreon/engine/configuration/applier/logging.hh>
-#include <com/centreon/engine/checks/checker.hh>
 #include "helper.hh"
+
+#include <com/centreon/engine/checks/checker.hh>
+#include <com/centreon/engine/configuration/applier/logging.hh>
+#include <com/centreon/engine/configuration/applier/state.hh>
 
 using namespace com::centreon::engine;
 

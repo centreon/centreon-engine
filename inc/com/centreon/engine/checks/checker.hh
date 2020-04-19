@@ -21,6 +21,7 @@
 #define CCE_CHECKS_CHECKER_HH
 
 #include <queue>
+
 #include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/commands/command.hh"
 

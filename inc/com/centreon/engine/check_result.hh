@@ -23,8 +23,8 @@
 
 #include <sys/time.h>
 
-#include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/checkable.hh"
+#include "com/centreon/engine/namespace.hh"
 
 enum check_source { service_check, host_check };
 

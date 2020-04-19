@@ -21,11 +21,13 @@
 #define CCE_HOST_HH
 
 #include <time.h>
+
 #include <list>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <unordered_map>
+
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/namespace.hh"

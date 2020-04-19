@@ -22,6 +22,7 @@
 
 #include <ctime>
 #include <string>
+
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()

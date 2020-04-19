@@ -21,12 +21,14 @@
 #define CCE_SERVICE_HH
 
 #include <time.h>
+
 #include <array>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <unordered_map>
 #include <utility>
+
 #include "com/centreon/engine/check_result.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/customvariable.hh"

@@ -21,6 +21,7 @@
 #define CCE_CONFIGURATION_STATE_HH
 
 #include <cstdint>
+
 #include "com/centreon/engine/configuration/anomalydetection.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
@@ -324,7 +325,7 @@ class state {
       servicegroup::key_type const& k) const;
   set_servicegroup::iterator servicegroups_find(
       servicegroup::key_type const& k);
-  //const set_anomalydetection& anomalydetections() const noexcept;
+  // const set_anomalydetection& anomalydetections() const noexcept;
   set_anomalydetection& anomalydetections() noexcept;
   set_service const& services() const noexcept;
   set_service& services() noexcept;

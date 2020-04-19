@@ -23,7 +23,9 @@
 #define CCE_GLOBALS_HH
 
 #include <stdio.h>
+
 #include <map>
+
 #include "com/centreon/engine/circular_buffer.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/events/sched_info.hh"

@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
+
 #include "com/centreon/engine/string.hh"
 
 typedef std::list<std::string> list_string;
