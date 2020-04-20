@@ -85,13 +85,7 @@ void loop::run() {
   _last_status_update = 0L;
 
   // Initialize fake "sleep" event.
-  _sleep_event.event_type = timed_event::EVENT_SLEEP;
   _sleep_event.run_time = _last_time;
-  _sleep_event.recurring = false;
-  _sleep_event.event_interval = 0L;
-  _sleep_event.compensate_for_time_change = false;
-  _sleep_event.timing_func = nullptr;
-  _sleep_event.event_data = nullptr;
   _sleep_event.event_args = nullptr;
   _sleep_event.event_options = 0;
 
@@ -107,7 +101,18 @@ void loop::run() {
 /**
  *  Default constructor.
  */
-loop::loop() : _need_reload(0), _reload_running(false) {}
+loop::loop()
+    : _need_reload(0),
+      _reload_running(false),
+      _sleep_event(timed_event::EVENT_SLEEP,
+                   0,
+                   false,
+                   0L,
+                   nullptr,
+                   false,
+                   nullptr,
+                   nullptr,
+                   0) {}
 
 static void apply_conf(std::atomic<bool>* reloading) {
   logger(log_info_message, more) << "Starting to reload configuration.";
@@ -642,9 +647,9 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
     if ((*it)->timing_func) {
       union {
         time_t (*func)(void);
-        void* data;
-      } timing;
-      timing.data = (*it)->timing_func;
+        const void* data;
+      } timing = { .data = (*it)->timing_func };
+      //timing.data = (*it)->timing_func;
       (*it)->run_time = (*timing.func)();
     }
 
@@ -668,9 +673,8 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
     if ((*it)->timing_func) {
       union {
         time_t (*func)(void);
-        void* data;
-      } timing;
-      timing.data = (*it)->timing_func;
+        const void* data;
+      } timing = { .data = (*it)->timing_func };
       (*it)->run_time = (*timing.func)();
     }
 
@@ -899,9 +903,8 @@ void loop::reschedule_event(timed_event* event, loop::priority priority) {
     if (event->timing_func) {
       union {
         time_t (*func)(void);
-        void* data;
-      } timing;
-      timing.data = event->timing_func;
+        const void* data;
+      } timing = { .data = event->timing_func };
       event->run_time = (*timing.func)();
     }
 

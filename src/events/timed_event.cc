@@ -41,20 +41,6 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine;
 
 /**
- * Defaut constructor
- */
-timed_event::timed_event()
-    : event_type{0},
-      run_time{0},
-      recurring{0},
-      event_interval{0},
-      compensate_for_time_change{false},
-      timing_func{nullptr},
-      event_data{nullptr},
-      event_args{nullptr},
-      event_options{0} {}
-
-/**
  * Constructor with arguments
  *
  * @param event_type
@@ -101,8 +87,8 @@ void timed_event::_exec_event_service_check() {
   // get check latency.
   timeval tv;
   gettimeofday(&tv, NULL);
-  double latency = (double)((double)(tv.tv_sec - run_time) +
-                            (double)(tv.tv_usec / 1000) / 1000.0);
+  double latency = static_cast<double>(tv.tv_sec - run_time) +
+                   static_cast<double>(tv.tv_usec) / 1000000.0;
 
   logger(dbg_events, basic)
       << "** Service Check Event ==> Host: '" << svc->get_hostname()
@@ -345,7 +331,7 @@ void timed_event::_exec_event_user_function() {
     union {
       void (*func)(void*);
       void* data;
-    } user;
+    } user = { .data = event_data };
     user.data = event_data;
     (*user.func)(event_args);
   }

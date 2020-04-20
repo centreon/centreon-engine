@@ -57,12 +57,12 @@ class timed_event {
   void _exec_event_user_function();
 
  public:
-  uint32_t event_type;
+  const uint32_t event_type;
   time_t run_time;
-  bool recurring;
-  unsigned long event_interval;
-  bool compensate_for_time_change;
-  void* timing_func;
+  const bool recurring;
+  const unsigned long event_interval;
+  const bool compensate_for_time_change;
+  const void* const timing_func;
   void* event_data;
   void* event_args;
   int32_t event_options;
@@ -92,7 +92,6 @@ class timed_event {
                                // event queues are empty
     EVENT_USER_FUNCTION = 99   // USER-defined function (modules)
   };
-  timed_event();
   timed_event(uint32_t event_type,
               time_t run_time,
               bool recurring,
@@ -102,6 +101,7 @@ class timed_event {
               void* event_data,
               void* event_args,
               int32_t event_options);
+  timed_event() = delete;
   ~timed_event();
   int handle_timed_event();
 
