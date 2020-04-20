@@ -750,7 +750,7 @@ void applier::scheduler::_calculate_service_scheduling_params() {
  *
  *  @return The new event.
  */
-timed_event* applier::scheduler::_create_misc_event(int type,
+timed_event* applier::scheduler::_create_misc_event(timed_event::event_type_t type,
                                                     time_t start,
                                                     unsigned long interval,
                                                     void* data) {

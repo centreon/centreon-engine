@@ -23,9 +23,11 @@
 #ifndef CCE_EVENTS_TIMED_EVENT_HH
 #define CCE_EVENTS_TIMED_EVENT_HH
 
-#include <deque>
 #include <stdint.h>
 #include <time.h>
+
+#include <deque>
+
 #include "com/centreon/engine/downtimes/downtime.hh"
 #include "com/centreon/engine/namespace.hh"
 
@@ -35,39 +37,8 @@ CCE_END()
 
 CCE_BEGIN()
 class timed_event {
-  void _exec_event_service_check();
-  void _exec_event_command_check();
-  void _exec_event_log_rotation();
-  void _exec_event_program_shutdown();
-  void _exec_event_program_restart();
-  void _exec_event_check_reaper();
-  void _exec_event_orphan_check();
-  void _exec_event_retention_save();
-  void _exec_event_status_save();
-  void _exec_event_scheduled_downtime();
-  void _exec_event_sfreshness_check();
-  void _exec_event_expire_downtime();
-  void _exec_event_host_check();
-  void _exec_event_hfreshness_check();
-  void _exec_event_reschedule_checks();
-  void _exec_event_expire_comment();
-  void _exec_event_expire_host_ack();
-  void _exec_event_expire_service_ack();
-  void _exec_event_enginerpc_check();
-  void _exec_event_user_function();
-
  public:
-  const uint32_t event_type;
-  time_t run_time;
-  const bool recurring;
-  const unsigned long event_interval;
-  const bool compensate_for_time_change;
-  const void* const timing_func;
-  void* event_data;
-  void* event_args;
-  int32_t event_options;
-
-  enum event_type {
+  enum event_type_t {
     EVENT_SERVICE_CHECK,       // active service check
     EVENT_COMMAND_CHECK,       // external command check
     EVENT_LOG_ROTATION,        // log file rotation
@@ -92,7 +63,45 @@ class timed_event {
                                // event queues are empty
     EVENT_USER_FUNCTION = 99   // USER-defined function (modules)
   };
-  timed_event(uint32_t event_type,
+
+ private:
+  typedef void (timed_event::*exec_event)();
+  static const std::unordered_map<event_type_t, exec_event> _tab_exec_event;
+  void _exec_event_service_check();
+  void _exec_event_command_check();
+  void _exec_event_log_rotation();
+  void _exec_event_program_shutdown();
+  void _exec_event_program_restart();
+  void _exec_event_check_reaper();
+  void _exec_event_orphan_check();
+  void _exec_event_retention_save();
+  void _exec_event_status_save();
+  void _exec_event_scheduled_downtime();
+  void _exec_event_sfreshness_check();
+  void _exec_event_expire_downtime();
+  void _exec_event_host_check();
+  void _exec_event_hfreshness_check();
+  void _exec_event_reschedule_checks();
+  void _exec_event_expire_comment();
+  void _exec_event_expire_host_ack();
+  void _exec_event_expire_service_ack();
+  void _exec_event_enginerpc_check();
+  void _exec_event_sleep();
+  void _exec_event_user_function();
+  const exec_event _exec_event;
+
+ public:
+  const event_type_t event_type;
+  time_t run_time;
+  const bool recurring;
+  const unsigned long event_interval;
+  const bool compensate_for_time_change;
+  const void* const timing_func;
+  void* event_data;
+  void* event_args;
+  int32_t event_options;
+
+  timed_event(event_type_t event_type,
               time_t run_time,
               bool recurring,
               unsigned long event_interval,
@@ -122,6 +131,7 @@ time_t adjust_timestamp_for_time_change(int64_t time_difference, time_t ts);
 #ifdef __cplusplus
 
 #include <ostream>
+
 #include "com/centreon/engine/namespace.hh"
 
 #endif /* C++ */

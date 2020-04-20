@@ -910,8 +910,8 @@ void loop::reschedule_event(timed_event* event, loop::priority priority) {
 
     // normal recurring events.
     else {
-      time_t current_time(0L);
-      event->run_time = event->run_time + event->event_interval;
+      time_t current_time;
+      event->run_time += event->event_interval;
       time(&current_time);
       if (event->run_time < current_time)
         event->run_time = current_time;

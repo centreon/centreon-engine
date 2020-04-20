@@ -21,7 +21,6 @@
 */
 
 #include <algorithm>
-#include <array>
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -40,6 +39,48 @@ using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine;
 
+const std::unordered_map<timed_event::event_type_t, timed_event::exec_event>
+    timed_event::_tab_exec_event{
+        {{timed_event::EVENT_SERVICE_CHECK,
+          &timed_event::_exec_event_service_check},
+         {timed_event::EVENT_COMMAND_CHECK,
+          &timed_event::_exec_event_command_check},
+         {timed_event::EVENT_LOG_ROTATION,
+          &timed_event::_exec_event_log_rotation},
+         {timed_event::EVENT_PROGRAM_SHUTDOWN,
+          &timed_event::_exec_event_program_shutdown},
+         {timed_event::EVENT_PROGRAM_RESTART,
+          &timed_event::_exec_event_program_restart},
+         {timed_event::EVENT_CHECK_REAPER,
+          &timed_event::_exec_event_check_reaper},
+         {timed_event::EVENT_ORPHAN_CHECK,
+          &timed_event::_exec_event_orphan_check},
+         {timed_event::EVENT_RETENTION_SAVE,
+          &timed_event::_exec_event_retention_save},
+         {timed_event::EVENT_STATUS_SAVE,
+          &timed_event::_exec_event_status_save},
+         {timed_event::EVENT_SCHEDULED_DOWNTIME,
+          &timed_event::_exec_event_scheduled_downtime},
+         {timed_event::EVENT_SFRESHNESS_CHECK,
+          &timed_event::_exec_event_sfreshness_check},
+         {timed_event::EVENT_EXPIRE_DOWNTIME,
+          &timed_event::_exec_event_expire_downtime},
+         {timed_event::EVENT_HOST_CHECK, &timed_event::_exec_event_host_check},
+         {timed_event::EVENT_HFRESHNESS_CHECK,
+          &timed_event::_exec_event_hfreshness_check},
+         {timed_event::EVENT_RESCHEDULE_CHECKS,
+          &timed_event::_exec_event_reschedule_checks},
+         {timed_event::EVENT_EXPIRE_COMMENT,
+          &timed_event::_exec_event_expire_comment},
+         {timed_event::EVENT_EXPIRE_HOST_ACK,
+          &timed_event::_exec_event_expire_host_ack},
+         {timed_event::EVENT_EXPIRE_SERVICE_ACK,
+          &timed_event::_exec_event_expire_service_ack},
+         {timed_event::EVENT_ENGINERPC_CHECK,
+          &timed_event::_exec_event_enginerpc_check},
+         {timed_event::EVENT_SLEEP, &timed_event::_exec_event_sleep},
+         {timed_event::EVENT_USER_FUNCTION,
+          &timed_event::_exec_event_user_function}}};
 /**
  * Constructor with arguments
  *
@@ -53,7 +94,7 @@ using namespace com::centreon::engine;
  * @param event_args
  * @param event_options
  */
-timed_event::timed_event(uint32_t event_type,
+timed_event::timed_event(event_type_t ev,
                          time_t run_time,
                          bool recurring,
                          unsigned long event_interval,
@@ -62,7 +103,7 @@ timed_event::timed_event(uint32_t event_type,
                          void* event_data,
                          void* event_args,
                          int32_t event_options)
-    : event_type{event_type},
+    : event_type{ev},
       run_time{run_time},
       recurring{recurring},
       event_interval{event_interval},
@@ -70,7 +111,8 @@ timed_event::timed_event(uint32_t event_type,
       timing_func{timing_func},
       event_data{event_data},
       event_args{event_args},
-      event_options{event_options} {}
+      event_options{event_options},
+      _exec_event{timed_event::_tab_exec_event.at(ev)} {}
 
 timed_event::~timed_event() {
   if (event_type == timed_event::EVENT_SCHEDULED_DOWNTIME && event_data)
@@ -318,6 +360,8 @@ void timed_event::_exec_event_expire_service_ack() {
   static_cast<service*>(event_data)->check_for_expired_acknowledgement();
 }
 
+void timed_event::_exec_event_sleep() {}
+
 /**
  *  Execute user function.
  *
@@ -369,28 +413,6 @@ time_t adjust_timestamp_for_time_change(int64_t time_difference, time_t ts) {
  *  @return OK.
  */
 int timed_event::handle_timed_event() {
-  typedef void (timed_event::*exec_event)();
-  static std::array<exec_event, 19> tab_exec_event{
-      &timed_event::_exec_event_service_check,
-      &timed_event::_exec_event_command_check,
-      &timed_event::_exec_event_log_rotation,
-      &timed_event::_exec_event_program_shutdown,
-      &timed_event::_exec_event_program_restart,
-      &timed_event::_exec_event_check_reaper,
-      &timed_event::_exec_event_orphan_check,
-      &timed_event::_exec_event_retention_save,
-      &timed_event::_exec_event_status_save,
-      &timed_event::_exec_event_scheduled_downtime,
-      &timed_event::_exec_event_sfreshness_check,
-      &timed_event::_exec_event_expire_downtime,
-      &timed_event::_exec_event_host_check,
-      &timed_event::_exec_event_hfreshness_check,
-      &timed_event::_exec_event_reschedule_checks,
-      &timed_event::_exec_event_expire_comment,
-      &timed_event::_exec_event_expire_host_ack,
-      &timed_event::_exec_event_expire_service_ack,
-      &timed_event::_exec_event_enginerpc_check};
-
   logger(dbg_functions, basic) << "handle_timed_event()";
 
   // send event data to broker.
@@ -400,12 +422,7 @@ int timed_event::handle_timed_event() {
   logger(dbg_events, basic) << "** Timed Event ** Type: " << event_type
                             << ", Run Time: " << my_ctime(&run_time);
 
-  // how should we handle the event?
-  if (event_type < tab_exec_event.size())
-    (this->*(tab_exec_event[event_type]))();
-  else if (event_type == timed_event::EVENT_USER_FUNCTION)
-    _exec_event_user_function();
-
+  (this->*_exec_event)();
   return OK;
 }
 

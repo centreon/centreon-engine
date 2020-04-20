@@ -25,12 +25,12 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/events/timed_event.hh"
 
 // Forward declaration.
 CCE_BEGIN()
 class host;
 class service;
-class timed_event;
 
 namespace configuration {
 namespace applier {
@@ -65,7 +65,7 @@ class scheduler {
   void _calculate_service_interleave_factor(
       configuration::state::interleave_factor method);
   void _calculate_service_scheduling_params();
-  timed_event* _create_misc_event(int type,
+  timed_event* _create_misc_event(timed_event::event_type_t type,
                                   time_t start,
                                   unsigned long interval,
                                   void* data = NULL);
