@@ -19,14 +19,16 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
+
 #include <cstring>
 #include <memory>
+
+#include "../helper.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/hostescalation.hh"
-#include "../helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -36,7 +38,6 @@ using namespace com::centreon::engine::configuration::applier;
 class HostRecovery : public ::testing::Test {
  public:
   void SetUp() override {
-
     init_config_state();
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
@@ -73,6 +74,7 @@ class HostRecovery : public ::testing::Test {
   }
 
   void TearDown() override {
+    _host.reset();
     deinit_config_state();
   }
 
@@ -163,8 +165,7 @@ TEST_F(HostRecovery,
   ASSERT_EQ(id, _host->get_next_notification_id());
 }
 
-TEST_F(HostRecovery,
-       SimpleRecoveryHostNotificationAfterDelay) {
+TEST_F(HostRecovery, SimpleRecoveryHostNotificationAfterDelay) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
    * If we call time(), it is not the glibc time() function that will be called.
    */
@@ -179,17 +180,13 @@ TEST_F(HostRecovery,
   _host->set_current_state(engine::host::state_up);
   _host->set_last_hard_state_change(_current_time);
 
-  ASSERT_EQ(_host->notify(notifier::reason_recovery,
-                          "",
-                          "",
+  ASSERT_EQ(_host->notify(notifier::reason_recovery, "", "",
                           notifier::notification_option_none),
             OK);
   ASSERT_EQ(id, _host->get_next_notification_id());
   _current_time += 350;
   set_time(_current_time);
-  ASSERT_EQ(_host->notify(notifier::reason_recovery,
-                          "",
-                          "",
+  ASSERT_EQ(_host->notify(notifier::reason_recovery, "", "",
                           notifier::notification_option_none),
             OK);
 

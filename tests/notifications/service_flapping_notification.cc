@@ -18,13 +18,14 @@
  */
 
 #include <time.h>
+
 #include <cstring>
 #include <iostream>
 #include <memory>
 #include <regex>
+
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
-#include "com/centreon/process_manager.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
@@ -36,6 +37,7 @@
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
+#include "com/centreon/process_manager.hh"
 #include "helper.hh"
 
 using namespace com::centreon;
@@ -48,8 +50,6 @@ class ServiceFlappingNotification : public TestEngine {
  public:
   void SetUp() override {
     init_config_state();
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -103,6 +103,8 @@ class ServiceFlappingNotification : public TestEngine {
   }
 
   void TearDown() override {
+    _service.reset();
+    _host.reset();
     deinit_config_state();
   }
 

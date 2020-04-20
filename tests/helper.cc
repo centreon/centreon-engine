@@ -33,7 +33,7 @@ void init_config_state(void) {
 
   // Hack to instanciate the logger.
   configuration::applier::logging::instance();
-  checks::checker::instance().clear();
+  checks::checker::init();
 }
 
 void deinit_config_state(void) {
@@ -41,4 +41,5 @@ void deinit_config_state(void) {
   config = nullptr;
 
   configuration::applier::state::instance().clear();
+  checks::checker::deinit();
 }

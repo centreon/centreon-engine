@@ -94,7 +94,11 @@ class ServiceCheck : public TestEngine {
     config->host_check_timeout(10000);
   }
 
-  void TearDown() override { deinit_config_state(); }
+  void TearDown() override {
+    _host.reset();
+    _svc.reset();
+    deinit_config_state();
+  }
 
  protected:
   std::shared_ptr<engine::host> _host;

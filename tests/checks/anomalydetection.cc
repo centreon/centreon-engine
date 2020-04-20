@@ -97,7 +97,12 @@ class AnomalydetectionCheck : public TestEngine {
     _svc->set_notify_on(static_cast<uint32_t>(-1));
   }
 
-  void TearDown() override { deinit_config_state(); }
+  void TearDown() override {
+    _host.reset();
+    _svc.reset();
+    _ad.reset();
+    deinit_config_state();
+  }
 
   void CreateFile(std::string const& filename, std::string const& content) {
     std::ofstream oss(filename);

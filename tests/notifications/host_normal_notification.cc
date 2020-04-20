@@ -19,10 +19,13 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
+
 #include <cstring>
 #include <iostream>
 #include <memory>
 #include <regex>
+
+#include "../helper.hh"
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -40,7 +43,6 @@
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/timezone_manager.hh"
-#include "../helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -53,8 +55,6 @@ class HostNotification : public TestEngine {
  public:
   void SetUp() override {
     init_config_state();
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -76,6 +76,7 @@ class HostNotification : public TestEngine {
 
   void TearDown() override {
     downtime_manager::instance().clear_scheduled_downtimes();
+    _host.reset();
     deinit_config_state();
   }
 

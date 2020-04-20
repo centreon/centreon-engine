@@ -20,6 +20,7 @@
 
 #include "com/centreon/engine/checks/checker.hh"
 
+#include <cassert>
 #include <cstdlib>
 
 #include "com/centreon/engine/broker.hh"
@@ -36,6 +37,8 @@ using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::checks;
 
+checker* checker::_instance = nullptr;
+
 /**************************************
  *                                     *
  *           Public Methods            *
@@ -48,8 +51,22 @@ using namespace com::centreon::engine::checks;
  *  @return This singleton.
  */
 checker& checker::instance() {
-  static checker instance;
-  return instance;
+  /* This singleton does not follow the C++ good practices, because we
+   * need to control when to destroy it. */
+  assert(_instance);
+  return *_instance;
+}
+
+void checker::init() {
+  if (!_instance)
+    _instance = new checker();
+}
+
+void checker::deinit() {
+  if (_instance) {
+    delete _instance;
+    _instance = nullptr;
+  }
 }
 
 void checker::clear() noexcept {
@@ -606,6 +623,8 @@ void checker::add_check_result_to_reap(check_result* check_result) noexcept {
  * @param n The notifier to forget.
  */
 void checker::forget(notifier* n) noexcept {
-  std::lock_guard<std::mutex> lock(_mut_reap);
-  _to_forget.push_back(n);
+  if (_instance) {
+    std::lock_guard<std::mutex> lock(_instance->_mut_reap);
+    _instance->_to_forget.push_back(n);
+  }
 }

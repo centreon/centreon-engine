@@ -19,9 +19,11 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
+
 #include <cstring>
 #include <iostream>
 #include <memory>
+
 #include "../../test_engine.hh"
 #include "../../timeperiod/utils.hh"
 #include "com/centreon/clib.hh"
@@ -41,6 +43,7 @@
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
 #include "com/centreon/engine/timezone_manager.hh"
+#include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -52,10 +55,7 @@ extern configuration::state* config;
 class HostDependency : public TestEngine {
  public:
   void SetUp() override {
-    if (!config)
-      config = new configuration::state;
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
+    init_config_state();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -78,11 +78,7 @@ class HostDependency : public TestEngine {
     hst_aply.resolve_object(hst3);
   }
 
-  void TearDown() override {
-    delete config;
-    config = nullptr;
-    configuration::applier::state::instance().clear();
-  }
+  void TearDown() override { deinit_config_state(); }
 };
 
 TEST_F(HostDependency, CircularDependency2) {

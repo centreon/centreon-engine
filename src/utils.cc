@@ -20,12 +20,14 @@
 */
 
 #include "com/centreon/engine/utils.hh"
+
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
@@ -34,13 +36,14 @@
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/comment.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
@@ -412,6 +415,7 @@ bool set_cloexec(int fd) {
 void cleanup() {
   // Unload modules.
   if (!test_scheduling && !verify_config) {
+    checks::checker::deinit();
     neb_free_callback_list();
     neb_unload_all_modules(NEBMODULE_FORCE_UNLOAD, sigshutdown
                                                        ? NEBMODULE_NEB_SHUTDOWN

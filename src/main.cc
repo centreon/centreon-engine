@@ -32,6 +32,7 @@
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -166,6 +167,9 @@ int main(int argc, char* argv[]) {
 
     // Reset umask.
     umask(S_IWGRP | S_IWOTH);
+
+    // Checker init
+    checks::checker::init();
 
     // Just display the license.
     if (display_license) {
@@ -323,8 +327,8 @@ int main(int argc, char* argv[]) {
         uint16_t port = config.rpc_port();
 
         if (!port) {
-          std::random_device
-              rd;  // Will be used to obtain a seed for the random number engine
+          std::random_device rd;  // Will be used to obtain a seed for the
+                                  // random number engine
           std::mt19937 gen(
               rd());  // Standard mersenne_twister_engine seeded with rd()
           std::uniform_int_distribution<uint16_t> dis(50000, 50999);
@@ -332,7 +336,7 @@ int main(int argc, char* argv[]) {
           port = dis(gen);
         }
 
-        std::unique_ptr<enginerpc, std::function<void(enginerpc*)>> rpc(
+        std::unique_ptr<enginerpc, std::function<void(enginerpc*)> > rpc(
             new enginerpc("0.0.0.0", port), [](enginerpc* rpc) {
               rpc->shutdown();
               delete rpc;
@@ -428,7 +432,6 @@ int main(int argc, char* argv[]) {
               << "Successfully shutdown ... (PID=" << getpid() << ")";
 
         retval = EXIT_SUCCESS;
-
       } catch (std::exception const& e) {
         // Log.
         logger(logging::log_runtime_error, logging::basic)

@@ -19,9 +19,11 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
+
 #include <cstring>
 #include <iostream>
 #include <memory>
+
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -47,8 +49,6 @@ class ServiceNotification : public TestEngine {
  public:
   void SetUp() override {
     init_config_state();
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -84,6 +84,8 @@ class ServiceNotification : public TestEngine {
   }
 
   void TearDown() override {
+    _svc.reset();
+    _host.reset();
     deinit_config_state();
   }
 
@@ -1047,8 +1049,8 @@ TEST_F(ServiceNotification, WarnCritServiceNotification) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-      new engine::serviceescalation(
-          "test_host", "test_svc", 0, 1, 1.0, "tperiod", 7, Uuid())};
+      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0,
+                                    "tperiod", 7, Uuid())};
   _svc->set_current_state(engine::service::state_critical);
   _svc->set_last_state(engine::service::state_critical);
   _svc->set_last_hard_state_change(43200);
@@ -1057,20 +1059,18 @@ TEST_F(ServiceNotification, WarnCritServiceNotification) {
   ASSERT_TRUE(service_escalation);
   uint64_t id{_svc->get_next_notification_id()};
   _svc->set_notification_period_ptr(tperiod.get());
-  ASSERT_EQ(
-      _svc->notify(
-          notifier::reason_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
+                         notifier::notification_option_none),
+            OK);
 
   _svc->set_current_state(engine::service::state_warning);
   _svc->set_last_state(engine::service::state_warning);
   _svc->set_last_hard_state_change(43500);
   _svc->set_state_type(checkable::hard);
 
-  ASSERT_EQ(
-      _svc->notify(
-          notifier::reason_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
+                         notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id + 2, _svc->get_next_notification_id());
 }
 
@@ -1122,7 +1122,6 @@ TEST_F(ServiceNotification, SimpleNormalVolatileServiceNotification) {
             OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }
-
 
 TEST_F(ServiceNotification, RecoveryNotifEvenIfServiceAcknowledged) {
   /* We are using a local time() function defined in tests/timeperiod/utils.cc.
@@ -1197,13 +1196,13 @@ TEST_F(ServiceNotification, SimpleVolatileServiceNotificationWithDowntime) {
     tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
 
   std::unique_ptr<engine::serviceescalation> service_escalation{
-      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7, Uuid())};
+      new engine::serviceescalation("test_host", "test_svc", 0, 1, 1.0, "", 7,
+                                    Uuid())};
   _svc->set_notification_period_ptr(tperiod.get());
 
   ASSERT_TRUE(service_escalation);
-  ASSERT_EQ(
-      _svc->notify(
-          notifier::reason_normal, "", "", notifier::notification_option_none),
-      OK);
+  ASSERT_EQ(_svc->notify(notifier::reason_normal, "", "",
+                         notifier::notification_option_none),
+            OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
 }

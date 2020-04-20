@@ -36,8 +36,13 @@ namespace checks {
  *  result.
  */
 class checker : public commands::command_listener {
+  static checker* _instance;
+
  public:
   static checker& instance();
+  static void init();
+  static void deinit();
+
   void clear() noexcept;
   void reap();
   void run_sync(host* hst,
@@ -47,7 +52,7 @@ class checker : public commands::command_listener {
                 unsigned long check_timestamp_horizon);
   void add_check_result(uint64_t id, check_result* result) noexcept;
   void add_check_result_to_reap(check_result* result) noexcept;
-  void forget(notifier* n) noexcept;
+  static void forget(notifier* n) noexcept;
 
  private:
   checker();

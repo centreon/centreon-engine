@@ -172,16 +172,6 @@ void timed_event::_exec_event_program_restart() {
       << "PROGRAM_RESTART event encountered, restarting...";
 }
 
-static int reap_check_results() {
-  try {
-    checks::checker::instance().reap();
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "Error: " << e.what();
-    return ERROR;
-  }
-  return OK;
-}
-
 /**
  *  Execute check reaper.
  *
@@ -190,7 +180,11 @@ void timed_event::_exec_event_check_reaper() {
   logger(dbg_events, basic) << "** Check Result Reaper";
 
   // reap host and service check results.
-  reap_check_results();
+  try {
+    checks::checker::instance().reap();
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "Error: " << e.what();
+  }
 }
 
 /**

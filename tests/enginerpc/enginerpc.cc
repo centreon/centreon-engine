@@ -17,21 +17,24 @@
  *
  */
 
-#include <gtest/gtest.h>
-#include <cstdio>
 #include "enginerpc.hh"
-#include "com/centreon/engine/configuration/contact.hh"
+
+#include <gtest/gtest.h>
+
+#include <cstdio>
+
+#include "../test_engine.hh"
 #include "com/centreon/engine/anomalydetection.hh"
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/command_manager.hh"
 #include "com/centreon/engine/configuration/applier/anomalydetection.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
-#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/events/loop.hh"
-#include "com/centreon/engine/version.hh"
-#include "../test_engine.hh"
 #include "com/centreon/engine/timezone_manager.hh"
-#include "com/centreon/engine/command_manager.hh"
+#include "com/centreon/engine/version.hh"
 #include "helper.hh"
 
 using namespace com::centreon;
@@ -63,11 +66,9 @@ class EngineRpc : public TestEngine {
     svc_aply.resolve_object(svc);
 
     configuration::anomalydetection ad{new_configuration_anomalydetection(
-        "test_host",
-        "test_ad",
-        "admin",
-        12, // service_id of the anomalydetection
-        13, // service_id of the dependent service
+        "test_host", "test_ad", "admin",
+        12,  // service_id of the anomalydetection
+        13,  // service_id of the dependent service
         "/tmp/thresholds_status_change.json")};
     configuration::applier::anomalydetection ad_aply;
     ad_aply.add_object(ad);
@@ -91,7 +92,12 @@ class EngineRpc : public TestEngine {
     }
   }
 
-  void TearDown() override { deinit_config_state(); }
+  void TearDown() override {
+    _host.reset();
+    _svc.reset();
+    _ad.reset();
+    deinit_config_state();
+  }
 
   std::list<std::string> execute(const std::string& command) {
     std::list<std::string> retval;
