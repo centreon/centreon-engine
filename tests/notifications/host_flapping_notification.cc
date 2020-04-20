@@ -21,6 +21,7 @@
 #include <iostream>
 #include <memory>
 #include <regex>
+
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
@@ -35,7 +36,6 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
-
 
 class HostFlappingNotification : public TestEngine {
  public:

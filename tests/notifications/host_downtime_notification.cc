@@ -19,6 +19,7 @@
 
 #include <cstring>
 #include <memory>
+
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"

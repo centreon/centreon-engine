@@ -19,10 +19,13 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
+
 #include <cstring>
 #include <iostream>
 #include <memory>
 #include <regex>
+
+#include "../helper.hh"
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -40,7 +43,6 @@
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/timezone_manager.hh"
-#include "../helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
