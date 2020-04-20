@@ -43,6 +43,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/broker.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/nebmods.hh"
@@ -113,8 +114,8 @@ int main(int argc, char* argv[]) {
     // Process all command line arguments.
     int c;
 #ifdef HAVE_GETOPT_H
-    while ((c = getopt_long(argc, argv, "+hVvsxD", long_options,
-                            &option_index)) != -1) {
+    while ((c = getopt_long(
+                argc, argv, "+hVvsxD", long_options, &option_index)) != -1) {
 #else
     while ((c = getopt(argc, argv, "+hVvsxD")) != -1) {
 #endif  // HAVE_GETOPT_H
@@ -148,7 +149,8 @@ int main(int argc, char* argv[]) {
     // Invalid argument count.
     if ((argc < 2)
         // Main configuration file not on command line.
-        || (optind >= argc))
+        ||
+        (optind >= argc))
       error = true;
     else {
       // Config file is last argument specified.
@@ -166,6 +168,9 @@ int main(int argc, char* argv[]) {
 
     // Reset umask.
     umask(S_IWGRP | S_IWOTH);
+
+    // Checker init
+    checks::checker::init();
 
     // Just display the license.
     if (display_license) {
@@ -267,7 +272,8 @@ int main(int argc, char* argv[]) {
             << "Total Errors:   " << config_errors;
 
         retval = (config_errors ? EXIT_FAILURE : EXIT_SUCCESS);
-      } catch (std::exception const& e) {
+      }
+      catch (std::exception const& e) {
         logger(logging::log_config_error, logging::basic)
             << "Error while processing a config file: " << e.what();
         logger(logging::log_config_error, logging::basic)
@@ -291,7 +297,8 @@ int main(int argc, char* argv[]) {
           retention::parser p;
           try {
             p.parse(config.state_retention_file(), state);
-          } catch (std::exception const& e) {
+          }
+          catch (std::exception const& e) {
             logger(logging::log_config_error, logging::basic) << e.what();
           }
         }
@@ -301,7 +308,8 @@ int main(int argc, char* argv[]) {
 
         display_scheduling_info();
         retval = EXIT_SUCCESS;
-      } catch (std::exception const& e) {
+      }
+      catch (std::exception const& e) {
         logger(logging::log_config_error, logging::basic) << e.what();
       }
     }
@@ -323,8 +331,8 @@ int main(int argc, char* argv[]) {
         uint16_t port = config.rpc_port();
 
         if (!port) {
-          std::random_device
-              rd;  // Will be used to obtain a seed for the random number engine
+          std::random_device rd;  // Will be used to obtain a seed for the
+                                  // random number engine
           std::mt19937 gen(
               rd());  // Standard mersenne_twister_engine seeded with rd()
           std::uniform_int_distribution<uint16_t> dis(50000, 50999);
@@ -332,7 +340,7 @@ int main(int argc, char* argv[]) {
           port = dis(gen);
         }
 
-        std::unique_ptr<enginerpc, std::function<void(enginerpc*)>> rpc(
+        std::unique_ptr<enginerpc, std::function<void(enginerpc*)> > rpc(
             new enginerpc("0.0.0.0", port), [](enginerpc* rpc) {
               rpc->shutdown();
               delete rpc;
@@ -344,7 +352,8 @@ int main(int argc, char* argv[]) {
           retention::parser p;
           try {
             p.parse(config.state_retention_file(), state);
-          } catch (std::exception const& e) {
+          }
+          catch (std::exception const& e) {
             logger(logging::log_config_error, logging::basic) << e.what();
           }
         }
@@ -359,7 +368,8 @@ int main(int argc, char* argv[]) {
         for (std::list<std::string>::const_iterator
                  it(config.broker_module().begin()),
              end(config.broker_module().end());
-             it != end; ++it) {
+             it != end;
+             ++it) {
           std::string filename;
           std::string args;
           if (!string::split(*it, filename, args, ' '))
@@ -391,8 +401,8 @@ int main(int argc, char* argv[]) {
         update_all_status_data();
 
         // Send program data to broker.
-        broker_program_state(NEBTYPE_PROCESS_EVENTLOOPSTART, NEBFLAG_NONE,
-                             NEBATTR_NONE, NULL);
+        broker_program_state(
+            NEBTYPE_PROCESS_EVENTLOOPSTART, NEBFLAG_NONE, NEBATTR_NONE, NULL);
 
         // Get event start time and save as macro.
         event_start = time(NULL);
@@ -410,11 +420,13 @@ int main(int argc, char* argv[]) {
               << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
 
         // Send program data to broker.
-        broker_program_state(NEBTYPE_PROCESS_EVENTLOOPEND, NEBFLAG_NONE,
-                             NEBATTR_NONE, NULL);
+        broker_program_state(
+            NEBTYPE_PROCESS_EVENTLOOPEND, NEBFLAG_NONE, NEBATTR_NONE, NULL);
         if (sigshutdown)
-          broker_program_state(NEBTYPE_PROCESS_SHUTDOWN, NEBFLAG_USER_INITIATED,
-                               NEBATTR_SHUTDOWN_NORMAL, NULL);
+          broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                               NEBFLAG_USER_INITIATED,
+                               NEBATTR_SHUTDOWN_NORMAL,
+                               NULL);
 
         // Save service and host state information.
         retention::dump::save(::config->state_retention_file());
@@ -428,8 +440,8 @@ int main(int argc, char* argv[]) {
               << "Successfully shutdown ... (PID=" << getpid() << ")";
 
         retval = EXIT_SUCCESS;
-
-      } catch (std::exception const& e) {
+      }
+      catch (std::exception const& e) {
         // Log.
         logger(logging::log_runtime_error, logging::basic)
             << "Error: " << e.what();
@@ -437,7 +449,8 @@ int main(int argc, char* argv[]) {
         // Send program data to broker.
         broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
                              NEBFLAG_PROCESS_INITIATED,
-                             NEBATTR_SHUTDOWN_ABNORMAL, NULL);
+                             NEBATTR_SHUTDOWN_ABNORMAL,
+                             NULL);
       }
     }
 
@@ -445,7 +458,8 @@ int main(int argc, char* argv[]) {
     cleanup();
     delete[] config_file;
     config_file = NULL;
-  } catch (std::exception const& e) {
+  }
+  catch (std::exception const& e) {
     logger(logging::log_runtime_error, logging::basic) << "Error: " << e.what();
   }
 

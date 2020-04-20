@@ -91,7 +91,12 @@ class EngineRpc : public TestEngine {
     }
   }
 
-  void TearDown() override { deinit_config_state(); }
+  void TearDown() override {
+    _host.reset();
+    _svc.reset();
+    _ad.reset();
+    deinit_config_state();
+  }
 
   std::list<std::string> execute(const std::string& command) {
     std::list<std::string> retval;

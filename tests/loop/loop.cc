@@ -76,6 +76,8 @@ class LoopTest : public TestEngine {
   }
 
   void TearDown() override {
+    _host.reset();
+    _svc.reset();
     deinit_config_state();
   }
 

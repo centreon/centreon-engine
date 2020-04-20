@@ -53,8 +53,6 @@ class HostNotification : public TestEngine {
  public:
   void SetUp() override {
     init_config_state();
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -76,6 +74,7 @@ class HostNotification : public TestEngine {
 
   void TearDown() override {
     downtime_manager::instance().clear_scheduled_downtimes();
+    _host.reset();
     deinit_config_state();
   }
 

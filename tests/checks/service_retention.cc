@@ -55,8 +55,9 @@ extern configuration::state* config;
 class ServiceRetention : public TestEngine {
  public:
   void SetUp() override {
-    if (!config)
-      config = new configuration::state;
+    init_config_state();
+//    if (!config)
+//      config = new configuration::state;
 
     config->contacts().clear();
     configuration::applier::contact ct_aply;
@@ -93,6 +94,8 @@ class ServiceRetention : public TestEngine {
   }
 
   void TearDown() override {
+    _host.reset();
+    _svc.reset();
     deinit_config_state();
   }
 

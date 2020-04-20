@@ -163,7 +163,7 @@ notifier::notifier(notifier::notifier_type notifier_type,
 }
 
 notifier::~notifier() {
-  checks::checker::instance().forget(this);
+  checks::checker::forget(this);
 }
 
 unsigned long notifier::get_current_event_id() const {

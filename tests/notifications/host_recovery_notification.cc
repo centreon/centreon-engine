@@ -73,6 +73,7 @@ class HostRecovery : public ::testing::Test {
   }
 
   void TearDown() override {
+    _host.reset();
     deinit_config_state();
   }
 

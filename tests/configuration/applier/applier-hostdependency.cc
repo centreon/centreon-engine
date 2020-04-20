@@ -35,6 +35,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/host.hh"
+#include "helper.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/exceptions/error.hh"
@@ -52,10 +53,7 @@ extern configuration::state* config;
 class HostDependency : public TestEngine {
  public:
   void SetUp() override {
-    if (!config)
-      config = new configuration::state;
-    // Do not unload this in the tear down function, it is done by the
-    // other unload function... :-(
+    init_config_state();
 
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
@@ -78,11 +76,7 @@ class HostDependency : public TestEngine {
     hst_aply.resolve_object(hst3);
   }
 
-  void TearDown() override {
-    delete config;
-    config = nullptr;
-    configuration::applier::state::instance().clear();
-  }
+  void TearDown() override { deinit_config_state(); }
 };
 
 TEST_F(HostDependency, CircularDependency2) {
