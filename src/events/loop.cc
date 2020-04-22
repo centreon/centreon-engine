@@ -648,8 +648,8 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
       union {
         time_t (*func)(void);
         const void* data;
-      } timing = { .data = (*it)->timing_func };
-      //timing.data = (*it)->timing_func;
+      } timing = {.data = (*it)->timing_func};
+      // timing.data = (*it)->timing_func;
       (*it)->run_time = (*timing.func)();
     }
 
@@ -674,7 +674,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
       union {
         time_t (*func)(void);
         const void* data;
-      } timing = { .data = (*it)->timing_func };
+      } timing = {.data = (*it)->timing_func};
       (*it)->run_time = (*timing.func)();
     }
 
@@ -779,23 +779,16 @@ void loop::add_event(timed_event* event, loop::priority priority) {
   // no other events.
   if (list->empty())
     list->push_front(event);
-
   // add event to head of the list if it should be executed first.
   else if (event->run_time < (*list->begin())->run_time)
     list->push_front(event);
-
   // else place the event according to next execution time.
   else {
-    // start from the end of the list, as new events are likely to
-    // be executed in the future, rather than now...
-    for (timed_event_list::reverse_iterator it(list->rbegin()),
-         end(list->rend());
-         it != end; ++it) {
-      if (event->run_time >= (*it)->run_time) {
-        list->insert(it.base(), event);
-        break;
-      }
-    }
+    auto prev = std::lower_bound(list->begin(), list->end(), event->run_time,
+                                 [](timed_event* ev, time_t const& b) -> bool {
+                                   return ev->run_time < b;
+                                 });
+    list->insert(prev, event);
   }
 
   // send event data to broker.
@@ -904,7 +897,7 @@ void loop::reschedule_event(timed_event* event, loop::priority priority) {
       union {
         time_t (*func)(void);
         const void* data;
-      } timing = { .data = event->timing_func };
+      } timing = {.data = event->timing_func};
       event->run_time = (*timing.func)();
     }
 

@@ -97,9 +97,9 @@ class downtime {
 
 CCE_END()
 
-int handle_scheduled_downtime_by_id(uint64_t downtime_id);
+using namespace com::centreon::engine::downtimes;
 
-std::ostream& operator<<(std::ostream& os,
-                         com::centreon::engine::downtimes::downtime const& dt);
+int handle_scheduled_downtime_by_id(uint64_t downtime_id);
+std::ostream& operator<<(std::ostream& os, downtime const& dt);
 
 #endif  // !CCE_DOWNTIMES_DOWTIME_HH
