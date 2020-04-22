@@ -40,7 +40,7 @@ int update_all_status_data() {
   broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_STARTDUMP,
                                 NEBFLAG_NONE, NEBATTR_NONE, NULL);
 
-  result = xsddefault_save_status_data();
+  result = xsddefault_save_status_data1();
 
   /* send data to event broker */
   broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_ENDDUMP, NEBFLAG_NONE,
