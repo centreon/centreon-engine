@@ -168,23 +168,23 @@ void centenginestats_client::get_stats(std::string const& object) {
            duration_to_str(time_difference).c_str());
     printf("Program Running Time:                   %s\n",
            duration_to_str(program_age).c_str());
-    printf("Centreon Engine PID:                    %ld\n",
+    printf("Centreon Engine PID:                    %ud\n",
            stats.program_status().pid());
     printf("Used/High/Total command Buffers:        %d / %d / %d\n\n",
            stats.program_status().used_external_command_buffer_slots(),
            stats.program_status().high_external_command_buffer_slots(),
            stats.program_status().total_external_command_buffer_slots());
-    printf("Total Services:                         %ld\n",
+    printf("Total Services:                         %ud\n",
            stats.services_stats().services_count());
-    printf("Services Checked:                       %ld\n",
+    printf("Services Checked:                       %ud\n",
            stats.services_stats().checked_services());
-    printf("Services Scheduled:                     %ld\n",
+    printf("Services Scheduled:                     %ud\n",
            stats.services_stats().scheduled_services());
-    printf("Services Actively Checked:              %ld\n",
+    printf("Services Actively Checked:              %ud\n",
            stats.services_stats().actively_checked());
-    printf("Services Passively Checked:             %ld\n",
+    printf("Services Passively Checked:             %ud\n",
            stats.services_stats().passively_checked());
-    printf("Total Service State Change:             %.3f / %.3f / %.3f %\n",
+    printf("Total Service State Change:             %.3f / %.3f / %.3f %%\n",
            stats.services_stats().min_state_change(),
            stats.services_stats().max_state_change(),
            stats.services_stats().average_state_change());
@@ -196,11 +196,11 @@ void centenginestats_client::get_stats(std::string const& object) {
            stats.services_stats().active_services().min_execution_time(),
            stats.services_stats().active_services().max_execution_time(),
            stats.services_stats().active_services().average_execution_time());
-    printf("Active Service State Change:            %.3f / %.3f / %.3f %\n",
+    printf("Active Service State Change:            %.3f / %.3f / %.3f %%\n",
            stats.services_stats().active_services().min_state_change(),
            stats.services_stats().active_services().max_state_change(),
            stats.services_stats().active_services().average_state_change());
-    printf("Active Services Last 1/5/15/60 min:     %ld / %ld / %ld / %ld\n",
+    printf("Active Services Last 1/5/15/60 min:     %ud / %ud / %ud / %ud\n",
            stats.services_stats().active_services().checks_last_1min(),
            stats.services_stats().active_services().checks_last_5min(),
            stats.services_stats().active_services().checks_last_15min(),
@@ -209,33 +209,33 @@ void centenginestats_client::get_stats(std::string const& object) {
            stats.services_stats().passive_services().min_latency(),
            stats.services_stats().passive_services().max_latency(),
            stats.services_stats().passive_services().average_latency());
-    printf("Passive Service State Change:           %.3f / %.3f / %.3f %\n",
+    printf("Passive Service State Change:           %.3f / %.3f / %.3f %%\n",
            stats.services_stats().passive_services().min_state_change(),
            stats.services_stats().passive_services().max_state_change(),
            stats.services_stats().passive_services().average_state_change());
-    printf("Passive Services Last 1/5/15/60 min:    %ld / %ld / %ld / %ld\n",
+    printf("Passive Services Last 1/5/15/60 min:    %ud / %ud / %ud / %ud\n",
            stats.services_stats().passive_services().checks_last_1min(),
            stats.services_stats().passive_services().checks_last_5min(),
            stats.services_stats().passive_services().checks_last_15min(),
            stats.services_stats().passive_services().checks_last_1hour());
-    printf("Services OK/Warn/Unk/Crit:              %ld / %ld / %ld / %ld\n",
+    printf("Services OK/Warn/Unk/Crit:              %ud / %ud / %ud / %ud\n",
            stats.services_stats().ok(), stats.services_stats().warning(),
            stats.services_stats().unknown(), stats.services_stats().critical());
-    printf("Services Flapping:                      %ld\n",
+    printf("Services Flapping:                      %ud\n",
            stats.services_stats().flapping());
-    printf("Services In Downtime:                   %ld\n\n",
+    printf("Services In Downtime:                   %ud\n\n",
            stats.services_stats().downtime());
-    printf("Total Hosts:                            %ld\n",
+    printf("Total Hosts:                            %ud\n",
            stats.hosts_stats().hosts_count());
-    printf("Hosts Checked:                          %ld\n",
+    printf("Hosts Checked:                          %ud\n",
            stats.hosts_stats().checked_hosts());
-    printf("Hosts Scheduled:                        %ld\n",
+    printf("Hosts Scheduled:                        %ud\n",
            stats.hosts_stats().scheduled_hosts());
-    printf("Hosts Actively Checked:                 %ld\n",
+    printf("Hosts Actively Checked:                 %ud\n",
            stats.hosts_stats().actively_checked());
-    printf("Hosts Passively Checked:                %ld\n",
+    printf("Hosts Passively Checked:                %ud\n",
            stats.hosts_stats().passively_checked());
-    printf("Total Host State Change:                %.3f / %.3f / %.3f %\n",
+    printf("Total Host State Change:                %.3f / %.3f / %.3f %%\n",
            stats.hosts_stats().min_state_change(),
            stats.hosts_stats().max_state_change(),
            stats.hosts_stats().average_state_change());
@@ -247,11 +247,11 @@ void centenginestats_client::get_stats(std::string const& object) {
            stats.hosts_stats().active_hosts().min_execution_time(),
            stats.hosts_stats().active_hosts().max_execution_time(),
            stats.hosts_stats().active_hosts().average_execution_time());
-    printf("Active Host State Change:               %.3f / %.3f / %.3f %\n",
+    printf("Active Host State Change:               %.3f / %.3f / %.3f %%\n",
            stats.hosts_stats().active_hosts().min_state_change(),
            stats.hosts_stats().active_hosts().max_state_change(),
            stats.hosts_stats().active_hosts().average_state_change());
-    printf("Active Hosts Last 1/5/15/60 min:        %ld / %ld / %ld / %ld\n",
+    printf("Active Hosts Last 1/5/15/60 min:        %ud / %ud / %ud / %ud\n",
            stats.hosts_stats().active_hosts().checks_last_1min(),
            stats.hosts_stats().active_hosts().checks_last_5min(),
            stats.hosts_stats().active_hosts().checks_last_15min(),
@@ -260,77 +260,77 @@ void centenginestats_client::get_stats(std::string const& object) {
            stats.hosts_stats().passive_hosts().min_latency(),
            stats.hosts_stats().passive_hosts().max_latency(),
            stats.hosts_stats().passive_hosts().average_latency());
-    printf("Passive Host State Change:              %.3f / %.3f / %.3f %\n",
+    printf("Passive Host State Change:              %.3f / %.3f / %.3f %%\n",
            stats.hosts_stats().passive_hosts().min_state_change(),
            stats.hosts_stats().passive_hosts().max_state_change(),
            stats.hosts_stats().passive_hosts().average_state_change());
-    printf("Passive Hosts Last 1/5/15/60 min:       %ld / %ld / %ld / %ld\n",
+    printf("Passive Hosts Last 1/5/15/60 min:       %ud / %ud / %ud / %ud\n",
            stats.hosts_stats().passive_hosts().checks_last_1min(),
            stats.hosts_stats().passive_hosts().checks_last_5min(),
            stats.hosts_stats().passive_hosts().checks_last_15min(),
            stats.hosts_stats().passive_hosts().checks_last_1hour());
-    printf("Hosts Up/Down/Unreach:                  %ld / %ld / %ld\n",
+    printf("Hosts Up/Down/Unreach:                  %ud / %ud / %ud\n",
            stats.hosts_stats().up(), stats.hosts_stats().down(),
            stats.hosts_stats().unreachable());
-    printf("Hosts Flapping:                         %ld\n",
+    printf("Hosts Flapping:                         %ud\n",
            stats.hosts_stats().flapping());
-    printf("Hosts In Downtime:                      %ld\n\n",
+    printf("Hosts In Downtime:                      %ud\n\n",
            stats.hosts_stats().downtime());
-    printf("Active Host Checks Last 1/5/15 min:     %ld / %ld / %ld\n",
+    printf("Active Host Checks Last 1/5/15 min:     %ud / %ud / %ud\n",
            stats.program_status().active_scheduled_host_check_stats()[0] +
                stats.program_status().active_ondemand_host_check_stats()[0],
            stats.program_status().active_scheduled_host_check_stats()[1] +
                stats.program_status().active_ondemand_host_check_stats()[1],
            stats.program_status().active_scheduled_host_check_stats()[2] +
                stats.program_status().active_ondemand_host_check_stats()[2]);
-    printf("   Scheduled:                           %ld / %ld / %ld\n",
+    printf("   Scheduled:                           %ud / %ud / %ud\n",
            stats.program_status().active_scheduled_host_check_stats()[0],
            stats.program_status().active_scheduled_host_check_stats()[1],
            stats.program_status().active_scheduled_host_check_stats()[2]);
-    printf("   On-demand:                           %ld / %ld / %ld\n",
+    printf("   On-demand:                           %ud / %ud / %ud\n",
            stats.program_status().active_ondemand_host_check_stats()[0],
            stats.program_status().active_ondemand_host_check_stats()[1],
            stats.program_status().active_ondemand_host_check_stats()[2]);
-    printf("   Parallel:                            %ld / %ld / %ld\n",
+    printf("   Parallel:                            %ud / %ud / %ud\n",
            stats.program_status().parallel_host_check_stats()[0],
            stats.program_status().parallel_host_check_stats()[1],
            stats.program_status().parallel_host_check_stats()[2]);
-    printf("   Serial:                              %ld / %ld / %ld\n",
+    printf("   Serial:                              %ud / %ud / %ud\n",
            stats.program_status().serial_host_check_stats()[0],
            stats.program_status().serial_host_check_stats()[1],
            stats.program_status().serial_host_check_stats()[2]);
-    printf("   Cached:                              %ld / %ld / %ld\n",
+    printf("   Cached:                              %ud / %ud / %ud\n",
            stats.program_status().cached_host_check_stats()[0],
            stats.program_status().cached_host_check_stats()[1],
            stats.program_status().cached_host_check_stats()[2]);
-    printf("Passive Host Checks Last 1/5/15 min:    %ld / %ld / %ld\n",
+    printf("Passive Host Checks Last 1/5/15 min:    %ud / %ud / %ud\n",
            stats.program_status().passive_host_check_stats()[0],
            stats.program_status().passive_host_check_stats()[1],
            stats.program_status().passive_host_check_stats()[2]);
-    printf("Active Service Checks Last 1/5/15 min:  %ld / %ld / %ld\n",
+    printf("Active Service Checks Last 1/5/15 min:  %ud / %ud / %ud\n",
            stats.program_status().active_scheduled_service_check_stats()[0] +
                stats.program_status().active_ondemand_service_check_stats()[0],
            stats.program_status().active_scheduled_service_check_stats()[1] +
                stats.program_status().active_ondemand_service_check_stats()[1],
            stats.program_status().active_scheduled_service_check_stats()[2] +
                stats.program_status().active_ondemand_service_check_stats()[2]);
-    printf("   Scheduled:                           %ld / %ld / %ld\n",
+    printf("   Scheduled:                           %ud / %ud / %ud\n",
            stats.program_status().active_scheduled_service_check_stats()[0],
            stats.program_status().active_scheduled_service_check_stats()[1],
            stats.program_status().active_scheduled_service_check_stats()[2]);
-    printf("   On-demand:                           %ld / %ld / %ld\n",
+    printf("   On-demand:                           %ud / %ud / %ud\n",
            stats.program_status().active_ondemand_service_check_stats()[0],
            stats.program_status().active_ondemand_service_check_stats()[1],
            stats.program_status().active_ondemand_service_check_stats()[2]);
-    printf("   Cached:                              %ld / %ld / %ld\n",
+    printf("   Cached:                              %ud / %ud / %ud\n",
            stats.program_status().cached_service_check_stats()[0],
            stats.program_status().cached_service_check_stats()[1],
            stats.program_status().cached_service_check_stats()[2]);
-    printf("Passive Service Checks Last 1/5/15 min: %ld / %ld / %ld\n\n",
+    printf("Passive Service Checks Last 1/5/15 min: %ud / %ud / %ud\n\n",
            stats.program_status().passive_service_check_stats()[0],
            stats.program_status().passive_service_check_stats()[1],
            stats.program_status().passive_service_check_stats()[2]);
-    printf("External Commands Last 1/5/15 min:      %ld / %ld / %ld\n\n\n",
+    printf("External Commands Last 1/5/15 min:      %ud / %ud / %ud\n\n\n",
            stats.program_status().external_command_stats()[0],
            stats.program_status().external_command_stats()[1],
            stats.program_status().external_command_stats()[2]);
