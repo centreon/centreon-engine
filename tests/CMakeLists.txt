@@ -134,6 +134,6 @@ if (WITH_TESTING)
     )
     set(GCOV gcov)
   endif ()
-  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV} ${gtest_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
+  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV} ${gtest_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} ${fmt_LIBS} dl)
 
 endif ()

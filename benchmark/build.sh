@@ -76,7 +76,7 @@ if [[ $? -ne 0 ]] ; then
   cmake=$(command -v cmake)
 fi
 
-$cmake -GNinja -DWITH_SIMU=On -DWITH_RW_DIR=$root_dir/lib -DWITH_VAR_DIR=$root_dir/log -DWITH_DEBUG_CONFIG=On ../..
+$cmake -DCMAKE_BUILD_TYPE=Debug -GNinja -DWITH_SIMU=On -DWITH_RW_DIR=$root_dir/lib -DWITH_VAR_DIR=$root_dir/log -DWITH_DEBUG_CONFIG=On ../..
 
 if [[ $? -ne 0 ]] ; then
   echo "Error..."
