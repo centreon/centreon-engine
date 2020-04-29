@@ -455,8 +455,10 @@ int neb_make_callbacks(int callback_type, void* data) {
   if (callback_type < 0 || callback_type >= NEBCALLBACK_NUMITEMS)
     return ERROR;
 
-  logger(dbg_eventbroker, more)
-      << "Making callbacks (type " << callback_type << ")...";
+  if (callback_type != NEBCALLBACK_LOG_DATA) {
+    logger(dbg_eventbroker, more)
+        << "Making callbacks (type " << callback_type << ")...";
+  }
 
   /* make the callbacks... */
   for (temp_callback = neb_callback_list[callback_type]; temp_callback != NULL;
@@ -473,9 +475,11 @@ int neb_make_callbacks(int callback_type, void* data) {
     temp_callback = next_callback;
 
     total_callbacks++;
-    logger(dbg_eventbroker, most)
-        << "Callback #" << total_callbacks << " (type " << callback_type
-        << ") return (code = " << cbresult << ")";
+    if (callback_type != NEBCALLBACK_LOG_DATA) {
+      logger(dbg_eventbroker, most)
+          << "Callback #" << total_callbacks << " (type " << callback_type
+          << ") return (code = " << cbresult << ")";
+    }
 
     /* module wants to cancel callbacks to other modules (and potentially cancel
      * the default handling of an event) */
