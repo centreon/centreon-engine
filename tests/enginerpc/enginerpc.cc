@@ -137,11 +137,17 @@ TEST_F(EngineRpc, GetVersion) {
   oss << "GetVersion: major: " << CENTREON_ENGINE_VERSION_MAJOR;
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("GetVersion");
-  ASSERT_EQ(output.size(), 2);
+  //ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), oss.str());
-  oss.str("");
-  oss << "minor: " << CENTREON_ENGINE_VERSION_MINOR;
-  ASSERT_EQ(output.back(), oss.str());
+  if (output.size() == 2) {
+    oss.str("");
+    oss << "minor: " << CENTREON_ENGINE_VERSION_MINOR;
+    ASSERT_EQ(output.back(), oss.str());
+  } else {
+    oss.str("");
+    oss << "patch: " << CENTREON_ENGINE_VERSION_PATCH;
+    ASSERT_EQ(output.back(), oss.str());
+  }
   erpc.shutdown();
 }
 
