@@ -1,4 +1,19 @@
 =======================
+Centreon Engine 20.04.01
+=======================
+
+************
+Bug Fix
+************
+
+debug_lvl=-1
+============
+
+Engine was stuck when we put -1 as debug_lvl
+in centengine.cfg.
+
+
+=======================
 Centreon Engine 20.04
 =======================
 
