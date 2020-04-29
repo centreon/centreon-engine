@@ -137,7 +137,6 @@ TEST_F(EngineRpc, GetVersion) {
   oss << "GetVersion: major: " << CENTREON_ENGINE_VERSION_MAJOR;
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("GetVersion");
-  //ASSERT_EQ(output.size(), 2);
   ASSERT_EQ(output.front(), oss.str());
   if (output.size() == 2) {
     oss.str("");
