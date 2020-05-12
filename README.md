@@ -82,7 +82,7 @@ When you are ready do :
 
 Then you will be able to resume the following steps :
     $> git clone https://github.com/centreon/centreon-engine
-    $> cd centreon-engine && ./make.sh
+    $> cd centreon-engine && ./cmake.sh
     $> cd build
     $> make && make install
 
