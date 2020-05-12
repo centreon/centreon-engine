@@ -65,9 +65,31 @@ This paragraph is only a quickstart guide for the compilation of
 Centreon Engine. For a more in-depth guide with build options you should
 refer to the [online documentation](https://documentation.centreon.com/docs/centreon-engine/en/latest/installation/index.html#using-sources).
 
-Centreon Engine needs Centreon Clib to be build. You should
-[install it first](https://github.com/centreon/centreon-clib).
 
+"""
+Centreon Engine needs Centreon Clib and (Conan / gestionaire de package de donnees) to be build. You should (prioriser d'utiliser le packager de votre systeme).
+[install it first](https://github.com/centreon/centreon-clib).
+For a more in-depth guide with build options you should refer to the [online documentation](https://documention.centreon.com/docs/centreon-clib/en/lateset/).
+
+Centreon Clib needs CMake to be build. You should
+[install it first](https://).
+
+
+Once the sources of Centreon Clib extracted, create the *./build/* directory and launch the CMake command.
+Pour ce faire, il faut avoir installe CMake
+
+
+    $> install conan
+ 
+    $> cd centreon-clib
+    $> mkdir build && cd build
+    $> cmake ..
+    ...
+    $> make -j 4
+    ...
+    $# make install
+
+"""
 Once the sources of Centreon Engine extracted go to the *./build/*
 directory and launch the CMake command. This will look for required
 dependencies and print a summary of the compilation parameters if
