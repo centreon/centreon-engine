@@ -19,6 +19,7 @@ its stability we improved it in several ways :
 
 Just give it a try !
 
+
 ## Documentation ##
 
 The full Centreon Engine documentation is available online
@@ -30,6 +31,7 @@ The documentation extensively covers all aspects of Centreon Engine such
 as installation, compilation, configuration, use and more. It is the
 reference guide of the software. This *README* is only provided as a
 quick introduction.
+
 
 ## Installing from binaries ##
 
@@ -47,6 +49,7 @@ Centreon Engine.
 
     $# yum install centreon-engine
 
+
 ## Fetching sources ##
 
 The reference repository is hosted at [GitHub](https://github.com/centreon/centreon-engine).
@@ -54,6 +57,7 @@ Beware that the repository hosts in-developement sources and that it
 might not work at all.
 
 Stable releases are available as gziped tarballs on [Centreon's download site](https://download.centreon.com).
+
 
 ## Compilation (quickstart) ##
 
@@ -67,29 +71,26 @@ refer to the [online documentation](https://documentation.centreon.com/docs/cent
 
 
 """
-Centreon Engine needs Centreon Clib and (Conan / gestionaire de package de donnees) to be build. You should (prioriser d'utiliser le packager de votre systeme).
-[install it first](https://github.com/centreon/centreon-clib).
-For a more in-depth guide with build options you should refer to the [online documentation](https://documention.centreon.com/docs/centreon-clib/en/lateset/).
+()[For Centos 7]() :
+First of all, check if you have these packages installed (Note that packages names come from Centos 7 distribution, so if some packages names don't match on your distribution try to find their equivalent names) :
 
-Centreon Clib needs CMake to be build. You should
-[install it first](https://).
+    git, make, cmake.
+
+If they are not installed, pleade install them.
+
+    $> git clone https://github.com/centreon/centreon-engine
+    $> cd centreon-engine && ./make.sh
+    $> cd build
+    $> make && make install
 
 
-Once the sources of Centreon Clib extracted, create the *./build/* directory and launch the CMake command.
-Pour ce faire, il faut avoir installe CMake
+()[For other didtributions]() :
+If you are on another distribution, then follow the steps below.
 
+For the projet compilation you need to have conan installed. To install conan you need pip3 if you are using python3 (python package manager). You can install conan in that manner.
 
-    $> install conan
- 
-    $> cd centreon-clib
-    $> mkdir build && cd build
-    $> cmake ..
-    ...
-    $> make -j 4
-    ...
-    $# make install
+    $> pip3 install conan
 
-"""
 Once the sources of Centreon Engine extracted go to the *./build/*
 directory and launch the CMake command. This will look for required
 dependencies and print a summary of the compilation parameters if
@@ -97,7 +98,9 @@ everything went fine.
 
     $> cd centreon-engine/build
     $> cmake .
-    ...
+    $> cmake" -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
+
+"""
 
 Now launch the compilation using the *make* command and then install the
 software by running *make install* as priviledged user.
@@ -106,7 +109,11 @@ software by running *make install* as priviledged user.
     ...
     $# make install
 
+    or : 
+    $> make && make install
+
 You're done !
+
 
 ## Bug reports / Feature requests ##
 
@@ -126,6 +133,7 @@ For a quick resolution of a bug your message should contain :
 * the Centreon product**s** version**s**
 * the operating system you're using (name and version)
 * if possible configuration, log and debug files
+
 
 ## Contributing ##
 
