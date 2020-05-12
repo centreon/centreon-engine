@@ -69,50 +69,61 @@ This paragraph is only a quickstart guide for the compilation of
 Centreon Engine. For a more in-depth guide with build options you should
 refer to the [online documentation](https://documentation.centreon.com/docs/centreon-engine/en/latest/installation/index.html#using-sources).
 
-
-"""
-()[For Centos 7]() :
+**For Centos 7 :**
 First of all, check if you have these packages installed (Note that packages names come from Centos 7 distribution, so if some packages names don't match on your distribution try to find their equivalent names) :
 
-    git, make, cmake.
+    git, make, cmake, gcc-c++, python3, epel-release, cmake3
 
-If they are not installed, pleade install them.
+If they are not installed, please install them.
 
+Conan is needed as well but make sure to install gcc before conan.
+When you are ready do :  
+    $> pip3 install conan  
+
+Then you will be able to resume the following steps :
     $> git clone https://github.com/centreon/centreon-engine
     $> cd centreon-engine && ./make.sh
     $> cd build
     $> make && make install
 
 
-()[For other didtributions]() :
+**For other didtributions :**
 If you are on another distribution, then follow the steps below.
 
-For the projet compilation you need to have conan installed. To install conan you need pip3 if you are using python3 (python package manager). You can install conan in that manner.
+For the projet compilation you need to have conan installed. Try to use the package manager given by your OS to install conan. ('apt' for Debian, 'rpm' for Red Hat, 'pacman' for Arch Linux, ...)
 
+Note that conan should be installed after gcc-c++
+
+Exemple :
+    $> _apt_  install conan
+
+If it doesn't work, you will have to install a python programm such as pip3 :
+    $> _apt_ install pip3
+Then :
     $> pip3 install conan
 
-Once the sources of Centreon Engine extracted go to the *./build/*
-directory and launch the CMake command. This will look for required
-dependencies and print a summary of the compilation parameters if
-everything went fine.
-
+    $> git clone https://github.com/centreon/centreon-engine
     $> cd centreon-engine/build
-    $> cmake .
-    $> cmake" -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
 
-"""
+Once the sources of Centreon Engine extracted go to the *./build/* directory and launch the CMake command.
+This will look for required dependencies and print a summary of the compilation parameters if everything went fine.
 
-Now launch the compilation using the *make* command and then install the
-software by running *make install* as priviledged user.
+   $> cmake -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Release -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=OFF -DWITH_CREATE_FILES=OFF -DWITH_BENCH=OFF ..
 
-    $> make -j 4
-    ...
-    $# make install
+Now launch the compilation using the *make* command and then install the software by running *make install* as priviledged user.
 
-    or : 
     $> make && make install
 
+
 You're done !
+
+Verify /etc/centreon-engine directory.
+
+Usually, its content is filled by the Centreon web interface, owned by the apache user.
+
+A command like the following may be necessary:
+
+    $> chown -R apache:apache /etc/centreon-engine/*
 
 
 ## Bug reports / Feature requests ##
