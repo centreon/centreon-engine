@@ -70,7 +70,7 @@ Centreon Engine. For a more in-depth guide with build options you should
 refer to the [online documentation](https://documentation.centreon.com/docs/centreon-engine/en/latest/installation/index.html#using-sources).
 
 **For Centos 7 :**
-First of all, check if you have these packages installed (Note that packages names come from Centos 7 distribution, so if some packages names don't match on your distribution try to find their equivalent names) :
+First of all, check if you have these packages installed :
 
     git, make, cmake, gcc-c++, python3, epel-release, cmake3
 
@@ -90,18 +90,19 @@ Then you will be able to resume the following steps :
 **For other didtributions :**
 If you are on another distribution, then follow the steps below.
 
-For the projet compilation you need to have conan installed. Try to use the package manager given by your OS to install conan. ('apt' for Debian, 'rpm' for Red Hat, 'pacman' for Arch Linux, ...)
+Check if you have these packages installed (Note that packages names come from Centos 7 distribution, so if some packages names don't match on your distribution try to find their equivalent names) :
 
-Note that conan should be installed after gcc-c++
+    git, make, cmake, gcc-c++, python3, cmake3
+
+For the projet compilation you need to have conan installed. Try to use the package manager given by your OS to install conan. ('apt' for Debian, 'rpm' for Red Hat, 'pacman' for Arch Linux, ...) It is prefered to install gcc before conan.
 
 Exemple :
     $> _apt_  install conan
 
-If it doesn't work, you will have to install a python programm such as pip3 :
-    $> _apt_ install pip3
-Then :
+If it does not work, conan can be installed with pip3 :
     $> pip3 install conan
 
+You can now compile centreon-engine :
     $> git clone https://github.com/centreon/centreon-engine
     $> cd centreon-engine/build
 
