@@ -72,9 +72,11 @@ refer to the [online documentation](https://documentation.centreon.com/docs/cent
 **For Centos 7 :**
 First of all, check if you have these packages installed :
 
-    git, make, cmake, gcc-c++, python3, epel-release, cmake3
+    git, make, gcc-c++, python3, epel-release, cmake3
 
-If they are not installed, please install them.
+If they are not installed, please install them. Make sure to install epel-release before cmake3, if you install them both together it will not find cmake3.
+    $> yum install git make cmake gcc-c++ python3 epel-release
+    $> yum install cmake3
 
 Conan is needed as well but make sure to install gcc before conan.
 When you are ready do :  
@@ -84,15 +86,18 @@ Then you will be able to resume the following steps :
     $> git clone https://github.com/centreon/centreon-engine
     $> cd centreon-engine && ./cmake.sh
     $> cd build
+
+To speed up the compilation you can use make -j4 if you have 4 cpu or make -j8 if you have 8 cpu...
     $> make && make install
+   Or:
+    $> make -j4 && make install
 
-
-**For other didtributions :**
+**For other distributions :**
 If you are on another distribution, then follow the steps below.
 
 Check if you have these packages installed (Note that packages names come from Centos 7 distribution, so if some packages names don't match on your distribution try to find their equivalent names) :
 
-    git, make, cmake, gcc-c++, python3, cmake3
+    git, make, cmake, gcc-c++, python3
 
 For the projet compilation you need to have conan installed. Try to use the package manager given by your OS to install conan. ('apt' for Debian, 'rpm' for Red Hat, 'pacman' for Arch Linux, ...) It is prefered to install gcc before conan.
 
@@ -104,12 +109,13 @@ If it does not work, conan can be installed with pip3 :
 
 You can now compile centreon-engine :
     $> git clone https://github.com/centreon/centreon-engine
+    $> mkdir -p centreon-engine/build
     $> cd centreon-engine/build
 
 Once the sources of Centreon Engine extracted go to the *./build/* directory and launch the CMake command.
 This will look for required dependencies and print a summary of the compilation parameters if everything went fine.
 
-   $> cmake -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Release -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=OFF -DWITH_CREATE_FILES=OFF -DWITH_BENCH=OFF ..
+   $> cmake -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Release -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine ..
 
 Now launch the compilation using the *make* command and then install the software by running *make install* as priviledged user.
 
