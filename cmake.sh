@@ -12,6 +12,14 @@ else
   fi
 fi
 
+if ! rpm -qa | grep "python3-pip" ; then
+  yum -y install python3-pip
+else
+  echo "pip3 already installed"
+fi
+
+pip3 install conan
+
 if [ ! -d build ] ; then
   mkdir build
 else
