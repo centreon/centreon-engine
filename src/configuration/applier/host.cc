@@ -432,6 +432,13 @@ void applier::host::remove_object(configuration::host const& obj) {
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
+
+    for (auto it_s = it->second->services.begin();
+         it_s != it->second->services.end(); ++it_s)
+      broker_adaptive_service_data(NEBTYPE_SERVICE_DELETE, NEBFLAG_NONE,
+                                   NEBATTR_NONE, it_s->second, CMD_NONE,
+                                   MODATTR_ALL, MODATTR_ALL, &tv);
+
     broker_adaptive_host_data(NEBTYPE_HOST_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
                               it->second.get(), CMD_NONE, MODATTR_ALL,
                               MODATTR_ALL, &tv);
