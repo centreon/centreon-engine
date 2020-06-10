@@ -1,4 +1,19 @@
 =======================
+Centreon Engine 20.04.2
+=======================
+
+************
+Bug Fix
+************
+
+If a host is disabled, it should also be the case for its services
+==================================================================
+
+If a host with several services is disabled. Its services are removed from
+the monitoring. But a query in centreon_storage shows that those services
+are still there. With this new version, it is fixed.
+
+=======================
 Centreon Engine 20.04.01
 =======================
 
