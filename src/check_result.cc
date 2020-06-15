@@ -102,7 +102,8 @@ std::string const& check_result::get_output() const {
   return _output;
 }
 
-void check_result::set_output(std::string const& output) {
+void check_result::set_output(std::string const& output,
+                              const bool check_encoding) {
   _output = output;
 }
 
