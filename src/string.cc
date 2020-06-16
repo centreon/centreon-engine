@@ -324,7 +324,7 @@ std::string& string::remove_thresholds(std::string& perfdata) noexcept {
   return perfdata;
 }
 
-void string::check_string_utf8(std::string&& str) {
+std::string& string::check_string_utf8(std::string& str) noexcept {
   for (auto it = str.begin(); it != str.end(); ) {
     if ((*it & ~127) == 0)
       ++it;
@@ -335,7 +335,7 @@ void string::check_string_utf8(std::string&& str) {
     else if ((*it & 240) == 240 && (*(it + 1) & 128) == 128 && (*(it + 2) & 128) == 128 && (*(it + 3) & 128) == 128)
       it += 4;
     else {
-      /* Not a UTF-8 string */
+      /* Not an UTF-8 string */
       bool is_cp1252 = true, is_iso8859 = true;
       auto itt = it;
 
@@ -350,21 +350,25 @@ void string::check_string_utf8(std::string&& str) {
             is_cp1252 = false;
         if (!is_cp1252) {
           std::string out;
-          std::size_t d = str.distance(str.begin(), it);
+          std::size_t d = it - str.begin();
           out.reserve(d + 2 * (str.size() - d));
           out = str.substr(0, d);
-          while (it != str.end())
-            if (*it < 128)
-              out.push_back(*it++);
-            else {
-              out.push_back(0xc2 + (*it > 0xbf));
-              out.push_back((*it++ & 0x3f) + 0x80);
+          while (it != str.end()) {
+            unsigned char c = static_cast<unsigned char>(*it);
+            if (c < 128) {
+              out.push_back(c++);
             }
-          str.swap(out);
+            else {
+              out.push_back(0xc2 + (c > 0xbf));
+              out.push_back((c & 0x3f) + 0x80);
+            }
+            ++it;
+          }
+          return str;
           break;
         } else if (!is_iso8859) {
           std::string out;
-          std::size_t d = str.distance(str.begin(), it);
+          std::size_t d = it - str.begin();
           out.reserve(d + 3 * (str.size() - d));
           out = str.substr(0, d);
           while (it != str.end()) {
@@ -455,34 +459,19 @@ void string::check_string_utf8(std::string&& str) {
                   out.append("Ÿ");
                   break;
                 default:
-              out.push_back(0xc2 + (*it > 0xbf));
-              out.push_back((*it++ & 0x3f) + 0x80);
+              out.push_back(0xc2 + (c > 0xbf));
+              out.push_back((c & 0x3f) + 0x80);
+              ++it;
               break;
               }
             }
           }
-          str.swap(out);
+          return str;
           break;
         }
         ++itt;
       } while (itt != str.end());
     }
   }
-}
-
-void string::check_string_utf8(std::string&& str) {
-  bool is_cp1252 = true, is_iso8859 = true, is_utf8 = true;
-  for (auto it = str.begin(); it != str.end(); ++it) {
-    unsigned char c = *it;
-    /* not ISO-8859-15 */
-    if (c < 32 || (c > 126 && c < 160))
-      is_iso8859 = false;
-    /* not cp1252 */
-    if (c & 128)
-      if (c == 129 || c == 141 || c == 143 || c == 144 || c == 155)
-        is_cp1252 = false;
-    /* UTF-8 */
-    if ((c & ~127) == 0 || // One byte
-        (c & 192) == 192 && 
-  }
+  return str;
 }

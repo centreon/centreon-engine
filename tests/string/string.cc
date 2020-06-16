@@ -109,3 +109,8 @@ TEST(string_utils, removeThresholdsMoreComplex2) {
   std::string perfdata("a=2V;5;9;0;");
   ASSERT_EQ(string::remove_thresholds(perfdata), "a=2V;;;0;");
 }
+
+TEST(string_check_utf8, cp1252) {
+  std::string txt("L'accí³¨s í³  l'hí³´tel est emcombrí³©");
+  ASSERT_EQ(string::check_string_utf8(txt), "L'accÃ¨s Ã  l'hÃ´tel est encombrÃ©");
+}
