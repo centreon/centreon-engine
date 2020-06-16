@@ -1,24 +1,26 @@
 /*
-** Copyright 2011-2014,2017 Centreon
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2011 - 2014, 2017, 2020 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
+
+#include "com/centreon/engine/string.hh"
 
 #include <cassert>
-#include "com/centreon/engine/string.hh"
+
 #include "com/centreon/engine/exceptions/error.hh"
 
 using namespace com::centreon::engine;
@@ -257,7 +259,8 @@ std::string& string::trim_right(std::string& str) noexcept {
   return str;
 }
 
-std::string string::extract_perfdata(std::string const& perfdata, std::string const& metric) noexcept {
+std::string string::extract_perfdata(std::string const& perfdata,
+                                     std::string const& metric) noexcept {
   size_t pos, pos_start = 0;
 
   do {
@@ -325,15 +328,27 @@ std::string& string::remove_thresholds(std::string& perfdata) noexcept {
   return perfdata;
 }
 
+/**
+ * @brief Checks if the string given as parameter is a real UTF-8 string.
+ * If it is not, it tries to convert it to UTF-8. Encodings correctly changed
+ * are ISO-8859-15 and CP-1252.
+ *
+ * @param str The string to check
+ *
+ * @return The string itself or a new string converted to UTF-8. The output
+ * string should always be an UTF-8 string.
+ */
 std::string string::check_string_utf8(std::string const& str) noexcept {
-  for (auto it = str.begin(); it != str.end(); ) {
+  for (auto it = str.begin(); it != str.end();) {
     if ((*it & ~127) == 0)
       ++it;
     else if ((*it & 192) == 192 && (*(it + 1) & 128) == 128)
       it += 2;
-    else if ((*it & 224) == 224 && (*(it + 1) & 128) == 128 && (*(it + 2) & 128) == 128)
+    else if ((*it & 224) == 224 && (*(it + 1) & 128) == 128 &&
+             (*(it + 2) & 128) == 128)
       it += 3;
-    else if ((*it & 240) == 240 && (*(it + 1) & 128) == 128 && (*(it + 2) & 128) == 128 && (*(it + 3) & 128) == 128)
+    else if ((*it & 240) == 240 && (*(it + 1) & 128) == 128 &&
+             (*(it + 2) & 128) == 128 && (*(it + 3) & 128) == 128)
       it += 4;
     else {
       /* Not an UTF-8 string */
