@@ -324,7 +324,7 @@ std::string& string::remove_thresholds(std::string& perfdata) noexcept {
   return perfdata;
 }
 
-std::string& string::check_string_utf8(std::string& str) noexcept {
+std::string string::check_string_utf8(std::string& str) noexcept {
   for (auto it = str.begin(); it != str.end(); ) {
     if ((*it & ~127) == 0)
       ++it;
@@ -339,6 +339,24 @@ std::string& string::check_string_utf8(std::string& str) noexcept {
       bool is_cp1252 = true, is_iso8859 = true;
       auto itt = it;
 
+      auto iso8859_to_utf8 = [&str, &it]() -> std::string {
+        /* Strings are both cp1252 and iso8859-15 */
+        std::string out;
+        std::size_t d = it - str.begin();
+        out.reserve(d + 2 * (str.size() - d));
+        out = str.substr(0, d);
+        while (it != str.end()) {
+          unsigned char c = static_cast<unsigned char>(*it);
+          if (c < 128) {
+            out.push_back(c++);
+          } else {
+            out.push_back(0xc2 + (c > 0xbf));
+            out.push_back((c & 0x3f) + 0x80);
+          }
+          ++it;
+        }
+        return out;
+      };
       do {
         unsigned char c = *itt;
         /* not ISO-8859-15 */
@@ -353,18 +371,7 @@ std::string& string::check_string_utf8(std::string& str) noexcept {
           std::size_t d = it - str.begin();
           out.reserve(d + 2 * (str.size() - d));
           out = str.substr(0, d);
-          while (it != str.end()) {
-            unsigned char c = static_cast<unsigned char>(*it);
-            if (c < 128) {
-              out.push_back(c++);
-            }
-            else {
-              out.push_back(0xc2 + (c > 0xbf));
-              out.push_back((c & 0x3f) + 0x80);
-            }
-            ++it;
-          }
-          return str;
+          return iso8859_to_utf8();
           break;
         } else if (!is_iso8859) {
           std::string out;
@@ -471,6 +478,7 @@ std::string& string::check_string_utf8(std::string& str) noexcept {
         }
         ++itt;
       } while (itt != str.end());
+      return iso8859_to_utf8();
     }
   }
   return str;

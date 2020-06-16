@@ -110,7 +110,12 @@ TEST(string_utils, removeThresholdsMoreComplex2) {
   ASSERT_EQ(string::remove_thresholds(perfdata), "a=2V;;;0;");
 }
 
-TEST(string_check_utf8, cp1252) {
-  std::string txt("L'accÌ≥®s Ì≥† l'hÌ≥¥tel est emcombrÌ≥©");
+TEST(string_check_utf8, simple) {
+  std::string txt("L'acc\350s \340 l'h\364tel est encombr\351");
+  ASSERT_EQ(string::check_string_utf8(txt), "L'acc√®s √† l'h√¥tel est encombr√©");
+}
+
+TEST(string_check_utf8, utf8) {
+  std::string txt("L'acc√®s √† l'h√¥tel est encombr√©");
   ASSERT_EQ(string::check_string_utf8(txt), "L'acc√®s √† l'h√¥tel est encombr√©");
 }
