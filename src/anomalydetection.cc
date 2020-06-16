@@ -662,7 +662,7 @@ int anomalydetection::run_async_check(int check_options,
   if (!std::isnan(std::get<4>(pd))) {
     oss << ' ' << _metric_name << "_upper_thresholds=" << std::get<4>(pd) << std::get<2>(pd) << without_thresholds;
   }
-  check_result_info->set_output(oss.str());
+  check_result_info->set_output(oss.str(), false);
 
   timestamp now(timestamp::now());
 

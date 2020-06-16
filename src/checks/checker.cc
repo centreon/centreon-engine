@@ -378,7 +378,7 @@ void checker::finished(commands::result const& res) noexcept {
   result->set_return_code(res.exit_code);
   result->set_exited_ok(res.exit_status == process::normal ||
                         res.exit_status == process::timeout);
-  result->set_output(res.output);
+  result->set_output(res.output, true);
 
   // Queue check result.
   lock.lock();

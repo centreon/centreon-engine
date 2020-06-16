@@ -119,3 +119,46 @@ TEST(string_check_utf8, utf8) {
   std::string txt("L'accès à l'hôtel est encombré");
   ASSERT_EQ(string::check_string_utf8(txt), "L'accès à l'hôtel est encombré");
 }
+
+TEST(string_check_utf8, cp1252) {
+  std::string txt("Le ticket co\xfbte 12\x80\n");
+  ASSERT_EQ(string::check_string_utf8(txt), "Le ticket coûte 12€\n");
+}
+
+TEST(string_check_utf8, iso8859) {
+  std::string txt("Le ticket co\xfbte 12\xa4\n");
+  ASSERT_EQ(string::check_string_utf8(txt), "Le ticket coûte 12€\n");
+}
+
+TEST(string_check_utf8, iso8859_cpx) {
+  std::string txt("\xa4\xa6\xa8\xb4\xb8\xbc\xbd\xbe");
+  ASSERT_EQ(string::check_string_utf8(txt), "€ŠšŽžŒœŸ");
+}
+
+TEST(string_check_utf8, cp1252_cpx) {
+  std::string txt("\x80\x95\x82\x89\x8a");
+  ASSERT_EQ(string::check_string_utf8(txt), "€•‚‰Š");
+}
+
+TEST(string_check_utf8, whatever_as_cp1252) {
+  std::string txt;
+  for (uint8_t c = 32; c < 255; c++)
+    if (c != 127)
+      txt.push_back(c);
+  std::string result(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~€_‚ƒ„…†‡ˆ‰Š‹Œ_Ž__‘’“”•–—˜™š›œ_žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ");
+  ASSERT_EQ(string::check_string_utf8(txt), result);
+}
+
+TEST(string_check_utf8, whatever_as_iso8859) {
+  /* Construction of a string that is not cp1252 so it should be considered as
+   * iso8859-15 */
+  std::string txt;
+  for (uint8_t c = 32; c < 255; c++) {
+    if (c == 32)
+      txt.push_back(129);
+    if (c != 127)
+      txt.push_back(c);
+  }
+  std::string result("_ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~_________________________________¡¢£€¥Š§š©ª«¬­®¯°±²³Žµ¶·ž¹º»ŒœŸ¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ");
+  ASSERT_EQ(string::check_string_utf8(txt), result);
+}

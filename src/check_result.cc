@@ -104,7 +104,10 @@ std::string const& check_result::get_output() const {
 
 void check_result::set_output(std::string const& output,
                               const bool check_encoding) {
-  _output = output;
+  if (check_encoding)
+    _output = string::check_string_utf8(output);
+  else
+    _output = output;
 }
 
 bool check_result::get_exited_ok() const {
