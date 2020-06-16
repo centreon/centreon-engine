@@ -46,7 +46,7 @@ result::result(result const& right) {
 /**
  *  Destructor.
  */
-result::~result() throw() {}
+result::~result() noexcept {}
 
 /**
  *  Default copy operator.
@@ -58,7 +58,7 @@ result::~result() throw() {}
 result& result::operator=(result const& right) {
   if (this != &right)
     _internal_copy(right);
-  return (*this);
+  return *this;
 }
 
 /**
@@ -68,7 +68,7 @@ result& result::operator=(result const& right) {
  *
  *  @return True if object have the same value.
  */
-bool result::operator==(result const& right) const throw() {
+bool result::operator==(result const& right) const noexcept {
   return (command_id == right.command_id && exit_code == right.exit_code &&
           exit_status == right.exit_status && end_time == right.end_time &&
           start_time == right.start_time && output == right.output);
@@ -81,8 +81,8 @@ bool result::operator==(result const& right) const throw() {
  *
  *  @return True if object have the different value.
  */
-bool result::operator!=(result const& right) const throw() {
-  return (!operator==(right));
+bool result::operator!=(result const& right) const noexcept {
+  return !operator==(right);
 }
 
 /**************************************
@@ -103,5 +103,4 @@ void result::_internal_copy(result const& right) {
   exit_status = right.exit_status;
   start_time = right.start_time;
   output = right.output;
-  return;
 }

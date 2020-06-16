@@ -39,10 +39,10 @@ class result {
  public:
   result();
   result(result const& right);
-  ~result() throw();
+  ~result() noexcept;
   result& operator=(result const& right);
-  bool operator==(result const& right) const throw();
-  bool operator!=(result const& right) const throw();
+  bool operator==(result const& right) const noexcept;
+  bool operator!=(result const& right) const noexcept;
   uint64_t command_id;
   timestamp end_time;
   int exit_code;
