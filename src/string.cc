@@ -514,8 +514,8 @@ std::string string::check_string_utf8(std::string const& str) noexcept {
                   out.append("Ÿ");
                   break;
                 default:
-                  out.push_back(0xc2 + (c > 0xbf));
-                  out.push_back((c & 0x3f) + 0x80);
+                  out.push_back(0xc0 | c >> 6);
+                  out.push_back((c & 0x3f) | 0x80);
                   break;
               }
             }
