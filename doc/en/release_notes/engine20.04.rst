@@ -1,4 +1,21 @@
 =======================
+Centreon Engine 20.04.3
+=======================
+
+************
+Bug Fix
+************
+
+Windows checks can be CP1252 encoded
+====================================
+
+To write into the database such strings is impossible unless we convert the
+string to utf-8. This is what is done in this new Engine version. Each time
+a check is done, we verify its output is in UTF-8 format, if it is not the
+case, it is converted. Supported input encodings are ISO-8859-15, CP-1252 and
+UTF-8.
+
+=======================
 Centreon Engine 20.04.2
 =======================
 
