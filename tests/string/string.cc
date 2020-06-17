@@ -16,8 +16,9 @@
  * For more information : contact@centreon.com
  *
  */
-#include "gtest/gtest.h"
 #include "com/centreon/engine/string.hh"
+
+#include "gtest/gtest.h"
 
 using namespace com::centreon::engine;
 
@@ -38,20 +39,27 @@ TEST(string_utils, trim) {
 }
 
 TEST(string_utils, extractPerfdataSimple) {
-  std::string perfdata("metric_2=2;3;7;1;9 metric=12;25;50;0;118 metric_1=28;13;54;0;80");
-  ASSERT_EQ(string::extract_perfdata(perfdata, "metric"), "metric=12;25;50;0;118");
+  std::string perfdata(
+      "metric_2=2;3;7;1;9 metric=12;25;50;0;118 metric_1=28;13;54;0;80");
+  ASSERT_EQ(string::extract_perfdata(perfdata, "metric"),
+            "metric=12;25;50;0;118");
 }
 
 TEST(string_utils, extractPerfdataQuotes) {
-  std::string perfdata("'aa a aa'=2;3;7;1;9 'a aa'=12;25;50;0;118 'aa a'=28;13;54;0;80");
-  ASSERT_EQ(string::extract_perfdata(perfdata, "a aa"), "'a aa'=12;25;50;0;118");
+  std::string perfdata(
+      "'aa a aa'=2;3;7;1;9 'a aa'=12;25;50;0;118 'aa a'=28;13;54;0;80");
+  ASSERT_EQ(string::extract_perfdata(perfdata, "a aa"),
+            "'a aa'=12;25;50;0;118");
   ASSERT_EQ(string::extract_perfdata(perfdata, "aa a"), "'aa a'=28;13;54;0;80");
 }
 
 TEST(string_utils, extractPerfdataGaugeDiff) {
-  std::string perfdata("'aa a aa'=2;3;7;1;9 g[a aa]=12;25;50;0;118 d[aa a]=28;13;54;0;80");
-  ASSERT_EQ(string::extract_perfdata(perfdata, "a aa"), "g[a aa]=12;25;50;0;118");
-  ASSERT_EQ(string::extract_perfdata(perfdata, "aa a"), "d[aa a]=28;13;54;0;80");
+  std::string perfdata(
+      "'aa a aa'=2;3;7;1;9 g[a aa]=12;25;50;0;118 d[aa a]=28;13;54;0;80");
+  ASSERT_EQ(string::extract_perfdata(perfdata, "a aa"),
+            "g[a aa]=12;25;50;0;118");
+  ASSERT_EQ(string::extract_perfdata(perfdata, "aa a"),
+            "d[aa a]=28;13;54;0;80");
 }
 
 TEST(string_utils, removeThresholdsWithoutThresholds) {
@@ -108,4 +116,102 @@ TEST(string_utils, removeThresholdsMoreComplex) {
 TEST(string_utils, removeThresholdsMoreComplex2) {
   std::string perfdata("a=2V;5;9;0;");
   ASSERT_EQ(string::remove_thresholds(perfdata), "a=2V;;;0;");
+}
+
+/*
+ * Given a string encoded in ISO-8859-15 and CP-1252
+ * Then the check_string_utf8 function converts it to UTF-8.
+ */
+TEST(string_check_utf8, simple) {
+  std::string txt("L'acc\350s \340 l'h\364tel est encombr\351");
+  ASSERT_EQ(string::check_string_utf8(txt), "L'accès à l'hôtel est encombré");
+}
+
+/*
+ * Given a string encoded in UTF-8
+ * Then the check_string_utf8 function returns itself.
+ */
+TEST(string_check_utf8, utf8) {
+  std::string txt("L'accès à l'hôtel est encombré");
+  ASSERT_EQ(string::check_string_utf8(txt), "L'accès à l'hôtel est encombré");
+}
+
+/*
+ * Given a string encoded in CP-1252
+ * Then the check_string_utf8 function converts it to UTF-8.
+ */
+TEST(string_check_utf8, cp1252) {
+  std::string txt("Le ticket co\xfbte 12\x80\n");
+  ASSERT_EQ(string::check_string_utf8(txt), "Le ticket coûte 12€\n");
+}
+
+/*
+ * Given a string encoded in ISO-8859-15
+ * Then the check_string_utf8 function converts it to UTF-8.
+ */
+TEST(string_check_utf8, iso8859) {
+  std::string txt("Le ticket co\xfbte 12\xa4\n");
+  ASSERT_EQ(string::check_string_utf8(txt), "Le ticket coûte 12€\n");
+}
+
+/*
+ * Given a string encoded in ISO-8859-15
+ * Then the check_string_utf8 function converts it to UTF-8.
+ */
+TEST(string_check_utf8, iso8859_cpx) {
+  std::string txt("\xa4\xa6\xa8\xb4\xb8\xbc\xbd\xbe");
+  ASSERT_EQ(string::check_string_utf8(txt), "€ŠšŽžŒœŸ");
+}
+
+/*
+ * Given a string encoded in CP-1252
+ * Then the check_string_utf8 function converts it to UTF-8.
+ */
+TEST(string_check_utf8, cp1252_cpx) {
+  std::string txt("\x80\x95\x82\x89\x8a");
+  ASSERT_EQ(string::check_string_utf8(txt), "€•‚‰Š");
+}
+
+/*
+ * Given a string badly encoded in CP-1252
+ * Then the check_string_utf8 function converts it to UTF-8 and replaces bad
+ * characters into '_'.
+ */
+TEST(string_check_utf8, whatever_as_cp1252) {
+  std::string txt;
+  for (uint8_t c = 32; c < 255; c++)
+    if (c != 127)
+      txt.push_back(c);
+  std::string result(
+      " !\"#$%&'()*+,-./"
+      "0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
+      "abcdefghijklmnopqrstuvwxyz{|}~€_‚ƒ„…†‡ˆ‰Š‹Œ_Ž__‘’“”•–—˜™š›œ_"
+      "žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäå"
+      "æçèéêëìíîïðñòóôõö÷øùúûüýþ");
+  ASSERT_EQ(string::check_string_utf8(txt), result);
+}
+
+/*
+ * Given a string badly encoded in ISO-8859-15
+ * Then the check_string_utf8 function converts it to UTF-8 and replaces bad
+ * characters into '_'.
+ */
+TEST(string_check_utf8, whatever_as_iso8859) {
+  /* Construction of a string that is not cp1252 so it should be considered as
+   * iso8859-15 */
+  std::string txt;
+  for (uint8_t c = 32; c < 255; c++) {
+    if (c == 32)
+      txt.push_back(129);
+    if (c != 127)
+      txt.push_back(c);
+  }
+  std::string result(
+      "_ "
+      "!\"#$%&'()*+,-./"
+      "0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
+      "abcdefghijklmnopqrstuvwxyz{|}~_________________________________"
+      "¡¢£€¥Š§š©ª«¬­®¯°±²³Žµ¶·ž¹º»ŒœŸ¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçè"
+      "éêëìíîïðñòóôõö÷øùúûüýþ");
+  ASSERT_EQ(string::check_string_utf8(txt), result);
 }

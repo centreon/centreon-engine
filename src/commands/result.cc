@@ -1,23 +1,23 @@
 /*
-** Copyright 2011-2013 Merethis
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
-
+ * Copyright 2011 - 2013, 2020 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 #include "com/centreon/engine/commands/result.hh"
+
 #include "com/centreon/timestamp.hh"
 
 using namespace com::centreon;
@@ -46,7 +46,7 @@ result::result(result const& right) {
 /**
  *  Destructor.
  */
-result::~result() throw() {}
+result::~result() noexcept {}
 
 /**
  *  Default copy operator.
@@ -58,7 +58,7 @@ result::~result() throw() {}
 result& result::operator=(result const& right) {
   if (this != &right)
     _internal_copy(right);
-  return (*this);
+  return *this;
 }
 
 /**
@@ -68,7 +68,7 @@ result& result::operator=(result const& right) {
  *
  *  @return True if object have the same value.
  */
-bool result::operator==(result const& right) const throw() {
+bool result::operator==(result const& right) const noexcept {
   return (command_id == right.command_id && exit_code == right.exit_code &&
           exit_status == right.exit_status && end_time == right.end_time &&
           start_time == right.start_time && output == right.output);
@@ -81,8 +81,8 @@ bool result::operator==(result const& right) const throw() {
  *
  *  @return True if object have the different value.
  */
-bool result::operator!=(result const& right) const throw() {
-  return (!operator==(right));
+bool result::operator!=(result const& right) const noexcept {
+  return !operator==(right);
 }
 
 /**************************************
@@ -103,5 +103,4 @@ void result::_internal_copy(result const& right) {
   exit_status = right.exit_status;
   start_time = right.start_time;
   output = right.output;
-  return;
 }

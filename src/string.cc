@@ -1,23 +1,26 @@
 /*
-** Copyright 2011-2014,2017 Centreon
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2011 - 2014, 2017, 2020 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 
 #include "com/centreon/engine/string.hh"
+
+#include <cassert>
+
 #include "com/centreon/engine/exceptions/error.hh"
 
 using namespace com::centreon::engine;
@@ -256,7 +259,8 @@ std::string& string::trim_right(std::string& str) noexcept {
   return str;
 }
 
-std::string string::extract_perfdata(std::string const& perfdata, std::string const& metric) noexcept {
+std::string string::extract_perfdata(std::string const& perfdata,
+                                     std::string const& metric) noexcept {
   size_t pos, pos_start = 0;
 
   do {
@@ -322,4 +326,209 @@ std::string& string::remove_thresholds(std::string& perfdata) noexcept {
 
   perfdata.replace(pos1, pos3 - pos1, ";;");
   return perfdata;
+}
+
+/**
+ * @brief Checks if the string given as parameter is a real UTF-8 string.
+ * If it is not, it tries to convert it to UTF-8. Encodings correctly changed
+ * are ISO-8859-15 and CP-1252.
+ *
+ * @param str The string to check
+ *
+ * @return The string itself or a new string converted to UTF-8. The output
+ * string should always be an UTF-8 string.
+ */
+std::string string::check_string_utf8(std::string const& str) noexcept {
+  for (auto it = str.begin(); it != str.end();) {
+    if ((*it & ~127) == 0)
+      ++it;
+    else if ((*it & 192) == 192 && (*(it + 1) & 128) == 128)
+      it += 2;
+    else if ((*it & 224) == 224 && (*(it + 1) & 128) == 128 &&
+             (*(it + 2) & 128) == 128)
+      it += 3;
+    else if ((*it & 240) == 240 && (*(it + 1) & 128) == 128 &&
+             (*(it + 2) & 128) == 128 && (*(it + 3) & 128) == 128)
+      it += 4;
+    else {
+      /* Not an UTF-8 string */
+      bool is_cp1252 = true, is_iso8859 = true;
+      auto itt = it;
+
+      auto iso8859_to_utf8 = [&str, &it]() -> std::string {
+        /* Strings are both cp1252 and iso8859-15 */
+        std::string out;
+        std::size_t d = it - str.begin();
+        out.reserve(d + 2 * (str.size() - d));
+        out = str.substr(0, d);
+        while (it != str.end()) {
+          unsigned char c = static_cast<unsigned char>(*it);
+          if (c < 128)
+            out.push_back(c);
+          else if (c >= 128 && c <= 160)
+            out.push_back('_');
+          else {
+            switch (c) {
+              case 0xa4:
+                out.append("€");
+                break;
+              case 0xa6:
+                out.append("Š");
+                break;
+              case 0xa8:
+                out.append("š");
+                break;
+              case 0xb4:
+                out.append("Ž");
+                break;
+              case 0xb8:
+                out.append("ž");
+                break;
+              case 0xbc:
+                out.append("Œ");
+                break;
+              case 0xbd:
+                out.append("œ");
+                break;
+              case 0xbe:
+                out.append("Ÿ");
+                break;
+              default:
+                out.push_back(0xc0 | c >> 6);
+                out.push_back((c & 0x3f) | 0x80);
+                break;
+            }
+          }
+          ++it;
+        }
+        return out;
+      };
+      do {
+        unsigned char c = *itt;
+        /* not ISO-8859-15 */
+        if (c > 126 && c < 160)
+          is_iso8859 = false;
+        /* not cp1252 */
+        if (c & 128)
+          if (c == 129 || c == 141 || c == 143 || c == 144 || c == 155)
+            is_cp1252 = false;
+        if (!is_cp1252)
+          return iso8859_to_utf8();
+        else if (!is_iso8859) {
+          std::string out;
+          std::size_t d = it - str.begin();
+          out.reserve(d + 3 * (str.size() - d));
+          out = str.substr(0, d);
+          while (it != str.end()) {
+            c = *it;
+            if (c < 128)
+              out.push_back(c);
+            else {
+              switch (c) {
+                case 128:
+                  out.append("€");
+                  break;
+                case 129:
+                case 141:
+                case 143:
+                case 144:
+                case 157:
+                  out.append("_");
+                  break;
+                case 130:
+                  out.append("‚");
+                  break;
+                case 131:
+                  out.append("ƒ");
+                  break;
+                case 132:
+                  out.append("„");
+                  break;
+                case 133:
+                  out.append("…");
+                  break;
+                case 134:
+                  out.append("†");
+                  break;
+                case 135:
+                  out.append("‡");
+                  break;
+                case 136:
+                  out.append("ˆ");
+                  break;
+                case 137:
+                  out.append("‰");
+                  break;
+                case 138:
+                  out.append("Š");
+                  break;
+                case 139:
+                  out.append("‹");
+                  break;
+                case 140:
+                  out.append("Œ");
+                  break;
+                case 142:
+                  out.append("Ž");
+                  break;
+                case 145:
+                  out.append("‘");
+                  break;
+                case 146:
+                  out.append("’");
+                  break;
+                case 147:
+                  out.append("“");
+                  break;
+                case 148:
+                  out.append("”");
+                  break;
+                case 149:
+                  out.append("•");
+                  break;
+                case 150:
+                  out.append("–");
+                  break;
+                case 151:
+                  out.append("—");
+                  break;
+                case 152:
+                  out.append("˜");
+                  break;
+                case 153:
+                  out.append("™");
+                  break;
+                case 154:
+                  out.append("š");
+                  break;
+                case 155:
+                  out.append("›");
+                  break;
+                case 156:
+                  out.append("œ");
+                  break;
+                case 158:
+                  out.append("ž");
+                  break;
+                case 159:
+                  out.append("Ÿ");
+                  break;
+                default:
+                  out.push_back(0xc0 | c >> 6);
+                  out.push_back((c & 0x3f) | 0x80);
+                  break;
+              }
+            }
+            ++it;
+          }
+          return out;
+          break;
+        }
+        ++itt;
+      } while (itt != str.end());
+      assert(is_cp1252 == is_iso8859);
+      return iso8859_to_utf8();
+    }
+  }
+  return str;
 }

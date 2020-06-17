@@ -5,7 +5,7 @@ import engine_pb2_grpc
 from google.protobuf import empty_pb2, timestamp_pb2
 
 def run():
-    with grpc.insecure_channel("10.0.2.15:50051") as channel:
+    with grpc.insecure_channel("127.0.0.1:50051") as channel:
         stub = engine_pb2_grpc.EngineStub(channel)
         for i in range(10000):
           check = stub.ProcessServiceCheckResult(engine_pb2.ServiceCheck(

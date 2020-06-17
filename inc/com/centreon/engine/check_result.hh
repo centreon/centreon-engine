@@ -62,7 +62,7 @@ class check_result {
   bool get_early_timeout() const;
   void set_early_timeout(bool early_timeout);
   std::string const& get_output() const;
-  void set_output(std::string const& output);
+  void set_output(std::string const& output, const bool check_encoding);
   bool get_exited_ok() const;
   void set_exited_ok(bool exited_ok);
   bool get_reschedule_check() const;
