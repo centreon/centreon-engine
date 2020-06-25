@@ -207,7 +207,7 @@ static int handle_service_macro(nagios_macros* mac,
       // On-demand macro with both host and service name.
       service_map::const_iterator found(service::services.find({arg1, arg2}));
 
-      if (found == service::services.end() || !found->second)
+      if (found != service::services.end() && found->second)
         // Get the service macro value.
         retval = grab_standard_service_macro_r(
             mac, macro_type, found->second.get(), output, free_macro);
