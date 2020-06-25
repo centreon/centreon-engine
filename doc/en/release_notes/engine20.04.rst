@@ -1,4 +1,18 @@
 =======================
+Centreon Engine 20.04.4
+=======================
+
+************
+Bug Fix
+************
+
+Macros on services do not work
+==============================
+
+A macro working on a service did not work, and most of the time crashed.
+This is fixed with this new version.
+
+=======================
 Centreon Engine 20.04.3
 =======================
 
