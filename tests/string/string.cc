@@ -215,3 +215,16 @@ TEST(string_check_utf8, whatever_as_iso8859) {
       "éêëìíîïðñòóôõö÷øùúûüýþ");
   ASSERT_EQ(string::check_string_utf8(txt), result);
 }
+
+/*
+ * In case of a string containing multiple encoding, the resulting string should
+ * be an UTF-8 string. Here we have a string beginning with UTF-8 and finishing
+ * with cp1252. The resulting string is good and is UTF-8 only encoded.
+ */
+TEST(string_check_utf8, utf8_and_cp1252) {
+  std::string txt(
+      "\xc3\xa9\xc3\xa7\xc3\xa8\xc3\xa0\xc3\xb9\xc3\xaf\xc3\xab\x7e\x23\x0a\xe9"
+      "\xe7\xe8\xe0\xf9\xef\xeb\x7e\x23\x0a");
+  std::string result("éçèàùïë~#\néçèàùïë~#\n");
+  ASSERT_EQ(string::check_string_utf8(txt), result);
+}

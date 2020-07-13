@@ -342,13 +342,13 @@ std::string string::check_string_utf8(std::string const& str) noexcept {
   for (auto it = str.begin(); it != str.end();) {
     if ((*it & ~127) == 0)
       ++it;
-    else if ((*it & 192) == 192 && (*(it + 1) & 128) == 128)
+    else if ((*it & 192) == 192 && (*(it + 1) & 0xc0) == 0x80)
       it += 2;
-    else if ((*it & 224) == 224 && (*(it + 1) & 128) == 128 &&
-             (*(it + 2) & 128) == 128)
+    else if ((*it & 224) == 224 && (*(it + 1) & 0xc0) == 0x80 &&
+             (*(it + 2) & 0xc0) == 0x80)
       it += 3;
-    else if ((*it & 240) == 240 && (*(it + 1) & 128) == 128 &&
-             (*(it + 2) & 128) == 128 && (*(it + 3) & 128) == 128)
+    else if ((*it & 240) == 240 && (*(it + 1) & 0xc0) == 0x80 &&
+             (*(it + 2) & 0xc0) == 0x80 && (*(it + 3) & 0xc0) == 0x80)
       it += 4;
     else {
       /* Not an UTF-8 string */
@@ -362,7 +362,7 @@ std::string string::check_string_utf8(std::string const& str) noexcept {
         out.reserve(d + 2 * (str.size() - d));
         out = str.substr(0, d);
         while (it != str.end()) {
-          unsigned char c = static_cast<unsigned char>(*it);
+          uint8_t c = static_cast<uint8_t>(*it);
           if (c < 128)
             out.push_back(c);
           else if (c >= 128 && c <= 160)
@@ -404,7 +404,7 @@ std::string string::check_string_utf8(std::string const& str) noexcept {
         return out;
       };
       do {
-        unsigned char c = *itt;
+        uint8_t c = *itt;
         /* not ISO-8859-15 */
         if (c > 126 && c < 160)
           is_iso8859 = false;
