@@ -223,7 +223,7 @@ static int handle_service_macro(
         service_map::const_iterator
           found(service::services.find({mac->host_ptr->get_name(), arg2}));
 
-        if (found == service::services.end() || !found->second)
+        if (found != service::services.end() && found->second)
           retval = ERROR;
         else
           // Get the service macro value.
