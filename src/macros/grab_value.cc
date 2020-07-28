@@ -242,7 +242,7 @@ static int handle_service_macro(
       service_map::const_iterator
         found(service::services.find({arg1, arg2}));
 
-      if (found == service::services.end() || !found->second)
+      if (found != service::services.end() && found->second)
         // Get the service macro value.
         retval = grab_standard_service_macro_r(
                    mac,
