@@ -47,7 +47,7 @@ or as individual packages on [our RPM repository](https://documentation.centreon
 Once the repository installed a simple command will be needed to install
 Centreon Engine.
 
-    $# yum install centreon-engine
+    $> yum install centreon-engine
 
 
 ## Fetching sources ##
