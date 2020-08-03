@@ -47,7 +47,7 @@ or as individual packages on [our RPM repository](https://documentation.centreon
 Once the repository installed a simple command will be needed to install
 Centreon Engine.
 
-    $# yum install centreon-engine
+    $> yum install centreon-engine
 
 
 ## Fetching sources ##
@@ -68,6 +68,9 @@ want to [install it entirely](https://documentation.centreon.com/docs/centreon/e
 This paragraph is only a quickstart guide for the compilation of
 Centreon Engine. For a more in-depth guide with build options you should
 refer to the [online documentation](https://documentation.centreon.com/docs/centreon-engine/en/latest/installation/index.html#using-sources).
+
+Centreon-Clib should be installed before installing Centreon-Engine.
+If you do not have Centreon-Clib you can follow the README for a quick introduction at : [GitHub](https://github.com/centreon/centreon-clib)
 
 **For Centos 7 :**
 First of all, check if you have these packages installed :
