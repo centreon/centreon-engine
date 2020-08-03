@@ -1,4 +1,18 @@
 =======================
+Centreon Engine 20.04.5
+=======================
+
+************
+Bug Fix
+************
+
+Unicode check was buggy
+=======================
+
+The code that validates the UTF-8 strings was buggy and could keep as is some
+characters that were not UTF-8.
+
+=======================
 Centreon Engine 20.04.4
 =======================
 
