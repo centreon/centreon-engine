@@ -78,22 +78,22 @@ First of all, check if you have these packages installed :
     git, make, gcc-c++, python3, epel-release, cmake3
 
 If they are not installed, please install them. Make sure to install epel-release before cmake3, if you install them both together it will not find cmake3.
-    $# yum install git make cmake gcc-c++ python3 epel-release
-    $# yum install cmake3
+    $> yum install git make cmake gcc-c++ python3 epel-release
+    $> yum install cmake3
 
 Conan is needed as well but make sure to install gcc before conan.
 When you are ready do :  
-    $# pip3 install conan  
+    $> pip3 install conan  
 
 Then you will be able to resume the following steps :
-    $# git clone https://github.com/centreon/centreon-engine
-    $# cd centreon-engine && ./cmake.sh
-    $# cd build
+    $> git clone https://github.com/centreon/centreon-engine
+    $> cd centreon-engine && ./cmake.sh
+    $> cd build
 
 To speed up the compilation you can use make -j4 if you have 4 cpu or make -j8 if you have 8 cpu...
-    $# make && make install
+    $> make && make install
    Or:
-    $# make -j4 && make install
+    $> make -j4 && make install
 
 **For other distributions :**
 If you are on another distribution, then follow the steps below.
