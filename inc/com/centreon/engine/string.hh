@@ -204,7 +204,6 @@ std::string& trim_right(std::string& str) noexcept;
 std::string extract_perfdata(std::string const& perfdata,
                              std::string const& metric) noexcept;
 std::string& remove_thresholds(std::string& perfdata) noexcept;
-std::string check_string_utf8(std::string const& str) noexcept;
 }  // namespace string
 
 CCE_END()

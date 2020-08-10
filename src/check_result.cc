@@ -112,12 +112,8 @@ std::string const& check_result::get_output() const {
  * @param output The string to set as output
  * @param check_encoding A boolean telling if the string has to be checked.
  */
-void check_result::set_output(std::string const& output,
-                              const bool check_encoding) {
-  if (check_encoding)
-    _output = string::check_string_utf8(output);
-  else
-    _output = output;
+void check_result::set_output(std::string const& output) {
+  _output = output;
 }
 
 bool check_result::get_exited_ok() const {
