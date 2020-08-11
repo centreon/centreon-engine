@@ -2424,7 +2424,7 @@ int service::run_async_check(int check_options,
       check_result_info->set_early_timeout(false);
       check_result_info->set_return_code(service::state_unknown);
       check_result_info->set_exited_ok(true);
-      check_result_info->set_output("(Execute command failed)", false);
+      check_result_info->set_output("(Execute command failed)");
 
       // Queue check result.
       checks::checker::instance().add_check_result_to_reap(

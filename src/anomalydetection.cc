@@ -628,7 +628,7 @@ int anomalydetection::run_async_check(int check_options,
         << std::get<2>(pd) << without_thresholds;
   }
   /* We should master this string, so no need to check if it is utf-8 */
-  check_result_info->set_output(oss.str(), false);
+  check_result_info->set_output(oss.str());
 
   timestamp now(timestamp::now());
 

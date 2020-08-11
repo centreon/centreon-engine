@@ -10,7 +10,7 @@ Unicode check was buggy
 =======================
 
 The code that validates the UTF-8 strings was buggy and could keep as is some
-characters that were not UTF-8.
+characters that were not UTF-8. It is fixed and moved to the cbmod module.
 
 =======================
 Centreon Engine 20.04.4
