@@ -1,4 +1,17 @@
 =======================
+Centreon Engine 20.04.6
+=======================
+
+*******
+Bug Fix
+*******
+
+problem_id macro
+================
+
+It was buggy on hosts and on services. This new version fixes this point.
+
+=======================
 Centreon Engine 20.04.5
 =======================
 
