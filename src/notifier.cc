@@ -183,7 +183,7 @@ void notifier::set_last_event_id(unsigned long last_event_id) noexcept {
 }
 
 unsigned long notifier::get_current_problem_id() const noexcept {
-  return _current_notification_id;
+  return _current_problem_id;
 }
 
 void notifier::set_current_problem_id(

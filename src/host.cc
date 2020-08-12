@@ -2172,8 +2172,8 @@ int host::handle_state() {
       /* don't reset last problem id, or it will be zero the next time a problem
        * is encountered */
       /*this->get_last_problem_id=this->get_current_problem_id; */
-      set_current_problem_id(next_problem_id);
       next_problem_id++;
+      set_current_problem_id(next_problem_id);
     }
 
     /* clear the problem id when transitioning from a problem state to an UP

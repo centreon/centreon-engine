@@ -51,10 +51,12 @@ find_package(OpenSSL REQUIRED)
 find_package(c-ares REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(json11 REQUIRED)
+find_package(fmt REQUIRED)
 
 include_directories(${grpc_INCLUDE_DIRS})
 include_directories(${protobuf_INCLUDE_DIRS})
 include_directories(${json11_INCLUDE_DIRS})
+include_directories(${fmt_INCLUDE_DIRS})
 
 link_directories(${protobuf_LIB_DIRS})
 link_directories(${grpc_LIB_DIRS})
