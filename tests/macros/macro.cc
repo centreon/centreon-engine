@@ -109,7 +109,7 @@ TEST_F(Macro, TotalServicesOkZero) {
 TEST_F(Macro, HostProblemId) {
   configuration::applier::host hst_aply, hst_aply2;
   configuration::host hst, hst2;
-  next_problem_id = 0;
+  next_problem_id = 1;
 
   set_time(50000);
   //first host

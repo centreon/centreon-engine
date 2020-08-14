@@ -114,4 +114,4 @@ unsigned long modified_host_process_attributes(MODATTR_NONE);
 unsigned long modified_service_process_attributes(MODATTR_NONE);
 unsigned long next_event_id(1);
 unsigned long next_notification_id(1);
-unsigned long next_problem_id(0L);
+unsigned long next_problem_id(1);
