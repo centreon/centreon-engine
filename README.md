@@ -75,10 +75,10 @@ If you do not have Centreon-Clib you can follow the README for a quick introduct
 **For Centos 7 :**
 First of all, check if you have these packages installed :
 
-    git, make, gcc-c++, python3, epel-release, cmake3
+    git, make, gcc-c++, python3, epel-release, cmake3, centreon-clib-devel
 
 If they are not installed, please install them. Make sure to install epel-release before cmake3, if you install them both together it will not find cmake3.
-    $> yum install git make cmake gcc-c++ python3 epel-release
+    $> yum install git make cmake gcc-c++ python3 epel-release centreon-clib-devel
     $> yum install cmake3
 
 Conan is needed as well but make sure to install gcc before conan.
@@ -87,8 +87,9 @@ When you are ready do :
 
 Then you will be able to resume the following steps :
     $> git clone https://github.com/centreon/centreon-engine
-    $> cd centreon-engine && ./cmake.sh
-    $> cd build
+    $> cd centreon-engine/build
+    $> conan install .. --build missing
+    $> cd .. && ./cmake.sh
 
 To speed up the compilation you can use make -j4 if you have 4 cpu or make -j8 if you have 8 cpu...
     $> make && make install
@@ -100,12 +101,12 @@ If you are on another distribution, then follow the steps below.
 
 Check if you have these packages installed (Note that packages names come from Centos 7 distribution, so if some packages names don't match on your distribution try to find their equivalent names) :
 
-    git, make, cmake, gcc-c++, python3
+    git, make, cmake, gcc-c++, python3, epel-release, centreon-clib-devel
 
 For the projet compilation you need to have conan installed. Try to use the package manager given by your OS to install conan. ('apt' for Debian, 'rpm' for Red Hat, 'pacman' for Arch Linux, ...) It is prefered to install gcc before conan.
 
 Exemple :
-    $> _apt_  install conan
+    $> _apt_ install conan
 
 If it does not work, conan can be installed with pip3 :
     $> pip3 install conan
@@ -114,6 +115,7 @@ You can now compile centreon-engine :
     $> git clone https://github.com/centreon/centreon-engine
     $> mkdir -p centreon-engine/build
     $> cd centreon-engine/build
+    $> conan install .. --build missing
 
 Once the sources of Centreon Engine extracted go to the *./build/* directory and launch the CMake command.
 This will look for required dependencies and print a summary of the compilation parameters if everything went fine.
