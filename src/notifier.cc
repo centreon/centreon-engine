@@ -722,7 +722,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
   return retval;
 }
 
-notifier::notification_category notifier::get_category(reason_type type) const {
+notifier::notification_category notifier::get_category(reason_type type) {
   if (type == 99)
     return cat_custom;
   notification_category cat[] = {
@@ -760,7 +760,7 @@ int notifier::notify(notifier::reason_type type,
       get_contacts_to_notify(cat, type, notification_interval)};
 
   _current_notification_id = _next_notification_id++;
-  std::shared_ptr<notification> notif{new notification(
+  std::shared_ptr<notification> notif{std::make_shared<notification>(
       this, type, not_author, not_data, options, _current_notification_id,
       _notification_number, notification_interval)};
 
@@ -1489,7 +1489,17 @@ void notifier::set_notification(int32_t idx, std::string const& value) {
     return;
   }
 
-  std::shared_ptr<notification> notif{std::make_shared<notification>(
-      this, type, author, "", options, id, number, interval, escalated)};
+  v += 13;
+  std::set<std::string> contacts;
+  for (const char* s = v; *s; ++s) {
+    if ((*s == ',' || *s == '\n') && v != s) {
+      contacts.emplace(v, s);
+      v = s + 1;
+    }
+  }
+
+  std::shared_ptr<notification> notif{
+      std::make_shared<notification>(this, type, author, "", options, id,
+                                     number, interval, escalated, contacts)};
   _notification[idx] = notif;
 }

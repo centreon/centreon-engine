@@ -2806,21 +2806,6 @@ int service::notify_contact(nagios_macros* mac,
 
   logger(dbg_functions, basic) << "notify_contact_of_service()";
   logger(dbg_notifications, most)
-      << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
-
-  /*
-   * check viability of notifying this user
-   * acknowledgements are no longer excluded from this test -
-   * added 8/19/02 Tom Bertelson
-   */
-  notification_category cat{get_category(type)};
-  if (!cntct->should_be_notified(cat, type, *this))
-    return ERROR;
-  //  if (cntct->check_service_notification_viability(this, type,
-  //                                                   options) == ERROR)
-  //    return ERROR;
-
-  logger(dbg_notifications, most)
       << "** Notifying contact '" << cntct->get_name() << "'";
 
   /* get start time */
