@@ -34,7 +34,7 @@ if (WITH_ASAN)
   set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif ()
 
-add_definitions("-D_GLIBCXX_USE_CXX11_ABI=0")
+add_definitions("-D_GLIBCXX_USE_CXX11_ABI=1")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
