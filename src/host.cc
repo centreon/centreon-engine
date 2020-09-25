@@ -2342,29 +2342,12 @@ int host::notify_contact(nagios_macros* mac,
   std::string processed_command;
   int early_timeout = false;
   double exectime;
-  struct timeval start_time;
-  struct timeval end_time;
-  struct timeval method_start_time;
-  struct timeval method_end_time;
+  struct timeval start_time, end_time;
+  struct timeval method_start_time, method_end_time;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   int neb_result;
 
   logger(dbg_functions, basic) << "notify_contact_of_host()";
-  logger(dbg_notifications, most)
-      << "** Attempting to notifying contact '" << cntct->get_name() << "'...";
-
-  /*
-   * check viability of notifying this user about the host
-   * acknowledgements are no longer excluded from this test -
-   * added 8/19/02 Tom Bertelson
-   */
-  notification_category cat{get_category(type)};
-  if (!cntct->should_be_notified(cat, type, *this))
-    return ERROR;
-  //  if (cntct->check_host_notification_viability(this, cat, options) ==
-  //      ERROR)
-  //    return ERROR;
-
   logger(dbg_notifications, most)
       << "** Notifying contact '" << cntct->get_name() << "'";
 

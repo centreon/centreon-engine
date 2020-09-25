@@ -17,6 +17,7 @@
  *
  */
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <time.h>
 
@@ -53,15 +54,19 @@ class ServiceNotification : public TestEngine {
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
+    configuration::contact ctct1{
+        new_configuration_contact("admin1", false, "c,r")};
+    ct_aply.add_object(ctct1);
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
+    ct_aply.resolve_object(ctct1);
 
     configuration::host hst{new_configuration_host("test_host", "admin")};
     configuration::applier::host hst_aply;
     hst_aply.add_object(hst);
 
     configuration::service svc{
-        new_configuration_service("test_host", "test_svc", "admin")};
+        new_configuration_service("test_host", "test_svc", "admin,admin1")};
     configuration::applier::service svc_aply;
     svc_aply.add_object(svc);
 
@@ -1205,4 +1210,58 @@ TEST_F(ServiceNotification, SimpleVolatileServiceNotificationWithDowntime) {
                          notifier::notification_option_none),
             OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
+}
+
+TEST_F(ServiceNotification, WarningAndTwoUsers) {
+  /* admin is notified on all whereas admin1 is notified only no critical and
+   * recovery. So in case of a warning notification, only admin should be
+   * notified for a recovery.
+   */
+  set_time(50000);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 3; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification ; just for admin
+    set_time(50500 + i * 500);
+    _svc->set_last_state(_svc->get_current_state());
+    if (notifier::hard == _svc->get_state_type())
+      _svc->set_last_hard_state(_svc->get_current_state());
+
+    std::time_t now{std::time(nullptr)};
+    std::string cmd(fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warn",
+        now));
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  for (int i = 0; i < 2; i++) {
+    // When i == 0, the state_up is hard (return to up) => Recovery notification
+    // only for admin, not admin1.
+    // When i == 1, the state_up is still here (no
+    // change) => no notification
+    set_time(56500 + i * 500);
+    std::time_t now{std::time(nullptr)};
+    std::string cmd(fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok",
+        now));
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t warn_admin1{
+      out.find("SERVICE NOTIFICATION: "
+               "admin1;test_host;test_svc;WARNING;cmd;service warn")};
+  ASSERT_EQ(warn_admin1, std::string::npos);
+  size_t rec_admin1{
+      out.find("SERVICE NOTIFICATION: admin1;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok")};
+  ASSERT_EQ(rec_admin1, std::string::npos);
 }

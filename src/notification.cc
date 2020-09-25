@@ -17,6 +17,9 @@
  *
  */
 #include "com/centreon/engine/notification.hh"
+
+#include <algorithm>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
@@ -35,7 +38,8 @@ notification::notification(notifier* parent,
                            uint64_t notification_id,
                            uint32_t notification_number,
                            uint32_t notification_interval,
-                           bool escalated)
+                           bool escalated,
+                           const std::set<std::string>& notified_contacts)
     : _parent{parent},
       _type{type},
       _author{author},
@@ -44,7 +48,8 @@ notification::notification(notifier* parent,
       _id{notification_id},
       _number{notification_number},
       _escalated{escalated},
-      _interval{notification_interval} {}
+      _interval{notification_interval},
+      _notified_contact{notified_contacts} {}
 
 int notification::execute(std::unordered_set<contact*> const& to_notify) {
   uint32_t contacts_notified{0};
@@ -162,14 +167,18 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
     /* clear summary macros (they are customized for each contact) */
     clear_summary_macros_r(&mac);
 
-    /* notify this contact */
-    int result =
-        _parent->notify_contact(&mac, ctc, _type, _author.c_str(),
-                                _message.c_str(), _options, _escalated);
-
-    /* keep track of how many contacts were notified */
-    if (result == OK)
-      contacts_notified++;
+    /* check viability of notifying the user */
+    notifier::notification_category cat{notifier::get_category(_type)};
+    if (ctc->should_be_notified(cat, _type, *_parent)) {
+      /* notify this contact */
+      if (_parent->notify_contact(&mac, ctc, _type, _author.c_str(),
+                                  _message.c_str(), _options,
+                                  _escalated) == OK) {
+        /* keep track of how many contacts were notified */
+        contacts_notified++;
+        _notified_contact.insert(ctc->get_name());
+      }
+    }
   }
 
   /* get the time we finished */
@@ -195,6 +204,19 @@ uint32_t notification::get_notification_interval() const {
   return _interval;
 }
 
+/**
+ * @brief Return a boolean telling if this notification has been sent to the
+ * given user.
+ *
+ * @param user The name of the user.
+ *
+ * @return a boolean.
+ */
+bool notification::sent_to(const std::string& user) const {
+  return std::find(_notified_contact.begin(), _notified_contact.end(), user) !=
+         _notified_contact.end();
+}
+
 namespace com {
 namespace centreon {
 namespace engine {
@@ -210,7 +232,11 @@ std::ostream& operator<<(std::ostream& os, notification const& obj) {
   os << "type: " << obj._type << ", author: " << obj._author
      << ", options: " << obj._options << ", escalated: " << obj._escalated
      << ", id: " << obj._id << ", number: " << obj._number
-     << ", interval: " << obj._interval << "\n";
+     << ", interval: " << obj._interval << ", contacts: ";
+
+  for (auto& c : obj._notified_contact)
+    os << c << ",";
+  os << "\n";
   return os;
 }
 }  // namespace engine

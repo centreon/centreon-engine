@@ -21,6 +21,8 @@
 #define CCE_NOTIFICATION_HH
 
 #include <memory>
+#include <set>
+
 #include "com/centreon/engine/namespace.hh"
 #include "com/centreon/engine/notifier.hh"
 
@@ -28,21 +30,6 @@ CCE_BEGIN()
 class contact;
 
 class notification {
- public:
-  notification(notifier* parent,
-               notifier::reason_type type,
-               std::string const& author,
-               std::string const& message,
-               uint32_t options,
-               uint64_t notification_id,
-               uint32_t notification_number,
-               uint32_t notification_interval,
-               bool escalated = false);
-  int execute(std::unordered_set<contact*> const& to_notify);
-  notifier::reason_type get_reason() const;
-  uint32_t get_notification_interval() const;
-
- private:
   friend std::ostream& operator<<(std::ostream& os, notification const& n);
 
   notifier* _parent;
@@ -54,6 +41,24 @@ class notification {
   uint32_t _number;
   bool _escalated;
   uint32_t _interval;
+  std::set<std::string> _notified_contact;
+
+ public:
+  notification(
+      notifier* parent,
+      notifier::reason_type type,
+      const std::string& author,
+      const std::string& message,
+      uint32_t options,
+      uint64_t notification_id,
+      uint32_t notification_number,
+      uint32_t notification_interval,
+      bool escalated = false,
+      const std::set<std::string>& notified_contact = std::set<std::string>());
+  int execute(std::unordered_set<contact*> const& to_notify);
+  notifier::reason_type get_reason() const;
+  uint32_t get_notification_interval() const;
+  bool sent_to(const std::string& user) const;
 };
 
 std::ostream& operator<<(std::ostream& os, notification const& obj);
