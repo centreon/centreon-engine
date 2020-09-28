@@ -17,6 +17,7 @@
  *
  */
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <time.h>
 
@@ -53,15 +54,19 @@ class ServiceNotification : public TestEngine {
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
+    configuration::contact ctct1{
+        new_configuration_contact("admin1", false, "c,r")};
+    ct_aply.add_object(ctct1);
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
+    ct_aply.resolve_object(ctct1);
 
     configuration::host hst{new_configuration_host("test_host", "admin")};
     configuration::applier::host hst_aply;
     hst_aply.add_object(hst);
 
     configuration::service svc{
-        new_configuration_service("test_host", "test_svc", "admin")};
+        new_configuration_service("test_host", "test_svc", "admin,admin1")};
     configuration::applier::service svc_aply;
     svc_aply.add_object(svc);
 
@@ -862,143 +867,6 @@ TEST_F(ServiceNotification, ServiceEscalationCG) {
   ASSERT_NE(step13, std::string::npos);
 }
 
-TEST_F(ServiceNotification, ServiceDependency) {
-  configuration::applier::contact ct_aply;
-  configuration::contact ctct{new_configuration_contact("test_contact", false)};
-  ct_aply.add_object(ctct);
-  ct_aply.expand_objects(*config);
-  ct_aply.resolve_object(ctct);
-
-  configuration::applier::contactgroup cg_aply;
-  configuration::contactgroup cg{
-      new_configuration_contactgroup("test_cg", "test_contact")};
-  cg_aply.add_object(cg);
-  cg_aply.expand_objects(*config);
-  cg_aply.resolve_object(cg);
-
-  configuration::applier::service s_aply;
-  configuration::service s{
-      new_configuration_service("test_host", "dep_svc", "admin", 14)};
-  s_aply.add_object(s);
-  s_aply.expand_objects(*config);
-  s_aply.resolve_object(s);
-
-  configuration::applier::servicedependency sd_aply;
-  configuration::servicedependency sd{new_configuration_servicedependency(
-      "test_host", "test_svc", "test_host", "dep_svc")};
-  sd_aply.expand_objects(*config);
-  sd_aply.add_object(sd);
-  sd_aply.resolve_object(sd);
-
-  int now{50000};
-  set_time(now);
-
-  _svc->set_current_state(engine::service::state_ok);
-  _svc->set_notification_interval(1);
-  _svc->set_last_hard_state(engine::service::state_ok);
-  _svc->set_last_hard_state_change(50000);
-  _svc->set_state_type(checkable::hard);
-  _svc->set_accept_passive_checks(true);
-  _svc->set_last_hard_state(engine::service::state_ok);
-  _svc->set_last_hard_state_change(now);
-  _svc->set_state_type(checkable::hard);
-  _svc->set_accept_passive_checks(true);
-
-  service_map& sm(engine::service::services);
-  service_map::iterator it{sm.find({"test_host", "dep_svc"})};
-  ASSERT_NE(it, sm.end());
-  engine::service* dep_svc{it->second.get()};
-
-  testing::internal::CaptureStdout();
-  _svc->set_last_state(engine::service::state_ok);
-  if (notifier::hard == _svc->get_state_type())
-    _svc->set_last_hard_state(_svc->get_current_state());
-
-  dep_svc->set_current_state(engine::service::state_ok);
-  dep_svc->set_last_state(dep_svc->get_current_state());
-  if (notifier::hard == dep_svc->get_state_type())
-    dep_svc->set_last_hard_state(dep_svc->get_current_state());
-
-  // Here, we get a notification
-  for (int i = 0; i < 3; ++i) {
-    dep_svc->set_last_state(dep_svc->get_current_state());
-    if (notifier::hard == dep_svc->get_state_type())
-      dep_svc->set_last_hard_state(dep_svc->get_last_state());
-    now += 300;
-    set_time(now);
-    std::ostringstream oss;
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;dep_svc;2;service critical";
-    std::string cmd{oss.str()};
-    process_external_command(cmd.c_str());
-    checks::checker::instance().reap();
-    dep_svc->set_last_state(dep_svc->get_current_state());
-  }
-
-  dep_svc->set_last_state(dep_svc->get_current_state());
-  if (notifier::hard == dep_svc->get_state_type())
-    dep_svc->set_last_hard_state(dep_svc->get_last_state());
-  now += 300;
-  set_time(now);
-  std::ostringstream oss;
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;dep_svc;0;service ok";
-  std::string cmd{oss.str()};
-  process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
-  dep_svc->set_last_state(dep_svc->get_current_state());
-
-  for (int i = 0; i < 3; ++i) {
-    _svc->set_last_state(_svc->get_current_state());
-    if (notifier::hard == _svc->get_state_type())
-      _svc->set_last_hard_state(_svc->get_last_state());
-    now += 300;
-    set_time(now);
-    std::ostringstream oss;
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
-           "critical";
-    std::string cmd{oss.str()};
-    process_external_command(cmd.c_str());
-    checks::checker::instance().reap();
-  }
-
-  // Here, we won't have any notification
-  for (int i = 0; i < 3; ++i) {
-    dep_svc->set_last_state(dep_svc->get_current_state());
-    if (notifier::hard == dep_svc->get_state_type())
-      dep_svc->set_last_hard_state(dep_svc->get_last_state());
-    now += 300;
-    set_time(now);
-    std::ostringstream oss;
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;dep_svc;2;service critical";
-    std::string cmd{oss.str()};
-    process_external_command(cmd.c_str());
-    checks::checker::instance().reap();
-    dep_svc->set_last_state(dep_svc->get_current_state());
-  }
-
-  std::string out{testing::internal::GetCapturedStdout()};
-  size_t step1{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;dep_svc;CRITICAL;cmd;service critical")};
-  size_t step2{
-      out.find("SERVICE NOTIFICATION: admin;test_host;dep_svc;RECOVERY "
-               "(OK);cmd;service ok",
-               step1 + 1)};
-  size_t step3{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_svc;CRITICAL;cmd;service critical",
-               step2 + 1)};
-  size_t step4{
-      out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;dep_svc;CRITICAL;cmd;service critical",
-               step3 + 1)};
-  ASSERT_NE(step3, std::string::npos);
-  ASSERT_EQ(step4, std::string::npos);
-}
-
 TEST_F(ServiceNotification, NoServiceNotificationWhenHostDown) {
   set_time(50000);
   _svc->set_current_state(engine::service::state_ok);
@@ -1205,4 +1073,58 @@ TEST_F(ServiceNotification, SimpleVolatileServiceNotificationWithDowntime) {
                          notifier::notification_option_none),
             OK);
   ASSERT_EQ(id, _svc->get_next_notification_id());
+}
+
+TEST_F(ServiceNotification, WarningAndTwoUsers) {
+  /* admin is notified on all whereas admin1 is notified only no critical and
+   * recovery. So in case of a warning notification, only admin should be
+   * notified for a recovery.
+   */
+  set_time(50000);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 3; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification ; just for admin
+    set_time(50500 + i * 500);
+    _svc->set_last_state(_svc->get_current_state());
+    if (notifier::hard == _svc->get_state_type())
+      _svc->set_last_hard_state(_svc->get_current_state());
+
+    std::time_t now{std::time(nullptr)};
+    std::string cmd(fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warn",
+        now));
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  for (int i = 0; i < 2; i++) {
+    // When i == 0, the state_up is hard (return to up) => Recovery notification
+    // only for admin, not admin1.
+    // When i == 1, the state_up is still here (no
+    // change) => no notification
+    set_time(56500 + i * 500);
+    std::time_t now{std::time(nullptr)};
+    std::string cmd(fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok",
+        now));
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t warn_admin1{
+      out.find("SERVICE NOTIFICATION: "
+               "admin1;test_host;test_svc;WARNING;cmd;service warn")};
+  ASSERT_EQ(warn_admin1, std::string::npos);
+  size_t rec_admin1{
+      out.find("SERVICE NOTIFICATION: admin1;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok")};
+  ASSERT_EQ(rec_admin1, std::string::npos);
 }

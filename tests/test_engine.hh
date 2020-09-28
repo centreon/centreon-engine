@@ -22,6 +22,7 @@
 #define TEST_ENGINE_HH
 
 #include <gtest/gtest.h>
+
 #include "com/centreon/engine/configuration/anomalydetection.hh"
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/contactgroup.hh"
@@ -36,8 +37,10 @@ using namespace com::centreon::engine;
 
 class TestEngine : public ::testing::Test {
  public:
-  configuration::contact new_configuration_contact(std::string const& name,
-                                                   bool full) const;
+  configuration::contact new_configuration_contact(
+      std::string const& name,
+      bool full,
+      const std::string& notif = "a") const;
   configuration::host new_configuration_host(std::string const& hostname,
                                              std::string const& contacts,
                                              uint64_t hst_id = 12);
