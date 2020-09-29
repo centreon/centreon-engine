@@ -240,7 +240,7 @@ class notifier : public checkable {
       dependency::types dependency_type) const = 0;
   uint64_t get_next_notification_id() const noexcept;
   virtual timeperiod* get_notification_timeperiod() const = 0;
-  notification_category get_category(reason_type type) const;
+  static notification_category get_category(reason_type type);
   bool is_notification_viable(notification_category cat,
                               reason_type type,
                               notification_option options);

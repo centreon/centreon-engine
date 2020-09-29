@@ -18,6 +18,7 @@
  */
 
 #include "test_engine.hh"
+
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -28,7 +29,8 @@ using namespace com::centreon::engine::downtimes;
 
 configuration::contact TestEngine::new_configuration_contact(
     std::string const& name,
-    bool full) const {
+    bool full,
+    const std::string& notif) const {
   if (full) {
     // Add command.
     {
@@ -63,7 +65,7 @@ configuration::contact TestEngine::new_configuration_contact(
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
   ctct.parse("host_notification_options", "d,r,f,s");
-  ctct.parse("service_notification_options", "a");
+  ctct.parse("service_notification_options", notif.c_str());
   ctct.parse("host_notifications_enabled", "1");
   ctct.parse("service_notifications_enabled", "1");
   return ctct;

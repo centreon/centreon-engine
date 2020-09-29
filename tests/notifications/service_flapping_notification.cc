@@ -451,7 +451,7 @@ TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
 
   notification0 =
       "type: 4, author: admin, options: 3, escalated: 1, id: 9, number: 2, "
-      "interval: 3";
+      "interval: 3, contacts: ";
   _service->set_notification(3, notification0);
   oss.str("");
 

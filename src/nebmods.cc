@@ -113,13 +113,13 @@ int neb_load_all_modules() {
 
 /* load a particular module */
 int neb_load_module(void* mod) {
-  if (mod == NULL)
+  if (mod == nullptr)
     return ERROR;
 
   broker::handle* module = static_cast<broker::handle*>(mod);
 
   /* don't reopen the module */
-  if (module->is_loaded() == true)
+  if (module->is_loaded())
     return OK;
 
   try {
