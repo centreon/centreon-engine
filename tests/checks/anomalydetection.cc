@@ -21,6 +21,7 @@
 
 #include <gtest/gtest.h>
 #include <time.h>
+#include <fmt/format.h>
 
 #include <cstring>
 #include <memory>
@@ -163,12 +164,11 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   _ad->set_last_check(50000);
 
   set_time(50500);
-  std::ostringstream oss;
-  std::time_t now{std::time(nullptr)};
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| "
-         "metric=90;25;60";
-  std::string cmd{oss.str()};
+  time_t now = std::time(nullptr);
+  std::string cmd(fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
+      "critical| metric=90;25;60",
+      now));
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -198,11 +198,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   set_time(51000);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
-         "metric=50;25;60";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
+         "metric=50;25;60", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -226,11 +223,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   now = std::time(nullptr);
   time_t previous = now;
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| "
-         "metric=110foo;25;60";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| "
+         "metric=110foo;25;60", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -254,11 +248,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   set_time(52000);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
-         "metric=30%;25;60";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
+         "metric=30%;25;60", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -283,11 +274,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
-         "metric=35%;25;60";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
+         "metric=35%;25;60", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -313,11 +301,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=70%;80;90";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+         "metric=70%;80;90", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -340,11 +325,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=71%;80;90";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+         "metric=71%;80;90", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -367,10 +349,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -392,11 +371,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=72%;80;90";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+         "metric=72%;80;90", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -419,11 +395,8 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=71.7%;80;90;10;100";
-  cmd = oss.str();
+  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+         "metric=71.7%;80;90;10;100", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
