@@ -134,6 +134,16 @@ class AnomalydetectionCheck : public TestEngine {
  * ------------------------------------------------------
  */
 TEST_F(AnomalydetectionCheck, StatusChanges) {
+  auto wait_state = [](std::shared_ptr<engine::service> svc,
+                       checkable::state_type value) {
+  for (int i = 0; i < 10; i++) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    checks::checker::instance().reap();
+    if (svc->get_state_type() == value)
+      break;
+  }
+  };
+
   CreateFile(
       "/tmp/thresholds_status_change.json",
       "[{\n \"host_id\": \"12\",\n \"service_id\": \"9\",\n \"metric_name\": "
@@ -201,19 +211,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
          "metric=50;25;60", now);
   process_external_command(cmd.c_str());
-  for (int i = 0; i < 10; i++) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    checks::checker::instance().reap();
-    if (_svc->get_state_type() == checkable::soft)
-      break;
-  }
+  wait_state(_svc, checkable::soft);
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_warning);
   ASSERT_EQ(_svc->get_last_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 2);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::soft);
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_plugin_output(),
@@ -231,14 +236,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| "
          "metric=110foo;25;60", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::hard);
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 3);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now);
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
@@ -256,14 +261,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
          "metric=30%;25;60", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::hard);
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_warning);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 3);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::hard);
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_last_hard_state_change(), previous);
@@ -282,7 +287,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
          "metric=35%;25;60", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::hard);
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_warning);
   ASSERT_EQ(_svc->get_last_hard_state_change(), previous);
@@ -291,7 +296,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_perf_data(), "metric=35%;25;60");
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::hard);
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_plugin_output(),
@@ -309,14 +314,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
          "metric=70%;80;90", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::hard);
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::hard);
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now);
@@ -333,14 +338,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
          "metric=71%;80;90", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::hard);
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_svc->get_last_hard_state_change(), previous);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::hard);
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_hard_state_change(), previous);
@@ -356,7 +361,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   now = std::time(nullptr);
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::soft);
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_unknown);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now - 1000);
@@ -364,7 +369,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::soft);
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_unknown);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now - 1000);
@@ -379,14 +384,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
          "metric=72%;80;90", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::soft);
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_svc->get_last_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 2);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::soft);
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_state_change(), now);
@@ -403,14 +408,14 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
          "metric=71.7%;80;90;10;100", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::hard);
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_svc->get_last_hard_state_change(), now);
   ASSERT_EQ(_svc->get_current_attempt(), 1);
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::hard);
   ASSERT_EQ(_ad->get_state_type(), checkable::hard);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_ok);
   ASSERT_EQ(_ad->get_last_hard_state_change(), now);
