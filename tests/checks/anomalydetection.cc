@@ -201,7 +201,12 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
          "metric=50;25;60", now);
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  for (int i = 0; i < 10; i++) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    checks::checker::instance().reap();
+    if (_svc->get_state_type() == checkable::soft)
+      break;
+  }
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_warning);
   ASSERT_EQ(_svc->get_last_state_change(), now);
