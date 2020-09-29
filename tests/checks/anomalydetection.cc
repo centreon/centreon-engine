@@ -137,10 +137,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   auto wait_state = [](std::shared_ptr<engine::service> svc,
                        checkable::state_type value) {
   for (int i = 0; i < 10; i++) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     checks::checker::instance().reap();
     if (svc->get_state_type() == value)
       break;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   };
 
