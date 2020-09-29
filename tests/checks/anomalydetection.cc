@@ -180,7 +180,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
       "critical| metric=90;25;60",
       now));
   process_external_command(cmd.c_str());
-  checks::checker::instance().reap();
+  wait_state(_svc, checkable::soft);
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
   ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_svc->get_last_state_change(), now);
@@ -193,7 +193,7 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   time_t preferred_time;
   _ad->run_async_check(check_options, latency, true, true, &time_is_valid,
                        &preferred_time);
-  checks::checker::instance().reap();
+  wait_state(_ad, checkable::soft);
   ASSERT_EQ(_ad->get_state_type(), checkable::soft);
   ASSERT_EQ(_ad->get_current_state(), engine::service::state_critical);
   ASSERT_EQ(_ad->get_last_state_change(), now);
