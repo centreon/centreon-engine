@@ -56,34 +56,6 @@ try {
           }
         }
       }
-    },
-    'centos8': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh centos8"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
-    },
-    'debian10': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian10"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Unit tests stage failure.');
@@ -96,26 +68,6 @@ try {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
       }
-    },
-    'centos8': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos8"
-      }
-    },
-    'debian10': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
-      }
-/*
-    },
-    'debian10-armhf': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10-armhf"
-      }
-*/
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Package stage failure.');
