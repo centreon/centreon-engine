@@ -1,6 +1,6 @@
 [requires]
 gtest/1.8.1@bincrafters/stable
-grpc/1.25.0@inexorgame/stable
+grpc/1.26.0@inexorgame/stable
 json11/e2e3a11@centreon/stable
 fmt/6.2.0
 
