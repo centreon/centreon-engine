@@ -51,7 +51,13 @@ notification::notification(notifier* parent,
       _interval{notification_interval},
       _notified_contact{notified_contacts} {}
 
+/**
+ *  @brief Execute the notification on each contact in to_notify.
+ *
+ *  @return OK if at least one notification is sent, and ERROR otherwise.
+ */
 int notification::execute(std::unordered_set<contact*> const& to_notify) {
+
   uint32_t contacts_notified{0};
 
   struct timeval start_time;
