@@ -768,7 +768,9 @@ int notifier::notify(notifier::reason_type type,
   int retval{notif->execute(to_notify)};
 
   if (retval == OK) {
-    _last_notification = std::time(nullptr);
+    if (!to_notify.empty())
+      _last_notification = std::time(nullptr);
+
     _notification[cat] = notif;
     /* The notification has been sent.
      * Should we increment the notification number? */
