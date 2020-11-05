@@ -51,6 +51,14 @@ notification::notification(notifier* parent,
       _interval{notification_interval},
       _notified_contact{notified_contacts} {}
 
+      /**
+       * @brief Execute the notification, that is to say, for each contact to
+       * notify, the notification is sent to him.
+       *
+       * @param to_notify the set of contact to notify.
+       *
+       * @return OK on success, ERROR otherwise.
+       */
 int notification::execute(std::unordered_set<contact*> const& to_notify) {
   uint32_t contacts_notified{0};
 
@@ -145,6 +153,8 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
     /* The $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
      */
     mac.x[MACRO_NOTIFICATIONNUMBER] = mac.x[MACRO_HOSTNOTIFICATIONNUMBER];
+    /* set the notification is escalated macro */
+    mac.x[MACRO_NOTIFICATIONISESCALATED] = std::to_string(_escalated);
 
     /* Set the notification id macro */
     mac.x[MACRO_HOSTNOTIFICATIONID] = std::to_string(_id);
@@ -156,6 +166,8 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
      */
     mac.x[MACRO_NOTIFICATIONNUMBER] = mac.x[MACRO_SERVICENOTIFICATIONNUMBER];
 
+    /* set the notification is escalated macro */
+    mac.x[MACRO_NOTIFICATIONISESCALATED] = std::to_string(_escalated);
     /* Set the notification id macro */
     mac.x[MACRO_SERVICENOTIFICATIONID] = std::to_string(_id);
   }

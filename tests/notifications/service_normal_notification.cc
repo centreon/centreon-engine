@@ -39,6 +39,7 @@
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/serviceescalation.hh"
+#include <com/centreon/engine/macros.hh>
 #include "helper.hh"
 
 using namespace com::centreon;
@@ -795,7 +796,7 @@ TEST_F(ServiceNotification, ServiceEscalationCG) {
   _svc->set_state_type(checkable::hard);
   _svc->set_accept_passive_checks(true);
 
-  testing::internal::CaptureStdout();
+  //testing::internal::CaptureStdout();
   for (int i = 0; i < 12; i++) {
     // When i == 0, the state_critical is soft => no notification
     // When i == 1, the state_critical is soft => no notification
@@ -815,6 +816,12 @@ TEST_F(ServiceNotification, ServiceEscalationCG) {
     std::string cmd{oss.str()};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
+    nagios_macros mac;
+    std::string out;
+    std::string out1;
+    process_macros_r(&mac, "$NOTIFICATIONISESCALATED$", out, 0);
+    process_macros_r(&mac, "$NOTIFICATIONNUMBER$", out1, 0);
+    std::cout << "NOTIFICATIONISESCALATED: " << out << ":" << out1 << std::endl;
   }
 
   // When i == 0, the state_ok is hard (return to up) => Recovery
@@ -829,7 +836,7 @@ TEST_F(ServiceNotification, ServiceEscalationCG) {
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
-  std::string out{testing::internal::GetCapturedStdout()};
+  std::string out;//{testing::internal::GetCapturedStdout()};
   size_t step1{out.find("NOW = 50900")};
   size_t step2{
       out.find("SERVICE NOTIFICATION: "
