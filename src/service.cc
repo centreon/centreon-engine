@@ -1824,7 +1824,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   /* if we're stalking this state type and state was not already logged AND the
    * plugin output changed since last check, log it now.. */
   if (get_state_type() == hard && !state_change && !state_was_logged &&
-      old_plugin_output == get_plugin_output()) {
+      old_plugin_output != get_plugin_output()) {
     if ((_current_state == service::state_ok && get_stalk_on(ok)))
       log_event();
 
