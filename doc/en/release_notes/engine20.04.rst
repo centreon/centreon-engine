@@ -1,4 +1,18 @@
 ========================
+Centreon Engine 20.04.8
+========================
+
+*******
+Bug Fix
+*******
+
+Stalking option
+================
+
+the result is if status change the first event is not logged and the second is logged.
+the fix result is if status change the first event is logged and the second event is not logged.
+
+========================
 Centreon Engine 20.04.7
 ========================
 
