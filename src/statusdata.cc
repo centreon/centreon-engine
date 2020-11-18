@@ -19,6 +19,7 @@
 */
 
 #include "com/centreon/engine/statusdata.hh"
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/xsddefault.hh"
@@ -59,6 +60,8 @@ int cleanup_status_data(int delete_status_data) {
 /* updates program status info */
 int update_program_status(int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
+  // FIXME DBR: -> instances update
+  // static time_t now = time(nullptr);
   if (aggregated_dump == false)
     broker_program_status(NEBTYPE_PROGRAMSTATUS_UPDATE, NEBFLAG_NONE,
                           NEBATTR_NONE, NULL);
