@@ -8,9 +8,13 @@ Bug Fix
 
 Stalking option
 ================
+The stalking option works again, it has been fixed.
 
-the result is if status change the first event is not logged and the second is logged.
-the fix result is if status change the first event is logged and the second event is not logged.
+Macros filters
+==============
+Macros can be filtered. This was possible before and there was a regression
+breaking this functionality. So now, we can activate the macros filtering and
+then we can specify which macros to send to broker.
 
 ========================
 Centreon Engine 20.04.7
