@@ -1,14 +1,4 @@
 ========================
-Centreon Engine 19.10.17
-========================
-
-*******
-Bug Fix
-*******
-Recovery notifications are no more sent to all users if they don't have been
-notified before.
-
-========================
 Centreon Engine 19.10.16
 ========================
 
@@ -16,8 +6,13 @@ Centreon Engine 19.10.16
 Bug Fix
 *******
 
+Recovery notifications
+======================
+Recovery notifications are no more sent to all users if they don't have been
+notified before.
+
 last service notification
-================
+=========================
 
 Last Service Notification set when state is HARD without notification. This new version fixes this point.
 
