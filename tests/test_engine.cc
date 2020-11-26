@@ -18,6 +18,7 @@
  */
 
 #include "test_engine.hh"
+
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -26,7 +27,10 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
 
-configuration::contact TestEngine::new_configuration_contact(std::string const& name, bool full) const {
+configuration::contact TestEngine::new_configuration_contact(
+    std::string const& name,
+    bool full,
+    const std::string& notif) const {
   if (full) {
     // Add command.
     {
@@ -61,14 +65,15 @@ configuration::contact TestEngine::new_configuration_contact(std::string const& 
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
   ctct.parse("host_notification_options", "d,r,f,s");
-  ctct.parse("service_notification_options", "a");
+  ctct.parse("service_notification_options", notif.c_str());
   ctct.parse("host_notifications_enabled", "1");
   ctct.parse("service_notifications_enabled", "1");
   return ctct;
 }
 
 configuration::contactgroup TestEngine::new_configuration_contactgroup(
-    std::string const& name, std::string const& contactname) {
+    std::string const& name,
+    std::string const& contactname) {
   configuration::contactgroup cg;
   cg.parse("contactgroup_name", name.c_str());
   cg.parse("alias", name.c_str());
@@ -76,7 +81,8 @@ configuration::contactgroup TestEngine::new_configuration_contactgroup(
   return cg;
 }
 
-configuration::serviceescalation TestEngine::new_configuration_serviceescalation(
+configuration::serviceescalation
+TestEngine::new_configuration_serviceescalation(
     std::string const& hostname,
     std::string const& svc_desc,
     std::string const& contactgroup) {
@@ -103,7 +109,8 @@ configuration::hostdependency TestEngine::new_configuration_hostdependency(
   return hd;
 }
 
-configuration::servicedependency TestEngine::new_configuration_servicedependency(
+configuration::servicedependency
+TestEngine::new_configuration_servicedependency(
     std::string const& hostname,
     std::string const& service,
     std::string const& dep_hostname,

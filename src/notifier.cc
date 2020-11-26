@@ -17,7 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/notifier.hh"
+
 #include <cassert>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -28,7 +31,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notification.hh"
-#include "com/centreon/engine/notifier.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/utils.hh"
 
@@ -36,20 +38,28 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;
 
-std::array<std::string, 9> const notifier::tab_notification_str{
-    {"NORMAL",        "RECOVERY",     "ACKNOWLEDGEMENT",
-     "FLAPPINGSTART", "FLAPPINGSTOP", "FLAPPINGDISABLED",
-     "DOWNTIMESTART", "DOWNTIMEEND",  "DOWNTIMECANCELLED", }};
+std::array<std::string, 9> const notifier::tab_notification_str{{
+    "NORMAL",
+    "RECOVERY",
+    "ACKNOWLEDGEMENT",
+    "FLAPPINGSTART",
+    "FLAPPINGSTOP",
+    "FLAPPINGDISABLED",
+    "DOWNTIMESTART",
+    "DOWNTIMEEND",
+    "DOWNTIMECANCELLED",
+}};
 
 std::array<std::string, 2> const notifier::tab_state_type{{"SOFT", "HARD"}};
 
-std::array<notifier::is_viable, 6> const notifier::_is_notification_viable{
-    {&notifier::_is_notification_viable_normal,
-     &notifier::_is_notification_viable_recovery,
-     &notifier::_is_notification_viable_acknowledgement,
-     &notifier::_is_notification_viable_flapping,
-     &notifier::_is_notification_viable_downtime,
-     &notifier::_is_notification_viable_custom, }};
+std::array<notifier::is_viable, 6> const notifier::_is_notification_viable{{
+    &notifier::_is_notification_viable_normal,
+    &notifier::_is_notification_viable_recovery,
+    &notifier::_is_notification_viable_acknowledgement,
+    &notifier::_is_notification_viable_flapping,
+    &notifier::_is_notification_viable_downtime,
+    &notifier::_is_notification_viable_custom,
+}};
 
 uint64_t notifier::_next_notification_id{1L};
 
@@ -85,15 +95,28 @@ notifier::notifier(notifier::notifier_type notifier_type,
                    std::string const& timezone,
                    bool retain_status_information,
                    bool retain_nonstatus_information)
-    : checkable{
-          display_name,           check_command,       checks_enabled,
-          accept_passive_checks,  check_interval,      retry_interval,
-          max_attempts,           check_period,        event_handler,
-          event_handler_enabled,  notes,               notes_url,
-          action_url,             icon_image,          icon_image_alt,
-          flap_detection_enabled, low_flap_threshold,  high_flap_threshold,
-          check_freshness,        freshness_threshold, obsess_over,
-          timezone},
+    : checkable{display_name,
+                check_command,
+                checks_enabled,
+                accept_passive_checks,
+                check_interval,
+                retry_interval,
+                max_attempts,
+                check_period,
+                event_handler,
+                event_handler_enabled,
+                notes,
+                notes_url,
+                action_url,
+                icon_image,
+                icon_image_alt,
+                flap_detection_enabled,
+                low_flap_threshold,
+                high_flap_threshold,
+                check_freshness,
+                freshness_threshold,
+                obsess_over,
+                timezone},
       _notifier_type{notifier_type},
       _stalk_type{stalk},
       _flap_type{0},
@@ -296,7 +319,6 @@ bool notifier::_is_notification_viable_normal(reason_type type
     /* In the case of a state change, we don't care of the notification interval
      * and we notify as soon as we can */
     if (get_last_hard_state_change() <= _last_notification) {
-
       uint32_t notification_interval =
           !_notification[cat_normal]
               ? _notification_interval
@@ -384,8 +406,7 @@ bool notifier::_is_notification_viable_recovery(reason_type type
           << "This notifier state is not UP/OK to send a recovery notification";
       retval = false;
       send_later = true;
-    }
-    else if (!(get_notify_on(up) || get_notify_on(ok))) {
+    } else if (!(get_notify_on(up) || get_notify_on(ok))) {
       logger(dbg_notifications, more)
           << "This notifier is not configured to send a recovery notification";
       retval = false;
@@ -495,9 +516,9 @@ bool notifier::_is_notification_viable_flapping(reason_type type,
     f = flappingdisabled;
 
   if (!get_notify_on(f)) {
-    logger(dbg_notifications, more) << "We shouldn't notify about "
-                                    << tab_notification_str[type]
-                                    << " events for this notifier.";
+    logger(dbg_notifications, more)
+        << "We shouldn't notify about " << tab_notification_str[type]
+        << " events for this notifier.";
     return false;
   }
 
@@ -523,9 +544,9 @@ bool notifier::_is_notification_viable_flapping(reason_type type,
   /* Don't send a notification if the same has already been sent previously. */
   if (_notification[cat_flapping] &&
       _notification[cat_flapping]->get_reason() == type) {
-    logger(dbg_notifications, more) << "We shouldn't notify about a "
-                                    << tab_notification_str[type]
-                                    << " event: already sent.";
+    logger(dbg_notifications, more)
+        << "We shouldn't notify about a " << tab_notification_str[type]
+        << " event: already sent.";
     return false;
   }
 
@@ -637,8 +658,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
   /* Let's start looking at escalations */
   for (std::list<escalation*>::const_iterator it{_escalations.begin()},
        end{_escalations.end()};
-       it != end;
-       ++it) {
+       it != end; ++it) {
     if ((*it)->is_viable(get_current_state_int(), _notification_number)) {
       /* Among escalations, we choose the smallest notification interval. */
       if (escalated) {
@@ -655,13 +675,11 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
       for (contactgroup_map_unsafe::const_iterator
                cgit{(*it)->get_contactgroups().begin()},
            cgend{(*it)->get_contactgroups().end()};
-           cgit != cgend;
-           ++cgit) {
+           cgit != cgend; ++cgit) {
         for (contact_map_unsafe::const_iterator
                  cit{cgit->second->get_members().begin()},
              cend{cgit->second->get_members().end()};
-             cit != cend;
-             ++cit) {
+             cit != cend; ++cit) {
           assert(cit->second);
           if (cit->second->should_be_notified(cat, type, *this))
             retval.insert(cit->second);
@@ -675,8 +693,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
      * for the moment if those contacts accept notification. */
     for (contact_map_unsafe::const_iterator it{get_contacts().begin()},
          end{get_contacts().end()};
-         it != end;
-         ++it) {
+         it != end; ++it) {
       assert(it->second);
       retval.insert(it->second);
     }
@@ -685,13 +702,11 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
     for (contactgroup_map_unsafe::const_iterator
              it{get_contactgroups().begin()},
          end{get_contactgroups().end()};
-         it != end;
-         ++it) {
+         it != end; ++it) {
       for (contact_map_unsafe::const_iterator
                cit{it->second->get_members().begin()},
            cend{it->second->get_members().end()};
-           cit != cend;
-           ++cit) {
+           cit != cend; ++cit) {
         assert(cit->second);
         retval.insert(cit->second);
       }
@@ -702,7 +717,7 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
   return retval;
 }
 
-notifier::notification_category notifier::get_category(reason_type type) const {
+notifier::notification_category notifier::get_category(reason_type type) {
   if (type == 99)
     return cat_custom;
   notification_category cat[] = {
@@ -740,14 +755,9 @@ int notifier::notify(notifier::reason_type type,
       get_contacts_to_notify(cat, type, notification_interval)};
 
   _current_notification_id = _next_notification_id++;
-  std::shared_ptr<notification> notif{new notification(this,
-                                                       type,
-                                                       not_author,
-                                                       not_data,
-                                                       options,
-                                                       _current_notification_id,
-                                                       _notification_number,
-                                                       notification_interval)};
+  std::shared_ptr<notification> notif{std::make_shared<notification>(
+      this, type, not_author, not_data, options, _current_notification_id,
+      _notification_number, notification_interval)};
 
   /* Let's make the notification. */
   int retval{notif->execute(to_notify)};
@@ -918,7 +928,9 @@ bool notifier::get_flap_detection_on(notification_flag type) const noexcept {
   return _flap_type & type;
 }
 
-uint32_t notifier::get_flap_detection_on() const noexcept { return _flap_type; }
+uint32_t notifier::get_flap_detection_on() const noexcept {
+  return _flap_type;
+}
 
 void notifier::set_flap_detection_on(uint32_t type) noexcept {
   _flap_type = type;
@@ -932,9 +944,13 @@ bool notifier::get_stalk_on(notification_flag type) const noexcept {
   return _stalk_type & type;
 }
 
-uint32_t notifier::get_stalk_on() const noexcept { return _stalk_type; }
+uint32_t notifier::get_stalk_on() const noexcept {
+  return _stalk_type;
+}
 
-void notifier::set_stalk_on(uint32_t type) noexcept { _stalk_type = type; }
+void notifier::set_stalk_on(uint32_t type) noexcept {
+  _stalk_type = type;
+}
 
 void notifier::add_stalk_on(notification_flag type) noexcept {
   _stalk_type |= type;
@@ -968,7 +984,9 @@ void notifier::set_flapping_comment_id(uint64_t comment_id) noexcept {
   _flapping_comment_id = comment_id;
 }
 
-int notifier::get_check_options(void) const noexcept { return _check_options; }
+int notifier::get_check_options(void) const noexcept {
+  return _check_options;
+}
 
 void notifier::set_check_options(int option) noexcept {
   _check_options = option;
@@ -1075,16 +1093,14 @@ bool is_contact_for_notifier(com::centreon::engine::notifier* notif,
   // Search all individual contacts of this host.
   for (contact_map_unsafe::const_iterator it{notif->get_contacts().begin()},
        end{notif->get_contacts().end()};
-       it != end;
-       ++it)
+       it != end; ++it)
     if (it->second == cntct)
       return true;
 
   for (contactgroup_map_unsafe::const_iterator
            it{notif->get_contactgroups().begin()},
        end{notif->get_contactgroups().end()};
-       it != end;
-       ++it) {
+       it != end; ++it) {
     assert(it->second);
     if (it->second->get_members().find(cntct->get_name()) ==
         it->second->get_members().end())
@@ -1170,8 +1186,7 @@ void notifier::resolve(int& w, int& e) {
   /* check all contacts */
   for (contact_map_unsafe::iterator it{get_contacts().begin()},
        end{get_contacts().end()};
-       it != end;
-       ++it) {
+       it != end; ++it) {
     contact_map::const_iterator found_it{contact::contacts.find(it->first)};
     if (found_it == contact::contacts.end() || !found_it->second.get()) {
       logger(log_verification_error, basic)
@@ -1186,8 +1201,7 @@ void notifier::resolve(int& w, int& e) {
   /* check all contact groups */
   for (contactgroup_map_unsafe::iterator it{get_contactgroups().begin()},
        end{get_contactgroups().end()};
-       it != end;
-       ++it) {
+       it != end; ++it) {
     // Find the contact group.
     contactgroup_map::const_iterator found_it{
         contactgroup::contactgroups.find(it->first)};
@@ -1319,7 +1333,8 @@ time_t notifier::get_next_notification_time(time_t offset) {
     set_no_more_notifications(false);
 
   logger(dbg_notifications, most) << "Interval used for calculating next valid "
-                                     "notification time: " << interval_to_use;
+                                     "notification time: "
+                                  << interval_to_use;
 
   /* calculate next notification time */
   time_t next_notification{
@@ -1329,7 +1344,9 @@ time_t notifier::get_next_notification_time(time_t offset) {
   return next_notification;
 }
 
-void notifier::set_flap_type(uint32_t type) noexcept { _flap_type = type; }
+void notifier::set_flap_type(uint32_t type) noexcept {
+  _flap_type = type;
+}
 
 timeperiod* notifier::get_notification_period_ptr() const noexcept {
   return _notification_period_ptr;
@@ -1469,7 +1486,17 @@ void notifier::set_notification(int32_t idx, std::string const& value) {
     return;
   }
 
-  std::shared_ptr<notification> notif{std::make_shared<notification>(
-      this, type, author, "", options, id, number, interval, escalated)};
+  v += 13;
+  std::set<std::string> contacts;
+  for (const char* s = v; *s; ++s) {
+    if ((*s == ',' || *s == '\n') && v != s) {
+      contacts.emplace(v, s);
+      v = s + 1;
+    }
+  }
+
+  std::shared_ptr<notification> notif{
+      std::make_shared<notification>(this, type, author, "", options, id,
+                                     number, interval, escalated, contacts)};
   _notification[idx] = notif;
 }
