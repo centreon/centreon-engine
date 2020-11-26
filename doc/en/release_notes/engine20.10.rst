@@ -6,10 +6,11 @@ Centreon Engine 20.10.1
 Bug Fix
 *******
 
-Recovery notification
-=====================
-Recovery notifications are now sent to users already notified of an issue and
-no more to everybody.
+Macros filters
+==============
+Macros can be filtered. This was possible before and there was a regression
+breaking this functionality. So now, we can activate the macros filtering and
+then we can specify which macros to send to broker.
 
 Stalking option
 ================
