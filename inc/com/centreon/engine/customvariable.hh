@@ -22,6 +22,7 @@
 
 #include <string>
 #include <unordered_map>
+
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -36,7 +37,7 @@ CCE_BEGIN()
  */
 class customvariable {
  public:
-  customvariable(std::string const& value = "", bool is_sent = true);
+  customvariable(std::string const& value = "", bool is_sent = false);
   customvariable(customvariable const& other);
   ~customvariable();
   customvariable& operator=(customvariable const& other);
