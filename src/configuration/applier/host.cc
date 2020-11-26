@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/configuration/applier/host.hh"
+
 #include <algorithm>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/config.hh"
@@ -152,13 +154,11 @@ void applier::host::add_object(configuration::host const& obj) {
  */
 void applier::host::expand_objects(configuration::state& s) {
   // Browse all hosts.
-  for (configuration::set_host::iterator it_host(s.hosts().begin()),
-       end_host(s.hosts().end());
-       it_host != end_host; ++it_host) {
+  for (auto& host_cfg : s.hosts()) {
     // Should custom variables be sent to broker ?
     for (map_customvar::iterator
-             it(const_cast<map_customvar&>(it_host->customvariables()).begin()),
-         end(const_cast<map_customvar&>(it_host->customvariables()).end());
+             it(const_cast<map_customvar&>(host_cfg.customvariables()).begin()),
+         end(const_cast<map_customvar&>(host_cfg.customvariables()).end());
          it != end; ++it) {
       if (!s.enable_macros_filter() ||
           s.macros_filter().find(it->first) != s.macros_filter().end()) {
@@ -167,15 +167,15 @@ void applier::host::expand_objects(configuration::state& s) {
     }
 
     // Browse current host's groups.
-    for (set_string::const_iterator it_group(it_host->hostgroups().begin()),
-         end_group(it_host->hostgroups().end());
+    for (set_string::const_iterator it_group(host_cfg.hostgroups().begin()),
+         end_group(host_cfg.hostgroups().end());
          it_group != end_group; ++it_group) {
       // Find host group.
       configuration::set_hostgroup::iterator group(
           s.hostgroups_find(*it_group));
       if (group == s.hostgroups().end())
         throw(engine_error()
-              << "Could not add host '" << it_host->host_name()
+              << "Could not add host '" << host_cfg.host_name()
               << "' to non-existing host group '" << *it_group << "'");
 
       // Remove host group from state.
@@ -183,7 +183,7 @@ void applier::host::expand_objects(configuration::state& s) {
       s.hostgroups().erase(group);
 
       // Add host to group members.
-      backup.members().insert(it_host->host_name());
+      backup.members().insert(host_cfg.host_name());
 
       // Reinsert host group.
       s.hostgroups().insert(backup);
@@ -426,8 +426,8 @@ void applier::host::remove_object(configuration::host const& obj) {
     // Remove events related to this host.
     applier::scheduler::instance().remove_host(obj.key());
 
-    //remove host from hostgroup->members
-    for (auto& it_h: it->second->get_parent_groups())
+    // remove host from hostgroup->members
+    for (auto& it_h : it->second->get_parent_groups())
       it_h->members.erase(it->second->get_name());
 
     // Notify event broker.
