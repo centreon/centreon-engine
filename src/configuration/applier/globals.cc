@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/configuration/applier/globals.hh"
+
 #include <cassert>
+
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -67,6 +69,7 @@ void applier::globals::apply(state& config) {
   ::soft_state_dependencies = config.soft_state_dependencies();
   ::use_aggressive_host_checking = config.use_aggressive_host_checking();
   ::use_large_installation_tweaks = config.use_large_installation_tweaks();
+  ::instance_heartbeat_interval = config.instance_heartbeat_interval();
 }
 
 /**
