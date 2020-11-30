@@ -18,7 +18,9 @@
 */
 
 #include "com/centreon/engine/configuration/state.hh"
+
 #include <limits>
+
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -168,9 +170,9 @@ std::unordered_map<std::string, state::setter_func> const state::_setters{
     {"passive_host_checks_are_soft",
      SETTER(bool, passive_host_checks_are_soft)},
     {"perfdata_timeout", SETTER(int, perfdata_timeout)},
-    { "poller_name", SETTER(std::string const&, poller_name)},
-    { "poller_id", SETTER(uint32_t, poller_id)},
-    { "rpc_port", SETTER(uint16_t, rpc_port)},
+    {"poller_name", SETTER(std::string const&, poller_name)},
+    {"poller_id", SETTER(uint32_t, poller_id)},
+    {"rpc_port", SETTER(uint16_t, rpc_port)},
     {"precached_object_file",
      SETTER(std::string const&, _set_precached_object_file)},
     {"process_performance_data", SETTER(bool, process_performance_data)},
@@ -229,6 +231,8 @@ std::unordered_map<std::string, state::setter_func> const state::_setters{
      SETTER(std::string const&, _set_use_embedded_perl_implicitly)},
     {"use_large_installation_tweaks",
      SETTER(bool, use_large_installation_tweaks)},
+    {"instance_heartbeat_interval",
+     SETTER(uint32_t, instance_heartbeat_interval)},
     {"use_regexp_matching", SETTER(bool, use_regexp_matches)},
     {"use_retained_program_state", SETTER(bool, use_retained_program_state)},
     {"use_retained_scheduling_info",
@@ -351,6 +355,7 @@ static unsigned int const default_time_change_threshold(900);
 static bool const default_translate_passive_host_checks(false);
 static bool const default_use_aggressive_host_checking(false);
 static bool const default_use_large_installation_tweaks(false);
+static uint32_t const default_instance_heartbeat_interval(30);
 static bool const default_use_regexp_matches(false);
 static bool const default_use_retained_program_state(true);
 static bool const default_use_retained_scheduling_info(false);
@@ -475,6 +480,7 @@ state::state()
       _translate_passive_host_checks(default_translate_passive_host_checks),
       _use_aggressive_host_checking(default_use_aggressive_host_checking),
       _use_large_installation_tweaks(default_use_large_installation_tweaks),
+      _instance_heartbeat_interval(default_instance_heartbeat_interval),
       _use_regexp_matches(default_use_regexp_matches),
       _use_retained_program_state(default_use_retained_program_state),
       _use_retained_scheduling_info(default_use_retained_scheduling_info),
@@ -749,8 +755,7 @@ bool state::operator==(state const& right) const noexcept {
       _ocsp_timeout == right._ocsp_timeout &&
       _passive_host_checks_are_soft == right._passive_host_checks_are_soft &&
       _perfdata_timeout == right._perfdata_timeout &&
-      _poller_name == right._poller_name &&
-      _poller_id == right._poller_id &&
+      _poller_name == right._poller_name && _poller_id == right._poller_id &&
       _rpc_port == right._rpc_port &&
       _process_performance_data == right._process_performance_data &&
       _retained_contact_host_attribute_mask ==
@@ -3010,7 +3015,7 @@ set_servicegroup::iterator state::servicegroups_find(
 // *
 // *  @return All engine anomalydetections.
 // */
-//set_anomalydetection const& state::anomalydetections() const noexcept {
+// set_anomalydetection const& state::anomalydetections() const noexcept {
 //  return _anomalydetections;
 //}
 
@@ -3574,12 +3579,31 @@ bool state::use_large_installation_tweaks() const noexcept {
 }
 
 /**
+ * @brief Get instance_heartbeat_interval value. This is the minimal delay in
+ * seconds between two instance status sent to broker.
+ *
+ * @return this value in seconds.
+ */
+uint32_t state::instance_heartbeat_interval() const noexcept {
+  return _instance_heartbeat_interval;
+}
+
+/**
  *  Set use_large_installation_tweaks value.
  *
  *  @param[in] value The new use_large_installation_tweaks value.
  */
 void state::use_large_installation_tweaks(bool value) {
   _use_large_installation_tweaks = value;
+}
+
+/**
+ *  Set instance_heartbeat_interval value.
+ *
+ *  @param[in] value The new instance_heartbeat_interval value.
+ */
+void state::instance_heartbeat_interval(uint32_t value) {
+  _instance_heartbeat_interval = value;
 }
 
 /**

@@ -60,10 +60,14 @@ int cleanup_status_data(int delete_status_data) {
 /* updates program status info */
 int update_program_status(int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
-  // FIXME DBR: -> instances update
-  // static time_t now = time(nullptr);
-  if (aggregated_dump == false)
-    broker_program_status(NEBTYPE_PROGRAMSTATUS_UPDATE, NEBFLAG_NONE,
-                          NEBATTR_NONE, NULL);
+  static time_t next_program_status =
+      time(nullptr) + instance_heartbeat_interval;
+  time_t now = time(nullptr);
+  if (now >= next_program_status) {
+    next_program_status += instance_heartbeat_interval;
+    if (!aggregated_dump)
+      broker_program_status(NEBTYPE_PROGRAMSTATUS_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, NULL);
+  }
   return OK;
 }
