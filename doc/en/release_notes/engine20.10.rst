@@ -1,4 +1,18 @@
 =======================
+Centreon Engine 20.10.2
+=======================
+
+***********
+Enhancement
+***********
+
+Instance updates
+================
+There is a minimal delay specified in seconds between two instance updates.
+By default, its value is 30s. It can be set with the variable
+instance_heartbeat_interval in the centengine.cfg file.
+
+=======================
 Centreon Engine 20.10.1
 =======================
 
