@@ -383,6 +383,8 @@ class state {
   void use_aggressive_host_checking(bool value);
   bool use_large_installation_tweaks() const noexcept;
   void use_large_installation_tweaks(bool value);
+  uint32_t instance_heartbeat_interval() const noexcept;
+  void instance_heartbeat_interval(uint32_t value);
   bool use_regexp_matches() const noexcept;
   void use_regexp_matches(bool value);
   bool use_retained_program_state() const noexcept;
@@ -598,6 +600,7 @@ class state {
   std::unordered_map<std::string, std::string> _users;
   bool _use_aggressive_host_checking;
   bool _use_large_installation_tweaks;
+  uint32_t _instance_heartbeat_interval;
   bool _use_regexp_matches;
   bool _use_retained_program_state;
   bool _use_retained_scheduling_info;
