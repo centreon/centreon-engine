@@ -21,7 +21,9 @@
 */
 
 #include "com/centreon/engine/globals.hh"
+
 #include <map>
+
 #include "com/centreon/engine/logging/logger.hh"
 #include "nagios.h"
 
@@ -98,6 +100,7 @@ unsigned int process_performance_data(false);
 unsigned int soft_state_dependencies(false);
 unsigned int use_aggressive_host_checking(false);
 unsigned int use_large_installation_tweaks(false);
+uint32_t instance_heartbeat_interval(30);
 unsigned long cached_host_check_horizon(15);
 unsigned long logging_options(
     logging::log_runtime_error | logging::log_runtime_warning |
