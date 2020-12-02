@@ -391,6 +391,7 @@ TEST_F(Macro, StatusDataFile) {
   std::remove("/tmp/test-config.cfg");
 
   std::ofstream ofs("/tmp/test-config.cfg");
+  ofs << "status_file=/usr/local/var/status.dat" << std::endl;
   ofs << "log_file=\"\"" << std::endl;
   ofs.close();
 
@@ -401,7 +402,7 @@ TEST_F(Macro, StatusDataFile) {
   std::string out;
   nagios_macros* mac(get_global_macros());
   process_macros_r(mac, "$STATUSDATAFILE:test_host$", out, 1);
-  ASSERT_EQ(out, "/var/log/centreon-engine/status.dat");
+  ASSERT_EQ(out, "/usr/local/var/status.dat");
 }
 
 TEST_F(Macro, RetentionDataFile) {
@@ -466,27 +467,6 @@ TEST_F(Macro, LogFile) {
   ASSERT_EQ(out, "/tmp/centengine.log");
 }
 
-TEST_F(Macro, RessourceFile) {
-  configuration::parser parser;
-  configuration::state st;
-
-  std::remove("/tmp/test-config.cfg");
-
-  std::ofstream ofs("/tmp/test-config.cfg");
-  ofs << "resource_file=/etc/centreon-engine/resource.cfg" << std::endl;
-  ofs << "log_file=\"\"" << std::endl;
-  ofs.close();
-
-  parser.parse("/tmp/test-config.cfg", st);
-  configuration::applier::state::instance().apply(st);
-  init_macros();
-
-  std::string out;
-  nagios_macros* mac(get_global_macros());
-  process_macros_r(mac, "$RESOURCEFILE:test_host$", out, 1);
-  ASSERT_EQ(out, "/etc/centreon-engine/resource.cfg");
-}
-
 TEST_F(Macro, CommandFile) {
   configuration::parser parser;
   configuration::state st;
@@ -494,6 +474,7 @@ TEST_F(Macro, CommandFile) {
   std::remove("/tmp/test-config.cfg");
 
   std::ofstream ofs("/tmp/test-config.cfg");
+  ofs << "command_file=/usr/local/var/rw/centengine.cmd" << std::endl;
   ofs << "log_file=\"\"" << std::endl;
   ofs.close();
 
@@ -504,7 +485,7 @@ TEST_F(Macro, CommandFile) {
   std::string out;
   nagios_macros* mac(get_global_macros());
   process_macros_r(mac, "$COMMANDFILE:test_host$", out, 1);
-  ASSERT_EQ(out, "/var/lib/centreon-engine/rw/centengine.cmd");
+  ASSERT_EQ(out, "/usr/local/var/rw/centengine.cmd");
 }
 
 TEST_F(Macro, TempPath) {
