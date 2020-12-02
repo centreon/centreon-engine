@@ -12,6 +12,14 @@ There is a minimal delay specified in seconds between two instance updates.
 By default, its value is 30s. It can be set with the variable
 instance_heartbeat_interval in the centengine.cfg file.
 
+*******
+Bug Fix
+*******
+
+Macros 
+==============
+fix some macro and test for some macro.
+
 =======================
 Centreon Engine 20.10.1
 =======================
