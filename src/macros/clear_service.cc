@@ -22,8 +22,6 @@
 #include "com/centreon/engine/macros/defines.hh"
 #include "com/centreon/engine/macros/misc.hh"
 
-extern "C" {
-
 /**
  *  Clear service macros.
  *
@@ -81,5 +79,4 @@ int clear_service_macros_r(nagios_macros* mac) {
   mac->service_ptr = nullptr;
 
   return OK;
-}
 }

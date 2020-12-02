@@ -47,7 +47,7 @@ int grab_contact_address_macro(unsigned int macro_num,
                                std::string& output);
 int grab_standard_contactgroup_macro(
     int macro_type,
-    com::centreon::engine::contactgroup* temp_contactgroup,
+    std::shared_ptr<com::centreon::engine::contactgroup> temp_contactgroup,
     std::string& output);
 
 int grab_contact_macros_r(nagios_macros* mac,

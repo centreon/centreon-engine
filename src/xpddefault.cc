@@ -200,7 +200,7 @@ int xpddefault_cleanup_performance_data() {
 // updates service performance data.
 int xpddefault_update_service_performance_data(
     com::centreon::engine::service* svc) {
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   /*
    * bail early if we've got nothing to do so we don't spend a lot
@@ -213,27 +213,27 @@ int xpddefault_update_service_performance_data(
       config->service_perfdata_command().empty())
     return OK;
 
-  grab_host_macros_r(&mac, svc->get_host_ptr());
-  grab_service_macros_r(&mac, svc);
+  grab_host_macros_r(mac, svc->get_host_ptr());
+  grab_service_macros_r(mac, svc);
 
   // run the performance data command.
-  xpddefault_run_service_performance_data_command(&mac, svc);
+  xpddefault_run_service_performance_data_command(mac, svc);
 
   // get rid of used memory we won't need anymore.
-  clear_argv_macros_r(&mac);
+  clear_argv_macros_r(mac);
 
   // update the performance data file.
-  xpddefault_update_service_performance_data_file(&mac, svc);
+  xpddefault_update_service_performance_data_file(mac, svc);
 
   // now free() it all.
-  clear_volatile_macros_r(&mac);
+  clear_volatile_macros_r(mac);
 
   return OK;
 }
 
 // updates host performance data.
 int xpddefault_update_host_performance_data(host* hst) {
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   /*
    * bail early if we've got nothing to do so we don't spend a lot
@@ -247,19 +247,19 @@ int xpddefault_update_host_performance_data(host* hst) {
     return OK;
 
   // set up macros and get to work.
-  grab_host_macros_r(&mac, hst);
+  grab_host_macros_r(mac, hst);
 
   // run the performance data command.
-  xpddefault_run_host_performance_data_command(&mac, hst);
+  xpddefault_run_host_performance_data_command(mac, hst);
 
   // no more commands to run, so we won't need this any more.
-  clear_argv_macros_r(&mac);
+  clear_argv_macros_r(mac);
 
   // update the performance data file.
-  xpddefault_update_host_performance_data_file(&mac, hst);
+  xpddefault_update_host_performance_data_file(mac, hst);
 
   // free() all.
-  clear_volatile_macros_r(&mac);
+  clear_volatile_macros_r(mac);
 
   return OK;
 }
@@ -599,7 +599,7 @@ int xpddefault_process_host_perfdata_file() {
   double exectime(0.0);
   int result(OK);
   int macro_options(STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   logger(dbg_functions, basic) << "process_host_perfdata_file()";
 
@@ -609,11 +609,11 @@ int xpddefault_process_host_perfdata_file() {
 
   // get the raw command line.
   get_raw_command_line_r(
-      &mac, xpddefault_host_perfdata_file_processing_command_ptr,
+      mac, xpddefault_host_perfdata_file_processing_command_ptr,
       config->host_perfdata_file_processing_command().c_str(), raw_command_line,
       macro_options);
   if (raw_command_line.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -622,10 +622,10 @@ int xpddefault_process_host_perfdata_file() {
       << raw_command_line;
 
   // process any macros in the raw command line.
-  process_macros_r(&mac, raw_command_line, processed_command_line,
+  process_macros_r(mac, raw_command_line, processed_command_line,
                    macro_options);
   if (processed_command_line.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -641,7 +641,7 @@ int xpddefault_process_host_perfdata_file() {
   // run the command.
   try {
     std::string tmp;
-    my_system_r(&mac, processed_command_line, config->perfdata_timeout(),
+    my_system_r(mac, processed_command_line, config->perfdata_timeout(),
                 &early_timeout, &exectime, tmp, 0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -649,7 +649,7 @@ int xpddefault_process_host_perfdata_file() {
            "line '"
         << processed_command_line << "' : " << e.what();
   }
-  clear_volatile_macros_r(&mac);
+  clear_volatile_macros_r(mac);
 
   // re-open and unlock the performance data file.
   xpddefault_open_host_perfdata_file();
@@ -672,7 +672,7 @@ int xpddefault_process_service_perfdata_file() {
   double exectime(0.0);
   int result(OK);
   int macro_options(STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   logger(dbg_functions, basic) << "process_service_perfdata_file()";
 
@@ -682,11 +682,11 @@ int xpddefault_process_service_perfdata_file() {
 
   // get the raw command line.
   get_raw_command_line_r(
-      &mac, xpddefault_service_perfdata_file_processing_command_ptr,
+      mac, xpddefault_service_perfdata_file_processing_command_ptr,
       config->service_perfdata_file_processing_command().c_str(),
       raw_command_line, macro_options);
   if (raw_command_line.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -695,10 +695,10 @@ int xpddefault_process_service_perfdata_file() {
                              << raw_command_line;
 
   // process any macros in the raw command line.
-  process_macros_r(&mac, raw_command_line, processed_command_line,
+  process_macros_r(mac, raw_command_line, processed_command_line,
                    macro_options);
   if (processed_command_line.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -714,7 +714,7 @@ int xpddefault_process_service_perfdata_file() {
   // run the command.
   try {
     std::string tmp;
-    my_system_r(&mac, processed_command_line, config->perfdata_timeout(),
+    my_system_r(mac, processed_command_line, config->perfdata_timeout(),
                 &early_timeout, &exectime, tmp, 0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -727,7 +727,7 @@ int xpddefault_process_service_perfdata_file() {
   xpddefault_open_service_perfdata_file();
   pthread_mutex_unlock(&xpddefault_service_perfdata_fp_lock);
 
-  clear_volatile_macros_r(&mac);
+  clear_volatile_macros_r(mac);
 
   // check to see if the command timed out.
   if (early_timeout == true)

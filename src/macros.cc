@@ -322,7 +322,8 @@ int grab_datetime_macro_r(nagios_macros* mac,
       break;
 
     case MACRO_ISVALIDTIME:
-      output = std::to_string(!check_time_against_period(test_time, temp_timeperiod));
+      output = std::to_string(
+          !check_time_against_period(test_time, temp_timeperiod));
       break;
 
     case MACRO_NEXTVALIDTIME:
@@ -330,7 +331,8 @@ int grab_datetime_macro_r(nagios_macros* mac,
       if (next_valid_time == test_time &&
           !check_time_against_period(test_time, temp_timeperiod))
         next_valid_time = (time_t)0L;
-      get_datetime_string(&next_valid_time, tmp_date, MAX_DATETIME_LENGTH, SHORT_TIME);
+      get_datetime_string(&next_valid_time, tmp_date, MAX_DATETIME_LENGTH,
+                          SHORT_TIME);
       output = tmp_date;
       break;
 
@@ -367,11 +369,11 @@ int grab_standard_hostgroup_macro_r(nagios_macros* mac,
            it != end; ++it) {
         if (it->first.empty())
           continue;
-        if (temp_buffer.empty()) /* If our buffer didn't contain anything, we
+        if (output.empty()) /* If our buffer didn't contain anything, we
                                     just need to write "%s,%s" */
-          temp_buffer.append(it->first);
+          output.append(it->first);
         else
-          temp_buffer += "," + it->first;
+          output += "," + it->first;
       }
       break;
 
@@ -452,6 +454,7 @@ int grab_standard_servicegroup_macro_r(nagios_macros* mac,
         else /* Now we need to write ",%s,%s" */
           temp_buffer = "," + it->first.first + "," + it->first.second;
       }
+      output = temp_buffer;
       break;
     case MACRO_SERVICEGROUPACTIONURL:
       if (!temp_servicegroup->get_action_url().empty())
@@ -485,7 +488,7 @@ int grab_standard_servicegroup_macro_r(nagios_macros* mac,
       break;
 
     case MACRO_SERVICEGROUPNOTES:
-      process_macros_r(mac, output, output, 0);
+      process_macros_r(mac, output, temp_buffer, 0);
       output = temp_buffer;
       break;
 
@@ -573,9 +576,10 @@ int grab_contact_address_macro(unsigned int macro_num,
 }
 
 /* computes a contactgroup macro */
-int grab_standard_contactgroup_macro(int macro_type,
-                                     contactgroup* temp_contactgroup,
-                                     std::string& output) {
+int grab_standard_contactgroup_macro(
+    int macro_type,
+    std::shared_ptr<com::centreon::engine::contactgroup> temp_contactgroup,
+    std::string& output) {
   if (temp_contactgroup == nullptr)
     return ERROR;
 
@@ -820,10 +824,6 @@ int init_macrox_names() {
   add_macrox_name(HOSTGROUPALIAS);
   add_macrox_name(SERVICEGROUPNAME);
   add_macrox_name(SERVICEGROUPALIAS);
-  add_macrox_name(HOSTACKAUTHOR);
-  add_macrox_name(HOSTACKCOMMENT);
-  add_macrox_name(SERVICEACKAUTHOR);
-  add_macrox_name(SERVICEACKCOMMENT);
   add_macrox_name(LASTSERVICEOK);
   add_macrox_name(LASTSERVICEWARNING);
   add_macrox_name(LASTSERVICEUNKNOWN);
@@ -838,7 +838,6 @@ int init_macrox_names() {
   add_macrox_name(HOSTDISPLAYNAME);
   add_macrox_name(SERVICEDISPLAYNAME);
   add_macrox_name(RETENTIONDATAFILE);
-  add_macrox_name(OBJECTCACHEFILE);
   add_macrox_name(TEMPFILE);
   add_macrox_name(LOGFILE);
   add_macrox_name(RESOURCEFILE);
@@ -883,10 +882,6 @@ int init_macrox_names() {
   add_macrox_name(LASTSERVICEEVENTID);
   add_macrox_name(HOSTGROUPNAMES);
   add_macrox_name(SERVICEGROUPNAMES);
-  add_macrox_name(HOSTACKAUTHORNAME);
-  add_macrox_name(HOSTACKAUTHORALIAS);
-  add_macrox_name(SERVICEACKAUTHORNAME);
-  add_macrox_name(SERVICEACKAUTHORALIAS);
   add_macrox_name(MAXHOSTATTEMPTS);
   add_macrox_name(MAXSERVICEATTEMPTS);
   add_macrox_name(TOTALHOSTSERVICES);
@@ -973,7 +968,6 @@ int clear_volatile_macros_r(nagios_macros* mac) {
       case MACRO_MAINCONFIGFILE:
       case MACRO_STATUSDATAFILE:
       case MACRO_RETENTIONDATAFILE:
-      case MACRO_OBJECTCACHEFILE:
       case MACRO_TEMPFILE:
       case MACRO_LOGFILE:
       case MACRO_RESOURCEFILE:

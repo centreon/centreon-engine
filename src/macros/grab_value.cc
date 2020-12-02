@@ -389,14 +389,14 @@ static int handle_contactgroup_macro(nagios_macros* mac,
 
   // Use the saved contactgroup pointer.
   // or find the contactgroup for on-demand macros.
-  contactgroup* cg{nullptr};
+  std::shared_ptr<com::centreon::engine::contactgroup> cg{nullptr};
   contactgroup_map::iterator cg_it{contactgroup::contactgroups.find(arg1)};
   if (cg_it == contactgroup::contactgroups.end() || !cg_it->second)
-    cg = mac->contactgroup_ptr;
-
-  if (!cg)
     retval = ERROR;
-  else {
+  else
+    cg = cg_it->second;
+
+  if (cg) {
     // Get the contactgroup macro value.
     retval = grab_standard_contactgroup_macro(macro_type, cg, output);
     if (OK == retval)
@@ -655,19 +655,26 @@ static int handle_summary_macro(nagios_macros* mac,
     mac->x[MACRO_TOTALHOSTSUP] = std::to_string(hosts_up);
     mac->x[MACRO_TOTALHOSTSDOWN] = std::to_string(hosts_down);
     mac->x[MACRO_TOTALHOSTSUNREACHABLE] = std::to_string(hosts_unreachable);
-    mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED] = std::to_string(hosts_down_unhandled);
-    mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED] = std::to_string(hosts_unreachable_unhandled);
+    mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED] =
+        std::to_string(hosts_down_unhandled);
+    mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED] =
+        std::to_string(hosts_unreachable_unhandled);
     mac->x[MACRO_TOTALHOSTPROBLEMS] = std::to_string(host_problems);
-    mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED] = std::to_string(host_problems_unhandled);
+    mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED] =
+        std::to_string(host_problems_unhandled);
     mac->x[MACRO_TOTALSERVICESOK] = std::to_string(services_ok);
     mac->x[MACRO_TOTALSERVICESWARNING] = std::to_string(services_warning);
     mac->x[MACRO_TOTALSERVICESCRITICAL] = std::to_string(services_critical);
     mac->x[MACRO_TOTALSERVICESUNKNOWN] = std::to_string(services_unknown);
-    mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED] = std::to_string(services_warning_unhandled);
-    mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED] = std::to_string(services_critical_unhandled);
-    mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED] = std::to_string(services_unknown_unhandled);
+    mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED] =
+        std::to_string(services_warning_unhandled);
+    mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED] =
+        std::to_string(services_critical_unhandled);
+    mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED] =
+        std::to_string(services_unknown_unhandled);
     mac->x[MACRO_TOTALSERVICEPROBLEMS] = std::to_string(service_problems);
-    mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED] = std::to_string(service_problems_unhandled);
+    mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED] =
+        std::to_string(service_problems_unhandled);
   }
 
   // Return only the macro the user requested.
@@ -715,8 +722,6 @@ struct grab_value_redirection {
                                             MACRO_HOSTDOWNTIME,
                                             MACRO_HOSTSTATETYPE,
                                             MACRO_HOSTPERCENTCHANGE,
-                                            MACRO_HOSTACKAUTHOR,
-                                            MACRO_HOSTACKCOMMENT,
                                             MACRO_LASTHOSTUP,
                                             MACRO_LASTHOSTDOWN,
                                             MACRO_LASTHOSTUNREACHABLE,
@@ -732,8 +737,6 @@ struct grab_value_redirection {
                                             MACRO_HOSTEVENTID,
                                             MACRO_LASTHOSTEVENTID,
                                             MACRO_HOSTGROUPNAMES,
-                                            MACRO_HOSTACKAUTHORNAME,
-                                            MACRO_HOSTACKAUTHORALIAS,
                                             MACRO_MAXHOSTATTEMPTS,
                                             MACRO_TOTALHOSTSERVICES,
                                             MACRO_TOTALHOSTSERVICESOK,
@@ -776,8 +779,6 @@ struct grab_value_redirection {
                                                MACRO_SERVICEDOWNTIME,
                                                MACRO_SERVICESTATETYPE,
                                                MACRO_SERVICEPERCENTCHANGE,
-                                               MACRO_SERVICEACKAUTHOR,
-                                               MACRO_SERVICEACKCOMMENT,
                                                MACRO_LASTSERVICEOK,
                                                MACRO_LASTSERVICEWARNING,
                                                MACRO_LASTSERVICEUNKNOWN,
@@ -794,8 +795,6 @@ struct grab_value_redirection {
                                                MACRO_SERVICEEVENTID,
                                                MACRO_LASTSERVICEEVENTID,
                                                MACRO_SERVICEGROUPNAMES,
-                                               MACRO_SERVICEACKAUTHORNAME,
-                                               MACRO_SERVICEACKAUTHORALIAS,
                                                MACRO_MAXSERVICEATTEMPTS,
                                                MACRO_SERVICEISVOLATILE,
                                                MACRO_SERVICEPROBLEMID,
@@ -852,16 +851,22 @@ struct grab_value_redirection {
       routines[datetime_ids[i]] = &handle_datetime_macro;
 
     // Static macros.
-    static unsigned int const static_ids[] = {
-        MACRO_ADMINEMAIL,        MACRO_ADMINPAGER,
-        MACRO_MAINCONFIGFILE,    MACRO_STATUSDATAFILE,
-        MACRO_RETENTIONDATAFILE, MACRO_OBJECTCACHEFILE,
-        MACRO_TEMPFILE,          MACRO_LOGFILE,
-        MACRO_RESOURCEFILE,      MACRO_COMMANDFILE,
-        MACRO_HOSTPERFDATAFILE,  MACRO_SERVICEPERFDATAFILE,
-        MACRO_PROCESSSTARTTIME,  MACRO_TEMPPATH,
-        MACRO_EVENTSTARTTIME,    MACRO_POLLERNAME,
-        MACRO_POLLERID};
+    static unsigned int const static_ids[] = {MACRO_ADMINEMAIL,
+                                              MACRO_ADMINPAGER,
+                                              MACRO_MAINCONFIGFILE,
+                                              MACRO_STATUSDATAFILE,
+                                              MACRO_RETENTIONDATAFILE,
+                                              MACRO_TEMPFILE,
+                                              MACRO_LOGFILE,
+                                              MACRO_RESOURCEFILE,
+                                              MACRO_COMMANDFILE,
+                                              MACRO_HOSTPERFDATAFILE,
+                                              MACRO_SERVICEPERFDATAFILE,
+                                              MACRO_PROCESSSTARTTIME,
+                                              MACRO_TEMPPATH,
+                                              MACRO_EVENTSTARTTIME,
+                                              MACRO_POLLERNAME,
+                                              MACRO_POLLERID};
     for (unsigned int i = 0; i < sizeof(static_ids) / sizeof(*static_ids); ++i)
       routines[static_ids[i]] = &handle_static_macro;
 
@@ -894,8 +899,6 @@ struct grab_value_redirection {
  *          Global Functions           *
  *                                     *
  **************************************/
-
-extern "C" {
 
 /* this is the big one */
 int grab_macro_value_r(nagios_macros* mac,
@@ -1132,5 +1135,4 @@ int grab_macrox_value_r(nagios_macros* mac,
     }
   }
   return retval;
-}
 }

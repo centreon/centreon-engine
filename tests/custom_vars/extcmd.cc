@@ -18,6 +18,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <com/centreon/engine/macros.hh>
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
@@ -33,14 +34,9 @@ using namespace com::centreon::engine::configuration;
 
 class CustomVar : public ::testing::Test {
  public:
-  void SetUp() override {
-    init_config_state();
-  }
+  void SetUp() override { init_config_state(); }
 
-  void TearDown() override {
-    deinit_config_state();
-  }
-
+  void TearDown() override { deinit_config_state(); }
 };
 
 // Given simple command (without connector) applier already applied with
@@ -53,9 +49,10 @@ TEST_F(CustomVar, UpdateHostCustomVar) {
   configuration::applier::contact cnt_aply;
 
   configuration::command cmd("base_centreon_ping");
-  cmd.parse("command_line", "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w $_HOSTWARNING$ -c $_HOSTCRITICAL$ $CONTACTNAME$");
+  cmd.parse("command_line",
+            "$USER1$/check_icmp -H $HOSTADDRESS$ -n $_HOSTPACKETNUMBER$ -w "
+            "$_HOSTWARNING$ -c $_HOSTCRITICAL$ $CONTACTNAME$");
   cmd_aply.add_object(cmd);
-
 
   configuration::contact cnt;
   ASSERT_TRUE(cnt.parse("contact_name", "user"));
@@ -88,13 +85,18 @@ TEST_F(CustomVar, UpdateHostCustomVar) {
   hst_aply.expand_objects(*config);
   hst_aply.resolve_object(hst);
   ASSERT_TRUE(hst_found->second->custom_variables.size() == 3);
-  nagios_macros macros;
-  grab_host_macros_r(&macros, hst_found->second.get());
-  std::string processed_cmd(hst_found->second->get_check_command_ptr()->process_cmd(&macros));
-  ASSERT_EQ(processed_cmd, "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50% user");
+  nagios_macros* macros(get_global_macros());
+  grab_host_macros_r(macros, hst_found->second.get());
+  std::string processed_cmd(
+      hst_found->second->get_check_command_ptr()->process_cmd(macros));
+  ASSERT_EQ(processed_cmd,
+            "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50% user");
 
-  cmd_change_object_custom_var(CMD_CHANGE_CUSTOM_HOST_VAR, "hst_test;PACKETNUMBER;44");
-  grab_host_macros_r(&macros, hst_found->second.get());
-  std::string processed_cmd2(hst_found->second->get_check_command_ptr()->process_cmd(&macros));
-  ASSERT_EQ(processed_cmd2, "/check_icmp -H 127.0.0.1 -n 44 -w 200,20% -c 400,50% user");
+  cmd_change_object_custom_var(CMD_CHANGE_CUSTOM_HOST_VAR,
+                               "hst_test;PACKETNUMBER;44");
+  grab_host_macros_r(macros, hst_found->second.get());
+  std::string processed_cmd2(
+      hst_found->second->get_check_command_ptr()->process_cmd(macros));
+  ASSERT_EQ(processed_cmd2,
+            "/check_icmp -H 127.0.0.1 -n 44 -w 200,20% -c 400,50% user");
 }

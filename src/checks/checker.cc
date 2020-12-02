@@ -423,10 +423,10 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
     return hst->get_current_state();
 
   // Get current host macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, hst);
+  nagios_macros* macros(get_global_macros());
+  grab_host_macros_r(macros, hst);
   std::string tmp;
-  get_raw_command_line_r(&macros, hst->get_check_command_ptr(),
+  get_raw_command_line_r(macros, hst->get_check_command_ptr(),
                          hst->get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
@@ -437,7 +437,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
 
   // Get command object.
   commands::command* cmd = hst->get_check_command_ptr();
-  std::string processed_cmd(cmd->process_cmd(&macros));
+  std::string processed_cmd(cmd->process_cmd(macros));
   const char* tmp_processed_cmd = processed_cmd.c_str();
 
   // Send broker event.
@@ -476,7 +476,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   // Run command.
   commands::result res;
   try {
-    cmd->run(processed_cmd, macros, config->host_check_timeout(), res);
+    cmd->run(processed_cmd, *macros, config->host_check_timeout(), res);
   } catch (std::exception const& e) {
     // Update check result.
     res.command_id = 0;
@@ -514,7 +514,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
 
   // Cleanup.
   delete[] output;
-  clear_volatile_macros_r(&macros);
+  clear_volatile_macros_r(macros);
 
   // If the command timed out.
   if (res.exit_status == process::timeout) {

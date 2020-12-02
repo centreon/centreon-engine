@@ -2063,7 +2063,7 @@ void service::check_for_flapping(bool update,
 
 /* handles changes in the state of a service */
 int service::handle_service_event() {
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   logger(dbg_functions, basic) << "handle_service_event()";
 
@@ -2084,16 +2084,16 @@ int service::handle_service_event() {
     return ERROR;
 
   /* update service macros */
-  grab_host_macros_r(&mac, get_host_ptr());
-  grab_service_macros_r(&mac, this);
+  grab_host_macros_r(mac, get_host_ptr());
+  grab_service_macros_r(mac, this);
 
   /* run the global service event handler */
-  run_global_service_event_handler(&mac, this);
+  run_global_service_event_handler(mac, this);
 
   /* run the event handler command if there is one */
   if (!get_event_handler().empty())
-    run_service_event_handler(&mac, this);
-  clear_volatile_macros_r(&mac);
+    run_service_event_handler(mac, this);
+  clear_volatile_macros_r(mac);
 
   /* send data to event broker */
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK, NEBFLAG_NONE,
@@ -2111,7 +2111,7 @@ int service::obsessive_compulsive_service_check_processor() {
   int early_timeout = false;
   double exectime = 0.0;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   logger(dbg_functions, basic)
       << "obsessive_compulsive_service_check_processor()";
@@ -2131,14 +2131,14 @@ int service::obsessive_compulsive_service_check_processor() {
     return ERROR;
 
   /* update service macros */
-  grab_host_macros_r(&mac, temp_host);
-  grab_service_macros_r(&mac, this);
+  grab_host_macros_r(mac, temp_host);
+  grab_service_macros_r(mac, this);
 
   /* get the raw command line */
-  get_raw_command_line_r(&mac, ocsp_command_ptr, config->ocsp_command().c_str(),
+  get_raw_command_line_r(mac, ocsp_command_ptr, config->ocsp_command().c_str(),
                          raw_command, macro_options);
   if (raw_command.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -2147,9 +2147,9 @@ int service::obsessive_compulsive_service_check_processor() {
                            << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(&mac, raw_command, processed_command, macro_options);
+  process_macros_r(mac, raw_command, processed_command, macro_options);
   if (processed_command.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -2160,7 +2160,7 @@ int service::obsessive_compulsive_service_check_processor() {
   /* run the command */
   try {
     std::string tmp;
-    my_system_r(&mac, processed_command, config->ocsp_timeout(), &early_timeout,
+    my_system_r(mac, processed_command, config->ocsp_timeout(), &early_timeout,
                 &exectime, tmp, 0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -2168,7 +2168,7 @@ int service::obsessive_compulsive_service_check_processor() {
         << processed_command << "' : " << e.what();
   }
 
-  clear_volatile_macros_r(&mac);
+  clear_volatile_macros_r(mac);
 
   /* check to see if the command timed out */
   if (early_timeout == true)
@@ -2353,11 +2353,11 @@ int service::run_async_check(int check_options,
   set_latency(latency);
 
   // Get current host and service macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, get_host_ptr());
-  grab_service_macros_r(&macros, this);
+  nagios_macros* macros(get_global_macros());
+  grab_host_macros_r(macros, get_host_ptr());
+  grab_service_macros_r(macros, this);
   std::string tmp;
-  get_raw_command_line_r(&macros, get_check_command_ptr(),
+  get_raw_command_line_r(macros, get_check_command_ptr(),
                          get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
@@ -2373,7 +2373,7 @@ int service::run_async_check(int check_options,
 
   // Get command object.
   commands::command* cmd = get_check_command_ptr();
-  std::string processed_cmd(cmd->process_cmd(&macros));
+  std::string processed_cmd(cmd->process_cmd(macros));
 
   // Send event broker.
   res =
@@ -2388,7 +2388,7 @@ int service::run_async_check(int check_options,
 
   // Service check was override by neb_module.
   if (NEBERROR_CALLBACKOVERRIDE == res) {
-    clear_volatile_macros_r(&macros);
+    clear_volatile_macros_r(macros);
     return OK;
   }
 
@@ -2410,7 +2410,7 @@ int service::run_async_check(int check_options,
     try {
       // Run command.
       uint64_t id =
-          cmd->run(processed_cmd, macros, config->service_check_timeout());
+          cmd->run(processed_cmd, *macros, config->service_check_timeout());
       if (id != 0)
         checks::checker::instance().add_check_result(
             id, check_result_info.release());
@@ -2436,7 +2436,7 @@ int service::run_async_check(int check_options,
   } while (retry);
 
   // Cleanup.
-  clear_volatile_macros_r(&macros);
+  clear_volatile_macros_r(macros);
   return OK;
 }
 

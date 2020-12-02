@@ -1,15 +1,11 @@
-##
-## Copyright 2016 Centreon
-##
+####Copyright 2016 Centreon##
 
-## This file is part of Centreon Engine.
-##
-## Centreon Engine is free software: you can redistribute it and/or
-## modify it under the terms of the GNU General Public License version 2
-## as published by the Free Software Foundation.
-##
-## Centreon Engine is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
+        ##This file is part of Centreon Engine.####Centreon Engine is free
+            software : you can redistribute it and /
+    or ##modify it under the terms of the GNU General Public License
+           version 2##as published by the Free Software Foundation.####Centreon
+               Engine is distributed in the hope that it will be useful,
+    ##but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
@@ -18,7 +14,7 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-# Enable unit tests or not.
+#Enable unit tests or not .
 option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
 
@@ -26,13 +22,13 @@ if (WITH_TESTING)
   include_directories(${gtest_INCLUDE_DIRS})
   link_directories(${gtest_LIB_DIRS})
 
-# Tests directory.
-  # Add root inclusion direction.
+#Tests directory.
+#Add root inclusion direction.
   set(MODULE_DIR "${PROJECT_SOURCE_DIR}/modules/external_commands")
   set(INC_DIR "${MODULE_DIR}/inc/com/centreon/engine/modules/external_commands")
   include_directories(${PROJECT_SOURCE_DIR} ${MODULE_DIR}/inc)
 
-  # Set directory.
+#Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
   include_directories(${PROJECT_SOURCE_DIR}/enginerpc)
   add_definitions(-DENGINERPC_TESTS_PATH="${TESTS_DIR}/enginerpc")
@@ -47,7 +43,7 @@ if (WITH_TESTING)
   target_link_libraries(bin_connector_test_run cce_core pthread)
 
   set(ut_sources
-    # Sources.
+#Sources.
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/commands.cc"
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/internal.cc"
     "${PROJECT_SOURCE_DIR}/modules/external_commands/src/processing.cc"
@@ -82,6 +78,8 @@ if (WITH_TESTING)
     "${TESTS_DIR}/enginerpc/enginerpc.cc"
     "${TESTS_DIR}/helper.cc"
     "${TESTS_DIR}/macros/macro.cc"
+    "${TESTS_DIR}/macros/macro_hostname.cc"
+    "${TESTS_DIR}/macros/macro_service.cc"
     "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/external_commands/anomalydetection.cc"
     "${TESTS_DIR}/external_commands/host.cc"
@@ -113,12 +111,12 @@ if (WITH_TESTING)
     "${TESTS_DIR}/timeperiod/get_next_valid_time/skip_interval.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/specific_month_date.cc"
     "${TESTS_DIR}/timeperiod/utils.cc"
-    # Headers.
+#Headers.
     "${TESTS_DIR}/test_engine.hh"
     "${TESTS_DIR}/timeperiod/utils.hh"
   )
 
-  # Unit test executable.
+#Unit test executable.
   include_directories(${TESTS_DIR})
 
   add_executable(ut ${ut_sources})

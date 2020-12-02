@@ -666,7 +666,8 @@ bool notifier::_is_notification_viable_custom(reason_type type
 std::unordered_set<contact*> notifier::get_contacts_to_notify(
     notification_category cat,
     reason_type type,
-    uint32_t& notification_interval, bool& escalated) {
+    uint32_t& notification_interval,
+    bool& escalated) {
   std::unordered_set<contact*> retval;
   escalated = false;
   uint32_t notif_interv{_notification_interval};
@@ -1076,8 +1077,8 @@ std::unordered_map<std::string, contact*>& notifier::get_contacts() noexcept {
   return _contacts;
 }
 
-std::unordered_map<std::string, contact*> const& notifier::get_contacts() const
-    noexcept {
+std::unordered_map<std::string, contact*> const& notifier::get_contacts()
+    const noexcept {
   return _contacts;
 }
 
