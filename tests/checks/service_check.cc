@@ -414,6 +414,183 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
   ASSERT_EQ(_svc->get_current_attempt(), 3);
 }
 
+/* The following test comes from this array (inherited from Nagios behaviour):
+ *
+ * | Time | Check # | State | State type | State change |
+ * ------------------------------------------------------
+ * | 0    | 1       | OK    | HARD       | No           |
+ * | 1    | 2       | OK    | HARD       | No           |
+ * | 2    | 3       | WARN  | HARD       | Yes          |
+ * | 3    | 4       | CRTCL | HARD       | Yes          |
+ * | 4    | 5       | CRTCL | HARD       | Yes          |
+ * | 5    | 6       | CRTCL | HARD       | Yes          |
+ * | 6    | 7       | CRTCL | HARD       | No           |
+ * | 7    | 8       | CRTCL | HARD       | No           |
+ * ------------------------------------------------------
+ */
+TEST_F(ServiceCheck, OkCriticalStalking) {
+  std::ostringstream oss;
+  set_time(55000);
+
+  time_t now = std::time(nullptr);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_state_change(55000);
+  _svc->set_current_attempt(2);
+  _svc->set_state_type(checkable::soft);
+  _svc->set_accept_passive_checks(true);
+  _svc->set_stalk_on(static_cast<uint32_t>(-1));
+
+  set_time(55500);
+  testing::internal::CaptureStdout();
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;RAID array "
+         "optimal";
+  std::string cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 1);
+
+  set_time(56000);
+  time_t previous = now;
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;RAID array "
+         "optimal";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_ok);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), previous);
+  ASSERT_EQ(_svc->get_current_attempt(), 1);
+
+  set_time(56500);
+  for (int i = 0; i < 3; i++) {
+    // When i == 0, the state_critical is soft => no notification
+    // When i == 1, the state_critical is soft => no notification
+    // When i == 2, the state_critical is hard down => notification
+    now = std::time(nullptr);
+    oss.str("");
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;RAID array "
+           "degraded (1 drive bad, 1 hot spare rebuilding)";
+    cmd = oss.str();
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_warning);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+
+  set_time(57000);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
+         "degraded (2 drives bad, 1 host spare online, 1 hot spare rebuilding)";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), now);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+
+  set_time(57500);
+  previous = now;
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
+         "degraded (3 drives bad, 2 hot spares online)";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), previous);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+
+  set_time(58000);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array failed";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), previous);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+
+  set_time(58500);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array failed";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), previous);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+
+  set_time(59000);
+
+  now = std::time(nullptr);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array failed";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  ASSERT_EQ(_svc->get_state_type(), checkable::hard);
+  ASSERT_EQ(_svc->get_current_state(), engine::service::state_critical);
+  ASSERT_EQ(_svc->get_last_hard_state_change(), previous);
+  ASSERT_EQ(_svc->get_current_attempt(), 3);
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  ASSERT_NE(
+      out.find(
+          "SERVICE ALERT: test_host;test_svc;OK;HARD;1;RAID array optimal"),
+      std::string::npos);
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;WARNING;HARD;3;RAID "
+                     "array degraded (1 drive bad, 1 hot spare rebuilding)"),
+            std::string::npos);
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
+                     "array degraded (2 drives bad, 1 host spare online, 1 hot "
+                     "spare rebuilding)"),
+            std::string::npos);
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
+                     "array degraded (3 drives bad, 2 hot spares online"),
+            std::string::npos);
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
+                     "array failed"),
+            std::string::npos);
+}
+
 TEST_F(ServiceCheck, CheckRemoveCheck) {
   set_time(50000);
   _svc->set_current_state(engine::service::state_ok);

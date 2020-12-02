@@ -60,6 +60,7 @@ notification::notification(notifier* parent,
  * @return OK on success, ERROR otherwise.
  */
 int notification::execute(std::unordered_set<contact*> const& to_notify) {
+
   uint32_t contacts_notified{0};
 
   struct timeval start_time;
