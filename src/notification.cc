@@ -52,9 +52,12 @@ notification::notification(notifier* parent,
       _notified_contact{notified_contacts} {}
 
 /**
- *  @brief Execute the notification on each contact in to_notify.
+ * @brief Execute the notification, that is to say, for each contact to
+ * notify, the notification is sent to him.
  *
- *  @return OK if at least one notification is sent, and ERROR otherwise.
+ * @param to_notify the set of contact to notify.
+ *
+ * @return OK on success, ERROR otherwise.
  */
 int notification::execute(std::unordered_set<contact*> const& to_notify) {
 
@@ -79,10 +82,10 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
     return OK;
   }
 
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   /* Grab the macro variables */
-  _parent->grab_macros_r(&mac);
+  _parent->grab_macros_r(mac);
 
   contact* author{nullptr};
   contact_map::const_iterator it{contact::contacts.find(_author)};
@@ -100,89 +103,100 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
   }
 
   /* Get author and comment macros */
-  mac.x[MACRO_NOTIFICATIONAUTHOR] = _author;
-  mac.x[MACRO_NOTIFICATIONCOMMENT] = _message;
+  mac->x[MACRO_NOTIFICATIONAUTHOR] = _author;
+  mac->x[MACRO_NOTIFICATIONCOMMENT] = _message;
   if (author) {
-    mac.x[MACRO_NOTIFICATIONAUTHORNAME] = author->get_name();
-    mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = author->get_alias();
+    mac->x[MACRO_NOTIFICATIONAUTHORNAME] = author->get_name();
+    mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = author->get_alias();
   } else {
-    mac.x[MACRO_NOTIFICATIONAUTHORNAME] = "";
-    mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = "";
+    mac->x[MACRO_NOTIFICATIONAUTHORNAME] = "";
+    mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = "";
   }
 
   /* set the notification type macro */
   switch (_type) {
     case notifier::reason_acknowledgement:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "ACKNOWLEDGEMENT";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "ACKNOWLEDGEMENT";
       break;
     case notifier::reason_flappingstart:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTART";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTART";
       break;
     case notifier::reason_flappingstop:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTOP";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGSTOP";
       break;
     case notifier::reason_flappingdisabled:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGDISABLED";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "FLAPPINGDISABLED";
       break;
     case notifier::reason_downtimestart:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMESTART";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMESTART";
       break;
     case notifier::reason_downtimeend:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMEEND";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMEEND";
       break;
     case notifier::reason_downtimecancelled:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMECANCELLED";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "DOWNTIMECANCELLED";
       break;
     case notifier::reason_custom:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "CUSTOM";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "CUSTOM";
       break;
     case notifier::reason_recovery:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "RECOVERY";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "RECOVERY";
       break;
     default:
-      mac.x[MACRO_NOTIFICATIONTYPE] = "PROBLEM";
+      mac->x[MACRO_NOTIFICATIONTYPE] = "PROBLEM";
       break;
   }
 
   if (_parent->get_notifier_type() == notifier::host_notification) {
     /* set the notification number macro */
-    mac.x[MACRO_HOSTNOTIFICATIONNUMBER] = std::to_string(_number);
+    mac->x[MACRO_HOSTNOTIFICATIONNUMBER] = std::to_string(_number);
 
     /* The $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
      */
-    mac.x[MACRO_NOTIFICATIONNUMBER] = mac.x[MACRO_HOSTNOTIFICATIONNUMBER];
+    mac->x[MACRO_NOTIFICATIONNUMBER] = mac->x[MACRO_HOSTNOTIFICATIONNUMBER];
+    /* set the notification is escalated macro */
+    mac->x[MACRO_NOTIFICATIONISESCALATED] = std::to_string(_escalated);
 
     /* Set the notification id macro */
-    mac.x[MACRO_HOSTNOTIFICATIONID] = std::to_string(_id);
+    mac->x[MACRO_HOSTNOTIFICATIONID] = std::to_string(_id);
   } else {
     /* set the notification number macro */
-    mac.x[MACRO_SERVICENOTIFICATIONNUMBER] = std::to_string(_number);
+    mac->x[MACRO_SERVICENOTIFICATIONNUMBER] = std::to_string(_number);
 
     /* The $NOTIFICATIONNUMBER$ macro is maintained for backward compatibility
      */
-    mac.x[MACRO_NOTIFICATIONNUMBER] = mac.x[MACRO_SERVICENOTIFICATIONNUMBER];
+    mac->x[MACRO_NOTIFICATIONNUMBER] = mac->x[MACRO_SERVICENOTIFICATIONNUMBER];
+
+    /* set the notification is escalated macro */
+    mac->x[MACRO_NOTIFICATIONISESCALATED] = std::to_string(_escalated);
 
     /* Set the notification id macro */
-    mac.x[MACRO_SERVICENOTIFICATIONID] = std::to_string(_id);
+    mac->x[MACRO_SERVICENOTIFICATIONID] = std::to_string(_id);
   }
 
   for (contact* ctc : to_notify) {
     /* grab the macro variables for this contact */
-    grab_contact_macros_r(&mac, ctc);
+    grab_contact_macros_r(mac, ctc);
 
     /* clear summary macros (they are customized for each contact) */
-    clear_summary_macros_r(&mac);
+    clear_summary_macros_r(mac);
 
     /* check viability of notifying the user */
     notifier::notification_category cat{notifier::get_category(_type)};
     if (ctc->should_be_notified(cat, _type, *_parent)) {
       /* notify this contact */
-      if (_parent->notify_contact(&mac, ctc, _type, _author.c_str(),
+      if (_parent->notify_contact(mac, ctc, _type, _author.c_str(),
                                   _message.c_str(), _options,
                                   _escalated) == OK) {
         /* keep track of how many contacts were notified */
         contacts_notified++;
         _notified_contact.insert(ctc->get_name());
+        if (mac->x[MACRO_NOTIFICATIONRECIPIENTS].empty())
+          mac->x[MACRO_NOTIFICATIONRECIPIENTS] = ctc->get_name();
+        else {
+          mac->x[MACRO_NOTIFICATIONRECIPIENTS].append(",");
+          mac->x[MACRO_NOTIFICATIONRECIPIENTS].append(ctc->get_name());
+        }
       }
     }
   }

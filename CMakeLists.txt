@@ -46,20 +46,19 @@ include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 set(protobuf_MODULE_COMPATIBLE True)
 find_package(protobuf REQUIRED)
 find_package(protoc_installer REQUIRED)
-find_package(grpc REQUIRED)
-find_package(OpenSSL REQUIRED)
+find_package(gRPC REQUIRED)
 find_package(c-ares REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(json11 REQUIRED)
 find_package(fmt REQUIRED)
 
-include_directories(${grpc_INCLUDE_DIRS})
+include_directories(${gRPC_INCLUDE_DIRS})
 include_directories(${protobuf_INCLUDE_DIRS})
 include_directories(${json11_INCLUDE_DIRS})
 include_directories(${fmt_INCLUDE_DIRS})
 
 link_directories(${protobuf_LIB_DIRS})
-link_directories(${grpc_LIB_DIRS})
+link_directories(${gRPC_LIB_DIRS})
 link_directories(${OpenSSL_LIB_DIRS})
 link_directories(${c-ares_LIB_DIRS})
 link_directories(${ZLIB_LIB_DIRS})
@@ -634,7 +633,7 @@ set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
-target_link_libraries(centengine ${CLIB_LIBRARIES} "-Wl,-whole-archive"  grpc++_reflection enginerpc cce_core  "-Wl,-no-whole-archive" ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
+target_link_libraries(centengine ${CLIB_LIBRARIES} "-Wl,-whole-archive"  grpc++_reflection enginerpc cce_core  "-Wl,-no-whole-archive" ${gRPC_LIBS} ${absl_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")

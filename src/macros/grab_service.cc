@@ -350,23 +350,8 @@ struct grab_service_redirection {
        {&get_recursive<service, checkable, &checkable::get_notes, 0>, true}},
       // Group names.
       {MACRO_SERVICEGROUPNAMES, {&get_service_group_names, true}},
-      // Acknowledgement author.
-      {MACRO_SERVICEACKAUTHOR,
-       {&get_macro_copy<service, MACRO_SERVICEACKAUTHOR>, true}},
-      // Acknowledgement author name.
-      {MACRO_SERVICEACKAUTHORNAME,
-       {&get_macro_copy<service, MACRO_SERVICEACKAUTHORNAME>, true}},
-      // Acknowledgement author alias.
-      {MACRO_SERVICEACKAUTHORALIAS,
-       {&get_macro_copy<service, MACRO_SERVICEACKAUTHORALIAS>, true}},
-      // Acknowledgement comment.
-      {MACRO_SERVICEACKCOMMENT,
-       {&get_macro_copy<service, MACRO_SERVICEACKCOMMENT>, true}},
       // Service id.
       {MACRO_SERVICEID, {&get_service_id, true}},
-      // Acknowledgement comment.
-      {MACRO_SERVICEACKCOMMENT,
-       {&get_macro_copy<service, MACRO_SERVICEACKCOMMENT>, true}},
       // Acknowledgement comment.
       {MACRO_SERVICETIMEZONE, {&get_service_macro_timezone, true}}};
 } static const redirector;
@@ -377,7 +362,6 @@ struct grab_service_redirection {
  *                                     *
  **************************************/
 
-extern "C" {
 /**
  *  Grab a standard service macro.
  *
@@ -455,5 +439,4 @@ int grab_service_macros_r(nagios_macros* mac,
     mac->contactgroup_ptr = svc->get_contactgroups().begin()->second;
 
   return OK;
-}
 }

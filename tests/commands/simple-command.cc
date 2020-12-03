@@ -18,6 +18,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <com/centreon/engine/macros.hh>
 #include <memory>
 #include <mutex>
 #include "../timeperiod/utils.hh"
@@ -35,9 +36,7 @@ class SimpleCommand : public ::testing::Test {
     init_config_state();
   }
 
-  void TearDown() override {
-    deinit_config_state();
-  }
+  void TearDown() override { deinit_config_state(); }
 };
 
 class my_listener : public commands::command_listener {
@@ -88,11 +87,11 @@ TEST_F(SimpleCommand, CommandAlreadyExisting) {
 TEST_F(SimpleCommand, NewCommandSync) {
   std::unique_ptr<commands::command> cmd{
       new commands::raw("test", "/bin/echo bonjour")};
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
   commands::result res;
-  std::string cc(cmd->process_cmd(&mac));
+  std::string cc(cmd->process_cmd(mac));
   ASSERT_EQ(cc, "/bin/echo bonjour");
-  cmd->run(cc, mac, 2, res);
+  cmd->run(cc, *mac, 2, res);
   ASSERT_EQ(res.output, "bonjour\n");
 }
 
@@ -106,10 +105,10 @@ TEST_F(SimpleCommand, NewCommandAsync) {
   std::unique_ptr<commands::command> cmd{
       new commands::raw("test", "/bin/echo bonjour")};
   cmd->set_listener(lstnr.get());
-  nagios_macros mac;
-  std::string cc(cmd->process_cmd(&mac));
+  nagios_macros* mac(get_global_macros());
+  std::string cc(cmd->process_cmd(mac));
   ASSERT_EQ(cc, "/bin/echo bonjour");
-  cmd->run(cc, mac, 2);
+  cmd->run(cc, *mac, 2);
   int timeout{0};
   int max_timeout{3000};
   while (timeout < max_timeout && lstnr->get_result().output == "") {
@@ -125,14 +124,14 @@ TEST_F(SimpleCommand, LongCommandAsync) {
   std::unique_ptr<commands::command> cmd{
       new commands::raw("test", "/bin/sleep 10")};
   cmd->set_listener(lstnr.get());
-  nagios_macros mac;
-  std::string cc(cmd->process_cmd(&mac));
+  nagios_macros* mac(get_global_macros());
+  std::string cc(cmd->process_cmd(mac));
   ASSERT_EQ(cc, "/bin/sleep 10");
 
   // We force the time to be coherent with now because the function gettimeofday
   // that is not simulated.
   set_time(std::time(nullptr));
-  cmd->run(cc, mac, 2);
+  cmd->run(cc, *mac, 2);
   int timeout{0};
   int max_timeout{15};
   while (timeout < max_timeout && lstnr->get_result().output == "") {

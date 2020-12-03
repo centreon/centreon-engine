@@ -17,6 +17,7 @@
  *
  */
 #include <gtest/gtest.h>
+#include <com/centreon/engine/macros.hh>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -36,13 +37,9 @@ using namespace com::centreon::engine::configuration::applier;
 
 class ApplierCommand : public ::testing::Test {
  public:
-  void SetUp() override {
-    init_config_state();
-  }
+  void SetUp() override { init_config_state(); }
 
-  void TearDown() override {
-    deinit_config_state();
-  }
+  void TearDown() override { deinit_config_state(); }
 };
 
 // Given a command applier
@@ -261,10 +258,10 @@ TEST_F(ApplierCommand, ComplexCommand) {
   hst_aply.expand_objects(*config);
   hst_aply.resolve_object(hst);
   ASSERT_TRUE(hst_found->second->custom_variables.size() == 3);
-  nagios_macros macros;
-  grab_host_macros_r(&macros, hst_found->second.get());
+  nagios_macros* macros(get_global_macros());
+  grab_host_macros_r(macros, hst_found->second.get());
   std::string processed_cmd(
-      hst_found->second->get_check_command_ptr()->process_cmd(&macros));
+      hst_found->second->get_check_command_ptr()->process_cmd(macros));
   ASSERT_EQ(processed_cmd,
             "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50%");
 }
@@ -315,10 +312,10 @@ TEST_F(ApplierCommand, ComplexCommandWithContact) {
   hst_aply.expand_objects(*config);
   hst_aply.resolve_object(hst);
   ASSERT_TRUE(hst_found->second->custom_variables.size() == 3);
-  nagios_macros macros;
-  grab_host_macros_r(&macros, hst_found->second.get());
+  nagios_macros* macros(get_global_macros());
+  grab_host_macros_r(macros, hst_found->second.get());
   std::string processed_cmd(
-      hst_found->second->get_check_command_ptr()->process_cmd(&macros));
+      hst_found->second->get_check_command_ptr()->process_cmd(macros));
   ASSERT_EQ(processed_cmd,
             "/check_icmp -H 127.0.0.1 -n 42 -w 200,20% -c 400,50% user");
 }
