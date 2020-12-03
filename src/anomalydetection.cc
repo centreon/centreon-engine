@@ -534,11 +534,11 @@ int anomalydetection::run_async_check(int check_options,
   set_latency(latency);
 
   // Get current host and service macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, get_host_ptr());
-  grab_service_macros_r(&macros, this);
+  nagios_macros* macros(get_global_macros());
+  grab_host_macros_r(macros, get_host_ptr());
+  grab_service_macros_r(macros, this);
   std::string tmp;
-  get_raw_command_line_r(&macros, get_check_command_ptr(),
+  get_raw_command_line_r(macros, get_check_command_ptr(),
                          get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
@@ -568,7 +568,7 @@ int anomalydetection::run_async_check(int check_options,
 
   // Service check was override by neb_module.
   if (NEBERROR_CALLBACKOVERRIDE == res) {
-    clear_volatile_macros_r(&macros);
+    clear_volatile_macros_r(macros);
     return OK;
   }
 
@@ -643,7 +643,7 @@ int anomalydetection::run_async_check(int check_options,
       check_result_info.release());
 
   // Cleanup.
-  clear_volatile_macros_r(&macros);
+  clear_volatile_macros_r(macros);
 
   return OK;
 }

@@ -39,7 +39,7 @@ class notification {
   uint32_t _options;
   uint64_t _id;
   uint32_t _number;
-  bool _escalated;
+  const bool _escalated;
   uint32_t _interval;
   std::set<std::string> _notified_contact;
 

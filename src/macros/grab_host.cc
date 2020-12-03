@@ -175,8 +175,8 @@ static std::string get_host_parents(host& hst, nagios_macros* mac) {
        end(hst.parent_hosts.end());
        it != end; it++) {
     if (!retval.empty())
-      retval.append(it->first);
-    retval.append(",");
+      retval.append(",");
+    retval.append(it->first);
   }
   return retval;
 }
@@ -196,8 +196,8 @@ static std::string get_host_children(host& hst, nagios_macros* mac) {
        end(hst.child_hosts.end());
        it != end; it++) {
     if (!retval.empty())
-      retval.append(it->first);
-    retval.append(",");
+      retval.append(",");
+    retval.append(it->first);
   }
   return retval;
 }
@@ -400,13 +400,6 @@ struct grab_host_redirection {
        {&get_host_total_services<MACRO_TOTALHOSTSERVICESUNKNOWN>, true}},
       {MACRO_TOTALHOSTSERVICESCRITICAL,
        {&get_host_total_services<MACRO_TOTALHOSTSERVICESCRITICAL>, true}},
-      {MACRO_HOSTACKAUTHOR, {&get_macro_copy<host, MACRO_HOSTACKAUTHOR>, true}},
-      {MACRO_HOSTACKAUTHORNAME,
-       {&get_macro_copy<host, MACRO_HOSTACKAUTHORNAME>, true}},
-      {MACRO_HOSTACKAUTHORALIAS,
-       {&get_macro_copy<host, MACRO_HOSTACKAUTHORALIAS>, true}},
-      {MACRO_HOSTACKCOMMENT,
-       {&get_macro_copy<host, MACRO_HOSTACKCOMMENT>, true}},
       {MACRO_HOSTPARENTS, {&get_host_parents, true}},
       {MACRO_HOSTCHILDREN, {&get_host_children, true}},
       {MACRO_HOSTID, {&get_host_id, true}},

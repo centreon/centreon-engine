@@ -47,7 +47,7 @@ int obsessive_compulsive_host_check_processor(
   int early_timeout = false;
   double exectime = 0.0;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   logger(dbg_functions, basic) << "obsessive_compulsive_host_check_processor()";
 
@@ -65,13 +65,13 @@ int obsessive_compulsive_host_check_processor(
     return ERROR;
 
   /* update macros */
-  grab_host_macros_r(&mac, hst);
+  grab_host_macros_r(mac, hst);
 
   /* get the raw command line */
-  get_raw_command_line_r(&mac, ochp_command_ptr, config->ochp_command().c_str(),
+  get_raw_command_line_r(mac, ochp_command_ptr, config->ochp_command().c_str(),
                          raw_command, macro_options);
   if (raw_command.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -80,9 +80,9 @@ int obsessive_compulsive_host_check_processor(
       << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(&mac, raw_command, processed_command, macro_options);
+  process_macros_r(mac, raw_command, processed_command, macro_options);
   if (processed_command.empty()) {
-    clear_volatile_macros_r(&mac);
+    clear_volatile_macros_r(mac);
     return ERROR;
   }
 
@@ -93,14 +93,14 @@ int obsessive_compulsive_host_check_processor(
   /* run the command */
   try {
     std::string tmp;
-    my_system_r(&mac, processed_command, config->ochp_timeout(), &early_timeout,
+    my_system_r(mac, processed_command, config->ochp_timeout(), &early_timeout,
                 &exectime, tmp, 0);
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
         << "Error: can't execute compulsive host processor command line '"
         << processed_command << "' : " << e.what();
   }
-  clear_volatile_macros_r(&mac);
+  clear_volatile_macros_r(mac);
 
   /* check to see if the command timed out */
   if (early_timeout == true)
@@ -351,7 +351,7 @@ int run_service_event_handler(nagios_macros* mac,
 
 /* handles a change in the status of a host */
 int handle_host_event(com::centreon::engine::host* hst) {
-  nagios_macros mac;
+  nagios_macros* mac(get_global_macros());
 
   logger(dbg_functions, basic) << "handle_host_event()";
 
@@ -371,14 +371,14 @@ int handle_host_event(com::centreon::engine::host* hst) {
     return OK;
 
   /* update host macros */
-  grab_host_macros_r(&mac, hst);
+  grab_host_macros_r(mac, hst);
 
   /* run the global host event handler */
-  run_global_host_event_handler(&mac, hst);
+  run_global_host_event_handler(mac, hst);
 
   /* run the event handler command if there is one */
   if (!hst->get_event_handler().empty())
-    run_host_event_handler(&mac, hst);
+    run_host_event_handler(mac, hst);
 
   /* send data to event broker */
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK, NEBFLAG_NONE,
