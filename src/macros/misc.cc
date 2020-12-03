@@ -24,14 +24,11 @@
 // Scoped to this file to prevent (unintentional) mischief.
 static nagios_macros global_macros;
 
-extern "C" {
-
 /**
  *  Get global macros.
  *
  *  @return Global macro object.
  */
 nagios_macros* get_global_macros() {
-  return (&global_macros);
-}
+  return &global_macros;
 }

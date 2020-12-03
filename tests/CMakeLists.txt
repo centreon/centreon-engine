@@ -4,7 +4,7 @@
 
 ## This file is part of Centreon Engine.
 ##
-## Centreon Engine is free software: you can redistribute it and/or
+## Centreon Engine is free software : you can redistribute it and / or 
 ## modify it under the terms of the GNU General Public License version 2
 ## as published by the Free Software Foundation.
 ##
@@ -18,7 +18,7 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-# Enable unit tests or not.
+# Enable unit tests or not .
 option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
 
@@ -32,7 +32,7 @@ if (WITH_TESTING)
   set(INC_DIR "${MODULE_DIR}/inc/com/centreon/engine/modules/external_commands")
   include_directories(${PROJECT_SOURCE_DIR} ${MODULE_DIR}/inc)
 
-  # Set directory.
+#Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
   include_directories(${PROJECT_SOURCE_DIR}/enginerpc)
   add_definitions(-DENGINERPC_TESTS_PATH="${TESTS_DIR}/enginerpc")
@@ -40,7 +40,7 @@ if (WITH_TESTING)
   add_executable(rpc_client
       ${TESTS_DIR}/enginerpc/client.cc)
 
-  target_link_libraries(rpc_client cerpc ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
+  target_link_libraries(rpc_client cerpc ${gRPC_LIBS} ${absl_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
 
   add_executable("bin_connector_test_run"
       "${TESTS_DIR}/commands/bin_connector_test_run.cc")
@@ -82,6 +82,8 @@ if (WITH_TESTING)
     "${TESTS_DIR}/enginerpc/enginerpc.cc"
     "${TESTS_DIR}/helper.cc"
     "${TESTS_DIR}/macros/macro.cc"
+    "${TESTS_DIR}/macros/macro_hostname.cc"
+    "${TESTS_DIR}/macros/macro_service.cc"
     "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/external_commands/anomalydetection.cc"
     "${TESTS_DIR}/external_commands/host.cc"
@@ -134,6 +136,6 @@ if (WITH_TESTING)
     )
     set(GCOV gcov)
   endif ()
-  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV} ${gtest_LIBS} ${grpc_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} ${fmt_LIBS} dl)
+  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV} ${gtest_LIBS} ${gRPC_LIBS} ${absl_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} ${fmt_LIBS} dl)
 
 endif ()

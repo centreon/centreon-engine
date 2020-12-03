@@ -652,34 +652,44 @@ bool notifier::_is_notification_viable_custom(reason_type type
   return true;
 }
 
+/**
+ * @brief Select contacts to notify. Also return the notification_interval and
+ * a boolean value escalated to know if an escalation is active.
+ *
+ * @param cat
+ * @param type
+ * @param[out] notification_interval
+ * @param[out] escalated
+ *
+ * @return A set of contacts to notify.
+ */
 std::unordered_set<contact*> notifier::get_contacts_to_notify(
     notification_category cat,
     reason_type type,
-    uint32_t& notification_interval) {
+    uint32_t& notification_interval,
+    bool& escalated) {
   std::unordered_set<contact*> retval;
-  bool escalated{false};
+  escalated = false;
   uint32_t notif_interv{_notification_interval};
 
   /* Let's start looking at escalations */
-  for (std::list<escalation*>::const_iterator it{_escalations.begin()},
-       end{_escalations.end()};
-       it != end; ++it) {
-    if ((*it)->is_viable(get_current_state_int(), _notification_number)) {
+  for (auto* e : _escalations) {
+    if (e->is_viable(get_current_state_int(), _notification_number)) {
       /* Among escalations, we choose the smallest notification interval. */
       if (escalated) {
-        if ((*it)->get_notification_interval() < notif_interv)
-          notif_interv = (*it)->get_notification_interval();
+        if (e->get_notification_interval() < notif_interv)
+          notif_interv = e->get_notification_interval();
       } else {
         /* Here is the first escalation, so we take its notification_interval.
          */
         escalated = true;
-        notif_interv = (*it)->get_notification_interval();
+        notif_interv = e->get_notification_interval();
       }
 
       /* For each contact group, we also add its contacts. */
       for (contactgroup_map_unsafe::const_iterator
-               cgit{(*it)->get_contactgroups().begin()},
-           cgend{(*it)->get_contactgroups().end()};
+               cgit{e->get_contactgroups().begin()},
+           cgend{e->get_contactgroups().end()};
            cgit != cgend; ++cgit) {
         for (contact_map_unsafe::const_iterator
                  cit{cgit->second->get_members().begin()},
@@ -717,7 +727,6 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
       }
     }
   }
-
   notification_interval = notif_interv;
   return retval;
 }
@@ -756,13 +765,14 @@ int notifier::notify(notifier::reason_type type,
 
   /* What are the contacts to notify? */
   uint32_t notification_interval;
+  bool escalated;
   std::unordered_set<contact*> to_notify{
-      get_contacts_to_notify(cat, type, notification_interval)};
+      get_contacts_to_notify(cat, type, notification_interval, escalated)};
 
   _current_notification_id = _next_notification_id++;
   std::shared_ptr<notification> notif{std::make_shared<notification>(
       this, type, not_author, not_data, options, _current_notification_id,
-      _notification_number, notification_interval)};
+      _notification_number, notification_interval, escalated)};
 
   /* Let's make the notification. */
   int retval{notif->execute(to_notify)};
@@ -1069,8 +1079,8 @@ std::unordered_map<std::string, contact*>& notifier::get_contacts() noexcept {
   return _contacts;
 }
 
-std::unordered_map<std::string, contact*> const& notifier::get_contacts() const
-    noexcept {
+std::unordered_map<std::string, contact*> const& notifier::get_contacts()
+    const noexcept {
   return _contacts;
 }
 

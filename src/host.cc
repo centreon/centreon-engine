@@ -1649,10 +1649,10 @@ int host::run_async_check(int check_options,
   set_latency(latency);
 
   // Get current host macros.
-  nagios_macros macros;
-  grab_host_macros_r(&macros, this);
+  nagios_macros* macros(get_global_macros());
+  grab_host_macros_r(macros, this);
   std::string tmp;
-  get_raw_command_line_r(&macros, get_check_command_ptr(),
+  get_raw_command_line_r(macros, get_check_command_ptr(),
                          get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
@@ -1671,7 +1671,7 @@ int host::run_async_check(int check_options,
 
   // Get command object.
   commands::command* cmd = get_check_command_ptr();
-  std::string processed_cmd(cmd->process_cmd(&macros));
+  std::string processed_cmd(cmd->process_cmd(macros));
 
   // Send event broker.
   broker_host_check(NEBTYPE_HOSTCHECK_INITIATE, NEBFLAG_NONE, NEBATTR_NONE,
@@ -1704,7 +1704,7 @@ int host::run_async_check(int check_options,
     try {
       // Run command.
       uint64_t id =
-          cmd->run(processed_cmd, macros, config->host_check_timeout());
+          cmd->run(processed_cmd, *macros, config->host_check_timeout());
       if (id != 0)
         checks::checker::instance().add_check_result(
             id, check_result_info.release());
@@ -1730,7 +1730,7 @@ int host::run_async_check(int check_options,
   } while (retry);
 
   // Cleanup.
-  clear_volatile_macros_r(&macros);
+  clear_volatile_macros_r(macros);
   return OK;
 }
 
