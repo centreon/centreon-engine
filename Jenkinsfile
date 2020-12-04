@@ -13,21 +13,7 @@ stage('Source') {
 
 try {
   stage('Unit tests') {
-    parallel 'centos6': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/3.4/mon-engine-unittest.sh centos6'
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
-    },
-    'centos7': {
+    parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
         sh './centreon-build/jobs/engine/3.4/mon-engine-unittest.sh centos7'
@@ -52,13 +38,7 @@ try {
   }
 
   stage('Package') {
-    parallel 'centos6': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/engine/3.4/mon-engine-package.sh centos6'
-      }
-    },
-    'centos7': {
+    parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
         sh './centreon-build/jobs/engine/3.4/mon-engine-package.sh centos7'
