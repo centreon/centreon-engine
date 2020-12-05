@@ -19,6 +19,9 @@ if [ -r /etc/centos-release ] ; then
     elif [ $maj = "centos7" ] ; then
       yum -y install epel-release cmake3
       cmake='cmake3'
+    else
+      dnf -y install cmake
+      cmake='cmake'
     fi
   fi
   if [[ ! -x /usr/bin/python3 ]] ; then
