@@ -37,6 +37,7 @@ if [ -r /etc/centos-release ] ; then
   fi
 
   pkgs=(
+    ninja-build
   )
   for i in "${pkgs[@]}"; do
     if ! rpm -q $i ; then
