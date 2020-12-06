@@ -17,7 +17,8 @@ if [ -r /etc/centos-release ] ; then
     if rpm -q cmake3 ; then
       cmake='cmake3'
     elif [ $maj = "centos7" ] ; then
-      yum -y install epel-release cmake3
+      yum -y install epel-release
+      yum -y install cmake3
       cmake='cmake3'
     else
       dnf -y install cmake
