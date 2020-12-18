@@ -20,7 +20,6 @@
 #include "com/centreon/engine/notifier.hh"
 
 #include <cassert>
-
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/common.hh"
@@ -329,7 +328,7 @@ bool notifier::_is_notification_viable_normal(reason_type type
               ? _notification_interval
               : _notification[cat_normal]->get_notification_interval();
 
-      if (notification_interval == 0) {
+      if (notification_interval == 0 && !config->use_time_period_notification()) {
         logger(dbg_notifications, more)
             << "This notifier problem has already been sent at "
             << _last_notification
@@ -384,6 +383,7 @@ bool notifier::_is_notification_viable_recovery(reason_type type
           << "This notifier shouldn't have notifications sent out "
              "at this time.";
       retval = false;
+      send_later = true;
     }
     /* if this notifier is currently in a scheduled downtime period, don't send
      * the notification */

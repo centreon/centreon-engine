@@ -95,6 +95,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/notifications/host_normal_notification.cc"
     "${TESTS_DIR}/notifications/host_recovery_notification.cc"
     "${TESTS_DIR}/notifications/service_normal_notification.cc"
+    "${TESTS_DIR}/notifications/service_timeperiod_notification.cc"
     "${TESTS_DIR}/notifications/service_flapping_notification.cc"
     "${TESTS_DIR}/perfdata/perfdata.cc"
     "${TESTS_DIR}/retention/host.cc"
