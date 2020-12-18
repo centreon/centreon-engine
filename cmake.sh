@@ -72,6 +72,8 @@ elif [ -r /etc/issue ] ; then
     fi
     pkgs=(
       gcc
+      g++
+      pkg-config
       ninja-build
       python3
       python3-pip
