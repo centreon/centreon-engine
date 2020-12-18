@@ -70,6 +70,11 @@ elif [ -r /etc/issue ] ; then
         exit 1
       fi
     fi
+  else
+    echo "Bad version of cmake..."
+    exit 1
+  fi
+  if [ $maj = "Debian" ] ; then
     pkgs=(
       gcc
       g++
@@ -88,9 +93,6 @@ elif [ -r /etc/issue ] ; then
         fi
       fi
     done
-  else
-    echo "Bad version of cmake..."
-    exit 1
   fi
 fi
 
