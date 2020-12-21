@@ -54,11 +54,17 @@ if [ -r /etc/centos-release ] ; then
   done
 elif [ -r /etc/issue ] ; then
   maj=$(cat /etc/issue | awk '{print $1}')
+  version=$(cat /etc/issue | awk '{print $3}')
+  if [ $version = "9" ] ; then
+    dpkg='dpkg'
+  else
+    dpkg='dpkg --no-pager'
+  fi
   v=$(cmake --version)
   if [[ $v =~ "version 3" ]] ; then
     cmake='cmake'
   elif [ $maj = "Debian" ] ; then
-    if dpkg -l --no-pager cmake ; then
+    if $dpkg -l cmake ; then
       echo "Bad version of cmake..."
       exit 1
     else
@@ -70,14 +76,21 @@ elif [ -r /etc/issue ] ; then
         exit 1
       fi
     fi
+  else
+    echo "Bad version of cmake..."
+    exit 1
+  fi
+  if [ $maj = "Debian" ] ; then
     pkgs=(
       gcc
+      g++
+      pkg-config
       ninja-build
       python3
       python3-pip
     )
     for i in "${pkgs[@]}"; do
-      if ! dpkg -l --no-pager $i | grep "^ii" ; then
+      if ! $dpkg -l $i | grep "^ii" ; then
         if [ $my_id -eq 0 ] ; then
           apt install -y $i
         else
@@ -86,9 +99,6 @@ elif [ -r /etc/issue ] ; then
         fi
       fi
     done
-  else
-    echo "Bad version of cmake..."
-    exit 1
   fi
 fi
 
@@ -129,7 +139,7 @@ else
   $conan install .. --remote centreon -s compiler.libcxx=libstdc++
 fi
 
-CXXFLAGS="-Wall -Wextra" $cmake -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On $* -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
+CXXFLAGS="-Wall -Wextra" $cmake -DWITH_PREFIX=/usr -DWITH_CENTREON_CLIB_LIBRARY_DIR=/usr/lib64 -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On $* -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
 
 #CXX=/usr/bin/clang++ CC=/usr/bin/clang cmake -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On .
 
