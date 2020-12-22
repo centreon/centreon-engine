@@ -58,7 +58,7 @@ class ServiceTimePeriodNotification : public TestEngine {
  public:
   void SetUp() override {
     init_config_state();
-    
+
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
@@ -68,7 +68,6 @@ class ServiceTimePeriodNotification : public TestEngine {
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
     ct_aply.resolve_object(ctct1);
-    
 
     configuration::host hst{new_configuration_host("test_host", "admin")};
     configuration::applier::host hst_aply;
@@ -97,8 +96,7 @@ class ServiceTimePeriodNotification : public TestEngine {
     _svc->set_notify_on(static_cast<uint32_t>(-1));
 
     _tp = _creator.new_timeperiod();
-    for (int i(0); i < 7; ++i)
-      _creator.new_timerange(0, 0, 24, 0, i);
+    for (int i(0); i < 7; ++i) _creator.new_timerange(0, 0, 24, 0, i);
     _now = strtotimet("2016-11-24 08:00:00");
     set_time(_now);
   }
@@ -115,9 +113,7 @@ class ServiceTimePeriodNotification : public TestEngine {
   com::centreon::engine::timeperiod* _tp;
   timeperiod_creator _creator;
   time_t _now;
-  
 };
-
 
 // Given a service with a notification interval = 2, a
 // first_delay_notification = 0, an escalation from 2 to 12 with a contactgroup
@@ -131,7 +127,7 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
       new engine::timeperiod("tperiod", "alias")};
   int now{20000};
   set_time(now);
-  
+
   configuration::applier::contact ct_aply;
   configuration::contact ctct{new_configuration_contact("test_contact", false)};
   ct_aply.add_object(ctct);
@@ -152,15 +148,13 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
   se_aply.expand_objects(*config);
   se_aply.resolve_object(se);
 
-  //uint64_t id{_svc->get_next_notification_id()};
-  for (int i = 0; i < 7; ++i){
+  // uint64_t id{_svc->get_next_notification_id()};
+  for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
     list_time.push_back(std::make_shared<engine::timerange>(15000, 38000));
     list_time.push_back(std::make_shared<engine::timerange>(65000, 85000));
-    tperiod->days[i]=list_time;
+    tperiod->days[i] = list_time;
   }
-  
-
 
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_notification_interval(1);
@@ -174,10 +168,6 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
   _svc->set_accept_passive_checks(true);
   _svc->set_notification_period_ptr(tperiod.get());
   nagios_macros* mac(get_global_macros());
-std::string outNOTIFICATIONTYPE;
-    std::string outNOTIFICATIONNUMBER;
-    std::string outNOTIFICATIONISESCALATED;
-    std::string outSERVICENOTIFICATIONNUMBER;
 
   testing::internal::CaptureStdout();
   for (int i = 0; i < 12; i++) {
@@ -217,32 +207,34 @@ std::string outNOTIFICATIONTYPE;
   oss.str("");
   oss << '[' << now << ']'
       << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd=oss.str();
+  cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
   std::string out{testing::internal::GetCapturedStdout()};
   std::cout << out << std::endl;
   size_t step1{out.find("NOW = 32000")};
-  size_t step2{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
-               step1 + 1)};
+  size_t step2{out.find(
+      "SERVICE NOTIFICATION: "
+      "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      step1 + 1)};
   size_t step3{out.find("NOW = 70000", step2 + 1)};
-  size_t step4{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY (OK);cmd;service ok",
-               step3 + 1)};
+  size_t step4{out.find(
+      "SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      step3 + 1)};
   ASSERT_NE(step4, std::string::npos);
 }
 
 TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
-  config->use_time_period_notification(true);
-  
+  config->postpone_notification_to_timeperiod(true);
+
   init_macros();
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   int now{20000};
   set_time(now);
-  
+
   configuration::applier::contact ct_aply;
   configuration::contact ctct{new_configuration_contact("test_contact", false)};
   ct_aply.add_object(ctct);
@@ -259,18 +251,15 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
   configuration::applier::serviceescalation se_aply;
   configuration::serviceescalation se{
       new_configuration_serviceescalation("test_host", "test_svc", "test_cg")};
+  se.notification_interval(0);
   se_aply.add_object(se);
   se_aply.expand_objects(*config);
   se_aply.resolve_object(se);
-  config->use_time_period_notification(true);
-  //uint64_t id{_svc->get_next_notification_id()};
-  for (int i = 0; i < 7; ++i){
+  for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
     list_time.push_back(std::make_shared<engine::timerange>(35000, 85000));
-    tperiod->days[i]=list_time;
+    tperiod->days[i] = list_time;
   }
-  
-
 
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_notification_interval(0);
@@ -282,16 +271,11 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
   _svc->set_last_hard_state_change(now);
   _svc->set_state_type(checkable::hard);
   _svc->set_accept_passive_checks(true);
-_svc->set_notification_period_ptr(tperiod.get());
+  _svc->set_notification_period_ptr(tperiod.get());
   nagios_macros* mac(get_global_macros());
-std::string outNOTIFICATIONTYPE;
-    std::string outNOTIFICATIONNUMBER;
-    std::string outNOTIFICATIONISESCALATED;
-    std::string outSERVICENOTIFICATIONNUMBER;
 
   testing::internal::CaptureStdout();
 
-  std::cout<<"use timeperiod "<<config->use_time_period_notification()<<std::endl;
   for (int i = 0; i < 12; i++) {
     // When i == 0, the state_critical is soft => no notification
     // When i == 1, the state_critical is soft => no notification
@@ -329,21 +313,30 @@ std::string outNOTIFICATIONTYPE;
   oss.str("");
   oss << '[' << now << ']'
       << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd=oss.str();
+  cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
   std::string out{testing::internal::GetCapturedStdout()};
   std::cout << out << std::endl;
-  size_t step1{out.find("NOW = 32000")};
-  size_t step2{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
-               step1 + 1)};
+  size_t step1{out.find("NOW = 35000")};
+  size_t step2{out.find(
+      "SERVICE NOTIFICATION: "
+      "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      step1 + 1)};
   size_t step3{out.find("NOW = 59000", step2 + 1)};
-  size_t step4{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY (OK);cmd;service ok",
-               step3 + 1)};
+  size_t step4{out.find(
+      "SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      step3 + 1)};
   ASSERT_NE(step4, std::string::npos);
+
+  size_t step5{out.find("NOW = 44000")};
+  size_t step6{out.find(
+      "SERVICE NOTIFICATION: "
+      "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      step5 + 1)};
+  ASSERT_EQ(step6, std::string::npos);
 }
 
 TEST_F(ServiceTimePeriodNotification, TimePeriodOut) {
@@ -352,7 +345,7 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodOut) {
       new engine::timeperiod("tperiod", "alias")};
   int now{20000};
   set_time(now);
-  
+
   configuration::applier::contact ct_aply;
   configuration::contact ctct{new_configuration_contact("test_contact", false)};
   ct_aply.add_object(ctct);
@@ -373,15 +366,13 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodOut) {
   se_aply.expand_objects(*config);
   se_aply.resolve_object(se);
 
-  //uint64_t id{_svc->get_next_notification_id()};
-  for (int i = 0; i < 7; ++i){
+  // uint64_t id{_svc->get_next_notification_id()};
+  for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
     list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
     list_time.push_back(std::make_shared<engine::timerange>(80000, 85000));
-    tperiod->days[i]=list_time;
+    tperiod->days[i] = list_time;
   }
-  
-
 
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_notification_interval(1);
@@ -393,12 +384,8 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodOut) {
   _svc->set_last_hard_state_change(now);
   _svc->set_state_type(checkable::hard);
   _svc->set_accept_passive_checks(true);
-_svc->set_notification_period_ptr(tperiod.get());
+  _svc->set_notification_period_ptr(tperiod.get());
   nagios_macros* mac(get_global_macros());
-std::string outNOTIFICATIONTYPE;
-    std::string outNOTIFICATIONNUMBER;
-    std::string outNOTIFICATIONISESCALATED;
-    std::string outSERVICENOTIFICATIONNUMBER;
 
   testing::internal::CaptureStdout();
   for (int i = 0; i < 12; i++) {
@@ -438,19 +425,21 @@ std::string outNOTIFICATIONTYPE;
   oss.str("");
   oss << '[' << now << ']'
       << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd=oss.str();
+  cmd = oss.str();
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
   std::string out{testing::internal::GetCapturedStdout()};
   std::cout << out << std::endl;
   size_t step1{out.find("NOW = 32000")};
-  size_t step2{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
-               step1 + 1)};
+  size_t step2{out.find(
+      "SERVICE NOTIFICATION: "
+      "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+      step1 + 1)};
   size_t step3{out.find("NOW = 59000", step2 + 1)};
-  size_t step4{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY (OK);cmd;service ok",
-               step3 + 1)};
+  size_t step4{out.find(
+      "SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
+      "(OK);cmd;service ok",
+      step3 + 1)};
   ASSERT_EQ(step4, std::string::npos);
 }

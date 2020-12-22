@@ -70,7 +70,7 @@ void applier::globals::apply(state& config) {
   ::use_aggressive_host_checking = config.use_aggressive_host_checking();
   ::use_large_installation_tweaks = config.use_large_installation_tweaks();
   ::instance_heartbeat_interval = config.instance_heartbeat_interval();
-  ::use_time_period_notification = config.use_time_period_notification();
+  ::postpone_notification_to_timeperiod = config.postpone_notification_to_timeperiod();
 }
 
 /**

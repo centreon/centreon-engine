@@ -320,6 +320,8 @@ class notifier : public checkable {
   bool _retain_status_information;
   bool _retain_nonstatus_information;
   bool _is_being_freshened;
+  //notify on starting time period with notificatio_interval at 0
+  bool _notification_to_interval_on_timeperiod_in; 
 
   /* New ones */
   int _notification_number;

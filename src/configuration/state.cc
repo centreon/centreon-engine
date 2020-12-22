@@ -233,8 +233,8 @@ std::unordered_map<std::string, state::setter_func> const state::_setters{
      SETTER(bool, use_large_installation_tweaks)},
     {"instance_heartbeat_interval",
      SETTER(uint32_t, instance_heartbeat_interval)},
-    {"use_time_period_notification",
-     SETTER(bool, use_time_period_notification)},
+    {"postpone_notification_to_timeperiod",
+     SETTER(bool, postpone_notification_to_timeperiod)},
     {"use_regexp_matching", SETTER(bool, use_regexp_matches)},
     {"use_retained_program_state", SETTER(bool, use_retained_program_state)},
     {"use_retained_scheduling_info",
@@ -358,7 +358,7 @@ static bool const default_translate_passive_host_checks(false);
 static bool const default_use_aggressive_host_checking(false);
 static bool const default_use_large_installation_tweaks(false);
 static uint32_t const default_instance_heartbeat_interval(30);
-static bool const default_use_time_period_notification(false);
+static bool const default_postpone_notification_to_timeperiod(false);
 static bool const default_use_regexp_matches(false);
 static bool const default_use_retained_program_state(true);
 static bool const default_use_retained_scheduling_info(false);
@@ -484,7 +484,7 @@ state::state()
       _use_aggressive_host_checking(default_use_aggressive_host_checking),
       _use_large_installation_tweaks(default_use_large_installation_tweaks),
       _instance_heartbeat_interval(default_instance_heartbeat_interval),
-      _use_time_period_notification(default_use_time_period_notification),
+      _postpone_notification_to_timeperiod(default_postpone_notification_to_timeperiod),
       _use_regexp_matches(default_use_regexp_matches),
       _use_retained_program_state(default_use_retained_program_state),
       _use_retained_scheduling_info(default_use_retained_scheduling_info),
@@ -649,7 +649,7 @@ state& state::operator=(state const& right) {
     _users = right._users;
     _use_aggressive_host_checking = right._use_aggressive_host_checking;
     _use_large_installation_tweaks = right._use_large_installation_tweaks;
-    _use_time_period_notification = right._use_time_period_notification;
+    _postpone_notification_to_timeperiod = right._postpone_notification_to_timeperiod;
     _use_regexp_matches = right._use_regexp_matches;
     _use_retained_program_state = right._use_retained_program_state;
     _use_retained_scheduling_info = right._use_retained_scheduling_info;
@@ -803,7 +803,7 @@ bool state::operator==(state const& right) const noexcept {
       _users == right._users &&
       _use_aggressive_host_checking == right._use_aggressive_host_checking &&
       _use_large_installation_tweaks == right._use_large_installation_tweaks &&
-      _use_time_period_notification == right._use_time_period_notification &&
+      _postpone_notification_to_timeperiod == right._postpone_notification_to_timeperiod &&
       _use_regexp_matches == right._use_regexp_matches &&
       _use_retained_program_state == right._use_retained_program_state &&
       _use_retained_scheduling_info == right._use_retained_scheduling_info &&
@@ -3596,13 +3596,13 @@ uint32_t state::instance_heartbeat_interval() const noexcept {
 
 
 /**
- * @brief Get use_time_period_notification value. This is the 
+ * @brief Get postpone_notification_to_timeperiod value. This is the 
  * param to notify on return to the time period.
  *
  * @return this value in seconds.
  */
-bool state::use_time_period_notification() const noexcept {
-  return _use_time_period_notification;
+bool state::postpone_notification_to_timeperiod() const noexcept {
+  return _postpone_notification_to_timeperiod;
 }
 
 /**
@@ -3624,12 +3624,12 @@ void state::instance_heartbeat_interval(uint32_t value) {
 }
 
 /**
- *  Set use_time_period_notification value.
+ *  Set postpone_notification_to_timeperiod value.
  *
- *  @param[in] value The new use_time_period_notification value.
+ *  @param[in] value The new postpone_notification_to_timeperiod value.
  */
-void state::use_time_period_notification(bool value) {
-  _use_time_period_notification = value;
+void state::postpone_notification_to_timeperiod(bool value) {
+  _postpone_notification_to_timeperiod = value;
 }
 
 /**
