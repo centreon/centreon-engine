@@ -16,26 +16,39 @@
  * For more information : contact@centreon.com
  *
  */
-
-#include "enginerpc.hh"
+#include "com/centreon/engine/enginerpc.hh"
 
 #include <gtest/gtest.h>
 
+#include <atomic>
+#include <chrono>
 #include <cstdio>
+#include <fstream>
+#include <thread>
 
 #include "../test_engine.hh"
+#include "../timeperiod/utils.hh"
 #include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/command_manager.hh"
+#include "com/centreon/engine/comment.hh"
 #include "com/centreon/engine/configuration/applier/anomalydetection.hh"
+#include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
+#include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
+#include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/contact.hh"
+#include "com/centreon/engine/configuration/hostgroup.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/version.hh"
 #include "helper.hh"
+
+
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -47,22 +60,62 @@ class EngineRpc : public TestEngine {
 
     // Do not unload this in the tear down function, it is done by the
     // other unload function... :-(
+
+    config->execute_service_checks(true);
+
+    /* contact */
     configuration::applier::contact ct_aply;
     configuration::contact ctct{new_configuration_contact("admin", true)};
     ct_aply.add_object(ctct);
     ct_aply.expand_objects(*config);
     ct_aply.resolve_object(ctct);
 
+    /* hosts */
+    configuration::host hst_child;
+    configuration::applier::host hst_aply2;
+    hst_child.parse("host_name", "child_host");
+    hst_child.parse("address", "127.0.0.1");
+    hst_child.parse("parents", "test_host");
+    hst_child.parse("_HOST_ID", "42");
+    hst_aply2.add_object(hst_child);
+
     configuration::host hst{new_configuration_host("test_host", "admin")};
     configuration::applier::host hst_aply;
+    hst.parse("_HOST_ID", "12");
     hst_aply.add_object(hst);
 
+    hst_aply.resolve_object(hst);
+    hst_aply2.resolve_object(hst_child);
+
+    ASSERT_EQ(engine::host::hosts.size(), 2u);
+
+    host_map::iterator child = engine::host::hosts.find("child_host");
+    host_map::iterator parent = engine::host::hosts.find("test_host");
+
+    ASSERT_EQ(child->second->parent_hosts.size(), 1u);
+    ASSERT_EQ(parent->second->child_hosts.size(), 1u);
+
+    /* hostgroup */
+    configuration::hostgroup hg;
+    configuration::applier::hostgroup hg_aply;
+    hg.parse("hostgroup_name", "test_hg");
+    hg.parse("members", "test_host");
+    hg_aply.add_object(hg);
+    hg_aply.expand_objects(*config);
+    hg_aply.resolve_object(hg);
+
+    /* service */
     configuration::service svc{
         new_configuration_service("test_host", "test_svc", "admin")};
+    configuration::command cmd("cmd");
+    cmd.parse("command_line", "/bin/sh -c 'echo \"test_cmd\"'");
+    svc.parse("check_command", "cmd");
+    configuration::applier::command cmd_aply;
+
     configuration::applier::service svc_aply;
     svc_aply.add_object(svc);
+    cmd_aply.add_object(cmd);
 
-    hst_aply.resolve_object(hst);
     svc_aply.resolve_object(svc);
 
     configuration::anomalydetection ad{new_configuration_anomalydetection(
@@ -77,7 +130,7 @@ class EngineRpc : public TestEngine {
 
     host_map const& hm{engine::host::hosts};
     _host = hm.begin()->second;
-    _host->set_current_state(engine::host::state_up);
+    _host->set_current_state(engine::host::state_down);
     _host->set_state_type(checkable::hard);
     _host->set_problem_has_been_acknowledged(false);
     _host->set_notify_on(static_cast<uint32_t>(-1));
@@ -90,6 +143,22 @@ class EngineRpc : public TestEngine {
       else
         _svc = svc;
     }
+    _svc->set_current_state(engine::service::state_critical);
+    _svc->set_state_type(checkable::hard);
+    _svc->set_problem_has_been_acknowledged(false);
+    _svc->set_notify_on(static_cast<uint32_t>(-1));
+
+    contact_map const& cm{engine::contact::contacts};
+    _contact = cm.begin()->second;
+
+    /* servicegroup */
+    configuration::servicegroup sg("test_sg");
+    configuration::applier::servicegroup sg_aply;
+    sg.parse("members", "test_host,test_svc");
+
+    sg_aply.add_object(sg);
+    sg_aply.expand_objects(*config);
+    sg_aply.resolve_object(sg);
   }
 
   void TearDown() override {
@@ -123,9 +192,32 @@ class EngineRpc : public TestEngine {
 
  protected:
   std::shared_ptr<engine::host> _host;
+  std::shared_ptr<engine::contact> _contact;
   std::shared_ptr<engine::service> _svc;
   std::shared_ptr<engine::anomalydetection> _ad;
 };
+
+/* calls command manager in an other thread (function is used for units tests)
+ */
+static void call_command_manager(std::unique_ptr<std::thread>& th,
+                                 std::condition_variable* condvar,
+                                 std::mutex* mutex,
+                                 bool* continuerunning) {
+  auto fn = [continuerunning, mutex, condvar]() {
+    std::unique_lock<std::mutex> lock(*mutex);
+    while (true) {
+      command_manager::instance().execute();
+      if (condvar->wait_for(
+              lock, std::chrono::milliseconds(50),
+              [continuerunning]() -> bool { return *continuerunning; })) {
+        break;
+      }
+    }
+  };
+
+  th.reset(new std::thread(fn));
+}
+
 
 TEST_F(EngineRpc, StartStop) {
   enginerpc erpc("0.0.0.0", 40001);
@@ -149,6 +241,280 @@ TEST_F(EngineRpc, GetVersion) {
   }
   erpc.shutdown();
 }
+
+TEST_F(EngineRpc, GetHost) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  std::vector<std::string> vectests = {"GetHost",
+                                       "Host name: test_host",
+                                       "Host alias: test_host",
+                                       "Host id: 12",
+                                       "Host address: 127.0.0.1",
+                                       "Host state: 1",
+                                       "Host period: test_period"};
+  _host->set_current_state(engine::host::state_down);
+  _host->set_check_period("test_period");
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetHost byhostid 12");
+  auto output2 = execute("GetHost byhostname test_host");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  std::vector<std::string> result_ids(output.size());
+  std::copy(output.begin(), output.end(), result_ids.begin());
+
+  ASSERT_EQ(vectests, result_ids);
+
+  std::vector<std::string> result_names(output2.size());
+  std::copy(output2.begin(), output2.end(), result_names.begin());
+
+  ASSERT_EQ(vectests, result_names);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetService) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+  std::vector<std::string> vectests = {"GetService",
+                                       "Host id: 12",
+                                       "Service id: 13",
+                                       "Host name: test_host",
+                                       "Serv desc: test_svc",
+                                       "Service state: 2",
+                                       "Service period: test_period"};
+  _svc->set_current_state(engine::service::state_critical);
+  _svc->set_check_period("test_period");
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetService bynames test_host test_svc");
+  auto output2 = execute("GetService byids 12 13");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  std::vector<std::string> result_names(output.size());
+  std::copy(output.begin(), output.end(), result_names.begin());
+
+  ASSERT_EQ(vectests, result_names);
+
+  std::vector<std::string> result_ids(output2.size());
+  std::copy(output2.begin(), output2.end(), result_ids.begin());
+
+  ASSERT_EQ(vectests, result_ids);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetContact) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+  std::vector<std::string> vectests = {"GetContact", "admin", "admin",
+                                       "admin@centreon.com"};
+  int j = 0;
+  _contact->set_email("admin@centreon.com");
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetContact admin");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  std::vector<std::string> result_names(output.size());
+  std::copy(output.begin(), output.end(), result_names.begin());
+
+  ASSERT_EQ(vectests, result_names);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetHostsCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetHostsCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "2");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetContactsCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetContactsCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "1");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetServicesCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetServicesCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "2");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetServiceGroupsCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetServiceGroupsCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "1");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetContactGroupsCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetContactGroupsCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "0");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetHostGroupsCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetHostGroupsCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "1");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetServiceDependenciesCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetServiceDependenciesCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "0");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, GetHostDependenciesCount) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetHostDependenciesCount");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(output.back(), "0");
+  erpc.shutdown();
+}
+
 
 TEST_F(EngineRpc, ProcessServiceCheckResult) {
   enginerpc erpc("0.0.0.0", 40001);

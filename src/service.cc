@@ -486,7 +486,7 @@ std::ostream& operator<<(std::ostream& os,
      << "\n  last_time_critical:                   "
      << string::ctime(obj.get_last_time_critical())
      << "\n  has_been_checked:                     "
-     << obj.get_has_been_checked()
+     << obj.has_been_checked()
      << "\n  is_being_freshened:                   "
      << obj.get_is_being_freshened()
      << "\n  notified_on_unknown:                  "
@@ -1214,7 +1214,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
      * only do this if 1) the initial state was set to non-UP or 2) the host
      * is not scheduled to be checked soon (next 5 minutes)
      */
-    if (!hst->get_has_been_checked() &&
+    if (!hst->has_been_checked() &&
         (hst->get_initial_state() != host::state_up ||
          (unsigned long)hst->get_next_check() == 0L ||
          (unsigned long)(hst->get_next_check() - current_time) > 300)) {
@@ -1391,7 +1391,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* usually only use cached host state if no service state change has
          * occurred */
         if ((!state_change || state_changes_use_cached_state) &&
-            hst->get_has_been_checked() &&
+            hst->has_been_checked() &&
             (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
              config->cached_host_check_horizon())) {
           logger(dbg_checks, more)
@@ -1502,7 +1502,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* can we use the last cached host state? */
         /* only use cached host state if no service state change has occurred */
         if ((!state_change || state_changes_use_cached_state) &&
-            hst->get_has_been_checked() &&
+            hst->has_been_checked() &&
             (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
              config->cached_host_check_horizon())) {
           /* use current host state as route result */
@@ -1577,7 +1577,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
          * last check time */
         /* 03/11/06 EG Note: This probably never evaluates to false, present for
          * historical reasons only, can probably be removed in the future */
-        if (!hst->get_has_been_checked()) {
+        if (!hst->has_been_checked()) {
           hst->set_has_been_checked(true);
           hst->set_last_check(get_last_check());
         }
@@ -1851,7 +1851,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       queued_check_result->get_return_code(), nullptr, nullptr);
 
   if (!(reschedule_check && get_should_be_scheduled() &&
-        get_has_been_checked()) ||
+        has_been_checked()) ||
       !get_checks_enabled()) {
     /* set the checked flag */
     set_has_been_checked(true);
@@ -3055,7 +3055,7 @@ bool service::is_result_fresh(time_t current_time, int log_this) {
    * can become stale immediately upon program startup */
   /* CHANGED 02/25/06 SG - passive checks also become stale, so remove
    * dependence on active check logic */
-  if (!this->get_has_been_checked())
+  if (!this->has_been_checked())
     expiration_time = (time_t)(event_start + freshness_threshold);
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use
    * program start time over last check if no specific threshold has been set by
@@ -3073,7 +3073,7 @@ bool service::is_result_fresh(time_t current_time, int log_this) {
   else
     expiration_time = (time_t)(get_last_check() + freshness_threshold);
 
-  logger(dbg_checks, most) << "HBC: " << this->get_has_been_checked()
+  logger(dbg_checks, most) << "HBC: " << this->has_been_checked()
                            << ", PS: " << program_start
                            << ", ES: " << event_start
                            << ", LC: " << get_last_check()
@@ -3222,7 +3222,7 @@ bool service::authorized_by_dependencies(
       return false;
 
     if (state == service::state_ok &&
-        !dep->master_service_ptr->get_has_been_checked() &&
+        !dep->master_service_ptr->has_been_checked() &&
         dep->get_fail_on_pending())
       return false;
 

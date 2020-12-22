@@ -38,6 +38,8 @@ char const* sigs[] = {"EXIT", "HUP",    "INT",    "QUIT",  "ILL",    "TRAP",
                       "XCPU", "XFSZ",   "VTALRM", "PROF",  "WINCH",  "IO",
                       "PWR",  "UNUSED", "ZERR",   "DEBUG", NULL};
 
+com::centreon::engine::restart_stats restart_apply_stats;
+
 char* config_file(NULL);
 char* debug_file(NULL);
 char* global_host_event_handler(NULL);
