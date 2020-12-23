@@ -436,8 +436,7 @@ int service_downtime::handle() {
     }
 
     /* delete downtime entry */
-    downtime_manager::instance().delete_downtime(downtime::service_downtime,
-                                                 get_downtime_id());
+    downtime_manager::instance().delete_downtime(get_downtime_id());
   }
   /* else we are just starting the scheduled downtime */
   else {

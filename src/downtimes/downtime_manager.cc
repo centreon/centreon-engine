@@ -39,16 +39,14 @@ using namespace com::centreon::engine::logging;
  * @param downtime_id The downtime's id
  *
  */
-void downtime_manager::delete_downtime(downtime::type type,
-                                       uint64_t downtime_id) {
+void downtime_manager::delete_downtime(uint64_t downtime_id) {
   /* find the downtime we should remove */
   for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
        it != end;
        ++it) {
-    if (it->second->get_downtime_id() == downtime_id &&
-        it->second->get_type() == type) {
+    if (it->second->get_downtime_id() == downtime_id) {
       logger(dbg_downtime, basic)
-        << "delete downtime(type:" << type << ", id: " << downtime_id << ")";
+        << "delete downtime(id: " << downtime_id << ")";
       _scheduled_downtimes.erase(it);
       break;
     }
@@ -56,44 +54,47 @@ void downtime_manager::delete_downtime(downtime::type type,
 }
 
 /* unschedules a host or service downtime */
-int downtime_manager::unschedule_downtime(downtime::type type, uint64_t downtime_id) {
-  std::shared_ptr<downtime> temp_downtime{find_downtime(type, downtime_id)};
+int downtime_manager::unschedule_downtime(uint64_t downtime_id) {
+  auto found = std::find_if(_scheduled_downtimes.begin(),
+      _scheduled_downtimes.end(),
+      [&downtime_id](std::pair<time_t, std::shared_ptr<downtime>> d) {
+        return downtime_id == d.second->get_downtime_id();
+      });
 
   logger(dbg_functions, basic) << "unschedule_downtime()";
   logger(dbg_downtime, basic)
-    << "unschedule downtime(type:" << type << ", id: " << downtime_id << ")";
+    << "unschedule downtime(id: " << downtime_id << ")";
 
   /* find the downtime entry in the list in memory */
-  if (!temp_downtime)
+  if (found == _scheduled_downtimes.end())
     return ERROR;
 
-  if (temp_downtime->unschedule() == ERROR)
+  if (found->second->unschedule() == ERROR)
     return ERROR;
 
   /* remove scheduled entry from event queue */
   events::loop::instance().remove_downtime(downtime_id);
 
   /* delete downtime entry */
-  if (temp_downtime->get_type() == downtime::host_downtime)
-    delete_downtime(downtime::host_downtime, downtime_id);
-  else
-    delete_downtime(downtime::service_downtime, downtime_id);
+  _scheduled_downtimes.erase(found);
 
   /* unschedule all downtime entries that were triggered by this one */
   std::list<uint64_t> lst;
   for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
-      it != end; ++it) {
+       it != end;
+       ++it) {
     if (it->second->get_triggered_by() == downtime_id)
       lst.push_back(it->second->get_downtime_id());
   }
+
   for (uint64_t id : lst) {
     logger(dbg_downtime, basic)
       << "Unschedule triggered downtime (id: " << id << ")";
-    unschedule_downtime(downtime::any_downtime, id);
+    unschedule_downtime(id);
   }
-
   return OK;
 }
+
 
 /* finds a specific downtime entry */
 std::shared_ptr<downtime> downtime_manager::find_downtime(
@@ -230,22 +231,22 @@ int downtime_manager::check_for_expired_downtime() {
   /* check all downtime entries... */
   auto next_it = downtime_manager::instance()._scheduled_downtimes.begin();
   for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
-       it != end; it = next_it) {
+       it != end;
+       it = next_it) {
     downtime& dt(*it->second);
     ++next_it;
 
     /* this entry should be removed */
     if (!dt.is_in_effect() && dt.get_end_time() < current_time) {
-      logger(dbg_downtime, basic)
-          << "Expiring "
-          << (dt.get_type() == downtime::host_downtime ? "host" : "service")
-          << " downtime (id=" << dt.get_downtime_id() << ")...";
+      logger(dbg_downtime, basic) << "Expiring "
+                                  << (dt.get_type() == downtime::host_downtime
+                                          ? "host"
+                                          : "service")
+                                  << " downtime (id=" << dt.get_downtime_id()
+                                  << ")...";
 
       /* delete the downtime entry */
-      if (dt.get_type() == downtime::host_downtime)
-        delete_downtime(downtime::host_downtime, dt.get_downtime_id());
-      else
-        delete_downtime(downtime::service_downtime, dt.get_downtime_id());
+      delete_downtime(dt.get_downtime_id());
     }
   }
   return OK;
@@ -261,35 +262,30 @@ int downtime_manager::
     delete_downtime_by_hostname_service_description_start_time_comment(
         std::string const& hostname,
         std::string const& service_description,
-        time_t start_time,
+        std::pair<bool, time_t> const& start_time,
         std::string const& comment) {
-  logger(dbg_downtime, basic)
-    << "Delete downtimes (host: '" << hostname << "', service description: '"
-    << service_description << "', start time: " << start_time
-    << ", comment: '" << comment << "')";
+  logger(dbg_downtime, basic) << "Delete downtimes (host: '" << hostname
+                              << "', service description: '"
+                              << service_description
+                              << "', start time: " << start_time.second
+                              << ", comment: '" << comment << "')";
   int deleted{0};
 
   /* Do not allow deletion of everything - must have at least 1 filter on. */
-  if (hostname.empty() && service_description.empty() && start_time == 0 &&
+  if (hostname.empty() && service_description.empty() && !start_time.first &&
       comment.empty())
     return deleted;
 
-  std::pair<std::multimap<time_t, std::shared_ptr<downtime>>::iterator,
-            std::multimap<time_t, std::shared_ptr<downtime>>::iterator>
-      range;
+  std::pair<std::multimap<time_t, std::shared_ptr<downtime> >::iterator,
+            std::multimap<time_t, std::shared_ptr<downtime> >::iterator> range;
 
-  if (start_time != 0)
-    range = _scheduled_downtimes.equal_range(start_time);
+  if (start_time.first)
+    range = _scheduled_downtimes.equal_range(start_time.second);
   else
     range = {_scheduled_downtimes.begin(), _scheduled_downtimes.end()};
 
-  std::map<time_t, std::shared_ptr<downtime>>::iterator it,
-      next_it{range.first};
-  std::map<time_t, std::shared_ptr<downtime>>::iterator end{range.second};
-
-  for (it = next_it; it != end; it = next_it) {
-    ++next_it;
-
+  std::list<uint64_t> lst;
+  for (auto it = range.first,  end = range.second; it != end; ++it) {
     if (!comment.empty() && it->second->get_comment() != comment)
       continue;
     if (downtime::host_downtime == it->second->get_type()) {
@@ -309,13 +305,15 @@ int downtime_manager::
           continue;
       }
     }
-
-    unschedule_downtime(it->second->get_type(), it->second->get_downtime_id());
+    lst.push_back(it->second->get_downtime_id());
     ++deleted;
   }
+
+  for (auto id : lst)
+    unschedule_downtime(id);
+
   return deleted;
 }
-
 void downtime_manager::insert_downtime(std::shared_ptr<downtime> dt) {
   logger(dbg_functions, basic) << "downtime_manager::insert_downtime()";
   time_t start{dt->get_start_time()};

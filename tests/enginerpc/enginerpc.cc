@@ -52,6 +52,10 @@
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::downtimes;
+using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::configuration::applier;
+
 
 class EngineRpc : public TestEngine {
  public:
@@ -512,6 +516,1048 @@ TEST_F(EngineRpc, GetHostDependenciesCount) {
   th->join();
 
   ASSERT_EQ(output.back(), "0");
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, AddHostComment) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output =
+      execute("AddHostComment test_host test-admin mycomment 1 10000");
+  ASSERT_EQ(comment::comments.size(), 1u);
+
+  output = execute("DeleteComment 1");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, AddServiceComment) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+  auto output = execute(
+      "AddServiceComment test_host test_svc test-admin mycomment 1 10000");
+  ASSERT_EQ(comment::comments.size(), 1u);
+
+  output = execute("DeleteComment 1");
+  ASSERT_EQ(comment::comments.size(), 0u);
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, DeleteComment) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  // create comment
+  std::ostringstream oss;
+  oss << "my comment ";
+  auto cmt = std::make_shared<comment>(
+      comment::host, comment::user, _host->get_host_id(), 0, 10000,
+      "test-admin", oss.str(), true, comment::external, false, 0);
+  comment::comments.insert({cmt->get_comment_id(), cmt});
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("DeleteComment 1");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, DeleteAllHostComments) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+  // first test
+  ASSERT_EQ(comment::comments.size(), 0u);
+  // create some comments
+  for (int i = 0; i < 10; ++i) {
+    std::ostringstream oss;
+    oss << "my host comment " << i;
+    auto cmt = std::make_shared<comment>(
+        comment::host, comment::user, _host->get_host_id(), 0, 10000,
+        "test-admin", oss.str(), true, comment::external, false, 0);
+    comment::comments.insert({cmt->get_comment_id(), cmt});
+  }
+  ASSERT_EQ(comment::comments.size(), 10u);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+  auto output = execute("DeleteAllHostComments byhostid 12");
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  // second test
+  for (int i = 0; i < 10; ++i) {
+    std::ostringstream oss;
+    oss << "my host comment " << i;
+    auto cmt = std::make_shared<comment>(
+        comment::host, comment::user, _host->get_host_id(), 0, 10000,
+        "test-admin", oss.str(), true, comment::external, false, 0);
+    comment::comments.insert({cmt->get_comment_id(), cmt});
+  }
+  ASSERT_EQ(comment::comments.size(), 10u);
+  output = execute("DeleteAllHostComments byhostname test_host");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, DeleteAllServiceComments) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  // first test
+  ASSERT_EQ(comment::comments.size(), 0u);
+  // create some comments
+  for (int i = 0; i < 10; ++i) {
+    std::ostringstream oss;
+    oss << "my service comment " << i;
+    auto cmt = std::make_shared<comment>(
+        comment::service, comment::user, _host->get_host_id(),
+        _svc->get_service_id(), 10000, "test-admin", oss.str(), true,
+        comment::external, false, 0);
+    comment::comments.insert({cmt->get_comment_id(), cmt});
+  }
+  ASSERT_EQ(comment::comments.size(), 10u);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+  auto output = execute("DeleteAllServiceComments byids 12 13");
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  // second test
+  for (int i = 0; i < 10; ++i) {
+    std::ostringstream oss;
+    oss << "my service comment " << i;
+    auto cmt = std::make_shared<comment>(
+        comment::service, comment::user, _host->get_host_id(),
+        _svc->get_service_id(), 10000, "test-admin", oss.str(), true,
+        comment::external, false, 0);
+    comment::comments.insert({cmt->get_comment_id(), cmt});
+  }
+  ASSERT_EQ(comment::comments.size(), 10u);
+  output = execute("DeleteAllServiceComments bynames test_host test_svc");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, RemoveHostAcknowledgement) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+  oss << "my comment ";
+  // first test
+  _host->set_problem_has_been_acknowledged(true);
+  // create comment
+  auto cmt = std::make_shared<comment>(
+      comment::host, comment::acknowledgment, _host->get_host_id(), 0, 10000,
+      "test-admin", oss.str(), false, comment::external, false, 0);
+  comment::comments.insert({cmt->get_comment_id(), cmt});
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+  auto output = execute("RemoveHostAcknowledgement byhostid 12");
+
+  ASSERT_EQ(_host->get_problem_has_been_acknowledged(), false);
+  ASSERT_EQ(comment::comments.size(), 0u);
+  // second test
+  _host->set_problem_has_been_acknowledged(true);
+  cmt = std::make_shared<comment>(
+      comment::host, comment::acknowledgment, _host->get_host_id(), 0, 10000,
+      "test-admin", oss.str(), false, comment::external, false, 0);
+  comment::comments.insert({cmt->get_comment_id(), cmt});
+
+  output = execute("RemoveHostAcknowledgement byhostname test_host");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(_host->get_problem_has_been_acknowledged(), false);
+  ASSERT_EQ(comment::comments.size(), 0u);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, RemoveServiceAcknowledgement) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+  oss << "my comment ";
+  _svc->set_problem_has_been_acknowledged(true);
+  auto cmt = std::make_shared<comment>(
+      comment::service, comment::acknowledgment, _host->get_host_id(),
+      _svc->get_service_id(), 10000, "test-admin", oss.str(), false,
+      comment::external, false, 0);
+  comment::comments.insert({cmt->get_comment_id(), cmt});
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output =
+      execute("RemoveServiceAcknowledgement bynames test_host test_svc");
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  ASSERT_EQ(_svc->get_problem_has_been_acknowledged(), false);
+
+  _svc->set_problem_has_been_acknowledged(true);
+  cmt = std::make_shared<comment>(comment::service, comment::acknowledgment,
+                                  _host->get_host_id(), _svc->get_service_id(),
+                                  10000, "test-admin", oss.str(), false,
+                                  comment::external, false, 0);
+  comment::comments.insert({cmt->get_comment_id(), cmt});
+
+  output = execute("RemoveServiceAcknowledgement byids 12 13");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(comment::comments.size(), 0u);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, AcknowledgementHostProblem) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(_host->get_problem_has_been_acknowledged(), false);
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output =
+      execute("AcknowledgementHostProblem test_host admin test 1 0 0");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(_host->get_problem_has_been_acknowledged(), true);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, AcknowledgementServiceProblem) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(_svc->get_problem_has_been_acknowledged(), false);
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(
+      "AcknowledgementServiceProblem test_host test_svc admin test 1 0 0");
+  ;
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(_svc->get_problem_has_been_acknowledged(), true);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleHostDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  oss << "ScheduleHostDowntime test_host " << now << " " << now + 1
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  // we fake a wrong test with an undefined parameter
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleHostDowntime 0", output.back());
+  oss.str("");
+
+  // we make the right test
+  oss << "ScheduleHostDowntime test_host " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ("ScheduleHostDowntime 1", output.back());
+
+  // deleting the current downtime
+  uint64_t id = downtime_manager::instance()
+                    .get_scheduled_downtimes()
+                    .begin()
+                    ->second->get_downtime_id();
+  oss.str("");
+  oss << "DeleteDowntime " << id;
+  output = execute(oss.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleServiceDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  oss << "ScheduleServiceDowntime test_host test_svc " << now << " " << now + 1
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleServiceDowntime 0", output.back());
+  oss.str("");
+
+  oss << "ScheduleServiceDowntime test_host test_svc " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ("ScheduleServiceDowntime 1", output.back());
+
+  oss.str("");
+  uint64_t id = downtime_manager::instance()
+                    .get_scheduled_downtimes()
+                    .begin()
+                    ->second->get_downtime_id();
+  oss << "DeleteDowntime " << id;
+  output = execute(oss.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleHostServicesDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  std::ostringstream oss2;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  oss << "ScheduleHostServicesDowntime test_host " << now << " " << now + 1
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleHostServicesDowntime 0", output.back());
+  oss.str("");
+
+  oss << "ScheduleHostServicesDowntime test_host " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(2u, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ("ScheduleHostServicesDowntime 1", output.back());
+
+  oss2 << "DeleteServiceDowntimeFull test_host undef undef undef"
+          " undef undef undef undef undef";
+
+  output = execute(oss2.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleHostGroupHostsDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  oss << "ScheduleHostGroupHostsDowntime test_hg " << now << " " << now + 1
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleHostGroupHostsDowntime 0", output.back());
+  oss.str("");
+
+  oss << "ScheduleHostGroupHostsDowntime test_hg " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
+  uint64_t id = downtime_manager::instance()
+                    .get_scheduled_downtimes()
+                    .begin()
+                    ->second->get_downtime_id();
+  oss.str("");
+  oss << "DeleteDowntime " << id;
+  output = execute(oss.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleHostGroupServicesDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  oss << "ScheduleHostGroupServicesDowntime test_hg " << now << " " << now + 1
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleHostGroupServicesDowntime 0", output.back());
+  oss.str("");
+
+  oss << "ScheduleHostGroupServicesDowntime test_hg " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(2u, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ("ScheduleHostGroupServicesDowntime 1", output.back());
+
+  oss.str("");
+  oss << "DeleteServiceDowntimeFull test_host undef undef undef"
+         " undef undef undef undef undef";
+  output = execute(oss.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleServiceGroupHostsDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  std::ostringstream oss2;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  set_time(20000);
+  time_t now = time(nullptr);
+  oss << "ScheduleServiceGroupHostsDowntime test_sg " << now << " " << now + 1
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleServiceGroupHostsDowntime 0", output.back());
+  oss.str("");
+
+  oss << "ScheduleServiceGroupHostsDowntime test_sg " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ("ScheduleServiceGroupHostsDowntime 1", output.back());
+
+  // deleting current downtime
+  uint64_t id = downtime_manager::instance()
+                    .get_scheduled_downtimes()
+                    .begin()
+                    ->second->get_downtime_id();
+  oss.str("");
+  oss << "DeleteDowntime " << id;
+  output = execute(oss.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleServiceGroupServicesDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  std::ostringstream oss2;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  set_time(20000);
+  time_t now = time(nullptr);
+  oss << "ScheduleServiceGroupServicesDowntime test_sg " << now << " "
+      << now + 1 << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleServiceGroupServicesDowntime 0", output.back());
+  oss.str("");
+
+  oss << "ScheduleServiceGroupServicesDowntime test_sg " << now << " "
+      << now + 1 << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ("ScheduleServiceGroupServicesDowntime 1", output.back());
+
+  uint64_t id = downtime_manager::instance()
+                    .get_scheduled_downtimes()
+                    .begin()
+                    ->second->get_downtime_id();
+  oss2 << "DeleteDowntime " << id;
+  output = execute(oss2.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleAndPropagateHostDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  set_time(20000);
+  time_t now = time(nullptr);
+  oss << "ScheduleAndPropagateHostDowntime test_host " << now << " " << now + 1
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleAndPropagateHostDowntime 0", output.back());
+  oss.str("");
+
+  oss << "ScheduleAndPropagateHostDowntime test_host " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(2u, downtime_manager::instance().get_scheduled_downtimes().size());
+  ASSERT_EQ("ScheduleAndPropagateHostDowntime 1", output.back());
+
+  uint64_t id = downtime_manager::instance()
+                    .get_scheduled_downtimes()
+                    .begin()
+                    ->second->get_downtime_id();
+  oss.str("");
+  oss << "DeleteDowntimeByHostName test_host undef undef undef";
+  output = execute(oss.str());
+
+  oss.str("");
+  oss << "DeleteDowntimeByHostName child_host undef undef undef";
+  output = execute(oss.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ScheduleAndPropagateTriggeredHostDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  std::ostringstream oss2;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  set_time(20000);
+  time_t now = time(nullptr);
+  oss << "ScheduleHostDowntime test_host " << now << " " << now + 1
+      << " 0 0 10000 admin host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ(1u, downtime_manager::instance().get_scheduled_downtimes().size());
+  uint64_t id = downtime_manager::instance()
+                    .get_scheduled_downtimes()
+                    .begin()
+                    ->second->get_downtime_id();
+  oss.str("");
+  oss << "ScheduleAndPropagateTriggeredHostDowntime test_host " << now << " "
+      << now + 1 << " 0 " << id << " 10000 admin host " << now;
+  output = execute(oss.str());
+  ASSERT_EQ(3u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  oss.str("");
+  oss << "DeleteDowntime " << id;
+  output = execute(oss.str());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, DelayHostNotification) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(_host->get_next_notification(), 0);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("DelayHostNotification byhostid 12 20");
+  ASSERT_EQ(_host->get_next_notification(), 20);
+
+  output = execute("DelayHostNotification byhostname test_host 10");
+  ASSERT_EQ(_host->get_next_notification(), 10);
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, DelayServiceNotification) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(_host->get_next_notification(), 0);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("DelayServiceNotification byids 12 13 20");
+  ASSERT_EQ(_svc->get_next_notification(), 20);
+
+  output = execute("DelayServiceNotification bynames test_host test_svc 10");
+  ASSERT_EQ(_svc->get_next_notification(), 10);
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeHostObjectIntVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("ChangeHostObjectIntVar test_host 0 1 1.0");
+  ASSERT_EQ(_host->get_check_interval(), 1);
+  output = execute("ChangeHostObjectIntVar test_host 1 1 2.0");
+  ASSERT_EQ(_host->get_retry_interval(), 2);
+  output = execute("ChangeHostObjectIntVar test_host 2 1 1.0");
+  ASSERT_EQ(_host->get_max_attempts(), 1);
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeServiceObjectIntVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(
+      "ChangeServiceObjectIntVar"
+      " test_host test_svc 0 1 1.0");
+  ASSERT_EQ(_svc->get_check_interval(), 1);
+  output = execute(
+      "ChangeServiceObjectIntVar"
+      " test_host test_svc 1 1 2.0");
+  ASSERT_EQ(_svc->get_retry_interval(), 2);
+  output = execute(
+      "ChangeServiceObjectIntVar"
+      " test_host test_svc 2 1 1.0");
+  ASSERT_EQ(_svc->get_max_attempts(), 1);
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeContactObjectIntVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(
+      "ChangeContactObjectIntVar"
+      " admin 0 1 1.0");
+  ASSERT_EQ(_contact->get_modified_attributes(), 1);
+  output = execute(
+      "ChangeContactObjectIntVar"
+      " admin 1 2 1.0");
+  ASSERT_EQ(_contact->get_modified_host_attributes(), 2);
+  output = execute(
+      "ChangeContactObjectIntVar"
+      " admin 2 3 1.0");
+  ASSERT_EQ(_contact->get_modified_service_attributes(), 3);
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeHostObjectCharVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(engine::timeperiod::timeperiods.size(), 1u);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(
+      "ChangeHostObjectCharVar"
+      " null 0 cmd");
+  ASSERT_EQ(output.back(), "ChangeHostObjectCharVar 1");
+  output = execute(
+      "ChangeHostObjectCharVar"
+      " test_host 1 cmd");
+  ASSERT_EQ(_host->get_event_handler(), "cmd");
+  output = execute(
+      "ChangeHostObjectCharVar"
+      " test_host 2 cmd");
+  ASSERT_EQ(_host->get_check_command(), "cmd");
+  output = execute(
+      "ChangeHostObjectCharVar"
+      " test_host 3 24x7");
+  ASSERT_EQ(_host->get_check_period(), "24x7");
+  output = execute(
+      "ChangeHostObjectCharVar"
+      " test_host 4 24x7");
+  ASSERT_EQ(_host->get_notification_period(), "24x7");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeServiceObjectCharVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(engine::timeperiod::timeperiods.size(), 1u);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(
+      "ChangeServiceObjectCharVar"
+      " null null 0 cmd");
+  ASSERT_EQ(output.back(), "ChangeServiceObjectCharVar 1");
+  output = execute(
+      "ChangeServiceObjectCharVar"
+      " test_host test_svc 1 cmd");
+  ASSERT_EQ(_svc->get_event_handler(), "cmd");
+  output = execute(
+      "ChangeServiceObjectCharVar"
+      " test_host test_svc 2 cmd");
+  ASSERT_EQ(_svc->get_check_command(), "cmd");
+  output = execute(
+      "ChangeServiceObjectCharVar"
+      " test_host test_svc 3 24x7");
+  ASSERT_EQ(_svc->get_check_period(), "24x7");
+  output = execute(
+      "ChangeServiceObjectCharVar"
+      " test_host test_svc 4 24x7");
+  ASSERT_EQ(_svc->get_notification_period(), "24x7");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeContactObjectCharVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(engine::timeperiod::timeperiods.size(), 1u);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(
+      "ChangeContactObjectCharVar"
+      " admin 0 24x7");
+  ASSERT_EQ(_contact->get_host_notification_period(), "24x7");
+  output = execute(
+      "ChangeContactObjectCharVar"
+      " admin 1 24x7");
+  ASSERT_EQ(_contact->get_service_notification_period(), "24x7");
+
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeHostObjectCustomVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  ASSERT_EQ(_host->custom_variables.size(), 0);
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+  auto output = execute(
+      "ChangeHostObjectCustomVar"
+      " test_host test_var test_val");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(_host->custom_variables.size(), 1u);
+  ASSERT_EQ(_host->custom_variables["TEST_VAR"].get_value(), "test_val");
+  _host->custom_variables.clear();
+  ASSERT_EQ(_host->custom_variables.size(), 0);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeServiceObjectCustomVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  _svc->custom_variables.clear();
+  ASSERT_EQ(_svc->custom_variables.size(), 0);
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+  auto output = execute(
+      "ChangeServiceObjectCustomVar"
+      " test_host test_svc test_var test_val");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(_svc->custom_variables.size(), 1u);
+  ASSERT_EQ(_svc->custom_variables["TEST_VAR"].get_value(), "test_val");
+  _svc->custom_variables.clear();
+  ASSERT_EQ(_svc->custom_variables.size(), 0);
+  erpc.shutdown();
+}
+
+TEST_F(EngineRpc, ChangeContactObjectCustomVar) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+  ASSERT_EQ(_contact->get_custom_variables().size(), 0);
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+  auto output = execute(
+      "ChangeContactObjectCustomVar"
+      " admin test_var test_val");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+  ASSERT_EQ(_contact->get_custom_variables().size(), 1u);
+  ASSERT_EQ(_contact->get_custom_variables()["TEST_VAR"].get_value(),
+            "test_val");
+
   erpc.shutdown();
 }
 
