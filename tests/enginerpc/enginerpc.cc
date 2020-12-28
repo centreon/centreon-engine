@@ -331,7 +331,6 @@ TEST_F(EngineRpc, GetContact) {
   bool continuerunning = false;
   std::vector<std::string> vectests = {"GetContact", "admin", "admin",
                                        "admin@centreon.com"};
-  int j = 0;
   _contact->set_email("admin@centreon.com");
 
   call_command_manager(th, &condvar, &mutex, &continuerunning);
@@ -1165,10 +1164,6 @@ TEST_F(EngineRpc, ScheduleAndPropagateHostDowntime) {
   ASSERT_EQ(2u, downtime_manager::instance().get_scheduled_downtimes().size());
   ASSERT_EQ("ScheduleAndPropagateHostDowntime 1", output.back());
 
-  uint64_t id = downtime_manager::instance()
-                    .get_scheduled_downtimes()
-                    .begin()
-                    ->second->get_downtime_id();
   oss.str("");
   oss << "DeleteDowntimeByHostName test_host undef undef undef";
   output = execute(oss.str());

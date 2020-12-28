@@ -20,6 +20,7 @@
 # Set directories.
 set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc")
 set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc" PARENT_SCOPE)
+set(INC_DIR "../inc/com/centreon/engine/")
 
 set(ENGINERPC enginerpc)
 set(ENGINERPC enginerpc PARENT_SCOPE)
@@ -79,8 +80,8 @@ add_library(
   enginerpc.cc
 
   # Headers.
-  engine_impl.hh
-  enginerpc.hh
+  "${INC_DIR}/engine_impl.hh"
+  "${INC_DIR}/enginerpc.hh"
 )
 
 # Prettier name.
