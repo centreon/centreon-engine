@@ -19,6 +19,7 @@ Bug Fix
 Macros 
 ==============
 fix some macro and test for some macro.
+fix macro $TIMET$ now return time in a unix epoch format.
 
 =======================
 Centreon Engine 20.10.1
