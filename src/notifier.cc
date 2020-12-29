@@ -270,8 +270,12 @@ bool notifier::_is_notification_viable_normal(reason_type type
     logger(dbg_notifications, more)
         << "This notifier shouldn't have notifications sent out "
            "at this time.";
-    if(notification_interval == 0 && config->postpone_notification_to_timeperiod())
+    if(notification_interval == 0 && config->postpone_notification_to_timeperiod()) {
       _notification_to_interval_on_timeperiod_in = true;
+      logger(dbg_notifications, more)
+          << "This notifier is save to send this notifications in "
+             "the next notification time period.";
+    }
     return false;
   }
 
