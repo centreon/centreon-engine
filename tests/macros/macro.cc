@@ -209,7 +209,7 @@ TEST_F(Macro, TimeT) {
   std::string out;
   nagios_macros* mac(get_global_macros());
   process_macros_r(mac, "$TIMET:test_host$", out, 0);
-  ASSERT_EQ(out, "01:53:20");
+  ASSERT_EQ(out, "500000000");
 }
 
 TEST_F(Macro, ContactName) {

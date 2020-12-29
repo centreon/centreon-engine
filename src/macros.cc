@@ -316,9 +316,7 @@ int grab_datetime_macro_r(nagios_macros* mac,
       break;
 
     case MACRO_TIMET:
-      get_datetime_string(&current_time, tmp_date, MAX_DATETIME_LENGTH,
-                          SHORT_TIME);
-      output = tmp_date;
+      output = std::to_string(current_time);
       break;
 
     case MACRO_ISVALIDTIME:
