@@ -323,7 +323,7 @@ class EngineRPCClient {
     request.set_value(req);
 
     grpc::Status status = _stub->DeleteComment(&context, request, response);
-    if (!status.ok()) {
+    if (!status.ok() || !response->value()) {
       std::cout << "DeleteComment failed." << std::endl;
       return false;
     }
@@ -1574,7 +1574,7 @@ int main(int argc, char** argv) {
     uint32_t entrytime = atoi(argv[7]);
     status = client.AddServiceComment(hostname, svcdsc, entrytime, user,
                                       commentdata, persistent, &response);
-    std::cout << "AddServiceComment" << std::endl;
+    std::cout << "AddServiceComment " << status << std::endl;
   } 
   else if (strcmp(argv[1], "DeleteAllHostComments") == 0) {
     if (argc != 4) {
@@ -1628,7 +1628,7 @@ int main(int argc, char** argv) {
     CommandSuccess response;
     uint32_t commentid = atoi(argv[2]);
     status = client.DeleteComment(commentid, &response);
-    std::cout << "DeleteComment" << std::endl;
+    std::cout << "DeleteComment " << status << std::endl;
   }
   else if (strcmp(argv[1], "RemoveHostAcknowledgement") == 0) {
     if (argc != 4) {

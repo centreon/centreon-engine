@@ -285,6 +285,41 @@ TEST_F(EngineRpc, GetHost) {
   erpc.shutdown();
 }
 
+TEST_F(EngineRpc, GetWrongHost) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+
+  std::vector<std::string> vectests = {"GetHostByHostName rpc engine failed",
+                                       "GetHost",
+                                       "Host name: ",
+                                       "Host alias: ",
+                                       "Host id: 0",
+                                       "Host address: ",
+                                       "Host state: 0",
+                                       "Host period: "};
+  _host->set_current_state(engine::host::state_down);
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetHost byhostname wrong_host");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  std::vector<std::string> result_names(output.size());
+  std::copy(output.begin(), output.end(), result_names.begin());
+
+  ASSERT_EQ(vectests, result_names);
+  erpc.shutdown();
+}
+
+
+
 TEST_F(EngineRpc, GetService) {
   enginerpc erpc("0.0.0.0", 40001);
   std::unique_ptr<std::thread> th;
@@ -323,6 +358,41 @@ TEST_F(EngineRpc, GetService) {
   erpc.shutdown();
 }
 
+TEST_F(EngineRpc, GetWrongService) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+  std::vector<std::string> vectests = {"GetService rpc engine failed",
+                                       "GetService",
+                                       "Host id: 0",
+                                       "Service id: 0",
+                                       "Host name: ",
+                                       "Serv desc: ",
+                                       "Service state: 0",
+                                       "Service period: "
+                                       };
+
+  _svc->set_current_state(engine::service::state_critical);
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetService bynames wrong_host wrong_svc");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  std::vector<std::string> result_names(output.size());
+  std::copy(output.begin(), output.end(), result_names.begin());
+
+  ASSERT_EQ(vectests, result_names);
+  erpc.shutdown();
+}
+
+
 TEST_F(EngineRpc, GetContact) {
   enginerpc erpc("0.0.0.0", 40001);
   std::unique_ptr<std::thread> th;
@@ -349,6 +419,33 @@ TEST_F(EngineRpc, GetContact) {
   ASSERT_EQ(vectests, result_names);
   erpc.shutdown();
 }
+
+TEST_F(EngineRpc, GetWrongContact) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+  std::vector<std::string> vectests = {"GetContact rpc engine failed", "GetContact", "", "",
+                                       ""};
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("GetContact wrong_contactadmin");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  std::vector<std::string> result_names(output.size());
+  std::copy(output.begin(), output.end(), result_names.begin());
+
+  ASSERT_EQ(vectests, result_names);
+  erpc.shutdown();
+}
+
 
 TEST_F(EngineRpc, GetHostsCount) {
   enginerpc erpc("0.0.0.0", 40001);
@@ -600,6 +697,34 @@ TEST_F(EngineRpc, DeleteComment) {
   ASSERT_EQ(comment::comments.size(), 0u);
   erpc.shutdown();
 }
+
+TEST_F(EngineRpc, DeleteWrongComment) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  bool continuerunning = false;
+  std::vector<std::string> vectests = {"DeleteComment failed.", 
+                                       "DeleteComment 0",
+                                      };
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute("DeleteComment 999");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  std::vector<std::string> results(output.size());
+  std::copy(output.begin(), output.end(), results.begin());
+
+  ASSERT_EQ(vectests, results);
+  ASSERT_EQ(comment::comments.size(), 0u);
+  erpc.shutdown();
+}
+
 
 TEST_F(EngineRpc, DeleteAllHostComments) {
   enginerpc erpc("0.0.0.0", 40001);
@@ -872,6 +997,39 @@ TEST_F(EngineRpc, ScheduleHostDowntime) {
   ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
   erpc.shutdown();
 }
+
+TEST_F(EngineRpc, ScheduleWrongHostDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  oss << "ScheduleHostDowntime test_host " << now + 1 << " " << now
+      << " 0 0 10000 undef host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  // we fake a wrong test with an 
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleHostDowntime 0", output.back());
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
 
 TEST_F(EngineRpc, ScheduleServiceDowntime) {
   enginerpc erpc("0.0.0.0", 40001);

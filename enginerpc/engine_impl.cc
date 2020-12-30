@@ -591,6 +591,8 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
         temp_service->get_service_id(), request->entry_time(), request->user(),
         request->comment_data(), persistent, comment::external, false,
         (time_t)0);
+    if (cmt == nullptr)
+      return 1;
     comment::comments.insert({cmt->get_comment_id(), cmt});
     return 0;
   });
@@ -621,8 +623,10 @@ grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
                         "comment_id must not be set to 0");
 
   auto fn = std::packaged_task<int32_t(void)>([&comment_id]() -> int32_t {
-    comment::delete_comment(comment_id);
-    return 0;
+    if (comment::delete_comment(comment_id))
+      return 0;
+    else
+      return 1;
   });
 
   std::future<int32_t> result = fn.get_future();
@@ -1005,13 +1009,15 @@ grpc::Status engine_impl::ScheduleHostDowntime(
     else
       duration = static_cast<unsigned long>(request->duration());
     /* scheduling downtime */
-    downtime_manager::instance().schedule_downtime(
+    int res = downtime_manager::instance().schedule_downtime(
         downtime::host_downtime, request->host_name(), "",
         request->entry_time(), request->author().c_str(),
         request->comment_data().c_str(), request->start(), request->end(),
         request->fixed(), request->triggered_by(), duration, &downtime_id);
-
-    return 0;
+    if (res == ERROR)
+      return 1;
+    else
+      return 0;
   });
 
   std::future<int32_t> result = fn.get_future();
