@@ -20,6 +20,11 @@ Macros
 ==============
 fix some macro and add tests for all macro.
 fix macro $TIMET$ now return time in a unix epoch format.
+
+Notification
+==============
+fix Notifications are not sent when entering in notification timeperiod with notification_interval setted to 0.
+
 ========================
 Centreon Engine 20.04.8
 ========================
