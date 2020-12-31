@@ -20,6 +20,10 @@ Macros
 ==============
 fix some macro and test for some macro.
 
+Notification
+==============
+fix Notifications are not sent when entering in notification timeperiod with notification_interval setted to 0.
+
 =======================
 Centreon Engine 20.10.1
 =======================
