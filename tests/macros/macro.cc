@@ -30,6 +30,7 @@
 #include <com/centreon/engine/broker/loader.hh>
 #include <fstream>
 #include <gtest/gtest.h>
+#include "../timeperiod/utils.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -131,4 +132,23 @@ TEST_F(Macro, TotalHostServicesCriticalError) {
   /* The call of this variable needs a host name */
   process_macros_r(&mac, "$TOTALHOSTSERVICESCRITICAL$", out, 1);
   ASSERT_EQ(out, "");
+}
+
+TEST_F(Macro, TimeT) {
+  configuration::applier::host hst_aply;
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
+  ASSERT_NO_THROW(hst_aply.add_object(hst));
+  ASSERT_EQ(1u, host::hosts.size());
+
+  int now{500000000};
+  set_time(now);
+  init_macros();
+
+  std::string out;
+  nagios_macros* mac(get_global_macros());
+  process_macros_r(mac, "$TIMET:test_host$", out, 0);
+  ASSERT_EQ(out, "500000000");
 }
