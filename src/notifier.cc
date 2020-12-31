@@ -20,7 +20,6 @@
 #include "com/centreon/engine/notifier.hh"
 
 #include <cassert>
-
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/common.hh"
@@ -149,6 +148,7 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _retain_status_information{retain_status_information},
       _retain_nonstatus_information{retain_nonstatus_information},
       _is_being_freshened{false},
+      _notification_to_interval_on_timeperiod_in{false},
       _notification_number{0},
       _notification{{}},
       _state_history{{}},
@@ -218,6 +218,11 @@ bool notifier::_is_notification_viable_normal(reason_type type
   logger(dbg_functions, basic) << "notifier::is_notification_viable_normal()";
 
   /* forced notifications bust through everything */
+  uint32_t notification_interval =
+    !_notification[cat_normal]
+        ? _notification_interval
+        : _notification[cat_normal]->get_notification_interval();
+
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
         << "This is a forced notification, so we'll send it out.";
@@ -265,6 +270,12 @@ bool notifier::_is_notification_viable_normal(reason_type type
     logger(dbg_notifications, more)
         << "This notifier shouldn't have notifications sent out "
            "at this time.";
+    if(notification_interval == 0 && config->postpone_notification_to_timeperiod()) {
+      _notification_to_interval_on_timeperiod_in = true;
+      logger(dbg_notifications, more)
+          << "This notifier is save to send this notifications in "
+             "the next notification time period.";
+    }
     return false;
   }
 
@@ -324,12 +335,11 @@ bool notifier::_is_notification_viable_normal(reason_type type
     /* In the case of a state change, we don't care of the notification interval
      * and we notify as soon as we can */
     if (get_last_hard_state_change() <= _last_notification) {
-      uint32_t notification_interval =
-          !_notification[cat_normal]
-              ? _notification_interval
-              : _notification[cat_normal]->get_notification_interval();
-
-      if (notification_interval == 0) {
+      if (notification_interval == 0 ) {
+        if (_notification_to_interval_on_timeperiod_in){
+          _notification_to_interval_on_timeperiod_in= false;
+          return true;
+        }
         logger(dbg_notifications, more)
             << "This notifier problem has already been sent at "
             << _last_notification
@@ -384,6 +394,7 @@ bool notifier::_is_notification_viable_recovery(reason_type type
           << "This notifier shouldn't have notifications sent out "
              "at this time.";
       retval = false;
+      send_later = true;
     }
     /* if this notifier is currently in a scheduled downtime period, don't send
      * the notification */
