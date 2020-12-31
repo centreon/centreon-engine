@@ -127,7 +127,8 @@ extern char* use_timezone;
 extern char* illegal_object_chars;
 extern char* illegal_output_chars;
 extern unsigned int use_large_installation_tweaks;
-extern uint32_t instance_heartbeat_interval;
+extern uint32_t instance_heartbeat_interval;   
+extern unsigned int postpone_notification_to_timeperiod;
 
 #ifdef __cplusplus
 }
