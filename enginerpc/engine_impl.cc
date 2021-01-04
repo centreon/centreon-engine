@@ -1073,14 +1073,16 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
       duration = static_cast<unsigned long>(request->duration());
 
     /* scheduling downtime */
-    downtime_manager::instance().schedule_downtime(
+    int res = downtime_manager::instance().schedule_downtime(
         downtime::service_downtime, request->host_name(),
         request->service_desc(), request->entry_time(),
         request->author().c_str(), request->comment_data().c_str(),
         request->start(), request->end(), request->fixed(),
         request->triggered_by(), duration, &downtime_id);
-
-    return 0;
+    if (res == ERROR)
+      return 1;   
+    else 
+      return 0;
   });
 
   std::future<int32_t> result = fn.get_future();

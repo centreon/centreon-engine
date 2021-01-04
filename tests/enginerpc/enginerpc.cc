@@ -1012,7 +1012,7 @@ TEST_F(EngineRpc, ScheduleWrongHostDowntime) {
   time_t now = time(nullptr);
 
   oss << "ScheduleHostDowntime test_host " << now + 1 << " " << now
-      << " 0 0 10000 undef host " << now;
+      << " 0 0 10000 admin host " << now;
 
   call_command_manager(th, &condvar, &mutex, &continuerunning);
 
@@ -1076,6 +1076,40 @@ TEST_F(EngineRpc, ScheduleServiceDowntime) {
   ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
   erpc.shutdown();
 }
+
+TEST_F(EngineRpc, ScheduleWrongServiceDowntime) {
+  enginerpc erpc("0.0.0.0", 40001);
+  std::unique_ptr<std::thread> th;
+  std::condition_variable condvar;
+  std::mutex mutex;
+  std::ostringstream oss;
+  bool continuerunning = false;
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+
+  set_time(20000);
+  time_t now = time(nullptr);
+
+  oss << "ScheduleServiceDowntime test_host test_svc " << now + 1 << " " << now
+      << " 0 0 10000 admin host " << now;
+
+  call_command_manager(th, &condvar, &mutex, &continuerunning);
+
+  auto output = execute(oss.str());
+  ASSERT_EQ("ScheduleServiceDowntime 0", output.back());
+  oss.str("");
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    continuerunning = true;
+  }
+  condvar.notify_one();
+  th->join();
+
+  ASSERT_EQ(0u, downtime_manager::instance().get_scheduled_downtimes().size());
+  erpc.shutdown();
+}
+
+
 
 TEST_F(EngineRpc, ScheduleHostServicesDowntime) {
   enginerpc erpc("0.0.0.0", 40001);
