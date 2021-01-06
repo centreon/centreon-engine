@@ -334,7 +334,6 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   }
 
   std::string out{testing::internal::GetCapturedStdout()};
-
   size_t m1{out.find("Step 6:")};
   size_t m2{
       out.find("SERVICE NOTIFICATION: "
