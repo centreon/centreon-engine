@@ -23,14 +23,18 @@
 #include <unistd.h>
 #include <memory>
 #include <mutex>
+#include <iostream>
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/logging.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 extern "C" {
 
@@ -953,13 +957,14 @@ void broker_flapping_data(int type,
   ds.flapping_type = flapping_type;
   if (flapping_type == SERVICE_FLAPPING) {
     temp_service = (com::centreon::engine::service*)data;
-    ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
+    ds.host_id = temp_service->get_host_id();
+    ds.service_id = temp_service->get_service_id();
     ds.service_description =
         const_cast<char*>(temp_service->get_description().c_str());
     ds.comment_id = temp_service->get_flapping_comment_id();
   } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
+    ds.host_id = temp_host->get_host_id();
     ds.service_description = NULL;
     ds.comment_id = temp_host->get_flapping_comment_id();
   }

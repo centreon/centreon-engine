@@ -320,7 +320,8 @@ typedef struct nebstruct_flapping_struct {
   struct timeval timestamp;
 
   int flapping_type;
-  char* host_name;
+  uint64_t  host_id;
+  uint64_t  service_id;
   char* service_description;
   double percent_change;
   double high_threshold;

@@ -254,6 +254,7 @@ TEST_F(ServiceFlappingNotification, SimpleServiceFlappingStopTwoTimes) {
 }
 
 TEST_F(ServiceFlappingNotification, CheckFlapping) {
+  testing::internal::CaptureStdout();
   config->enable_flap_detection(true);
   _service->set_flap_detection_enabled(true);
   _service->add_flap_detection_on(engine::service::ok);
@@ -267,7 +268,7 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   _service->set_state_type(checkable::hard);
   _service->set_first_notification_delay(3);
   _service->set_max_attempts(1);
-
+  
   // This loop is to store many UP in the state history.
   for (int i = 1; i < 22; i++) {
     // When i == 0, the state_critical is soft => no notification
@@ -290,7 +291,7 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
     checks::checker::instance().reap();
   }
 
-  testing::internal::CaptureStdout();
+  
   for (int i = 1; i < 8; i++) {
     // When i == 0, the state_critical is soft => no notification
     // When i == 1, the state_critical is soft => no notification
@@ -334,7 +335,7 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   }
 
   std::string out{testing::internal::GetCapturedStdout()};
-
+  std::cout<<out<<std::endl;
   size_t m1{out.find("Step 6:")};
   size_t m2{
       out.find("SERVICE NOTIFICATION: "
