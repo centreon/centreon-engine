@@ -530,7 +530,7 @@ static int handle_summary_macro(nagios_macros* mac,
       if (authorized) {
         bool problem(true);
         if ((it->second->get_current_state() == host::state_up) &&
-            it->second->get_has_been_checked())
+            it->second->has_been_checked())
           hosts_up++;
         else if (it->second->get_current_state() == host::state_down) {
           if (it->second->get_scheduled_downtime_depth() > 0)
@@ -580,7 +580,7 @@ static int handle_summary_macro(nagios_macros* mac,
       if (authorized) {
         bool problem(true);
         if (it->second->get_current_state() == service::state_ok &&
-            it->second->get_has_been_checked())
+            it->second->has_been_checked())
           services_ok++;
         else if (it->second->get_current_state() == service::state_warning) {
           host* temp_host{nullptr};

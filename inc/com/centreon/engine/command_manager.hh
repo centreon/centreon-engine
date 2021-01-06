@@ -20,19 +20,23 @@
 #ifndef CCE_COMMAND_MANAGER_HH
 #define CCE_COMMAND_MANAGER_HH
 
-#include <mutex>
 #include <deque>
-#include <functional>
+#include <future>
+#include <mutex>
+
+#include "com/centreon/engine/engine_impl.hh"
+#include "com/centreon/engine/host.hh"
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 class command_manager {
   std::mutex _queue_m;
-  std::deque<std::function<int()>> _queue;
+  std::deque<std::packaged_task<int()>> _queue;
   command_manager();
+
  public:
   static command_manager& instance();
-  void enqueue(std::function<int(void)>&& f);
+  void enqueue(std::packaged_task<int(void)>&& f);
 
   int process_passive_service_check(time_t check_time,
                                     const std::string& host_name,
@@ -43,7 +47,20 @@ class command_manager {
                                  const std::string& host_name,
                                  uint32_t return_code,
                                  const std::string& output);
+  int get_stats(std::string const& request, Stats* response);
+  int get_restart_stats(RestartStats* response);
+  int get_services_stats(ServicesStats* sstats);
+  int get_hosts_stats(HostsStats* hstats);
   void execute();
+  static void schedule_and_propagate_downtime(host* h,
+                                              time_t entry_time,
+                                              char const* author,
+                                              char const* comment,
+                                              time_t start,
+                                              time_t end,
+                                              int fixed,
+                                              unsigned long trigerred,
+                                              unsigned long duration);
 };
 
 CCE_END()

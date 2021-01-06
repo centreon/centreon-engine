@@ -35,8 +35,8 @@ typedef struct nebstruct_acknowledgement_struct {
   uint64_t host_id;
   uint64_t service_id;
   int state;
-  char* author_name;
-  char* comment_data;
+  const char* author_name;
+  const char* comment_data;
   int is_sticky;
   int persistent_comment;
   int notify_contacts;

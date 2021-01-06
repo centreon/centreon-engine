@@ -320,7 +320,7 @@ int xsddefault_save_status_data() {
         << it->second->get_event_handler()
         << "\n"
            "\thas_been_checked="
-        << it->second->get_has_been_checked()
+        << it->second->has_been_checked()
         << "\n"
            "\tshould_be_scheduled="
         << it->second->get_should_be_scheduled()
@@ -492,7 +492,7 @@ int xsddefault_save_status_data() {
            << it->second->get_event_handler()
            << "\n"
               "\thas_been_checked="
-           << it->second->get_has_been_checked()
+           << it->second->has_been_checked()
            << "\n"
               "\tshould_be_scheduled="
            << it->second->get_should_be_scheduled()

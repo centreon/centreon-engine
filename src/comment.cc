@@ -87,9 +87,10 @@ comment::comment(comment::type comment_type,
 }
 
 /* deletes a host or service comment */
-void comment::delete_comment(uint64_t comment_id) {
+bool comment::delete_comment(uint64_t comment_id) {
   comment_map::iterator found = comment::comments.find(comment_id);
 
+  //check that comment exist
   if (found != comment::comments.end() && found->second) {
     broker_comment_data(
         NEBTYPE_COMMENT_DELETE, NEBFLAG_NONE, NEBATTR_NONE,
@@ -102,7 +103,9 @@ void comment::delete_comment(uint64_t comment_id) {
         found->second->get_expires(), found->second->get_expire_time(),
         comment_id, nullptr);
     comment::comments.erase(comment_id);
-  }
+    return true;
+  } 
+  else  { return false; }
 }
 
 void comment::delete_host_comments(uint64_t host_id) {
