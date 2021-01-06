@@ -2040,7 +2040,7 @@ void service::check_for_flapping(bool update,
       curved_percent_change < high_threshold)
     return;
   /* we're below the lower bound, so we're not flapping */
-  else if (curved_percent_change <= low_threshold)
+  else if (curved_percent_change < low_threshold)
     is_flapping = false;
   /* else we're above the upper bound, so we are flapping */
   else if (curved_percent_change >= high_threshold)
