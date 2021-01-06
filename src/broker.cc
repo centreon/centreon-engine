@@ -23,18 +23,14 @@
 #include <unistd.h>
 #include <memory>
 #include <mutex>
-#include <iostream>
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/engine/logging.hh"
-#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::logging;
 
 extern "C" {
 
