@@ -322,7 +322,6 @@ typedef struct nebstruct_flapping_struct {
   int flapping_type;
   uint64_t  host_id;
   uint64_t  service_id;
-  char* service_description;
   double percent_change;
   double high_threshold;
   double low_threshold;
