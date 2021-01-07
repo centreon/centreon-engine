@@ -60,6 +60,12 @@ add_custom_command(
   ARGS --cpp_out="${ENGINERPC_DIR}" --proto_path=${ENGINERPC_DIR} ${ENGINERPC_DIR}/engine.proto
 )
 
+add_custom_target(engine_rpc DEPENDS
+  ${ENGINERPC_DIR}/engine.grpc.pb.cc
+  ${ENGINERPC_DIR}/engine.pb.cc
+  ${ENGINERPC_DIR}/engine.grpc.pb.h
+  ${ENGINERPC_DIR}/engine.pb.h)
+
 add_library(
     cerpc
     STATIC

@@ -617,7 +617,9 @@ add_subdirectory(enginerpc)
 include_directories(enginerpc)
 
 # Library engine target.
+
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
+add_dependencies(cce_core engine_rpc)
 
 # Link target with required libraries.
 target_link_libraries(cce_core ${json11_LIBS}
