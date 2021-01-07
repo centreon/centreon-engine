@@ -1,4 +1,19 @@
 ========================
+Centreon Engine 20.04.10
+========================
+
+*******
+Bug Fix
+*******
+
+Flapping detection
+==================
+The code is updated to match the documentation. Following the documentation,
+the hightest threshold on flapping detection is a non strict threshold whereas
+the lowest threshold is a strict one. For the second one, we had to change the
+code to be agress with the documentation.
+
+========================
 Centreon Engine 20.04.9
 ========================
 
