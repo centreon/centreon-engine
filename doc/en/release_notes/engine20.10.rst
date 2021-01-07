@@ -1,4 +1,19 @@
 =======================
+Centreon Engine 20.10.3
+=======================
+
+*******
+Bug Fix
+*******
+
+Flapping detection
+==================
+The code is updated to match the documentation. Following the documentation,
+the hightest threshold on flapping detection is a non strict threshold whereas
+the lowest threshold is a strict one. For the second one, we had to change the
+code to be agress with the documentation.
+
+=======================
 Centreon Engine 20.10.2
 =======================
 
@@ -16,8 +31,8 @@ instance_heartbeat_interval in the centengine.cfg file.
 Bug Fix
 *******
 
-Macros 
-==============
+Macros
+======
 fix some macro and test for some macro.
 fix macro $TIMET$ now return time in a unix epoch format.
 
