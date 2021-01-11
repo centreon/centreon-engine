@@ -51,11 +51,9 @@ connector::connector(std::string const& connector_name,
       _is_running(false),
       _query_quit_ok(false),
       _query_version_ok(false),
-      _process(this),
+      _process(this, true, true, false), // Disable stderr.
       _restart(nullptr),
       _try_to_restart(true) {
-  // Disable stderr.
-  _process.enable_stream(process::err, false);
   // Set use setpgid.
   _process.setpgid_on_exec(config->use_setpgid());
 

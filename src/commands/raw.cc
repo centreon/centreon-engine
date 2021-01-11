@@ -530,9 +530,8 @@ void raw::_build_macrosx_environment(nagios_macros& macros, environment& env) {
 process* raw::_get_free_process() {
   // If any process are available, create new one.
   if (_processes_free.empty()) {
-    process* p(new process(this));
-    p->enable_stream(process::in, false);
-    p->enable_stream(process::err, false);
+    /* Only the out stream is open */
+    process* p = new process(this, false, true, false);
     p->setpgid_on_exec(config->use_setpgid());
     return p;
   }
