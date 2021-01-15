@@ -36,7 +36,7 @@ while (<F>) {
         elsif (m/^\s*char\*\s+([^\s]*);/) {
             $callback .= "\n      << \"  $1=\" << (neb_data->$1 ? neb_data->$1 : \"NULL\") << std::endl";
         }
-        elsif (m/^\s*[a-z\s]*\*?\s+([^\s]*);/) {
+        elsif (m/^\s*[a-z0-9_\s]*\*?\s+([^\s]*);/) {
             $callback .= "\n      << \"  $1=\" << neb_data->$1 << std::endl";
         }
         elsif (m/}\s*([a-z_]*);/) {
