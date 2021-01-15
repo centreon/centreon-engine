@@ -40,11 +40,7 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+loop* loop::_instance = nullptr;
 
 /**
  *  Get instance of the events loop singleton.
@@ -52,8 +48,22 @@ using namespace com::centreon::engine::logging;
  *  @return The singleton.
  */
 loop& loop::instance() {
-  static loop instance;
-  return instance;
+  /* This singleton does not follow the C++ good practices, because we
+   * need to control when to destroy it. */
+  assert(_instance);
+  return *_instance;
+}
+
+void loop::init() {
+  if (!_instance)
+    _instance = new loop();
+}
+
+void loop::deinit() {
+  if (_instance) {
+    delete _instance;
+    _instance = nullptr;
+  }
 }
 
 void loop::clear() {

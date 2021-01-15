@@ -223,7 +223,7 @@ void handle::open() {
     return;
 
   try {
-    _handle = std::shared_ptr<library>(new library(_filename));
+    _handle = std::shared_ptr<library>(std::make_shared<library>(_filename));
     _handle->load();
 
     int api_version(*static_cast<int*>(_handle->resolve("__neb_api_version")));
@@ -236,8 +236,8 @@ void handle::open() {
 
     if (init(NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE, _args.c_str(), this) !=
         OK)
-      throw(engine_error() << "Function nebmodule_init "
-                              "returned an error");
+      throw engine_error() << "Function nebmodule_init "
+                              "returned an error";
 
     broker::compatibility::instance().loaded_module(this);
   } catch (std::exception const& e) {
@@ -245,7 +245,6 @@ void handle::open() {
     close();
     throw;
   }
-  return;
 }
 
 /**

@@ -17,6 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <fmt/format.h>
+
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/environment.hh"
 #include "com/centreon/engine/exceptions/error.hh"
@@ -338,10 +340,9 @@ void raw::finished(process& p) noexcept {
  */
 void raw::_build_argv_macro_environment(nagios_macros const& macros,
                                         environment& env) {
-  for (uint32_t i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
-    std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << macros.argv[i];
-    env.add(oss.str());
+  for (uint32_t i = 0; i < MAX_COMMAND_ARGUMENTS; ++i) {
+    std::string e{fmt::format("{}ARG{}={}", MACRO_ENV_VAR_PREFIX, i + 1, macros.argv[i])};
+    env.add(e);
   }
 }
 
@@ -357,9 +358,8 @@ void raw::_build_contact_address_environment(nagios_macros const& macros,
     return;
   std::vector<std::string> const& address(macros.contact_ptr->get_addresses());
   for (uint32_t i(0); i < address.size(); ++i) {
-    std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS" << i << "=" << address[i];
-    env.add(oss.str());
+    std::string e{fmt::format("{}CONTACTADDRESS{}={}", MACRO_ENV_VAR_PREFIX, i, address[i])};
+    env.add(e);
   }
 }
 
@@ -376,8 +376,7 @@ void raw::_build_custom_contact_macro_environment(nagios_macros& macros,
   if (cntct) {
     for (auto const& cv : cntct->get_custom_variables()) {
       if (!cv.first.empty()) {
-        std::string name("_CONTACT");
-        name.append(cv.first);
+        std::string name(fmt::format("_CONTACT{}", cv.first));
         macros.custom_contact_vars[name] = cv.second;
       }
     }
@@ -388,11 +387,7 @@ void raw::_build_custom_contact_macro_environment(nagios_macros& macros,
       std::string value(
           clean_macro_chars(cv.second.get_value(),
                             STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(cv.first);
-      line.append("=");
-      line.append(value);
+      std::string line{fmt::format("{}{}={}", MACRO_ENV_VAR_PREFIX, cv.first, value)};
       env.add(line);
     }
   }
@@ -411,8 +406,7 @@ void raw::_build_custom_host_macro_environment(nagios_macros& macros,
   if (hst) {
     for (auto const& cv : hst->custom_variables) {
       if (!cv.first.empty()) {
-        std::string name("_HOST");
-        name.append(cv.first);
+        std::string name{fmt::format("_HOST{}", cv.first)};
         macros.custom_host_vars[name] = cv.second;
       }
     }
@@ -423,11 +417,7 @@ void raw::_build_custom_host_macro_environment(nagios_macros& macros,
       std::string value(
           clean_macro_chars(cv.second.get_value(),
                             STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(cv.first);
-      line.append("=");
-      line.append(value);
+      std::string line{fmt::format("{}{}={}", MACRO_ENV_VAR_PREFIX, cv.first, value)};
       env.add(line);
     }
   }
@@ -446,8 +436,7 @@ void raw::_build_custom_service_macro_environment(nagios_macros& macros,
   if (svc) {
     for (auto const& cv : svc->custom_variables) {
       if (!cv.first.empty()) {
-        std::string name("_SERVICE");
-        name.append(cv.first);
+        std::string name(fmt::format("_SERVICE{}", cv.first));
         macros.custom_service_vars[name] = cv.second;
       }
     }
@@ -458,11 +447,7 @@ void raw::_build_custom_service_macro_environment(nagios_macros& macros,
       std::string value(
           clean_macro_chars(cv.second.get_value(),
                             STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(cv.first);
-      line.append("=");
-      line.append(value);
+      std::string line{fmt::format("{}{}={}", MACRO_ENV_VAR_PREFIX, cv.first, value)};
       env.add(line);
     }
   }
@@ -507,11 +492,7 @@ void raw::_build_macrosx_environment(nagios_macros& macros, environment& env) {
 
     // Add into the environment.
     if (!macro_x_names[i].empty()) {
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(macro_x_names[i]);
-      line.append("=");
-      line.append(macros.x[i]);
+      std::string line{fmt::format("{}{}={}", MACRO_ENV_VAR_PREFIX, macro_x_names[i], macros.x[i])};
       env.add(line);
     }
 

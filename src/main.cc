@@ -96,7 +96,15 @@ int main(int argc, char* argv[]) {
 #endif  // HAVE_GETOPT_H
 
   // Load singletons and global variable.
+  //FIXME DBR
+  // logging::engine::load();
   config = new configuration::state;
+  //engine::timezone_manager::load();
+  //engine::configuration::applier::state::load();
+  //engine::checks::checker::load();
+  //engine::events::loop::load();
+  //engine::broker::loader::load();
+  //engine::broker::compatibility::load();
 
   // Hack to instanciate the logger.
   configuration::applier::logging::instance();
@@ -170,6 +178,8 @@ int main(int argc, char* argv[]) {
 
     // Checker init
     checks::checker::init();
+    // Loop init
+    events::loop::init();
 
     // Just display the license.
     if (display_license) {
@@ -360,14 +370,11 @@ int main(int argc, char* argv[]) {
         mac->x[MACRO_PROCESSSTARTTIME] = std::to_string(program_start);
 
         // Load broker modules.
-        for (std::list<std::string>::const_iterator
-                 it(config.broker_module().begin()),
-             end(config.broker_module().end());
-             it != end; ++it) {
+        for (const auto& m : config.broker_module()) {
           std::string filename;
           std::string args;
-          if (!string::split(*it, filename, args, ' '))
-            filename = *it;
+          if (!string::split(m, filename, args, ' '))
+            filename = m;
           broker::loader::instance().add_module(filename, args);
         }
         neb_init_callback_list();
@@ -445,6 +452,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Memory cleanup.
+    //    FIXME DBR
     cleanup();
     delete[] config_file;
     config_file = NULL;
@@ -453,8 +461,16 @@ int main(int argc, char* argv[]) {
   }
 
   // Unload singletons and global objects.
+  // FIXME DBR
+  //engine::events::loop::unload();
+  //engine::broker::compatibility::unload();
+  //engine::broker::loader::unload();
+  //engine::configuration::applier::state::unload();
+  //engine::checks::checker::unload();
   delete config;
   config = nullptr;
+  //com::centreon::engine::timezone_manager::unload();
+  //com::centreon::logging::engine::unload();
 
   return retval;
 }

@@ -137,9 +137,8 @@ unsigned int loader::load_directory(std::string const& dir) {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (std::list<std::shared_ptr<handle> >::iterator it(_modules.begin()),
-       end(_modules.end());
-       it != end; ++it) {
+  for (std::list<std::shared_ptr<handle>>::iterator it = _modules.begin(),
+       end = _modules.end(); it != end; ++it) {
     try {
       (*it)->close();
     } catch (...) {

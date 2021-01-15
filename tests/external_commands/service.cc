@@ -39,7 +39,6 @@ class ServiceExternalCommand : public ::testing::Test {
 
   void TearDown() override {
     deinit_config_state();
-    events::loop::instance().clear();
   }
 };
 

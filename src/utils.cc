@@ -415,6 +415,7 @@ bool set_cloexec(int fd) {
 void cleanup() {
   // Unload modules.
   if (!test_scheduling && !verify_config) {
+    events::loop::deinit();
     checks::checker::deinit();
     neb_free_callback_list();
     neb_unload_all_modules(NEBMODULE_FORCE_UNLOAD, sigshutdown

@@ -344,6 +344,10 @@ checker::checker() : commands::command_listener() {}
  *  Default destructor.
  */
 checker::~checker() noexcept {
+  {
+  std::unique_lock<std::mutex> lock(_mut_reap);
+  _waiting_check_cv.wait(lock, [this] { return _waiting_check_result.empty(); });
+  }
   clear();
 }
 
@@ -383,6 +387,7 @@ void checker::finished(commands::result const& res) noexcept {
   // Queue check result.
   lock.lock();
   _to_reap_partial.push_back(result);
+  _waiting_check_cv.notify_all();
 }
 
 /**

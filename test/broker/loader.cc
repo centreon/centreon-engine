@@ -68,7 +68,7 @@ void check_change_name() {
   loader& loader(loader::instance());
   std::shared_ptr<handle> module(loader.add_module(MOD_LIB_NAME, MOD_LIB_NAME));
   if (loader.get_modules().size() != 1)
-    throw(engine_error() << __func__ << ": add module failed");
+    throw engine_error() << __func__ << ": add module failed";
 
   // Change name.
   std::string new_name("New Name");
@@ -77,9 +77,9 @@ void check_change_name() {
   // Check content.
   std::list<std::shared_ptr<handle> > modules(loader.get_modules());
   if (modules.size() != 1)
-    throw(engine_error() << __func__ << ": set name failed");
+    throw engine_error() << __func__ << ": set name failed";
   if ((*modules.begin())->get_name() != new_name)
-    throw(engine_error() << __func__ << ": set name failed");
+    throw engine_error() << __func__ << ": set name failed";
   loader.del_module(module);
 }
 
@@ -93,7 +93,7 @@ int main_test(int argc, char** argv) {
   check_load();
   check_unload();
   check_change_name();
-  return (0);
+  return 0;
 }
 
 /**

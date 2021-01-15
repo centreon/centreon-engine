@@ -64,6 +64,8 @@ class checker : public commands::command_listener {
 
   /* A mutex to protect access on _waiting_check_result and _to_reap_partial */
   std::mutex _mut_reap;
+  std::condition_variable _waiting_check_cv;
+
   /*
    * Here is the list of prepared check results but with a command being
    * running. When the command will be finished, each check result is get back
