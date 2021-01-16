@@ -15,7 +15,7 @@ BUILD_TYPE="Debug"
 for i in "$@"
 do
   case $i in
-    -f=*|--force)
+    -f|--force)
       force=1
       shift
       ;;
