@@ -132,10 +132,7 @@ int main(int argc, char* argv[]) {
     std::string cmdline(engine);
     cmdline.append(" ");
     cmdline.append(cfg_files.main_file());
-    com::centreon::process centengine;
-    centengine.enable_stream(com::centreon::process::in, false);
-    centengine.enable_stream(com::centreon::process::out, false);
-    centengine.enable_stream(com::centreon::process::err, false);
+    com::centreon::process centengine(nullptr, false, false, false);
     centengine.exec(cmdline);
     while (access(cfg_files.command_file().c_str(), F_OK))
       sleep(1);

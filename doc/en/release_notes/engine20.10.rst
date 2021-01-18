@@ -13,6 +13,11 @@ the hightest threshold on flapping detection is a non strict threshold whereas
 the lowest threshold is a strict one. For the second one, we had to change the
 code to be agress with the documentation.
 
+process/process_manager api updated
+===================================
+Because of several changes in the clib api, we have to change several calls
+here.
+
 =======================
 Centreon Engine 20.10.2
 =======================
