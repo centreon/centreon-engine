@@ -523,11 +523,8 @@ TEST_F(ServiceNotification, SimpleCheck) {
     if (notifier::hard == _svc->get_state_type())
       _svc->set_last_hard_state(_svc->get_current_state());
 
-    std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down";
-    std::string cmd{oss.str()};
+    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down", now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -536,11 +533,8 @@ TEST_F(ServiceNotification, SimpleCheck) {
     // When i == 0, the state_up is hard (return to up) => Recovery notification
     // When i == 1, the state_up is still here (no change) => no notification
     set_time(56500 + i * 500);
-    std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-    std::string cmd{oss.str()};
+    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -583,12 +577,9 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
     _svc->set_last_state(_svc->get_current_state());
     if (notifier::hard == _svc->get_state_type())
       _svc->set_last_hard_state(_svc->get_current_state());
-    std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
-           "critical";
-    std::string cmd{oss.str()};
+    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
+                   "critical", now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -598,11 +589,8 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
     // When i == 1, the state_up is still here (no change) => no notification
     std::cout << "New step " << i << std::endl;
     set_time(50600 + i * 60);
-    std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-    std::string cmd{oss.str()};
+    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -646,8 +634,8 @@ TEST_F(ServiceNotification, CheckNotifIntervZero) {
     if (notifier::hard == _svc->get_state_type())
       _svc->set_last_hard_state(_svc->get_current_state());
 
-    std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
+    std::ostringstream oss;
     oss << '[' << now << ']'
         << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down";
     std::string cmd{oss.str()};
@@ -659,8 +647,8 @@ TEST_F(ServiceNotification, CheckNotifIntervZero) {
     // When i == 0, the state_up is hard (return to up) => Recovery notification
     // When i == 1, the state_up is still here (no change) => no notification
     set_time(56500 + i * 500);
-    std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
+    std::ostringstream oss;
     oss << '[' << now << ']'
         << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
     std::string cmd{oss.str()};
@@ -941,11 +929,8 @@ TEST_F(ServiceNotification, NoServiceNotificationWhenHostDown) {
     if (notifier::hard == _svc->get_state_type())
       _svc->set_last_hard_state(_svc->get_current_state());
 
-    std::ostringstream oss;
     std::time_t now{std::time(nullptr)};
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down";
-    std::string cmd{oss.str()};
+    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down", now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
