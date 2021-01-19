@@ -322,7 +322,7 @@ std::ostream& dump::host(std::ostream& os,
      << obj.get_flap_detection_enabled()
      << "\n"
         "has_been_checked="
-     << obj.get_has_been_checked()
+     << obj.has_been_checked()
      << "\n"
         "is_flapping="
      << obj.get_is_flapping()
@@ -659,7 +659,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
      << obj.get_flap_detection_enabled()
      << "\n"
         "has_been_checked="
-     << obj.get_has_been_checked()
+     << obj.has_been_checked()
      << "\n"
         "is_flapping="
      << obj.get_is_flapping()

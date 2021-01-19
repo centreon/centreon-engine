@@ -75,7 +75,7 @@ class comment {
 
   static uint64_t get_next_comment_id();
   static void set_next_comment_id(uint64_t comment_id);
-  static void delete_comment(uint64_t comment_id);
+  static bool delete_comment(uint64_t comment_id);
   static void delete_host_comments(uint64_t host_id);
   static void delete_service_comments(uint64_t host_id, uint64_t service_id);
   static void delete_host_acknowledgement_comments(engine::host* hst);

@@ -123,7 +123,7 @@ class checkable {
   int get_current_attempt() const;
   void set_current_attempt(int current_attempt);
   void add_current_attempt(int num);
-  bool get_has_been_checked() const;
+  bool has_been_checked() const;
   void set_has_been_checked(bool has_been_checked);
   int get_scheduled_downtime_depth() const;
   void set_scheduled_downtime_depth(int scheduled_downtime_depth) noexcept;

@@ -1078,7 +1078,7 @@ int notifier::get_notification_number() const noexcept {
  *
  * @return a long unsigned integer.
  */
-uint64_t notifier::get_next_notification_id() const noexcept {
+uint64_t notifier::get_next_notification_id() {
   return _next_notification_id;
 }
 

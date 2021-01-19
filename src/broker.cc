@@ -53,8 +53,8 @@ void broker_acknowledgement_data(int type,
                                  int attr,
                                  int acknowledgement_type,
                                  void* data,
-                                 char* ack_author,
-                                 char* ack_data,
+                                 const char* ack_author,
+                                 const char* ack_data,
                                  int subtype,
                                  int notify_contacts,
                                  int persistent_comment,
@@ -953,14 +953,13 @@ void broker_flapping_data(int type,
   ds.flapping_type = flapping_type;
   if (flapping_type == SERVICE_FLAPPING) {
     temp_service = (com::centreon::engine::service*)data;
-    ds.host_name = const_cast<char*>(temp_service->get_hostname().c_str());
-    ds.service_description =
-        const_cast<char*>(temp_service->get_description().c_str());
+    ds.host_id = temp_service->get_host_id();
+    ds.service_id = temp_service->get_service_id();
     ds.comment_id = temp_service->get_flapping_comment_id();
   } else {
     temp_host = (host*)data;
-    ds.host_name = const_cast<char*>(temp_host->get_name().c_str());
-    ds.service_description = NULL;
+    ds.host_id = temp_host->get_host_id();
+    ds.service_id = 0;
     ds.comment_id = temp_host->get_flapping_comment_id();
   }
   ds.object_ptr = data;

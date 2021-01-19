@@ -515,7 +515,7 @@ void applier::service::remove_object(configuration::service const& obj) {
     // Remove service downtimes.
     downtime_manager::instance()
         .delete_downtime_by_hostname_service_description_start_time_comment(
-            host_name, service_description, (time_t)0, "");
+            host_name, service_description, {false, (time_t)0}, "");
 
     // Remove events related to this service.
     applier::scheduler::instance().remove_service(obj.host_id(),

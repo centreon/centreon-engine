@@ -20,6 +20,7 @@
 # Set directories.
 set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc")
 set(ENGINERPC_DIR "${PROJECT_SOURCE_DIR}/enginerpc" PARENT_SCOPE)
+set(INC_DIR "../inc/com/centreon/engine/")
 
 set(ENGINERPC enginerpc)
 set(ENGINERPC enginerpc PARENT_SCOPE)
@@ -59,6 +60,12 @@ add_custom_command(
   ARGS --cpp_out="${ENGINERPC_DIR}" --proto_path=${ENGINERPC_DIR} ${ENGINERPC_DIR}/engine.proto
 )
 
+add_custom_target(engine_rpc DEPENDS
+  ${ENGINERPC_DIR}/engine.grpc.pb.cc
+  ${ENGINERPC_DIR}/engine.pb.cc
+  ${ENGINERPC_DIR}/engine.grpc.pb.h
+  ${ENGINERPC_DIR}/engine.pb.h)
+
 add_library(
     cerpc
     STATIC
@@ -79,8 +86,8 @@ add_library(
   enginerpc.cc
 
   # Headers.
-  engine_impl.hh
-  enginerpc.hh
+  "${INC_DIR}/engine_impl.hh"
+  "${INC_DIR}/enginerpc.hh"
 )
 
 # Prettier name.
