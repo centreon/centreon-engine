@@ -1,9 +1,36 @@
 #!/bin/bash
 
-if [ "$1" = "-f" ] ; then
-  force=1
-  shift
-fi
+show_help() {
+cat << EOF
+Usage: ${0##*/} -n=[yes|no] -v
+
+This program build Centreon-engine
+
+    -f|--force    : force rebuild
+    -r|--release  : Build on release mode
+    -h|--help     : help
+EOF
+}
+BUILD_TYPE="Debug"
+for i in "$@"
+do
+  case $i in
+    -f|--force)
+      force=1
+      shift
+      ;;
+    -r|--release)
+      BUILD_TYPE="Release"
+      ;;
+    -h|--help)
+      show_help
+      exit 2
+      ;;
+    *)
+            # unknown option
+    ;;
+  esac
+done
 
 # Am I root?
 my_id=$(id -u)
@@ -145,14 +172,11 @@ fi
 if ! $conan remote list | grep ^centreon ; then
   $conan remote add centreon https://api.bintray.com/conan/centreon/centreon
 fi
+if ! $conan remote list | grep ^centreon ; then
+  $conan remote add centreon https://api.bintray.com/conan/centreon/centreon
+fi
 
 good=$(gcc --version | awk '/gcc/ && ($3+0)>5.0{print 1}')
-
-if [ ! -d build ] ; then
-  mkdir build
-else
-  echo "'build' directory already there"
-fi
 
 if [ ! -d build ] ; then
   mkdir build
@@ -173,9 +197,11 @@ else
 fi
 
 if [ $maj = "Raspbian" ] ; then
-  CXXFLAGS="-Wall -Wextra" $cmake -DWITH_PREFIX=/usr -DWITH_CENTREON_CLIB_LIBRARY_DIR=/usr/lib -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On $* -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
+  CXXFLAGS="-Wall -Wextra" $cmake -DWITH_PREFIX=/usr -DWITH_CENTREON_CLIB_LIBRARY_DIR=/usr/lib -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On $* -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
+elif [ $maj = "Debian" ] ; then
+  CXXFLAGS="-Wall -Wextra" $cmake -DWITH_PREFIX=/usr -DWITH_CENTREON_CLIB_LIBRARY_DIR=/usr/lib64 -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On $* -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
 else
-  CXXFLAGS="-Wall -Wextra" $cmake -DWITH_PREFIX=/usr -DWITH_CENTREON_CLIB_LIBRARY_DIR=/usr/lib64 -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On $* -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
+  CXXFLAGS="-Wall -Wextra" $cmake -DWITH_PREFIX=/usr -DWITH_CENTREON_CLIB_LIBRARY_DIR=/usr/lib64 -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On $* -DWITH_CREATE_FILES=OFF -DWITH_BENCH=On ..
 fi
 #CXX=/usr/bin/clang++ CC=/usr/bin/clang cmake -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Debug -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine -DWITH_TESTING=On -DWITH_SIMU=On .
 
