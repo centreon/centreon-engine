@@ -18,6 +18,11 @@ process/process_manager api updated
 Because of several changes in the clib api, we have to change several calls
 here.
 
+Notification Period
+===================
+the timeperiod are now filtered for the contact 
+and now don't push the notification with time period empty.
+
 ========================
 Centreon Engine 20.04.9
 ========================
