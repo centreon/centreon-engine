@@ -60,7 +60,6 @@ notification::notification(notifier* parent,
  * @return OK on success, ERROR otherwise.
  */
 int notification::execute(std::unordered_set<contact*> const& to_notify) {
-
   uint32_t contacts_notified{0};
 
   struct timeval start_time;
@@ -181,22 +180,17 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
     /* clear summary macros (they are customized for each contact) */
     clear_summary_macros_r(mac);
 
-    /* check viability of notifying the user */
-    notifier::notification_category cat{notifier::get_category(_type)};
-    if (ctc->should_be_notified(cat, _type, *_parent)) {
-      /* notify this contact */
-      if (_parent->notify_contact(mac, ctc, _type, _author.c_str(),
-                                  _message.c_str(), _options,
-                                  _escalated) == OK) {
-        /* keep track of how many contacts were notified */
-        contacts_notified++;
-        _notified_contact.insert(ctc->get_name());
-        if (mac->x[MACRO_NOTIFICATIONRECIPIENTS].empty())
-          mac->x[MACRO_NOTIFICATIONRECIPIENTS] = ctc->get_name();
-        else {
-          mac->x[MACRO_NOTIFICATIONRECIPIENTS].append(",");
-          mac->x[MACRO_NOTIFICATIONRECIPIENTS].append(ctc->get_name());
-        }
+    /* notify this contact */
+    if (_parent->notify_contact(mac, ctc, _type, _author.c_str(),
+                                _message.c_str(), _options, _escalated) == OK) {
+      /* keep track of how many contacts were notified */
+      contacts_notified++;
+      _notified_contact.insert(ctc->get_name());
+      if (mac->x[MACRO_NOTIFICATIONRECIPIENTS].empty())
+        mac->x[MACRO_NOTIFICATIONRECIPIENTS] = ctc->get_name();
+      else {
+        mac->x[MACRO_NOTIFICATIONRECIPIENTS].append(",");
+        mac->x[MACRO_NOTIFICATIONRECIPIENTS].append(ctc->get_name());
       }
     }
   }
