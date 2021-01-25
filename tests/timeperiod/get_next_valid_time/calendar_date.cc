@@ -89,10 +89,21 @@ TEST_F(GetNextValidTimeCalendarDateTest, WithinCalendarDate) {
 // When get_next_valid_time() is called
 // Then the next valid time is now
 TEST_F(GetNextValidTimeCalendarDateTest, AfterCalendarDates) {
+  std::unique_ptr<engine::timeperiod> tiperiod{
+      new engine::timeperiod("tperiod", "alias")};
+
+  for (int i = 0; i < 7; ++i) {
+    timerange_list list_time;
+    // list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
+    list_time.push_back(std::make_shared<engine::timerange>(8000, 85000));
+    tiperiod->days[i] = list_time;
+  }
+
   default_data_set();
+
   time_t now(strtotimet("2016-10-30 12:00:00"));
   set_time(now);
   time_t computed((time_t)-1);
-  get_next_valid_time(now, &computed, _creator.get_timeperiods());
+  get_next_valid_time(now, &computed, tiperiod.get());
   ASSERT_EQ(computed, now);
 }
