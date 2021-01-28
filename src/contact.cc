@@ -841,31 +841,37 @@ bool contact::should_be_notified(notifier::notification_category cat,
   logger(dbg_functions, basic) << "contact::should_be_notified()";
   /* Are notifications enabled? */
   switch (notif.get_notifier_type()) {
-    case notifier::service_notification:
+    case notifier::service_notification: {
       if (!_service_notifications_enabled) {
         logger(dbg_notifications, most)
             << "This contact shouldn't be notified from services.";
         return false;
       }
-      break;
-    case notifier::host_notification:
+      // See if the contact can be notified at this time for the host.
+      timezone_locker lock(get_timezone());
+      if (!check_time_against_period(std::time(nullptr),
+                                     get_service_notification_period_ptr())) {
+        logger(dbg_notifications, most)
+            << "This contact shouldn't be notified at this time.";
+        return false;
+      }
+    } break;
+    case notifier::host_notification: {
       if (!_host_notifications_enabled) {
         logger(dbg_notifications, most)
             << "This contact shouldn't be notified from hosts.";
         return false;
       }
-      break;
+      // See if the contact can be notified at this time for the service.
+      timezone_locker lock(get_timezone());
+      if (!check_time_against_period(std::time(nullptr),
+                                     get_host_notification_period_ptr())) {
+        logger(dbg_notifications, most)
+            << "This contact shouldn't be notified at this time.";
+        return false;
+      }
+    } break;
   }
-
-  // See if the contact can be notified at this time. 
-  timezone_locker lock(get_timezone());
-  if (!check_time_against_period(std::time(nullptr),
-                                  get_service_notification_period_ptr())) {
-    logger(dbg_notifications, most)
-        << "This contact shouldn't be notified at this time.";
-    return false;
-  }
-
   return (this->*(_to_notify[cat]))(type, notif);
 }
 

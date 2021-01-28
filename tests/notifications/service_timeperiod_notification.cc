@@ -464,7 +464,6 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserOut) {
   configuration::applier::contact ct_aply;
   configuration::contact ctct;
   ctct.parse("contact_name", "test_contact");
-  ctct.parse("host_notification_period", "24x9");
   ctct.parse("service_notification_period", "24x9");
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
@@ -590,7 +589,6 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserIn) {
   configuration::applier::contact ct_aply;
   configuration::contact ctct;
   ctct.parse("contact_name", "test_contact");
-  ctct.parse("host_notification_period", "24x9");
   ctct.parse("service_notification_period", "24x9");
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
@@ -716,7 +714,6 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserAll) {
   configuration::applier::contact ct_aply;
   configuration::contact ctct;
   ctct.parse("contact_name", "test_contact");
-  ctct.parse("host_notification_period", "24x9");
   ctct.parse("service_notification_period", "24x9");
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
@@ -835,7 +832,6 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserNone) {
   configuration::applier::contact ct_aply;
   configuration::contact ctct;
   ctct.parse("contact_name", "test_contact");
-  ctct.parse("host_notification_period", "24x9");
   ctct.parse("service_notification_period", "24x9");
   ctct.parse("host_notification_commands", "cmd");
   ctct.parse("service_notification_commands", "cmd");
