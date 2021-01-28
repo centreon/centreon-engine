@@ -1198,8 +1198,7 @@ void timeperiod::get_next_valid_time_per_timeperiod(
         24 * 60 * 60);
   }
 
-  // If we couldn't find a time period there must be none defined.
-
+  // If we couldn't find a time period there must be none defined and return -1.
   *valid_time = earliest_time;
 }
 
