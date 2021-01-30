@@ -1066,12 +1066,8 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
           _add_round_days_to_midnight(ti.midnight, 24 * 60 * 60);
   }
 
-  // If we couldn't find a time period there must be none defined.
-  if (earliest_time == (time_t)-1)
-    *valid_time = original_preferred_time;
-  // Else use the calculated time.
-  else
-    *valid_time = earliest_time;
+  // If we couldn't find a time period there must be none defined and return -1.
+  *valid_time = earliest_time;
 }
 
 /**
