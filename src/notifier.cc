@@ -219,9 +219,9 @@ bool notifier::_is_notification_viable_normal(reason_type type
 
   /* forced notifications bust through everything */
   uint32_t notification_interval =
-    !_notification[cat_normal]
-        ? _notification_interval
-        : _notification[cat_normal]->get_notification_interval();
+      !_notification[cat_normal]
+          ? _notification_interval
+          : _notification[cat_normal]->get_notification_interval();
 
   if (options & notification_option_forced) {
     logger(dbg_notifications, more)
@@ -270,7 +270,8 @@ bool notifier::_is_notification_viable_normal(reason_type type
     logger(dbg_notifications, more)
         << "This notifier shouldn't have notifications sent out "
            "at this time.";
-    if(notification_interval == 0 && config->postpone_notification_to_timeperiod()) {
+    if (notification_interval == 0 &&
+        config->postpone_notification_to_timeperiod()) {
       _notification_to_interval_on_timeperiod_in = true;
       logger(dbg_notifications, more)
           << "This notifier is save to send this notifications in "
@@ -335,9 +336,9 @@ bool notifier::_is_notification_viable_normal(reason_type type
     /* In the case of a state change, we don't care of the notification interval
      * and we notify as soon as we can */
     if (get_last_hard_state_change() <= _last_notification) {
-      if (notification_interval == 0 ) {
-        if (_notification_to_interval_on_timeperiod_in){
-          _notification_to_interval_on_timeperiod_in= false;
+      if (notification_interval == 0) {
+        if (_notification_to_interval_on_timeperiod_in) {
+          _notification_to_interval_on_timeperiod_in = false;
           return true;
         }
         logger(dbg_notifications, more)
@@ -721,7 +722,8 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
          end{get_contacts().end()};
          it != end; ++it) {
       assert(it->second);
-      retval.insert(it->second);
+      if (it->second->should_be_notified(cat, type, *this))
+        retval.insert(it->second);
     }
 
     /* For each contact group, we also add its contacts. */
@@ -734,7 +736,8 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
            cend{it->second->get_members().end()};
            cit != cend; ++cit) {
         assert(cit->second);
-        retval.insert(cit->second);
+        if (cit->second->should_be_notified(cat, type, *this))
+          retval.insert(cit->second);
       }
     }
   }

@@ -884,7 +884,7 @@ TEST_F(Macro, IsValidTime) {
   std::string out;
   nagios_macros* mac(get_global_macros());
   process_macros_r(mac, "$ISVALIDTIME:test$", out, 1);
-  ASSERT_EQ(out, "0");
+  ASSERT_EQ(out, "1");
 }
 
 TEST_F(Macro, NextValidTime) {
@@ -893,6 +893,13 @@ TEST_F(Macro, NextValidTime) {
 
   time.parse("alias", "test");
   time.parse("timeperiod_name", "test");
+  time.parse("monday", "23:00-24:00");
+  time.parse("tuesday", "23:00-24:00");
+  time.parse("wednesday", "23:00-24:00");
+  time.parse("thursday", "23:00-24:00");
+  time.parse("friday", "23:00-24:00");
+  time.parse("saterday", "23:00-24:00");
+  time.parse("sunday", "23:00-24:00");
   time_aply.add_object(time);
 
   init_macros();
@@ -902,7 +909,7 @@ TEST_F(Macro, NextValidTime) {
   std::string out;
   nagios_macros* mac(get_global_macros());
   process_macros_r(mac, "$NEXTVALIDTIME:test$", out, 1);
-  ASSERT_EQ(out, "01:53:20");
+  ASSERT_EQ(out, "23:00:00");
 }
 
 TEST_F(Macro, ContactTimeZone) {
