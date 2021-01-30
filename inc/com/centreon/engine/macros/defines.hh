@@ -196,7 +196,6 @@
 // Macro Cleaning Options
 #define STRIP_ILLEGAL_MACRO_CHARS 1
 #define ESCAPE_MACRO_CHARS 2
-#define URL_ENCODE_MACRO_CHARS 4
 
 // NAGIOS_MACROS structure
 class nagios_macros {

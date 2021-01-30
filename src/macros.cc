@@ -402,7 +402,7 @@ int grab_standard_hostgroup_macro_r(nagios_macros* mac,
   switch (macro_type) {
     case MACRO_HOSTGROUPACTIONURL:
     case MACRO_HOSTGROUPNOTESURL:
-      process_macros_r(mac, output, temp_buffer, URL_ENCODE_MACRO_CHARS);
+      process_macros_r(mac, output, temp_buffer, 0);
       output = temp_buffer;
       break;
 
@@ -481,7 +481,7 @@ int grab_standard_servicegroup_macro_r(nagios_macros* mac,
   switch (macro_type) {
     case MACRO_SERVICEGROUPACTIONURL:
     case MACRO_SERVICEGROUPNOTESURL:
-      process_macros_r(mac, output, temp_buffer, URL_ENCODE_MACRO_CHARS);
+      process_macros_r(mac, output, temp_buffer, 0);
       output = temp_buffer;
       break;
 
@@ -670,72 +670,6 @@ std::string clean_macro_chars(std::string const& macro, int options) {
   }
   return retval;
 }
-
-std::string url_encode(std::string const& value) {
-  std::ostringstream escaped;
-  escaped.fill('0');
-  escaped << std::hex;
-
-  for (std::string::const_iterator i{value.begin()}, n{value.end()}; i != n;
-       ++i) {
-    std::string::value_type c{*i};
-
-    // Keep alphanumeric and other accepted characters intact
-    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
-      escaped << c;
-      continue;
-    }
-
-    // Any other characters are percent-encoded
-    escaped << std::uppercase;
-    escaped << '%' << std::setw(2) << int((unsigned char)c);
-    escaped << std::nouppercase;
-  }
-
-  return escaped.str();
-}
-
-///* encodes a string in proper URL format */
-// char* get_url_encoded_string(std::string const& input) {
-//  int x = 0;
-//  int y = 0;
-//  char* encoded_url_string = nullptr;
-//  char temp_expansion[6] = "";
-//
-//  /* bail if no input */
-//  if (input.empty())
-//    return nullptr;
-//
-//  /* allocate enough memory to escape all characters if necessary */
-//  encoded_url_string = new char[input.length() * 3 + 1];
-//
-//  /* check/encode all characters */
-//  for (x = 0, y = 0; input[x] != (char)'\x0'; x++) {
-//    /* alpha-numeric characters and a few other characters don't get encoded
-//    */ if (((char)input[x] >= '0' && (char)input[x] <= '9')
-//        || ((char)input[x] >= 'A' && (char)input[x] <= 'Z')
-//        || ((char)input[x] >= (char)'a' && (char)input[x] <= (char)'z')
-//        || (char)input[x] == (char)'.' || (char)input[x] == (char)'-'
-//        || (char)input[x] == (char)'_' || (char)input[x] == (char)':'
-//        || (char)input[x] == (char)'/' || (char)input[x] == (char)'?'
-//        || (char)input[x] == (char)'=' || (char)input[x] == (char)'&')
-//      encoded_url_string[y++] = input[x];
-//    /* spaces are pluses */
-//    else if (input[x] == ' ')
-//      encoded_url_string[y++] = '+';
-//    /* anything else gets represented by its hex value */
-//    else {
-//      encoded_url_string[y] = '\x0';
-//      sprintf(temp_expansion, "%%%02X", (unsigned int)(input[x] & 0xFF));
-//      strcat(encoded_url_string, temp_expansion);
-//      y += 3;
-//    }
-//  }
-//
-//  /* terminate encoded string */
-//  encoded_url_string[y] = '\x0';
-//  return encoded_url_string;
-//}
 
 /******************************************************************/
 /***************** MACRO INITIALIZATION FUNCTIONS *****************/
