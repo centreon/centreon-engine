@@ -102,12 +102,6 @@ int process_macros_r(nagios_macros* mac,
                                      << ", local=" << clean_options
                                      << ", effective=" << macro_options;
 
-            /* URL encode the macro if requested - this allocates new memory */
-            if (macro_options & URL_ENCODE_MACRO_CHARS) {
-              token_resolved = url_encode(token_resolved);
-              free_macro = true;
-            }
-
             /* some macros are cleaned... */
             if (clean_macro || (macro_options & STRIP_ILLEGAL_MACRO_CHARS) ||
                 (macro_options & ESCAPE_MACRO_CHARS)) {

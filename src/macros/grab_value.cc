@@ -964,13 +964,6 @@ int grab_macro_value_r(nagios_macros* mac,
         *clean_options |= (STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
         logger(dbg_macros, most) << "  New clean options: " << *clean_options;
       }
-      /* url macros should get cleaned */
-      if ((x >= 125 && x <= 126) || (x >= 128 && x <= 129) ||
-          (x >= 77 && x <= 78) || (x >= 74 && x <= 75)) {
-        *clean_options |= URL_ENCODE_MACRO_CHARS;
-        logger(dbg_macros, most) << "  New clean options: " << *clean_options;
-      }
-
       break;
     }
   }
