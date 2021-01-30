@@ -10,6 +10,11 @@
 delete the url encode on maccro :    
 (ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$)
 
+*Notification Period*
+
+the timeperiod are now filtered for the contact 
+and now don't push the notification with time period empty.
+
 ### Enhancements
 ## 20.04.9
 
