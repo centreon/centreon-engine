@@ -1,4 +1,16 @@
 ========================
+Centreon Engine 19.10.17
+========================
+
+*******
+Bug Fix
+*******
+
+Macros 
+==============
+fix macro $TIMET$ now return time in a unix epoch format.
+
+========================
 Centreon Engine 19.10.16
 ========================
 
@@ -15,10 +27,6 @@ last service notification
 =========================
 
 Last Service Notification set when state is HARD without notification. This new version fixes this point.
-
-Macros 
-==============
-fix macro $TIMET$ now return time in a unix epoch format.
 
 ========================
 Centreon Engine 19.10.15
