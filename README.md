@@ -94,7 +94,7 @@ to install gcc before conan.
 Example:
 
 ```shell
-_apt_ install conan
+apt install conan
 ```
 
 If it does not work, conan can be installed with pip3:
@@ -127,7 +127,7 @@ You can now compile Centreon Engine:
 git clone https://github.com/centreon/centreon-engine
 mkdir -p centreon-engine/build
 cd centreon-engine/build
-conan install --remote centreon --build missing
+conan install --remote centreon --build missing ..
 ```
 
 Once the sources of Centreon Engine extracted go to the *./build/*
