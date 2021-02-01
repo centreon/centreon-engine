@@ -66,7 +66,7 @@ Compilation of these distributions is pretty straightforward.
 You'll need to download the project and launch the *cmake.sh* script
 to prepare the compilation environment.
 
-Here are the command lines to launch:
+Here are the command lines to execute:
 
 ```shell
 git clone https://github.com/centreon/centreon-engine
@@ -91,7 +91,7 @@ the package manager given by your OS to install conan. ('apt' for
 Debian, 'rpm' for Red Hat, 'pacman' for Arch Linux, ...). It is prefered
 to install gcc before conan.
 
-Exemple :
+Example:
 
 ```shell
 _apt_ install conan
