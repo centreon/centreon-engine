@@ -695,7 +695,8 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
          end{get_contacts().end()};
          it != end; ++it) {
       assert(it->second);
-      retval.insert(it->second);
+      if (it->second->should_be_notified(cat, type, *this))
+        retval.insert(it->second);
     }
 
     /* For each contact group, we also add its contacts. */
@@ -708,7 +709,8 @@ std::unordered_set<contact*> notifier::get_contacts_to_notify(
            cend{it->second->get_members().end()};
            cit != cend; ++cit) {
         assert(cit->second);
-        retval.insert(cit->second);
+        if (cit->second->should_be_notified(cat, type, *this))
+          retval.insert(cit->second);
       }
     }
   }

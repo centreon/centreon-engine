@@ -174,7 +174,7 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
 
     /* check viability of notifying the user */
     notifier::notification_category cat{notifier::get_category(_type)};
-    if (ctc->should_be_notified(cat, _type, *_parent)) {
+
       /* notify this contact */
       if (_parent->notify_contact(&mac, ctc, _type, _author.c_str(),
                                   _message.c_str(), _options,
@@ -183,7 +183,6 @@ int notification::execute(std::unordered_set<contact*> const& to_notify) {
         contacts_notified++;
         _notified_contact.insert(ctc->get_name());
       }
-    }
   }
 
   /* get the time we finished */
