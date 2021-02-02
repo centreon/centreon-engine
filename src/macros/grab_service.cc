@@ -333,17 +333,11 @@ struct grab_service_redirection {
         true}},
       // Action URL.
       {MACRO_SERVICEACTIONURL,
-       {&get_recursive<service,
-                       checkable,
-                       &checkable::get_action_url,
-                       URL_ENCODE_MACRO_CHARS>,
+       {&get_recursive<service, checkable, &checkable::get_action_url, 0>,
         true}},
       // Notes URL.
       {MACRO_SERVICENOTESURL,
-       {&get_recursive<service,
-                       checkable,
-                       &checkable::get_notes_url,
-                       URL_ENCODE_MACRO_CHARS>,
+       {&get_recursive<service, checkable, &checkable::get_notes_url, 0>,
         true}},
       // Notes.
       {MACRO_SERVICENOTES,
