@@ -84,7 +84,6 @@ if (WITH_TESTING)
     "${TESTS_DIR}/macros/macro.cc"
     "${TESTS_DIR}/macros/macro_hostname.cc"
     "${TESTS_DIR}/macros/macro_service.cc"
-    "${TESTS_DIR}/macros/url_encode.cc"
     "${TESTS_DIR}/external_commands/anomalydetection.cc"
     "${TESTS_DIR}/external_commands/host.cc"
     "${TESTS_DIR}/external_commands/service.cc"

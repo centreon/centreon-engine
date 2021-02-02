@@ -1031,7 +1031,7 @@ TEST_F(MacroService, ServiceNotesUrl) {
   ASSERT_TRUE(svc.parse("host_name", "test_host"));
   ASSERT_TRUE(svc.parse("_HOST_ID", "12"));
   ASSERT_TRUE(svc.parse("_SERVICE_ID", "13"));
-  ASSERT_TRUE(svc.parse("notes_url", "test_notes_url"));
+  ASSERT_TRUE(svc.parse("notes_url", "http://192.168.0.172/centreon/main.php"));
   svc.set_host_id(12);
 
   configuration::command cmd("cmd");
@@ -1048,7 +1048,7 @@ TEST_F(MacroService, ServiceNotesUrl) {
   std::string out;
   nagios_macros *mac(get_global_macros());
   process_macros_r(mac, "$SERVICENOTESURL:test_host:test_svc$", out, 1);
-  ASSERT_EQ(out, "test_notes_url");
+  ASSERT_EQ(out, "http://192.168.0.172/centreon/main.php");
 }
 
 TEST_F(MacroService, ServiceNotes) {
