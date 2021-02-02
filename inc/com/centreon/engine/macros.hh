@@ -35,13 +35,6 @@
 // cleans macros characters before insertion into output string
 std::string clean_macro_chars(std::string const& macro, int options);
 
-// URL encode a string
-std::string url_encode(std::string const& value);
-
-#ifdef __cplusplus
-extern "C" {
-#endif  // C++
-
 int grab_contact_address_macro(unsigned int macro_num,
                                com::centreon::engine::contact* temp_contact,
                                std::string& output);
@@ -92,9 +85,5 @@ int clear_volatile_macros_r(nagios_macros* mac);
 int clear_contact_macros_r(nagios_macros* mac);
 int clear_contactgroup_macros_r(nagios_macros* mac);
 int clear_summary_macros_r(nagios_macros* mac);
-
-#ifdef __cplusplus
-}
-#endif  // C++
 
 #endif  // !CCE_MACROS_HH

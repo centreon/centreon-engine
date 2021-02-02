@@ -1,5 +1,16 @@
 # Changelog
 
+## 20.10.3
+
+
+### Bugfixes
+
+*Notification macros*
+
+delete the url encode on maccro :    
+(ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$)
+
+### Enhancements
 ## 20.10.2
 
 `January 20, 2021`
