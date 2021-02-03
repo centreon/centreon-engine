@@ -167,7 +167,8 @@ class notifier : public checkable {
   unsigned long get_last_problem_id() const noexcept;
   void set_last_problem_id(unsigned long last_problem_id) noexcept;
 
-  virtual void update_status(bool aggregated_dump) = 0;
+  virtual bool schedule_check(time_t check_time, int options) = 0;
+  virtual void update_status() = 0;
   int notify(reason_type type,
              std::string const& not_author,
              std::string const& not_data,

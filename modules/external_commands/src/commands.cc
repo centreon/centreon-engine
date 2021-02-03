@@ -1550,7 +1550,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
           found_svc->second->get_modified_attributes(), nullptr);
 
       /* update the status log with the service info */
-      found_svc->second->update_status(false);
+      found_svc->second->update_status();
       break;
 
     case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
@@ -1570,7 +1570,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
                                 temp_host->get_modified_attributes(), nullptr);
 
       /* update the status log with the host info */
-      temp_host->update_status(false);
+      temp_host->update_status();
       break;
 
     case CMD_CHANGE_CONTACT_MODATTR:
@@ -1886,7 +1886,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
           found_svc->second->get_modified_attributes(), nullptr);
 
       /* update the status log with the service info */
-      found_svc->second->update_status(false);
+      found_svc->second->update_status();
       break;
 
     case CMD_CHANGE_HOST_EVENT_HANDLER:
@@ -1902,7 +1902,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
                                 temp_host->get_modified_attributes(), nullptr);
 
       /* update the status log with the host info */
-      temp_host->update_status(false);
+      temp_host->update_status();
       break;
 
     case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
@@ -1983,7 +1983,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
 
       /* set the modified attributes and update the status of the object */
       temp_host->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
-      temp_host->update_status(false);
+      temp_host->update_status();
     } break;
     case CMD_CHANGE_CUSTOM_SVC_VAR: {
       service_map::const_iterator found(service::services.find({name1, name2}));
@@ -1997,7 +1997,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
         it->second.update(varvalue);
 
       found->second->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
-      found->second->update_status(false);
+      found->second->update_status();
     } break;
     case CMD_CHANGE_CUSTOM_CONTACT_VAR: {
       contact_map::iterator cnct_it = contact::contacts.find(name1);
@@ -2079,7 +2079,7 @@ void disable_service_checks(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* enables a service check */
@@ -2122,7 +2122,7 @@ void enable_service_checks(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* enable notifications on a program-wide basis */
@@ -2195,7 +2195,7 @@ void enable_service_notifications(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* disables notifications for a service */
@@ -2218,7 +2218,7 @@ void disable_service_notifications(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* enables notifications for a host */
@@ -2241,7 +2241,7 @@ void enable_host_notifications(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new host state */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* disables notifications for a host */
@@ -2264,7 +2264,7 @@ void disable_host_notifications(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new host state */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* enables notifications for all hosts and services "beyond" a given host */
@@ -2516,7 +2516,7 @@ void acknowledge_host_problem(host* hst,
                 notifier::notification_option_none);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com{
@@ -2562,7 +2562,7 @@ void acknowledge_service_problem(service* svc,
                 notifier::notification_option_none);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com{new comment(
@@ -2578,7 +2578,7 @@ void remove_host_acknowledgement(host* hst) {
   hst->set_problem_has_been_acknowledged(false);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 
   /* remove any non-persistant comments associated with the ack */
   comment::delete_host_acknowledgement_comments(hst);
@@ -2590,7 +2590,7 @@ void remove_service_acknowledgement(service* svc) {
   svc->set_problem_has_been_acknowledged(false);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 
   /* remove any non-persistant comments associated with the ack */
   comment::delete_service_acknowledgement_comments(svc);
@@ -2712,7 +2712,7 @@ void enable_passive_service_checks(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* disables passive service checks for a particular service */
@@ -2735,7 +2735,7 @@ void disable_passive_service_checks(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* starts executing host checks */
@@ -2853,7 +2853,7 @@ void enable_passive_host_checks(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* disables passive host checks for a particular host */
@@ -2876,7 +2876,7 @@ void disable_passive_host_checks(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* enables event handlers on a program-wide basis */
@@ -2949,7 +2949,7 @@ void enable_service_event_handler(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* disables the event handler for a particular service */
@@ -2972,7 +2972,7 @@ void disable_service_event_handler(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* enables the event handler for a particular host */
@@ -2995,7 +2995,7 @@ void enable_host_event_handler(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* disables the event handler for a particular host */
@@ -3018,7 +3018,7 @@ void disable_host_event_handler(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* disables checks of a particular host */
@@ -3042,7 +3042,7 @@ void disable_host_checks(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* enables checks of a particular host */
@@ -3085,7 +3085,7 @@ void enable_host_checks(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* start obsessing over service check results */
@@ -3347,7 +3347,7 @@ void start_obsessing_over_service(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* stop obsessing over a particular service */
@@ -3370,7 +3370,7 @@ void stop_obsessing_over_service(service* svc) {
                                svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
-  svc->update_status(false);
+  svc->update_status();
 }
 
 /* start obsessing over a particular host */
@@ -3393,7 +3393,7 @@ void start_obsessing_over_host(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 /* stop obsessing over a particular host */
@@ -3416,7 +3416,7 @@ void stop_obsessing_over_host(host* hst) {
                             hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
-  hst->update_status(false);
+  hst->update_status();
 }
 
 void set_host_notification_number(host* hst, int num) {
