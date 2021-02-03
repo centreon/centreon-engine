@@ -1,5 +1,16 @@
 # Changelog
 
+## 20.04.11
+
+
+### Bug fixes
+
+*service and host status sent twice*
+
+When a service or a host is actively checked, regularly the status is sent
+twice to cbd. This patch should fix this issue.
+
+
 ## 20.04.10
 
 
@@ -7,12 +18,12 @@
 
 *Notification macros*
 
-delete the url encode on maccro :    
+delete the url encode on maccro :
 (ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$)
 
 *Notification Period*
 
-the timeperiod are now filtered for the contact 
+the timeperiod are now filtered for the contact
 and now don't push the notification with time period empty.
 
 ### Enhancements
