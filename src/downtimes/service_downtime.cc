@@ -194,7 +194,7 @@ int service_downtime::unschedule() {
         get_duration(), get_downtime_id(), nullptr);
 
     found->second->dec_scheduled_downtime_depth();
-    found->second->update_status(false);
+    found->second->update_status();
 
     /* log a notice - this is parsed by the history CGI */
     if (found->second->get_scheduled_downtime_depth() == 0) {
@@ -400,7 +400,7 @@ int service_downtime::handle() {
     }
 
     /* update the status data */
-    found->second->update_status(false);
+    found->second->update_status();
 
     /* decrement pending flex downtime if necessary */
     if (!is_fixed() && _incremented_pending_downtime) {
@@ -475,7 +475,7 @@ int service_downtime::handle() {
     _set_in_effect(true);
 
     /* update the status data */
-    found->second->update_status(false);
+    found->second->update_status();
 
     /* schedule an event */
     if (!is_fixed())

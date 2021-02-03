@@ -923,7 +923,7 @@ void applier::scheduler::_schedule_host_events(
     com::centreon::engine::host& hst(*hosts[i]);
 
     // update status of all hosts (scheduled or not).
-    hst.update_status(false);
+    hst.update_status();
 
     // skip most hosts that shouldn't be scheduled.
     if (!hst.get_should_be_scheduled()) {
@@ -1030,7 +1030,7 @@ void applier::scheduler::_schedule_service_events(
     engine::service& svc(*services[i]);
 
     // update status of all services (scheduled or not).
-    svc.update_status(false);
+    svc.update_status();
 
     // skip most services that shouldn't be scheduled.
     if (!svc.get_should_be_scheduled()) {

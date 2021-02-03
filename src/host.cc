@@ -1550,7 +1550,7 @@ int host::run_scheduled_check(int check_options, double latency) {
     }
 
     /* update the status log */
-    update_status(false);
+    update_status();
 
     /* reschedule the next host check - unless we couldn't find a valid next
      * check time */
@@ -1734,8 +1734,15 @@ int host::run_async_check(int check_options,
   return OK;
 }
 
-/* schedules an immediate or delayed host check */
-void host::schedule_check(time_t check_time, int options) {
+/**
+ * @brief Schedules an immediate or delayed host check
+ *
+ * @param check_time The check time.
+ * @param options A bit field with several options.
+ *
+ * @return a boolean telling if yes or not the host status is sent to broker.
+ */
+bool host::schedule_check(time_t check_time, int options) {
   timed_event* temp_event = nullptr;
   int use_original_event = true;
 
@@ -1750,7 +1757,7 @@ void host::schedule_check(time_t check_time, int options) {
   /* don't schedule a check if active checks of this host are disabled */
   if (!get_checks_enabled() && !(options & CHECK_OPTION_FORCE_EXECUTION)) {
     logger(dbg_checks, basic) << "Active checks are disabled for this host.";
-    return;
+    return false;
   }
 
   /* default is to use the new event */
@@ -1849,7 +1856,8 @@ void host::schedule_check(time_t check_time, int options) {
   }
 
   /* update the status log */
-  update_status(false);
+  update_status();
+  return true;
 }
 
 /* detects host flapping */
@@ -2086,12 +2094,12 @@ void host::clear_flap(double percent_change,
   notify(reason_recovery, "", "", notifier::notification_option_none);
 }
 
-/* updates host status info */
-void host::update_status(bool aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (!aggregated_dump)
-    broker_host_status(NEBTYPE_HOSTSTATUS_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
-                       this, nullptr);
+/**
+ * @brief Updates host status info. Data are sent to event broker.
+ */
+void host::update_status() {
+  broker_host_status(NEBTYPE_HOSTSTATUS_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+                     this, nullptr);
 }
 
 /**
@@ -2107,7 +2115,7 @@ void host::check_for_expired_acknowledgement() {
             << "Acknowledgement of host '" << get_name() << "' just expired";
         set_problem_has_been_acknowledged(false);
         set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
-        update_status(false);
+        update_status();
       }
     }
   }
@@ -2546,7 +2554,7 @@ void host::enable_flap_detection() {
   check_for_flapping(false, false, true);
 
   /* update host status */
-  update_status(false);
+  update_status();
 }
 
 /*
@@ -2736,7 +2744,7 @@ void host::handle_flap_detection_disabled() {
   }
 
   /* update host status */
-  this->update_status(false);
+  update_status();
 }
 
 int host::perform_on_demand_check(enum host::host_state* check_return_code,
@@ -3233,6 +3241,7 @@ int host::process_check_result_3x(enum host::host_state new_state,
 
   /* reschedule the next check of the host (usually ONLY for scheduled, active
    * checks, unless overridden above) */
+  bool sent = false;
   if (reschedule_check) {
     logger(dbg_checks, more)
         << "Rescheduling next check of host at " << my_ctime(&next_check);
@@ -3269,13 +3278,15 @@ int host::process_check_result_3x(enum host::host_state new_state,
 
     /* schedule a non-forced check if we can */
     if (get_should_be_scheduled()) {
-      schedule_check(get_next_check(), CHECK_OPTION_NONE);
+      sent = schedule_check(get_next_check(), CHECK_OPTION_NONE);
     }
   }
 
   /* update host status - for both active (scheduled) and passive
    * (non-scheduled) hosts */
-  update_status(false);
+  /* This condition is to avoid to send host status twice. */
+  if (!sent)
+    update_status();
 
   /* run async checks of all hosts we added above */
   /* don't run a check if one is already executing or we can get by with a

@@ -151,7 +151,7 @@ class service : public notifier {
                               bool reschedule_check,
                               bool* time_is_valid,
                               time_t* preferred_time) noexcept;
-  void schedule_check(time_t check_time, int options);
+  bool schedule_check(time_t check_time, int options) override;
   void set_flap(double percent_change,
                 double high_threshold,
                 double low_threshold,
@@ -162,7 +162,7 @@ class service : public notifier {
                   double low_threshold);
   void enable_flap_detection();
   void disable_flap_detection();
-  void update_status(bool aggregated_dump) override;
+  void update_status() override;
   bool verify_check_viability(int check_options,
                               bool* time_is_valid,
                               time_t* new_time);

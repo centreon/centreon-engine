@@ -311,5 +311,5 @@ void applier::host::_update(configuration::state const& config,
     obj.set_last_hard_state_change(obj.get_last_state_change());
 
   // update host status.
-  obj.update_status(false);
+  obj.update_status();
 }
