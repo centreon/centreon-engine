@@ -128,7 +128,7 @@ class host : public notifier {
                       bool reschedule_check,
                       bool* time_is_valid,
                       time_t* preferred_time) noexcept;
-  void schedule_check(time_t check_time, int options);
+  bool schedule_check(time_t check_time, int options) override;
   void check_for_flapping(bool update,
                           bool actual_check,
                           bool allow_flapstart_notification);
@@ -139,7 +139,7 @@ class host : public notifier {
   void clear_flap(double percent_change,
                   double high_threshold,
                   double low_threshold);
-  void update_status(bool aggregated_dump) override;
+  void update_status() override;
   void check_for_expired_acknowledgement();
   //  bool               check_notification_viability(reason_type type,
   //                                                  int options) override;

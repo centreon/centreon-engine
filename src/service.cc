@@ -796,7 +796,7 @@ void service::check_for_expired_acknowledgement() {
             << "' just expired";
         set_problem_has_been_acknowledged(false);
         this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
-        update_status(false);
+        update_status();
       }
     }
   }
@@ -1856,7 +1856,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /* set the checked flag */
     set_has_been_checked(true);
     /* update the current service status log */
-    this->update_status(false);
+    update_status();
   }
 
   /* check to see if the service and/or associate host is flapping */
@@ -2271,11 +2271,13 @@ int service::run_scheduled_check(int check_options, double latency) {
      * next check time
      * 10/19/07 EG - keep original check options
      */
+    bool sent = false;
     if (get_should_be_scheduled())
-      schedule_check(get_next_check(), check_options);
+      sent = schedule_check(get_next_check(), check_options);
 
     /* update the status log */
-    this->update_status(false);
+    if (!sent)
+      update_status();
     return ERROR;
   }
   return OK;
@@ -2446,8 +2448,10 @@ int service::run_async_check(int check_options,
  *  @param[in] svc         Target service.
  *  @param[in] check_time  Desired check time.
  *  @param[in] options     Check options (FORCED, FRESHNESS, ...).
+ *
+ * @return A boolean telling if service_status has been sent or not to broker.
  */
-void service::schedule_check(time_t check_time, int options) {
+bool service::schedule_check(time_t check_time, int options) {
   logger(dbg_functions, basic) << "schedule_service_check()";
 
   logger(dbg_checks, basic)
@@ -2460,7 +2464,7 @@ void service::schedule_check(time_t check_time, int options) {
   // of this service are disabled.
   if (!get_checks_enabled() && !(options & CHECK_OPTION_FORCE_EXECUTION)) {
     logger(dbg_checks, basic) << "Active checks of this service are disabled.";
-    return;
+    return false;
   }
 
   // Default is to use the new event.
@@ -2517,7 +2521,7 @@ void service::schedule_check(time_t check_time, int options) {
   }
 
   // Save check options for retention purposes.
-  this->set_check_options(options);
+  set_check_options(options);
 
   // Schedule a new event.
   if (!use_original_event) {
@@ -2542,7 +2546,7 @@ void service::schedule_check(time_t check_time, int options) {
       events::loop::instance().reschedule_event(new_event, events::loop::low);
     } catch (...) {
       // Update the status log.
-      update_status(false);
+      update_status();
       throw;
     }
   } else {
@@ -2555,7 +2559,8 @@ void service::schedule_check(time_t check_time, int options) {
   }
 
   // Update the status log.
-  this->update_status(false);
+  update_status();
+  return true;
 }
 
 void service::set_flap(double percent_change,
@@ -2673,7 +2678,7 @@ void service::enable_flap_detection() {
   check_for_flapping(false, true);
 
   /* update service status */
-  update_status(false);
+  update_status();
 }
 
 /* disables flap detection for a specific service */
@@ -2706,11 +2711,12 @@ void service::disable_flap_detection() {
 }
 
 /* updates service status info */
-void service::update_status(bool aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (!aggregated_dump)
-    broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE, NEBFLAG_NONE,
-                          NEBATTR_NONE, this, nullptr);
+/**
+ * @brief Updates service status info. Send data to event broker.
+ */
+void service::update_status() {
+  broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE, NEBFLAG_NONE,
+                        NEBATTR_NONE, this, nullptr);
 }
 
 /* checks viability of performing a service check */
@@ -3150,7 +3156,7 @@ void service::handle_flap_detection_disabled() {
   }
 
   /* update service status */
-  update_status(false);
+  update_status();
 }
 
 bool service::get_is_volatile() const {
@@ -3353,7 +3359,6 @@ void service::check_result_freshness() {
           CHECK_OPTION_FORCE_EXECUTION | CHECK_OPTION_FRESHNESS_CHECK);
     }
   }
-  return;
 }
 
 std::string const& service::get_current_state_as_string() const {
