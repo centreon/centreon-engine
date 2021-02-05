@@ -1,0 +1,2613 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Protocol Documentation</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
+    <style>
+      body {
+        width: 60em;
+        margin: 1em auto;
+        color: #222;
+        font-family: "Ubuntu", sans-serif;
+        padding-bottom: 4em;
+      }
+
+      h1 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      h2 {
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+        margin: 1.5em 0;
+      }
+
+      h3 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      a {
+        text-decoration: none;
+        color: #567e25;
+      }
+
+      table {
+        width: 100%;
+        font-size: 80%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        font-weight: 700;
+        background-color: #dcdcdc;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #fbfbfb;
+      }
+
+      td {
+        border: 1px solid #ccc;
+        padding: 0.5ex 2ex;
+      }
+
+      td p {
+        text-indent: 1em;
+        margin: 0;
+      }
+
+      td p:nth-child(1) {
+        text-indent: 0; /* No indent on first p in td */
+      }
+
+      /* Table of fields */
+      .field-table td:nth-child(1) { /* Field */
+        width: 10em;
+      }
+      .field-table td:nth-child(2) { /* Type */
+        width: 10em;
+      }
+      .field-table td:nth-child(3) { /* Label */
+        width: 6em;
+      }
+      .field-table td:nth-child(4) { /* Description */
+        width: auto;
+      }
+
+      /* Table of enum values. */
+      .enum-table td:nth-child(1) { /* Name */
+        width: 10em;
+      }
+      .enum-table td:nth-child(2) { /* Number */
+        width: 10em;
+      }
+      .enum-table td:nth-child(3) { /* Description */
+        width: auto;
+      }
+
+      /* Table of scalar value types. */
+      .scalar-value-types-table tr {
+        height: 3em;
+      }
+
+      /* Table of contents. */
+      #toc-container ul {
+        list-style-type: none;
+        padding-left: 1em;
+        line-height: 180%;
+        margin: 0;
+      }
+      #toc > li > a {
+        font-weight: bold;
+      }
+
+      /* File heading div */
+      .file-heading {
+        width: 100%;
+        display: table;
+        border-bottom: 1px solid #aaa;
+        margin: 4em 0 1.5em 0;
+      }
+      .file-heading h2 {
+        border: none;
+        display: table-cell;
+      }
+      .file-heading a {
+        text-align: right;
+        display: table-cell;
+      }
+
+      /* The 'M' and 'E' badges in the ToC */
+      .badge {
+        width: 1.6em;
+        height: 1.6em;
+        display: inline-block;
+
+        line-height: 1.6em;
+        text-align: center;
+        font-weight: bold;
+        font-size: 60%;
+
+        color: #89ba48;
+        background-color: #dff0c8;
+
+        margin: 0.5ex 1em 0.5ex -1em;
+        border: 1px solid #fbfbfb;
+        border-radius: 1ex;
+      }
+    </style>
+
+    <!-- User custom CSS -->
+    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  </head>
+
+  <body>
+
+    <h1 id="title">Protocol Documentation</h1>
+
+    <h2>Table of Contents</h2>
+
+    <div id="toc-container">
+      <ul id="toc">
+        <li>
+          <a href="#engine.proto">engine.proto</a>
+          <ul>
+            <li>
+              <a href="#com.centreon.engine.ChangeContactObjectChar">
+                <span class="badge">M</span>
+                ChangeContactObjectChar
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeContactObjectInt">
+                <span class="badge">M</span>
+                ChangeContactObjectInt
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeObjectChar">
+                <span class="badge">M</span>
+                ChangeObjectChar
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeObjectCustomVar">
+                <span class="badge">M</span>
+                ChangeObjectCustomVar
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeObjectInt">
+                <span class="badge">M</span>
+                ChangeObjectInt
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.Check">
+                <span class="badge">M</span>
+                Check
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.CommandSuccess">
+                <span class="badge">M</span>
+                CommandSuccess
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ContactIdentifier">
+                <span class="badge">M</span>
+                ContactIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.DowntimeCriterias">
+                <span class="badge">M</span>
+                DowntimeCriterias
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.DowntimeHostGroupIdentifier">
+                <span class="badge">M</span>
+                DowntimeHostGroupIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.DowntimeHostIdentifier">
+                <span class="badge">M</span>
+                DowntimeHostIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.DowntimeStartTimeIdentifier">
+                <span class="badge">M</span>
+                DowntimeStartTimeIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineAcknowledgement">
+                <span class="badge">M</span>
+                EngineAcknowledgement
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineComment">
+                <span class="badge">M</span>
+                EngineComment
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineContact">
+                <span class="badge">M</span>
+                EngineContact
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineHost">
+                <span class="badge">M</span>
+                EngineHost
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineService">
+                <span class="badge">M</span>
+                EngineService
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineSignalProcess">
+                <span class="badge">M</span>
+                EngineSignalProcess
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ExtCmdBuffer">
+                <span class="badge">M</span>
+                ExtCmdBuffer
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.GenericString">
+                <span class="badge">M</span>
+                GenericString
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.GenericValue">
+                <span class="badge">M</span>
+                GenericValue
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.HostCheckIdentifier">
+                <span class="badge">M</span>
+                HostCheckIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.HostDelayIdentifier">
+                <span class="badge">M</span>
+                HostDelayIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.HostIdentifier">
+                <span class="badge">M</span>
+                HostIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.HostTypeStats">
+                <span class="badge">M</span>
+                HostTypeStats
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.HostsStats">
+                <span class="badge">M</span>
+                HostsStats
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.IdIdentifier">
+                <span class="badge">M</span>
+                IdIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.NameIdentifier">
+                <span class="badge">M</span>
+                NameIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ProgramConfiguration">
+                <span class="badge">M</span>
+                ProgramConfiguration
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ProgramStatus">
+                <span class="badge">M</span>
+                ProgramStatus
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.RestartStats">
+                <span class="badge">M</span>
+                RestartStats
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ScheduleDowntimeIdentifier">
+                <span class="badge">M</span>
+                ScheduleDowntimeIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ServiceCheckIdentifier">
+                <span class="badge">M</span>
+                ServiceCheckIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ServiceDelayIdentifier">
+                <span class="badge">M</span>
+                ServiceDelayIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ServiceIdentifier">
+                <span class="badge">M</span>
+                ServiceIdentifier
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ServiceTypeStats">
+                <span class="badge">M</span>
+                ServiceTypeStats
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ServicesStats">
+                <span class="badge">M</span>
+                ServicesStats
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.Stats">
+                <span class="badge">M</span>
+                Stats
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ThresholdsFile">
+                <span class="badge">M</span>
+                ThresholdsFile
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.Version">
+                <span class="badge">M</span>
+                Version
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeContactObjectChar.Mode">
+                <span class="badge">E</span>
+                ChangeContactObjectChar.Mode
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeContactObjectInt.Mode">
+                <span class="badge">E</span>
+                ChangeContactObjectInt.Mode
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeObjectChar.Mode">
+                <span class="badge">E</span>
+                ChangeObjectChar.Mode
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.ChangeObjectInt.Mode">
+                <span class="badge">E</span>
+                ChangeObjectInt.Mode
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineAcknowledgement.Type">
+                <span class="badge">E</span>
+                EngineAcknowledgement.Type
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineHost.State">
+                <span class="badge">E</span>
+                EngineHost.State
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineService.State">
+                <span class="badge">E</span>
+                EngineService.State
+              </a>
+            </li>
+            <li>
+              <a href="#com.centreon.engine.EngineSignalProcess.Process">
+                <span class="badge">E</span>
+                EngineSignalProcess.Process
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#scalar-value-types">Scalar Value Types</a></li>
+      </ul>
+    </div>
+
+    <div class="file-heading">
+      <h2 id="engine.proto">engine.proto</h2><a href="#title">Top</a>
+    </div>
+    <h3 id="com.centreon.engine.ChangeContactObjectChar">ChangeContactObjectChar</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>contact</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>mode</td>
+          <td><a href="#com.centreon.engine.ChangeContactObjectChar.Mode">ChangeContactObjectChar.Mode</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>charval</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeContactObjectInt">ChangeContactObjectInt</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>contact_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>mode</td>
+          <td><a href="#com.centreon.engine.ChangeContactObjectInt.Mode">ChangeContactObjectInt.Mode</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>intval</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>dval</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeObjectChar">ChangeObjectChar</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>mode</td>
+          <td><a href="#com.centreon.engine.ChangeObjectChar.Mode">ChangeObjectChar.Mode</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>charval</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeObjectCustomVar">ChangeObjectCustomVar</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>contact</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>varname</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>varvalue</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeObjectInt">ChangeObjectInt</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>mode</td>
+          <td><a href="#com.centreon.engine.ChangeObjectInt.Mode">ChangeObjectInt.Mode</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>intval</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>dval</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.Check">Check</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>check_time</td>
+          <td><a href="#google.protobuf.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>svc_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>output</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>code</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.CommandSuccess">CommandSuccess</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>value</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ContactIdentifier">ContactIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.DowntimeCriterias">DowntimeCriterias</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>start</td>
+          <td><a href="#google.protobuf.UInt64Value">UInt64Value</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>end</td>
+          <td><a href="#google.protobuf.UInt64Value">UInt64Value</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>fixed</td>
+          <td><a href="#google.protobuf.BoolValue">BoolValue</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>triggered_by</td>
+          <td><a href="#google.protobuf.UInt32Value">UInt32Value</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>duration</td>
+          <td><a href="#google.protobuf.UInt32Value">UInt32Value</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>author</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>comment_data</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.DowntimeHostGroupIdentifier">DowntimeHostGroupIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_group_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>comment_data</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>start</td>
+          <td><a href="#google.protobuf.UInt32Value">UInt32Value</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.DowntimeHostIdentifier">DowntimeHostIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>start</td>
+          <td><a href="#google.protobuf.UInt32Value">UInt32Value</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>comment_data</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.DowntimeStartTimeIdentifier">DowntimeStartTimeIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>start</td>
+          <td><a href="#google.protobuf.UInt32Value">UInt32Value</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>comment_data</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineAcknowledgement">EngineAcknowledgement</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ack_author</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ack_data</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>type</td>
+          <td><a href="#com.centreon.engine.EngineAcknowledgement.Type">EngineAcknowledgement.Type</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>notify</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>persistent</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineComment">EngineComment</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>svc_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>user</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>comment_data</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>persistent</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>entry_time</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineContact">EngineContact</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>alias</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>email</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineHost">EngineHost</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>alias</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>address</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>check_period</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>id</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>current_state</td>
+          <td><a href="#com.centreon.engine.EngineHost.State">EngineHost.State</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineService">EngineService</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_id</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_id</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>check_period</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>current_state</td>
+          <td><a href="#com.centreon.engine.EngineService.State">EngineService.State</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineSignalProcess">EngineSignalProcess</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>process</td>
+          <td><a href="#com.centreon.engine.EngineSignalProcess.Process">EngineSignalProcess.Process</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>scheduled_time</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ExtCmdBuffer">ExtCmdBuffer</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>used</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>high</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>total</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.GenericString">GenericString</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>str_arg</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.GenericValue">GenericValue</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>value</td>
+          <td><a href="#int32">int32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.HostCheckIdentifier">HostCheckIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>delay_time</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>force</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.HostDelayIdentifier">HostDelayIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>id</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>delay_time</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.HostIdentifier">HostIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>id</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.HostTypeStats">HostTypeStats</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>min_latency</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_latency</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_latency</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>min_execution_time</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_execution_time</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_execution_time</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>min_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_1min</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_5min</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_15min</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_1hour</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.HostsStats">HostsStats</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>hosts_count</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checked_hosts</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>scheduled_hosts</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>actively_checked</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passively_checked</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>min_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_hosts</td>
+          <td><a href="#com.centreon.engine.HostTypeStats">HostTypeStats</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passive_hosts</td>
+          <td><a href="#com.centreon.engine.HostTypeStats">HostTypeStats</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>up</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>down</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>unreachable</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>flapping</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>downtime</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.IdIdentifier">IdIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_id</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_id</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.NameIdentifier">NameIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ProgramConfiguration">ProgramConfiguration</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>hosts_count</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ProgramStatus">ProgramStatus</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>modified_host_attributes</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>modified_service_attributes</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>pid</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>program_start</td>
+          <td><a href="#google.protobuf.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>last_command_check</td>
+          <td><a href="#google.protobuf.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>last_log_rotation</td>
+          <td><a href="#google.protobuf.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>enable_notifications</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_service_checks_enabled</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passive_service_checks_enabled</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_host_checks_enabled</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passive_host_checks_enabled</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>enable_event_handlers</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>obsess_over_services</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>obsess_over_hosts</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>check_service_freshness</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>check_host_freshness</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>enable_flap_detection</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>process_performance_data</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>global_host_event_handler</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>global_service_event_handler</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>next_comment_id</td>
+          <td><a href="#uint64">uint64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>next_event_id</td>
+          <td><a href="#uint64">uint64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>next_problem_id</td>
+          <td><a href="#uint64">uint64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>next_notification_id</td>
+          <td><a href="#uint64">uint64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>total_external_command_buffer_slots</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>used_external_command_buffer_slots</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>high_external_command_buffer_slots</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_scheduled_host_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_ondemand_host_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passive_host_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_scheduled_service_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_ondemand_service_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passive_service_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>cached_host_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>cached_service_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>external_command_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>parallel_host_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>serial_host_check_stats</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.RestartStats">RestartStats</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>apply_start</td>
+          <td><a href="#google.protobuf.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>objects_expansion</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>objects_difference</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_config</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_timeperiods</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_connectors</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_commands</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_contacts</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_hosts</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_services</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_hosts</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_services</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_host_dependencies</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_host_dependencies</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_service_dependencies</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_service_dependencies</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_host_escalations</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_host_escalations</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_service_escalations</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_service_escalations</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_new_config</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_scheduler</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>check_circular_paths</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>reload_modules</td>
+          <td><a href="#google.protobuf.Duration">Duration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>apply_end</td>
+          <td><a href="#google.protobuf.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ScheduleDowntimeIdentifier">ScheduleDowntimeIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>host_group_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_group_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>start</td>
+          <td><a href="#uint64">uint64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>end</td>
+          <td><a href="#uint64">uint64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>fixed</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>triggered_by</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>duration</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>author</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>comment_data</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>entry_time</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ServiceCheckIdentifier">ServiceCheckIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>host_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>service_desc</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>delay_time</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>force</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ServiceDelayIdentifier">ServiceDelayIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>names</td>
+          <td><a href="#com.centreon.engine.NameIdentifier">NameIdentifier</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ids</td>
+          <td><a href="#com.centreon.engine.IdIdentifier">IdIdentifier</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>delay_time</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ServiceIdentifier">ServiceIdentifier</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>names</td>
+          <td><a href="#com.centreon.engine.NameIdentifier">NameIdentifier</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ids</td>
+          <td><a href="#com.centreon.engine.IdIdentifier">IdIdentifier</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ServiceTypeStats">ServiceTypeStats</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>min_latency</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_latency</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_latency</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>min_execution_time</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_execution_time</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_execution_time</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>min_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_1min</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_5min</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_15min</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checks_last_1hour</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ServicesStats">ServicesStats</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>services_count</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>checked_services</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>scheduled_services</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>actively_checked</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passively_checked</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>min_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>average_state_change</td>
+          <td><a href="#double">double</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>active_services</td>
+          <td><a href="#com.centreon.engine.ServiceTypeStats">ServiceTypeStats</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>passive_services</td>
+          <td><a href="#com.centreon.engine.ServiceTypeStats">ServiceTypeStats</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ok</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>warning</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>critical</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>unknown</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>flapping</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>downtime</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.Stats">Stats</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>program_configuration</td>
+          <td><a href="#com.centreon.engine.ProgramConfiguration">ProgramConfiguration</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>program_status</td>
+          <td><a href="#com.centreon.engine.ProgramStatus">ProgramStatus</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>services_stats</td>
+          <td><a href="#com.centreon.engine.ServicesStats">ServicesStats</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>hosts_stats</td>
+          <td><a href="#com.centreon.engine.HostsStats">HostsStats</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>buffer</td>
+          <td><a href="#com.centreon.engine.ExtCmdBuffer">ExtCmdBuffer</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>restart_status</td>
+          <td><a href="#com.centreon.engine.RestartStats">RestartStats</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ThresholdsFile">ThresholdsFile</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>filename</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.Version">Version</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>major</td>
+          <td><a href="#int32">int32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>minor</td>
+          <td><a href="#int32">int32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>patch</td>
+          <td><a href="#int32">int32</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeContactObjectChar.Mode">ChangeContactObjectChar.Mode</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeContactObjectInt.Mode">ChangeContactObjectInt.Mode</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MODATTR</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>MODHATTR</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>MODSATTR</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeObjectChar.Mode">ChangeObjectChar.Mode</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CHANGE_GLOBAL_EVENT_HANDLER</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CHANGE_EVENT_HANDLER</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CHANGE_CHECK_COMMAND</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CHANGE_CHECK_TIMEPERIOD</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CHANGE_NOTIFICATION_TIMEPERIOD</td>
+          <td>4</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.ChangeObjectInt.Mode">ChangeObjectInt.Mode</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NORMAL_CHECK_INTERVAL</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>RETRY_CHECK_INTERVAL</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>MAX_ATTEMPTS</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>MODATTR</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineAcknowledgement.Type">EngineAcknowledgement.Type</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NORMAL</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>STICKY</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineHost.State">EngineHost.State</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>UP</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>DOWN</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>UNREACHABLE</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineService.State">EngineService.State</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>OK</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>WARNING</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CRITICAL</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>UNKNOWN</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="com.centreon.engine.EngineSignalProcess.Process">EngineSignalProcess.Process</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>RESTART</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SHUTDOWN</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="scalar-value-types">Scalar Value Types</h2>
+    <table class="scalar-value-types-table">
+      <thead>
+        <tr><td>.proto Type</td><td>Notes</td><td>C++ Type</td><td>Java Type</td><td>Python Type</td></tr>
+      </thead>
+      <tbody>
+        <tr id="double">
+          <td>double</td>
+          <td></td>
+          <td>double</td>
+          <td>double</td>
+          <td>float</td>
+        </tr>
+        <tr id="float">
+          <td>float</td>
+          <td></td>
+          <td>float</td>
+          <td>float</td>
+          <td>float</td>
+        </tr>
+        <tr id="int32">
+          <td>int32</td>
+          <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="int64">
+          <td>int64</td>
+          <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="uint32">
+          <td>uint32</td>
+          <td>Uses variable-length encoding.</td>
+          <td>uint32</td>
+          <td>int</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="uint64">
+          <td>uint64</td>
+          <td>Uses variable-length encoding.</td>
+          <td>uint64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="sint32">
+          <td>sint32</td>
+          <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="sint64">
+          <td>sint64</td>
+          <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="fixed32">
+          <td>fixed32</td>
+          <td>Always four bytes. More efficient than uint32 if values are often greater than 2^28.</td>
+          <td>uint32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="fixed64">
+          <td>fixed64</td>
+          <td>Always eight bytes. More efficient than uint64 if values are often greater than 2^56.</td>
+          <td>uint64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="sfixed32">
+          <td>sfixed32</td>
+          <td>Always four bytes.</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="sfixed64">
+          <td>sfixed64</td>
+          <td>Always eight bytes.</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="bool">
+          <td>bool</td>
+          <td></td>
+          <td>bool</td>
+          <td>boolean</td>
+          <td>boolean</td>
+        </tr>
+        <tr id="string">
+          <td>string</td>
+          <td>A string must always contain UTF-8 encoded or 7-bit ASCII text.</td>
+          <td>string</td>
+          <td>String</td>
+          <td>str/unicode</td>
+        </tr>
+        <tr id="bytes">
+          <td>bytes</td>
+          <td>May contain any arbitrary sequence of bytes.</td>
+          <td>string</td>
+          <td>ByteString</td>
+          <td>str</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </body>
+</html>
