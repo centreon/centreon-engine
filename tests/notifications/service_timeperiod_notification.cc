@@ -226,7 +226,7 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
   ASSERT_NE(step4, std::string::npos);
 }
 
-TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
+TEST_F(ServiceTimePeriodNotification, NoTimePeriodKoWithPostpone) {
   config->postpone_notification_to_timeperiod(true);
 
   init_macros();
@@ -235,29 +235,9 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
   int now{20000};
   set_time(now);
 
-  configuration::applier::contact ct_aply;
-  configuration::contact ctct{new_configuration_contact("test_contact", false)};
-  ct_aply.add_object(ctct);
-  ct_aply.expand_objects(*config);
-  ct_aply.resolve_object(ctct);
-
-  configuration::applier::contactgroup cg_aply;
-  configuration::contactgroup cg{
-      new_configuration_contactgroup("test_cg", "test_contact")};
-  cg_aply.add_object(cg);
-  cg_aply.expand_objects(*config);
-  cg_aply.resolve_object(cg);
-
-  configuration::applier::serviceescalation se_aply;
-  configuration::serviceescalation se{
-      new_configuration_serviceescalation("test_host", "test_svc", "test_cg")};
-  se.notification_interval(0);
-  se_aply.add_object(se);
-  se_aply.expand_objects(*config);
-  se_aply.resolve_object(se);
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    list_time.push_back(std::make_shared<engine::timerange>(35000, 85000));
+    list_time.push_back(std::make_shared<engine::timerange>(40000, 85000));
     tperiod->days[i] = list_time;
   }
 
@@ -296,7 +276,7 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
     checks::checker::instance().reap();
   }
 
-  now += 3000;
+  now = 70000;
   std::cout << "NOW = " << now << std::endl;
   set_time(now);
   std::ostringstream oss;
@@ -306,36 +286,94 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t step1{out.find("NOW = 38000")};
+  size_t step2{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_svc;CRITICAL;cmd;service critical",
+               step1 + 1)};
+  size_t step3{out.find("NOW = 70000", step2 + 1)};
+  size_t step4{
+      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok",
+               step3 + 1)};
+  ASSERT_NE(step4, std::string::npos);
+}
+
+TEST_F(ServiceTimePeriodNotification, NoTimePeriodKoWithoutPostpone) {
+  config->postpone_notification_to_timeperiod(false);
+
+  init_macros();
+  std::unique_ptr<engine::timeperiod> tperiod{
+      new engine::timeperiod("tperiod", "alias")};
+  int now{20000};
+  set_time(now);
+
+  for (int i = 0; i < 7; ++i) {
+    timerange_list list_time;
+    list_time.push_back(std::make_shared<engine::timerange>(40000, 85000));
+    tperiod->days[i] = list_time;
+  }
+
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_notification_interval(0);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(20000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(now);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  _svc->set_notification_period_ptr(tperiod.get());
+
+  testing::internal::CaptureStdout();
+
+  for (int i = 0; i < 12; i++) {
+    // When i == 0, the state_critical is soft => no notification
+    // When i == 1, the state_critical is soft => no notification
+    // When i == 2, the state_critical is hard down => notification
+    now += 3000;
+    std::cout << "NOW = " << now << std::endl;
+    set_time(now);
+    _svc->set_last_state(_svc->get_current_state());
+    if (notifier::hard == _svc->get_state_type())
+      _svc->set_last_hard_state(_svc->get_current_state());
+
+    std::ostringstream oss;
+    std::time_t now{std::time(nullptr)};
+    oss << '[' << now << ']'
+        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
+           "critical";
+    std::string cmd{oss.str()};
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
   now = 70000;
   std::cout << "NOW = " << now << std::endl;
   set_time(now);
-  oss.str("");
+  std::ostringstream oss;
   oss << '[' << now << ']'
       << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd = oss.str();
+  std::string cmd{oss.str()};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
   std::string out{testing::internal::GetCapturedStdout()};
   std::cout << out << std::endl;
-  size_t step1{out.find("NOW = 35000")};
+  size_t step1{out.find("NOW = 38000")};
   size_t step2{
       out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
+               "admin;test_host;test_svc;CRITICAL;cmd;service critical",
                step1 + 1)};
-  size_t step3{out.find("NOW = 59000", step2 + 1)};
+  size_t step3{out.find("NOW = 70000", step2 + 1)};
   size_t step4{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
+      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
                "(OK);cmd;service ok",
                step3 + 1)};
-  ASSERT_NE(step4, std::string::npos);
-
-  size_t step5{out.find("NOW = 44000")};
-  size_t step6{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
-               step5 + 1)};
-  ASSERT_EQ(step6, std::string::npos);
+  ASSERT_EQ(step4, std::string::npos);
 }
 
 TEST_F(ServiceTimePeriodNotification, TimePeriodOut) {

@@ -18,8 +18,8 @@
 */
 
 #include "com/centreon/engine/notifier.hh"
-
 #include <cassert>
+#include <iostream>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/common.hh"
@@ -270,13 +270,11 @@ bool notifier::_is_notification_viable_normal(reason_type type
     logger(dbg_notifications, more)
         << "This notifier shouldn't have notifications sent out "
            "at this time.";
-    if (notification_interval == 0 &&
-        config->postpone_notification_to_timeperiod()) {
-      _notification_to_interval_on_timeperiod_in = true;
-      logger(dbg_notifications, more)
-          << "This notifier is save to send this notifications in "
-             "the next notification time period.";
-    }
+
+    _notification_to_interval_on_timeperiod_in = true;
+    logger(dbg_notifications, more)
+        << "This notifier is save to send this notifications in "
+           "the next notification time period.";
     return false;
   }
 
@@ -332,15 +330,19 @@ bool notifier::_is_notification_viable_normal(reason_type type
     return false;
   }
 
+  if (notification_interval == 0 &&
+      !config->postpone_notification_to_timeperiod() &&
+      _notification_to_interval_on_timeperiod_in) {
+    logger(dbg_notifications, more)
+        << "This notifier is in no postpone states, so we won't send "
+           "notifications. ";
+    return false;
+  }
   if (_notification[cat_normal]) {
     /* In the case of a state change, we don't care of the notification interval
      * and we notify as soon as we can */
     if (get_last_hard_state_change() <= _last_notification) {
       if (notification_interval == 0) {
-        if (_notification_to_interval_on_timeperiod_in) {
-          _notification_to_interval_on_timeperiod_in = false;
-          return true;
-        }
         logger(dbg_notifications, more)
             << "This notifier problem has already been sent at "
             << _last_notification
