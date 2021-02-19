@@ -22,11 +22,17 @@
 
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
+#include "com/centreon/engine/configuration/applier/contactgroup.hh"
+#include <com/centreon/engine/configuration/applier/timeperiod.hh>
+#include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/hostescalation.hh"
+#include "com/centreon/engine/timeperiod.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "helper.hh"
 
 using namespace com::centreon;
@@ -157,6 +163,69 @@ TEST_F(HostDowntimeNotification,
       out.find("HOST NOTIFICATION: admin;test_host;DOWNTIMEEND (UP);cmd;")};
   ASSERT_EQ(step1, std::string::npos);
   ASSERT_EQ(step2, std::string::npos);
+}
+
+TEST_F(HostDowntimeNotification, SimpleHostDowntimeNotifyContactExitingUp) {
+  int now{50000};
+  set_time(now);
+
+  _host->set_current_state(engine::host::state_up);
+  _host->set_notification_interval(1);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(50000);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+  _host->set_last_hard_state(engine::host::state_up);
+  _host->set_last_hard_state_change(now);
+  _host->set_state_type(checkable::hard);
+  _host->set_accept_passive_checks(true);
+
+  testing::internal::CaptureStdout();
+  now += 300;
+  std::cout << "NOW = " << now << std::endl;
+  set_time(now);
+  std::ostringstream oss;
+  oss << '[' << now << ']' << " PROCESS_HOST_CHECK_RESULT;test_host;1;Down host";
+  std::string cmd{oss.str()};
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  _host->set_scheduled_downtime_depth(2);
+
+  now += 300;
+  std::cout << "NOW = " << now << std::endl;
+  set_time(now);
+  oss.str("");
+  oss << '[' << now << ']' << " PROCESS_HOST_CHECK_RESULT;test_host;0;Host up";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  _host->set_scheduled_downtime_depth(0);
+
+  now += 300;
+  std::cout << "NOW = " << now << std::endl;
+  set_time(now);
+  oss.str("");
+  oss << '[' << now << ']' << " PROCESS_HOST_CHECK_RESULT;test_host;0;Host up";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t step1{out.find("NOW = 50300")};
+  ASSERT_NE(step1, std::string::npos);
+  size_t step2{
+      out.find("HOST NOTIFICATION: admin;test_host;DOWN;cmd;Down host",
+               step1 + 1)};
+  ASSERT_NE(step2, std::string::npos);
+  size_t step3{out.find("NOW = 50600", step2 + 1)};
+  ASSERT_NE(step3, std::string::npos);
+  size_t step4{
+      out.find("HOST NOTIFICATION: admin;test_host;RECOVERY (UP);cmd;Host up",
+               step3 + 1)};
+  ASSERT_NE(step4, std::string::npos);
 }
 
 //// Given a host UP
