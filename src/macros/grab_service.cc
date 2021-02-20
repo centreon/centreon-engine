@@ -82,6 +82,23 @@ static std::string get_service_group_names(service& svc, nagios_macros* mac) {
 }
 
 /**
+ *  Extract service group name.
+ *
+ *  @param[in] svc Target service.
+ *  @param[in] mac Unused.
+ *
+ *  @return name of group associated with this service.
+ */
+static std::string get_service_group_name(service& svc, nagios_macros* mac) {
+  (void)mac;
+
+  // Find all servicegroups this service is associated with.
+  std::string buf{svc.get_parent_groups().front()->get_group_name()};
+  logger(dbg_notifications, more) << "on grab service service name :" << buf;
+  return buf;
+}
+
+/**
  *  Extract service state.
  *
  *  @param[in] svc Service object.
@@ -344,6 +361,8 @@ struct grab_service_redirection {
        {&get_recursive<service, checkable, &checkable::get_notes, 0>, true}},
       // Group names.
       {MACRO_SERVICEGROUPNAMES, {&get_service_group_names, true}},
+      // Group name.
+      {MACRO_SERVICEGROUPNAME, {&get_service_group_name, true}},
       // Service id.
       {MACRO_SERVICEID, {&get_service_id, true}},
       // Acknowledgement comment.
