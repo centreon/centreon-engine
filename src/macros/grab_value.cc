@@ -737,6 +737,7 @@ struct grab_value_redirection {
                                             MACRO_HOSTEVENTID,
                                             MACRO_LASTHOSTEVENTID,
                                             MACRO_HOSTGROUPNAMES,
+                                            MACRO_HOSTGROUPNAME,
                                             MACRO_MAXHOSTATTEMPTS,
                                             MACRO_TOTALHOSTSERVICES,
                                             MACRO_TOTALHOSTSERVICESOK,
@@ -756,8 +757,7 @@ struct grab_value_redirection {
 
     // Hostgroup macros.
     static unsigned int const hostgroup_ids[] = {
-        MACRO_HOSTGROUPNAME,      MACRO_HOSTGROUPALIAS,
-        MACRO_HOSTGROUPNOTES,     MACRO_HOSTGROUPNOTESURL,
+        MACRO_HOSTGROUPALIAS, MACRO_HOSTGROUPNOTES, MACRO_HOSTGROUPNOTESURL,
         MACRO_HOSTGROUPACTIONURL, MACRO_HOSTGROUPMEMBERS};
     for (unsigned int i = 0; i < sizeof(hostgroup_ids) / sizeof(*hostgroup_ids);
          ++i)
@@ -795,6 +795,7 @@ struct grab_value_redirection {
                                                MACRO_SERVICEEVENTID,
                                                MACRO_LASTSERVICEEVENTID,
                                                MACRO_SERVICEGROUPNAMES,
+                                               MACRO_SERVICEGROUPNAME,
                                                MACRO_MAXSERVICEATTEMPTS,
                                                MACRO_SERVICEISVOLATILE,
                                                MACRO_SERVICEPROBLEMID,
@@ -809,24 +810,24 @@ struct grab_value_redirection {
 
     // Servicegroup macros.
     static unsigned int const servicegroup_ids[] = {
-        MACRO_SERVICEGROUPNAME,      MACRO_SERVICEGROUPALIAS,
-        MACRO_SERVICEGROUPNOTES,     MACRO_SERVICEGROUPNOTESURL,
-        MACRO_SERVICEGROUPACTIONURL, MACRO_SERVICEGROUPMEMBERS};
+        MACRO_SERVICEGROUPALIAS, MACRO_SERVICEGROUPNOTES,
+        MACRO_SERVICEGROUPNOTESURL, MACRO_SERVICEGROUPACTIONURL,
+        MACRO_SERVICEGROUPMEMBERS};
     for (unsigned int i = 0;
          i < sizeof(servicegroup_ids) / sizeof(*servicegroup_ids); ++i)
       routines[servicegroup_ids[i]] = &handle_servicegroup_macro;
 
     // Contact macros.
     static unsigned int const contact_ids[] = {
-        MACRO_CONTACTNAME,  MACRO_CONTACTALIAS,      MACRO_CONTACTEMAIL,
-        MACRO_CONTACTPAGER, MACRO_CONTACTGROUPNAMES, MACRO_CONTACTTIMEZONE};
+        MACRO_CONTACTNAME,     MACRO_CONTACTALIAS,      MACRO_CONTACTEMAIL,
+        MACRO_CONTACTPAGER,    MACRO_CONTACTGROUPNAMES, MACRO_CONTACTTIMEZONE,
+        MACRO_CONTACTGROUPNAME};
     for (unsigned int i = 0; i < sizeof(contact_ids) / sizeof(*contact_ids);
          ++i)
       routines[contact_ids[i]] = &handle_contact_macro;
 
     // Contactgroup macros.
-    static unsigned int const contactgroup_ids[] = {MACRO_CONTACTGROUPNAME,
-                                                    MACRO_CONTACTGROUPALIAS,
+    static unsigned int const contactgroup_ids[] = {MACRO_CONTACTGROUPALIAS,
                                                     MACRO_CONTACTGROUPMEMBERS};
     for (unsigned int i = 0;
          i < sizeof(contactgroup_ids) / sizeof(*contactgroup_ids); ++i)

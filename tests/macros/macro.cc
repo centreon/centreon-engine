@@ -528,7 +528,7 @@ TEST_F(Macro, ContactGroupName) {
 
   std::string out;
   nagios_macros* mac(get_global_macros());
-  process_macros_r(mac, "$CONTACTGROUPNAME:test_cg$", out, 1);
+  process_macros_r(mac, "$CONTACTGROUPNAME:test_contact$", out, 1);
   ASSERT_EQ(out, "test_cg");
 }
 
