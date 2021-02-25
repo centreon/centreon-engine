@@ -227,7 +227,6 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
 }
 
 TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
-  config->postpone_notification_to_timeperiod(true);
 
   init_macros();
   std::unique_ptr<engine::timeperiod> tperiod{
@@ -249,9 +248,14 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
   cg_aply.resolve_object(cg);
 
   configuration::applier::serviceescalation se_aply;
-  configuration::serviceescalation se{
-      new_configuration_serviceescalation("test_host", "test_svc", "test_cg")};
-  se.notification_interval(0);
+  configuration::serviceescalation se;
+  se.parse("first_notification", "1");
+  se.parse("last_notification", "1");
+  se.parse("notification_interval", "0");
+  se.parse("escalation_options", "w,u,c,r");
+  se.parse("host_name", "test_host");
+  se.parse("service_description", "test_svc");
+  se.parse("contact_groups", "test_cg");
   se_aply.add_object(se);
   se_aply.expand_objects(*config);
   se_aply.resolve_object(se);
