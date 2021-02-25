@@ -430,7 +430,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->use_large_installation_tweaks(
       new_cfg.use_large_installation_tweaks());
   config->instance_heartbeat_interval(new_cfg.instance_heartbeat_interval());
-  config->postpone_notification_to_timeperiod(new_cfg.postpone_notification_to_timeperiod());
   config->use_regexp_matches(new_cfg.use_regexp_matches());
   config->use_retained_program_state(new_cfg.use_retained_program_state());
   config->use_retained_scheduling_info(new_cfg.use_retained_scheduling_info());

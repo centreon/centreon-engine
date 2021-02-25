@@ -616,7 +616,6 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
 // first_delay_notification = 0
 // When a normal notification should be sent, it is sent only one time.
 TEST_F(ServiceNotification, CheckNotifIntervZero) {
-  config->postpone_notification_to_timeperiod(true);
   set_time(50000);
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_last_hard_state(engine::service::state_ok);
