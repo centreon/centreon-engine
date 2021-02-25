@@ -10,6 +10,8 @@
 delete the url encode on maccro :    
 (ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$)
 
+these macro are now usable without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
+
 *Notification Period*
 
 the timeperiod are now filtered for the contact 
