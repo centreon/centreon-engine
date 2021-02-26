@@ -14,6 +14,7 @@ delete the url encode on maccro :
 
 the timeperiod are now filtered for the contact 
 and now don't push the notification with time period empty.
+these macro are now usable without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
 
 ### Enhancements
 ## 20.10.2
