@@ -14,6 +14,8 @@ delete the url encode on maccro :
 
 the timeperiod are now filtered for the contact 
 and now don't push the notification with time period empty.
+the notification recovery are now send when entering in timeperiod notification
+
 
 ### Enhancements
 ## 20.04.9
