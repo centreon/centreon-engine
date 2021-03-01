@@ -7,14 +7,16 @@
 
 *Notification macros*
 
-delete the url encode on maccro :    
-(ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$)
+delete the url encode on macro
+(ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$,
+$HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$,
+$SERVICEGROUPACTIONURL*$)
 
 *Notification Period*
 
-the timeperiod are now filtered for the contact 
-and now don't push the notification with time period empty.
-the notification recovery are now send when entering in timeperiod notification
+the timeperiods are now filtered for the contact
+and now don't push the notification if the time period is empty.
+The notification recovery are now sent when entering in timeperiod notification.
 
 
 ### Enhancements
