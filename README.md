@@ -64,14 +64,18 @@ If you do not have Centreon Clib please refer to the
 Compilation of these distributions is pretty straightforward.
 
 You'll need to download the project and launch the *cmake.sh* script
-to prepare the compilation environment.
-
-Here are the command lines to execute:
+to prepare the compilation environment:
 
 ```shell
 git clone https://github.com/centreon/centreon-engine
 cd centreon-engine
 ./cmake.sh
+```
+
+Now launch the compilation using the *make* command and then install the
+software by running *make install* as priviledged user:
+
+```shell
 cd build
 make
 make install
@@ -121,19 +125,13 @@ conan-center: https://conan.bintray.com [Verify SSL: True]
 centreon: https://api.bintray.com/conan/centreon/centreon [Verify SSL: True]
 ```
 
-You can now compile Centreon Engine:
+You can now prepare the compilation environment:
 
 ```shell
 git clone https://github.com/centreon/centreon-engine
 mkdir -p centreon-engine/build
 cd centreon-engine/build
 conan install --remote centreon --build missing ..
-```
-
-Once the sources of Centreon Engine extracted go to the *./build/*
-directory and launch the CMake command:
-
-```shell
 cmake -DWITH_PREFIX=/usr -DWITH_PREFIX_BIN=/usr/sbin -DWITH_USER=centreon-engine -DWITH_GROUP=centreon-engine -DCMAKE_BUILD_TYPE=Release -DWITH_RW_DIR=/var/lib/centreon-engine/rw -DWITH_PREFIX_CONF=/etc/centreon-engine -DWITH_VAR_DIR=/var/log/centreon-engine -DWITH_PREFIX_LIB=/usr/lib64/centreon-engine ..
 ```
 
