@@ -780,7 +780,7 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
     /* set the acknowledgement flag */
     temp_host->set_problem_has_been_acknowledged(false);
     /* update the status log with the host info */
-    temp_host->update_status(false);
+    temp_host->update_status();
     /* remove any non-persistant comments associated with the ack */
     comment::delete_host_acknowledgement_comments(temp_host.get());
     return 0;
@@ -840,7 +840,7 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
     /* set the acknowledgement flag */
     temp_service->set_problem_has_been_acknowledged(false);
     /* update the status log with the service info */
-    temp_service->update_status(false);
+    temp_service->update_status();
     /* remove any non-persistant comments associated with the ack */
     comment::delete_service_acknowledgement_comments(temp_service.get());
     return 0;
@@ -891,7 +891,7 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
                         request->ack_data(),
                         notifier::notification_option_none);
     /* update the status log with the host info */
-    temp_host->update_status(false);
+    temp_host->update_status();
     /* add a comment for the acknowledgement */
     auto com = std::make_shared<comment>(
         comment::host, comment::acknowledgment, temp_host->get_host_id(), 0,
@@ -947,7 +947,7 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
                            request->ack_author(), request->ack_data(),
                            notifier::notification_option_none);
     /* update the status log with the service info */
-    temp_service->update_status(false);
+    temp_service->update_status();
 
     /* add a comment for the acknowledgement */
     auto com = std::make_shared<comment>(
@@ -2246,7 +2246,7 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
                               temp_host->get_modified_attributes(), nullptr);
 
     /* update the status log with the host info */
-    temp_host->update_status(false);
+    temp_host->update_status();
     return 0;
   });
 
@@ -2334,7 +2334,7 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
                                  nullptr);
 
     /* update the status log with the service info */
-    temp_service->update_status(false);
+    temp_service->update_status();
     return 0;
   });
 
@@ -2491,7 +2491,7 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
                                 temp_host->get_modified_attributes(), nullptr);
 
       /* update the status log with the host info */
-      temp_host->update_status(false);
+      temp_host->update_status();
     }
 
     return 0;
@@ -2605,7 +2605,7 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
           temp_service->get_modified_attributes(), nullptr);
 
       /* update the status log with the service info */
-      temp_service->update_status(false);
+      temp_service->update_status();
     }
     return 0;
   });
@@ -2707,7 +2707,7 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
       it->second.update(request->varvalue());
     /* set the modified attributes and update the status of the object */
     temp_host->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
-    temp_host->update_status(false);
+    temp_host->update_status();
     return 0;
   });
 
@@ -2747,7 +2747,7 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
     else
       it->second.update(request->varvalue());
     temp_service->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
-    temp_service->update_status(false);
+    temp_service->update_status();
     return 0;
   });
 

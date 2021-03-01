@@ -173,7 +173,7 @@ int host_downtime::unschedule() {
         get_downtime_id(), nullptr);
 
     it->second->dec_scheduled_downtime_depth();
-    it->second->update_status(false);
+    it->second->update_status();
 
     /* log a notice - this is parsed by the history CGI */
     if (it->second->get_scheduled_downtime_depth() == 0) {
@@ -364,7 +364,7 @@ int host_downtime::handle() {
     }
 
     /* update the status data */
-    it_hst->second->update_status(false);
+    it_hst->second->update_status();
 
     /* decrement pending flex downtime if necessary */
     if (!is_fixed() && _incremented_pending_downtime) {
@@ -437,7 +437,7 @@ int host_downtime::handle() {
     _set_in_effect(true);
 
     /* update the status data */
-    it_hst->second->update_status(false);
+    it_hst->second->update_status();
 
     /* schedule an event */
     if (!is_fixed())
