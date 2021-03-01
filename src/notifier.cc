@@ -392,6 +392,7 @@ bool notifier::_is_notification_viable_recovery(reason_type type
           << "This notifier is currently in a scheduled downtime, so "
              "we won't send notifications.";
       retval = false;
+      send_later = true;
     }
     /* if this notifier is flapping, don't send the notification */
     else if (get_is_flapping()) {
