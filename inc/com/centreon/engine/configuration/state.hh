@@ -385,8 +385,6 @@ class state {
   void use_large_installation_tweaks(bool value);
   uint32_t instance_heartbeat_interval() const noexcept;
   void instance_heartbeat_interval(uint32_t value);
-  bool postpone_notification_to_timeperiod() const noexcept;
-  void postpone_notification_to_timeperiod(bool value);
   bool use_regexp_matches() const noexcept;
   void use_regexp_matches(bool value);
   bool use_retained_program_state() const noexcept;
@@ -603,7 +601,6 @@ class state {
   bool _use_aggressive_host_checking;
   bool _use_large_installation_tweaks;
   uint32_t _instance_heartbeat_interval;
-  bool _postpone_notification_to_timeperiod;
   bool _use_regexp_matches;
   bool _use_retained_program_state;
   bool _use_retained_scheduling_info;
