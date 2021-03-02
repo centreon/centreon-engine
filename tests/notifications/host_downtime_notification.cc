@@ -24,9 +24,6 @@
 #include "../timeperiod/utils.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
-#include "com/centreon/engine/configuration/applier/contactgroup.hh"
-#include <com/centreon/engine/configuration/applier/timeperiod.hh>
-#include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/exceptions/error.hh"
@@ -227,90 +224,3 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntimeNotifyContactExitingUp) {
                step3 + 1)};
   ASSERT_NE(step4, std::string::npos);
 }
-
-//// Given a host UP
-//// When it is flapping
-//// Then it can throw a flappingstart notification followed by a recovery
-//// notification.
-//// When a second flappingstart notification is sent
-//// Then no notification is sent (because already sent).
-// TEST_F(HostDowntimeNotification, SimpleHostDowntimeStartTwoTimes) {
-//  /* We are using a local time() function defined in
-//  tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be
-//   called.
-//   */
-//  set_time(43000);
-//  _host->set_notification_interval(2);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  for (uint32_t i = 0; i < tperiod->days.size(); ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
-//
-//  ASSERT_TRUE(host_escalation);
-//  uint64_t id{_host->get_next_notification_id()};
-//  _host->notification_period_ptr = tperiod.get();
-//  _host->set_is_flapping(true);
-//  ASSERT_EQ(_host->notify(notifier::reason_flappingstart, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//
-//  set_time(43050);
-//  /* Notification already sent, no notification should be sent. */
-//  ASSERT_EQ(_host->notify(notifier::reason_flappingstart, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//}
-//
-//// Given a host UP
-//// When it is flapping
-//// Then it can throw a flappingstart notification followed by a recovery
-//// notification.
-//// When a flappingstop notification is sent
-//// Then it is sent.
-//// When a second flappingstop notification is sent
-//// Then nothing is sent.
-// TEST_F(HostDowntimeNotification, SimpleHostDowntimeStopTwoTimes) {
-//  /* We are using a local time() function defined in
-//  tests/timeperiod/utils.cc.
-//   * If we call time(), it is not the glibc time() function that will be
-//   called.
-//   */
-//  set_time(43000);
-//  _host->set_notification_interval(2);
-//  std::unique_ptr<engine::timeperiod> tperiod{
-//      new engine::timeperiod("tperiod", "alias")};
-//  for (uint32_t i = 0; i < tperiod->days.size(); ++i)
-//    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
-//
-//  std::unique_ptr<engine::hostescalation> host_escalation{
-//      new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7)};
-//
-//  ASSERT_TRUE(host_escalation);
-//  uint64_t id{_host->get_next_notification_id()};
-//  _host->notification_period_ptr = tperiod.get();
-//  _host->set_is_flapping(true);
-//  ASSERT_EQ(_host->notify(notifier::reason_flappingstart, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 1, _host->get_next_notification_id());
-//
-//  set_time(43050);
-//  /* Downtimestop notification: sent. */
-//  ASSERT_EQ(_host->notify(notifier::reason_flappingstop, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 2, _host->get_next_notification_id());
-//
-//  set_time(43100);
-//  /* Second flappingstop notification: not sent. */
-//  ASSERT_EQ(_host->notify(notifier::reason_flappingstop, "", "",
-//                          notifier::notification_option_none),
-//            OK);
-//  ASSERT_EQ(id + 2, _host->get_next_notification_id());
-//}
