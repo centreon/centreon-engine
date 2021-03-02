@@ -1,5 +1,13 @@
 # Changelog
 
+## 20.04.11
+
+### Bugfixes
+
+*Host/service status*
+
+They could be sent twice. This new version fixes that.
+
 ## 20.04.10
 
 
