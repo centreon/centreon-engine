@@ -1,6 +1,6 @@
 # Changelog
 
-## 20.04.11
+## 20.04.10
 
 ### Bugfixes
 
@@ -8,26 +8,18 @@
 
 They could be sent twice. This new version fixes that.
 
-## 20.04.10
-
-
-### Bugfixes
-
 *Notification macros*
 
-delete the url encode on macro
-(ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$,
-$HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$,
-$SERVICEGROUPACTIONURL*$)
+The url encode action is removed from macros $HOSTACTIONURL*$, $HOSTNOTESURL*$,
+$SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$,
+$HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$.
 
 *Notification Period*
 
-the timeperiods are now filtered for the contact
-and now don't push the notification if the time period is empty.
-The notification recovery are now sent when entering in timeperiod notification.
+The timeperiods work on contacts and notifications are not sent anymore if the
+time period is empty. The notification recovery are now sent when entering in
+timeperiod notification.
 
-
-### Enhancements
 ## 20.04.9
 
 `January 20, 2021`
