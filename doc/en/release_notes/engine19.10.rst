@@ -10,6 +10,11 @@ Macros
 ==============
 fix macro $TIMET$ now return time in a unix epoch format.
 
+Notifications
+==============
+Engine did not respect user's defined notification periods
+
+
 ========================
 Centreon Engine 19.10.16
 ========================
