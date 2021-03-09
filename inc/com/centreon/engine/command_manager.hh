@@ -31,6 +31,8 @@
 CCE_BEGIN()
 class command_manager {
   std::mutex _queue_m;
+  std::condition_variable _queue_cv;
+  std::atomic<bool> _has_data;
   std::deque<std::packaged_task<int()>> _queue;
   command_manager();
 
@@ -51,7 +53,7 @@ class command_manager {
   int get_restart_stats(RestartStats* response);
   int get_services_stats(ServicesStats* sstats);
   int get_hosts_stats(HostsStats* hstats);
-  void execute();
+  void execute(long t);
   static void schedule_and_propagate_downtime(host* h,
                                               time_t entry_time,
                                               char const* author,

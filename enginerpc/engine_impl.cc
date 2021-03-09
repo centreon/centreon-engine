@@ -541,7 +541,7 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
+  //response->set_value(!result.get());
   return grpc::Status::OK;
 }
 

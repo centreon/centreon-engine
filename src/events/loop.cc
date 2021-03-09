@@ -410,7 +410,10 @@ void loop::_dispatching() {
                                 nullptr);
       }
 
-      command_manager::instance().execute();
+      auto now = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); 
+      long later = now + (config->sleep_time() * 1000000000);
+
+      command_manager::instance().execute(config->sleep_time() * 1000000000);
 
       // Set time to sleep so we don't hog the CPU...
       timespec sleep_time;
@@ -431,8 +434,8 @@ void loop::_dispatching() {
                          nullptr);
 
       // Wait a while so we don't hog the CPU...
-      uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
-      std::this_thread::sleep_for(std::chrono::nanoseconds(d));
+      //uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
+      //std::this_thread::sleep_for(std::chrono::nanoseconds(d));
     }
     configuration::applier::state::instance().unlock();
   }
