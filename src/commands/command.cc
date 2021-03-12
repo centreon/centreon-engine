@@ -42,15 +42,23 @@ command_map commands::command::commands;
 commands::command::command(std::string const& name,
                            std::string const& command_line,
                            command_listener* listener)
-    : _command_line(command_line), _listener(listener), _name(name) {
+    : _command_line(command_line), _listener{listener}, _name(name) {
   if (_name.empty())
-    throw(engine_error() << "Could not create a command with an empty name");
+    throw engine_error() << "Could not create a command with an empty name";
+  if (_listener) {
+    std::function<void()> f = [this] { _listener = nullptr; };
+    _listener->reg(this, f);
+  }
 }
 
 /**
  *  Destructor.
  */
-commands::command::~command() noexcept {}
+commands::command::~command() noexcept {
+  if (_listener) {
+    _listener->unreg(this);
+  }
+}
 
 /**
  *  Compare two result.
@@ -108,7 +116,13 @@ void commands::command::set_command_line(std::string const& command_line) {
  */
 void commands::command::set_listener(
     commands::command_listener* listener) noexcept {
+  if (_listener)
+    _listener->unreg(this);
   _listener = listener;
+  if (_listener) {
+    std::function<void()> f([this] { _listener = nullptr; });
+    _listener->reg(this, f);
+  }
 }
 
 /**

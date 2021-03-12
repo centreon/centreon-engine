@@ -20,12 +20,16 @@
 #ifndef CCE_COMMANDS_COMMAND_LISTENER_HH
 #define CCE_COMMANDS_COMMAND_LISTENER_HH
 
+#include <functional>
+#include <unordered_map>
+
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace commands {
+  class command;
 /**
  *  @class command_listener command_listener.hh
  *  @brief Notify command events.
@@ -33,9 +37,23 @@ namespace commands {
  *  This class provide interface to notify command events.
  */
 class command_listener {
+  std::unordered_map<command*, std::function<void()>> _clean_callbacks;
+
  public:
-  virtual ~command_listener() throw() {}
-  virtual void finished(result const& res) throw() = 0;
+  virtual ~command_listener() noexcept {
+    for (auto it = _clean_callbacks.begin(), end = _clean_callbacks.end();
+        it != end; ++it) {
+      (it->second)();
+    }
+  }
+
+  virtual void finished(result const& res) noexcept = 0;
+  void reg(command* const ptr, std::function<void()>& regf) {
+    _clean_callbacks.insert({ptr, regf});
+  }
+  void unreg(command* const ptr) {
+    _clean_callbacks.erase(ptr);
+  }
 };
 }  // namespace commands
 
