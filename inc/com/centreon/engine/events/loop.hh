@@ -40,12 +40,6 @@ namespace events {
  *  and dispatch the Centreon Engine events.
  */
 class loop {
-  loop();
-  loop(loop const&) = delete;
-  ~loop() = default;
-  loop& operator=(loop const&) = delete;
-  void _dispatching();
-
   time_t _last_status_update;
   time_t _last_time;
   unsigned int _need_reload;
@@ -55,6 +49,12 @@ class loop {
 
   timed_event_list _event_list_high;
   timed_event_list _event_list_low;
+
+  loop();
+  loop(const loop&) = delete;
+  ~loop() noexcept = default;
+  loop& operator=(const loop&) = delete;
+  void _dispatching();
 
  public:
   enum priority {

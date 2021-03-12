@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2021 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -16,7 +16,6 @@
 ** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
-
 #ifndef CCE_LOGGING_BROKER_HH
 #define CCE_LOGGING_BROKER_HH
 
@@ -42,12 +41,12 @@ class broker : public com::centreon::logging::backend {
   broker(broker const& right);
   ~broker() noexcept override;
   broker& operator=(broker const& right);
-  void close() noexcept override;
+  void close() noexcept override final;
   void log(uint64_t types,
            uint32_t verbose,
            char const* msg,
            uint32_t size) noexcept override;
-  void open() override;
+  void open() override final;
   void reopen() override;
 };
 }  // namespace logging

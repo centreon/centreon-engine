@@ -385,7 +385,7 @@ static int handle_contactgroup_macro(nagios_macros* mac,
   (void)arg2;
 
   // Return value.
-  int retval;
+  int retval = OK;
 
   // Use the saved contactgroup pointer.
   // or find the contactgroup for on-demand macros.
