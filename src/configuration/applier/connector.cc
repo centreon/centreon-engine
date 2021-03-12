@@ -36,7 +36,7 @@ applier::connector::connector() {}
 /**
  *  Destructor.
  */
-applier::connector::~connector() throw() {}
+applier::connector::~connector() noexcept {}
 
 /**
  *  Add new connector.

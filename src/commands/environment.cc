@@ -39,7 +39,7 @@ environment::environment(char** env)
       _size_buffer(0),
       _size_env(0) {
   if (env)
-    for (uint32_t i(0); env[i]; ++i)
+    for (uint32_t i = 0; env[i]; ++i)
       add(env[i]);
 }
 
@@ -104,7 +104,7 @@ void environment::add(char const* line) {
   if (!line)
     return;
   uint32_t size(strlen(line));
-  uint32_t new_pos(_pos_buffer + size + 1);
+  uint32_t new_pos = _pos_buffer + size + 1;
   if (new_pos > _size_buffer) {
     if (new_pos < _size_buffer + EXTRA_SIZE_BUFFER)
       _realoc_buffer(_size_buffer + EXTRA_SIZE_BUFFER);
@@ -117,7 +117,6 @@ void environment::add(char const* line) {
   _env[_pos_env++] = _buffer + _pos_buffer;
   _env[_pos_env] = nullptr;
   _pos_buffer += size + 1;
-  return;
 }
 
 /**
@@ -170,7 +169,6 @@ void environment::add(std::string const& line) {
   _env[_pos_env++] = _buffer + _pos_buffer;
   _env[_pos_env] = nullptr;
   _pos_buffer += line.size() + 1;
-  return;
 }
 
 /**
@@ -226,7 +224,6 @@ void environment::_internal_copy(environment const& right) {
     memcpy(_buffer, right._buffer, _pos_buffer);
     _rebuild_env();
   }
-  return;
 }
 
 /**
@@ -246,7 +243,6 @@ void environment::_realoc_buffer(uint32_t size) {
   delete[] _buffer;
   _buffer = new_buffer;
   _rebuild_env();
-  return;
 }
 
 /**

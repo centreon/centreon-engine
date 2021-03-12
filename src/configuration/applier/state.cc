@@ -174,7 +174,7 @@ applier::state::state() : _config(nullptr), _processing_state(state_ready) {}
 /**
  *  Destructor.
  */
-applier::state::~state() throw() {
+applier::state::~state() noexcept {
   engine::contact::contacts.clear();
   engine::contactgroup::contactgroups.clear();
   engine::servicegroup::servicegroups.clear();

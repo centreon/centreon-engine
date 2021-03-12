@@ -40,12 +40,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
-
 /**
  *  Get instance of the events loop singleton.
  *
@@ -96,12 +90,6 @@ void loop::run() {
   _dispatching();
 }
 
-/**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
-
 /**
  *  Default constructor.
  */
@@ -119,8 +107,7 @@ static void apply_conf(std::atomic<bool>* reloading) {
     configuration::applier::state::instance().apply(config);
     logger(log_info_message, basic)
         << "Configuration reloaded, main loop continuing.";
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     logger(log_config_error, most) << "Error: " << e.what();
   }
   *reloading = false;
@@ -189,20 +176,20 @@ void loop::_dispatching() {
     // Log messages about event lists.
     logger(dbg_events, more) << "** Event Check Loop";
     if (!_event_list_high.empty())
-      logger(dbg_events, more) << "Next High Priority Event Time: "
-                               << my_ctime(
-                                      &(*_event_list_high.begin())->run_time);
+      logger(dbg_events, more)
+          << "Next High Priority Event Time: "
+          << my_ctime(&(*_event_list_high.begin())->run_time);
     else
       logger(dbg_events, more) << "No high priority events are scheduled...";
     if (!_event_list_low.empty())
-      logger(dbg_events, more) << "Next Low Priority Event Time:  "
-                               << my_ctime(
-                                      &(*_event_list_low.begin())->run_time);
+      logger(dbg_events, more)
+          << "Next Low Priority Event Time:  "
+          << my_ctime(&(*_event_list_low.begin())->run_time);
     else
       logger(dbg_events, more) << "No low priority events are scheduled...";
-    logger(dbg_events, more) << "Current/Max Service Checks: "
-                             << currently_running_service_checks << '/'
-                             << config->max_parallel_service_checks();
+    logger(dbg_events, more)
+        << "Current/Max Service Checks: " << currently_running_service_checks
+        << '/' << config->max_parallel_service_checks();
 
     // Update status information occassionally - NagVis watches the
     // NDOUtils DB to see if Engine is alive.
@@ -400,14 +387,9 @@ void loop::_dispatching() {
       // often as possible.
       if (config->command_check_interval() == -1) {
         // Send data to event broker.
-        broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
-                                NEBFLAG_NONE,
-                                NEBATTR_NONE,
-                                CMD_NONE,
-                                time(nullptr),
-                                nullptr,
-                                nullptr,
-                                nullptr);
+        broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK, NEBFLAG_NONE,
+                                NEBATTR_NONE, CMD_NONE, time(nullptr), nullptr,
+                                nullptr, nullptr);
       }
 
       command_manager::instance().execute();
@@ -424,11 +406,8 @@ void loop::_dispatching() {
       _sleep_event.event_data = (void*)&sleep_time;
 
       // Send event data to broker.
-      broker_timed_event(NEBTYPE_TIMEDEVENT_SLEEP,
-                         NEBFLAG_NONE,
-                         NEBATTR_NONE,
-                         &_sleep_event,
-                         nullptr);
+      broker_timed_event(NEBTYPE_TIMEDEVENT_SLEEP, NEBFLAG_NONE, NEBATTR_NONE,
+                         &_sleep_event, nullptr);
 
       // Wait a while so we don't hog the CPU...
       uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
@@ -451,11 +430,10 @@ void loop::adjust_check_scheduling() {
   double last_check_exec_time(0.0);
   double total_check_exec_time(0.0);
   int adjust_scheduling(false);
-  int current_check(0);
   int total_checks(0);
   time_t last_check_time(0L);
-  host* hst(NULL);
-  com::centreon::engine::service* svc(NULL);
+  host* hst(nullptr);
+  com::centreon::engine::service* svc(nullptr);
 
   logger(dbg_functions, basic) << "adjust_check_scheduling()";
 
@@ -473,8 +451,7 @@ void loop::adjust_check_scheduling() {
   // get current scheduling data.
   for (timed_event_list::iterator it{_event_list_low.begin()},
        end{_event_list_low.end()};
-       it != end;
-       ++it) {
+       it != end; ++it) {
     // skip events outside of our current window.
     if ((*it)->run_time <= first_window_time)
       continue;
@@ -543,10 +520,9 @@ void loop::adjust_check_scheduling() {
 
   // adjust check scheduling.
   double current_icd_offset(inter_check_delay / 2.0);
-  for (timed_event_list::iterator it{_event_list_low.begin()},
-       end{_event_list_low.end()};
-       it != end;
-       ++it) {
+  for (timed_event_list::iterator it = _event_list_low.begin(),
+                                  end = _event_list_low.end();
+       it != end; ++it) {
     // skip events outside of our current window.
     if ((*it)->run_time <= first_window_time)
       continue;
@@ -578,7 +554,6 @@ void loop::adjust_check_scheduling() {
     } else
       continue;
 
-    ++current_check;
     double new_run_time_offset(current_exec_time_offset + current_icd_offset);
     time_t new_run_time(
         (time_t)(first_window_time + (unsigned long)new_run_time_offset));
@@ -621,16 +596,16 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
   // we moved back in time...
   if (time_difference < 0) {
     get_time_breakdown(-time_difference, &days, &hours, &minutes, &seconds);
-    logger(dbg_events, basic) << "Detected a backwards time change of " << days
-                              << "d " << hours << "h " << minutes << "m "
-                              << seconds << "s.";
+    logger(dbg_events, basic)
+        << "Detected a backwards time change of " << days << "d " << hours
+        << "h " << minutes << "m " << seconds << "s.";
   }
   // we moved into the future...
   else {
     get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
-    logger(dbg_events, basic) << "Detected a forwards time change of " << days
-                              << "d " << hours << "h " << minutes << "m "
-                              << seconds << "s.";
+    logger(dbg_events, basic)
+        << "Detected a forwards time change of " << days << "d " << hours
+        << "h " << minutes << "m " << seconds << "s.";
   }
 
   // log the time change.
@@ -642,8 +617,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
 
   // adjust the next run time for all high priority timed events.
   for (auto it = _event_list_high.begin(), end = _event_list_high.end();
-       it != end;
-       ++it) {
+       it != end; ++it) {
     // skip special events that occur at specific times...
     if (!(*it)->compensate_for_time_change)
       continue;
@@ -669,8 +643,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
 
   // adjust the next run time for all low priority timed events.
   for (auto it = _event_list_low.begin(), end = _event_list_low.end();
-       it != end;
-       ++it) {
+       it != end; ++it) {
     // skip special events that occur at specific times...
     if (!(*it)->compensate_for_time_change)
       continue;
@@ -697,8 +670,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
   // adjust service timestamps.
   for (service_map::iterator it(service::services.begin()),
        end(service::services.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     it->second->set_last_notification(adjust_timestamp_for_time_change(
         time_difference, it->second->get_last_notification()));
     it->second->set_last_check(adjust_timestamp_for_time_change(
@@ -726,8 +698,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
   // adjust host timestamps.
   for (host_map::iterator it(com::centreon::engine::host::hosts.begin()),
        end(com::centreon::engine::host::hosts.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     time_t last_host_notif{adjust_timestamp_for_time_change(
         time_difference, it->second->get_last_notification())};
     time_t last_check{adjust_timestamp_for_time_change(
@@ -799,8 +770,7 @@ void loop::add_event(timed_event* event, loop::priority priority) {
     // be executed in the future, rather than now...
     for (timed_event_list::reverse_iterator it(list->rbegin()),
          end(list->rend());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       if (event->run_time >= (*it)->run_time) {
         list->insert(it.base(), event);
         break;
@@ -809,23 +779,21 @@ void loop::add_event(timed_event* event, loop::priority priority) {
   }
 
   // send event data to broker.
-  broker_timed_event(
-      NEBTYPE_TIMEDEVENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, event, nullptr);
+  broker_timed_event(NEBTYPE_TIMEDEVENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, event,
+                     nullptr);
 }
 
 void loop::remove_downtime(uint64_t downtime_id) {
   logger(dbg_functions, basic) << "loop::remove_downtime()";
 
-  for (auto it = _event_list_high.begin(),
-            end = _event_list_high.end();
-       it != end;
-       ++it) {
+  for (auto it = _event_list_high.begin(), end = _event_list_high.end();
+       it != end; ++it) {
     if ((*it)->event_type != timed_event::EVENT_SCHEDULED_DOWNTIME)
       continue;
     if (((uint64_t)(*it)->event_data) == downtime_id) {
       // send event data to broker.
-      broker_timed_event(
-          NEBTYPE_TIMEDEVENT_REMOVE, NEBFLAG_NONE, NEBATTR_NONE, *it, nullptr);
+      broker_timed_event(NEBTYPE_TIMEDEVENT_REMOVE, NEBFLAG_NONE, NEBATTR_NONE,
+                         *it, nullptr);
       _event_list_high.erase(it);
       break;
     }
@@ -843,8 +811,8 @@ void loop::remove_event(timed_event* event, loop::priority priority) {
   logger(dbg_functions, basic) << "loop::remove_event()";
 
   // send event data to broker.
-  broker_timed_event(
-      NEBTYPE_TIMEDEVENT_REMOVE, NEBFLAG_NONE, NEBATTR_NONE, event, NULL);
+  broker_timed_event(NEBTYPE_TIMEDEVENT_REMOVE, NEBFLAG_NONE, NEBATTR_NONE,
+                     event, NULL);
 
   if (!event)
     return;
@@ -953,16 +921,15 @@ void loop::resort_event_list(loop::priority priority) {
   else
     list = &_event_list_high;
 
-  std::sort(list->begin(),
-            list->end(),
+  std::sort(list->begin(), list->end(),
             [](timed_event* const& first, timed_event* const& second) {
-    return first->run_time < second->run_time;
-  });
+              return first->run_time < second->run_time;
+            });
 
   // send event data to broker.
   for (auto& evt : *list)
-    broker_timed_event(
-        NEBTYPE_TIMEDEVENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, evt, nullptr);
+    broker_timed_event(NEBTYPE_TIMEDEVENT_ADD, NEBFLAG_NONE, NEBATTR_NONE, evt,
+                       nullptr);
 }
 
 /**
