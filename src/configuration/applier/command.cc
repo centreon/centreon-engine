@@ -64,8 +64,9 @@ void applier::command::add_object(configuration::command const& obj) {
         commands::connector::connectors.find(obj.connector())};
     if (found_con != commands::connector::connectors.end() &&
         found_con->second) {
-      std::shared_ptr<commands::forward> forward{new commands::forward(
-          obj.command_name(), obj.command_line(), *found_con->second)};
+      std::shared_ptr<commands::forward> forward{
+          std::make_shared<commands::forward>(
+              obj.command_name(), obj.command_line(), found_con->second)};
       commands::command::commands[forward->get_name()] = forward;
     } else
       throw engine_error() << "Could not register command '"
@@ -131,8 +132,9 @@ void applier::command::modify_object(configuration::command const& obj) {
         commands::connector::connectors.find(obj.connector())};
     if (found_con != commands::connector::connectors.end() &&
         found_con->second) {
-      std::shared_ptr<commands::forward> forward{new commands::forward(
-          obj.command_name(), obj.command_line(), *found_con->second)};
+      std::shared_ptr<commands::forward> forward{
+          std::make_shared<commands::forward>(
+              obj.command_name(), obj.command_line(), found_con->second)};
       commands::command::commands[forward->get_name()] = forward;
     } else
       throw engine_error() << "Could not register command '"

@@ -29,12 +29,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
-/**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
-
 /**
  *  Constructor.
  *
@@ -50,13 +44,6 @@ raw::raw(std::string const& name,
     throw engine_error() << "Could not create '" << _name
                          << "' command: command line is empty";
 }
-
-/**
- *  Copy constructor
- *
- *  @param[in] right Object to copy.
- */
-raw::raw(raw const& right) : command(right), process_listener(right) {}
 
 /**
  *  Destructor.
@@ -77,28 +64,6 @@ raw::~raw() noexcept {
     logger(log_runtime_error, basic)
         << "Error: Raw command destructor failed: " << e.what();
   }
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-raw& raw::operator=(raw const& right) {
-  if (this != &right)
-    command::operator=(right);
-  return *this;
-}
-
-/**
- *  Get a pointer on a copy of the same object.
- *
- *  @return Return a pointer on a copy object.
- */
-commands::command* raw::clone() const {
-  return new raw(*this);
 }
 
 /**
@@ -202,8 +167,8 @@ void raw::run(std::string const& processed_cmd,
   if (res.exit_status == process::timeout) {
     res.exit_code = service::state_unknown;
     res.output = "(Process Timeout)";
-  } else if ((res.exit_status == process::crash) || (res.exit_code < -1) ||
-             (res.exit_code > 3))
+  } else if (res.exit_status == process::crash || res.exit_code < -1 ||
+             res.exit_code > 3)
     res.exit_code = service::state_unknown;
 
   logger(dbg_commands, basic) << "raw::run: end process: "
