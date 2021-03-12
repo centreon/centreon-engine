@@ -122,7 +122,6 @@ void handle::close() {
     _handle.reset();
   }
   broker::compatibility::instance().unloaded_module(this);
-  return;
 }
 
 /**
