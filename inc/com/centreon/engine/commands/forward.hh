@@ -1,27 +1,27 @@
 /*
-** Copyright 2011-2013 Merethis
-**
-** This file is part of Centreon Engine.
-**
-** Centreon Engine is free software: you can redistribute it and/or
-** modify it under the terms of the GNU General Public License version 2
-** as published by the Free Software Foundation.
-**
-** Centreon Engine is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with Centreon Engine. If not, see
-** <http://www.gnu.org/licenses/>.
-*/
-
+ * Copyright 2011-2013,2015,2019-2021 Centreon (https://www.centreon.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For more information : contact@centreon.com
+ *
+ */
 #ifndef CCE_COMMANDS_FORWARD_HH
 #define CCE_COMMANDS_FORWARD_HH
 
 #include <string>
 #include "com/centreon/engine/commands/command.hh"
+#include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -35,26 +35,23 @@ namespace commands {
  *  provide forward, is more efficiente that a raw command.
  */
 class forward : public command {
+  std::shared_ptr<command> _s_command;
+  command* _command;
+
  public:
-  forward(std::string const& command_name,
-          std::string const& command_line,
-          command& cmd);
-  forward(forward const& right);
-  ~forward() throw() override;
-  forward& operator=(forward const& right);
-  commands::command* clone() const override;
-  uint64_t run(std::string const& processed_cmd,
+  forward(const std::string& command_name,
+          const std::string& command_line,
+          std::shared_ptr<connector>& cmd);
+  ~forward() noexcept = default;
+  forward(const forward&) = delete;
+  forward& operator=(const forward&) = delete;
+  uint64_t run(const std::string& processed_cmd,
                nagios_macros& macros,
                uint32_t timeout) override;
-  void run(std::string const& processed_cmd,
+  void run(const std::string& processed_cmd,
            nagios_macros& macros,
            uint32_t timeout,
            result& res) override;
-
- private:
-  void _internal_copy(forward const& right);
-
-  command* _command;
 };
 }  // namespace commands
 

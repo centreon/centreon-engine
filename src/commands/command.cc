@@ -112,32 +112,6 @@ void commands::command::set_listener(
 }
 
 /**
- *  Default copy constructor.
- *
- *  @param[in] right The copy class.
- */
-commands::command::command(commands::command const& right) {
-  operator=(right);
-}
-
-/**
- *  Default copy operatro.
- *
- *  @param[in] right The copy class.
- *
- *  @return This object.
- */
-commands::command& commands::command::operator=(
-    commands::command const& right) {
-  if (this != &right) {
-    _command_line = right._command_line;
-    _listener = right._listener;
-    _name = right._name;
-  }
-  return *this;
-}
-
-/**
  *  Get the processed command line.
  *
  *  @param[in] macros The macros list.

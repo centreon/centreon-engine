@@ -94,7 +94,8 @@ notifier::notifier(notifier::notifier_type notifier_type,
                    bool obsess_over,
                    std::string const& timezone,
                    bool retain_status_information,
-                   bool retain_nonstatus_information)
+                   bool retain_nonstatus_information,
+                   bool is_volatile)
     : checkable{display_name,
                 check_command,
                 checks_enabled,
@@ -148,6 +149,7 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _retain_status_information{retain_status_information},
       _retain_nonstatus_information{retain_nonstatus_information},
       _is_being_freshened{false},
+      _is_volatile{is_volatile},
       _notification_number{0},
       _notification{{}},
       _state_history{{}},
@@ -1517,4 +1519,12 @@ void notifier::set_notification(int32_t idx, std::string const& value) {
       std::make_shared<notification>(this, type, author, "", options, id,
                                      number, interval, escalated, contacts)};
   _notification[idx] = notif;
+}
+
+bool notifier::get_is_volatile() const noexcept {
+  return _is_volatile;
+}
+
+void notifier::set_is_volatile(bool vol) {
+  _is_volatile = vol;
 }

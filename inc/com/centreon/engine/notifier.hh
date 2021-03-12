@@ -130,7 +130,8 @@ class notifier : public checkable {
            bool obsess_over,
            std::string const& timezone,
            bool retain_status_information,
-           bool retain_nonstatus_information);
+           bool retain_nonstatus_information,
+           bool is_volatile);
   ~notifier();
 
   void set_notification(int32_t idx, std::string const& value);
@@ -248,11 +249,12 @@ class notifier : public checkable {
   std::unordered_set<contact*> get_contacts_to_notify(
       notification_category cat,
       reason_type type,
-      uint32_t& notification_interval, bool& escalated);
+      uint32_t& notification_interval,
+      bool& escalated);
   notifier_type get_notifier_type() const noexcept;
   std::unordered_map<std::string, contact*>& get_contacts() noexcept;
-  std::unordered_map<std::string, contact*> const& get_contacts() const
-      noexcept;
+  std::unordered_map<std::string, contact*> const& get_contacts()
+      const noexcept;
   contactgroup_map_unsafe& get_contactgroups() noexcept;
   contactgroup_map_unsafe const& get_contactgroups() const noexcept;
   void resolve(int& w, int& e);
@@ -263,11 +265,12 @@ class notifier : public checkable {
   int get_pending_flex_downtime() const;
   void inc_pending_flex_downtime() noexcept;
   void dec_pending_flex_downtime() noexcept;
-  virtual bool get_is_volatile() const = 0;
   void set_flap_type(uint32_t type) noexcept;
   timeperiod* get_notification_period_ptr() const noexcept;
   void set_notification_period_ptr(timeperiod* tp) noexcept;
   int get_acknowledgement_timeout() const noexcept;
+  bool get_is_volatile() const noexcept;
+  void set_is_volatile(bool vol);
 
   map_customvar custom_variables;
 
@@ -321,7 +324,9 @@ class notifier : public checkable {
   bool _retain_status_information;
   bool _retain_nonstatus_information;
   bool _is_being_freshened;
-  
+
+  bool _is_volatile;
+
   /* New ones */
   int _notification_number;
   // reason_type _type;
