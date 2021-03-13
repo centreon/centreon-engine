@@ -31,7 +31,8 @@ option(WITH_ASAN "Add the libasan to check memory leaks and other memory issues.
 if (WITH_ASAN)
   set(CMAKE_BUILD_TYPE Debug)
   set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-  set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+  set (CMAKE_LINKER_FLAGS_DEBUG
+       "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif ()
 
 if (USE_CXX11_ABI)
