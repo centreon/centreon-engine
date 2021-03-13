@@ -20,6 +20,19 @@ The timeperiods work on contacts and notifications are not sent anymore if the
 time period is empty. The notification recovery are now sent when entering in
 timeperiod notification.
 
+*Connectors*
+
+When a Perl connector or an SSH connector is used, engine could crash when we
+stop it.
+
+*Connector restart*
+
+If a connector stops working because of a crash or whatever else, it was not
+restarted automatically. It is fixed now.
+
+*Check commands*
+
+When many commands are running, engine could crash when we stop it.
 ## 20.10.2
 
 `January 20, 2021`
