@@ -210,7 +210,7 @@ static void call_command_manager(std::unique_ptr<std::thread>& th,
   auto fn = [continuerunning, mutex, condvar]() {
     std::unique_lock<std::mutex> lock(*mutex);
     while (true) {
-      command_manager::instance().execute();
+      command_manager::instance().execute(0);
       if (condvar->wait_for(
               lock, std::chrono::milliseconds(50),
               [continuerunning]() -> bool { return *continuerunning; })) {
@@ -1804,6 +1804,6 @@ TEST_F(EngineRpc, NewThresholdsFile) {
   auto output = execute("NewThresholdsFile /tmp/thresholds_file.json");
   ASSERT_EQ(output.size(), 1);
   ASSERT_EQ(output.front(), "NewThresholdsFile: 0");
-  command_manager::instance().execute();
+  command_manager::instance().execute(0);
   ASSERT_EQ(_ad->get_thresholds_file(), "/tmp/thresholds_file.json");
 }

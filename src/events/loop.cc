@@ -410,7 +410,8 @@ void loop::_dispatching() {
                                 nullptr);
       }
 
-      command_manager::instance().execute();
+      // Send to execute function the time in seconds to sleep cpu
+      command_manager::instance().execute(config->sleep_time());
 
       // Set time to sleep so we don't hog the CPU...
       timespec sleep_time;
@@ -430,9 +431,6 @@ void loop::_dispatching() {
                          &_sleep_event,
                          nullptr);
 
-      // Wait a while so we don't hog the CPU...
-      uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
-      std::this_thread::sleep_for(std::chrono::nanoseconds(d));
     }
     configuration::applier::state::instance().unlock();
   }

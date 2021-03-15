@@ -36,7 +36,7 @@ using namespace com::centreon::engine::downtimes;
 /**
  *  The default constructor
  */
-command_manager::command_manager() {}
+command_manager::command_manager(): _has_data{false} {}
 
 /**
  * @brief Just an accessor to the command_manager instance.
@@ -51,20 +51,40 @@ command_manager& command_manager::instance() {
 void command_manager::enqueue(std::packaged_task<int(void)>&& f) {
   std::lock_guard<std::mutex> lock(_queue_m);
   _queue.emplace_back(std::move(f));
+  if (!_has_data) {
+    _has_data = true;
+    _queue_cv.notify_all();
+  }
 }
 
-void command_manager::execute() {
+/**
+ * @brief Executes external commands stored in _queue.
+ * 
+ * @param time is send in seconds
+ * 
+ */
+void command_manager::execute(float time) {
   std::unique_lock<std::mutex> lock(_queue_m);
-  if (_queue.empty())
-    return;
-  auto end = _queue.end();
-  lock.unlock();
+  std::chrono::duration<float> t{time};
+  // Wait a while so we don't hog the CPU...
+  // While waiting we executes commands in queue.
+  while (_queue_cv.wait_for(lock, t, [this] {
+    return static_cast<bool>(_has_data); 
+  })) { 
+    std::deque<std::packaged_task<int()>> queue;
+    std::swap(queue, _queue);
+    logger(dbg_functions, basic) << "size of queue" << queue.size(); 
+    _has_data = false;
+    lock.unlock();
 
-  auto it = _queue.begin();
-  while (it != end) {
-    (*it)();
-    ++it;
-    _queue.pop_front();
+    auto end = queue.end();
+    auto it = queue.begin();
+    while (it != end) {
+      (*it)();
+      ++it;
+      queue.pop_front();
+    }
+    lock.lock();
   }
 }
 
