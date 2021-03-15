@@ -804,8 +804,13 @@ void connector::_run_restart() {
 
       if (!info->waiting_result) {
         // Forward result to the listener.
+        try {
         if (_listener)
           (_listener->finished)(res);
+        } catch (std::exception const& e) {
+          throw engine_error()
+              << "BISOUS... Le bug est la...";
+        }
       } else {
         std::lock_guard<std::mutex> lock(_lock);
         // Push result into list of results.
