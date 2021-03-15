@@ -108,6 +108,7 @@ class AnomalydetectionCheck : public TestEngine {
   void CreateFile(std::string const& filename, std::string const& content) {
     std::ofstream oss(filename);
     oss << content;
+    oss.close();
   }
 
  protected:
