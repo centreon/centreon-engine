@@ -70,7 +70,12 @@ connector::~connector() noexcept {
   logger(dbg_commands, basic) << "connector::~connector";
 
   // Close connector properly.
-  _connector_close();
+  try {
+    _connector_close();
+  } catch (const std::exception& e) {
+    logger(log_runtime_error, basic)
+        << "Error: could not stop connector properly: " << e.what();
+  }
 
   // Wait restart thread.
   {
