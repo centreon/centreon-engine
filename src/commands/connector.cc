@@ -80,8 +80,12 @@ connector::~connector() noexcept {
   if (_restart && _restart->joinable())
     _restart->join();
   // Close connector properly.
-  _connector_close();
-}
+  try {
+    _connector_close();
+  } catch (const std::exception& e) {
+    logger(log_runtime_error, basic)
+        << "Error: could not stop connector properly: " << e.what();
+  }
 
 /**
  *  Get a pointer on a copy of the same object.
