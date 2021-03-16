@@ -63,36 +63,6 @@ class Connector : public ::testing::Test {
   void TearDown() override { deinit_config_state(); }
 };
 
-class wait_process : public commands::command_listener {
-  mutable std::mutex _mutex;
-  mutable std::condition_variable _condvar;
-  commands::result _res;
-  command* _cmd;
-
- public:
-  wait_process(command* cmd) : _cmd{cmd} { _cmd->set_listener(this); }
-
-  wait_process(wait_process const&) = delete;
-  ~wait_process() = default;
-
-  result const& get_result() const {
-    std::lock_guard<std::mutex> guard(_mutex);
-    return _res;
-  }
-
-  void wait() const noexcept {
-    std::unique_lock<std::mutex> lock(_mutex);
-    _condvar.wait(lock, [this] { return _res.command_id != 0; });
-  }
-
-  void finished(result const& res) throw() override {
-    std::cout << "WAIT LISTENER FINISHED\n";
-    std::lock_guard<std::mutex> guard(_mutex);
-    _res = res;
-    _cmd->set_listener(nullptr);
-    _condvar.notify_all();
-  }
-};
 
 // Given an empty name
 // When the add_command method is called with it as argument,
