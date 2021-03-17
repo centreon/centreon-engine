@@ -396,29 +396,24 @@ void connector::_connector_close() {
  *  Start connection with the process.
  */
 void connector::_connector_start() {
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts1";
   logger(dbg_commands, basic)
       << "connector::_connector_start: process=" << &_process;
 
   {
     std::lock_guard<std::mutex> lock(_lock);
 
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts2";
     // Reset variables.
     _query_quit_ok = false;
     _query_version_ok = false;
     _is_running = false;
   }
 
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts3";
   // Start connector execution.
   _process.exec(_command_line);
 
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts4";
   {
     std::unique_lock<std::mutex> lock(_lock);
 
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts5";
     // Ask connector version.
     _send_query_version();
 
@@ -428,12 +423,15 @@ void connector::_connector_start() {
         _cv_query.wait_for(
             lock, std::chrono::seconds(config->service_check_timeout())) ==
         std::cv_status::timeout};
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts7";
+  logger(log_info_message, basic) << "Connector '" << _name << "' starts7 : " << is_timeout;
     if (is_timeout || !_query_version_ok) {
+  logger(log_info_message, basic) << "Connector '" << _name << "' starts7.1";
       _process.kill();
+  logger(log_info_message, basic) << "Connector '" << _name << "' starts7.2";
       _try_to_restart = false;
       _thread_cv.notify_all();
 
+  logger(log_info_message, basic) << "Connector '" << _name << "' starts7.3";
       if (is_timeout)
         throw engine_error()
             << "Cannot start connector '" << _name << "': Timeout";
