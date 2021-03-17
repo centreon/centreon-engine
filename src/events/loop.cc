@@ -2,6 +2,7 @@
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
 ** Copyright 2011-2013 Merethis
+** Copyright 2013-2021 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -410,7 +411,8 @@ void loop::_dispatching() {
                                 nullptr);
       }
 
-      // Send to execute function the time in seconds to sleep cpu
+      // Send to the execute function the max delay in seconds we have to
+      // execute external commands.
       command_manager::instance().execute(config->sleep_time());
 
       // Set time to sleep so we don't hog the CPU...
@@ -431,6 +433,9 @@ void loop::_dispatching() {
                          &_sleep_event,
                          nullptr);
 
+      // Wait a while so we don't hog the CPU...
+      uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
+      std::this_thread::sleep_for(std::chrono::nanoseconds(d));
     }
     configuration::applier::state::instance().unlock();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Centreon (https://www.centreon.com/)
+ * Copyright 2019-2021 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,26 +65,18 @@ void command_manager::enqueue(std::packaged_task<int(void)>&& f) {
  */
 void command_manager::execute(float time) {
   std::unique_lock<std::mutex> lock(_queue_m);
-  std::chrono::duration<float> t{time};
-  // Wait a while so we don't hog the CPU...
-  // While waiting we executes commands in queue.
-  while (_queue_cv.wait_for(lock, t, [this] {
-    return static_cast<bool>(_has_data); 
-  })) { 
-    std::deque<std::packaged_task<int()>> queue;
-    std::swap(queue, _queue);
-    logger(dbg_functions, basic) << "size of queue" << queue.size(); 
-    _has_data = false;
-    lock.unlock();
+  if (_queue.empty())
+    return;
 
-    auto end = queue.end();
-    auto it = queue.begin();
-    while (it != end) {
-      (*it)();
-      ++it;
-      queue.pop_front();
-    }
-    lock.lock();
+  std::deque<std::packaged_task<int()>> queue;
+  std::swap(queue, _queue);
+  lock.unlock();
+
+  auto it = queue.begin(), end = queue.end();
+  while (it != end) {
+    (*it)();
+    ++it;
+    queue.pop_front();
   }
 }
 
