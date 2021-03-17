@@ -60,7 +60,10 @@ class Connector : public ::testing::Test {
     init_config_state();
   }
 
-  void TearDown() override { deinit_config_state(); }
+  void TearDown() override { std::cout << "Deinit 1\n";
+    deinit_config_state();
+    std::cout << "Deinit 2\n";
+  }
 };
 
 

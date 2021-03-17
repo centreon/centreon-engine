@@ -19,6 +19,8 @@
 
 #include "helper.hh"
 
+#include <iostream>
+
 #include <com/centreon/engine/checks/checker.hh>
 #include <com/centreon/engine/configuration/applier/logging.hh>
 #include <com/centreon/engine/configuration/applier/state.hh>
@@ -37,9 +39,13 @@ void init_config_state(void) {
 }
 
 void deinit_config_state(void) {
+  std::cout << "deinit_config_state1\n";
   delete config;
+  std::cout << "deinit_config_state2\n";
   config = nullptr;
 
   configuration::applier::state::instance().clear();
+  std::cout << "deinit_config_state3\n";
   checks::checker::deinit();
+  std::cout << "deinit_config_state4\n";
 }
