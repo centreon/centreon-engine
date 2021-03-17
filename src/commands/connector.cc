@@ -67,23 +67,31 @@ connector::connector(std::string const& connector_name,
  *  Destructor.
  */
 connector::~connector() noexcept {
+  logger(log_info_message, basic) << "Destroy connector1";
   logger(dbg_commands, basic) << "connector::~connector";
 
   // Close connector properly.
   try {
     _connector_close();
+  logger(log_info_message, basic) << "Destroy connector2";
   } catch (const std::exception& e) {
+  logger(log_info_message, basic) << "Destroy connector3";
     logger(log_runtime_error, basic)
         << "Error: could not stop connector properly: " << e.what();
   }
 
+  logger(log_info_message, basic) << "Destroy connector4";
   // Wait restart thread.
   {
     std::unique_lock<std::mutex> lck(_thread_m);
+  logger(log_info_message, basic) << "Destroy connector5";
     _thread_action = stop;
     _thread_cv.notify_all();
+  logger(log_info_message, basic) << "Destroy connector6";
     lck.unlock();
+  logger(log_info_message, basic) << "Destroy connector7";
     _restart.join();
+  logger(log_info_message, basic) << "Destroy connector8";
   }
 }
 
@@ -417,28 +425,22 @@ void connector::_connector_start() {
     // Ask connector version.
     _send_query_version();
 
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts6";
     // Waiting connector version, or 1 seconds.
     bool is_timeout{
         _cv_query.wait_for(
             lock, std::chrono::seconds(config->service_check_timeout())) ==
         std::cv_status::timeout};
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts7 : " << is_timeout;
     if (is_timeout || !_query_version_ok) {
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts7.1";
       _process.kill();
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts7.2";
       _try_to_restart = false;
       _thread_cv.notify_all();
 
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts7.3";
       if (is_timeout)
         throw engine_error()
             << "Cannot start connector '" << _name << "': Timeout";
       throw engine_error() << "Cannot start connector '" << _name
                            << "': Bad protocol version";
     }
-  logger(log_info_message, basic) << "Connector '" << _name << "' starts8";
     _is_running = true;
   }
 
