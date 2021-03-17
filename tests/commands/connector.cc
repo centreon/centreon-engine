@@ -127,6 +127,7 @@ TEST_F(Connector, RunConnectorAsync) {
 }
 
 TEST_F(Connector, RunWithConnectorSwitchedOff) {
+  {
   std::unique_ptr<my_listener> lstnr(new my_listener);
   nagios_macros macros = nagios_macros();
   connector cmd_connector("RunWithConnectorSwitchedOff",
@@ -150,6 +151,8 @@ TEST_F(Connector, RunWithConnectorSwitchedOff) {
   std::cout << "Run... 5\n";
   ASSERT_EQ(res.output, "");
   std::cout << "Run... 6\n";
+  }
+  std::cout << "Run... 7\n";
 }
 
 TEST_F(Connector, RunConnectorSetCommandLine) {
