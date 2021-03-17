@@ -86,6 +86,7 @@ connector::~connector() noexcept {
     logger(log_runtime_error, basic)
         << "Error: could not stop connector properly: " << e.what();
   }
+}
 
 /**
  *  Get a pointer on a copy of the same object.

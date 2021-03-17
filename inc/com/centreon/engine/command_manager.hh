@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Centreon (https://www.centreon.com/)
+ * Copyright 2019 - 2021 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,19 +30,17 @@
 
 /**
  *  @class command_manager command_manager.hh
- *  @brief Base exception class.
+ *  @brief External commands manager.
  *
  *  This class is related to the execution of external commands with
  *  gRPC. _queue attribute is a queue where external commands are stored
- *  and wait to be executed. _has_data attribute indicates 
- *  if at least one external command has been loaded in the queue.
+ *  and wait to be executed.
  */
 
 CCE_BEGIN()
 class command_manager {
   std::mutex _queue_m;
   std::condition_variable _queue_cv;
-  std::atomic<bool> _has_data;
   std::deque<std::packaged_task<int()>> _queue;
   command_manager();
 
@@ -63,7 +61,7 @@ class command_manager {
   int get_restart_stats(RestartStats* response);
   int get_services_stats(ServicesStats* sstats);
   int get_hosts_stats(HostsStats* hstats);
-  void execute(float time);
+  void execute();
   static void schedule_and_propagate_downtime(host* h,
                                               time_t entry_time,
                                               char const* author,

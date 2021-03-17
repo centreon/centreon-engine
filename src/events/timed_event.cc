@@ -133,7 +133,7 @@ void timed_event::_exec_event_enginerpc_check() {
   logger(dbg_events, basic) << "** EngineRPC Command Check Event";
 
   // send data to event broker.
-  command_manager::instance().execute(1);
+  command_manager::instance().execute();
 }
 
 /**

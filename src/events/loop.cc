@@ -20,6 +20,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/events/loop.hh"
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -28,24 +29,17 @@
 #include <future>
 #include <thread>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/command_manager.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
-#include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/engine.hh"
-#include "com/centreon/engine/command_manager.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
-
-/**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
 
 /**
  *  Get instance of the events loop singleton.
@@ -97,12 +91,6 @@ void loop::run() {
   _dispatching();
 }
 
-/**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
-
 /**
  *  Default constructor.
  */
@@ -120,8 +108,7 @@ static void apply_conf(std::atomic<bool>* reloading) {
     configuration::applier::state::instance().apply(config);
     logger(log_info_message, basic)
         << "Configuration reloaded, main loop continuing.";
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     logger(log_config_error, most) << "Error: " << e.what();
   }
   *reloading = false;
@@ -411,9 +398,10 @@ void loop::_dispatching() {
                                 nullptr);
       }
 
-      // Send to the execute function the max delay in seconds we have to
-      // execute external commands.
-      command_manager::instance().execute(config->sleep_time());
+      auto t1 = std::chrono::system_clock::now();
+      auto t2 = t1 + std::chrono::nanoseconds(static_cast<uint64_t>(
+                         1000000000 * config->sleep_time()));
+      command_manager::instance().execute();
 
       // Set time to sleep so we don't hog the CPU...
       timespec sleep_time;
@@ -433,9 +421,7 @@ void loop::_dispatching() {
                          &_sleep_event,
                          nullptr);
 
-      // Wait a while so we don't hog the CPU...
-      uint64_t d = static_cast<uint64_t>(config->sleep_time() * 1000000000);
-      std::this_thread::sleep_for(std::chrono::nanoseconds(d));
+      std::this_thread::sleep_until(t2);
     }
     configuration::applier::state::instance().unlock();
   }
@@ -457,8 +443,8 @@ void loop::adjust_check_scheduling() {
   int current_check(0);
   int total_checks(0);
   time_t last_check_time(0L);
-  host* hst(NULL);
-  com::centreon::engine::service* svc(NULL);
+  host* hst(nullptr);
+  com::centreon::engine::service* svc(nullptr);
 
   logger(dbg_functions, basic) << "adjust_check_scheduling()";
 

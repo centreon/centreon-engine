@@ -201,7 +201,7 @@ class EngineRpc : public TestEngine {
   std::shared_ptr<engine::anomalydetection> _ad;
 };
 
-/* calls command manager in an other thread (function is used for units tests)
+/* calls command manager in another thread (function is used for unit tests)
  */
 static void call_command_manager(std::unique_ptr<std::thread>& th,
                                  std::condition_variable* condvar,
@@ -209,8 +209,8 @@ static void call_command_manager(std::unique_ptr<std::thread>& th,
                                  bool* continuerunning) {
   auto fn = [continuerunning, mutex, condvar]() {
     std::unique_lock<std::mutex> lock(*mutex);
-    while (true) {
-      command_manager::instance().execute(0);
+    for (;;) {
+      command_manager::instance().execute();
       if (condvar->wait_for(
               lock, std::chrono::milliseconds(50),
               [continuerunning]() -> bool { return *continuerunning; })) {
@@ -1804,6 +1804,6 @@ TEST_F(EngineRpc, NewThresholdsFile) {
   auto output = execute("NewThresholdsFile /tmp/thresholds_file.json");
   ASSERT_EQ(output.size(), 1);
   ASSERT_EQ(output.front(), "NewThresholdsFile: 0");
-  command_manager::instance().execute(0);
+  command_manager::instance().execute();
   ASSERT_EQ(_ad->get_thresholds_file(), "/tmp/thresholds_file.json");
 }

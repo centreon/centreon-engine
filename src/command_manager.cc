@@ -25,9 +25,9 @@
 
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comment.hh"
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/downtimes/downtime_manager.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -36,7 +36,7 @@ using namespace com::centreon::engine::downtimes;
 /**
  *  The default constructor
  */
-command_manager::command_manager(): _has_data{false} {}
+command_manager::command_manager() {}
 
 /**
  * @brief Just an accessor to the command_manager instance.
@@ -51,19 +51,13 @@ command_manager& command_manager::instance() {
 void command_manager::enqueue(std::packaged_task<int(void)>&& f) {
   std::lock_guard<std::mutex> lock(_queue_m);
   _queue.emplace_back(std::move(f));
-  if (!_has_data) {
-    _has_data = true;
-    _queue_cv.notify_all();
-  }
 }
 
 /**
  * @brief Executes external commands stored in _queue.
- * 
- * @param time is send in seconds
- * 
+ *
  */
-void command_manager::execute(float time) {
+void command_manager::execute() {
   std::unique_lock<std::mutex> lock(_queue_m);
   if (_queue.empty())
     return;
@@ -373,15 +367,16 @@ int command_manager::get_stats(std::string const& request, Stats* response) {
   return 0;
 }
 
-void command_manager::schedule_and_propagate_downtime(host* temp_host,
-                                     time_t entry_time,
-                                     char const* author,
-                                     char const* comment_data,
-                                     time_t start_time,
-                                     time_t end_time,
-                                     int fixed,
-                                     unsigned long triggered_by,
-                                     unsigned long duration) {
+void command_manager::schedule_and_propagate_downtime(
+    host* temp_host,
+    time_t entry_time,
+    char const* author,
+    char const* comment_data,
+    time_t start_time,
+    time_t end_time,
+    int fixed,
+    unsigned long triggered_by,
+    unsigned long duration) {
   /* check all child hosts... */
   for (host_map_unsafe::iterator it(temp_host->child_hosts.begin()),
        end(temp_host->child_hosts.end());
