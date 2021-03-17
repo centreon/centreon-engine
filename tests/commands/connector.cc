@@ -140,9 +140,13 @@ TEST_F(Connector, RunWithConnectorSwitchedOff) {
     set_time(std::time(nullptr) + 1);
     ++timeout;
   }
+  std::cout << "Run... 3\n";
   result res{lstnr->get_result()};
+  std::cout << "Run... 4\n";
   ASSERT_EQ(res.command_id, 0);
+  std::cout << "Run... 5\n";
   ASSERT_EQ(res.output, "");
+  std::cout << "Run... 6\n";
 }
 
 TEST_F(Connector, RunConnectorSetCommandLine) {
