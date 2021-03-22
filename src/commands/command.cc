@@ -39,8 +39,8 @@ command_map commands::command::commands;
  *  @param[in] command_line The command line.
  *  @param[in] listener     The command listener to catch events.
  */
-commands::command::command(std::string const& name,
-                           std::string const& command_line,
+commands::command::command(const std::string& name,
+                           const std::string& command_line,
                            command_listener* listener)
     : _command_line(command_line), _listener{listener}, _name(name) {
   if (_name.empty())
@@ -87,7 +87,7 @@ bool commands::command::operator!=(command const& right) const noexcept {
  *
  *  @return The command line.
  */
-std::string const& commands::command::get_command_line() const noexcept {
+const std::string& commands::command::get_command_line() const noexcept {
   return _command_line;
 }
 
@@ -96,7 +96,7 @@ std::string const& commands::command::get_command_line() const noexcept {
  *
  *  @return The command name.
  */
-std::string const& commands::command::get_name() const noexcept {
+const std::string& commands::command::get_name() const noexcept {
   return _name;
 }
 
@@ -105,7 +105,7 @@ std::string const& commands::command::get_name() const noexcept {
  *
  *  @param[in] command_line The command line.
  */
-void commands::command::set_command_line(std::string const& command_line) {
+void commands::command::set_command_line(const std::string& command_line) {
   _command_line = command_line;
 }
 
