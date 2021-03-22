@@ -36,8 +36,8 @@ connector_map connector::connectors;
  *  @param[in] connector_line  The connector command line.
  *  @param[in] listener        The listener who catch events.
  */
-connector::connector(std::string const& connector_name,
-                     std::string const& connector_line,
+connector::connector(const std::string& connector_name,
+                     const std::string& connector_line,
                      command_listener* listener)
     : command(connector_name, connector_line, listener),
       process_listener(),
@@ -104,7 +104,7 @@ connector::~connector() noexcept {
  *
  *  @return The command id.
  */
-uint64_t connector::run(std::string const& processed_cmd,
+uint64_t connector::run(const std::string& processed_cmd,
                         nagios_macros& macros,
                         uint32_t timeout) {
   (void)macros;
@@ -162,7 +162,7 @@ uint64_t connector::run(std::string const& processed_cmd,
  *  @param[in]  timeout The command timeout.
  *  @param[out] res     The result of the command.
  */
-void connector::run(std::string const& processed_cmd,
+void connector::run(const std::string& processed_cmd,
                     nagios_macros& macros,
                     uint32_t timeout,
                     result& res) {
@@ -228,7 +228,7 @@ void connector::run(std::string const& processed_cmd,
  *
  *  @param[in] command_line The new command line.
  */
-void connector::set_command_line(std::string const& command_line) {
+void connector::set_command_line(const std::string& command_line) {
   // Close connector properly.
   _connector_close();
   _try_to_restart = true;
@@ -470,7 +470,7 @@ void connector::_connector_start() {
  *
  *  @return The ending string.
  */
-std::string const& connector::_query_ending() const noexcept {
+const std::string& connector::_query_ending() const noexcept {
   const static std::string ending(3, '\0');
   return ending;
 }
@@ -683,7 +683,7 @@ void connector::_recv_query_version(char const* data) {
  *  @param[in]  start       The start time.
  *  @param[in]  timeout     The timeout.
  */
-void connector::_send_query_execute(std::string const& cmdline,
+void connector::_send_query_execute(const std::string& cmdline,
                                     uint64_t command_id,
                                     timestamp const& start,
                                     uint32_t timeout) {
