@@ -127,30 +127,25 @@ TEST_F(Connector, RunConnectorAsync) {
 }
 
 TEST_F(Connector, RunWithConnectorSwitchedOff) {
-  {
-  std::unique_ptr<my_listener> lstnr(new my_listener);
-  nagios_macros macros = nagios_macros();
   connector cmd_connector("RunWithConnectorSwitchedOff",
                           "tests/bin_connector_test_run");
-  cmd_connector.set_listener(lstnr.get());
-  std::cout << "Run... 1\n";
-  cmd_connector.run("commande --kill=1", macros, 1);
-  std::cout << "Run... 2\n";
-
-  int timeout = 0;
-  int max_timeout{15};
-  while (timeout < max_timeout && lstnr->get_result().output == "") {
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    set_time(std::time(nullptr) + 1);
-    ++timeout;
-  }
-  std::cout << "Run... 3\n";
-  result res{lstnr->get_result()};
-  std::cout << "Run... 4\n";
-  ASSERT_EQ(res.command_id, 0);
-  std::cout << "Run... 5\n";
-  ASSERT_EQ(res.output, "");
-  std::cout << "Run... 6\n";
+  {
+    std::unique_ptr<my_listener> lstnr(new my_listener);
+    nagios_macros macros = nagios_macros();
+    cmd_connector.set_listener(lstnr.get());
+    cmd_connector.run("commande --kill=1", macros, 1);
+  
+    int timeout = 0;
+    int max_timeout{15};
+    while (timeout < max_timeout && lstnr->get_result().output == "") {
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      set_time(std::time(nullptr) + 1);
+      ++timeout;
+    }
+    result res{lstnr->get_result()};
+    ASSERT_EQ(res.command_id, 0);
+    ASSERT_EQ(res.output, "");
+    std::cout << "Run... 6\n";
   }
   std::cout << "Run... 7\n";
 }
