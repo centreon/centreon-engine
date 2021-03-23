@@ -332,18 +332,15 @@ void connector::data_is_available_err(process& p) noexcept {
  *  @param[in] p  The process to finished.
  */
 void connector::finished(process& p) noexcept {
-std::cout << "finished1" << std::endl;
   try {
     logger(dbg_commands, basic) << "connector::finished: process=" << &p;
 
     {
       std::lock_guard<std::mutex> lock(_lock);
-std::cout << "finished2" << std::endl;
       _is_running = false;
       _data_available.clear();
     }
 
-std::cout << "finished3" << std::endl;
     // The connector is stop, restart it if necessary.
     if (_try_to_restart && !sigshutdown) {
 std::cout << "finished4" << std::endl;
@@ -352,22 +349,22 @@ std::cout << "finished4" << std::endl;
     else if (sigshutdown) {
 std::cout << "finished5" << std::endl;
       std::lock_guard<std::mutex> lck(_thread_m);
-std::cout << "finished5" << std::endl;
+std::cout << "finished6" << std::endl;
       _thread_action = stop;
       _thread_cv.notify_all();
     }
     // Connector probably quit without sending exit return.
     else {
-std::cout << "finished6" << std::endl;
+std::cout << "finished7" << std::endl;
       _cv_query.notify_all();
 }
   } catch (std::exception const& e) {
-std::cout << "finished7" << std::endl;
+std::cout << "finished8" << std::endl;
     logger(log_runtime_error, basic)
         << "Error: Connector '" << _name
         << "' termination routine failed: " << e.what();
   }
-std::cout << "finished8" << std::endl;
+std::cout << "finished9" << std::endl;
 }
 
 /**
@@ -746,7 +743,9 @@ void connector::_send_query_version() {
  * step to then execute a check.
  */
 void connector::restart_connector() {
+std::cout << "restart connector1" << std::endl;
   std::lock_guard<std::mutex> lck(_thread_m);
+std::cout << "restart connector2" << std::endl;
   _thread_action = start;
   _thread_cv.notify_all();
 }
