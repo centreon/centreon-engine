@@ -14,7 +14,7 @@ The url encode action is removed from macros $HOSTACTIONURL*$, $HOSTNOTESURL*$,
 $SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$,
 $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$.
 
-these macro are now usable without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
+these macro are now available without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
 
 *Notification Period*
 
