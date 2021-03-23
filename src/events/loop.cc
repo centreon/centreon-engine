@@ -312,7 +312,7 @@ void loop::_dispatching() {
           }
           temp_event->run_time = temp_service->get_next_check();
           reschedule_event(temp_event, events::loop::low);
-          temp_service->update_status(false);
+          temp_service->update_status();
           run_event = false;
         }
       }
@@ -357,7 +357,7 @@ void loop::_dispatching() {
                 (temp_host->get_check_interval() * config->interval_length())));
           temp_event->run_time = temp_host->get_next_check();
           reschedule_event(temp_event, events::loop::low);
-          temp_host->update_status(false);
+          temp_host->update_status();
           run_event = false;
         }
       }
@@ -586,11 +586,11 @@ void loop::adjust_check_scheduling() {
     if ((*it)->event_type == timed_event::EVENT_HOST_CHECK) {
       (*it)->run_time = new_run_time;
       hst->set_next_check(new_run_time);
-      hst->update_status(false);
+      hst->update_status();
     } else {
       (*it)->run_time = new_run_time;
       svc->set_next_check(new_run_time);
-      svc->update_status(false);
+      svc->update_status();
     }
 
     current_icd_offset += inter_check_delay;
@@ -720,7 +720,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
         it->second->get_last_notification()));
 
     // update the status data.
-    it->second->update_status(false);
+    it->second->update_status();
   }
 
   // adjust host timestamps.
@@ -752,7 +752,7 @@ void loop::compensate_for_system_time_change(unsigned long last_time,
         it->second->get_last_notification()));
 
     // update the status data.
-    it->second->update_status(false);
+    it->second->update_status();
   }
 
   // adjust program timestamps.

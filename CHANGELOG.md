@@ -2,13 +2,17 @@
 
 ## 20.10.3
 
-
 ### Bugfixes
+
+*Host/service status*
+
+They could be sent twice. This new version fixes that.
 
 *Notification macros*
 
-delete the url encode on maccro :    
-(ie $HOSTACTIONURL*$, $HOSTNOTESURL*$, $SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$, $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$)
+The url encode action is removed from macros $HOSTACTIONURL*$, $HOSTNOTESURL*$,
+$SERVICEACTIONURL*$, $SERVICENOTESURL*$, $HOSTGROUPNOTESURL*$,
+$HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$.
 
 *Notification Period*
 
@@ -16,7 +20,6 @@ the timeperiod are now filtered for the contact
 and now don't push the notification with time period empty.
 these macro are now usable without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
 
-### Enhancements
 ## 20.10.2
 
 `January 20, 2021`

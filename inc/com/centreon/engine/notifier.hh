@@ -167,7 +167,8 @@ class notifier : public checkable {
   unsigned long get_last_problem_id() const noexcept;
   void set_last_problem_id(unsigned long last_problem_id) noexcept;
 
-  virtual void update_status(bool aggregated_dump) = 0;
+  virtual bool schedule_check(time_t check_time, int options) = 0;
+  virtual void update_status() = 0;
   int notify(reason_type type,
              std::string const& not_author,
              std::string const& not_data,
@@ -321,10 +322,6 @@ class notifier : public checkable {
   bool _retain_nonstatus_information;
   bool _is_being_freshened;
   
-  /*if notification_interval at 0 and is on time period off.
-  is set as true to send the notification on the next starting time period*/
-  bool _notification_to_interval_on_timeperiod_in; 
-
   /* New ones */
   int _notification_number;
   // reason_type _type;
