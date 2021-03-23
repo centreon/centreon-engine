@@ -555,7 +555,7 @@ TEST_F(MacroHostname, HostGroupName) {
 
   std::string out;
   nagios_macros *mac(get_global_macros());
-  process_macros_r(mac, "$HOSTGROUPNAME:temphg$", out, 1);
+  process_macros_r(mac, "$HOSTGROUPNAME:a$", out, 1);
   ASSERT_EQ(out, "temphg");
 }
 
