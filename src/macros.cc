@@ -545,6 +545,14 @@ int grab_standard_contact_macro_r(nagios_macros* mac,
         output = buf;
     } break;
 
+    case MACRO_CONTACTGROUPNAME: {
+      /* get the contactgroup names */
+      /* find contactgroup this contact is a member of */
+      if (!temp_contact->get_parent_groups().empty()) {
+        output = temp_contact->get_parent_groups().begin()->first;
+      }
+    } break;
+
     case MACRO_CONTACTTIMEZONE: {
       output = temp_contact->get_timezone();
     } break;

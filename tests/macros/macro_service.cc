@@ -733,7 +733,7 @@ TEST_F(MacroService, ServiceGroupName) {
 
   std::string out;
   nagios_macros *mac(get_global_macros());
-  process_macros_r(mac, "$SERVICEGROUPNAME:test_group$", out, 1);
+  process_macros_r(mac, "$SERVICEGROUPNAME:test_host:test$", out, 1);
   ASSERT_EQ(out, "test_group");
 }
 

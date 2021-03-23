@@ -16,9 +16,9 @@ $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$.
 
 *Notification Period*
 
-The timeperiods work on contacts and notifications are not sent anymore if the
-time period is empty. The notification recovery are now sent when entering in
-timeperiod notification.
+the timeperiod are now filtered for the contact 
+and now don't push the notification with time period empty.
+these macro are now available without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
 
 ## 20.10.2
 
