@@ -132,6 +132,22 @@ static std::string get_host_group_names(host& hst, nagios_macros* mac) {
 }
 
 /**
+ *  Extract host group name.
+ *
+ *  @param[in] hst Host object.
+ *  @param[in] mac Unused.
+ *
+ *  @return Newly allocated string with group name.
+ */
+static std::string get_host_group_name(host& hst, nagios_macros* mac) {
+  (void)mac;
+  logger(dbg_notifications, more) << "on macro juste avant host group ";
+  std::string buf{hst.get_parent_groups().front()->get_group_name()};
+  logger(dbg_notifications, more) << "on macro after host group " << buf;
+  return buf;
+}
+
+/**
  *  Extract host state.
  *
  *  @param[in] hst Host object.
@@ -382,6 +398,7 @@ struct grab_host_redirection {
       {MACRO_HOSTNOTES,
        {&get_recursive<host, checkable, &checkable::get_notes, 0>, true}},
       {MACRO_HOSTGROUPNAMES, {&get_host_group_names, true}},
+      {MACRO_HOSTGROUPNAME, {&get_host_group_name, true}},
       {MACRO_TOTALHOSTSERVICES,
        {&get_host_total_services<MACRO_TOTALHOSTSERVICES>, true}},
       {MACRO_TOTALHOSTSERVICESOK,
