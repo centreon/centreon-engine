@@ -18,7 +18,7 @@ $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$.
 
 the timeperiod are now filtered for the contact 
 and now don't push the notification with time period empty.
-these macro are now usable without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
+these macro are now available without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
 
 ## 20.10.2
 
