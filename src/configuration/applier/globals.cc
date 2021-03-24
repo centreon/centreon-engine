@@ -67,7 +67,6 @@ void applier::globals::apply(state& config) {
   ::obsess_over_services = config.obsess_over_services();
   ::process_performance_data = config.process_performance_data();
   ::soft_state_dependencies = config.soft_state_dependencies();
-  ::use_aggressive_host_checking = config.use_aggressive_host_checking();
   ::use_large_installation_tweaks = config.use_large_installation_tweaks();
   ::instance_heartbeat_interval = config.instance_heartbeat_interval();
 }
