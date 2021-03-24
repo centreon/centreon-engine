@@ -17,7 +17,9 @@
  *
  */
 #include "com/centreon/engine/commands/connector.hh"
+#include <unistd.h>
 #include <cstdlib>
+
 #include <list>
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -743,7 +745,7 @@ void connector::_send_query_version() {
  * step to then execute a check.
  */
 void connector::restart_connector() {
-  UNIQUE_LOCK(lck, _thread_m);
+  LOCK_GUARD(lck, _thread_m);
   _thread_action = start;
   _thread_cv.notify_all();
 }
@@ -756,6 +758,7 @@ void connector::_restart_loop() {
   _thread_running = true;
   _thread_cv.notify_all();
   for (;;) {
+    usleep(10);
     _thread_cv.wait(lck, [this] { return _thread_action != none; });
     UNLOCK(lck);
 
