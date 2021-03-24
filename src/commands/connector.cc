@@ -16,8 +16,6 @@
  * For more information : contact@centreon.com
  *
  */
-#include <iostream>
-
 #include "com/centreon/engine/commands/connector.hh"
 #include <cstdlib>
 #include <list>
@@ -69,31 +67,23 @@ connector::connector(const std::string& connector_name,
  *  Destructor.
  */
 connector::~connector() noexcept {
-  logger(log_info_message, basic) << "Destroy connector1";
   logger(dbg_commands, basic) << "connector::~connector";
 
   // Close connector properly.
   try {
     _connector_close();
-  logger(log_info_message, basic) << "Destroy connector2";
   } catch (const std::exception& e) {
-  logger(log_info_message, basic) << "Destroy connector3";
     logger(log_runtime_error, basic)
         << "Error: could not stop connector properly: " << e.what();
   }
 
-  logger(log_info_message, basic) << "Destroy connector4";
   // Wait restart thread.
   {
     std::unique_lock<std::mutex> lck(_thread_m);
-  logger(log_info_message, basic) << "Destroy connector5";
     _thread_action = stop;
     _thread_cv.notify_all();
-  logger(log_info_message, basic) << "Destroy connector6";
     lck.unlock();
-  logger(log_info_message, basic) << "Destroy connector7";
     _restart.join();
-  logger(log_info_message, basic) << "Destroy connector8";
   }
 }
 
@@ -343,28 +333,22 @@ void connector::finished(process& p) noexcept {
 
     // The connector is stop, restart it if necessary.
     if (_try_to_restart && !sigshutdown) {
-std::cout << "finished4" << std::endl;
       restart_connector();
 }
     else if (sigshutdown) {
-std::cout << "finished5" << std::endl;
       std::lock_guard<std::mutex> lck(_thread_m);
-std::cout << "finished6" << std::endl;
       _thread_action = stop;
       _thread_cv.notify_all();
     }
     // Connector probably quit without sending exit return.
     else {
-std::cout << "finished7" << std::endl;
       _cv_query.notify_all();
 }
   } catch (std::exception const& e) {
-std::cout << "finished8" << std::endl;
     logger(log_runtime_error, basic)
         << "Error: Connector '" << _name
         << "' termination routine failed: " << e.what();
   }
-std::cout << "finished9" << std::endl;
 }
 
 /**
@@ -743,9 +727,7 @@ void connector::_send_query_version() {
  * step to then execute a check.
  */
 void connector::restart_connector() {
-std::cout << "restart connector1" << std::endl;
   std::lock_guard<std::mutex> lck(_thread_m);
-std::cout << "restart connector2" << std::endl;
   _thread_action = start;
   _thread_cv.notify_all();
 }
@@ -758,14 +740,15 @@ void connector::_restart_loop() {
   _thread_running = true;
   _thread_cv.notify_all();
   for (;;) {
-    // FIXME DBR: do not mix the connector restart and the thread restart
     _thread_cv.wait(lck, [this] { return _thread_action != none; });
+    lck.unlock();
 
     if (_thread_action == stop)
       return;
 
     _thread_action = none;
     _run_restart();
+    lck.lock();
   }
 }
 
