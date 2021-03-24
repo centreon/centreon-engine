@@ -22,8 +22,8 @@
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/version.hh"
 #include "com/centreon/engine/my_lock.hh"
+#include "com/centreon/engine/version.hh"
 
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
@@ -31,15 +31,17 @@ using namespace com::centreon::engine::commands;
 #define DEBUG_CONFIG
 
 #ifdef DEBUG_CONFIG
-  #define LOCK_GUARD(lck, m) my_lock_guard<std::mutex> lck(m, __FILE__ ":"#m, __LINE__)
-  #define UNIQUE_LOCK(lck, m) my_unique_lock<std::mutex> lck(m, __FILE__":"#m, __LINE__)
-  #define UNLOCK(lck) lck.unlock(__LINE__)
-  #define LOCK(lck) lck.lock(__LINE__)
+#define LOCK_GUARD(lck, m) \
+  my_lock_guard<std::mutex> lck(m, __FILE__ ":" #m, __LINE__)
+#define UNIQUE_LOCK(lck, m) \
+  my_unique_lock<std::mutex> lck(m, __FILE__ ":" #m, __LINE__)
+#define UNLOCK(lck) lck.unlock(__LINE__)
+#define LOCK(lck) lck.lock(__LINE__)
 #else
-  #define LOCK_GUARD(lck, m) std::lock_guard<std::mutex> lck(m)
-  #define UNIQUE_LOCK(lck, m) std::unique_lock<std::mutex> lck(m)
-  #define UNLOCK(lck) lck.unlock()
-  #define LOCK(lck) lck.lock()
+#define LOCK_GUARD(lck, m) std::lock_guard<std::mutex> lck(m)
+#define UNIQUE_LOCK(lck, m) std::unique_lock<std::mutex> lck(m)
+#define UNLOCK(lck) lck.unlock()
+#define LOCK(lck) lck.lock()
 #endif
 
 connector_map connector::connectors;
@@ -191,7 +193,7 @@ void connector::run(const std::string& processed_cmd,
 
   try {
     {
-      UNIQUE_LOCK(lock,_lock);
+      UNIQUE_LOCK(lock, _lock);
 
       // Start connector if is not running.
       if (!_is_running) {
@@ -218,7 +220,7 @@ void connector::run(const std::string& processed_cmd,
   }
 
   // Waiting result.
-  UNIQUE_LOCK(lock,_lock);
+  UNIQUE_LOCK(lock, _lock);
   for (;;) {
     auto it = _results.find(command_id);
     if (it != _results.end()) {
@@ -349,8 +351,7 @@ void connector::finished(process& p) noexcept {
     // The connector is stop, restart it if necessary.
     if (_try_to_restart && !sigshutdown) {
       restart_connector();
-}
-    else if (sigshutdown) {
+    } else if (sigshutdown) {
       LOCK_GUARD(lck, _thread_m);
       _thread_action = stop;
       _thread_cv.notify_all();
@@ -358,7 +359,7 @@ void connector::finished(process& p) noexcept {
     // Connector probably quit without sending exit return.
     else {
       _cv_query.notify_all();
-}
+    }
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
         << "Error: Connector '" << _name
@@ -370,7 +371,7 @@ void connector::finished(process& p) noexcept {
  *  Close connection with the process.
  */
 void connector::_connector_close() {
-  UNIQUE_LOCK(lock,_lock);
+  UNIQUE_LOCK(lock, _lock);
 
   // Exit if connector is not running.
   if (!_is_running)
@@ -429,7 +430,7 @@ void connector::_connector_start() {
   _process.exec(_command_line);
 
   {
-    UNIQUE_LOCK(lock,_lock);
+    UNIQUE_LOCK(lock, _lock);
 
     // Ask connector version.
     _send_query_version();
@@ -742,7 +743,7 @@ void connector::_send_query_version() {
  * step to then execute a check.
  */
 void connector::restart_connector() {
-  LOCK_GUARD(lck, _thread_m);
+  UNIQUE_LOCK(lck, _thread_m);
   _thread_action = start;
   _thread_cv.notify_all();
 }
@@ -751,7 +752,7 @@ void connector::restart_connector() {
  * @brief The restart loop used to restart in background the connector.
  */
 void connector::_restart_loop() {
-  UNIQUE_LOCK(lck,_thread_m);
+  UNIQUE_LOCK(lck, _thread_m);
   _thread_running = true;
   _thread_cv.notify_all();
   for (;;) {
