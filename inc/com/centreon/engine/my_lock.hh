@@ -5,14 +5,15 @@ template <typename M>
 class my_lock_guard : public std::lock_guard<M> {
   std::string _file;
   int _line;
+  M* _m;
 
  public:
-  my_lock_guard<M>(M& m, const char* file, int line) : std::lock_guard<M>(m), _file{file}, _line{line} {
-    std::cout << "Lock(G): " << _file << ": " << _line << std::endl;
+  my_lock_guard<M>(M& m, const char* file, int line) : std::lock_guard<M>(m), _file{file}, _line{line}, _m(&m) {
+    std::cout << "Lock(G): " << _file << ": " << _m << ":" << _line << std::endl;
   }
 
   ~my_lock_guard() {
-    std::cout << "Unlock(G): " << _file << ": " << _line << std::endl;
+    std::cout << "Unlock(G): " << _file << ": " << _m << ":" << _line << std::endl;
   }
 };
 
