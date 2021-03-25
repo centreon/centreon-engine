@@ -86,8 +86,6 @@ connector::connector(const std::string& connector_name,
  *  Destructor.
  */
 connector::~connector() noexcept {
-  logger(dbg_commands, basic) << "connector::~connector";
-
   // Close connector properly.
   try {
     _connector_close();
