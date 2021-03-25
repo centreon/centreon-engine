@@ -25,6 +25,9 @@ timeperiod notification.
 When a Perl connector or an SSH connector is used, engine could crash when we
 stop it.
 
+When a connector is destroyed, a deadlock could appear while waiting its
+destruction.
+
 *Connector restart*
 
 If a connector stops working because of a crash or whatever else, it was not
