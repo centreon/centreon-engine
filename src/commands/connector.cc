@@ -30,7 +30,7 @@
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
-#define DEBUG_CONFIG
+//#define DEBUG_CONFIG
 
 #ifdef DEBUG_CONFIG
 #define LOCK_GUARD(lck, m) \
