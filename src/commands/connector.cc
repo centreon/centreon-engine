@@ -354,9 +354,9 @@ void connector::finished(process& p) noexcept {
     } else /*if (sigshutdown)*/ {
       _cv_query.notify_all();
       UNLOCK(lock);
-      LOCK_GUARD(lck, _thread_m);
-      _thread_action = stop;
-      _thread_cv.notify_all();
+      // LOCK_GUARD(lck, _thread_m);
+      // _thread_action = stop;
+      // _thread_cv.notify_all();
     }
 
     // Connector probably quit without sending exit return.
