@@ -190,7 +190,7 @@ if [ "$force" = "1" ] ; then
 fi
 cd build
 
-if [ $good -eq 1 ] ; then
+if [ x"$good" = "x1" ] ; then
   $conan install .. --remote centreon -s compiler.libcxx=libstdc++11
 else
   $conan install .. --remote centreon -s compiler.libcxx=libstdc++
