@@ -762,8 +762,10 @@ void connector::_restart_loop() {
     _thread_cv.wait(lck, [this] { return _thread_action != none; });
     UNLOCK(lck);
 
-    if (_thread_action == stop)
+    if (_thread_action == stop) {
+      sigshutdown = true;
       return;
+    }
 
     _thread_action = none;
     _run_restart();
