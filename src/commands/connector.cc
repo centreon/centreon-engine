@@ -344,22 +344,21 @@ void connector::finished(process& p) noexcept {
   try {
     logger(dbg_commands, basic) << "connector::finished: process=" << &p;
 
-    
-      UNIQUE_LOCK(lock, _lock);
-      _is_running = false;
-      _data_available.clear();
+    UNIQUE_LOCK(lock, _lock);
+    _is_running = false;
+    _data_available.clear();
 
-      // The connector is stop, restart it if necessary.
-      if (_try_to_restart && !sigshutdown) {
-        restart_connector();
-      } else /*if (sigshutdown)*/ {
-        _cv_query.notify_all();
-        UNLOCK(lock);
-        LOCK_GUARD(lck, _thread_m);
-        _thread_action = stop;
-        _thread_cv.notify_all();
-      }
-    
+    // The connector is stop, restart it if necessary.
+    if (_try_to_restart && !sigshutdown) {
+      restart_connector();
+    } else /*if (sigshutdown)*/ {
+      _cv_query.notify_all();
+      UNLOCK(lock);
+      LOCK_GUARD(lck, _thread_m);
+      _thread_action = stop;
+      _thread_cv.notify_all();
+    }
+
     // Connector probably quit without sending exit return.
     // else {
     //   _cv_query.notify_all();
@@ -764,7 +763,7 @@ void connector::_restart_loop() {
     UNLOCK(lck);
 
     if (_thread_action == stop) {
-      // sigshutdown = true;
+      _try_to_restart = false;
       return;
     }
 
