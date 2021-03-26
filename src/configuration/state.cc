@@ -353,7 +353,6 @@ static std::string const default_status_file(DEFAULT_STATUS_FILE);
 static unsigned int const default_status_update_interval(60);
 static unsigned int const default_time_change_threshold(900);
 static bool const default_translate_passive_host_checks(false);
-static bool const default_use_aggressive_host_checking(false);
 static bool const default_use_large_installation_tweaks(false);
 static uint32_t const default_instance_heartbeat_interval(30);
 static bool const default_use_regexp_matches(false);
@@ -478,7 +477,6 @@ state::state()
       _status_update_interval(default_status_update_interval),
       _time_change_threshold(default_time_change_threshold),
       _translate_passive_host_checks(default_translate_passive_host_checks),
-      _use_aggressive_host_checking(default_use_aggressive_host_checking),
       _use_large_installation_tweaks(default_use_large_installation_tweaks),
       _instance_heartbeat_interval(default_instance_heartbeat_interval),
       _use_regexp_matches(default_use_regexp_matches),
@@ -643,7 +641,6 @@ state& state::operator=(state const& right) {
     _time_change_threshold = right._time_change_threshold;
     _translate_passive_host_checks = right._translate_passive_host_checks;
     _users = right._users;
-    _use_aggressive_host_checking = right._use_aggressive_host_checking;
     _use_large_installation_tweaks = right._use_large_installation_tweaks;
     _use_regexp_matches = right._use_regexp_matches;
     _use_retained_program_state = right._use_retained_program_state;
@@ -796,7 +793,6 @@ bool state::operator==(state const& right) const noexcept {
       _time_change_threshold == right._time_change_threshold &&
       _translate_passive_host_checks == right._translate_passive_host_checks &&
       _users == right._users &&
-      _use_aggressive_host_checking == right._use_aggressive_host_checking &&
       _use_large_installation_tweaks == right._use_large_installation_tweaks &&
       _use_regexp_matches == right._use_regexp_matches &&
       _use_retained_program_state == right._use_retained_program_state &&
@@ -3553,14 +3549,15 @@ void state::user(unsigned int key, std::string const& value) {
 
 
 /**
- *  Set use_aggressive_host_checking value.
+ *  Set use_aggressive_host_checking value. This function is still there just
+ *  to warn the user. It should be removed soon.
  *
  *  @param[in] value The new use_aggressive_host_checking value.
  */
 void state::use_aggressive_host_checking(bool value __attribute__((unused))) {
   logger(log_verification_error, basic)
-      << "Warning: use_aggressive_host_checking is deprecated"
-      << " This option will not be supported in 21.04.";
+      << "Warning: use_aggressive_host_checking is deprecated."
+         " This option is no more supported since version 21.04.";
   ++config_warnings;
 }
 

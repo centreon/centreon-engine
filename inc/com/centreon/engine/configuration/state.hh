@@ -379,8 +379,7 @@ class state {
   void user(std::unordered_map<std::string, std::string> const& value);
   void user(std::string const& key, std::string const& value);
   void user(unsigned int key, std::string const& value);
-  bool use_aggressive_host_checking() const noexcept;
-  void use_aggressive_host_checking(bool value);
+  void use_aggressive_host_checking(bool);
   bool use_large_installation_tweaks() const noexcept;
   void use_large_installation_tweaks(bool value);
   uint32_t instance_heartbeat_interval() const noexcept;
@@ -598,7 +597,6 @@ class state {
   unsigned int _time_change_threshold;
   bool _translate_passive_host_checks;
   std::unordered_map<std::string, std::string> _users;
-  bool _use_aggressive_host_checking;
   bool _use_large_installation_tweaks;
   uint32_t _instance_heartbeat_interval;
   bool _use_regexp_matches;

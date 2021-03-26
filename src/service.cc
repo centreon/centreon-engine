@@ -1221,12 +1221,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* set a flag to remember that we launched a check */
       first_host_check_initiated = true;
 
-      /* 08/04/07 EG launch an async (parallel) host check unless
-       * aggressive host checking is enabled
-       * previous logic was to simply run a sync (serial) host check
-       * do NOT allow cached check results to happen here - we need the host
-       * to be checked for real...
-       * */
       hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
                              nullptr);
     }
@@ -1483,8 +1477,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
           << "Host is currently UP, so we'll recheck its state to "
              "make sure...";
 
-      /* 08/04/07 EG launch an async (parallel) host check (possibly cached)
-       * unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
         /* can we use the last cached host state? */
         /* only use cached host state if no service state change has occurred */
@@ -1532,8 +1524,6 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         logger(dbg_checks, more)
             << "Service wobbled between non-OK states, so we'll recheck"
                " the host state...";
-        /* 08/04/07 EG launch an async (parallel) host check unless aggressive
-         * host checking is enabled */
         /* previous logic was to simply run a sync (serial) host check */
         /* use current host state as route result */
         route_result = hst->get_current_state();
