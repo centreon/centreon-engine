@@ -20,7 +20,6 @@
 #ifndef CCE_COMMAND_MANAGER_HH
 #define CCE_COMMAND_MANAGER_HH
 
-#include <chrono>
 #include <deque>
 #include <future>
 #include <mutex>

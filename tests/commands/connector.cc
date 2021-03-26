@@ -60,7 +60,9 @@ class Connector : public ::testing::Test {
     init_config_state();
   }
 
-  void TearDown() override { deinit_config_state(); }
+  void TearDown() override {
+    deinit_config_state();
+  }
 };
 
 
@@ -107,9 +109,7 @@ TEST_F(Connector, RunConnectorAsync) {
   nagios_macros macros = nagios_macros();
   connector cmd_connector("RunConnectorAsync", "tests/bin_connector_test_run");
   cmd_connector.set_listener(lstnr.get());
-  std::cout << "Run... 1\n";
   cmd_connector.run("commande", macros, 1);
-  std::cout << "Run... 2\n";
 
   int timeout = 0;
   int max_timeout{15};
@@ -124,25 +124,25 @@ TEST_F(Connector, RunConnectorAsync) {
 }
 
 TEST_F(Connector, RunWithConnectorSwitchedOff) {
-  std::unique_ptr<my_listener> lstnr(new my_listener);
-  nagios_macros macros = nagios_macros();
   connector cmd_connector("RunWithConnectorSwitchedOff",
                           "tests/bin_connector_test_run");
-  cmd_connector.set_listener(lstnr.get());
-  std::cout << "Run... 1\n";
-  cmd_connector.run("commande --kill=1", macros, 1);
-  std::cout << "Run... 2\n";
-
-  int timeout = 0;
-  int max_timeout{15};
-  while (timeout < max_timeout && lstnr->get_result().output == "") {
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    set_time(std::time(nullptr) + 1);
-    ++timeout;
+  {
+    std::unique_ptr<my_listener> lstnr(new my_listener);
+    nagios_macros macros = nagios_macros();
+    cmd_connector.set_listener(lstnr.get());
+    cmd_connector.run("commande --kill=1", macros, 1);
+  
+    int timeout = 0;
+    int max_timeout{15};
+    while (timeout < max_timeout && lstnr->get_result().output == "") {
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      set_time(std::time(nullptr) + 1);
+      ++timeout;
+    }
+    result res{lstnr->get_result()};
+    ASSERT_EQ(res.command_id, 0);
+    ASSERT_EQ(res.output, "");
   }
-  result res{lstnr->get_result()};
-  ASSERT_EQ(res.command_id, 0);
-  ASSERT_EQ(res.output, "");
 }
 
 TEST_F(Connector, RunConnectorSetCommandLine) {
