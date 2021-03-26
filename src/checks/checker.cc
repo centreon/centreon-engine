@@ -559,8 +559,7 @@ com::centreon::engine::host::host_state checker::_execute_sync(host* hst) {
   std::replace(ploutput.begin(), ploutput.end(), ';', ':');
   hst->set_plugin_output(ploutput);
 
-  // If we're not doing aggressive host checking, let WARNING
-  // states indicate the host is up (fake the result to be UP = 0).
+  // let WARNING states indicate the host is up (fake the result to be UP = 0).
   if (res.exit_code == service::state_warning)
     res.exit_code = service::state_ok;
 

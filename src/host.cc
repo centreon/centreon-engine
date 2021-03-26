@@ -1431,8 +1431,8 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
   /* NOTE: only do this for active checks - passive check results already have
    * the final state */
   if (queued_check_result->get_check_type() == check_active) {
-    /* if we're not doing aggressive host checking, let WARNING states indicate
-     * the host is up (fake the result to be state_ok) */
+    /* Let WARNING states indicate the host is up
+     * (fake the result to be state_ok) */
     if (svc_res == service::state_warning)
       svc_res = service::state_ok;
 
