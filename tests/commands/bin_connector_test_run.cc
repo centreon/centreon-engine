@@ -76,9 +76,9 @@ static std::string execute_process(std::vector<std::string> const& argv,
   }
 
   std::string const& arg(argv[1]);
-  if (arg == "--timeout=on")
+  if (arg == "--timeout=on") {
     std::this_thread::sleep_for(std::chrono::seconds(timeout + 1));
-  else if (arg == "--timeout=off")
+  } else if (arg == "--timeout=off")
     *exit_code = STATE_OK;
   else if (arg.find("--kill=") == 0) {
     std::string value(arg.substr(7));
@@ -93,7 +93,8 @@ static std::string execute_process(std::vector<std::string> const& argv,
       outfile << "execute process segfault!!!\n";
       outfile.close();
 
-      char* ptr(NULL);
+      /* Here is the segfault in action */
+      char* ptr = nullptr;
       ptr[0] = 0;
 
     } else
@@ -135,13 +136,10 @@ static void query_execute(char const* q) {
     throw basic_error() << "invalid query execute: "
                            "invalid is_executed";
   startptr = endptr + 1;
-  char const* cendptr(startptr);
-  while (isdigit(*cendptr))
-    ++cendptr;
-  if (startptr == cendptr)
-    throw basic_error() << "invalid query execute: "
-                           "invalid exit_code";
-  char const* cmd(cendptr + 1);
+  strtol(startptr, &endptr, 10);
+  if (startptr == endptr)
+    throw basic_error() << "invalid query execute: invalid exit_code";
+  char const* cmd{endptr + 1};
 
   std::vector<std::string> cmdline = split(cmd);
   int exit_code = STATE_OK;

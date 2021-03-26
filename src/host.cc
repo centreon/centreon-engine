@@ -229,7 +229,8 @@ host::host(uint64_t host_id,
                obsess_over_host,
                timezone,
                retain_status_information > 0,
-               retain_nonstatus_information > 0},
+               retain_nonstatus_information > 0,
+               false},
       _id{host_id},
       _name{name},
       _address{address},
@@ -3690,10 +3691,6 @@ void host::resolve(int& w, int& e) {
 
   if (errors)
     throw engine_error() << "Cannot resolve host '" << _name << "'";
-}
-
-bool host::get_is_volatile() const {
-  return false;
 }
 
 timeperiod* host::get_notification_timeperiod() const {

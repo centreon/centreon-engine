@@ -190,8 +190,8 @@ host& host::operator=(host const& right) {
  *
  *  @return True if is the same object, otherwise false.
  */
-bool host::operator==(host const& right) const throw() {
-  return (
+bool host::operator==(host const& right) const noexcept {
+  return
       object::operator==(right) &&
       _acknowledgement_type == right._acknowledgement_type &&
       _active_checks_enabled == right._active_checks_enabled &&
@@ -246,7 +246,7 @@ bool host::operator==(host const& right) const throw() {
       _process_performance_data == right._process_performance_data &&
       _retry_check_interval == right._retry_check_interval &&
       _state_history == right._state_history &&
-      _state_type == right._state_type && _notification == right._notification);
+      _state_type == right._state_type && _notification == right._notification;
 }
 
 /**

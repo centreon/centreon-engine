@@ -38,7 +38,7 @@ class opt {
   opt& operator=(opt const& right) {
     _data = right._data;
     _is_set = right._is_set;
-    return (*this);
+    return *this;
   }
   bool operator==(opt const& right) const throw() {
     return (_data == right._data);

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2019 Centreon
+## Copyright 2011-2021 Centreon
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -31,7 +31,8 @@ option(WITH_ASAN "Add the libasan to check memory leaks and other memory issues.
 if (WITH_ASAN)
   set(CMAKE_BUILD_TYPE Debug)
   set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-  set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+  set (CMAKE_LINKER_FLAGS_DEBUG
+       "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif ()
 
 add_definitions("-D_GLIBCXX_USE_CXX11_ABI=1")
@@ -617,7 +618,6 @@ add_subdirectory(enginerpc)
 include_directories(enginerpc)
 
 # Library engine target.
-
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
 add_dependencies(cce_core engine_rpc)
 

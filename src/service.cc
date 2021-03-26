@@ -122,7 +122,8 @@ service::service(std::string const& hostname,
                obsess_over,
                timezone,
                0,
-               0},
+               0,
+               is_volatile},
       _host_id{0},
       _service_id{0},
       _hostname{hostname},
@@ -133,7 +134,6 @@ service::service(std::string const& hostname,
       _last_time_warning{0},
       _last_time_unknown{0},
       _last_time_critical{0},
-      _is_volatile{is_volatile},
       _initial_state{initial_state},
       _current_state{initial_state},
       _last_hard_state{initial_state},
@@ -816,8 +816,8 @@ com::centreon::engine::service& engine::find_service(uint64_t host_id,
   service_id_map::const_iterator it(
       service::services_by_id.find({host_id, service_id}));
   if (it == service::services_by_id.end())
-    throw(engine_error() << "Service '" << service_id << "' on host '"
-                         << host_id << "' was not found");
+    throw engine_error() << "Service '" << service_id << "' on host '"
+                         << host_id << "' was not found";
   return *it->second;
 }
 
@@ -2710,7 +2710,6 @@ void service::disable_flap_detection() {
   handle_flap_detection_disabled();
 }
 
-/* updates service status info */
 /**
  * @brief Updates service status info. Send data to event broker.
  */
@@ -3157,14 +3156,6 @@ void service::handle_flap_detection_disabled() {
 
   /* update service status */
   update_status();
-}
-
-bool service::get_is_volatile() const {
-  return _is_volatile;
-}
-
-void service::set_is_volatile(bool vol) {
-  _is_volatile = vol;
 }
 
 std::list<servicegroup*> const& service::get_parent_groups() const {

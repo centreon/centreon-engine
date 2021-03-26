@@ -39,18 +39,26 @@ command_map commands::command::commands;
  *  @param[in] command_line The command line.
  *  @param[in] listener     The command listener to catch events.
  */
-commands::command::command(std::string const& name,
-                           std::string const& command_line,
+commands::command::command(const std::string& name,
+                           const std::string& command_line,
                            command_listener* listener)
-    : _command_line(command_line), _listener(listener), _name(name) {
+    : _command_line(command_line), _listener{listener}, _name(name) {
   if (_name.empty())
-    throw(engine_error() << "Could not create a command with an empty name");
+    throw engine_error() << "Could not create a command with an empty name";
+  if (_listener) {
+    std::function<void()> f = [this] { _listener = nullptr; };
+    _listener->reg(this, f);
+  }
 }
 
 /**
  *  Destructor.
  */
-commands::command::~command() noexcept {}
+commands::command::~command() noexcept {
+  if (_listener) {
+    _listener->unreg(this);
+  }
+}
 
 /**
  *  Compare two result.
@@ -79,7 +87,7 @@ bool commands::command::operator!=(command const& right) const noexcept {
  *
  *  @return The command line.
  */
-std::string const& commands::command::get_command_line() const noexcept {
+const std::string& commands::command::get_command_line() const noexcept {
   return _command_line;
 }
 
@@ -88,7 +96,7 @@ std::string const& commands::command::get_command_line() const noexcept {
  *
  *  @return The command name.
  */
-std::string const& commands::command::get_name() const noexcept {
+const std::string& commands::command::get_name() const noexcept {
   return _name;
 }
 
@@ -97,7 +105,7 @@ std::string const& commands::command::get_name() const noexcept {
  *
  *  @param[in] command_line The command line.
  */
-void commands::command::set_command_line(std::string const& command_line) {
+void commands::command::set_command_line(const std::string& command_line) {
   _command_line = command_line;
 }
 
@@ -108,33 +116,13 @@ void commands::command::set_command_line(std::string const& command_line) {
  */
 void commands::command::set_listener(
     commands::command_listener* listener) noexcept {
+  if (_listener)
+    _listener->unreg(this);
   _listener = listener;
-}
-
-/**
- *  Default copy constructor.
- *
- *  @param[in] right The copy class.
- */
-commands::command::command(commands::command const& right) {
-  operator=(right);
-}
-
-/**
- *  Default copy operatro.
- *
- *  @param[in] right The copy class.
- *
- *  @return This object.
- */
-commands::command& commands::command::operator=(
-    commands::command const& right) {
-  if (this != &right) {
-    _command_line = right._command_line;
-    _listener = right._listener;
-    _name = right._name;
+  if (_listener) {
+    std::function<void()> f([this] { _listener = nullptr; });
+    _listener->reg(this, f);
   }
-  return *this;
 }
 
 /**
