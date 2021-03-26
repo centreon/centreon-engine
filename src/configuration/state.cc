@@ -3551,22 +3551,17 @@ void state::user(unsigned int key, std::string const& value) {
   _users[string::from(key)] = value;
 }
 
-/**
- *  Get use_aggressive_host_checking value.
- *
- *  @return The use_aggressive_host_checking value.
- */
-bool state::use_aggressive_host_checking() const noexcept {
-  return _use_aggressive_host_checking;
-}
 
 /**
  *  Set use_aggressive_host_checking value.
  *
  *  @param[in] value The new use_aggressive_host_checking value.
  */
-void state::use_aggressive_host_checking(bool value) {
-  _use_aggressive_host_checking = value;
+void state::use_aggressive_host_checking(bool value __attribute__((unused))) {
+  logger(log_verification_error, basic)
+      << "Warning: use_aggressive_host_checking is deprecated"
+      << " This option will not be supported in 21.04.";
+  ++config_warnings;
 }
 
 /**

@@ -1227,10 +1227,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
        * do NOT allow cached check results to happen here - we need the host
        * to be checked for real...
        * */
-      if (config->use_aggressive_host_checking())
-        hst->perform_on_demand_check(nullptr, CHECK_OPTION_NONE, false, 0L);
-      else
-        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+      hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
                              nullptr);
     }
   }
@@ -1374,15 +1371,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       logger(dbg_checks, more)
           << "Host is NOT UP, so we'll check it to see if it recovered...";
 
-      /* 08/04/07 EG launch an async (parallel) host check (possibly cached)
-       * unless aggressive host checking is enabled */
-      /* previous logic was to simply run a sync (serial) host check */
-      if (config->use_aggressive_host_checking())
-        hst->perform_on_demand_check(nullptr, CHECK_OPTION_NONE, true,
-                                     config->cached_host_check_horizon());
       /* 09/23/07 EG don't launch a new host check if we already did so earlier
        */
-      else if (first_host_check_initiated)
+      if (first_host_check_initiated)
         logger(dbg_checks, more)
             << "First host check was already initiated, so we'll skip a "
                "new host check.";
@@ -1495,43 +1486,38 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* 08/04/07 EG launch an async (parallel) host check (possibly cached)
        * unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
-      if (config->use_aggressive_host_checking())
-        hst->perform_on_demand_check(&route_result, CHECK_OPTION_NONE, true,
-                                     config->cached_host_check_horizon());
-      else {
         /* can we use the last cached host state? */
         /* only use cached host state if no service state change has occurred */
-        if ((!state_change || state_changes_use_cached_state) &&
-            hst->has_been_checked() &&
-            (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
-             config->cached_host_check_horizon())) {
-          /* use current host state as route result */
-          route_result = hst->get_current_state();
-          logger(dbg_checks, more)
-              << "* Using cached host state: " << hst->get_current_state();
-          update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
-          update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
-        }
+      if ((!state_change || state_changes_use_cached_state) &&
+          hst->has_been_checked() &&
+          (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
+           config->cached_host_check_horizon())) {
+        /* use current host state as route result */
+        route_result = hst->get_current_state();
+        logger(dbg_checks, more)
+            << "* Using cached host state: " << hst->get_current_state();
+        update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
+        update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
+      }
 
-        /* else launch an async (parallel) check of the host */
-        /* CHANGED 02/15/08 only if service changed state since service was last
-           checked */
-        else if (state_change) {
-          /* use current host state as route result */
-          route_result = hst->get_current_state();
-          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                               nullptr);
-        }
+      /* else launch an async (parallel) check of the host */
+      /* CHANGED 02/15/08 only if service changed state since service was last
+         checked */
+      else if (state_change) {
+        /* use current host state as route result */
+        route_result = hst->get_current_state();
+        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                             nullptr);
+      }
 
-        /* ADDED 02/15/08 */
-        /* else assume same host state */
-        else {
-          route_result = hst->get_current_state();
-          logger(dbg_checks, more)
-              << "* Using last known host state: " << hst->get_current_state();
-          update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
-          update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
-        }
+      /* ADDED 02/15/08 */
+      /* else assume same host state */
+      else {
+        route_result = hst->get_current_state();
+        logger(dbg_checks, more)
+            << "* Using last known host state: " << hst->get_current_state();
+        update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
+        update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
       }
     }
 
@@ -1540,18 +1526,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     else {
       logger(dbg_checks, more) << "Host is currently DOWN/UNREACHABLE.";
 
-      /* we're using aggressive host checking, so really do recheck the host...
-       */
-      if (config->use_aggressive_host_checking()) {
-        logger(dbg_checks, more)
-            << "Aggressive host checking is enabled, so we'll recheck the "
-               "host state...";
-        hst->perform_on_demand_check(&route_result, CHECK_OPTION_NONE, true,
-                                     config->cached_host_check_horizon());
-      }
-
       /* the service wobbled between non-OK states, so check the host... */
-      else if ((state_change && !state_changes_use_cached_state) &&
+      if ((state_change && !state_changes_use_cached_state) &&
                _last_hard_state != service::state_ok) {
         logger(dbg_checks, more)
             << "Service wobbled between non-OK states, so we'll recheck"

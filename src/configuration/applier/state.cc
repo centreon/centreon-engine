@@ -426,7 +426,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->time_change_threshold(new_cfg.time_change_threshold());
   config->translate_passive_host_checks(
       new_cfg.translate_passive_host_checks());
-  config->use_aggressive_host_checking(new_cfg.use_aggressive_host_checking());
   config->use_large_installation_tweaks(
       new_cfg.use_large_installation_tweaks());
   config->instance_heartbeat_interval(new_cfg.instance_heartbeat_interval());

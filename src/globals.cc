@@ -100,7 +100,6 @@ unsigned int obsess_over_hosts(false);
 unsigned int obsess_over_services(false);
 unsigned int process_performance_data(false);
 unsigned int soft_state_dependencies(false);
-unsigned int use_aggressive_host_checking(false);
 unsigned int use_large_installation_tweaks(false);
 uint32_t instance_heartbeat_interval(30);
 unsigned long cached_host_check_horizon(15);
