@@ -47,15 +47,14 @@ static FILE* command_file_fp = NULL;
  * (non-blocked mode) */
 int open_command_file(void) {
   struct stat st;
-  int result = 0;
 
   /* if we're not checking external commands, don't do anything */
   if (config->check_external_commands() == false)
-    return (OK);
+    return OK;
 
   /* the command file was already created */
   if (command_file_created)
-    return (OK);
+    return OK;
 
   /* reset umask (group needs write permissions) */
   umask(S_IWOTH);
@@ -64,8 +63,8 @@ int open_command_file(void) {
   if (!(stat(config->command_file().c_str(), &st) != -1 &&
         (st.st_mode & S_IFIFO))) {
     /* create the external command file as a named pipe (FIFO) */
-    if ((result = mkfifo(config->command_file().c_str(),
-                         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
+    if (mkfifo(config->command_file().c_str(),
+                         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) != 0) {
       logger(log_runtime_error, basic)
           << "Error: Could not create external command file '"
           << config->command_file() << "' as named pipe: (" << errno << ") -> "
@@ -74,7 +73,7 @@ int open_command_file(void) {
              "you are sure that another copy of Centreon Engine is not "
              "running, "
              "you should delete this file.";
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -87,7 +86,7 @@ int open_command_file(void) {
         << "Error: Could not open external command file for reading "
            "via open(): ("
         << errno << ") -> " << strerror(errno);
-    return (ERROR);
+    return ERROR;
   }
 
   /* Set the close-on-exec flag on the file descriptor. */
@@ -99,7 +98,7 @@ int open_command_file(void) {
           << "Error: Could not get file descriptor flags on external "
              "command via fcntl(): ("
           << errno << ") -> " << strerror(errno);
-      return (ERROR);
+      return ERROR;
     }
     flags |= FD_CLOEXEC;
     if (fcntl(command_file_fd, F_SETFL, flags) == -1) {
@@ -107,7 +106,7 @@ int open_command_file(void) {
           << "Error: Could not set close-on-exec flag on external "
              "command via fcntl(): ("
           << errno << ") -> " << strerror(errno);
-      return (ERROR);
+      return ERROR;
     }
   }
 
@@ -117,7 +116,7 @@ int open_command_file(void) {
         << "Error: Could not open external command file for "
            "reading via fdopen(): ("
         << errno << ") -> " << strerror(errno);
-    return (ERROR);
+    return ERROR;
   }
 
   /* initialize worker thread */
@@ -131,24 +130,24 @@ int open_command_file(void) {
     /* delete the named pipe */
     unlink(config->command_file().c_str());
 
-    return (ERROR);
+    return ERROR;
   }
 
   /* set a flag to remember we already created the file */
   command_file_created = true;
 
-  return (OK);
+  return OK;
 }
 
 /* closes the external command file FIFO and deletes it */
 int close_command_file(void) {
   /* if we're not checking external commands, don't do anything */
   if (config->check_external_commands() == false)
-    return (OK);
+    return OK;
 
   /* the command file wasn't created or was already cleaned up */
   if (command_file_created == false)
-    return (OK);
+    return OK;
 
   /* reset our flag */
   command_file_created = false;
@@ -156,7 +155,7 @@ int close_command_file(void) {
   /* close the command file */
   fclose(command_file_fp);
 
-  return (OK);
+  return OK;
 }
 
 /* initializes command file worker thread */
@@ -173,7 +172,7 @@ int init_command_file_worker_thread(void) {
   external_command_buffer.buffer =
       new void*[config->external_command_buffer_slots()];
   if (external_command_buffer.buffer == NULL)
-    return (ERROR);
+    return ERROR;
 
   /* initialize mutex (only on cold startup) */
   if (sigrestart == false)
@@ -191,9 +190,9 @@ int init_command_file_worker_thread(void) {
   pthread_sigmask(SIG_UNBLOCK, &newmask, NULL);
 
   if (result)
-    return (ERROR);
+    return ERROR;
 
-  return (OK);
+  return OK;
 }
 
 /* shutdown command file worker thread */
@@ -223,7 +222,7 @@ int shutdown_command_file_worker_thread(void) {
     }
   }
 
-  return (OK);
+  return OK;
 }
 
 /* clean up resources used by command file worker thread */
@@ -249,7 +248,6 @@ void* command_file_worker_thread(void* arg) {
   int pollval;
   struct timeval tv;
   int buffer_items = 0;
-  int result = 0;
 
   (void)arg;
 
@@ -329,7 +327,7 @@ void* command_file_worker_thread(void* arg) {
       /* pause a bit so OS X doesn't go nuts with CPU overload */
       tv.tv_sec = 0;
       tv.tv_usec = 500;
-      select(0, NULL, NULL, NULL, &tv);
+      select(0, nullptr, nullptr, nullptr, &tv);
     }
 
     /* process all commands in the file (named pipe) if there's some space in
@@ -341,7 +339,7 @@ void* command_file_worker_thread(void* arg) {
 
       /* read and process the next command in the file */
       while (fgets(input_buffer, (int)(sizeof(input_buffer) - 1),
-                   command_file_fp) != NULL) {
+                   command_file_fp) != nullptr) {
         // Check if command is thread-safe (for immediate execution).
         if (modules::external_commands::gl_processor.is_thread_safe(
                 input_buffer))
@@ -349,13 +347,13 @@ void* command_file_worker_thread(void* arg) {
         // Submit the external command for processing
         // (retry if buffer is full).
         else {
-          while ((result = submit_external_command(input_buffer,
-                                                   &buffer_items)) == ERROR &&
+          while (submit_external_command(input_buffer, &buffer_items) ==
+                     ERROR &&
                  buffer_items == config->external_command_buffer_slots()) {
             // Wait a bit.
             tv.tv_sec = 0;
             tv.tv_usec = 250000;
-            select(0, NULL, NULL, NULL, &tv);
+            select(0, nullptr, nullptr, nullptr, &tv);
 
             // Should we shutdown?
             pthread_testcancel();
@@ -375,7 +373,7 @@ void* command_file_worker_thread(void* arg) {
   /* removes cleanup handler - this should never be reached */
   pthread_cleanup_pop(0);
 
-  return (NULL);
+  return nullptr;
 }
 
 /* submits an external command for processing */
@@ -385,7 +383,7 @@ int submit_external_command(char const* cmd, int* buffer_items) {
   if (cmd == NULL || external_command_buffer.buffer == NULL) {
     if (buffer_items != NULL)
       *buffer_items = -1;
-    return (ERROR);
+    return ERROR;
   }
 
   /* obtain a lock for writing to the buffer */

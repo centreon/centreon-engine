@@ -64,17 +64,16 @@ class raw : public command, public process_listener {
   process* _get_free_process();
 
  public:
-  raw(std::string const& name,
-      std::string const& command_line,
-      command_listener* listener = NULL);
-  raw(raw const& right);
+  raw(const std::string& name,
+      const std::string& command_line,
+      command_listener* listener = nullptr);
   ~raw() noexcept override;
-  raw& operator=(raw const& right);
-  command* clone() const override;
-  uint64_t run(std::string const& process_cmd,
+  raw(const raw&) = delete;
+  raw& operator=(const raw&) = delete;
+  uint64_t run(const std::string& process_cmd,
                nagios_macros& macros,
                uint32_t timeout) override;
-  void run(std::string const& process_cmd,
+  void run(const std::string& process_cmd,
            nagios_macros& macros,
            uint32_t timeout,
            result& res) override;

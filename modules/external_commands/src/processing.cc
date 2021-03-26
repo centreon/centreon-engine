@@ -576,9 +576,9 @@ processing::processing()
       CMD_PROCESS_FILE, &_redirector<&cmd_process_external_commands_from_file>);
 }
 
-processing::~processing() throw() {}
+processing::~processing() noexcept {}
 
-bool processing::execute(std::string const& cmdstr) const {
+bool processing::execute(const std::string& cmdstr) const {
   logger(dbg_functions, basic) << "processing external command";
 
   char const* cmd{cmdstr.c_str()};
