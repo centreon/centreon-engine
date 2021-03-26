@@ -349,18 +349,13 @@ void connector::finished(process& p) noexcept {
     // The connector is stop, restart it if necessary.
     if (_try_to_restart && !sigshutdown) {
       restart_connector();
-    } else /*if (sigshutdown)*/ {
+    }
+    // Connector probably quit without sending exit return.
+    else {
       _cv_query.notify_all();
       UNLOCK(lock);
-      // LOCK_GUARD(lck, _thread_m);
-      // _thread_action = stop;
-      // _thread_cv.notify_all();
     }
 
-    // Connector probably quit without sending exit return.
-    // else {
-    //   _cv_query.notify_all();
-    // }
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
         << "Error: Connector '" << _name
