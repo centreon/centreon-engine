@@ -3559,7 +3559,7 @@ void state::user(unsigned int key, std::string const& value) {
  */
 void state::use_aggressive_host_checking(bool value __attribute__((unused))) {
   logger(log_verification_error, basic)
-      << "Warning: service use_aggressive_host_checking is deprecated"
+      << "Warning: use_aggressive_host_checking is deprecated"
       << " This option will not be supported in 21.04.";
   ++config_warnings;
 }
