@@ -182,7 +182,6 @@ class host : public notifier {
   bool recovered() const override;
   int get_current_state_int() const override;
   std::string const& get_current_state_as_string() const override;
-  bool get_is_volatile() const override;
 
   // setters / getters
   std::string const& get_name() const;

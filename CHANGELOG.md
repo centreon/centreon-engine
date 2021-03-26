@@ -20,6 +20,22 @@ the timeperiod are now filtered for the contact
 and now don't push the notification with time period empty.
 these macro are now available without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
 
+*Connectors*
+
+When a Perl connector or an SSH connector is used, engine could crash when we
+stop it.
+
+When a connector is destroyed, a deadlock could appear while waiting its
+destruction.
+
+*Connector restart*
+
+If a connector stops working because of a crash or whatever else, it was not
+restarted automatically. It is fixed now.
+
+*Check commands*
+
+When many commands are running, engine could crash when we stop it.
 ## 20.10.2
 
 `January 20, 2021`

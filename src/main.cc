@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
           << "Copyright 1999-2009 Ethan Galstad\n"
           << "Copyright 2009-2010 Nagios Core Development Team and Community "
              "Contributors\n"
-          << "Copyright 2011-2018 Centreon\n"
+          << "Copyright 2011-2021 Centreon\n"
           << "\n"
           << "This program is free software: you can redistribute it and/or\n"
           << "modify it under the terms of the GNU General Public License "

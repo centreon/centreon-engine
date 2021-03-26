@@ -76,7 +76,7 @@ int check_for_external_commands() {
 
   /* process all commands found in the buffer */
   char* buffer(nullptr);
-  while (1) {
+  for (;;) {
     /* get a lock on the buffer */
     pthread_mutex_lock(&external_command_buffer.buffer_lock);
 

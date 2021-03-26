@@ -211,6 +211,16 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
+  now = 80000;
+  std::cout << "NOW = " << now << std::endl;
+  set_time(now);
+  oss.str("");
+  oss << '[' << now << ']'
+      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
+  cmd = oss.str();
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
   std::string out{testing::internal::GetCapturedStdout()};
   std::cout << out << std::endl;
   size_t step1{out.find("NOW = 32000")};
@@ -227,7 +237,6 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
 }
 
 TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
-
   init_macros();
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
