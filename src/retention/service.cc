@@ -18,11 +18,15 @@
 */
 
 #include "com/centreon/engine/retention/service.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include <array>
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/string.hh"
 
-using namespace com::centreon::engine;
+using com::centreon::engine::opt;
+using com::centreon::engine::map_customvar;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::retention;
 
 #define SETTER(type, method) \
@@ -1165,6 +1169,12 @@ bool service::_set_last_state_change(time_t value) {
  *  @param[in] value The new last_time_critical.
  */
 bool service::_set_last_time_critical(time_t value) {
+  time_t now = time(nullptr);
+  if (value > now) {
+    logger(log_runtime_warning, basic)
+        << "Warning: Service last time critical cannot be in the future (bad value: " << value << ")";
+    value = now;
+  }
   _last_time_critical = value;
   return true;
 }
@@ -1175,6 +1185,12 @@ bool service::_set_last_time_critical(time_t value) {
  *  @param[in] value The new last_time_ok.
  */
 bool service::_set_last_time_ok(time_t value) {
+  time_t now = time(nullptr);
+  if (value > now) {
+    logger(log_runtime_warning, basic)
+        << "Warning: Service last time ok cannot be in the future (bad value: " << value << ")";
+    value = now;
+  }
   _last_time_ok = value;
   return true;
 }
@@ -1185,6 +1201,12 @@ bool service::_set_last_time_ok(time_t value) {
  *  @param[in] value The new last_time_unknown.
  */
 bool service::_set_last_time_unknown(time_t value) {
+  time_t now = time(nullptr);
+  if (value > now) {
+    logger(log_runtime_warning, basic)
+        << "Warning: Service last time unknown cannot be in the future (bad value: " << value << ")";
+    value = now;
+  }
   _last_time_unknown = value;
   return true;
 }
@@ -1195,6 +1217,12 @@ bool service::_set_last_time_unknown(time_t value) {
  *  @param[in] value The new last_time_warning.
  */
 bool service::_set_last_time_warning(time_t value) {
+  time_t now = time(nullptr);
+  if (value > now) {
+    logger(log_runtime_warning, basic)
+        << "Warning: Service last time warning cannot be in the future (bad value: " << value << ")";
+    value = now;
+  }
   _last_time_warning = value;
   return true;
 }

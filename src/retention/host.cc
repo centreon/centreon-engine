@@ -21,8 +21,12 @@
 #include <array>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/logging.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
-using namespace com::centreon::engine;
+using com::centreon::engine::opt;
+using com::centreon::engine::map_customvar;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::retention;
 
 #define SETTER(type, method) &object::setter<host, type, &host::method>::generic
@@ -1091,6 +1095,12 @@ bool host::_set_last_state_change(time_t value) {
  *  @param[in] value The new last_time_down.
  */
 bool host::_set_last_time_down(time_t value) {
+  time_t now = time(nullptr);
+  if (value > now) {
+    logger(log_runtime_warning, basic)
+        << "Warning: Host last time down cannot be in the future (bad value: " << value << ")";
+    value = now;
+  }
   _last_time_down = value;
   return true;
 }
@@ -1101,6 +1111,12 @@ bool host::_set_last_time_down(time_t value) {
  *  @param[in] value The new last_time_unreachable.
  */
 bool host::_set_last_time_unreachable(time_t value) {
+  time_t now = time(nullptr);
+  if (value > now) {
+    logger(log_runtime_warning, basic)
+        << "Warning: Host last time unreachable cannot be in the future (bad value: " << value << ")";
+    value = now;
+  }
   _last_time_unreachable = value;
   return true;
 }
@@ -1111,6 +1127,12 @@ bool host::_set_last_time_unreachable(time_t value) {
  *  @param[in] value The new last_time_up.
  */
 bool host::_set_last_time_up(time_t value) {
+  time_t now = time(nullptr);
+  if (value > now) {
+    logger(log_runtime_warning, basic)
+        << "Warning: Host last time up cannot be in the future (bad value: " << value << ")";
+    value = now;
+  }
   _last_time_up = value;
   return true;
 }

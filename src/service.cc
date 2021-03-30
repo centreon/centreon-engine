@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cassert>
 #include "com/centreon/engine/service.hh"
 
 #include <iomanip>
@@ -148,6 +149,7 @@ time_t service::get_last_time_ok() const {
 }
 
 void service::set_last_time_ok(time_t last_time) {
+  assert(last_time < 2000000000);
   _last_time_ok = last_time;
 }
 
@@ -156,6 +158,7 @@ time_t service::get_last_time_warning() const {
 }
 
 void service::set_last_time_warning(time_t last_time) {
+  assert(last_time < 2000000000);
   _last_time_warning = last_time;
 }
 
@@ -164,6 +167,7 @@ time_t service::get_last_time_unknown() const {
 }
 
 void service::set_last_time_unknown(time_t last_time) {
+  assert(last_time < 2000000000);
   _last_time_unknown = last_time;
 }
 
@@ -172,6 +176,7 @@ time_t service::get_last_time_critical() const {
 }
 
 void service::set_last_time_critical(time_t last_time) {
+  assert(last_time < 2000000000);
   _last_time_critical = last_time;
 }
 

@@ -445,6 +445,7 @@ time_t host::get_last_time_down() const {
 }
 
 void host::set_last_time_down(time_t last_time) {
+  assert(last_time < 2000000000);
   _last_time_down = last_time;
 }
 
@@ -453,6 +454,7 @@ time_t host::get_last_time_unreachable() const {
 }
 
 void host::set_last_time_unreachable(time_t last_time) {
+  assert(last_time < 2000000000);
   _last_time_unreachable = last_time;
 }
 
@@ -461,6 +463,7 @@ time_t host::get_last_time_up() const {
 }
 
 void host::set_last_time_up(time_t last_time) {
+  assert(last_time < 2000000000);
   _last_time_up = last_time;
 }
 
