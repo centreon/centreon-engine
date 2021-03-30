@@ -17,20 +17,31 @@
  *
  */
 
+#include <gtest/gtest.h>
 #include <com/centreon/clib.hh>
+#include <com/centreon/engine/broker/loader.hh>
 #include <com/centreon/engine/checks/checker.hh>
+#include <com/centreon/engine/configuration/applier/command.hh>
+#include <com/centreon/engine/configuration/applier/contact.hh>
 #include <com/centreon/engine/configuration/applier/host.hh>
+#include <com/centreon/engine/configuration/applier/hostgroup.hh>
+#include <com/centreon/engine/configuration/applier/service.hh>
+#include <com/centreon/engine/configuration/applier/servicegroup.hh>
 #include <com/centreon/engine/configuration/applier/state.hh>
+#include <com/centreon/engine/configuration/applier/timeperiod.hh>
 #include <com/centreon/engine/configuration/parser.hh>
 #include <com/centreon/engine/hostescalation.hh>
+#include <com/centreon/engine/macros.hh>
 #include <com/centreon/engine/macros/grab_host.hh>
 #include <com/centreon/engine/macros/process.hh>
-#include <com/centreon/engine/macros.hh>
 #include <com/centreon/engine/timezone_manager.hh>
-#include <com/centreon/engine/broker/loader.hh>
 #include <fstream>
-#include <gtest/gtest.h>
 #include "../timeperiod/utils.hh"
+#include "com/centreon/engine/configuration/applier/command.hh"
+#include "com/centreon/engine/configuration/applier/contactgroup.hh"
+#include "com/centreon/engine/configuration/applier/timeperiod.hh"
+#include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -151,4 +162,104 @@ TEST_F(Macro, TimeT) {
   nagios_macros* mac(get_global_macros());
   process_macros_r(mac, "$TIMET:test_host$", out, 0);
   ASSERT_EQ(out, "500000000");
+}
+
+TEST_F(Macro, HostGroupName) {
+  configuration::applier::hostgroup hg_aply;
+  configuration::applier::host hst_aply;
+  configuration::hostgroup hg;
+  configuration::host hst_a;
+  configuration::host hst_c;
+
+  ASSERT_TRUE(hst_a.parse("host_name", "a"));
+  ASSERT_TRUE(hst_a.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst_a.parse("_HOST_ID", "1"));
+
+  ASSERT_TRUE(hst_c.parse("host_name", "c"));
+  ASSERT_TRUE(hst_c.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst_c.parse("_HOST_ID", "2"));
+
+  hst_aply.add_object(hst_a);
+  hst_aply.add_object(hst_c);
+
+  ASSERT_TRUE(hg.parse("hostgroup_name", "temphg"));
+  ASSERT_TRUE(hg.parse("members", "a,c"));
+  ASSERT_NO_THROW(hg_aply.add_object(hg));
+
+  ASSERT_NO_THROW(hst_aply.expand_objects(*config));
+  ASSERT_NO_THROW(hst_aply.expand_objects(*config));
+  ASSERT_NO_THROW(hg_aply.expand_objects(*config));
+
+  ASSERT_NO_THROW(hst_aply.resolve_object(hst_a));
+  ASSERT_NO_THROW(hst_aply.resolve_object(hst_c));
+  ASSERT_NO_THROW(hg_aply.resolve_object(hg));
+
+  int now{500000000};
+  set_time(now);
+  init_macros();
+
+  std::string out;
+  nagios_macros* mac(get_global_macros());
+  process_macros_r(mac, "$HOSTGROUPNAME:a$", out, 1);
+  ASSERT_EQ(out, "temphg");
+}
+
+TEST_F(Macro, ServiceGroupName) {
+  configuration::applier::host aply_hst;
+  configuration::applier::service aply_svc;
+  configuration::applier::servicegroup aply_grp;
+  configuration::servicegroup grp("test_group");
+  configuration::host hst;
+  ASSERT_TRUE(hst.parse("host_name", "test_host"));
+  ASSERT_TRUE(hst.parse("address", "127.0.0.1"));
+  ASSERT_TRUE(hst.parse("_HOST_ID", "12"));
+  aply_hst.add_object(hst);
+  configuration::service svc;
+  ASSERT_TRUE(svc.parse("service_description", "test"));
+  ASSERT_TRUE(svc.parse("hosts", "test_host"));
+  ASSERT_TRUE(svc.parse("service_id", "18"));
+  ASSERT_TRUE(svc.parse("check_command", "cmd"));
+  // We fake here the expand_object on configuration::service
+  svc.set_host_id(12);
+  aply_svc.add_object(svc);
+  ASSERT_TRUE(svc.parse("servicegroups", "test_group"));
+  grp.parse("members", "test_host,test");
+  aply_grp.add_object(grp);
+  aply_grp.expand_objects(*config);
+  ASSERT_NO_THROW(aply_grp.resolve_object(grp));
+
+  init_macros();
+  int now{500000000};
+  set_time(now);
+
+  std::string out;
+  nagios_macros* mac(get_global_macros());
+  process_macros_r(mac, "$SERVICEGROUPNAME:test_host:test$", out, 1);
+  ASSERT_EQ(out, "test_group");
+}
+
+TEST_F(Macro, ContactGroupName) {
+  configuration::applier::contact ct_aply;
+  configuration::contact ctct;
+  configuration::applier::contactgroup cg_aply;
+  configuration::contactgroup cg;
+
+  ctct.parse("contact_name", "test_contact");
+  ct_aply.add_object(ctct);
+
+  cg.parse("contactgroup_name", "test_cg");
+  cg.parse("alias", "test_cg");
+  cg.parse("members", "test_contact");
+  cg_aply.add_object(cg);
+  cg_aply.expand_objects(*config);
+  cg_aply.resolve_object(cg);
+
+  init_macros();
+  int now{500000000};
+  set_time(now);
+
+  std::string out;
+  nagios_macros* mac(get_global_macros());
+  process_macros_r(mac, "$CONTACTGROUPNAME:test_contact$", out, 1);
+  ASSERT_EQ(out, "test_cg");
 }
