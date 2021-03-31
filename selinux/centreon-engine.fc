@@ -1,0 +1,2 @@
+/usr/sbin/centengine    --	gen_context(system_u:object_r:centreon_engine_exec_t,s0)
+/var/lib/centreon-engine(/.*)?  gen_context(system_u:object_r:centreon_engine_t,s0)
